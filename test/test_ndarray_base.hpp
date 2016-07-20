@@ -7,7 +7,7 @@
 #include "ndarray/ndindex.hpp"
 #include "test_utils.hpp"
 
-namespace ndarray
+namespace qs
 {
     struct layout_result
     {

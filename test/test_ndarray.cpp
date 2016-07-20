@@ -2,7 +2,7 @@
 #include "ndarray/ndarray.hpp"
 #include "test_ndarray_base.hpp"
 
-namespace ndarray
+namespace qs
 {
     TEST(ndarray, reshape)
     {

@@ -4,7 +4,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace ndarray
+namespace qs
 {
 
     template <class C>

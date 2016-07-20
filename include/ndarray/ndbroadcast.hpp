@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include "ndindex.hpp"
 
-namespace ndarray
+namespace qs
 {
 
     template <class S, size_t N>

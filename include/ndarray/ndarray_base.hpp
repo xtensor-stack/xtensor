@@ -5,7 +5,7 @@
 #include "ndindex.hpp"
 #include "ndbroadcast.hpp"
 
-namespace ndarray
+namespace qs
 {
 
     enum class layout
@@ -228,7 +228,7 @@ namespace ndarray
     template <class D>
     inline bool ndarray_base<D>::broadcast_shape(shape_type& shape) const
     {
-        return ndarray::broadcast_shape(m_shape, shape);
+        return qs::broadcast_shape(m_shape, shape);
     }
 
     template <class D>

@@ -6,7 +6,7 @@
 #include <iterator>
 #include <iostream>
 
-namespace ndarray
+namespace qs
 {
     template <class S>
     void print_vector(const std::vector<S>& data)

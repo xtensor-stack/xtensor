@@ -4,7 +4,7 @@
 #include <utility>
 #include "ndarray_base.hpp"
 
-namespace ndarray
+namespace qs
 {
 
     /*************************
