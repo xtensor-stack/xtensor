@@ -54,13 +54,14 @@ set(NDARRAY_HEADERS
     include/ndarray/ndarray.hpp
     include/ndarray/ndarray_base.hpp
     include/ndarray/ndindex.hpp
+    include/ndarray/ndutils.hpp
 )
 
 set(NDARRAY_TESTS
     test/main.cpp
     test/test_ndarray.cpp
     test/test_ndarray_base.hpp
-    test/test_utils.hpp
+    test/test_ndutils.cpp
 )
 
 add_executable(${NDARRAY_TARGET} ${NDARRAY_TESTS} ${NDARRAY_HEADERS})

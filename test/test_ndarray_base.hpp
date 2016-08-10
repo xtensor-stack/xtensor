@@ -5,7 +5,6 @@
 #include <vector>
 #include <algorithm>
 #include "ndarray/ndindex.hpp"
-#include "test_utils.hpp"
 
 namespace qs
 {
