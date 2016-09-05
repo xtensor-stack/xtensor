@@ -18,9 +18,11 @@ namespace qs
     template <class F, class... T>
     void for_each(F&& f, std::tuple<T...>& t);
 
-
     template <class F, class... Args>
     void for_each_arg(F&&, Args&&...);
+
+    template <class F, class R, class... Args>
+    R accumulate_arg(F&& f, T init, Args&&... args);
 
 
     /********************
@@ -71,13 +73,13 @@ namespace qs
 
     namespace detail
     {
-        template <class F, class... T, size_t I>
+        template <class... T, class F, size_t I>
         inline typename std::enable_if<I == sizeof...(T), void>::type
-        for_each_impl(F&&, std::tuple<T...>& t)
+        for_each_impl(F&& f, std::tuple<T...>& t)
         {
         }
 
-        template <class F, class... T, size_t I>
+        template <class... T, class F, size_t I>
         inline typename std::enable_if<I < sizeof...(T), void>::type
         for_each_impl(F&& f, std::tuple<T...>& t)
         {
@@ -89,13 +91,13 @@ namespace qs
     template <class F, class... T>
     inline void for_each(F&& f, std::tuple<T...>& t)
     {
-        detail::for_each_impl<T..., F, 0>(std::forward<F>(f), f);
+        detail::for_each_impl<T..., F, 0>(std::forward<F>(f), t);
     }
 
 
-    /********************************
-     * for_each on parameter pack
-     ********************************/
+    /*********************************
+     * for_each_arg implementation
+     *********************************/
 
     namespace detail
     {
@@ -130,6 +132,46 @@ namespace qs
     inline void for_each_arg(F&& f, Args&&... args)
     {
         detail::for_each_arg_impl(std::forward<F>(f), make_index_sequence<sizeof...(Args)>(), std::forward<Args>(args)...);
+    }
+
+
+    /***********************************
+     * accumulate_arg implementation
+     ***********************************/
+
+    namespace detail
+    {
+        template <size_t I, size_t N>
+        struct accumulator : accumulator<I+1, N>
+        {
+            using base_type = accumulator<I+1, N>;
+
+            template <class F, class R, class T, class... Args>
+            inline R apply(F&& f, R r, T&& t, Args&&... args) const
+            {
+                R r = f(r, std::forward<T>(t));
+                r = base_type::apply(std::forward<F>(f), r, std::forward<Args>(args)...);
+                return r;
+            }
+        };
+
+        template <size_t N>
+        struct accumulator<N, N>
+        {
+
+            template <class F, class R, class T>
+            inline R apply(F&& f, R r, T&& t)
+            {
+                return f(r, std::forward<T>(t));
+            }
+        };
+    }
+
+    template <class F, class R, class... Args>
+    inline R accumulate_arg(F&& f, R init, Args&&... args)
+    {
+        detail::accumulator<1, sizeof...(Args)> ac;
+        return ac.apply(std::forward<F>(f), init, std::forward<Args>(args)...);
     }
 
 }
