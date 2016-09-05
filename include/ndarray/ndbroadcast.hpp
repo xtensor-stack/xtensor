@@ -16,7 +16,7 @@ namespace qs
      *************************/
 
     template <class S, size_t N>
-    S broadcast_dim(std::array<std::array<S, N>& dim_list);
+    S broadcast_dim(std::array<S, N>& dim_list);
 
     template <class S>
     bool broadcast_shape(const array_shape<S>& input, array_shape<S>& output);

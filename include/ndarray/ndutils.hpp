@@ -22,7 +22,7 @@ namespace qs
     void for_each_arg(F&&, Args&&...);
 
     template <class F, class R, class... Args>
-    R accumulate_arg(F&& f, T init, Args&&... args);
+    R accumulate_arg(F&& f, R init, Args&&... args);
 
 
     /********************
@@ -149,9 +149,9 @@ namespace qs
             template <class F, class R, class T, class... Args>
             inline R apply(F&& f, R r, T&& t, Args&&... args) const
             {
-                R r = f(r, std::forward<T>(t));
-                r = base_type::apply(std::forward<F>(f), r, std::forward<Args>(args)...);
-                return r;
+                R res = f(r, std::forward<T>(t));
+                res = base_type::apply(std::forward<F>(f), res, std::forward<Args>(args)...);
+                return res;
             }
         };
 
