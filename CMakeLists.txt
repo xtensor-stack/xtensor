@@ -13,10 +13,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 
     if (HAS_CPP14_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
-    elseif (HAS_CPP11_FLAG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
     else()
-        message(FATAL_ERROR "Unsupported compiler -- ndarray requires C++11 support!")
+        message(FATAL_ERROR "Unsupported compiler -- ndarray requires C++14 support!")
     endif()
 
     # Enable link time optimization and set the default symbol
@@ -50,10 +48,13 @@ include_directories(${GTEST_INCLUDE_DIRS})
 set(NDARRAY_TARGET test_ndarray)
 
 set(NDARRAY_HEADERS
-    include/ndarray/ndbroadcast.hpp
     include/ndarray/ndarray.hpp
     include/ndarray/ndarray_base.hpp
+    include/ndarray/ndbroadcast.hpp
+    include/ndarray/ndexpression.hpp
     include/ndarray/ndindex.hpp
+    include/ndarray/ndoperation.hpp
+    include/ndarray/ndoperation_expression.hpp
     include/ndarray/ndutils.hpp
 )
 

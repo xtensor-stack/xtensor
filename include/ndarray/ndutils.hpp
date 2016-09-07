@@ -160,7 +160,7 @@ namespace qs
         {
 
             template <class F, class R, class T>
-            inline R apply(F&& f, R r, T&& t)
+            inline R apply(F&& f, R r, T&& t) const
             {
                 return f(r, std::forward<T>(t));
             }
