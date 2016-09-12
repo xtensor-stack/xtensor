@@ -25,18 +25,18 @@ namespace qs
      * Unary operation on a ndexpression
      ***************************************/
 
-    template <class E, class F>
-    class ndunary : public ndexpression<ndunary<E, F>>
+    template <class F, class E>
+    class ndunary : public ndexpression<ndunary<F, E>>
     {
 
     public:
 
-        using self_type = ndunary<E, F>;
+        using self_type = ndunary<F, E>;
         using functor_type = F;
         
-        using value_type = typename functor_type::value_type;
+        using value_type = typename functor_type::result_type;
         using const_reference = value_type;
-        using const_pointer = typename E::const_pointer;
+        using const_pointer = const value_type*;
         using size_type = typename E::size_type;
         using difference_type = typename E::difference_type;
 
@@ -46,7 +46,7 @@ namespace qs
         using closure_type = const self_type;
 
         using subiterator_type = typename E::const_iterator;
-        using const_iterator = ndunary_iterator<E, F>;
+        using const_iterator = ndunary_iterator<F, E>;
 
         inline ndunary(const E& e) : m_e(e)
         {
@@ -73,21 +73,21 @@ namespace qs
         expression_closure_type m_e;
     };
 
-    template <class E, template <class> class F>
-    using ndunary_op = ndunary<E, F<typename E::value_type>>;
+    template <template <class> class F, class E>
+    using ndunary_op = ndunary<F<typename E::value_type>, E>;
 
 
     /******************************************
      * Binary operation on two ndexpression
      ******************************************/
 
-    template <class E1, class E2, class F>
-    class ndbinary : public ndexpression<ndbinary<E1, E2, F>>
+    template <class F, class E1, class E2>
+    class ndbinary : public ndexpression<ndbinary<F, E1, E2>>
     {
 
     public:
 
-        using self_type = ndbinary<E1, E2, F>;
+        using self_type = ndbinary<F, E1, E2>;
         using functor_type = F;
 
         using value_type = typename functor_type::result_type;
@@ -104,7 +104,7 @@ namespace qs
 
         using subiterator1_type = typename E1::const_iterator;
         using subiterator2_type = typename E2::const_iterator;
-        using const_iterator = ndbinary_iterator<E1, E2, F>;
+        using const_iterator = ndbinary_iterator<F, E1, E2>;
 
         inline ndbinary(const E1& e1, const E2& e2)
             : m_e1(e1), m_e2(e2)
@@ -129,8 +129,8 @@ namespace qs
         expression2_closure_type m_e2;
     };
 
-    template <class E1, class E2, template <class, class> class F>
-    using ndbinary_op = ndbinary<E1, E2, F<typename E1::value_type, typename E2::value_type>>;
+    template <template <class, class> class F, class E1, class E2>
+    using ndbinary_op = ndbinary<F<typename E1::value_type, typename E2::value_type>, E1, E2>;
 
 }
 
