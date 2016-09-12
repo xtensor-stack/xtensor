@@ -1,7 +1,7 @@
 #ifndef NDOPERATION_HPP
 #define NDOPERATION_HPP
 
-#include "ndoperation_expression.hpp"
+#include "ndfunction.hpp"
 
 namespace qs
 {

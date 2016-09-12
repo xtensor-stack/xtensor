@@ -1,5 +1,5 @@
-#ifndef NDOPERATION_EXPRESSION_HPP
-#define NDOPERATION_EXPRESSION_HPP
+#ifndef NDFUNCTION_HPP
+#define NDFUNCTION_HPP
 
 #include <type_traits>
 #include "ndutils.hpp"

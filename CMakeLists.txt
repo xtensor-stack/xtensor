@@ -55,7 +55,7 @@ set(NDARRAY_HEADERS
     include/ndarray/ndexpression.hpp
     include/ndarray/ndindex.hpp
     include/ndarray/ndoperation.hpp
-    include/ndarray/ndoperation_expression.hpp
+    include/ndarray/ndfunction.hpp
     include/ndarray/ndutils.hpp
 )
 
