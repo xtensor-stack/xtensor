@@ -41,6 +41,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 endif()
 
 find_package(GTest REQUIRED)
+find_package(Threads)
 
 include_directories(include)
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -66,5 +67,5 @@ set(NDARRAY_TESTS
 )
 
 add_executable(${NDARRAY_TARGET} ${NDARRAY_TESTS} ${NDARRAY_HEADERS})
-target_link_libraries(${NDARRAY_TARGET} ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(${NDARRAY_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
