@@ -76,7 +76,7 @@ namespace qs
     template <class V, class R>
     bool compare_shape(V& vec, const R& result)
     {
-        return (vec.nb_dim() == result.m_shape.size()) &&
+        return (vec.dimension() == result.m_shape.size()) &&
                (vec.shape() == result.m_shape) &&
                (vec.strides() == result.m_strides) &&
                (vec.size() == result.m_data.size());

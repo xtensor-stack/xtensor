@@ -174,6 +174,35 @@ namespace qs
         return ac.apply(std::forward<F>(f), init, std::forward<Args>(args)...);
     }
 
+    /*************************************
+     * Accumulate tuples
+     ***********************************/
+
+    namespace detail
+    {
+        template <size_t I, class F, class R, class... T>
+        inline std::enable_if_t<I == sizeof...(T), R>
+        accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
+        {
+            return init;
+        }
+
+        template <size_t I, class F, class R, class... T>
+        inline std::enable_if_t<I < sizeof...(T), R>
+        accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
+        {
+            R res = f(init, std::get<I>(t));
+            return accumulate_impl<I + 1, F, R, T...>(std::forward<F>(f), res, t);
+        }
+    }
+
+
+    template <class F, class R, class... T>
+    inline R accumulate(F&& f, R init, const std::tuple<T...>& t)
+    {
+        return detail::accumulate_impl<0, F, R, T...>(f, init, t);
+    }
+
 }
 
 #endif

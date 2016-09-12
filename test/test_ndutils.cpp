@@ -46,5 +46,12 @@ namespace qs
         for_each_arg(fn, a, b, c, d);
         ASSERT_TRUE(a == fn.a && b == fn.b && c == fn.c && d == fn.d);
     }
+
+    TEST(ndutils, accumulate)
+    {
+        auto func = [](int i, int j) { return i + j; };
+        const std::tuple<int, int, int> t(3, 4, 1);
+        ASSERT_TRUE(accumulate(func, 0, t) == 8);
+    }
 }
 

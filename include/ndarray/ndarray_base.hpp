@@ -42,7 +42,7 @@ namespace qs
 
         size_type size() const;
 
-        size_type nb_dim() const;
+        size_type dimension() const;
         size_type size(size_type dim) const;
 
         const shape_type& shape() const;
@@ -141,7 +141,7 @@ namespace qs
     }
 
     template <class D>
-    inline auto ndarray_base<D>::nb_dim() const -> size_type
+    inline auto ndarray_base<D>::dimension() const -> size_type
     {
         return m_shape.size();
     }

@@ -82,50 +82,50 @@ namespace qs
      ***************/
 
     template <class E>
-    inline ndunary_op<plus_functor, E>
+    inline ndfunction_op<plus_functor, E>
     operator+(const ndexpression<E>& e) noexcept
     {
-        using type = ndunary_op<plus_functor, E>;
+        using type = ndfunction_op<plus_functor, E>;
         return type(e());
     }
 
     template <class E>
-    inline ndunary_op<minus_functor, E>
+    inline ndfunction_op<minus_functor, E>
     operator-(const ndexpression<E>& e) noexcept
     {
-        using type = ndunary_op<minus_functor, E>;
+        using type = ndfunction_op<minus_functor, E>;
         return type(e());
     }
 
     template <class E1, class E2>
-    inline ndbinary_op<add_functor, E1, E2>
+    inline ndfunction_op<add_functor, E1, E2>
     operator+(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
     {
-        using type = ndbinary_op<add_functor, E1, E2>;
+        using type = ndfunction_op<add_functor, E1, E2>;
         return type(e1(), e2());
     }
 
     template <class E1, class E2>
-    inline ndbinary_op<sub_functor, E1, E2>
+    inline ndfunction_op<sub_functor, E1, E2>
     operator-(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
     {
-        using type = ndbinary_op<sub_functor, E1, E2>;
+        using type = ndfunction_op<sub_functor, E1, E2>;
         return type(e1(), e2());
     }
 
     template <class E1, class E2>
-    inline ndbinary_op<mul_functor, E1, E2>
+    inline ndfunction_op<mul_functor, E1, E2>
     operator*(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
     {
-        using type = ndbinary_op<mul_functor, E1, E2>;
+        using type = ndfunction_op<mul_functor, E1, E2>;
         return type(e1(), e2());
     }
 
     template <class E1, class E2>
-    inline ndbinary_op<div_functor, E1, E2>
+    inline ndfunction_op<div_functor, E1, E2>
     operator/(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
     {
-        using type = ndbinary_op<div_functor, E1, E2>;
+        using type = ndfunction_op<div_functor, E1, E2>;
         return type(e1(), e2());
     }
 
