@@ -73,25 +73,25 @@ namespace qs
 
     namespace detail
     {
-        template <class... T, class F, size_t I>
+        template <size_t I, class F, class... T>
         inline typename std::enable_if<I == sizeof...(T), void>::type
         for_each_impl(F&& f, std::tuple<T...>& t)
         {
         }
 
-        template <class... T, class F, size_t I>
+        template <size_t I, class F, class... T>
         inline typename std::enable_if<I < sizeof...(T), void>::type
         for_each_impl(F&& f, std::tuple<T...>& t)
         {
             f(std::get<I>(t));
-            for_each_impl<T..., F, I+1>(std::forward<F>(f), t);
+            for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
         }
     }
 
     template <class F, class... T>
     inline void for_each(F&& f, std::tuple<T...>& t)
     {
-        detail::for_each_impl<T..., F, 0>(std::forward<F>(f), t);
+        detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
 
 

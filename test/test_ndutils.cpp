@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "ndarray/ndutils.hpp"
 #include <type_traits>
+#include <tuple>
 
 namespace qs
 {
@@ -47,6 +48,17 @@ namespace qs
         ASSERT_TRUE(a == fn.a && b == fn.b && c == fn.c && d == fn.d);
     }
 
+    TEST(ndutils, for_each)
+    {
+        for_each_fn fn;
+        short a = 1;
+        int b = 4;
+        float c = 1.2;
+        double d = 2.3;
+        auto t = std::make_tuple(a, b, c, d);
+        for_each(fn, t);
+        ASSERT_TRUE(a == fn.a && b == fn.b && c == fn.c && d == fn.d);
+    }
     TEST(ndutils, accumulate)
     {
         auto func = [](int i, int j) { return i + j; };
