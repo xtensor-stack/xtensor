@@ -17,7 +17,7 @@ namespace qs
     using array_strides = std::vector<S>;
 
     template <class S, class... Args>
-    S data_offset(const array_strides<S>& str, Args... args);
+    S data_offset(const array_strides<S>& strides, Args... args);
 
     template <class S>
     S data_size(const array_shape<S>& s);
@@ -30,22 +30,22 @@ namespace qs
     namespace detail
     {
         template <class S>
-        inline S data_offset_impl(const array_strides<S>& str, S i)
+        inline S data_offset_impl(const array_strides<S>& strides, S i)
         {
-            return i * str.back();
+            return i * strides.back();
         }
 
         template <class S, class... Args>
-        inline S data_offset_impl(const array_strides<S>& str, S i, Args... args)
+        inline S data_offset_impl(const array_strides<S>& strides, S i, Args... args)
         {
-            return i * str[str.size() - sizeof...(args) - 1] + data_offset_impl(str, args...);
+            return i * strides[strides.size() - sizeof...(args) - 1] + data_offset_impl(strides, args...);
         }
     }
 
     template <class S, class... Args>
-    inline S data_offset(const array_strides<S>& str, Args... args)
+    inline S data_offset(const array_strides<S>& strides, Args... args)
     {
-        return detail::data_offset_impl(str, static_cast<S>(args)...);
+        return detail::data_offset_impl(strides, static_cast<S>(args)...);
     }
 
     template <class S>
