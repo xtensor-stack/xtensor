@@ -1,11 +1,11 @@
 #include "gtest/gtest.h"
-#include "ndarray/ndutils.hpp"
+#include "xarray/utils.hpp"
 #include <type_traits>
 #include <tuple>
 
 namespace qs
 {
-    TEST(ndutils, make_index_seqence)
+    TEST(utils, make_index_seqence)
     {
         static_assert(std::is_same<make_index_sequence<3>, index_sequence<0,1,2>>::value,
                       "index sequences mismatch");
@@ -37,7 +37,7 @@ namespace qs
         }
     };
 
-    TEST(ndutils, for_each_arg)
+    TEST(utils, for_each_arg)
     {
         for_each_fn fn;
         short a = 1;
@@ -48,7 +48,7 @@ namespace qs
         ASSERT_TRUE(a == fn.a && b == fn.b && c == fn.c && d == fn.d);
     }
 
-    TEST(ndutils, for_each)
+    TEST(utils, for_each)
     {
         for_each_fn fn;
         short a = 1;
@@ -59,7 +59,8 @@ namespace qs
         for_each(fn, t);
         ASSERT_TRUE(a == fn.a && b == fn.b && c == fn.c && d == fn.d);
     }
-    TEST(ndutils, accumulate)
+
+    TEST(utils, accumulate)
     {
         auto func = [](int i, int j) { return i + j; };
         const std::tuple<int, int, int> t(3, 4, 1);

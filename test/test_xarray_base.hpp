@@ -1,10 +1,10 @@
-#ifndef TEST_NDARRAY_BASE_HPP
-#define TEST_NDARRAY_BASE_HPP
+#ifndef TEST_XARRAY_BASE_HPP
+#define TEST_XARRAY_BASE_HPP
 
 #include <iostream>
 #include <vector>
 #include <algorithm>
-#include "ndarray/ndindex.hpp"
+#include "xarray/xindex.hpp"
 
 namespace qs
 {
@@ -83,7 +83,7 @@ namespace qs
     }
 
     template <class V>
-    bool test_ndarray_reshape(V& vec)
+    bool test_xarray_reshape(V& vec)
     {
         row_major_result rm;
         vec.reshape(rm.m_shape, layout::row_major);
@@ -101,7 +101,7 @@ namespace qs
     }
 
     template <class V>
-    bool test_ndarray_iterator(V& vec)
+    bool test_xarray_iterator(V& vec)
     {
         using result_type = central_major_result;
         using vector_type = result_type::vector_type;
@@ -153,7 +153,7 @@ namespace qs
     }
 
     template <class V>
-    bool test_ndarray_access(V& vec)
+    bool test_xarray_access(V& vec)
     {
         row_major_result rm;
         vec.reshape(rm.m_shape, layout::row_major);
@@ -174,7 +174,7 @@ namespace qs
     }
 
     template <class V>
-    bool test_ndarray_broadcast(V& vec)
+    bool test_xarray_broadcast(V& vec)
     {
         using shape_type = typename V::shape_type;
 

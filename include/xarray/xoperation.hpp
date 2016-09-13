@@ -1,7 +1,7 @@
-#ifndef NDOPERATION_HPP
-#define NDOPERATION_HPP
+#ifndef XOPERATION_HPP
+#define XOPERATION_HPP
 
-#include "ndfunction.hpp"
+#include "xfunction.hpp"
 
 namespace qs
 {
@@ -82,50 +82,50 @@ namespace qs
      ***************/
 
     template <class E>
-    inline ndfunction_op<plus_functor, E>
-    operator+(const ndexpression<E>& e) noexcept
+    inline xfunction_op<plus_functor, E>
+    operator+(const xexpression<E>& e) noexcept
     {
-        using type = ndfunction_op<plus_functor, E>;
+        using type = xfunction_op<plus_functor, E>;
         return type(e());
     }
 
     template <class E>
-    inline ndfunction_op<minus_functor, E>
-    operator-(const ndexpression<E>& e) noexcept
+    inline xfunction_op<minus_functor, E>
+    operator-(const xexpression<E>& e) noexcept
     {
-        using type = ndfunction_op<minus_functor, E>;
+        using type = xfunction_op<minus_functor, E>;
         return type(e());
     }
 
     template <class E1, class E2>
-    inline ndfunction_op<add_functor, E1, E2>
-    operator+(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
+    inline xfunction_op<add_functor, E1, E2>
+    operator+(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
-        using type = ndfunction_op<add_functor, E1, E2>;
+        using type = xfunction_op<add_functor, E1, E2>;
         return type(e1(), e2());
     }
 
     template <class E1, class E2>
-    inline ndfunction_op<sub_functor, E1, E2>
-    operator-(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
+    inline xfunction_op<sub_functor, E1, E2>
+    operator-(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
-        using type = ndfunction_op<sub_functor, E1, E2>;
+        using type = xfunction_op<sub_functor, E1, E2>;
         return type(e1(), e2());
     }
 
     template <class E1, class E2>
-    inline ndfunction_op<mul_functor, E1, E2>
-    operator*(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
+    inline xfunction_op<mul_functor, E1, E2>
+    operator*(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
-        using type = ndfunction_op<mul_functor, E1, E2>;
+        using type = xfunction_op<mul_functor, E1, E2>;
         return type(e1(), e2());
     }
 
     template <class E1, class E2>
-    inline ndfunction_op<div_functor, E1, E2>
-    operator/(const ndexpression<E1>& e1, const ndexpression<E2>& e2) noexcept
+    inline xfunction_op<div_functor, E1, E2>
+    operator/(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
-        using type = ndfunction_op<div_functor, E1, E2>;
+        using type = xfunction_op<div_functor, E1, E2>;
         return type(e1(), e2());
     }
 

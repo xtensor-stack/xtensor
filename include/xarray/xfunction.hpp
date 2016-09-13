@@ -1,10 +1,10 @@
-#ifndef NDFUNCTION_HPP
-#define NDFUNCTION_HPP
+#ifndef XFUNCTION_HPP
+#define XFUNCTION_HPP
 
 #include <type_traits>
-#include "ndutils.hpp"
-#include "ndarray_expression.hpp"
-#include "ndbroadcast.hpp"
+#include "utils.hpp"
+#include "xarray_expression.hpp"
+#include "broadcast.hpp"
 
 namespace qs
 {
@@ -26,12 +26,12 @@ namespace qs
     }
 
     template <class F, class... E>
-    class ndfunction : public ndexpression<ndfunction<F, E...>>
+    class xfunction : public xexpression<xfunction<F, E...>>
     {
 
     public:
 
-        using self_type = ndfunction<F, E...>;
+        using self_type = xfunction<F, E...>;
         using functor_type = F;
 
         using value_type = typename functor_type::result_type;
@@ -43,9 +43,9 @@ namespace qs
         using shape_type = array_shape<size_type>;
         using closure_type = const self_type;
 
-        using const_iterator = ndfunction_iterator<F, E...>;
+        using const_iterator = xfunction_iterator<F, E...>;
 
-        inline ndfunction(const E&...e)
+        inline xfunction(const E&...e)
             : m_e(e...)  // m_e(wrap_scalar(e)...)
         {
         }
@@ -68,7 +68,7 @@ namespace qs
     };
 
     template <template <class, class> class F, class... E>
-    using ndfunction_op = ndfunction<F<typename E::value_type...>, E...>;
+    using xfunction_op = xfunction<F<typename E::value_type...>, E...>;
 
 }
 

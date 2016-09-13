@@ -1,5 +1,5 @@
-#ifndef NDINDEX_HPP
-#define NDINDEX_HPP
+#ifndef XINDEX_HPP
+#define XINDEX_HPP
 
 #include <vector>
 #include <algorithm>

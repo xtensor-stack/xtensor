@@ -1,9 +1,9 @@
-#ifndef NDARRAY_BASE_HPP
-#define NDARRAY_BASE_HPP
+#ifndef XARRAY_BASE_HPP
+#define XARRAY_BASE_HPP
 
 #include <functional>
-#include "ndindex.hpp"
-#include "ndbroadcast.hpp"
+#include "xindex.hpp"
+#include "broadcast.hpp"
 
 namespace qs
 {
@@ -15,7 +15,7 @@ namespace qs
     };
 
     template <class D>
-    class ndarray_base
+    class xarray_base
     {
 
     public:
@@ -80,19 +80,19 @@ namespace qs
 
     protected:
 
-        ndarray_base() = default;
-        ndarray_base(const shape_type& shape, layout l);
-        ndarray_base(const shape_type& shape, const_reference value, layout l);
-        ndarray_base(const shape_type& shape, const strides_type& strides);
-        ndarray_base(const shape_type& shape, const strides_type& strides, const_reference value);
+        xarray_base() = default;
+        xarray_base(const shape_type& shape, layout l);
+        xarray_base(const shape_type& shape, const_reference value, layout l);
+        xarray_base(const shape_type& shape, const strides_type& strides);
+        xarray_base(const shape_type& shape, const strides_type& strides, const_reference value);
 
-        ~ndarray_base() = default;
+        ~xarray_base() = default;
 
-        ndarray_base(const ndarray_base&) = default;
-        ndarray_base& operator=(const ndarray_base&) = default;
+        xarray_base(const xarray_base&) = default;
+        xarray_base& operator=(const xarray_base&) = default;
 
-        ndarray_base(ndarray_base&&) = default;
-        ndarray_base& operator=(ndarray_base&&) = default;
+        xarray_base(xarray_base&&) = default;
+        xarray_base& operator=(xarray_base&&) = default;
 
     private:
 
@@ -102,18 +102,18 @@ namespace qs
 
 
     /****************************
-     * ndarray_base implementation
+     * xarray_base implementation
      ****************************/
 
     template <class D>
-    inline ndarray_base<D>::ndarray_base(const shape_type& shape, layout l)
+    inline xarray_base<D>::xarray_base(const shape_type& shape, layout l)
         : m_shape(0), m_strides(0)
     {
         reshape(shape, l);
     }
 
     template <class D>
-    inline ndarray_base<D>::ndarray_base(const shape_type& shape, const_reference value, layout l)
+    inline xarray_base<D>::xarray_base(const shape_type& shape, const_reference value, layout l)
         : m_shape(0), m_strides(0)
     {
         reshape(shape, l);
@@ -121,51 +121,51 @@ namespace qs
     }
 
     template <class D>
-    inline ndarray_base<D>::ndarray_base(const shape_type& shape, const strides_type& strides)
+    inline xarray_base<D>::xarray_base(const shape_type& shape, const strides_type& strides)
         : m_shape(shape), m_strides(strides)
     {
         data().resize(data_size(m_shape));
     }
 
     template <class D>
-    inline ndarray_base<D>::ndarray_base(const shape_type& shape, const strides_type& strides, const_reference value)
+    inline xarray_base<D>::xarray_base(const shape_type& shape, const strides_type& strides, const_reference value)
         : m_shape(shape), m_strides(strides)
     {
         data().resize(data_size(m_shape), value);
     }
 
     template <class D>
-    inline auto ndarray_base<D>::size() const -> size_type
+    inline auto xarray_base<D>::size() const -> size_type
     {
         return data().size();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::dimension() const -> size_type
+    inline auto xarray_base<D>::dimension() const -> size_type
     {
         return m_shape.size();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::size(size_type dim) const -> size_type
+    inline auto xarray_base<D>::size(size_type dim) const -> size_type
     {
         return m_shape[dim];
     }
     
     template <class D>
-    inline auto ndarray_base<D>::shape() const -> const shape_type&
+    inline auto xarray_base<D>::shape() const -> const shape_type&
     {
         return m_shape;
     }
 
     template <class D>
-    inline auto ndarray_base<D>::strides() const -> const strides_type&
+    inline auto xarray_base<D>::strides() const -> const strides_type&
     {
         return m_strides;
     }
 
     template <class D>
-    inline void ndarray_base<D>::reshape(const shape_type& shape, layout l)
+    inline void xarray_base<D>::reshape(const shape_type& shape, layout l)
     {
         m_shape = shape;
         m_strides.resize(m_shape.size());
@@ -190,7 +190,7 @@ namespace qs
     }
 
     template <class D>
-    inline void ndarray_base<D>::reshape(const shape_type& shape, const strides_type& strides)
+    inline void xarray_base<D>::reshape(const shape_type& shape, const strides_type& strides)
     {
         m_shape = shape;
         m_strides = strides;
@@ -199,7 +199,7 @@ namespace qs
 
     template <class D>
     template <class... Args>
-    inline auto ndarray_base<D>::operator()(Args... args) -> reference
+    inline auto xarray_base<D>::operator()(Args... args) -> reference
     {
         size_type index = data_offset(m_strides, static_cast<size_type>(args)...);
         return data()[index];
@@ -207,98 +207,98 @@ namespace qs
 
     template <class D>
     template <class... Args>
-    inline auto ndarray_base<D>::operator()(Args... args) const -> const_reference
+    inline auto xarray_base<D>::operator()(Args... args) const -> const_reference
     {
         size_type index = data_offset(m_strides, static_cast<size_type>(args)...);
         return data()[index];
     }
 
     template <class D>
-    inline auto ndarray_base<D>::data() -> container_type&
+    inline auto xarray_base<D>::data() -> container_type&
     {
         return static_cast<derived_type*>(this)->data_impl();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::data() const -> const container_type&
+    inline auto xarray_base<D>::data() const -> const container_type&
     {
         return static_cast<const derived_type*>(this)->data_impl();
     }
 
     template <class D>
-    inline bool ndarray_base<D>::broadcast_shape(shape_type& shape) const
+    inline bool xarray_base<D>::broadcast_shape(shape_type& shape) const
     {
         return qs::broadcast_shape(m_shape, shape);
     }
 
     template <class D>
-    inline auto ndarray_base<D>::begin() -> iterator
+    inline auto xarray_base<D>::begin() -> iterator
     {
         return data().begin();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::end() -> iterator
+    inline auto xarray_base<D>::end() -> iterator
     {
         return data().end();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::begin() const -> const_iterator
+    inline auto xarray_base<D>::begin() const -> const_iterator
     {
         return data().begin();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::end() const -> const_iterator
+    inline auto xarray_base<D>::end() const -> const_iterator
     {
         return data().end();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::cbegin() const -> const_iterator 
+    inline auto xarray_base<D>::cbegin() const -> const_iterator 
     {
         return data().cbegin();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::cend() const -> const_iterator
+    inline auto xarray_base<D>::cend() const -> const_iterator
     {
         return data().cend();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::rbegin() -> reverse_iterator
+    inline auto xarray_base<D>::rbegin() -> reverse_iterator
     {
         return data().rbegin();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::rend() -> reverse_iterator
+    inline auto xarray_base<D>::rend() -> reverse_iterator
     {
         return data().rend();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::rbegin() const -> const_reverse_iterator
+    inline auto xarray_base<D>::rbegin() const -> const_reverse_iterator
     {
         return data().rbegin();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::rend() const -> const_reverse_iterator
+    inline auto xarray_base<D>::rend() const -> const_reverse_iterator
     {
         return data().rend();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::crbegin() const -> const_reverse_iterator
+    inline auto xarray_base<D>::crbegin() const -> const_reverse_iterator
     {
         return data().rbegin();
     }
 
     template <class D>
-    inline auto ndarray_base<D>::crend() const -> const_reverse_iterator
+    inline auto xarray_base<D>::crend() const -> const_reverse_iterator
     {
         return data().rend();
     }

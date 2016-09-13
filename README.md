@@ -1,2 +1,3 @@
-# ndarray
-N dimensional array with broadcasting
+# xarray
+
+N-Dimensional Array with Broadcasting

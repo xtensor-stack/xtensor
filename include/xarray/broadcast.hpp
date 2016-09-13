@@ -1,12 +1,12 @@
-#ifndef NDBROADCAST_HPP
-#define NDBROADCAST_HPP
+#ifndef BROADCAST_HPP
+#define BROADCAST_HPP
 
 #include <stdexcept>
 #include <iterator>
 #include <array>
 #include <type_traits>
-#include "ndindex.hpp"
-#include "ndutils.hpp"
+#include "xindex.hpp"
+#include "utils.hpp"
 
 namespace qs
 {

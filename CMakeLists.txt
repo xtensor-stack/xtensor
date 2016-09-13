@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(ndarray)
+project(xarray)
 
 include(CheckCXXCompilerFlag)
 
@@ -14,7 +14,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     if (HAS_CPP14_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     else()
-        message(FATAL_ERROR "Unsupported compiler -- ndarray requires C++14 support!")
+        message(FATAL_ERROR "Unsupported compiler -- xarray requires C++14 support!")
     endif()
 
     # Enable link time optimization and set the default symbol
@@ -46,26 +46,26 @@ find_package(Threads)
 include_directories(include)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(NDARRAY_TARGET test_ndarray)
+set(XARRAY_TARGET test_xarray)
 
-set(NDARRAY_HEADERS
-    include/ndarray/ndarray.hpp
-    include/ndarray/ndarray_base.hpp
-    include/ndarray/ndbroadcast.hpp
-    include/ndarray/ndexpression.hpp
-    include/ndarray/ndindex.hpp
-    include/ndarray/ndoperation.hpp
-    include/ndarray/ndfunction.hpp
-    include/ndarray/ndutils.hpp
+set(XARRAY_HEADERS
+    include/xarray/xarray.hpp
+    include/xarray/xarray_base.hpp
+    include/xarray/broadcast.hpp
+    include/xarray/xexpression.hpp
+    include/xarray/xindex.hpp
+    include/xarray/xoperation.hpp
+    include/xarray/xfunction.hpp
+    include/xarray/utils.hpp
 )
 
-set(NDARRAY_TESTS
+set(XARRAY_TESTS
     test/main.cpp
-    test/test_ndarray.cpp
-    test/test_ndarray_base.hpp
-    test/test_ndutils.cpp
+    test/test_xarray.cpp
+    test/test_xarray_base.hpp
+    test/test_utils.cpp
 )
 
-add_executable(${NDARRAY_TARGET} ${NDARRAY_TESTS} ${NDARRAY_HEADERS})
-target_link_libraries(${NDARRAY_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+add_executable(${XARRAY_TARGET} ${XARRAY_TESTS} ${XARRAY_HEADERS})
+target_link_libraries(${XARRAY_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 

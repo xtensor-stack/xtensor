@@ -1,5 +1,5 @@
-#ifndef NDUTILS_HPP
-#define NDUTILS_HPP
+#ifndef XUTILS_HPP
+#define XUTILS_HPP
 
 #include <utility>
 #include <tuple>
