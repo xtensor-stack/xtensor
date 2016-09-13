@@ -113,34 +113,6 @@ namespace qs
     };
 
 
-    /****************
-     * broacaster
-     ****************/
-
-    /*template <class F, class R>
-    class broadcaster
-    {
-
-    public:
-
-        template <class... Args>
-        R operator()(Args&&... args)
-        {
-            using size_type = typename std::common<typename Args::size_type...>::type;
-            
-            sitd::array<size_type, sizeof...(Args)> dim_list{{ args.nb_dim()...}};
-            size_type nb_dim = broadcast_dim(dim_list);
-
-            array_shape<size_type> shape(nd_dim, 1);
-            broadcast_shape_fn fn(shape);
-            for_each_arg(std::forward<Args>(args)..., fn);
-            bool trivial_broadcast = fn.m_trivial_broadcast;
-
-
-        }
-    };*/
-
-
     /****************************************
      * Broadcast functions implementation
      ****************************************/
@@ -258,44 +230,6 @@ namespace qs
      * multi_iterator implementation
      ***********************************/
 
-    namespace detail
-    {
-        // TODO : replace with C++14 lambda
-        template <class S>
-        struct increment_fn
-        {
-            inline increment_fn(S index)
-                : m_index(index)
-            {
-            }
-
-            template <class I>
-            inline void operator()(I& iter) const
-            {
-                iter.increment(m_index);
-            }
-
-            S m_index;
-        };
-
-        template <class S>
-        struct reset_fn
-        {
-            inline reset_fn(S index)
-                : m_index(index)
-            {
-            }
-
-            template <class I>
-            inline void operator()(I& iter) const
-            {
-                iter.reset(m_index);
-            }
-
-            S m_index;
-        };
-    }
-    
     template <class S, class... I>
     inline multi_iterator<S, I...>::multi_iterator(I&&... iterator, const shape_type& shape)
         : m_iterator(std::make_tuple(iterator...)), m_shape(shape), m_index(shape.size(), S(0))
@@ -331,14 +265,14 @@ namespace qs
     template <class S, class... I>
     inline void multi_iterator<S, I...>::increment(size_type i)
     {
-        detail::increment_fn<S> fn(i);
+        auto fn = [i](auto& iter) { iter.increment(i); };
         for_each(fn, m_iterator);
     }
 
     template <class S, class... I>
     inline void multi_iterator<S, I...>::reset(size_type i)
     {
-        detail::reset_fn<S> fn(i);
+        auto fn = [i](auto& iter) { iter.reset(i); };
         for_each(fn, m_iterator);
     }
 }
