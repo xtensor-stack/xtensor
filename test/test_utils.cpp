@@ -5,16 +5,6 @@
 
 namespace qs
 {
-    TEST(utils, make_index_seqence)
-    {
-        static_assert(std::is_same<make_index_sequence<3>, index_sequence<0,1,2>>::value,
-                      "index sequences mismatch");
-        static_assert(!std::is_same<make_index_sequence<3>, index_sequence<0,1>>::value,
-                      "index sequences should mismatch");
-        static_assert(!std::is_same<make_index_sequence<3>, index_sequence<0,2,4,6>>::value,
-                      "index sequences should mismatch");
-        ASSERT_TRUE(true);
-    }
 
     struct for_each_fn
     {

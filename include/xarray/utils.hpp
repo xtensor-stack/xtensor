@@ -7,14 +7,6 @@
 namespace qs
 {
 
-    template <size_t... Ints>
-    struct index_sequence;
-
-    /*
-    template <size_t N>
-    using make_index_sequence;
-    */
-
     template <class F, class... T>
     void for_each(F&& f, std::tuple<T...>& t);
 
@@ -23,48 +15,6 @@ namespace qs
 
     template <class F, class R, class... Args>
     R accumulate_arg(F&& f, R init, Args&&... args);
-
-
-    /********************
-     * index_sequence
-     ********************/
-
-    template <size_t... Ints>
-    struct index_sequence
-    {
-        using type = index_sequence<Ints...>;
-
-        static constexpr size_t size() noexcept
-        {
-            return sizeof...(Ints);
-        }
-    };
-
-    namespace detail
-    {
-        template <class S1, class S2>
-        struct merge_and_renumber;
-
-        template <size_t... I1, size_t... I2>
-        struct merge_and_renumber<index_sequence<I1...>, index_sequence<I2...>>
-            : index_sequence<I1..., (sizeof...(I1) + I2)...>
-        {};
-
-        template <size_t N>
-        struct make_index_sequence_impl
-            : merge_and_renumber<typename make_index_sequence_impl<N/2>::type,
-                                 typename make_index_sequence_impl<N-N/2>::type>
-        {};
-
-        template <>
-        struct make_index_sequence_impl<0> : index_sequence<> {};
-
-        template <>
-        struct make_index_sequence_impl<1> : index_sequence<0> {};
-    }
-
-    template <size_t N>
-    using make_index_sequence = typename detail::make_index_sequence_impl<N>::type;
 
 
     /***********************
@@ -122,7 +72,7 @@ namespace qs
         };
 
         template <class F, size_t... Ints, class... Args>
-        inline void for_each_arg_impl(F&& f, index_sequence<Ints...>, Args&&... args)
+        inline void for_each_arg_impl(F&& f, std::index_sequence<Ints...>, Args&&... args)
         {
             invoker<Ints...> invoker(std::forward<F>(f), std::forward<Args>(args)...);
         }
@@ -131,7 +81,7 @@ namespace qs
     template <class F, class... Args>
     inline void for_each_arg(F&& f, Args&&... args)
     {
-        detail::for_each_arg_impl(std::forward<F>(f), make_index_sequence<sizeof...(Args)>(), std::forward<Args>(args)...);
+        detail::for_each_arg_impl(std::forward<F>(f), std::make_index_sequence<sizeof...(Args)>(), std::forward<Args>(args)...);
     }
 
 
