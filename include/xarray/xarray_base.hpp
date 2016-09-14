@@ -47,6 +47,7 @@ namespace qs
 
         const shape_type& shape() const;
         const strides_type& strides() const;
+        const strides_type& backstrides() const;
 
         void reshape(const shape_type& shape, layout l = layout::row_major);
         void reshape(const shape_type& shape, const strides_type& strides);
@@ -96,8 +97,12 @@ namespace qs
 
     private:
 
+        void adapt_strides();
+        void adapt_strides(size_type i);
+
         shape_type m_shape;
         strides_type m_strides;
+        strides_type m_backstrides;
     };
 
 
@@ -107,14 +112,14 @@ namespace qs
 
     template <class D>
     inline xarray_base<D>::xarray_base(const shape_type& shape, layout l)
-        : m_shape(0), m_strides(0)
+        : m_shape(0), m_strides(0), m_backstrides(0)
     {
         reshape(shape, l);
     }
 
     template <class D>
     inline xarray_base<D>::xarray_base(const shape_type& shape, const_reference value, layout l)
-        : m_shape(0), m_strides(0)
+        : m_shape(0), m_strides(0), m_backstrides(0)
     {
         reshape(shape, l);
         std::fill(data().begin(), data().end(), value);
@@ -122,16 +127,41 @@ namespace qs
 
     template <class D>
     inline xarray_base<D>::xarray_base(const shape_type& shape, const strides_type& strides)
-        : m_shape(shape), m_strides(strides)
+        : m_shape(shape), m_strides(strides), m_backstrides(strides.size())
     {
+        adapt_strides();
         data().resize(data_size(m_shape));
     }
 
     template <class D>
     inline xarray_base<D>::xarray_base(const shape_type& shape, const strides_type& strides, const_reference value)
-        : m_shape(shape), m_strides(strides)
+        : m_shape(shape), m_strides(strides), m_backstrides(strides.size())
     {
+        adapt_strides();
         data().resize(data_size(m_shape), value);
+    }
+
+    template <class D>
+    inline void xarray_base<D>::adapt_strides()
+    {
+        for(size_type i = 0; i < m_shape.size(); ++i)
+        {
+            adapt_strides(i);
+        }
+    }
+
+    template <class D>
+    inline void xarray_base<D>::adapt_strides(size_type i)
+    {
+        if(m_shape[i] == 1)
+        {
+            m_strides[i] = 0;
+            m_backstrides[i] = 0;
+        }
+        else
+        {
+            m_backstrides[i] = m_strides[i] * m_shape[i] - 1;
+        }
     }
 
     template <class D>
@@ -165,18 +195,27 @@ namespace qs
     }
 
     template <class D>
+    inline auto xarray_base<D>::backstrides() const -> const strides_type&
+    {
+        return m_backstrides;
+    }
+
+    template <class D>
     inline void xarray_base<D>::reshape(const shape_type& shape, layout l)
     {
         m_shape = shape;
         m_strides.resize(m_shape.size());
+        m_backstrides.resize(m_shape.size());
         if(l == layout::row_major)
         {
             m_strides.back() = size_type(1);
             for(size_type i = m_strides.size() - 1; i != 0; --i)
             {
                 m_strides[i - 1] = m_strides[i] * m_shape[i];
+                adapt_strides(i);
             }
             data().resize(m_strides.front() * m_shape.front());
+            adapt_strides(size_type(0));
         }
         else
         {
@@ -184,8 +223,10 @@ namespace qs
             for(size_type i = 1; i < m_strides.size(); ++i)
             {
                 m_strides[i] = m_strides[i - 1] * m_shape[i - 1];
+                adapt_strides(i - 1);
             }
             data().resize(m_strides.back() * m_shape.back());
+            adapt_strides(m_strides.size() - 1);
         }
     }
 
@@ -194,6 +235,7 @@ namespace qs
     {
         m_shape = shape;
         m_strides = strides;
+        adapt_strides();
         data().resize(data_size(m_shape));
     }
 

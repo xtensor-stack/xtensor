@@ -22,18 +22,6 @@ namespace qs
     bool broadcast_shape(const array_shape<S>& input, array_shape<S>& output);
 
     template <class S>
-    void broadcast_strides(const array_shape<S>& output_shape,
-                           const array_shape<S>& shape,
-                           const array_strides<S>& strides,
-                           array_strides<S>& output_strides);
-
-    template <class S>
-    array_strides<S> broadcast_strides(const array_shape<S>& output_shape,
-                                       const array_shape<S>& shape,
-                                       const array_strides<S>& strides);
-
-
-    template <class S>
     bool check_trivial_broadcast(const array_strides<S>& strides1,
                                  const array_strides<S>& strides2);
 
@@ -42,6 +30,7 @@ namespace qs
      * broadcasting_iterator
      ***************************/
 
+    // TODO : refactor this
     template <class I, class S>
     class broadcasting_iterator
     {
@@ -145,44 +134,6 @@ namespace qs
             trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
         }
         return trivial_broadcast;
-    }
-
-    template <class S>
-    inline void broadcast_strides(const array_shape<S>& output_shape,
-                                  const array_shape<S>& shape,
-                                  const array_strides<S>& strides,
-                                  array_strides<S>& output_strides)
-    {
-        output_strides.resize(shape.size());
-        auto output_shape_iter = output_shape.rbegin();
-        auto shape_iter = shape.rbegin();
-        auto strides_iter = strides.rbegin();
-        auto output_strides_iter = output_strides.rbegin();
-
-        while(shape_iter != shape.rend())
-        {
-            if(*output_shape_iter == *shape_iter)
-                *output_strides_iter = *strides_iter;
-            else
-                *output_strides_iter = S(0);
-
-            ++output_shape_iter;
-            ++shape_iter;
-            ++strides_iter;
-            ++output_strides_iter;
-        }
-
-        std::fill(output_strides_iter, output_strides.rend(), S(0));
-    }
-
-    template <class S>
-    inline array_strides<S> broadcast_strides(const array_shape<S>& output_shape,
-                                              const array_shape<S>& shape,
-                                              const array_strides<S>& strides)
-    {
-        array_strides<S> res(0);
-        broadcast_strides(output_shape, shape, strides, res);
-        return res;
     }
 
     template <class S>
