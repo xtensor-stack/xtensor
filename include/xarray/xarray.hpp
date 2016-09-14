@@ -3,6 +3,7 @@
 
 #include <utility>
 #include "xarray_base.hpp"
+#include "xsemantic.hpp"
 
 namespace qs
 {
@@ -18,10 +19,11 @@ namespace qs
     struct array_inner_types<xarray<T>>
     {
         using container_type = std::vector<T>;
+        using temporary_type = xarray<T>;
     };
 
     template <class T>
-    class xarray : public xarray_base<xarray<T>>
+    class xarray : public xarray_base<xarray<T>>, public xsemantic_base<xarray<T>>
     {
 
     public:

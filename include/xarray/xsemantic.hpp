@@ -50,7 +50,7 @@ namespace qs
         ~xsemantic_base() = default;
 
         xsemantic_base(const xsemantic_base&) = default;
-        xsemantic_case& operator=(const xsemantic_base&) = default;
+        xsemantic_base& operator=(const xsemantic_base&) = default;
 
         xsemantic_base(xsemantic_base&&) = default;
         xsemantic_base& operator=(xsemantic_base&&) = default;
@@ -123,7 +123,7 @@ namespace qs
 
     template <class D>
     template <class E>
-    inline auto xsemantic_base<D>::operator-=(const xexpression<E>& e) -> dervied_type&
+    inline auto xsemantic_base<D>::operator-=(const xexpression<E>& e) -> derived_type&
     {
         temporary_type tmp(*this - e);
         return base_type::derived_cast().assign_temporary(tmp);
@@ -145,6 +145,7 @@ namespace qs
         return base_type::derived_cast().assign_temporary(tmp);
     }
 
+    template <class D>
     template <class E>
     inline auto xsemantic_base<D>::conformant_assign(const xexpression<E>& e) -> derived_type&
     {

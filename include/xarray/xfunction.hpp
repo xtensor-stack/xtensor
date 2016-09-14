@@ -66,15 +66,15 @@ namespace qs
         template <class... Args>
         const_reference operator()(Args... args) const
         {
-            return access_impl(args..., std::make_index_sequence<sizeof...(E)>());
+            return access_impl(std::make_index_sequence<sizeof...(E)>(), args...);
         }
 
     private:
 
         std::tuple<const E&...> m_e;
 
-        template <class... Args, class... I>
-        const_reference access_impl(Args... args, std::integer_sequence<I...>)
+        template <class... Args, size_t... I>
+        const_reference access_impl(std::index_sequence<I...>, Args... args) const
         {
             return F::apply(std::get<I>(m_e)(args...)...);
         }

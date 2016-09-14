@@ -3,7 +3,7 @@
 
 namespace qs
 {
-    
+
     template <class D>
     class xexpression
     {
@@ -44,6 +44,12 @@ namespace qs
         return *static_cast<const derived_type*>(this);
     }
 
+    template <class E>
+    using is_xexpression = std::is_base_of<xexpression<E>, E>;
+   
+    template <class E, class R>
+    using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
+ 
 }
 
 #endif

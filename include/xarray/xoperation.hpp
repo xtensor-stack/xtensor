@@ -86,7 +86,7 @@ namespace qs
     operator+(const xexpression<E>& e) noexcept
     {
         using type = xfunction_op<plus_functor, E>;
-        return type(e());
+        return type(e.derived_cast());
     }
 
     template <class E>
@@ -94,7 +94,7 @@ namespace qs
     operator-(const xexpression<E>& e) noexcept
     {
         using type = xfunction_op<minus_functor, E>;
-        return type(e());
+        return type(e.derived_cast());
     }
 
     template <class E1, class E2>
@@ -102,7 +102,7 @@ namespace qs
     operator+(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
         using type = xfunction_op<add_functor, E1, E2>;
-        return type(e1(), e2());
+        return type(e1.derived_cast(), e2.derived_cast());
     }
 
     template <class E1, class E2>
@@ -110,7 +110,7 @@ namespace qs
     operator-(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
         using type = xfunction_op<sub_functor, E1, E2>;
-        return type(e1(), e2());
+        return type(e1.derived_cast(), e2.derived_cast());
     }
 
     template <class E1, class E2>
@@ -118,7 +118,7 @@ namespace qs
     operator*(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
         using type = xfunction_op<mul_functor, E1, E2>;
-        return type(e1(), e2());
+        return type(e1.derived_cast(), e2.derived_cast());
     }
 
     template <class E1, class E2>
@@ -126,7 +126,7 @@ namespace qs
     operator/(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
     {
         using type = xfunction_op<div_functor, E1, E2>;
-        return type(e1(), e2());
+        return type(e1.derived_cast(), e2.derived_cast());
     }
 
 }
