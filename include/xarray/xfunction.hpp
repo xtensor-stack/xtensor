@@ -3,7 +3,7 @@
 
 #include <type_traits>
 #include "utils.hpp"
-#include "xarray_expression.hpp"
+#include "xexpression.hpp"
 #include "broadcast.hpp"
 
 namespace qs
@@ -43,7 +43,7 @@ namespace qs
         using shape_type = array_shape<size_type>;
         using closure_type = const self_type;
 
-        using const_iterator = xfunction_iterator<F, E...>;
+        //using const_iterator = xfunction_iterator<F, E...>;
 
         inline xfunction(const E&...e)
             : m_e(e...)  // m_e(wrap_scalar(e)...)
@@ -58,16 +58,29 @@ namespace qs
 
         inline bool broadcast_shape(shape_type& shape) const
         {
-            auto func = [](bool b, auto&& e) { return b && e.broadcast_shape(shape); };
-            return accumulate(func, True, e);
+            auto func = [&shape](bool b, auto&& e) { return b && e.broadcast_shape(shape); };
+            return accumulate(func, true, m_e);
+        }
+
+        // xfunction does not have a non const version of operator()
+        template <class... Args>
+        const_reference operator()(Args... args) const
+        {
+            return access_impl(args..., std::make_index_sequence<sizeof...(E)>());
         }
 
     private:
 
         std::tuple<const E&...> m_e;
-    };
 
-    template <template <class, class> class F, class... E>
+        template <class... Args, class... I>
+        const_reference access_impl(Args... args, std::integer_sequence<I...>)
+        {
+            return F::apply(std::get<I>(m_e)(args...)...);
+        }
+     };
+
+    template <template <class...> class F, class... E>
     using xfunction_op = xfunction<F<typename E::value_type...>, E...>;
 
 }

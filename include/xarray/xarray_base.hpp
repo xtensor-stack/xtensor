@@ -3,6 +3,7 @@
 
 #include <functional>
 #include "xindex.hpp"
+#include "xoperation.hpp"
 #include "broadcast.hpp"
 
 namespace qs
