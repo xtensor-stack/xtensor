@@ -19,10 +19,6 @@ namespace qs
     template <class F, class R, class... Args>
     R accumulate_arg(F&& f, R init, Args&&... args);
 
-    template <class E>
-    using get_closure_type = typename E::closure_type;
-
-
     /***********************
      * for_each on tuple
      ***********************/

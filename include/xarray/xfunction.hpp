@@ -62,7 +62,6 @@ namespace qs
             return accumulate(func, true, m_e);
         }
 
-        // xfunction does not have a non const version of operator()
         template <class... Args>
         const_reference operator()(Args... args) const
         {

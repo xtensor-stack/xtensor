@@ -44,7 +44,6 @@ namespace qs
         size_type size() const;
 
         size_type dimension() const;
-        size_type size(size_type dim) const;
 
         const shape_type& shape() const;
         const strides_type& strides() const;
@@ -139,12 +138,6 @@ namespace qs
     inline auto xarray_base<D>::dimension() const -> size_type
     {
         return m_shape.size();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::size(size_type dim) const -> size_type
-    {
-        return m_shape[dim];
     }
     
     template <class D>

@@ -49,6 +49,30 @@ namespace qs
    
     template <class E, class R>
     using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
+
+    /*********************************
+     *  get_closure_type
+     *********************************/
+    template <class T>
+    class xscalar;
+
+    namespace detail
+    {
+        template <class E, class enable=void>
+        struct get_closure_type_impl
+        {
+            using type = xscalar<E>;
+        };
+        
+        template <class E>
+        struct get_closure_type_impl<E, std::enable_if_t<is_xexpression<E>::value, void>>
+        {
+            using type = typename E::closure_type;
+        };
+    }
+
+    template <class E>
+    using get_closure_type = typename detail::get_closure_type_impl<E>::type;
  
 }
 
