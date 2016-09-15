@@ -28,11 +28,14 @@ namespace qs
 
     public:
 
-        using base_type = xarray_base<xarray<T>>;
+        using self_type = xarray<T>;
+        using base_type = xarray_base<self_type>;
         using container_type = typename base_type::container_type;
         using const_reference = typename base_type::const_reference;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
+
+        using closure_type = const self_type&;
 
         xarray() = default;
         explicit xarray(const shape_type& shape, layout l = layout::row_major);
@@ -78,10 +81,13 @@ namespace qs
 
     public:
 
-        using base_type = xarray_base<xarray_adaptor<C>>;
+        using self_type = xarray_adaptor<C>;
+        using base_type = xarray_base<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
+
+        using closure_type = const self_type&;
 
         xarray_adaptor(container_type& data);
         xarray_adaptor(container_type& data, const shape_type& shape, layout l = layout::row_major);
@@ -112,26 +118,32 @@ namespace qs
 
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, layout l)
-        : base_type(shape, l)
+        : base_type()
     {
+        base_type::reshape(shape, l);
     }
 
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, const_reference value, layout l)
-        : base_type(shape, value, l)
+        : base_type()
     {
+        base_type::reshape(shape, l);
+        std::fill(m_data.begin(), m_data.end(), value);
     }
 
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, const strides_type& strides)
-        : base_type(shape, strides)
+        : base_type()
     {
+        base_type::reshape(shape, strides);
     }
 
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, const strides_type& strides, const_reference value)
-        : base_type(shape, strides, value)
+        : base_type()
     {
+        base_type::reshape(shape, strides);
+        std::fill(m_data.begin(), m_data.end(), value);
     }
 
     template <class T>

@@ -13,8 +13,14 @@ namespace qs
     template <class F, class... Args>
     void for_each_arg(F&&, Args&&...);
 
+    template <class F, class R, class... T>
+    R accumulate(F&& f, R init, const std::tuple<T...>& t);
+
     template <class F, class R, class... Args>
     R accumulate_arg(F&& f, R init, Args&&... args);
+
+    template <class E>
+    using get_closure_type = typename E::closure_type;
 
 
     /***********************
@@ -123,6 +129,7 @@ namespace qs
         detail::accumulator<1, sizeof...(Args)> ac;
         return ac.apply(std::forward<F>(f), init, std::forward<Args>(args)...);
     }
+
 
     /*************************************
      * Accumulate tuples

@@ -83,11 +83,6 @@ namespace qs
     protected:
 
         xarray_base() = default;
-        xarray_base(const shape_type& shape, layout l);
-        xarray_base(const shape_type& shape, const_reference value, layout l);
-        xarray_base(const shape_type& shape, const strides_type& strides);
-        xarray_base(const shape_type& shape, const strides_type& strides, const_reference value);
-
         ~xarray_base() = default;
 
         xarray_base(const xarray_base&) = default;
@@ -110,37 +105,6 @@ namespace qs
     /****************************
      * xarray_base implementation
      ****************************/
-
-    template <class D>
-    inline xarray_base<D>::xarray_base(const shape_type& shape, layout l)
-        : m_shape(0), m_strides(0), m_backstrides(0)
-    {
-        reshape(shape, l);
-    }
-
-    template <class D>
-    inline xarray_base<D>::xarray_base(const shape_type& shape, const_reference value, layout l)
-        : m_shape(0), m_strides(0), m_backstrides(0)
-    {
-        reshape(shape, l);
-        std::fill(data().begin(), data().end(), value);
-    }
-
-    template <class D>
-    inline xarray_base<D>::xarray_base(const shape_type& shape, const strides_type& strides)
-        : m_shape(shape), m_strides(strides), m_backstrides(strides.size())
-    {
-        adapt_strides();
-        data().resize(data_size(m_shape));
-    }
-
-    template <class D>
-    inline xarray_base<D>::xarray_base(const shape_type& shape, const strides_type& strides, const_reference value)
-        : m_shape(shape), m_strides(strides), m_backstrides(strides.size())
-    {
-        adapt_strides();
-        data().resize(data_size(m_shape), value);
-    }
 
     template <class D>
     inline void xarray_base<D>::adapt_strides()

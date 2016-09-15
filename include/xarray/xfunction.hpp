@@ -25,8 +25,8 @@ namespace qs
         using common_value_type = std::common_type_t<typename Args::value_type...>;
     }
 
-    template <class F, class... E>
-    class xfunction : public xexpression<xfunction<F, E...>>
+    template <class F, class R, class... E>
+    class xfunction : public xexpression<xfunction<F, R, E...>>
     {
 
     public:
@@ -34,7 +34,7 @@ namespace qs
         using self_type = xfunction<F, E...>;
         using functor_type = F;
 
-        using value_type = typename functor_type::result_type;
+        using value_type = R;
         using const_reference = value_type;
         using const_pointer = const value_type*;
         using size_type = detail::common_size_type<E...>;
@@ -45,8 +45,8 @@ namespace qs
 
         //using const_iterator = xfunction_iterator<F, E...>;
 
-        inline xfunction(const E&...e)
-            : m_e(e...)  // m_e(wrap_scalar(e)...)
+        inline xfunction(F&& f, const E&...e) noexcept
+            : m_f(std::forward<F>(f)), m_e(e...)
         {
         }
 
@@ -66,24 +66,20 @@ namespace qs
         template <class... Args>
         const_reference operator()(Args... args) const
         {
-            //return access_impl(std::make_index_sequence<sizeof...(E)>(), args...);
-            return access_impl(args..., std::make_index_sequence<sizeof...(E)>());
+            return access_impl(std::make_index_sequence<sizeof...(E)>(), args...);
         }
 
     private:
 
-        std::tuple<const E&...> m_e;
+        std::tuple<get_closure_type<E>...> m_e;
+        F m_f;
 
-        template <class... Args, size_t... I>
-        const_reference access_impl(Args... args, std::index_sequence<I...>) const
-        //const_reference access_impl(std::index_sequence<I...>, Args... args) const
+        template <size_t... I, class... Args>
+        const_reference access_impl(std::index_sequence<I...>, Args... args) const
         {
-            return F::apply(std::get<I>(m_e)(args...)...);
+            return m_f(std::get<I>(m_e)(args...)...);
         }
      };
-
-    template <template <class...> class F, class... E>
-    using xfunction_op = xfunction<F<typename E::value_type...>, E...>;
 
 }
 
