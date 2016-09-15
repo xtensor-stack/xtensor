@@ -4,8 +4,9 @@
 #include <functional>
 
 #include "xindex.hpp"
-#include "xoperation.hpp"
 #include "broadcast.hpp"
+#include "xoperation.hpp"
+#include "xmath.hpp"
 
 namespace qs
 {

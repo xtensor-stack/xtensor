@@ -49,8 +49,9 @@ namespace qs
 
         //using const_iterator = xfunction_iterator<F, E...>;
 
-        inline xfunction(F&& f, const E&...e) noexcept
-            : m_f(std::forward<F>(f)), m_e(e...)
+        template <class Func>
+        inline xfunction(Func&& f, const E&...e) noexcept
+            : m_f(std::forward<Func>(f)), m_e(e...)
         {
         }
 

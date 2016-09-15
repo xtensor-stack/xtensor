@@ -26,7 +26,7 @@ namespace qs
     namespace detail
     {
         template <template <class...> class F, class... E>
-        auto make_xfunction(const xexpression<E>&... e) noexcept
+        inline auto make_xfunction(const xexpression<E>&... e) noexcept
         {
             using functor_type = F<common_value_type<E...>>;
             using result_type = typename functor_type::result_type;
