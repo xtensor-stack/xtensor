@@ -2,6 +2,10 @@
 #define XFUNCTION_HPP
 
 #include <type_traits>
+#include <utility>
+#include <tuple>
+#include <algorithm>
+
 #include "utils.hpp"
 #include "xexpression.hpp"
 #include "broadcast.hpp"

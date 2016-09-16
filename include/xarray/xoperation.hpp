@@ -2,6 +2,7 @@
 #define XOPERATION_HPP
 
 #include <functional>
+
 #include "xfunction.hpp"
 
 namespace qs

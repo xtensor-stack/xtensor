@@ -2,7 +2,8 @@
 #define XINDEX_HPP
 
 #include <vector>
-#include <algorithm>
+#include <numeric>
+#include <functional>
 
 namespace qs
 {

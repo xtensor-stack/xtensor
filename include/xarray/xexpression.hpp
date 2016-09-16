@@ -1,6 +1,8 @@
 #ifndef XEXPRESSION_HPP
 #define XEXPRESSION_HPP
 
+#include <type_traits>
+
 namespace qs
 {
 

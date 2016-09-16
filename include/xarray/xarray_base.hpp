@@ -2,6 +2,7 @@
 #define XARRAY_BASE_HPP
 
 #include <functional>
+
 #include "xindex.hpp"
 #include "xoperation.hpp"
 #include "broadcast.hpp"

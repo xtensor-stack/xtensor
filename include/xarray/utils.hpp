@@ -3,6 +3,7 @@
 
 #include <utility>
 #include <tuple>
+#include <type_traits>
 
 namespace qs
 {

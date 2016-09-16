@@ -2,6 +2,7 @@
 #define XSCALAR_HPP
 
 #include <utility>
+
 #include "xexpression.hpp"
 #include "xindex.hpp"
 

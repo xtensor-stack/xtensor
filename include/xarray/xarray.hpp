@@ -2,6 +2,9 @@
 #define XARRAY_HPP
 
 #include <utility>
+#include <vector>
+#include <algorithm>
+
 #include "xarray_base.hpp"
 #include "xsemantic.hpp"
 

@@ -1,10 +1,14 @@
 #ifndef BROADCAST_HPP
 #define BROADCAST_HPP
 
+#include <utility>
+#include <tuple>
+#include <type_traits>
 #include <stdexcept>
 #include <iterator>
 #include <array>
-#include <type_traits>
+#include <algorithm>
+
 #include "xindex.hpp"
 #include "utils.hpp"
 
