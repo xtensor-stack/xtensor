@@ -63,6 +63,7 @@ set(XARRAY_TESTS
     test/main.cpp
     test/test_xarray.cpp
     test/test_xarray_base.hpp
+    test/test_xscalar.cpp
     test/test_utils.cpp
 )
 

@@ -3,6 +3,7 @@
 
 #include <utility>
 #include "xexpression.hpp"
+#include "xindex.hpp"
 
 namespace qs
 {
@@ -28,16 +29,17 @@ namespace qs
         using difference_type = ptrdiff_t;
 
         using self_type = xscalar<T>;
-        using shape_type = typename base_type::shape_type;
-        using strides_type = typename base_type::strides_type;
+        using shape_type = array_shape<size_type>;
+        using strides_type = array_strides<size_type>;
+
         xscalar(const T& value);
 
         size_type size() const;
         size_type dimension() const;
 
-        const shape_type shape() const;
-        const strides_type strides() const;
-        const strides_type backstrides() const;
+        shape_type shape() const;
+        strides_type strides() const;
+        strides_type backstrides() const;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -61,38 +63,38 @@ namespace qs
     }
 
     template <class T>
-    inline xscalar<T>::size_type xscalar<T>::size() const
+    inline typename xscalar<T>::size_type xscalar<T>::size() const
     {
         return 1;
     }
 
     template <class T>
-    inline xscalar<T>::size_type xscalar<T>::dimension() const
+    inline typename xscalar<T>::size_type xscalar<T>::dimension() const
     {
         return 0;
     }
 
     template <class T>
-    inline xscalar<T>::shape_type xscalar<T>::shape() const
+    inline typename xscalar<T>::shape_type xscalar<T>::shape() const
     {
         return {};
     }
 
     template <class T>
-    inline xscalar<T>::strides_type xscalar<T>::strides() const
+    inline typename xscalar<T>::strides_type xscalar<T>::strides() const
     {
         return {};
     }
 
     template <class T>
-    inline xscalar<T>::strides_type xscalar<T>::backstrides() const
+    inline typename xscalar<T>::strides_type xscalar<T>::backstrides() const
     {
         return {};
     }
 
     template <class T>
     template <class... Args>
-    inline xscalar<T>::const_reference xscalar<T>::operator()(Args... args) const
+    inline typename xscalar<T>::const_reference xscalar<T>::operator()(Args... args) const
     {
         return m_value;
     }
