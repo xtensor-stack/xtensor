@@ -56,5 +56,17 @@ namespace qs
         const std::tuple<int, int, int> t(3, 4, 1);
         ASSERT_TRUE(accumulate(func, 0, t) == 8);
     }
+
+    TEST(utils, or)
+    {
+        using true_t = std::true_type;
+        using false_t = std::false_type;
+
+        using t1 = or_<false_t, false_t, false_t>;
+        using t2 = or_<false_t, true_t, false_t>;
+
+        ASSERT_TRUE(!t1::value);
+        ASSERT_TRUE(t2::value);
+    }
 }
 

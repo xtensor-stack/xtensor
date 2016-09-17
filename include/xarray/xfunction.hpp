@@ -20,13 +20,13 @@ namespace qs
     namespace detail
     {
         template <class... Args>
-        using common_size_type = std::common_type_t<typename Args::size_type...>;
+        using common_size_type = std::common_type_t<get_size_type<Args>...>;
 
         template <class... Args>
-        using common_difference_type = std::common_type_t<typename Args::difference_type...>;
+        using common_difference_type = std::common_type_t<get_difference_type<Args>...>;
 
         template <class... Args>
-        using common_value_type = std::common_type_t<typename Args::value_type...>;
+        using common_value_type = std::common_type_t<get_value_type<Args>...>;
     }
 
     template <class F, class R, class... E>
@@ -83,7 +83,7 @@ namespace qs
         {
             return m_f(std::get<I>(m_e)(args...)...);
         }
-     };
+    };
 
 }
 

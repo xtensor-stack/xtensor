@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "xfunction.hpp"
+#include "xscalar.hpp"
 
 namespace qs
 {
@@ -26,13 +27,19 @@ namespace qs
     namespace detail
     {
         template <template <class...> class F, class... E>
-        inline auto make_xfunction(const xexpression<E>&... e) noexcept
+        inline auto make_xfunction(const E&... e) noexcept
         {
             using functor_type = F<common_value_type<E...>>;
             using result_type = typename functor_type::result_type;
             using type = xfunction<functor_type, result_type, E...>;
-            return type(functor_type(), e.derived_cast()...);
+            return type(functor_type(), get_xexpression(e)...);
         }
+
+        template <template <class...> class F, class... E>
+        using get_xfunction_type = std::enable_if_t<has_xexpression<E...>::value,
+                                                    xfunction<F<common_value_type<E...>>,
+                                                              common_value_type<E...>,
+                                                              E...>>;
     }
 
 
@@ -53,25 +60,29 @@ namespace qs
     }
 
     template <class E1, class E2>
-    inline auto operator+(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
+    inline auto operator+(const E1& e1, const E2& e2) noexcept
+        -> detail::get_xfunction_type<std::plus, E1, E2>
     {
         return detail::make_xfunction<std::plus>(e1, e2);
     }
 
     template <class E1, class E2>
-    inline auto operator-(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
+    inline auto operator-(const E1& e1, const E2& e2) noexcept
+        -> detail::get_xfunction_type<std::minus, E1, E2>
     {
         return detail::make_xfunction<std::minus>(e1, e2);
     }
 
     template <class E1, class E2>
-    inline auto operator*(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
+    inline auto operator*(const E1& e1, const E2& e2) noexcept
+        -> detail::get_xfunction_type<std::multiplies, E1, E2>
     {
         return detail::make_xfunction<std::multiplies>(e1, e2);
     }
 
     template <class E1, class E2>
-    inline auto operator/(const xexpression<E1>& e1, const xexpression<E2>& e2) noexcept
+    inline auto operator/(const E1& e1, const E2& e2) noexcept
+        -> detail::get_xfunction_type<std::divides, E1, E2>
     {
         return detail::make_xfunction<std::divides>(e1, e2);
     }

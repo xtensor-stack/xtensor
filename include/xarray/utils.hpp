@@ -20,6 +20,9 @@ namespace qs
     template <class F, class R, class... Args>
     R accumulate_arg(F&& f, R init, Args&&... args);
 
+    template <class... T>
+    struct or_;
+
     /***********************
      * for_each on tuple
      ***********************/
@@ -156,6 +159,22 @@ namespace qs
     {
         return detail::accumulate_impl<0, F, R, T...>(f, init, t);
     }
+
+
+    /**********************
+     * or_ metafunction
+     **********************/
+
+    template <class T>
+    struct or_<T> : std::integral_constant<bool, T::value>
+    {
+    };
+
+    template <class T, class... Ts>
+    struct or_<T, Ts...>
+        : std::integral_constant<bool, T::value || or_<Ts...>::value>
+    {
+    };
 
 }
 
