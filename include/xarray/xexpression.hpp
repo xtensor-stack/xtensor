@@ -15,8 +15,8 @@ namespace qs
 
         using derived_type = D;
 
-        derived_type& derived_cast();
-        const derived_type& derived_cast() const;
+        derived_type& derived_cast() noexcept;
+        const derived_type& derived_cast() const noexcept;
 
     protected:
 
@@ -36,13 +36,13 @@ namespace qs
      *********************************/
 
     template <class D>
-    inline auto xexpression<D>::derived_cast() -> derived_type&
+    inline auto xexpression<D>::derived_cast() noexcept -> derived_type&
     {
         return *static_cast<derived_type*>(this);
     }
 
     template <class D>
-    inline auto xexpression<D>::derived_cast() const -> const derived_type&
+    inline auto xexpression<D>::derived_cast() const noexcept -> const derived_type&
     {
         return *static_cast<const derived_type*>(this);
     }
@@ -62,13 +62,13 @@ namespace qs
      ********************/
 
     template <class E>
-    inline const E& get_xexpression(const xexpression<E>& e)
+    inline const E& get_xexpression(const xexpression<E>& e) noexcept
     {
         return e.derived_cast();
     }
 
     template <class E>
-    inline disable_xexpression<E, const E&> get_xexpression(const E& e)
+    inline disable_xexpression<E, const E&> get_xexpression(const E& e) noexcept
     {
         return e;
     }
