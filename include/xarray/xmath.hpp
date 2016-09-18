@@ -114,7 +114,7 @@ namespace qs
     inline auto exp2(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detial::make_xfunction((functor_type)std::exp2, e);
+        return detail::make_xfunction((functor_type)std::exp2, e);
     }
 
     template <class E>
@@ -135,7 +135,7 @@ namespace qs
     inline auto log2(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detial::make_xfunction((functor_type)std::log2, e);
+        return detail::make_xfunction((functor_type)std::log2, e);
     }
 
     template <class E>
@@ -151,7 +151,7 @@ namespace qs
      *********************/
 
     template <class E1, class E2>
-    inline auto pow(const E1& e1, const e2& e2) noexcept
+    inline auto pow(const E1& e1, const E2& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
@@ -173,7 +173,7 @@ namespace qs
     }
 
     template <class E1, class E2>
-    inline auto hypot(const E1& e1, const e2& e2) noexcept
+    inline auto hypot(const E1& e1, const E2& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
