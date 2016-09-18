@@ -16,7 +16,7 @@ namespace qs
         template <class R, class... Args, class... E>
         inline auto make_xfunction(R (*f) (Args...), const E&... e) noexcept
         {
-            using type = xfunction<R (*) (Args...), R, E...>;
+            using type = xfunction<R (*) (Args...), R, get_xexpression_type<E>...>;
             return type(f, get_xexpression(e)...);
         }
 
@@ -27,7 +27,7 @@ namespace qs
         using get_xfunction_free_type = std::enable_if_t<has_xexpression<Args...>::value,
                                                          xfunction<mf_type<Args...>,
                                                                    common_value_type<Args...>,
-                                                                   Args...>>;
+                                                                   get_xexpression_type<Args>...>>;
 
     }
 
@@ -169,7 +169,7 @@ namespace qs
     inline auto cbrt(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::cbrt);
+        return detail::make_xfunction((functor_type)std::cbrt, e);
     }
 
     template <class E1, class E2>
@@ -227,11 +227,12 @@ namespace qs
         return detail::make_xfunction((functor_type)std::atan, e);
     }
 
-    template <class E>
-    inline auto atan2(const xexpression<E>& e) noexcept
+    template <class E1, class E2>
+    inline auto atan2(const E1& e1, const E2& e2) noexcept
+        -> detail::get_xfunction_free_type<E1, E2>
     {
-        using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::atan2, e);
+        using functor_type = detail::mf_type<E1, E2>;
+        return detail::make_xfunction((functor_type)std::atan2, e1, e2);
     }
 
 

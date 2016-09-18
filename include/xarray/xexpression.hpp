@@ -57,6 +57,29 @@ namespace qs
     using has_xexpression = or_<is_xexpression<E>...>;
 
 
+    /*************************
+     * get_expression_type
+     *************************/
+
+    namespace detail
+    {
+        template <class T>
+        struct get_xexpression_type_impl
+        {
+            using type = T;
+        };
+
+        template <class E>
+        struct get_xexpression_type_impl<xexpression<E>>
+        {
+            using type = E;
+        };
+    }
+
+    template <class E>
+    using get_xexpression_type = typename detail::get_xexpression_type_impl<E>::type;
+
+
     /********************
      * get_expression
      ********************/

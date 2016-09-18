@@ -54,6 +54,7 @@ set(XARRAY_HEADERS
     include/xarray/broadcast.hpp
     include/xarray/xexpression.hpp
     include/xarray/xindex.hpp
+    include/xarray/xmath.hpp
     include/xarray/xoperation.hpp
     include/xarray/xfunction.hpp
     include/xarray/utils.hpp
@@ -63,6 +64,7 @@ set(XARRAY_TESTS
     test/main.cpp
     test/test_xarray.cpp
     test/test_xarray_base.hpp
+    test/test_xmath.cpp
     test/test_xscalar.cpp
     test/test_utils.cpp
 )
