@@ -64,23 +64,8 @@ namespace qs
     template <class T>
     class xscalar;
 
-    namespace detail
-    {
-        template <class E>
-        struct get_xexpression_type_impl
-        {
-            using type = std::conditional_t<is_xexpression<E>::value, E, xscalar<E>>;
-        };
-
-        template <class E>
-        struct get_xexpression_type_impl<xexpression<E>>
-        {
-            using type = E;
-        };
-    }
-
     template <class E>
-    using get_xexpression_type = typename detail::get_xexpression_type_impl<E>::type;
+    using get_xexpression_type = std::conditional_t<is_xexpression<E>::value, E, xscalar<E>>;
 
 
     /*********************

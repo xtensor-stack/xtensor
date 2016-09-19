@@ -40,14 +40,14 @@ namespace qs
     inline auto abs(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::abs, e);
+        return detail::make_xfunction((functor_type)std::abs, e.derived_cast());
     }
 
     template <class E>
     inline auto fabs(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::fabs, e);
+        return detail::make_xfunction((functor_type)std::fabs, e.derived_cast());
     }
 
     template <class E1, class E2>
@@ -107,42 +107,42 @@ namespace qs
     inline auto exp(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::exp, e);
+        return detail::make_xfunction((functor_type)std::exp, e.derived_cast());
     }
 
     template <class E>
     inline auto exp2(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::exp2, e);
+        return detail::make_xfunction((functor_type)std::exp2, e.derived_cast());
     }
 
     template <class E>
     inline auto expm1(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::expm1, e);
+        return detail::make_xfunction((functor_type)std::expm1, e.derived_cast());
     }
 
     template <class E>
     inline auto log(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::log, e);
+        return detail::make_xfunction((functor_type)std::log, e.derived_cast());
     }
 
     template <class E>
     inline auto log2(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::log2, e);
+        return detail::make_xfunction((functor_type)std::log2, e.derived_cast());
     }
 
     template <class E>
     inline auto log1p(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::log1p, e);
+        return detail::make_xfunction((functor_type)std::log1p, e.derived_cast());
     }
 
 
@@ -162,14 +162,14 @@ namespace qs
     inline auto sqrt(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::sqrt, e);
+        return detail::make_xfunction((functor_type)std::sqrt, e.derived_cast());
     }
 
     template <class E>
     inline auto cbrt(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::cbrt, e);
+        return detail::make_xfunction((functor_type)std::cbrt, e.derived_cast());
     }
 
     template <class E1, class E2>
@@ -189,42 +189,42 @@ namespace qs
     inline auto sin(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::sin, e);
+        return detail::make_xfunction((functor_type)std::sin, e.derived_cast());
     }
 
     template <class E>
     inline auto cos(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::cos, e);
+        return detail::make_xfunction((functor_type)std::cos, e.derived_cast());
     }
 
     template <class E>
     inline auto tan(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::tan, e);
+        return detail::make_xfunction((functor_type)std::tan, e.derived_cast());
     }
 
     template <class E>
     inline auto asin(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::asin, e);
+        return detail::make_xfunction((functor_type)std::asin, e.derived_cast());
     }
 
     template <class E>
     inline auto acos(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::acos, e);
+        return detail::make_xfunction((functor_type)std::acos, e.derived_cast());
     }
 
     template <class E>
     inline auto atan(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::atan, e);
+        return detail::make_xfunction((functor_type)std::atan, e.derived_cast());
     }
 
     template <class E1, class E2>
@@ -244,42 +244,42 @@ namespace qs
     inline auto sinh(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::sinh, e);
+        return detail::make_xfunction((functor_type)std::sinh, e.derived_cast());
     }
 
     template <class E>
     inline auto cosh(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::cosh, e);
+        return detail::make_xfunction((functor_type)std::cosh, e.derived_cast());
     }
 
     template <class E>
     inline auto tanh(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::tanh, e);
+        return detail::make_xfunction((functor_type)std::tanh, e.derived_cast());
     }
 
     template <class E>
     inline auto asinh(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::asinh, e);
+        return detail::make_xfunction((functor_type)std::asinh, e.derived_cast());
     }
 
     template <class E>
     inline auto acosh(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::acosh, e);
+        return detail::make_xfunction((functor_type)std::acosh, e.derived_cast());
     }
 
     template <class E>
     inline auto atanh(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::atanh, e);
+        return detail::make_xfunction((functor_type)std::atanh, e.derived_cast());
     }
 
 
@@ -291,28 +291,28 @@ namespace qs
     inline auto erf(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::erf, e);
+        return detail::make_xfunction((functor_type)std::erf, e.derived_cast());
     }
 
     template <class E>
     inline auto erfc(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::erfc, e);
+        return detail::make_xfunction((functor_type)std::erfc, e.derived_cast());
     }
 
     template <class E>
     inline auto tgamma(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::tgamma, e);
+        return detail::make_xfunction((functor_type)std::tgamma, e.derived_cast());
     }
 
     template <class E>
     inline auto lgamma(const xexpression<E>& e) noexcept
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::lgamma, e);
+        return detail::make_xfunction((functor_type)std::lgamma, e.derived_cast());
     }
 
 }
