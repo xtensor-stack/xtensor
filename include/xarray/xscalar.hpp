@@ -33,6 +33,8 @@ namespace qs
         using shape_type = array_shape<size_type>;
         using strides_type = array_strides<size_type>;
 
+        using closure_type = const self_type;
+
         xscalar(const T& value);
 
         size_type size() const;

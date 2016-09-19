@@ -57,16 +57,19 @@ namespace qs
     using has_xexpression = or_<is_xexpression<E>...>;
 
 
-    /*************************
-     * get_expression_type
-     *************************/
+    /**************************
+     * get_xexpression_type
+     **************************/
+
+    template <class T>
+    class xscalar;
 
     namespace detail
     {
-        template <class T>
+        template <class E>
         struct get_xexpression_type_impl
         {
-            using type = T;
+            using type = std::conditional_t<is_xexpression<E>::value, E, xscalar<E>>;
         };
 
         template <class E>
@@ -80,9 +83,9 @@ namespace qs
     using get_xexpression_type = typename detail::get_xexpression_type_impl<E>::type;
 
 
-    /********************
-     * get_expression
-     ********************/
+    /*********************
+     * get_xexpression
+     *********************/
 
     template <class E>
     inline const E& get_xexpression(const xexpression<E>& e) noexcept
@@ -91,37 +94,11 @@ namespace qs
     }
 
     template <class E>
-    inline disable_xexpression<E, const E&> get_xexpression(const E& e) noexcept
+    inline disable_xexpression<E, xscalar<E>> get_xexpression(const E& e) noexcept
     {
-        return e;
+        return xscalar<E>(e);
     }
 
-
-    /*********************************
-     *  get_closure_type
-     *********************************/
-    
-    template <class T>
-    class xscalar;
-
-    namespace detail
-    {
-        template <class E, class enable=void>
-        struct get_closure_type_impl
-        {
-            using type = xscalar<E>;
-        };
-        
-        template <class E>
-        struct get_closure_type_impl<E, std::enable_if_t<is_xexpression<E>::value, void>>
-        {
-            using type = typename E::closure_type;
-        };
-    }
-
-    template <class E>
-    using get_closure_type = typename detail::get_closure_type_impl<E>::type;
- 
 
     /********************
      * get_value_type
@@ -144,52 +121,6 @@ namespace qs
 
     template <class E>
     using get_value_type = typename detail::get_value_type_impl<E>::type;
-
-
-    /*******************
-     * get_size_type
-     *******************/
-
-    namespace detail
-    {
-        template <class E, class enable = void>
-        struct get_size_type_impl
-        {
-            using type = size_t;
-        };
-
-        template <class E>
-        struct get_size_type_impl<E, std::enable_if_t<is_xexpression<E>::value, void>>
-        {
-            using type = typename E::size_type;
-        };
-    }
-
-    template <class E>
-    using get_size_type = typename detail::get_size_type_impl<E>::type;
-
-
-    /*************************
-     * get_difference_type
-     *************************/
-
-    namespace detail
-    {
-        template <class E, class enable = void>
-        struct get_difference_type_impl
-        {
-            using type = ptrdiff_t;
-        };
-
-        template <class E>
-        struct get_difference_type_impl<E, std::enable_if_t<is_xexpression<E>::value, void>>
-        {
-            using type = typename E::difference_type;
-        };
-    }
-
-    template <class E>
-    using get_difference_type = typename detail::get_difference_type_impl<E>::type;
 
 }
 

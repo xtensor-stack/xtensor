@@ -20,10 +20,10 @@ namespace qs
     namespace detail
     {
         template <class... Args>
-        using common_size_type = std::common_type_t<get_size_type<Args>...>;
+        using common_size_type = std::common_type_t<typename Args::size_type...>;
 
         template <class... Args>
-        using common_difference_type = std::common_type_t<get_difference_type<Args>...>;
+        using common_difference_type = std::common_type_t<typename Args::difference_type...>;
 
         template <class... Args>
         using common_value_type = std::common_type_t<get_value_type<Args>...>;
@@ -75,7 +75,7 @@ namespace qs
 
     private:
 
-        std::tuple<get_closure_type<E>...> m_e;
+        std::tuple<typename E::closure_type...> m_e;
         F m_f;
 
         template <size_t... I, class... Args>
