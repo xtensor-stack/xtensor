@@ -1,6 +1,5 @@
 #include "gtest/gtest.h"
 #include "xarray/xarray.hpp"
-#include <iostream>
 
 namespace qs
 {

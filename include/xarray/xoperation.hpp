@@ -31,7 +31,7 @@ namespace qs
         {
             using functor_type = F<common_value_type<E...>>;
             using result_type = typename functor_type::result_type;
-            using type = xfunction<functor_type, result_type, E...>;
+            using type = xfunction<functor_type, result_type, get_xexpression_type<E>...>;
             return type(functor_type(), get_xexpression(e)...);
         }
 
@@ -39,7 +39,7 @@ namespace qs
         using get_xfunction_type = std::enable_if_t<has_xexpression<E...>::value,
                                                     xfunction<F<common_value_type<E...>>,
                                                               common_value_type<E...>,
-                                                              E...>>;
+                                                              get_xexpression_type<E>...>>;
     }
 
 
@@ -50,13 +50,13 @@ namespace qs
     template <class E>
     inline auto operator+(const xexpression<E>& e) noexcept
     {
-        return detail::make_xfunction<identity>(e);
+        return detail::make_xfunction<identity>(e.derived_cast());
     }
 
     template <class E>
     inline auto operator-(const xexpression<E>& e) noexcept
     {
-        return detail::make_xfunction<std::negate>(e);
+        return detail::make_xfunction<std::negate>(e.derived_cast());
     }
 
     template <class E1, class E2>
