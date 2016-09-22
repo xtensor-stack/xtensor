@@ -176,6 +176,45 @@ namespace qs
     {
     };
 
+    /**********************
+     * get_arg
+     **********************/
+ 
+    namespace detail
+    {
+        template <size_t I>
+        struct getter
+        {
+            template <class Arg, class... Args>
+            static inline decltype(auto) get(Arg&& arg, Args&&... args) noexcept
+            {
+                return getter<I - 1>::get(std::forward<Args>(args)...);
+            }
+        };
+
+        template <>
+        struct getter<0>
+        {
+            template <class Arg, class... Args>
+            static inline Arg&& get(Arg&& arg, Args&&... args) noexcept
+            {
+                return std::forward<Arg>(arg);
+            }
+            
+            static inline size_t get() noexcept
+            {
+                // return 0 when requesting an argument beyond the maximum
+                return 0;
+            } 
+        };
+    }
+
+    template <size_t I, class... Args>
+    inline decltype(auto) argument(Args&&... args) noexcept
+    {
+        return detail::getter<I>::get(std::forward<Args>(args)...);
+    }
+    
 }
 
 #endif

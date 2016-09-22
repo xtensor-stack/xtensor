@@ -57,6 +57,8 @@ set(XARRAY_HEADERS
     include/xarray/xmath.hpp
     include/xarray/xoperation.hpp
     include/xarray/xfunction.hpp
+    include/xarray/xslice.hpp
+    include/xarray/xview.hpp
     include/xarray/utils.hpp
 )
 
@@ -67,6 +69,7 @@ set(XARRAY_TESTS
     test/test_xmath.cpp
     test/test_xoperation.cpp
     test/test_xscalar.cpp
+    test/test_xview.cpp
     test/test_utils.cpp
 )
 
