@@ -200,18 +200,13 @@ namespace qs
             {
                 return std::forward<Arg>(arg);
             }
-            
-            static inline size_t get() noexcept
-            {
-                // return 0 when requesting an argument beyond the maximum
-                return 0;
-            } 
         };
     }
 
     template <size_t I, class... Args>
     inline decltype(auto) argument(Args&&... args) noexcept
     {
+        static_assert(I < sizeof...(Args), "I should be lesser than sizeof...(Args)");
         return detail::getter<I>::get(std::forward<Args>(args)...);
     }
     

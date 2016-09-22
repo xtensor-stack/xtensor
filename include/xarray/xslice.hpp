@@ -115,7 +115,7 @@ namespace qs
 
         explicit xsqueeze(size_type index) noexcept : m_index(index) {}
 
-        inline size_type operator()(size_type i) const noexcept
+        inline size_type operator()() const noexcept
         {
             return m_index;
         }
