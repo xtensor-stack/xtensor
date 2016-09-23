@@ -128,8 +128,8 @@ namespace qs
         template <size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
 
-        std::tuple<typename E::const_iterator...> m_it;
         const xfunction_type* p_f;
+        std::tuple<typename E::const_iterator...> m_it;
 
     };
 
@@ -177,8 +177,8 @@ namespace qs
         template <size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
 
-        std::tuple<typename E::broadcasting_iterator...> m_it;
         const xfunction_type* p_f;
+        std::tuple<typename E::broadcasting_iterator...> m_it;
     };
 
     template <class F, class R, class... E>
@@ -233,14 +233,14 @@ namespace qs
     inline auto xfunction<F, R, E...>::begin() const -> const_iterator
     {
         auto f = [](const auto& e) { return e.begin(); };
-        return buid_const_iterator(f, std::make_index_sequence<sizeof...(E)>());
+        return build_const_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
     
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::end() const -> const_iterator
     {
         auto f = [](const auto& e) { return e.end(); };
-        return buid_const_iterator(f, std::make_index_sequence<sizeof...(E)>());
+        return build_const_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>

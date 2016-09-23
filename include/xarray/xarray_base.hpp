@@ -313,13 +313,13 @@ namespace qs
     template <class D>
     inline auto xarray_base<D>::begin(const shape_type& shape) const -> broadcasting_iterator
     {
-        return broadcasting_iterator(*static_cast<const D*>(this), data().begin());
+        return broadcasting_iterator(static_cast<const D*>(this), data().begin());
     }
 
     template <class D>
     inline auto xarray_base<D>::end(const shape_type& shape) const -> broadcasting_iterator
     {
-        return broadcasting_iterator(*static_cast<const D*>(this), data().end());
+        return broadcasting_iterator(static_cast<const D*>(this), data().end());
     }
 
 }
