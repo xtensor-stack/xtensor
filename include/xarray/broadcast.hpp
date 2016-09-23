@@ -34,76 +34,89 @@ namespace qs
      * broadcasting_iterator
      ***************************/
 
-    // TODO : refactor this
-    template <class I, class S>
+    template <class C>
     class broadcasting_iterator
     {
 
     public:
 
-        
-        using subiterator_type = I;
+        using container_type = C;
+        using subiterator_type = typename container_type::const_iterator;
         using value_type = typename subiterator_type::value_type;
         using reference = typename subiterator_type::reference;
         using pointer = typename subiterator_type::pointer;
         using difference_type = typename subiterator_type::difference_type;
-        using iterator_category = std::forward_iterator_tag;
+        using size_type = typename container_type::size_type;
+        using iterator_category = std::input_iterator_tag;
 
-        using size_type = S;
-        using shape_type = array_shape<size_type>;
-        using strides_type = array_strides<size_type>;
-
-        broadcasting_iterator(subiterator_type it, strides_type&& strides, const shape_type& shape);
+        broadcasting_iterator(const container_type* c, subiterator_type it);
         reference operator*() const;
 
         void increment(size_type i);
         void reset(size_type i);
 
+        bool equal(const broadcasting_iterator& rhs) const;
+
     private:
 
-        subiterator_type m_iter;
-        strides_type m_strides;
-        strides_type m_backstrides;
+        const container_type* p_c;
+        subiterator_type m_it;
     };
 
+    template <class C>
+    bool operator==(const broadcasting_iterator<C>& lhs,
+                    const broadcasting_iterator<C>& rhs);
 
-    /********************
-     * multi_iterator
-     ********************/
+    template <class C>
+    bool operator!=(const broadcasting_iterator<C>& lhs,
+                    const broadcasting_iterator<C>& rhs);
 
-    template <class S, class... I>
-    class multi_iterator
+
+    /**********************
+     * indexed_iterator
+     **********************/
+
+    template <class E>
+    class indexed_iterator
     {
 
     public:
 
-        using iterator_container = std::tuple<I...>;
-        
-        template <size_t N>
-        using iterator = typename std::tuple_element<N, iterator_container>::type;
-        
-        template <size_t N>
-        using reference = typename iterator<N>::reference;
+        using self_type = indexed_iterator<E>;
 
-        using size_type = S;
-        using shape_type = array_shape<S>;
+        using subiterator_type = typename E::broadcasting_iterator;
+        using value_type = typename subiterator_type::value_type;
+        using reference = typename subiterator_type::reference;
+        using pointer = typename subiterator_type::pointer;
+        using difference_type = typename subiterator_type::difference_type;
+        using size_type = typename E::size_type;
+        using iterator_category = std::input_iterator_tag;
         
-        multi_iterator(I&&... iterator, const shape_type& shape);
+        using shape_type = array_shape<size_type>;
+        
+        indexed_iterator(const E& e, const shape_type& shape);
 
-        multi_iterator& operator++();
+        self_type& operator++();
+        self_type operator++(int);
 
-        template <size_t N>
-        reference<N> data() const;
+        reference operator*() const;
+
+        bool equal(const indexed_iterator& rhs) const;
 
     private:
 
-        void increment(size_type i);
-        void reset(size_type i);
-
-        iterator_container m_iterator;
+        subiterator_type m_it;
         shape_type m_shape;
         shape_type m_index;
     };
+
+    template <class E>
+    bool operator==(const indexed_iterator<E>& lhs,
+                    const indexed_iterator<E>& rhs);
+
+    template <class E>
+    bool operator!=(const indexed_iterator<E>& lhs,
+                    const indexed_iterator<E>& rhs);
 
 
     /****************************************
@@ -152,84 +165,116 @@ namespace qs
      * broadcasting_iterator implementation
      ******************************************/
 
-    template <class I, class S>
-    inline broadcasting_iterator<I, S>::broadcasting_iterator(subiterator_type iter,
-                                                              strides_type&& strides,
-                                                              const shape_type& shape)
-        : m_iter(iter), m_strides(std::move(strides)), m_backstrides(shape.size())
-    {
-        std::transform(strides.begin(), strides.end(), shape.begin(), m_backstrides.begin(),
-                [](size_type stride, size_type shape) { return stride != 0 ? stride * shape - 1 : 0;});
-    }
-
-    template <class I, class S>
-    inline auto broadcasting_iterator<I, S>::operator*() const -> reference
-    {
-        return *m_iter;
-    }
-
-    template <class I, class S>
-    inline void broadcasting_iterator<I, S>::increment(size_type dim)
-    {
-        m_iter += m_strides[dim];
-    }
-
-    template <class I, class S>
-    inline void broadcasting_iterator<I, S>::reset(size_type dim)
-    {
-        m_iter -= m_backstrides[dim];
-    }
-
-
-    /***********************************
-     * multi_iterator implementation
-     ***********************************/
-
-    template <class S, class... I>
-    inline multi_iterator<S, I...>::multi_iterator(I&&... iterator, const shape_type& shape)
-        : m_iterator(std::make_tuple(iterator...)), m_shape(shape), m_index(shape.size(), S(0))
+    template <class C>
+    inline broadcasting_iterator<C>::broadcasting_iterator(const container_type* c, subiterator_type it)
+        : p_c(c), m_it(it)
     {
     }
 
-    template <class S, class... I>
-    inline multi_iterator<S, I...>& multi_iterator<S, I...>::operator++()
+    template <class C>
+    inline auto broadcasting_iterator<C>::operator*() const -> reference
+    {
+        return *m_it;
+    }
+
+    template <class C>
+    inline void broadcasting_iterator<C>::increment(size_type dim)
+    {
+        if(dim < p_c->dimension())
+            m_it += p_c->strides()[dim];
+    }
+
+    template <class C>
+    inline void broadcasting_iterator<C>::reset(size_type dim)
+    {
+        if(dim < p_c->dimension())
+            m_it -= p_c->backstrides()[dim];
+    }
+
+    template <class C>
+    inline bool broadcasting_iterator<C>::equal(const broadcasting_iterator& rhs) const
+    {
+        return p_c == rhs.p_c && m_it == rhs.m_it;
+    }
+
+    template <class C>
+    inline bool operator==(const broadcasting_iterator<C>& lhs,
+                           const broadcasting_iterator<C>& rhs)
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class C>
+    inline bool operator!=(const broadcasting_iterator<C>& lhs,
+                           const broadcasting_iterator<C>& rhs)
+    {
+        return !(lhs.equal(rhs));
+    }
+
+
+    /*************************************
+     * indexed_iterator implementation
+     *************************************/
+
+    template <class E>
+    inline indexed_iterator<E>::indexed_iterator(const E& e, const shape_type& shape)
+        : m_it(e.begin(shape)), m_shape(shape), m_index(shape.size(), size_type(0))
+    {
+    }
+
+    template <class E>
+    inline auto indexed_iterator<E>::operator++() -> self_type&
     {
         for(size_type j = m_index.size(); j != 0; --j)
         {
             size_type i = j-1;
             if(++m_index[i] != m_shape[i])
             {
-                increment(i);
+                m_it.increment(i);
                 break;
             }
             else
             {
                 m_index[i] = 0;
-                reset(i);
+                m_it.reset(i);
             }
         }
     }
 
-    template <class S, class... I>
-    template <size_t N>
-    inline auto multi_iterator<S, I...>::data() const -> reference<N>
+    template <class E>
+    inline auto indexed_iterator<E>::operator++(int) -> self_type
     {
-        return std::get<N>(m_iterator);
+        self_type tmp(*this);
+        ++(*this);
+        return tmp;
     }
 
-    template <class S, class... I>
-    inline void multi_iterator<S, I...>::increment(size_type i)
+    template <class E>
+    inline auto indexed_iterator<E>::operator*() const -> reference
     {
-        auto fn = [i](auto& iter) { iter.increment(i); };
-        for_each(fn, m_iterator);
+        return *m_it;
     }
 
-    template <class S, class... I>
-    inline void multi_iterator<S, I...>::reset(size_type i)
+    template <class E>
+    inline bool indexed_iterator<E>::equal(const indexed_iterator& rhs) const
     {
-        auto fn = [i](auto& iter) { iter.reset(i); };
-        for_each(fn, m_iterator);
+        return m_it == rhs.m_it && m_shape == rhs.m_shape && m_index == rhs.m_index;
     }
+
+    template <class E>
+    inline bool operator==(const indexed_iterator<E>& lhs,
+                           const indexed_iterator<E>& rhs)
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class E>
+    inline bool operator!=(const indexed_iterator<E>& lhs,
+                           const indexed_iterator<E>& rhs)
+    {
+        return !(lhs.equal(rhs));
+    }
+
 }
 
 #endif
