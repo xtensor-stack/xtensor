@@ -40,6 +40,8 @@ namespace qs
         using reverse_iterator = typename container_type::reverse_iterator;
         using const_reverse_iterator = typename container_type::const_reverse_iterator;
 
+        using broadcasting_iterator = broadcast_iterator<D>;
+
         using shape_type = array_shape<size_type>;
         using strides_type = array_strides<size_type>;
 
@@ -80,6 +82,9 @@ namespace qs
         const_reverse_iterator rend() const;
         const_reverse_iterator crbegin() const;
         const_reverse_iterator crend() const;
+
+        broadcasting_iterator begin(const shape_type& shape) const;
+        broadcasting_iterator end(const shape_type& shape) const;
 
     protected:
 
@@ -303,6 +308,18 @@ namespace qs
     inline auto xarray_base<D>::crend() const -> const_reverse_iterator
     {
         return data().rend();
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::begin(const shape_type& shape) const -> broadcasting_iterator
+    {
+        return broadcasting_iterator(*static_cast<const D*>(this), data().begin());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::end(const shape_type& shape) const -> broadcasting_iterator
+    {
+        return broadcasting_iterator(*static_cast<const D*>(this), data().end());
     }
 
 }

@@ -35,7 +35,7 @@ namespace qs
      ***************************/
 
     template <class C>
-    class broadcasting_iterator
+    class broadcast_iterator
     {
 
     public:
@@ -49,13 +49,13 @@ namespace qs
         using size_type = typename container_type::size_type;
         using iterator_category = std::input_iterator_tag;
 
-        broadcasting_iterator(const container_type* c, subiterator_type it);
+        broadcast_iterator(const container_type* c, subiterator_type it);
         reference operator*() const;
 
         void increment(size_type i);
         void reset(size_type i);
 
-        bool equal(const broadcasting_iterator& rhs) const;
+        bool equal(const broadcast_iterator& rhs) const;
 
     private:
 
@@ -64,12 +64,12 @@ namespace qs
     };
 
     template <class C>
-    bool operator==(const broadcasting_iterator<C>& lhs,
-                    const broadcasting_iterator<C>& rhs);
+    bool operator==(const broadcast_iterator<C>& lhs,
+                    const broadcast_iterator<C>& rhs);
 
     template <class C>
-    bool operator!=(const broadcasting_iterator<C>& lhs,
-                    const broadcasting_iterator<C>& rhs);
+    bool operator!=(const broadcast_iterator<C>& lhs,
+                    const broadcast_iterator<C>& rhs);
 
 
     /**********************
@@ -161,52 +161,52 @@ namespace qs
     }
 
 
-    /******************************************
-     * broadcasting_iterator implementation
-     ******************************************/
+    /***************************************
+     * broadcast_iterator implementation
+     ***************************************/
 
     template <class C>
-    inline broadcasting_iterator<C>::broadcasting_iterator(const container_type* c, subiterator_type it)
+    inline broadcast_iterator<C>::broadcast_iterator(const container_type* c, subiterator_type it)
         : p_c(c), m_it(it)
     {
     }
 
     template <class C>
-    inline auto broadcasting_iterator<C>::operator*() const -> reference
+    inline auto broadcast_iterator<C>::operator*() const -> reference
     {
         return *m_it;
     }
 
     template <class C>
-    inline void broadcasting_iterator<C>::increment(size_type dim)
+    inline void broadcast_iterator<C>::increment(size_type dim)
     {
         if(dim < p_c->dimension())
             m_it += p_c->strides()[dim];
     }
 
     template <class C>
-    inline void broadcasting_iterator<C>::reset(size_type dim)
+    inline void broadcast_iterator<C>::reset(size_type dim)
     {
         if(dim < p_c->dimension())
             m_it -= p_c->backstrides()[dim];
     }
 
     template <class C>
-    inline bool broadcasting_iterator<C>::equal(const broadcasting_iterator& rhs) const
+    inline bool broadcast_iterator<C>::equal(const broadcast_iterator& rhs) const
     {
         return p_c == rhs.p_c && m_it == rhs.m_it;
     }
 
     template <class C>
-    inline bool operator==(const broadcasting_iterator<C>& lhs,
-                           const broadcasting_iterator<C>& rhs)
+    inline bool operator==(const broadcast_iterator<C>& lhs,
+                           const broadcast_iterator<C>& rhs)
     {
         return lhs.equal(rhs);
     }
 
     template <class C>
-    inline bool operator!=(const broadcasting_iterator<C>& lhs,
-                           const broadcasting_iterator<C>& rhs)
+    inline bool operator!=(const broadcast_iterator<C>& lhs,
+                           const broadcast_iterator<C>& rhs)
     {
         return !(lhs.equal(rhs));
     }
