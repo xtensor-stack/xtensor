@@ -35,12 +35,11 @@ namespace qs
         using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
 
-        using iterator = typename container_type::iterator;
-        using const_iterator = typename container_type::const_iterator;
-        using reverse_iterator = typename container_type::reverse_iterator;
-        using const_reverse_iterator = typename container_type::const_reverse_iterator;
+        using storage_iterator = typename container_type::iterator;
+        using const_storage_iterator = typename container_type::const_iterator;
 
-        using broadcasting_iterator = broadcast_iterator<D>;
+        using iterator = broadcasting_iterator<D>;
+        using const_iterator = broadcasting_iterator<const D>;
 
         using shape_type = array_shape<size_type>;
         using strides_type = array_strides<size_type>;
@@ -67,6 +66,12 @@ namespace qs
 
         bool broadcast_shape(shape_type& shape) const;
 
+        storage_iterator storage_begin();
+        storage_iterator storage_end();
+
+        const_storage_iterator storage_begin() const;
+        const_storage_iterator storage_end() const;
+
         iterator begin();
         iterator end();
 
@@ -74,17 +79,6 @@ namespace qs
         const_iterator end() const;
         const_iterator cbegin() const;
         const_iterator cend() const;
-
-        reverse_iterator rbegin();
-        reverse_iterator rend();
-
-        const_reverse_iterator rbegin() const;
-        const_reverse_iterator rend() const;
-        const_reverse_iterator crbegin() const;
-        const_reverse_iterator crend() const;
-
-        broadcasting_iterator begin(const shape_type& shape) const;
-        broadcasting_iterator end(const shape_type& shape) const;
 
     protected:
 
@@ -239,87 +233,63 @@ namespace qs
     }
 
     template <class D>
-    inline auto xarray_base<D>::begin() -> iterator
+    inline auto xarray_base<D>::storage_begin() -> storage_iterator
     {
         return data().begin();
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::storage_end() -> storage_iterator
+    {
+        return data().end();
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::storage_begin() const -> const_storage_iterator
+    {
+        return data().begin();
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::storage_end() const -> const_storage_iterator
+    {
+        return data().end();
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::begin() -> iterator
+    {
+        return iterator(static_cast<D*>(this), data().begin());
     }
 
     template <class D>
     inline auto xarray_base<D>::end() -> iterator
     {
-        return data().end();
+        return iterator(static_cast<D*>(this), data().end());
     }
 
     template <class D>
     inline auto xarray_base<D>::begin() const -> const_iterator
     {
-        return data().begin();
+        return const_iterator(static_cast<const D*>(this), data().begin());
     }
 
     template <class D>
     inline auto xarray_base<D>::end() const -> const_iterator
     {
-        return data().end();
+        return const_iterator(static_cast<const D*>(this), data().end());
     }
 
     template <class D>
-    inline auto xarray_base<D>::cbegin() const -> const_iterator 
+    inline auto xarray_base<D>::cbegin() const -> const_iterator
     {
-        return data().cbegin();
+        return begin();
     }
 
     template <class D>
     inline auto xarray_base<D>::cend() const -> const_iterator
     {
-        return data().cend();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::rbegin() -> reverse_iterator
-    {
-        return data().rbegin();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::rend() -> reverse_iterator
-    {
-        return data().rend();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::rbegin() const -> const_reverse_iterator
-    {
-        return data().rbegin();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::rend() const -> const_reverse_iterator
-    {
-        return data().rend();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::crbegin() const -> const_reverse_iterator
-    {
-        return data().rbegin();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::crend() const -> const_reverse_iterator
-    {
-        return data().rend();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::begin(const shape_type& shape) const -> broadcasting_iterator
-    {
-        return broadcasting_iterator(static_cast<const D*>(this), data().begin());
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::end(const shape_type& shape) const -> broadcasting_iterator
-    {
-        return broadcasting_iterator(static_cast<const D*>(this), data().end());
+        return end();
     }
 
 }

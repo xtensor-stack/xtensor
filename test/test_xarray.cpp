@@ -10,10 +10,10 @@ namespace qs
         ASSERT_TRUE(test_xarray_reshape(a));
     }
 
-    TEST(xarray, iterator)
+    TEST(xarray, storage_iterator)
     {
         xarray<int> a;
-        ASSERT_TRUE(test_xarray_iterator(a));
+        ASSERT_TRUE(test_xarray_storage_iterator(a));
     }
 
     TEST(xarray, access)
@@ -38,11 +38,11 @@ namespace qs
         ASSERT_TRUE(test_xarray_reshape(a));
     }
 
-    TEST(xarray_adaptor, iterator)
+    TEST(xarray_adaptor, storage_iterator)
     {
         vec_type v;
         adaptor_type a(v);
-        ASSERT_TRUE(test_xarray_iterator(a));
+        ASSERT_TRUE(test_xarray_storage_iterator(a));
     }
 
     TEST(xarray_adaptor, access)

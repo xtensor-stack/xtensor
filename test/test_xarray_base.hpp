@@ -142,7 +142,7 @@ namespace qs
     }
 
     template <class V>
-    bool test_xarray_iterator(V& vec)
+    bool test_xarray_storage_iterator(V& vec)
     {
         using result_type = central_major_result;
         using vector_type = result_type::vector_type;
@@ -151,29 +151,8 @@ namespace qs
 
         // begin/end test
         vec.reshape(res.m_shape);
-        std::copy(res.m_data.begin(), res.m_data.end(), vec.begin());
-        bool b = (vec.data() == res.m_data) && (vec.end() == vec.data().end());
-
-        // const begin/end test
-        const V& cvec = vec;
-        std::copy(cvec.begin(), cvec.end(), tester.begin());
-        b = b && (cvec.data() == tester) && (cvec.end() == cvec.data().end());
- 
-        // cbegin/cend test
-        std::copy(vec.cbegin(), vec.cend(), tester.begin());
-        b = b && (vec.data() == tester) && (vec.cend() == vec.data().cend());
-
-        // rbegin/rend test
-        std::copy(res.m_data.rbegin(), res.m_data.rend(), vec.rbegin());
-        b = b && (vec.data() == res.m_data) && (vec.rend() == vec.data().rend());
-
-        // const rbegin /rend test
-        std::copy(cvec.rbegin(), cvec.rend(), tester.rbegin());
-        b = b && (cvec.data() == tester) && (cvec.rend() == cvec.data().rend());
-
-        // crbegin/crend test
-        std::copy(vec.cbegin(), vec.cend(), tester.begin());
-        b = b && (vec.data() == tester) && (vec.crend() == vec.data().crend());
+        std::copy(res.m_data.begin(), res.m_data.end(), vec.storage_begin());
+        bool b = (vec.data() == res.m_data) && (vec.storage_end() == vec.data().end());
 
         return b;
     }
