@@ -149,7 +149,7 @@ namespace qs
         result_type res;
         vector_type tester(res.m_data.size());
 
-        // begin/end test
+        // storage_begin/storage_end test
         vec.reshape(res.m_shape);
         std::copy(res.m_data.begin(), res.m_data.end(), vec.storage_begin());
         bool b = (vec.data() == res.m_data) && (vec.storage_end() == vec.data().end());

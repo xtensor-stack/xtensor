@@ -29,7 +29,7 @@ namespace qs
     class xf_storage_iterator;
 
     template <class F, class R, class... E>
-    class xf_broadcasting_iterator;
+    class xfunction_stepper;
 
 
     /***************
@@ -54,8 +54,9 @@ namespace qs
         using shape_type = array_shape<size_type>;
         using closure_type = const self_type;
 
+        using const_stepper = xfunction_stepper<F, R, E...>;
+        using const_iterator = xiterator<const_stepper>;
         using const_storage_iterator = xf_storage_iterator<F, R, E...>;
-        using const_iterator = xf_broadcasting_iterator<F, R, E...>;
 
         template <class Func>
         xfunction(Func&& f, const E&...e) noexcept;
@@ -66,13 +67,21 @@ namespace qs
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        const_storage_iterator storage_begin() const;
-        const_storage_iterator storage_end() const;
-
         const_iterator begin() const;
         const_iterator end() const;
         const_iterator cbegin() const;
         const_iterator cend() const;
+
+        const_iterator xbegin(const shape_type& shape) const;
+        const_iterator xend(const shape_type& shape) const;
+        const_iterator cxbegin(const shape_type& shape) const;
+        const_iterator cxend(const shape_type& shape) const;
+
+        const_stepper stepper_begin() const;
+        const_stepper stepper_end() const;
+
+        const_storage_iterator storage_begin() const;
+        const_storage_iterator storage_end() const;
 
     private:
 
@@ -80,16 +89,16 @@ namespace qs
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
         template <class Func, size_t... I>
-        const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const;
+        const_iterator build_iterator(Func&& f, const shape_type& shape, std::index_sequence<I...>) const;
 
         template <class Func, size_t... I>
-        const_iterator build_iterator(Func&& f, std::index_sequence<I...>) const;
+        const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const;
 
         std::tuple<typename E::closure_type...> m_e;
         F m_f;
 
         friend class xf_storage_iterator<F, R, E...>;
-        friend class xf_broadcasting_iterator<F, R, E...>;
+        friend class xfunction_stepper<F, R, E...>;
     };
 
 
@@ -142,16 +151,16 @@ namespace qs
 
 
     /******************************
-     * xf_broadcasting_iterator
+     * xfunction_stepper
      ******************************/
 
     template <class F, class R, class... E>
-    class xf_broadcasting_iterator
+    class xfunction_stepper
     {
 
     public:
 
-        using self_type = xf_broadcasting_iterator<F, R, E...>;
+        using self_type = xfunction_stepper<F, R, E...>;
         using xfunction_type = xfunction<F, R, E...>;
 
         using value_type = typename xfunction_type::value_type;
@@ -162,7 +171,7 @@ namespace qs
         using iterator_category = std::input_iterator_tag;
 
         template <class... It>
-        xf_broadcasting_iterator(const xfunction_type* func, It&&... it);
+        xfunction_stepper(const xfunction_type* func, It&&... it);
 
         void increment(size_type i);
         void reset(size_type i);
@@ -181,12 +190,12 @@ namespace qs
     };
 
     template <class F, class R, class... E>
-    bool operator==(const xf_broadcasting_iterator<F, R, E...>& it1,
-                    const xf_broadcasting_iterator<F, R, E...>& it2);
+    bool operator==(const xfunction_stepper<F, R, E...>& it1,
+                    const xfunction_stepper<F, R, E...>& it2);
 
     template <class F, class R, class... E>
-    bool operator!=(const xf_broadcasting_iterator<F, R, E...>& it1,
-                    const xf_broadcasting_iterator<F, R, E...>& it2);
+    bool operator!=(const xfunction_stepper<F, R, E...>& it1,
+                    const xfunction_stepper<F, R, E...>& it2);
 
 
     /******************************
@@ -222,31 +231,19 @@ namespace qs
     }
 
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::storage_begin() const -> const_storage_iterator
-    {
-        auto f = [](const auto& e) { return e.storage_begin(); };
-        return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
-    }
-    
-    template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::storage_end() const -> const_storage_iterator
-    {
-        auto f = [](const auto& e) { return e.storage_end(); };
-        return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
-    }
-
-    template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::begin() const -> const_iterator
     {
-        auto f = [](const auto& e) { return e.begin(); };
-        return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
+        shape_type shape(dimension(), size_type(1));
+        broadcast_shape(shape);
+        return xbegin(shape);
     }
 
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::end() const -> const_iterator
     {
-        auto f = [](const auto& e) { return e.end(); };
-        return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
+        shape_type shape(dimension(), size_type(1));
+        broadcast_shape(shape);
+        return xend(shape);
     }
 
     template <class F, class R, class... E>
@@ -262,6 +259,46 @@ namespace qs
     }
 
     template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::xbegin(const shape_type& shape) const -> const_iterator
+    {
+        auto f = [](const auto& e) { return e.stepper_begin(); };
+        return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
+    }
+
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::xend(const shape_type& shape) const -> const_iterator
+    {
+        auto f = [](const auto& e) { return e.stepper_end(); };
+        return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
+    }
+
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::cxbegin(const shape_type& shape) const -> const_iterator
+    {
+        return xbegin(shape);
+    }
+
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::cxend(const shape_type& shape) const -> const_iterator
+    {
+        return xend(shape);
+    }
+
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::storage_begin() const -> const_storage_iterator
+    {
+        auto f = [](const auto& e) { return e.storage_begin(); };
+        return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
+    }
+    
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::storage_end() const -> const_storage_iterator
+    {
+        auto f = [](const auto& e) { return e.storage_end(); };
+        return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
+    }
+
+    template <class F, class R, class... E>
     template <size_t... I, class... Args>
     inline auto xfunction<F, R, E...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
     {
@@ -270,16 +307,16 @@ namespace qs
 
     template <class F, class R, class... E>
     template <class Func, size_t... I>
-    inline auto xfunction<F, R, E...>::build_storage_iterator(Func&& f, std::index_sequence<I...>) const -> const_storage_iterator
+    inline auto xfunction<F, R, E...>::build_iterator(Func&& f, const shape_type& shape, std::index_sequence<I...>) const -> const_iterator
     {
-        return const_storage_iterator(this, f(std::get<I>(m_e))...);
+        return const_iterator(const_stepper(this, f(std::get<I>(m_e))...), shape);
     }
 
     template <class F, class R, class... E>
     template <class Func, size_t... I>
-    inline auto xfunction<F, R, E...>::build_iterator(Func&& f, std::index_sequence<I...>) const -> const_iterator
+    inline auto xfunction<F, R, E...>::build_storage_iterator(Func&& f, std::index_sequence<I...>) const -> const_storage_iterator
     {
-        return const_iterator(this, f(std::get<I>(m_e))...);
+        return const_storage_iterator(this, f(std::get<I>(m_e))...);
     }
 
 
@@ -345,60 +382,60 @@ namespace qs
     }
 
 
-    /*********************************************
-     * xf_broadcasting_iterator implementation
-     *********************************************/
+    /**************************************
+     * xfunction_stepper implementation
+     **************************************/
 
     template <class F, class R, class... E>
     template <class... It>
-    inline xf_broadcasting_iterator<F, R, E...>::xf_broadcasting_iterator(const xfunction_type* func, It&&... it)
+    inline xfunction_stepper<F, R, E...>::xfunction_stepper(const xfunction_type* func, It&&... it)
         : p_f(func), m_it(std::forward<It>(it)...)
     {
     }
 
     template <class F, class R, class... E>
-    inline void xf_broadcasting_iterator<F, R, E...>::increment(size_type i)
+    inline void xfunction_stepper<F, R, E...>::increment(size_type i)
     {
         auto f = [i](auto& it) { it.increment(i); };
         for_each(f, m_it);
     }
 
     template <class F, class R, class... E>
-    inline void xf_broadcasting_iterator<F, R, E...>::reset(size_type i)
+    inline void xfunction_stepper<F, R, E...>::reset(size_type i)
     {
         auto f = [i](auto& it) { it.reset(i); };
         for_each(f, m_it);
     }
 
     template <class F, class R, class... E>
-    inline auto xf_broadcasting_iterator<F, R, E...>::operator*() const -> reference
+    inline auto xfunction_stepper<F, R, E...>::operator*() const -> reference
     {
         return deref_impl(std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>
-    inline bool xf_broadcasting_iterator<F, R, E...>::equal(const self_type& rhs) const
+    inline bool xfunction_stepper<F, R, E...>::equal(const self_type& rhs) const
     {
         return p_f == rhs.pf && m_it == rhs.m_it;
     }
 
     template <class F, class R, class... E>
     template <size_t... I>
-    inline auto xf_broadcasting_iterator<F, R, E...>::deref_impl(std::index_sequence<I...>) const -> reference
+    inline auto xfunction_stepper<F, R, E...>::deref_impl(std::index_sequence<I...>) const -> reference
     {
         return (p_f->m_f)(*std::get<I>(m_it)...);
     }
 
     template <class F, class R, class... E>
-    inline bool operator==(const xf_broadcasting_iterator<F, R, E...>& it1,
-                           const xf_broadcasting_iterator<F, R, E...>& it2)
+    inline bool operator==(const xfunction_stepper<F, R, E...>& it1,
+                           const xfunction_stepper<F, R, E...>& it2)
     {
         return it1.equal(it2);
     }
 
     template <class F, class R, class... E>
-    inline bool operator!=(const xf_broadcasting_iterator<F, R, E...>& it1,
-                           const xf_broadcasting_iterator<F, R, E...>& it2)
+    inline bool operator!=(const xfunction_stepper<F, R, E...>& it1,
+                           const xfunction_stepper<F, R, E...>& it2)
     {
         return !(it1.equal(it2));
     }

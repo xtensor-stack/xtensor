@@ -35,14 +35,17 @@ namespace qs
         using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
 
-        using storage_iterator = typename container_type::iterator;
-        using const_storage_iterator = typename container_type::const_iterator;
-
-        using iterator = broadcasting_iterator<D>;
-        using const_iterator = broadcasting_iterator<const D>;
-
         using shape_type = array_shape<size_type>;
         using strides_type = array_strides<size_type>;
+
+        using stepper = xstepper<D>;
+        using const_stepper = xstepper<const D*>;
+
+        using iterator = xiterator<stepper>;
+        using const_iterator = xiterator<const_stepper>;
+
+        using storage_iterator = typename container_type::iterator;
+        using const_storage_iterator = typename container_type::const_iterator;
 
         size_type size() const;
 
@@ -66,12 +69,6 @@ namespace qs
 
         bool broadcast_shape(shape_type& shape) const;
 
-        storage_iterator storage_begin();
-        storage_iterator storage_end();
-
-        const_storage_iterator storage_begin() const;
-        const_storage_iterator storage_end() const;
-
         iterator begin();
         iterator end();
 
@@ -79,6 +76,26 @@ namespace qs
         const_iterator end() const;
         const_iterator cbegin() const;
         const_iterator cend() const;
+
+        iterator xbegin(const shape_type& shape);
+        iterator xend(const shape_type& shape);
+
+        const_iterator xbegin(const shape_type& shape) const;
+        const_iterator xend(const shape_type& shape) const;
+        const_iterator cxbegin(const shape_type& shape) const;
+        const_iterator cxend(const shape_type& shape) const;
+
+        stepper stepper_begin();
+        stepper stepper_end();
+
+        const_stepper stepper_begin() const;
+        const_stepper stepper_end() const;
+
+        storage_iterator storage_begin();
+        storage_iterator storage_end();
+
+        const_storage_iterator storage_begin() const;
+        const_storage_iterator storage_end() const;
 
     protected:
 
@@ -232,6 +249,117 @@ namespace qs
         return qs::broadcast_shape(m_shape, shape);
     }
 
+
+    /******************
+     * iterator api
+     ******************/
+
+    template <class D>
+    inline auto xarray_base<D>::begin() -> iterator
+    {
+        return xbegin(shape());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::end() -> iterator
+    {
+        return xend(shape());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::begin() const -> const_iterator
+    {
+        return xbegin(shape());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::end() const -> const_iterator
+    {
+        return xend(shape());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::cbegin() const -> const_iterator
+    {
+        return begin();
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::cend() const -> const_iterator
+    {
+        return end();
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::xbegin(const shape_type& shape) -> iterator
+    {
+        return iterator(stepper_begin(), shape);
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::xend(const shape_type& shape) -> iterator
+    {
+        return iterator(stepper_end(), shape);
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::xbegin(const shape_type& shape) const -> const_iterator
+    {
+        return const_iterator(stepper_begin(), shape);
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::xend(const shape_type& shape) const -> const_iterator
+    {
+        return const_iterator(stepper_end(), shape());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::cxbegin(const shape_type& shape) const -> const_iterator
+    {
+        return xbegin(shape);
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::cxend(const shape_type& shape) const -> const_iterator
+    {
+        return xend(shape);
+    }
+
+
+    /****************************
+     * stepper api
+     ****************************/
+
+    template <class D>
+    inline auto xarray_base<D>::stepper_begin() -> stepper
+    {
+        return stepper(static_cast<derived_type*>(this), data().begin());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::stepper_end() -> stepper
+    {
+        return stepper(static_cast<derived_type*>(this), data().end());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::stepper_begin() const -> const_stepper
+    {
+        return const_broadcazst_iterator(static_cast<const derived_type*>(this), data().begin());
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::stepper_end() const -> const_stepper
+    {
+        return const_stepper(static_cast<const derived_type*>(this), data().end());
+    }
+
+
+    /**************************
+     * storage_iterator api
+     **************************/
+
     template <class D>
     inline auto xarray_base<D>::storage_begin() -> storage_iterator
     {
@@ -254,42 +382,6 @@ namespace qs
     inline auto xarray_base<D>::storage_end() const -> const_storage_iterator
     {
         return data().end();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::begin() -> iterator
-    {
-        return iterator(static_cast<D*>(this), data().begin());
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::end() -> iterator
-    {
-        return iterator(static_cast<D*>(this), data().end());
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::begin() const -> const_iterator
-    {
-        return const_iterator(static_cast<const D*>(this), data().begin());
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::end() const -> const_iterator
-    {
-        return const_iterator(static_cast<const D*>(this), data().end());
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::cbegin() const -> const_iterator
-    {
-        return begin();
-    }
-
-    template <class D>
-    inline auto xarray_base<D>::cend() const -> const_iterator
-    {
-        return end();
     }
 
 }

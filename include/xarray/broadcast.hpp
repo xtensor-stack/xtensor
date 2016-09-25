@@ -31,7 +31,7 @@ namespace qs
 
 
     /***************************
-     * broadcasting_iterator
+     * xstepper
      ***************************/
 
     namespace detail
@@ -53,7 +53,7 @@ namespace qs
     using get_storage_iterator = typename detail::get_storage_iterator_impl<C>::type;
 
     template <class C>
-    class broadcasting_iterator
+    class xstepper
     {
 
     public:
@@ -67,13 +67,13 @@ namespace qs
         using size_type = typename container_type::size_type;
         using iterator_category = std::input_iterator_tag;
 
-        broadcasting_iterator(container_type* c, subiterator_type it);
+        xstepper(container_type* c, subiterator_type it);
         reference operator*() const;
 
         void increment(size_type i);
         void reset(size_type i);
 
-        bool equal(const broadcasting_iterator& rhs) const;
+        bool equal(const xstepper& rhs) const;
 
     private:
 
@@ -82,44 +82,44 @@ namespace qs
     };
 
     template <class C>
-    bool operator==(const broadcasting_iterator<C>& lhs,
-                    const broadcasting_iterator<C>& rhs);
+    bool operator==(const xstepper<C>& lhs,
+                    const xstepper<C>& rhs);
 
     template <class C>
-    bool operator!=(const broadcasting_iterator<C>& lhs,
-                    const broadcasting_iterator<C>& rhs);
+    bool operator!=(const xstepper<C>& lhs,
+                    const xstepper<C>& rhs);
 
 
     /**********************
-     * indexed_iterator
+     * xiterator
      **********************/
 
-    template <class E>
-    class indexed_iterator
+    template <class It>
+    class xiterator
     {
 
     public:
 
-        using self_type = indexed_iterator<E>;
+        using self_type = xiterator<It>;
 
-        using subiterator_type = typename E::const_iterator;
+        using subiterator_type = It;
         using value_type = typename subiterator_type::value_type;
         using reference = typename subiterator_type::reference;
         using pointer = typename subiterator_type::pointer;
         using difference_type = typename subiterator_type::difference_type;
-        using size_type = typename E::size_type;
+        using size_type = typename subiterator_type::size_type;
         using iterator_category = std::input_iterator_tag;
         
         using shape_type = array_shape<size_type>;
         
-        indexed_iterator(const E& e, const shape_type& shape);
+        xiterator(It it, const shape_type& shape);
 
         self_type& operator++();
         self_type operator++(int);
 
         reference operator*() const;
 
-        bool equal(const indexed_iterator& rhs) const;
+        bool equal(const xiterator& rhs) const;
 
     private:
 
@@ -128,13 +128,13 @@ namespace qs
         shape_type m_index;
     };
 
-    template <class E>
-    bool operator==(const indexed_iterator<E>& lhs,
-                    const indexed_iterator<E>& rhs);
+    template <class It>
+    bool operator==(const xiterator<It>& lhs,
+                    const xiterator<It>& rhs);
 
-    template <class E>
-    bool operator!=(const indexed_iterator<E>& lhs,
-                    const indexed_iterator<E>& rhs);
+    template <class It>
+    bool operator!=(const xiterator<It>& lhs,
+                    const xiterator<It>& rhs);
 
 
     /****************************************
@@ -179,69 +179,69 @@ namespace qs
     }
 
 
-    /******************************************
-     * broadcasting_iterator implementation
-     ******************************************/
+    /*****************************
+     * xstepper implementation
+     *****************************/
 
     template <class C>
-    inline broadcasting_iterator<C>::broadcasting_iterator(container_type* c, subiterator_type it)
+    inline xstepper<C>::xstepper(container_type* c, subiterator_type it)
         : p_c(c), m_it(it)
     {
     }
 
     template <class C>
-    inline auto broadcasting_iterator<C>::operator*() const -> reference
+    inline auto xstepper<C>::operator*() const -> reference
     {
         return *m_it;
     }
 
     template <class C>
-    inline void broadcasting_iterator<C>::increment(size_type dim)
+    inline void xstepper<C>::increment(size_type dim)
     {
         if(dim < p_c->dimension())
             m_it += p_c->strides()[dim];
     }
 
     template <class C>
-    inline void broadcasting_iterator<C>::reset(size_type dim)
+    inline void xstepper<C>::reset(size_type dim)
     {
         if(dim < p_c->dimension())
             m_it -= p_c->backstrides()[dim];
     }
 
     template <class C>
-    inline bool broadcasting_iterator<C>::equal(const broadcasting_iterator& rhs) const
+    inline bool xstepper<C>::equal(const xstepper& rhs) const
     {
         return p_c == rhs.p_c && m_it == rhs.m_it;
     }
 
     template <class C>
-    inline bool operator==(const broadcasting_iterator<C>& lhs,
-                           const broadcasting_iterator<C>& rhs)
+    inline bool operator==(const xstepper<C>& lhs,
+                           const xstepper<C>& rhs)
     {
         return lhs.equal(rhs);
     }
 
     template <class C>
-    inline bool operator!=(const broadcasting_iterator<C>& lhs,
-                           const broadcasting_iterator<C>& rhs)
+    inline bool operator!=(const xstepper<C>& lhs,
+                           const xstepper<C>& rhs)
     {
         return !(lhs.equal(rhs));
     }
 
 
     /*************************************
-     * indexed_iterator implementation
+     * xiterator implementation
      *************************************/
 
-    template <class E>
-    inline indexed_iterator<E>::indexed_iterator(const E& e, const shape_type& shape)
-        : m_it(e.begin(shape)), m_shape(shape), m_index(shape.size(), size_type(0))
+    template <class It>
+    inline xiterator<It>::xiterator(It it, const shape_type& shape)
+        : m_it(it), m_shape(shape), m_index(shape.size(), size_type(0))
     {
     }
 
-    template <class E>
-    inline auto indexed_iterator<E>::operator++() -> self_type&
+    template <class It>
+    inline auto xiterator<It>::operator++() -> self_type&
     {
         for(size_type j = m_index.size(); j != 0; --j)
         {
@@ -259,36 +259,36 @@ namespace qs
         }
     }
 
-    template <class E>
-    inline auto indexed_iterator<E>::operator++(int) -> self_type
+    template <class It>
+    inline auto xiterator<It>::operator++(int) -> self_type
     {
         self_type tmp(*this);
         ++(*this);
         return tmp;
     }
 
-    template <class E>
-    inline auto indexed_iterator<E>::operator*() const -> reference
+    template <class It>
+    inline auto xiterator<It>::operator*() const -> reference
     {
         return *m_it;
     }
 
-    template <class E>
-    inline bool indexed_iterator<E>::equal(const indexed_iterator& rhs) const
+    template <class It>
+    inline bool xiterator<It>::equal(const xiterator& rhs) const
     {
         return m_it == rhs.m_it && m_shape == rhs.m_shape && m_index == rhs.m_index;
     }
 
-    template <class E>
-    inline bool operator==(const indexed_iterator<E>& lhs,
-                           const indexed_iterator<E>& rhs)
+    template <class It>
+    inline bool operator==(const xiterator<It>& lhs,
+                           const xiterator<It>& rhs)
     {
         return lhs.equal(rhs);
     }
 
-    template <class E>
-    inline bool operator!=(const indexed_iterator<E>& lhs,
-                           const indexed_iterator<E>& rhs)
+    template <class It>
+    inline bool operator!=(const xiterator<It>& lhs,
+                           const xiterator<It>& rhs)
     {
         return !(lhs.equal(rhs));
     }
