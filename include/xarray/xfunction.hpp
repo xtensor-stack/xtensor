@@ -51,7 +51,7 @@ namespace qs
         using size_type = detail::common_size_type<E...>;
         using difference_type = detail::common_difference_type<E...>;
 
-        using shape_type = array_shape<size_type>;
+        using shape_type = xshape<size_type>;
         using closure_type = const self_type;
 
         using const_stepper = xfunction_stepper<F, R, E...>;
@@ -173,7 +173,7 @@ namespace qs
         template <class... It>
         xfunction_stepper(const xfunction_type* func, It&&... it);
 
-        void increment(size_type i);
+        void step(size_type i);
         void reset(size_type i);
 
         void to_end();
@@ -396,9 +396,9 @@ namespace qs
     }
 
     template <class F, class R, class... E>
-    inline void xfunction_stepper<F, R, E...>::increment(size_type i)
+    inline void xfunction_stepper<F, R, E...>::step(size_type i)
     {
-        auto f = [i](auto& it) { it.increment(i); };
+        auto f = [i](auto& it) { it.step(i); };
         for_each(f, m_it);
     }
 

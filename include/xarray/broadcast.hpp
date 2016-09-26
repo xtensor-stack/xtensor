@@ -23,11 +23,11 @@ namespace qs
     S broadcast_dim(std::array<S, N>& dim_list);
 
     template <class S>
-    bool broadcast_shape(const array_shape<S>& input, array_shape<S>& output);
+    bool broadcast_shape(const xshape<S>& input, xshape<S>& output);
 
     template <class S>
-    bool check_trivial_broadcast(const array_strides<S>& strides1,
-                                 const array_strides<S>& strides2);
+    bool check_trivial_broadcast(const xstrides<S>& strides1,
+                                 const xstrides<S>& strides2);
 
 
     /***************************
@@ -65,12 +65,11 @@ namespace qs
         using pointer = typename subiterator_type::pointer;
         using difference_type = typename subiterator_type::difference_type;
         using size_type = typename container_type::size_type;
-        using iterator_category = std::input_iterator_tag;
 
         xstepper(container_type* c, subiterator_type it, size_type offset);
         reference operator*() const;
 
-        void increment(size_type i);
+        void step(size_type i);
         void reset(size_type i);
 
         void to_end();
@@ -113,7 +112,7 @@ namespace qs
         using size_type = typename subiterator_type::size_type;
         using iterator_category = std::input_iterator_tag;
         
-        using shape_type = array_shape<size_type>;
+        using shape_type = xshape<size_type>;
         
         xiterator(It it, const shape_type& shape);
 
@@ -153,7 +152,7 @@ namespace qs
     }
 
     template <class S>
-    inline bool broadcast_shape(const array_shape<S>& input, array_shape<S>& output)
+    inline bool broadcast_shape(const xshape<S>& input, xshape<S>& output)
     {
         size_t size = output.size();
         bool trivial_broadcast = (input.size() == output.size());
@@ -175,8 +174,8 @@ namespace qs
     }
 
     template <class S>
-    inline bool check_trivial_broadcast(const array_strides<S>& strides1,
-                                        const array_strides<S>& strides2)
+    inline bool check_trivial_broadcast(const xstrides<S>& strides1,
+                                        const xstrides<S>& strides2)
     {
         return strides1 == strides2;
     }
@@ -199,7 +198,7 @@ namespace qs
     }
 
     template <class C>
-    inline void xstepper<C>::increment(size_type dim)
+    inline void xstepper<C>::step(size_type dim)
     {
         if(dim >= m_offset)
             m_it += p_c->strides()[dim - m_offset];
@@ -257,7 +256,7 @@ namespace qs
             size_type i = j-1;
             if(++m_index[i] != m_shape[i])
             {
-                m_it.increment(i);
+                m_it.step(i);
                 break;
             }
             else if (i == 0)

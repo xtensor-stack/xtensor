@@ -8,10 +8,10 @@ namespace qs
 
     TEST(xview, simple)
     {
-        array_shape<size_t> shape = {3, 4};
+        xshape<size_t> shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.begin(), data.end(), a.begin());
+        std::copy(data.begin(), data.end(), a.storage_begin());
 
         auto view1 = make_xview(a, 1, range(1, 4));
         ASSERT_TRUE(view1(0) == a(1, 1));

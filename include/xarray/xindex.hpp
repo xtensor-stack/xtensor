@@ -12,16 +12,16 @@ namespace qs
     struct array_inner_types;
 
     template <class S>
-    using array_shape = std::vector<S>;
+    using xshape = std::vector<S>;
 
     template <class S>
-    using array_strides = std::vector<S>;
+    using xstrides = std::vector<S>;
 
     template <class S, class... Args>
-    S data_offset(const array_strides<S>& strides, Args... args);
+    S data_offset(const xstrides<S>& strides, Args... args);
 
     template <class S>
-    S data_size(const array_shape<S>& s);
+    S data_size(const xshape<S>& s);
 
 
     /********************************
@@ -31,26 +31,26 @@ namespace qs
     namespace detail
     {
         template <class S>
-        inline S data_offset_impl(const array_strides<S>& strides, S i)
+        inline S data_offset_impl(const xstrides<S>& strides, S i)
         {
             return i * strides.back();
         }
 
         template <class S, class... Args>
-        inline S data_offset_impl(const array_strides<S>& strides, S i, Args... args)
+        inline S data_offset_impl(const xstrides<S>& strides, S i, Args... args)
         {
             return i * strides[strides.size() - sizeof...(args) - 1] + data_offset_impl(strides, args...);
         }
     }
 
     template <class S, class... Args>
-    inline S data_offset(const array_strides<S>& strides, Args... args)
+    inline S data_offset(const xstrides<S>& strides, Args... args)
     {
         return detail::data_offset_impl(strides, static_cast<S>(args)...);
     }
 
     template <class S>
-    inline S data_size(const array_shape<S>& s)
+    inline S data_size(const xshape<S>& s)
     {
         return std::accumulate(s.begin(), s.end(), S(1), std::multiplies<S>());
     }

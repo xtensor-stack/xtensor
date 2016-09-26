@@ -6,21 +6,21 @@ namespace qs
 
     TEST(operation, plus)
     {
-        array_shape<size_t> shape = {3 ,2};
+        xshape<size_t> shape = {3 ,2};
         xarray<double> a(shape, 4.5);
         ASSERT_TRUE((+a)(0, 0) == +(a(0, 0)));
     }
 
     TEST(operation, minus)
     {
-        array_shape<size_t> shape = {3 ,2};
+        xshape<size_t> shape = {3 ,2};
         xarray<double> a(shape, 4.5);
         ASSERT_TRUE((-a)(0, 0) == -(a(0, 0)));
     }
 
     TEST(operation, add)
     {
-        array_shape<size_t> shape = {3, 2};
+        xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         ASSERT_TRUE((a + b)(0, 0) == a(0, 0) + b(0, 0));
@@ -34,7 +34,7 @@ namespace qs
 
     TEST(operation, subtract)
     {
-        array_shape<size_t> shape = {3, 2};
+        xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         ASSERT_TRUE((a - b)(0, 0) == a(0, 0) - b(0, 0));
@@ -48,7 +48,7 @@ namespace qs
     
     TEST(operation, multiply)
     {
-        array_shape<size_t> shape = {3, 2};
+        xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         ASSERT_TRUE((a * b)(0, 0) == a(0, 0) * b(0, 0));
@@ -62,7 +62,7 @@ namespace qs
     
     TEST(operation, divide)
     {
-        array_shape<size_t> shape = {3, 2};
+        xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         ASSERT_TRUE((a / b)(0, 0) == a(0, 0) / b(0, 0));

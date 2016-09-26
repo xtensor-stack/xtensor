@@ -96,6 +96,39 @@ namespace qs
         return xrange<size_type>(min, max);
     }
 
+    /********************************
+     * xall
+     ********************************/
+
+    template <class size_type>
+    class xall : public xslice<xall<size_type>>
+    {
+
+    public:
+
+        xall() = default;
+        ~xall() = default;
+        xall(const xall&) = default;
+        xall& operator=(const xall&) = default;
+        xall(xall&&) = default;
+        xall& operator=(xall&&) = default;
+
+        explicit xall(size_type size) noexcept : m_size(size) {}
+
+        inline size_type operator()(size_type i) const noexcept
+        {
+            return i;
+        }
+
+        inline size_type size() const noexcept
+        {
+            return m_size;
+        }
+
+    private:
+        size_type m_size;
+    };
+
     /*******************************
      * xsqueeze
      *******************************/
@@ -135,4 +168,3 @@ namespace qs
 }
 
 #endif
-

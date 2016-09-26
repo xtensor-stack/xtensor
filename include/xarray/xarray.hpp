@@ -34,7 +34,11 @@ namespace qs
         using self_type = xarray<T>;
         using base_type = xarray_base<self_type>;
         using container_type = typename base_type::container_type;
+        using value_type = typename base_type::value_type;
+        using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
+        using pointer = typename base_type::pointer;
+        using const_pointer = typename base_type::const_pointer;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
 

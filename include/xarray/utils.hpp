@@ -177,7 +177,7 @@ namespace qs
     };
 
     /**********************
-     * get_arg
+     * argument
      **********************/
  
     namespace detail

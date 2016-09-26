@@ -30,8 +30,8 @@ namespace qs
         using difference_type = ptrdiff_t;
 
         using self_type = xscalar<T>;
-        using shape_type = array_shape<size_type>;
-        using strides_type = array_strides<size_type>;
+        using shape_type = xshape<size_type>;
+        using strides_type = xstrides<size_type>;
 
         using closure_type = const self_type;
 

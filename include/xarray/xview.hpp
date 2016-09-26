@@ -79,7 +79,7 @@ namespace qs
         using size_type = typename E::size_type;
         using difference_type = typename E::difference_type;
 
-        using shape_type = array_shape<size_type>;
+        using shape_type = xshape<size_type>;
         using closure_type = const self_type&;
 
         xview(E&& e, S&&... slices) noexcept
@@ -92,11 +92,10 @@ namespace qs
             return m_e.dimension() - squeeze_count<S...>::value;
         }
 
-        //inline bool broadcast_shape(shape_type& shape) const
-        //{
-        //    auto func = [&shape](bool b, auto&& e) { return b && e.broadcast_shape(shape); };
-        //    return accumulate(func, true, m_e);
-        //}
+        inline bool broadcast_shape(shape_type& shape) const
+        {
+            return false;
+        }
 
         template <class... Args>
         reference operator()(Args... args)
@@ -118,13 +117,13 @@ namespace qs
         template <size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args)
         {
-            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(std::get<I>(m_slices), args...)...);
+            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(slice<I>(), args...)...);
         }
 
         template <size_type... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const
         {
-            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(std::get<I>(m_slices), args...)...);
+            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(slice<I>(), args...)...);
         }
 
         // sliced_access retrieves the index from the xslice or xsqueeze indexer.
@@ -138,6 +137,19 @@ namespace qs
         disable_xslice<Squeeze, size_type> sliced_access(const Squeeze& squeeze, Args...) const
         {
             return squeeze();
+        }
+
+        template <size_type I>
+        const auto& slice() const
+        {
+            if (I < sizeof...(S))
+            {
+                std::get<I>(m_slices);
+            }
+            else
+            {
+                return xall<size_type>(m_e.shape()[I]);
+            }
         }
 
     };

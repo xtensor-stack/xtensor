@@ -35,8 +35,8 @@ namespace qs
         using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
 
-        using shape_type = array_shape<size_type>;
-        using strides_type = array_strides<size_type>;
+        using shape_type = xshape<size_type>;
+        using strides_type = xstrides<size_type>;
 
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D*>;

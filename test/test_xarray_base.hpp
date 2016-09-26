@@ -12,8 +12,8 @@ namespace qs
     {
         using vector_type = std::vector<int>;
         using size_type = vector_type::size_type;
-        using shape_type = array_shape<size_type>;
-        using strides_type = array_strides<size_type>;
+        using shape_type = xshape<size_type>;
+        using strides_type = xstrides<size_type>;
 
         using assigner_type = std::vector<std::vector<vector_type>>;
 
@@ -81,8 +81,8 @@ namespace qs
     {
         using vector_type = std::vector<int>;
         using size_type = vector_type::size_type;
-        using shape_type = array_shape<size_type>;
-        using strides_type = array_strides<size_type>;
+        using shape_type = xshape<size_type>;
+        using strides_type = xstrides<size_type>;
 
         using assigner_type = std::vector<std::vector<vector_type>>;
 
