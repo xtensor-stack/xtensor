@@ -311,7 +311,7 @@ namespace qs
     template <class D>
     inline auto xarray_base<D>::xend(const shape_type& shape) const -> const_iterator
     {
-        return const_iterator(stepper_end(), shape());
+        return const_iterator(stepper_end(), shape);
     }
 
     template <class D>

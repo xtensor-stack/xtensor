@@ -246,7 +246,12 @@ namespace qs
         for(size_type j = m_index.size(); j != 0; --j)
         {
             size_type i = j-1;
-            if(++m_index[i] != m_shape[i])
+            // The last dimension must be incremented
+            // even when beco,ing greater than shape,
+            // else the subiterator is reset to the
+            // beginning of the data and never reaches
+            // the end.
+            if(++m_index[i] != m_shape[i] || i == 0)
             {
                 m_it.increment(i);
                 break;
@@ -276,7 +281,7 @@ namespace qs
     template <class It>
     inline bool xiterator<It>::equal(const xiterator& rhs) const
     {
-        return m_it == rhs.m_it && m_shape == rhs.m_shape && m_index == rhs.m_index;
+        return m_it == rhs.m_it && m_shape == rhs.m_shape;
     }
 
     template <class It>
