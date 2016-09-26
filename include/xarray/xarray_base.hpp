@@ -85,11 +85,11 @@ namespace qs
         const_iterator cxbegin(const shape_type& shape) const;
         const_iterator cxend(const shape_type& shape) const;
 
-        stepper stepper_begin();
-        stepper stepper_end();
+        stepper stepper_begin(const shape_type& shape);
+        stepper stepper_end(const shape_type& shape);
 
-        const_stepper stepper_begin() const;
-        const_stepper stepper_end() const;
+        const_stepper stepper_begin(const shape_type& shape) const;
+        const_stepper stepper_end(const shape_type& shape) const;
 
         storage_iterator storage_begin();
         storage_iterator storage_end();
@@ -142,7 +142,7 @@ namespace qs
         }
         else
         {
-            m_backstrides[i] = m_strides[i] * m_shape[i] - 1;
+            m_backstrides[i] = m_strides[i] * (m_shape[i] - 1);
         }
     }
 
@@ -293,25 +293,25 @@ namespace qs
     template <class D>
     inline auto xarray_base<D>::xbegin(const shape_type& shape) -> iterator
     {
-        return iterator(stepper_begin(), shape);
+        return iterator(stepper_begin(shape), shape);
     }
 
     template <class D>
     inline auto xarray_base<D>::xend(const shape_type& shape) -> iterator
     {
-        return iterator(stepper_end(), shape);
+        return iterator(stepper_end(shape), shape);
     }
 
     template <class D>
     inline auto xarray_base<D>::xbegin(const shape_type& shape) const -> const_iterator
     {
-        return const_iterator(stepper_begin(), shape);
+        return const_iterator(stepper_begin(shape), shape);
     }
 
     template <class D>
     inline auto xarray_base<D>::xend(const shape_type& shape) const -> const_iterator
     {
-        return const_iterator(stepper_end(), shape);
+        return const_iterator(stepper_end(shape), shape);
     }
 
     template <class D>
@@ -332,27 +332,31 @@ namespace qs
      ****************************/
 
     template <class D>
-    inline auto xarray_base<D>::stepper_begin() -> stepper
+    inline auto xarray_base<D>::stepper_begin(const shape_type& shape) -> stepper
     {
-        return stepper(static_cast<derived_type*>(this), data().begin());
+        size_type offset = shape.size() - dimension();
+        return stepper(static_cast<derived_type*>(this), data().begin(), offset);
     }
 
     template <class D>
-    inline auto xarray_base<D>::stepper_end() -> stepper
+    inline auto xarray_base<D>::stepper_end(const shape_type& shape) -> stepper
     {
-        return stepper(static_cast<derived_type*>(this), data().end());
+        size_type offset = shape.size() - dimension();
+        return stepper(static_cast<derived_type*>(this), data().end(), offset);
     }
 
     template <class D>
-    inline auto xarray_base<D>::stepper_begin() const -> const_stepper
+    inline auto xarray_base<D>::stepper_begin(const shape_type& shape) const -> const_stepper
     {
-        return const_broadcazst_iterator(static_cast<const derived_type*>(this), data().begin());
+        size_type offset = shape.size() - dimension();
+        return const_broadcazst_iterator(static_cast<const derived_type*>(this), data().begin(), offset);
     }
 
     template <class D>
-    inline auto xarray_base<D>::stepper_end() const -> const_stepper
+    inline auto xarray_base<D>::stepper_end(const shape_type& shape) const -> const_stepper
     {
-        return const_stepper(static_cast<const derived_type*>(this), data().end());
+        size_type offset = shape.size() - dimension();
+        return const_stepper(static_cast<const derived_type*>(this), data().end(), offset);
     }
 
 

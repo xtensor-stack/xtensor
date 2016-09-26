@@ -67,11 +67,13 @@ namespace qs
         using size_type = typename container_type::size_type;
         using iterator_category = std::input_iterator_tag;
 
-        xstepper(container_type* c, subiterator_type it);
+        xstepper(container_type* c, subiterator_type it, size_type offset);
         reference operator*() const;
 
         void increment(size_type i);
         void reset(size_type i);
+
+        void to_end();
 
         bool equal(const xstepper& rhs) const;
 
@@ -79,6 +81,7 @@ namespace qs
 
         container_type* p_c;
         subiterator_type m_it;
+        size_type m_offset;
     };
 
     template <class C>
@@ -184,8 +187,8 @@ namespace qs
      *****************************/
 
     template <class C>
-    inline xstepper<C>::xstepper(container_type* c, subiterator_type it)
-        : p_c(c), m_it(it)
+    inline xstepper<C>::xstepper(container_type* c, subiterator_type it, size_type offset)
+        : p_c(c), m_it(it), m_offset(offset)
     {
     }
 
@@ -198,15 +201,21 @@ namespace qs
     template <class C>
     inline void xstepper<C>::increment(size_type dim)
     {
-        if(dim < p_c->dimension())
-            m_it += p_c->strides()[dim];
+        if(dim >= m_offset)
+            m_it += p_c->strides()[dim - m_offset];
     }
 
     template <class C>
     inline void xstepper<C>::reset(size_type dim)
     {
-        if(dim < p_c->dimension())
-            m_it -= p_c->backstrides()[dim];
+        if(dim >= m_offset)
+            m_it -= p_c->backstrides()[dim - m_offset];
+    }
+
+    template <class C>
+    inline void xstepper<C>::to_end()
+    {
+        m_it = p_c->storage_end();
     }
 
     template <class C>
@@ -246,15 +255,14 @@ namespace qs
         for(size_type j = m_index.size(); j != 0; --j)
         {
             size_type i = j-1;
-            // The last dimension must be incremented
-            // even when beco,ing greater than shape,
-            // else the subiterator is reset to the
-            // beginning of the data and never reaches
-            // the end.
-            if(++m_index[i] != m_shape[i] || i == 0)
+            if(++m_index[i] != m_shape[i])
             {
                 m_it.increment(i);
                 break;
+            }
+            else if (i == 0)
+            {
+                m_it.to_end();
             }
             else
             {

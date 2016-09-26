@@ -77,8 +77,8 @@ namespace qs
         const_iterator cxbegin(const shape_type& shape) const;
         const_iterator cxend(const shape_type& shape) const;
 
-        const_stepper stepper_begin() const;
-        const_stepper stepper_end() const;
+        const_stepper stepper_begin(const shape_type& shape) const;
+        const_stepper stepper_end(const shape_type& shape) const;
 
         const_storage_iterator storage_begin() const;
         const_storage_iterator storage_end() const;
@@ -176,6 +176,8 @@ namespace qs
         void increment(size_type i);
         void reset(size_type i);
 
+        void to_end();
+
         reference operator*() const;
 
         bool equal(const self_type& rhs) const;
@@ -261,14 +263,14 @@ namespace qs
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::xbegin(const shape_type& shape) const -> const_iterator
     {
-        auto f = [](const auto& e) { return e.stepper_begin(); };
+        auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
         return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::xend(const shape_type& shape) const -> const_iterator
     {
-        auto f = [](const auto& e) { return e.stepper_end(); };
+        auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
         return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
 
@@ -404,6 +406,13 @@ namespace qs
     inline void xfunction_stepper<F, R, E...>::reset(size_type i)
     {
         auto f = [i](auto& it) { it.reset(i); };
+        for_each(f, m_it);
+    }
+
+    template <class F, class R, class... E>
+    inline void xfunction_stepper<F, R, E...>::to_end()
+    {
+        auto f = [](auto& it) { it.to_end(); };
         for_each(f, m_it);
     }
 

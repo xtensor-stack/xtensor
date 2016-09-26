@@ -66,6 +66,7 @@ set(XARRAY_TESTS
     test/main.cpp
     test/test_xarray.cpp
     test/test_xarray_base.hpp
+    test/test_xiterator.cpp
     test/test_xmath.cpp
     test/test_xoperation.cpp
     test/test_xscalar.cpp
