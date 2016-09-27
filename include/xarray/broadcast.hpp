@@ -157,7 +157,8 @@ namespace qs
         size_t size = output.size();
         bool trivial_broadcast = (input.size() == output.size());
         auto output_iter = output.rbegin();
-        for(auto input_iter = input.rbegin(); input_iter != input.rend();
+        auto input_rend = input.rend();
+        for(auto input_iter = input.rbegin(); input_iter != input_rend;
             ++input_iter, ++output_iter)
         {
             if(*output_iter == 1)
@@ -166,7 +167,7 @@ namespace qs
             }
             else if((*input_iter != 1) && (*output_iter != *input_iter))
             {
-                throw std::runtime_error("broadcast error : incompatible dimension of inputs");
+                throw std::runtime_error("broadcast error : incompatible dimension of arrays");
             }
             trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
         }

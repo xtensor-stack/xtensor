@@ -211,6 +211,7 @@ namespace qs
     {
         m_shape = shape;
         m_strides = strides;
+        m_backstrides.resize(m_strides.size());
         adapt_strides();
         data().resize(data_size(m_shape));
     }
