@@ -43,6 +43,24 @@ namespace qs
         {
             static constexpr size_t value = 0;
         };
+
+        template <class T, class... S>
+        struct squeeze_count_dyn_impl
+        {
+            static inline constexpr size_t count(size_t i) noexcept
+            {
+                return i ? (squeeze_count_dyn_impl<S...>::count(i - 1) + (std::is_integral<T>::value ? 1 : 0)) : 0;
+            } 
+        };
+
+        template <>
+        struct squeeze_count_dyn_impl<void>
+        {
+            static inline constexpr size_t count(size_t i) noexcept
+            {
+                return i;
+            } 
+        };
     }
 
     template <class... S>
@@ -50,6 +68,12 @@ namespace qs
 
     template <size_t I, class... S>
     using squeeze_count_before = detail::squeeze_count_before_impl<I, S..., void>;
+
+    template <class... S>
+    constexpr size_t squeeze_count_dyn(size_t i)
+    {
+        return detail::squeeze_count_dyn_impl<S..., void>::count(i);
+    }
 
     /******************************************
      * Views on xexpressions
@@ -62,6 +86,9 @@ namespace qs
 
     // If more slices are provided than the dimension of the underlying
     // expression, the behavior is undefined.
+    
+    template <class E, class... S>
+    class xview_shape;
 
     template <class E, class... S>
     class xview : public xexpression<xview<E, S...>>
@@ -90,6 +117,11 @@ namespace qs
         inline size_type dimension() const noexcept
         {
             return m_e.dimension() - squeeze_count<S...>::value;
+        }
+        
+        auto shape() const
+        {
+            return xview_shape<E, S...>(*this);
         }
 
         inline bool broadcast_shape(shape_type& shape) const
@@ -142,14 +174,7 @@ namespace qs
         template <size_type I>
         const auto& slice() const
         {
-            if (I < sizeof...(S))
-            {
-                std::get<I>(m_slices);
-            }
-            else
-            {
-                return xall<size_type>(m_e.shape()[I]);
-            }
+            return I < sizeof...(S) ? std::get<I>(m_slices) : std::get<I>(m_slices);
         }
 
     };

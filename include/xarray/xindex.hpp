@@ -31,9 +31,9 @@ namespace qs
     namespace detail
     {
         template <class S>
-        inline S data_offset_impl(const xstrides<S>& strides, S i)
+        inline S data_offset_impl(const xstrides<S>& strides)
         {
-            return i * strides.back();
+            return 0;
         }
 
         template <class S, class... Args>

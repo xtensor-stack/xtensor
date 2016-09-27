@@ -19,16 +19,17 @@ namespace qs
         {
             if (e.dimension() == 0)
             {
-                return out << e();
+                out << e();
             }
             else
             {
-                auto i = 0;
+                size_t i = 0;
                 out << '{';
                 for (;i != e.shape()[0] - 1; ++i)
                     out << make_xview(e, i) << ',' << ' ';
                 return out << make_xview(e, i) << '}';
             }
+            return out;
         }
     }
 
