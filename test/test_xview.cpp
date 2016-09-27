@@ -27,6 +27,9 @@ namespace qs
         ASSERT_TRUE(view3(0) == a(0, 2));
         ASSERT_TRUE(view3(1) == a(1, 2));
         ASSERT_TRUE(view3.dimension() == 1);
+
+        auto view4 = make_xview(a, 1);
+        ASSERT_TRUE(view4.dimension() == 1);
     }
 
     TEST(xview, squeeze_count)

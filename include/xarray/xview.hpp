@@ -149,13 +149,13 @@ namespace qs
         template <size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args)
         {
-            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(slice<I>(), args...)...);
+            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(std::get<I>(m_slices), args...)...);
         }
 
         template <size_type... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const
         {
-            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(slice<I>(), args...)...);
+            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(std::get<I>(m_slices), args...)...);
         }
 
         // sliced_access retrieves the index from the xslice or xsqueeze indexer.
@@ -171,11 +171,6 @@ namespace qs
             return squeeze();
         }
 
-        template <size_type I>
-        const auto& slice() const
-        {
-            return I < sizeof...(S) ? std::get<I>(m_slices) : std::get<I>(m_slices);
-        }
 
     };
 
