@@ -67,6 +67,7 @@ namespace qs
         using size_type = typename container_type::size_type;
 
         xstepper(container_type* c, subiterator_type it, size_type offset);
+
         reference operator*() const;
 
         void step(size_type i);

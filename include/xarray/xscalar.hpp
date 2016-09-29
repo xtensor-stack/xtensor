@@ -16,6 +16,9 @@ namespace qs
     // xscalar is a cheap wrapper for a scalar value as an xexpression.
 
     template <class T>
+    class xscalar_stepper;
+
+    template <class T>
     class xscalar : public xexpression<xscalar<T>>
     {
 
@@ -34,6 +37,7 @@ namespace qs
         using strides_type = xstrides<size_type>;
 
         using closure_type = const self_type;
+        using const_stepper = xscalar_stepper<T>;
 
         xscalar(const T& value);
 
@@ -49,10 +53,57 @@ namespace qs
 
         bool broadcast_shape(shape_type& shape) const;
 
+        const_stepper stepper_begin(const shape_type& shape) const;
+        const_stepper stepper_end(const shape_type& shape) const;
+
     private:
 
         const T& m_value;
     };
+
+
+    /*********************
+     * xscalar_stepper
+     *********************/
+
+    template <class T>
+    class xscalar_stepper
+    {
+
+    public:
+
+        using self_type = xscalar_stepper<T>;
+        using container_type = xscalar<T>;
+
+        using value_type = typename container_type::value_type;
+        using reference = typename container_type::const_reference;
+        using pointer = typename container_type::const_pointer;
+        using difference_type = typename container_type::difference_type;
+
+        xscalar_stepper(const container_type* c, bool end = false);
+
+        reference operator*() const;
+
+        void step(size_type i);
+        void reset(size_type i);
+
+        void to_end();
+
+        bool equal(const self_type& rhs) const;
+
+    private:
+
+        const container_type* p_c;
+        bool m_end;
+    };
+
+    template <class T>
+    bool operator==(const xscalar_stepper<T>& lhs,
+                    const xscalar_stepper<T>& rhs);
+
+    template <class T>
+    bool operator!=(const xscalar_stepper<T>& lhs,
+                    const xscalar_stepper<T>& rhs);
 
 
     /****************************
@@ -106,6 +157,58 @@ namespace qs
     inline bool xscalar<T>::broadcast_shape(xscalar<T>::shape_type& shape) const
     {
         return true;
+    }
+
+
+    /************************************
+     * xscalar_stepper implementation
+     ************************************/
+
+    template <class T>
+    inline xscalar_stepper<T>::xscalar_stepper(const container_type* c, bool end)
+        : p_c(c), m_end(end)
+    {
+    }
+
+    template <class T>
+    inline auto xscalar_stepper<T>::operator*() const -> reference
+    {
+        return p_c->operator()();
+    }
+
+    template <class T>
+    inline void xscalar<T>::step(size_type i)
+    {
+    }
+
+    template <class T>
+    inline void xscalar<T>::reset(size_type i)
+    {
+    }
+
+    template <class T>
+    inline void xscalar<T>::to_end()
+    {
+        m_end = true;
+    }
+
+    template <class T>
+    inline bool xscalar<T>::equal(const self_type& rhs) const
+    {
+        return p_c = rhs.p_c && m_end = rhs.m_end;
+    }
+
+    template <class T>
+    inline bool operator==(const xscalar_stepper<T>& lhs,
+                           const xscalar_stepper<T>& rhs)
+    {
+        return lhs.equal(rhs);
+
+    template <class T>
+    inline bool operator!=(const xscalar_stepper<T>& lhs,
+                           const xscalar_stepper<T>& rhs)
+    {
+        return !(lhs.equal(rhs));
     }
 
 }
