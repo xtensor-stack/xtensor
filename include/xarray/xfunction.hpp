@@ -188,7 +188,7 @@ namespace qs
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
-        std::tuple<typename E::const_iterator...> m_it;
+        std::tuple<typename E::const_stepper...> m_it;
     };
 
     template <class F, class R, class... E>
@@ -203,6 +203,23 @@ namespace qs
     /******************************
      * xfunction implementation
      ******************************/
+
+    namespace detail
+    {
+        template <class E, class S>
+        inline typename E::const_reference get_element(const E& e, S i)
+        {
+            return e(i);
+        }
+
+        template <class E, class S, class... Args>
+        inline typename E::const_reference get_element(const E& e, S i, Args... args)
+        {
+            if(sizeof...(Args) >= e.dimension())
+                return get_element(e, args...);
+            return e(i, args...);
+        }
+    }
 
     template <class F, class R, class... E>
     template <class Func>
@@ -221,7 +238,8 @@ namespace qs
     template <class F, class R, class... E>
     inline bool xfunction<F, R, E...>::broadcast_shape(shape_type& shape) const
     {
-        auto func = [&shape](bool b, auto&& e) { return b && e.broadcast_shape(shape); };
+        // e.broadcast_shape must be evaluated even if b is false
+        auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
         return accumulate(func, true, m_e);
     }
     
@@ -264,14 +282,14 @@ namespace qs
     inline auto xfunction<F, R, E...>::xbegin(const shape_type& shape) const -> const_iterator
     {
         auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
-        return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
+        return build_iterator(f, shape, std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::xend(const shape_type& shape) const -> const_iterator
     {
         auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
-        return build_iterator(f, std::make_index_sequence<sizeof...(E)>());
+        return build_iterator(f, shape, std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>
@@ -304,7 +322,7 @@ namespace qs
     template <size_t... I, class... Args>
     inline auto xfunction<F, R, E...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
     {
-        return m_f(std::get<I>(m_e)(args...)...);
+        return m_f(detail::get_element(std::get<I>(m_e), args...)...);
     }
 
     template <class F, class R, class... E>
@@ -425,7 +443,7 @@ namespace qs
     template <class F, class R, class... E>
     inline bool xfunction_stepper<F, R, E...>::equal(const self_type& rhs) const
     {
-        return p_f == rhs.pf && m_it == rhs.m_it;
+        return p_f == rhs.p_f && m_it == rhs.m_it;
     }
 
     template <class F, class R, class... E>

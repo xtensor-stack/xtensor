@@ -235,7 +235,7 @@ namespace qs
         }
 
         {
-            SCOPED_TRACE("different dimension");
+            SCOPED_TRACE("different dimensions");
             shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
             bool res = vec.broadcast_shape(s3);

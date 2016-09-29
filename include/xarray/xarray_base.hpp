@@ -39,7 +39,7 @@ namespace qs
         using strides_type = xstrides<size_type>;
 
         using stepper = xstepper<D>;
-        using const_stepper = xstepper<const D*>;
+        using const_stepper = xstepper<const D>;
 
         using iterator = xiterator<stepper>;
         using const_iterator = xiterator<const_stepper>;
@@ -350,7 +350,7 @@ namespace qs
     inline auto xarray_base<D>::stepper_begin(const shape_type& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_broadcazst_iterator(static_cast<const derived_type*>(this), data().begin(), offset);
+        return const_stepper(static_cast<const derived_type*>(this), data().begin(), offset);
     }
 
     template <class D>
