@@ -377,7 +377,7 @@ namespace qs
     template <class F, class R, class... E>
     inline bool xf_storage_iterator<F, R, E...>::equal(const xf_storage_iterator& rhs) const
     {
-        return p_f == rhs.p_f && m_it = rhs.m_it;
+        return p_f == rhs.p_f && m_it == rhs.m_it;
     }
 
     template <class F, class R, class... E>

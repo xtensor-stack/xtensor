@@ -2,6 +2,7 @@
 #define XSEMANTIC_HPP
 
 #include "xexpression.hpp"
+#include "xassign.hpp"
 
 namespace qs
 {
@@ -42,7 +43,19 @@ namespace qs
         derived_type& operator/=(const xexpression<E>&);
 
         template <class E>
-        derived_type& conformant_assign(const xexpression<E>&);
+        derived_type& assign(const xexpression<E>&);
+
+        template <class E>
+        derived_type& plus_assign(const xexpression<E>&);
+
+        template <class E>
+        derived_type& minus_assign(const xexpression<E>&);
+
+        template <class E>
+        derived_type& multiplies_assign(const xexpression<E>&);
+
+        template <class E>
+        derived_type& divides_assign(const xexpression<E>&);
 
     protected:
 
@@ -57,6 +70,11 @@ namespace qs
 
         template <class E>
         derived_type& operator=(const xexpression<E>&);
+
+    private:
+
+        template <class E, class F>
+        derived_type& scalar_computed_assign(const E& e, F&& f);
     };
 
 
@@ -66,7 +84,12 @@ namespace qs
 
     public:
 
+        using base_type = xsemantic_base<D>;
         using derived_type = D;
+
+        using temporary_type = typename base_type::temporary_type;
+
+        derived_type& assign_temporary(temporary_type&);
 
     protected:
 
@@ -78,6 +101,9 @@ namespace qs
 
         xarray_semantic(xarray_semantic&&) = default;
         xarray_semantic& operator=(xarray_semantic&&) = default;
+
+        template <class E>
+        derived_type& operator=(const xexpression<E>&);
     };
 
 
@@ -89,68 +115,140 @@ namespace qs
     template <class E>
     inline auto xsemantic_base<D>::operator+=(const E& e) -> disable_xexpression<E, derived_type&>
     {
-        return conformant_assign(*this + e);
+        return scalar_computed_assign(e, std::plus<>());
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator-=(const E& e) -> disable_xexpression<E, derived_type&>
     {
-        return conformant_assign(*this - e);
+        return scalar_computed_assign(e, std::minus<>());
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator*=(const E& e) -> disable_xexpression<E, derived_type&>
     {
-        return conformant_assign(*this * e);
+        return scalar_computed_assign(e, std::multiplies<>());
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator/=(const E& e) -> disable_xexpression<E, derived_type&>
     {
-        return conformant_assign(*this / e);
+        return scalar_computed_assign(e, std::divides<>());
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator+=(const xexpression<E>& e) -> derived_type&
     {
-        temporary_type tmp(*this + e);
-        return base_type::derived_cast().assign_temporary(tmp);
+        return operator=(*this + e);
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator-=(const xexpression<E>& e) -> derived_type&
     {
-        temporary_type tmp(*this - e);
-        return base_type::derived_cast().assign_temporary(tmp);
+        return operator=(*this - e);
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator*=(const xexpression<E>& e) -> derived_type&
     {
-        temporary_type tmp(*this * e);
-        return base_type::derived_cast().assign_temporary(tmp);
+        return operator=(*this * e);
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator/=(const xexpression<E>& e) -> derived_type&
     {
-        temporary_type tmp(*this / e);
-        return base_type::derived_cast().assign_temporary(tmp);
+        return operator=(*this / e);
     }
 
     template <class D>
     template <class E>
-    inline auto xsemantic_base<D>::conformant_assign(const xexpression<E>& e) -> derived_type&
+    inline auto xsemantic_base<D>::assign(const xexpression<E>& e) -> derived_type&
     {
-        // TODO
+        assign_xexpression(*this, e);
+        return base_type::derived_cast();
     }
+
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::plus_assign(const xexpression<E>& e) -> derived_type&
+    {
+        auto expr = (*this + e);
+        computed_assign_xexpression(*this, expr);
+        return base_type::derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::minus_assign(const xexpression<E>& e) -> derived_type&
+    {
+        auto expr = (*this - e);
+        computed_assign_expression(*this, expr);
+        return base_type::derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::multiplies_assign(const xexpression<E>& e) -> derived_type&
+    {
+        auto expr = (*this * e);
+        computed_assign_xexpression(*this, expr);
+        return base_type::derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::divides_assign(const xexpression<E>& e) -> derived_type&
+    {
+        auto expr = (*this / e);
+        computed_assign_xexpression(*this, expr);
+        return base_type::derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::operator=(const xexpression<E>& e) -> derived_type&
+    {
+        temporary_type tmp(e);
+        return base_type::derived_cast().assign_temporary(tmp);
+    }
+
+    template <class D>
+    template <class E, class F>
+    inline auto xsemantic_base<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
+    {
+        derived_type& d = base_type::derived_cast();
+        std::transform(d.storage_begin(), d.storage_end(), d.storage_begin(),
+                [e, &f](const auto& v) { return f(v, e); });
+        return d;
+    }
+
+
+    /*********************
+     * xarray_semantic
+     *********************/
+
+    template <class D>
+    inline auto xarray_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
+    {
+        using std::swap;
+        swap(this->derived_cast(), tmp);
+        return this->derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xarray_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
+    {
+        return base_type::operator=(e);
+    }
+
 }
 
 #endif

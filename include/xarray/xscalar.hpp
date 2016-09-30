@@ -78,6 +78,7 @@ namespace qs
         using value_type = typename container_type::value_type;
         using reference = typename container_type::const_reference;
         using pointer = typename container_type::const_pointer;
+        using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
 
         xscalar_stepper(const container_type* c, bool end = false);
@@ -177,23 +178,23 @@ namespace qs
     }
 
     template <class T>
-    inline void xscalar<T>::step(size_type i)
+    inline void xscalar_stepper<T>::step(size_type i)
     {
     }
 
     template <class T>
-    inline void xscalar<T>::reset(size_type i)
+    inline void xscalar_stepper<T>::reset(size_type i)
     {
     }
 
     template <class T>
-    inline void xscalar<T>::to_end()
+    inline void xscalar_stepper<T>::to_end()
     {
         m_end = true;
     }
 
     template <class T>
-    inline bool xscalar<T>::equal(const self_type& rhs) const
+    inline bool xscalar_stepper<T>::equal(const self_type& rhs) const
     {
         return p_c = rhs.p_c && m_end = rhs.m_end;
     }
@@ -203,6 +204,7 @@ namespace qs
                            const xscalar_stepper<T>& rhs)
     {
         return lhs.equal(rhs);
+    }
 
     template <class T>
     inline bool operator!=(const xscalar_stepper<T>& lhs,

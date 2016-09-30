@@ -26,13 +26,15 @@ namespace qs
     };
 
     template <class T>
-    class xarray : public xarray_base<xarray<T>>, public xsemantic_base<xarray<T>>
+    class xarray : public xarray_base<xarray<T>>,
+                   public xarray_semantic<xarray<T>>
     {
 
     public:
 
         using self_type = xarray<T>;
         using base_type = xarray_base<self_type>;
+        using semantic_base = xarray_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
@@ -57,6 +59,12 @@ namespace qs
 
         xarray(xarray&&) = default;
         xarray& operator=(xarray&&) = default;
+
+        template <class E>
+        xarray(const xexpression<E>& e);
+
+        template <class E>
+        xarray& operator=(const xexpression<E>& e);
 
     private:
 
@@ -151,6 +159,21 @@ namespace qs
     {
         base_type::reshape(shape, strides);
         std::fill(m_data.begin(), m_data.end(), value);
+    }
+
+    template <class T>
+    template <class E>
+    inline xarray<T>::xarray(const xexpression<E>& e)
+        : base_type()
+    {
+        semantic_base::assign(e);
+    }
+
+    template <class T>
+    template <class E>
+    inline auto xarray<T>::operator=(const xexpression<E>& e) -> self_type&
+    {
+        return semantic_base::operator=(e);
     }
 
     template <class T>
