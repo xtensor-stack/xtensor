@@ -20,41 +20,18 @@ namespace qs
 
     namespace detail
     {
+
         template <class T, class... S>
-        struct squeeze_count_impl
-        {
-            static constexpr size_t value = squeeze_count_impl<S...>::value + (std::is_integral<T>::value ? 1 : 0);
-        };
-
-        template <>
-        struct squeeze_count_impl<void>
-        {
-            static constexpr size_t value = 0;
-        };
-
-        template <size_t I, class T, class... S>
         struct squeeze_count_before_impl
-        {
-            static constexpr size_t value = I ? (squeeze_count_before_impl<I - 1, S...>::value + (std::is_integral<T>::value ? 1 : 0)) : 0;
-        };
-
-        template <size_t I>
-        struct squeeze_count_before_impl<I, void>
-        {
-            static constexpr size_t value = 0;
-        };
-
-        template <class T, class... S>
-        struct squeeze_count_dyn_impl
         {
             static inline constexpr size_t count(size_t i) noexcept
             {
-                return i ? (squeeze_count_dyn_impl<S...>::count(i - 1) + (std::is_integral<T>::value ? 1 : 0)) : 0;
+                return i ? (squeeze_count_before_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
             } 
         };
 
         template <>
-        struct squeeze_count_dyn_impl<void>
+        struct squeeze_count_before_impl<void>
         {
             static inline constexpr size_t count(size_t i) noexcept
             {
@@ -64,15 +41,15 @@ namespace qs
     }
 
     template <class... S>
-    using squeeze_count = detail::squeeze_count_impl<S..., void>;
-
-    template <size_t I, class... S>
-    using squeeze_count_before = detail::squeeze_count_before_impl<I, S..., void>;
+    constexpr size_t squeeze_count()
+    {
+        return detail::squeeze_count_before_impl<S..., void>::count(sizeof...(S));
+    }
 
     template <class... S>
-    constexpr size_t squeeze_count_dyn(size_t i)
+    constexpr size_t squeeze_count_before(size_t i)
     {
-        return detail::squeeze_count_dyn_impl<S..., void>::count(i);
+        return detail::squeeze_count_before_impl<S..., void>::count(i);
     }
 
     /******************************************
@@ -88,7 +65,23 @@ namespace qs
     // expression, the behavior is undefined.
     
     template <class E, class... S>
-    class xview_shape;
+    class xview_shape
+    {
+    public:
+        using size_type = typename E::size_type;
+
+        xview_shape(const E& e) : m_e(e)
+        {
+        }
+
+        inline size_type operator[](size_type i) const
+        {
+            return m_e.shape()[i - squeeze_count_before<S...>(i)];
+        }
+
+    private:
+        const E& m_e;
+    };
 
     template <class E, class... S>
     class xview : public xexpression<xview<E, S...>>
@@ -116,12 +109,12 @@ namespace qs
 
         inline size_type dimension() const noexcept
         {
-            return m_e.dimension() - squeeze_count<S...>::value;
+            return m_e.dimension() - squeeze_count<S...>();
         }
         
         auto shape() const
         {
-            return xview_shape<E, S...>(*this);
+            return xview_shape<E, S...>(m_e);
         }
 
         inline bool broadcast_shape(shape_type& shape) const
@@ -132,13 +125,13 @@ namespace qs
         template <class... Args>
         reference operator()(Args... args)
         {
-            return access_impl(std::make_index_sequence<sizeof...(Args) + squeeze_count<S...>::value>(), args...);
+            return access_impl(std::make_index_sequence<sizeof...(Args) + squeeze_count<S...>()>(), args...);
         }
 
         template <class... Args>
         const_reference operator()(Args... args) const
         {
-            return access_impl(std::make_index_sequence<sizeof...(Args) + squeeze_count<S...>::value>(), args...);
+            return access_impl(std::make_index_sequence<sizeof...(Args) + squeeze_count<S...>()>(), args...);
         }
 
     private:
@@ -149,16 +142,27 @@ namespace qs
         template <size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args)
         {
-            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(std::get<I>(m_slices), args...)...);
+            return m_e(index<I>(args...)...);
         }
 
         template <size_type... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const
         {
-            return m_e(sliced_access<I - squeeze_count_before<I, S...>::value>(std::get<I>(m_slices), args...)...);
+            return m_e(index<I>(args...)...);
         }
 
-        // sliced_access retrieves the index from the xslice or xsqueeze indexer.
+        template <size_type I, class... Args>
+        std::enable_if_t<(I<sizeof...(S)), size_type> index(Args... args) const
+        {
+            return sliced_access<I - squeeze_count_before<S...>(I)>(std::get<I>(m_slices), args...);
+        }
+
+        template <size_type I, class... Args>
+        std::enable_if_t<(I>=sizeof...(S)), size_type> index(Args... args) const
+        {
+            return argument<I - squeeze_count_before<S...>(I)>(args...);
+        }
+
         template<size_type I, class T, class... Args>
         size_type sliced_access(const xslice<T>& slice, Args... args) const
         {
@@ -171,7 +175,6 @@ namespace qs
             return squeeze();
         }
 
-
     };
 
     template <class E, class... S>
@@ -183,4 +186,3 @@ namespace qs
 }
 
 #endif
-

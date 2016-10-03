@@ -6,7 +6,7 @@
 namespace qs
 {
 
-    /*TEST(xview, simple)
+    TEST(xview, simple)
     {
         xshape<size_t> shape = {3, 4};
         xarray<double> a(shape);
@@ -30,18 +30,21 @@ namespace qs
 
         auto view4 = make_xview(a, 1);
         ASSERT_TRUE(view4.dimension() == 1);
+
+        auto view5 = make_xview(view4, 1);
+        ASSERT_TRUE(view5.dimension() == 0);
     }
 
     TEST(xview, squeeze_count)
     {
-        size_t squeeze1 = squeeze_count<size_t, size_t, size_t, xrange<size_t>>::value;
+        size_t squeeze1 = squeeze_count<size_t, size_t, size_t, xrange<size_t>>();
         ASSERT_TRUE(squeeze1 == 3);
-        size_t squeeze2 = squeeze_count<size_t, xrange<size_t>, size_t>::value;
+        size_t squeeze2 = squeeze_count<size_t, xrange<size_t>, size_t>();
         ASSERT_TRUE(squeeze2 == 2);
-        size_t squeeze3 = squeeze_count_before<3, size_t, size_t, size_t, xrange<size_t>>::value;
+        size_t squeeze3 = squeeze_count_before<size_t, size_t, size_t, xrange<size_t>>(3);
         ASSERT_TRUE(squeeze3 == 3);
-        size_t squeeze4 = squeeze_count_before<2, size_t, xrange<size_t>, size_t>::value;
+        size_t squeeze4 = squeeze_count_before<size_t, xrange<size_t>, size_t>(2);
         ASSERT_TRUE(squeeze4 == 1);
-    }*/
+    }
 }
 
