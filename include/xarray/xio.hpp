@@ -51,7 +51,7 @@ namespace qs
     template <class E>
     inline std::ostream& operator<<(std::ostream& out, const xexpression<E>& e)
     {
-        return detail::xout<3>::output(out, e.derived_cast());
+        return detail::xout<5>::output(out, e.derived_cast());
     }
 
 }

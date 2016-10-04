@@ -52,6 +52,38 @@ namespace qs
         return detail::squeeze_count_before_impl<S..., void>::count(i);
     }
 
+    /**************************************
+     * index of n-th non-squeeze
+     **************************************/
+    namespace detail
+    {
+
+        template <class T, class... S>
+        struct non_squeeze_impl
+        {
+            static inline constexpr size_t count(size_t i) noexcept
+            {
+                return 1 + (std::is_integral<std::remove_reference_t<T>>::value ? non_squeeze_impl<S...>::count(i) : non_squeeze_impl<S...>::count(i - 1));
+            } 
+        };
+
+        template <>
+        struct non_squeeze_impl<void>
+        {
+            static inline constexpr size_t count(size_t i) noexcept
+            {
+                return i;
+            } 
+        };
+    }
+
+    template <class... S>
+    constexpr size_t non_squeeze(size_t i)
+    {
+        return detail::non_squeeze_impl<S..., void>::count(i);
+    }
+
+
     /******************************************
      * Views on xexpressions
      ******************************************/
@@ -70,17 +102,17 @@ namespace qs
     public:
         using size_type = typename E::size_type;
 
-        xview_shape(const E& e) : m_e(e)
+        xview_shape(const xview<E, S...>& v) : m_v(v)
         {
         }
 
         inline size_type operator[](size_type i) const
         {
-            return m_e.shape()[i - squeeze_count_before<S...>(i)];
+            return m_v.m_e.shape()[non_squeeze<S...>(i)];
         }
 
     private:
-        const E& m_e;
+        const xview<E, S...>& m_v;
     };
 
     template <class E, class... S>
@@ -174,6 +206,8 @@ namespace qs
         {
             return squeeze();
         }
+
+        friend class xview_shape<E, S...>;
 
     };
 
