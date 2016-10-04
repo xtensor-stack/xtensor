@@ -143,28 +143,28 @@ namespace qs
     template <class E>
     inline auto xsemantic_base<D>::operator+=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(*this + e);
+        return operator=(base_type::derived_cast() + e.derived_cast());
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator-=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(*this - e);
+        return operator=(base_type::derived_cast() - e.derived_cast());
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator*=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(*this * e);
+        return operator=(base_type::derived_cast() * e.derived_cast());
     }
 
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator/=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(*this / e);
+        return operator=(base_type::derived_cast() / e.derived_cast());
     }
 
     template <class D>
@@ -179,7 +179,7 @@ namespace qs
     template <class E>
     inline auto xsemantic_base<D>::plus_assign(const xexpression<E>& e) -> derived_type&
     {
-        auto expr = (*this + e);
+        auto expr = (base_type::derived_cast() + e.derived_cast());
         computed_assign_xexpression(*this, expr);
         return base_type::derived_cast();
     }
@@ -188,8 +188,8 @@ namespace qs
     template <class E>
     inline auto xsemantic_base<D>::minus_assign(const xexpression<E>& e) -> derived_type&
     {
-        auto expr = (*this - e);
-        computed_assign_expression(*this, expr);
+        auto expr = (base_type::derived_cast() - e.derived_cast());
+        computed_assign_xexpression(*this, expr);
         return base_type::derived_cast();
     }
 
@@ -197,7 +197,7 @@ namespace qs
     template <class E>
     inline auto xsemantic_base<D>::multiplies_assign(const xexpression<E>& e) -> derived_type&
     {
-        auto expr = (*this * e);
+        auto expr = (base_type::derived_cast() * e.derived_cast());
         computed_assign_xexpression(*this, expr);
         return base_type::derived_cast();
     }
@@ -206,7 +206,7 @@ namespace qs
     template <class E>
     inline auto xsemantic_base<D>::divides_assign(const xexpression<E>& e) -> derived_type&
     {
-        auto expr = (*this / e);
+        auto expr = (base_type::derived_cast() / e.derived_cast());
         computed_assign_xexpression(*this, expr);
         return base_type::derived_cast();
     }

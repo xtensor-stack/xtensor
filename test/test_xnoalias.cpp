@@ -136,5 +136,137 @@ namespace qs
             EXPECT_EQ(tester.res_ru, b);
         }
     }
+
+    TEST(xnoalias, a_plus_equal_b)
+    {
+        operation_tester<std::plus<>> tester;
+
+        {
+            SCOPED_TRACE("row_major += row_major");
+            xarray<int> b = tester.a;
+            noalias(b) += tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major += column_major");
+            xarray<int> b = tester.a;
+            noalias(b) += tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major += central_major");
+            xarray<int> b = tester.a;
+            noalias(b) += tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major += unit_major");
+            xarray<int> b = tester.a;
+            noalias(b) += tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST(xnoalias, a_minus_equal_b)
+    {
+        operation_tester<std::minus<>> tester;
+
+        {
+            SCOPED_TRACE("row_major -= row_major");
+            xarray<int> b = tester.a;
+            noalias(b) -= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major -= column_major");
+            xarray<int> b = tester.a;
+            noalias(b) -= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major -= central_major");
+            xarray<int> b = tester.a;
+            noalias(b) -= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major -= unit_major");
+            xarray<int> b = tester.a;
+            noalias(b) -= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST(xnoalias, a_times_equal_b)
+    {
+        operation_tester<std::multiplies<>> tester;
+
+        {
+            SCOPED_TRACE("row_major *= row_major");
+            xarray<int> b = tester.a;
+            noalias(b) *= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major *= column_major");
+            xarray<int> b = tester.a;
+            noalias(b) *= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major *= central_major");
+            xarray<int> b = tester.a;
+            noalias(b) *= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major *= unit_major");
+            xarray<int> b = tester.a;
+            noalias(b) *= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TEST(xnoalias, a_divide_by_equal_b)
+    {
+        operation_tester<std::divides<>> tester;
+
+        {
+            SCOPED_TRACE("row_major /= row_major");
+            xarray<int> b = tester.a;
+            noalias(b) /= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major /= column_major");
+            xarray<int> b = tester.a;
+            noalias(b) /= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major /= central_major");
+            xarray<int> b = tester.a;
+            noalias(b) /= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major /= unit_major");
+            xarray<int> b = tester.a;
+            noalias(b) /= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
 }
 
