@@ -23,6 +23,12 @@ namespace qs
     template <class... T>
     struct or_;
 
+    template <size_t I, class... Args>
+    decltype(auto) argument(Args&&... args) noexcept;
+
+    template<class R, class F, class... S>
+    R apply(size_t index, F&& func, S... s);
+
     /***********************
      * for_each on tuple
      ***********************/
@@ -92,7 +98,7 @@ namespace qs
 
 
     /***********************************
-     * accumulate_arg implementation
+     * accumulate_arg arguments
      ***********************************/
 
     namespace detail
@@ -132,7 +138,7 @@ namespace qs
 
 
     /*************************
-     * Accumulate on tuple
+     * accumulate tuple
      *************************/
 
     namespace detail
@@ -210,6 +216,33 @@ namespace qs
         return detail::getter<I>::get(std::forward<Args>(args)...);
     }
     
+    /************************
+     * apply implementation
+     ************************/
+
+    namespace detail
+    {
+
+        template<class R, class F, int I, class... S>
+        R apply_one(F&& func, S&&... s)
+        {
+            return func(argument<I>(s...));
+        }
+
+        template<class R, class F, size_t... I, class... S>
+        R apply(size_t index, F&& func, std::index_sequence<I...>, S&&... s)
+        {
+            using FT = R(F, S&&...);
+            static constexpr FT* arr[] = { &apply_one<R, F, I, S...>... };
+            return arr[index](std::forward<F>(func), std::forward<S>(s)...);
+        }
+    }
+
+    template<class R, class F, class... S>
+    R apply(size_t index, F&& func, S... s)
+    {
+        return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(s)...);
+    }
 }
 
 #endif

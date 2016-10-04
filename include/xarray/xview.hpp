@@ -83,7 +83,6 @@ namespace qs
         return detail::non_squeeze_impl<S..., void>::count(i);
     }
 
-
     /******************************************
      * Views on xexpressions
      ******************************************/
@@ -95,24 +94,17 @@ namespace qs
 
     // If more slices are provided than the dimension of the underlying
     // expression, the behavior is undefined.
-    
-    template <class E, class... S>
-    class xview_shape
+
+    template <class S>
+    disable_xslice<S, size_t> get_size(const S&)
     {
-    public:
-        using size_type = typename E::size_type;
+        return 0;
+    };
 
-        xview_shape(const xview<E, S...>& v) : m_v(v)
-        {
-        }
-
-        inline size_type operator[](size_type i) const
-        {
-            return m_v.m_e.shape()[non_squeeze<S...>(i)];
-        }
-
-    private:
-        const xview<E, S...>& m_v;
+    template <class S>
+    size_t get_size(const xslice<S>& slice)
+    {
+        return slice.derived_cast().size();
     };
 
     template <class E, class... S>
@@ -137,6 +129,16 @@ namespace qs
         xview(E&& e, S&&... slices) noexcept
             : m_e(e), m_slices(get_xslice_type<S>(slices)...)
         {
+            auto func = [](auto s) { return get_size(s); };
+            m_shape.reserve(dimension());
+            for (size_type i=0; i!=sizeof...(S); ++i)
+            {
+                m_shape.push_back(apply<size_t>(non_squeeze<S...>(i), func, std::forward<S>(slices)...));
+            }
+            for (size_type i = sizeof...(S); i!=dimension(); ++i)
+            {
+                m_shape.push_back(m_e.shape()[non_squeeze<S...>(i)]);
+            }
         }
 
         inline size_type dimension() const noexcept
@@ -144,9 +146,9 @@ namespace qs
             return m_e.dimension() - squeeze_count<S...>();
         }
         
-        auto shape() const
+        auto shape() const noexcept
         {
-            return xview_shape<E, S...>(m_e);
+            return m_shape;
         }
 
         inline bool broadcast_shape(shape_type& shape) const
@@ -170,6 +172,7 @@ namespace qs
 
         E& m_e;
         std::tuple<get_xslice_type<S>...> m_slices;
+        shape_type m_shape;
 
         template <size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args)
@@ -206,8 +209,6 @@ namespace qs
         {
             return squeeze();
         }
-
-        friend class xview_shape<E, S...>;
 
     };
 
