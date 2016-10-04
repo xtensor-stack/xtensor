@@ -9,26 +9,12 @@ namespace qs
     template <class E>
     class xexpression;
 
-    template <class T>
-    std::ostream& operator<<(std::ostream& out, const std::vector<T>& v)
-    {
-        out << "(";
-        for(size_t i = 0; i < v.size() - 1; ++i)
-        {
-            out << v[i] << ",";
-        }
-        out << v.back() << ")";
-    }
-
     template <class E1, class E2>
     inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
         bool trivial_broadcast = trivial && de2.is_trivial_broadcast(de1.strides());
-        /*std::cout << "assign data : " << std::endl;
-        std::cout << "trivial broadcast : " << trivial_broadcast << std::endl;
-        std::cout << "e1 shape : " << de1.shape() << std::endl;*/
         if(trivial_broadcast)
         {
             std::copy(de2.storage_begin(), de2.storage_end(), de1.storage_begin());
