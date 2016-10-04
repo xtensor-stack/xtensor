@@ -51,7 +51,7 @@ set(XARRAY_TARGET test_xarray)
 set(XARRAY_HEADERS
     include/xarray/xarray.hpp
     include/xarray/xarray_base.hpp
-    include/xarray/broadcast.hpp
+    include/xarray/xbroadcast.hpp
     include/xarray/xexpression.hpp
     include/xarray/xindex.hpp
     include/xarray/xio.hpp

@@ -1,7 +1,7 @@
 #ifndef XASSIGN_HPP
 #define XASSIGN_HPP
 
-#include "broadcast.hpp"
+#include "xbroadcast.hpp"
 #include "xindex.hpp"
 
 namespace qs
