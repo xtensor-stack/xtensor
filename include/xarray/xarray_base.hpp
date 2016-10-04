@@ -109,6 +109,9 @@ namespace qs
         xarray_base(xarray_base&&) = default;
         xarray_base& operator=(xarray_base&&) = default;
 
+        shape_type& get_shape();
+        strides_type& get_strides();
+        strides_type& get_backstrides();
 
     private:
 
@@ -120,16 +123,34 @@ namespace qs
         strides_type m_backstrides;
     };
 
-    template <class D>
-    bool operator==(const xarray_base<D>& lhs, const xarray_base<D>& rhs);
+    template <class D1, class D2>
+    bool operator==(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs);
 
-    template <class D>
-    bool operator!=(const xarray_base<D>& lhs, const xarray_base<D>& rhs);
+    template <class D1, class D2>
+    bool operator!=(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs);
 
 
     /****************************
      * xarray_base implementation
      ****************************/
+
+    template <class D>
+    inline auto xarray_base<D>::get_shape() -> shape_type&
+    {
+        return m_shape;
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::get_strides() -> strides_type&
+    {
+        return m_strides;
+    }
+
+    template <class D>
+    inline auto xarray_base<D>::get_backstrides() -> strides_type&
+    {
+        return m_backstrides;
+    }
 
     template <class D>
     inline void xarray_base<D>::adapt_strides()
@@ -407,15 +428,15 @@ namespace qs
      * Comparison
      ****************/
 
-    template <class D>
-    inline bool operator==(const xarray_base<D>& lhs, const xarray_base<D>& rhs)
+    template <class D1, class D2>
+    inline bool operator==(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs)
     {
         return lhs.shape() == rhs.shape() && lhs.strides() == rhs.strides()
             && lhs.data() == rhs.data();
     }
 
-    template <class D>
-    inline bool operator!=(const xarray_base<D>& lhs, const xarray_base<D>& rhs)
+    template <class D1, class D2>
+    inline bool operator!=(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs)
     {
         return !(lhs == rhs);
     }

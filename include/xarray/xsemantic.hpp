@@ -86,7 +86,6 @@ namespace qs
 
         using base_type = xsemantic_base<D>;
         using derived_type = D;
-
         using temporary_type = typename base_type::temporary_type;
 
         derived_type& assign_temporary(temporary_type&);
@@ -101,6 +100,34 @@ namespace qs
 
         xarray_semantic(xarray_semantic&&) = default;
         xarray_semantic& operator=(xarray_semantic&&) = default;
+
+        template <class E>
+        derived_type& operator=(const xexpression<E>&);
+    };
+
+
+    template <class D>
+    class xadaptor_semantic : public xsemantic_base<D>
+    {
+
+    public:
+
+        using base_type = xsemantic_base<D>;
+        using derived_type = D;
+        using temporary_type = typename base_type::temporary_type;
+
+        derived_type& assign_temporary(temporary_type&);
+
+    protected:
+
+        xadaptor_semantic() = default;
+        ~xadaptor_semantic() = default;
+
+        xadaptor_semantic(const xadaptor_semantic&) = default;
+        xadaptor_semantic& operator=(const xadaptor_semantic&) = default;
+
+        xadaptor_semantic(xadaptor_semantic&&) = default;
+        xadaptor_semantic& operator=(xadaptor_semantic&&) = default;
 
         template <class E>
         derived_type& operator=(const xexpression<E>&);
@@ -230,9 +257,9 @@ namespace qs
     }
 
 
-    /*********************
-     * xarray_semantic
-     *********************/
+    /************************************
+     * xarray_semantic implementation
+     ************************************/
 
     template <class D>
     inline auto xarray_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
@@ -249,6 +276,24 @@ namespace qs
         return base_type::operator=(e);
     }
 
+
+    /**************************************
+     * xadaptor_semantic implementation
+     **************************************/
+
+    template <class D>
+    inline auto xadaptor_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
+    {
+        this->derived_cast().assign_temporary_impl(tmp);
+        return this->derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xadaptor_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
+    {
+        return base_type::operator=(e);
+    }
 }
 
 #endif

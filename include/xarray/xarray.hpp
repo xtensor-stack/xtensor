@@ -88,16 +88,19 @@ namespace qs
     struct array_inner_types<xarray_adaptor<C>>
     {
         using container_type = C;
+        using temporary_type = xarray<typename C::value_type>;
     };
 
     template <class C>
-    class xarray_adaptor : public xarray_base<xarray_adaptor<C>>
+    class xarray_adaptor : public xarray_base<xarray_adaptor<C>>,
+                           public xadaptor_semantic<xarray_adaptor<C>>
     {
 
     public:
 
         using self_type = xarray_adaptor<C>;
         using base_type = xarray_base<self_type>;
+        using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
@@ -116,6 +119,9 @@ namespace qs
         xarray_adaptor(xarray_adaptor&&) = default;
         xarray_adaptor& operator=(xarray_adaptor&&);
 
+        template <class E>
+        xarray_adaptor& operator=(const xexpression<E>& e);
+
     private:
 
         container_type& m_data;
@@ -123,7 +129,11 @@ namespace qs
         container_type& data_impl();
         const container_type& data_impl() const;
 
+        using temporary_type = typename array_inner_types<self_type>::temporary_type;
+        void assign_temporary_impl(temporary_type& tmp);
+
         friend class xarray_base<xarray_adaptor<C>>;
+        friend class xadaptor_semantic<xarray_adaptor<C>>;
     };
 
 
@@ -230,6 +240,13 @@ namespace qs
     }
 
     template <class C>
+    template <class E>
+    inline auto xarray_adaptor<C>::operator=(const xexpression<E>& e) -> self_type&
+    {
+        return semantic_base::operator=(e);
+    }
+
+    template <class C>
     inline auto xarray_adaptor<C>::data_impl() -> container_type&
     {
         return m_data;
@@ -241,6 +258,17 @@ namespace qs
         return m_data;
     }
 
+    template <class C>
+    inline void xarray_adaptor<C>::assign_temporary_impl(temporary_type& tmp)
+    {
+        // TODO (performance improvement) : consider moving tmps
+        // shape and strides
+        base_type::get_shape() = tmp.shape();
+        base_type::get_strides() = tmp.strides();
+        base_type::get_backstrides() = tmp.backstrides();
+        m_data.resize(tmp.size());
+        std::copy(tmp.data().begin(), tmp.data().end(), m_data.begin());
+    }
 }
 
 #endif

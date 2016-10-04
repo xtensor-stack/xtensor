@@ -66,6 +66,7 @@ set(XARRAY_HEADERS
 set(XARRAY_TESTS
     test/main.cpp
     test/test_common.hpp
+    test/test_xadaptor_semantic.cpp
     test/test_xarray.cpp
     test/test_xarray_adaptor.cpp
     test/test_xarray_semantic.cpp
