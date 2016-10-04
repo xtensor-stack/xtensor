@@ -15,6 +15,9 @@ namespace qs
         noalias_proxy(A& a);
 
         template <class E>
+        A& operator=(const xexpression<E>& e);
+
+        template <class E>
         A& operator+=(const xexpression<E>& e);
 
         template <class E>
@@ -43,6 +46,13 @@ namespace qs
     inline noalias_proxy<A>::noalias_proxy(A& a)
         : m_array(a)
     {
+    }
+
+    template <class A>
+    template <class E>
+    inline A& noalias_proxy<A>::operator=(const xexpression<E>& e)
+    {
+        return m_array.assign(e);
     }
 
     template <class A>

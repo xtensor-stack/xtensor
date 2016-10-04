@@ -73,6 +73,7 @@ set(XARRAY_TESTS
     test/test_xiterator.cpp
     test/test_xio.cpp
     test/test_xmath.cpp
+    test/test_xnoalias.cpp
     test/test_xoperation.cpp
     test/test_xscalar.cpp
     test/test_xsemantic.hpp
