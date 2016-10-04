@@ -68,12 +68,14 @@ set(XARRAY_TESTS
     test/test_common.hpp
     test/test_xarray.cpp
     test/test_xarray_adaptor.cpp
+    test/test_xarray_semantic.cpp
     test/test_xfunction.cpp
     test/test_xiterator.cpp
     test/test_xio.cpp
     test/test_xmath.cpp
     test/test_xoperation.cpp
     test/test_xscalar.cpp
+    test/test_xsemantic.hpp
     test/test_xview.cpp
     test/test_utils.cpp
 )

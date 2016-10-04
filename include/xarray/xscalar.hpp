@@ -52,6 +52,7 @@ namespace qs
         const_reference operator()(Args... args) const;
 
         bool broadcast_shape(shape_type& shape) const;
+        bool is_trivial_broadcast(const strides_type& strides) const;
 
         const_stepper stepper_begin(const shape_type& shape) const;
         const_stepper stepper_end(const shape_type& shape) const;
@@ -155,7 +156,13 @@ namespace qs
     }
 
     template <class T>
-    inline bool xscalar<T>::broadcast_shape(xscalar<T>::shape_type& shape) const
+    inline bool xscalar<T>::broadcast_shape(shape_type&) const
+    {
+        return true;
+    }
+
+    template <class T>
+    inline bool xscalar<T>::is_trivial_broadcast(const strides_type&) const
     {
         return true;
     }

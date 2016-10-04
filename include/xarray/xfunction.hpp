@@ -52,6 +52,7 @@ namespace qs
         using difference_type = detail::common_difference_type<E...>;
 
         using shape_type = xshape<size_type>;
+        using strides_type = xstrides<size_type>;
         using closure_type = const self_type;
 
         using const_stepper = xfunction_stepper<F, R, E...>;
@@ -63,6 +64,7 @@ namespace qs
 
         size_type dimension() const;
         bool broadcast_shape(shape_type& shape) const;
+        bool is_trivial_broadcast(const strides_type& strides) const;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -243,6 +245,13 @@ namespace qs
         return accumulate(func, true, m_e);
     }
     
+    template <class F, class R, class... E>
+    inline bool xfunction<F, R, E...>::is_trivial_broadcast(const strides_type& strides) const
+    {
+        auto func = [&strides](bool b, auto&& e) { return b && e.is_trivial_broadcast(strides); };
+        return accumulate(func, true, m_e);
+    }
+
     template <class F, class R, class... E>
     template <class... Args>
     inline auto xfunction<F, R, E...>::operator()(Args... args) const -> const_reference

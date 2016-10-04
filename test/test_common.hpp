@@ -20,7 +20,7 @@ namespace qs
             {
                 m_assigner[i].resize(m_shape[1]);
             }
-            m_assigner[0][0] = { 0, 1, 2, 3 };
+            m_assigner[0][0] = { -1, 1, 2, 3 };
             m_assigner[0][1] = { 4, 5, 6, 7 };
             m_assigner[1][0] = { 8, 9, 10, 11 };
             m_assigner[1][1] = { 12, 13, 14, 15 };
@@ -47,7 +47,7 @@ namespace qs
         {
             m_strides = { 8, 4, 1 };
             m_backstrides = {16, 4, 3};
-            m_data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+            m_data = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                       10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
                       20, 21, 22, 23 };
         }
@@ -59,7 +59,7 @@ namespace qs
         {
             m_strides = { 1, 3, 6 };
             m_backstrides = { 2, 3, 18 };
-            m_data = { 0, 8, 16, 4, 12, 20,
+            m_data = { -1, 8, 16, 4, 12, 20,
                        1, 9, 17, 5, 13, 21,
                        2, 10, 18, 6, 14, 22,
                        3, 11, 19, 7, 15, 23 };
@@ -72,7 +72,7 @@ namespace qs
         {
             m_strides = { 8, 1, 2 };
             m_backstrides = { 16, 1, 6};
-            m_data = { 0, 4, 1, 5, 2, 6, 3, 7,
+            m_data = { -1, 4, 1, 5, 2, 6, 3, 7,
                        8, 12, 9, 13, 10, 14, 11, 15,
                       16, 20, 17, 21, 18, 22, 19, 23 };
         }
@@ -92,13 +92,13 @@ namespace qs
             m_shape = { 3, 1, 4 };
             m_strides = { 4, 0, 1 };
             m_backstrides = { 8, 0, 3 };
-            m_data = { 0, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19 };
+            m_data = { -1, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19 };
             m_assigner.resize(m_shape[0]);
             for(size_t i = 0; i < m_shape[0]; ++i)
             {
                 m_assigner[i].resize(m_shape[1]);
             }
-            m_assigner[0][0] = { 0, 1, 2, 3 };
+            m_assigner[0][0] = { -1, 1, 2, 3 };
             m_assigner[1][0] = { 8, 9, 10, 11 };
             m_assigner[2][0] = { 16, 17, 18, 19 };
         }

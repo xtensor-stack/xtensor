@@ -68,6 +68,7 @@ namespace qs
         const container_type& data() const;
 
         bool broadcast_shape(shape_type& shape) const;
+        bool is_trivial_broadcast(const strides_type& strides) const;
 
         iterator begin();
         iterator end();
@@ -108,6 +109,7 @@ namespace qs
         xarray_base(xarray_base&&) = default;
         xarray_base& operator=(xarray_base&&) = default;
 
+
     private:
 
         void adapt_strides();
@@ -117,6 +119,12 @@ namespace qs
         strides_type m_strides;
         strides_type m_backstrides;
     };
+
+    template <class D>
+    bool operator==(const xarray_base<D>& lhs, const xarray_base<D>& rhs);
+
+    template <class D>
+    bool operator!=(const xarray_base<D>& lhs, const xarray_base<D>& rhs);
 
 
     /****************************
@@ -250,6 +258,11 @@ namespace qs
         return qs::broadcast_shape(m_shape, shape);
     }
 
+    template <class D>
+    inline bool xarray_base<D>::is_trivial_broadcast(const strides_type& str) const
+    {
+        return str == strides();
+    }
 
     /******************
      * iterator api
@@ -387,6 +400,24 @@ namespace qs
     inline auto xarray_base<D>::storage_end() const -> const_storage_iterator
     {
         return data().end();
+    }
+
+
+    /****************
+     * Comparison
+     ****************/
+
+    template <class D>
+    inline bool operator==(const xarray_base<D>& lhs, const xarray_base<D>& rhs)
+    {
+        return lhs.shape() == rhs.shape() && lhs.strides() == rhs.strides()
+            && lhs.data() == rhs.data();
+    }
+
+    template <class D>
+    inline bool operator!=(const xarray_base<D>& lhs, const xarray_base<D>& rhs)
+    {
+        return !(lhs == rhs);
     }
 
 }
