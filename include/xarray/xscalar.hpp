@@ -19,6 +19,9 @@ namespace qs
     class xscalar_stepper;
 
     template <class T>
+    class xscalar_iterator;
+
+    template <class T>
     class xscalar : public xexpression<xscalar<T>>
     {
 
@@ -38,6 +41,7 @@ namespace qs
 
         using closure_type = const self_type;
         using const_stepper = xscalar_stepper<T>;
+        using const_storage_iterator = xscalar_iterator<T>;
 
         xscalar(const T& value);
 
@@ -56,6 +60,9 @@ namespace qs
 
         const_stepper stepper_begin(const shape_type& shape) const;
         const_stepper stepper_end(const shape_type& shape) const;
+
+        const_storage_iterator storage_begin() const;
+        const_storage_iterator storage_end() const;
 
     private:
 
@@ -82,7 +89,7 @@ namespace qs
         using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
 
-        xscalar_stepper(const container_type* c, bool end = false);
+        explicit xscalar_stepper(const container_type* c);
 
         reference operator*() const;
 
@@ -96,7 +103,6 @@ namespace qs
     private:
 
         const container_type* p_c;
-        bool m_end;
     };
 
     template <class T>
@@ -106,6 +112,48 @@ namespace qs
     template <class T>
     bool operator!=(const xscalar_stepper<T>& lhs,
                     const xscalar_stepper<T>& rhs);
+
+
+    /**********************
+     * xscalar_iterator
+     **********************/
+
+    template <class T>
+    class xscalar_iterator
+    {
+
+    public:
+
+        using self_type = xscalar_stepper<T>;
+        using container_type = xscalar<T>;
+
+        using value_type = typename container_type::value_type;
+        using reference = typename container_type::const_reference;
+        using pointer = typename container_type::const_pointer;
+        using difference_type = typename container_type::difference_type;
+        using iterator_category = std::input_iterator_tag;
+
+        explicit xscalar_iterator(const container_type* c);
+    
+        self_type& operator++();
+        self_type operator++(int);
+
+        reference operator*() const;
+
+        bool equal(const self_type& rhs) const;
+
+    private:
+
+        const container_type* p_c;
+    };
+
+    template <class T>
+    bool operator==(const xscalar_iterator<T>& lhs,
+                    const xscalar_iterator<T>& rhs);
+
+    template <class T>
+    bool operator!=(const xscalar_iterator<T>& lhs,
+                    const xscalar_iterator<T>& rhs);
 
 
     /****************************
@@ -119,38 +167,38 @@ namespace qs
     }
 
     template <class T>
-    inline typename xscalar<T>::size_type xscalar<T>::size() const
+    inline auto xscalar<T>::size() const -> size_type
     {
         return 1;
     }
 
     template <class T>
-    inline typename xscalar<T>::size_type xscalar<T>::dimension() const
+    inline auto xscalar<T>::dimension() const -> size_type
     {
         return 0;
     }
 
     template <class T>
-    inline typename xscalar<T>::shape_type xscalar<T>::shape() const
+    inline auto xscalar<T>::shape() const -> shape_type
     {
         return {};
     }
 
     template <class T>
-    inline typename xscalar<T>::strides_type xscalar<T>::strides() const
+    inline auto xscalar<T>::strides() const -> strides_type
     {
         return {};
     }
 
     template <class T>
-    inline typename xscalar<T>::strides_type xscalar<T>::backstrides() const
+    inline auto xscalar<T>::backstrides() const -> strides_type
     {
         return {};
     }
 
     template <class T>
     template <class... Args>
-    inline typename xscalar<T>::const_reference xscalar<T>::operator()(Args... args) const
+    inline auto xscalar<T>::operator()(Args... args) const -> const_reference
     {
         return m_value;
     }
@@ -167,14 +215,38 @@ namespace qs
         return true;
     }
 
+    template <class T>
+    inline auto xscalar<T>::stepper_begin(const shape_type&) const -> const_stepper
+    {
+        return const_stepper(this);
+    }
+
+    template <class T>
+    inline auto xscalar<T>::stepper_end(const shape_type& shape) const -> const_stepper
+    {
+        return const_stepper(this);
+    }
+
+    template <class T>
+    inline auto xscalar<T>::storage_begin() const -> const_storage_iterator
+    {
+        return const_storage_iterator(this);
+    }
+
+    template <class T>
+    inline auto xscalar<T>::storage_end() const -> const_storage_iterator 
+    {
+        return const_storage_iterator(this);
+    }
+
 
     /************************************
      * xscalar_stepper implementation
      ************************************/
 
     template <class T>
-    inline xscalar_stepper<T>::xscalar_stepper(const container_type* c, bool end)
-        : p_c(c), m_end(end)
+    inline xscalar_stepper<T>::xscalar_stepper(const container_type* c)
+        : p_c(c)
     {
     }
 
@@ -197,13 +269,12 @@ namespace qs
     template <class T>
     inline void xscalar_stepper<T>::to_end()
     {
-        m_end = true;
     }
 
     template <class T>
     inline bool xscalar_stepper<T>::equal(const self_type& rhs) const
     {
-        return p_c = rhs.p_c && m_end = rhs.m_end;
+        return p_c = rhs.p_c;
     }
 
     template <class T>
@@ -216,6 +287,57 @@ namespace qs
     template <class T>
     inline bool operator!=(const xscalar_stepper<T>& lhs,
                            const xscalar_stepper<T>& rhs)
+    {
+        return !(lhs.equal(rhs));
+    }
+
+
+    /*************************************
+     * xscalar_iterator implementation
+     *************************************/
+
+    template <class T>
+    inline xscalar_iterator<T>::xscalar_iterator(const container_type* c)
+        : p_c(c)
+    {
+    }
+    
+    template <class T>
+    inline auto xscalar_iterator<T>::operator++() -> self_type&
+    {
+        return *this;
+    }
+
+    template <class T>
+    inline auto xscalar_iterator<T>::operator++(int) -> self_type
+    {
+        self_type tmp(*this);
+        ++(*this);
+        return tmp;
+    }
+
+    template <class T>
+    inline auto xscalar_iterator<T>::operator*() const -> reference
+    {
+        return p_c->operator()();
+    }
+
+    template <class T>
+    inline bool xscalar_iterator<T>::equal(const self_type& rhs) const
+    {
+        return p_c == rhs.p_c;
+    }
+
+    template <class T>
+    inline bool operator==(const xscalar_iterator<T>& lhs,
+                           const xscalar_iterator<T>& rhs)
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class T>
+    inline bool operator!=(const xscalar_iterator<T>& lhs,
+                           const xscalar_iterator<T>& rhs)
     {
         return !(lhs.equal(rhs));
     }
