@@ -6,7 +6,7 @@
 namespace qs
 {
 
-    TEST(xview, simple)
+    /*TEST(xview, simple)
     {
         xshape<size_t> shape = {3, 4};
         xarray<double> a(shape);
@@ -45,6 +45,6 @@ namespace qs
         ASSERT_TRUE(squeeze3 == 3);
         size_t squeeze4 = squeeze_count_before<size_t, xrange<size_t>, size_t>(2);
         ASSERT_TRUE(squeeze4 == 1);
-    }
+    }*/
 }
 
