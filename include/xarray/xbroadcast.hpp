@@ -19,15 +19,8 @@ namespace qs
      * Broadcast functions
      *************************/
 
-    template <class S, size_t N>
-    S broadcast_dim(std::array<S, N>& dim_list);
-
     template <class S>
     bool broadcast_shape(const xshape<S>& input, xshape<S>& output);
-
-    template <class S>
-    bool check_trivial_broadcast(const xstrides<S>& strides1,
-                                 const xstrides<S>& strides2);
 
 
     /***************************
@@ -144,14 +137,6 @@ namespace qs
      * Broadcast functions implementation
      ****************************************/
 
-    template <class S, size_t N>
-    inline S broadcast_dim(const std::array<S, N>& dim_list)
-    {
-        S ndim = std::accumulate(dim_list.begin(), dim_list.end(), S(0),
-                [](S res, const S& dim) { return std::max(dim, res); });
-        return ndim;
-    }
-
     template <class S>
     inline bool broadcast_shape(const xshape<S>& input, xshape<S>& output)
     {
@@ -173,13 +158,6 @@ namespace qs
             trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
         }
         return trivial_broadcast;
-    }
-
-    template <class S>
-    inline bool check_trivial_broadcast(const xstrides<S>& strides1,
-                                        const xstrides<S>& strides2)
-    {
-        return strides1 == strides2;
     }
 
 
