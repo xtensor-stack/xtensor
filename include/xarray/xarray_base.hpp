@@ -55,7 +55,8 @@ namespace qs
         const strides_type& strides() const;
         const strides_type& backstrides() const;
 
-        void reshape(const shape_type& shape, layout l = layout::row_major);
+        void reshape(const shape_type& shape);
+        void reshape(const shape_type& shape, layout l);
         void reshape(const shape_type& shape, const strides_type& strides);
 
         template <class... Args>
@@ -203,6 +204,15 @@ namespace qs
     inline auto xarray_base<D>::backstrides() const -> const strides_type&
     {
         return m_backstrides;
+    }
+
+    template <class D>
+    inline void xarray_base<D>::reshape(const shape_type& shape)
+    {
+        if(shape != m_shape)
+        {
+            reshape(shape, layout::row_major);
+        }
     }
 
     template <class D>

@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "xarray/xarray.hpp"
+#include "xarray/xnoalias.hpp"
 #include "test_xsemantic.hpp"
 
 namespace qs
@@ -143,28 +144,28 @@ namespace qs
         {
             SCOPED_TRACE("row_major + scalar");
             xarray<int> a(tester.ra.shape(), tester.ra.strides(), 0);
-            a = tester.ra + tester.b;
+            noalias(a) = tester.ra + tester.b;
             EXPECT_EQ(tester.res_r, a);
         }
 
         {
             SCOPED_TRACE("column_major + scalar");
             xarray<int> a(tester.ca.shape(), tester.ca.strides(), 0);
-            a = tester.ca + tester.b;
+            noalias(a) = tester.ca + tester.b;
             EXPECT_EQ(tester.res_c, a);
         }
 
         {
             SCOPED_TRACE("central_major + scalar");
             xarray<int> a(tester.cta.shape(), tester.cta.strides(), 0);
-            a = tester.cta + tester.b;
+            noalias(a) = tester.cta + tester.b;
             EXPECT_EQ(tester.res_ct, a);
         }
 
         {
             SCOPED_TRACE("unit_major + scalar");
             xarray<int> a(tester.ua.shape(), tester.ua.strides(), 0);
-            a = tester.ua + tester.b;
+            noalias(a) = tester.ua + tester.b;
             EXPECT_EQ(tester.res_u, a);
         }
     }
@@ -176,28 +177,28 @@ namespace qs
         {
             SCOPED_TRACE("row_major - scalar");
             xarray<int> a(tester.ra.shape(), tester.ra.strides(), 0);
-            a = tester.ra - tester.b;
+            noalias(a) = tester.ra - tester.b;
             EXPECT_EQ(tester.res_r, a);
         }
 
         {
             SCOPED_TRACE("column_major - scalar");
             xarray<int> a(tester.ca.shape(), tester.ca.strides(), 0);
-            a = tester.ca - tester.b;
+            noalias(a) = tester.ca - tester.b;
             EXPECT_EQ(tester.res_c, a);
         }
 
         {
             SCOPED_TRACE("central_major - scalar");
             xarray<int> a(tester.cta.shape(), tester.cta.strides(), 0);
-            a = tester.cta - tester.b;
+            noalias(a) = tester.cta - tester.b;
             EXPECT_EQ(tester.res_ct, a);
         }
 
         {
             SCOPED_TRACE("unit_major - scalar");
             xarray<int> a(tester.ua.shape(), tester.ua.strides(), 0);
-            a = tester.ua - tester.b;
+            noalias(a) = tester.ua - tester.b;
             EXPECT_EQ(tester.res_u, a);
         }
     }
@@ -209,28 +210,28 @@ namespace qs
         {
             SCOPED_TRACE("row_major * scalar");
             xarray<int> a(tester.ra.shape(), tester.ra.strides(), 0);
-            a = tester.ra * tester.b;
+            noalias(a) = tester.ra * tester.b;
             EXPECT_EQ(tester.res_r, a);
         }
 
         {
             SCOPED_TRACE("column_major * scalar");
             xarray<int> a(tester.ca.shape(), tester.ca.strides(), 0);
-            a = tester.ca * tester.b;
+            noalias(a) = tester.ca * tester.b;
             EXPECT_EQ(tester.res_c, a);
         }
 
         {
             SCOPED_TRACE("central_major * scalar");
             xarray<int> a(tester.cta.shape(), tester.cta.strides(), 0);
-            a = tester.cta * tester.b;
+            noalias(a) = tester.cta * tester.b;
             EXPECT_EQ(tester.res_ct, a);
         }
 
         {
             SCOPED_TRACE("unit_major * scalar");
             xarray<int> a(tester.ua.shape(), tester.ua.strides(), 0);
-            a = tester.ua * tester.b;
+            noalias(a) = tester.ua * tester.b;
             EXPECT_EQ(tester.res_u, a);
         }
     }
@@ -242,28 +243,28 @@ namespace qs
         {
             SCOPED_TRACE("row_major / scalar");
             xarray<int> a(tester.ra.shape(), tester.ra.strides(), 0);
-            a = tester.ra / tester.b;
+            noalias(a) = tester.ra / tester.b;
             EXPECT_EQ(tester.res_r, a);
         }
 
         {
             SCOPED_TRACE("column_major / scalar");
             xarray<int> a(tester.ca.shape(), tester.ca.strides(), 0);
-            a = tester.ca / tester.b;
+            noalias(a) = tester.ca / tester.b;
             EXPECT_EQ(tester.res_c, a);
         }
 
         {
             SCOPED_TRACE("central_major / scalar");
             xarray<int> a(tester.cta.shape(), tester.cta.strides(), 0);
-            a = tester.cta / tester.b;
+            noalias(a) = tester.cta / tester.b;
             EXPECT_EQ(tester.res_ct, a);
         }
 
         {
             SCOPED_TRACE("unit_major / scalar");
             xarray<int> a(tester.ua.shape(), tester.ua.strides(), 0);
-            a = tester.ua / tester.b;
+            noalias(a) = tester.ua / tester.b;
             EXPECT_EQ(tester.res_u, a);
         }
     }
