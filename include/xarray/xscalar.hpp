@@ -124,7 +124,7 @@ namespace qs
 
     public:
 
-        using self_type = xscalar_stepper<T>;
+        using self_type = xscalar_iterator<T>;
         using container_type = xscalar<T>;
 
         using value_type = typename container_type::value_type;
@@ -274,7 +274,7 @@ namespace qs
     template <class T>
     inline bool xscalar_stepper<T>::equal(const self_type& rhs) const
     {
-        return p_c = rhs.p_c;
+        return p_c == rhs.p_c;
     }
 
     template <class T>

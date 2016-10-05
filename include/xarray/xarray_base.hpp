@@ -285,6 +285,7 @@ namespace qs
         return str == strides();
     }
 
+
     /******************
      * iterator api
      ******************/
