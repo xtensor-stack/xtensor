@@ -66,6 +66,63 @@ namespace qs
         }
     }
 
+    template <class F>
+    struct scalar_operation_tester
+    {
+        int b;
+        xarray<int> ra;
+        xarray<int> ca;
+        xarray<int> cta;
+        xarray<int> ua;
+
+        xarray<int> res_r;
+        xarray<int> res_c;
+        xarray<int> res_ct;
+        xarray<int> res_u;
+
+        scalar_operation_tester();
+    };
+
+    template <class F>
+    inline scalar_operation_tester<F>::scalar_operation_tester()
+    {
+        F f;
+        b = 2;
+        row_major_result rmr;
+        ra.reshape(rmr.shape(), rmr.strides());
+        assign_array(ra, rmr.m_assigner);
+
+        column_major_result cmr;
+        ca.reshape(cmr.shape(), cmr.strides());
+        assign_array(ca, cmr.m_assigner);
+
+        central_major_result ctmr;
+        cta.reshape(ctmr.shape(), ctmr.strides());
+        assign_array(cta, ctmr.m_assigner);
+
+        unit_shape_result usr;
+        ua.reshape(usr.shape(), usr.strides());
+        assign_array(ua, usr.m_assigner);
+
+        res_r.reshape(rmr.shape(), rmr.strides());
+        res_c.reshape(cmr.shape(), cmr.strides());
+        res_ct.reshape(ctmr.shape(), ctmr.strides());
+        res_u.reshape(usr.shape(), usr.strides());
+        
+        for(size_t i = 0; i < rmr.shape()[0]; ++i)
+        {
+            for(size_t j = 0; j < rmr.shape()[1]; ++j)
+            {
+                for(size_t k = 0; k < rmr.shape()[2]; ++k)
+                {
+                    res_r(i,j,k) = f(ra(i,j,k), b);
+                    res_c(i,j,k) = f( ca(i,j,k), b);
+                    res_ct(i,j,k) = f(cta(i,j,k), b);
+                    res_u(i,j,k) = f(ua(i,j,k), b);
+                }
+            }
+        }
+    }
 }
 
 #endif
