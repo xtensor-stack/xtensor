@@ -129,15 +129,16 @@ namespace qs
         xview(E&& e, S&&... slices) noexcept
             : m_e(e), m_slices(get_xslice_type<S>(slices)...)
         {
+            constexpr size_t last_slice_index = sizeof...(S) - squeeze_count<S...>();
             auto func = [](auto s) { return get_size(s); };
-            m_shape.reserve(dimension());
-            for (size_type i=0; i!=sizeof...(S); ++i)
+            m_shape.resize(dimension());
+            for (size_type i = 0; i != last_slice_index; ++i)
             {
-                m_shape.push_back(apply<size_t>(non_squeeze<S...>(i), func, std::forward<S>(slices)...));
+                m_shape[i] = apply<size_t>(non_squeeze<S...>(i), func, std::forward<S>(slices)...);
             }
-            for (size_type i = sizeof...(S); i!=dimension(); ++i)
+            for (size_type i = last_slice_index; i != dimension(); ++i)
             {
-                m_shape.push_back(m_e.shape()[non_squeeze<S...>(i)]);
+                m_shape[i] = m_e.shape()[non_squeeze<S...>(i)];
             }
         }
 

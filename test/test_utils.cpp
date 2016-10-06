@@ -68,5 +68,17 @@ namespace qs
         ASSERT_TRUE(!t1::value);
         ASSERT_TRUE(t2::value);
     }
+
+    template <class... T >
+    auto foo(T... t) {
+        auto func = [](int i) { return i; };
+        return apply<int>(1, func, t...);
+    }
+
+    TEST(utils, apply)
+    {
+        ASSERT_TRUE(foo(1, 2, 3)==2);
+    }
+
 }
 
