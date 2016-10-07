@@ -254,7 +254,7 @@ namespace qs
                     return 1 + (
                         std::is_integral<std::remove_reference_t<T>>::value ? 
                             non_squeeze_impl<S...>::count(i) :
-                            (i? non_squeeze_impl<S...>::count(i - 1) : 0)
+                            non_squeeze_impl<S...>::count(i - 1)
                     );
                 }
             }
