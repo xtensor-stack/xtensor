@@ -42,8 +42,7 @@ namespace qs
         using shape_type = typename E1::shape_type;
         using size_type = typename lhs_iterator::size_type;
 
-        data_assigner(lhs_iterator lhs_begin, rhs_iterator rhs_begin,
-                      rhs_iterator rhs_end, const shape_type& shape);
+        data_assigner(E1& e1, const E2 & e2);
 
         void run();
 
@@ -54,11 +53,12 @@ namespace qs
         
     private:
 
+        E1& m_e1;
+
         lhs_iterator m_lhs;
         rhs_iterator m_rhs;
         rhs_iterator m_rhs_end;
 
-        shape_type m_shape;
         shape_type m_index;
     };
 
@@ -80,7 +80,7 @@ namespace qs
         else
         {
             const auto& shape = de1.shape();
-            data_assigner<E1, E2> assigner(de1.stepper_begin(shape), de2.stepper_begin(shape), de2.stepper_end(shape), shape);
+            data_assigner<E1, E2> assigner(de1, de2);
             assigner.run();
         }
     }
@@ -136,10 +136,10 @@ namespace qs
      **********************************/
 
     template <class E1, class E2>
-    inline data_assigner<E1, E2>::data_assigner(lhs_iterator lhs_begin, rhs_iterator rhs_begin,
-                                                rhs_iterator rhs_end, const shape_type& shape)
-        : m_lhs(lhs_begin), m_rhs(rhs_begin), m_rhs_end(rhs_end), m_shape(shape),
-          m_index(shape.size(), size_type(0))
+    inline data_assigner<E1, E2>::data_assigner(E1& e1, const E2& e2)
+        : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
+          m_rhs(e2.stepper_begin(e1.shape())), m_rhs_end(e2.stepper_end(e1.shape())),
+          m_index(e1.shape().size(), size_type(0))
     {
     }
 
@@ -149,7 +149,7 @@ namespace qs
         while(m_rhs != m_rhs_end)
         {
             *m_lhs = *m_rhs;
-            increment_stepper(*this, m_index, m_shape);
+            increment_stepper(*this, m_index, m_e1.shape());
         }
     }
 
