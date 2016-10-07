@@ -91,7 +91,7 @@ namespace qs
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
         template <class Func, size_t... I>
-        const_iterator build_iterator(Func&& f, const shape_type& shape, std::index_sequence<I...>) const;
+        const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const;
 
         template <class Func, size_t... I>
         const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const;
@@ -290,15 +290,13 @@ namespace qs
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::xbegin(const shape_type& shape) const -> const_iterator
     {
-        auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
-        return build_iterator(f, shape, std::make_index_sequence<sizeof...(E)>());
+        return const_iterator(stepper_begin(shape), shape);
     }
 
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::xend(const shape_type& shape) const -> const_iterator
     {
-        auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
-        return build_iterator(f, shape, std::make_index_sequence<sizeof...(E)>());
+        return const_iterator(stepper_end(shape), shape);
     }
 
     template <class F, class R, class... E>
@@ -313,6 +311,20 @@ namespace qs
         return xend(shape);
     }
 
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::stepper_begin(const shape_type& shape) const -> const_stepper 
+    {
+        auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
+        return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
+    }
+
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::stepper_end(const shape_type& shape) const -> const_stepper
+    {
+        auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
+        return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
+    }
+    
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::storage_begin() const -> const_storage_iterator
     {
@@ -336,9 +348,9 @@ namespace qs
 
     template <class F, class R, class... E>
     template <class Func, size_t... I>
-    inline auto xfunction<F, R, E...>::build_iterator(Func&& f, const shape_type& shape, std::index_sequence<I...>) const -> const_iterator
+    inline auto xfunction<F, R, E...>::build_stepper(Func&& f, std::index_sequence<I...>) const -> const_stepper
     {
-        return const_iterator(const_stepper(this, f(std::get<I>(m_e))...), shape);
+        return const_stepper(this, f(std::get<I>(m_e))...);
     }
 
     template <class F, class R, class... E>

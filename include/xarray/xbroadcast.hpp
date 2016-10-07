@@ -85,6 +85,11 @@ namespace qs
     bool operator!=(const xstepper<C>& lhs,
                     const xstepper<C>& rhs);
 
+    template <class S>
+    void increment_stepper(S& stepper,
+                           xshape<typename S::size_type>& index,
+                           const xshape<typename S::size_type>& shape);
+
 
     /**********************
      * xiterator
@@ -217,6 +222,32 @@ namespace qs
         return !(lhs.equal(rhs));
     }
 
+    template <class S>
+    void increment_stepper(S& stepper,
+                           xshape<typename S::size_type>& index,
+                           const xshape<typename S::size_type>& shape)
+    {
+        using size_type = typename S::size_type;
+        for(size_type j = index.size(); j != 0; --j)
+        {
+            size_type i = j-1;
+            if(++index[i] != shape[i])
+            {
+                stepper.step(i);
+                break;
+            }
+            else if (i == 0)
+            {
+                stepper.to_end();
+            }
+            else
+            {
+                index[i] = 0;
+                stepper.reset(i);
+            }
+        }
+    }
+
 
     /*************************************
      * xiterator implementation
@@ -231,24 +262,7 @@ namespace qs
     template <class It>
     inline auto xiterator<It>::operator++() -> self_type&
     {
-        for(size_type j = m_index.size(); j != 0; --j)
-        {
-            size_type i = j-1;
-            if(++m_index[i] != m_shape[i])
-            {
-                m_it.step(i);
-                break;
-            }
-            else if (i == 0)
-            {
-                m_it.to_end();
-            }
-            else
-            {
-                m_index[i] = 0;
-                m_it.reset(i);
-            }
-        }
+        increment_stepper(m_it, m_index, m_shape);
     }
 
     template <class It>
