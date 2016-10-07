@@ -129,41 +129,21 @@ namespace qs
         size_type m_size;
     };
 
-    /*******************************
-     * xsqueeze
-     *******************************/
-
-    template <class size_type>
-    class xsqueeze
-    {
-
-    public:
-
-        xsqueeze() = default;
-        ~xsqueeze() = default;
-        xsqueeze(const xsqueeze&) = default;
-        xsqueeze& operator=(const xsqueeze&) = default;
-        xsqueeze(xsqueeze&&) = default;
-        xsqueeze& operator=(xsqueeze&&) = default;
-
-        explicit xsqueeze(size_type index) noexcept : m_index(index) {}
-
-        inline size_type operator()() const noexcept
-        {
-            return m_index;
-        }
-
-    private:
-
-        const size_type m_index;
-    };
-
-    /********************************
-     * get_xslice_type
-     ********************************/
+    /**********************************************
+     * Homogeneous get_size for slices and squeeze
+     **********************************************/
 
     template <class S>
-    using get_xslice_type = std::conditional_t<is_xslice<S>::value, S, xsqueeze<S>>;
+    disable_xslice<S, size_t> get_size(const S&)
+    {
+        return 0;
+    };
+
+    template <class S>
+    size_t get_size(const xslice<S>& slice)
+    {
+        return slice.derived_cast().size();
+    };
 
 }
 

@@ -95,18 +95,6 @@ namespace qs
     // If more slices are provided than the dimension of the underlying
     // expression, the behavior is undefined.
 
-    template <class S>
-    disable_xslice<S, size_t> get_size(const S&)
-    {
-        return 0;
-    };
-
-    template <class S>
-    size_t get_size(const xslice<S>& slice)
-    {
-        return slice.derived_cast().size();
-    };
-
     template <class E, class... S>
     class xview : public xexpression<xview<E, S...>>
     {
@@ -127,7 +115,7 @@ namespace qs
         using closure_type = const self_type&;
 
         xview(E&& e, S&&... slices) noexcept
-            : m_e(e), m_slices(get_xslice_type<S>(slices)...)
+            : m_e(e), m_slices(slices...)
         {
             constexpr size_t last_slice_index = sizeof...(S) - squeeze_count<S...>();
             auto func = [](auto s) { return get_size(s); };
@@ -172,7 +160,7 @@ namespace qs
     private:
 
         E& m_e;
-        std::tuple<get_xslice_type<S>...> m_slices;
+        std::tuple<S...> m_slices;
         shape_type m_shape;
 
         template <size_type... I, class... Args>
@@ -205,10 +193,10 @@ namespace qs
             return slice.derived_cast()(argument<I>(args...));
         }
 
-        template<size_type I, class Squeeze, class... Args>
-        disable_xslice<Squeeze, size_type> sliced_access(const Squeeze& squeeze, Args...) const
+        template<size_type I, class T, class... Args>
+        disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const
         {
-            return squeeze();
+            return squeeze;
         }
 
     };
