@@ -6,7 +6,7 @@
 namespace qs
 {
 
-    /*TEST(xview, simple)
+    TEST(xview, simple)
     {
         xshape<size_t> shape = {3, 4};
         xarray<double> a(shape);
@@ -14,37 +14,51 @@ namespace qs
         std::copy(data.begin(), data.end(), a.storage_begin());
 
         auto view1 = make_xview(a, 1, range(1, 4));
-        ASSERT_TRUE(view1(0) == a(1, 1));
-        ASSERT_TRUE(view1(1) == a(1, 2));
-        ASSERT_TRUE(view1.dimension() == 1);
+        ASSERT_EQ(view1(0), a(1, 1));
+        ASSERT_EQ(view1(1), a(1, 2));
+        ASSERT_EQ(view1.dimension(), 1);
 
         auto view2 = make_xview(a, 0, range(0, 3));
-        ASSERT_TRUE(view2(0) == a(0, 0));
-        ASSERT_TRUE(view2(1) == a(0, 1));
-        ASSERT_TRUE(view2.dimension() == 1);
+        ASSERT_EQ(view2(0), a(0, 0));
+        ASSERT_EQ(view2(1), a(0, 1));
+        ASSERT_EQ(view2.dimension(), 1);
+        ASSERT_EQ(view2.shape()[0], 3);
 
         auto view3 = make_xview(a, range(0, 2), 2);
-        ASSERT_TRUE(view3(0) == a(0, 2));
-        ASSERT_TRUE(view3(1) == a(1, 2));
-        ASSERT_TRUE(view3.dimension() == 1);
+        ASSERT_EQ(view3(0), a(0, 2));
+        ASSERT_EQ(view3(1), a(1, 2));
+        ASSERT_EQ(view3.dimension(), 1);
+        ASSERT_EQ(view3.shape()[0], 2);
 
         auto view4 = make_xview(a, 1);
-        ASSERT_TRUE(view4.dimension() == 1);
+        ASSERT_EQ(view4.dimension(), 1);
+        ASSERT_EQ(view4.shape()[0], 4);
 
         auto view5 = make_xview(view4, 1);
-        ASSERT_TRUE(view5.dimension() == 0);
+        ASSERT_EQ(view5.dimension(), 0);
+        ASSERT_EQ(view5.shape().size(), 0);
     }
 
     TEST(xview, squeeze_count)
     {
         size_t squeeze1 = squeeze_count<size_t, size_t, size_t, xrange<size_t>>();
-        ASSERT_TRUE(squeeze1 == 3);
+        ASSERT_EQ(squeeze1, 3);
         size_t squeeze2 = squeeze_count<size_t, xrange<size_t>, size_t>();
-        ASSERT_TRUE(squeeze2 == 2);
+        ASSERT_EQ(squeeze2, 2);
         size_t squeeze3 = squeeze_count_before<size_t, size_t, size_t, xrange<size_t>>(3);
-        ASSERT_TRUE(squeeze3 == 3);
+        ASSERT_EQ(squeeze3, 3);
         size_t squeeze4 = squeeze_count_before<size_t, xrange<size_t>, size_t>(2);
-        ASSERT_TRUE(squeeze4 == 1);
-    }*/
+        ASSERT_EQ(squeeze4, 1);
+    }
+
+    TEST(xview, non_squeeze)
+    {
+        size_t index0 = non_squeeze<size_t, xrange<size_t>, size_t, xrange<size_t>> (0);
+        size_t index1 = non_squeeze<size_t, xrange<size_t>, size_t, xrange<size_t>> (1);
+        size_t index2 = non_squeeze<size_t, xrange<size_t>, size_t, xrange<size_t>> (2);
+        ASSERT_EQ(index0, 1);
+        ASSERT_EQ(index1, 3);
+        ASSERT_EQ(index2, 4);
+    }
 }
 

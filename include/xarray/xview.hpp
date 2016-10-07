@@ -99,16 +99,19 @@ namespace qs
     template <class E, class... S>
     inline xview<E, S...>::xview(E&& e, S&&... slices) noexcept : m_e(e), m_slices(slices...)
     {
-        constexpr size_t last_slice_index = sizeof...(S) - squeeze_count<S...>();
         auto func = [](auto s) { return get_size(s); };
         m_shape.resize(dimension());
-        for (size_type i = 0; i != last_slice_index; ++i)
+        for (size_type i = 0; i != dimension(); ++i)
         {
-            m_shape[i] = apply<size_t>(non_squeeze<S...>(i), func, std::forward<S>(slices)...);
-        }
-        for (size_type i = last_slice_index; i != dimension(); ++i)
-        {
-            m_shape[i] = m_e.shape()[non_squeeze<S...>(i)];
+            size_type index = non_squeeze<S...>(i);
+            if (index < sizeof...(S))
+            {
+                m_shape[i] = apply<size_t>(index, func, std::forward<S>(slices)...);
+            }
+            else
+            {
+                m_shape[i] = m_e.shape()[index];
+            }
         }
     }
 
@@ -242,8 +245,19 @@ namespace qs
         {
             static inline constexpr size_t count(size_t i) noexcept
             {
-                return 1 + (std::is_integral<std::remove_reference_t<T>>::value ? non_squeeze_impl<S...>::count(i) : non_squeeze_impl<S...>::count(i - 1));
-            } 
+                if (i == 0)
+                {
+                    return std::is_integral<std::remove_reference_t<T>>::value ? 1 + non_squeeze_impl<S...>::count(i) : 0;
+                }
+                else
+                {
+                    return 1 + (
+                        std::is_integral<std::remove_reference_t<T>>::value ? 
+                            non_squeeze_impl<S...>::count(i) :
+                            (i? non_squeeze_impl<S...>::count(i - 1) : 0)
+                    );
+                }
+            }
         };
 
         template <>
@@ -252,7 +266,7 @@ namespace qs
             static inline constexpr size_t count(size_t i) noexcept
             {
                 return i;
-            } 
+            }
         };
     }
 
