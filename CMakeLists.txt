@@ -51,16 +51,16 @@ set(XARRAY_TARGET test_xarray)
 set(XARRAY_HEADERS
     include/xarray/xarray.hpp
     include/xarray/xarray_base.hpp
-    include/xarray/xbroadcast.hpp
     include/xarray/xexpression.hpp
     include/xarray/xindex.hpp
     include/xarray/xio.hpp
+    include/xarray/xiterator.hpp
     include/xarray/xmath.hpp
     include/xarray/xoperation.hpp
     include/xarray/xfunction.hpp
     include/xarray/xslice.hpp
     include/xarray/xview.hpp
-    include/xarray/utils.hpp
+    include/xarray/xutils.hpp
 )
 
 set(XARRAY_TESTS
@@ -80,7 +80,7 @@ set(XARRAY_TESTS
     test/test_xscalar_semantic.cpp
     test/test_xsemantic.hpp
     test/test_xview.cpp
-    test/test_utils.cpp
+    test/test_xutils.cpp
 )
 
 add_executable(${XARRAY_TARGET} ${XARRAY_TESTS} ${XARRAY_HEADERS})

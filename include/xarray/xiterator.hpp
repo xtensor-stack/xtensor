@@ -1,5 +1,5 @@
-#ifndef BROADCAST_HPP
-#define BROADCAST_HPP
+#ifndef XITERATOR_HPP
+#define XITERATOR_HPP
 
 #include <utility>
 #include <tuple>
@@ -10,7 +10,7 @@
 #include <algorithm>
 
 #include "xindex.hpp"
-#include "utils.hpp"
+#include "xutils.hpp"
 
 namespace qs
 {

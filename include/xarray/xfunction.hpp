@@ -6,9 +6,9 @@
 #include <tuple>
 #include <algorithm>
 
-#include "utils.hpp"
-#include "xbroadcast.hpp"
 #include "xexpression.hpp"
+#include "xiterator.hpp"
+#include "xutils.hpp"
 
 namespace qs
 {
