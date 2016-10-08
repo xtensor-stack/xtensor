@@ -8,9 +8,13 @@
 namespace qs
 {
 
-    /*********************************
-     * Representing xexpressions
-     *********************************/
+
+    template <class E>
+    inline std::ostream& operator<<(std::ostream& out, const xexpression<E>& e);
+
+    /*************************************
+     * xexpression ostream implementation
+     *************************************/
 
     namespace detail
     {
@@ -26,7 +30,7 @@ namespace qs
                 }
                 else
                 {
-                    size_t i = 0;
+                    typename E::size_type i = 0;
                     out << '{';
                     for (;i != e.shape()[0] - 1; i++)
                         xout<I-1>::output(out, make_xview(e, i)) << ',' << ' ';
