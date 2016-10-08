@@ -82,15 +82,15 @@ namespace qs
 
     // number of integral types in the specified sequence of types
     template <class... S>
-    inline constexpr size_t squeeze_count();
+    inline constexpr size_t integral_count();
 
     // number of integral types in the specified sequence of types before specified index.
     template <class... S>
-    inline constexpr size_t squeeze_count_before(size_t i);
+    inline constexpr size_t integral_count_before(size_t i);
 
     // index in the specified sequence of types of the ith non-integral type.
     template <class... S>
-    inline constexpr size_t non_squeeze(size_t i);
+    inline constexpr size_t integral_skip(size_t i);
 
     /*********************************
      * xview implementation
@@ -103,7 +103,7 @@ namespace qs
         m_shape.resize(dimension());
         for (size_type i = 0; i != dimension(); ++i)
         {
-            size_type index = non_squeeze<S...>(i);
+            size_type index = integral_skip<S...>(i);
             if (index < sizeof...(S))
             {
                 m_shape[i] = apply<size_t>(index, func, std::forward<S>(slices)...);
@@ -118,7 +118,7 @@ namespace qs
     template <class E, class... S>
     inline auto xview<E, S...>::dimension() const noexcept -> size_type
     {
-        return m_e.dimension() - squeeze_count<S...>();
+        return m_e.dimension() - integral_count<S...>();
     }
         
     template <class E, class... S>
@@ -137,14 +137,14 @@ namespace qs
     template <class... Args>
     inline auto xview<E, S...>::operator()(Args... args) -> reference
     {
-        return access_impl(std::make_index_sequence<sizeof...(Args) + squeeze_count<S...>()>(), args...);
+        return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
     }
 
     template <class E, class... S>
     template <class... Args>
     inline auto xview<E, S...>::operator()(Args... args) const -> const_reference
     {
-        return access_impl(std::make_index_sequence<sizeof...(Args) + squeeze_count<S...>()>(), args...);
+        return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
     }
 
     template <class E, class... S>
@@ -165,14 +165,14 @@ namespace qs
     template <typename E::size_type I, class... Args>
     inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I<sizeof...(S)), size_type>
     {
-        return sliced_access<I - squeeze_count_before<S...>(I)>(std::get<I>(m_slices), args...);
+        return sliced_access<I - integral_count_before<S...>(I)>(std::get<I>(m_slices), args...);
     }
 
     template <class E, class... S>
     template <typename E::size_type I, class... Args>
     inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I>=sizeof...(S)), size_type>
     {
-        return argument<I - squeeze_count_before<S...>(I)>(args...);
+        return argument<I - integral_count_before<S...>(I)>(args...);
     }
 
     template <class E, class... S>
@@ -203,16 +203,16 @@ namespace qs
     {
 
         template <class T, class... S>
-        struct squeeze_count_before_impl
+        struct integral_count_impl
         {
             static inline constexpr size_t count(size_t i) noexcept
             {
-                return i ? (squeeze_count_before_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
+                return i ? (integral_count_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
             } 
         };
 
         template <>
-        struct squeeze_count_before_impl<void>
+        struct integral_count_impl<void>
         {
             static inline constexpr size_t count(size_t i) noexcept
             {
@@ -222,15 +222,15 @@ namespace qs
     }
 
     template <class... S>
-    inline constexpr size_t squeeze_count()
+    inline constexpr size_t integral_count()
     {
-        return detail::squeeze_count_before_impl<S..., void>::count(sizeof...(S));
+        return detail::integral_count_impl<S..., void>::count(sizeof...(S));
     }
 
     template <class... S>
-    inline constexpr size_t squeeze_count_before(size_t i)
+    inline constexpr size_t integral_count_before(size_t i)
     {
-        return detail::squeeze_count_before_impl<S..., void>::count(i);
+        return detail::integral_count_impl<S..., void>::count(i);
     }
 
     /**************************************
@@ -241,27 +241,27 @@ namespace qs
     {
 
         template <class T, class... S>
-        struct non_squeeze_impl
+        struct integral_skip_impl
         {
             static inline constexpr size_t count(size_t i) noexcept
             {
                 if (i == 0)
                 {
-                    return std::is_integral<std::remove_reference_t<T>>::value ? 1 + non_squeeze_impl<S...>::count(i) : 0;
+                    return std::is_integral<std::remove_reference_t<T>>::value ? 1 + integral_skip_impl<S...>::count(i) : 0;
                 }
                 else
                 {
                     return 1 + (
                         std::is_integral<std::remove_reference_t<T>>::value ? 
-                            non_squeeze_impl<S...>::count(i) :
-                            non_squeeze_impl<S...>::count(i - 1)
+                            integral_skip_impl<S...>::count(i) :
+                            integral_skip_impl<S...>::count(i - 1)
                     );
                 }
             }
         };
 
         template <>
-        struct non_squeeze_impl<void>
+        struct integral_skip_impl<void>
         {
             static inline constexpr size_t count(size_t i) noexcept
             {
@@ -271,9 +271,9 @@ namespace qs
     }
 
     template <class... S>
-    inline constexpr size_t non_squeeze(size_t i)
+    inline constexpr size_t integral_skip(size_t i)
     {
-        return detail::non_squeeze_impl<S..., void>::count(i);
+        return detail::integral_skip_impl<S..., void>::count(i);
     }
 
 }
