@@ -1,5 +1,6 @@
 #include "gtest/gtest.h"
 #include "xarray/xutils.hpp"
+#include <initializer_list>
 #include <type_traits>
 #include <tuple>
 
@@ -54,7 +55,7 @@ namespace qs
     {
         auto func = [](int i, int j) { return i + j; };
         const std::tuple<int, int, int> t(3, 4, 1);
-        ASSERT_TRUE(accumulate(func, 0, t) == 8);
+        ASSERT_EQ(8, accumulate(func, 0, t));
     }
 
     TEST(utils, or)
@@ -78,6 +79,30 @@ namespace qs
     TEST(utils, apply)
     {
         ASSERT_TRUE(foo(1, 2, 3)==2);
+    }
+
+    TEST(utils, initializer_dimension)
+    {
+        size_t d0 = initializer_dimension<double>::value;
+        size_t d1 = initializer_dimension<std::initializer_list<double>>::value;
+        size_t d2 = initializer_dimension<std::initializer_list<std::initializer_list<double>>>::value;
+        ASSERT_EQ(0, d0);
+        ASSERT_EQ(1, d1);
+        ASSERT_EQ(2, d2);
+    }
+
+    TEST(utils, initializer_shape)
+    {
+        auto s0 = initializer_shape(3);
+        auto s1 = initializer_shape({1, 2});
+        auto s2 = initializer_shape({{1, 2, 4}, {1, 3, 5}});
+        std::array<size_t, 0> e0 = {};
+        std::array<size_t, 1> e1 = {2};
+        std::array<size_t, 2> e2 = {2, 3};
+
+        ASSERT_EQ(e0, s0);
+        ASSERT_EQ(e1, s1);
+        ASSERT_EQ(e2, s2);
     }
 
 }

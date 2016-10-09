@@ -4,6 +4,7 @@
 #include <utility>
 #include <tuple>
 #include <type_traits>
+#include <initializer_list>
 
 namespace qs
 {
@@ -29,9 +30,12 @@ namespace qs
     template<class R, class F, class... S>
     R apply(size_t index, F&& func, S... s);
 
-    /***********************
+    template <class U>
+    struct initializer_dimension;
+    
+    /********************
      * for_each on tuple
-     ***********************/
+     ********************/
 
     namespace detail
     {
@@ -56,10 +60,9 @@ namespace qs
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
 
-
-    /*********************************
+    /******************************
      * for_each_arg implementation
-     *********************************/
+     ******************************/
 
     namespace detail
     {
@@ -96,10 +99,9 @@ namespace qs
         detail::for_each_arg_impl(std::forward<F>(f), std::make_index_sequence<sizeof...(Args)>(), std::forward<Args>(args)...);
     }
 
-
-    /***********************************
-     * accumulate_arg arguments
-     ***********************************/
+    /********************************
+     * accumulate_arg implementation
+     ********************************/
 
     namespace detail
     {
@@ -136,10 +138,9 @@ namespace qs
         return ac.apply(std::forward<F>(f), init, std::forward<Args>(args)...);
     }
 
-
-    /*************************
-     * accumulate tuple
-     *************************/
+    /****************************
+     * accumulate implementation
+     ****************************/
 
     namespace detail
     {
@@ -166,9 +167,8 @@ namespace qs
         return detail::accumulate_impl<0, F, R, T...>(f, init, t);
     }
 
-
     /**********************
-     * or_ metafunction
+     * or_ implementation
      **********************/
 
     template <class T>
@@ -182,9 +182,9 @@ namespace qs
     {
     };
 
-    /**********************
-     * argument
-     **********************/
+    /**************************
+     * argument implementation
+     **************************/
  
     namespace detail
     {
@@ -243,6 +243,87 @@ namespace qs
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(s)...);
     }
+
+    /***************************************
+     * initializer_dimension implementation
+     ***************************************/
+
+    namespace detail
+    {
+
+        template <class U>
+        struct initializer_depth_impl
+        {
+            static constexpr size_t value = 0;
+        };
+
+        template <class T>
+        struct initializer_depth_impl<std::initializer_list<T>>
+        {
+            static constexpr size_t value = 1 + initializer_depth_impl<T>::value;
+        };
+
+    }
+
+    template <class U>
+    struct initializer_dimension
+    {
+        static constexpr size_t value = detail::initializer_depth_impl<U>::value;
+    };
+
+    /***********************************
+     * initializer_shape implementation
+     ***********************************/
+
+    namespace detail
+    {
+
+        template <size_t I>
+        struct initializer_shape_impl
+        {
+            template <class T>
+            static inline constexpr size_t value(T t)
+            {
+                return t.size() == 0 ? 0 : initializer_shape_impl<I - 1>::value(*t.begin());
+            }
+        };
+
+        template <>
+        struct initializer_shape_impl<0>
+        {
+            template <class T>
+            static inline constexpr size_t value(T t)
+            {
+                return t.size();
+            }
+        };
+
+        template <class U, size_t... I>
+        inline constexpr std::array<size_t, initializer_dimension<U>::value> initializer_shape(U t, std::index_sequence<I...>)
+        {
+             return { initializer_shape_impl<I>::value(t)... };
+        }
+        
+    }
+
+    template <class T>
+    inline constexpr decltype(auto) initializer_shape(T t)
+    {
+        return detail::initializer_shape<decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+    } 
+
+    template <class T>
+    inline constexpr decltype(auto) initializer_shape(std::initializer_list<T> t)
+    {
+        return detail::initializer_shape<decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+    }
+    
+    template <class T>
+    inline constexpr decltype(auto) initializer_shape(std::initializer_list<std::initializer_list<T>> t)
+    {
+        return detail::initializer_shape<decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+    }
+ 
 }
 
 #endif
