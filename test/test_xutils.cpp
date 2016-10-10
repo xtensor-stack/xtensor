@@ -83,12 +83,12 @@ namespace qs
 
     TEST(utils, initializer_shape)
     {
-        auto s0 = initializer_shape(3);
-        auto s1 = initializer_shape({1, 2});
-        auto s2 = initializer_shape({{1, 2, 4}, {1, 3, 5}});
-        std::array<size_t, 0> e0 = {};
-        std::array<size_t, 1> e1 = {2};
-        std::array<size_t, 2> e2 = {2, 3};
+        auto s0 = initializer_shape<std::vector<size_t>>(3);
+        auto s1 = initializer_shape<std::vector<size_t>>({1, 2});
+        auto s2 = initializer_shape<std::vector<size_t>>({{1, 2, 4}, {1, 3, 5}});
+        std::vector<size_t> e0 = {};
+        std::vector<size_t> e1 = {2};
+        std::vector<size_t> e2 = {2, 3};
 
         ASSERT_EQ(e0, s0);
         ASSERT_EQ(e1, s1);

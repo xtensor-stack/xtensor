@@ -210,29 +210,29 @@ namespace qs
             }
         };
 
-        template <class U, std::size_t... I>
-        inline constexpr std::array<std::size_t, initializer_dimension<U>::value> initializer_shape(U t, std::index_sequence<I...>)
+        template <class R, class U, std::size_t... I>
+        inline constexpr R initializer_shape(U t, std::index_sequence<I...>)
         {
              return { initializer_shape_impl<I>::value(t)... };
         }
     }
 
-    template <class T>
-    inline constexpr decltype(auto) initializer_shape(T t)
+    template <class R, class T>
+    inline constexpr R initializer_shape(T t)
     {
-        return detail::initializer_shape<decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     } 
 
-    template <class T>
-    inline constexpr decltype(auto) initializer_shape(std::initializer_list<T> t)
+    template <class R, class T>
+    inline constexpr R initializer_shape(std::initializer_list<T> t)
     {
-        return detail::initializer_shape<decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
     
-    template <class T>
-    inline constexpr decltype(auto) initializer_shape(std::initializer_list<std::initializer_list<T>> t)
+    template <class R, class T>
+    inline constexpr R initializer_shape(std::initializer_list<std::initializer_list<T>> t)
     {
-        return detail::initializer_shape<decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
  
 }
