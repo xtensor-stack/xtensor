@@ -234,7 +234,35 @@ namespace qs
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
- 
+
+    /*****************************
+     * nested_copy implementation 
+     *****************************/
+
+    template <class T, class S>
+    inline void nested_copy(T&& iter, const S& s)
+    {
+	*iter++ = s;
+    }
+
+    template <class T, class S>
+    inline void nested_copy(T&& iter, std::initializer_list<S> s)
+    {
+        for (auto it = s.begin(); it != s.end(); ++it)
+        {
+            nested_copy(std::forward<T>(iter), *it);
+        }
+    }
+
+    template <class T, class S>
+    inline void nested_copy(T&& iter, std::initializer_list<std::initializer_list<S>> s)
+    {
+        for (auto it = s.begin(); it != s.end(); ++it)
+        {
+            nested_copy(std::forward<T>(iter), *it);
+        }
+    }
+
 }
 
 #endif

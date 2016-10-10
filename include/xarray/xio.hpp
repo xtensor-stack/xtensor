@@ -34,7 +34,7 @@ namespace qs
                 {
                     typename E::size_type i = 0;
                     out << '{';
-                    for (;i != e.shape()[0] - 1; i++)
+                    for (;i != e.shape()[0] - 1; ++i)
                         xout<I-1>::output(out, make_xview(e, i)) << ',' << ' ';
                     xout<I-1>::output(out, make_xview(e, i)) << '}';
                 }

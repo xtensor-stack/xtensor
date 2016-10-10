@@ -135,5 +135,14 @@ namespace qs
         test_storage_iterator(a);
     }
 
+    TEST(xarray, initializer_list)
+    {
+        xarray<int> a0(1);
+        xarray<int> a1({1, 2});
+        xarray<int> a2({{1, 2}, {2, 4}, {5, 6}});
+        EXPECT_EQ(1, a0());
+        EXPECT_EQ(2, a1(1));
+        EXPECT_EQ(4, a2(1, 1));
+    }
 }
 

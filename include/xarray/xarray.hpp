@@ -1,6 +1,7 @@
 #ifndef XARRAY_HPP
 #define XARRAY_HPP
 
+#include <initializer_list>
 #include <utility>
 #include <vector>
 #include <algorithm>
@@ -48,9 +49,13 @@ namespace qs
 
         xarray() = default;
         explicit xarray(const shape_type& shape, layout l = layout::row_major);
-        xarray(const shape_type& shape, const_reference value, layout l = layout::row_major);
-        xarray(const shape_type& shape, const strides_type& strides);
-        xarray(const shape_type& shape, const strides_type& strides, const_reference value);
+        explicit xarray(const shape_type& shape, const_reference value, layout l = layout::row_major);
+        explicit xarray(const shape_type& shape, const strides_type& strides);
+        explicit xarray(const shape_type& shape, const strides_type& strides, const_reference value);
+
+        explicit xarray(const T& t);
+        explicit xarray(std::initializer_list<T> t);
+        explicit xarray(std::initializer_list<std::initializer_list<T>> t);
 
         ~xarray() = default;
 
@@ -172,6 +177,30 @@ namespace qs
     }
 
     template <class T>
+    inline xarray<T>::xarray(const T& t)
+        : base_type()
+    {
+        base_type::reshape(initializer_shape<shape_type>(t), layout::row_major);
+        nested_copy(m_data.begin(), t);        
+    }
+
+    template <class T>
+    inline xarray<T>::xarray(std::initializer_list<T> t)
+        : base_type()
+    {
+        base_type::reshape(initializer_shape<shape_type>(t), layout::row_major);
+        nested_copy(m_data.begin(), t);
+    }
+
+    template <class T>
+    inline xarray<T>::xarray(std::initializer_list<std::initializer_list<T>> t)
+        : base_type()
+    {
+        base_type::reshape(initializer_shape<shape_type>(t), layout::row_major);
+        nested_copy(m_data.begin(), t);
+    }
+
+    template <class T>
     template <class E>
     inline xarray<T>::xarray(const xexpression<E>& e)
         : base_type()
@@ -197,7 +226,6 @@ namespace qs
     {
         return m_data;
     }
-
 
     /*********************
      * xarray_adaptor

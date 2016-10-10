@@ -221,28 +221,26 @@ namespace qs
         m_shape = shape;
         m_strides.resize(m_shape.size());
         m_backstrides.resize(m_shape.size());
+        size_type data_size = 1;
         if(l == layout::row_major)
         {
-            size_type data_size = 1;
             for(size_type i = m_strides.size(); i != 0; --i)
             {
                 m_strides[i - 1] = data_size;
                 data_size = m_strides[i - 1] * m_shape[i - 1];
                 adapt_strides(i - 1);
             }
-            data().resize(data_size);
         }
         else
         {
-            size_type data_size = 1;
             for(size_type i = 0; i < m_strides.size(); ++i)
             {
                 m_strides[i] = data_size;
                 data_size = m_strides[i] * m_shape[i];
                 adapt_strides(i);
             }
-            data().resize(data_size);
         }
+        data().resize(data_size);
     }
 
     template <class D>
