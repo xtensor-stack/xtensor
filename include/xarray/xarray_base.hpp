@@ -223,25 +223,25 @@ namespace qs
         m_backstrides.resize(m_shape.size());
         if(l == layout::row_major)
         {
-            m_strides.back() = size_type(1);
-            for(size_type i = m_strides.size() - 1; i != 0; --i)
+            size_type data_size = 1;
+            for(size_type i = m_strides.size(); i != 0; --i)
             {
-                m_strides[i - 1] = m_strides[i] * m_shape[i];
-                adapt_strides(i);
+                m_strides[i - 1] = data_size;
+                data_size = m_strides[i - 1] * m_shape[i - 1];
+                adapt_strides(i - 1);
             }
-            data().resize(m_strides.front() * m_shape.front());
-            adapt_strides(size_type(0));
+            data().resize(data_size);
         }
         else
         {
-            m_strides.front() = size_type(1);
-            for(size_type i = 1; i < m_strides.size(); ++i)
+            size_type data_size = 1;
+            for(size_type i = 0; i < m_strides.size(); ++i)
             {
-                m_strides[i] = m_strides[i - 1] * m_shape[i - 1];
-                adapt_strides(i - 1);
+                m_strides[i] = data_size;
+                data_size = m_strides[i] * m_shape[i];
+                adapt_strides(i);
             }
-            data().resize(m_strides.back() * m_shape.back());
-            adapt_strides(m_strides.size() - 1);
+            data().resize(data_size);
         }
     }
 
