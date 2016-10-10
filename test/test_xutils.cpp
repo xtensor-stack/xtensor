@@ -28,17 +28,6 @@ namespace qs
         }
     };
 
-    TEST(utils, for_each_arg)
-    {
-        for_each_fn fn;
-        short a = 1;
-        int b = 4;
-        float c = 1.2;
-        double d = 2.3;
-        for_each_arg(fn, a, b, c, d);
-        ASSERT_TRUE(a == fn.a && b == fn.b && c == fn.c && d == fn.d);
-    }
-
     TEST(utils, for_each)
     {
         for_each_fn fn;

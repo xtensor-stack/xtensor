@@ -12,14 +12,8 @@ namespace qs
     template <class F, class... T>
     void for_each(F&& f, std::tuple<T...>& t);
 
-    template <class F, class... Args>
-    void for_each_arg(F&&, Args&&...);
-
     template <class F, class R, class... T>
     R accumulate(F&& f, R init, const std::tuple<T...>& t);
-
-    template <class F, class R, class... Args>
-    R accumulate_arg(F&& f, R init, Args&&... args);
 
     template <class... T>
     struct or_;
@@ -32,10 +26,10 @@ namespace qs
 
     template <class U>
     struct initializer_dimension;
-    
-    /********************
-     * for_each on tuple
-     ********************/
+
+    /**************************
+     * for_each implementation
+     **************************/
 
     namespace detail
     {
@@ -60,84 +54,6 @@ namespace qs
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
 
-    /******************************
-     * for_each_arg implementation
-     ******************************/
-
-    namespace detail
-    {
-        template <size_t I>
-        struct invoker_base
-        {
-            template <class F, class T>
-            invoker_base(F&& f, T&& t)
-            {
-                f(std::forward<T>(t));
-            }
-        };
-
-        template <size_t... Ints>
-        struct invoker : invoker_base<Ints>...
-        {
-            template <class F, class... Args>
-            invoker(F&& f, Args&&... args)
-                : invoker_base<Ints>(std::forward<F>(f), std::forward<Args>(args))...
-            {
-            }
-        };
-
-        template <class F, size_t... Ints, class... Args>
-        inline void for_each_arg_impl(F&& f, std::index_sequence<Ints...>, Args&&... args)
-        {
-            invoker<Ints...> invoker(std::forward<F>(f), std::forward<Args>(args)...);
-        }
-    }
-
-    template <class F, class... Args>
-    inline void for_each_arg(F&& f, Args&&... args)
-    {
-        detail::for_each_arg_impl(std::forward<F>(f), std::make_index_sequence<sizeof...(Args)>(), std::forward<Args>(args)...);
-    }
-
-    /********************************
-     * accumulate_arg implementation
-     ********************************/
-
-    namespace detail
-    {
-        template <size_t I, size_t N>
-        struct accumulator : accumulator<I+1, N>
-        {
-            using base_type = accumulator<I+1, N>;
-
-            template <class F, class R, class T, class... Args>
-            inline R apply(F&& f, R r, T&& t, Args&&... args) const
-            {
-                R res = f(r, std::forward<T>(t));
-                res = base_type::apply(std::forward<F>(f), res, std::forward<Args>(args)...);
-                return res;
-            }
-        };
-
-        template <size_t N>
-        struct accumulator<N, N>
-        {
-
-            template <class F, class R, class T>
-            inline R apply(F&& f, R r, T&& t) const
-            {
-                return f(r, std::forward<T>(t));
-            }
-        };
-    }
-
-    template <class F, class R, class... Args>
-    inline R accumulate_arg(F&& f, R init, Args&&... args)
-    {
-        detail::accumulator<1, sizeof...(Args)> ac;
-        return ac.apply(std::forward<F>(f), init, std::forward<Args>(args)...);
-    }
-
     /****************************
      * accumulate implementation
      ****************************/
@@ -159,7 +75,6 @@ namespace qs
             return accumulate_impl<I + 1, F, R, T...>(std::forward<F>(f), res, t);
         }
     }
-
 
     template <class F, class R, class... T>
     inline R accumulate(F&& f, R init, const std::tuple<T...>& t)
@@ -222,7 +137,6 @@ namespace qs
 
     namespace detail
     {
-
         template<class R, class F, int I, class... S>
         R apply_one(F&& func, S&&... s)
         {
@@ -250,7 +164,6 @@ namespace qs
 
     namespace detail
     {
-
         template <class U>
         struct initializer_depth_impl
         {
@@ -262,7 +175,6 @@ namespace qs
         {
             static constexpr size_t value = 1 + initializer_depth_impl<T>::value;
         };
-
     }
 
     template <class U>
@@ -277,7 +189,6 @@ namespace qs
 
     namespace detail
     {
-
         template <size_t I>
         struct initializer_shape_impl
         {
@@ -303,7 +214,6 @@ namespace qs
         {
              return { initializer_shape_impl<I>::value(t)... };
         }
-        
     }
 
     template <class T>
