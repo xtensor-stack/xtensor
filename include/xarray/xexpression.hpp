@@ -2,6 +2,7 @@
 #define XEXPRESSION_HPP
 
 #include <type_traits>
+
 #include "xutils.hpp"
 
 namespace qs

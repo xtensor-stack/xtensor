@@ -13,7 +13,7 @@ namespace qs
 
     TEST(xio, simple)
     {
-        /*xshape<size_t> shape = {3, 4};
+        xshape<size_t> shape = {3, 4};
         xarray<double> e(shape);
         std::vector<double> data {
         	1, 2, 3, 4,
@@ -23,7 +23,7 @@ namespace qs
         std::copy(data.begin(), data.end(), e.storage_begin());
         std::stringstream out;
         out << e;
-        ASSERT_EQ(out.str(), "{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}}");*/
+        ASSERT_EQ(out.str(), "{{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}}");
     }
 
 }

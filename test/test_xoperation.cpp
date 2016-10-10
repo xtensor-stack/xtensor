@@ -1,8 +1,11 @@
 #include "gtest/gtest.h"
+
+#include <cstddef>
 #include "xarray/xarray.hpp"
 
 namespace qs
 {
+    using std::size_t;
 
     TEST(operation, plus)
     {

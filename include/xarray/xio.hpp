@@ -1,7 +1,9 @@
 #ifndef XIO_HPP
 #define XIO_HPP
 
+#include <cstddef>
 #include <iostream>
+
 #include "xexpression.hpp"
 #include "xview.hpp"
 
@@ -18,7 +20,7 @@ namespace qs
 
     namespace detail
     {
-        template <size_t I>
+        template <std::size_t I>
         struct xout
         {
             template <class E>

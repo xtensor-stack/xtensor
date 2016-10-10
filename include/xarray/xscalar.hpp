@@ -2,6 +2,7 @@
 #define XSCALAR_HPP
 
 #include <utility>
+#include <cstddef>
 
 #include "xexpression.hpp"
 #include "xindex.hpp"
@@ -32,8 +33,8 @@ namespace qs
         using const_reference = const T&;
         using pointer = T*;
         using const_pointer = const T*;
-        using size_type = size_t;
-        using difference_type = ptrdiff_t;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
 
         using self_type = xscalar<T>;
         using shape_type = xshape<size_type>;

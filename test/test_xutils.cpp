@@ -6,6 +6,7 @@
 
 namespace qs
 {
+    using std::size_t;
 
     struct for_each_fn
     {

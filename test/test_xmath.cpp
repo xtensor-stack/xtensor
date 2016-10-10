@@ -3,6 +3,7 @@
 
 namespace qs
 {
+    using std::size_t;
 
     /**********************
      * Basic operations

@@ -6,6 +6,7 @@
 
 namespace qs
 {
+    using std::size_t;
 
     template <class F>
     struct operation_tester

@@ -16,7 +16,7 @@ namespace qs
         {
             m_shape = { 3, 2, 4 };
             m_assigner.resize(m_shape[0]);
-            for(size_t i = 0; i < m_shape[0]; ++i)
+            for(std::size_t i = 0; i < m_shape[0]; ++i)
             {
                 m_assigner[i].resize(m_shape[1]);
             }
@@ -94,7 +94,7 @@ namespace qs
             m_backstrides = { 8, 0, 3 };
             m_data = { -1, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19 };
             m_assigner.resize(m_shape[0]);
-            for(size_t i = 0; i < m_shape[0]; ++i)
+            for(std::size_t i = 0; i < m_shape[0]; ++i)
             {
                 m_assigner[i].resize(m_shape[1]);
             }
@@ -160,11 +160,11 @@ namespace qs
     template <class V1, class V2>
     void assign_array(V1& dst, const V2& src)
     {
-        for(size_t i = 0; i < dst.shape()[0]; ++i)
+        for(std::size_t i = 0; i < dst.shape()[0]; ++i)
         {
-            for(size_t j = 0; j < dst.shape()[1]; ++j)
+            for(std::size_t j = 0; j < dst.shape()[1]; ++j)
             {
-                for(size_t k = 0; k < dst.shape()[2]; ++k)
+                for(std::size_t k = 0; k < dst.shape()[2]; ++k)
                 {
                     dst(i, j, k) = src[i][j][k];
                 }

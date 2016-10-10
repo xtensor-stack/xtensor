@@ -4,6 +4,8 @@
 
 namespace qs
 {
+    using std::size_t;
+
     template <class R, class S>
     void test_increment(const R& result, const S& shape)
     {

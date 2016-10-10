@@ -1,6 +1,7 @@
 #ifndef XUTILS_HPP
 #define XUTILS_HPP
 
+#include <cstddef>
 #include <utility>
 #include <tuple>
 #include <type_traits>
@@ -18,11 +19,11 @@ namespace qs
     template <class... T>
     struct or_;
 
-    template <size_t I, class... Args>
+    template <std::size_t I, class... Args>
     decltype(auto) argument(Args&&... args) noexcept;
 
     template<class R, class F, class... S>
-    R apply(size_t index, F&& func, S... s);
+    R apply(std::size_t index, F&& func, S... s);
 
     template <class U>
     struct initializer_dimension;
@@ -33,13 +34,13 @@ namespace qs
 
     namespace detail
     {
-        template <size_t I, class F, class... T>
+        template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I == sizeof...(T), void>::type
         for_each_impl(F&& f, std::tuple<T...>& t)
         {
         }
 
-        template <size_t I, class F, class... T>
+        template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I < sizeof...(T), void>::type
         for_each_impl(F&& f, std::tuple<T...>& t)
         {
@@ -60,14 +61,14 @@ namespace qs
 
     namespace detail
     {
-        template <size_t I, class F, class R, class... T>
+        template <std::size_t I, class F, class R, class... T>
         inline std::enable_if_t<I == sizeof...(T), R>
         accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
         {
             return init;
         }
 
-        template <size_t I, class F, class R, class... T>
+        template <std::size_t I, class F, class R, class... T>
         inline std::enable_if_t<I < sizeof...(T), R>
         accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
         {
@@ -103,7 +104,7 @@ namespace qs
  
     namespace detail
     {
-        template <size_t I>
+        template <std::size_t I>
         struct getter
         {
             template <class Arg, class... Args>
@@ -124,7 +125,7 @@ namespace qs
         };
     }
 
-    template <size_t I, class... Args>
+    template <std::size_t I, class... Args>
     inline decltype(auto) argument(Args&&... args) noexcept
     {
         static_assert(I < sizeof...(Args), "I should be lesser than sizeof...(Args)");
@@ -143,8 +144,8 @@ namespace qs
             return func(argument<I>(s...));
         }
 
-        template<class R, class F, size_t... I, class... S>
-        R apply(size_t index, F&& func, std::index_sequence<I...>, S&&... s)
+        template<class R, class F, std::size_t... I, class... S>
+        R apply(std::size_t index, F&& func, std::index_sequence<I...>, S&&... s)
         {
             using FT = R(F, S&&...);
             static constexpr FT* arr[] = { &apply_one<R, F, I, S...>... };
@@ -153,7 +154,7 @@ namespace qs
     }
 
     template<class R, class F, class... S>
-    R apply(size_t index, F&& func, S... s)
+    R apply(std::size_t index, F&& func, S... s)
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(s)...);
     }
@@ -167,20 +168,20 @@ namespace qs
         template <class U>
         struct initializer_depth_impl
         {
-            static constexpr size_t value = 0;
+            static constexpr std::size_t value = 0;
         };
 
         template <class T>
         struct initializer_depth_impl<std::initializer_list<T>>
         {
-            static constexpr size_t value = 1 + initializer_depth_impl<T>::value;
+            static constexpr std::size_t value = 1 + initializer_depth_impl<T>::value;
         };
     }
 
     template <class U>
     struct initializer_dimension
     {
-        static constexpr size_t value = detail::initializer_depth_impl<U>::value;
+        static constexpr std::size_t value = detail::initializer_depth_impl<U>::value;
     };
 
     /***********************************
@@ -189,11 +190,11 @@ namespace qs
 
     namespace detail
     {
-        template <size_t I>
+        template <std::size_t I>
         struct initializer_shape_impl
         {
             template <class T>
-            static inline constexpr size_t value(T t)
+            static inline constexpr std::size_t value(T t)
             {
                 return t.size() == 0 ? 0 : initializer_shape_impl<I - 1>::value(*t.begin());
             }
@@ -203,14 +204,14 @@ namespace qs
         struct initializer_shape_impl<0>
         {
             template <class T>
-            static inline constexpr size_t value(T t)
+            static inline constexpr std::size_t value(T t)
             {
                 return t.size();
             }
         };
 
-        template <class U, size_t... I>
-        inline constexpr std::array<size_t, initializer_dimension<U>::value> initializer_shape(U t, std::index_sequence<I...>)
+        template <class U, std::size_t... I>
+        inline constexpr std::array<std::size_t, initializer_dimension<U>::value> initializer_shape(U t, std::index_sequence<I...>)
         {
              return { initializer_shape_impl<I>::value(t)... };
         }

@@ -100,13 +100,13 @@ namespace qs
      ******************************************************/
 
     template <class S>
-    inline disable_xslice<S, size_t> get_size(const S&)
+    inline disable_xslice<S, std::size_t> get_size(const S&)
     {
         return 0;
     };
 
     template <class S>
-    inline size_t get_size(const xslice<S>& slice)
+    inline std::size_t get_size(const xslice<S>& slice)
     {
         return slice.derived_cast().size();
     };

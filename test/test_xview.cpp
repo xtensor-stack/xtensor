@@ -5,6 +5,7 @@
 
 namespace qs
 {
+    using std::size_t;
 
     TEST(xview, simple)
     {

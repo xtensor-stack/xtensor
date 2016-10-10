@@ -82,15 +82,15 @@ namespace qs
 
     // number of integral types in the specified sequence of types
     template <class... S>
-    inline constexpr size_t integral_count();
+    inline constexpr std::size_t integral_count();
 
     // number of integral types in the specified sequence of types before specified index.
     template <class... S>
-    inline constexpr size_t integral_count_before(size_t i);
+    inline constexpr std::size_t integral_count_before(std::size_t i);
 
     // index in the specified sequence of types of the ith non-integral type.
     template <class... S>
-    inline constexpr size_t integral_skip(size_t i);
+    inline constexpr std::size_t integral_skip(std::size_t i);
 
     /*********************************
      * xview implementation
@@ -106,7 +106,7 @@ namespace qs
             size_type index = integral_skip<S...>(i);
             if (index < sizeof...(S))
             {
-                m_shape[i] = apply<size_t>(index, func, std::forward<S>(slices)...);
+                m_shape[i] = apply<std::size_t>(index, func, std::forward<S>(slices)...);
             }
             else
             {
@@ -205,7 +205,7 @@ namespace qs
         template <class T, class... S>
         struct integral_count_impl
         {
-            static inline constexpr size_t count(size_t i) noexcept
+            static inline constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i ? (integral_count_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
             } 
@@ -214,7 +214,7 @@ namespace qs
         template <>
         struct integral_count_impl<void>
         {
-            static inline constexpr size_t count(size_t i) noexcept
+            static inline constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i;
             } 
@@ -222,13 +222,13 @@ namespace qs
     }
 
     template <class... S>
-    inline constexpr size_t integral_count()
+    inline constexpr std::size_t integral_count()
     {
         return detail::integral_count_impl<S..., void>::count(sizeof...(S));
     }
 
     template <class... S>
-    inline constexpr size_t integral_count_before(size_t i)
+    inline constexpr std::size_t integral_count_before(std::size_t i)
     {
         return detail::integral_count_impl<S..., void>::count(i);
     }
@@ -243,7 +243,7 @@ namespace qs
         template <class T, class... S>
         struct integral_skip_impl
         {
-            static inline constexpr size_t count(size_t i) noexcept
+            static inline constexpr std::size_t count(std::size_t i) noexcept
             {
                 if (i == 0)
                 {
@@ -263,7 +263,7 @@ namespace qs
         template <>
         struct integral_skip_impl<void>
         {
-            static inline constexpr size_t count(size_t i) noexcept
+            static inline constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i;
             }
@@ -271,7 +271,7 @@ namespace qs
     }
 
     template <class... S>
-    inline constexpr size_t integral_skip(size_t i)
+    inline constexpr std::size_t integral_skip(std::size_t i)
     {
         return detail::integral_skip_impl<S..., void>::count(i);
     }

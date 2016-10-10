@@ -1,6 +1,7 @@
 #ifndef XFUNCTION_HPP
 #define XFUNCTION_HPP
 
+#include <cstddef>
 #include <type_traits>
 #include <utility>
 #include <tuple>
@@ -87,13 +88,13 @@ namespace qs
 
     private:
 
-        template <size_t... I, class... Args>
+        template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
-        template <class Func, size_t... I>
+        template <class Func, std::size_t... I>
         const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const;
 
-        template <class Func, size_t... I>
+        template <class Func, std::size_t... I>
         const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const;
 
         std::tuple<typename E::closure_type...> m_e;
@@ -135,7 +136,7 @@ namespace qs
 
     private:
 
-        template <size_t... I>
+        template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
@@ -186,7 +187,7 @@ namespace qs
 
     private:
 
-        template <size_t... I>
+        template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
@@ -340,21 +341,21 @@ namespace qs
     }
 
     template <class F, class R, class... E>
-    template <size_t... I, class... Args>
+    template <std::size_t... I, class... Args>
     inline auto xfunction<F, R, E...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
     {
         return m_f(detail::get_element(std::get<I>(m_e), args...)...);
     }
 
     template <class F, class R, class... E>
-    template <class Func, size_t... I>
+    template <class Func, std::size_t... I>
     inline auto xfunction<F, R, E...>::build_stepper(Func&& f, std::index_sequence<I...>) const -> const_stepper
     {
         return const_stepper(this, f(std::get<I>(m_e))...);
     }
 
     template <class F, class R, class... E>
-    template <class Func, size_t... I>
+    template <class Func, std::size_t... I>
     inline auto xfunction<F, R, E...>::build_storage_iterator(Func&& f, std::index_sequence<I...>) const -> const_storage_iterator
     {
         return const_storage_iterator(this, f(std::get<I>(m_e))...);
@@ -402,7 +403,7 @@ namespace qs
     }
 
     template <class F, class R, class... E>
-    template <size_t... I>
+    template <std::size_t... I>
     inline auto xf_storage_iterator<F, R, E...>::deref_impl(std::index_sequence<I...>) const -> reference
     {
         return (p_f->m_f)(*std::get<I>(m_it)...);
@@ -468,7 +469,7 @@ namespace qs
     }
 
     template <class F, class R, class... E>
-    template <size_t... I>
+    template <std::size_t... I>
     inline auto xfunction_stepper<F, R, E...>::deref_impl(std::index_sequence<I...>) const -> reference
     {
         return (p_f->m_f)(*std::get<I>(m_it)...);

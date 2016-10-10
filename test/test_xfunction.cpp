@@ -4,6 +4,7 @@
 
 namespace qs
 {
+    using std::size_t;
 
     struct xfunction_features
     {
