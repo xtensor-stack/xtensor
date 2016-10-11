@@ -23,7 +23,7 @@ namespace qs
     struct or_;
 
     template <std::size_t I, class... Args>
-    decltype(auto) argument(Args&&... args) noexcept;
+    constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template<class R, class F, class... S>
     R apply(std::size_t index, F&& func, S&&... s);
@@ -138,7 +138,7 @@ namespace qs
         struct getter
         {
             template <class Arg, class... Args>
-            static inline decltype(auto) get(Arg&& arg, Args&&... args) noexcept
+            static constexpr decltype(auto) get(Arg&& arg, Args&&... args) noexcept
             {
                 return getter<I - 1>::get(std::forward<Args>(args)...);
             }
@@ -148,7 +148,7 @@ namespace qs
         struct getter<0>
         {
             template <class Arg, class... Args>
-            static inline Arg&& get(Arg&& arg, Args&&... args) noexcept
+            static constexpr Arg&& get(Arg&& arg, Args&&... args) noexcept
             {
                 return std::forward<Arg>(arg);
             }
@@ -156,7 +156,7 @@ namespace qs
     }
 
     template <std::size_t I, class... Args>
-    inline decltype(auto) argument(Args&&... args) noexcept
+    constexpr decltype(auto) argument(Args&&... args) noexcept
     {
         static_assert(I < sizeof...(Args), "I should be lesser than sizeof...(Args)");
         return detail::getter<I>::get(std::forward<Args>(args)...);
