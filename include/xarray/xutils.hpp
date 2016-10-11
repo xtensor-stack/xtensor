@@ -10,6 +10,9 @@
 namespace qs
 {
 
+    template <class T>
+    struct remove_class;
+
     template <class F, class... T>
     void for_each(F&& f, std::tuple<T...>& t);
 
@@ -27,6 +30,30 @@ namespace qs
 
     template <class U>
     struct initializer_dimension;
+
+    /*******************************
+     * remove_class implementation *
+     *******************************/
+
+    template <class T>
+    struct remove_class
+    {
+    };
+
+    template <class C, class R, class... Args>
+    struct remove_class<R (C::*) (Args...)>
+    {
+        typedef R type(Args...);
+    };
+
+    template <class C, class R, class... Args>
+    struct remove_class<R (C::*) (Args...) const>
+    {
+        typedef R type(Args...);
+    };
+
+    template <class T>
+    using remove_class_t = typename remove_class<T>::type;
 
     /**************************
      * for_each implementation

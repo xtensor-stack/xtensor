@@ -98,7 +98,7 @@ namespace qs
         const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const;
 
         std::tuple<typename E::closure_type...> m_e;
-        F m_f;
+        typename std::remove_reference<F>::type m_f;
 
         friend class xf_storage_iterator<F, R, E...>;
         friend class xfunction_stepper<F, R, E...>;
