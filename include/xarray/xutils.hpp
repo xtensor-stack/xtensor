@@ -242,7 +242,7 @@ namespace qs
     template <class T, class S>
     inline void nested_copy(T&& iter, const S& s)
     {
-	*iter++ = s;
+        *iter++ = s;
     }
 
     template <class T, class S>
