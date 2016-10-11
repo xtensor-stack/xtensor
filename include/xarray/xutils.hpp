@@ -23,7 +23,7 @@ namespace qs
     decltype(auto) argument(Args&&... args) noexcept;
 
     template<class R, class F, class... S>
-    R apply(std::size_t index, F&& func, S... s);
+    R apply(std::size_t index, F&& func, S&&... s);
 
     template <class U>
     struct initializer_dimension;
@@ -138,7 +138,7 @@ namespace qs
 
     namespace detail
     {
-        template<class R, class F, int I, class... S>
+        template<class R, class F, std::size_t I, class... S>
         R apply_one(F&& func, S&&... s)
         {
             return func(argument<I>(s...));
@@ -154,7 +154,7 @@ namespace qs
     }
 
     template<class R, class F, class... S>
-    R apply(std::size_t index, F&& func, S... s)
+    R apply(std::size_t index, F&& func, S&&... s)
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(s)...);
     }
@@ -194,7 +194,7 @@ namespace qs
         struct initializer_shape_impl
         {
             template <class T>
-            static inline constexpr std::size_t value(T t)
+            static constexpr std::size_t value(T t)
             {
                 return t.size() == 0 ? 0 : initializer_shape_impl<I - 1>::value(*t.begin());
             }
@@ -204,33 +204,33 @@ namespace qs
         struct initializer_shape_impl<0>
         {
             template <class T>
-            static inline constexpr std::size_t value(T t)
+            static constexpr std::size_t value(T t)
             {
                 return t.size();
             }
         };
 
         template <class R, class U, std::size_t... I>
-        inline constexpr R initializer_shape(U t, std::index_sequence<I...>)
+        constexpr R initializer_shape(U t, std::index_sequence<I...>)
         {
              return { initializer_shape_impl<I>::value(t)... };
         }
     }
 
     template <class R, class T>
-    inline constexpr R initializer_shape(T t)
+    constexpr R initializer_shape(T t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     } 
 
     template <class R, class T>
-    inline constexpr R initializer_shape(std::initializer_list<T> t)
+    constexpr R initializer_shape(std::initializer_list<T> t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
     
     template <class R, class T>
-    inline constexpr R initializer_shape(std::initializer_list<std::initializer_list<T>> t)
+    constexpr R initializer_shape(std::initializer_list<std::initializer_list<T>> t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }

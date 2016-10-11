@@ -78,19 +78,19 @@ namespace qs
     };
 
     template <class E, class... S>
-    inline xview<E, S...> make_xview(E& e, S&&... slices);
+    xview<E, S...> make_xview(E& e, S&&... slices);
 
     // number of integral types in the specified sequence of types
     template <class... S>
-    inline constexpr std::size_t integral_count();
+    constexpr std::size_t integral_count();
 
     // number of integral types in the specified sequence of types before specified index.
     template <class... S>
-    inline constexpr std::size_t integral_count_before(std::size_t i);
+    constexpr std::size_t integral_count_before(std::size_t i);
 
     // index in the specified sequence of types of the ith non-integral type.
     template <class... S>
-    inline constexpr std::size_t integral_skip(std::size_t i);
+    constexpr std::size_t integral_skip(std::size_t i);
 
     /*********************************
      * xview implementation
@@ -205,7 +205,7 @@ namespace qs
         template <class T, class... S>
         struct integral_count_impl
         {
-            static inline constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i ? (integral_count_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
             } 
@@ -214,7 +214,7 @@ namespace qs
         template <>
         struct integral_count_impl<void>
         {
-            static inline constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i;
             } 
@@ -222,13 +222,13 @@ namespace qs
     }
 
     template <class... S>
-    inline constexpr std::size_t integral_count()
+    constexpr std::size_t integral_count()
     {
         return detail::integral_count_impl<S..., void>::count(sizeof...(S));
     }
 
     template <class... S>
-    inline constexpr std::size_t integral_count_before(std::size_t i)
+    constexpr std::size_t integral_count_before(std::size_t i)
     {
         return detail::integral_count_impl<S..., void>::count(i);
     }
@@ -243,27 +243,32 @@ namespace qs
         template <class T, class... S>
         struct integral_skip_impl
         {
-            static inline constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr std::size_t count(std::size_t i) noexcept
             {
-                if (i == 0)
-                {
-                    return std::is_integral<std::remove_reference_t<T>>::value ? 1 + integral_skip_impl<S...>::count(i) : 0;
-                }
-                else
-                {
-                    return 1 + (
-                        std::is_integral<std::remove_reference_t<T>>::value ? 
-                            integral_skip_impl<S...>::count(i) :
-                            integral_skip_impl<S...>::count(i - 1)
-                    );
-                }
+                return i == 0 ? count_impl() : count_impl(i);
+            }
+
+        private:
+
+            static constexpr std::size_t count_impl(std::size_t i) noexcept
+            {
+                return 1 + (
+                    std::is_integral<std::remove_reference_t<T>>::value ? 
+                        integral_skip_impl<S...>::count(i) :
+                        integral_skip_impl<S...>::count(i - 1)
+                );
+            }
+
+            static constexpr std::size_t count_impl() noexcept
+            {
+                return std::is_integral<std::remove_reference_t<T>>::value ? 1 + integral_skip_impl<S...>::count(0) : 0;
             }
         };
 
         template <>
         struct integral_skip_impl<void>
         {
-            static inline constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i;
             }
@@ -271,7 +276,7 @@ namespace qs
     }
 
     template <class... S>
-    inline constexpr std::size_t integral_skip(std::size_t i)
+    constexpr std::size_t integral_skip(std::size_t i)
     {
         return detail::integral_skip_impl<S..., void>::count(i);
     }
