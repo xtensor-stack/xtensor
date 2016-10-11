@@ -28,6 +28,9 @@ namespace qs
     template<class R, class F, class... S>
     R apply(std::size_t index, F&& func, S&&... s);
 
+    template<class R, class F, class... S>
+    R apply(std::size_t index, F&& func, std::tuple<S...>& s);
+
     template <class U>
     struct initializer_dimension;
 
@@ -178,12 +181,24 @@ namespace qs
             static constexpr FT* arr[] = { &apply_one<R, F, I, S...>... };
             return arr[index](std::forward<F>(func), std::forward<S>(s)...);
         }
+
+        template <class R, class F, std::size_t... I, class... S>
+        R apply(std::size_t index, F&& func, std::index_sequence<I...> seq, std::tuple<S...>& s)
+        {
+            return apply<R>(index, std::forward<F>(func), seq, std::get<I>(s)...);
+        }
     }
 
     template<class R, class F, class... S>
-    R apply(std::size_t index, F&& func, S&&... s)
+    inline R apply(std::size_t index, F&& func, S&&... s)
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(s)...);
+    }
+
+    template<class R, class F, class... S>
+    inline R apply(std::size_t index, F&& func, std::tuple<S...>& s)
+    {
+        return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }
 
     /***************************************

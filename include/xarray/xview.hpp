@@ -37,7 +37,8 @@ namespace qs
         using shape_type = xshape<size_type>;
         using closure_type = const self_type&;
 
-        xview(E&& e, S&&... slices) noexcept;
+        template <class... SL>
+        xview(E& e, SL&&... slices) noexcept;
 
         size_type dimension() const noexcept;
         
@@ -78,7 +79,7 @@ namespace qs
     };
 
     template <class E, class... S>
-    xview<E, S...> make_xview(E& e, S&&... slices);
+    xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices);
 
     // number of integral types in the specified sequence of types
     template <class... S>
@@ -97,7 +98,9 @@ namespace qs
      *********************************/
 
     template <class E, class... S>
-    inline xview<E, S...>::xview(E&& e, S&&... slices) noexcept : m_e(e), m_slices(slices...)
+    template <class... SL>
+    inline xview<E, S...>::xview(E& e, SL&&... slices) noexcept
+        : m_e(e), m_slices(std::forward<SL>(slices)...)
     {
         auto func = [](auto s) { return get_size(s); };
         m_shape.resize(dimension());
@@ -106,7 +109,7 @@ namespace qs
             size_type index = integral_skip<S...>(i);
             if (index < sizeof...(S))
             {
-                m_shape[i] = apply<std::size_t>(index, func, std::forward<S>(slices)...);
+                m_shape[i] = apply<std::size_t>(index, func, m_slices);
             }
             else
             {
@@ -190,9 +193,9 @@ namespace qs
     }
 
     template <class E, class... S>
-    inline xview<E, S...> make_xview(E& e, S&&... slices)
+    inline xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices)
     {
-        return xview<E, S...>(std::forward<E>(e), std::forward<S>(slices)...);
+        return xview<E, std::remove_reference_t<S>...>(e, std::forward<S>(slices)...);
     }
 
     /*********************************
