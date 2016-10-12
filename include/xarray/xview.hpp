@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XVIEW_HPP
 #define XVIEW_HPP
 
@@ -11,12 +19,12 @@
 #include "xslice.hpp"
 #include "xindex.hpp"
 
-namespace qs
+namespace xt
 {
 
-    /*********************************
-     * xview declaration
-     *********************************/
+    /*********************
+     * xview declaration *
+     *********************/
 
     template <class E, class... S>
     class xview : public xexpression<xview<E, S...>>
@@ -41,7 +49,7 @@ namespace qs
         xview(E& e, SL&&... slices) noexcept;
 
         size_type dimension() const noexcept;
-        
+
         auto shape() const noexcept;
 
         bool broadcast_shape(shape_type& shape) const;
@@ -93,9 +101,9 @@ namespace qs
     template <class... S>
     constexpr std::size_t integral_skip(std::size_t i);
 
-    /*********************************
-     * xview implementation
-     *********************************/
+    /************************
+     * xview implementation *
+     ************************/
 
     template <class E, class... S>
     template <class... SL>
@@ -123,7 +131,7 @@ namespace qs
     {
         return m_e.dimension() - integral_count<S...>();
     }
-        
+
     template <class E, class... S>
     inline auto xview<E, S...>::shape() const noexcept
     {
@@ -198,9 +206,9 @@ namespace qs
         return xview<E, std::remove_reference_t<S>...>(e, std::forward<S>(slices)...);
     }
 
-    /*********************************
-     * number of integral types
-     *********************************/
+    /************************
+     * count integral types *
+     ************************/
 
     namespace detail
     {
@@ -211,7 +219,7 @@ namespace qs
             static constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i ? (integral_count_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
-            } 
+            }
         };
 
         template <>
@@ -220,7 +228,7 @@ namespace qs
             static constexpr std::size_t count(std::size_t i) noexcept
             {
                 return i;
-            } 
+            }
         };
     }
 
@@ -236,9 +244,9 @@ namespace qs
         return detail::integral_count_impl<S..., void>::count(i);
     }
 
-    /**************************************
-     * index of ith non-integral type
-     **************************************/
+    /**********************************
+     * index of ith non-integral type *
+     **********************************/
 
     namespace detail
     {
@@ -256,7 +264,7 @@ namespace qs
             static constexpr std::size_t count_impl(std::size_t i) noexcept
             {
                 return 1 + (
-                    std::is_integral<std::remove_reference_t<T>>::value ? 
+                    std::is_integral<std::remove_reference_t<T>>::value ?
                         integral_skip_impl<S...>::count(i) :
                         integral_skip_impl<S...>::count(i - 1)
                 );
@@ -283,7 +291,6 @@ namespace qs
     {
         return detail::integral_skip_impl<S..., void>::count(i);
     }
-
 }
 
 #endif

@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XEXPRESSION_HPP
 #define XEXPRESSION_HPP
 
@@ -5,7 +13,7 @@
 
 #include "xutils.hpp"
 
-namespace qs
+namespace xt
 {
 
     template <class D>
@@ -31,10 +39,9 @@ namespace qs
         xexpression& operator=(xexpression&&) = default;
     };
 
-
-    /*********************************
-     * xexpression implementation
-     *********************************/
+    /******************************
+     * xexpression implementation *
+     ******************************/
 
     template <class D>
     inline auto xexpression<D>::derived_cast() noexcept -> derived_type&
@@ -50,17 +57,16 @@ namespace qs
 
     template <class E>
     using is_xexpression = std::is_base_of<xexpression<E>, E>;
-   
+
     template <class E, class R>
     using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
 
     template <class... E>
     using has_xexpression = or_<is_xexpression<E>...>;
 
-
-    /**************************
-     * get_xexpression_type
-     **************************/
+    /************************
+     * get_xexpression_type *
+     ************************/
 
     template <class T>
     class xscalar;
@@ -68,10 +74,9 @@ namespace qs
     template <class E>
     using get_xexpression_type = std::conditional_t<is_xexpression<E>::value, E, xscalar<E>>;
 
-
-    /*********************
-     * get_xexpression
-     *********************/
+    /*******************
+     * get_xexpression *
+     *******************/
 
     template <class E>
     inline const E& get_xexpression(const xexpression<E>& e) noexcept
@@ -85,10 +90,9 @@ namespace qs
         return xscalar<E>(e);
     }
 
-
-    /********************
-     * get_value_type
-     ********************/
+    /******************
+     * get_value_type *
+     ******************/
 
     namespace detail
     {
@@ -107,7 +111,6 @@ namespace qs
 
     template <class E>
     using get_value_type = typename detail::get_value_type_impl<E>::type;
-
 }
 
 #endif

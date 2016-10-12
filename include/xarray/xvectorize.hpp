@@ -1,9 +1,17 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XVECTORIZE_HPP
 #define XVECTORIZE_HPP
 
 #include "xutils.hpp"
 
-namespace qs
+namespace xt
 {
 
     /***************
@@ -39,7 +47,7 @@ namespace qs
 
     template <class R, class... Args>
     xvectorizer<R (*) (Args...), R> vectorize(R (*f) (Args...));
-    
+
     template <class F, class R, class... Args>
     xvectorizer<F, R> vectorize(F&& f, R (*) (Args...));
 

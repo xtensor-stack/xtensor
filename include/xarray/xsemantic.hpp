@@ -1,10 +1,18 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XSEMANTIC_HPP
 #define XSEMANTIC_HPP
 
 #include "xexpression.hpp"
 #include "xassign.hpp"
 
-namespace qs
+namespace xt
 {
 
     template <class D>
@@ -133,10 +141,9 @@ namespace qs
         derived_type& operator=(const xexpression<E>&);
     };
 
-
-    /************************************
-     * xsemantic_base implementation
-     ************************************/
+    /*********************************
+     * xsemantic_base implementation *
+     *********************************/
 
     template <class D>
     template <class E>
@@ -256,10 +263,9 @@ namespace qs
         return d;
     }
 
-
-    /************************************
-     * xarray_semantic implementation
-     ************************************/
+    /**********************************
+     * xarray_semantic implementation *
+     **********************************/
 
     template <class D>
     inline auto xarray_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
@@ -275,7 +281,6 @@ namespace qs
     {
         return base_type::operator=(e);
     }
-
 
     /**************************************
      * xadaptor_semantic implementation

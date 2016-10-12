@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XOPERATION_HPP
 #define XOPERATION_HPP
 
@@ -6,12 +14,12 @@
 #include "xfunction.hpp"
 #include "xscalar.hpp"
 
-namespace qs
+namespace xt
 {
 
-    /**************
-     * Helpers
-     **************/
+    /***********
+     * helpers *
+     ***********/
 
     template <class T>
     struct identity
@@ -42,10 +50,9 @@ namespace qs
                                                               get_xexpression_type<E>...>>;
     }
 
-
-    /***************
-     * Operators
-     ***************/
+    /*************
+     * operators *
+     *************/
 
     template <class E>
     inline auto operator+(const xexpression<E>& e) noexcept
@@ -86,7 +93,6 @@ namespace qs
     {
         return detail::make_xfunction<std::divides>(e1, e2);
     }
-
 }
 
 #endif

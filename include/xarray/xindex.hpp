@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XINDEX_HPP
 #define XINDEX_HPP
 
@@ -5,7 +13,7 @@
 #include <numeric>
 #include <functional>
 
-namespace qs
+namespace xt
 {
 
     template <class C>
@@ -23,10 +31,9 @@ namespace qs
     template <class S>
     S data_size(const xshape<S>& s);
 
-
-    /********************************
-     * data_offset implementation
-     ********************************/
+    /******************************
+     * data_offset implementation *
+     ******************************/
 
     namespace detail
     {
@@ -54,7 +61,6 @@ namespace qs
     {
         return std::accumulate(s.begin(), s.end(), S(1), std::multiplies<S>());
     }
-
 }
 
 #endif

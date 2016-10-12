@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XARRAY_HPP
 #define XARRAY_HPP
 
@@ -9,12 +17,12 @@
 #include "xarray_base.hpp"
 #include "xsemantic.hpp"
 
-namespace qs
+namespace xt
 {
 
-    /*************************
-     * xarray declaration
-     *************************/
+    /**********************
+     * xarray declaration *
+     **********************/
 
     template <class T>
     class xarray;
@@ -81,10 +89,9 @@ namespace qs
         friend class xarray_base<xarray<T>>;
     };
 
-
-    /*********************************
-     * xarray_adaptor declaration
-     *********************************/
+    /******************************
+     * xarray_adaptor declaration *
+     ******************************/
 
     template <class C>
     class xarray_adaptor;
@@ -141,10 +148,9 @@ namespace qs
         friend class xadaptor_semantic<xarray_adaptor<C>>;
     };
 
-
-    /****************************
-     * xarray implementation
-     ****************************/
+    /*************************
+     * xarray implementation *
+     *************************/
 
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, layout l)
@@ -181,7 +187,7 @@ namespace qs
         : base_type()
     {
         base_type::reshape(initializer_shape<shape_type>(t), layout::row_major);
-        nested_copy(m_data.begin(), t);        
+        nested_copy(m_data.begin(), t);
     }
 
     template <class T>
@@ -227,9 +233,9 @@ namespace qs
         return m_data;
     }
 
-    /*********************
-     * xarray_adaptor
-     *********************/
+    /******************
+     * xarray_adaptor *
+     ******************/
 
     template <class C>
     inline xarray_adaptor<C>::xarray_adaptor(container_type& data)

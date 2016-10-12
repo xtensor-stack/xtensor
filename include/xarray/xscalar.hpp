@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XSCALAR_HPP
 #define XSCALAR_HPP
 
@@ -7,12 +15,12 @@
 #include "xexpression.hpp"
 #include "xindex.hpp"
 
-namespace qs
+namespace xt
 {
 
-    /*************************
-     * xscalar
-     *************************/
+    /***********
+     * xscalar *
+     ***********/
 
     // xscalar is a cheap wrapper for a scalar value as an xexpression.
 
@@ -70,10 +78,9 @@ namespace qs
         const T& m_value;
     };
 
-
-    /*********************
-     * xscalar_stepper
-     *********************/
+    /*******************
+     * xscalar_stepper *
+     *******************/
 
     template <class T>
     class xscalar_stepper
@@ -114,10 +121,9 @@ namespace qs
     bool operator!=(const xscalar_stepper<T>& lhs,
                     const xscalar_stepper<T>& rhs);
 
-
-    /**********************
-     * xscalar_iterator
-     **********************/
+    /********************
+     * xscalar_iterator *
+     ********************/
 
     template <class T>
     class xscalar_iterator
@@ -135,7 +141,7 @@ namespace qs
         using iterator_category = std::input_iterator_tag;
 
         explicit xscalar_iterator(const container_type* c);
-    
+
         self_type& operator++();
         self_type operator++(int);
 
@@ -156,10 +162,9 @@ namespace qs
     bool operator!=(const xscalar_iterator<T>& lhs,
                     const xscalar_iterator<T>& rhs);
 
-
-    /****************************
-     * xscalar implementation
-     ****************************/
+    /**************************
+     * xscalar implementation *
+     **************************/
 
     template <class T>
     inline xscalar<T>::xscalar(const T& value)
@@ -235,15 +240,14 @@ namespace qs
     }
 
     template <class T>
-    inline auto xscalar<T>::storage_end() const -> const_storage_iterator 
+    inline auto xscalar<T>::storage_end() const -> const_storage_iterator
     {
         return const_storage_iterator(this);
     }
 
-
-    /************************************
-     * xscalar_stepper implementation
-     ************************************/
+    /**********************************
+     * xscalar_stepper implementation *
+     **********************************/
 
     template <class T>
     inline xscalar_stepper<T>::xscalar_stepper(const container_type* c)
@@ -292,17 +296,16 @@ namespace qs
         return !(lhs.equal(rhs));
     }
 
-
-    /*************************************
-     * xscalar_iterator implementation
-     *************************************/
+    /***********************************
+     * xscalar_iterator implementation *
+     ***********************************/
 
     template <class T>
     inline xscalar_iterator<T>::xscalar_iterator(const container_type* c)
         : p_c(c)
     {
     }
-    
+
     template <class T>
     inline auto xscalar_iterator<T>::operator++() -> self_type&
     {
@@ -342,7 +345,6 @@ namespace qs
     {
         return !(lhs.equal(rhs));
     }
-
 }
 
 #endif

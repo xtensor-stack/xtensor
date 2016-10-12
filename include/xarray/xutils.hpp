@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XUTILS_HPP
 #define XUTILS_HPP
 
@@ -7,7 +15,7 @@
 #include <type_traits>
 #include <initializer_list>
 
-namespace qs
+namespace xt
 {
 
     template <class T>
@@ -58,9 +66,9 @@ namespace qs
     template <class T>
     using remove_class_t = typename remove_class<T>::type;
 
-    /**************************
-     * for_each implementation
-     **************************/
+    /***************************
+     * for_each implementation *
+     ***************************/
 
     namespace detail
     {
@@ -85,9 +93,9 @@ namespace qs
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
 
-    /****************************
-     * accumulate implementation
-     ****************************/
+    /*****************************
+     * accumulate implementation *
+     *****************************/
 
     namespace detail
     {
@@ -114,7 +122,7 @@ namespace qs
     }
 
     /**********************
-     * or_ implementation
+     * or_ implementation *
      **********************/
 
     template <class T>
@@ -128,10 +136,10 @@ namespace qs
     {
     };
 
-    /**************************
-     * argument implementation
-     **************************/
- 
+    /***************************
+     * argument implementation *
+     ***************************/
+
     namespace detail
     {
         template <std::size_t I>
@@ -161,9 +169,9 @@ namespace qs
         static_assert(I < sizeof...(Args), "I should be lesser than sizeof...(Args)");
         return detail::getter<I>::get(std::forward<Args>(args)...);
     }
-    
+
     /************************
-     * apply implementation
+     * apply implementation *
      ************************/
 
     namespace detail
@@ -201,9 +209,9 @@ namespace qs
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }
 
-    /***************************************
-     * initializer_dimension implementation
-     ***************************************/
+    /****************************************
+     * initializer_dimension implementation *
+     ****************************************/
 
     namespace detail
     {
@@ -226,9 +234,9 @@ namespace qs
         static constexpr std::size_t value = detail::initializer_depth_impl<U>::value;
     };
 
-    /***********************************
-     * initializer_shape implementation
-     ***********************************/
+    /************************************
+     * initializer_shape implementation *
+     ************************************/
 
     namespace detail
     {
@@ -263,23 +271,23 @@ namespace qs
     constexpr R initializer_shape(T t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
-    } 
+    }
 
     template <class R, class T>
     constexpr R initializer_shape(std::initializer_list<T> t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
-    
+
     template <class R, class T>
     constexpr R initializer_shape(std::initializer_list<std::initializer_list<T>> t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
 
-    /*****************************
-     * nested_copy implementation 
-     *****************************/
+    /******************************
+     * nested_copy implementation *
+     ******************************/
 
     template <class T, class S>
     inline void nested_copy(T&& iter, const S& s)
@@ -304,7 +312,6 @@ namespace qs
             nested_copy(std::forward<T>(iter), *it);
         }
     }
-
 }
 
 #endif

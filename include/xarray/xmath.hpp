@@ -1,15 +1,23 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XMATH_HPP
 #define XMATH_HPP
 
 #include <cmath>
 #include "xfunction.hpp"
 
-namespace qs
+namespace xt
 {
 
-    /*************
-     * Helpers
-     *************/
+    /***********
+     * Helpers *
+     ***********/
 
     namespace detail
     {
@@ -28,13 +36,11 @@ namespace qs
                                                          xfunction<mf_type<Args...>,
                                                                    common_value_type<Args...>,
                                                                    get_xexpression_type<Args>...>>;
-
     }
 
-
-    /**********************
-     * Basic operations
-     **********************/
+    /********************
+     * basic operations *
+     ********************/
 
     template <class E>
     inline auto abs(const xexpression<E>& e) noexcept
@@ -98,10 +104,9 @@ namespace qs
         return detail::make_xfunction((functor_type)std::fdim, e1, e2);
     }
 
-
-    /***************************
-     * Exponential functions
-     ***************************/
+    /*************************
+     * exponential functions *
+     *************************/
 
     template <class E>
     inline auto exp(const xexpression<E>& e) noexcept
@@ -145,10 +150,9 @@ namespace qs
         return detail::make_xfunction((functor_type)std::log1p, e.derived_cast());
     }
 
-
-    /*********************
-     * Power functions
-     *********************/
+    /*******************
+     * power functions *
+     *******************/
 
     template <class E1, class E2>
     inline auto pow(const E1& e1, const E2& e2) noexcept
@@ -180,10 +184,9 @@ namespace qs
         return detail::make_xfunction((functor_type)std::hypot, e1, e2);
     }
 
-
-    /*****************************
-     * Trigonometric functions
-     *****************************/
+    /***************************
+     * trigonometric functions *
+     ***************************/
 
     template <class E>
     inline auto sin(const xexpression<E>& e) noexcept
@@ -235,10 +238,9 @@ namespace qs
         return detail::make_xfunction((functor_type)std::atan2, e1, e2);
     }
 
-
-    /**************************
-     * Hyperbolic functions
-     **************************/
+    /************************
+     * hyperbolic functions *
+     ************************/
 
     template <class E>
     inline auto sinh(const xexpression<E>& e) noexcept
@@ -282,10 +284,9 @@ namespace qs
         return detail::make_xfunction((functor_type)std::atanh, e.derived_cast());
     }
 
-
-    /*******************************
-     * Error and gamma functions
-     *******************************/
+    /*****************************
+     * error and gamma functions *
+     *****************************/
 
     template <class E>
     inline auto erf(const xexpression<E>& e) noexcept
@@ -314,7 +315,6 @@ namespace qs
         using functor_type = detail::mf_type<E>;
         return detail::make_xfunction((functor_type)std::lgamma, e.derived_cast());
     }
-
 }
 
 #endif

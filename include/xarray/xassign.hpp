@@ -1,14 +1,21 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XASSIGN_HPP
 #define XASSIGN_HPP
 
 #include "xindex.hpp"
 #include "xiterator.hpp"
 
-namespace qs
+namespace xt
 {
     template <class E>
     class xexpression;
-
 
     /**********************
      * Assign functions
@@ -25,7 +32,6 @@ namespace qs
 
     template <class E1, class E2>
     inline void computed_assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
-
 
     /*******************
      * data_assigner
@@ -50,7 +56,7 @@ namespace qs
         void reset(size_type i);
 
         void to_end();
-        
+
     private:
 
         E1& m_e1;
@@ -61,7 +67,6 @@ namespace qs
 
         shape_type m_index;
     };
-
 
     /*************************************
      * Assign functions implementation
@@ -129,7 +134,6 @@ namespace qs
             assign_data(e1, e2, trivial_broadcast);
         }
     }
-
 
     /**********************************
      * data_assigner implementation

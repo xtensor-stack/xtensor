@@ -1,9 +1,17 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XNOALIAS_HPP
 #define XNOALIAS_HPP
 
 #include "xsemantic.hpp"
 
-namespace qs
+namespace xt
 {
 
     template <class A>
@@ -37,10 +45,9 @@ namespace qs
     template <class A>
     noalias_proxy<A> noalias(A& a);
 
-
-    /**********************************
-     * noalias_proxy implementation
-     **********************************/
+    /********************************
+     * noalias_proxy implementation *
+     ********************************/
 
     template <class A>
     inline noalias_proxy<A>::noalias_proxy(A& a)
@@ -88,7 +95,6 @@ namespace qs
     {
         return noalias_proxy<A>(a);
     }
-
 }
 
 #endif

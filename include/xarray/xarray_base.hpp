@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XARRAY_BASE_HPP
 #define XARRAY_BASE_HPP
 
@@ -8,7 +16,7 @@
 #include "xoperation.hpp"
 #include "xmath.hpp"
 
-namespace qs
+namespace xt
 {
 
     enum class layout
@@ -130,10 +138,9 @@ namespace qs
     template <class D1, class D2>
     bool operator!=(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs);
 
-
-    /****************************
-     * xarray_base implementation
-     ****************************/
+    /******************************
+     * xarray_base implementation *
+     ******************************/
 
     template <class D>
     inline auto xarray_base<D>::get_shape() -> shape_type&
@@ -187,7 +194,7 @@ namespace qs
     {
         return m_shape.size();
     }
-    
+
     template <class D>
     inline auto xarray_base<D>::shape() const -> const shape_type&
     {
@@ -284,7 +291,7 @@ namespace qs
     template <class D>
     inline bool xarray_base<D>::broadcast_shape(shape_type& shape) const
     {
-        return qs::broadcast_shape(m_shape, shape);
+        return xt::broadcast_shape(m_shape, shape);
     }
 
     template <class D>
@@ -293,10 +300,9 @@ namespace qs
         return str == strides();
     }
 
-
-    /******************
-     * iterator api
-     ******************/
+    /****************
+     * iterator api *
+     ****************/
 
     template <class D>
     inline auto xarray_base<D>::begin() -> iterator
@@ -370,10 +376,9 @@ namespace qs
         return xend(shape);
     }
 
-
-    /****************************
-     * stepper api
-     ****************************/
+    /***************
+     * stepper api *
+     ***************/
 
     template <class D>
     inline auto xarray_base<D>::stepper_begin(const shape_type& shape) -> stepper
@@ -403,10 +408,9 @@ namespace qs
         return const_stepper(static_cast<const derived_type*>(this), data().end(), offset);
     }
 
-
-    /**************************
-     * storage_iterator api
-     **************************/
+    /************************
+     * storage_iterator api *
+     ************************/
 
     template <class D>
     inline auto xarray_base<D>::storage_begin() -> storage_iterator
@@ -432,10 +436,9 @@ namespace qs
         return data().end();
     }
 
-
-    /****************
-     * Comparison
-     ****************/
+    /**************
+     * comparison *
+     **************/
 
     template <class D1, class D2>
     inline bool operator==(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs)
@@ -449,7 +452,6 @@ namespace qs
     {
         return !(lhs == rhs);
     }
-
 }
 
 #endif

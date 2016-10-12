@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XIO_HPP
 #define XIO_HPP
 
@@ -7,16 +15,15 @@
 #include "xexpression.hpp"
 #include "xview.hpp"
 
-namespace qs
+namespace xt
 {
-
 
     template <class E>
     inline std::ostream& operator<<(std::ostream& out, const xexpression<E>& e);
 
-    /*************************************
-     * xexpression ostream implementation
-     *************************************/
+    /**************************************
+     * xexpression ostream implementation *
+     **************************************/
 
     namespace detail
     {
@@ -27,7 +34,7 @@ namespace qs
             static std::ostream& output(std::ostream& out, const E& e)
             {
                 if (e.dimension() == 0)
-                { 
+                {
                     out << e();
                 }
                 else
@@ -51,7 +58,6 @@ namespace qs
                 return out << "...";
             }
         };
-
     }
 
     template <class E>
@@ -59,7 +65,6 @@ namespace qs
     {
         return detail::xout<5>::output(out, e.derived_cast());
     }
-
 }
 
 #endif

@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XSLICE_HPP
 #define XSLICE_HPP
 
@@ -5,12 +13,12 @@
 #include <type_traits>
 #include <vector>
 
-namespace qs
+namespace xt
 {
 
-    /****************************
-     * xslice declaration
-     ****************************/
+    /**********************
+     * xslice declaration *
+     **********************/
 
     template <class D>
     class xslice
@@ -44,15 +52,16 @@ namespace qs
     template <class... E>
     using has_xslice = or_<is_xslice<E>...>;
 
-    /****************************
-     * xrange declaration
-     ****************************/
+    /**********************
+     * xrange declaration *
+     **********************/
 
-    template <class size_type>
-    class xrange : public xslice<xrange<size_type>>
+    template <class T>
+    class xrange : public xslice<xrange<T>>
     {
 
     public:
+        using size_type = T;
 
         xrange() = default;
         explicit xrange(size_type min, size_type max) noexcept;
@@ -73,15 +82,16 @@ namespace qs
         return xrange<size_type>(min, max);
     }
 
-    /********************************
-     * xall declaration
-     ********************************/
+    /********************
+     * xall declaration *
+     ********************/
 
-    template <class size_type>
-    class xall : public xslice<xall<size_type>>
+    template <class T>
+    class xall : public xslice<xall<T>>
     {
 
     public:
+        using size_type = T;
 
         xall() = default;
         explicit xall(size_type size) noexcept;
@@ -96,24 +106,24 @@ namespace qs
     };
 
     /******************************************************
-     * homogeneous get_size for integral types and slices
+     * homogeneous get_size for integral types and slices *
      ******************************************************/
 
     template <class S>
     inline disable_xslice<S, std::size_t> get_size(const S&)
     {
-        return 0;
+        return 1;
     };
 
     template <class S>
-    inline std::size_t get_size(const xslice<S>& slice)
+    inline auto get_size(const xslice<S>& slice)
     {
         return slice.derived_cast().size();
     };
 
-    /*********************************
-     * xslice implementation
-     *********************************/
+    /*************************
+     * xslice implementation *
+     *************************/
 
     template <class D>
     inline auto xslice<D>::derived_cast() noexcept -> derived_type&
@@ -127,48 +137,47 @@ namespace qs
         return *static_cast<const derived_type*>(this);
     }
 
-    /****************************
-     * xrange implementation
-     ****************************/
+    /*************************
+     * xrange implementation *
+     *************************/
 
-    template <class size_type>
-    inline xrange<size_type>::xrange(size_type min, size_type max) noexcept : m_min(min), m_size(max - min)
+    template <class T>
+    inline xrange<T>::xrange(size_type min, size_type max) noexcept : m_min(min), m_size(max - min)
     {
     }
 
-    template <class size_type>
-    inline size_type xrange<size_type>::operator()(size_type i) const noexcept
+    template <class T>
+    inline auto xrange<T>::operator()(size_type i) const noexcept -> size_type
     {
         return m_min + i;
     }
 
-    template <class size_type>
-    inline size_type xrange<size_type>::size() const noexcept
+    template <class T>
+    inline auto xrange<T>::size() const noexcept -> size_type
     {
         return m_size;
     }
 
-    /********************************
-     * xall implementation
-     ********************************/
+    /***********************
+     * xall implementation *
+     ***********************/
 
-    template <class size_type>
-    inline xall<size_type>::xall(size_type size) noexcept : m_size(size)
+    template <class T>
+    inline xall<T>::xall(size_type size) noexcept : m_size(size)
     {
     }
 
-    template <class size_type>
-    inline size_type xall<size_type>::operator()(size_type i) const noexcept
+    template <class T>
+    inline auto xall<T>::operator()(size_type i) const noexcept -> size_type
     {
         return i;
     }
 
-    template <class size_type>
-    inline size_type xall<size_type>::size() const noexcept
+    template <class T>
+    inline auto xall<T>::size() const noexcept -> size_type
     {
         return m_size;
     }
-
 }
 
 #endif

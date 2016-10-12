@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XFUNCTION_HPP
 #define XFUNCTION_HPP
 
@@ -11,7 +19,7 @@
 #include "xiterator.hpp"
 #include "xutils.hpp"
 
-namespace qs
+namespace xt
 {
 
     namespace detail
@@ -32,10 +40,9 @@ namespace qs
     template <class F, class R, class... E>
     class xfunction_stepper;
 
-
-    /***************
-     * xfunction
-     ***************/
+    /*************
+     * xfunction *
+     *************/
 
     template <class F, class R, class... E>
     class xfunction : public xexpression<xfunction<F, R, E...>>
@@ -104,10 +111,9 @@ namespace qs
         friend class xfunction_stepper<F, R, E...>;
     };
 
-
-    /*************************
-     * xf_storage_iterator
-     *************************/
+    /***********************
+     * xf_storage_iterator *
+     ***********************/
 
     template <class F, class R, class... E>
     class xf_storage_iterator
@@ -152,10 +158,9 @@ namespace qs
     bool operator!=(const xf_storage_iterator<F, R, E...>& it1,
                     const xf_storage_iterator<F, R, E...>& it2);
 
-
-    /******************************
-     * xfunction_stepper
-     ******************************/
+    /*********************
+     * xfunction_stepper *
+     *********************/
 
     template <class F, class R, class... E>
     class xfunction_stepper
@@ -202,10 +207,9 @@ namespace qs
     bool operator!=(const xfunction_stepper<F, R, E...>& it1,
                     const xfunction_stepper<F, R, E...>& it2);
 
-
-    /******************************
-     * xfunction implementation
-     ******************************/
+    /****************************
+     * xfunction implementation *
+     ****************************/
 
     namespace detail
     {
@@ -245,7 +249,7 @@ namespace qs
         auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
         return accumulate(func, true, m_e);
     }
-    
+
     template <class F, class R, class... E>
     inline bool xfunction<F, R, E...>::is_trivial_broadcast(const strides_type& strides) const
     {
@@ -313,7 +317,7 @@ namespace qs
     }
 
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::stepper_begin(const shape_type& shape) const -> const_stepper 
+    inline auto xfunction<F, R, E...>::stepper_begin(const shape_type& shape) const -> const_stepper
     {
         auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
@@ -325,14 +329,14 @@ namespace qs
         auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
     }
-    
+
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::storage_begin() const -> const_storage_iterator
     {
         auto f = [](const auto& e) { return e.storage_begin(); };
         return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
-    
+
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::storage_end() const -> const_storage_iterator
     {
@@ -361,10 +365,9 @@ namespace qs
         return const_storage_iterator(this, f(std::get<I>(m_e))...);
     }
 
-
-    /****************************************
-     * xf_storage_iterator implementation
-     ****************************************/
+    /**************************************
+     * xf_storage_iterator implementation *
+     **************************************/
 
     template <class F, class R, class... E>
     template <class... It>
@@ -380,7 +383,7 @@ namespace qs
         for_each(f, m_it);
         return *this;
     }
-    
+
     template <class F, class R, class... E>
     inline auto xf_storage_iterator<F, R, E...>::operator++(int) -> self_type
     {
@@ -423,10 +426,9 @@ namespace qs
         return !(it1.equal(it2));
     }
 
-
-    /**************************************
-     * xfunction_stepper implementation
-     **************************************/
+    /************************************
+     * xfunction_stepper implementation *
+     ************************************/
 
     template <class F, class R, class... E>
     template <class... It>
@@ -488,7 +490,6 @@ namespace qs
     {
         return !(it1.equal(it2));
     }
-
 }
 
 #endif

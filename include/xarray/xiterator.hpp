@@ -1,3 +1,11 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
 #ifndef XITERATOR_HPP
 #define XITERATOR_HPP
 
@@ -12,19 +20,19 @@
 #include "xindex.hpp"
 #include "xutils.hpp"
 
-namespace qs
+namespace xt
 {
 
-    /**********************
-     * Broadcast functions
-     **********************/
+    /***********************
+     * broadcast functions *
+     ***********************/
 
     template <class S>
     bool broadcast_shape(const xshape<S>& input, xshape<S>& output);
 
-    /***********
-     * xstepper
-     ***********/
+    /************
+     * xstepper *
+     ************/
 
     namespace detail
     {
@@ -89,10 +97,9 @@ namespace qs
                            xshape<typename S::size_type>& index,
                            const xshape<typename S::size_type>& shape);
 
-
-    /**********************
-     * xiterator
-     **********************/
+    /*************
+     * xiterator *
+     *************/
 
     template <class It>
     class xiterator
@@ -109,9 +116,9 @@ namespace qs
         using difference_type = typename subiterator_type::difference_type;
         using size_type = typename subiterator_type::size_type;
         using iterator_category = std::input_iterator_tag;
-        
+
         using shape_type = xshape<size_type>;
-        
+
         xiterator(It it, const shape_type& shape);
 
         self_type& operator++();
@@ -136,15 +143,14 @@ namespace qs
     bool operator!=(const xiterator<It>& lhs,
                     const xiterator<It>& rhs);
 
-
-    /****************************************
-     * Broadcast functions implementation
-     ****************************************/
+    /**************************************
+     * broadcast functions implementation *
+     **************************************/
 
     template <class S>
     inline bool broadcast_shape(const xshape<S>& input, xshape<S>& output)
     {
-        std::size_t size = output.size();
+        auto size = output.size();
         bool trivial_broadcast = (input.size() == output.size());
         auto output_iter = output.rbegin();
         auto input_rend = input.rend();
@@ -164,10 +170,9 @@ namespace qs
         return trivial_broadcast;
     }
 
-
-    /*****************************
-     * xstepper implementation
-     *****************************/
+    /***************************
+     * xstepper implementation *
+     ***************************/
 
     template <class C>
     inline xstepper<C>::xstepper(container_type* c, subiterator_type it, size_type offset)
@@ -247,9 +252,9 @@ namespace qs
         }
     }
 
-    /*************************************
-     * xiterator implementation
-     *************************************/
+    /****************************
+     * xiterator implementation *
+     ****************************/
 
     template <class It>
     inline xiterator<It>::xiterator(It it, const shape_type& shape)
@@ -296,7 +301,6 @@ namespace qs
     {
         return !(lhs.equal(rhs));
     }
-
 }
 
 #endif
