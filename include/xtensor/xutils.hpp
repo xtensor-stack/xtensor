@@ -14,6 +14,7 @@
 #include <tuple>
 #include <type_traits>
 #include <initializer_list>
+#include <algorithm>
 
 namespace xt
 {
@@ -194,6 +195,34 @@ namespace xt
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }
 
+    /******************************
+     * nested_copy implementation *
+     ******************************/
+
+    template <class T, class S>
+    inline void nested_copy(T&& iter, const S& s)
+    {
+        *iter++ = s;
+    }
+
+    template <class T, class S>
+    inline void nested_copy(T&& iter, std::initializer_list<S> s)
+    {
+        for (auto it = s.begin(); it != s.end(); ++it)
+        {
+            nested_copy(std::forward<T>(iter), *it);
+        }
+    }
+
+    template <class T, class S>
+    inline void nested_copy(T&& iter, std::initializer_list<std::initializer_list<S>> s)
+    {
+        for (auto it = s.begin(); it != s.end(); ++it)
+        {
+            nested_copy(std::forward<T>(iter), *it);
+        }
+    }
+
     /****************************************
      * initializer_dimension implementation *
      ****************************************/
@@ -253,50 +282,92 @@ namespace xt
     }
 
     template <class R, class T>
-    constexpr R initializer_shape(T t)
+    constexpr R shape(T t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
 
     template <class R, class T>
-    constexpr R initializer_shape(std::initializer_list<T> t)
+    constexpr R shape(std::initializer_list<T> t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
 
     template <class R, class T>
-    constexpr R initializer_shape(std::initializer_list<std::initializer_list<T>> t)
+    constexpr R shape(std::initializer_list<std::initializer_list<T>> t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
 
     /******************************
-     * nested_copy implementation *
+     * check_shape implementation *
      ******************************/
 
-    template <class T, class S>
-    inline void nested_copy(T&& iter, const S& s)
+    namespace detail
     {
-        *iter++ = s;
-    }
+	    template <class T, class S>
+	    struct predshape
+	    {
+	        constexpr predshape(S first, S last): m_first(first), m_last(last)
+	        {}
+
+	        constexpr bool operator()(const T& t)
+	        {
+	            return m_first == m_last;
+	        }
+
+	        S m_first;
+	        S m_last;
+	    };
+
+	    template <class T, class S>
+	    struct predshape<std::initializer_list<T>, S>
+	    {
+	        constexpr predshape(S first, S last): m_first(first), m_last(last)
+	        {}
+
+	        constexpr bool operator()(std::initializer_list<T> t)
+	        {
+	            return *m_first == t.size() && std::all_of(t.begin(), t.end(), predshape<T, S>(m_first + 1, m_last));
+	        }
+
+	        S m_first;
+	        S m_last;
+	    };
+
+	    template <class T, class S>
+	    struct predshape<std::initializer_list<std::initializer_list<T>>, S>
+	    {
+	        constexpr predshape(S first, S last): m_first(first), m_last(last)
+	        {}
+
+	        constexpr bool operator()(std::initializer_list<std::initializer_list<T>> t)
+	        {
+	            return *m_first == t.size() && std::all_of(t.begin(), t.end(), predshape<std::initializer_list<T>, S>(m_first + 1, m_last));
+	        }
+
+	        S m_first;
+	        S m_last;
+	    };
+	}
 
     template <class T, class S>
-    inline void nested_copy(T&& iter, std::initializer_list<S> s)
+    constexpr bool check_shape(T t, S first, S last)
     {
-        for (auto it = s.begin(); it != s.end(); ++it)
-        {
-            nested_copy(std::forward<T>(iter), *it);
-        }
-    }
+        return detail::predshape<decltype(t), S>(first, last)(t);
+    } 
 
     template <class T, class S>
-    inline void nested_copy(T&& iter, std::initializer_list<std::initializer_list<S>> s)
+    constexpr bool check_shape(std::initializer_list<T> t, S first, S last)
     {
-        for (auto it = s.begin(); it != s.end(); ++it)
-        {
-            nested_copy(std::forward<T>(iter), *it);
-        }
-    }
+        return detail::predshape<decltype(t), S>(first, last)(t);
+    } 
+    
+    template <class T, class S>
+    constexpr bool check_shape(std::initializer_list<std::initializer_list<T>> t, S first, S last)
+    {
+        return detail::predshape<decltype(t), S>(first, last)(t);
+    } 
 }
 
 #endif

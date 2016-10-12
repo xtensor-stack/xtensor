@@ -89,14 +89,19 @@ namespace xt
         EXPECT_EQ(2, d2);
     }
 
-    TEST(utils, initializer_shape)
+    TEST(utils, shape)
     {
-        auto s0 = initializer_shape<std::vector<size_t>>(3);
-        auto s1 = initializer_shape<std::vector<size_t>>({1, 2});
-        auto s2 = initializer_shape<std::vector<size_t>>({{1, 2, 4}, {1, 3, 5}});
+        auto s0 = shape<std::vector<size_t>>(3);
+        auto s1 = shape<std::vector<size_t>>({1, 2});
+        auto s2 = shape<std::vector<size_t>>({{1, 2, 4}, {1, 3, 5}});
+
         std::vector<size_t> e0 = {};
         std::vector<size_t> e1 = {2};
         std::vector<size_t> e2 = {2, 3};
+
+        ASSERT_TRUE(check_shape(3, s0.begin(), s0.end()));
+        ASSERT_TRUE(check_shape({1, 2}, s1.begin(), s1.end()));
+        ASSERT_TRUE(check_shape({{1, 2, 4}, {1, 3, 5}}, s2.begin(), s2.end()));
 
         EXPECT_EQ(e0, s0);
         EXPECT_EQ(e1, s1);

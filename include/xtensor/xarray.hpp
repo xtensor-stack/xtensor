@@ -192,7 +192,7 @@ namespace xt
     inline xarray<T>::xarray(const T& t)
         : base_type()
     {
-        base_type::reshape(initializer_shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
         nested_copy(m_data.begin(), t);
     }
 
@@ -200,7 +200,7 @@ namespace xt
     inline xarray<T>::xarray(std::initializer_list<T> t)
         : base_type()
     {
-        base_type::reshape(initializer_shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
         nested_copy(m_data.begin(), t);
     }
 
@@ -208,7 +208,7 @@ namespace xt
     inline xarray<T>::xarray(std::initializer_list<std::initializer_list<T>> t)
         : base_type()
     {
-        base_type::reshape(initializer_shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
         nested_copy(m_data.begin(), t);
     }
 
