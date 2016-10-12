@@ -61,14 +61,16 @@ namespace xt
     {
 
     public:
+
         using size_type = T;
 
         xrange() = default;
-        explicit xrange(size_type min, size_type max) noexcept;
+        xrange(size_type min, size_type max) noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
         size_type size() const noexcept;
+        size_type step_size(size_type i) const noexcept;
 
     private:
 
@@ -77,9 +79,42 @@ namespace xt
     };
 
     template <class size_type>
-    auto range(size_type min, size_type max)
+    inline auto range(size_type min, size_type max)
     {
         return xrange<size_type>(min, max);
+    }
+
+    /******************************
+     * xstepped_range declaration *
+     ******************************/
+
+    template <class T>
+    class xstepped_range : public xslice<xstepped_range<T>>
+    {
+
+    public:
+
+        using size_type = T;
+
+        xstepped_range() = default;
+        xstepped_range(size_type min, size_type max, size_type step) noexcept;
+
+        size_type operator()(size_type i) const noexcept;
+
+        size_type size() const noexcept;
+        size_type step_size(size_type i) const noexcept;
+
+    private:
+
+        size_type m_min;
+        size_type m_size;
+        size_type m_step;
+    };
+
+    template <class size_type>
+    inline auto range(size_type min, size_type max, size_type step)
+    {
+        return xstepped_range<size_type>(min, max, step);
     }
 
     /********************
@@ -91,6 +126,7 @@ namespace xt
     {
 
     public:
+
         using size_type = T;
 
         xall() = default;
@@ -99,6 +135,7 @@ namespace xt
         size_type operator()(size_type i) const noexcept;
 
         size_type size() const noexcept;
+        size_type step_size(size_type i) const noexcept;
 
     private:
 
@@ -121,6 +158,22 @@ namespace xt
         return slice.derived_cast().size();
     };
 
+    /*******************************************************
+     * homogeneous step_size for integral types and slices *
+     *******************************************************/
+
+    template <class S>
+    inline disable_xslice<S, std::size_t> step_size(const S&, std::size_t)
+    {
+        return 0;
+    }
+
+    template <class S>
+    inline auto step_size(const xslice<S>& slice, S i)
+    {
+        return slice.derived_cast().step_size(i);
+    }
+
     /*************************
      * xslice implementation *
      *************************/
@@ -142,7 +195,8 @@ namespace xt
      *************************/
 
     template <class T>
-    inline xrange<T>::xrange(size_type min, size_type max) noexcept : m_min(min), m_size(max - min)
+    inline xrange<T>::xrange(size_type min, size_type max) noexcept
+        : m_min(min), m_size(max - min)
     {
     }
 
@@ -158,12 +212,47 @@ namespace xt
         return m_size;
     }
 
+    template <class T>
+    inline auto xrange<T>::step_size(size_type i) const noexcept -> size_type
+    {
+        return 1;
+    }
+
+    /********************************
+     * xtepped_range implementation *
+     ********************************/
+
+    template <class T>
+    inline xstepped_range<T>::xstepped_range(size_type min, size_type max, size_type step) noexcept
+        : m_min(min), m_size((max - min)/step), m_step(step)
+    {
+    }
+
+    template <class T>
+    inline auto xstepped_range<T>::operator()(size_type i) const noexcept -> size_type
+    {
+        return m_min + i * m_step;
+    }
+
+    template <class T>
+    inline auto xstepped_range<T>::size() const noexcept -> size_type
+    {
+        return m_size;
+    }
+
+    template <class T>
+    inline auto xstepped_range<T>::step_size(size_type i) const noexcept -> size_type
+    {
+        return m_step;
+    }
+
     /***********************
      * xall implementation *
      ***********************/
 
     template <class T>
-    inline xall<T>::xall(size_type size) noexcept : m_size(size)
+    inline xall<T>::xall(size_type size) noexcept
+        : m_size(size)
     {
     }
 
@@ -178,6 +267,13 @@ namespace xt
     {
         return m_size;
     }
+
+    template <class T>
+    inline auto xall<T>::step_size(size_type i) const noexcept -> size_type
+    {
+        return 1;
+    }
+
 }
 
 #endif
