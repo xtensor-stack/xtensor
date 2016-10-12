@@ -152,5 +152,11 @@ namespace xt
         EXPECT_EQ(2, a1(1));
         EXPECT_EQ(4, a2(1, 1));
     }
+    
+    TEST(xarray, zerod)
+    {
+        xarray<int> a;
+        EXPECT_EQ(0, a());
+    }
 }
 

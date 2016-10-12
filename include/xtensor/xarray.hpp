@@ -55,7 +55,7 @@ namespace xt
 
         using closure_type = const self_type&;
 
-        xarray() = default;
+        xarray();
         explicit xarray(const shape_type& shape, layout l = layout::row_major);
         explicit xarray(const shape_type& shape, const_reference value, layout l = layout::row_major);
         explicit xarray(const shape_type& shape, const strides_type& strides);
@@ -151,6 +151,12 @@ namespace xt
     /*************************
      * xarray implementation *
      *************************/
+
+    template <class T>
+    inline xarray<T>::xarray()
+        : base_type(), m_data(1, value_type())
+    {
+    }
 
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, layout l)
