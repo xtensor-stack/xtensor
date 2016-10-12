@@ -7,8 +7,8 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xarray/xscalar.hpp"
-#include "xarray/xindex.hpp"
+#include "xtensor/xscalar.hpp"
+#include "xtensor/xindex.hpp"
 
 namespace xt
 {

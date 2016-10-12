@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xarray/xarray.hpp"
+#include "xtensor/xarray.hpp"
 #include "test_xsemantic.hpp"
 
 namespace xt

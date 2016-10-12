@@ -17,9 +17,9 @@ namespace xt
     template <class E>
     class xexpression;
 
-    /**********************
-     * Assign functions
-     **********************/
+    /********************
+     * Assign functions *
+     ********************/
 
     template <class E1, class E2>
     inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
@@ -33,9 +33,9 @@ namespace xt
     template <class E1, class E2>
     inline void computed_assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
 
-    /*******************
-     * data_assigner
-     *******************/
+    /*****************
+     * data_assigner *
+     *****************/
 
     template <class E1, class E2>
     class data_assigner
@@ -68,9 +68,9 @@ namespace xt
         shape_type m_index;
     };
 
-    /*************************************
-     * Assign functions implementation
-     *************************************/
+    /***********************************
+     * Assign functions implementation *
+     ***********************************/
 
     template <class E1, class E2>
     inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
@@ -135,9 +135,9 @@ namespace xt
         }
     }
 
-    /**********************************
-     * data_assigner implementation
-     **********************************/
+    /********************************
+     * data_assigner implementation *
+     ********************************/
 
     template <class E1, class E2>
     inline data_assigner<E1, E2>::data_assigner(E1& e1, const E2& e2)

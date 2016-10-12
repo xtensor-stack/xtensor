@@ -12,8 +12,8 @@
 #include <algorithm>
 #include <sstream>
 
-#include "xarray/xarray.hpp"
-#include "xarray/xio.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
 
 
 namespace xt

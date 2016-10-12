@@ -7,8 +7,8 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xarray/xarray.hpp"
-#include "xarray/xview.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xview.hpp"
 #include <algorithm>
 
 namespace xt

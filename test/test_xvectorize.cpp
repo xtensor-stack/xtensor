@@ -8,8 +8,8 @@
 
 #include "gtest/gtest.h"
 
-#include "xarray/xarray.hpp"
-#include "xarray/xvectorize.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xvectorize.hpp"
 
 namespace xt
 {

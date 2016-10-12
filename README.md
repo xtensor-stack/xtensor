@@ -1,3 +1,3 @@
-# xarray
+# xtensor
 
-N-Dimensional Array with Broadcasting
+C++ tensor algebra.

@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xarray/xutils.hpp"
+#include "xtensor/xutils.hpp"
 #include <initializer_list>
 #include <type_traits>
 #include <tuple>

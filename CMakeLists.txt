@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(xarray)
+project(xtensor)
 
 include(CheckCXXCompilerFlag)
 
@@ -14,7 +14,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     if (HAS_CPP14_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
     else()
-        message(FATAL_ERROR "Unsupported compiler -- xarray requires C++14 support!")
+        message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
     endif()
 
     # Enable link time optimization and set the default symbol
@@ -46,24 +46,24 @@ find_package(Threads)
 include_directories(include)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(XARRAY_TARGET test_xarray)
+set(XTENSOR_TARGET test_xtensor)
 
-set(XARRAY_HEADERS
-    include/xarray/xarray.hpp
-    include/xarray/xarray_base.hpp
-    include/xarray/xexpression.hpp
-    include/xarray/xindex.hpp
-    include/xarray/xio.hpp
-    include/xarray/xiterator.hpp
-    include/xarray/xmath.hpp
-    include/xarray/xoperation.hpp
-    include/xarray/xfunction.hpp
-    include/xarray/xslice.hpp
-    include/xarray/xview.hpp
-    include/xarray/xutils.hpp
+set(XTENSOR_HEADERS
+    include/xtensor/xarray.hpp
+    include/xtensor/xarray_base.hpp
+    include/xtensor/xexpression.hpp
+    include/xtensor/xindex.hpp
+    include/xtensor/xio.hpp
+    include/xtensor/xiterator.hpp
+    include/xtensor/xmath.hpp
+    include/xtensor/xoperation.hpp
+    include/xtensor/xfunction.hpp
+    include/xtensor/xslice.hpp
+    include/xtensor/xview.hpp
+    include/xtensor/xutils.hpp
 )
 
-set(XARRAY_TESTS
+set(XTENSOR_TESTS
     test/main.cpp
     test/test_common.hpp
     test/test_xadaptor_semantic.cpp
@@ -84,6 +84,6 @@ set(XARRAY_TESTS
     test/test_xutils.cpp
 )
 
-add_executable(${XARRAY_TARGET} ${XARRAY_TESTS} ${XARRAY_HEADERS})
-target_link_libraries(${XARRAY_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
