@@ -101,8 +101,9 @@ namespace xt
 
         reference operator*() const;
 
-        void step(size_type i);
-        void reset(size_type i);
+        void step(size_type dim, size_type n = 1);
+        void step_back(size_type dim, size_type n = 1);
+        void reset(size_type dim);
 
         void to_end();
 
@@ -262,12 +263,17 @@ namespace xt
     }
 
     template <class T>
-    inline void xscalar_stepper<T>::step(size_type i)
+    inline void xscalar_stepper<T>::step(size_type dim, size_type n)
     {
     }
 
     template <class T>
-    inline void xscalar_stepper<T>::reset(size_type i)
+    inline void xscalar_stepper<T>::step_back(size_type dim, size_type n)
+    {
+    }
+
+    template <class T>
+    inline void xscalar_stepper<T>::reset(size_type dim)
     {
     }
 

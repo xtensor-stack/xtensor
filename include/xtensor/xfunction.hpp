@@ -181,8 +181,9 @@ namespace xt
         template <class... It>
         xfunction_stepper(const xfunction_type* func, It&&... it);
 
-        void step(size_type i);
-        void reset(size_type i);
+        void step(size_type dim, size_type n = 1);
+        void step_back(size_type dim, size_type n = 1);
+        void reset(size_type dim);
 
         void to_end();
 
@@ -438,16 +439,23 @@ namespace xt
     }
 
     template <class F, class R, class... E>
-    inline void xfunction_stepper<F, R, E...>::step(size_type i)
+    inline void xfunction_stepper<F, R, E...>::step(size_type dim, size_type n)
     {
-        auto f = [i](auto& it) { it.step(i); };
+        auto f = [dim, n](auto& it) { it.step(dim, n); };
         for_each(f, m_it);
     }
 
     template <class F, class R, class... E>
-    inline void xfunction_stepper<F, R, E...>::reset(size_type i)
+    inline void xfunction_stepper<F, R, E...>::step_back(size_type dim, size_type n)
     {
-        auto f = [i](auto& it) { it.reset(i); };
+        auto f = [dim, n](auto& it) { it.step_back(dim, n); };
+        for_each(f, m_it);
+    }
+
+    template <class F, class R, class... E>
+    inline void xfunction_stepper<F, R, E...>::reset(size_type dim)
+    {
+        auto f = [dim](auto& it) { it.reset(dim); };
         for_each(f, m_it);
     }
 

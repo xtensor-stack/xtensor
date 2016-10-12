@@ -70,7 +70,8 @@ namespace xt
 
         reference operator*() const;
 
-        void step(size_type i);
+        void step(size_type dim, size_type n = 1);
+        void step_back(size_type dim, size_type n = 1);
         void reset(size_type i);
 
         void to_end();
@@ -187,10 +188,17 @@ namespace xt
     }
 
     template <class C>
-    inline void xstepper<C>::step(size_type dim)
+    inline void xstepper<C>::step(size_type dim, size_type n)
     {
         if(dim >= m_offset)
-            m_it += p_c->strides()[dim - m_offset];
+            m_it += n * p_c->strides()[dim - m_offset];
+    }
+
+    template <class C>
+    inline void xstepper<C>::step_back(size_type dim, size_type n)
+    {
+        if(dim >= m_offset)
+            m_it -= n * p_c->strides()[dim - m_offset];
     }
 
     template <class C>
