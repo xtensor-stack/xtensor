@@ -108,6 +108,8 @@ namespace xt
      * exponential functions *
      *************************/
 
+    //! The Exponential Function
+    /*! Computes the exponential of a floating point number. */
     template <class E>
     inline auto exp(const xexpression<E>& e) noexcept
     {

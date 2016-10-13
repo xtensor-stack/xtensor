@@ -1,0 +1,7 @@
+name: xtensor-docs
+
+channels:
+  - conda-forge
+
+dependencies:
+  - breathe

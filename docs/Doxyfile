@@ -1,0 +1,12 @@
+PROJECT_NAME      = "xtensor"
+XML_OUTPUT        = xml
+INPUT             = ../include
+GENERATE_LATEX    = NO
+GENERATE_MAN      = NO
+GENERATE_RTF      = NO
+CASE_SENSE_NAMES  = NO
+GENERATE_HTML     = NO
+GENERATE_XML      = YES
+RECURSIVE         = YES
+QUIET             = YES
+JAVADOC_AUTOBRIEF = YES

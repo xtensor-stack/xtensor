@@ -33,3 +33,7 @@
 # Build folders
 build/
 
+# Documentation
+docs/CMakeCache.txt
+docs/xml/
+docs/build/
