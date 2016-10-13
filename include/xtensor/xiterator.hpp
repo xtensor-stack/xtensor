@@ -72,7 +72,7 @@ namespace xt
 
         void step(size_type dim, size_type n = 1);
         void step_back(size_type dim, size_type n = 1);
-        void reset(size_type i);
+        void reset(size_type dim);
 
         void to_end();
 

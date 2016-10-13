@@ -26,6 +26,9 @@ namespace xt
      * xview declaration *
      *********************/
 
+    template <class V>
+    class xview_stepper;
+
     template <class E, class... S>
     class xview : public xexpression<xview<E, S...>>
     {
@@ -33,6 +36,7 @@ namespace xt
     public:
 
         using self_type = xview<E, S...>;
+        using expression_type = E;
 
         using value_type = typename E::value_type;
         using reference = typename E::reference;
@@ -88,6 +92,76 @@ namespace xt
 
     template <class E, class... S>
     xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices);
+
+    /*****************************
+     * xview_stepper declaration *
+     *****************************/
+
+    namespace detail
+    {
+        template <class V>
+        struct get_stepper_impl
+        {
+            using expression_type = typename V::expression_type;
+            using type = typename expression_type::stepper;
+        };
+
+        template <class V>
+        struct get_stepper_impl<const V>
+        {
+            using expression_type = typename V::expression_type;
+            using type = typename expression_type::const_stepper;
+        };
+    }
+
+    template <class V>
+    using get_stepper = typename detail::get_stepper_impl<V>::type;
+
+    template <class E, class... S>
+    class xview_stepper
+    {
+
+    public:
+
+        using view_type = std::conditional_t<std::is_const<E>::value,
+                                             xview<E, S...>,
+                                             const xview<E, S...>>;
+        using substepper_type = get_stepper<view_type>;
+
+        using value_type = typename substepper_type::value_type;
+        using reference = typename substepper_type::reference;
+        using pointer = typename substepper_type::pointer;
+        using difference_type = typename substepper_type::difference_type;
+        using size_type = typename view_type::size_type;
+
+        reference operator*() const;
+
+        void step(size_type dim, size_type n = 1);
+        void step_back(size_type dim, size_type n = 1);
+        void reset(size_type dim);
+
+        void to_end();
+
+        bool equal(const xview_stepper& rhs);
+
+    private:
+
+        view_type* p_view;
+        substepper_type m_it;
+        size_type m_offset;
+    };
+
+    template <class E, class... S>
+    bool operator==(const xview_stepper<E, S...>& lhs,
+                    const xview_stepper<E, S...>& rhs);
+
+    template <class E, class... S>
+    bool operator!=(const xview_stepper<E, S...>& lhs,
+                    const xview_stepper<E, S...>& rhs);
+
+    /********************************
+     * helper functions declaration *
+     ********************************/
 
     // number of integral types in the specified sequence of types
     template <class... S>
