@@ -217,7 +217,7 @@ namespace xt
     template <class C>
     inline bool xstepper<C>::equal(const xstepper& rhs) const
     {
-        return p_c == rhs.p_c && m_it == rhs.m_it;
+        return p_c == rhs.p_c && m_it == rhs.m_it && m_offset == rhs.m_offset;
     }
 
     template <class C>

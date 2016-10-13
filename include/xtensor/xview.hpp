@@ -18,6 +18,7 @@
 #include "xutils.hpp"
 #include "xslice.hpp"
 #include "xindex.hpp"
+#include "xiterator.hpp"
 
 namespace xt
 {
@@ -26,7 +27,7 @@ namespace xt
      * xview declaration *
      *********************/
 
-    template <class V>
+    template <class E, class... S>
     class xview_stepper;
 
     template <class E, class... S>
@@ -47,6 +48,15 @@ namespace xt
         using difference_type = typename E::difference_type;
 
         using shape_type = xshape<size_type>;
+        using strides_type = xstrides<size_type>;
+        using slice_type = std::tuple<S...>;
+
+        using stepper = xview_stepper<E, S...>;
+        using const_stepper = xview_stepper<const E, S...>;
+
+        using iterator = xiterator<stepper>;
+        using const_iterator = xiterator<const_stepper>;
+        
         using closure_type = const self_type&;
 
         template <class... SL>
@@ -54,9 +64,8 @@ namespace xt
 
         size_type dimension() const noexcept;
 
-        auto shape() const noexcept;
-
-        bool broadcast_shape(shape_type& shape) const;
+        shape_type shape() const noexcept;
+        slice_type slices() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
@@ -64,10 +73,35 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
+        bool broadcast_shape(shape_type& shape) const;
+        bool is_trivial_broadcast(const strides_type& strides) const;
+
+        iterator begin();
+        iterator end();
+
+        const_iterator begin() const;
+        const_iterator end() const;
+        const_iterator cbegin() const;
+        const_iterator cend() const;
+
+        iterator xbegin(const shape_type& shape);
+        iterator xend(const shape_type& shape);
+
+        const_iterator xbegin(const shape_type& shape) const;
+        const_iterator xend(const shape_type& shape) const;
+        const_iterator cxbegin(const shape_type& shape) const;
+        const_iterator cxend(const shape_type& shape) const;
+
+        stepper stepper_begin(const shape_type& shape);
+        stepper stepper_end(const shape_type& shape);
+
+        const_stepper stepper_begin(const shape_type& shape) const;
+        const_stepper stepper_end(const shape_type& shape) const;
+
     private:
 
         E& m_e;
-        std::tuple<S...> m_slices;
+        slice_type m_slices;
         shape_type m_shape;
 
         template <size_type... I, class... Args>
@@ -134,6 +168,8 @@ namespace xt
         using difference_type = typename substepper_type::difference_type;
         using size_type = typename view_type::size_type;
 
+        xview_stepper(view_type* view, substepper_type it, size_type offset);
+
         reference operator*() const;
 
         void step(size_type dim, size_type n = 1);
@@ -142,7 +178,7 @@ namespace xt
 
         void to_end();
 
-        bool equal(const xview_stepper& rhs);
+        bool equal(const xview_stepper& rhs) const;
 
     private:
 
@@ -184,7 +220,7 @@ namespace xt
     inline xview<E, S...>::xview(E& e, SL&&... slices) noexcept
         : m_e(e), m_slices(std::forward<SL>(slices)...)
     {
-        auto func = [](auto s) { return get_size(s); };
+        auto func = [](const auto& s) { return get_size(s); };
         m_shape.resize(dimension());
         for (size_type i = 0; i != dimension(); ++i)
         {
@@ -207,15 +243,15 @@ namespace xt
     }
 
     template <class E, class... S>
-    inline auto xview<E, S...>::shape() const noexcept
+    inline auto xview<E, S...>::shape() const noexcept -> shape_type
     {
         return m_shape;
     }
 
     template <class E, class... S>
-    inline auto xview<E, S...>::broadcast_shape(shape_type& shape) const -> bool
+    inline auto xview<E, S...>::slices() const noexcept -> slice_type
     {
-        return false;
+        return m_slices;
     }
 
     template <class E, class... S>
@@ -230,6 +266,18 @@ namespace xt
     inline auto xview<E, S...>::operator()(Args... args) const -> const_reference
     {
         return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
+    }
+
+    template <class E, class... S>
+    inline bool xview<E, S...>::broadcast_shape(shape_type& shape) const
+    {
+        return xt::broadcast_shape(m_shape, shape);
+    }
+
+    template <class E, class... S>
+    inline bool xview<E, S...>::is_trivial_broadcast(const strides_type& strides) const
+    {
+        return false;
     }
 
     template <class E, class... S>
@@ -278,6 +326,195 @@ namespace xt
     inline xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices)
     {
         return xview<E, std::remove_reference_t<S>...>(e, std::forward<S>(slices)...);
+    }
+
+    /****************
+     * iterator api *
+     ****************/
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::begin() -> iterator
+    {
+        return xbegin(shape());
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::end() -> iterator
+    {
+        return xend(shape());
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::begin() const -> const_iterator
+    {
+        return xbegin(shape());
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::end() const -> const_iterator
+    {
+        return xend(shape());
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::cbegin() const -> const_iterator
+    {
+        return begin();
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::cend() const -> const_iterator
+    {
+        return end();
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::xbegin(const shape_type& shape) -> iterator
+    {
+        return iterator(stepper_begin(shape), shape);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::xend(const shape_type& shape) -> iterator
+    {
+        return iterator(stepper_end(shape), shape);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::xbegin(const shape_type& shape) const -> const_iterator
+    {
+        return const_iterator(stepper_begin(shape), shape);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::xend(const shape_type& shape) const -> const_iterator
+    {
+        return const_iterator(stepper_end(shape), shape);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::cxbegin(const shape_type& shape) const -> const_iterator
+    {
+        return xbegin(shape);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::cxend(const shape_type& shape) const -> const_iterator
+    {
+        return xend(shape);
+    }
+
+    /***************
+     * stepper api *
+     ***************/
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::stepper_begin(const shape_type& shape) -> stepper
+    {
+        size_type offset = shape.size() - dimension();
+        return stepper(this, m_e.stepper_begin(m_e.shape()), offset);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::stepper_end(const shape_type& shape) -> stepper
+    {
+        size_type offset = shape.size() - dimension();
+        return stepper(this, m_e.stepper_end(m_e.shape()), offset);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::stepper_begin(const shape_type& shape) const -> const_stepper
+    {
+        size_type offset = shape.size() - dimension();
+        return const_stepper(this, m_e.stepper_begin(m_e.shape()), offset);
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::stepper_end(const shape_type& shape) const -> const_stepper
+    {
+        size_type offset = shape.size() - dimension();
+        return const_stepper(this, m_e.stepper_end(m_e.shape()), offset);
+    }
+
+    /********************************
+     * xview_stepper implementation *
+     ********************************/
+
+    template <class E, class... S>
+    inline xview_stepper<E, S...>::xview_stepper(view_type* view, substepper_type it, size_type offset)
+        : p_view(view), m_it(it), m_offset(offset)
+    {
+        // TODO
+    }
+
+    template <class E, class... S>
+    inline auto xview_stepper<E, S...>::operator*() const -> reference
+    {
+        return *m_it;
+    }
+
+    template <class E, class... S>
+    inline void xview_stepper<E, S...>::step(size_type dim, size_type n)
+    {
+        if(dim >= m_offset)
+        {
+            auto func = [](const auto& s) { return s.step_size(0); };
+            size_type index = integral_skip<S...>(dim);
+            size_type step_size = apply(index, func, p_view->slices());
+            m_it.step(index, step_size * n);
+        }
+    }
+
+    template <class E, class... S>
+    inline void xview_stepper<E, S...>::step_back(size_type dim, size_type n)
+    {
+        if(dim >= m_offset)
+        {
+            auto func = [](const auto& s) { return s.step_size(0); };
+            size_type index = integral_skip<S...>(dim);
+            size_type step_size = apply(index, func, p_view->slices());
+            m_it.step_back(index, step_size * n);
+        }
+    }
+
+    template <class E, class... S>
+    inline void xview_stepper<E, S...>::reset(size_type dim)
+    {
+        if(dim >= m_offset)
+        {
+            auto size_func = [](const auto& s) { return get_size(s); };
+            auto step_func = [](const auto& s) { return s.step_size(0); };
+            size_type index = integral_skip<S...>(dim);
+            size_type size = apply(index, size_func, p_view->slices());
+            size_type step_size = apply(index, step_func, p_view->slices());
+            m_it.step_back(index, step_size * size);
+        }
+    }
+
+    template <class E, class... S>
+    inline void xview_stepper<E, S...>::to_end()
+    {
+        m_it.to_end();
+    }
+
+    template <class E, class... S>
+    inline bool xview_stepper<E, S...>::equal(const xview_stepper& rhs) const
+    {
+        return p_view == rhs.p_view && m_it == rhs.m_it && m_offset == rhs.m_offset;
+    }
+
+    template <class E, class... S>
+    inline bool operator==(const xview_stepper<E, S...>& lhs,
+                           const xview_stepper<E, S...>& rhs)
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class E, class... S>
+    inline bool operator!=(const xview_stepper<E, S...>& lhs,
+                           const xview_stepper<E, S...>& rhs)
+    {
+        return !(lhs.equal(rhs));
     }
 
     /************************
@@ -368,3 +605,4 @@ namespace xt
 }
 
 #endif
+
