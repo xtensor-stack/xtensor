@@ -69,14 +69,14 @@ namespace xt
     }
 
     template <class... T >
-    auto foo(T... t) {
+    auto foo(const std::tuple<T...>& t) {
         auto func = [](int i) { return i; };
-        return apply<int>(1, func, t...);
+        return apply<int>(1, func, t);
     }
 
     TEST(utils, apply)
     {
-        ASSERT_TRUE(foo(1, 2, 3)==2);
+        ASSERT_TRUE(foo(std::make_tuple(1, 2, 3))==2);
     }
 
     TEST(utils, initializer_dimension)

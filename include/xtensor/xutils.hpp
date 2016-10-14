@@ -34,10 +34,7 @@ namespace xt
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template<class R, class F, class... S>
-    R apply(std::size_t index, F&& func, S&&... s);
-
-    template<class R, class F, class... S>
-    R apply(std::size_t index, F&& func, std::tuple<S...>& s);
+    R apply(std::size_t index, F&& func, const std::tuple<S...>& s);
 
     template <class U>
     struct initializer_dimension;
@@ -176,35 +173,23 @@ namespace xt
 
     namespace detail
     {
-        template<class R, class F, std::size_t I, class... S>
-        R apply_one(F&& func, S&&... s)
+        template <class R, class F, std::size_t I, class... S>
+        R apply_one(F&& func, const std::tuple<S...>& s)
         {
-            return func(argument<I>(s...));
-        }
-
-        template<class R, class F, std::size_t... I, class... S>
-        R apply(std::size_t index, F&& func, std::index_sequence<I...>, S&&... s)
-        {
-            using FT = R(F, S&&...);
-            static constexpr FT* arr[] = { &apply_one<R, F, I, S...>... };
-            return arr[index](std::forward<F>(func), std::forward<S>(s)...);
+            return func(std::get<I>(s));
         }
 
         template <class R, class F, std::size_t... I, class... S>
-        R apply(std::size_t index, F&& func, std::index_sequence<I...> seq, std::tuple<S...>& s)
+        R apply(std::size_t index, F&& func, std::index_sequence<I...> seq, const std::tuple<S...>& s)
         {
-            return apply<R>(index, std::forward<F>(func), seq, std::get<I>(s)...);
+            using FT = std::add_pointer_t<R(F&&, const std::tuple<S...>&)>;
+            static const std::array<FT, sizeof...(I)> ar = { &apply_one<R, F, I, S...>... };
+            return ar[index](std::forward<F>(func), s);
         }
     }
 
     template<class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, S&&... s)
-    {
-        return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(s)...);
-    }
-
-    template<class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, std::tuple<S...>& s)
+    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s)
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }

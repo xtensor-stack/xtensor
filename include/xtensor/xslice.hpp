@@ -70,7 +70,7 @@ namespace xt
         size_type operator()(size_type i) const noexcept;
 
         size_type size() const noexcept;
-        size_type step_size(size_type i) const noexcept;
+        size_type step_size() const noexcept;
 
     private:
 
@@ -78,10 +78,10 @@ namespace xt
         size_type m_size;
     };
 
-    template <class size_type>
-    inline auto range(size_type min, size_type max)
+    template <class T>
+    inline auto range(T min, T max)
     {
-        return xrange<size_type>(min, max);
+        return xrange<T>(min, max);
     }
 
     /******************************
@@ -102,7 +102,7 @@ namespace xt
         size_type operator()(size_type i) const noexcept;
 
         size_type size() const noexcept;
-        size_type step_size(size_type i) const noexcept;
+        size_type step_size() const noexcept;
 
     private:
 
@@ -111,10 +111,10 @@ namespace xt
         size_type m_step;
     };
 
-    template <class size_type>
-    inline auto range(size_type min, size_type max, size_type step)
+    template <class T>
+    inline auto range(T min, T max, T step)
     {
-        return xstepped_range<size_type>(min, max, step);
+        return xstepped_range<T>(min, max, step);
     }
 
     /********************
@@ -135,7 +135,7 @@ namespace xt
         size_type operator()(size_type i) const noexcept;
 
         size_type size() const noexcept;
-        size_type step_size(size_type i) const noexcept;
+        size_type step_size() const noexcept;
 
     private:
 
@@ -163,15 +163,31 @@ namespace xt
      *******************************************************/
 
     template <class S>
-    inline disable_xslice<S, std::size_t> step_size(const S&, std::size_t)
+    inline disable_xslice<S, std::size_t> step_size(const S&)
     {
         return 0;
     }
 
     template <class S>
-    inline auto step_size(const xslice<S>& slice, S i)
+    inline auto step_size(const xslice<S>& slice)
     {
-        return slice.derived_cast().step_size(i);
+        return slice.derived_cast().step_size();
+    }
+
+    /***************************************************
+     * homogeneous first_value for integral and slices *
+     ***************************************************/
+
+    template <class S>
+    inline disable_xslice<S, std::size_t> first_value(const S& s)
+    {
+        return s;
+    }
+
+    template <class S>
+    inline auto first_value(const xslice<S>& slice)
+    {
+        return slice.derived_cast()(0);
     }
 
     /*************************
@@ -213,7 +229,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto xrange<T>::step_size(size_type i) const noexcept -> size_type
+    inline auto xrange<T>::step_size() const noexcept -> size_type
     {
         return 1;
     }
@@ -241,7 +257,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto xstepped_range<T>::step_size(size_type i) const noexcept -> size_type
+    inline auto xstepped_range<T>::step_size() const noexcept -> size_type
     {
         return m_step;
     }
@@ -269,7 +285,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto xall<T>::step_size(size_type i) const noexcept -> size_type
+    inline auto xall<T>::step_size() const noexcept -> size_type
     {
         return 1;
     }

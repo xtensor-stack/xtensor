@@ -64,8 +64,8 @@ namespace xt
 
         size_type dimension() const noexcept;
 
-        shape_type shape() const noexcept;
-        slice_type slices() const noexcept;
+        const shape_type& shape() const noexcept;
+        const slice_type& slices() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
@@ -158,8 +158,8 @@ namespace xt
     public:
 
         using view_type = std::conditional_t<std::is_const<E>::value,
-                                             xview<E, S...>,
-                                             const xview<E, S...>>;
+                                             const xview<std::remove_const_t<E>, S...>,
+                                             xview<E, S...>>;
         using substepper_type = get_stepper<view_type>;
 
         using value_type = typename substepper_type::value_type;
@@ -168,7 +168,8 @@ namespace xt
         using difference_type = typename substepper_type::difference_type;
         using size_type = typename view_type::size_type;
 
-        xview_stepper(view_type* view, substepper_type it, size_type offset);
+        xview_stepper(view_type* view, substepper_type it,
+                      size_type offset, bool end = false);
 
         reference operator*() const;
 
@@ -243,13 +244,13 @@ namespace xt
     }
 
     template <class E, class... S>
-    inline auto xview<E, S...>::shape() const noexcept -> shape_type
+    inline auto xview<E, S...>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
 
     template <class E, class... S>
-    inline auto xview<E, S...>::slices() const noexcept -> slice_type
+    inline auto xview<E, S...>::slices() const noexcept -> const slice_type&
     {
         return m_slices;
     }
@@ -419,7 +420,7 @@ namespace xt
     inline auto xview<E, S...>::stepper_end(const shape_type& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return stepper(this, m_e.stepper_end(m_e.shape()), offset);
+        return stepper(this, m_e.stepper_end(m_e.shape()), offset, true);
     }
 
     template <class E, class... S>
@@ -433,7 +434,7 @@ namespace xt
     inline auto xview<E, S...>::stepper_end(const shape_type& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(this, m_e.stepper_end(m_e.shape()), offset);
+        return const_stepper(this, m_e.stepper_end(m_e.shape()), offset, true);
     }
 
     /********************************
@@ -441,10 +442,19 @@ namespace xt
      ********************************/
 
     template <class E, class... S>
-    inline xview_stepper<E, S...>::xview_stepper(view_type* view, substepper_type it, size_type offset)
+    inline xview_stepper<E, S...>::xview_stepper(view_type* view, substepper_type it,
+                                                 size_type offset, bool end)
         : p_view(view), m_it(it), m_offset(offset)
     {
-        // TODO
+        if(!end)
+        {
+            auto func = [](const auto& s) { return xt::first_value(s); };
+            for(size_type i = 0; i < sizeof...(S); ++i)
+            {
+                size_type s = apply<size_type>(i, func, p_view->slices());
+                m_it.step(i, s);
+            }
+        }
     }
 
     template <class E, class... S>
@@ -458,9 +468,9 @@ namespace xt
     {
         if(dim >= m_offset)
         {
-            auto func = [](const auto& s) { return s.step_size(0); };
+            auto func = [](const auto& s) { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
-            size_type step_size = apply(index, func, p_view->slices());
+            size_type step_size = apply<size_type>(index, func, p_view->slices());
             m_it.step(index, step_size * n);
         }
     }
@@ -470,9 +480,9 @@ namespace xt
     {
         if(dim >= m_offset)
         {
-            auto func = [](const auto& s) { return s.step_size(0); };
+            auto func = [](const auto& s) { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
-            size_type step_size = apply(index, func, p_view->slices());
+            size_type step_size = apply<size_type>(index, func, p_view->slices());
             m_it.step_back(index, step_size * n);
         }
     }
@@ -483,10 +493,10 @@ namespace xt
         if(dim >= m_offset)
         {
             auto size_func = [](const auto& s) { return get_size(s); };
-            auto step_func = [](const auto& s) { return s.step_size(0); };
+            auto step_func = [](const auto& s) { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
-            size_type size = apply(index, size_func, p_view->slices());
-            size_type step_size = apply(index, step_func, p_view->slices());
+            size_type size = apply<size_type>(index, size_func, p_view->slices());
+            size_type step_size = apply<size_type>(index, step_func, p_view->slices());
             m_it.step_back(index, step_size * size);
         }
     }
