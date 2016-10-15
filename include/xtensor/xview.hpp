@@ -562,6 +562,7 @@ namespace xt
             auto step_func = [](const auto& s) { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
             size_type size = apply<size_type>(index, size_func, p_view->slices());
+            if(size != 0) size = size - 1;
             size_type step_size = apply<size_type>(index, step_func, p_view->slices());
             m_it.step_back(index, step_size * size);
         }

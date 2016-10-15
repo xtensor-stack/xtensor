@@ -74,7 +74,7 @@ namespace xt
     {
         xshape<size_t> shape = {2, 3, 4};
         xarray<double> a(shape);
-        std::vector<double> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+        std::vector<double> data {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
                                   13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.begin(), data.end(), a.storage_begin());
 
@@ -82,17 +82,17 @@ namespace xt
         auto iter = view1.begin();
         auto iter_end = view1.end();
 
-        EXPECT_EQ(*iter, 6);
+        EXPECT_EQ(6, *iter);
         ++iter;
-        EXPECT_EQ(*iter, 7);
+        EXPECT_EQ(7, *iter);
         ++iter;
-        EXPECT_EQ(*iter, 8);
+        EXPECT_EQ(8, *iter);
         ++iter;
-        EXPECT_EQ(*iter, 17);
+        EXPECT_EQ(18, *iter);
         ++iter;
-        EXPECT_EQ(*iter, 18);
+        EXPECT_EQ(19, *iter);
         ++iter;
-        EXPECT_EQ(*iter, 19);
+        EXPECT_EQ(20, *iter);
         ++iter;
         EXPECT_EQ(iter, iter_end);
 
@@ -100,13 +100,13 @@ namespace xt
         auto iter2 = view2.begin();
         auto iter_end2 = view2.end();
 
-        EXPECT_EQ(*iter2, 7);
+        EXPECT_EQ(7, *iter2);
         ++iter2;
-        EXPECT_EQ(*iter2, 8);
+        EXPECT_EQ(8, *iter2);
         ++iter2;
-        EXPECT_EQ(*iter2, 18);
+        EXPECT_EQ(19, *iter2);
         ++iter2;
-        EXPECT_EQ(*iter2, 19);
+        EXPECT_EQ(20, *iter2);
         ++iter2;
         EXPECT_EQ(iter2, iter_end2);
     }
@@ -127,11 +127,11 @@ namespace xt
         auto iter = func.begin();
         auto iter_end = func.end();
 
-        EXPECT_EQ(*iter, 7);
+        EXPECT_EQ(7, *iter);
         ++iter;
-        EXPECT_EQ(*iter, 9);
+        EXPECT_EQ(9, *iter);
         ++iter;
-        EXPECT_EQ(*iter, 11);
+        EXPECT_EQ(11, *iter);
         ++iter;
         EXPECT_EQ(iter, iter_end);
     }
