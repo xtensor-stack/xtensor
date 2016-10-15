@@ -81,6 +81,7 @@ set(XTENSOR_TESTS
     test/test_xsemantic.hpp
     test/test_xvectorize.cpp
     test/test_xview.cpp
+    test/test_xview_semantic.cpp
     test/test_xutils.cpp
 )
 
