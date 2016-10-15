@@ -33,8 +33,8 @@ namespace xt
             iter2++;
         }
 
-        ASSERT_EQ(*iter, expected) << "preincrement operator doesn't give expected result";
-        ASSERT_EQ(*iter2, expected) << "postincrement operator doesn't give expected result";
+        EXPECT_EQ(*iter, expected) << "preincrement operator doesn't give expected result";
+        EXPECT_EQ(*iter2, expected) << "postincrement operator doesn't give expected result";
     }
 
     TEST(xiterator, increment_row_major)
@@ -122,7 +122,7 @@ namespace xt
             ++iter;
         }
 
-        ASSERT_EQ(iter, last) << "iterator doesn't reach the end";
+        EXPECT_EQ(iter, last) << "iterator doesn't reach the end";
     }
 
     TEST(xiterator, end_row_major)

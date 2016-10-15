@@ -19,14 +19,14 @@ namespace xt
     {
         xshape<size_t> shape = {3 ,2};
         xarray<double> a(shape, 4.5);
-        ASSERT_TRUE((+a)(0, 0) == +(a(0, 0)));
+        EXPECT_EQ((+a)(0, 0), +(a(0, 0)));
     }
 
     TEST(operation, minus)
     {
         xshape<size_t> shape = {3 ,2};
         xarray<double> a(shape, 4.5);
-        ASSERT_TRUE((-a)(0, 0) == -(a(0, 0)));
+        EXPECT_EQ((-a)(0, 0), -(a(0, 0)));
     }
 
     TEST(operation, add)
@@ -34,13 +34,13 @@ namespace xt
         xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
-        ASSERT_TRUE((a + b)(0, 0) == a(0, 0) + b(0, 0));
+        EXPECT_EQ((a + b)(0, 0), a(0, 0) + b(0, 0));
         
         double sb = 1.2;
-        ASSERT_TRUE((a + sb)(0, 0) == a(0, 0) + sb);
+        EXPECT_EQ((a + sb)(0, 0), a(0, 0) + sb);
 
         double sa = 4.6;
-        ASSERT_TRUE((sa + b)(0, 0) == sa + b(0, 0));
+        EXPECT_EQ((sa + b)(0, 0), sa + b(0, 0));
     }
 
     TEST(operation, subtract)
@@ -48,13 +48,13 @@ namespace xt
         xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
-        ASSERT_TRUE((a - b)(0, 0) == a(0, 0) - b(0, 0));
+        EXPECT_EQ((a - b)(0, 0), a(0, 0) - b(0, 0));
         
         double sb = 1.2;
-        ASSERT_TRUE((a - sb)(0, 0) == a(0, 0) - sb);
+        EXPECT_EQ((a - sb)(0, 0), a(0, 0) - sb);
 
         double sa = 4.6;
-        ASSERT_TRUE((sa - b)(0, 0) == sa - b(0, 0));
+        EXPECT_EQ((sa - b)(0, 0), sa - b(0, 0));
     }
     
     TEST(operation, multiply)
@@ -62,13 +62,13 @@ namespace xt
         xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
-        ASSERT_TRUE((a * b)(0, 0) == a(0, 0) * b(0, 0));
+        EXPECT_EQ((a * b)(0, 0), a(0, 0) * b(0, 0));
         
         double sb = 1.2;
-        ASSERT_TRUE((a * sb)(0, 0) == a(0, 0) * sb);
+        EXPECT_EQ((a * sb)(0, 0), a(0, 0) * sb);
 
         double sa = 4.6;
-        ASSERT_TRUE((sa * b)(0, 0) == sa * b(0, 0));
+        EXPECT_EQ((sa * b)(0, 0), sa * b(0, 0));
     }
     
     TEST(operation, divide)
@@ -76,13 +76,13 @@ namespace xt
         xshape<size_t> shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
-        ASSERT_TRUE((a / b)(0, 0) == a(0, 0) / b(0, 0));
+        EXPECT_EQ((a / b)(0, 0), a(0, 0) / b(0, 0));
         
         double sb = 1.2;
-        ASSERT_TRUE((a / sb)(0, 0) == a(0, 0) / sb);
+        EXPECT_EQ((a / sb)(0, 0), a(0, 0) / sb);
 
         double sa = 4.6;
-        ASSERT_TRUE((sa / b)(0, 0) == sa / b(0, 0));
+        EXPECT_EQ((sa / b)(0, 0), sa / b(0, 0));
     }
 }
 

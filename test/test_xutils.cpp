@@ -53,7 +53,7 @@ namespace xt
     {
         auto func = [](int i, int j) { return i + j; };
         const std::tuple<int, int, int> t(3, 4, 1);
-        ASSERT_EQ(8, accumulate(func, 0, t));
+        EXPECT_EQ(8, accumulate(func, 0, t));
     }
 
     TEST(utils, or)
@@ -84,9 +84,9 @@ namespace xt
         size_t d0 = initializer_dimension<double>::value;
         size_t d1 = initializer_dimension<std::initializer_list<double>>::value;
         size_t d2 = initializer_dimension<std::initializer_list<std::initializer_list<double>>>::value;
-        ASSERT_EQ(0, d0);
-        ASSERT_EQ(1, d1);
-        ASSERT_EQ(2, d2);
+        EXPECT_EQ(0, d0);
+        EXPECT_EQ(1, d1);
+        EXPECT_EQ(2, d2);
     }
 
     TEST(utils, initializer_shape)
@@ -98,9 +98,9 @@ namespace xt
         std::vector<size_t> e1 = {2};
         std::vector<size_t> e2 = {2, 3};
 
-        ASSERT_EQ(e0, s0);
-        ASSERT_EQ(e1, s1);
-        ASSERT_EQ(e2, s2);
+        EXPECT_EQ(e0, s0);
+        EXPECT_EQ(e1, s1);
+        EXPECT_EQ(e2, s2);
     }
 
 }
