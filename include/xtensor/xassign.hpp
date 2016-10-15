@@ -22,16 +22,22 @@ namespace xt
      ********************/
 
     template <class E1, class E2>
-    inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
+    void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
 
     template <class E1, class E2>
-    inline bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2);
+    bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     template <class E1, class E2>
-    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+    void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     template <class E1, class E2>
-    inline void computed_assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+    void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
+
+    template <class E1, class E2, class F>
+    void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f);
+
+    template <class E1, class E2>
+    void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
 
     /*****************
      * data_assigner *
@@ -111,7 +117,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void computed_assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
@@ -132,6 +138,30 @@ namespace xt
         else
         {
             assign_data(e1, e2, trivial_broadcast);
+        }
+    }
+
+    template <class E1, class E2, class F>
+    inline void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
+    {
+        E1& d = e1.derived_cast();
+        std::transform(d.storage_begin(), d.storage_end(), d.storage_begin(),
+                [e2, &f](const auto& v) { return f(v, e2); });
+    }
+
+    template <class E1, class E2>
+    inline void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        using shape_type = typename E1::shape_type;
+        using size_type = typename E1::size_type;
+        const E1& de1 = e1.derived_cast();
+        const E2& de2 = e2.derived_cast();
+        size_type size = de2.dimension();
+        shape_type shape(size, size_type(1));
+        de2.broadcast_shape(shape);
+        if(shape.size() > de1.shape().size() || shape > de1.shape())
+        {
+            throw std::runtime_error("broadcast error : incompatible dimension of arrays");
         }
     }
 

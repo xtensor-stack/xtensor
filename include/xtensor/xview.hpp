@@ -14,11 +14,8 @@
 #include <tuple>
 #include <algorithm>
 
-#include "xexpression.hpp"
-#include "xutils.hpp"
+#include "xarray.hpp"
 #include "xslice.hpp"
-#include "xindex.hpp"
-#include "xiterator.hpp"
 
 namespace xt
 {
@@ -31,13 +28,23 @@ namespace xt
     class xview_stepper;
 
     template <class E, class... S>
-    class xview : public xexpression<xview<E, S...>>
+    class xview;
+
+    template <class E, class... S>
+    struct array_inner_types<xview<E, S...>>
+    {
+        using temporary_type = xarray<typename E::value_type>;
+    };
+
+    template <class E, class... S>
+    class xview : public xview_semantic<xview<E, S...>>
     {
 
     public:
 
         using self_type = xview<E, S...>;
         using expression_type = E;
+        using semantic_base = xview_semantic<self_type>;
 
         using value_type = typename E::value_type;
         using reference = typename E::reference;
@@ -57,10 +64,16 @@ namespace xt
         using iterator = xiterator<stepper>;
         using const_iterator = xiterator<const_stepper>;
         
+        using storage_iterator = iterator;
+        using const_storage_iterator = const_iterator;
+
         using closure_type = const self_type&;
 
         template <class... SL>
         xview(E& e, SL&&... slices) noexcept;
+
+        template <class OE>
+        self_type& operator=(const xexpression<OE>& e);
 
         size_type dimension() const noexcept;
 
@@ -98,6 +111,12 @@ namespace xt
         const_stepper stepper_begin(const shape_type& shape) const;
         const_stepper stepper_end(const shape_type& shape) const;
 
+        storage_iterator storage_begin();
+        storage_iterator storage_end();
+
+        const_storage_iterator storage_begin() const;
+        const_storage_iterator storage_end() const;
+
     private:
 
         E& m_e;
@@ -122,6 +141,10 @@ namespace xt
         template<size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
+        using temporary_type = typename array_inner_types<self_type>::temporary_type;
+        void assign_temporary_impl(temporary_type& tmp);
+
+        friend class xview_semantic<xview<E, S...>>;
     };
 
     template <class E, class... S>
@@ -238,6 +261,13 @@ namespace xt
     }
 
     template <class E, class... S>
+    template <class OE>
+    inline auto xview<E, S...>::operator=(const xexpression<OE>& e) -> self_type&
+    {
+        return semantic_base::operator=(e);
+    }
+
+    template <class E, class... S>
     inline auto xview<E, S...>::dimension() const noexcept -> size_type
     {
         return m_e.dimension() - integral_count<S...>();
@@ -321,6 +351,12 @@ namespace xt
     inline auto xview<E, S...>::sliced_access(const T& squeeze, Args...) const -> disable_xslice<T, size_type>
     {
         return squeeze;
+    }
+
+    template <class E, class... S>
+    inline void xview<E, S...>::assign_temporary_impl(temporary_type& tmp)
+    {
+        std::copy(tmp.storage_begin(), tmp.storage_end(), begin());
     }
 
     template <class E, class... S>
@@ -427,14 +463,44 @@ namespace xt
     inline auto xview<E, S...>::stepper_begin(const shape_type& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(this, m_e.stepper_begin(m_e.shape()), offset);
+        const E& e = m_e;
+        return const_stepper(this, e.stepper_begin(m_e.shape()), offset);
     }
 
     template <class E, class... S>
     inline auto xview<E, S...>::stepper_end(const shape_type& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(this, m_e.stepper_end(m_e.shape()), offset, true);
+        const E& e = m_e;
+        return const_stepper(this, e.stepper_end(m_e.shape()), offset, true);
+    }
+
+    /************************
+     * storage_iterator api *
+     ************************/
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::storage_begin() -> storage_iterator
+    {
+        return begin();
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::storage_end() -> storage_iterator
+    {
+        return end();
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::storage_begin() const -> const_storage_iterator
+    {
+        return begin();
+    }
+
+    template <class E, class... S>
+    inline auto xview<E, S...>::storage_end() const -> const_storage_iterator
+    {
+        return end();
     }
 
     /********************************

@@ -110,5 +110,30 @@ namespace xt
         ++iter2;
         EXPECT_EQ(iter2, iter_end2);
     }
+
+    TEST(xview, xview_on_xfunction)
+    {
+        xshape<size_t> shape = {3, 4};
+        xarray<int> a(shape);
+        std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::copy(data.begin(), data.end(), a.storage_begin());
+
+        xshape<size_t> shape2 = { 3 };
+        xarray<int> b(shape2);
+        std::vector<int> data2 = { 1, 2, 3 };
+        std::copy(data2.begin(), data2.end(), b.storage_begin());
+
+        auto func = make_xview(a, 1, range(1, 4)) + b;
+        auto iter = func.begin();
+        auto iter_end = func.end();
+
+        EXPECT_EQ(*iter, 7);
+        ++iter;
+        EXPECT_EQ(*iter, 9);
+        ++iter;
+        EXPECT_EQ(*iter, 11);
+        ++iter;
+        EXPECT_EQ(iter, iter_end);
+    }
 }
 
