@@ -259,7 +259,7 @@ namespace xt
             {
                 vec.broadcast_shape(s4);
             }
-            catch(...)
+            catch(broadcast_error<typename shape_type::size_type>& e)
             {
                 wit = true;
             }

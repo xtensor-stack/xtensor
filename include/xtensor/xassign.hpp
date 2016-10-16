@@ -161,7 +161,7 @@ namespace xt
         de2.broadcast_shape(shape);
         if(shape.size() > de1.shape().size() || shape > de1.shape())
         {
-            throw std::runtime_error("broadcast error : incompatible dimension of arrays");
+            throw broadcast_error<size_type>(shape, de1.shape());
         }
     }
 

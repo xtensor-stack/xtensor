@@ -12,13 +12,13 @@
 #include <utility>
 #include <tuple>
 #include <type_traits>
-#include <stdexcept>
 #include <iterator>
 #include <array>
 #include <algorithm>
 
 #include "xindex.hpp"
 #include "xutils.hpp"
+#include "xexception.hpp"
 
 namespace xt
 {
@@ -164,7 +164,7 @@ namespace xt
             }
             else if((*input_iter != 1) && (*output_iter != *input_iter))
             {
-                throw std::runtime_error("broadcast error : incompatible dimension of arrays");
+                throw broadcast_error<S>(output, input);
             }
             trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
         }
