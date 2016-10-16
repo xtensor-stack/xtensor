@@ -51,16 +51,22 @@ set(XTENSOR_TARGET test_xtensor)
 set(XTENSOR_HEADERS
     include/xtensor/xarray.hpp
     include/xtensor/xarray_base.hpp
+    include/xtensor/xassign.hpp
+    include/xtensor/xexception.hpp
     include/xtensor/xexpression.hpp
+    include/xtensor/xfunction.hpp
     include/xtensor/xindex.hpp
     include/xtensor/xio.hpp
     include/xtensor/xiterator.hpp
     include/xtensor/xmath.hpp
+    include/xtensor/xnoalias.hpp
     include/xtensor/xoperation.hpp
-    include/xtensor/xfunction.hpp
+    include/xtensor/xscalar.hpp
+    include/xtensor/xsemantic.hpp
     include/xtensor/xslice.hpp
-    include/xtensor/xview.hpp
     include/xtensor/xutils.hpp
+    include/xtensor/xvectorize.hpp
+    include/xtensor/xview.hpp
 )
 
 set(XTENSOR_TESTS
