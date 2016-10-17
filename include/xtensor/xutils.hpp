@@ -214,15 +214,6 @@ namespace xt
         }
     }
 
-    template <class T, class S>
-    inline void nested_copy(T&& iter, std::initializer_list<std::initializer_list<S>> s)
-    {
-        for (auto it = s.begin(); it != s.end(); ++it)
-        {
-            nested_copy(std::forward<T>(iter), *it);
-        }
-    }
-
     /****************************************
      * initializer_dimension implementation *
      ****************************************/
@@ -287,18 +278,6 @@ namespace xt
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
     }
 
-    template <class R, class T>
-    constexpr R shape(std::initializer_list<T> t)
-    {
-        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
-    }
-
-    template <class R, class T>
-    constexpr R shape(std::initializer_list<std::initializer_list<T>> t)
-    {
-        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
-    }
-
     /******************************
      * check_shape implementation *
      ******************************/
@@ -334,37 +313,10 @@ namespace xt
 	        S m_first;
 	        S m_last;
 	    };
-
-	    template <class T, class S>
-	    struct predshape<std::initializer_list<std::initializer_list<T>>, S>
-	    {
-	        constexpr predshape(S first, S last): m_first(first), m_last(last)
-	        {}
-
-	        constexpr bool operator()(std::initializer_list<std::initializer_list<T>> t)
-	        {
-	            return *m_first == t.size() && std::all_of(t.begin(), t.end(), predshape<std::initializer_list<T>, S>(m_first + 1, m_last));
-	        }
-
-	        S m_first;
-	        S m_last;
-	    };
 	}
 
     template <class T, class S>
     constexpr bool check_shape(T t, S first, S last)
-    {
-        return detail::predshape<decltype(t), S>(first, last)(t);
-    } 
-
-    template <class T, class S>
-    constexpr bool check_shape(std::initializer_list<T> t, S first, S last)
-    {
-        return detail::predshape<decltype(t), S>(first, last)(t);
-    } 
-    
-    template <class T, class S>
-    constexpr bool check_shape(std::initializer_list<std::initializer_list<T>> t, S first, S last)
     {
         return detail::predshape<decltype(t), S>(first, last)(t);
     } 
