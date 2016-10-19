@@ -4,11 +4,14 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+Mathematical functions
+======================
 
 .. toctree::
 
-   xfunction
-   xmath
-   
+   basic_functions
+   exponential_functions
+   power_functions
+   trigonometric_functions
+   hyperbolic_functions
+   error_functions

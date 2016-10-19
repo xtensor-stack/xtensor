@@ -4,11 +4,11 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+Hyperbolic functions
+====================
 
-.. toctree::
+**xtensor** provides the following hyperbolic functions for xexpressions:
 
-   xfunction
-   xmath
-   
+.. doxygengroup:: hyper_functions
+   :project: xtensor
+   :content-only:

@@ -4,11 +4,9 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+xfunction
+=========
 
-.. toctree::
+.. doxygenclass:: xt::xfunction
+   :project: xtensor
 
-   xfunction
-   xmath
-   

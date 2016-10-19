@@ -4,11 +4,11 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+Basic functions
+===============
 
-.. toctree::
+**xtensor** provides the following basic functions for xexpressions and scalars:
 
-   xfunction
-   xmath
-   
+.. doxygengroup:: basic_functions
+   :project: xtensor
+   :content-only:

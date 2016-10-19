@@ -4,11 +4,11 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+Exponential functions
+=====================
 
-.. toctree::
+**xtensor** provides the following exponential functions for xexpressions:
 
-   xfunction
-   xmath
-   
+.. doxygengroup:: exp_functions
+   :project: xtensor
+   :content-only:

@@ -4,11 +4,12 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
 
-.. toctree::
+Power functions
+===============
 
-   xfunction
-   xmath
-   
+**xtensor** provides the following power functions for xexpressions and scalars:
+
+.. doxygengroup:: pow_functions
+   :project: xtensor
+   :content-only:
