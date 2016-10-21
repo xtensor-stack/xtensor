@@ -30,10 +30,14 @@
 # Vim tmp files
 *.swp
 
-# Build folders
-build/
+# Test build artefacts
+test/test_xtensor
+test/CMakeCache.txt
+test/Makefile
+test/CMakeFiles/
+test/cmake_install.cmake
 
-# Documentation
+# Documentation build artefacts
 docs/CMakeCache.txt
 docs/xml/
 docs/build/

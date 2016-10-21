@@ -43,52 +43,53 @@ endif()
 find_package(GTest REQUIRED)
 find_package(Threads)
 
-include_directories(include)
+include_directories(../include)
 include_directories(${GTEST_INCLUDE_DIRS})
 
 set(XTENSOR_TARGET test_xtensor)
+set(XTENSOR_INCLUDE ../include)
 
 set(XTENSOR_HEADERS
-    include/xtensor/xarray.hpp
-    include/xtensor/xarray_base.hpp
-    include/xtensor/xassign.hpp
-    include/xtensor/xexception.hpp
-    include/xtensor/xexpression.hpp
-    include/xtensor/xfunction.hpp
-    include/xtensor/xindex.hpp
-    include/xtensor/xio.hpp
-    include/xtensor/xiterator.hpp
-    include/xtensor/xmath.hpp
-    include/xtensor/xnoalias.hpp
-    include/xtensor/xoperation.hpp
-    include/xtensor/xscalar.hpp
-    include/xtensor/xsemantic.hpp
-    include/xtensor/xslice.hpp
-    include/xtensor/xutils.hpp
-    include/xtensor/xvectorize.hpp
-    include/xtensor/xview.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xarray.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xarray_base.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xassign.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xexception.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xexpression.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xfunction.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xindex.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xio.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xiterator.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xmath.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xnoalias.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xoperation.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xscalar.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xsemantic.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xslice.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xutils.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xvectorize.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xview.hpp
 )
 
 set(XTENSOR_TESTS
-    test/main.cpp
-    test/test_common.hpp
-    test/test_xadaptor_semantic.cpp
-    test/test_xarray.cpp
-    test/test_xarray_adaptor.cpp
-    test/test_xarray_semantic.cpp
-    test/test_xfunction.cpp
-    test/test_xiterator.cpp
-    test/test_xio.cpp
-    test/test_xmath.cpp
-    test/test_xnoalias.cpp
-    test/test_xoperation.cpp
-    test/test_xscalar.cpp
-    test/test_xscalar_semantic.cpp
-    test/test_xsemantic.hpp
-    test/test_xvectorize.cpp
-    test/test_xview.cpp
-    test/test_xview_semantic.cpp
-    test/test_xutils.cpp
+    main.cpp
+    test_common.hpp
+    test_xadaptor_semantic.cpp
+    test_xarray.cpp
+    test_xarray_adaptor.cpp
+    test_xarray_semantic.cpp
+    test_xfunction.cpp
+    test_xiterator.cpp
+    test_xio.cpp
+    test_xmath.cpp
+    test_xnoalias.cpp
+    test_xoperation.cpp
+    test_xscalar.cpp
+    test_xscalar_semantic.cpp
+    test_xsemantic.hpp
+    test_xvectorize.cpp
+    test_xview.cpp
+    test_xview_semantic.cpp
+    test_xutils.cpp
 )
 
 add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
