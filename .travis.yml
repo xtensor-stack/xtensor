@@ -35,6 +35,9 @@ matrix:
           packages:
             - clang-3.7
       env: COMPILER=clang CLANG=3.7
+    - os: osx
+      osx_image: xcode8
+      compiler: clang
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -43,11 +46,15 @@ env:
 before_install:
     - |
       # Configure build variables
-      if [[ "$COMPILER" == "gcc" ]]; then
-        export CXX=g++-$GCC CC=gcc-$GCC;
-      fi
-      if [[ "$COMPILER" == "clang" ]]; then
-        export CXX=clang++-$CLANG CC=clang-$CLANG;
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        if [[ "$COMPILER" == "gcc" ]]; then
+          export CXX=g++-$GCC CC=gcc-$GCC;
+        fi
+        if [[ "$COMPILER" == "clang" ]]; then
+          export CXX=clang++-$CLANG CC=clang-$CLANG;
+        fi
+      elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        export CXX=clang++ CC=clang;
       fi
 install:
     # Define the version of miniconda to download

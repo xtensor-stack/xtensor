@@ -10,6 +10,7 @@
 #define XUTILS_HPP
 
 #include <cstddef>
+#include <array>
 #include <utility>
 #include <tuple>
 #include <type_traits>
