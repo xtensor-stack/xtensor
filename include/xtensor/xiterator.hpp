@@ -274,6 +274,7 @@ namespace xt
     inline auto xiterator<It>::operator++() -> self_type&
     {
         increment_stepper(m_it, m_index, m_shape);
+        return *this;
     }
 
     template <class It>

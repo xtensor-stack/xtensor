@@ -1,17 +1,56 @@
 language: cpp
-compiler:
-    - clang
-    - gcc 
-os:
-    - linux
-    - osx
+matrix:
+  include:
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: COMPILER=gcc GCC=4.9
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-5
+      env: COMPILER=gcc GCC=5
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.6
+          packages:
+            - clang-3.6
+      env: COMPILER=clang CLANG=3.6
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.7
+          packages:
+            - clang-3.7
+      env: COMPILER=clang CLANG=3.7
 env:
   global:
     - MINCONDA_VERSION="latest"
     - MINCONDA_LINUX="Linux-x86_64"
     - MINCONDA_OSX="MacOSX-x86_64"
+before_install:
+    - |
+      # Configure build variables
+      if [[ "$COMPILER" == "gcc" ]]; then
+        export CXX=g++-$GCC CC=gcc-$GCC;
+      fi
+      if [[ "$COMPILER" == "clang" ]]; then
+        export CXX=clang++-$CLANG CC=clang-$CLANG;
+      fi
 install:
-    # Define the value to download
+    # Define the version of miniconda to download
     - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
         MINCONDA_OS=$MINCONDA_LINUX;
       elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
@@ -29,6 +68,6 @@ install:
     - conda env create -f ./test-environment.yml
     - source activate test-xtensor
     - cmake .
-    - make
+    - make -j2
 script:
     - ./test_xtensor
