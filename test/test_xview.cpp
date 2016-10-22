@@ -23,29 +23,59 @@ namespace xt
         std::copy(data.begin(), data.end(), a.storage_begin());
 
         auto view1 = make_xview(a, 1, range(1, 4));
-        EXPECT_EQ(view1(0), a(1, 1));
-        EXPECT_EQ(view1(1), a(1, 2));
-        EXPECT_EQ(view1.dimension(), 1);
+        EXPECT_EQ(a(1, 1), view1(0));
+        EXPECT_EQ(a(1, 2), view1(1));
+        EXPECT_EQ(1, view1.dimension());
 
-        auto view2 = make_xview(a, 0, range(0, 3));
-        EXPECT_EQ(view2(0), a(0, 0));
-        EXPECT_EQ(view2(1), a(0, 1));
-        EXPECT_EQ(view2.dimension(), 1);
-        EXPECT_EQ(view2.shape()[0], 3);
+        auto view0 = make_xview(a, 0, range(0, 3));
+        EXPECT_EQ(a(0, 0), view0(0));
+        EXPECT_EQ(a(0, 1), view0(1));
+        EXPECT_EQ(1, view0.dimension());
+        EXPECT_EQ(3, view0.shape()[0]);
 
-        auto view3 = make_xview(a, range(0, 2), 2);
-        EXPECT_EQ(view3(0), a(0, 2));
-        EXPECT_EQ(view3(1), a(1, 2));
-        EXPECT_EQ(view3.dimension(), 1);
-        EXPECT_EQ(view3.shape()[0], 2);
+        auto view2 = make_xview(a, range(0, 2), 2);
+        EXPECT_EQ(a(0, 2), view2(0));
+        EXPECT_EQ(a(1, 2), view2(1));
+        EXPECT_EQ(1, view2.dimension());
+        EXPECT_EQ(2, view2.shape()[0]);
 
         auto view4 = make_xview(a, 1);
-        EXPECT_EQ(view4.dimension(), 1);
-        EXPECT_EQ(view4.shape()[0], 4);
+        EXPECT_EQ(1, view4.dimension());
+        EXPECT_EQ(4, view4.shape()[0]);
 
         auto view5 = make_xview(view4, 1);
-        EXPECT_EQ(view5.dimension(), 0);
-        EXPECT_EQ(view5.shape().size(), 0);
+        EXPECT_EQ(0, view5.dimension());
+        EXPECT_EQ(0, view5.shape().size());
+    }
+
+    TEST(xview, three_dimensional)
+    {
+        xshape<size_t> shape = {3, 4, 2};
+        std::vector<double> data {
+            1, 2,
+            3, 4,
+            5, 6,
+            7, 8,
+
+            9, 10,
+            11, 12,
+            21, 22, 
+            23, 24,
+
+            25, 26,
+            27, 28,
+            29, 210,
+            211, 212
+        };
+        xarray<double> a(shape);
+        std::copy(data.begin(), data.end(), a.storage_begin());
+
+        auto view1 = make_xview(a, 1);
+        EXPECT_EQ(2, view1.dimension());
+        EXPECT_EQ(a(1, 0, 0), view1(0, 0));
+        EXPECT_EQ(a(1, 0, 1), view1(0, 1));
+        EXPECT_EQ(a(1, 1, 0), view1(1, 0));
+        EXPECT_EQ(a(1, 1, 1), view1(1, 1));
     }
 
     TEST(xview, integral_count)

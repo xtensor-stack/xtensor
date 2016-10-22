@@ -130,10 +130,10 @@ namespace xt
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
         template <size_type I, class... Args>
-        std::enable_if_t<(I<sizeof...(S)), size_type> index(Args... args) const;
+        std::enable_if_t<(I < sizeof...(S)), size_type> index(Args... args) const;
 
         template <size_type I, class... Args>
-        std::enable_if_t<(I>=sizeof...(S)), size_type> index(Args... args) const;
+        std::enable_if_t<(I >= sizeof...(S)), size_type> index(Args... args) const;
 
         template<size_type I, class T, class... Args>
         size_type sliced_access(const xslice<T>& slice, Args... args) const;
@@ -327,16 +327,16 @@ namespace xt
 
     template <class E, class... S>
     template <typename E::size_type I, class... Args>
-    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I<sizeof...(S)), size_type>
+    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I < sizeof...(S)), size_type>
     {
         return sliced_access<I - integral_count_before<S...>(I)>(std::get<I>(m_slices), args...);
     }
 
     template <class E, class... S>
     template <typename E::size_type I, class... Args>
-    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I>=sizeof...(S)), size_type>
+    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I >= sizeof...(S)), size_type>
     {
-        return argument<I - integral_count_before<S...>(I)>(args...);
+        return argument<I - integral_count<S...>()>(args...);
     }
 
     template <class E, class... S>
