@@ -52,10 +52,10 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Absolute value function
+     * @brief Absolute value function.
      * 
      * Returns an \ref xfunction for the element-wise absolute value
-     * of \em e
+     * of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -68,10 +68,10 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Absolute value function
+     * @brief Absolute value function.
      * 
      * Returns an \ref xfunction for the element-wise absolute value
-     * of \em e
+     * of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -84,7 +84,7 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Remainder of the floating point division operation
+     * @brief Remainder of the floating point division operation.
      * 
      * Returns an \ref xfunction for the element-wise remainder of
      * the floating point division operation <em>e1 / e2</em>.
@@ -103,7 +103,7 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Signed remainder of the division operation
+     * @brief Signed remainder of the division operation.
      * 
      * Returns an \ref xfunction for the element-wise signed remainder
      * of the floating point division operation <em>e1 / e2</em>.
@@ -122,7 +122,7 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Fused multiply-add operation
+     * @brief Fused multiply-add operation.
      *
      * Returns an \ref xfunction for <em>e1 * e2 + e3</em> as if
      * to infinite precision and rounded only once to fit the result type.
@@ -142,7 +142,7 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Maximum function
+     * @brief Maximum function.
      *
      * Returns an \ref xfunction for the element-wise maximum
      * of \a e1 and \a e2.
@@ -161,7 +161,7 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Minimum function
+     * @brief Minimum function.
      *
      * Returns an \ref xfunction for the element-wise minimum
      * of \a e1 and \a e2.
@@ -180,7 +180,7 @@ namespace xt
 
     /**
      * @ingroup basic_functions
-     * @brief Positive difference function
+     * @brief Positive difference function.
      *
      * Returns an \ref xfunction for the element-wise positive
      * difference of \a e1 and \a e2.
@@ -207,10 +207,10 @@ namespace xt
 
     /**
      * @ingroup exp_functions
-     * @brief Natural exponential function
+     * @brief Natural exponential function.
      *
      * Returns an \ref xfunction for the element-wise natural
-     * exponential of \em e
+     * exponential of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -223,10 +223,10 @@ namespace xt
 
     /**
      * @ingroup exp_functions
-     * @brief Base 2 exponential function
+     * @brief Base 2 exponential function.
      *
      * Returns an \ref xfunction for the element-wise base 2
-     * exponential of \em e
+     * exponential of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -239,10 +239,10 @@ namespace xt
 
     /**
      * @ingroup exp_functions
-     * @brief Natural exponential minus one function
+     * @brief Natural exponential minus one function.
      *
      * Returns an \ref xfunction for the element-wise natural
-     * exponential of \em e, minus 1
+     * exponential of \em e, minus 1.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -255,10 +255,10 @@ namespace xt
 
     /**
      * @ingroup exp_functions
-     * @brief Natural logarithm function
+     * @brief Natural logarithm function.
      *
      * Returns an \ref xfunction for the element-wise natural
-     * logarithm of \em e
+     * logarithm of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -271,10 +271,10 @@ namespace xt
 
     /**
      * @ingroup exp_functions
-     * @brief Base 10 logarithm function
+     * @brief Base 10 logarithm function.
      *
      * Returns an \ref xfunction for the element-wise base 10
-     * logarithm of \em e
+     * logarithm of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -287,10 +287,10 @@ namespace xt
 
     /**
      * @ingroup exp_functions
-     * @brief Base 2 logarithm function
+     * @brief Base 2 logarithm function.
      *
      * Returns an \ref xfunction for the element-wise base 2
-     * logarithm of \em e
+     * logarithm of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -303,10 +303,10 @@ namespace xt
 
     /**
      * @ingroup exp_functions
-     * @brief Natural logarithm of one plus function
+     * @brief Natural logarithm of one plus function.
      *
      * Returns an \ref xfunction for the element-wise natural
-     * logarithm of \em e, plus 1
+     * logarithm of \em e, plus 1.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -327,10 +327,10 @@ namespace xt
 
     /**
      * @ingroup pow_functions
-     * @brief Power function
+     * @brief Power function.
      *
      * Returns an \ref xfunction for the element-wise value of
-     * of \em e1 raised to the power \em e2
+     * of \em e1 raised to the power \em e2.
      * @param e1 an \ref xexpression or a scalar
      * @param e2 an \ref xexpression or a scalar
      * @return an \ref xfunction
@@ -346,10 +346,10 @@ namespace xt
 
     /**
      * @ingroup pow_functions
-     * @brief Square root function
+     * @brief Square root function.
      *
      * Returns an \ref xfunction for the element-wise square 
-     * root of \em e
+     * root of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -362,10 +362,10 @@ namespace xt
 
     /**
      * @ingroup pow_functions
-     * @brief Cubic root function
+     * @brief Cubic root function.
      *
      * Returns an \ref xfunction for the element-wise cubic
-     * root of \em e
+     * root of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -378,11 +378,11 @@ namespace xt
 
     /**
      * @ingroup pow_functions
-     * @brief Hypotenuse function
+     * @brief Hypotenuse function.
      *
      * Returns an \ref xfunction for the element-wise square
      * root of the sum of the square of \em e1 and \em e2, avoiding
-     * overflow and underflow at intermediate stages of computation
+     * overflow and underflow at intermediate stages of computation.
      * @param e1 an \ref xexpression or a scalar
      * @param e2 an \ref xexpression or a scalar
      * @return an \ref xfunction
@@ -406,10 +406,10 @@ namespace xt
 
     /**
      * @ingroup trigo_functions
-     * @brief Sine function
+     * @brief Sine function.
      *
      * Returns an \ref xfunction for the element-wise sine
-     * of \em e (measured in radians)
+     * of \em e (measured in radians).
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -422,10 +422,10 @@ namespace xt
 
     /**
      * @ingroup trigo_functions
-     * @brief Cosine function
+     * @brief Cosine function.
      *
      * Returns an \ref xfunction for the element-wise cosine
-     * of \em e (measured in radians)
+     * of \em e (measured in radians).
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -438,10 +438,10 @@ namespace xt
 
     /**
      * @ingroup trigo_functions
-     * @brief Tangent function
+     * @brief Tangent function.
      *
      * Returns an \ref xfunction for the element-wise tangent
-     * of \em e (measured in radians)
+     * of \em e (measured in radians).
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -454,10 +454,10 @@ namespace xt
 
     /**
      * @ingroup trigo_functions
-     * @brief Arcsine function
+     * @brief Arcsine function.
      *
      * Returns an \ref xfunction for the element-wise arcsine
-     * of \em e
+     * of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -470,10 +470,10 @@ namespace xt
 
     /**
      * @ingroup trigo_functions
-     * @brief Arccosine function
+     * @brief Arccosine function.
      *
      * Returns an \ref xfunction for the element-wise arccosine
-     * of \em e
+     * of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -486,10 +486,10 @@ namespace xt
 
     /**
      * @ingroup trigo_functions
-     * @brief Arctangent function
+     * @brief Arctangent function.
      *
      * Returns an \ref xfunction for the element-wise arctangent
-     * of \em e
+     * of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -502,11 +502,11 @@ namespace xt
 
     /**
      * @ingroup trigo_functions
-     * @brief Artangent function, using signs to determine quadrants
+     * @brief Artangent function, using signs to determine quadrants.
      *
      * Returns an \ref xfunction for the element-wise arctangent
      * of <em>e1 / e2</em>, using the signs of arguments to determine the
-     * correct quadrant
+     * correct quadrant.
      * @param e1 an \ref xexpression or a scalar
      * @param e2 an \ref xexpression or a scalar
      * @return an \ref xfunction
@@ -530,10 +530,10 @@ namespace xt
 
     /**
      * @ingroup hyper_functions
-     * @brief Hyperbolic sine function
+     * @brief Hyperbolic sine function.
      *
      * Returns an \ref xfunction for the element-wise hyperbolic
-     * sine of \em e
+     * sine of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -546,10 +546,10 @@ namespace xt
 
     /**
      * @ingroup hyper_functions
-     * @brief Hyperbolic cosine function
+     * @brief Hyperbolic cosine function.
      *
      * Returns an \ref xfunction for the element-wise hyperbolic
-     * cosine of \em e
+     * cosine of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -562,10 +562,10 @@ namespace xt
 
     /**
      * @ingroup hyper_functions
-     * @brief Hyperbolic tangent function
+     * @brief Hyperbolic tangent function.
      *
      * Returns an \ref xfunction for the element-wise hyperbolic
-     * tangent of \em e
+     * tangent of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -578,10 +578,10 @@ namespace xt
 
     /**
      * @ingroup hyper_functions
-     * @brief Inverse hyperbolic sine function
+     * @brief Inverse hyperbolic sine function.
      *
      * Returns an \ref xfunction for the element-wise inverse hyperbolic
-     * sine of \em e
+     * sine of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -594,10 +594,10 @@ namespace xt
 
     /**
      * @ingroup hyper_functions
-     * @brief Inverse hyperbolic cosine function
+     * @brief Inverse hyperbolic cosine function.
      *
      * Returns an \ref xfunction for the element-wise inverse hyperbolic
-     * cosine of \em e
+     * cosine of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -610,10 +610,10 @@ namespace xt
 
     /**
      * @ingroup hyper_functions
-     * @brief Inverse hyperbolic tangent function
+     * @brief Inverse hyperbolic tangent function.
      *
      * Returns an \ref xfunction for the element-wise inverse hyperbolic
-     * tangent of \em e
+     * tangent of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -634,10 +634,10 @@ namespace xt
 
     /**
      * @ingroup err_functions
-     * @brief Error function
+     * @brief Error function.
      *
      * Returns an \ref xfunction for the element-wise error function
-     * of \em e
+     * of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -650,10 +650,10 @@ namespace xt
 
     /**
      * @ingroup err_functions
-     * @brief Complementary error function
+     * @brief Complementary error function.
      *
      * Returns an \ref xfunction for the element-wise complementary
-     * error function of \em e, whithout loss of precision for large argument
+     * error function of \em e, whithout loss of precision for large argument.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -666,10 +666,10 @@ namespace xt
 
     /**
      * @ingroup err_functions
-     * @brief Gamma function
+     * @brief Gamma function.
      *
      * Returns an \ref xfunction for the element-wise gamma function
-     * of \em e
+     * of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
@@ -682,10 +682,10 @@ namespace xt
 
     /**
      * @ingroup err_functions
-     * @brief Natural logarithm of the gamma function
+     * @brief Natural logarithm of the gamma function.
      *
      * Returns an \ref xfunction for the element-wise logarithm of
-     * the asbolute value fo the gamma function of \em e
+     * the asbolute value fo the gamma function of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
      */
