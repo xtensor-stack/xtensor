@@ -34,6 +34,16 @@ namespace xt
         using temporary_type = xarray<T>;
     };
 
+    /**
+     * @class xarray
+     * @brief Dense multidimensional container with tensor
+     * semantic.
+     *
+     * The xarray class implements a dense multidimensional container
+     * with tensor semantic.
+     *
+     * @tparam T The type of objects stored in the container.
+     */
     template <class T>
     class xarray : public xarray_base<xarray<T>>,
                    public xarray_semantic<xarray<T>>
@@ -106,6 +116,18 @@ namespace xt
         using temporary_type = xarray<typename C::value_type>;
     };
 
+    /**
+     * @class xarray_adaptor
+     * @brief Dense multidimensional container adaptor with
+     * tensor semantic.
+     *
+     * The xarray_adaptor class implements a dense multidimensional
+     * container adaptor with tensor semantic. It is used to provide
+     * a multidimensional container semantic and a tensor semantic to
+     * stl-like containers.
+     *
+     * @tparam C The container type to adapt.
+     */
     template <class C>
     class xarray_adaptor : public xarray_base<xarray_adaptor<C>>,
                            public xadaptor_semantic<xarray_adaptor<C>>
@@ -155,12 +177,25 @@ namespace xt
      * xarray implementation *
      *************************/
 
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Allocates an uninitialized xarray that holds 0 element.
+     */
     template <class T>
     inline xarray<T>::xarray()
         : base_type(), m_data(1, value_type())
     {
     }
 
+    /**
+     * Allocates an uninitialized xarray with the specified shape and
+     * layout.
+     * @param shape the shape of the xarray
+     * @param l the layout of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, layout l)
         : base_type()
@@ -168,6 +203,13 @@ namespace xt
         base_type::reshape(shape, l);
     }
 
+    /**
+     * Allocates an xarray with the specified shape and layout. Elements
+     * are initialized to the specified value.
+     * @param shape the shape of the xarray
+     * @param value the value of the elements
+     * @param l the layout of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, const_reference value, layout l)
         : base_type()
@@ -176,6 +218,11 @@ namespace xt
         std::fill(m_data.begin(), m_data.end(), value);
     }
 
+    /**
+     * Allocates an uninitialized xarray with the specified shape and strides.
+     * @param shape the shape of the xarray
+     * @param strides the strides of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, const strides_type& strides)
         : base_type()
@@ -183,6 +230,13 @@ namespace xt
         base_type::reshape(shape, strides);
     }
 
+    /**
+     * Allocates an uninitialized xarray with the specified shape and strides.
+     * Elements are initialized to the specified value.
+     * @param shape the shape of the xarray
+     * @param strides the strides of the xarray
+     * @param value the value of the elements
+     */
     template <class T>
     inline xarray<T>::xarray(const shape_type& shape, const strides_type& strides, const_reference value)
         : base_type()
@@ -191,6 +245,11 @@ namespace xt
         std::fill(m_data.begin(), m_data.end(), value);
     }
 
+    /**
+     * Allocates an xarray that holds a single element initialized to the
+     * specified value.
+     * @param t the value of the element
+     */
     template <class T>
     inline xarray<T>::xarray(const T& t)
         : base_type()
@@ -198,7 +257,16 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
         nested_copy(m_data.begin(), t);
     }
+    //@}
 
+    /**
+     * @name Constructors from initializer list
+     */
+    //@{
+    /**
+     * Allocates a one-dimensional xarray.
+     * @param t the elements of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(std::initializer_list<T> t)
         : base_type()
@@ -207,6 +275,10 @@ namespace xt
         nested_copy(m_data.begin(), t);
     }
 
+    /**
+     * Allocates a two-dimensional xarray.
+     * @param t the elements of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(std::initializer_list<std::initializer_list<T>> t)
         : base_type()
@@ -215,6 +287,10 @@ namespace xt
         nested_copy(m_data.begin(), t);
     }
 
+    /**
+     * Allocates a three-dimensional xarray.
+     * @param t the elements of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(std::initializer_list<std::initializer_list<std::initializer_list<T>>> t)
         : base_type()
@@ -223,6 +299,10 @@ namespace xt
         nested_copy(m_data.begin(), t);
     }
 
+    /**
+     * Allocates a four-dimensional xarray.
+     * @param t the elements of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>> t)
         : base_type()
@@ -231,6 +311,10 @@ namespace xt
         nested_copy(m_data.begin(), t);
     }
 
+    /**
+     * Allocates a five-dimensional xarray.
+     * @param t the elements of the xarray
+     */
     template <class T>
     inline xarray<T>::xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>>> t)
         : base_type()
@@ -238,7 +322,15 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
         nested_copy(m_data.begin(), t);
     }
+    //@}
 
+    /**
+     * @name Extended copy semantic
+     */
+    //@{
+    /**
+     * The extended copy constructor.
+     */
     template <class T>
     template <class E>
     inline xarray<T>::xarray(const xexpression<E>& e)
@@ -247,12 +339,16 @@ namespace xt
         semantic_base::assign(e);
     }
 
+    /**
+     * The extended assignment operator.
+     */
     template <class T>
     template <class E>
     inline auto xarray<T>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
+    //@}
 
     template <class T>
     inline auto xarray<T>::data_impl() -> container_type&
@@ -270,12 +366,27 @@ namespace xt
      * xarray_adaptor *
      ******************/
 
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Constructs an xarray_adaptor of the given stl-like container.
+     * @param data the container to adapt
+     */
     template <class C>
     inline xarray_adaptor<C>::xarray_adaptor(container_type& data)
         : base_type(), m_data(data)
     {
     }
 
+    /**
+     * Constructs an xarray_adaptor of the given stl-like container,
+     * with the specified shape and layout.
+     * @param data the container to adapt
+     * @param shape the shape of the xarray_adaptor
+     * @adaptor l the layout of the xarray_adaptor
+     */
     template <class C>
     inline xarray_adaptor<C>::xarray_adaptor(container_type& data, const shape_type& shape, layout l)
         : base_type(), m_data(data)
@@ -283,12 +394,20 @@ namespace xt
         base_type::reshape(shape, l);
     }
 
+    /**
+     * Constructs an xarray_adaptor of the given stl-like container,
+     * with the specified shape and strides.
+     * @param data the container to adapt
+     * @param shape the shape of the xarray_adaptor
+     * @adaptor strides the strides of the xarray_adaptor
+     */
     template <class C>
     inline xarray_adaptor<C>::xarray_adaptor(container_type& data, const shape_type& shape, const strides_type& strides)
         : base_type(), m_data(data)
     {
         base_type::reshape(shape, strides);
     }
+    //@}
 
     template <class C>
     inline xarray_adaptor<C>& xarray_adaptor<C>::operator=(const xarray_adaptor& rhs)
@@ -306,12 +425,20 @@ namespace xt
         return *this;
     }
 
+    /**
+     * @name Extended copy semantic
+     */
+    //@{
+    /**
+     * The extended assignment operator.
+     */
     template <class C>
     template <class E>
     inline auto xarray_adaptor<C>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
+    //@}
 
     template <class C>
     inline auto xarray_adaptor<C>::data_impl() -> container_type&

@@ -9,6 +9,7 @@ xtensor
 
 .. toctree::
 
+   xarray
    xfunction
    xmath
    
