@@ -110,7 +110,7 @@ namespace xt
         auto itera = a.begin();
         auto iterb = b.xbegin(a.shape());
         auto nb_iter = a.shape().back() * 2 + 1;
-        for(auto i = 0; i < nb_iter; ++i)
+        for(size_t i = 0; i < nb_iter; ++i)
         {
             ++iter, ++itera, ++iterb;
         }
@@ -143,7 +143,7 @@ namespace xt
         auto iter = func.begin();
         auto iter_end = func.end();
         auto size = a.size();
-        for(auto i = 0; i < size; ++i)
+        for(size_t i = 0; i < size; ++i)
         {
             ++iter;
         }

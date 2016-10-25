@@ -291,7 +291,7 @@ namespace xt
 	        constexpr predshape(S first, S last): m_first(first), m_last(last)
 	        {}
 
-	        constexpr bool operator()(const T& t)
+	        constexpr bool operator()(const T& t) const
 	        {
 	            return m_first == m_last;
 	        }
@@ -306,7 +306,7 @@ namespace xt
 	        constexpr predshape(S first, S last): m_first(first), m_last(last)
 	        {}
 
-	        constexpr bool operator()(std::initializer_list<T> t)
+	        constexpr bool operator()(std::initializer_list<T> t) const
 	        {
 	            return *m_first == t.size() && std::all_of(t.begin(), t.end(), predshape<T, S>(m_first + 1, m_last));
 	        }

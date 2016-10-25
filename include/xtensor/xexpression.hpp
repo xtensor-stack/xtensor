@@ -71,8 +71,9 @@ namespace xt
     template <class T>
     class xscalar;
 
+    // Workaround for buggy error C2210 in VS2015 when using condtional_t
     template <class E>
-    using get_xexpression_type = std::conditional_t<is_xexpression<E>::value, E, xscalar<E>>;
+    using get_xexpression_type = typename std::conditional<is_xexpression<E>::value, E, xscalar<E>>::type;
 
     /*******************
      * get_xexpression *

@@ -27,13 +27,13 @@ namespace xt
         void operator()(T t)
         {
             if(std::is_same<T, short>::value)
-                a = t;
+                a = static_cast<short>(t);
             else if(std::is_same<T, int>::value)
-                b = t;
+                b = static_cast<int>(t);
             else if(std::is_same<T, float>::value)
-                c = t;
+                c = static_cast<float>(t);
             else if(std::is_same<T, double>::value)
-                d = t;
+                d = static_cast<double>(t);
         }
     };
 
@@ -42,7 +42,7 @@ namespace xt
         for_each_fn fn;
         short a = 1;
         int b = 4;
-        float c = 1.2;
+        float c = float(1.2);
         double d = 2.3;
         auto t = std::make_tuple(a, b, c, d);
         for_each(fn, t);

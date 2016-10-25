@@ -24,9 +24,10 @@ namespace xt
 
     public:
 
-
+        // Yes, really. std::enable_if<true> as a workaround to MSVC madness.
+        // (buggy error C2210 when mixing parameter packs and template aliases)
         template <class... E>
-        using get_xfunction_type = xfunction<F, R, get_xexpression_type<E>...>;
+        using get_xfunction_type = std::enable_if_t<true, xfunction<F, R, get_xexpression_type<E>...>>;
 
         template <class Func>
         explicit xvectorizer(Func&& f);

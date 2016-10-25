@@ -19,14 +19,18 @@ namespace xt
     {
         xshape<size_t> shape = {3 ,2};
         xarray<double> a(shape, 4.5);
-        EXPECT_EQ((+a)(0, 0), +(a(0, 0)));
+		double ref = +(a(0, 0));
+		double actual = (+a)(0, 0);
+        EXPECT_EQ(ref, actual);
     }
 
     TEST(operation, minus)
     {
         xshape<size_t> shape = {3 ,2};
         xarray<double> a(shape, 4.5);
-        EXPECT_EQ((-a)(0, 0), -(a(0, 0)));
+		double ref = -(a(0, 0));
+		double actual = (-a)(0, 0);
+        EXPECT_EQ(ref, actual);
     }
 
     TEST(operation, add)
