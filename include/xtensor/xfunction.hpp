@@ -44,6 +44,17 @@ namespace xt
      * xfunction *
      *************/
 
+    /**
+     * @class xfunction
+     * @brief Multidimensional function operating on xexpression.
+     *
+     * Th xfunction class implements a multidimensional function
+     * operating on xexpression.
+     *
+     * @tparam F the function type
+     * @tparam R the return type of the function
+     * @tparam E the argument list of the function
+     */
     template <class F, class R, class... E>
     class xfunction : public xexpression<xfunction<F, R, E...>>
     {
@@ -72,11 +83,12 @@ namespace xt
         xfunction(Func&& f, const E&...e) noexcept;
 
         size_type dimension() const;
-        bool broadcast_shape(shape_type& shape) const;
-        bool is_trivial_broadcast(const strides_type& strides) const;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
+
+        bool broadcast_shape(shape_type& shape) const;
+        bool is_trivial_broadcast(const strides_type& strides) const;
 
         const_iterator begin() const;
         const_iterator end() const;
@@ -230,20 +242,65 @@ namespace xt
         }
     }
 
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Constructs an xfunction applying the specified function to the given
+     * arguments.
+     * @param f the function to apply
+     * @param e the \ref xexpression arguments
+     */
     template <class F, class R, class... E>
     template <class Func>
     inline xfunction<F, R, E...>::xfunction(Func&& f, const E&... e) noexcept
         : m_f(std::forward<Func>(f)), m_e(e...)
     {
     }
+    //@}
 
+    /**
+     * @name Size and shape
+     */
+    //@{
+    /**
+     * Returns the number of dimensions of the function.
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::dimension() const -> size_type
     {
         auto func = [](size_type d, auto&& e) { return std::max(d, e.dimension()); };
         return accumulate(func, size_type(0), m_e);
     }
+    //@}
 
+    /**
+     * @name Data
+     */
+    /**
+     * Returns a constant reference to the element at the specified position in the function.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the function.
+     */
+    template <class F, class R, class... E>
+    template <class... Args>
+    inline auto xfunction<F, R, E...>::operator()(Args... args) const -> const_reference
+    {
+        return access_impl(std::make_index_sequence<sizeof...(E)>(), args...);
+    }
+    //@}
+    
+    /**
+     * @name Broadcasting
+     */
+    //@{
+    /**
+     * Broadcast the shape of the function to the specified parameter.
+     * @param shape the result shape
+     * @return a boolean indicating whether the broadcast is trivial
+     */
     template <class F, class R, class... E>
     inline bool xfunction<F, R, E...>::broadcast_shape(shape_type& shape) const
     {
@@ -252,20 +309,26 @@ namespace xt
         return accumulate(func, true, m_e);
     }
 
+    /**
+     * Compares the specified strides with those of the container to see wether
+     * the broadcast is trivial.
+     * @return a boolean indicating whether the broadcast is trivial
+     */
     template <class F, class R, class... E>
     inline bool xfunction<F, R, E...>::is_trivial_broadcast(const strides_type& strides) const
     {
         auto func = [&strides](bool b, auto&& e) { return b && e.is_trivial_broadcast(strides); };
         return accumulate(func, true, m_e);
     }
+    //@}
 
-    template <class F, class R, class... E>
-    template <class... Args>
-    inline auto xfunction<F, R, E...>::operator()(Args... args) const -> const_reference
-    {
-        return access_impl(std::make_index_sequence<sizeof...(E)>(), args...);
-    }
-
+    /**
+     * @name Iterators
+     */
+    //@{
+    /**
+     * Returns a constant iterator to the first element of the function.
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::begin() const -> const_iterator
     {
@@ -274,6 +337,10 @@ namespace xt
         return xbegin(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the function.
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::end() const -> const_iterator
     {
@@ -282,41 +349,69 @@ namespace xt
         return xend(shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the function.
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::cbegin() const -> const_iterator
     {
         return begin();
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the function.
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::cend() const -> const_iterator
     {
         return end();
     }
 
+    /**
+     * Returns a constant iterator to the first element of the function. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for braodcasting
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::xbegin(const shape_type& shape) const -> const_iterator
     {
         return const_iterator(stepper_begin(shape), shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * function. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::xend(const shape_type& shape) const -> const_iterator
     {
         return const_iterator(stepper_end(shape), shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the function. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for braodcasting
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::cxbegin(const shape_type& shape) const -> const_iterator
     {
         return xbegin(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * function. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::cxend(const shape_type& shape) const -> const_iterator
     {
         return xend(shape);
     }
+    //@}
 
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::stepper_begin(const shape_type& shape) const -> const_stepper
@@ -332,6 +427,13 @@ namespace xt
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
     }
 
+    /**
+     * @name Storage iterators
+     */
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the function.
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::storage_begin() const -> const_storage_iterator
     {
@@ -339,12 +441,17 @@ namespace xt
         return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
 
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the function.
+     */
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::storage_end() const -> const_storage_iterator
     {
         auto f = [](const auto& e) { return e.storage_end(); };
         return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
+    //@}
 
     template <class F, class R, class... E>
     template <std::size_t... I, class... Args>

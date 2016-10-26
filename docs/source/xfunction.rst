@@ -9,4 +9,5 @@ xfunction
 
 .. doxygenclass:: xt::xfunction
    :project: xtensor
+   :members:
 
