@@ -4,9 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+API reference
+=============
 
 .. toctree::
 
-   api_reference
+   xexpression
+   xarray
+   xview
+   xfunction
+   xmath

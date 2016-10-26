@@ -385,7 +385,7 @@ namespace xt
      * with the specified shape and layout.
      * @param data the container to adapt
      * @param shape the shape of the xarray_adaptor
-     * @adaptor l the layout of the xarray_adaptor
+     * @param l the layout of the xarray_adaptor
      */
     template <class C>
     inline xarray_adaptor<C>::xarray_adaptor(container_type& data, const shape_type& shape, layout l)
@@ -399,7 +399,7 @@ namespace xt
      * with the specified shape and strides.
      * @param data the container to adapt
      * @param shape the shape of the xarray_adaptor
-     * @adaptor strides the strides of the xarray_adaptor
+     * @param strides the strides of the xarray_adaptor
      */
     template <class C>
     inline xarray_adaptor<C>::xarray_adaptor(container_type& data, const shape_type& shape, const strides_type& strides)
