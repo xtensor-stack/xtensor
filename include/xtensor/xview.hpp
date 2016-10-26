@@ -36,6 +36,17 @@ namespace xt
         using temporary_type = xarray<typename E::value_type>;
     };
 
+    /**
+     * @class xview
+     * @brief Multidimensional view with tensor semantic.
+     *
+     * The xview class implements a multidimensional view with tensor
+     * semantic. It is used to adapt the shape of an xexpression without
+     * changing it.
+     *
+     * @tparam E the expression type to adapt
+     * @tparam S the slices type describing the shape adaptation
+     */
     template <class E, class... S>
     class xview : public xview_semantic<xview<E, S...>>
     {
@@ -239,6 +250,15 @@ namespace xt
      * xview implementation *
      ************************/
 
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Constructs a view on the specified xexpression.
+     * @param e the xexpression to adapt
+     * @param slices the slices list describing the view
+     */
     template <class E, class... S>
     template <class... SL>
     inline xview<E, S...>::xview(E& e, SL&&... slices) noexcept
@@ -259,32 +279,65 @@ namespace xt
             }
         }
     }
+    //@}
 
+    /**
+     * @name Extended copy semantic
+     */
+    //@{
+    /**
+     * The extended assignment operator.
+     */
     template <class E, class... S>
     template <class OE>
     inline auto xview<E, S...>::operator=(const xexpression<OE>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
+    //@}
 
+    /**
+     * @name Size and shape
+     */
+    //@{
+    /**
+     * Returns the number of dimensions of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::dimension() const noexcept -> size_type
     {
         return m_e.dimension() - integral_count<S...>();
     }
 
+    /**
+     * Returns the shape of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
 
+    /**
+     * Returns the slices of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::slices() const noexcept -> const slice_type&
     {
         return m_slices;
     }
+    //@}
 
+    /**
+     * @name Data
+     */
+    //@{
+    /**
+     * Returns a reference to the element at the specified position in the view.
+     * @param args a list of indices specifying the position in the voew. Indices
+     * must be unsigned integers, the number of indices should be equal or greater
+     * than the number of dimensions of the view.
+     */
     template <class E, class... S>
     template <class... Args>
     inline auto xview<E, S...>::operator()(Args... args) -> reference
@@ -292,24 +345,46 @@ namespace xt
         return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the view.
+     * @param args a list of indices specifying the position in the view. Indices must be
+     * unsigned integers, the number of indices should be equal or greater than the number
+     * of dimensions of the view.
+     */
     template <class E, class... S>
     template <class... Args>
     inline auto xview<E, S...>::operator()(Args... args) const -> const_reference
     {
         return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
     }
+    //@}
 
+    /**
+     * @name Broadcasting
+     */
+    //@{
+    /**
+     * Broadcast the shape of the view to the specified parameter.
+     * @param shape the result shape
+     * @return a boolean indicating whether the broadcast is trivial
+     */
     template <class E, class... S>
     inline bool xview<E, S...>::broadcast_shape(shape_type& shape) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
 
+    /**
+     * Compares the specified strides with those of the view to see wether
+     * the broadcast is trivial.
+     * @return a boolean indicating whether the broadcast is trivial
+     */
     template <class E, class... S>
     inline bool xview<E, S...>::is_trivial_broadcast(const strides_type& strides) const
     {
         return false;
     }
+    //@}
 
     template <class E, class... S>
     template <typename E::size_type... I, class... Args>
@@ -369,77 +444,133 @@ namespace xt
      * iterator api *
      ****************/
 
+    /**
+     * @name Iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::begin() -> iterator
     {
         return xbegin(shape());
     }
 
+    /**
+     * Returns an iterator to the element following the last element
+     * of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::end() -> iterator
     {
         return xend(shape());
     }
 
+    /**
+     * Returns a constant iterator to the first element of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::begin() const -> const_iterator
     {
         return xbegin(shape());
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::end() const -> const_iterator
     {
         return xend(shape());
     }
 
+    /**
+     * Returns a constant iterator to the first element of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::cbegin() const -> const_iterator
     {
         return begin();
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::cend() const -> const_iterator
     {
         return end();
     }
 
+    /**
+     * Returns an iterator to the first element of the view. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for braodcasting
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::xbegin(const shape_type& shape) -> iterator
     {
         return iterator(stepper_begin(shape), shape);
     }
 
+    /**
+     * Returns an iterator to the element following the last element of the
+     * view. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::xend(const shape_type& shape) -> iterator
     {
         return iterator(stepper_end(shape), shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the view. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for braodcasting
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::xbegin(const shape_type& shape) const -> const_iterator
     {
         return const_iterator(stepper_begin(shape), shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * view. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::xend(const shape_type& shape) const -> const_iterator
     {
         return const_iterator(stepper_end(shape), shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the view. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for braodcasting
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::cxbegin(const shape_type& shape) const -> const_iterator
     {
         return xbegin(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * container. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::cxend(const shape_type& shape) const -> const_iterator
     {
         return xend(shape);
     }
+    //@}
 
     /***************
      * stepper api *
@@ -479,29 +610,50 @@ namespace xt
      * storage_iterator api *
      ************************/
 
+    /**
+     * @name Storage iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the buffer containing
+     * the elements of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::storage_begin() -> storage_iterator
     {
         return begin();
     }
 
+    /**
+     * Returns an iterator to the element following the last element of
+     * the buffer containing the elements of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::storage_end() -> storage_iterator
     {
         return end();
     }
 
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::storage_begin() const -> const_storage_iterator
     {
         return begin();
     }
 
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the view.
+     */
     template <class E, class... S>
     inline auto xview<E, S...>::storage_end() const -> const_storage_iterator
     {
         return end();
     }
+    //@}
 
     /********************************
      * xview_stepper implementation *
