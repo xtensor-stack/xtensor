@@ -16,6 +16,18 @@
 namespace xt
 {
 
+    /**
+     * @class xexpression
+     * @brief Base class for xexpressions
+     *
+     * The xexpression class is the base class for all classes representing an expression
+     * that can be evaluated to a multidimensional container with tensor semantic.
+     * Functions that can apply to any xexpression regardless of its specific type should take a
+     * xexpression argument.
+     *
+     * \tparam E The derived type.
+     *
+     */
     template <class D>
     class xexpression
     {
@@ -43,17 +55,28 @@ namespace xt
      * xexpression implementation *
      ******************************/
 
+    /**
+     * @name Downcast functions
+     */
+    //@{
+    /**
+     * Returns a reference to the actual derived type of the xexpression.
+     */
     template <class D>
     inline auto xexpression<D>::derived_cast() noexcept -> derived_type&
     {
         return *static_cast<derived_type*>(this);
     }
 
+    /**
+     * Returns a constant reference to the actual derived type of the xexpression.
+     */
     template <class D>
     inline auto xexpression<D>::derived_cast() const noexcept -> const derived_type&
     {
         return *static_cast<const derived_type*>(this);
     }
+    //@}
 
     template <class E>
     using is_xexpression = std::is_base_of<xexpression<E>, E>;

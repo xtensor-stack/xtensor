@@ -15,6 +15,16 @@
 namespace xt
 {
 
+    /**
+     * @class xsemantic_base
+     * @brief Base interface for assignable xexpressions.
+     *
+     * The xsemantic_base class defines the interface for assignable
+     * xexpressions.
+     *
+     * @tparam D The derived type, i.e. the inheriting class for which xsemantic_base
+     *           provides the interface.
+     */
     template <class D>
     class xsemantic_base : public xexpression<D>
     {
@@ -81,6 +91,17 @@ namespace xt
     };
 
 
+    /**
+     * @class xarray_semantic
+     * @brief Implementation of the xsemantic_base interface
+     * for dense multidimensional containers.
+     *
+     * The xarray_semantic class is an implementation of the
+     * xsemantic_base interface for dense multidimensional
+     * containers.
+     *
+     * @tparam D the derived type
+     */
     template <class D>
     class xarray_semantic : public xsemantic_base<D>
     {
@@ -118,6 +139,17 @@ namespace xt
     };
 
 
+    /**
+     * @class xadaptor_semantic
+     * @brief Implementation of the xsemantic_base interface
+     * for dense multidimensional container adaptors.
+     *
+     * The xadaptor_semantic class is an implementation of the
+     * xsemantic_base interface for dense multidimensional
+     * container adaptors.
+     *
+     * @tparam D the derived type
+     */
     template <class D>
     class xadaptor_semantic : public xsemantic_base<D>
     {
@@ -154,6 +186,17 @@ namespace xt
         derived_type& operator=(const xexpression<E>&);
     };
 
+
+    /**
+     * @class xview_semantic
+     * @brief Implementation of the xsemantic_base interface for
+     * multidimensional views
+     *
+     * The xview_semantic is an implementation of the xsemantic_base
+     * interface for multidimensional views.
+     *
+     * @tparam D the derived type
+     */
     template <class D>
     class xview_semantic : public xsemantic_base<D>
     {
@@ -194,6 +237,15 @@ namespace xt
      * xsemantic_base implementation *
      *********************************/
 
+    /**
+     * @name Computed assignement
+     */
+    //@{
+    /**
+     * Adds the scalar \c e to \c *this.
+     * @param e the scalar to add.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator+=(const E& e) -> disable_xexpression<E, derived_type&>
@@ -201,6 +253,11 @@ namespace xt
         return this->derived_cast().scalar_computed_assign(e, std::plus<>());
     }
 
+    /**
+     * Subtracts the scalar \c e from \c *this.
+     * @param e the scalar to subtract.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator-=(const E& e) -> disable_xexpression<E, derived_type&>
@@ -208,6 +265,11 @@ namespace xt
         return this->derived_cast().scalar_computed_assign(e, std::minus<>());
     }
 
+    /**
+     * Multiplies \c *this with the scalar \c e.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator*=(const E& e) -> disable_xexpression<E, derived_type&>
@@ -215,6 +277,11 @@ namespace xt
         return this->derived_cast().scalar_computed_assign(e, std::multiplies<>());
     }
 
+    /**
+     * Divides \c *this by the scalar \c e.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator/=(const E& e) -> disable_xexpression<E, derived_type&>
@@ -222,6 +289,11 @@ namespace xt
         return this->derived_cast().scalar_computed_assign(e, std::divides<>());
     }
 
+    /**
+     * Adds the xexpression \c e to \c *this.
+     * @param e the xexpression to add.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator+=(const xexpression<E>& e) -> derived_type&
@@ -229,6 +301,11 @@ namespace xt
         return operator=(this->derived_cast() + e.derived_cast());
     }
 
+    /**
+     * Subtracts the xexpression \c e from \c *this.
+     * @param e the xexpression to subtract.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator-=(const xexpression<E>& e) -> derived_type&
@@ -236,6 +313,11 @@ namespace xt
         return operator=(this->derived_cast() - e.derived_cast());
     }
 
+    /**
+     * Multiplies \c *this with the xexpression \c e.
+     * @param e the xexpression involved in the operation.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator*=(const xexpression<E>& e) -> derived_type&
@@ -243,13 +325,28 @@ namespace xt
         return operator=(this->derived_cast() * e.derived_cast());
     }
 
+    /**
+     * Divides \c *this by the xexpression \c e.
+     * @param e the xexpression involved in the operation.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator/=(const xexpression<E>& e) -> derived_type&
     {
         return operator=(this->derived_cast() / e.derived_cast());
     }
+    //@}
 
+    /**
+     * @name Assign functions
+     */
+    /**
+     * Assigns the xexpression \c e to \c *this. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression to assign.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::assign(const xexpression<E>& e) -> derived_type&
@@ -257,6 +354,12 @@ namespace xt
         return this->derived_cast().assign_xexpression(e);
     }
 
+    /**
+     * Adds the xexpression \c e to \c *this. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression to add.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::plus_assign(const xexpression<E>& e) -> derived_type&
@@ -264,6 +367,12 @@ namespace xt
         return this->derived_cast().computed_assign(this->derived_cast() + e.derived_cast());
     }
 
+    /**
+     * Subtracts the xexpression \c e to \c *this. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression to subtract.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::minus_assign(const xexpression<E>& e) -> derived_type&
@@ -271,6 +380,12 @@ namespace xt
         return this->derived_cast().computed_assign(this->derived_cast() - e.derived_cast());
     }
 
+    /**
+     * Multiplies \c *this with the xexpression \c e. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression involved in the operation.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::multiplies_assign(const xexpression<E>& e) -> derived_type&
@@ -278,6 +393,12 @@ namespace xt
         return this->derived_cast().computed_assign(this->derived_cast() * e.derived_cast());
     }
 
+    /**
+     * Divides \c *this by the xexpression \c e. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression involved in the operation.
+     * @return a reference to \c *this.
+     */
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::divides_assign(const xexpression<E>& e) -> derived_type&
@@ -297,6 +418,11 @@ namespace xt
      * xarray_semantic implementation *
      **********************************/
 
+    /**
+     * Assigns the temporary \c tmp to \c *this.
+     * @param tmp the temporary to assign.
+     * @return a reference to \c *this.
+     */
     template <class D>
     inline auto xarray_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
     {
@@ -340,6 +466,11 @@ namespace xt
      * xadaptor_semantic implementation *
      ************************************/
 
+    /**
+     * Assigns the temporary \c tmp to \c *this.
+     * @param tmp the temporary to assign.
+     * @return a reference to \c *this.
+     */
     template <class D>
     inline auto xadaptor_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
     {
@@ -382,6 +513,11 @@ namespace xt
      * xview_semantic implementation *
      *********************************/
 
+    /**
+     * Assigns the temporary \c tmp to \c *this.
+     * @param tmp the temporary to assign.
+     * @return a reference to \c *this.
+     */
     template <class D>
     inline auto xview_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
     {
