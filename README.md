@@ -1,6 +1,6 @@
 # xtensor
 
-C++ tensor algebra.
+Multi-dimensional arrays with broadcasting and lazy computing.
 
 ## Introduction
 
@@ -33,29 +33,54 @@ conda install -c conda-forge xtensor
 
 ### Basic Usage
 
-Initialize a 2-D array and computing the sum of one of its rows and a 1-D array.
+- Initialize a 2-D array and compute the sum of one of its rows and a 1-D array.
 
-```cpp
-#include <iostream>
-#include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
+  ```cpp
+  #include <iostream>
+  #include "xtensor/xarray.hpp"
+  #include "xtensor/xio.hpp"
 
-xt::array<double> arr1
-  {{1.0, 2.0, 3.0},
-   {2.0, 5.0, 7.0},
-   {2.0, 5.0, 7.0}};
+  xt::xarray<double> arr1
+    {{1.0, 2.0, 3.0},
+     {2.0, 5.0, 7.0},
+     {2.0, 5.0, 7.0}};
 
-xt::array<double> arr2
-  {5.0, 6.0, 7.0};
+  xt::xarray<double> arr2
+    {5.0, 6.0, 7.0};
 
-std::cout << xt::make_xview(arr, 1) + arr2;
-```
+  xt::xarray<double> res = xt::make_xview(arr1, 1) + arr2;
 
-Outputs:
+  std::cout << res;
+  ```
 
-```
-{7.0, 11.0, 14.0}
-```
+  Outputs:
+
+  ```
+  {7, 11, 14}
+  ```
+
+- Initialize a 1-D array and reshape it inplace.
+
+  ```cpp
+  #include <iostream>
+  #include "xtensor/xarray.hpp"
+  #include "xtensor/xio.hpp"
+
+  xt::xarray<int> arr
+    {1, 2, 3, 4, 5, 6, 7, 8, 9};
+  
+  arr.reshape({3, 3});
+  
+  std::cout << arr;
+  ```
+
+  Outputs:
+
+  ```
+  {{1, 2, 3},
+   {4, 5, 6},
+   {7, 8, 9}}
+  ```
 
 ## Lazy Broadcasting with `xtensor`
 
@@ -74,7 +99,7 @@ For example, if `A` has shape `(2, 3)`, and `B` has shape `(4, 2, 3)`, the resul
 (4, 2, 3) # Result
 ```
 
-The same rule holds for scalars, which are handled as 0-D expressions. If `A` is scalar, the equation becomes:
+The same rule holds for scalars, which are handled as 0-D expressions. If `A` is a scalar, the equation becomes:
 
 ```
        () # A
@@ -83,7 +108,7 @@ The same rule holds for scalars, which are handled as 0-D expressions. If `A` is
 (4, 2, 3) # Result
 ```
 
-If matched up dimensions of two input arrays are different, and one of them has size 1, it is broadcast to match the size of the other. Let's say B has the shape (4, 2, 1) in the previous example, so the broadcasting happens as follows:
+If matched up dimensions of two input arrays are different, and one of them has size `1`, it is broadcast to match the size of the other. Let's say B has the shape `(4, 2, 1)` in the previous example, so the broadcasting happens as follows:
 
 ```
    (2, 3) # A
@@ -94,9 +119,9 @@ If matched up dimensions of two input arrays are different, and one of them has 
 
 ### Universal functions, Laziness and Vectorization
 
-With `xtensor`, if `x`, `y` and `z` are arrays of *broadcastable shapes*, the return type of an expression like `x + y * sin(z)` is **not an array**. It is an `xexpression` object offering the same interface as an N-dimensional array, which does not hold the result. **Values are only computed upon access or when the expression is assigned to an xarray object**. This allows to operate symbolically on very large arrays and then only compute the result on the area of interest.
+With `xtensor`, if `x`, `y` and `z` are arrays of *broadcastable shapes*, the return type of an expression such as `x + y * sin(z)` is **not an array**. It is an `xexpression` object offering the same interface as an N-dimensional array, which does not hold the result. **Values are only computed upon access or when the expression is assigned to an xarray object**. This allows to operate symbolically on very large arrays and only compute the result for the indices of interest.
 
-We provide utilities to **vectorize any scalar function** (taking multiple scalar argument) into a function that will perform on `xexpression`s, apply the lazy broadcasting rules which we just described. Such functions are called *xfunction*s. They are `xtensor`'s counterpart to numpy's universal functions.
+We provide utilities to **vectorize any scalar function** (taking multiple scalar arguments) into a function that will perform on `xexpression`s, applying the lazy broadcasting rules which we just described. These functions are called *xfunction*s. They are `xtensor`'s counterpart to numpy's universal functions.
 
 In `xtensor`, arithmetic operations (`+`, `-`, `*`, `/`) and all special functions are *xfunction*s.
 
@@ -111,7 +136,7 @@ All `xexpression`s offer two sets of functions to retrieve iterator pairs (and t
 
 Building the tests requires the [GTest](https://github.com/google/googletest) testing framework and [cmake](https://cmake.org).
 
-gtest and cmake are available as a packages for most linux distributions. They can also be installed with the `conda` package manager:
+gtest and cmake are available as a packages for most linux distributions. Besideds, they can also be installed with the `conda` package manager (even on windows):
 
 ```bash
 conda install -c conda-forge gtest cmake
