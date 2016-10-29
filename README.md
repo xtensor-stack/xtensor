@@ -19,7 +19,7 @@ The implementation of the containers of `xtensor` is inspired by [NumPy](http://
  - On Windows platforms, Visual C++ 2015 Update 2, or more recent
  - On Unix platforms, gcc 4.9 or a recent version of Clang
 
-<!---
+<!--
 ## Installation
 
 `xtensor` is a header-only library. We provide a package for the conda package manager.
@@ -27,60 +27,60 @@ The implementation of the containers of `xtensor` is inspired by [NumPy](http://
 ```bash
 conda install -c conda-forge xtensor
 ```
---->
+-->
 
 ## Usage
 
 ### Basic Usage
 
-- Initialize a 2-D array and compute the sum of one of its rows and a 1-D array.
+**Initialize a 2-D array and compute the sum of one of its rows and a 1-D array.**
 
-  ```cpp
-  #include <iostream>
-  #include "xtensor/xarray.hpp"
-  #include "xtensor/xio.hpp"
+```cpp
+#include <iostream>
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
 
-  xt::xarray<double> arr1
-    {{1.0, 2.0, 3.0},
-     {2.0, 5.0, 7.0},
-     {2.0, 5.0, 7.0}};
+xt::xarray<double> arr1
+  {{1.0, 2.0, 3.0},
+   {2.0, 5.0, 7.0},
+   {2.0, 5.0, 7.0}};
 
-  xt::xarray<double> arr2
-    {5.0, 6.0, 7.0};
+xt::xarray<double> arr2
+  {5.0, 6.0, 7.0};
 
-  xt::xarray<double> res = xt::make_xview(arr1, 1) + arr2;
+xt::xarray<double> res = xt::make_xview(arr1, 1) + arr2;
 
-  std::cout << res;
-  ```
+std::cout << res;
+```
 
-  Outputs:
+Outputs:
 
-  ```
-  {7, 11, 14}
-  ```
+```
+{7, 11, 14}
+```
 
-- Initialize a 1-D array and reshape it inplace.
+**Initialize a 1-D array and reshape it inplace.**
 
-  ```cpp
-  #include <iostream>
-  #include "xtensor/xarray.hpp"
-  #include "xtensor/xio.hpp"
+```cpp
+#include <iostream>
+#include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
 
-  xt::xarray<int> arr
-    {1, 2, 3, 4, 5, 6, 7, 8, 9};
-  
-  arr.reshape({3, 3});
-  
-  std::cout << arr;
-  ```
+xt::xarray<int> arr
+  {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-  Outputs:
+arr.reshape({3, 3});
 
-  ```
-  {{1, 2, 3},
-   {4, 5, 6},
-   {7, 8, 9}}
-  ```
+std::cout << arr;
+```
+
+Outputs:
+
+```
+{{1, 2, 3},
+ {4, 5, 6},
+ {7, 8, 9}}
+```
 
 ## Lazy Broadcasting with `xtensor`
 
