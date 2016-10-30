@@ -65,7 +65,9 @@ namespace xt
         using functor_type = F;
 
         using value_type = R;
+        using reference = value_type;
         using const_reference = value_type;
+        using pointer = value_type*;
         using const_pointer = const value_type*;
         // Workaround for buggy error C2210 in VS2015
         using size_type = std::common_type_t<typename E::size_type...>; // detail::common_size_type<E...>;
@@ -105,6 +107,8 @@ namespace xt
 
         const_storage_iterator storage_begin() const;
         const_storage_iterator storage_end() const;
+
+        shape_type shape() const;
 
     private:
 
@@ -227,10 +231,10 @@ namespace xt
 
     namespace detail
     {
-        template <class E, class S>
-        inline typename E::const_reference get_element(const E& e, S i)
+        template <class E>
+        inline typename E::const_reference get_element(const E& e)
         {
-            return e(i);
+            return e();
         }
 
         template <class E, class S, class... Args>
@@ -450,6 +454,18 @@ namespace xt
     {
         auto f = [](const auto& e) { return e.storage_end(); };
         return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
+    }
+    //@}
+
+    /**
+     * Returns the shape of the xfunction.
+     */
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::shape() const -> shape_type
+    {
+        shape_type shape(dimension(), size_type(1));
+        broadcast_shape(shape);
+        return shape;
     }
     //@}
 
