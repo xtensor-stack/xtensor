@@ -41,3 +41,6 @@ test/cmake_install.cmake
 docs/CMakeCache.txt
 docs/xml/
 docs/build/
+
+# Jupyter artefacts
+.ipynb_checkpoints/

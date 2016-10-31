@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="189"
+   height="51"
+   viewBox="0 0 189 51.000001"
+   id="svg4217"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="cling-logo.svg">
+  <defs
+     id="defs4219" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="3.959798"
+     inkscape:cx="64.383384"
+     inkscape:cy="14.089732"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     units="px"
+     inkscape:window-width="1726"
+     inkscape:window-height="686"
+     inkscape:window-x="174"
+     inkscape:window-y="73"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata4222">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-1001.3622)">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:33.72947693px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#5a5a5a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="66.600609"
+       y="1037.5299"
+       id="text4765"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4767"
+         x="66.600609"
+         y="1037.5299"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#5a5a5a;fill-opacity:1">Cling</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:43.04484558px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="22.313026"
+       y="1033.6368"
+       id="text4773"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4775"
+         x="22.313026"
+         y="1033.6368"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#ff0000;fill-opacity:1">+</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:43.04484558px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="31.455755"
+       y="1047.4022"
+       id="text4773-2"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan4775-5"
+         x="31.455755"
+         y="1047.4022"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#008500;fill-opacity:1">+</tspan></text>
+  </g>
+</svg>
