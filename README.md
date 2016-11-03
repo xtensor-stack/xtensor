@@ -1,5 +1,8 @@
 # xtensor
 
+[![Build Status](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
+[![Documentation Status](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
+
 Multi-dimensional arrays with broadcasting and lazy computing.
 
 ## Introduction
