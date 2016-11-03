@@ -1,0 +1,8 @@
+name: xtensor
+channels:
+  - nodefaults
+  - conda-forge
+  - SylvainCorlay
+dependencies:
+  - cling >=0.0.3
+  - xtensor
