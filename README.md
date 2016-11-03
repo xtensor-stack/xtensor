@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Documentation Status](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
+[![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/QuantStack/xtensor/notebooks/xtensor.ipynb)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
 
