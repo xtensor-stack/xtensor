@@ -26,8 +26,8 @@ install:
   - cd test
   - conda env create -f .\test-environment.yml
   - activate test-xtensor
-  #- cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -D CMAKE_BUILD_TYPE=Release .
-  #- nmake
+  - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -D CMAKE_BUILD_TYPE=Release .
+  - nmake
 
 test_script:
   #- .\text_xtensor
