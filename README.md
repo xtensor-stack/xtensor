@@ -1,6 +1,7 @@
 # xtensor
 
-[![Build Status](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
+[![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/8dpc5tx1m9lftt59?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
 [![Documentation Status](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
 [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/QuantStack/xtensor/notebooks/notebooks/xtensor.ipynb)
 
@@ -23,7 +24,6 @@ The implementation of the containers of `xtensor` is inspired by [NumPy](http://
  - On Windows platforms, Visual C++ 2015 Update 2, or more recent
  - On Unix platforms, gcc 4.9 or a recent version of Clang
 
-<!--
 ## Installation
 
 `xtensor` is a header-only library. We provide a package for the conda package manager.
@@ -31,7 +31,6 @@ The implementation of the containers of `xtensor` is inspired by [NumPy](http://
 ```bash
 conda install -c conda-forge xtensor
 ```
--->
 
 ## Usage
 
