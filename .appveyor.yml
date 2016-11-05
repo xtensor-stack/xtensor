@@ -4,6 +4,7 @@ os: Visual Studio 2015
 
 platform:
   - x64
+  - x86
 
 environment:
   matrix:
@@ -11,7 +12,7 @@ environment:
 
 init:
   - "ECHO %MINICONDA%"
-  - C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat amd64
+  - C:\"Program Files (x86)"\"Microsoft Visual Studio 14.0"\VC\vcvarsall.bat %PLATFORM%
   - ps: if($env:Platform -eq "x64"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86_64.exe' C:\Miniconda.exe; echo "Done"}
   - ps: if($env:Platform -eq "x86"){Start-FileDownload 'http://repo.continuum.io/miniconda/Miniconda3-latest-Windows-x86.exe' C:\Miniconda.exe; echo "Done"}
   - cmd: C:\Miniconda.exe /S /D=C:\xtensor-conda
@@ -21,13 +22,10 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda install pyyaml
-  - conda install gtest -c conda-forge
+  - conda install gtest cmake -c conda-forge
   - cd test
-  - conda env create -f .\test-environment.yml
-  - activate test-xtensor
-  #- cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -D CMAKE_BUILD_TYPE=Release .
-  #- nmake
+  - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -D CMAKE_BUILD_TYPE=Release .
+  - nmake
 
-test_script:
-  #- .\text_xtensor
+build_script:
+  - .\test_xtensor
