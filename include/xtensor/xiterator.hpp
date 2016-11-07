@@ -60,10 +60,11 @@ namespace xt
 
         using container_type = C;
         using subiterator_type = get_storage_iterator<C>;
-        using value_type = typename subiterator_type::value_type;
-        using reference = typename subiterator_type::reference;
-        using pointer = typename subiterator_type::pointer;
-        using difference_type = typename subiterator_type::difference_type;
+        using subiterator_traits = std::iterator_traits<subiterator_type>;
+        using value_type = typename subiterator_traits::value_type;
+        using reference = typename subiterator_traits::reference;
+        using pointer = typename subiterator_traits::pointer;
+        using difference_type = typename subiterator_traits::difference_type;
         using size_type = typename container_type::size_type;
 
         xstepper(container_type* c, subiterator_type it, size_type offset);
