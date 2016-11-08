@@ -14,7 +14,7 @@
 #include <vector>
 #include <algorithm>
 
-#include "xarray_base.hpp"
+#include "xcontainer.hpp"
 #include "xsemantic.hpp"
 
 namespace xt
@@ -45,14 +45,14 @@ namespace xt
      * @tparam T The type of objects stored in the container.
      */
     template <class T>
-    class xarray : public xarray_base<xarray<T>>,
+    class xarray : public xcontainer<xarray<T>>,
                    public xarray_semantic<xarray<T>>
     {
 
     public:
 
         using self_type = xarray<T>;
-        using base_type = xarray_base<self_type>;
+        using base_type = xcontainer<self_type>;
         using semantic_base = xarray_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
@@ -99,7 +99,7 @@ namespace xt
         container_type& data_impl();
         const container_type& data_impl() const;
 
-        friend class xarray_base<xarray<T>>;
+        friend class xcontainer<xarray<T>>;
     };
 
     /******************************
@@ -129,14 +129,14 @@ namespace xt
      * @tparam C The container type to adapt.
      */
     template <class C>
-    class xarray_adaptor : public xarray_base<xarray_adaptor<C>>,
+    class xarray_adaptor : public xcontainer<xarray_adaptor<C>>,
                            public xadaptor_semantic<xarray_adaptor<C>>
     {
 
     public:
 
         using self_type = xarray_adaptor<C>;
-        using base_type = xarray_base<self_type>;
+        using base_type = xcontainer<self_type>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
@@ -169,7 +169,7 @@ namespace xt
         using temporary_type = typename array_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type& tmp);
 
-        friend class xarray_base<xarray_adaptor<C>>;
+        friend class xcontainer<xarray_adaptor<C>>;
         friend class xadaptor_semantic<xarray_adaptor<C>>;
     };
 

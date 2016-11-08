@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XARRAY_BASE_HPP
-#define XARRAY_BASE_HPP
+#ifndef XCONTAINER_HPP
+#define XCONTAINER_HPP
 
 #include <functional>
 
@@ -26,18 +26,18 @@ namespace xt
     };
 
     /**
-     * @class xarray_base
+     * @class xcontainer
      * @brief Base class for dense multidimensional containers.
      *
-     * The xarray_base class defines the interface for dense multidimensional
+     * The xcontainer class defines the interface for dense multidimensional
      * container classes. It does not embed any data container, this responsibility
      * is delegated to the inheriting classes.
      *
-     * @tparam D The derived type, i.e. the inheriting class for which xarray_base
+     * @tparam D The derived type, i.e. the inheriting class for which xcontainer
      *           provides the interface.
      */
     template <class D>
-    class xarray_base
+    class xcontainer
     {
 
     public:
@@ -120,14 +120,14 @@ namespace xt
 
     protected:
 
-        xarray_base() = default;
-        ~xarray_base() = default;
+        xcontainer() = default;
+        ~xcontainer() = default;
 
-        xarray_base(const xarray_base&) = default;
-        xarray_base& operator=(const xarray_base&) = default;
+        xcontainer(const xcontainer&) = default;
+        xcontainer& operator=(const xcontainer&) = default;
 
-        xarray_base(xarray_base&&) = default;
-        xarray_base& operator=(xarray_base&&) = default;
+        xcontainer(xcontainer&&) = default;
+        xcontainer& operator=(xcontainer&&) = default;
 
         shape_type& get_shape();
         strides_type& get_strides();
@@ -144,35 +144,35 @@ namespace xt
     };
 
     template <class D1, class D2>
-    bool operator==(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs);
+    bool operator==(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs);
 
     template <class D1, class D2>
-    bool operator!=(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs);
+    bool operator!=(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs);
 
     /******************************
-     * xarray_base implementation *
+     * xcontainer implementation *
      ******************************/
 
     template <class D>
-    inline auto xarray_base<D>::get_shape() -> shape_type&
+    inline auto xcontainer<D>::get_shape() -> shape_type&
     {
         return m_shape;
     }
 
     template <class D>
-    inline auto xarray_base<D>::get_strides() -> strides_type&
+    inline auto xcontainer<D>::get_strides() -> strides_type&
     {
         return m_strides;
     }
 
     template <class D>
-    inline auto xarray_base<D>::get_backstrides() -> strides_type&
+    inline auto xcontainer<D>::get_backstrides() -> strides_type&
     {
         return m_backstrides;
     }
 
     template <class D>
-    inline void xarray_base<D>::adapt_strides()
+    inline void xcontainer<D>::adapt_strides()
     {
         for(size_type i = 0; i < m_shape.size(); ++i)
         {
@@ -181,7 +181,7 @@ namespace xt
     }
 
     template <class D>
-    inline void xarray_base<D>::adapt_strides(size_type i)
+    inline void xcontainer<D>::adapt_strides(size_type i)
     {
         if(m_shape[i] == 1)
         {
@@ -202,7 +202,7 @@ namespace xt
      * Returns the number of element in the container.
      */
     template <class D>
-    inline auto xarray_base<D>::size() const -> size_type
+    inline auto xcontainer<D>::size() const -> size_type
     {
         return data().size();
     }
@@ -211,7 +211,7 @@ namespace xt
      * Returns the number of dimensions of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::dimension() const -> size_type
+    inline auto xcontainer<D>::dimension() const -> size_type
     {
         return m_shape.size();
     }
@@ -220,7 +220,7 @@ namespace xt
      * Returns the shape of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::shape() const -> const shape_type&
+    inline auto xcontainer<D>::shape() const -> const shape_type&
     {
         return m_shape;
     }
@@ -229,7 +229,7 @@ namespace xt
      * Returns the strides of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::strides() const -> const strides_type&
+    inline auto xcontainer<D>::strides() const -> const strides_type&
     {
         return m_strides;
     }
@@ -238,7 +238,7 @@ namespace xt
      * Returns the backstrides of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::backstrides() const -> const strides_type&
+    inline auto xcontainer<D>::backstrides() const -> const strides_type&
     {
         return m_backstrides;
     }
@@ -248,7 +248,7 @@ namespace xt
      * @param shape the new shape
      */
     template <class D>
-    inline void xarray_base<D>::reshape(const shape_type& shape)
+    inline void xcontainer<D>::reshape(const shape_type& shape)
     {
         if(shape != m_shape)
         {
@@ -262,7 +262,7 @@ namespace xt
      * @param l the new layout
      */
     template <class D>
-    inline void xarray_base<D>::reshape(const shape_type& shape, layout l)
+    inline void xcontainer<D>::reshape(const shape_type& shape, layout l)
     {
         m_shape = shape;
         m_strides.resize(m_shape.size());
@@ -295,7 +295,7 @@ namespace xt
      * @param strides the new strides
      */
     template <class D>
-    inline void xarray_base<D>::reshape(const shape_type& shape, const strides_type& strides)
+    inline void xcontainer<D>::reshape(const shape_type& shape, const strides_type& strides)
     {
         m_shape = shape;
         m_strides = strides;
@@ -317,7 +317,7 @@ namespace xt
      */
     template <class D>
     template <class... Args>
-    inline auto xarray_base<D>::operator()(Args... args) -> reference
+    inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
         size_type index = data_offset(m_strides, static_cast<size_type>(args)...);
         return data()[index];
@@ -331,7 +331,7 @@ namespace xt
      */
     template <class D>
     template <class... Args>
-    inline auto xarray_base<D>::operator()(Args... args) const -> const_reference
+    inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
         size_type index = data_offset(m_strides, static_cast<size_type>(args)...);
         return data()[index];
@@ -341,7 +341,7 @@ namespace xt
      * Returns a reference to the buffer containing the elements of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::data() -> container_type&
+    inline auto xcontainer<D>::data() -> container_type&
     {
         return static_cast<derived_type*>(this)->data_impl();
     }
@@ -351,7 +351,7 @@ namespace xt
      * container.
      */
     template <class D>
-    inline auto xarray_base<D>::data() const -> const container_type&
+    inline auto xcontainer<D>::data() const -> const container_type&
     {
         return static_cast<const derived_type*>(this)->data_impl();
     }
@@ -367,7 +367,7 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class D>
-    inline bool xarray_base<D>::broadcast_shape(shape_type& shape) const
+    inline bool xcontainer<D>::broadcast_shape(shape_type& shape) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
@@ -378,7 +378,7 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class D>
-    inline bool xarray_base<D>::is_trivial_broadcast(const strides_type& str) const
+    inline bool xcontainer<D>::is_trivial_broadcast(const strides_type& str) const
     {
         return str == strides();
     }
@@ -396,7 +396,7 @@ namespace xt
      * Returns an iterator to the first element of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::begin() -> iterator
+    inline auto xcontainer<D>::begin() -> iterator
     {
         return xbegin(shape());
     }
@@ -406,7 +406,7 @@ namespace xt
      * of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::end() -> iterator
+    inline auto xcontainer<D>::end() -> iterator
     {
         return xend(shape());
     }
@@ -415,7 +415,7 @@ namespace xt
      * Returns a constant iterator to the first element of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::begin() const -> const_iterator
+    inline auto xcontainer<D>::begin() const -> const_iterator
     {
         return xbegin(shape());
     }
@@ -425,7 +425,7 @@ namespace xt
      * of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::end() const -> const_iterator
+    inline auto xcontainer<D>::end() const -> const_iterator
     {
         return xend(shape());
     }
@@ -434,7 +434,7 @@ namespace xt
      * Returns a constant iterator to the first element of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::cbegin() const -> const_iterator
+    inline auto xcontainer<D>::cbegin() const -> const_iterator
     {
         return begin();
     }
@@ -444,7 +444,7 @@ namespace xt
      * of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::cend() const -> const_iterator
+    inline auto xcontainer<D>::cend() const -> const_iterator
     {
         return end();
     }
@@ -455,7 +455,7 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class D>
-    inline auto xarray_base<D>::xbegin(const shape_type& shape) -> iterator
+    inline auto xcontainer<D>::xbegin(const shape_type& shape) -> iterator
     {
         return iterator(stepper_begin(shape), shape);
     }
@@ -466,7 +466,7 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class D>
-    inline auto xarray_base<D>::xend(const shape_type& shape) -> iterator
+    inline auto xcontainer<D>::xend(const shape_type& shape) -> iterator
     {
         return iterator(stepper_end(shape), shape);
     }
@@ -477,7 +477,7 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class D>
-    inline auto xarray_base<D>::xbegin(const shape_type& shape) const -> const_iterator
+    inline auto xcontainer<D>::xbegin(const shape_type& shape) const -> const_iterator
     {
         return const_iterator(stepper_begin(shape), shape);
     }
@@ -488,7 +488,7 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class D>
-    inline auto xarray_base<D>::xend(const shape_type& shape) const -> const_iterator
+    inline auto xcontainer<D>::xend(const shape_type& shape) const -> const_iterator
     {
         return const_iterator(stepper_end(shape), shape);
     }
@@ -499,7 +499,7 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class D>
-    inline auto xarray_base<D>::cxbegin(const shape_type& shape) const -> const_iterator
+    inline auto xcontainer<D>::cxbegin(const shape_type& shape) const -> const_iterator
     {
         return xbegin(shape);
     }
@@ -510,7 +510,7 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class D>
-    inline auto xarray_base<D>::cxend(const shape_type& shape) const -> const_iterator
+    inline auto xcontainer<D>::cxend(const shape_type& shape) const -> const_iterator
     {
         return xend(shape);
     }
@@ -521,28 +521,28 @@ namespace xt
      ***************/
 
     template <class D>
-    inline auto xarray_base<D>::stepper_begin(const shape_type& shape) -> stepper
+    inline auto xcontainer<D>::stepper_begin(const shape_type& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(static_cast<derived_type*>(this), data().begin(), offset);
     }
 
     template <class D>
-    inline auto xarray_base<D>::stepper_end(const shape_type& shape) -> stepper
+    inline auto xcontainer<D>::stepper_end(const shape_type& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(static_cast<derived_type*>(this), data().end(), offset);
     }
 
     template <class D>
-    inline auto xarray_base<D>::stepper_begin(const shape_type& shape) const -> const_stepper
+    inline auto xcontainer<D>::stepper_begin(const shape_type& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(static_cast<const derived_type*>(this), data().begin(), offset);
     }
 
     template <class D>
-    inline auto xarray_base<D>::stepper_end(const shape_type& shape) const -> const_stepper
+    inline auto xcontainer<D>::stepper_end(const shape_type& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(static_cast<const derived_type*>(this), data().end(), offset);
@@ -561,7 +561,7 @@ namespace xt
      * the elements of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::storage_begin() -> storage_iterator
+    inline auto xcontainer<D>::storage_begin() -> storage_iterator
     {
         return data().begin();
     }
@@ -571,7 +571,7 @@ namespace xt
      * the buffer containing the elements of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::storage_end() -> storage_iterator
+    inline auto xcontainer<D>::storage_end() -> storage_iterator
     {
         return data().end();
     }
@@ -581,7 +581,7 @@ namespace xt
      * containing the elements of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::storage_begin() const -> const_storage_iterator
+    inline auto xcontainer<D>::storage_begin() const -> const_storage_iterator
     {
         return data().begin();
     }
@@ -591,7 +591,7 @@ namespace xt
      * element of the buffer containing the elements of the container.
      */
     template <class D>
-    inline auto xarray_base<D>::storage_end() const -> const_storage_iterator
+    inline auto xcontainer<D>::storage_end() const -> const_storage_iterator
     {
         return data().end();
     }
@@ -602,28 +602,28 @@ namespace xt
      **************/
 
     /**
-     * @memberof xarray_base
+     * @memberof xcontainer
      * Compares the content of two containers.
      * @param lhs the first container
      * @param rhs the second container
      * @return true if the container are equals
      */
     template <class D1, class D2>
-    inline bool operator==(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs)
+    inline bool operator==(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs)
     {
         return lhs.shape() == rhs.shape() && lhs.strides() == rhs.strides()
             && lhs.data() == rhs.data();
     }
 
     /**
-     * @memberof xarray_base
+     * @memberof xcontainer
      * Compares the content of two containers.
      * @param lhs the first container
      * @param rhs the second container
      * @return true if the container are different
      */
     template <class D1, class D2>
-    inline bool operator!=(const xarray_base<D1>& lhs, const xarray_base<D2>& rhs)
+    inline bool operator!=(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs)
     {
         return !(lhs == rhs);
     }
