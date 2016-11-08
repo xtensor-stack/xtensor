@@ -73,8 +73,8 @@ namespace xt
         using size_type = std::common_type_t<typename E::size_type...>; // detail::common_size_type<E...>;
         using difference_type = std::common_type_t<typename E::difference_type...>; //detail::common_difference_type<E...>;
 
-        using shape_type = xshape<size_type>;
-        using strides_type = xstrides<size_type>;
+        using shape_type = std::vector<size_type>;
+        using strides_type = std::vector<size_type>;
         using closure_type = const self_type;
 
         using const_stepper = xfunction_stepper<F, R, E...>;
@@ -85,6 +85,7 @@ namespace xt
         xfunction(Func&& f, const E&...e) noexcept;
 
         size_type dimension() const;
+        shape_type shape() const;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -107,8 +108,6 @@ namespace xt
 
         const_storage_iterator storage_begin() const;
         const_storage_iterator storage_end() const;
-
-        shape_type shape() const;
 
     private:
 
@@ -195,6 +194,8 @@ namespace xt
         using difference_type = typename xfunction_type::difference_type;
         using iterator_category = std::input_iterator_tag;
 
+        using shape_type = typename xfunction_type::shape_type;
+
         template <class... It>
         xfunction_stepper(const xfunction_type* func, It&&... it);
 
@@ -276,6 +277,17 @@ namespace xt
     {
         auto func = [](size_type d, auto&& e) { return std::max(d, e.dimension()); };
         return accumulate(func, size_type(0), m_e);
+    }
+
+    /**
+     * Returns the shape of the xfunction.
+     */
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::shape() const -> shape_type
+    {
+        shape_type shape(dimension(), size_type(1));
+        broadcast_shape(shape);
+        return shape;
     }
     //@}
 
@@ -457,18 +469,6 @@ namespace xt
     }
     //@}
 
-    /**
-     * Returns the shape of the xfunction.
-     */
-    template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::shape() const -> shape_type
-    {
-        shape_type shape(dimension(), size_type(1));
-        broadcast_shape(shape);
-        return shape;
-    }
-    //@}
-
     template <class F, class R, class... E>
     template <std::size_t... I, class... Args>
     inline auto xfunction<F, R, E...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
@@ -525,7 +525,7 @@ namespace xt
     }
 
     template <class F, class R, class... E>
-    inline bool xf_storage_iterator<F, R, E...>::equal(const xf_storage_iterator& rhs) const
+    inline bool xf_storage_iterator<F, R, E...>::equal(const self_type& rhs) const
     {
         return p_f == rhs.p_f && m_it == rhs.m_it;
     }

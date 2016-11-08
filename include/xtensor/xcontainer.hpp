@@ -9,15 +9,17 @@
 #ifndef XCONTAINER_HPP
 #define XCONTAINER_HPP
 
+#include <numeric>
 #include <functional>
 
-#include "xindex.hpp"
 #include "xiterator.hpp"
 #include "xoperation.hpp"
 #include "xmath.hpp"
 
 namespace xt
 {
+    template <class C>
+    struct array_inner_types;
 
     enum class layout
     {
@@ -54,8 +56,8 @@ namespace xt
         using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
 
-        using shape_type = xshape<size_type>;
-        using strides_type = xstrides<size_type>;
+        using shape_type = typename inner_types::shape_type;
+        using strides_type = typename inner_types::strides_type;
 
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D>;
@@ -138,6 +140,16 @@ namespace xt
         void adapt_strides();
         void adapt_strides(size_type i);
 
+        size_type data_size() const;
+
+        size_type data_offset_impl() const;
+
+        template <class... Args>
+        size_type data_offset_impl(size_type i, Args... args) const;
+
+        template <class... Args>
+        size_type data_offset(Args... args) const;
+
         shape_type m_shape;
         strides_type m_strides;
         strides_type m_backstrides;
@@ -192,6 +204,32 @@ namespace xt
         {
             m_backstrides[i] = m_strides[i] * (m_shape[i] - 1);
         }
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_size() const -> size_type
+    {
+        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_offset_impl() const -> size_type
+    {
+        return 0;
+    }
+
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::data_offset_impl(size_type i, Args... args) const -> size_type
+    {
+        return i * m_strides[m_strides.size() - sizeof...(args)-1] + data_offset_impl(args...);
+    }
+
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::data_offset(Args... args) const -> size_type
+    {
+        return data_offset_impl(args...);
     }
 
     /**
@@ -301,7 +339,7 @@ namespace xt
         m_strides = strides;
         m_backstrides.resize(m_strides.size());
         adapt_strides();
-        data().resize(data_size(m_shape));
+        data().resize(data_size());
     }
     //@}
 
@@ -319,7 +357,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
-        size_type index = data_offset(m_strides, static_cast<size_type>(args)...);
+        size_type index = data_offset(static_cast<size_type>(args)...);
         return data()[index];
     }
 
@@ -333,7 +371,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
-        size_type index = data_offset(m_strides, static_cast<size_type>(args)...);
+        size_type index = data_offset(static_cast<size_type>(args)...);
         return data()[index];
     }
 

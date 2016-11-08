@@ -13,7 +13,6 @@
 #include <cstddef>
 
 #include "xexpression.hpp"
-#include "xindex.hpp"
 
 namespace xt
 {
@@ -45,8 +44,8 @@ namespace xt
         using difference_type = std::ptrdiff_t;
 
         using self_type = xscalar<T>;
-        using shape_type = xshape<size_type>;
-        using strides_type = xstrides<size_type>;
+        using shape_type = std::vector<size_type>;
+        using strides_type = std::vector<size_type>;
 
         using closure_type = const self_type;
         using const_stepper = xscalar_stepper<T>;

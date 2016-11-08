@@ -31,6 +31,8 @@ namespace xt
     struct array_inner_types<xarray<T>>
     {
         using container_type = std::vector<T>;
+        using shape_type = std::vector<typename container_type::size_type>;
+        using strides_type = shape_type;
         using temporary_type = xarray<T>;
     };
 
@@ -113,6 +115,8 @@ namespace xt
     struct array_inner_types<xarray_adaptor<C>>
     {
         using container_type = C;
+        using shape_type = std::vector<typename container_type::size_type>;
+        using strides_type = shape_type;
         using temporary_type = xarray<typename C::value_type>;
     };
 

@@ -65,8 +65,8 @@ namespace xt
         using size_type = typename E::size_type;
         using difference_type = typename E::difference_type;
 
-        using shape_type = xshape<size_type>;
-        using strides_type = xstrides<size_type>;
+        using shape_type = std::vector<size_type>;
+        using strides_type = std::vector<size_type>;
         using slice_type = std::tuple<S...>;
 
         using stepper = xview_stepper<E, S...>;
@@ -201,6 +201,8 @@ namespace xt
         using pointer = typename substepper_type::pointer;
         using difference_type = typename substepper_type::difference_type;
         using size_type = typename view_type::size_type;
+
+        using shape_type = typename substepper_type::shape_type;
 
         xview_stepper(view_type* view, substepper_type it,
                       size_type offset, bool end = false);

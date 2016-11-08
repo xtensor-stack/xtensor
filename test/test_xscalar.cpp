@@ -8,7 +8,6 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xscalar.hpp"
-#include "xtensor/xindex.hpp"
 
 namespace xt
 {
@@ -16,7 +15,7 @@ namespace xt
     {
         // The shape of a 0-D xarray is ().  The size of the buffer is 1.
         xscalar<int> x(1);
-        EXPECT_EQ(x.size(), data_size(x.shape()));
+        EXPECT_EQ(x.size(), 1);
     }
 
     TEST(xscalar, access)

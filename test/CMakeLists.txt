@@ -60,12 +60,11 @@ set(XTENSOR_INCLUDE ../include)
 
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE}/xtensor/xarray.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xarray_base.hpp
     ${XTENSOR_INCLUDE}/xtensor/xassign.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE}/xtensor/xexpression.hpp
     ${XTENSOR_INCLUDE}/xtensor/xfunction.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xindex.hpp
     ${XTENSOR_INCLUDE}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE}/xtensor/xiterator.hpp
     ${XTENSOR_INCLUDE}/xtensor/xmath.hpp

@@ -9,7 +9,6 @@
 #ifndef XASSIGN_HPP
 #define XASSIGN_HPP
 
-#include "xindex.hpp"
 #include "xiterator.hpp"
 
 namespace xt
@@ -160,7 +159,7 @@ namespace xt
         de2.broadcast_shape(shape);
         if(shape.size() > de1.shape().size() || shape > de1.shape())
         {
-            throw broadcast_error<size_type>(shape, de1.shape());
+            throw broadcast_error(shape, de1.shape());
         }
     }
 
