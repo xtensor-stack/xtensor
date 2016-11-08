@@ -90,7 +90,6 @@ namespace xt
         }
         else
         {
-            const auto& shape = de1.shape();
             data_assigner<E1, E2> assigner(de1, de2);
             assigner.run();
         }
