@@ -152,7 +152,6 @@ namespace xt
     template <class S>
     inline bool broadcast_shape(const xshape<S>& input, xshape<S>& output)
     {
-        auto size = output.size();
         bool trivial_broadcast = (input.size() == output.size());
         auto output_iter = output.rbegin();
         auto input_rend = input.rend();
