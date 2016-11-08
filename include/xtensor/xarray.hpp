@@ -28,7 +28,7 @@ namespace xt
     class xarray;
 
     template <class T>
-    struct array_inner_types<xarray<T>>
+    struct xcontainer_inner_types<xarray<T>>
     {
         using container_type = std::vector<T>;
         using shape_type = std::vector<typename container_type::size_type>;
@@ -48,14 +48,14 @@ namespace xt
      */
     template <class T>
     class xarray : public xcontainer<xarray<T>>,
-                   public xarray_semantic<xarray<T>>
+                   public xcontainer_semantic<xarray<T>>
     {
 
     public:
 
         using self_type = xarray<T>;
         using base_type = xcontainer<self_type>;
-        using semantic_base = xarray_semantic<self_type>;
+        using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
@@ -112,7 +112,7 @@ namespace xt
     class xarray_adaptor;
 
     template <class C>
-    struct array_inner_types<xarray_adaptor<C>>
+    struct xcontainer_inner_types<xarray_adaptor<C>>
     {
         using container_type = C;
         using shape_type = std::vector<typename container_type::size_type>;
@@ -170,7 +170,7 @@ namespace xt
         container_type& data_impl();
         const container_type& data_impl() const;
 
-        using temporary_type = typename array_inner_types<self_type>::temporary_type;
+        using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type& tmp);
 
         friend class xcontainer<xarray_adaptor<C>>;

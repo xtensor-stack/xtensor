@@ -19,7 +19,7 @@
 namespace xt
 {
     template <class C>
-    struct array_inner_types;
+    struct xcontainer_inner_types;
 
     enum class layout
     {
@@ -46,7 +46,7 @@ namespace xt
 
         using derived_type = D;
 
-        using inner_types = array_inner_types<D>;
+        using inner_types = xcontainer_inner_types<D>;
         using container_type = typename inner_types::container_type;
         using value_type = typename container_type::value_type;
         using reference = typename container_type::reference;

@@ -31,7 +31,7 @@ namespace xt
     class xview;
 
     template <class E, class... S>
-    struct array_inner_types<xview<E, S...>>
+    struct xcontainer_inner_types<xview<E, S...>>
     {
         using temporary_type = xarray<typename E::value_type>;
     };
@@ -152,7 +152,7 @@ namespace xt
         template<size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
-        using temporary_type = typename array_inner_types<self_type>::temporary_type;
+        using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type& tmp);
 
         friend class xview_semantic<xview<E, S...>>;
