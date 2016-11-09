@@ -55,11 +55,11 @@ namespace xt
     {
         inline row_major_result()
         {
-            m_strides = { 8, 4, 1 };
-            m_backstrides = {16, 4, 3};
-            m_data = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                      10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                      20, 21, 22, 23 };
+            this->m_strides = { 8, 4, 1 };
+            this->m_backstrides = {16, 4, 3};
+            this->m_data = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                             10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                             20, 21, 22, 23 };
         }
     };
 
@@ -68,12 +68,12 @@ namespace xt
     {
         inline column_major_result()
         {
-            m_strides = { 1, 3, 6 };
-            m_backstrides = { 2, 3, 18 };
-            m_data = { -1, 8, 16, 4, 12, 20,
-                       1, 9, 17, 5, 13, 21,
-                       2, 10, 18, 6, 14, 22,
-                       3, 11, 19, 7, 15, 23 };
+            this->m_strides = { 1, 3, 6 };
+            this->m_backstrides = { 2, 3, 18 };
+            this->m_data = { -1, 8, 16, 4, 12, 20,
+                              1, 9, 17, 5, 13, 21,
+                              2, 10, 18, 6, 14, 22,
+                              3, 11, 19, 7, 15, 23 };
         }
     };
 
@@ -82,11 +82,11 @@ namespace xt
     {
         inline central_major_result()
         {
-            m_strides = { 8, 1, 2 };
-            m_backstrides = { 16, 1, 6};
-            m_data = { -1, 4, 1, 5, 2, 6, 3, 7,
-                       8, 12, 9, 13, 10, 14, 11, 15,
-                      16, 20, 17, 21, 18, 22, 19, 23 };
+            this->m_strides = { 8, 1, 2 };
+            this->m_backstrides = { 16, 1, 6};
+            this->m_data = { -1, 4, 1, 5, 2, 6, 3, 7,
+                              8, 12, 9, 13, 10, 14, 11, 15,
+                             16, 20, 17, 21, 18, 22, 19, 23 };
         }
     };
 
