@@ -4,11 +4,9 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-API reference
-=============
+xarray_adaptor
+==============
 
-.. toctree::
-
-   expression_index
-   container_index
-   xmath
+.. doxygenclass:: xt::xarray_adaptor
+   :project: xtensor
+   :members:

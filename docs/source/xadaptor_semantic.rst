@@ -4,11 +4,9 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-API reference
-=============
+xadaptor_semantic
+=================
 
-.. toctree::
-
-   expression_index
-   container_index
-   xmath
+.. doxygenclass:: xt::xadaptor_semantic
+   :project: xtensor
+   :members:

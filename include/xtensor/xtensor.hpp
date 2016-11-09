@@ -34,6 +34,17 @@ namespace xt
         using temporary_type = xtensor<T, N>;
     };
 
+    /**
+     * @class xtensor
+     * @brief Dense multidimensional container with tensor
+     * semantic and fixed dimension.
+     *
+     * The xtnesor class implements a dense multidimensional container
+     * with tensor semantic and fixed dimension
+     *
+     * @tparam T The type of objects stored in the container.
+     * @tparam N The dimension of the container.
+     */
     template <class T, size_t N>
     class xtensor : public xcontainer<xtensor<T, N>>,
                     public xcontainer_semantic<xtensor<T, N>>
@@ -101,6 +112,19 @@ namespace xt
         using temporary_type = xtensor<typename C::value_type, N>;
     };
 
+    /**
+     * @class xtensor_adaptor
+     * @brief Dense multidimensional container adaptor with
+     * tensor semantic and fixed dimension.
+     *
+     * The xtensor_adaptor class implements a dense multidimensional
+     * container adaptor with tensor semantic and fixed dimension. It
+     * is used to provide a multidimensional container semantic and a
+     * tensor semantic to stl-like containers.
+     *
+     * @tparam C The container type to adapt.
+     * @tparam N The dimension of the adaptor.
+     */
     template <class C, std::size_t N>
     class xtensor_adaptor : public xcontainer<xtensor_adaptor<C, N>>,
                             public xadaptor_semantic<xtensor_adaptor<C, N>>
