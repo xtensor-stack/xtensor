@@ -106,8 +106,11 @@ namespace xt
         const_iterator cxbegin(const shape_type& shape) const;
         const_iterator cxend(const shape_type& shape) const;
 
-        const_stepper stepper_begin(const shape_type& shape) const;
-        const_stepper stepper_end(const shape_type& shape) const;
+        template <class S>
+        const_stepper stepper_begin(const S& shape) const;
+
+        template <class S>
+        const_stepper stepper_end(const S& shape) const;
 
         const_storage_iterator storage_begin() const;
         const_storage_iterator storage_end() const;
@@ -435,14 +438,16 @@ namespace xt
     //@}
 
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::stepper_begin(const shape_type& shape) const -> const_stepper
+    template <class S>
+    inline auto xfunction<F, R, E...>::stepper_begin(const S& shape) const -> const_stepper
     {
         auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::stepper_end(const shape_type& shape) const -> const_stepper
+    template <class S>
+    inline auto xfunction<F, R, E...>::stepper_end(const S& shape) const -> const_stepper
     {
         auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());

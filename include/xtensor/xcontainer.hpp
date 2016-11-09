@@ -111,11 +111,15 @@ namespace xt
         const_iterator cxbegin(const shape_type& shape) const;
         const_iterator cxend(const shape_type& shape) const;
 
-        stepper stepper_begin(const shape_type& shape);
-        stepper stepper_end(const shape_type& shape);
+        template <class S>
+        stepper stepper_begin(const S& shape);
+        template <class S>
+        stepper stepper_end(const S& shape);
 
-        const_stepper stepper_begin(const shape_type& shape) const;
-        const_stepper stepper_end(const shape_type& shape) const;
+        template <class S>
+        const_stepper stepper_begin(const S& shape) const;
+        template <class S>
+        const_stepper stepper_end(const S& shape) const;
 
         storage_iterator storage_begin();
         storage_iterator storage_end();
@@ -565,28 +569,32 @@ namespace xt
      ***************/
 
     template <class D>
-    inline auto xcontainer<D>::stepper_begin(const shape_type& shape) -> stepper
+    template <class S>
+    inline auto xcontainer<D>::stepper_begin(const S& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(static_cast<derived_type*>(this), data().begin(), offset);
     }
 
     template <class D>
-    inline auto xcontainer<D>::stepper_end(const shape_type& shape) -> stepper
+    template <class S>
+    inline auto xcontainer<D>::stepper_end(const S& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(static_cast<derived_type*>(this), data().end(), offset);
     }
 
     template <class D>
-    inline auto xcontainer<D>::stepper_begin(const shape_type& shape) const -> const_stepper
+    template <class S>
+    inline auto xcontainer<D>::stepper_begin(const S& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(static_cast<const derived_type*>(this), data().begin(), offset);
     }
 
     template <class D>
-    inline auto xcontainer<D>::stepper_end(const shape_type& shape) const -> const_stepper
+    template <class S>
+    inline auto xcontainer<D>::stepper_end(const S& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(static_cast<const derived_type*>(this), data().end(), offset);

@@ -338,6 +338,43 @@ namespace xt
     {
         return size == N;
     }
+
+    /**************
+     * make_shape *
+     **************/
+    namespace detail
+    {
+        template <class S>
+        struct shape_builder
+        {
+            using value_type = typename S::value_type;
+            using size_type = typename S::size_type;
+            inline static S make(size_type size, value_type v)
+            {
+                return S(size, v);
+            }
+        };
+
+        template <class T, std::size_t N>
+        struct shape_builder<std::array<T, N>>
+        {
+            using shape_type = std::array<T, N>;
+            using value_type = typename shape_type::value_type;
+            using size_type = typename shape_type::size_type;
+            inline static shape_type make(size_type /*size*/, value_type v)
+            {
+                shape_type s;
+                s.fill(v);
+                return s;
+            }
+        };
+    }
+
+    template <class S>
+    inline S make_shape(typename S::size_type size, typename S::value_type v)
+    {
+        return detail::shape_builder<S>::make(size, v);
+    }
 }
 
 #endif
