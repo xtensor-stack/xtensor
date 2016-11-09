@@ -320,7 +320,24 @@ namespace xt
     constexpr bool check_shape(T t, S first, S last)
     {
         return detail::predshape<decltype(t), S>(first, last)(t);
-    } 
+    }
+
+    /***********************************
+     * resize_container implementation *
+     ***********************************/
+
+    template <class C>
+    inline bool resize_container(C& c, typename C::size_type size)
+    {
+        c.resize(size);
+        return true;
+    }
+
+    template <class T, std::size_t N>
+    inline bool resize_container(std::array<T, N>& a, typename std::array<T, N>::size_type size)
+    {
+        return size == N;
+    }
 }
 
 #endif

@@ -89,8 +89,11 @@ namespace xt
         container_type& data();
         const container_type& data() const;
 
-        bool broadcast_shape(shape_type& shape) const;
-        bool is_trivial_broadcast(const strides_type& strides) const;
+        template <class S>
+        bool broadcast_shape(S& shape) const;
+
+        template <class S>
+        bool is_trivial_broadcast(const S& strides) const;
 
         iterator begin();
         iterator end();
@@ -303,8 +306,8 @@ namespace xt
     inline void xcontainer<D>::reshape(const shape_type& shape, layout l)
     {
         m_shape = shape;
-        m_strides.resize(m_shape.size());
-        m_backstrides.resize(m_shape.size());
+        resize_container(m_strides, m_shape.size());
+        resize_container(m_backstrides, m_shape.size());
         size_type data_size = 1;
         if(l == layout::row_major)
         {
@@ -337,7 +340,7 @@ namespace xt
     {
         m_shape = shape;
         m_strides = strides;
-        m_backstrides.resize(m_strides.size());
+        resize_container(m_backstrides, m_strides.size());
         adapt_strides();
         data().resize(data_size());
     }
@@ -405,7 +408,8 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class D>
-    inline bool xcontainer<D>::broadcast_shape(shape_type& shape) const
+    template <class S>
+    inline bool xcontainer<D>::broadcast_shape(S& shape) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
@@ -416,9 +420,11 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class D>
-    inline bool xcontainer<D>::is_trivial_broadcast(const strides_type& str) const
+    template <class S>
+    inline bool xcontainer<D>::is_trivial_broadcast(const S& str) const
     {
-        return str == strides();
+        return str.size() == strides().size() &&
+            std::equal(str.cbegin(), str.cend(), strides().begin());
     }
     //@}
 

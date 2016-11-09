@@ -90,8 +90,11 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        bool broadcast_shape(shape_type& shape) const;
-        bool is_trivial_broadcast(const strides_type& strides) const;
+        template <class S>
+        bool broadcast_shape(S& shape) const;
+
+        template <class S>
+        bool is_trivial_broadcast(const S& strides) const;
 
         const_iterator begin() const;
         const_iterator end() const;
@@ -318,7 +321,8 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class F, class R, class... E>
-    inline bool xfunction<F, R, E...>::broadcast_shape(shape_type& shape) const
+    template <class S>
+    inline bool xfunction<F, R, E...>::broadcast_shape(S& shape) const
     {
         // e.broadcast_shape must be evaluated even if b is false
         auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
@@ -331,7 +335,8 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class F, class R, class... E>
-    inline bool xfunction<F, R, E...>::is_trivial_broadcast(const strides_type& strides) const
+    template <class S>
+    inline bool xfunction<F, R, E...>::is_trivial_broadcast(const S& strides) const
     {
         auto func = [&strides](bool b, auto&& e) { return b && e.is_trivial_broadcast(strides); };
         return accumulate(func, true, m_e);
