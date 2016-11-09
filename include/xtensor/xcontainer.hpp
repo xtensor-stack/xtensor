@@ -57,6 +57,7 @@ namespace xt
         using difference_type = typename container_type::difference_type;
 
         using shape_type = typename inner_types::shape_type;
+        using index_type = shape_type;
         using strides_type = typename inner_types::strides_type;
 
         using stepper = xstepper<D>;
@@ -85,6 +86,9 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args... args) const;
+
+        reference operator[](const index_type& index);
+        const_reference operator[](const index_type& index) const;
 
         container_type& data();
         const container_type& data() const;
@@ -156,6 +160,8 @@ namespace xt
 
         template <class... Args>
         size_type data_offset(Args... args) const;
+
+        size_type data_offset(const index_type& index) const;
 
         shape_type m_shape;
         strides_type m_strides;
@@ -237,6 +243,16 @@ namespace xt
     inline auto xcontainer<D>::data_offset(Args... args) const -> size_type
     {
         return data_offset_impl(args...);
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_offset(const index_type& index) const -> size_type
+    {
+        // VS2015 workaround : index.begin() + index.size() - m_strides.size()
+        // doesn't compile
+        auto iter = index.begin();
+        iter += index.size() - m_strides.size();
+        return std::inner_product(m_strides.begin(), m_strides.end(), iter, size_type(0));
     }
 
     /**
@@ -380,6 +396,30 @@ namespace xt
     {
         size_type index = data_offset(static_cast<size_type>(args)...);
         return data()[index];
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the container.
+     * @param index a list of indices specifying the position in the container. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::operator[](const index_type& index) -> reference
+    {
+        return data()[data_offset(index)];
+    }
+
+    /**
+    * Returns a constant reference to the element at the specified position in the container.
+    * @param index a list of indices specifying the position in the container. Indices
+    * must be unsigned integers, the number of indices in the list should be equal or greater
+    * than the number of dimensions of the container.
+    */
+    template <class D>
+    inline auto xcontainer<D>::operator[](const index_type& index) const -> const_reference
+    {
+        return data()[data_offset(index)];
     }
 
     /**

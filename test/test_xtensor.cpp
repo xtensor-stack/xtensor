@@ -133,6 +133,12 @@ namespace xt
         test_access<xtensor<int, 3>, container_type>(a);
     }
 
+    TEST(xtensor, indexed_access)
+    {
+        xtensor<int, 3> a;
+        test_indexed_access<xtensor<int, 3>, container_type>(a);
+    }
+
     TEST(xtensor, broadcast_shape)
     {
         xtensor<int, 4> a;

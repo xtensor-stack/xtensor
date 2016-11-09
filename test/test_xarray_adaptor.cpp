@@ -110,6 +110,13 @@ namespace xt
         test_access(a);
     }
 
+    TEST(xarray_adaptor, indexed_access)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_indexed_access(a);
+    }
+
     TEST(xarray_adaptor, broadcast_shape)
     {
         vec_type v;
