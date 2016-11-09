@@ -10,31 +10,3 @@ xexpression
 .. doxygenclass:: xt::xexpression
    :project: xtensor
    :members:
-
-xsemantic_base
-==============
-
-.. doxygenclass:: xt::xsemantic_base
-   :project: xtensor
-   :members:
-
-xarray_semantic
-===============
-
-.. doxygenclass:: xt::xarray_semantic
-   :project: xtensor
-   :members:
-
-xadaptor_semantic
-=================
-
-.. doxygenclass:: xt::xadaptor_semantic
-   :project: xtensor
-   :members:
-
-xview_semantic
-==============
-
-.. doxygenclass:: xt::xview_semantic
-   :project: xtensor
-   :members:

@@ -60,12 +60,11 @@ set(XTENSOR_INCLUDE ../include)
 
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE}/xtensor/xarray.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xarray_base.hpp
     ${XTENSOR_INCLUDE}/xtensor/xassign.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE}/xtensor/xexpression.hpp
     ${XTENSOR_INCLUDE}/xtensor/xfunction.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xindex.hpp
     ${XTENSOR_INCLUDE}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE}/xtensor/xiterator.hpp
     ${XTENSOR_INCLUDE}/xtensor/xmath.hpp
@@ -85,7 +84,7 @@ set(XTENSOR_TESTS
     test_xadaptor_semantic.cpp
     test_xarray.cpp
     test_xarray_adaptor.cpp
-    test_xarray_semantic.cpp
+    test_xcontainer_semantic.cpp
     test_xfunction.cpp
     test_xiterator.cpp
     test_xio.cpp
@@ -95,6 +94,9 @@ set(XTENSOR_TESTS
     test_xscalar.cpp
     test_xscalar_semantic.cpp
     test_xsemantic.hpp
+    test_xtensor.cpp
+    test_xtensor_adaptor.cpp
+    test_xtensor_semantic.cpp
     test_xvectorize.cpp
     test_xview.cpp
     test_xview_semantic.cpp

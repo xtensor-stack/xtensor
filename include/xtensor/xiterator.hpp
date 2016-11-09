@@ -16,7 +16,6 @@
 #include <array>
 #include <algorithm>
 
-#include "xindex.hpp"
 #include "xutils.hpp"
 #include "xexception.hpp"
 
@@ -27,8 +26,8 @@ namespace xt
      * broadcast functions *
      ***********************/
 
-    template <class S>
-    bool broadcast_shape(const xshape<S>& input, xshape<S>& output);
+    template <class S1, class S2>
+    bool broadcast_shape(const S1& input, S2& output);
 
     /************
      * xstepper *
@@ -66,6 +65,7 @@ namespace xt
         using pointer = typename subiterator_traits::pointer;
         using difference_type = typename subiterator_traits::difference_type;
         using size_type = typename container_type::size_type;
+        using shape_type = typename container_type::shape_type;
 
         xstepper(container_type* c, subiterator_type it, size_type offset);
 
@@ -96,8 +96,8 @@ namespace xt
 
     template <class S>
     void increment_stepper(S& stepper,
-                           xshape<typename S::size_type>& index,
-                           const xshape<typename S::size_type>& shape);
+                           typename S::shape_type& index,
+                           const typename S::shape_type& shape);
 
     /*************
      * xiterator *
@@ -119,7 +119,7 @@ namespace xt
         using size_type = typename subiterator_type::size_type;
         using iterator_category = std::input_iterator_tag;
 
-        using shape_type = xshape<size_type>;
+        using shape_type = typename subiterator_type::shape_type;
 
         xiterator(It it, const shape_type& shape);
 
@@ -149,8 +149,8 @@ namespace xt
      * broadcast functions implementation *
      **************************************/
 
-    template <class S>
-    inline bool broadcast_shape(const xshape<S>& input, xshape<S>& output)
+    template <class S1, class S2>
+    inline bool broadcast_shape(const S1& input, S2& output)
     {
         bool trivial_broadcast = (input.size() == output.size());
         auto output_iter = output.rbegin();
@@ -164,7 +164,7 @@ namespace xt
             }
             else if((*input_iter != 1) && (*output_iter != *input_iter))
             {
-                throw broadcast_error<S>(output, input);
+                throw broadcast_error(output, input);
             }
             trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
         }
@@ -236,8 +236,8 @@ namespace xt
 
     template <class S>
     void increment_stepper(S& stepper,
-                           xshape<typename S::size_type>& index,
-                           const xshape<typename S::size_type>& shape)
+                           typename S::shape_type& index,
+                           const typename S::shape_type& shape)
     {
         using size_type = typename S::size_type;
         for(size_type j = index.size(); j != 0; --j)
@@ -266,7 +266,8 @@ namespace xt
 
     template <class It>
     inline xiterator<It>::xiterator(It it, const shape_type& shape)
-        : m_it(it), m_shape(shape), m_index(shape.size(), size_type(0))
+        : m_it(it), m_shape(shape),
+          m_index(make_shape<shape_type>(shape.size(), size_type(0)))
     {
     }
 

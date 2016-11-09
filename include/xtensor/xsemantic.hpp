@@ -34,7 +34,7 @@ namespace xt
         using base_type = xexpression<D>;
         using derived_type = typename base_type::derived_type;
 
-        using temporary_type = typename array_inner_types<D>::temporary_type;
+        using temporary_type = typename xcontainer_inner_types<D>::temporary_type;
 
         template <class E>
         disable_xexpression<E, derived_type&> operator+=(const E&);
@@ -92,18 +92,18 @@ namespace xt
 
 
     /**
-     * @class xarray_semantic
+     * @class xcontainer_semantic
      * @brief Implementation of the xsemantic_base interface
      * for dense multidimensional containers.
      *
-     * The xarray_semantic class is an implementation of the
+     * The xcontainer_semantic class is an implementation of the
      * xsemantic_base interface for dense multidimensional
      * containers.
      *
      * @tparam D the derived type
      */
     template <class D>
-    class xarray_semantic : public xsemantic_base<D>
+    class xcontainer_semantic : public xsemantic_base<D>
     {
 
     public:
@@ -125,14 +125,14 @@ namespace xt
 
     protected:
 
-        xarray_semantic() = default;
-        ~xarray_semantic() = default;
+        xcontainer_semantic() = default;
+        ~xcontainer_semantic() = default;
 
-        xarray_semantic(const xarray_semantic&) = default;
-        xarray_semantic& operator=(const xarray_semantic&) = default;
+        xcontainer_semantic(const xcontainer_semantic&) = default;
+        xcontainer_semantic& operator=(const xcontainer_semantic&) = default;
 
-        xarray_semantic(xarray_semantic&&) = default;
-        xarray_semantic& operator=(xarray_semantic&&) = default;
+        xcontainer_semantic(xcontainer_semantic&&) = default;
+        xcontainer_semantic& operator=(xcontainer_semantic&&) = default;
 
         template <class E>
         derived_type& operator=(const xexpression<E>&);
@@ -415,7 +415,7 @@ namespace xt
     }
 
     /**********************************
-     * xarray_semantic implementation *
+     * xcontainer_semantic implementation *
      **********************************/
 
     /**
@@ -424,7 +424,7 @@ namespace xt
      * @return a reference to \c *this.
      */
     template <class D>
-    inline auto xarray_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
+    inline auto xcontainer_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
     {
         using std::swap;
         swap(this->derived_cast(), tmp);
@@ -433,7 +433,7 @@ namespace xt
 
     template <class D>
     template <class E>
-    inline auto xarray_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
+    inline auto xcontainer_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
     {
         xt::assign_xexpression(*this, e);
         return this->derived_cast();
@@ -441,7 +441,7 @@ namespace xt
 
     template <class D>
     template <class E>
-    inline auto xarray_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
+    inline auto xcontainer_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
     {
         xt::computed_assign(*this, e);
         return this->derived_cast();
@@ -449,7 +449,7 @@ namespace xt
 
     template <class D>
     template <class E, class F>
-    inline auto xarray_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
+    inline auto xcontainer_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
     {
         xt::scalar_computed_assign(*this, e, std::forward<F>(f));
         return this->derived_cast();
@@ -457,7 +457,7 @@ namespace xt
 
     template <class D>
     template <class E>
-    inline auto xarray_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
+    inline auto xcontainer_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
     {
         return base_type::operator=(e);
     }

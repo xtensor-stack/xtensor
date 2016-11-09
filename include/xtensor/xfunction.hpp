@@ -73,8 +73,8 @@ namespace xt
         using size_type = std::common_type_t<typename E::size_type...>; // detail::common_size_type<E...>;
         using difference_type = std::common_type_t<typename E::difference_type...>; //detail::common_difference_type<E...>;
 
-        using shape_type = xshape<size_type>;
-        using strides_type = xstrides<size_type>;
+        using shape_type = std::vector<size_type>;
+        using strides_type = std::vector<size_type>;
         using closure_type = const self_type;
 
         using const_stepper = xfunction_stepper<F, R, E...>;
@@ -85,12 +85,16 @@ namespace xt
         xfunction(Func&& f, const E&...e) noexcept;
 
         size_type dimension() const;
+        shape_type shape() const;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        bool broadcast_shape(shape_type& shape) const;
-        bool is_trivial_broadcast(const strides_type& strides) const;
+        template <class S>
+        bool broadcast_shape(S& shape) const;
+
+        template <class S>
+        bool is_trivial_broadcast(const S& strides) const;
 
         const_iterator begin() const;
         const_iterator end() const;
@@ -102,13 +106,14 @@ namespace xt
         const_iterator cxbegin(const shape_type& shape) const;
         const_iterator cxend(const shape_type& shape) const;
 
-        const_stepper stepper_begin(const shape_type& shape) const;
-        const_stepper stepper_end(const shape_type& shape) const;
+        template <class S>
+        const_stepper stepper_begin(const S& shape) const;
+
+        template <class S>
+        const_stepper stepper_end(const S& shape) const;
 
         const_storage_iterator storage_begin() const;
         const_storage_iterator storage_end() const;
-
-        shape_type shape() const;
 
     private:
 
@@ -195,6 +200,8 @@ namespace xt
         using difference_type = typename xfunction_type::difference_type;
         using iterator_category = std::input_iterator_tag;
 
+        using shape_type = typename xfunction_type::shape_type;
+
         template <class... It>
         xfunction_stepper(const xfunction_type* func, It&&... it);
 
@@ -277,6 +284,17 @@ namespace xt
         auto func = [](size_type d, auto&& e) { return std::max(d, e.dimension()); };
         return accumulate(func, size_type(0), m_e);
     }
+
+    /**
+     * Returns the shape of the xfunction.
+     */
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::shape() const -> shape_type
+    {
+        shape_type shape(dimension(), size_type(1));
+        broadcast_shape(shape);
+        return shape;
+    }
     //@}
 
     /**
@@ -306,7 +324,8 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class F, class R, class... E>
-    inline bool xfunction<F, R, E...>::broadcast_shape(shape_type& shape) const
+    template <class S>
+    inline bool xfunction<F, R, E...>::broadcast_shape(S& shape) const
     {
         // e.broadcast_shape must be evaluated even if b is false
         auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
@@ -319,7 +338,8 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class F, class R, class... E>
-    inline bool xfunction<F, R, E...>::is_trivial_broadcast(const strides_type& strides) const
+    template <class S>
+    inline bool xfunction<F, R, E...>::is_trivial_broadcast(const S& strides) const
     {
         auto func = [&strides](bool b, auto&& e) { return b && e.is_trivial_broadcast(strides); };
         return accumulate(func, true, m_e);
@@ -418,14 +438,16 @@ namespace xt
     //@}
 
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::stepper_begin(const shape_type& shape) const -> const_stepper
+    template <class S>
+    inline auto xfunction<F, R, E...>::stepper_begin(const S& shape) const -> const_stepper
     {
         auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::stepper_end(const shape_type& shape) const -> const_stepper
+    template <class S>
+    inline auto xfunction<F, R, E...>::stepper_end(const S& shape) const -> const_stepper
     {
         auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
@@ -454,18 +476,6 @@ namespace xt
     {
         auto f = [](const auto& e) { return e.storage_end(); };
         return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
-    }
-    //@}
-
-    /**
-     * Returns the shape of the xfunction.
-     */
-    template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::shape() const -> shape_type
-    {
-        shape_type shape(dimension(), size_type(1));
-        broadcast_shape(shape);
-        return shape;
     }
     //@}
 
@@ -525,7 +535,7 @@ namespace xt
     }
 
     template <class F, class R, class... E>
-    inline bool xf_storage_iterator<F, R, E...>::equal(const xf_storage_iterator& rhs) const
+    inline bool xf_storage_iterator<F, R, E...>::equal(const self_type& rhs) const
     {
         return p_f == rhs.p_f && m_it == rhs.m_it;
     }

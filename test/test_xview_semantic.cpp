@@ -33,7 +33,7 @@ namespace xt
         : operation_tester<F>(), x_slice(0),
         y_slice(0, 2), z_slice(1, 4)
     {
-        xshape<size_t> shape = this->a.shape();
+        std::vector<size_t> shape = this->a.shape();
         vres_rr = this->a;
         vres_rc = this->a;
         vres_rct = this->a;

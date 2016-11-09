@@ -14,10 +14,11 @@
 namespace xt
 {
     using std::size_t;
+    using shape_type = std::vector<size_t>;
 
     TEST(operation, plus)
     {
-        xshape<size_t> shape = {3 ,2};
+        shape_type shape = {3 ,2};
         xarray<double> a(shape, 4.5);
 		double ref = +(a(0, 0));
 		double actual = (+a)(0, 0);
@@ -26,7 +27,7 @@ namespace xt
 
     TEST(operation, minus)
     {
-        xshape<size_t> shape = {3 ,2};
+        shape_type shape = {3 ,2};
         xarray<double> a(shape, 4.5);
 		double ref = -(a(0, 0));
 		double actual = (-a)(0, 0);
@@ -35,7 +36,7 @@ namespace xt
 
     TEST(operation, add)
     {
-        xshape<size_t> shape = {3, 2};
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a + b)(0, 0), a(0, 0) + b(0, 0));
@@ -49,7 +50,7 @@ namespace xt
 
     TEST(operation, subtract)
     {
-        xshape<size_t> shape = {3, 2};
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a - b)(0, 0), a(0, 0) - b(0, 0));
@@ -63,7 +64,7 @@ namespace xt
     
     TEST(operation, multiply)
     {
-        xshape<size_t> shape = {3, 2};
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a * b)(0, 0), a(0, 0) * b(0, 0));
@@ -77,7 +78,7 @@ namespace xt
     
     TEST(operation, divide)
     {
-        xshape<size_t> shape = {3, 2};
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a / b)(0, 0), a(0, 0) / b(0, 0));

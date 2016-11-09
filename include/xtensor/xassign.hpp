@@ -9,7 +9,6 @@
 #ifndef XASSIGN_HPP
 #define XASSIGN_HPP
 
-#include "xindex.hpp"
 #include "xiterator.hpp"
 
 namespace xt
@@ -102,7 +101,7 @@ namespace xt
         using size_type = typename E1::size_type;
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
-        shape_type shape(size, size_type(1));
+        shape_type shape = make_shape<shape_type>(size, size_type(1));
         bool trivial_broadcast = de2.broadcast_shape(shape);
         e1.derived_cast().reshape(shape);
         return trivial_broadcast;
@@ -160,7 +159,7 @@ namespace xt
         de2.broadcast_shape(shape);
         if(shape.size() > de1.shape().size() || shape > de1.shape())
         {
-            throw broadcast_error<size_type>(shape, de1.shape());
+            throw broadcast_error(shape, de1.shape());
         }
     }
 
@@ -172,7 +171,7 @@ namespace xt
     inline data_assigner<E1, E2>::data_assigner(E1& e1, const E2& e2)
         : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
           m_rhs(e2.stepper_begin(e1.shape())), m_rhs_end(e2.stepper_end(e1.shape())),
-          m_index(e1.shape().size(), size_type(0))
+          m_index(make_shape<typename E1::shape_type>(e1.shape().size(), size_type(0)))
     {
     }
 

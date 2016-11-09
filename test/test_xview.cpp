@@ -14,10 +14,11 @@
 namespace xt
 {
     using std::size_t;
+    using shape_type = std::vector<size_t>;
 
     TEST(xview, simple)
     {
-        xshape<size_t> shape = {3, 4};
+        shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.begin(), data.end(), a.storage_begin());
@@ -50,7 +51,7 @@ namespace xt
 
     TEST(xview, three_dimensional)
     {
-        xshape<size_t> shape = {3, 4, 2};
+        shape_type shape = {3, 4, 2};
         std::vector<double> data {
             1, 2,
             3, 4,
@@ -102,7 +103,7 @@ namespace xt
 
     TEST(xview, iterator)
     {
-        xshape<size_t> shape = {2, 3, 4};
+        shape_type shape = {2, 3, 4};
         xarray<double> a(shape);
         std::vector<double> data {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
                                   13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
@@ -143,12 +144,12 @@ namespace xt
 
     TEST(xview, xview_on_xfunction)
     {
-        xshape<size_t> shape = {3, 4};
+        shape_type shape = {3, 4};
         xarray<int> a(shape);
         std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.begin(), data.end(), a.storage_begin());
 
-        xshape<size_t> shape2 = { 3 };
+        shape_type shape2 = { 3 };
         xarray<int> b(shape2);
         std::vector<int> data2 = { 1, 2, 3 };
         std::copy(data2.begin(), data2.end(), b.storage_begin());

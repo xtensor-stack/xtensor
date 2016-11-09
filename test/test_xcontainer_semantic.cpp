@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    TEST(xarray_semantic, a_plus_b)
+    TEST(xcontainer_semantic, a_plus_b)
     {
         operation_tester<std::plus<>> tester;
 
@@ -41,7 +41,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, a_minus_b)
+    TEST(xcontainer_semantic, a_minus_b)
     {
         operation_tester<std::minus<>> tester;
 
@@ -70,7 +70,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, a_times_b)
+    TEST(xcontainer_semantic, a_times_b)
     {
         operation_tester<std::multiplies<>> tester;
 
@@ -99,7 +99,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, a_divide_by_b)
+    TEST(xcontainer_semantic, a_divide_by_b)
     {
         operation_tester<std::divides<>> tester;
 
@@ -128,7 +128,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, a_plus_equal_b)
+    TEST(xcontainer_semantic, a_plus_equal_b)
     {
         operation_tester<std::plus<>> tester;
 
@@ -161,7 +161,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, a_minus_equal_b)
+    TEST(xcontainer_semantic, a_minus_equal_b)
     {
         operation_tester<std::minus<>> tester;
 
@@ -194,7 +194,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, a_times_equal_b)
+    TEST(xcontainer_semantic, a_times_equal_b)
     {
         operation_tester<std::multiplies<>> tester;
 
@@ -227,7 +227,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, a_divide_by_equal_b)
+    TEST(xcontainer_semantic, a_divide_by_equal_b)
     {
         operation_tester<std::divides<>> tester;
 
@@ -260,7 +260,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, assign_a_plus_b)
+    TEST(xcontainer_semantic, assign_a_plus_b)
     {
         operation_tester<std::plus<>> tester;
 
@@ -293,7 +293,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, assign_a_minus_b)
+    TEST(xcontainer_semantic, assign_a_minus_b)
     {
         operation_tester<std::minus<>> tester;
 
@@ -326,7 +326,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, assign_a_multiplies_b)
+    TEST(xcontainer_semantic, assign_a_multiplies_b)
     {
         operation_tester<std::multiplies<>> tester;
 
@@ -359,7 +359,7 @@ namespace xt
         }
     }
 
-    TEST(xarray_semantic, assign_a_divides_by_b)
+    TEST(xcontainer_semantic, assign_a_divides_by_b)
     {
         operation_tester<std::divides<>> tester;
 

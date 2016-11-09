@@ -31,7 +31,7 @@ namespace xt
     class xview;
 
     template <class E, class... S>
-    struct array_inner_types<xview<E, S...>>
+    struct xcontainer_inner_types<xview<E, S...>>
     {
         using temporary_type = xarray<typename E::value_type>;
     };
@@ -65,8 +65,8 @@ namespace xt
         using size_type = typename E::size_type;
         using difference_type = typename E::difference_type;
 
-        using shape_type = xshape<size_type>;
-        using strides_type = xstrides<size_type>;
+        using shape_type = std::vector<size_type>;
+        using strides_type = std::vector<size_type>;
         using slice_type = std::tuple<S...>;
 
         using stepper = xview_stepper<E, S...>;
@@ -152,7 +152,7 @@ namespace xt
         template<size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
-        using temporary_type = typename array_inner_types<self_type>::temporary_type;
+        using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type& tmp);
 
         friend class xview_semantic<xview<E, S...>>;
@@ -201,6 +201,8 @@ namespace xt
         using pointer = typename substepper_type::pointer;
         using difference_type = typename substepper_type::difference_type;
         using size_type = typename view_type::size_type;
+
+        using shape_type = typename substepper_type::shape_type;
 
         xview_stepper(view_type* view, substepper_type it,
                       size_type offset, bool end = false);

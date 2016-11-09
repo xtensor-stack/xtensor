@@ -18,10 +18,12 @@ namespace xt
         return d1 + d2;
     }
 
+    using shape_type = std::vector<size_t>;
+
     TEST(xvectorize, function)
     {
         auto vecf1 = vectorize(f1);
-        xshape<std::size_t> shape = { 3, 2 };
+        shape_type shape = { 3, 2 };
         xarray<double> a(shape, 1.5);
         xarray<double> b(shape, 2.3);
         xarray<double> c = vecf1(a, b);
@@ -32,7 +34,7 @@ namespace xt
     {
         auto lambda = [](double d1, double d2) { return d1 + d2; };
         auto vec_lambda = vectorize(lambda);
-        xshape<std::size_t> shape = { 3, 2 };
+        shape_type shape = { 3, 2 };
         xarray<double> a(shape, 1.5);
         xarray<double> b(shape, 2.3);
         xarray<double> c = vec_lambda(a, b);
@@ -51,7 +53,7 @@ namespace xt
     {
         func f;
         auto vecfunc = vectorize(f);
-        xshape<std::size_t> shape = { 3, 2 };
+        shape_type shape = { 3, 2 };
         xarray<double> a(shape, 1.5);
         xarray<double> b(shape, 2.3);
         xarray<double> c = vecfunc(a, b);

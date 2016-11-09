@@ -39,7 +39,7 @@ namespace xt
 
     TEST(xiterator, increment_row_major)
     {
-        row_major_result rm;
+        row_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_increment(rm, rm.shape());
@@ -47,7 +47,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_increment(rm, rm.shape());
@@ -56,7 +56,7 @@ namespace xt
 
     TEST(xiterator, increment_column_major)
     {
-        column_major_result rm;
+        column_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_increment(rm, rm.shape());
@@ -64,7 +64,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_increment(rm, rm.shape());
@@ -73,7 +73,7 @@ namespace xt
 
     TEST(xiterator, increment_central_major)
     {
-        central_major_result rm;
+        central_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_increment(rm, rm.shape());
@@ -81,7 +81,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_increment(rm, rm.shape());
@@ -90,7 +90,7 @@ namespace xt
 
     TEST(xiterator, increment_unit_shape)
     {
-        unit_shape_result rm;
+        unit_shape_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_increment(rm, rm.shape());
@@ -98,7 +98,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_increment(rm, rm.shape());
@@ -127,7 +127,7 @@ namespace xt
 
     TEST(xiterator, end_row_major)
     {
-        row_major_result rm;
+        row_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_end(rm, rm.shape());
@@ -135,7 +135,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_end(rm, rm.shape());
@@ -144,7 +144,7 @@ namespace xt
 
     TEST(xiterator, end_column_major)
     {
-        column_major_result rm;
+        column_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_end(rm, rm.shape());
@@ -152,7 +152,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_end(rm, rm.shape());
@@ -161,7 +161,7 @@ namespace xt
 
     TEST(xiterator, end_central_major)
     {
-        central_major_result rm;
+        central_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_end(rm, rm.shape());
@@ -169,7 +169,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_end(rm, rm.shape());
@@ -178,7 +178,7 @@ namespace xt
 
     TEST(xiterator, end_unit_shape)
     {
-        unit_shape_result rm;
+        unit_shape_result<> rm;
         {
             SCOPED_TRACE("same shape");
             test_end(rm, rm.shape());
@@ -186,7 +186,7 @@ namespace xt
 
         {
             SCOPED_TRACE("broadcasting shape");
-            layout_result::shape_type sh = rm.shape();
+            layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
             test_end(rm, rm.shape());

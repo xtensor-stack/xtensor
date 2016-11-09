@@ -4,11 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-API reference
-=============
+Expressions and semantic
+========================
 
 .. toctree::
 
-   expression_index
-   container_index
-   xmath
+   xexpression
+   xsemantic_base
+   xcontainer_semantic
+   xadaptor_semantic
+   xview_semantic

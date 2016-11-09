@@ -7,85 +7,87 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "test_common.hpp"
 
 namespace xt
 {
-    TEST(xarray, shaped_constructor)
+    using container_type = std::array<std::size_t, 3>;
+
+    TEST(xtensor, shaped_constructor)
     {
         {
             SCOPED_TRACE("row_major constructor");
-            row_major_result<> rm;
-            xarray<int> ra(rm.m_shape);
+            row_major_result<container_type> rm;
+            xtensor<int, 3> ra(rm.m_shape);
             compare_shape(ra, rm);
         }
-        
+
         {
             SCOPED_TRACE("column_major constructor");
-            column_major_result<> cm;
-            xarray<int> ca(cm.m_shape, layout::column_major);
+            column_major_result<container_type> cm;
+            xtensor<int, 3> ca(cm.m_shape, layout::column_major);
             compare_shape(ca, cm);
         }
     }
 
-    TEST(xarray, strided_constructor)
+    TEST(xtensor, strided_constructor)
     {
-        central_major_result<> cmr;
-        xarray<int> cma(cmr.m_shape, cmr.m_strides);
+        central_major_result<container_type> cmr;
+        xtensor<int, 3> cma(cmr.m_shape, cmr.m_strides);
         compare_shape(cma, cmr);
     }
 
-    TEST(xarray, valued_constructor)
+    TEST(xtensor, valued_constructor)
     {
         {
             SCOPED_TRACE("row_major valued constructor");
-            row_major_result<> rm;
+            row_major_result<container_type> rm;
             int value = 2;
-            xarray<int> ra(rm.m_shape, value);
+            xtensor<int, 3> ra(rm.m_shape, value);
             compare_shape(ra, rm);
-            xarray<int>::container_type vec(ra.size(), value);
+            xtensor<int, 3>::container_type vec(ra.size(), value);
             EXPECT_EQ(ra.data(), vec);
         }
 
         {
             SCOPED_TRACE("column_major valued constructor");
-            column_major_result<> cm;
+            column_major_result<container_type> cm;
             int value = 2;
-            xarray<int> ca(cm.m_shape, value, layout::column_major);
+            xtensor<int, 3> ca(cm.m_shape, value, layout::column_major);
             compare_shape(ca, cm);
-            xarray<int>::container_type vec(ca.size(), value);
+            xtensor<int, 3>::container_type vec(ca.size(), value);
             EXPECT_EQ(ca.data(), vec);
         }
     }
 
-    TEST(xarray, strided_valued_constructor)
+    TEST(xtensor, strided_valued_constructor)
     {
-        central_major_result<> cmr;
+        central_major_result<container_type> cmr;
         int value = 2;
-        xarray<int> cma(cmr.m_shape, cmr.m_strides, value);
+        xtensor<int, 3> cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
-        xarray<int>::container_type vec(cma.size(), value);
+        xtensor<int, 3>::container_type vec(cma.size(), value);
         EXPECT_EQ(cma.data(), vec);
     }
 
-    TEST(xarray, copy_semantic)
+    TEST(xtensor, copy_semantic)
     {
-        central_major_result<> res;
+        central_major_result<container_type> res;
         int value = 2;
-        xarray<int> a(res.m_shape, res.m_strides, value);
-        
+        xtensor<int, 3> a(res.m_shape, res.m_strides, value);
+
         {
             SCOPED_TRACE("copy constructor");
-            xarray<int> b(a);
+            xtensor<int, 3> b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
 
         {
             SCOPED_TRACE("assignment operator");
-            row_major_result<> r;
-            xarray<int> c(r.m_shape, 0);
+            row_major_result<container_type> r;
+            xtensor<int, 3> c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
             c = a;
             compare_shape(a, c);
@@ -93,71 +95,59 @@ namespace xt
         }
     }
 
-    TEST(xarray, move_semantic)
+    TEST(xtensor, move_semantic)
     {
-        central_major_result<> res;
+        central_major_result<container_type> res;
         int value = 2;
-        xarray<int> a(res.m_shape, res.m_strides, value);
+        xtensor<int, 3> a(res.m_shape, res.m_strides, value);
 
         {
             SCOPED_TRACE("move constructor");
-            xarray<int> tmp(a);
-            xarray<int> b(std::move(tmp));
+            xtensor<int, 3> tmp(a);
+            xtensor<int, 3> b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
 
         {
             SCOPED_TRACE("move assignment");
-            row_major_result<> r;
-            xarray<int> c(r.m_shape, 0);
+            row_major_result<container_type> r;
+            xtensor<int, 3> c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
-            xarray<int> tmp(a);
+            xtensor<int, 3> tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
             EXPECT_EQ(a.data(), c.data());
         }
     }
 
-    TEST(xarray, reshape)
+    TEST(xtensor, reshape)
     {
-        xarray<int> a;
-        test_reshape(a);
+        xtensor<int, 3> a;
+        test_reshape<xtensor<int, 3>, container_type>(a);
     }
 
-    TEST(xarray, access)
+    TEST(xtensor, access)
     {
-        xarray<int> a;
-        test_access(a);
+        xtensor<int, 3> a;
+        test_access<xtensor<int, 3>, container_type>(a);
     }
 
-    TEST(xarray, broadcast_shape)
+    TEST(xtensor, broadcast_shape)
     {
-        xarray<int> a;
+        xtensor<int, 4> a;
         test_broadcast(a);
-        test_broadcast2(a);
     }
 
-    TEST(xarray, storage_iterator)
+    TEST(xtensor, storage_iterator)
     {
-        xarray<int> a;
-        test_storage_iterator(a);
+        xtensor<int, 3> a;
+        test_storage_iterator<xtensor<int, 3>, container_type>(a);
     }
 
-    TEST(xarray, initializer_list)
+    TEST(xtensor, zerod)
     {
-        xarray<int> a0(1);
-        xarray<int> a1({1, 2});
-        xarray<int> a2({{1, 2}, {2, 4}, {5, 6}});
-        EXPECT_EQ(1, a0());
-        EXPECT_EQ(2, a1(1));
-        EXPECT_EQ(4, a2(1, 1));
-    }
-    
-    TEST(xarray, zerod)
-    {
-        xarray<int> a;
+        xtensor<int, 3> a;
         EXPECT_EQ(0, a());
     }
 }
-

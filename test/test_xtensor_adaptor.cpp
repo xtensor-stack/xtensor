@@ -7,19 +7,20 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "test_common.hpp"
 
 namespace xt
 {
     using vec_type = std::vector<int>;
-    using adaptor_type = xarray_adaptor<vec_type>;
+    using adaptor_type = xtensor_adaptor<vec_type, 3>;
+    using container_type = std::array<std::size_t, 3>;
 
-    TEST(xarray_adaptor, shaped_constructor)
+    TEST(xtensor_adaptor, shaped_constructor)
     {
         {
             SCOPED_TRACE("row_major constructor");
-            row_major_result<> rm;
+            row_major_result<container_type> rm;
             vec_type v;
             adaptor_type a(v, rm.shape());
             compare_shape(a, rm);
@@ -27,24 +28,24 @@ namespace xt
 
         {
             SCOPED_TRACE("column_major constructor");
-            column_major_result<> cm;
+            column_major_result<container_type> cm;
             vec_type v;
             adaptor_type a(v, cm.shape(), layout::column_major);
             compare_shape(a, cm);
         }
     }
-    
-    TEST(xarray_adaptor, strided_constructor)
+
+    TEST(xtensor_adaptor, strided_constructor)
     {
-        central_major_result<> cmr;
+        central_major_result<container_type> cmr;
         vec_type v;
         adaptor_type a(v, cmr.shape(), cmr.strides());
         compare_shape(a, cmr);
     }
 
-    TEST(xarray_adaptor, copy_semantic)
+    TEST(xtensor_adaptor, copy_semantic)
     {
-        central_major_result<> res;
+        central_major_result<container_type> res;
         int value = 2;
         vec_type v(res.size(), value);
         adaptor_type a(v, res.shape(), res.strides());
@@ -58,7 +59,7 @@ namespace xt
 
         {
             SCOPED_TRACE("assignment operator");
-            row_major_result<> r;
+            row_major_result<container_type> r;
             vec_type v(r.size(), 0);
             adaptor_type c(v, r.shape());
             EXPECT_NE(a.data(), c.data());
@@ -68,9 +69,9 @@ namespace xt
         }
     }
 
-    TEST(xarray_adaptor, move_semantic)
+    TEST(xtensor_adaptor, move_semantic)
     {
-        central_major_result<> res;
+        central_major_result<container_type> res;
         int value = 2;
         vec_type v(res.size(), value);
         adaptor_type a(v, res.shape(), res.strides());
@@ -85,7 +86,7 @@ namespace xt
 
         {
             SCOPED_TRACE("move assignment");
-            row_major_result<> r;
+            row_major_result<container_type> r;
             vec_type v(r.size(), 0);
             adaptor_type c(v, r.shape());
             EXPECT_NE(a.data(), c.data());
@@ -96,33 +97,31 @@ namespace xt
         }
     }
 
-    TEST(xarray_adaptor, reshape)
+    TEST(xtensor_adaptor, reshape)
     {
         vec_type v;
         adaptor_type a(v);
-        test_reshape(a);
+        test_reshape<adaptor_type, container_type>(a);
     }
 
-    TEST(xarray_adaptor, access)
+    TEST(xtensor_adaptor, access)
     {
         vec_type v;
         adaptor_type a(v);
-        test_access(a);
+        test_access<adaptor_type, container_type>(a);
     }
 
-    TEST(xarray_adaptor, broadcast_shape)
+    TEST(xtensor_adaptor, broadcast_shape)
     {
         vec_type v;
-        adaptor_type a(v);
+        xtensor_adaptor<vec_type, 4> a(v);
         test_broadcast(a);
-        test_broadcast2(a);
     }
 
-    TEST(xarray_adaptor, storage_iterator)
+    TEST(xtensor_adaptor, storage_iterator)
     {
         vec_type v;
         adaptor_type a(v);
-        test_storage_iterator(a);
+        test_storage_iterator<adaptor_type, container_type>(a);
     }
 }
-
