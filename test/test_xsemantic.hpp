@@ -37,21 +37,21 @@ namespace xt
     inline operation_tester<F>::operation_tester()
     {
         F f;
-        row_major_result rmr;
+        row_major_result<> rmr;
         a.reshape(rmr.shape(), rmr.strides());
         assign_array(a, rmr.m_assigner);
         ra.reshape(rmr.shape(), rmr.strides());
         assign_array(ra, rmr.m_assigner);
 
-        column_major_result cmr;
+        column_major_result<> cmr;
         ca.reshape(cmr.shape(), cmr.strides());
         assign_array(ca, cmr.m_assigner);
 
-        central_major_result ctmr;
+        central_major_result<> ctmr;
         cta.reshape(ctmr.shape(), ctmr.strides());
         assign_array(cta, ctmr.m_assigner);
 
-        unit_shape_result usr;
+        unit_shape_result<> usr;
         ua.reshape(usr.shape(), usr.strides());
         assign_array(ua, usr.m_assigner);
 
@@ -97,19 +97,19 @@ namespace xt
     {
         F f;
         b = 2;
-        row_major_result rmr;
+        row_major_result<> rmr;
         ra.reshape(rmr.shape(), rmr.strides());
         assign_array(ra, rmr.m_assigner);
 
-        column_major_result cmr;
+        column_major_result<> cmr;
         ca.reshape(cmr.shape(), cmr.strides());
         assign_array(ca, cmr.m_assigner);
 
-        central_major_result ctmr;
+        central_major_result<> ctmr;
         cta.reshape(ctmr.shape(), ctmr.strides());
         assign_array(cta, ctmr.m_assigner);
 
-        unit_shape_result usr;
+        unit_shape_result<> usr;
         ua.reshape(usr.shape(), usr.strides());
         assign_array(ua, usr.m_assigner);
 

@@ -19,7 +19,7 @@ namespace xt
     {
         {
             SCOPED_TRACE("row_major constructor");
-            row_major_result rm;
+            row_major_result<> rm;
             vec_type v;
             adaptor_type a(v, rm.shape());
             compare_shape(a, rm);
@@ -27,7 +27,7 @@ namespace xt
 
         {
             SCOPED_TRACE("column_major constructor");
-            column_major_result cm;
+            column_major_result<> cm;
             vec_type v;
             adaptor_type a(v, cm.shape(), layout::column_major);
             compare_shape(a, cm);
@@ -36,7 +36,7 @@ namespace xt
     
     TEST(xarray_adaptor, strided_constructor)
     {
-        central_major_result cmr;
+        central_major_result<> cmr;
         vec_type v;
         adaptor_type a(v, cmr.shape(), cmr.strides());
         compare_shape(a, cmr);
@@ -44,7 +44,7 @@ namespace xt
 
     TEST(xarray_adaptor, copy_semantic)
     {
-        central_major_result res;
+        central_major_result<> res;
         int value = 2;
         vec_type v(res.size(), value);
         adaptor_type a(v, res.shape(), res.strides());
@@ -58,7 +58,7 @@ namespace xt
 
         {
             SCOPED_TRACE("assignment operator");
-            row_major_result r;
+            row_major_result<> r;
             vec_type v(r.size(), 0);
             adaptor_type c(v, r.shape());
             EXPECT_NE(a.data(), c.data());
@@ -70,7 +70,7 @@ namespace xt
 
     TEST(xarray_adaptor, move_semantic)
     {
-        central_major_result res;
+        central_major_result<> res;
         int value = 2;
         vec_type v(res.size(), value);
         adaptor_type a(v, res.shape(), res.strides());
@@ -85,7 +85,7 @@ namespace xt
 
         {
             SCOPED_TRACE("move assignment");
-            row_major_result r;
+            row_major_result<> r;
             vec_type v(r.size(), 0);
             adaptor_type c(v, r.shape());
             EXPECT_NE(a.data(), c.data());
@@ -115,6 +115,7 @@ namespace xt
         vec_type v;
         adaptor_type a(v);
         test_broadcast(a);
+        test_broadcast2(a);
     }
 
     TEST(xarray_adaptor, storage_iterator)

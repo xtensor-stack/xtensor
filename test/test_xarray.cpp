@@ -16,14 +16,14 @@ namespace xt
     {
         {
             SCOPED_TRACE("row_major constructor");
-            row_major_result rm;
+            row_major_result<> rm;
             xarray<int> ra(rm.m_shape);
             compare_shape(ra, rm);
         }
         
         {
             SCOPED_TRACE("column_major constructor");
-            column_major_result cm;
+            column_major_result<> cm;
             xarray<int> ca(cm.m_shape, layout::column_major);
             compare_shape(ca, cm);
         }
@@ -31,7 +31,7 @@ namespace xt
 
     TEST(xarray, strided_constructor)
     {
-        central_major_result cmr;
+        central_major_result<> cmr;
         xarray<int> cma(cmr.m_shape, cmr.m_strides);
         compare_shape(cma, cmr);
     }
@@ -40,7 +40,7 @@ namespace xt
     {
         {
             SCOPED_TRACE("row_major valued constructor");
-            row_major_result rm;
+            row_major_result<> rm;
             int value = 2;
             xarray<int> ra(rm.m_shape, value);
             compare_shape(ra, rm);
@@ -50,7 +50,7 @@ namespace xt
 
         {
             SCOPED_TRACE("column_major valued constructor");
-            column_major_result cm;
+            column_major_result<> cm;
             int value = 2;
             xarray<int> ca(cm.m_shape, value, layout::column_major);
             compare_shape(ca, cm);
@@ -61,7 +61,7 @@ namespace xt
 
     TEST(xarray, strided_valued_constructor)
     {
-        central_major_result cmr;
+        central_major_result<> cmr;
         int value = 2;
         xarray<int> cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
@@ -71,7 +71,7 @@ namespace xt
 
     TEST(xarray, copy_semantic)
     {
-        central_major_result res;
+        central_major_result<> res;
         int value = 2;
         xarray<int> a(res.m_shape, res.m_strides, value);
         
@@ -84,7 +84,7 @@ namespace xt
 
         {
             SCOPED_TRACE("assignment operator");
-            row_major_result r;
+            row_major_result<> r;
             xarray<int> c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
             c = a;
@@ -95,7 +95,7 @@ namespace xt
 
     TEST(xarray, move_semantic)
     {
-        central_major_result res;
+        central_major_result<> res;
         int value = 2;
         xarray<int> a(res.m_shape, res.m_strides, value);
 
@@ -109,7 +109,7 @@ namespace xt
 
         {
             SCOPED_TRACE("move assignment");
-            row_major_result r;
+            row_major_result<> r;
             xarray<int> c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
             xarray<int> tmp(a);
@@ -135,6 +135,7 @@ namespace xt
     {
         xarray<int> a;
         test_broadcast(a);
+        test_broadcast2(a);
     }
 
     TEST(xarray, storage_iterator)

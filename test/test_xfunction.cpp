@@ -25,15 +25,15 @@ namespace xt
 
     xfunction_features::xfunction_features()
     {
-        row_major_result rm;
+        row_major_result<> rm;
         m_a.reshape(rm.shape(), rm.strides());
         std::copy(rm.data().begin(), rm.data().end(), m_a.storage_begin());
 
-        unit_shape_result us;
+        unit_shape_result<> us;
         m_b.reshape(us.shape(), us.strides());
         std::copy(us.data().begin(), us.data().end(), m_b.storage_begin());
 
-        using shape_type = layout_result::shape_type;
+        using shape_type = layout_result<>::shape_type;
         shape_type sh = { 4, 3, 2, 4};
         m_c.reshape(sh);
 
@@ -46,7 +46,7 @@ namespace xt
 
     TEST(xfunction, broadcast_shape)
     {
-        using shape_type = layout_result::shape_type;
+        using shape_type = layout_result<>::shape_type;
         xfunction_features f;
 
         {
