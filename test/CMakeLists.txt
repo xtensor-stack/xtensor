@@ -94,6 +94,9 @@ set(XTENSOR_TESTS
     test_xscalar.cpp
     test_xscalar_semantic.cpp
     test_xsemantic.hpp
+    test_xtensor.cpp
+    test_xtensor_adaptor.cpp
+    test_xtensor_semantic.cpp
     test_xvectorize.cpp
     test_xview.cpp
     test_xview_semantic.cpp
