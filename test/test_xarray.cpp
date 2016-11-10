@@ -131,6 +131,13 @@ namespace xt
         test_access(a);
     }
 
+
+    TEST(xarray, indexed_access)
+    {
+        xarray<int> a;
+        test_indexed_access(a);
+    }
+
     TEST(xarray, broadcast_shape)
     {
         xarray<int> a;

@@ -221,6 +221,61 @@ namespace xt
         }
     }
 
+    template <class V1, class V2>
+    void indexed_assign_array(V1& dst, const V2& src)
+    {
+        typename V1::index_type index = dst.shape();
+        for (std::size_t i = 0; i < dst.shape()[0]; ++i)
+        {
+            index[0] = i;
+            for (std::size_t j = 0; j < dst.shape()[1]; ++j)
+            {
+                index[1] = j;
+                for (std::size_t k = 0; k < dst.shape()[2]; ++k)
+                {
+                    index[2] = k;
+                    dst[index] = src[i][j][k];
+                }
+            }
+        }
+    }
+
+    template <class V, class C = std::vector<std::size_t>>
+    void test_indexed_access(V& vec)
+    {
+        {
+            SCOPED_TRACE("row_major access");
+            row_major_result<C> rm;
+            vec.reshape(rm.m_shape, layout::row_major);
+            indexed_assign_array(vec, rm.m_assigner);
+            EXPECT_EQ(vec.data(), rm.m_data);
+        }
+
+        {
+            SCOPED_TRACE("column_major access");
+            column_major_result<C> cm;
+            vec.reshape(cm.m_shape, layout::column_major);
+            indexed_assign_array(vec, cm.m_assigner);
+            EXPECT_EQ(vec.data(), cm.m_data);
+        }
+
+        {
+            SCOPED_TRACE("central_major access");
+            central_major_result<C> cem;
+            vec.reshape(cem.m_shape, cem.m_strides);
+            indexed_assign_array(vec, cem.m_assigner);
+            EXPECT_EQ(vec.data(), cem.m_data);
+        }
+
+        {
+            SCOPED_TRACE("unit_shape access");
+            unit_shape_result<C> usr;
+            vec.reshape(usr.m_shape, layout::row_major);
+            indexed_assign_array(vec, usr.m_assigner);
+            EXPECT_EQ(vec.data(), usr.m_data);
+        }
+    }
+
     template <class V>
     void test_broadcast(V& vec)
     {
