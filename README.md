@@ -1,7 +1,7 @@
 # xtensor
 
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/8dpc5tx1m9lftt59?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
 [![Documentation Status](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
 [![Binder](http://mybinder.org/badge.svg)](http://mybinder.org/repo/QuantStack/xtensor/notebooks/notebooks/xtensor.ipynb)
 
