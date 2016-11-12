@@ -17,7 +17,7 @@ Multi-dimensional arrays with broadcasting and lazy computing.
  - an API following the idioms of the **C++ standard library**.
  - tools to manipulate array expressions and build upon `xtensor`.
 
-The implementation of the containers of `xtensor` is inspired by [NumPy](http://www.numpy.org), the Python array programming library. **Adaptors** for existing data structures to be plugged into our expression system can easily be written. In fact, `xtensor` can be used to **process `numpy` data structures inplace** using Python's [buffer protocol](https://docs.python.org/3/c-api/buffer.html).
+Containers of `xtensor` are inspired by [NumPy](http://www.numpy.org), the Python array programming library. **Adaptors** for existing data structures to be plugged into our expression system can easily be written. In fact, `xtensor` can be used to **process `numpy` data structures inplace** using Python's [buffer protocol](https://docs.python.org/3/c-api/buffer.html). For more details on the numpy bindings, check out the [xtensor-python](https://github.com/QuantStack/xtensor-python) project.
 
 `xtensor` requires a modern C++ compiler supporting C++14. The following C+ compilers are supported:
 
@@ -134,6 +134,27 @@ All `xexpression`s offer two sets of functions to retrieve iterator pairs (and t
 
  - `begin()` and `end()` provide instances of `xiterator`s which can be used to iterate over all the elements of the expression. The order in which elements are listed is `row-major` in that the index of last dimension is incremented first.
  - `xbegin(shape)` and `xend(shape)` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in a row-major way, but certain dimensions are repeated to match the provided shape as per the rules described above. For an expression `e`, `e.xbegin(e.shape())` and `e.begin()` are equivalent.
+
+### Fixed-dimension *and* Dynamic dimension
+
+Two container classes implementing multi-dimensional arrays are provided: `xarray` and `xtensor`.
+
+ - `xarray` can be reshaped dynamically to any number of dimensions. It is the container that is the most similar to numpy arrays.
+ - `xtensor` has a dimension set at compilation time, which enables many optimizations. For example, shapes and strides
+    of `xtensor` instances are allocated on the stack instead of the heap.
+
+`xarray` and `xtensor` container are both `xexpression`s and can be involved and mixed in universal functions, assigned to each other etc...
+
+Besides, two access operators are provided:
+
+ - The variadic template `operator()` which can take multiple integral arguments or none.
+ - And the `operator[]` which takes a single multi-index argument, which can be of size determined at runtime. `operator[]` also supports
+   access with braced initializers.
+
+## Python bindings
+
+The [xtensor-python](https://github.com/QuantStack/xtensor-python) project provides the implementation of an `xtensor` container, `pyarray` which
+effectively wraps numpy arrays, allowing inplace edition, including reshapes.
 
 ## Building and Running the Tests
 
