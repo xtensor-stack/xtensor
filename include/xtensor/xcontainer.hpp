@@ -153,13 +153,11 @@ namespace xt
 
         size_type data_size() const;
 
-        size_type data_offset_impl() const;
+        template <size_t dim = 0>
+        size_type data_offset() const;
 
-        template <class... Args>
-        size_type data_offset_impl(size_type i, Args... args) const;
-
-        template <class... Args>
-        size_type data_offset(Args... args) const;
+        template <size_t dim = 0, class... Args>
+        size_type data_offset(size_type i, Args... args) const;
 
         size_type data_offset(const index_type& index) const;
 
@@ -226,23 +224,17 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_offset_impl() const -> size_type
+    template <size_t dim>
+    inline auto xcontainer<D>::data_offset() const -> size_type
     {
         return 0;
     }
 
     template <class D>
-    template <class... Args>
-    inline auto xcontainer<D>::data_offset_impl(size_type i, Args... args) const -> size_type
+    template <size_t dim, class... Args>
+    inline auto xcontainer<D>::data_offset(size_type i, Args... args) const -> size_type
     {
-        return i * m_strides[m_strides.size() - sizeof...(args)-1] + data_offset_impl(args...);
-    }
-
-    template <class D>
-    template <class... Args>
-    inline auto xcontainer<D>::data_offset(Args... args) const -> size_type
-    {
-        return data_offset_impl(args...);
+        return i * m_strides[dim] + data_offset<dim + 1>(args...);
     }
 
     template <class D>
