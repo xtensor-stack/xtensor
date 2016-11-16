@@ -74,7 +74,6 @@ namespace xt
         using difference_type = std::common_type_t<typename E::difference_type...>; //detail::common_difference_type<E...>;
 
         using shape_type = std::vector<size_type>;
-        using index_type = shape_type;
         using strides_type = std::vector<size_type>;
         using closure_type = const self_type;
 
@@ -91,7 +90,7 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        const_reference operator[](const index_type& index) const;
+        const_reference operator[](const xindex& index) const;
 
         template <class S>
         bool broadcast_shape(S& shape) const;
@@ -124,7 +123,7 @@ namespace xt
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
         template <std::size_t... I>
-        const_reference access_impl(const index_type& index, std::index_sequence<I...>) const;
+        const_reference access_impl(const xindex& index, std::index_sequence<I...>) const;
 
         template <class Func, std::size_t... I>
         const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const;
@@ -320,7 +319,7 @@ namespace xt
     }
 
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::operator[](const index_type& index) const -> const_reference
+    inline auto xfunction<F, R, E...>::operator[](const xindex& index) const -> const_reference
     {
         return access_impl(index, std::make_index_sequence<sizeof...(E)>());
     }
@@ -501,7 +500,7 @@ namespace xt
 
     template <class F, class R, class... E>
     template <std::size_t... I>
-    inline auto xfunction<F, R, E...>::access_impl(const index_type& index, std::index_sequence<I...>) const -> const_reference
+    inline auto xfunction<F, R, E...>::access_impl(const xindex& index, std::index_sequence<I...>) const -> const_reference
     {
         return m_f(std::get<I>(m_e)[index]...);
     }

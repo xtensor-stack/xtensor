@@ -44,8 +44,8 @@ namespace xt
         using difference_type = std::ptrdiff_t;
 
         using self_type = xscalar<T>;
-        using shape_type = std::vector<size_type>;
-        using strides_type = std::vector<size_type>;
+        using shape_type = std::array<size_type, 0>;
+        using strides_type = std::array<size_type, 0>;
 
         using closure_type = const self_type;
         using const_stepper = xscalar_stepper<T>;
@@ -63,11 +63,16 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        bool broadcast_shape(shape_type& shape) const;
-        bool is_trivial_broadcast(const strides_type& strides) const;
+        template <class S>
+        bool broadcast_shape(S& shape) const;
 
-        const_stepper stepper_begin(const shape_type& shape) const;
-        const_stepper stepper_end(const shape_type& shape) const;
+        template <class S>
+        bool is_trivial_broadcast(const S& strides) const;
+
+        template <class S>
+        const_stepper stepper_begin(const S& shape) const;
+        template <class S>
+        const_stepper stepper_end(const S& shape) const;
 
         const_storage_iterator storage_begin() const;
         const_storage_iterator storage_end() const;
@@ -210,25 +215,29 @@ namespace xt
     }
 
     template <class T>
-    inline bool xscalar<T>::broadcast_shape(shape_type&) const
+    template <class S>
+    inline bool xscalar<T>::broadcast_shape(S&) const
     {
         return true;
     }
 
     template <class T>
-    inline bool xscalar<T>::is_trivial_broadcast(const strides_type&) const
+    template <class S>
+    inline bool xscalar<T>::is_trivial_broadcast(const S&) const
     {
         return true;
     }
 
     template <class T>
-    inline auto xscalar<T>::stepper_begin(const shape_type&) const -> const_stepper
+    template <class S>
+    inline auto xscalar<T>::stepper_begin(const S&) const -> const_stepper
     {
         return const_stepper(this);
     }
 
     template <class T>
-    inline auto xscalar<T>::stepper_end(const shape_type& shape) const -> const_stepper
+    template <class S>
+    inline auto xscalar<T>::stepper_end(const S& shape) const -> const_stepper
     {
         return const_stepper(this);
     }
