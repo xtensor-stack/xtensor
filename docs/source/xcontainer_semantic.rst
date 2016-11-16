@@ -5,7 +5,7 @@
    The full license is in the file LICENSE, distributed with this software.
 
 xcontainer_semantic
-===============
+===================
 
 .. doxygenclass:: xt::xcontainer_semantic
    :project: xtensor
