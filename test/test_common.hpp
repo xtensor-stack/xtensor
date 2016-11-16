@@ -224,7 +224,7 @@ namespace xt
     template <class V1, class V2>
     void indexed_assign_array(V1& dst, const V2& src)
     {
-        typename V1::index_type index = dst.shape();
+        xindex index(dst.dimension());
         for (std::size_t i = 0; i < dst.shape()[0]; ++i)
         {
             index[0] = i;

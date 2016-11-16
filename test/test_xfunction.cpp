@@ -106,8 +106,7 @@ namespace xt
     TEST(xfunction, indexed_access)
     {
         xfunction_features f;
-        using index_type = xarray<int>::index_type;
-        index_type index = f.m_a.shape();
+        xindex index(f.m_a.dimension());
         index[0] = f.m_a.shape()[0] - 1;
         index[1] = f.m_a.shape()[1] - 1;
         index[2] = f.m_a.shape()[2] - 1;
@@ -122,7 +121,7 @@ namespace xt
         {
             SCOPED_TRACE("different shape");
             int a = (f.m_a + f.m_b)[index];
-            index_type index2 = index;
+            xindex index2 = index;
             index2[1] = 0;
             int b = f.m_a[index] + f.m_b[index2];
             EXPECT_EQ(a, b);
@@ -130,7 +129,7 @@ namespace xt
 
         {
             SCOPED_TRACE("different dimensions");
-            index_type index2 = f.m_c.shape();
+            xindex index2(f.m_c.dimension());
             index2[0] = 1;
             index2[1] = index[0];
             index2[2] = index[1];

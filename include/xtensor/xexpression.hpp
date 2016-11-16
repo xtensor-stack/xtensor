@@ -10,11 +10,15 @@
 #define XEXPRESSION_HPP
 
 #include <type_traits>
+#include <cstddef>
+#include <vector>
 
 #include "xutils.hpp"
 
 namespace xt
 {
+
+    using xindex = std::vector<std::size_t>;
 
     /**
      * @class xexpression

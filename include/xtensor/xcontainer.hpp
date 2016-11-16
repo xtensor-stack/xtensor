@@ -57,7 +57,6 @@ namespace xt
         using difference_type = typename container_type::difference_type;
 
         using shape_type = typename inner_types::shape_type;
-        using index_type = shape_type;
         using strides_type = typename inner_types::strides_type;
 
         using stepper = xstepper<D>;
@@ -87,8 +86,8 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        reference operator[](const index_type& index);
-        const_reference operator[](const index_type& index) const;
+        reference operator[](const xindex& index);
+        const_reference operator[](const xindex& index) const;
 
         container_type& data();
         const container_type& data() const;
@@ -159,7 +158,7 @@ namespace xt
         template <size_t dim = 0, class... Args>
         size_type data_offset(size_type i, Args... args) const;
 
-        size_type data_offset(const index_type& index) const;
+        size_type data_offset(const xindex& index) const;
 
         shape_type m_shape;
         strides_type m_strides;
@@ -238,7 +237,7 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_offset(const index_type& index) const -> size_type
+    inline auto xcontainer<D>::data_offset(const xindex& index) const -> size_type
     {
         // VS2015 workaround : index.begin() + index.size() - m_strides.size()
         // doesn't compile
@@ -397,7 +396,7 @@ namespace xt
      * than the number of dimensions of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::operator[](const index_type& index) -> reference
+    inline auto xcontainer<D>::operator[](const xindex& index) -> reference
     {
         return data()[data_offset(index)];
     }
@@ -409,7 +408,7 @@ namespace xt
     * than the number of dimensions of the container.
     */
     template <class D>
-    inline auto xcontainer<D>::operator[](const index_type& index) const -> const_reference
+    inline auto xcontainer<D>::operator[](const xindex& index) const -> const_reference
     {
         return data()[data_offset(index)];
     }
