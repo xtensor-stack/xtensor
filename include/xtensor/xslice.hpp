@@ -142,6 +142,15 @@ namespace xt
         size_type m_size;
     };
 
+    struct xall_tag
+    {
+    };
+
+    inline auto all()
+    {
+        return xall_tag();
+    }
+
     /******************************************************
      * homogeneous get_size for integral types and slices *
      ******************************************************/
@@ -189,6 +198,44 @@ namespace xt
     {
         return slice.derived_cast()(0);
     }
+
+    /****************************************
+     * homogeneous get_slice_implementation *
+     ****************************************/
+
+    template <class E, class SL>
+    inline auto get_slice_implementation(E& /*e*/, SL&& slice, std::size_t /*index*/)
+    {
+        return std::forward<SL>(slice);
+    }
+
+    template <class E>
+    inline auto get_slice_implementation(E& e, xall_tag, std::size_t index)
+    {
+        return xall<typename E::size_type>(e.shape()[index]);
+    }
+
+    /******************************
+     * homogeneous get_slice_type *
+     ******************************/
+
+    namespace detail
+    {
+        template <class E, class SL>
+        struct get_slice_type_impl
+        {
+            using type = SL;
+        };
+
+        template <class E>
+        struct get_slice_type_impl<E, xall_tag>
+        {
+            using type = xall<typename E::size_type>;
+        };
+    }
+
+    template <class E, class SL>
+    using get_slice_type = typename detail::get_slice_type_impl<E, std::remove_reference_t<SL>>::type;
 
     /*************************
      * xslice implementation *

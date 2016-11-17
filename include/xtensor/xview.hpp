@@ -159,7 +159,7 @@ namespace xt
     };
 
     template <class E, class... S>
-    xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices);
+    xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices);
 
     /*****************************
      * xview_stepper declaration *
@@ -436,10 +436,22 @@ namespace xt
         std::copy(tmp.storage_begin(), tmp.storage_end(), begin());
     }
 
-    template <class E, class... S>
-    inline xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices)
+    namespace detail
     {
-        return xview<E, std::remove_reference_t<S>...>(e, std::forward<S>(slices)...);
+        template <class E, std::size_t... I, class... S>
+        inline xview<E, get_slice_type<E, S>...> make_view_impl(E& e, std::index_sequence<I...>, S&&... slices)
+        {
+            return xview<E, get_slice_type<E, S>...>(
+                    e,
+                    std::forward<get_slice_type<E, S>>(get_slice_implementation(e, slices, I))...
+                    );
+        }
+    }
+
+    template <class E, class... S>
+    inline xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices)
+    {
+        return detail::make_view_impl(e, std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
     }
 
     /****************
