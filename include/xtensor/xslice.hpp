@@ -78,6 +78,13 @@ namespace xt
         size_type m_size;
     };
 
+    /**
+     * Returns a slice representing an interval, to
+     * be used as an argument of make_xview function.
+     * @param min the first index of the interval
+     * @param max the last index of the interval
+     * @sa make_xview
+     */
     template <class T>
     inline auto range(T min, T max)
     {
@@ -111,6 +118,14 @@ namespace xt
         size_type m_step;
     };
 
+    /**
+     * Returns a slice representing an interval, to
+     * be used as an argument of make_xview function.
+     * @param min the first index of the interval
+     * @param max the last index of the interval
+     * @param step the space between two indices
+     * @sa make_xview
+     */
     template <class T>
     inline auto range(T min, T max, T step)
     {
@@ -146,6 +161,11 @@ namespace xt
     {
     };
 
+    /**
+     * Returns a slice representing a full dimension,
+     * to be used as an argument of make_xview function.
+     * @sa make_xview
+     */
     inline auto all()
     {
         return xall_tag();

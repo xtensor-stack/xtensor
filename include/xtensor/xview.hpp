@@ -46,6 +46,8 @@ namespace xt
      *
      * @tparam E the expression type to adapt
      * @tparam S the slices type describing the shape adaptation
+     *
+     * @sa make_xview
      */
     template <class E, class... S>
     class xview : public xview_semantic<xview<E, S...>>
@@ -258,8 +260,11 @@ namespace xt
     //@{
     /**
      * Constructs a view on the specified xexpression.
+     * Users should not call directly this constructor but
+     * use the make_xview function instead.
      * @param e the xexpression to adapt
      * @param slices the slices list describing the view
+     * @sa make_xview
      */
     template <class E, class... S>
     template <class... SL>
@@ -448,6 +453,15 @@ namespace xt
         }
     }
 
+    /**
+     * Constructs and returns a view on the specified xexpression. Users
+     * should not directly construct the slices but call helper functions
+     * instead.
+     * @param e the xexpression to adapt
+     * @param slices the slices list describing the view
+     * @sa range 
+     * @sa all
+     */
     template <class E, class... S>
     inline xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices)
     {

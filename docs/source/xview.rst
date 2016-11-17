@@ -10,3 +10,15 @@ xview
 .. doxygenclass:: xt::xview
    :project: xtensor
    :members:
+
+.. doxygenfunction:: xt::make_xview
+   :project: xtensor
+
+.. doxygenfunction:: xt::range(T, T)
+   :project: xtensor
+
+.. doxygenfunction:: xt::range(T, T, T)
+   :project: xtensor
+
+.. doxygenfunction:: xt::all
+   :project: xtensor
