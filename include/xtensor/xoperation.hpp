@@ -32,6 +32,17 @@ namespace xt
         }
     };
 
+    template <class T>
+    struct conditional_ternary
+    {
+        using result_type = T;
+
+        constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const
+        {
+            return t1 ? t2 : t3;
+        }
+    };
+
     namespace detail
     {
         template <template <class...> class F, class... E>
@@ -46,8 +57,8 @@ namespace xt
         template <template <class...> class F, class... E>
         using get_xfunction_type = std::enable_if_t<has_xexpression<E...>::value,
                                                     xfunction<F<common_value_type<E...>>,
-                                                              common_value_type<E...>,
-                                                              get_xexpression_type<E>...>>;
+                                                                common_value_type<E...>,
+                                                                get_xexpression_type<E>...>>;
     }
 
     /*************
@@ -93,6 +104,35 @@ namespace xt
     {
         return detail::make_xfunction<std::divides>(e1, e2);
     }
+
+    template <class E1, class E2>
+    inline auto operator||(const E1& e1, const E2& e2) noexcept
+        -> detail::get_xfunction_type<std::logical_or, E1, E2>
+    {
+        return detail::make_xfunction<std::logical_or>(e1, e2);
+    }
+
+    template <class E1, class E2>
+    inline auto operator&&(const E1& e1, const E2& e2) noexcept
+        -> detail::get_xfunction_type<std::logical_and, E1, E2>
+    {
+        return detail::make_xfunction<std::logical_and>(e1, e2);
+    }
+
+    template <class E>
+    inline auto operator!(const E& e) noexcept
+        -> detail::get_xfunction_type<std::logical_not, E>
+    {
+        return detail::make_xfunction<std::logical_not>(e);
+    }
+
+    template <class E1, class E2, class E3>
+    inline auto where(const E1& e1, const E2& e2, const E3& e3) noexcept
+        -> detail::get_xfunction_type<conditional_ternary, E1, E2, E3>
+    {
+         return detail::make_xfunction<conditional_ternary>(e1, e2, e3);
+    }
+
 }
 
 #endif
