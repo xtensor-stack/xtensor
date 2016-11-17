@@ -78,6 +78,13 @@ namespace xt
         size_type m_size;
     };
 
+    /**
+     * Returns a slice representing an interval, to
+     * be used as an argument of make_xview function.
+     * @param min the first index of the interval
+     * @param max the last index of the interval
+     * @sa make_xview
+     */
     template <class T>
     inline auto range(T min, T max)
     {
@@ -111,6 +118,14 @@ namespace xt
         size_type m_step;
     };
 
+    /**
+     * Returns a slice representing an interval, to
+     * be used as an argument of make_xview function.
+     * @param min the first index of the interval
+     * @param max the last index of the interval
+     * @param step the space between two indices
+     * @sa make_xview
+     */
     template <class T>
     inline auto range(T min, T max, T step)
     {
@@ -141,6 +156,20 @@ namespace xt
 
         size_type m_size;
     };
+
+    struct xall_tag
+    {
+    };
+
+    /**
+     * Returns a slice representing a full dimension,
+     * to be used as an argument of make_xview function.
+     * @sa make_xview
+     */
+    inline auto all()
+    {
+        return xall_tag();
+    }
 
     /******************************************************
      * homogeneous get_size for integral types and slices *
@@ -189,6 +218,44 @@ namespace xt
     {
         return slice.derived_cast()(0);
     }
+
+    /****************************************
+     * homogeneous get_slice_implementation *
+     ****************************************/
+
+    template <class E, class SL>
+    inline auto get_slice_implementation(E& /*e*/, SL&& slice, std::size_t /*index*/)
+    {
+        return std::forward<SL>(slice);
+    }
+
+    template <class E>
+    inline auto get_slice_implementation(E& e, xall_tag, std::size_t index)
+    {
+        return xall<typename E::size_type>(e.shape()[index]);
+    }
+
+    /******************************
+     * homogeneous get_slice_type *
+     ******************************/
+
+    namespace detail
+    {
+        template <class E, class SL>
+        struct get_slice_type_impl
+        {
+            using type = SL;
+        };
+
+        template <class E>
+        struct get_slice_type_impl<E, xall_tag>
+        {
+            using type = xall<typename E::size_type>;
+        };
+    }
+
+    template <class E, class SL>
+    using get_slice_type = typename detail::get_slice_type_impl<E, std::remove_reference_t<SL>>::type;
 
     /*************************
      * xslice implementation *

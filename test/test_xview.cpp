@@ -47,6 +47,17 @@ namespace xt
         auto view5 = make_xview(view4, 1);
         EXPECT_EQ(0, view5.dimension());
         EXPECT_EQ(0, view5.shape().size());
+
+        auto view6 = make_xview(a, 1, all());
+        EXPECT_EQ(a(1, 0), view6(0));
+        EXPECT_EQ(a(1, 1), view6(1));
+        EXPECT_EQ(a(1, 2), view6(2));
+        EXPECT_EQ(a(1, 3), view6(3));
+
+        auto view7 = make_xview(a, all(), 2);
+        EXPECT_EQ(a(0, 2), view7(0));
+        EXPECT_EQ(a(1, 2), view7(1));
+        EXPECT_EQ(a(2, 2), view7(2));
     }
 
     TEST(xview, three_dimensional)

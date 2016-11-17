@@ -46,6 +46,8 @@ namespace xt
      *
      * @tparam E the expression type to adapt
      * @tparam S the slices type describing the shape adaptation
+     *
+     * @sa make_xview
      */
     template <class E, class... S>
     class xview : public xview_semantic<xview<E, S...>>
@@ -159,7 +161,7 @@ namespace xt
     };
 
     template <class E, class... S>
-    xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices);
+    xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices);
 
     /*****************************
      * xview_stepper declaration *
@@ -258,8 +260,11 @@ namespace xt
     //@{
     /**
      * Constructs a view on the specified xexpression.
+     * Users should not call directly this constructor but
+     * use the make_xview function instead.
      * @param e the xexpression to adapt
      * @param slices the slices list describing the view
+     * @sa make_xview
      */
     template <class E, class... S>
     template <class... SL>
@@ -436,10 +441,31 @@ namespace xt
         std::copy(tmp.storage_begin(), tmp.storage_end(), begin());
     }
 
-    template <class E, class... S>
-    inline xview<E, std::remove_reference_t<S>...> make_xview(E& e, S&&... slices)
+    namespace detail
     {
-        return xview<E, std::remove_reference_t<S>...>(e, std::forward<S>(slices)...);
+        template <class E, std::size_t... I, class... S>
+        inline xview<E, get_slice_type<E, S>...> make_view_impl(E& e, std::index_sequence<I...>, S&&... slices)
+        {
+            return xview<E, get_slice_type<E, S>...>(
+                    e,
+                    std::forward<get_slice_type<E, S>>(get_slice_implementation(e, slices, I))...
+                    );
+        }
+    }
+
+    /**
+     * Constructs and returns a view on the specified xexpression. Users
+     * should not directly construct the slices but call helper functions
+     * instead.
+     * @param e the xexpression to adapt
+     * @param slices the slices list describing the view
+     * @sa range 
+     * @sa all
+     */
+    template <class E, class... S>
+    inline xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices)
+    {
+        return detail::make_view_impl(e, std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
     }
 
     /****************

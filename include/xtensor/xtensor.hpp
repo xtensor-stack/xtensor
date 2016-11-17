@@ -39,7 +39,7 @@ namespace xt
      * @brief Dense multidimensional container with tensor
      * semantic and fixed dimension.
      *
-     * The xtnesor class implements a dense multidimensional container
+     * The xtensor class implements a dense multidimensional container
      * with tensor semantic and fixed dimension
      *
      * @tparam T The type of objects stored in the container.
