@@ -73,7 +73,7 @@ namespace xt
         explicit xarray(const shape_type& shape, const strides_type& strides);
         explicit xarray(const shape_type& shape, const strides_type& strides, const_reference value);
 
-        explicit xarray(const T& t);
+        xarray(const value_type& t);
         xarray(std::initializer_list<T> t);
         xarray(std::initializer_list<std::initializer_list<T>> t);
         xarray(std::initializer_list<std::initializer_list<std::initializer_list<T>>> t);
@@ -255,7 +255,7 @@ namespace xt
      * @param t the value of the element
      */
     template <class T>
-    inline xarray<T>::xarray(const T& t)
+    inline xarray<T>::xarray(const value_type& t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
