@@ -94,22 +94,22 @@ namespace xt
     bool operator!=(const xstepper<C>& lhs,
                     const xstepper<C>& rhs);
 
-    template <class S>
+    template <class S, class ST>
     void increment_stepper(S& stepper,
-                           typename S::shape_type& index,
-                           const typename S::shape_type& shape);
+                           ST& index,
+                           const ST& shape);
 
     /*************
      * xiterator *
      *************/
 
-    template <class It>
+    template <class It, class S = void>
     class xiterator
     {
 
     public:
 
-        using self_type = xiterator<It>;
+        using self_type = xiterator<It, S>;
 
         using subiterator_type = It;
         using value_type = typename subiterator_type::value_type;
@@ -119,7 +119,9 @@ namespace xt
         using size_type = typename subiterator_type::size_type;
         using iterator_category = std::input_iterator_tag;
 
-        using shape_type = typename subiterator_type::shape_type;
+        using shape_type = std::conditional_t<std::is_same<S, void>::value,
+                                              typename subiterator_type::shape_type,
+                                              S>;
 
         xiterator(It it, const shape_type& shape);
 
@@ -137,13 +139,13 @@ namespace xt
         shape_type m_index;
     };
 
-    template <class It>
-    bool operator==(const xiterator<It>& lhs,
-                    const xiterator<It>& rhs);
+    template <class It, class S>
+    bool operator==(const xiterator<It, S>& lhs,
+                    const xiterator<It, S>& rhs);
 
-    template <class It>
-    bool operator!=(const xiterator<It>& lhs,
-                    const xiterator<It>& rhs);
+    template <class It, class S>
+    bool operator!=(const xiterator<It, S>& lhs,
+                    const xiterator<It, S>& rhs);
 
     /**************************************
      * broadcast functions implementation *
@@ -234,10 +236,10 @@ namespace xt
         return !(lhs.equal(rhs));
     }
 
-    template <class S>
+    template <class S, class ST>
     void increment_stepper(S& stepper,
-                           typename S::shape_type& index,
-                           const typename S::shape_type& shape)
+                           ST& index,
+                           const ST& shape)
     {
         using size_type = typename S::size_type;
         for(size_type j = index.size(); j != 0; --j)
@@ -264,50 +266,50 @@ namespace xt
      * xiterator implementation *
      ****************************/
 
-    template <class It>
-    inline xiterator<It>::xiterator(It it, const shape_type& shape)
+    template <class It, class S>
+    inline xiterator<It, S>::xiterator(It it, const shape_type& shape)
         : m_it(it), m_shape(shape),
           m_index(make_shape<shape_type>(shape.size(), size_type(0)))
     {
     }
 
-    template <class It>
-    inline auto xiterator<It>::operator++() -> self_type&
+    template <class It, class S>
+    inline auto xiterator<It, S>::operator++() -> self_type&
     {
         increment_stepper(m_it, m_index, m_shape);
         return *this;
     }
 
-    template <class It>
-    inline auto xiterator<It>::operator++(int) -> self_type
+    template <class It, class S>
+    inline auto xiterator<It, S>::operator++(int) -> self_type
     {
         self_type tmp(*this);
         ++(*this);
         return tmp;
     }
 
-    template <class It>
-    inline auto xiterator<It>::operator*() const -> reference
+    template <class It, class S>
+    inline auto xiterator<It, S>::operator*() const -> reference
     {
         return *m_it;
     }
 
-    template <class It>
-    inline bool xiterator<It>::equal(const xiterator& rhs) const
+    template <class It, class S>
+    inline bool xiterator<It, S>::equal(const xiterator& rhs) const
     {
         return m_it == rhs.m_it && m_shape == rhs.m_shape;
     }
 
-    template <class It>
-    inline bool operator==(const xiterator<It>& lhs,
-                           const xiterator<It>& rhs)
+    template <class It, class S>
+    inline bool operator==(const xiterator<It, S>& lhs,
+                           const xiterator<It, S>& rhs)
     {
         return lhs.equal(rhs);
     }
 
-    template <class It>
-    inline bool operator!=(const xiterator<It>& lhs,
-                           const xiterator<It>& rhs)
+    template <class It, class S>
+    inline bool operator!=(const xiterator<It, S>& lhs,
+                           const xiterator<It, S>& rhs)
     {
         return !(lhs.equal(rhs));
     }

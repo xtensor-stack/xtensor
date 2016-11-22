@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
 #include <algorithm>
 
@@ -176,6 +177,33 @@ namespace xt
         EXPECT_EQ(11, *iter);
         ++iter;
         EXPECT_EQ(iter, iter_end);
+    }
+
+    TEST(xview, xview_on_xtensor)
+    {
+        xtensor<int, 2> a({ 3, 4 });
+        std::vector<int> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::copy(data.begin(), data.end(), a.storage_begin());
+
+        auto view1 = make_xview(a, 1, range(1, 4));
+        EXPECT_EQ(a(1, 1), view1(0));
+        EXPECT_EQ(a(1, 2), view1(1));
+        EXPECT_EQ(1, view1.dimension());
+
+        auto iter = view1.begin();
+        auto iter_end = view1.end();
+
+        EXPECT_EQ(6, *iter);
+        ++iter;
+        EXPECT_EQ(7, *iter);
+        ++iter;
+        EXPECT_EQ(8, *iter);
+
+        xarray<int> b({ 3 }, 2);
+        xtensor<int, 1> res = view1 + b;
+        EXPECT_EQ(8, res(0));
+        EXPECT_EQ(9, res(1));
+        EXPECT_EQ(10, res(2));
     }
 }
 
