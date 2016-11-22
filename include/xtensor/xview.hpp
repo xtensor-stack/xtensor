@@ -74,8 +74,8 @@ namespace xt
         using stepper = xview_stepper<E, S...>;
         using const_stepper = xview_stepper<const E, S...>;
 
-        using iterator = xiterator<stepper>;
-        using const_iterator = xiterator<const_stepper>;
+        using iterator = xiterator<stepper, shape_type>;
+        using const_iterator = xiterator<const_stepper, shape_type>;
         
         using storage_iterator = iterator;
         using const_storage_iterator = const_iterator;
@@ -99,8 +99,11 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        bool broadcast_shape(shape_type& shape) const;
-        bool is_trivial_broadcast(const strides_type& strides) const;
+        template <class ST>
+        bool broadcast_shape(ST& shape) const;
+
+        template <class ST>
+        bool is_trivial_broadcast(const ST& strides) const;
 
         iterator begin();
         iterator end();
@@ -118,11 +121,15 @@ namespace xt
         const_iterator cxbegin(const shape_type& shape) const;
         const_iterator cxend(const shape_type& shape) const;
 
-        stepper stepper_begin(const shape_type& shape);
-        stepper stepper_end(const shape_type& shape);
+        template <class ST>
+        stepper stepper_begin(const ST& shape);
+        template <class ST>
+        stepper stepper_end(const ST& shape);
 
-        const_stepper stepper_begin(const shape_type& shape) const;
-        const_stepper stepper_end(const shape_type& shape) const;
+        template <class ST>
+        const_stepper stepper_begin(const ST& shape) const;
+        template <class ST>
+        const_stepper stepper_end(const ST& shape) const;
 
         storage_iterator storage_begin();
         storage_iterator storage_end();
@@ -376,7 +383,8 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class E, class... S>
-    inline bool xview<E, S...>::broadcast_shape(shape_type& shape) const
+    template <class ST>
+    inline bool xview<E, S...>::broadcast_shape(ST& shape) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
@@ -387,7 +395,8 @@ namespace xt
      * @return a boolean indicating whether the broadcast is trivial
      */
     template <class E, class... S>
-    inline bool xview<E, S...>::is_trivial_broadcast(const strides_type& strides) const
+    template <class ST>
+    inline bool xview<E, S...>::is_trivial_broadcast(const ST& strides) const
     {
         return false;
     }
@@ -605,21 +614,24 @@ namespace xt
      ***************/
 
     template <class E, class... S>
-    inline auto xview<E, S...>::stepper_begin(const shape_type& shape) -> stepper
+    template <class ST>
+    inline auto xview<E, S...>::stepper_begin(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, m_e.stepper_begin(m_e.shape()), offset);
     }
 
     template <class E, class... S>
-    inline auto xview<E, S...>::stepper_end(const shape_type& shape) -> stepper
+    template <class ST>
+    inline auto xview<E, S...>::stepper_end(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, m_e.stepper_end(m_e.shape()), offset, true);
     }
 
     template <class E, class... S>
-    inline auto xview<E, S...>::stepper_begin(const shape_type& shape) const -> const_stepper
+    template <class ST>
+    inline auto xview<E, S...>::stepper_begin(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         const E& e = m_e;
@@ -627,7 +639,8 @@ namespace xt
     }
 
     template <class E, class... S>
-    inline auto xview<E, S...>::stepper_end(const shape_type& shape) const -> const_stepper
+    template <class ST>
+    inline auto xview<E, S...>::stepper_end(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         const E& e = m_e;
