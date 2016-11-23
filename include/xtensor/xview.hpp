@@ -396,7 +396,7 @@ namespace xt
      */
     template <class E, class... S>
     template <class ST>
-    inline bool xview<E, S...>::is_trivial_broadcast(const ST& strides) const
+    inline bool xview<E, S...>::is_trivial_broadcast(const ST& /*strides*/) const
     {
         return false;
     }

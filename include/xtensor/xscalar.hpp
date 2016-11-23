@@ -209,7 +209,7 @@ namespace xt
 
     template <class T>
     template <class... Args>
-    inline auto xscalar<T>::operator()(Args... args) const -> const_reference
+    inline auto xscalar<T>::operator()(Args...) const -> const_reference
     {
         return m_value;
     }
@@ -237,7 +237,7 @@ namespace xt
 
     template <class T>
     template <class S>
-    inline auto xscalar<T>::stepper_end(const S& shape) const -> const_stepper
+    inline auto xscalar<T>::stepper_end(const S&) const -> const_stepper
     {
         return const_stepper(this);
     }
@@ -271,17 +271,17 @@ namespace xt
     }
 
     template <class T>
-    inline void xscalar_stepper<T>::step(size_type dim, size_type n)
+    inline void xscalar_stepper<T>::step(size_type /*dim*/, size_type /*n*/)
     {
     }
 
     template <class T>
-    inline void xscalar_stepper<T>::step_back(size_type dim, size_type n)
+    inline void xscalar_stepper<T>::step_back(size_type /*dim*/, size_type /*n*/)
     {
     }
 
     template <class T>
-    inline void xscalar_stepper<T>::reset(size_type dim)
+    inline void xscalar_stepper<T>::reset(size_type /*dim*/)
     {
     }
 

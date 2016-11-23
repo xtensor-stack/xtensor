@@ -73,7 +73,7 @@ namespace xt
     {
         template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I == sizeof...(T), void>::type
-        for_each_impl(F&& f, std::tuple<T...>& t)
+        for_each_impl(F&& /*f*/, std::tuple<T...>& /*t*/)
         {
         }
 
@@ -100,7 +100,7 @@ namespace xt
     {
         template <std::size_t I, class F, class R, class... T>
         inline std::enable_if_t<I == sizeof...(T), R>
-        accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
+        accumulate_impl(F&& /*f*/, R init, const std::tuple<T...>& /*t*/)
         {
             return init;
         }
@@ -145,7 +145,7 @@ namespace xt
         struct getter
         {
             template <class Arg, class... Args>
-            static constexpr decltype(auto) get(Arg&& arg, Args&&... args) noexcept
+            static constexpr decltype(auto) get(Arg&& /*arg*/, Args&&... args) noexcept
             {
                 return getter<I - 1>::get(std::forward<Args>(args)...);
             }
@@ -155,7 +155,7 @@ namespace xt
         struct getter<0>
         {
             template <class Arg, class... Args>
-            static constexpr Arg&& get(Arg&& arg, Args&&... args) noexcept
+            static constexpr Arg&& get(Arg&& arg, Args&&... /*args*/) noexcept
             {
                 return std::forward<Arg>(arg);
             }
@@ -182,7 +182,7 @@ namespace xt
         }
 
         template <class R, class F, std::size_t... I, class... S>
-        R apply(std::size_t index, F&& func, std::index_sequence<I...> seq, const std::tuple<S...>& s)
+        R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s)
         {
             using FT = std::add_pointer_t<R(F&&, const std::tuple<S...>&)>;
             static const std::array<FT, sizeof...(I)> ar = { &apply_one<R, F, I, S...>... };
@@ -291,7 +291,7 @@ namespace xt
 	        constexpr predshape(S first, S last): m_first(first), m_last(last)
 	        {}
 
-	        constexpr bool operator()(const T& t) const
+	        constexpr bool operator()(const T&) const
 	        {
 	            return m_first == m_last;
 	        }
@@ -334,7 +334,7 @@ namespace xt
     }
 
     template <class T, std::size_t N>
-    inline bool resize_container(std::array<T, N>& a, typename std::array<T, N>::size_type size)
+    inline bool resize_container(std::array<T, N>& /*a*/, typename std::array<T, N>::size_type size)
     {
         return size == N;
     }

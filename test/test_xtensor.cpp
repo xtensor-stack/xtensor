@@ -156,4 +156,5 @@ namespace xt
         xtensor<int, 3> a;
         EXPECT_EQ(0, a());
     }
+
 }

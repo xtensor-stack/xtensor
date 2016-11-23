@@ -59,8 +59,8 @@ namespace xt
         {
             SCOPED_TRACE("assignment operator");
             row_major_result<> r;
-            vec_type v(r.size(), 0);
-            adaptor_type c(v, r.shape());
+            vec_type v2(r.size(), 0);
+            adaptor_type c(v2, r.shape());
             EXPECT_NE(a.data(), c.data());
             c = a;
             compare_shape(a, c);
@@ -86,8 +86,8 @@ namespace xt
         {
             SCOPED_TRACE("move assignment");
             row_major_result<> r;
-            vec_type v(r.size(), 0);
-            adaptor_type c(v, r.shape());
+            vec_type v2(r.size(), 0);
+            adaptor_type c(v2, r.shape());
             EXPECT_NE(a.data(), c.data());
             adaptor_type tmp(a);
             c = std::move(tmp);
