@@ -205,5 +205,16 @@ namespace xt
         EXPECT_EQ(9, res(1));
         EXPECT_EQ(10, res(2));
     }
+
+    TEST(xview, trivial_iterating)
+    {
+        xtensor<double, 1> arr1{ {2} };
+        std::fill(arr1.begin(), arr1.end(), 6);
+        auto view = xt::make_xview(arr1, 0);
+        auto iter = view.begin();
+        auto iter_end = view.end();
+        ++iter;
+        EXPECT_EQ(iter, iter_end);
+    }
 }
 
