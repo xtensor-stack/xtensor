@@ -729,7 +729,8 @@ namespace xt
         {
             auto func = [](const auto& s) { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
-            size_type step_size = apply<size_type>(index, func, p_view->slices());
+            size_type step_size = index < sizeof...(S) ?
+                apply<size_type>(index, func, p_view->slices()) : 1;
             m_it.step(index, step_size * n);
         }
     }
@@ -741,7 +742,8 @@ namespace xt
         {
             auto func = [](const auto& s) { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
-            size_type step_size = apply<size_type>(index, func, p_view->slices());
+            size_type step_size = index < sizeof...(S) ?
+                apply<size_type>(index, func, p_view->slices()) : 1;
             m_it.step_back(index, step_size * n);
         }
     }
@@ -754,9 +756,11 @@ namespace xt
             auto size_func = [](const auto& s) { return get_size(s); };
             auto step_func = [](const auto& s) { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
-            size_type size = apply<size_type>(index, size_func, p_view->slices());
+            size_type size = index < sizeof...(S) ?
+                apply<size_type>(index, size_func, p_view->slices()) : p_view->shape()[dim];
             if(size != 0) size = size - 1;
-            size_type step_size = apply<size_type>(index, step_func, p_view->slices());
+            size_type step_size = index < sizeof...(S) ?
+                apply<size_type>(index, step_func, p_view->slices()) : 1;
             m_it.step_back(index, step_size * size);
         }
     }
