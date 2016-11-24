@@ -117,7 +117,7 @@ namespace xt
         using pointer = typename subiterator_type::pointer;
         using difference_type = typename subiterator_type::difference_type;
         using size_type = typename subiterator_type::size_type;
-        using iterator_category = std::input_iterator_tag;
+        using iterator_category = std::forward_iterator_tag;
 
         using shape_type = std::conditional_t<std::is_same<S, void>::value,
                                               typename subiterator_type::shape_type,
@@ -242,23 +242,24 @@ namespace xt
                            const ST& shape)
     {
         using size_type = typename S::size_type;
-        for(size_type j = index.size(); j != 0; --j)
+        size_type i = index.size();
+        while(i != 0)
         {
-            size_type i = j-1;
+            --i;
             if(++index[i] != shape[i])
             {
                 stepper.step(i);
-                break;
+                return;
             }
-            else if (i == 0)
-            {
-                stepper.to_end();
-            }
-            else
+            else if(i != 0)
             {
                 index[i] = 0;
                 stepper.reset(i);
             }
+        }
+        if(i == 0)
+        {
+            stepper.to_end();
         }
     }
 
