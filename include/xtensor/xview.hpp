@@ -24,7 +24,7 @@ namespace xt
      * xview declaration *
      *********************/
 
-    template <class E, class... S>
+    template <bool is_const, class E, class... S>
     class xview_stepper;
 
     template <class E, class... S>
@@ -71,8 +71,8 @@ namespace xt
         using strides_type = std::vector<size_type>;
         using slice_type = std::tuple<S...>;
 
-        using stepper = xview_stepper<E, S...>;
-        using const_stepper = xview_stepper<const E, S...>;
+        using stepper = xview_stepper<false, E, S...>;
+        using const_stepper = xview_stepper<true, E, S...>;
 
         using iterator = xiterator<stepper, shape_type>;
         using const_iterator = xiterator<const_stepper, shape_type>;
@@ -194,14 +194,14 @@ namespace xt
     template <class V>
     using get_stepper = typename detail::get_stepper_impl<V>::type;
 
-    template <class E, class... S>
+    template <bool is_const, class E, class... S>
     class xview_stepper
     {
 
     public:
 
-        using view_type = std::conditional_t<std::is_const<E>::value,
-                                             const xview<std::remove_const_t<E>, S...>,
+        using view_type = std::conditional_t<is_const,
+                                             const xview<E, S...>,
                                              xview<E, S...>>;
         using substepper_type = get_stepper<view_type>;
 
@@ -233,13 +233,13 @@ namespace xt
         size_type m_offset;
     };
 
-    template <class E, class... S>
-    bool operator==(const xview_stepper<E, S...>& lhs,
-                    const xview_stepper<E, S...>& rhs);
+    template <bool is_const, class E, class... S>
+    bool operator==(const xview_stepper<is_const, E, S...>& lhs,
+                    const xview_stepper<is_const, E, S...>& rhs);
 
-    template <class E, class... S>
-    bool operator!=(const xview_stepper<E, S...>& lhs,
-                    const xview_stepper<E, S...>& rhs);
+    template <bool is_const, class E, class... S>
+    bool operator!=(const xview_stepper<is_const, E, S...>& lhs,
+                    const xview_stepper<is_const, E, S...>& rhs);
 
     /********************************
      * helper functions declaration *
@@ -700,9 +700,9 @@ namespace xt
      * xview_stepper implementation *
      ********************************/
 
-    template <class E, class... S>
-    inline xview_stepper<E, S...>::xview_stepper(view_type* view, substepper_type it,
-                                                 size_type offset, bool end)
+    template <bool is_const, class E, class... S>
+    inline xview_stepper<is_const, E, S...>::xview_stepper(view_type* view, substepper_type it,
+                                                           size_type offset, bool end)
         : p_view(view), m_it(it), m_offset(offset)
     {
         if(!end)
@@ -716,14 +716,14 @@ namespace xt
         }
     }
 
-    template <class E, class... S>
-    inline auto xview_stepper<E, S...>::operator*() const -> reference
+    template <bool is_const, class E, class... S>
+    inline auto xview_stepper<is_const, E, S...>::operator*() const -> reference
     {
         return *m_it;
     }
 
-    template <class E, class... S>
-    inline void xview_stepper<E, S...>::step(size_type dim, size_type n)
+    template <bool is_const, class E, class... S>
+    inline void xview_stepper<is_const, E, S...>::step(size_type dim, size_type n)
     {
         if(dim >= m_offset)
         {
@@ -735,8 +735,8 @@ namespace xt
         }
     }
 
-    template <class E, class... S>
-    inline void xview_stepper<E, S...>::step_back(size_type dim, size_type n)
+    template <bool is_const, class E, class... S>
+    inline void xview_stepper<is_const, E, S...>::step_back(size_type dim, size_type n)
     {
         if(dim >= m_offset)
         {
@@ -748,8 +748,8 @@ namespace xt
         }
     }
 
-    template <class E, class... S>
-    inline void xview_stepper<E, S...>::reset(size_type dim)
+    template <bool is_const, class E, class... S>
+    inline void xview_stepper<is_const, E, S...>::reset(size_type dim)
     {
         if(dim >= m_offset)
         {
@@ -765,28 +765,28 @@ namespace xt
         }
     }
 
-    template <class E, class... S>
-    inline void xview_stepper<E, S...>::to_end()
+    template <bool is_const, class E, class... S>
+    inline void xview_stepper<is_const, E, S...>::to_end()
     {
         m_it.to_end();
     }
 
-    template <class E, class... S>
-    inline bool xview_stepper<E, S...>::equal(const xview_stepper& rhs) const
+    template <bool is_const, class E, class... S>
+    inline bool xview_stepper<is_const, E, S...>::equal(const xview_stepper& rhs) const
     {
         return p_view == rhs.p_view && m_it == rhs.m_it && m_offset == rhs.m_offset;
     }
 
-    template <class E, class... S>
-    inline bool operator==(const xview_stepper<E, S...>& lhs,
-                           const xview_stepper<E, S...>& rhs)
+    template <bool is_const, class E, class... S>
+    inline bool operator==(const xview_stepper<is_const, E, S...>& lhs,
+                           const xview_stepper<is_const, E, S...>& rhs)
     {
         return lhs.equal(rhs);
     }
 
-    template <class E, class... S>
-    inline bool operator!=(const xview_stepper<E, S...>& lhs,
-                           const xview_stepper<E, S...>& rhs)
+    template <bool is_const, class E, class... S>
+    inline bool operator!=(const xview_stepper<is_const, E, S...>& lhs,
+                           const xview_stepper<is_const, E, S...>& rhs)
     {
         return !(lhs.equal(rhs));
     }
