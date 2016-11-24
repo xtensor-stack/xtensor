@@ -105,8 +105,8 @@ namespace xt
         }
     }
 
-    template <class R, class S>
-    void test_end(const R& result, const S& shape)
+    template <class R>
+    void test_end(const R& result)
     {
         using size_type = typename R::size_type;
         using shape_type = typename R::shape_type;
@@ -130,7 +130,7 @@ namespace xt
         row_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
 
         {
@@ -138,7 +138,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
     }
 
@@ -147,7 +147,7 @@ namespace xt
         column_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
 
         {
@@ -155,7 +155,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
     }
 
@@ -164,7 +164,7 @@ namespace xt
         central_major_result<> rm;
         {
             SCOPED_TRACE("same shape");
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
 
         {
@@ -172,7 +172,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
     }
 
@@ -181,7 +181,7 @@ namespace xt
         unit_shape_result<> rm;
         {
             SCOPED_TRACE("same shape");
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
 
         {
@@ -189,7 +189,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_end(rm, rm.shape());
+            test_end(rm);
         }
     }
 
