@@ -271,7 +271,7 @@ namespace xt
     template <class F, class R, class... E>
     template <class Func>
     inline xfunction<F, R, E...>::xfunction(Func&& f, const E&... e) noexcept
-        : m_f(std::forward<Func>(f)), m_e(e...)
+        : m_e(e...), m_f(std::forward<Func>(f))
     {
     }
     //@}
