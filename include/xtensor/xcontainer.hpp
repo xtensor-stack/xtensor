@@ -80,6 +80,8 @@ namespace xt
         void reshape(const shape_type& shape, layout l);
         void reshape(const shape_type& shape, const strides_type& strides);
 
+        void transpose();
+
         template <class... Args>
         reference operator()(Args... args);
 
@@ -306,6 +308,17 @@ namespace xt
         {
             reshape(shape, layout::row_major);
         }
+    }
+
+    /**
+     * Transposes the container.
+     */
+    template <class D>
+    inline void xcontainer<D>::transpose()
+    {
+        // reverse stride and shape
+        m_strides = strides_type(m_strides.rbegin(), m_strides.rend());
+        m_shape = shape_type(m_shape.rbegin(), m_shape.rend());
     }
 
     /**
