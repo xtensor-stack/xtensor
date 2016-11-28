@@ -24,11 +24,48 @@ namespace xt
 
     namespace detail
     {
-        template <class... Args>
-        using common_size_type = std::common_type_t<typename Args::size_type...>;
+
+        /********************
+         * common_size_type *
+         ********************/
 
         template <class... Args>
-        using common_difference_type = std::common_type_t<typename Args::difference_type...>;
+        struct common_size_type_impl
+        {
+            using type = std::common_type_t<typename Args::size_type...>;
+        };
+
+        template <>
+        struct common_size_type_impl<>
+        {
+            using type = std::size_t;
+        };
+
+        template<class... Args>
+        using common_size_type = typename common_size_type_impl<Args...>::type;
+
+        /**************************
+         * common_difference type *
+         **************************/
+
+        template <class... Args>
+        struct common_difference_type_impl
+        {
+            using type = std::common_type_t<typename Args::difference_type...>;
+        };
+
+        template <>
+        struct common_difference_type_impl<>
+        {
+            using type = std::size_t;
+        };
+
+        template<class... Args>
+        using common_difference_type = typename common_difference_type_impl<Args...>::type;
+
+        /*********************
+         * common_value_type *
+         *********************/
 
         template <class... Args>
         using common_value_type = std::common_type_t<get_value_type<Args>...>;
@@ -61,7 +98,7 @@ namespace xt
 
     public:
 
-        using self_type = xfunction<F, E...>;
+        using self_type = xfunction<F, R, E...>;
         using functor_type = F;
 
         using value_type = R;
@@ -69,9 +106,8 @@ namespace xt
         using const_reference = value_type;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        // Workaround for buggy error C2210 in VS2015
-        using size_type = std::common_type_t<typename E::size_type...>; // detail::common_size_type<E...>;
-        using difference_type = std::common_type_t<typename E::difference_type...>; //detail::common_difference_type<E...>;
+        using size_type = detail::common_size_type<E...>;
+        using difference_type = detail::common_difference_type<E...>;
 
         using shape_type = std::vector<size_type>;
         using strides_type = std::vector<size_type>;

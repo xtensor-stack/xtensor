@@ -60,5 +60,13 @@ namespace xt
         EXPECT_EQ(a(0,0) + b(0, 0), c(0, 0));
     }
 
+    TEST(xvectorize, noargument)
+    {
+        auto vecfunc = vectorize([] { return double(1.); });
+        shape_type shape = { 3, 2 };
+        xarray<double> a(shape, 1.5);
+        a = vecfunc();
+        EXPECT_EQ(0, a.dimension());
+    }
 }
 
