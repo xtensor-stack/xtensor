@@ -26,7 +26,7 @@ namespace xt
     {
         using result_type = T;
 
-        constexpr T operator()(const T& t) const
+        constexpr T operator()(const T& t) const noexcept
         {
             return +t;
         }
@@ -37,7 +37,7 @@ namespace xt
     {
         using result_type = T;
 
-        constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const
+        constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const noexcept
         {
             return t1 ? t2 : t3;
         }

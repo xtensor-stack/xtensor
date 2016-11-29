@@ -86,7 +86,7 @@ namespace xt
      * @sa make_xview
      */
     template <class T>
-    inline auto range(T min, T max)
+    inline auto range(T min, T max) noexcept
     {
         return xrange<T>(min, max);
     }
@@ -127,7 +127,7 @@ namespace xt
      * @sa make_xview
      */
     template <class T>
-    inline auto range(T min, T max, T step)
+    inline auto range(T min, T max, T step) noexcept
     {
         return xstepped_range<T>(min, max, step);
     }
@@ -166,7 +166,7 @@ namespace xt
      * to be used as an argument of make_xview function.
      * @sa make_xview
      */
-    inline auto all()
+    inline auto all() noexcept
     {
         return xall_tag();
     }
@@ -176,13 +176,13 @@ namespace xt
      ******************************************************/
 
     template <class S>
-    inline disable_xslice<S, std::size_t> get_size(const S&)
+    inline disable_xslice<S, std::size_t> get_size(const S&) noexcept
     {
         return 1;
     };
 
     template <class S>
-    inline auto get_size(const xslice<S>& slice)
+    inline auto get_size(const xslice<S>& slice) noexcept
     {
         return slice.derived_cast().size();
     };
@@ -192,13 +192,13 @@ namespace xt
      *******************************************************/
 
     template <class S>
-    inline disable_xslice<S, std::size_t> step_size(const S&)
+    inline disable_xslice<S, std::size_t> step_size(const S&) noexcept
     {
         return 0;
     }
 
     template <class S>
-    inline auto step_size(const xslice<S>& slice)
+    inline auto step_size(const xslice<S>& slice) noexcept
     {
         return slice.derived_cast().step_size();
     }
@@ -208,13 +208,13 @@ namespace xt
      ***************************************************/
 
     template <class S>
-    inline disable_xslice<S, std::size_t> first_value(const S& s)
+    inline disable_xslice<S, std::size_t> first_value(const S& s) noexcept
     {
         return s;
     }
 
     template <class S>
-    inline auto first_value(const xslice<S>& slice)
+    inline auto first_value(const xslice<S>& slice) noexcept
     {
         return slice.derived_cast()(0);
     }

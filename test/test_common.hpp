@@ -343,7 +343,7 @@ namespace xt
             SCOPED_TRACE("row_major storage iterator");
             row_major_result<C> rm;
             vec.reshape(rm.m_shape, layout::row_major);
-            std::copy(rm.data().begin(), rm.data().end(), vec.storage_begin());
+            std::copy(rm.data().cbegin(), rm.data().cend(), vec.storage_begin());
             EXPECT_EQ(rm.data(), vec.data());
             EXPECT_EQ(vec.storage_end(), vec.data().end());
         }
@@ -352,7 +352,7 @@ namespace xt
             SCOPED_TRACE("column_major storage iterator");
             column_major_result<C> cm;
             vec.reshape(cm.m_shape, layout::column_major);
-            std::copy(cm.data().begin(), cm.data().end(), vec.storage_begin());
+            std::copy(cm.data().cbegin(), cm.data().cend(), vec.storage_begin());
             EXPECT_EQ(cm.data(), vec.data());
             EXPECT_EQ(vec.storage_end(), vec.data().end());
         }
@@ -361,7 +361,7 @@ namespace xt
             SCOPED_TRACE("central_major storage iterator");
             central_major_result<C> cem;
             vec.reshape(cem.m_shape, cem.m_strides);
-            std::copy(cem.data().begin(), cem.data().end(), vec.storage_begin());
+            std::copy(cem.data().cbegin(), cem.data().cend(), vec.storage_begin());
             EXPECT_EQ(cem.data(), vec.data());
             EXPECT_EQ(vec.storage_end(), vec.data().end());
         }
@@ -370,7 +370,7 @@ namespace xt
             SCOPED_TRACE("unit_shape storage iterator");
             unit_shape_result<C> usr;
             vec.reshape(usr.m_shape, layout::row_major);
-            std::copy(usr.data().begin(), usr.data().end(), vec.storage_begin());
+            std::copy(usr.data().cbegin(), usr.data().cend(), vec.storage_begin());
             EXPECT_EQ(usr.data(), vec.data());
             EXPECT_EQ(vec.storage_end(), vec.data().end());
         }

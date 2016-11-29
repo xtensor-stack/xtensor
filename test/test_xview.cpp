@@ -22,7 +22,7 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.begin(), data.end(), a.storage_begin());
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
         auto view1 = make_xview(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));
@@ -81,7 +81,7 @@ namespace xt
             211, 212
         };
         xarray<double> a(shape);
-        std::copy(data.begin(), data.end(), a.storage_begin());
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
         auto view1 = make_xview(a, 1);
         EXPECT_EQ(2, view1.dimension());
@@ -119,7 +119,7 @@ namespace xt
         xarray<double> a(shape);
         std::vector<double> data {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
                                   13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
-        std::copy(data.begin(), data.end(), a.storage_begin());
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
         auto view1 = make_xview(a, range(0, 2), 1, range(1, 4));
         auto iter = view1.begin();
@@ -159,12 +159,12 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
         std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.begin(), data.end(), a.storage_begin());
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
         view_shape_type shape2 = { 3 };
         xarray<int> b(shape2);
         std::vector<int> data2 = { 1, 2, 3 };
-        std::copy(data2.begin(), data2.end(), b.storage_begin());
+        std::copy(data2.cbegin(), data2.cend(), b.storage_begin());
 
         auto func = make_xview(a, 1, range(1, 4)) + b;
         auto iter = func.begin();
@@ -183,7 +183,7 @@ namespace xt
     {
         xtensor<int, 2> a({ 3, 4 });
         std::vector<int> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-        std::copy(data.begin(), data.end(), a.storage_begin());
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
         auto view1 = make_xview(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));

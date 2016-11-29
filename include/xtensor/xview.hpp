@@ -137,6 +137,9 @@ namespace xt
         const_storage_iterator storage_begin() const;
         const_storage_iterator storage_end() const;
 
+        const_storage_iterator storage_cbegin() const;
+        const_storage_iterator storage_cend() const;
+
     private:
 
         E& m_e;
@@ -278,7 +281,7 @@ namespace xt
     inline xview<E, S...>::xview(E& e, SL&&... slices) noexcept
         : m_e(e), m_slices(std::forward<SL>(slices)...)
     {
-        auto func = [](const auto& s) { return get_size(s); };
+        auto func = [](const auto& s) noexcept { return get_size(s); };
         m_shape.resize(dimension());
         for (size_type i = 0; i != dimension(); ++i)
         {
@@ -447,7 +450,7 @@ namespace xt
     template <class E, class... S>
     inline void xview<E, S...>::assign_temporary_impl(temporary_type& tmp)
     {
-        std::copy(tmp.storage_begin(), tmp.storage_end(), begin());
+        std::copy(tmp.storage_cbegin(), tmp.storage_cend(), begin());
     }
 
     namespace detail
@@ -682,7 +685,7 @@ namespace xt
     template <class E, class... S>
     inline auto xview<E, S...>::storage_begin() const -> const_storage_iterator
     {
-        return begin();
+        return cbegin();
     }
 
     /**
@@ -692,7 +695,28 @@ namespace xt
     template <class E, class... S>
     inline auto xview<E, S...>::storage_end() const -> const_storage_iterator
     {
-        return end();
+        return cend();
+    }
+    //@}
+
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the view.
+     */
+    template <class E, class... S>
+    inline auto xview<E, S...>::storage_cbegin() const -> const_storage_iterator
+    {
+        return cbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the view.
+     */
+    template <class E, class... S>
+    inline auto xview<E, S...>::storage_cend() const -> const_storage_iterator
+    {
+        return cend();
     }
     //@}
 
@@ -727,7 +751,7 @@ namespace xt
     {
         if(dim >= m_offset)
         {
-            auto func = [](const auto& s) { return step_size(s); };
+            auto func = [](const auto& s) noexcept { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
             size_type step_size = index < sizeof...(S) ?
                 apply<size_type>(index, func, p_view->slices()) : 1;
@@ -740,7 +764,7 @@ namespace xt
     {
         if(dim >= m_offset)
         {
-            auto func = [](const auto& s) { return step_size(s); };
+            auto func = [](const auto& s) noexcept { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
             size_type step_size = index < sizeof...(S) ?
                 apply<size_type>(index, func, p_view->slices()) : 1;
@@ -753,8 +777,8 @@ namespace xt
     {
         if(dim >= m_offset)
         {
-            auto size_func = [](const auto& s) { return get_size(s); };
-            auto step_func = [](const auto& s) { return step_size(s); };
+            auto size_func = [](const auto& s) noexcept { return get_size(s); };
+            auto step_func = [](const auto& s) noexcept { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
             size_type size = index < sizeof...(S) ?
                 apply<size_type>(index, size_func, p_view->slices()) : p_view->shape()[dim];
