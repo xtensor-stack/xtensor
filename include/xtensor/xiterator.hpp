@@ -67,7 +67,7 @@ namespace xt
         using size_type = typename container_type::size_type;
         using shape_type = typename container_type::shape_type;
 
-        xstepper(container_type* c, subiterator_type it, size_type offset);
+        xstepper(container_type* c, subiterator_type it, size_type offset) noexcept;
 
         reference operator*() const;
 
@@ -178,7 +178,7 @@ namespace xt
      ***************************/
 
     template <class C>
-    inline xstepper<C>::xstepper(container_type* c, subiterator_type it, size_type offset)
+    inline xstepper<C>::xstepper(container_type* c, subiterator_type it, size_type offset) noexcept
         : p_c(c), m_it(it), m_offset(offset)
     {
     }

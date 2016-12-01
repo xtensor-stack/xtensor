@@ -90,8 +90,8 @@ namespace xt
 
         container_type m_data;
 
-        container_type& data_impl();
-        const container_type& data_impl() const;
+        container_type& data_impl() noexcept;
+        const container_type& data_impl() const noexcept;
 
         friend class xcontainer<xtensor<T, N>>;
     };
@@ -160,8 +160,8 @@ namespace xt
 
         container_type& m_data;
 
-        container_type& data_impl();
-        const container_type& data_impl() const;
+        container_type& data_impl() noexcept;
+        const container_type& data_impl() const noexcept;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type& tmp);
@@ -270,13 +270,13 @@ namespace xt
     //@}
 
     template <class T, std::size_t N>
-    inline auto xtensor<T, N>::data_impl() -> container_type&
+    inline auto xtensor<T, N>::data_impl() noexcept -> container_type&
     {
         return m_data;
     }
 
     template <class T, std::size_t N>
-    inline auto xtensor<T, N>::data_impl() const -> const container_type&
+    inline auto xtensor<T, N>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
     }
@@ -360,13 +360,13 @@ namespace xt
     //@}
 
     template <class C, std::size_t N>
-    inline auto xtensor_adaptor<C, N>::data_impl() -> container_type&
+    inline auto xtensor_adaptor<C, N>::data_impl() noexcept -> container_type&
     {
         return m_data;
     }
 
     template <class C, std::size_t N>
-    inline auto xtensor_adaptor<C, N>::data_impl() const -> const container_type&
+    inline auto xtensor_adaptor<C, N>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
     }
@@ -380,7 +380,7 @@ namespace xt
         base_type::get_strides() = tmp.strides();
         base_type::get_backstrides() = tmp.backstrides();
         m_data.resize(tmp.size());
-        std::copy(tmp.data().begin(), tmp.data().end(), m_data.begin());
+        std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
     }
 }
 

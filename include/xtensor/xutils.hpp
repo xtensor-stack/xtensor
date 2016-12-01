@@ -24,10 +24,10 @@ namespace xt
     struct remove_class;
 
     template <class F, class... T>
-    void for_each(F&& f, std::tuple<T...>& t);
+    void for_each(F&& f, std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()));
 
     template <class F, class R, class... T>
-    R accumulate(F&& f, R init, const std::tuple<T...>& t);
+    R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()));
 
     template <class... T>
     struct or_;
@@ -36,7 +36,7 @@ namespace xt
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template<class R, class F, class... S>
-    R apply(std::size_t index, F&& func, const std::tuple<S...>& s);
+    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()));
 
     template <class U>
     struct initializer_dimension;
@@ -73,13 +73,13 @@ namespace xt
     {
         template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I == sizeof...(T), void>::type
-        for_each_impl(F&& /*f*/, std::tuple<T...>& /*t*/)
+        for_each_impl(F&& /*f*/, std::tuple<T...>& /*t*/) noexcept(noexcept(std::declval<F>()))
         {
         }
 
         template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I < sizeof...(T), void>::type
-        for_each_impl(F&& f, std::tuple<T...>& t)
+        for_each_impl(F&& f, std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
         {
             f(std::get<I>(t));
             for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
@@ -87,7 +87,7 @@ namespace xt
     }
 
     template <class F, class... T>
-    inline void for_each(F&& f, std::tuple<T...>& t)
+    inline void for_each(F&& f, std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
     {
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
@@ -100,14 +100,14 @@ namespace xt
     {
         template <std::size_t I, class F, class R, class... T>
         inline std::enable_if_t<I == sizeof...(T), R>
-        accumulate_impl(F&& /*f*/, R init, const std::tuple<T...>& /*t*/)
+        accumulate_impl(F&& /*f*/, R init, const std::tuple<T...>& /*t*/) noexcept(noexcept(std::declval<F>()))
         {
             return init;
         }
 
         template <std::size_t I, class F, class R, class... T>
         inline std::enable_if_t<I < sizeof...(T), R>
-        accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
+        accumulate_impl(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
         {
             R res = f(init, std::get<I>(t));
             return accumulate_impl<I + 1, F, R, T...>(std::forward<F>(f), res, t);
@@ -115,7 +115,7 @@ namespace xt
     }
 
     template <class F, class R, class... T>
-    inline R accumulate(F&& f, R init, const std::tuple<T...>& t)
+    inline R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
     {
         return detail::accumulate_impl<0, F, R, T...>(f, init, t);
     }
@@ -176,13 +176,13 @@ namespace xt
     namespace detail
     {
         template <class R, class F, std::size_t I, class... S>
-        R apply_one(F&& func, const std::tuple<S...>& s)
+        R apply_one(F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
         {
             return func(std::get<I>(s));
         }
 
         template <class R, class F, std::size_t... I, class... S>
-        R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s)
+        R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
         {
             using FT = std::add_pointer_t<R(F&&, const std::tuple<S...>&)>;
             static const std::array<FT, sizeof...(I)> ar = { &apply_one<R, F, I, S...>... };
@@ -191,7 +191,7 @@ namespace xt
     }
 
     template<class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s)
+    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }
@@ -285,36 +285,36 @@ namespace xt
 
     namespace detail
     {
-	    template <class T, class S>
-	    struct predshape
-	    {
-	        constexpr predshape(S first, S last): m_first(first), m_last(last)
-	        {}
+        template <class T, class S>
+        struct predshape
+        {
+            constexpr predshape(S first, S last): m_first(first), m_last(last)
+            {}
 
-	        constexpr bool operator()(const T&) const
-	        {
-	            return m_first == m_last;
-	        }
+            constexpr bool operator()(const T&) const
+            {
+                return m_first == m_last;
+            }
 
-	        S m_first;
-	        S m_last;
-	    };
+            S m_first;
+            S m_last;
+        };
 
-	    template <class T, class S>
-	    struct predshape<std::initializer_list<T>, S>
-	    {
-	        constexpr predshape(S first, S last): m_first(first), m_last(last)
-	        {}
+        template <class T, class S>
+        struct predshape<std::initializer_list<T>, S>
+        {
+            constexpr predshape(S first, S last): m_first(first), m_last(last)
+            {}
 
-	        constexpr bool operator()(std::initializer_list<T> t) const
-	        {
-	            return *m_first == t.size() && std::all_of(t.begin(), t.end(), predshape<T, S>(m_first + 1, m_last));
-	        }
+            constexpr bool operator()(std::initializer_list<T> t) const
+            {
+                return *m_first == t.size() && std::all_of(t.begin(), t.end(), predshape<T, S>(m_first + 1, m_last));
+            }
 
-	        S m_first;
-	        S m_last;
-	    };
-	}
+            S m_first;
+            S m_last;
+        };
+    }
 
     template <class T, class S>
     constexpr bool check_shape(T t, S first, S last)
@@ -349,6 +349,7 @@ namespace xt
         {
             using value_type = typename S::value_type;
             using size_type = typename S::size_type;
+
             inline static S make(size_type size, value_type v)
             {
                 return S(size, v);
@@ -361,6 +362,7 @@ namespace xt
             using shape_type = std::array<T, N>;
             using value_type = typename shape_type::value_type;
             using size_type = typename shape_type::size_type;
+
             inline static shape_type make(size_type /*size*/, value_type v)
             {
                 shape_type s;

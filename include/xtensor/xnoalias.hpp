@@ -20,7 +20,7 @@ namespace xt
 
     public:
 
-        noalias_proxy(A& a);
+        noalias_proxy(A& a) noexcept;
 
         template <class E>
         A& operator=(const xexpression<E>& e);
@@ -43,14 +43,14 @@ namespace xt
     };
 
     template <class A>
-    noalias_proxy<A> noalias(A& a);
+    noalias_proxy<A> noalias(A& a) noexcept;
 
     /********************************
      * noalias_proxy implementation *
      ********************************/
 
     template <class A>
-    inline noalias_proxy<A>::noalias_proxy(A& a)
+    inline noalias_proxy<A>::noalias_proxy(A& a) noexcept
         : m_array(a)
     {
     }
@@ -91,7 +91,7 @@ namespace xt
     }
 
     template <class A>
-    inline noalias_proxy<A> noalias(A& a)
+    inline noalias_proxy<A> noalias(A& a) noexcept
     {
         return noalias_proxy<A>(a);
     }

@@ -39,12 +39,12 @@ namespace xt
         buf << "\n LHS shape = (";
         using size_type1 = typename S1::value_type;
         std::ostream_iterator<size_type1> iter1(buf, ", ");
-        std::copy(lhs.begin(), lhs.end(), iter1);
+        std::copy(lhs.cbegin(), lhs.cend(), iter1);
 
         buf << ")\n RHS shape = (";
         using size_type2 = typename S2::value_type;
         std::ostream_iterator<size_type2> iter2(buf, ", ");
-        std::copy(rhs.begin(), rhs.end(), iter2);
+        std::copy(rhs.cbegin(), rhs.cend(), iter2);
         buf << ")";
 
         m_message = buf.str();

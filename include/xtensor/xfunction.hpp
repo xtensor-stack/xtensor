@@ -99,7 +99,7 @@ namespace xt
     public:
 
         using self_type = xfunction<F, R, E...>;
-        using functor_type = F;
+        using functor_type = typename std::remove_reference<F>::type;
 
         using value_type = R;
         using reference = value_type;
@@ -120,7 +120,7 @@ namespace xt
         template <class Func>
         xfunction(Func&& f, const E&...e) noexcept;
 
-        size_type dimension() const;
+        size_type dimension() const noexcept;
         shape_type shape() const;
 
         template <class... Args>
@@ -132,26 +132,29 @@ namespace xt
         bool broadcast_shape(S& shape) const;
 
         template <class S>
-        bool is_trivial_broadcast(const S& strides) const;
+        bool is_trivial_broadcast(const S& strides) const noexcept;
 
-        const_iterator begin() const;
-        const_iterator end() const;
-        const_iterator cbegin() const;
-        const_iterator cend() const;
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
 
-        const_iterator xbegin(const shape_type& shape) const;
-        const_iterator xend(const shape_type& shape) const;
-        const_iterator cxbegin(const shape_type& shape) const;
-        const_iterator cxend(const shape_type& shape) const;
-
-        template <class S>
-        const_stepper stepper_begin(const S& shape) const;
+        const_iterator xbegin(const shape_type& shape) const noexcept;
+        const_iterator xend(const shape_type& shape) const noexcept;
+        const_iterator cxbegin(const shape_type& shape) const noexcept;
+        const_iterator cxend(const shape_type& shape) const noexcept;
 
         template <class S>
-        const_stepper stepper_end(const S& shape) const;
+        const_stepper stepper_begin(const S& shape) const noexcept;
 
-        const_storage_iterator storage_begin() const;
-        const_storage_iterator storage_end() const;
+        template <class S>
+        const_stepper stepper_end(const S& shape) const noexcept;
+
+        const_storage_iterator storage_begin() const noexcept;
+        const_storage_iterator storage_end() const noexcept;
+
+        const_storage_iterator storage_cbegin() const noexcept;
+        const_storage_iterator storage_cend() const noexcept;
 
     private:
 
@@ -162,13 +165,13 @@ namespace xt
         const_reference access_impl(const xindex& index, std::index_sequence<I...>) const;
 
         template <class Func, std::size_t... I>
-        const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const;
+        const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const noexcept;
 
         template <class Func, std::size_t... I>
-        const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const;
+        const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const noexcept;
 
         std::tuple<typename E::closure_type...> m_e;
-        typename std::remove_reference<F>::type m_f;
+        functor_type m_f;
 
         friend class xf_storage_iterator<F, R, E...>;
         friend class xfunction_stepper<F, R, E...>;
@@ -185,6 +188,7 @@ namespace xt
     public:
 
         using self_type = xf_storage_iterator<F, R, E...>;
+        using functor_type = typename std::remove_reference<F>::type;
         using xfunction_type = xfunction<F, R, E...>;
 
         using value_type = typename xfunction_type::value_type;
@@ -194,7 +198,7 @@ namespace xt
         using iterator_category = std::forward_iterator_tag;
 
         template <class... It>
-        xf_storage_iterator(const xfunction_type* func, It&&... it);
+        xf_storage_iterator(const xfunction_type* func, It&&... it) noexcept;
 
         self_type& operator++();
         self_type operator++(int);
@@ -232,6 +236,7 @@ namespace xt
     public:
 
         using self_type = xfunction_stepper<F, R, E...>;
+        using functor_type = typename std::remove_reference<F>::type;
         using xfunction_type = xfunction<F, R, E...>;
 
         using value_type = typename xfunction_type::value_type;
@@ -244,7 +249,7 @@ namespace xt
         using shape_type = typename xfunction_type::shape_type;
 
         template <class... It>
-        xfunction_stepper(const xfunction_type* func, It&&... it);
+        xfunction_stepper(const xfunction_type* func, It&&... it) noexcept;
 
         void step(size_type dim, size_type n = 1);
         void step_back(size_type dim, size_type n = 1);
@@ -320,9 +325,9 @@ namespace xt
      * Returns the number of dimensions of the function.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::dimension() const -> size_type
+    inline auto xfunction<F, R, E...>::dimension() const noexcept -> size_type
     {
-        auto func = [](size_type d, auto&& e) { return std::max(d, e.dimension()); };
+        auto func = [](size_type d, auto&& e) noexcept { return std::max(d, e.dimension()); };
         return accumulate(func, size_type(0), m_e);
     }
 
@@ -387,7 +392,7 @@ namespace xt
      */
     template <class F, class R, class... E>
     template <class S>
-    inline bool xfunction<F, R, E...>::is_trivial_broadcast(const S& strides) const
+    inline bool xfunction<F, R, E...>::is_trivial_broadcast(const S& strides) const noexcept
     {
         auto func = [&strides](bool b, auto&& e) { return b && e.is_trivial_broadcast(strides); };
         return accumulate(func, true, m_e);
@@ -402,7 +407,7 @@ namespace xt
      * Returns a constant iterator to the first element of the function.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::begin() const -> const_iterator
+    inline auto xfunction<F, R, E...>::begin() const noexcept -> const_iterator
     {
         shape_type shape(dimension(), size_type(1));
         broadcast_shape(shape);
@@ -414,7 +419,7 @@ namespace xt
      * of the function.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::end() const -> const_iterator
+    inline auto xfunction<F, R, E...>::end() const noexcept -> const_iterator
     {
         shape_type shape(dimension(), size_type(1));
         broadcast_shape(shape);
@@ -425,7 +430,7 @@ namespace xt
      * Returns a constant iterator to the first element of the function.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::cbegin() const -> const_iterator
+    inline auto xfunction<F, R, E...>::cbegin() const noexcept -> const_iterator
     {
         return begin();
     }
@@ -435,7 +440,7 @@ namespace xt
      * of the function.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::cend() const -> const_iterator
+    inline auto xfunction<F, R, E...>::cend() const noexcept -> const_iterator
     {
         return end();
     }
@@ -446,7 +451,7 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::xbegin(const shape_type& shape) const -> const_iterator
+    inline auto xfunction<F, R, E...>::xbegin(const shape_type& shape) const noexcept -> const_iterator
     {
         return const_iterator(stepper_begin(shape), shape);
     }
@@ -457,7 +462,7 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::xend(const shape_type& shape) const -> const_iterator
+    inline auto xfunction<F, R, E...>::xend(const shape_type& shape) const noexcept -> const_iterator
     {
         return const_iterator(stepper_end(shape), shape);
     }
@@ -468,7 +473,7 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::cxbegin(const shape_type& shape) const -> const_iterator
+    inline auto xfunction<F, R, E...>::cxbegin(const shape_type& shape) const noexcept -> const_iterator
     {
         return xbegin(shape);
     }
@@ -479,7 +484,7 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::cxend(const shape_type& shape) const -> const_iterator
+    inline auto xfunction<F, R, E...>::cxend(const shape_type& shape) const noexcept -> const_iterator
     {
         return xend(shape);
     }
@@ -487,17 +492,17 @@ namespace xt
 
     template <class F, class R, class... E>
     template <class S>
-    inline auto xfunction<F, R, E...>::stepper_begin(const S& shape) const -> const_stepper
+    inline auto xfunction<F, R, E...>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
-        auto f = [&shape](const auto& e) { return e.stepper_begin(shape); };
+        auto f = [&shape](const auto& e) noexcept { return e.stepper_begin(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
     }
 
     template <class F, class R, class... E>
     template <class S>
-    inline auto xfunction<F, R, E...>::stepper_end(const S& shape) const -> const_stepper
+    inline auto xfunction<F, R, E...>::stepper_end(const S& shape) const noexcept -> const_stepper
     {
-        auto f = [&shape](const auto& e) { return e.stepper_end(shape); };
+        auto f = [&shape](const auto& e) noexcept { return e.stepper_end(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(E)>());
     }
 
@@ -509,9 +514,9 @@ namespace xt
      * containing the elements of the function.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::storage_begin() const -> const_storage_iterator
+    inline auto xfunction<F, R, E...>::storage_begin() const noexcept -> const_storage_iterator
     {
-        auto f = [](const auto& e) { return e.storage_begin(); };
+        auto f = [](const auto& e) noexcept { return e.storage_cbegin(); };
         return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
     }
 
@@ -520,10 +525,26 @@ namespace xt
      * element of the buffer containing the elements of the function.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::storage_end() const -> const_storage_iterator
+    inline auto xfunction<F, R, E...>::storage_end() const noexcept -> const_storage_iterator
     {
-        auto f = [](const auto& e) { return e.storage_end(); };
+        auto f = [](const auto& e) noexcept { return e.storage_cend(); };
         return build_storage_iterator(f, std::make_index_sequence<sizeof...(E)>());
+    }
+
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::storage_cbegin() const noexcept -> const_storage_iterator
+    {
+        return storage_begin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the function.
+     */
+    template <class F, class R, class... E>
+    inline auto xfunction<F, R, E...>::storage_cend() const noexcept -> const_storage_iterator
+    {
+        return storage_end();
     }
     //@}
 
@@ -543,14 +564,14 @@ namespace xt
 
     template <class F, class R, class... E>
     template <class Func, std::size_t... I>
-    inline auto xfunction<F, R, E...>::build_stepper(Func&& f, std::index_sequence<I...>) const -> const_stepper
+    inline auto xfunction<F, R, E...>::build_stepper(Func&& f, std::index_sequence<I...>) const noexcept -> const_stepper
     {
         return const_stepper(this, f(std::get<I>(m_e))...);
     }
 
     template <class F, class R, class... E>
     template <class Func, std::size_t... I>
-    inline auto xfunction<F, R, E...>::build_storage_iterator(Func&& f, std::index_sequence<I...>) const -> const_storage_iterator
+    inline auto xfunction<F, R, E...>::build_storage_iterator(Func&& f, std::index_sequence<I...>) const noexcept -> const_storage_iterator
     {
         return const_storage_iterator(this, f(std::get<I>(m_e))...);
     }
@@ -561,7 +582,7 @@ namespace xt
 
     template <class F, class R, class... E>
     template <class... It>
-    inline xf_storage_iterator<F, R, E...>::xf_storage_iterator(const xfunction_type* func, It&&... it)
+    inline xf_storage_iterator<F, R, E...>::xf_storage_iterator(const xfunction_type* func, It&&... it) noexcept
         : p_f(func), m_it(std::forward<It>(it)...)
     {
     }
@@ -622,7 +643,7 @@ namespace xt
 
     template <class F, class R, class... E>
     template <class... It>
-    inline xfunction_stepper<F, R, E...>::xfunction_stepper(const xfunction_type* func, It&&... it)
+    inline xfunction_stepper<F, R, E...>::xfunction_stepper(const xfunction_type* func, It&&... it) noexcept
         : p_f(func), m_it(std::forward<It>(it)...)
     {
     }
