@@ -109,8 +109,8 @@ namespace xt
         using size_type = detail::common_size_type<E...>;
         using difference_type = detail::common_difference_type<E...>;
 
-        using shape_type = std::vector<size_type>;
-        using strides_type = std::vector<size_type>;
+        using shape_type = promote_shape_t<typename E::shape_type...>;
+        using strides_type = promote_strides_t<typename E::strides_type...>;
         using closure_type = const self_type;
 
         using const_stepper = xfunction_stepper<F, R, E...>;
@@ -337,7 +337,7 @@ namespace xt
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::shape() const -> shape_type
     {
-        shape_type shape(dimension(), size_type(1));
+        shape_type shape = make_shape<shape_type>(dimension(), size_type(1));
         broadcast_shape(shape);
         return shape;
     }

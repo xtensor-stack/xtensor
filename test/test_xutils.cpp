@@ -89,6 +89,22 @@ namespace xt
         EXPECT_EQ(2, d2);
     }
 
+    TEST(utils, promote_shape)
+    {
+        bool expect_v = std::is_same<
+            std::vector<size_t>,
+            promote_shape_t<std::vector<size_t>, std::array<size_t, 3>, std::array<size_t, 2>>
+        >::value;
+
+        bool expect_a = std::is_same<
+            std::array<size_t, 3>,
+            promote_shape_t<std::array<size_t, 2>, std::array<size_t, 3>, std::array<size_t, 2>>
+        >::value;
+
+        ASSERT_TRUE(expect_v);
+        ASSERT_TRUE(expect_a);
+    }
+
     TEST(utils, shape)
     {
         auto s0 = shape<std::vector<size_t>>(3);
