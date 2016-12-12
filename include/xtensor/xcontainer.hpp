@@ -21,6 +21,9 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
+    struct no_check {};
+    struct do_check {};
+
     enum class layout
     {
         row_major,
@@ -81,7 +84,10 @@ namespace xt
         void reshape(const shape_type& shape, const strides_type& strides);
 
         void transpose();
+
         void transpose(const std::vector<size_type>& permute);
+        void transpose(const std::vector<size_type>& permute, no_check check_policy);
+        void transpose(const std::vector<size_type>& permute, do_check check_policy);
 
         template <class... Args>
         reference operator()(Args... args);
@@ -374,17 +380,12 @@ namespace xt
         adapt_strides();
     }
 
-    /**
-     * Transposes the container inplace by permuting the shape with @permutation.
-     * @param permutation the dimensions with the given permutation
-     */
     template <class D>
-    inline void xcontainer<D>::transpose(const std::vector<size_type>& permutation)
+    inline void xcontainer<D>::transpose(const std::vector<size_type>& permutation, const do_check check_policy)
     {
-        if (permutation.size() != m_shape.size())
-        {
-            throw transpose_error("Permutation does not have the same size as shape");
-        }
+        // casting to void eliminates unused parameter warning plus optimizes compiler output
+        // according to https://arobenko.gitbooks.io/bare_metal_cpp/content/compiler_output/tag_dispatch.html
+        static_cast<void>(check_policy);
 
         // check if axis is twice in permutation
         for (size_type i = 0; i < permutation.size(); ++i)
@@ -397,13 +398,20 @@ namespace xt
                 }
             }
         }
+        transpose(permutation, no_check());
+    }
 
-        for (const auto& el : permutation)
+    /**
+     * Transposes the container inplace by permuting the shape with @permutation.
+     * @param permutation the dimensions with the given permutation
+     */
+    template <class D>
+    inline void xcontainer<D>::transpose(const std::vector<size_type>& permutation, const no_check check_policy)
+    {
+        static_cast<void>(check_policy);
+        if (permutation.size() != m_shape.size())
         {
-            if (el >= dimension())
-            {
-                throw transpose_error("Permutation contains wrong axis");
-            }
+            throw transpose_error("Permutation does not have the same size as shape");
         }
 
         // permute stride and shape
@@ -413,14 +421,24 @@ namespace xt
         shape_type temp_shape;
         resize_container(temp_shape, m_shape.size());
 
-        for (size_type i = 0; i < m_strides.size(); ++i)
+        for (size_type i = 0; i < m_shape.size(); ++i)
         {
+            if (permutation[i] > dimension() - 1)
+            {
+                throw transpose_error("Permutation contains wrong axis");
+            }
             temp_strides[i] = m_strides[permutation[i]];
             temp_shape[i] = m_shape[permutation[i]];
         }
         m_strides = std::move(temp_strides);
         m_shape = std::move(temp_shape);
         adapt_strides();
+    }
+
+    template <class D>
+    inline void xcontainer<D>::transpose(const std::vector<size_type>& permutation)
+    {
+        transpose(permutation, no_check());
     }
     //@}
 

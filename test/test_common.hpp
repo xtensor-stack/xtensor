@@ -199,14 +199,14 @@ namespace xt
             EXPECT_EQ(vec.shape(), shape_new);
             EXPECT_EQ(vec.data(), rm.m_data);
 
-            strides_type new_strides{rm.m_strides[2],
-                                     rm.m_strides[1],
-                                     rm.m_strides[0]};
+            strides_type new_strides = {rm.m_strides[2],
+                                        rm.m_strides[1],
+                                        rm.m_strides[0]};
             EXPECT_EQ(vec.strides(), new_strides);
 
-            strides_type new_backstrides{rm.m_backstrides[2],
-                                         rm.m_backstrides[1],
-                                         rm.m_backstrides[0]};
+            strides_type new_backstrides = {rm.m_backstrides[2],
+                                            rm.m_backstrides[1],
+                                            rm.m_backstrides[0]};
             EXPECT_EQ(vec.backstrides(), new_backstrides);
 
             EXPECT_EQ(vec_copy(0, 0, 0), vec(0, 0, 0));
@@ -231,14 +231,14 @@ namespace xt
             EXPECT_EQ(vec.shape(), shape_new);
             EXPECT_EQ(vec.data(), rm.m_data);
 
-            strides_type new_strides{rm.m_strides[1], 
-                                     rm.m_strides[0], 
-                                     rm.m_strides[2]};
+            strides_type new_strides = {rm.m_strides[1], 
+                                        rm.m_strides[0], 
+                                        rm.m_strides[2]};
             EXPECT_EQ(vec.strides(), new_strides);
 
-            strides_type new_backstrides{rm.m_backstrides[1], 
-                                         rm.m_backstrides[0], 
-                                         rm.m_backstrides[2]};
+            strides_type new_backstrides = {rm.m_backstrides[1], 
+                                            rm.m_backstrides[0], 
+                                            rm.m_backstrides[2]};
             EXPECT_EQ(vec.backstrides(), new_backstrides);
 
             EXPECT_EQ(vec_copy(0, 0, 0), vec(0, 0, 0));
@@ -252,10 +252,10 @@ namespace xt
             row_major_result<C> rm;
             vec.reshape(rm.shape(), layout::row_major);
 
-            EXPECT_THROW(vec.transpose({1, 1, 0}), transpose_error);
-            EXPECT_THROW(vec.transpose({1, 0, 2, 3}), transpose_error);
-            EXPECT_THROW(vec.transpose({1, 2}), transpose_error);
-            EXPECT_THROW(vec.transpose({3, 0, 1}), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 1, 0}, do_check()), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 0, 2, 3}, do_check()), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 2}, do_check()), transpose_error);
+            EXPECT_THROW(vec.transpose({3, 0, 1}, do_check()), transpose_error);
         }
     }
 
