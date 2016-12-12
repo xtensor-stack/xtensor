@@ -227,7 +227,7 @@ namespace xt
 
             shape_type a = vec.shape();
             vec.transpose({1, 0, 2});
-            shape_type shape_new({a[1], a[0], a[2]});
+            shape_type shape_new = {a[1], a[0], a[2]};
             EXPECT_EQ(vec.shape(), shape_new);
             EXPECT_EQ(vec.data(), rm.m_data);
 
