@@ -242,11 +242,8 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::data_offset(const xindex& index) const noexcept -> size_type
     {
-        // VS2015 workaround : index.begin() + index.size() - m_strides.size()
-        // doesn't compile
-        auto iter = index.begin();
-        iter += index.size() - m_strides.size();
-        return std::inner_product(m_strides.begin(), m_strides.end(), iter, size_type(0));
+        auto iter = index.cbegin() + index.size() - m_strides.size();
+        return std::inner_product(m_strides.cbegin(), m_strides.cend(), iter, size_type(0));
     }
 
     /**
