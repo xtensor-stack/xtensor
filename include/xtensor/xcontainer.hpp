@@ -62,8 +62,8 @@ namespace xt
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D>;
 
-        using iterator = xiterator<stepper>;
-        using const_iterator = xiterator<const_stepper>;
+        using iterator = xiterator<stepper, shape_type>;
+        using const_iterator = xiterator<const_stepper, shape_type>;
 
         using storage_iterator = typename container_type::iterator;
         using const_storage_iterator = typename container_type::const_iterator;
@@ -106,13 +106,19 @@ namespace xt
         const_iterator cbegin() const noexcept;
         const_iterator cend() const noexcept;
 
-        iterator xbegin(const shape_type& shape) noexcept;
-        iterator xend(const shape_type& shape) noexcept;
+        template <class S>
+        xiterator<stepper, S> xbegin(const S& shape) noexcept;
+        template <class S>
+        xiterator<stepper, S> xend(const S& shape) noexcept;
 
-        const_iterator xbegin(const shape_type& shape) const noexcept;
-        const_iterator xend(const shape_type& shape) const noexcept;
-        const_iterator cxbegin(const shape_type& shape) const noexcept;
-        const_iterator cxend(const shape_type& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> xbegin(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> xend(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> cxbegin(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> cxend(const S& shape) const noexcept;
 
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
@@ -537,7 +543,8 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class D>
-    inline auto xcontainer<D>::xbegin(const shape_type& shape) noexcept -> iterator
+    template <class S>
+    inline auto xcontainer<D>::xbegin(const S& shape) noexcept -> xiterator<stepper, S>
     {
         return iterator(stepper_begin(shape), shape);
     }
@@ -548,7 +555,8 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class D>
-    inline auto xcontainer<D>::xend(const shape_type& shape) noexcept -> iterator
+    template <class S>
+    inline auto xcontainer<D>::xend(const S& shape) noexcept -> xiterator<stepper, S>
     {
         return iterator(stepper_end(shape), shape);
     }
@@ -559,7 +567,8 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class D>
-    inline auto xcontainer<D>::xbegin(const shape_type& shape) const noexcept -> const_iterator
+    template <class S>
+    inline auto xcontainer<D>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         return const_iterator(stepper_begin(shape), shape);
     }
@@ -570,7 +579,8 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class D>
-    inline auto xcontainer<D>::xend(const shape_type& shape) const noexcept -> const_iterator
+    template <class S>
+    inline auto xcontainer<D>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         return const_iterator(stepper_end(shape), shape);
     }
@@ -581,7 +591,8 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class D>
-    inline auto xcontainer<D>::cxbegin(const shape_type& shape) const noexcept -> const_iterator
+    template <class S>
+    inline auto xcontainer<D>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         return xbegin(shape);
     }
@@ -592,7 +603,8 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class D>
-    inline auto xcontainer<D>::cxend(const shape_type& shape) const noexcept -> const_iterator
+    template <class S>
+    inline auto xcontainer<D>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         return xend(shape);
     }

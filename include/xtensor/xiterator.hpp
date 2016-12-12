@@ -29,6 +29,9 @@ namespace xt
     template <class S1, class S2>
     bool broadcast_shape(const S1& input, S2& output);
 
+    template <class S1, class S2>
+    bool broadcastable(const S1& s1, S2& s2);
+
     /************
      * xstepper *
      ************/
@@ -103,7 +106,7 @@ namespace xt
      * xiterator *
      *************/
 
-    template <class It, class S = void>
+    template <class It, class S>
     class xiterator
     {
 
@@ -119,9 +122,7 @@ namespace xt
         using size_type = typename subiterator_type::size_type;
         using iterator_category = std::forward_iterator_tag;
 
-        using shape_type = std::conditional_t<std::is_same<S, void>::value,
-                                              typename subiterator_type::shape_type,
-                                              S>;
+        using shape_type = S;
 
         xiterator(It it, const shape_type& shape);
 
@@ -155,10 +156,9 @@ namespace xt
     inline bool broadcast_shape(const S1& input, S2& output)
     {
         bool trivial_broadcast = (input.size() == output.size());
+        auto input_iter = input.crbegin();
         auto output_iter = output.rbegin();
-        auto input_rend = input.rend();
-        for(auto input_iter = input.rbegin(); input_iter != input_rend;
-            ++input_iter, ++output_iter)
+        for(;input_iter != input.crend(); ++input_iter, ++output_iter)
         {
             if(*output_iter == 1)
             {
@@ -171,6 +171,21 @@ namespace xt
             trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
         }
         return trivial_broadcast;
+    }
+
+    template <class S1, class S2>
+    inline bool broadcastable(const S1& s1, const S2& s2)
+    {
+        auto iter1 = s1.crbegin();
+        auto iter2 = s2.crbegin();
+        for(;iter1 != s1.crend() && iter2 != s2.crend(); ++iter1, ++iter2)
+        {
+            if((*iter2 != 1) && (*iter1 != 1) && (*iter2 != *iter1))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     /***************************
