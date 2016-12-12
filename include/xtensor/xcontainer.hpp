@@ -375,24 +375,36 @@ namespace xt
     }
 
     /**
-     * Transposes the container inplace by permuting the shape with @permute.
-     * @param permute the dimensions with the given permutation
+     * Transposes the container inplace by permuting the shape with @permutation.
+     * @param permutation the dimensions with the given permutation
      */
     template <class D>
-    inline void xcontainer<D>::transpose(const std::vector<size_type>& permute)
+    inline void xcontainer<D>::transpose(const std::vector<size_type>& permutation)
     {
-        if (permute.size() != m_shape.size())
-            throw transpose_error(std::string("Permutation does not have the same size as shape"));
+        if (permutation.size() != m_shape.size())
+        {
+            throw transpose_error("Permutation does not have the same size as shape");
+        }
 
-        // check if axis is twice in permute
-        for (size_type i = 0; i < permute.size(); ++i)
-            for (size_type j = i + 1; j < permute.size(); ++j)
-                if (permute[i] == permute[j])
-                    throw transpose_error(std::string("Permutation contains axis more than once"));
+        // check if axis is twice in permutation
+        for (size_type i = 0; i < permutation.size(); ++i)
+        {
+            for (size_type j = i + 1; j < permutation.size(); ++j)
+            {
+                if (permutation[i] == permutation[j])
+                {
+                    throw transpose_error("Permutation contains axis more than once");
+                }
+            }
+        }
 
-        for (const auto& el : permute)
-            if (el >= dimension() || el < 0)
-                throw transpose_error(std::string("Permutation contains wrong axis"));
+        for (const auto& el : permutation)
+        {
+            if (el >= dimension())
+            {
+                throw transpose_error("Permutation contains wrong axis");
+            }
+        }
 
         // permute stride and shape
         strides_type temp_strides;
@@ -401,12 +413,13 @@ namespace xt
         shape_type temp_shape;
         resize_container(temp_shape, m_shape.size());
 
-        for (size_type i = 0; i < m_strides.size(); ++i) {
-            temp_strides[i] = m_strides[permute[i]];
-            temp_shape[i] = m_shape[permute[i]];
+        for (size_type i = 0; i < m_strides.size(); ++i)
+        {
+            temp_strides[i] = m_strides[permutation[i]];
+            temp_shape[i] = m_shape[permutation[i]];
         }
-        m_strides = temp_strides;
-        m_shape = temp_shape;
+        m_strides = std::move(temp_strides);
+        m_shape = std::move(temp_shape);
         adapt_strides();
     }
     //@}

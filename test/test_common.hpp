@@ -91,17 +91,6 @@ namespace xt
     };
 
     template <class C = std::vector<std::size_t>>
-    struct transpose_result : layout_result<C>
-    {
-        inline transpose_result()
-        {
-            this->m_shape = { 4, 2, 3 };
-            this->m_strides = { 2, 1, 8 };
-            this->m_backstrides = { 6, 1, 16};
-        }
-    };
-
-    template <class C = std::vector<std::size_t>>
     struct unit_shape_result
     {
         using vector_type = std::vector<int>;
