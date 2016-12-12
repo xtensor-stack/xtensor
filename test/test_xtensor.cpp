@@ -127,6 +127,12 @@ namespace xt
         test_reshape<xtensor<int, 3>, container_type>(a);
     }
 
+    TEST(xtensor, transpose)
+    {
+        xtensor<int, 3> a;
+        test_transpose<xtensor<int, 3>, container_type>(a);
+    }
+
     TEST(xtensor, access)
     {
         xtensor<int, 3> a;

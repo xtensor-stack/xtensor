@@ -2,6 +2,7 @@
 #define XEXCEPTION_HPP
 
 #include <exception>
+#include <string>
 #include <sstream>
 
 namespace xt
@@ -54,7 +55,35 @@ namespace xt
     {
         return m_message.c_str();
     }
+
+    /*******************
+     * transpose_error *
+     *******************/
+
+    class transpose_error : public std::exception
+    {
+
+    public:
+
+        transpose_error(const std::string& msg);
+
+        virtual const char* what() const noexcept;
+
+    private:
+
+        std::string m_message;
+    };
+
+    /**********************************
+     * transpose_error implementation *
+     **********************************/
+
+    inline transpose_error::transpose_error(const std::string& msg) : m_message(msg) {};
+
+    inline const char* transpose_error::what() const noexcept
+    {
+        return m_message.c_str();
+    }
 }
 
 #endif
-

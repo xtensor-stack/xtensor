@@ -80,6 +80,9 @@ namespace xt
         void reshape(const shape_type& shape, layout l);
         void reshape(const shape_type& shape, const strides_type& strides);
 
+        void transpose();
+        void transpose(const std::vector<size_type>& permute);
+
         template <class... Args>
         reference operator()(Args... args);
 
@@ -358,7 +361,56 @@ namespace xt
         adapt_strides();
         data().resize(data_size());
     }
+
+    /**
+     * Transposes the container inplace by reversing the dimensions.
+     */
+    template <class D>
+    inline void xcontainer<D>::transpose()
+    {
+        // reverse stride and shape
+        std::reverse(m_strides.begin(), m_strides.end());
+        std::reverse(m_shape.begin(), m_shape.end());
+        adapt_strides();
+    }
+
+    /**
+     * Transposes the container inplace by permuting the shape with @permute.
+     * @param permute the dimensions with the given permutation
+     */
+    template <class D>
+    inline void xcontainer<D>::transpose(const std::vector<size_type>& permute)
+    {
+        if (permute.size() != m_shape.size())
+            throw transpose_error(std::string("Permutation does not have the same size as shape"));
+
+        // check if axis is twice in permute
+        for (size_type i = 0; i < permute.size(); ++i)
+            for (size_type j = i + 1; j < permute.size(); ++j)
+                if (permute[i] == permute[j])
+                    throw transpose_error(std::string("Permutation contains axis more than once"));
+
+        for (const auto& el : permute)
+            if (el >= dimension() || el < 0)
+                throw transpose_error(std::string("Permutation contains wrong axis"));
+
+        // permute stride and shape
+        strides_type temp_strides;
+        resize_container(temp_strides, m_strides.size());
+
+        shape_type temp_shape;
+        resize_container(temp_shape, m_shape.size());
+
+        for (size_type i = 0; i < m_strides.size(); ++i) {
+            temp_strides[i] = m_strides[permute[i]];
+            temp_shape[i] = m_shape[permute[i]];
+        }
+        m_strides = temp_strides;
+        m_shape = temp_shape;
+        adapt_strides();
+    }
     //@}
+
 
     /**
      * @name Data

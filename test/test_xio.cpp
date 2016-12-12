@@ -39,6 +39,24 @@ namespace xt
  {9, 10, 11, 12}})xio", out.str());
     }
 
+    TEST(xio, view)
+    {
+        xarray<double> e{{1, 2, 3, 4},
+                         {5, 6, 7, 8},
+                         {9, 10, 11, 12}};
+
+        auto v_1 = make_xview(e, 1, xt::all());
+        auto v_2 = make_xview(e, xt::all(), 1);
+
+        std::stringstream out_1;
+        out_1 << v_1;
+        EXPECT_EQ("{5, 6, 7, 8}", out_1.str());
+
+        std::stringstream out_2;
+        out_2 << v_2;
+        EXPECT_EQ("{2, 6, 10}", out_2.str());
+    }
+
     TEST(xio, three_d)
     {
         xarray<double> e{{{1, 2},

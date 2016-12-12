@@ -91,6 +91,17 @@ namespace xt
     };
 
     template <class C = std::vector<std::size_t>>
+    struct transpose_result : layout_result<C>
+    {
+        inline transpose_result()
+        {
+            this->m_shape = { 4, 2, 3 };
+            this->m_strides = { 2, 1, 8 };
+            this->m_backstrides = { 6, 1, 16};
+        }
+    };
+
+    template <class C = std::vector<std::size_t>>
     struct unit_shape_result
     {
         using vector_type = std::vector<int>;
@@ -167,6 +178,95 @@ namespace xt
             unit_shape_result<C> usr;
             vec.reshape(usr.m_shape, layout::row_major);
             compare_shape(vec, usr);
+        }
+    }
+
+    template <class V, class C = std::vector<std::size_t>>
+    void test_transpose(V& vec)
+    {
+        using shape_type = typename V::shape_type;
+        using strides_type = typename V::strides_type;
+        {
+            SCOPED_TRACE("transpose");
+            shape_type shape_new = vec.shape();
+            vec.transpose();
+            std::reverse(shape_new.begin(), shape_new.end());
+            EXPECT_EQ(vec.shape(), shape_new);
+        }
+
+        {
+            SCOPED_TRACE("transpose with data");
+            row_major_result<C> rm;
+            vec.reshape(rm.shape(), layout::row_major);
+
+            assign_array(vec, rm.m_assigner);
+            EXPECT_EQ(vec.data(), rm.m_data);
+
+            auto vec_copy = vec;
+
+            shape_type shape_new(rm.shape());
+            vec.transpose();
+            std::reverse(shape_new.begin(), shape_new.end());
+            EXPECT_EQ(vec.shape(), shape_new);
+            EXPECT_EQ(vec.data(), rm.m_data);
+
+            strides_type new_strides{rm.m_strides[2],
+                                     rm.m_strides[1],
+                                     rm.m_strides[0]};
+            EXPECT_EQ(vec.strides(), new_strides);
+
+            strides_type new_backstrides{rm.m_backstrides[2],
+                                         rm.m_backstrides[1],
+                                         rm.m_backstrides[0]};
+            EXPECT_EQ(vec.backstrides(), new_backstrides);
+
+            EXPECT_EQ(vec_copy(0, 0, 0), vec(0, 0, 0));
+            EXPECT_EQ(vec_copy(0, 1, 0), vec(0, 1, 0));
+            EXPECT_EQ(vec_copy(1, 1, 0), vec(0, 1, 1));
+            EXPECT_EQ(vec_copy(1, 1, 2), vec(2, 1, 1));
+        }
+
+        {
+            SCOPED_TRACE("transpose with permutation");
+            row_major_result<C> rm;
+            vec.reshape(rm.shape(), layout::row_major);
+
+            assign_array(vec, rm.m_assigner);
+            EXPECT_EQ(vec.data(), rm.m_data);
+
+            auto vec_copy = vec;
+
+            shape_type a = vec.shape();
+            vec.transpose({1, 0, 2});
+            shape_type shape_new({a[1], a[0], a[2]});
+            EXPECT_EQ(vec.shape(), shape_new);
+            EXPECT_EQ(vec.data(), rm.m_data);
+
+            strides_type new_strides{rm.m_strides[1], 
+                                     rm.m_strides[0], 
+                                     rm.m_strides[2]};
+            EXPECT_EQ(vec.strides(), new_strides);
+
+            strides_type new_backstrides{rm.m_backstrides[1], 
+                                         rm.m_backstrides[0], 
+                                         rm.m_backstrides[2]};
+            EXPECT_EQ(vec.backstrides(), new_backstrides);
+
+            EXPECT_EQ(vec_copy(0, 0, 0), vec(0, 0, 0));
+            EXPECT_EQ(vec_copy(0, 1, 0), vec(1, 0, 0));
+            EXPECT_EQ(vec_copy(1, 1, 0), vec(1, 1, 0));
+            EXPECT_EQ(vec_copy(1, 1, 2), vec(1, 1, 2));
+        }
+
+        {
+            SCOPED_TRACE("transpose permutation throws");
+            row_major_result<C> rm;
+            vec.reshape(rm.shape(), layout::row_major);
+
+            EXPECT_THROW(vec.transpose({1, 1, 0}), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 0, 2, 3}), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 2}), transpose_error);
+            EXPECT_THROW(vec.transpose({3, 0, 1}), transpose_error);
         }
     }
 
