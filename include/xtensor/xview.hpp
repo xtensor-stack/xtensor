@@ -158,11 +158,11 @@ namespace xt
         template <size_type I, class... Args>
         std::enable_if_t<(I >= sizeof...(S)), size_type> index(Args... args) const;
 
-        template<size_type I, class T, class... Args>
-        std::enable_if_t<(sizeof...(Args) > 0), size_type> sliced_access(const xslice<T>& slice, Args... args) const;
+        template<size_type I, class T>
+        size_type sliced_access(const xslice<T>& slice) const;
 
-        template<size_type I, class T, class... Args>
-        std::enable_if_t<(sizeof...(Args) == 0), size_type> sliced_access(const xslice<T>& slice, Args... args) const;
+        template<size_type I, class T, class Arg, class... Args>
+        size_type sliced_access(const xslice<T>& slice, Arg arg, Args... args) const;
 
         template<size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
@@ -437,17 +437,17 @@ namespace xt
     }
 
     template <class E, class... S>
-    template<typename E::size_type I, class T, class... Args>
-    inline auto xview<E, S...>::sliced_access(const xslice<T>& slice, Args... args) const -> std::enable_if_t<(sizeof...(Args) > 0), size_type>
+    template<typename E::size_type I, class T>
+    inline auto xview<E, S...>::sliced_access(const xslice<T>& slice) const -> size_type
     {
-        return slice.derived_cast()(argument<I>(args...));
+        return slice.derived_cast()(0);
     }
 
     template <class E, class... S>
-    template<typename E::size_type I, class T, class... Args>
-    inline auto xview<E, S...>::sliced_access(const xslice<T>& slice, Args... args) const -> std::enable_if_t<(sizeof...(Args) == 0), size_type>
+    template<typename E::size_type I, class T, class Arg, class... Args>
+    inline auto xview<E, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
     {
-        return slice.derived_cast()(0);
+        return slice.derived_cast()(argument<I>(arg, args...));
     }
 
     template <class E, class... S>
