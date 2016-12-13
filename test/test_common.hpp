@@ -252,10 +252,10 @@ namespace xt
             row_major_result<C> rm;
             vec.reshape(rm.shape(), layout::row_major);
 
-            EXPECT_THROW(vec.transpose({1, 1, 0}, do_check()), transpose_error);
-            EXPECT_THROW(vec.transpose({1, 0, 2, 3}, do_check()), transpose_error);
-            EXPECT_THROW(vec.transpose({1, 2}, do_check()), transpose_error);
-            EXPECT_THROW(vec.transpose({3, 0, 1}, do_check()), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 1, 0}, check_policy::full()), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 0, 2, 3}, check_policy::full()), transpose_error);
+            EXPECT_THROW(vec.transpose({1, 2}, check_policy::full()), transpose_error);
+            EXPECT_THROW(vec.transpose({3, 0, 1}, check_policy::full()), transpose_error);
         }
     }
 
