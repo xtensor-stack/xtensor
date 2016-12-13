@@ -21,7 +21,8 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
-    namespace check_policy {
+    namespace check_policy
+    {
         struct none {};
         struct full {};
     }
@@ -387,8 +388,8 @@ namespace xt
     /**
      * Transposes the container inplace by permuting the shape with @permutation.
      * @param permutation the dimensions with the given permutation
-     * @param check_policy select the level of error checking on permutation vector 
-     *                     check_policy::full() or check_policy::none(), defaults to check_policy::none.
+     * @param check_policy the check level (check_policy::full() or check_policy::none())
+     * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
      */
     template <class D>
     template <class Tag>
