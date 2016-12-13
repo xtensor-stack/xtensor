@@ -467,7 +467,24 @@ namespace xt
         m_data.resize(tmp.size());
         std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
     }
+
+    /**
+     * Initializes an xarray of shape filled with zeros.
+     * @param shape the shape of the resulting xarray
+     */
+    template <class T>
+    static xarray<T> zeros(const std::vector<typename std::vector<T>::size_type>& shape) {
+        return xarray<T>(shape, (T) 0.0);
+    }
+
+    /**
+     * Initializes an xarray of shape filled with ones.
+     * @param shape the shape of the resulting xarray
+     */
+    template <class T>
+    static xarray<T> ones(const std::vector<typename std::vector<T>::size_type>& shape) {
+        return xarray<T>(shape, (T) 1.0);
+    }
 }
 
 #endif
-
