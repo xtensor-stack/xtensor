@@ -387,7 +387,7 @@ namespace xt
 
     /**
      * Transposes the container inplace by permuting the shape with @permutation.
-     * @param permutation the dimensions with the given permutation
+     * @param permutation the vector containing permutation
      * @param check_policy the check level (check_policy::full() or check_policy::none())
      * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
      */
