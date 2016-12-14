@@ -104,7 +104,8 @@ namespace xt
 
     // Workaround for buggy error C2210 in VS2015 when using condtional_t
     template <class E>
-    using get_xexpression_type = typename std::conditional<is_xexpression<E>::value, E, xscalar<E>>::type;
+    using get_xexpression_type = typename std::conditional<is_xexpression<typename std::remove_reference<E>::type>::value,
+                                                           typename std::remove_reference<E>::type, xscalar<E>>::type;
 
     /*******************
      * get_xexpression *

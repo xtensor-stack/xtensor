@@ -21,5 +21,8 @@ namespace xt
         xarray<double> assigned_ones = lazy_ones;
         ASSERT_EQ(2, lazy_ones.dimension());
         ASSERT_EQ(1, lazy_ones(0, 1));
+
+        xarray<double> m {{ 1, 2, 3}, {4, 5, 6}};
+        auto b = broadcast(m, std::array<size_t, 3>{1, 2, 3});
     }
 }

@@ -21,13 +21,23 @@
 namespace xt
 {
 
+    /*************
+     * broadcast *
+     *************/
+
+    template <class E, class S>
+    auto broadcast(E&& e, const S& s);
+
+    template <class E, class I, std::size_t L>
+    auto broadcast(E&& e, const I(&s)[L]);
+
     /**************
      * xbroadcast *
      **************/
 
     /**
      * @class xbroadcast
-     * @brief Broadcast an xexpression to a specified shape.
+     * @brief Broadcasted xexpression to a specified shape.
      *
      * Th xbroadcast class implements the broadcasting of an xexpression
      * to a specified shape
@@ -106,16 +116,52 @@ namespace xt
         shape_type m_shape;
     };
 
-    template <class E, class S>
-    inline auto broadcast(E e, S s)
+    /****************************
+     * broadcast implementation *
+     ****************************/
+
+    namespace detail
     {
-        return xbroadcast<get_xexpression_type<E>, S>(std::forward<E>(e), std::forward<S>(s));
+        template <class R, class A>
+        struct shape_forwarder
+        {
+            static inline R run(const A& r)
+            {
+                return R(r.cbegin(), r.cend());
+            }
+        };
+
+        template <class R, class T, std::size_t L>
+        struct shape_forwarder<R, T(&)[L]>
+        {
+            static inline R run(const T(&r)[L])
+            {
+                return R(r, r + L);
+            }
+        };        
+
+        template <class R>
+        struct shape_forwarder<R, R>
+        {
+            static inline const R& run(const R& r)
+            {
+                return r;
+            }
+        };
     }
 
-    template <class E, class I>
-    inline auto broadcast(E e, std::initializer_list<I> s)
+    template <class E, class S>
+    inline auto broadcast(E&& e, const S& s)
     {
-        return xbroadcast<get_xexpression_type<E>, std::vector<I>>(std::forward<E>(e), std::vector<I>(s));
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, S>;
+        return broadcast_type(std::forward<E>(e), detail::shape_forwarder<typename broadcast_type::shape_type, S>::run(s));
+    }
+
+    template <class E, class I, std::size_t L>
+    inline auto broadcast(E&& e, const I(&s)[L])
+    {
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::array<I, L>>;
+        return broadcast_type(std::forward<E>(e), detail::shape_forwarder<typename broadcast_type::shape_type, I(&)[L]>::run(s));
     }
 
     /*****************************
