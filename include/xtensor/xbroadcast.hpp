@@ -45,13 +45,13 @@ namespace xt
      * @tparam E the type of the xexpression to broadcast
      * @tparam S the type of the shape.
      */
-    template <class E, class X>
-    class xbroadcast : public xexpression<xbroadcast<E, X>>
+    template <class E, class X, bool LV>
+    class xbroadcast : public xexpression<xbroadcast<E, X, LV>>
     {
 
     public:
 
-        using self_type = xbroadcast<E, X>;
+        using self_type = xbroadcast<E, X, LV>;
 
         using value_type = typename E::value_type;
         using reference = typename E::reference;
@@ -70,7 +70,7 @@ namespace xt
         using const_storage_iterator = const_iterator;
 
         template <class S>
-        xbroadcast(E e, S s) noexcept;
+        xbroadcast(const E& e, S s) noexcept;
 
         size_type dimension() const noexcept;
         const shape_type & shape() const noexcept;
@@ -112,7 +112,7 @@ namespace xt
 
     private:
 
-        E m_e;
+        std::conditional_t<LV, const E&, E> m_e;
         shape_type m_shape;
     };
 
@@ -153,14 +153,16 @@ namespace xt
     template <class E, class S>
     inline auto broadcast(E&& e, const S& s)
     {
-        using broadcast_type = xbroadcast<get_xexpression_type<E>, S>;
+        constexpr bool is_lvalue = std::is_lvalue_reference<decltype(e)>::value;
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, S, is_lvalue>;
         return broadcast_type(std::forward<E>(e), detail::shape_forwarder<typename broadcast_type::shape_type, S>::run(s));
     }
 
     template <class E, class I, std::size_t L>
     inline auto broadcast(E&& e, const I(&s)[L])
     {
-        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::array<I, L>>;
+        constexpr bool is_lvalue = std::is_lvalue_reference<decltype(e)>::value;
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::array<I, L>, is_lvalue>;
         return broadcast_type(std::forward<E>(e), detail::shape_forwarder<typename broadcast_type::shape_type, I(&)[L]>::run(s));
     }
 
@@ -179,149 +181,149 @@ namespace xt
      * @param e the expression to broadcast
      * @param s the shape to apply
      */
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline xbroadcast<E, X>::xbroadcast(E e, S s) noexcept
-        : m_e(std::move(e)), m_shape(std::move(s))
+    inline xbroadcast<E, X, LV>::xbroadcast(const E& e, S s) noexcept
+        : m_e(e), m_shape(std::move(s))
     {
         xt::broadcast_shape(e.shape(), m_shape);
     }
     //@}
 
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::dimension() const noexcept -> size_type
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::dimension() const noexcept -> size_type
     {
         return m_shape.size();
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::shape() const noexcept -> const shape_type &
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::shape() const noexcept -> const shape_type &
     {
         return m_shape;
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class... Args>
-    inline auto xbroadcast<E, X>::operator()(Args... args) const -> const_reference
+    inline auto xbroadcast<E, X, LV>::operator()(Args... args) const -> const_reference
     {
         return detail::get_element(m_e, args...);
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::operator[](const xindex& index) const -> const_reference
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::operator[](const xindex& index) const -> const_reference
     {
         // TODO:: depile
         return m_e[index];
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline bool xbroadcast<E, X>::broadcast_shape(S& shape) const
+    inline bool xbroadcast<E, X, LV>::broadcast_shape(S& shape) const
     { 
         return xt::broadcast_shape(m_shape, shape);
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline bool xbroadcast<E, X>::is_trivial_broadcast(const S& strides) const noexcept
+    inline bool xbroadcast<E, X, LV>::is_trivial_broadcast(const S& strides) const noexcept
     {
         return dimension() == m_e.dimension() && std::equal(m_shape.cbegin(), m_shape.cend(), m_e.shape().cbegin()) &&
                m_e.is_trivial_broadcast(strides);
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::begin() const noexcept -> const_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::begin() const noexcept -> const_iterator
     {
         return cxbegin(shape());
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::end() const noexcept -> const_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::end() const noexcept -> const_iterator
     {
         return cxend(shape());
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::cbegin() const noexcept -> const_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::cbegin() const noexcept -> const_iterator
     {
         return cxbegin(shape());
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::cend() const noexcept -> const_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::cend() const noexcept -> const_iterator
     {
         return cxend(shape());
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline auto xbroadcast<E, X>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    inline auto xbroadcast<E, X, LV>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
         return cxbegin(shape);
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline auto xbroadcast<E, X>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    inline auto xbroadcast<E, X, LV>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
         return cxend(shape);
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline auto xbroadcast<E, X>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    inline auto xbroadcast<E, X, LV>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
         return cxbegin(shape);
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline auto xbroadcast<E, X>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    inline auto xbroadcast<E, X, LV>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
         return cxend(shape);
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline auto xbroadcast<E, X>::stepper_begin(const S& shape) const noexcept -> const_stepper
+    inline auto xbroadcast<E, X, LV>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
         // Could check if (broadcastable(shape, m_shape)
         return m_e.stepper_begin(shape);
     }
 
-    template <class E, class X>
+    template <class E, class X, bool LV>
     template <class S>
-    inline auto xbroadcast<E, X>::stepper_end(const S& shape) const noexcept -> const_stepper
+    inline auto xbroadcast<E, X, LV>::stepper_end(const S& shape) const noexcept -> const_stepper
     {
         // Could check if (broadcastable(shape, m_shape)
         return m_e.stepper_begin(shape);
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::storage_begin() const noexcept -> const_storage_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::storage_begin() const noexcept -> const_storage_iterator
     {
         return cbegin();
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::storage_end() const noexcept -> const_storage_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::storage_end() const noexcept -> const_storage_iterator
     {
         return cend();
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::storage_cbegin() const noexcept -> const_storage_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::storage_cbegin() const noexcept -> const_storage_iterator
     {
         return cbegin();
     }
 
-    template <class E, class X>
-    inline auto xbroadcast<E, X>::storage_cend() const noexcept -> const_storage_iterator
+    template <class E, class X, bool LV>
+    inline auto xbroadcast<E, X, LV>::storage_cend() const noexcept -> const_storage_iterator
     {
         return cend();
     }
