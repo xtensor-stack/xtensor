@@ -125,6 +125,12 @@ namespace xt
         test_reshape(a);
     }
 
+    TEST(xarray, transpose)
+    {
+        xarray<int> a;
+        test_transpose(a);
+    }
+
     TEST(xarray, access)
     {
         xarray<int> a;
