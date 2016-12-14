@@ -51,7 +51,7 @@ namespace xt
         using const_stepper = xscalar_stepper<T>;
         using const_storage_iterator = xscalar_iterator<T>;
 
-        xscalar(const T& value) noexcept;
+        xscalar(T value) noexcept;
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
@@ -82,7 +82,7 @@ namespace xt
 
     private:
 
-        const T& m_value;
+        value_type m_value;
     };
 
     /*******************
@@ -175,8 +175,8 @@ namespace xt
      **************************/
 
     template <class T>
-    inline xscalar<T>::xscalar(const T& value) noexcept
-        : m_value(value)
+    inline xscalar<T>::xscalar(T value) noexcept
+        : m_value(std::move(value))
     {
     }
 

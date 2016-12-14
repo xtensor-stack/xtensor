@@ -20,5 +20,6 @@ namespace xt
         auto lazy_ones = ones<double>(shape);
         xarray<double> assigned_ones = lazy_ones;
         ASSERT_EQ(2, lazy_ones.dimension());
+        ASSERT_EQ(1, lazy_ones(0, 1));
     }
 }
