@@ -392,7 +392,7 @@ namespace xt
     /**
      * Broadcast the shape of the view to the specified parameter.
      * @param shape the result shape
-     * @return a boolean indicating whether the broadcast is trivial
+     * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class E, class... S>
     template <class ST>
@@ -402,9 +402,9 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the view to see wether
-     * the broadcast is trivial.
-     * @return a boolean indicating whether the broadcast is trivial
+     * Compares the specified strides with those of the view to see whether
+     * the broadcasting is trivial.
+     * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class E, class... S>
     template <class ST>

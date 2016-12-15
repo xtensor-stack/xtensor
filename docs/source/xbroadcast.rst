@@ -4,16 +4,9 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Containers and views
-====================
+xbroadcast
+==========
 
-.. toctree::
-
-   xcontainer
-   xarray
-   xarray_adaptor
-   xtensor
-   xtensor_adaptor
-   xview
-   xfunction
-   xbroadcast
+.. doxygenclass:: xt::xbroadcast
+   :project: xtensor
+   :members:

@@ -28,6 +28,12 @@ namespace xt
      * ones *
      ********/
 
+    /**
+     * @function ones
+     * @brief Returns an \ref xexpression containing ones of the specified shape.
+     *
+     * @tparam shape the shape of the returned expression.
+     */
     template <class T, class S>
     inline auto ones(S shape) noexcept
     {
@@ -37,6 +43,7 @@ namespace xt
     template <class T, class I>
     inline auto ones(std::initializer_list<I> shape) noexcept
     {
+        // TODO: In the case of an initializer_list, use an array instead of a vector.
         return ones<T>(std::vector<I>(shape));
     }
 
@@ -44,6 +51,12 @@ namespace xt
      * zeros *
      *********/
 
+    /**
+     * @function ones
+     * @brief Returns an \ref xexpression containing zeros of the specified shape.
+     *
+     * @tparam shape the shape of the returned expression.
+     */
     template <class T, class S>
     inline auto zeros(S shape) noexcept
     {
@@ -53,6 +66,7 @@ namespace xt
     template <class T, class I>
     inline auto zeros(std::initializer_list<I> shape) noexcept
     {
+        // TODO: In the case of an initializer_list, use an array instead of a vector.
         return zeros<T>(std::vector<I>(shape));
     }
 

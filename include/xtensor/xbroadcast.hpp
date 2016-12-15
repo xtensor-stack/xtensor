@@ -28,8 +28,8 @@ namespace xt
     template <class E, class S>
     auto broadcast(E&& e, const S& s);
 
-    template <class E, class I, std::size_t L>
-    auto broadcast(E&& e, const I(&s)[L]);
+    template <class E>
+    auto broadcast(E&& e, std::initializer_list<std::size_t> s);
 
     /**************
      * xbroadcast *
@@ -39,11 +39,11 @@ namespace xt
      * @class xbroadcast
      * @brief Broadcasted xexpression to a specified shape.
      *
-     * Th xbroadcast class implements the broadcasting of an xexpression
+     * The xbroadcast class implements the broadcasting of an \ref xexpression
      * to a specified shape
      *
-     * @tparam E the type of the xexpression to broadcast
-     * @tparam S the type of the shape.
+     * @tparam E the type of the \ref xexpression to broadcast
+     * @tparam S the type of the specified shape.
      */
     template <class E, class X, bool LV>
     class xbroadcast : public xexpression<xbroadcast<E, X, LV>>
@@ -131,12 +131,12 @@ namespace xt
             }
         };
 
-        template <class R, class T, std::size_t L>
-        struct shape_forwarder<R, T(&)[L]>
+        template <class R, class T>
+        struct shape_forwarder<R, std::initializer_list<T>>
         {
-            static inline R run(const T(&r)[L])
+            static inline R run(std::initializer_list<T> s)
             {
-                return R(r, r + L);
+                return R(s);
             }
         };        
 
@@ -148,22 +148,42 @@ namespace xt
                 return r;
             }
         };
+
+        template <class R, class A>
+        inline auto forward_shape(const A& s)
+        {
+            return shape_forwarder<R, A>::run(s);
+        }
     }
 
+    /**
+     * @function broadcast
+     * @brief Returns an \ref xexpression broadcasting the given expression to
+     * a specified shape.
+     *
+     * @tparam e the \ref xexpression to broadcast
+     * @tparam s the specified shape to broadcast.
+     *
+     * The returned expression either hold a const reference to \p e or a copy
+     * depending on whether \p e is an lvalue or an rvalue.
+     */
     template <class E, class S>
     inline auto broadcast(E&& e, const S& s)
     {
         constexpr bool is_lvalue = std::is_lvalue_reference<decltype(e)>::value;
         using broadcast_type = xbroadcast<get_xexpression_type<E>, S, is_lvalue>;
-        return broadcast_type(std::forward<E>(e), detail::shape_forwarder<typename broadcast_type::shape_type, S>::run(s));
+        using shape_type = typename broadcast_type::shape_type;
+        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
 
-    template <class E, class I, std::size_t L>
-    inline auto broadcast(E&& e, const I(&s)[L])
+    template <class E>
+    inline auto broadcast(E&& e, std::initializer_list<std::size_t> s)
     {
+        // TODO: In the case of an initializer_list, use an array instead of a vector.
         constexpr bool is_lvalue = std::is_lvalue_reference<decltype(e)>::value;
-        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::array<I, L>, is_lvalue>;
-        return broadcast_type(std::forward<E>(e), detail::shape_forwarder<typename broadcast_type::shape_type, I(&)[L]>::run(s));
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::vector<std::size_t>, is_lvalue>;
+        using shape_type = typename broadcast_type::shape_type;
+        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
 
     /*****************************
@@ -175,8 +195,8 @@ namespace xt
      */
     //@{
     /**
-     * Constructs an xbroadcast broadcasting the specified expression to the given
-     * shape
+     * Constructs an xbroadcast expression broadcasting the specified
+     * \ref xexpression to the given shape
      *
      * @param e the expression to broadcast
      * @param s the shape to apply
@@ -191,18 +211,37 @@ namespace xt
     //@}
 
 
+    /**
+     * @name Size and shape
+     */
+    /**
+     * Returns the number of dimensions of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::dimension() const noexcept -> size_type
     {
         return m_shape.size();
     }
 
+    /**
+     * Returns the shape of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::shape() const noexcept -> const shape_type &
     {
         return m_shape;
     }
+    //@}
 
+    /**
+     * @name Data
+     */
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the expression.
+     */
     template <class E, class X, bool LV>
     template <class... Args>
     inline auto xbroadcast<E, X, LV>::operator()(Args... args) const -> const_reference
@@ -210,13 +249,28 @@ namespace xt
         return detail::get_element(m_e, args...);
     }
 
+    /**
+     * Compares the specified strides with those of the container to see whether
+     * the broadcasting is trivial.
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::operator[](const xindex& index) const -> const_reference
     {
         // TODO:: depile
         return m_e[index];
     }
+    //@}
 
+    /**
+     * @name Broadcasting
+     */
+    //@{
+    /**
+     * Broadcast the shape of the function to the specified parameter.
+     * @param shape the result shape
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
     template <class E, class X, bool LV>
     template <class S>
     inline bool xbroadcast<E, X, LV>::broadcast_shape(S& shape) const
@@ -224,6 +278,11 @@ namespace xt
         return xt::broadcast_shape(m_shape, shape);
     }
 
+    /**
+     * Compares the specified strides with those of the container to see whether
+     * the broadcasting is trivial.
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
     template <class E, class X, bool LV>
     template <class S>
     inline bool xbroadcast<E, X, LV>::is_trivial_broadcast(const S& strides) const noexcept
@@ -231,31 +290,55 @@ namespace xt
         return dimension() == m_e.dimension() && std::equal(m_shape.cbegin(), m_shape.cend(), m_e.shape().cbegin()) &&
                m_e.is_trivial_broadcast(strides);
     }
+    //@}
 
+    /**
+     * @name Iterators
+     */
+    //@{
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::begin() const noexcept -> const_iterator
     {
         return cxbegin(shape());
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::end() const noexcept -> const_iterator
     {
         return cxend(shape());
     }
 
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::cbegin() const noexcept -> const_iterator
     {
         return cxbegin(shape());
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::cend() const noexcept -> const_iterator
     {
         return cxend(shape());
     }
 
+    /**
+     * Returns a constant iterator to the first element of the expression. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for braodcasting
+     */
     template <class E, class X, bool LV>
     template <class S>
     inline auto xbroadcast<E, X, LV>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
@@ -264,6 +347,11 @@ namespace xt
         return cxbegin(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
     template <class E, class X, bool LV>
     template <class S>
     inline auto xbroadcast<E, X, LV>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
@@ -272,6 +360,11 @@ namespace xt
         return cxend(shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the expression. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for braodcasting
+     */
     template <class E, class X, bool LV>
     template <class S>
     inline auto xbroadcast<E, X, LV>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
@@ -280,6 +373,11 @@ namespace xt
         return cxbegin(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
     template <class E, class X, bool LV>
     template <class S>
     inline auto xbroadcast<E, X, LV>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
@@ -287,6 +385,7 @@ namespace xt
         // Could check if (broadcastable(shape, m_shape)
         return cxend(shape);
     }
+    //@}
 
     template <class E, class X, bool LV>
     template <class S>
@@ -304,29 +403,49 @@ namespace xt
         return m_e.stepper_begin(shape);
     }
 
+    /**
+     * @name Storage iterators
+     */
+    /**
+     * Returns an iterator to the first element of the buffer
+     * containing the elements of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::storage_begin() const noexcept -> const_storage_iterator
     {
         return cbegin();
     }
 
+    /**
+     * Returns an iterator to the element following the last
+     * element of the buffer containing the elements of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::storage_end() const noexcept -> const_storage_iterator
     {
         return cend();
     }
 
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::storage_cbegin() const noexcept -> const_storage_iterator
     {
         return cbegin();
     }
 
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the expression.
+     */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::storage_cend() const noexcept -> const_storage_iterator
     {
         return cend();
     }
+    //@}
 
 }
 
