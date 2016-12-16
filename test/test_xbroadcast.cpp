@@ -23,6 +23,12 @@ namespace xt
         ASSERT_EQ(4.0, m1_broadcast(0, 1, 0));
         ASSERT_EQ(5.0, m1_broadcast(0, 1, 1));
 
+        auto shape = std::vector<std::size_t> {1, 2, 3};
+        auto m1_broadcast2 = broadcast(m1, shape);
+        ASSERT_EQ(1.0, m1_broadcast2(0, 0, 0));
+        ASSERT_EQ(4.0, m1_broadcast2(0, 1, 0));
+        ASSERT_EQ(5.0, m1_broadcast2(0, 1, 1));
+
         double f = *(m1_broadcast.begin());
         xarray<double> m1_assigned = m1_broadcast;
         ASSERT_EQ(5.0, m1_assigned(0, 1, 1));
