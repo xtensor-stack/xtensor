@@ -16,16 +16,10 @@ namespace xt
 
     TEST(xbuilder, ones)
     {
-        std::vector<size_t> shape = {1, 2};
-        auto lazy_ones = ones<double>(shape);
-        xarray<double> assigned_ones = lazy_ones;
-        ASSERT_EQ(2, lazy_ones.dimension());
-        ASSERT_EQ(1, lazy_ones(0, 1));
-
-        xarray<double> m1 {{ 1, 2, 3}, {4, 5, 6}};
-        auto b = broadcast(m1, std::array<size_t, 3>{1, 2, 3});
-
-        xarray<double> m2 {{ 1, 2, 3}, {4, 5, 6}};
-        auto b2 = broadcast(m2, {1, 2, 3});
+        auto m = ones<double>({1, 2});
+        ASSERT_EQ(2, m.dimension());
+        ASSERT_EQ(1.0, m(0, 1));
+        xarray<double> m_assigned = m;
+        ASSERT_EQ(1.0, m_assigned(0, 1));
     }
 }

@@ -8,11 +8,24 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xbroadcast.hpp"
+#include "xtensor/xarray.hpp"
 
 namespace xt
 {
     TEST(xbroadcast, broadcast)
     {
+        xarray<double> m1
+          {{1, 2, 3},
+           {4, 5, 6}};
+
+        auto m1_broadcast = broadcast(m1, {1, 2, 3});
+        ASSERT_EQ(1.0, m1_broadcast(0, 0, 0));
+        ASSERT_EQ(4.0, m1_broadcast(0, 1, 0));
+        ASSERT_EQ(5.0, m1_broadcast(0, 1, 1));
+
+        double f = *(m1_broadcast.begin());
+        xarray<double> m1_assigned = m1_broadcast;
+        ASSERT_EQ(5.0, m1_assigned(0, 1, 1));
     }
 }
 

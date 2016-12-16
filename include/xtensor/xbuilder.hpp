@@ -19,7 +19,6 @@
 
 #include "xfunction.hpp"
 #include "xbroadcast.hpp"
-#include "xmath.hpp"
 
 namespace xt
 {

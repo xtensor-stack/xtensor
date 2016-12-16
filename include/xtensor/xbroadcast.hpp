@@ -344,7 +344,7 @@ namespace xt
     inline auto xbroadcast<E, X, LV>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
-        return cxbegin(shape);
+        return xiterator<const_stepper, S>(stepper_begin(shape), shape);
     }
 
     /**
@@ -357,7 +357,7 @@ namespace xt
     inline auto xbroadcast<E, X, LV>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
-        return cxend(shape);
+        return xiterator<const_stepper, S>(stepper_end(shape), shape);
     }
 
     /**
@@ -370,7 +370,7 @@ namespace xt
     inline auto xbroadcast<E, X, LV>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
-        return cxbegin(shape);
+        return xiterator<const_stepper, S>(stepper_begin(shape), shape);
     }
 
     /**
@@ -383,7 +383,7 @@ namespace xt
     inline auto xbroadcast<E, X, LV>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
         // Could check if (broadcastable(shape, m_shape)
-        return cxend(shape);
+        return xiterator<const_stepper, S>(stepper_end(shape), shape);
     }
     //@}
 
@@ -400,7 +400,7 @@ namespace xt
     inline auto xbroadcast<E, X, LV>::stepper_end(const S& shape) const noexcept -> const_stepper
     {
         // Could check if (broadcastable(shape, m_shape)
-        return m_e.stepper_begin(shape);
+        return m_e.stepper_end(shape);
     }
 
     /**
