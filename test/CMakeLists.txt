@@ -61,6 +61,7 @@ set(XTENSOR_INCLUDE ../include)
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE}/xtensor/xarray.hpp
     ${XTENSOR_INCLUDE}/xtensor/xassign.hpp
+    ${XTENSOR_INCLUDE}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE}/xtensor/xexpression.hpp
@@ -84,6 +85,8 @@ set(XTENSOR_TESTS
     test_xadaptor_semantic.cpp
     test_xarray.cpp
     test_xarray_adaptor.cpp
+    test_xbroadcast.cpp
+    test_xbuilder.cpp
     test_xcontainer_semantic.cpp
     test_xfunction.cpp
     test_xiterator.cpp

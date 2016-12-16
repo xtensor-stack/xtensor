@@ -113,13 +113,19 @@ namespace xt
         const_iterator cbegin() const;
         const_iterator cend() const;
 
-        iterator xbegin(const shape_type& shape);
-        iterator xend(const shape_type& shape);
+        template <class ST>
+        xiterator<stepper, ST> xbegin(const ST& shape);
+        template <class ST>
+        xiterator<stepper, ST> xend(const ST& shape);
 
-        const_iterator xbegin(const shape_type& shape) const;
-        const_iterator xend(const shape_type& shape) const;
-        const_iterator cxbegin(const shape_type& shape) const;
-        const_iterator cxend(const shape_type& shape) const;
+        template <class ST>
+        xiterator<const_stepper, ST> xbegin(const ST& shape) const;
+        template <class ST>
+        xiterator<const_stepper, ST> xend(const ST& shape) const;
+        template <class ST>
+        xiterator<const_stepper, ST> cxbegin(const ST& shape) const;
+        template <class ST>
+        xiterator<const_stepper, ST> cxend(const ST& shape) const;
 
         template <class ST>
         stepper stepper_begin(const ST& shape);
@@ -386,7 +392,7 @@ namespace xt
     /**
      * Broadcast the shape of the view to the specified parameter.
      * @param shape the result shape
-     * @return a boolean indicating whether the broadcast is trivial
+     * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class E, class... S>
     template <class ST>
@@ -396,9 +402,9 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the view to see wether
-     * the broadcast is trivial.
-     * @return a boolean indicating whether the broadcast is trivial
+     * Compares the specified strides with those of the view to see whether
+     * the broadcasting is trivial.
+     * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class E, class... S>
     template <class ST>
@@ -561,7 +567,8 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class E, class... S>
-    inline auto xview<E, S...>::xbegin(const shape_type& shape) -> iterator
+    template <class ST>
+    inline auto xview<E, S...>::xbegin(const ST& shape) -> xiterator<stepper, ST>
     {
         return iterator(stepper_begin(shape), shape);
     }
@@ -572,7 +579,8 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class E, class... S>
-    inline auto xview<E, S...>::xend(const shape_type& shape) -> iterator
+    template <class ST>
+    inline auto xview<E, S...>::xend(const ST& shape) -> xiterator<stepper, ST>
     {
         return iterator(stepper_end(shape), shape);
     }
@@ -583,7 +591,8 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class E, class... S>
-    inline auto xview<E, S...>::xbegin(const shape_type& shape) const -> const_iterator
+    template <class ST>
+    inline auto xview<E, S...>::xbegin(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return const_iterator(stepper_begin(shape), shape);
     }
@@ -594,7 +603,8 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class E, class... S>
-    inline auto xview<E, S...>::xend(const shape_type& shape) const -> const_iterator
+    template <class ST>
+    inline auto xview<E, S...>::xend(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return const_iterator(stepper_end(shape), shape);
     }
@@ -605,7 +615,8 @@ namespace xt
      * @param shape the shape used for braodcasting
      */
     template <class E, class... S>
-    inline auto xview<E, S...>::cxbegin(const shape_type& shape) const -> const_iterator
+    template <class ST>
+    inline auto xview<E, S...>::cxbegin(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xbegin(shape);
     }
@@ -616,7 +627,8 @@ namespace xt
      * @param shape the shape used for broadcasting
      */
     template <class E, class... S>
-    inline auto xview<E, S...>::cxend(const shape_type& shape) const -> const_iterator
+    template <class ST>
+    inline auto xview<E, S...>::cxend(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xend(shape);
     }

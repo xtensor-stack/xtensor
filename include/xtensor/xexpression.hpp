@@ -20,6 +20,10 @@ namespace xt
 
     using xindex = std::vector<std::size_t>;
 
+    /***************************
+     * xexpression declaration *
+     ***************************/
+
     /**
      * @class xexpression
      * @brief Base class for xexpressions
@@ -100,7 +104,8 @@ namespace xt
 
     // Workaround for buggy error C2210 in VS2015 when using condtional_t
     template <class E>
-    using get_xexpression_type = typename std::conditional<is_xexpression<E>::value, E, xscalar<E>>::type;
+    using get_xexpression_type = typename std::conditional<is_xexpression<typename std::remove_reference<E>::type>::value,
+                                                           typename std::remove_reference<E>::type, xscalar<E>>::type;
 
     /*******************
      * get_xexpression *
@@ -139,6 +144,42 @@ namespace xt
 
     template <class E>
     using get_value_type = typename detail::get_value_type_impl<E>::type;
+    
+    /***************
+     * get_element *
+     ***************/
+
+    namespace detail
+    {
+        template <class E>
+        inline typename E::reference get_element(E& e)
+        {
+            return e();
+        }
+
+        template <class E, class S, class... Args>
+        inline typename E::reference get_element(E& e, S i, Args... args)
+        {
+            if(sizeof...(Args) >= e.dimension())
+                return get_element(e, args...);
+            return e(i, args...);
+        }
+
+        template <class E>
+        inline typename E::const_reference get_element(const E& e)
+        {
+            return e();
+        }
+
+        template <class E, class S, class... Args>
+        inline typename E::const_reference get_element(const E& e, S i, Args... args)
+        {
+            if(sizeof...(Args) >= e.dimension())
+                return get_element(e, args...);
+            return e(i, args...);
+        }
+    }
+
 }
 
 #endif
