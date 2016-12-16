@@ -104,7 +104,7 @@ namespace xt
         using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
 
-        xscalar_stepper(const container_type* c, bool end) noexcept;
+        xscalar_stepper(const container_type* c) noexcept;
 
         reference operator*() const noexcept;
 
@@ -119,7 +119,6 @@ namespace xt
     private:
 
         const container_type* p_c;
-        bool m_end;
     };
 
     template <class T>
@@ -236,14 +235,14 @@ namespace xt
     template <class S>
     inline auto xscalar<T>::stepper_begin(const S&) const noexcept -> const_stepper
     {
-        return const_stepper(this, false);
+        return const_stepper(this);
     }
 
     template <class T>
     template <class S>
     inline auto xscalar<T>::stepper_end(const S&) const noexcept -> const_stepper
     {
-        return const_stepper(this, true);
+        return const_stepper(this + 1);
     }
 
     template <class T>
@@ -275,8 +274,8 @@ namespace xt
      **********************************/
 
     template <class T>
-    inline xscalar_stepper<T>::xscalar_stepper(const container_type* c, bool end) noexcept
-        : p_c(c), m_end(end)
+    inline xscalar_stepper<T>::xscalar_stepper(const container_type* c) noexcept
+        : p_c(c)
     {
     }
 
@@ -304,13 +303,13 @@ namespace xt
     template <class T>
     inline void xscalar_stepper<T>::to_end() noexcept
     {
-        m_end = true;
+        p_c = p_c->stepper_end(p_c->shape()).p_c;
     }
 
     template <class T>
     inline bool xscalar_stepper<T>::equal(const self_type& rhs) const noexcept
     {
-        return (p_c == rhs.p_c) && (m_end == rhs.m_end);
+        return (p_c == rhs.p_c);
     }
 
     template <class T>

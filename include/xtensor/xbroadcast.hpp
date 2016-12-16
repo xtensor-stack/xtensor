@@ -40,7 +40,8 @@ namespace xt
      * @brief Broadcasted xexpression to a specified shape.
      *
      * The xbroadcast class implements the broadcasting of an \ref xexpression
-     * to a specified shape
+     * to a specified shape. xbroadcast is not meant to be used directly, but
+     * only with the \ref broadcast helper functions.
      *
      * @tparam E the type of the \ref xexpression to broadcast
      * @tparam S the type of the specified shape.
@@ -180,8 +181,7 @@ namespace xt
     inline auto broadcast(E&& e, std::initializer_list<std::size_t> s)
     {
         // TODO: In the case of an initializer_list, use an array instead of a vector.
-        constexpr bool is_lvalue = std::is_lvalue_reference<decltype(e)>::value;
-        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::vector<std::size_t>, is_lvalue>;
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::vector<std::size_t>, false>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
