@@ -35,6 +35,15 @@ matrix:
           packages:
             - clang-3.7
       env: COMPILER=clang CLANG=3.7
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+            - llvm-toolchain-precise-3.8
+          packages:
+            - clang-3.8
+      env: COMPILER=clang CLANG=3.8
     - os: osx
       osx_image: xcode8
       compiler: clang
