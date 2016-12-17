@@ -440,7 +440,7 @@ namespace xt
     template <class S>
     inline auto xfunction<F, R, E...>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
-        return const_iterator(stepper_begin(shape), shape);
+        return xiterator<const_stepper, S>(stepper_begin(shape), shape);
     }
 
     /**
@@ -452,7 +452,7 @@ namespace xt
     template <class S>
     inline auto xfunction<F, R, E...>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
     {
-        return const_iterator(stepper_end(shape), shape);
+        return xiterator<const_stepper, S>(stepper_end(shape), shape);
     }
 
     /**
