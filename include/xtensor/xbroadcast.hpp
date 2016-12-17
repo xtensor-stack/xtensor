@@ -10,12 +10,21 @@
 #define XBROADCAST_HPP
 
 #include <utility>
-#include <vector>
+#include <array>
 #include <algorithm>
 
 #include "xtensor/xutils.hpp"
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xiterator.hpp"
+
+// DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
+#ifdef __clang__
+    #if __clang_major__ == 3 && __clang_minor__ < 8
+        #define X_OLD_CLANG
+        #include <initializer_list>
+        #include <vector>
+    #endif
+#endif
 
 namespace xt
 {
@@ -27,8 +36,13 @@ namespace xt
     template <class E, class S>
     auto broadcast(E&& e, const S& s);
 
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    auto broadcast(E&& e, std::initializer_list<I> s);
+#else
     template <class E, class I, std::size_t L>
     auto broadcast(E&& e, const I(&s)[L]);
+#endif
 
     /**************
      * xbroadcast *
@@ -167,6 +181,15 @@ namespace xt
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
 
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto broadcast(E&& e, std::initializer_list<I> s)
+    {
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::vector<std::size_t>, false>;
+        using shape_type = typename broadcast_type::shape_type;
+        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
+    }
+#else
     template <class E, class I, std::size_t L>
     inline auto broadcast(E&& e, const I(&s)[L])
     {
@@ -174,6 +197,7 @@ namespace xt
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
+#endif
 
     /*****************************
      * xbroadcast implementation *
