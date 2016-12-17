@@ -323,7 +323,7 @@ namespace xt
      * Returns the offset of the data in the memory layout
      */
     template <class D>
-    inline auto xcontainer<D>::offset() const noexcept -> const size_type&
+    inline auto xcontainer<D>::offset() const noexcept -> const size_type
     {
         return data_offset();
     }
