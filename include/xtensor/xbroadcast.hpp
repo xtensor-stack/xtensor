@@ -10,7 +10,6 @@
 #define XBROADCAST_HPP
 
 #include <utility>
-#include <initializer_list>
 #include <vector>
 #include <algorithm>
 
@@ -28,8 +27,8 @@ namespace xt
     template <class E, class S>
     auto broadcast(E&& e, const S& s);
 
-    template <class E>
-    auto broadcast(E&& e, std::initializer_list<std::size_t> s);
+    template <class E, class I, std::size_t L>
+    auto broadcast(E&& e, const I(&s)[L]);
 
     /**************
      * xbroadcast *
@@ -128,18 +127,9 @@ namespace xt
         {
             static inline R run(const A& r)
             {
-                return R(r.cbegin(), r.cend());
+                return R(std::begin(r), std::end(r));
             }
         };
-
-        template <class R, class T>
-        struct shape_forwarder<R, std::initializer_list<T>>
-        {
-            static inline R run(std::initializer_list<T> s)
-            {
-                return R(s);
-            }
-        };        
 
         template <class R>
         struct shape_forwarder<R, R>
@@ -177,11 +167,10 @@ namespace xt
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
 
-    template <class E>
-    inline auto broadcast(E&& e, std::initializer_list<std::size_t> s)
+    template <class E, class I, std::size_t L>
+    inline auto broadcast(E&& e, const I(&s)[L])
     {
-        // TODO: In the case of an initializer_list, use an array instead of a vector.
-        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::vector<std::size_t>, false>;
+        using broadcast_type = xbroadcast<get_xexpression_type<E>, std::array<std::size_t, L>, false>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
