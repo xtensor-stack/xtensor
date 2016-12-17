@@ -570,7 +570,7 @@ namespace xt
     template <class ST>
     inline auto xview<E, S...>::xbegin(const ST& shape) -> xiterator<stepper, ST>
     {
-        return iterator(stepper_begin(shape), shape);
+        return xiterator<stepper, ST>(stepper_begin(shape), shape);
     }
 
     /**
@@ -582,7 +582,7 @@ namespace xt
     template <class ST>
     inline auto xview<E, S...>::xend(const ST& shape) -> xiterator<stepper, ST>
     {
-        return iterator(stepper_end(shape), shape);
+        return xiterator<stepper, ST>(stepper_end(shape), shape);
     }
 
     /**
@@ -594,7 +594,7 @@ namespace xt
     template <class ST>
     inline auto xview<E, S...>::xbegin(const ST& shape) const -> xiterator<const_stepper, ST>
     {
-        return const_iterator(stepper_begin(shape), shape);
+        return xiterator<const_stepper, ST>(stepper_begin(shape), shape);
     }
 
     /**
@@ -606,7 +606,7 @@ namespace xt
     template <class ST>
     inline auto xview<E, S...>::xend(const ST& shape) const -> xiterator<const_stepper, ST>
     {
-        return const_iterator(stepper_end(shape), shape);
+        return xiterator<const_stepper, ST>(stepper_end(shape), shape);
     }
 
     /**
