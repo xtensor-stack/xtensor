@@ -33,5 +33,21 @@ namespace xt
         xarray<double> m1_assigned = m1_broadcast;
         ASSERT_EQ(5.0, m1_assigned(0, 1, 1));
     }
+
+    TEST(xbroadcast, element)
+    {
+        xarray<double> m1
+          {{1, 2, 3},
+           {4, 5, 6}};
+
+        auto m1_broadcast = broadcast(m1, {4, 2, 3});
+
+        // access with the right number of arguments
+        std::array<std::size_t, 3> index1 = {0, 1, 1};
+        ASSERT_EQ(5.0, m1_broadcast.element(index1.begin(), index1.end()));
+        // too many arguments = using the last ones only
+        std::array<std::size_t, 4> index3 = {4, 0, 1, 1};
+        ASSERT_EQ(5.0, m1_broadcast.element(index3.begin(), index3.end()));
+    }
 }
 

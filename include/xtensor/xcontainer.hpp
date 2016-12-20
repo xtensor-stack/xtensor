@@ -100,6 +100,11 @@ namespace xt
         reference operator[](const xindex& index);
         const_reference operator[](const xindex& index) const;
 
+        template <class It>
+        reference element(It first, It last);
+        template <class It>
+        const_reference element(It first, It last) const;
+
         container_type& data() noexcept;
         const container_type& data() const noexcept;
 
@@ -181,7 +186,8 @@ namespace xt
         template <size_t dim = 0, class... Args>
         size_type data_offset(size_type i, Args... args) const noexcept;
 
-        size_type data_offset(const xindex& index) const noexcept;
+        template <class It>
+        size_type element_offset(It, It last) const noexcept;
 
         shape_type m_shape;
         strides_type m_strides;
@@ -260,13 +266,12 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_offset(const xindex& index) const noexcept -> size_type
+    template <class It>
+    inline auto xcontainer<D>::element_offset(It, It last) const noexcept -> size_type
     {
-        // VS2015 workaround : index.begin() + index.size() - m_strides.size()
-        // doesn't compile
-        auto iter = index.begin();
-        iter += index.size() - m_strides.size();
-        return std::inner_product(m_strides.begin(), m_strides.end(), iter, size_type(0));
+        It first = last;
+        first -= m_strides.size();
+        return std::inner_product(m_strides.begin(), m_strides.end(), first, size_type(0));
     }
 
     /**
@@ -490,26 +495,54 @@ namespace xt
 
     /**
      * Returns a reference to the element at the specified position in the container.
-     * @param index a list of indices specifying the position in the container. Indices
+     * @param index a sequence of indices specifying the position in the container. Indices
      * must be unsigned integers, the number of indices in the list should be equal or greater
      * than the number of dimensions of the container.
      */
     template <class D>
     inline auto xcontainer<D>::operator[](const xindex& index) -> reference
     {
-        return data()[data_offset(index)];
+        return element(index.cbegin(), index.cend());
     }
 
     /**
     * Returns a constant reference to the element at the specified position in the container.
-    * @param index a list of indices specifying the position in the container. Indices
+    * @param index a sequence of indices specifying the position in the container. Indices
     * must be unsigned integers, the number of indices in the list should be equal or greater
     * than the number of dimensions of the container.
     */
     template <class D>
     inline auto xcontainer<D>::operator[](const xindex& index) const -> const_reference
     {
-        return data()[data_offset(index)];
+        return element(index.cbegin(), index.cend());
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the container.
+     * @param first iterator starting the sequence of indices
+     * @param second iterator starting the sequence of indices
+     * The number of indices in the squence should be equal or greater
+     * than the number of dimensions of the container.
+     */
+    template <class D>
+    template <class It>
+    inline auto xcontainer<D>::element(It first, It last) -> reference
+    {
+        return data()[element_offset(first, last)];
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the container.
+     * @param first iterator starting the sequence of indices
+     * @param second iterator starting the sequence of indices
+     * The number of indices in the squence should be equal or greater
+     * than the number of dimensions of the container.
+     */
+    template <class D>
+    template <class It>
+    inline auto xcontainer<D>::element(It first, It last) const -> const_reference
+    {
+        return data()[element_offset(first, last)];
     }
 
     /**
