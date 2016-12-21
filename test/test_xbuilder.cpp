@@ -23,7 +23,7 @@ namespace xt
         ASSERT_EQ(1.0, m_assigned(0, 1));
     }
 
-    TEST(xarray, random)
+    TEST(xbuilder, random)
     {
         xarray<double> a = random::rand<double>({20, 20});
         EXPECT_GE(a(0, 0), 0);
