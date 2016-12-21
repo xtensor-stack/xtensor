@@ -16,8 +16,11 @@
 #include <initializer_list>
 #include <utility>
 #include <vector>
+#include <functional>
+#include <random>
 
 #include "xfunction.hpp"
+#include "xarray.hpp"
 #include "xbroadcast.hpp"
 
 namespace xt
@@ -67,6 +70,26 @@ namespace xt
     {
         // TODO: In the case of an initializer_list, use an array instead of a vector.
         return zeros<T>(std::vector<I>(shape));
+    }
+
+    namespace random
+    {
+        // default random number engine
+        static std::mt19937 mt;
+
+        template <class T, class RE = decltype(mt)>
+        inline auto rand(std::vector<std::size_t> shape, T lower = 0, T upper = 1, RE engine = mt) noexcept
+        {
+            std::uniform_real_distribution<T> dist(lower, upper);
+            return xt::xarray<T>(shape, std::bind(dist, engine));
+        }
+
+        template <class T, class RE = decltype(mt)>
+        inline auto randint(std::vector<std::size_t> shape, T lower, T upper, RE engine = mt) noexcept
+        {
+            std::uniform_int_distribution<T> dist(lower, upper);
+            return xt::xarray<T>(shape, std::bind(dist, engine));
+        }
     }
 
 }

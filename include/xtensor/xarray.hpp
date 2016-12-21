@@ -80,6 +80,8 @@ namespace xt
         xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>> t);
         xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>>> t);
 
+        xarray(const shape_type& shape, std::function<T()> f, layout l = layout::row_major);
+
         ~xarray() = default;
 
         xarray(const xarray&) = default;
@@ -247,6 +249,24 @@ namespace xt
     {
         base_type::reshape(shape, strides);
         std::fill(m_data.begin(), m_data.end(), value);
+    }
+
+    /**
+     * Allocates an xarray with the specified shape and layout. Elements
+     * are initialized by calling @f.
+     * @param shape the shape of the xarray
+     * @param f functor that is called for each element
+     * @param l the layout of the xarray
+     */
+    template <class T>
+    inline xarray<T>::xarray(const shape_type& shape, std::function<T()> f, layout l)
+        : base_type()
+    {
+        base_type::reshape(shape, l);
+        for (auto& el : m_data)
+        {
+            el = f();
+        }
     }
 
     /**

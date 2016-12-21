@@ -22,4 +22,13 @@ namespace xt
         xarray<double> m_assigned = m;
         ASSERT_EQ(1.0, m_assigned(0, 1));
     }
+
+    TEST(xarray, random)
+    {
+        xarray<double> a = random::rand<double>({20, 20});
+        EXPECT_GE(a(0, 0), 0);
+        EXPECT_LE(a(0, 0), 1);
+        EXPECT_GE(a(19, 19), 0);
+        EXPECT_LE(a(19, 19), 1);
+    }
 }
