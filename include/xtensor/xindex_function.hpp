@@ -78,7 +78,7 @@ namespace xt
         bool broadcast_shape(S& shape) const;
 
         template <class S>
-        bool is_trivial_broadcast(const S& strides) const noexcept;
+        bool is_trivial_broadcast(const S& /*strides*/) const noexcept;
 
         const_iterator begin() const noexcept;
         const_iterator end() const noexcept;
@@ -152,9 +152,9 @@ namespace xt
         bool equal(const self_type& rhs) const;
 
     private:
+        const xfunction_type* p_f;
         shape_type m_shape;
         shape_type m_index;
-        const xfunction_type* p_f;
     };
 
     template <class F, class R>
@@ -256,7 +256,7 @@ namespace xt
      */
     template <class F, class R>
     template <class S>
-    inline bool xindex_function<F, R>::is_trivial_broadcast(const S& strides) const noexcept
+    inline bool xindex_function<F, R>::is_trivial_broadcast(const S& /*strides*/) const noexcept
     {
         return false;
     }
@@ -413,9 +413,9 @@ namespace xt
     }
     //@}
 
-    /************************************
+    /******************************************
      * xindex_function_stepper implementation *
-     ************************************/
+     ******************************************/
 
     template <class F, class R>
     inline xindex_function_stepper<F, R>::xindex_function_stepper(const xfunction_type* func, const shape_type& shape) noexcept

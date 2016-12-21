@@ -62,7 +62,7 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args... args) const noexcept;
-        const_reference operator[](const xindex& index) const noexcept;
+        const_reference operator[](const xindex& /*idx*/) const noexcept;
 
         template <class S>
         bool broadcast_shape(S& shape) const noexcept;
@@ -219,7 +219,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto xscalar<T>::operator[](const xindex& idx) const noexcept -> const_reference
+    inline auto xscalar<T>::operator[](const xindex& /*idx*/) const noexcept -> const_reference
     {
         return m_value;
     }
