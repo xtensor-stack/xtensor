@@ -77,14 +77,14 @@ namespace xt
         inline auto make_xindex_function(Functor&& f, std::initializer_list<std::size_t> shape) noexcept
         {
             using type = xindex_function<Functor, typename Functor::value_type>;
-            return type(f, std::vector<std::size_t>(shape));
+            return type(std::forward<Functor>(f), std::vector<std::size_t>(shape));
         }
         
         template <class Functor, class S>
         inline auto make_xindex_function(Functor&& f, const S& shape) noexcept
         {
             using type = xindex_function<Functor, typename Functor::value_type>;
-            return type(f, shape);
+            return type(std::forward<Functor>(f), shape);
         }
 
         template <class T>
