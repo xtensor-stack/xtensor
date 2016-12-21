@@ -256,10 +256,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(shape, l);
-        for (auto& el : m_data)
-        {
-            el = f();
-        }
+        std::generate(m_data.begin(), m_data.end(), f);
     }
     //@}
 
