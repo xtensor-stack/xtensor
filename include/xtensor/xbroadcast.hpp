@@ -93,6 +93,9 @@ namespace xt
         const_reference operator()(Args... args) const;
         const_reference operator[](const xindex& index) const;
 
+        template <class It>
+        const_reference element(It, It last) const;
+
         template <class S>
         bool broadcast_shape(S& shape) const;
 
@@ -263,15 +266,32 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the container to see whether
-     * the broadcasting is trivial.
-     * @return a boolean indicating whether the broadcasting is trivial
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param index a sequence of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices in the sequence should be equal or greater
+     * than the number of dimensions of the container.
      */
     template <class E, class X, bool LV>
     inline auto xbroadcast<E, X, LV>::operator[](const xindex& index) const -> const_reference
     {
-        // TODO:: depile
-        return m_e[index];
+        return element(index.cbegin(), index.cend());
+    }
+    
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param first iterator starting the sequence of indices
+     * @param second iterator starting the sequence of indices
+     * The number of indices in the squence should be equal or greater
+     * than the number of dimensions of the function.
+     */
+    template <class E, class X, bool LV>
+    template <class It>
+    inline auto xbroadcast<E, X, LV>::element(It, It last) const -> const_reference
+    {
+        // Workaround MSVC bug. m_e.element(last - dimension(), last) does not build.
+        It first = last;
+        first -= dimension();
+        return m_e.element(first, last);
     }
     //@}
 
@@ -300,7 +320,8 @@ namespace xt
     template <class S>
     inline bool xbroadcast<E, X, LV>::is_trivial_broadcast(const S& strides) const noexcept
     {
-        return dimension() == m_e.dimension() && std::equal(m_shape.cbegin(), m_shape.cend(), m_e.shape().cbegin()) &&
+        return dimension() == m_e.dimension() &&
+               std::equal(m_shape.cbegin(), m_shape.cend(), m_e.shape().cbegin()) &&
                m_e.is_trivial_broadcast(strides);
     }
     //@}

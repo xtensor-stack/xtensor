@@ -128,6 +128,9 @@ namespace xt
 
         const_reference operator[](const xindex& index) const;
 
+        template <class It>
+        const_reference element(It first, It last) const;
+
         template <class S>
         bool broadcast_shape(S& shape) const;
 
@@ -165,8 +168,8 @@ namespace xt
         template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
-        template <std::size_t... I>
-        const_reference access_impl(const xindex& index, std::index_sequence<I...>) const;
+        template <std::size_t... I, class It>
+        const_reference element_access_impl(std::index_sequence<I...>, It first, It last) const;
 
         template <class Func, std::size_t... I>
         const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const noexcept;
@@ -349,7 +352,21 @@ namespace xt
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::operator[](const xindex& index) const -> const_reference
     {
-        return access_impl(index, std::make_index_sequence<sizeof...(E)>());
+        return element(index.cbegin(), index.cend());
+    }
+    
+    /**
+     * Returns a constant reference to the element at the specified position in the function.
+     * @param first iterator starting the sequence of indices
+     * @param second iterator starting the sequence of indices
+     * The number of indices in the squence should be equal or greater
+     * than the number of dimensions of the container.
+     */
+    template <class F, class R, class... E>
+    template <class It>
+    inline auto xfunction<F, R, E...>::element(It first, It last) const -> const_reference
+    {
+        return element_access_impl(std::make_index_sequence<sizeof...(E)>(), first, last);
     }
     //@}
     
@@ -550,10 +567,10 @@ namespace xt
     }
 
     template <class F, class R, class... E>
-    template <std::size_t... I>
-    inline auto xfunction<F, R, E...>::access_impl(const xindex& index, std::index_sequence<I...>) const -> const_reference
+    template <std::size_t... I, class It>
+    inline auto xfunction<F, R, E...>::element_access_impl(std::index_sequence<I...>, It first, It last) const -> const_reference
     {
-        return m_f(std::get<I>(m_e)[index]...);
+        return m_f((std::get<I>(m_e).element(first, last))...);
     }
 
     template <class F, class R, class... E>
