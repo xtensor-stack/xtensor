@@ -78,17 +78,17 @@ namespace xt
         static std::mt19937 mt;
 
         template <class T, class RE = decltype(mt)>
-        inline auto rand(std::vector<std::size_t> shape, T lower = 0, T upper = 1, RE engine = mt) noexcept
+        inline auto rand(std::vector<std::size_t> shape, T lower = 0, T upper = 1, RE &engine = mt) noexcept
         {
             std::uniform_real_distribution<T> dist(lower, upper);
-            return xt::xarray<T>(shape, std::bind(dist, engine));
+            return xt::xarray<T>(shape, std::bind(dist, std::ref(engine)));
         }
 
         template <class T, class RE = decltype(mt)>
-        inline auto randint(std::vector<std::size_t> shape, T lower, T upper, RE engine = mt) noexcept
+        inline auto randint(std::vector<std::size_t> shape, T lower, T upper, RE &engine = mt) noexcept
         {
             std::uniform_int_distribution<T> dist(lower, upper);
-            return xt::xarray<T>(shape, std::bind(dist, engine));
+            return xt::xarray<T>(shape, std::bind(dist, std::ref(engine)));
         }
     }
 
