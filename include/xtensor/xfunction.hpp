@@ -327,7 +327,7 @@ namespace xt
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::shape() const -> shape_type
     {
-        shape_type shape = make_shape<shape_type>(dimension(), size_type(1));
+        shape_type shape = make_sequence<shape_type>(dimension(), size_type(1));
         broadcast_shape(shape);
         return shape;
     }

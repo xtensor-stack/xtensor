@@ -285,7 +285,7 @@ namespace xt
     template <class It, class S>
     inline xiterator<It, S>::xiterator(It it, const shape_type& shape)
         : m_it(it), m_shape(shape),
-          m_index(make_shape<shape_type>(shape.size(), size_type(0)))
+          m_index(make_sequence<shape_type>(shape.size(), size_type(0)))
     {
     }
 

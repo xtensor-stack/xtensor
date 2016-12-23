@@ -89,6 +89,9 @@ namespace xt
         EXPECT_EQ(a(1, 0, 1), view1(0, 1));
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
         EXPECT_EQ(a(1, 1, 1), view1(1, 1));
+        
+        std::array<std::size_t, 2> idx = {1, 1};
+        EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
 
     TEST(xview, integral_count)
@@ -220,8 +223,8 @@ namespace xt
     TEST(xview, const_view)
     {
         const xtensor<double, 3> arr{ {1, 2, 3}, 2.5 };
-        xtensor<double, 2> arr2{ {2,3}, 0.0 };
-        xtensor<double, 2> ref{ {2,3}, 2.5 };
+        xtensor<double, 2> arr2{ {2, 3}, 0.0 };
+        xtensor<double, 2> ref{ {2, 3}, 2.5 };
         arr2 = xt::make_xview(arr, 0);
         EXPECT_EQ(ref, arr2);
     }

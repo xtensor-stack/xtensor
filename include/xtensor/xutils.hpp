@@ -357,14 +357,14 @@ namespace xt
         return size == N;
     }
 
-    /*****************************
-     * make_shape implementation *
-     *****************************/
+    /********************************
+     * make_sequence implementation *
+     ********************************/
 
     namespace detail
     {
         template <class S>
-        struct shape_builder
+        struct sequence_builder
         {
             using value_type = typename S::value_type;
             using size_type = typename S::size_type;
@@ -376,15 +376,15 @@ namespace xt
         };
 
         template <class T, std::size_t N>
-        struct shape_builder<std::array<T, N>>
+        struct sequence_builder<std::array<T, N>>
         {
-            using shape_type = std::array<T, N>;
-            using value_type = typename shape_type::value_type;
-            using size_type = typename shape_type::size_type;
+            using sequence_type = std::array<T, N>;
+            using value_type = typename sequence_type::value_type;
+            using size_type = typename sequence_type::size_type;
 
-            inline static shape_type make(size_type /*size*/, value_type v)
+            inline static sequence_type make(size_type /*size*/, value_type v)
             {
-                shape_type s;
+                sequence_type s;
                 s.fill(v);
                 return s;
             }
@@ -392,9 +392,9 @@ namespace xt
     }
 
     template <class S>
-    inline S make_shape(typename S::size_type size, typename S::value_type v)
+    inline S make_sequence(typename S::size_type size, typename S::value_type v)
     {
-        return detail::shape_builder<S>::make(size, v);
+        return detail::sequence_builder<S>::make(size, v);
     }
 
     /*************************************

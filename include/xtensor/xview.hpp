@@ -95,9 +95,15 @@ namespace xt
 
         template <class... Args>
         reference operator()(Args... args);
+        reference operator[](const xindex& index);
+        template <class It>
+        reference element(It first, It last);
 
         template <class... Args>
         const_reference operator()(Args... args) const;
+        const_reference operator[](const xindex& index) const;
+        template <class It>
+        const_reference element(It first, It last) const;
 
         template <class ST>
         bool broadcast_shape(ST& shape) const;
@@ -269,6 +275,19 @@ namespace xt
     template <class... S>
     constexpr std::size_t integral_skip(std::size_t i);
 
+    // return slice evaluation and increment iterator
+    template <class S, class It>
+    inline disable_xslice<S, std::size_t> get_slice_value(const S& s, It&) noexcept
+    {
+        return s;
+    };
+
+    template <class S, class It>
+    inline auto get_slice_value(const xslice<S>& slice, It& it) noexcept
+    {
+        return slice.derived_cast()(*it++);
+    };
+
     /************************
      * xview implementation *
      ************************/
@@ -295,14 +314,8 @@ namespace xt
         for (size_type i = 0; i != dimension(); ++i)
         {
             size_type index = integral_skip<S...>(i);
-            if (index < sizeof...(S))
-            {
-                m_shape[i] = apply<std::size_t>(index, func, m_slices);
-            }
-            else
-            {
-                m_shape[i] = m_e.shape()[index];
-            }
+            m_shape[i] = index < sizeof...(S) ?
+                apply<std::size_t>(index, func, m_slices) : m_e.shape()[index];
         }
     }
     //@}
@@ -371,6 +384,41 @@ namespace xt
         return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
     }
 
+    template <class E, class... S>
+    inline auto xview<E, S...>::operator[](const xindex& index) -> reference
+    {
+        return element(index.cbegin(), index.cend());
+    }
+
+    template <class E, class... S>
+    template <class It>
+    inline auto xview<E, S...>::element(It first, It last) -> reference
+    {
+        auto index = make_sequence<typename E::shape_type>(m_e.dimension(), 0);
+        auto func1 = [&first](const auto& s)
+        {
+            return get_slice_value(s, first);
+        };
+        auto func2 = [](const auto& s)
+        {
+            return xt::value(s, 0);
+        };
+        for (size_type i=0; i!=m_e.dimension(); ++i)
+        {
+            if (first != last)
+            {
+                index[i] = i < sizeof...(S) ?
+                    apply<size_type>(i, func1, m_slices) : *first++;
+            }
+            else
+            {
+                index[i] = i < sizeof...(S) ?
+                    apply<size_type>(i, func2, m_slices) : 0;
+            }
+        }
+        return m_e.element(index.cbegin(), index.cend());
+    }
+
     /**
      * Returns a constant reference to the element at the specified position in the view.
      * @param args a list of indices specifying the position in the view. Indices must be
@@ -382,6 +430,41 @@ namespace xt
     inline auto xview<E, S...>::operator()(Args... args) const -> const_reference
     {
         return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
+    }
+    
+    template <class E, class... S>
+    inline auto xview<E, S...>::operator[](const xindex& index) const -> const_reference
+    {
+        return element(index.cbegin(), index.cend());
+    }
+
+    template <class E, class... S>
+    template <class It>
+    inline auto xview<E, S...>::element(It first, It last) const -> const_reference
+    {
+        auto index = make_sequence<typename E::shape_type>(m_e.dimension(), 0);
+        auto func1 = [&first](const auto& s)
+        {
+            return get_slice_value(s, first);
+        };
+        auto func2 = [](const auto& s)
+        {
+            return xt::value(s, 0);
+        };
+        for (size_type i=0; i!=m_e.dimension(); ++i)
+        {
+            if (first != last)
+            {
+                index[i] = i < sizeof...(S) ?
+                    apply<size_type>(i, func1, m_slices) : *first++;
+            }
+            else
+            {
+                index[i] = i < sizeof...(S) ?
+                    apply<size_type>(i, func2, m_slices) : 0;
+            }
+        }
+        return m_e.element(index.cbegin(), index.cend());
     }
     //@}
 
@@ -475,9 +558,9 @@ namespace xt
         inline xview<E, get_slice_type<E, S>...> make_view_impl(E& e, std::index_sequence<I...>, S&&... slices)
         {
             return xview<E, get_slice_type<E, S>...>(
-                    e,
-                    std::forward<get_slice_type<E, S>>(get_slice_implementation(e, slices, I))...
-                    );
+                e,
+                std::forward<get_slice_type<E, S>>(get_slice_implementation(e, slices, I))...
+            );
         }
     }
 
@@ -753,7 +836,7 @@ namespace xt
     {
         if(!end)
         {
-            auto func = [](const auto& s) { return xt::first_value(s); };
+            auto func = [](const auto& s) { return xt::value(s, 0); };
             for(size_type i = 0; i < sizeof...(S); ++i)
             {
                 size_type s = apply<size_type>(i, func, p_view->slices());
