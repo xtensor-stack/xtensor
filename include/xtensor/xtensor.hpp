@@ -374,8 +374,7 @@ namespace xt
     template <class C, std::size_t N>
     inline void xtensor_adaptor<C, N>::assign_temporary_impl(temporary_type& tmp)
     {
-        // TODO (performance improvement) : consider moving tmps
-        // shape and strides
+        // TODO (performance improvement) : consider moving tmps shape and strides
         base_type::get_shape() = tmp.shape();
         base_type::get_strides() = tmp.strides();
         base_type::get_backstrides() = tmp.backstrides();

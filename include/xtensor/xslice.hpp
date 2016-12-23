@@ -203,20 +203,20 @@ namespace xt
         return slice.derived_cast().step_size();
     }
 
-    /***************************************************
-     * homogeneous first_value for integral and slices *
-     ***************************************************/
+    /*********************************************
+     * homogeneous value for integral and slices *
+     *********************************************/
 
-    template <class S>
-    inline disable_xslice<S, std::size_t> first_value(const S& s) noexcept
+    template <class S, class I>
+    inline disable_xslice<S, std::size_t> value(const S& s, I) noexcept
     {
         return s;
     }
 
-    template <class S>
-    inline auto first_value(const xslice<S>& slice) noexcept
+    template <class S, class I>
+    inline auto value(const xslice<S>& slice, I i) noexcept
     {
-        return slice.derived_cast()(0);
+        return slice.derived_cast()(i);
     }
 
     /****************************************
@@ -234,7 +234,7 @@ namespace xt
     {
         return xall<typename E::size_type>(e.shape()[index]);
     }
-
+    
     /******************************
      * homogeneous get_slice_type *
      ******************************/
