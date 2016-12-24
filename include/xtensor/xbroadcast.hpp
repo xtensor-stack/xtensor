@@ -76,7 +76,6 @@ namespace xt
         using difference_type = typename E::difference_type;
         
         using shape_type = promote_shape_t<typename E::shape_type, X>;
-        using strides_type = promote_strides_t<typename E::strides_type, X>;
         using closure_type = const self_type;
 
         using const_stepper = typename E::const_stepper;

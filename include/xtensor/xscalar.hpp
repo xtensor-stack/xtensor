@@ -45,7 +45,6 @@ namespace xt
 
         using self_type = xscalar<T>;
         using shape_type = std::array<size_type, 0>;
-        using strides_type = std::array<size_type, 0>;
 
         using closure_type = const self_type;
         using const_stepper = xscalar_stepper<T>;
@@ -57,8 +56,6 @@ namespace xt
         size_type dimension() const noexcept;
 
         shape_type shape() const noexcept;
-        strides_type strides() const noexcept;
-        strides_type backstrides() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const noexcept;
@@ -197,18 +194,6 @@ namespace xt
 
     template <class T>
     inline auto xscalar<T>::shape() const noexcept -> shape_type
-    {
-        return {};
-    }
-
-    template <class T>
-    inline auto xscalar<T>::strides() const noexcept -> strides_type
-    {
-        return {};
-    }
-
-    template <class T>
-    inline auto xscalar<T>::backstrides() const noexcept -> strides_type
     {
         return {};
     }
