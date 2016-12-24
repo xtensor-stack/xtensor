@@ -9,6 +9,9 @@
 #ifndef XSEMANTIC_HPP
 #define XSEMANTIC_HPP
 
+#include <utility>
+#include <functional>
+
 #include "xexpression.hpp"
 #include "xassign.hpp"
 

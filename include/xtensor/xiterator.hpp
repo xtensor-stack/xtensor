@@ -9,12 +9,7 @@
 #ifndef XITERATOR_HPP
 #define XITERATOR_HPP
 
-#include <utility>
-#include <tuple>
-#include <type_traits>
 #include <iterator>
-#include <array>
-#include <algorithm>
 
 #include "xutils.hpp"
 #include "xexception.hpp"

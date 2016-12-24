@@ -9,6 +9,8 @@
 #ifndef XASSIGN_HPP
 #define XASSIGN_HPP
 
+#include <algorithm>
+
 #include "xiterator.hpp"
 
 namespace xt

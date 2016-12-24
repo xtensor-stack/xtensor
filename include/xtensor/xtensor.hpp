@@ -9,8 +9,11 @@
 #ifndef XTENSOR_HPP
 #define XTENSOR_HPP
 
-#include <array>
 #include <cstddef>
+#include <utility>
+#include <array>
+#include <vector>
+#include <algorithm>
 
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"

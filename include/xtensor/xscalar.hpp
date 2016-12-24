@@ -11,6 +11,7 @@
 
 #include <utility>
 #include <cstddef>
+#include <array>
 
 #include "xexpression.hpp"
 
