@@ -36,6 +36,9 @@ namespace xt
         using temporary_type = xarray<typename E::value_type>;
     };
 
+    template <class ST, class... S>
+    struct xview_shape_type;
+
     /**
      * @class xview
      * @brief Multidimensional view with tensor semantic.
@@ -67,8 +70,8 @@ namespace xt
         using size_type = typename E::size_type;
         using difference_type = typename E::difference_type;
 
-        using shape_type = std::vector<size_type>;
-        using strides_type = std::vector<size_type>;
+        using shape_type = typename xview_shape_type<typename E::shape_type, S...>::type;
+
         using slice_type = std::tuple<S...>;
 
         using stepper = xview_stepper<false, E, S...>;
@@ -288,6 +291,19 @@ namespace xt
         return slice.derived_cast()(*it++);
     };
 
+    // meta-function returning the shape type for an xview 
+    template <class ST, class... S>
+    struct xview_shape_type
+    {
+        using type = ST;
+    };
+
+    template <class I, std::size_t L, class... S>
+    struct xview_shape_type<std::array<I, L>, S...>
+    {
+        using type = std::array<I, L - integral_count<S...>()>;
+    };
+
     /************************
      * xview implementation *
      ************************/
@@ -307,10 +323,10 @@ namespace xt
     template <class E, class... S>
     template <class... SL>
     inline xview<E, S...>::xview(E& e, SL&&... slices) noexcept
-        : m_e(e), m_slices(std::forward<SL>(slices)...)
+        : m_e(e), m_slices(std::forward<SL>(slices)...),
+          m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>(), 0))
     {
         auto func = [](const auto& s) noexcept { return get_size(s); };
-        m_shape.resize(dimension());
         for (size_type i = 0; i != dimension(); ++i)
         {
             size_type index = integral_skip<S...>(i);

@@ -110,7 +110,6 @@ namespace xt
         using difference_type = detail::common_difference_type<E...>;
 
         using shape_type = promote_shape_t<typename E::shape_type...>;
-        using strides_type = promote_strides_t<typename E::strides_type...>;
         using closure_type = const self_type;
 
         using const_stepper = xfunction_stepper<F, R, E...>;
