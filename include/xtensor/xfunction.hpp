@@ -14,6 +14,7 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
+#include <iterator>
 
 #include "xexpression.hpp"
 #include "xiterator.hpp"

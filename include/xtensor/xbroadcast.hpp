@@ -12,6 +12,9 @@
 #include <utility>
 #include <array>
 #include <algorithm>
+#include <iterator>
+#include <type_traits>
+#include <cstddef>
 
 #include "xtensor/xutils.hpp"
 #include "xtensor/xexpression.hpp"
@@ -34,14 +37,14 @@ namespace xt
      *************/
 
     template <class E, class S>
-    auto broadcast(E&& e, const S& s);
+    auto broadcast(E&& e, const S& s) noexcept;
 
 #ifdef X_OLD_CLANG
     template <class E, class I>
-    auto broadcast(E&& e, std::initializer_list<I> s);
+    auto broadcast(E&& e, std::initializer_list<I> s) noexcept;
 #else
     template <class E, class I, std::size_t L>
-    auto broadcast(E&& e, const I(&s)[L]);
+    auto broadcast(E&& e, const I(&s)[L]) noexcept;
 #endif
 
     /**************
@@ -147,6 +150,19 @@ namespace xt
             }
         };
 
+        template <class I, std::size_t L, class A>
+        struct shape_forwarder<std::array<I, L>, A>
+        {
+            using R = std::array<I, L>;
+
+            static inline R run(const A& r)
+            {
+                R ret;
+                std::copy(std::begin(r), std::end(r), std::begin(ret));
+                return ret;
+            }
+        };
+
         template <class R>
         struct shape_forwarder<R, R>
         {
@@ -175,7 +191,7 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
     template <class E, class S>
-    inline auto broadcast(E&& e, const S& s)
+    inline auto broadcast(E&& e, const S& s) noexcept
     {
         constexpr bool is_lvalue = std::is_lvalue_reference<decltype(e)>::value;
         using broadcast_type = xbroadcast<get_xexpression_type<E>, S, is_lvalue>;
@@ -185,7 +201,7 @@ namespace xt
 
 #ifdef X_OLD_CLANG
     template <class E, class I>
-    inline auto broadcast(E&& e, std::initializer_list<I> s)
+    inline auto broadcast(E&& e, std::initializer_list<I> s) noexcept
     {
         using broadcast_type = xbroadcast<get_xexpression_type<E>, std::vector<std::size_t>, false>;
         using shape_type = typename broadcast_type::shape_type;
@@ -193,7 +209,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t L>
-    inline auto broadcast(E&& e, const I(&s)[L])
+    inline auto broadcast(E&& e, const I(&s)[L]) noexcept
     {
         using broadcast_type = xbroadcast<get_xexpression_type<E>, std::array<std::size_t, L>, false>;
         using shape_type = typename broadcast_type::shape_type;

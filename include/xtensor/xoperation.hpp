@@ -10,6 +10,7 @@
 #define XOPERATION_HPP
 
 #include <functional>
+#include <type_traits>
 
 #include "xfunction.hpp"
 #include "xscalar.hpp"

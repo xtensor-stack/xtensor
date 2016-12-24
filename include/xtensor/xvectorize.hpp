@@ -9,6 +9,9 @@
 #ifndef XVECTORIZE_HPP
 #define XVECTORIZE_HPP
 
+#include <utility>
+#include <type_traits>
+
 #include "xutils.hpp"
 
 namespace xt

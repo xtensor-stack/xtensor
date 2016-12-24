@@ -9,9 +9,11 @@
 #ifndef XVIEW_HPP
 #define XVIEW_HPP
 
+#include <cstddef>
 #include <utility>
 #include <type_traits>
 #include <tuple>
+#include <array>
 #include <algorithm>
 
 #include "xarray.hpp"

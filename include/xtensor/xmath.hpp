@@ -14,6 +14,8 @@
 #define XMATH_HPP
 
 #include <cmath>
+#include <type_traits>
+
 #include "xfunction.hpp"
 
 namespace xt

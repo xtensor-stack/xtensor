@@ -9,9 +9,9 @@
 #ifndef XSLICE_HPP
 #define XSLICE_HPP
 
+#include <cstddef>
 #include <utility>
 #include <type_traits>
-#include <vector>
 
 namespace xt
 {

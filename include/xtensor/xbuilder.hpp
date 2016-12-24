@@ -13,12 +13,17 @@
 #ifndef XBUILDER_HPP
 #define XBUILDER_HPP
 
-#include <initializer_list>
 #include <utility>
-#include <vector>
 
 #include "xfunction.hpp"
 #include "xbroadcast.hpp"
+
+#ifdef X_OLD_CLANG
+    #include <initializer_list>
+    #include <vector>
+#else
+    #include <array>
+#endif
 
 namespace xt
 {
@@ -39,12 +44,19 @@ namespace xt
         return broadcast(T(1), std::forward<S>(shape));
     }
 
+#ifdef X_OLD_CLANG
     template <class T, class I>
     inline auto ones(std::initializer_list<I> shape) noexcept
     {
-        // TODO: In the case of an initializer_list, use an array instead of a vector.
-        return ones<T>(std::vector<I>(shape));
+        return broadcast(T(1), shape);
     }
+#else
+    template <class T, class I, std::size_t L>
+    inline auto ones(const I(&shape)[L]) noexcept
+    {
+        return broadcast(T(1), shape);
+    }
+#endif
 
     /*********
      * zeros *
@@ -62,12 +74,19 @@ namespace xt
         return broadcast(T(0), std::forward<S>(shape));
     }
     
+#ifdef X_OLD_CLANG
     template <class T, class I>
     inline auto zeros(std::initializer_list<I> shape) noexcept
     {
-        // TODO: In the case of an initializer_list, use an array instead of a vector.
-        return zeros<T>(std::vector<I>(shape));
+        return broadcast(T(0), shape);
     }
+#else
+    template <class T, class I, std::size_t L>
+    inline auto zeros(const I(&shape)[L]) noexcept
+    {
+        return broadcast(T(0), shape);
+    }
+#endif
 
 }
 #endif

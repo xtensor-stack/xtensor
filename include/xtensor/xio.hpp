@@ -11,6 +11,7 @@
 
 #include <cstddef>
 #include <iostream>
+#include <string>
 
 #include "xexpression.hpp"
 #include "xview.hpp"
