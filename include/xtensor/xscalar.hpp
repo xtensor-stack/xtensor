@@ -49,6 +49,7 @@ namespace xt
 
         using closure_type = const self_type;
         using const_stepper = xscalar_stepper<T>;
+        using const_iterator = xscalar_iterator<T>;
         using const_storage_iterator = xscalar_iterator<T>;
 
         xscalar(T value) noexcept;
@@ -69,6 +70,20 @@ namespace xt
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
+
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+
+        template <class S>
+        const_iterator xbegin(const S& shape) const noexcept;
+        template <class S>
+        const_iterator xend(const S& shape) const noexcept;
+        template <class S>
+        const_iterator cxbegin(const S& shape) const noexcept;
+        template <class S>
+        const_iterator cxend(const S& shape) const noexcept;
 
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
@@ -225,6 +240,58 @@ namespace xt
     inline bool xscalar<T>::is_trivial_broadcast(const S&) const noexcept
     {
         return true;
+    }
+
+    template <class T>
+    inline auto xscalar<T>::begin() const noexcept -> const_iterator
+    {
+        return const_iterator(this);
+    }
+
+    template <class T>
+    inline auto xscalar<T>::end() const noexcept -> const_iterator
+    {
+        return const_iterator(this);
+    }
+
+    template <class T>
+    inline auto xscalar<T>::cbegin() const noexcept -> const_iterator
+    {
+        return const_iterator(this);
+    }
+
+    template <class T>
+    inline auto xscalar<T>::cend() const noexcept -> const_iterator
+    {
+        return const_iterator(this);
+    }
+
+    template <class T>
+    template <class S>
+    inline auto xscalar<T>::xbegin(const S& shape) const noexcept -> const_iterator
+    {
+        return const_iterator(this);
+    }
+
+    template <class T>
+    template <class S>
+    inline auto xscalar<T>::xend(const S& shape) const noexcept -> const_iterator
+    {
+        return const_iterator(this);
+    }
+
+    template <class T>
+    template <class S>
+    inline auto xscalar<T>::cxbegin(const S& shape) const noexcept -> const_iterator
+    {
+        return const_iterator(this);
+    }
+
+    template <class T>
+    template <class S>
+    inline auto xscalar<T>::cxend(const S& shape) const noexcept -> const_iterator
+    {
+        return const_iterator(this);
     }
 
     template <class T>
