@@ -180,7 +180,6 @@ namespace xt
     }
 
     /**
-     * @function broadcast
      * @brief Returns an \ref xexpression broadcasting the given expression to
      * a specified shape.
      *

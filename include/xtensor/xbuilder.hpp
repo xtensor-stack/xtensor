@@ -33,7 +33,6 @@ namespace xt
      ********/
 
     /**
-     * @function ones
      * @brief Returns an \ref xexpression containing ones of the specified shape.
      *
      * @tparam shape the shape of the returned expression.
@@ -63,7 +62,6 @@ namespace xt
      *********/
 
     /**
-     * @function ones
      * @brief Returns an \ref xexpression containing zeros of the specified shape.
      *
      * @tparam shape the shape of the returned expression.
