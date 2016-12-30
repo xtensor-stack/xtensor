@@ -1,5 +1,10 @@
-cmake_minimum_required(VERSION 3.1)
-project(xtensor)
+############################################################################
+# Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     #
+#                                                                          #
+# Distributed under the terms of the BSD 3-Clause License.                 #
+#                                                                          #
+# The full license is in the file LICENSE, distributed with this software. #
+############################################################################
 
 include(CheckCXXCompilerFlag)
 
@@ -8,7 +13,6 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder")
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
-    CHECK_CXX_COMPILER_FLAG("-std=c++11" HAS_CPP11_FLAG)
 
     if (HAS_CPP14_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -52,32 +56,8 @@ endif()
 find_package(GTest REQUIRED)
 find_package(Threads)
 
-include_directories(../include)
+include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${GTEST_INCLUDE_DIRS})
-
-set(XTENSOR_TARGET test_xtensor)
-set(XTENSOR_INCLUDE ../include)
-
-set(XTENSOR_HEADERS
-    ${XTENSOR_INCLUDE}/xtensor/xarray.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xassign.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xbroadcast.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xcontainer.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xexception.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xexpression.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xfunction.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xio.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xiterator.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xmath.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xnoalias.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xoperation.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xscalar.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xsemantic.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xslice.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xutils.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xvectorize.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xview.hpp
-)
 
 set(XTENSOR_TESTS
     main.cpp
@@ -106,6 +86,7 @@ set(XTENSOR_TESTS
     test_xutils.cpp
 )
 
+set(XTENSOR_TARGET test_xtensor)
 add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 

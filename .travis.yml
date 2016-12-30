@@ -83,7 +83,9 @@ install:
     - cd test
     - conda env create -f ./test-environment.yml
     - source activate test-xtensor
+    - cd ..
     - cmake .
     - make -j2
+    - cd test
 script:
     - ./test_xtensor
