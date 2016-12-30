@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <initializer_list>
 #include <algorithm>
+#include "xtensor_config.hpp"
 
 namespace xt
 {

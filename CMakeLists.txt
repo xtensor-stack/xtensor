@@ -12,11 +12,15 @@ project(xtensor)
 # Versionning
 # ===========
 
-set(XTENSOR_MAJOR_VERSION 0)
-set(XTENSOR_MINOR_VERSION 3)
-set(XTENSOR_PATCH_VERSION 0)
+file(STRINGS "include/xtensor/xtensor_config.hpp" xtensor_version_defines
+     REGEX "#define XTENSOR_VERSION_(MAJOR|MINOR|PATCH)")
+foreach(ver ${xtensor_version_defines})
+    if(ver MATCHES "#define XTENSOR_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
+        set(XTENSOR_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
+    endif()
+endforeach()
 set(${PROJECT_NAME}_VERSION 
-    ${XTENSOR_MAJOR_VERSION}.${XTENSOR_MINOR_VERSION}.${XTENSOR_PATCH_VERSION})
+    ${XTENSOR_VERSION_MAJOR}.${XTENSOR_VERSION_MINOR}.${XTENSOR_VERSION_PATCH})
 message(STATUS "xtensor v${${PROJECT_NAME}_VERSION}")
 
 
@@ -41,6 +45,7 @@ set(XTENSOR_HEADERS
     include/xtensor/xsemantic.hpp
     include/xtensor/xslice.hpp
     include/xtensor/xtensor.hpp
+    include/xtensor/xtensor_config.hpp
     include/xtensor/xutils.hpp
     include/xtensor/xvectorize.hpp
     include/xtensor/xview.hpp
