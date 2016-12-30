@@ -151,7 +151,7 @@ Besides, two access operators are provided:
  - And the `operator[]` which takes a single multi-index argument, which can be of size determined at runtime. `operator[]` also supports
    access with braced initializers.
 
-### Perfomance
+### Performance
 
 The dynamic nature of `xarray` over `xtensor` has a cost. Since the dimension is unknown at build time, the sequences holding shape and strides
 of `xarray` instances are heap-allocated, which makes it significantly more expansive than `xtensor`. Shape and strides of `xtensor` are stack
@@ -181,9 +181,11 @@ conda install -c conda-forge gtest cmake
 Once `gtest` and `cmake` are installed, you can build and run the tests:
 
 ```bash
+mkdir build
+cd build
+cmake ../
+make -j2
 cd test
-cmake .
-make
 ./test_xtensor
 ```
 
@@ -193,8 +195,10 @@ In the context of continuous integration with Travis CI, tests are run in a `con
 cd test
 conda env create -f ./test-environment.yml
 source activate test-xtensor
+cd ..
 cmake .
-make
+make -j2
+cd test
 ./test_xtensor
 ```
 
