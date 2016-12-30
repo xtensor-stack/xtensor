@@ -9,10 +9,12 @@
 cmake_minimum_required(VERSION 3.1)
 project(xtensor)
 
+set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 # Versionning
 # ===========
 
-file(STRINGS "include/xtensor/xtensor_config.hpp" xtensor_version_defines
+file(STRINGS "${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp" xtensor_version_defines
      REGEX "#define XTENSOR_VERSION_(MAJOR|MINOR|PATCH)")
 foreach(ver ${xtensor_version_defines})
     if(ver MATCHES "#define XTENSOR_VERSION_(MAJOR|MINOR|PATCH) +([^ ]+)$")
@@ -28,30 +30,28 @@ message(STATUS "xtensor v${${PROJECT_NAME}_VERSION}")
 # =====
 
 set(XTENSOR_HEADERS
-    include/xtensor/xarray.hpp
-    include/xtensor/xassign.hpp
-    include/xtensor/xbroadcast.hpp
-    include/xtensor/xbuilder.hpp
-    include/xtensor/xcontainer.hpp
-    include/xtensor/xexception.hpp
-    include/xtensor/xexpression.hpp
-    include/xtensor/xfunction.hpp
-    include/xtensor/xio.hpp
-    include/xtensor/xiterator.hpp
-    include/xtensor/xmath.hpp
-    include/xtensor/xnoalias.hpp
-    include/xtensor/xoperation.hpp
-    include/xtensor/xscalar.hpp
-    include/xtensor/xsemantic.hpp
-    include/xtensor/xslice.hpp
-    include/xtensor/xtensor.hpp
-    include/xtensor/xtensor_config.hpp
-    include/xtensor/xutils.hpp
-    include/xtensor/xvectorize.hpp
-    include/xtensor/xview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xutils.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
 )
-string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
-       XTENSOR_HEADERS "${XTENSOR_HEADERS}")
 
 add_subdirectory(test)
 

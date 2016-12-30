@@ -1,3 +1,11 @@
+############################################################################
+# Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     #
+#                                                                          #
+# Distributed under the terms of the BSD 3-Clause License.                 #
+#                                                                          #
+# The full license is in the file LICENSE, distributed with this software. #
+############################################################################
+
 include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
@@ -5,7 +13,6 @@ string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder")
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
-    CHECK_CXX_COMPILER_FLAG("-std=c++11" HAS_CPP11_FLAG)
 
     if (HAS_CPP14_FLAG)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -49,7 +56,7 @@ endif()
 find_package(GTest REQUIRED)
 find_package(Threads)
 
-include_directories(../include)
+include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${GTEST_INCLUDE_DIRS})
 
 set(XTENSOR_TESTS
