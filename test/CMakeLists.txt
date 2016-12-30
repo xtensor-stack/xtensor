@@ -1,6 +1,3 @@
-cmake_minimum_required(VERSION 3.1)
-project(xtensor)
-
 include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
@@ -55,30 +52,6 @@ find_package(Threads)
 include_directories(../include)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(XTENSOR_TARGET test_xtensor)
-set(XTENSOR_INCLUDE ../include)
-
-set(XTENSOR_HEADERS
-    ${XTENSOR_INCLUDE}/xtensor/xarray.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xassign.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xbroadcast.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xcontainer.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xexception.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xexpression.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xfunction.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xio.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xiterator.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xmath.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xnoalias.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xoperation.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xscalar.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xsemantic.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xslice.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xutils.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xvectorize.hpp
-    ${XTENSOR_INCLUDE}/xtensor/xview.hpp
-)
-
 set(XTENSOR_TESTS
     main.cpp
     test_common.hpp
@@ -106,6 +79,7 @@ set(XTENSOR_TESTS
     test_xutils.cpp
 )
 
+set(XTENSOR_TARGET test_xtensor)
 add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 

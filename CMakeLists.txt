@@ -27,6 +27,7 @@ set(XTENSOR_HEADERS
     include/xtensor/xarray.hpp
     include/xtensor/xassign.hpp
     include/xtensor/xbroadcast.hpp
+    include/xtensor/xbuilder.hpp
     include/xtensor/xcontainer.hpp
     include/xtensor/xexception.hpp
     include/xtensor/xexpression.hpp
@@ -39,12 +40,15 @@ set(XTENSOR_HEADERS
     include/xtensor/xscalar.hpp
     include/xtensor/xsemantic.hpp
     include/xtensor/xslice.hpp
+    include/xtensor/xtensor.hpp
     include/xtensor/xutils.hpp
     include/xtensor/xvectorize.hpp
     include/xtensor/xview.hpp
 )
 string(REPLACE "include/" "${CMAKE_CURRENT_SOURCE_DIR}/include/"
        XTENSOR_HEADERS "${XTENSOR_HEADERS}")
+
+add_subdirectory(test)
 
 # Installation
 # ============
