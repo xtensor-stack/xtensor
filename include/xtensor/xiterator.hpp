@@ -48,7 +48,25 @@ namespace xt
 
     template <class C>
     using get_storage_iterator = typename detail::get_storage_iterator_impl<C>::type;
+ 
+    namespace detail
+    {
+        template <class ST>
+        struct index_type_impl
+        {
+            using type = std::vector<typename ST::value_type>;
+        };
 
+        template <class V, std::size_t L>
+        struct index_type_impl<std::array<V, L>>
+        {
+            using type = std::array<V, L>;
+        };
+    }
+
+    template <class C>
+    using get_index_type = typename detail::index_type_impl<C>::type;
+ 
     template <class C>
     class xstepper
     {
@@ -92,9 +110,9 @@ namespace xt
     bool operator!=(const xstepper<C>& lhs,
                     const xstepper<C>& rhs);
 
-    template <class S, class ST>
+    template <class S, class IT, class ST>
     void increment_stepper(S& stepper,
-                           ST& index,
+                           IT& index,
                            const ST& shape);
 
     /*************
@@ -118,6 +136,7 @@ namespace xt
         using iterator_category = std::forward_iterator_tag;
 
         using shape_type = S;
+        using index_type = get_index_type<shape_type>;
 
         xiterator(It it, const shape_type& shape);
 
@@ -132,7 +151,7 @@ namespace xt
 
         subiterator_type m_it;
         shape_type m_shape;
-        shape_type m_index;
+        index_type m_index;
     };
 
     template <class It, class S>
@@ -246,9 +265,9 @@ namespace xt
         return !(lhs.equal(rhs));
     }
 
-    template <class S, class ST>
+    template <class S, class IT, class ST>
     void increment_stepper(S& stepper,
-                           ST& index,
+                           IT& index,
                            const ST& shape)
     {
         using size_type = typename S::size_type;
@@ -280,7 +299,7 @@ namespace xt
     template <class It, class S>
     inline xiterator<It, S>::xiterator(It it, const shape_type& shape)
         : m_it(it), m_shape(shape),
-          m_index(make_sequence<shape_type>(shape.size(), size_type(0)))
+          m_index(make_sequence<index_type>(shape.size(), size_type(0)))
     {
     }
 

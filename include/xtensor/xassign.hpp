@@ -53,6 +53,7 @@ namespace xt
         using lhs_iterator = typename E1::stepper;
         using rhs_iterator = typename E2::const_stepper;
         using shape_type = typename E1::shape_type;
+        using index_type = get_index_type<shape_type>;
         using size_type = typename lhs_iterator::size_type;
 
         data_assigner(E1& e1, const E2 & e2);
@@ -72,7 +73,7 @@ namespace xt
         rhs_iterator m_rhs;
         rhs_iterator m_rhs_end;
 
-        shape_type m_index;
+        index_type m_index;
     };
 
     /***********************************
@@ -173,7 +174,7 @@ namespace xt
     inline data_assigner<E1, E2>::data_assigner(E1& e1, const E2& e2)
         : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
           m_rhs(e2.stepper_begin(e1.shape())), m_rhs_end(e2.stepper_end(e1.shape())),
-          m_index(make_sequence<typename E1::shape_type>(e1.shape().size(), size_type(0)))
+          m_index(make_sequence<index_type>(e1.shape().size(), size_type(0)))
     {
     }
 
