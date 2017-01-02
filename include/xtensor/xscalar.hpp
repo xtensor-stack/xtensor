@@ -57,7 +57,7 @@ namespace xt
         size_type size() const noexcept;
         size_type dimension() const noexcept;
 
-        shape_type shape() const noexcept;
+        const shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const noexcept;
@@ -209,9 +209,10 @@ namespace xt
     }
 
     template <class T>
-    inline auto xscalar<T>::shape() const noexcept -> shape_type
+    inline auto xscalar<T>::shape() const noexcept -> const shape_type&
     {
-        return {};
+        static std::array<size_type, 0> zero_shape;
+        return zero_shape;
     }
 
     template <class T>

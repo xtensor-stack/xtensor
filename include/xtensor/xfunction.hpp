@@ -121,7 +121,7 @@ namespace xt
         xfunction(Func&& f, const E&...e) noexcept;
 
         size_type dimension() const noexcept;
-        shape_type shape() const;
+        const shape_type& shape() const;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -179,6 +179,7 @@ namespace xt
 
         std::tuple<typename E::closure_type...> m_e;
         functor_type m_f;
+        shape_type m_shape;
 
         friend class xf_storage_iterator<F, R, E...>;
         friend class xfunction_stepper<F, R, E...>;
@@ -302,8 +303,9 @@ namespace xt
     template <class F, class R, class... E>
     template <class Func>
     inline xfunction<F, R, E...>::xfunction(Func&& f, const E&... e) noexcept
-        : m_e(e...), m_f(std::forward<Func>(f))
+        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(make_sequence<shape_type>(dimension(), size_type(1)))
     {
+        broadcast_shape(m_shape);
     }
     //@}
 
@@ -325,11 +327,9 @@ namespace xt
      * Returns the shape of the xfunction.
      */
     template <class F, class R, class... E>
-    inline auto xfunction<F, R, E...>::shape() const -> shape_type
+    inline auto xfunction<F, R, E...>::shape() const -> const shape_type&
     {
-        shape_type shape = make_sequence<shape_type>(dimension(), size_type(1));
-        broadcast_shape(shape);
-        return shape;
+        return m_shape;
     }
     //@}
 
@@ -412,9 +412,7 @@ namespace xt
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::begin() const noexcept -> const_iterator
     {
-        shape_type shape(dimension(), size_type(1));
-        broadcast_shape(shape);
-        return xbegin(shape);
+        return xbegin(shape());
     }
 
     /**
@@ -424,9 +422,7 @@ namespace xt
     template <class F, class R, class... E>
     inline auto xfunction<F, R, E...>::end() const noexcept -> const_iterator
     {
-        shape_type shape(dimension(), size_type(1));
-        broadcast_shape(shape);
-        return xend(shape);
+        return xend(shape());
     }
 
     /**
