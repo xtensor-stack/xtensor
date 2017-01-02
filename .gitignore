@@ -30,6 +30,9 @@
 # Vim tmp files
 *.swp
 
+# Build directory
+build/
+
 # Test build artefacts
 test/test_xtensor
 test/CMakeCache.txt

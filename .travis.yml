@@ -85,7 +85,7 @@ install:
     - source activate test-xtensor
     - cd ..
     - cmake .
-    - make -j2
+    - make -j2 test_xtensor
     - cd test
 script:
     - ./test_xtensor

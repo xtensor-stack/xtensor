@@ -6,6 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
 
+message(STATUS "Forcing tests build type to Release")
+set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+
 include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
@@ -44,7 +47,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
 endif()
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
     foreach(flag_var
             CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
@@ -87,6 +90,7 @@ set(XTENSOR_TESTS
 )
 
 set(XTENSOR_TARGET test_xtensor)
-add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+add_executable(${XTENSOR_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
+add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})

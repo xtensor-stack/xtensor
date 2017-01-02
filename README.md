@@ -32,6 +32,13 @@ Containers of `xtensor` are inspired by [NumPy](http://www.numpy.org), the Pytho
 conda install -c conda-forge xtensor
 ```
 
+Or you can directly install it from the sources:
+
+```bash
+cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
+make install
+```
+
 ## Usage
 
 ### Basic Usage
