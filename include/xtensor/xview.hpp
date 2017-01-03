@@ -18,6 +18,7 @@
 
 #include "xarray.hpp"
 #include "xslice.hpp"
+#include "xiterator.hpp"
 
 namespace xt
 {
@@ -185,6 +186,8 @@ namespace xt
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
+        using base_index_type = get_index_type<shape_type>;
+
         void assign_temporary_impl(temporary_type& tmp);
 
         friend class xview_semantic<xview<E, S...>>;
@@ -412,7 +415,7 @@ namespace xt
     template <class It>
     inline auto xview<E, S...>::element(It first, It last) -> reference
     {
-        auto index = make_sequence<typename E::shape_type>(m_e.dimension(), 0);
+        auto index = make_sequence<base_index_type>(m_e.dimension(), 0);
         auto func1 = [&first](const auto& s)
         {
             return get_slice_value(s, first);
