@@ -4,5 +4,5 @@ channels:
   - conda-forge
   - SylvainCorlay
 dependencies:
-  - cling >=0.0.3
+  - cling_ubuntu14
   - xtensor
