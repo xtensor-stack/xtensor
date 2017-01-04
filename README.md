@@ -1,4 +1,5 @@
-# xtensor
+# ![xtensor](http://quantstack.net/assets/images/xtensor.svg)
+
 
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
@@ -179,7 +180,7 @@ effectively wraps numpy arrays, allowing inplace edition, including reshapes.
 
 Building the tests requires the [GTest](https://github.com/google/googletest) testing framework and [cmake](https://cmake.org).
 
-gtest and cmake are available as a packages for most linux distributions. Besideds, they can also be installed with the `conda` package manager (even on windows):
+gtest and cmake are available as a packages for most linux distributions. Besides, they can also be installed with the `conda` package manager (even on windows):
 
 ```bash
 conda install -c conda-forge gtest cmake
