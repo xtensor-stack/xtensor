@@ -1,6 +1,5 @@
 # ![xtensor](http://quantstack.net/assets/images/xtensor.svg)
 
-
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
 [![Documentation Status](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
@@ -192,9 +191,7 @@ Once `gtest` and `cmake` are installed, you can build and run the tests:
 mkdir build
 cd build
 cmake ../
-make -j2
-cd test
-./test_xtensor
+make xtest
 ```
 
 In the context of continuous integration with Travis CI, tests are run in a `conda` environment, which can be activated with
@@ -205,9 +202,7 @@ conda env create -f ./test-environment.yml
 source activate test-xtensor
 cd ..
 cmake .
-make -j2
-cd test
-./test_xtensor
+make xtest
 ```
 
 ## Building the HTML Documentation
