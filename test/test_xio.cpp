@@ -13,6 +13,7 @@
 #include <sstream>
 
 #include "xtensor/xarray.hpp"
+#include "xtensor/xbuilder.hpp"
 #include "xtensor/xio.hpp"
 
 
@@ -37,6 +38,21 @@ namespace xt
         EXPECT_EQ(R"xio({{1, 2, 3, 4},
  {5, 6, 7, 8},
  {9, 10, 11, 12}})xio", out.str());
+    }
+
+    TEST(xio, stacked)
+    {
+        xarray<double> e = {1, 2, 3, 4, 5};
+        auto stacked = vstack(e, e);
+        std::stringstream v_out;
+        v_out << stacked;
+        EXPECT_EQ(R"xio({{1, 2, 3, 4, 5},
+ {1, 2, 3, 4, 5}})xio", v_out.str());
+
+        auto h_stacked = hstack(e, e);
+        std::stringstream h_out;
+        h_out << h_stacked;
+        EXPECT_EQ(R"xio({1, 2, 3, 4, 5, 1, 2, 3, 4, 5})xio", h_out.str());
     }
 
     TEST(xio, view)

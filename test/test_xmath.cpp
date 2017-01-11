@@ -19,6 +19,12 @@ namespace xt
      * Basic operations
      **********************/
 
+    TEST(xmath, pow_add_pow)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a(shape, 4.5);
+        EXPECT_EQ((pow(a, 2.f) + pow(a, 2.f))(0, 0), std::pow(a(0, 0), 2.f) + std::pow(a(0, 0), 2.f));
+    }
 
     TEST(xmath, abs)
     {
