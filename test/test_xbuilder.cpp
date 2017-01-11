@@ -126,7 +126,7 @@ namespace xt
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 100);
 
-        double at_1 = std::pow<double>(10.0, (2.0 + 1.0/3.0));
+        double at_1 = std::pow(10.0, (2.0 + 1.0/3.0));
         ASSERT_EQ(ls(1), at_1);
 
         ASSERT_EQ(ls(3), 1000);
