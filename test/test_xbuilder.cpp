@@ -74,6 +74,12 @@ namespace xt
         ASSERT_EQ(m_assigned[{0}], 10);
         ASSERT_EQ(m_assigned(10), 15);
         ASSERT_EQ(m_assigned(3), 11.5);
+
+        auto l3 = arange<float>(0, 1, 0.3);
+        shape_t expected_shape_2 = {4};
+        ASSERT_EQ(l3.shape(), expected_shape_2);
+        ASSERT_EQ(l3[{0}], 0);
+        ASSERT_EQ(3.f * 0.3f, l3[{3}]);
     }
 
     TEST(xbuilder, linspace)

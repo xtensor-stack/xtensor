@@ -14,6 +14,7 @@
 #define XBUILDER_HPP
 
 #include <utility>
+#include <cmath>
 
 #include "xfunction.hpp"
 #include "xbroadcast.hpp"
@@ -152,7 +153,7 @@ namespace xt
     template <class T>
     inline auto arange(T start, T stop, T step = 1) noexcept
     {
-        std::size_t shape = (stop - start) / step;
+        std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
         return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step), {shape});
     }
 
