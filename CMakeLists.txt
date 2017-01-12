@@ -40,6 +40,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
@@ -55,9 +56,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
 )
 
-if(BUILD_TESTS)
-    add_subdirectory(test)
-endif()
+add_subdirectory(test)
 
 # Installation
 # ============
