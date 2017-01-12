@@ -104,7 +104,7 @@ namespace xt
 
     TEST(xbuilder, linspace_n_samples_endpoint)
     {
-        auto ls = linspace<float>(20.f, 50.f, 100.f, false);
+        auto ls = linspace<float>(20.f, 50.f, 100, false);
         ASSERT_EQ(ls.dimension(), 1);
         shape_t expected_shape = {100};
         ASSERT_EQ(ls.shape(), expected_shape);
@@ -126,7 +126,7 @@ namespace xt
 
     TEST(xbuilder, logspace)
     {
-        auto ls = logspace<double>(2., 3., 4.);
+        auto ls = logspace<double>(2., 3., 4);
         ASSERT_EQ(ls.dimension(), 1);
         shape_t expected_shape = {4};
         ASSERT_EQ(ls.shape(), expected_shape);

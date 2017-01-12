@@ -123,13 +123,13 @@ namespace xt
 
             inline T operator[](const xindex& idx) const
             {
-                return m_start + m_step * idx[0];
+                return T(m_start + m_step * idx[0]);
             }
 
             template <class It>
             inline T element(It first, It /*last*/) const
             {
-                return m_start + m_step * (*first);
+                return T(m_start + m_step * (*first));
             }
 
         private:
@@ -150,6 +150,18 @@ namespace xt
         };
     }
 
+    /**
+     * @function arange(T start, T stop, T step = 1)
+     * @brief generate numbers evenly spaced within given half-open interval [start, stop).
+     *
+     * @param start start of the interval
+     * @param stop stop of the interval
+     * @param step stepsize
+     *
+     * @tparam T value_type of xexpression
+     *
+     * @return xgenerator that generates the values on access
+     */
     template <class T>
     inline auto arange(T start, T stop, T step = 1) noexcept
     {
@@ -157,12 +169,36 @@ namespace xt
         return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step), {shape});
     }
 
+    /**
+     * @function arange(T stop)
+     * @brief generate numbers evenly spaced within given half-open interval [0, stop)
+     *        with a step size of 1.
+     *
+     * @param stop stop of the interval
+     *
+     * @tparam T value_type of xexpression
+     *
+     * @return xgenerator that generates the values on access
+     */
     template <class T>
     inline auto arange(T stop) noexcept
     {
         return arange<T>(T(0), stop, T(1));
     }
 
+    /**
+     * @function linspace
+     * @brief generate @a num_samples evenly spaced numbers over given interval
+     *
+     * @param start start of interval
+     * @param stop stop of interval
+     * @param num_samples number of samples (defaults to 50)
+     * @param endpoint if true, include endpoint (defaults to true)
+     *
+     * @tparam T value_type of xexpression
+     *
+     * @return xgenerator that generates the values on access
+     */
     template <class T>
     inline auto linspace(T start, T stop, std::size_t num_samples = 50, bool endpoint = true) noexcept
     {
@@ -170,6 +206,20 @@ namespace xt
         return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step), {num_samples});
     }
 
+    /**
+     * @function logspace
+     * @brief generate @num_samples numbers evenly spaced on a log scale over given interval
+     *
+     * @param start start of interval (pow(base, start) is the first value).
+     * @param stop stop of interval (pow(base, stop) is the final value, except if endpoint = false)
+     * @param num_samples number of samples (defaults to 50)
+     * @param base the base of the log space.
+     * @param endpoint if true, include endpoint (defaults to true)
+     *
+     * @tparam T value_type of xexpression
+     *
+     * @return xgenerator that generates the values on access
+     */
     template <class T>
     inline auto logspace(T start, T stop, std::size_t num_samples, T base = 10, bool endpoint = true) noexcept
     {
