@@ -77,6 +77,7 @@ set(XTENSOR_TESTS
     test_xmath.cpp
     test_xnoalias.cpp
     test_xoperation.cpp
+    test_xrandom.cpp
     test_xscalar.cpp
     test_xscalar_semantic.cpp
     test_xsemantic.hpp

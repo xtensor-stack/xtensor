@@ -90,21 +90,6 @@ namespace xt
 
     namespace detail
     {
-
-        template <class Functor, class I>
-        inline auto make_xgenerator(Functor&& f, std::initializer_list<I> shape) noexcept
-        {
-            using type = xgenerator<Functor, typename Functor::value_type, std::vector<std::size_t>>;
-            return type(std::forward<Functor>(f), std::vector<std::size_t>(shape));
-        }
-        
-        template <class Functor, class S>
-        inline auto make_xgenerator(Functor&& f, const S& shape) noexcept
-        {
-            using type = xgenerator<Functor, typename Functor::value_type, std::vector<std::size_t>>;
-            return type(std::forward<Functor>(f), shape);
-        }
-
         template <class T>
         struct arange_impl
         {
