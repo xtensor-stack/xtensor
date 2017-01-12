@@ -26,8 +26,8 @@ namespace xt
         ASSERT_EQ(a, b); // Works
         ASSERT_EQ(a, c); // Fails
 
-        xarray<double> b = rand<double>({3, 3});
-        ASSERT_NE(a, b);
+        xarray<double> other_rand = rand<double>({3, 3});
+        ASSERT_NE(a, other_rand);
         // check if assignment works
         bool eq = std::equal(a.begin(), a.end(), r.begin());
         ASSERT_TRUE(eq);
