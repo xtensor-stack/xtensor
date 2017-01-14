@@ -28,6 +28,9 @@ namespace xt
         struct random_impl
         {
             using value_type = V;
+            using engine_type = E;
+            using strides_type = S;
+            using distribution_type = D;
             using size_type = std::size_t;
 
             random_impl(E engine, D dist, S shape) :
@@ -63,9 +66,9 @@ namespace xt
             }
 
         private:
-            mutable E m_engine;
-            mutable D m_dist;
-            mutable S m_strides;
+            mutable engine_type m_engine;
+            mutable distribution_type m_dist;
+            mutable strides_type m_strides;
             // std::stringstream is not copyable but has to be copied in
             // case of being used in an xfunction
             std::shared_ptr<std::stringstream> m_engine_state;
@@ -76,22 +79,28 @@ namespace xt
             {
                 long advance_state = std::inner_product(idx.begin(), idx.end(), m_strides.begin(), 0);
                 m_advance_state++;
+                // the next state of the RNG is requested, advance by one
                 if (m_advance_state == advance_state)
                 {
                     return m_dist(m_engine);
                 }
                 else
                 {
+                    // a state of the RNG that is bigger than the next advance state
+                    // is requested, have to advance distribution 
                     if (advance_state > m_advance_state)
                     {
-                        m_engine.discard(advance_state - m_advance_state);
-                        m_advance_state = advance_state;
+                        for (; m_advance_state < advance_state; m_advance_state++)
+                            m_dist(m_engine);
                         return m_dist(m_engine);
                     }
-                    // TODO(BUG): this doesn't reset correctly after 2nd iteration...
                     (*m_engine_state) >> m_engine;
-                    m_engine.discard(advance_state);
-                    m_advance_state = advance_state;
+                    m_engine_state->seekg(0);
+                    m_dist.reset();
+
+                    // advance dist and engine to correct state
+                    for (m_advance_state = 0; m_advance_state < advance_state; m_advance_state++)
+                        m_dist(m_engine);
 
                     return m_dist(m_engine);
                 }

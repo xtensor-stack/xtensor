@@ -32,12 +32,20 @@ namespace xt
         bool eq = std::equal(a.begin(), a.end(), r.begin());
         ASSERT_TRUE(eq);
 
+        // check that random access works
         auto val = r(1, 1);
         std::cout << r << std::endl;
         ASSERT_EQ(val, r(1, 1));
 
         // check that it compiles
         xarray<int> q = randint<int>({3, 3});
-        xarray<double> p = randn<double>({3, 3});
+
+        // checking if internal state needs reset
+        auto n_dist = randn<double>({3, 3});
+        xarray<double> p1 = n_dist;
+        xarray<double> p2 = n_dist;
+        xarray<double> p3 = n_dist;
+        ASSERT_EQ(p1, p2);
+        ASSERT_EQ(p1, p3);
     }
 }
