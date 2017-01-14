@@ -34,8 +34,10 @@ namespace xt
 
         // check that random access works
         auto val = r(1, 1);
-        std::cout << r << std::endl;
         ASSERT_EQ(val, r(1, 1));
+        ASSERT_EQ(a(0, 2), r(0, 2));
+        ASSERT_EQ(a(1, 2), r(1, 2));
+        ASSERT_EQ(a(0, 1), r(0, 1));
 
         // check that it compiles
         xarray<int> q = randint<int>({3, 3});

@@ -101,20 +101,20 @@ namespace xt
                     // advance dist and engine to correct state
                     for (m_advance_state = 0; m_advance_state < advance_state; m_advance_state++)
                         m_dist(m_engine);
-
+                    
                     return m_dist(m_engine);
                 }
             }
         };
 
-        template <class T>
-        inline auto make_random_xgenerator(auto dist, auto& engine, auto shape) {
+        template <class T, class D, class E, class S>
+        inline auto make_random_xgenerator(D dist, E& engine, S shape) {
             auto f = detail::make_xgenerator(
-                detail::random_impl<decltype(dist), decltype(shape), T>(engine, dist, shape), 
+                detail::random_impl<D, S, T>(engine, dist, shape), 
                 shape
             );
             // Discard N random numbers from random number engine 
-            std::size_t n_discard = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<>());
+            std::size_t n_discard = std::accumulate(shape.begin(), shape.end(), std::size_t(1), std::multiplies<>());
             engine.discard(n_discard);
             return f;   
         }
