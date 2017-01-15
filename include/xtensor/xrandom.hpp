@@ -50,19 +50,19 @@ namespace xt
             template <class... Args>
             inline value_type operator()(Args... args) const
             {
-                std::array<size_type, sizeof...(Args)> args_arr({static_cast<size_type>(args)...});
-                return access_impl(args_arr);
+                size_type idx [sizeof...(Args)] = {static_cast<size_type>(args)...};
+                return access_impl(std::begin(idx), std::end(idx));
             }
 
             inline value_type operator[](const xindex& idx) const
             {
-                return access_impl(idx);
+                return access_impl(idx.begin(), idx.end());
             }
 
             template <class It>
-            inline value_type element(It first, It /*last*/) const
+            inline value_type element(It first, It last) const
             {
-                return access_impl(*first);
+                return access_impl(first, last);
             }
 
         private:
@@ -74,10 +74,10 @@ namespace xt
             std::shared_ptr<std::stringstream> m_engine_state;
             mutable long m_advance_state = -1;
 
-            template <class A>
-            value_type access_impl(const A& idx) const
+            template <class It>
+            value_type access_impl(It first, It last) const
             {
-                long advance_state = std::inner_product(idx.begin(), idx.end(), m_strides.begin(), 0);
+                long advance_state = std::inner_product(first, last, m_strides.begin(), 0);
                 m_advance_state++;
                 // the next state of the RNG is requested, advance by one
                 if (m_advance_state == advance_state)
@@ -86,22 +86,22 @@ namespace xt
                 }
                 else
                 {
-                    // a state of the RNG that is bigger than the next advance state
-                    // is requested, have to advance distribution 
-                    if (advance_state > m_advance_state)
+                    // a state of the RNG that is lower than the current advance state
+                    // is requested, have to reset distribution
+                    if (advance_state < m_advance_state)
                     {
-                        for (; m_advance_state < advance_state; m_advance_state++)
-                            m_dist(m_engine);
-                        return m_dist(m_engine);
+                        // full reset
+                        (*m_engine_state) >> m_engine;
+                        m_engine_state->seekg(0);
+                        m_dist.reset();
+                        m_advance_state = 0;
                     }
-                    (*m_engine_state) >> m_engine;
-                    m_engine_state->seekg(0);
-                    m_dist.reset();
-
-                    // advance dist and engine to correct state
-                    for (m_advance_state = 0; m_advance_state < advance_state; m_advance_state++)
+                    for (; m_advance_state < advance_state; m_advance_state++)
+                    {
+                        // discard values until m_advance_state and desired advance state match up
                         m_dist(m_engine);
-                    
+                    }
+
                     return m_dist(m_engine);
                 }
             }
