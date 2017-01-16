@@ -24,100 +24,36 @@ namespace xt
 {
     namespace detail
     {
-        template <class D, class S, class V, class E = std::mt19937>
+        template <class T>
         struct random_impl
         {
-            using value_type = V;
-            using engine_type = E;
-            using strides_type = S;
-            using distribution_type = D;
-            using size_type = std::size_t;
+            using value_type = T;
 
-            random_impl(E engine, D dist, S shape) :
-                m_engine(engine), m_dist(dist), m_strides(shape.size()), 
-                m_engine_state(std::make_shared<std::stringstream>())
+            random_impl(std::function<value_type()>&& generator) :
+                m_generator(std::move(generator))
             {
-                std::size_t data_size = 1;
-                for(size_type i = m_strides.size(); i != 0; --i)
-                {
-                    m_strides[i - 1] = data_size;
-                    data_size = m_strides[i - 1] * shape[i - 1];
-                }
-                // save initial engine state
-                (*m_engine_state) << m_engine; 
             }
 
             template <class... Args>
-            inline value_type operator()(Args... args) const
+            inline value_type operator()(Args... /*args*/) const
             {
-                size_type idx [sizeof...(Args)] = {static_cast<size_type>(args)...};
-                return access_impl(std::begin(idx), std::end(idx));
+                return m_generator();
             }
 
-            inline value_type operator[](const xindex& idx) const
+            inline value_type operator[](const xindex& /*idx*/) const
             {
-                return access_impl(idx.begin(), idx.end());
+                return m_generator();
             }
 
             template <class It>
-            inline value_type element(It first, It last) const
+            inline value_type element(It /*first*/, It /*last*/) const
             {
-                return access_impl(first, last);
+                return m_generator();
             }
 
         private:
-            mutable engine_type m_engine;
-            mutable distribution_type m_dist;
-            mutable strides_type m_strides;
-            // std::stringstream is not copyable but has to be copied in
-            // case of being used in an xfunction
-            std::shared_ptr<std::stringstream> m_engine_state;
-            mutable long m_advance_state = -1;
-
-            template <class It>
-            value_type access_impl(It first, It last) const
-            {
-                long advance_state = std::inner_product(first, last, m_strides.begin(), 0);
-                m_advance_state++;
-                // the next state of the RNG is requested, advance by one
-                if (m_advance_state == advance_state)
-                {
-                    return m_dist(m_engine);
-                }
-                else
-                {
-                    // a state of the RNG that is lower than the current advance state
-                    // is requested, have to reset distribution
-                    if (advance_state < m_advance_state)
-                    {
-                        // full reset
-                        (*m_engine_state) >> m_engine;
-                        m_engine_state->seekg(0);
-                        m_dist.reset();
-                        m_advance_state = 0;
-                    }
-                    for (; m_advance_state < advance_state; m_advance_state++)
-                    {
-                        // discard values until m_advance_state and desired advance state match up
-                        m_dist(m_engine);
-                    }
-
-                    return m_dist(m_engine);
-                }
-            }
+            std::function<value_type()> m_generator;
         };
-
-        template <class T, class D, class E, class S>
-        inline auto make_random_xgenerator(D dist, E& engine, S shape) {
-            auto f = detail::make_xgenerator(
-                detail::random_impl<D, S, T>(engine, dist, shape), 
-                shape
-            );
-            // Discard N random numbers from random number engine 
-            std::size_t n_discard = std::accumulate(shape.begin(), shape.end(), std::size_t(1), std::multiplies<>());
-            engine.discard(n_discard);
-            return f;   
-        }
     }
     
     namespace random
@@ -156,7 +92,7 @@ namespace xt
                      E& engine = random::get_default_random_engine())
     {
         std::uniform_real_distribution<T> dist(lower, upper);
-        return detail::make_random_xgenerator<T>(dist, engine, shape);
+        return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
     }
     
     /**
@@ -179,7 +115,7 @@ namespace xt
                         E& engine = random::get_default_random_engine())
     {
         std::uniform_int_distribution<T> dist(lower, upper - 1);
-        return detail::make_random_xgenerator<T>(dist, engine, shape);
+        return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
     }
 
     /**
@@ -203,7 +139,7 @@ namespace xt
                       E& engine = random::get_default_random_engine())
     {
         std::normal_distribution<T> dist(mean, std_dev);
-        return detail::make_random_xgenerator<T>(dist, engine, shape);
+        return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
     }
 }
 

@@ -23,21 +23,22 @@ namespace xt
         xarray<double> b = r;
         xarray<double> c = r;
 
-        ASSERT_EQ(a, b); // Works
-        ASSERT_EQ(a, c); // Fails
+        ASSERT_NE(a(0, 0), a(0, 1));
+        ASSERT_NE(a, b);
+        ASSERT_NE(a, c);
 
         xarray<double> other_rand = rand<double>({3, 3});
         ASSERT_NE(a, other_rand);
-        // check if assignment works
-        bool eq = std::equal(a.begin(), a.end(), r.begin());
-        ASSERT_TRUE(eq);
 
-        // check that random access works
-        auto val = r(1, 1);
-        ASSERT_EQ(val, r(1, 1));
-        ASSERT_EQ(a(0, 2), r(0, 2));
-        ASSERT_EQ(a(1, 2), r(1, 2));
-        ASSERT_EQ(a(0, 1), r(0, 1));
+        random::set_seed(0);
+        auto same_d_a = rand<double>({3, 3});
+        xarray<double> same_a = same_d_a;
+
+        random::set_seed(0);
+        auto same_d_b = rand<double>({3, 3});
+        xarray<double> same_b = same_d_b;
+
+        ASSERT_EQ(same_a, same_b);
 
         // check that it compiles
         xarray<int> q = randint<int>({3, 3});
@@ -47,7 +48,7 @@ namespace xt
         xarray<double> p1 = n_dist;
         xarray<double> p2 = n_dist;
         xarray<double> p3 = n_dist;
-        ASSERT_EQ(p1, p2);
-        ASSERT_EQ(p1, p3);
+        ASSERT_NE(p1, p2);
+        ASSERT_NE(p1, p3);
     }
 }
