@@ -29,7 +29,7 @@ message(STATUS "xtensor v${${PROJECT_NAME}_VERSION}")
 # Build
 # =====
 
-OPTION(BUILD_TESTS "xtensor test suite" OFF)
+OPTION(BUILD_TESTS "xtensor test suite" ON)
 
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
@@ -56,7 +56,9 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
 )
 
-add_subdirectory(test)
+if(BUILD_TESTS)
+    add_subdirectory(test)
+endif()
 
 # Installation
 # ============
