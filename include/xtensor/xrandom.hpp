@@ -139,14 +139,15 @@ namespace xt
 
     /**
      * @function rand
-     * @brief xexpression with specified @shape containing random numbers in the 
-     *        interval from @lower to @upper, excluding upper. Numbers are 
-     *        drawn from std::uniform_real_distribution.
+     * @brief xexpression with specified @p shape containing uniformly distributed random numbers 
+     *        in the interval from @p lower to @p upper, excluding upper.
+     * 
+     * Numbers are drawn from @c std::uniform_real_distribution.
      * 
      * @param shape shape of resulting xexpression
      * @param lower lower bound
      * @param upper upper bound
-     * @param engine random number engine (defaults to xt::random::get_default_random_engine())
+     * @param engine random number engine
      *
      * @tparam T number type to use
      */ 
@@ -160,13 +161,15 @@ namespace xt
     
     /**
      * @function randint
-     * @brief xexpression with specified @shape containing uniformly distributed 
-     *        random integers in the interval from @lower to @upper, excluding upper.
+     * @brief xexpression with specified @p shape containing uniformly distributed 
+     *        random integers in the interval from @p lower to @p upper, excluding upper.
+     * 
+     * Numbers are drawn from @c std::uniform_int_distribution.
      * 
      * @param shape shape of resulting xexpression
-     * @param lower lower bound (defaults to 0)
-     * @param upper upper bound (defaults to std::numeric_limits<T>::max())
-     * @param engine random number engine (defaults to xt::random::get_default_random_engine())
+     * @param lower lower bound
+     * @param upper upper bound
+     * @param engine random number engine
      *
      * @tparam T number type to use
      */
@@ -181,8 +184,11 @@ namespace xt
 
     /**
      * @function randn
-     * @brief xexpression with specified @shape containing normal distributed 
-     *        random numbers in the interval from @lower to @upper, excluding upper.
+     * @brief xexpression with specified @p shape containing numbers sampled from 
+     *        the Normal (Gaussian) random number distribution with mean @p mean and 
+     *        standard deviation @p std_dev.
+     * 
+     * Numbers are drawn from @c std::normal_distribution.
      * 
      * @param shape shape of resulting xexpression
      * @param mean mean of normal distribution
