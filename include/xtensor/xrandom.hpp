@@ -15,8 +15,7 @@
 
 #include <utility>
 #include <random>
-#include <memory>
-#include <sstream>
+#include <functional>
 
 #include "xgenerator.hpp"
 
