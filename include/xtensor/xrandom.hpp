@@ -60,13 +60,23 @@ namespace xt
         using default_engine_type = std::mt19937;
         using seed_type = default_engine_type::result_type;
 
+        /**
+         * @function get_default_random_engine
+         * @brief returns a reference to the default random number engine
+         */
         inline default_engine_type& get_default_random_engine()
         {
             static default_engine_type mt;
             return mt;
         }
-        
-        inline void set_seed(seed_type seed)
+
+        /**
+         * @function seed
+         * @brief seed the default random number generator with @p seed
+         *
+         * @param seed The seed
+         */
+        inline void seed(seed_type seed)
         {
             get_default_random_engine().seed(seed);
         }

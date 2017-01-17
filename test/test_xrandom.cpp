@@ -9,13 +9,9 @@
 #include "gtest/gtest.h"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xarray.hpp"
-#include "xtensor/xio.hpp"
 
 namespace xt
 {
-    using std::size_t;
-    using shape_t = std::vector<std::size_t>;
-
     TEST(xbuilder, random)
     {
         auto r = rand<double>({3, 3});
@@ -30,11 +26,11 @@ namespace xt
         xarray<double> other_rand = rand<double>({3, 3});
         ASSERT_NE(a, other_rand);
 
-        random::set_seed(0);
+        random::seed(0);
         auto same_d_a = rand<double>({3, 3});
         xarray<double> same_a = same_d_a;
 
-        random::set_seed(0);
+        random::seed(0);
         auto same_d_b = rand<double>({3, 3});
         xarray<double> same_b = same_d_b;
 
