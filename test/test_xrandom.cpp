@@ -14,7 +14,7 @@ namespace xt
 {
     TEST(xbuilder, random)
     {
-        auto r = rand<double>({3, 3});
+        auto r = random::rand<double>({3, 3});
         xarray<double> a = r;
         xarray<double> b = r;
         xarray<double> c = r;
@@ -23,24 +23,24 @@ namespace xt
         ASSERT_NE(a, b);
         ASSERT_NE(a, c);
 
-        xarray<double> other_rand = rand<double>({3, 3});
+        xarray<double> other_rand = random::rand<double>({3, 3});
         ASSERT_NE(a, other_rand);
 
         random::seed(0);
-        auto same_d_a = rand<double>({3, 3});
+        auto same_d_a = random::rand<double>({3, 3});
         xarray<double> same_a = same_d_a;
 
         random::seed(0);
-        auto same_d_b = rand<double>({3, 3});
+        auto same_d_b = random::rand<double>({3, 3});
         xarray<double> same_b = same_d_b;
 
         ASSERT_EQ(same_a, same_b);
 
         // check that it compiles
-        xarray<int> q = randint<int>({3, 3});
+        xarray<int> q = random::randint<int>({3, 3});
 
         // checking if internal state needs reset
-        auto n_dist = randn<double>({3, 3});
+        auto n_dist = random::randn<double>({3, 3});
         xarray<double> p1 = n_dist;
         xarray<double> p2 = n_dist;
         xarray<double> p3 = n_dist;
