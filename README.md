@@ -173,7 +173,7 @@ Therefore, when building an application with xtensor, we recommend using statica
 ## Python bindings
 
 The [xtensor-python](https://github.com/QuantStack/xtensor-python) project provides the implementation of an `xtensor` container, `pyarray` which
-effectively wraps numpy arrays, allowing inplace edition, including reshapes.
+effectively wraps numpy arrays, allowing inplace modification, including reshapes.
 
 ## Building and Running the Tests
 
