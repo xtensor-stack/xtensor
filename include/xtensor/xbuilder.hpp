@@ -14,6 +14,7 @@
 #define XBUILDER_HPP
 
 #include <utility>
+#include <functional>
 #include <cmath>
 
 #include "xfunction.hpp"
@@ -134,21 +135,23 @@ namespace xt
             }
         };
 
-        template <class T, class F>
+        template <class T, template<class, class> class F>
         struct fn_impl
         {
             using value_type = T;
             using size_type = std::size_t;
 
-            fn_impl(F& fn) : m_fn(fn)
+            inline T operator()() const
             {
+                // special case when called without args (happens when printing)
+                return T();
             }
 
             template <class... Args>
             inline T operator()(Args... args) const
             {
-                xindex idx({static_cast<size_type>(args)...});
-                return access_impl(idx.begin(), idx.end());
+                size_type idx [sizeof...(Args)] = {static_cast<size_type>(args)...};
+                return access_impl(std::begin(idx), std::end(idx));
             }
 
             inline T operator[](const xindex& idx) const
@@ -163,21 +166,28 @@ namespace xt
             }
 
         private:
-            std::function<T(xindex::iterator&, xindex::iterator&)> m_fn;
-
             template <class It>
-            inline T access_impl(It&& begin, It&& end) const
+            inline T access_impl(const It& begin, const It& end) const
             {
-                return m_fn(begin, end);
+                return F<T, It>()(begin, end);
+            }
+        };
+
+        template <class T, class It>
+        struct eye_fn
+        {
+            T operator()(const It& /*begin*/, const It& end)
+            {
+                return *(end - 1) == *(end - 2) ? 1 : 0;
             }
         };
     }
 
+
     template <class T = bool>
     inline auto eye(const std::vector<size_t>& shape)
     {
-        auto fn = [](xindex::iterator& /*begin*/, xindex::iterator& end) { return *(end - 1) == *(end - 2) ? 1 : 0; };
-        return detail::make_xgenerator(detail::fn_impl<T, decltype(fn)>(fn), shape);
+        return detail::make_xgenerator(detail::fn_impl<T, detail::eye_fn>(), shape);
     }
 
     template <class T = bool>
