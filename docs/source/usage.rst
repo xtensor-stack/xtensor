@@ -99,7 +99,7 @@ Broadcasting rules
 
 In an operation involving two arrays of different dimensions, the array with the lesser dimensions is broadcast across the leading dimensions of the other.
 
-For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, the result of a broadcasted operation with ``A`` and ``B`` has shape ``(4, 2, 3)``. 
+For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, the result of a broadcasted operation with ``A`` and ``B`` has shape ``(4, 2, 3)``.
 
 .. code::
 
@@ -175,7 +175,7 @@ Python bindings
 ---------------
 
 The xtensor-python_ project provides the implementation of a container compatible with ``xtensor``, ``pyarray`` which
-effectively wraps numpy arrays, allowing inplace edition, including reshapes.
+effectively wraps numpy arrays, allowing inplace modification, including reshapes.
 
 .. _NumPy: http://www.numpy.org
 .. _libdynd: http://libdynd.org
