@@ -133,6 +133,57 @@ namespace xt
                 return m_start;
             }
         };
+
+        template <class T, class F>
+        struct fn_impl
+        {
+            using value_type = T;
+            using size_type = std::size_t;
+
+            fn_impl(F& fn) : m_fn(fn)
+            {
+            }
+
+            template <class... Args>
+            inline T operator()(Args... args) const
+            {
+                xindex idx({static_cast<size_type>(args)...});
+                return access_impl(idx.begin(), idx.end());
+            }
+
+            inline T operator[](const xindex& idx) const
+            {
+                return access_impl(idx.begin(), idx.end());
+            }
+
+            template <class It>
+            inline T element(It first, It last) const
+            {
+                return access_impl(first, last);
+            }
+
+        private:
+            std::function<T(xindex::iterator&, xindex::iterator&)> m_fn;
+
+            template <class It>
+            inline T access_impl(It&& begin, It&& end) const
+            {
+                return m_fn(begin, end);
+            }
+        };
+    }
+
+    template <class T = bool>
+    inline auto eye(const std::vector<size_t>& shape)
+    {
+        auto fn = [](xindex::iterator& /*begin*/, xindex::iterator& end) { return *(end - 1) == *(end - 2) ? 1 : 0; };
+        return detail::make_xgenerator(detail::fn_impl<T, decltype(fn)>(fn), shape);
+    }
+
+    template <class T = bool>
+    inline auto eye(std::size_t n)
+    {
+        return eye<T>({n, n});
     }
 
     /**
