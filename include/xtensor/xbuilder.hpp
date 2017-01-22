@@ -176,13 +176,12 @@ namespace xt
         template <class T, class It>
         struct eye_fn
         {
-            T operator()(const It& /*begin*/, const It& end)
+            inline T operator()(const It& /*begin*/, const It& end) const
             {
-                return *(end - 1) == *(end - 2) ? 1 : 0;
+                return *(end - 1) == *(end - 2) ? T(1) : T(0);
             }
         };
     }
-
 
     template <class T = bool>
     inline auto eye(const std::vector<size_t>& shape)
