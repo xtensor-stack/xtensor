@@ -68,15 +68,15 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         xarray<double> c(shape, 2.6);
-        EXPECT_EQ(fma(a, b, c)(0, 0), std::fma(a(0, 0), b(0, 0), c(0, 0)));
+        EXPECT_EQ(xt::fma(a, b, c)(0, 0), std::fma(a(0, 0), b(0, 0), c(0, 0)));
         
         double sb = 1.2;
-        EXPECT_EQ(fma(a, sb, c)(0, 0), std::fma(a(0, 0), sb, c(0, 0)));
+        EXPECT_EQ(xt::fma(a, sb, c)(0, 0), std::fma(a(0, 0), sb, c(0, 0)));
 
         double sa = 4.6;
-        EXPECT_EQ(fma(sa, b, c)(0, 0), std::fma(sa, b(0, 0), c(0, 0)));
+        EXPECT_EQ(xt::fma(sa, b, c)(0, 0), std::fma(sa, b(0, 0), c(0, 0)));
 
-        EXPECT_EQ(fma(sa, sb, c)(0, 0), std::fma(sa, sb, c(0, 0)));
+        EXPECT_EQ(xt::fma(sa, sb, c)(0, 0), std::fma(sa, sb, c(0, 0)));
     }
 
     TEST(xmath, fmax)
