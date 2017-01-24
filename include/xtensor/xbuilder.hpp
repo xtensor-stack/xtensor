@@ -135,7 +135,7 @@ namespace xt
             }
         };
 
-        template <class T, template<class, class> class F>
+        template <class T, template <class> class K, class F = K<T>>
         struct fn_impl
         {
             using value_type = T;
@@ -166,19 +166,27 @@ namespace xt
             }
 
         private:
+            F m_ft;
             template <class It>
             inline T access_impl(const It& begin, const It& end) const
             {
-                return F<T, It>()(begin, end);
+                return m_ft(begin, end);
             }
         };
 
-        template <class T, class It>
+        template <class T>
         struct eye_fn
         {
+            template <class It>
             inline T operator()(const It& /*begin*/, const It& end) const
             {
-                return *(end - 1) == *(end - 2) ? T(1) : T(0);
+                // workaround windows compile error by using temporary 
+                // iterators and operator-=
+                auto end_1 = end;
+                auto end_2 = end;
+                end_1 -= 1;
+                end_2 -= 2;
+                return *(end_1) == *(end_2) ? T(1) : T(0);
             }
         };
     }
