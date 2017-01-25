@@ -135,32 +135,36 @@ namespace xt
             }
         };
 
-        template <class T, template <class> class K, class F = K<T>>
+        template <class F>
         struct fn_impl
         {
-            using value_type = T;
+            using value_type = typename F::value_type;
             using size_type = std::size_t;
 
-            inline T operator()() const
+            fn_impl(F&& f) : m_ft(f)
+            {
+            }
+
+            inline value_type operator()() const
             {
                 // special case when called without args (happens when printing)
-                return T();
+                return value_type();
             }
 
             template <class... Args>
-            inline T operator()(Args... args) const
+            inline value_type operator()(Args... args) const
             {
                 size_type idx [sizeof...(Args)] = {static_cast<size_type>(args)...};
                 return access_impl(std::begin(idx), std::end(idx));
             }
 
-            inline T operator[](const xindex& idx) const
+            inline value_type operator[](const xindex& idx) const
             {
                 return access_impl(idx.begin(), idx.end());
             }
 
             template <class It>
-            inline T element(It first, It last) const
+            inline value_type element(It first, It last) const
             {
                 return access_impl(first, last);
             }
@@ -168,7 +172,7 @@ namespace xt
         private:
             F m_ft;
             template <class It>
-            inline T access_impl(const It& begin, const It& end) const
+            inline value_type access_impl(const It& begin, const It& end) const
             {
                 return m_ft(begin, end);
             }
@@ -177,6 +181,12 @@ namespace xt
         template <class T>
         struct eye_fn
         {
+            using value_type = T;
+
+            eye_fn(int k) : m_k(k)
+            {
+            }
+
             template <class It>
             inline T operator()(const It& /*begin*/, const It& end) const
             {
@@ -186,21 +196,41 @@ namespace xt
                 auto end_2 = end;
                 end_1 -= 1;
                 end_2 -= 2;
-                return *(end_1) == *(end_2) ? T(1) : T(0);
+                return *(end_1) == *(end_2) + m_k ? T(1) : T(0);
             }
+
+        private:
+            int m_k;
         };
     }
 
+    /**
+     * @function eye(const std::vector<std::size_t>& shape, int k = 0)
+     * @brief generate array with ones on the diagonal
+     *
+     * @param shape shape of the resulting expression
+     * @param k index of the diagonal. 0 (default) refers to the main diagonal,
+     *          a positive value refers to an upper diagonal, and a negative
+     *          value to a lower diagonal.
+     *
+     * @tparam T value_type of xexpression
+     *
+     * @return xgenerator that generates the values on access
+     */
     template <class T = bool>
-    inline auto eye(const std::vector<size_t>& shape)
+    inline auto eye(const std::vector<std::size_t>& shape, int k = 0)
     {
-        return detail::make_xgenerator(detail::fn_impl<T, detail::eye_fn>(), shape);
+        return detail::make_xgenerator(detail::fn_impl<detail::eye_fn<T>>(detail::eye_fn<T>(k)), shape);
     }
 
+    /**
+     * @function eye(std::size_t n, int k = 0)
+     * @brief like eye with a shape of n x n
+     */
     template <class T = bool>
-    inline auto eye(std::size_t n)
+    inline auto eye(std::size_t n, int k = 0)
     {
-        return eye<T>({n, n});
+        return eye<T>({n, n}, k);
     }
 
     /**
