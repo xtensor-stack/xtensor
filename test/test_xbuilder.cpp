@@ -144,4 +144,22 @@ namespace xt
         ASSERT_EQ(m_assigned(3), 1000);
     }
 
+    TEST(xbuilder, eye)
+    {
+        auto e = eye(5);
+        ASSERT_EQ(2, e.dimension());
+        shape_t expected_shape = {5, 5};
+        ASSERT_EQ(expected_shape, e.shape());
+
+        ASSERT_EQ(1, e(1, 1));
+        xindex idx({1, 0});
+        ASSERT_EQ(0, e[idx]);
+
+        xarray<bool> m_assigned = e;
+        ASSERT_EQ(1, m_assigned(2, 2));
+        ASSERT_EQ(0, m_assigned(4, 2));
+
+        xt::xindex idx2({2, 2});
+        ASSERT_EQ(1, e.element(idx2.begin(), idx2.end()));
+    }
 }
