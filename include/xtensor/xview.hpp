@@ -283,6 +283,14 @@ namespace xt
     template <class... S>
     constexpr std::size_t integral_skip(std::size_t i);
 
+    // number of newaxis types in the specified sequence of types
+    template <class... S>
+    constexpr std::size_t newaxis_count();
+
+    // number of newaxis types in the specified sequence of types before specified index
+    template <class... S>
+    constexpr std::size_t newaxis_count_before(std::size_t i);
+
     // return slice evaluation and increment iterator
     template <class S, class It>
     inline disable_xslice<S, std::size_t> get_slice_value(const S& s, It&) noexcept
@@ -977,6 +985,53 @@ namespace xt
     constexpr std::size_t integral_count_before(std::size_t i)
     {
         return detail::integral_count_impl<S..., void>::count(i);
+    }
+
+    /***********************
+    * count newaxis types *
+    ***********************/
+
+    namespace detail
+    {
+        template <class T>
+        struct is_newaxis : std::false_type
+        {
+        };
+
+        template <class T>
+        struct is_newaxis<xnewaxis<T>> : public std::true_type
+        {
+        };
+
+        template <class T, class... S>
+        struct newaxis_count_impl
+        {
+            static constexpr std::size_t count(std::size_t i) noexcept
+            {
+                return i ? (newaxis_count_impl<S...>::count(i - 1) + (is_newaxis<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
+            }
+        };
+
+        template <>
+        struct newaxis_count_impl<void>
+        {
+            static constexpr std::size_t count(std::size_t i) noexcept
+            {
+                return i;
+            }
+        };
+    }
+
+    template <class... S>
+    constexpr std::size_t newaxis_count()
+    {
+        return detail::newaxis_count_impl<S..., void>::count(sizeof...(S));
+    }
+
+    template <class... S>
+    constexpr std::size_t newaxis_count_before(std::size_t i)
+    {
+        return detail::newaxis_count_impl<S..., void>::count(i);
     }
 
     /**********************************

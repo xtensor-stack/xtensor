@@ -228,5 +228,17 @@ namespace xt
         arr2 = xt::make_xview(arr, 0);
         EXPECT_EQ(ref, arr2);
     }
+
+    TEST(xview, newaxis_count)
+    {
+        size_t count1 = newaxis_count<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>();
+        EXPECT_EQ(count1, 3);
+        size_t count2 = newaxis_count<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>();
+        EXPECT_EQ(count2, 2);
+        size_t count3 = newaxis_count_before<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>(3);
+        EXPECT_EQ(count3, 3);
+        size_t count4 = newaxis_count_before<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>(2);
+        EXPECT_EQ(count4, 1);
+    }
 }
 
