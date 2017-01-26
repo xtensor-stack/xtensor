@@ -17,7 +17,7 @@
 #include <algorithm>
 
 #include "xarray.hpp"
-#include "xslice.hpp"
+#include "xview_utils.hpp"
 #include "xiterator.hpp"
 
 namespace xt
@@ -27,9 +27,6 @@ namespace xt
      * xview declaration *
      *********************/
 
-    template <bool is_const, class E, class... S>
-    class xview_stepper;
-
     template <class E, class... S>
     class xview;
 
@@ -38,6 +35,9 @@ namespace xt
     {
         using temporary_type = xarray<typename E::value_type>;
     };
+
+    template <bool is_const, class E, class... S>
+    class xview_stepper;
 
     template <class ST, class... S>
     struct xview_shape_type;
@@ -257,6 +257,11 @@ namespace xt
 
     private:
 
+        bool is_newaxis_slice(size_type index) const noexcept;
+
+        template <class F>
+        void common_step(size_type dim, size_type n, F f);
+
         view_type* p_view;
         substepper_type m_it;
         size_type m_offset;
@@ -270,42 +275,6 @@ namespace xt
     bool operator!=(const xview_stepper<is_const, E, S...>& lhs,
                     const xview_stepper<is_const, E, S...>& rhs);
 
-    /********************************
-     * helper functions declaration *
-     ********************************/
-
-    // number of integral types in the specified sequence of types
-    template <class... S>
-    constexpr std::size_t integral_count();
-
-    // number of integral types in the specified sequence of types before specified index.
-    template <class... S>
-    constexpr std::size_t integral_count_before(std::size_t i);
-
-    // index in the specified sequence of types of the ith non-integral type.
-    template <class... S>
-    constexpr std::size_t integral_skip(std::size_t i);
-
-    // number of newaxis types in the specified sequence of types
-    template <class... S>
-    constexpr std::size_t newaxis_count();
-
-    // number of newaxis types in the specified sequence of types before specified index
-    template <class... S>
-    constexpr std::size_t newaxis_count_before(std::size_t i);
-
-    // return slice evaluation and increment iterator
-    template <class S, class It>
-    inline disable_xslice<S, std::size_t> get_slice_value(const S& s, It&) noexcept
-    {
-        return s;
-    };
-
-    template <class S, class It>
-    inline auto get_slice_value(const xslice<S>& slice, It& it) noexcept
-    {
-        return slice.derived_cast()(*it++);
-    };
 
     // meta-function returning the shape type for an xview 
     template <class ST, class... S>
@@ -317,7 +286,7 @@ namespace xt
     template <class I, std::size_t L, class... S>
     struct xview_shape_type<std::array<I, L>, S...>
     {
-        using type = std::array<I, L - integral_count<S...>()>;
+        using type = std::array<I, L - integral_count<S...>() + newaxis_count<S...>()>;
     };
 
     /************************
@@ -340,7 +309,7 @@ namespace xt
     template <class... SL>
     inline xview<E, S...>::xview(E& e, SL&&... slices) noexcept
         : m_e(e), m_slices(std::forward<SL>(slices)...),
-          m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>(), 0))
+          m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
     {
         auto func = [](const auto& s) noexcept { return get_size(s); };
         for (size_type i = 0; i != dimension(); ++i)
@@ -377,7 +346,7 @@ namespace xt
     template <class E, class... S>
     inline auto xview<E, S...>::dimension() const noexcept -> size_type
     {
-        return m_e.dimension() - integral_count<S...>();
+        return m_e.dimension() - integral_count<S...>() + newaxis_count<S...>();
     }
 
     /**
@@ -413,7 +382,10 @@ namespace xt
     template <class... Args>
     inline auto xview<E, S...>::operator()(Args... args) -> reference
     {
-        return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
+        return access_impl(std::make_index_sequence<sizeof...(Args)
+                                                    + integral_count<S...>()
+                                                    - newaxis_count<S...>()>(),
+                           args...);
     }
 
     template <class E, class... S>
@@ -440,7 +412,10 @@ namespace xt
     template <class... Args>
     inline auto xview<E, S...>::operator()(Args... args) const -> const_reference
     {
-        return access_impl(std::make_index_sequence<sizeof...(Args) + integral_count<S...>()>(), args...);
+        return access_impl(std::make_index_sequence<sizeof...(Args)
+                                                    + integral_count<S...>()
+                                                    - newaxis_count<S...>()>(),
+                           args...);
     }
     
     template <class E, class... S>
@@ -505,14 +480,15 @@ namespace xt
     template <typename E::size_type I, class... Args>
     inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I < sizeof...(S)), size_type>
     {
-        return sliced_access<I - integral_count_before<S...>(I)>(std::get<I>(m_slices), args...);
+        return sliced_access<I - integral_count_before<S...>(I) + newaxis_count_before<S...>(I + 1)>
+            (std::get<I + newaxis_count_before<S...>(I + 1)>(m_slices), args...);
     }
 
     template <class E, class... S>
     template <typename E::size_type I, class... Args>
     inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I >= sizeof...(S)), size_type>
     {
-        return argument<I - integral_count<S...>()>(args...);
+        return argument<I - integral_count<S...>() + newaxis_count<S...>()>(args...);
     }
 
     template <class E, class... S>
@@ -551,15 +527,17 @@ namespace xt
         };
         for (size_type i = 0; i != m_e.dimension(); ++i)
         {
+            size_type k = newaxis_skip<S...>(i);
+            std::advance(first, k - i);
             if (first != last)
             {
-                index[i] = i < sizeof...(S) ?
-                    apply<size_type>(i, func1, m_slices) : *first++;
+                index[i] = k < sizeof...(S) ?
+                    apply<size_type>(k, func1, m_slices) : *first++;
             }
             else
             {
-                index[i] = i < sizeof...(S) ?
-                    apply<size_type>(i, func2, m_slices) : 0;
+                index[i] = k < sizeof...(S) ?
+                    apply<size_type>(k, func2, m_slices) : 0;
             }
         }
         return index;
@@ -573,12 +551,18 @@ namespace xt
 
     namespace detail
     {
+        template <class E, class... S>
+        inline std::size_t get_underlying_shape_index(std::size_t I)
+        {
+            return I - newaxis_count_before<get_slice_type<E, S>...>(I);
+        }
+
         template <class E, std::size_t... I, class... S>
         inline xview<E, get_slice_type<E, S>...> make_view_impl(E& e, std::index_sequence<I...>, S&&... slices)
         {
             return xview<E, get_slice_type<E, S>...>(
                 e,
-                std::forward<get_slice_type<E, S>>(get_slice_implementation(e, slices, I))...
+                std::forward<get_slice_type<E, S>>(get_slice_implementation(e, slices, get_underlying_shape_index<E, S...>(I)))...
             );
         }
     }
@@ -858,8 +842,12 @@ namespace xt
             auto func = [](const auto& s) { return xt::value(s, 0); };
             for(size_type i = 0; i < sizeof...(S); ++i)
             {
-                size_type s = apply<size_type>(i, func, p_view->slices());
-                m_it.step(i, s);
+                if (!is_newaxis_slice(i))
+                {
+                    size_type s = apply<size_type>(i, func, p_view->slices());
+                    size_type index = i - newaxis_count_before<S...>(i);
+                    m_it.step(index, s);
+                }
             }
         }
     }
@@ -873,27 +861,15 @@ namespace xt
     template <bool is_const, class E, class... S>
     inline void xview_stepper<is_const, E, S...>::step(size_type dim, size_type n)
     {
-        if(dim >= m_offset)
-        {
-            auto func = [](const auto& s) noexcept { return step_size(s); };
-            size_type index = integral_skip<S...>(dim);
-            size_type step_size = index < sizeof...(S) ?
-                apply<size_type>(index, func, p_view->slices()) : 1;
-            m_it.step(index, step_size * n);
-        }
+        auto func = [this](size_type index, size_type offset) { m_it.step(index, offset); };
+        common_step(dim, n, func);
     }
 
     template <bool is_const, class E, class... S>
     inline void xview_stepper<is_const, E, S...>::step_back(size_type dim, size_type n)
     {
-        if(dim >= m_offset)
-        {
-            auto func = [](const auto& s) noexcept { return step_size(s); };
-            size_type index = integral_skip<S...>(dim);
-            size_type step_size = index < sizeof...(S) ?
-                apply<size_type>(index, func, p_view->slices()) : 1;
-            m_it.step_back(index, step_size * n);
-        }
+        auto func = [this](size_type index, size_type offset) { m_it.step_back(index, offset); };
+        common_step(dim, n, func);
     }
 
     template <bool is_const, class E, class... S>
@@ -904,12 +880,16 @@ namespace xt
             auto size_func = [](const auto& s) noexcept { return get_size(s); };
             auto step_func = [](const auto& s) noexcept { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
-            size_type size = index < sizeof...(S) ?
-                apply<size_type>(index, size_func, p_view->slices()) : p_view->shape()[dim];
-            if(size != 0) size = size - 1;
-            size_type step_size = index < sizeof...(S) ?
-                apply<size_type>(index, step_func, p_view->slices()) : 1;
-            m_it.step_back(index, step_size * size);
+            if (!is_newaxis_slice(index))
+            {
+                size_type size = index < sizeof...(S) ?
+                    apply<size_type>(index, size_func, p_view->slices()) : p_view->shape()[dim];
+                if (size != 0) size = size - 1;
+                size_type step_size = index < sizeof...(S) ?
+                    apply<size_type>(index, step_func, p_view->slices()) : 1;
+                index -= newaxis_count_before<S...>(index);
+                m_it.step_back(index, step_size * size);
+            }
         }
     }
 
@@ -926,6 +906,31 @@ namespace xt
     }
 
     template <bool is_const, class E, class... S>
+    inline bool xview_stepper<is_const, E, S...>::is_newaxis_slice(size_type index) const noexcept
+    {
+        // A bit tricky but avoids a lot of template instantiations
+        return newaxis_count_before<S...>(index + 1) != newaxis_count_before<S...>(index);
+    }
+
+    template <bool is_const, class E, class... S>
+    template <class F>
+    void xview_stepper<is_const, E, S...>::common_step(size_type dim, size_type n, F f)
+    {
+        if (dim >= m_offset)
+        {
+            auto func = [](const auto& s) noexcept { return step_size(s); };
+            size_type index = integral_skip<S...>(dim);
+            if (!is_newaxis_slice(index))
+            {
+                size_type step_size = index < sizeof...(S) ?
+                    apply<size_type>(index, func, p_view->slices()) : 1;
+                index -= newaxis_count_before<S...>(index);
+                f(index, step_size * n);
+            }
+        }
+    }
+
+    template <bool is_const, class E, class... S>
     inline bool operator==(const xview_stepper<is_const, E, S...>& lhs,
                            const xview_stepper<is_const, E, S...>& rhs)
     {
@@ -938,140 +943,6 @@ namespace xt
     {
         return !(lhs.equal(rhs));
     }
-
-    /************************
-     * count integral types *
-     ************************/
-
-    namespace detail
-    {
-
-        template <class T, class... S>
-        struct integral_count_impl
-        {
-            static constexpr std::size_t count(std::size_t i) noexcept
-            {
-                return i ? (integral_count_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
-            }
-        };
-
-        template <>
-        struct integral_count_impl<void>
-        {
-            static constexpr std::size_t count(std::size_t i) noexcept
-            {
-                return i;
-            }
-        };
-    }
-
-    template <class... S>
-    constexpr std::size_t integral_count()
-    {
-        return detail::integral_count_impl<S..., void>::count(sizeof...(S));
-    }
-
-    template <class... S>
-    constexpr std::size_t integral_count_before(std::size_t i)
-    {
-        return detail::integral_count_impl<S..., void>::count(i);
-    }
-
-    /***********************
-    * count newaxis types *
-    ***********************/
-
-    namespace detail
-    {
-        template <class T>
-        struct is_newaxis : std::false_type
-        {
-        };
-
-        template <class T>
-        struct is_newaxis<xnewaxis<T>> : public std::true_type
-        {
-        };
-
-        template <class T, class... S>
-        struct newaxis_count_impl
-        {
-            static constexpr std::size_t count(std::size_t i) noexcept
-            {
-                return i ? (newaxis_count_impl<S...>::count(i - 1) + (is_newaxis<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
-            }
-        };
-
-        template <>
-        struct newaxis_count_impl<void>
-        {
-            static constexpr std::size_t count(std::size_t i) noexcept
-            {
-                return i;
-            }
-        };
-    }
-
-    template <class... S>
-    constexpr std::size_t newaxis_count()
-    {
-        return detail::newaxis_count_impl<S..., void>::count(sizeof...(S));
-    }
-
-    template <class... S>
-    constexpr std::size_t newaxis_count_before(std::size_t i)
-    {
-        return detail::newaxis_count_impl<S..., void>::count(i);
-    }
-
-    /**********************************
-     * index of ith non-integral type *
-     **********************************/
-
-    namespace detail
-    {
-
-        template <class T, class... S>
-        struct integral_skip_impl
-        {
-            static constexpr std::size_t count(std::size_t i) noexcept
-            {
-                return i == 0 ? count_impl() : count_impl(i);
-            }
-
-        private:
-
-            static constexpr std::size_t count_impl(std::size_t i) noexcept
-            {
-                return 1 + (
-                    std::is_integral<std::remove_reference_t<T>>::value ?
-                        integral_skip_impl<S...>::count(i) :
-                        integral_skip_impl<S...>::count(i - 1)
-                );
-            }
-
-            static constexpr std::size_t count_impl() noexcept
-            {
-                return std::is_integral<std::remove_reference_t<T>>::value ? 1 + integral_skip_impl<S...>::count(0) : 0;
-            }
-        };
-
-        template <>
-        struct integral_skip_impl<void>
-        {
-            static constexpr std::size_t count(std::size_t i) noexcept
-            {
-                return i;
-            }
-        };
-    }
-
-    template <class... S>
-    constexpr std::size_t integral_skip(std::size_t i)
-    {
-        return detail::integral_skip_impl<S..., void>::count(i);
-    }
 }
 
 #endif
-
