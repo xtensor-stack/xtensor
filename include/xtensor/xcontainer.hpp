@@ -391,7 +391,7 @@ namespace xt
     }
 
     /**
-     * Transposes the container inplace by permuting the shape with @permutation.
+     * Transposes the container inplace by permuting the shape with @p permutation.
      * @param permutation the vector containing permutation
      * @param check_policy the check level (check_policy::full() or check_policy::none())
      * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
@@ -514,8 +514,8 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position in the container.
      * @param first iterator starting the sequence of indices
-     * @param second iterator starting the sequence of indices
-     * The number of indices in the squence should be equal or greater
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the squence should be equal to or greater
      * than the number of dimensions of the container.
      */
     template <class D>
@@ -528,8 +528,8 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position in the container.
      * @param first iterator starting the sequence of indices
-     * @param second iterator starting the sequence of indices
-     * The number of indices in the squence should be equal or greater
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the squence should be equal to or greater
      * than the number of dimensions of the container.
      */
     template <class D>

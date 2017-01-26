@@ -4,15 +4,12 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Containers and views
-====================
+Functions and generators
+========================
 
 .. toctree::
 
-   xcontainer
-   xarray
-   xarray_adaptor
-   xtensor
-   xtensor_adaptor
-   xview
-   xbroadcast
+   xfunction
+   xgenerator
+   xbuilder
+   xrandom

@@ -11,4 +11,5 @@ API reference
 
    expression_index
    container_index
+   function_index
    xmath
