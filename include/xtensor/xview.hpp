@@ -53,7 +53,7 @@ namespace xt
      * @tparam E the expression type to adapt
      * @tparam S the slices type describing the shape adaptation
      *
-     * @sa make_xview
+     * @sa make_xview, range, all, newaxis
      */
     template <class E, class... S>
     class xview : public xview_semantic<xview<E, S...>>
@@ -571,8 +571,7 @@ namespace xt
      * instead.
      * @param e the xexpression to adapt
      * @param slices the slices list describing the view
-     * @sa range 
-     * @sa all
+     * @sa range, all, newaxis
      */
     template <class E, class... S>
     inline xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices)
@@ -803,7 +802,6 @@ namespace xt
     {
         return cend();
     }
-    //@}
 
     /**
      * Returns a constant iterator to the first element of the buffer

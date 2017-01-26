@@ -22,3 +22,6 @@ xview
 
 .. doxygenfunction:: xt::all
    :project: xtensor
+
+.. doxygenfunction:: xt::newaxis
+   :project: xtensor
