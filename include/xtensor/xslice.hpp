@@ -171,6 +171,40 @@ namespace xt
         return xall_tag();
     }
 
+    /************************
+    * xnewaxis declaration *
+    ************************/
+
+    template <class T>
+    class xnewaxis : public xslice<xnewaxis<T>>
+    {
+
+    public:
+
+        using size_type = T;
+
+        xnewaxis() = default;
+
+        size_type operator()(size_type i) const noexcept;
+
+        size_type size() const noexcept;
+        size_type step_size() const noexcept;
+    };
+
+    struct xnewaxis_tag
+    {
+    };
+
+    /**
+    * Returns a slice representing a new axis of length one,
+    * to be used as an argument of make_xview function.
+    * @sa make_xview
+    */
+    inline auto newaxis() noexcept
+    {
+        return xnewaxis_tag();
+    }
+
     /******************************************************
      * homogeneous get_size for integral types and slices *
      ******************************************************/
@@ -235,6 +269,12 @@ namespace xt
         return xall<typename E::size_type>(e.shape()[index]);
     }
     
+    template <class E>
+    inline auto get_slice_implementation(E& /*e*/, xnewaxis_tag, std::size_t /*index*/)
+    {
+        return xnewaxis<typename E::size_type>();
+    }
+
     /******************************
      * homogeneous get_slice_type *
      ******************************/
@@ -251,6 +291,12 @@ namespace xt
         struct get_slice_type_impl<E, xall_tag>
         {
             using type = xall<typename E::size_type>;
+        };
+
+        template <class E>
+        struct get_slice_type_impl<E, xnewaxis_tag>
+        {
+            using type = xnewaxis<typename E::size_type>;
         };
     }
 
@@ -357,6 +403,27 @@ namespace xt
         return 1;
     }
 
+    /***************************
+    * xnewaxis implementation *
+    ***************************/
+
+    template <class T>
+    inline auto xnewaxis<T>::operator()(size_type) const noexcept -> size_type
+    {
+        return 0;
+    }
+
+    template <class T>
+    inline auto xnewaxis<T>::size() const noexcept -> size_type
+    {
+        return 1;
+    }
+
+    template <class T>
+    inline auto xnewaxis<T>::step_size() const noexcept -> size_type
+    {
+        return 0;
+    }
 }
 
 #endif
