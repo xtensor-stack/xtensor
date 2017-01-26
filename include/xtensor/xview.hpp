@@ -188,6 +188,9 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = get_index_type<shape_type>;
 
+        template <class It>
+        base_index_type make_index(It first, It last) const;
+
         void assign_temporary_impl(temporary_type& tmp);
 
         friend class xview_semantic<xview<E, S...>>;
@@ -423,28 +426,7 @@ namespace xt
     template <class It>
     inline auto xview<E, S...>::element(It first, It last) -> reference
     {
-        auto index = make_sequence<base_index_type>(m_e.dimension(), 0);
-        auto func1 = [&first](const auto& s)
-        {
-            return get_slice_value(s, first);
-        };
-        auto func2 = [](const auto& s)
-        {
-            return xt::value(s, 0);
-        };
-        for (size_type i=0; i!=m_e.dimension(); ++i)
-        {
-            if (first != last)
-            {
-                index[i] = i < sizeof...(S) ?
-                    apply<size_type>(i, func1, m_slices) : *first++;
-            }
-            else
-            {
-                index[i] = i < sizeof...(S) ?
-                    apply<size_type>(i, func2, m_slices) : 0;
-            }
-        }
+        auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
     }
 
@@ -471,28 +453,7 @@ namespace xt
     template <class It>
     inline auto xview<E, S...>::element(It first, It last) const -> const_reference
     {
-        auto index = make_sequence<typename E::shape_type>(m_e.dimension(), 0);
-        auto func1 = [&first](const auto& s)
-        {
-            return get_slice_value(s, first);
-        };
-        auto func2 = [](const auto& s)
-        {
-            return xt::value(s, 0);
-        };
-        for (size_type i=0; i!=m_e.dimension(); ++i)
-        {
-            if (first != last)
-            {
-                index[i] = i < sizeof...(S) ?
-                    apply<size_type>(i, func1, m_slices) : *first++;
-            }
-            else
-            {
-                index[i] = i < sizeof...(S) ?
-                    apply<size_type>(i, func2, m_slices) : 0;
-            }
-        }
+        auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
     }
     //@}
@@ -573,6 +534,35 @@ namespace xt
     inline auto xview<E, S...>::sliced_access(const T& squeeze, Args...) const -> disable_xslice<T, size_type>
     {
         return squeeze;
+    }
+
+    template <class E, class... S>
+    template <class It>
+    inline auto xview<E, S...>::make_index(It first, It last) const -> base_index_type
+    {
+        auto index = make_sequence<typename E::shape_type>(m_e.dimension(), 0);
+        auto func1 = [&first](const auto& s)
+        {
+            return get_slice_value(s, first);
+        };
+        auto func2 = [](const auto& s)
+        {
+            return xt::value(s, 0);
+        };
+        for (size_type i = 0; i != m_e.dimension(); ++i)
+        {
+            if (first != last)
+            {
+                index[i] = i < sizeof...(S) ?
+                    apply<size_type>(i, func1, m_slices) : *first++;
+            }
+            else
+            {
+                index[i] = i < sizeof...(S) ?
+                    apply<size_type>(i, func2, m_slices) : 0;
+            }
+        }
+        return index;
     }
 
     template <class E, class... S>
