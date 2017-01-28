@@ -297,7 +297,7 @@ namespace xt
         {
             using xtype = T;
             using value_type = typename T::value_type;
-        using signed_idx_type = long int;
+            using signed_idx_type = long int;
 
             tril_fn(const T& arr, int k, const C& comp) : m_arr(arr), m_k(k), m_comp(comp)
             {
