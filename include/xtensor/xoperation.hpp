@@ -23,41 +23,30 @@ namespace xt
      * helpers *
      ***********/
 
-    template <class T>
-    struct identity
-    {
-        using result_type = T;
-
-        constexpr T operator()(const T& t) const noexcept
-        {
-            return +t;
-        }
-    };
-
-    template <class T>
-    struct conditional_ternary
-    {
-        using result_type = T;
-
-        constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const noexcept
-        {
-            return t1 ? t2 : t3;
-        }
-    };
-
-    template <class T>
-    struct conditional
-    {
-        using result_type = bool;
-
-        constexpr result_type operator()(const T t1, const T t2) const noexcept
-        {
-            return t1 < t2;
-        }
-    };
-
     namespace detail
     {
+        template <class T>
+        struct identity
+        {
+            using result_type = T;
+
+            constexpr T operator()(const T& t) const noexcept
+            {
+                return +t;
+            }
+        };
+
+        template <class T>
+        struct conditional_ternary
+        {
+            using result_type = T;
+
+            constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const noexcept
+            {
+                return t1 ? t2 : t3;
+            }
+        };
+
         template <template <class...> class F, class... E>
         inline auto make_xfunction(const E&... e) noexcept
         {
@@ -81,7 +70,7 @@ namespace xt
     template <class E>
     inline auto operator+(const xexpression<E>& e) noexcept
     {
-        return detail::make_xfunction<identity>(e.derived_cast());
+        return detail::make_xfunction<detail::identity>(e.derived_cast());
     }
 
     template <class E>
@@ -176,9 +165,9 @@ namespace xt
 
     template <class E1, class E2, class E3>
     inline auto where(const E1& e1, const E2& e2, const E3& e3) noexcept
-        -> detail::get_xfunction_type<conditional_ternary, E1, E2, E3>
+        -> detail::get_xfunction_type<detail::conditional_ternary, E1, E2, E3>
     {
-         return detail::make_xfunction<conditional_ternary>(e1, e2, e3);
+         return detail::make_xfunction<detail::conditional_ternary>(e1, e2, e3);
     }
 
     template <class E1>
