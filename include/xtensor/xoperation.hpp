@@ -19,34 +19,35 @@
 namespace xt
 {
 
-    /***********
-     * helpers *
-     ***********/
-
-    template <class T>
-    struct identity
-    {
-        using result_type = T;
-
-        constexpr T operator()(const T& t) const noexcept
-        {
-            return +t;
-        }
-    };
-
-    template <class T>
-    struct conditional_ternary
-    {
-        using result_type = T;
-
-        constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const noexcept
-        {
-            return t1 ? t2 : t3;
-        }
-    };
-
     namespace detail
     {
+
+        /***********
+         * helpers *
+         ***********/
+
+        template <class T>
+        struct identity
+        {
+            using result_type = T;
+
+            constexpr T operator()(const T& t) const noexcept
+            {
+                return +t;
+            }
+        };
+
+        template <class T>
+        struct conditional_ternary
+        {
+            using result_type = T;
+
+            constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const noexcept
+            {
+                return t1 ? t2 : t3;
+            }
+        };
+
         template <template <class...> class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
@@ -69,9 +70,9 @@ namespace xt
 
     template <class E>
     inline auto operator+(E&& e) noexcept
-        -> detail::get_xfunction_type<identity, E>
+        -> detail::get_xfunction_type<detail::identity, E>
     {
-        return detail::make_xfunction<identity>(std::forward<E>(e));
+        return detail::make_xfunction<detail::identity>(std::forward<E>(e));
     }
 
     template <class E>
@@ -204,14 +205,14 @@ namespace xt
     template <class E>
     inline bool any(E&& e)
     {
-        return std::any_of(e.storage_begin(), e.storage_end(), 
+        return std::any_of(e.storage_cbegin(), e.storage_cend(), 
                            [](const typename std::decay<E>::type::value_type& el) { return el; });
     }
 
     template <class E>
     inline bool all(E&& e)
     {
-        return std::all_of(e.storage_begin(), e.storage_end(),
+        return std::all_of(e.storage_cbegin(), e.storage_cend(),
                            [](const typename std::decay<E>::type::value_type& el) { return el; });
     }
 }

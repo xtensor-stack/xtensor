@@ -73,6 +73,7 @@ set(XTENSOR_TESTS
     test_xcontainer_semantic.cpp
     test_xfunction.cpp
     test_xiterator.cpp
+    test_xindexview.cpp
     test_xio.cpp
     test_xmath.cpp
     test_xnoalias.cpp

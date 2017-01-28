@@ -111,9 +111,6 @@ namespace xt
 
     private:
 
-        template <class Func, std::size_t... I>
-        const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const noexcept;
-
         functor_type m_f;
         shape_type m_shape;
         friend class xgenerator_stepper<F, R, S>;
