@@ -81,6 +81,7 @@ namespace xt
         const shape_type& shape() const noexcept;
         const strides_type& strides() const noexcept;
         const strides_type& backstrides() const noexcept;
+        const size_type offset() const noexcept;
 
         void reshape(const shape_type& shape);
         void reshape(const shape_type& shape, layout l);
@@ -321,6 +322,15 @@ namespace xt
     inline auto xcontainer<D>::backstrides() const noexcept -> const strides_type&
     {
         return m_backstrides;
+    }
+
+    /**
+     * Returns the offset of the data in the memory layout
+     */
+    template <class D>
+    inline auto xcontainer<D>::offset() const noexcept -> const size_type
+    {
+        return data_offset();
     }
 
     /**

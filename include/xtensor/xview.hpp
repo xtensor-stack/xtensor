@@ -158,6 +158,18 @@ namespace xt
         const_storage_iterator storage_cbegin() const;
         const_storage_iterator storage_cend() const;
 
+        template<typename T = E>
+        typename std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&>
+        data() const;
+
+        template<typename T = E>
+        typename std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::strides_type>
+        strides() const;
+
+        template <typename T = E>
+        typename std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::size_type>
+        offset() const;
+
     private:
 
         E& m_e;
@@ -939,6 +951,41 @@ namespace xt
                            const xview_stepper<is_const, E, S...>& rhs)
     {
         return !(lhs.equal(rhs));
+    }
+
+    template <class E, class... S>
+    template <typename T>
+    inline auto xview<E, S...>::data() const -> typename std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&> {
+        return m_e.data();
+    }
+
+    template <class E, class... S>
+    template <typename T>
+    inline auto xview<E, S...>::strides() const -> std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::strides_type> {
+        using strides_type = typename T::strides_type;
+        strides_type temp = m_e.strides();
+        strides_type strides(sizeof...(S) - integral_count<S...>());
+
+        auto idx = integral_skip<S...>(0);
+        for (size_type i = 0; i < strides.size(); ++i) {
+            strides[i] = m_e.strides()[idx];
+            idx = integral_skip<S...>(idx + 1);
+        }
+        return strides;
+    }
+
+    template <class E, class... S>
+    template <typename T>
+    inline auto xview<E, S...>::offset() const -> std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::size_type> {
+
+        auto func = [](const auto& s) { return xt::first_value(s); };
+        size_type offset = 0;
+        for(size_type i = 0; i < sizeof...(S); ++i)
+        {
+            size_type s = apply<size_type>(i, func, m_slices) * m_e.strides()[i];
+            offset += s;
+        }
+        return offset;
     }
 
     /************************
