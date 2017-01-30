@@ -151,15 +151,15 @@ namespace xt
         shape_t expected_shape = {5, 5};
         ASSERT_EQ(expected_shape, e.shape());
 
-        ASSERT_EQ(1, e(1, 1));
+        ASSERT_EQ(true, e(1, 1));
         xindex idx({1, 0});
-        ASSERT_EQ(0, e[idx]);
+        ASSERT_EQ(false, e[idx]);
 
         xarray<bool> m_assigned = e;
-        ASSERT_EQ(1, m_assigned(2, 2));
-        ASSERT_EQ(0, m_assigned(4, 2));
+        ASSERT_EQ(true, m_assigned(2, 2));
+        ASSERT_EQ(false, m_assigned(4, 2));
 
         xt::xindex idx2({2, 2});
-        ASSERT_EQ(1, e.element(idx2.begin(), idx2.end()));
+        ASSERT_EQ(true, e.element(idx2.begin(), idx2.end()));
     }
 }

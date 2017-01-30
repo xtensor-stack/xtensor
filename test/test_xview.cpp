@@ -228,5 +228,157 @@ namespace xt
         arr2 = xt::make_xview(arr, 0);
         EXPECT_EQ(ref, arr2);
     }
+
+    TEST(xview, newaxis_count)
+    {
+        size_t count1 = newaxis_count<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>();
+        EXPECT_EQ(count1, 3);
+        size_t count2 = newaxis_count<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>();
+        EXPECT_EQ(count2, 2);
+        size_t count3 = newaxis_count_before<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>(3);
+        EXPECT_EQ(count3, 3);
+        size_t count4 = newaxis_count_before<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>(2);
+        EXPECT_EQ(count4, 1);
+    }
+
+    TEST(xview, newaxis)
+    {
+        view_shape_type shape = { 3, 4 };
+        xarray<double> a(shape);
+        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
+
+        auto view1 = make_xview(a, all(), newaxis(), all());
+        EXPECT_EQ(a(1, 1), view1(1, 0, 1));
+        EXPECT_EQ(a(1, 2), view1(1, 0, 2));
+        EXPECT_EQ(3, view1.dimension());
+        EXPECT_EQ(3, view1.shape()[0]);
+        EXPECT_EQ(1, view1.shape()[1]);
+        EXPECT_EQ(4, view1.shape()[2]);
+
+        auto view2 = make_xview(a, all(), all(), newaxis());
+        EXPECT_EQ(a(1, 1), view2(1, 1, 0));
+        EXPECT_EQ(a(1, 2), view2(1, 2, 0));
+        EXPECT_EQ(3, view2.dimension());
+        EXPECT_EQ(3, view2.shape()[0]);
+        EXPECT_EQ(4, view2.shape()[1]);
+        EXPECT_EQ(1, view2.shape()[2]);
+
+        auto view3 = make_xview(a, 1, newaxis(), all());
+        EXPECT_EQ(a(1, 1), view3(0, 1));
+        EXPECT_EQ(a(1, 2), view3(0, 2));
+        EXPECT_EQ(2, view3.dimension());
+
+        auto view4 = make_xview(a, 1, all(), newaxis());
+        EXPECT_EQ(a(1, 1), view4(1, 0));
+        EXPECT_EQ(a(1, 2), view4(2, 0));
+        EXPECT_EQ(2, view4.dimension());
+
+        auto view5 = make_xview(view1, 1);
+        EXPECT_EQ(a(1, 1), view5(0, 1));
+        EXPECT_EQ(a(1, 2), view5(0, 2));
+        EXPECT_EQ(2, view5.dimension());
+
+        auto view6 = make_xview(view2, 1);
+        EXPECT_EQ(a(1, 1), view6(1, 0));
+        EXPECT_EQ(a(1, 2), view6(2, 0));
+        EXPECT_EQ(2, view6.dimension());
+
+        std::array<std::size_t, 3> idx1 = { 1, 0, 2 };
+        EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
+
+        std::array<std::size_t, 3> idx2 = { 1, 2, 0 };
+        EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
+    }
+
+    TEST(xview, newaxis_iterating)
+    {
+        view_shape_type shape = { 3, 4 };
+        xarray<double> a(shape);
+        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
+
+        auto view1 = make_xview(a, all(), all(), newaxis());
+        auto iter1 = view1.begin();
+        auto iter1_end = view1.end();
+
+        EXPECT_EQ(a(0, 0), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(0, 1), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(0, 2), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(0, 3), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(1, 0), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(1, 1), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(1, 2), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(1, 3), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(2, 0), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(2, 1), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(2, 2), *iter1);
+        ++iter1;
+        EXPECT_EQ(a(2, 3), *iter1);
+        ++iter1;
+        EXPECT_EQ(iter1_end, iter1);
+
+        auto view2 = make_xview(a, all(), newaxis(), all());
+        auto iter2 = view2.begin();
+        auto iter2_end = view2.end();
+
+        EXPECT_EQ(a(0, 0), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(0, 1), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(0, 2), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(0, 3), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(1, 0), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(1, 1), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(1, 2), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(1, 3), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(2, 0), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(2, 1), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(2, 2), *iter2);
+        ++iter2;
+        EXPECT_EQ(a(2, 3), *iter2);
+        ++iter2;
+        EXPECT_EQ(iter2_end, iter2);
+    }
+
+    TEST(xview, newaxis_function)
+    {
+        view_shape_type shape = { 3, 4 };
+        xarray<double> a(shape);
+        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::copy(data.cbegin(), data.cend(), a.storage_begin());
+
+        xarray<double> b(view_shape_type(1, 4));
+        auto data_end = data.cbegin();
+        data_end += 4;
+        std::copy(data.cbegin(), data_end, b.storage_begin());
+
+        auto view = make_xview(b, newaxis(), all());
+        xarray<double> res = a + view;
+
+        std::vector<double> data2{ 2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16 };
+        xarray<double> expected(shape);
+        std::copy(data2.cbegin(), data2.cend(), expected.storage_begin());
+
+        EXPECT_EQ(expected, res);
+    }
 }
 
