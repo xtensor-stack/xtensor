@@ -236,10 +236,9 @@ namespace xt
             template <class It>
             inline value_type operator()(const It& begin, const It& end) const
             {
-                auto beg_1 = begin;
-                auto beg_2 = begin;
-                beg_2 += 1;
-                return *beg_1 == *beg_2 ? m_arr(*beg_1) : value_type(0);
+                auto other = begin;
+                other += 1;
+                return *begin == *other ? m_arr(*begin) : value_type(0);
             }
 
         private:
@@ -307,7 +306,9 @@ namespace xt
             inline value_type operator()(const It& begin, const It& end) const
             {
                 // have to cast to signed int otherwise -1 can lead to overflow
-                return m_comp(signed_idx_type(*begin) + m_k, signed_idx_type(*(begin + 1))) ? m_arr.element(begin, end) : value_type(0);
+                auto begin_next = begin;
+                begin_next += 1;
+                return m_comp(signed_idx_type(*begin) + m_k, signed_idx_type(*begin_next)) ? m_arr.element(begin, end) : value_type(0);
             }
 
         private:
