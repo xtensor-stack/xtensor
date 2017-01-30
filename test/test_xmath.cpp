@@ -121,6 +121,15 @@ namespace xt
         EXPECT_EQ(fdim(sa, b)(0, 0), std::fdim(sa, b(0, 0)));
     }
 
+    TEST(xmath, clip)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a = {1,2,3,4,5,6};
+        xarray<double> res = {2, 2, 3, 4, 4, 4};
+
+        xarray<double> clipped = clip(a, 2.0, 4.0);
+        EXPECT_EQ(res, clipped);
+    }
 
     /***************************
      * Exponential functions

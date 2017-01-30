@@ -198,6 +198,36 @@ namespace xt
         using functor_type = detail::mf_type<E1, E2>;
         return detail::make_xfunction((functor_type)std::fdim, e1, e2);
     }
+    
+    namespace detail
+    {
+        // this function will be part of std with C++17
+        template <class T>
+        constexpr T clamp(const T v, const T lo, const T hi)
+        {
+            return v < lo ? lo : hi < v ? hi : v;
+        }
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Clip values between hi and lo
+     * 
+     * Returns an \ref xfunction for the element-wise clipped 
+     * values between hi- and lo
+     * @param e1 an \ref xexpression or a scalar
+     * @param hi a scalar
+     * @param lo a scalar
+     *
+     * @return a \ref xfunction
+     */
+    template <class E1, class E2, class E3>
+    inline auto clip(const E1& e1, const E2& hi, const E3& lo) noexcept
+        -> detail::get_xfunction_free_type<E1, E2, E3>
+    {
+        using functor_type = detail::mf_type<E1, E2, E3>;
+        return detail::make_xfunction((functor_type)detail::clamp, e1, hi, lo);
+    }
 
     /*************************
      * exponential functions *
