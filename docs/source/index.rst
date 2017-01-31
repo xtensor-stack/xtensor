@@ -37,11 +37,24 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
 
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    installation
-   usage
-   api_reference
+
+.. toctree::
+   :caption: USAGE
+   :maxdepth: 2
+
+..   basic_usage
+
+.. toctree::
+   :caption: API REFERENCE
+   :maxdepth: 2
+   
+   api/expression_index
+   api/container_index
+   api/function_index
+   api/xmath
 
 .. _NumPy: http://www.numpy.org
 .. _Buffer Protocol: https://docs.python.org/3/c-api/buffer.html
