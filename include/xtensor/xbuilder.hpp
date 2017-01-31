@@ -214,7 +214,7 @@ namespace xt
             }
 
             template <class It>
-            inline value_type operator()(const It& begin, const It& end) const
+            inline value_type operator()(const It& begin, const It& /*end*/) const
             {
                 return m_arr(*begin, *begin);
             }
@@ -234,7 +234,7 @@ namespace xt
             }
 
             template <class It>
-            inline value_type operator()(const It& begin, const It& end) const
+            inline value_type operator()(const It& begin, const It& /*end*/) const
             {
                 auto other = begin;
                 other += 1;
