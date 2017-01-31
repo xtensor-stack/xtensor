@@ -37,9 +37,14 @@ namespace xt
         EXPECT_EQ((e_copy(1, 1) + 6), t(0));
         EXPECT_EQ((e(1, 1) + 3), t(0));
 
+        v = broadcast(123, v.shape());
+        EXPECT_EQ(123, e(1, 1));
+        EXPECT_EQ(123, e(1, 2));
+        EXPECT_EQ(123, e(2, 2));
+
         xarray<double> as = {3, 3, 3};
         v = as;
-        EXPECT_TRUE(all(equal_to(v, as)));
+        EXPECT_TRUE(all(equal(v, as)));
         EXPECT_EQ(3, e(2, 2));
     }
 
@@ -63,4 +68,22 @@ namespace xt
         EXPECT_TRUE(!any(e2 > 0.5));
     }
 
+    TEST(xindexview, indices_on_function)
+    {
+        xarray<double> e = xt::random::rand<double>({3, 3});
+        auto fn = e * 3 - 120;
+        auto v = make_xindexview(fn, {{1, 1}, {1, 2}, {2, 2}});
+        EXPECT_EQ(fn(1, 1), v(0));
+        EXPECT_EQ(fn(1, 2), v[{1}]);
+
+        std::vector<size_t> idx = {2};
+        EXPECT_EQ(fn(2, 2), v.element(idx.begin(), idx.end()));
+
+        auto it = v.begin();
+        EXPECT_EQ(fn(1, 1), *it);
+
+        EXPECT_EQ(fn(1, 2), *(++it));
+        EXPECT_EQ(fn(2, 2), *(++it));
+        EXPECT_EQ(++it, v.end());
+    }
 }

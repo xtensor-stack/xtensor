@@ -197,9 +197,70 @@ namespace xt
 
     template <class E1, class E2, class E3>
     inline auto where(E1&& e1, E2&& e2, E3&& e3) noexcept
-        -> detail::get_xfunction_type<conditional_ternary, E1, E2, E3>
+        -> detail::get_xfunction_type<detail::conditional_ternary, E1, E2, E3>
     {
-         return detail::make_xfunction<conditional_ternary>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
+         return detail::make_xfunction<detail::conditional_ternary>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
+    }
+
+    /**
+     * @function nonzero(const T& arr)
+     * @brief return vector of indices where T is not zero
+     * 
+     * @param arr input array
+     * @return vector of \ref index_types where arr is not equal to zero
+     */
+    template <class T>
+    inline auto nonzero(const T& arr)
+        -> std::vector<get_index_type<typename T::shape_type>>
+    {
+        auto shape = arr.shape();
+        using index_type = get_index_type<typename T::shape_type>;
+        using size_type = typename T::size_type;
+
+        index_type idx(arr.dimension(), 0);
+        std::vector<index_type> indices;
+
+        auto next_idx = [&shape](index_type& idx) {
+            for (int i = int(shape.size() - 1); i >= 0; --i)
+            {
+                if (idx[i] >= shape[i] - 1)
+                {
+                    idx[i] = 0;
+                }
+                else
+                {
+                    idx[i]++;
+                    return idx;
+                }
+            }
+            // return empty index, happens at last iteration step, but remains unused
+            return index_type();
+        };
+
+        size_type total_size = std::accumulate(shape.begin(), shape.end(), size_type(1), std::multiplies<>());
+        for (size_type i = 0; i < total_size; i++, next_idx(idx))
+        {
+            if (arr[idx])
+            {
+                indices.push_back(idx);
+            }
+        }
+        return indices;
+    }
+
+    /**
+     * @function where(const T& condition)
+     * @brief return vector of indices where condition is true
+     *        (equivalent to \ref nonzero(conditition))
+     * 
+     * @param condition input array
+     * @return vector of \ref index_types where arr is not equal to zero
+     */
+    template <class T>
+    inline auto where(const T& condition)
+        -> std::vector<get_index_type<typename T::shape_type>>
+    {
+        return nonzero(condition);
     }
 
     template <class E>
