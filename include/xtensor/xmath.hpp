@@ -770,7 +770,6 @@ namespace xt
         using cf_type = typename E::value_type (*) (const E&);
     }
 
-
     /**
      * @ingroup complex_functions
      * @brief return real part of complex numbers
