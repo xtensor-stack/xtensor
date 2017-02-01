@@ -67,8 +67,6 @@ namespace xt
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
 
-        using closure_type = const self_type&;
-
         xtensor();
         explicit xtensor(const shape_type& shape, layout l = layout::row_major);
         explicit xtensor(const shape_type& shape, const_reference value, layout l = layout::row_major);
@@ -141,8 +139,6 @@ namespace xt
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
-
-        using closure_type = const self_type&;
 
         xtensor_adaptor(container_type& data);
         xtensor_adaptor(container_type& data, const shape_type& shape, layout l = layout::row_major);

@@ -66,8 +66,6 @@ namespace xt
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
 
-        using closure_type = const self_type&;
-
         xarray();
         explicit xarray(const shape_type& shape, layout l = layout::row_major);
         explicit xarray(const shape_type& shape, const_reference value, layout l = layout::row_major);
@@ -146,8 +144,6 @@ namespace xt
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
-
-        using closure_type = const self_type&;
 
         xarray_adaptor(container_type& data);
         xarray_adaptor(container_type& data, const shape_type& shape, layout l = layout::row_major);

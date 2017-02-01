@@ -30,13 +30,13 @@ namespace xt
         // Yes, really. std::enable_if<true> as a workaround to MSVC madness.
         // (buggy error C2210 when mixing parameter packs and template aliases)
         template <class... E>
-        using get_xfunction_type = std::enable_if_t<true, xfunction<F, R, get_xexpression_type<E>...>>;
+        using xfunction_type = std::enable_if_t<true, xfunction<F, R, xclosure<E>...>>;
 
         template <class Func>
         explicit xvectorizer(Func&& f);
 
         template <class... E>
-        get_xfunction_type<E...> operator()(const E&... e) const;
+        xfunction_type<E...> operator()(E&&... e) const;
 
     private:
 
@@ -71,9 +71,9 @@ namespace xt
 
     template <class F, class R>
     template <class... E>
-    inline auto xvectorizer<F, R>::operator()(const E&... e) const -> get_xfunction_type<E...>
+    inline auto xvectorizer<F, R>::operator()(E&&... e) const -> xfunction_type<E...>
     {
-        return get_xfunction_type<E...>(m_f, e...);
+        return xfunction_type<E...>(m_f, e...);
     }
 
     template <class R, class... Args>

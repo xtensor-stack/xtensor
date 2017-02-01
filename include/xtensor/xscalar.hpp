@@ -47,7 +47,6 @@ namespace xt
         using self_type = xscalar<T>;
         using shape_type = std::array<size_type, 0>;
 
-        using closure_type = const self_type;
         using const_stepper = xscalar_stepper<T>;
         using const_iterator = xscalar_iterator<T>;
         using const_storage_iterator = xscalar_iterator<T>;
