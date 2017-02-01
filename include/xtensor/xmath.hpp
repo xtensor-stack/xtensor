@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include <type_traits>
+#include <complex>
 
 #include "xfunction.hpp"
 
@@ -755,6 +756,52 @@ namespace xt
         return detail::make_xfunction((functor_type)std::lgamma, std::forward<E>(e));
     }
 
+    /********************************
+     * functions on complex numbers *
+     ********************************/
+
+    /**
+     * @defgroup complex_functions Functions on complex numbers
+     */
+
+    namespace detail
+    {
+        template <class E>
+        using cf_type = typename E::value_type (*) (const E&);
+    }
+
+
+    /**
+     * @ingroup complex_functions
+     * @brief return real part of complex numbers
+     *
+     * Returns an \ref xfunction that returns the element-wise real 
+     * part of \em e. Note that this is \em not a view into \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto real(const xexpression<E>& e) noexcept
+    {
+        using functor_type = detail::cf_type<typename E::value_type>;
+        return detail::make_xfunction((functor_type)std::real, e.derived_cast());
+    }
+
+    /**
+     * @ingroup complex_functions
+     * @brief return imaginary part of imaginary numbers
+     *
+     * Returns an \ref xfunction that returns the element-wise imaginary
+     * part of \em e. Note that this is \em not a view into the \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto imag(const xexpression<E>& e) noexcept
+    {
+        using functor_type = detail::cf_type<typename E::value_type>;
+        return detail::make_xfunction((functor_type)std::imag, e.derived_cast());
+    }
 }
 
 #endif
