@@ -28,20 +28,20 @@ namespace xt
     namespace detail
     {
         template <class R, class... Args, class... E>
-        inline auto make_xfunction(R (*f) (Args...), const E&... e) noexcept
+        inline auto make_xfunction(R (*f) (Args...), E&&... e) noexcept
         {
-            using type = xfunction<R (*) (Args...), R, get_xexpression_type<E>...>;
-            return type(f, get_xexpression(e)...);
+            using type = xfunction<R (*) (Args...), R, xclosure<E>...>;
+            return type(f, std::forward<E>(e)...);
         }
 
         template <class... E>
-        using mf_type = common_value_type<E...> (*) (get_value_type<E>...);
+        using mf_type = common_value_type<typename std::decay<E>::type...> (*) (get_value_type<typename std::decay<E>::type>...);
 
-        template <class... Args>
-        using get_xfunction_free_type = std::enable_if_t<has_xexpression<Args...>::value,
-                                                         xfunction<mf_type<Args...>,
-                                                                   common_value_type<Args...>,
-                                                                   get_xexpression_type<Args>...>>;
+        template <class... E>
+        using get_xfunction_free_type = std::enable_if_t<has_xexpression<typename std::decay<E>::type...>::value,
+                                                         xfunction<mf_type<E...>,
+                                                                   common_value_type<typename std::decay<E>::type...>,
+                                                                   xclosure<E>...>>;
     }
 
     /*******************
@@ -62,10 +62,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto abs(const xexpression<E>& e) noexcept
+    inline auto abs(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::abs, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::abs, std::forward<E>(e));
     }
 
     /**
@@ -78,10 +79,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto fabs(const xexpression<E>& e) noexcept
+    inline auto fabs(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::fabs, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::fabs, std::forward<E>(e));
     }
 
     /**
@@ -96,11 +98,11 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto fmod(const E1& e1, const E2& e2) noexcept
+    inline auto fmod(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::fmod, e1, e2);
+        return detail::make_xfunction((functor_type)std::fmod, std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -115,11 +117,11 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto remainder(const E1& e1, const E2& e2) noexcept
+    inline auto remainder(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::remainder, e1, e2);
+        return detail::make_xfunction((functor_type)std::remainder, std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -135,11 +137,11 @@ namespace xt
      * @note e1, e2 and e3 can't be scalars every three.
      */
     template <class E1, class E2, class E3>
-    inline auto fma(const E1& e1, const E2& e2, const E3& e3) noexcept
+    inline auto fma(E1&& e1, E2&& e2, E3&& e3) noexcept
         -> detail::get_xfunction_free_type<E1, E2, E3>
     {
         using functor_type = detail::mf_type<E1, E2, E3>;
-        return detail::make_xfunction((functor_type)std::fma, e1, e2, e3);
+        return detail::make_xfunction((functor_type)std::fma, std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
     }
 
     /**
@@ -154,11 +156,11 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto fmax(const E1& e1, const E2& e2) noexcept
+    inline auto fmax(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::fmax, e1, e2);
+        return detail::make_xfunction((functor_type)std::fmax, std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -173,11 +175,11 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto fmin(const E1& e1, const E2& e2) noexcept
+    inline auto fmin(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::fmin, e1, e2);
+        return detail::make_xfunction((functor_type)std::fmin, std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -192,18 +194,18 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto fdim(const E1& e1, const E2& e2) noexcept
+    inline auto fdim(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::fdim, e1, e2);
+        return detail::make_xfunction((functor_type)std::fdim, std::forward<E1>(e1), std::forward<E2>(e2));
     }
     
     namespace detail
     {
         // this function will be part of std with C++17
         template <class T>
-        constexpr T clamp(const T v, const T lo, const T hi)
+        constexpr T clamp(T v, T lo, T hi)
         {
             return v < lo ? lo : hi < v ? hi : v;
         }
@@ -222,11 +224,11 @@ namespace xt
      * @return a \ref xfunction
      */
     template <class E1, class E2, class E3>
-    inline auto clip(const E1& e1, const E2& hi, const E3& lo) noexcept
+    inline auto clip(E1&& e1, E2&& hi, E3&& lo) noexcept
         -> detail::get_xfunction_free_type<E1, E2, E3>
     {
         using functor_type = detail::mf_type<E1, E2, E3>;
-        return detail::make_xfunction((functor_type)detail::clamp, e1, hi, lo);
+        return detail::make_xfunction((functor_type)detail::clamp, std::forward<E1>(e1), std::forward<E2>(hi), std::forward<E3>(lo));
     }
 
     /*************************
@@ -247,10 +249,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto exp(const xexpression<E>& e) noexcept
+    inline auto exp(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::exp, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::exp, std::forward<E>(e));
     }
 
     /**
@@ -263,10 +266,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto exp2(const xexpression<E>& e) noexcept
+    inline auto exp2(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::exp2, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::exp2, std::forward<E>(e));
     }
 
     /**
@@ -279,10 +283,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto expm1(const xexpression<E>& e) noexcept
+    inline auto expm1(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::expm1, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::expm1, std::forward<E>(e));
     }
 
     /**
@@ -295,10 +300,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto log(const xexpression<E>& e) noexcept
+    inline auto log(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::log, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::log, std::forward<E>(e));
     }
 
     /**
@@ -311,10 +317,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto log10(const xexpression<E>& e) noexcept
+    inline auto log10(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::log10, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::log10, std::forward<E>(e));
     }
 
     /**
@@ -327,10 +334,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto log2(const xexpression<E>& e) noexcept
+    inline auto log2(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::log2, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::log2, std::forward<E>(e));
     }
 
     /**
@@ -343,10 +351,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto log1p(const xexpression<E>& e) noexcept
+    inline auto log1p(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::log1p, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::log1p, std::forward<E>(e));
     }
 
     /*******************
@@ -369,11 +378,11 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto pow(const E1& e1, const E2& e2) noexcept
+    inline auto pow(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::pow, e1, e2);
+        return detail::make_xfunction((functor_type)std::pow, std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -386,10 +395,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto sqrt(const xexpression<E>& e) noexcept
+    inline auto sqrt(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::sqrt, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::sqrt, std::forward<E>(e));
     }
 
     /**
@@ -402,10 +412,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto cbrt(const xexpression<E>& e) noexcept
+    inline auto cbrt(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::cbrt, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::cbrt, std::forward<E>(e));
     }
 
     /**
@@ -421,11 +432,11 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto hypot(const E1& e1, const E2& e2) noexcept
+    inline auto hypot(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::hypot, e1, e2);
+        return detail::make_xfunction((functor_type)std::hypot, std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /***************************
@@ -446,10 +457,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto sin(const xexpression<E>& e) noexcept
+    inline auto sin(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::sin, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::sin, std::forward<E>(e));
     }
 
     /**
@@ -462,10 +474,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto cos(const xexpression<E>& e) noexcept
+    inline auto cos(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::cos, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::cos, std::forward<E>(e));
     }
 
     /**
@@ -478,10 +491,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto tan(const xexpression<E>& e) noexcept
+    inline auto tan(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::tan, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::tan, std::forward<E>(e));
     }
 
     /**
@@ -494,10 +508,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto asin(const xexpression<E>& e) noexcept
+    inline auto asin(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::asin, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::asin, std::forward<E>(e));
     }
 
     /**
@@ -510,10 +525,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto acos(const xexpression<E>& e) noexcept
+    inline auto acos(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::acos, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::acos, std::forward<E>(e));
     }
 
     /**
@@ -526,10 +542,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto atan(const xexpression<E>& e) noexcept
+    inline auto atan(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::atan, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::atan, std::forward<E>(e));
     }
 
     /**
@@ -545,11 +562,11 @@ namespace xt
      * @note e1 and e2 can't be both scalars.
      */
     template <class E1, class E2>
-    inline auto atan2(const E1& e1, const E2& e2) noexcept
+    inline auto atan2(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_free_type<E1, E2>
     {
         using functor_type = detail::mf_type<E1, E2>;
-        return detail::make_xfunction((functor_type)std::atan2, e1, e2);
+        return detail::make_xfunction((functor_type)std::atan2, std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /************************
@@ -570,10 +587,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto sinh(const xexpression<E>& e) noexcept
+    inline auto sinh(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::sinh, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::sinh, std::forward<E>(e));
     }
 
     /**
@@ -586,10 +604,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto cosh(const xexpression<E>& e) noexcept
+    inline auto cosh(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::cosh, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::cosh, std::forward<E>(e));
     }
 
     /**
@@ -602,10 +621,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto tanh(const xexpression<E>& e) noexcept
+    inline auto tanh(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::tanh, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::tanh, std::forward<E>(e));
     }
 
     /**
@@ -618,10 +638,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto asinh(const xexpression<E>& e) noexcept
+    inline auto asinh(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::asinh, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::asinh, std::forward<E>(e));
     }
 
     /**
@@ -634,10 +655,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto acosh(const xexpression<E>& e) noexcept
+    inline auto acosh(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::acosh, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::acosh, std::forward<E>(e));
     }
 
     /**
@@ -650,10 +672,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto atanh(const xexpression<E>& e) noexcept
+    inline auto atanh(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::atanh, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::atanh, std::forward<E>(e));
     }
 
     /*****************************
@@ -674,10 +697,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto erf(const xexpression<E>& e) noexcept
+    inline auto erf(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::erf, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::erf, std::forward<E>(e));
     }
 
     /**
@@ -690,10 +714,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto erfc(const xexpression<E>& e) noexcept
+    inline auto erfc(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::erfc, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::erfc, std::forward<E>(e));
     }
 
     /**
@@ -706,10 +731,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto tgamma(const xexpression<E>& e) noexcept
+    inline auto tgamma(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::tgamma, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::tgamma, std::forward<E>(e));
     }
 
     /**
@@ -722,10 +748,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto lgamma(const xexpression<E>& e) noexcept
+    inline auto lgamma(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)std::lgamma, e.derived_cast());
+        return detail::make_xfunction((functor_type)std::lgamma, std::forward<E>(e));
     }
 
 }

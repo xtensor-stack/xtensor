@@ -86,8 +86,6 @@ namespace xt
         using storage_iterator = iterator;
         using const_storage_iterator = const_iterator;
 
-        using closure_type = const self_type&;
-
         template <class... SL>
         xview(E& e, SL&&... slices) noexcept;
 

@@ -86,43 +86,51 @@ namespace xt
     }
     //@}
 
-    template <class E>
-    using is_xexpression = std::is_base_of<xexpression<E>, E>;
+    namespace detail
+    {
+        template <class E>
+        struct is_xexpression_impl : std::is_base_of<xexpression<E>, E>
+        {
+        };
 
-    template <class E, class R>
+        template <class E>
+        struct is_xexpression_impl<xexpression<E>> : std::true_type
+        {
+        };
+    }
+
+    template <class E>
+    using is_xexpression = detail::is_xexpression_impl<E>;
+
+    template <class E, class R = void>
     using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
 
     template <class... E>
     using has_xexpression = or_<is_xexpression<E>...>;
 
-    /************************
-     * get_xexpression_type *
-     ************************/
+    /************
+     * xclosure *
+     ************/
 
     template <class T>
     class xscalar;
 
-    // Workaround for buggy error C2210 in VS2015 when using condtional_t
-    template <class E>
-    using get_xexpression_type = typename std::conditional<is_xexpression<typename std::remove_reference<E>::type>::value,
-                                                           typename std::remove_reference<E>::type, xscalar<E>>::type;
-
-    /*******************
-     * get_xexpression *
-     *******************/
-
-    template <class E>
-    inline const E& get_xexpression(const xexpression<E>& e) noexcept
+    template <class E, class EN = void>
+    struct xclosure
     {
-        return e.derived_cast();
-    }
+        using xexpression_type = typename std::decay<E>::type;
+        using xclosure_type = typename std::conditional<std::is_lvalue_reference<E>::value,
+                                                        const xexpression_type&,
+                                                        xexpression_type>::type;
+    };
 
     template <class E>
-    inline disable_xexpression<E, xscalar<E>> get_xexpression(const E& e) noexcept
+    struct xclosure<E, disable_xexpression<typename std::decay<E>::type>>
     {
-        return xscalar<E>(e);
-    }
-
+        using xexpression_type = xscalar<typename std::decay<E>::type>;
+        using xclosure_type = xexpression_type;
+    };
+    
     /******************
      * get_value_type *
      ******************/
@@ -136,7 +144,7 @@ namespace xt
         };
 
         template <class E>
-        struct get_value_type_impl<E, std::enable_if_t<is_xexpression<E>::value, void>>
+        struct get_value_type_impl<E, std::enable_if_t<is_xexpression<E>::value>>
         {
             using type = typename E::value_type;
         };

@@ -46,7 +46,7 @@ namespace xt
     template <class S>
     using is_xslice = std::is_base_of<xslice<S>, S>;
 
-    template <class E, class R>
+    template <class E, class R = void>
     using disable_xslice = typename std::enable_if<!is_xslice<E>::value, R>::type;
 
     template <class... E>

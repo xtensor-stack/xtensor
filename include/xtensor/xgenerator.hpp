@@ -59,7 +59,6 @@ namespace xt
 
         using shape_type = S;
         using strides_type = S;
-        using closure_type = const self_type;
 
         using const_stepper = xgenerator_stepper<F, R, S>;
         using const_iterator = xiterator<const_stepper, shape_type>;
