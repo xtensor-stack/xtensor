@@ -131,6 +131,31 @@ namespace xt
         EXPECT_EQ(res, clipped);
     }
 
+    TEST(xmath, sign)
+    {
+        shape_type shape = {3, 2};
+        xarray<float> a(shape, 1);
+        a(0, 1) = -1;
+        a(1, 1) = 0;
+        a(2, 1) = -0;
+
+        auto signs = sign(a);
+        EXPECT_EQ(+1, signs(0, 0));
+        EXPECT_EQ(-1, signs(0, 1));
+        EXPECT_EQ(0, signs(1, 1));
+        EXPECT_EQ(0, signs(2, 1));
+
+        xarray<unsigned int> b(shape, 1);
+        b(1, 1) = -1;
+        b(2, 1) = 0;
+
+        auto signs_b = sign(b);
+        EXPECT_EQ(+1, signs_b(0, 0));
+        // sign from overflow
+        EXPECT_EQ(+1, signs_b(1, 1));
+        EXPECT_EQ(0, signs_b(2, 1));
+    }
+
     /***************************
      * Exponential functions
      ***************************/
@@ -364,6 +389,4 @@ namespace xt
         xarray<double> a(shape, 0.7);
         EXPECT_EQ(lgamma(a)(0, 0), std::lgamma(a(0, 0)));
     }
-
 }
-

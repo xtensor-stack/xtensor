@@ -231,6 +231,40 @@ namespace xt
         return detail::make_xfunction((functor_type)detail::clamp, std::forward<E1>(e1), std::forward<E2>(hi), std::forward<E3>(lo));
     }
 
+    namespace detail
+    {
+        template <typename T>
+        inline constexpr std::enable_if_t<std::is_signed<T>::value, T>
+        signum(T x)
+        {
+            return T((x > T(0)) - (x < T(0)));
+        }
+
+        template <typename T>
+        inline constexpr std::enable_if_t<std::is_unsigned<T>::value, T>
+        signum(T x)
+        {
+            return T(x > T(0));
+        }
+    }
+
+    /**
+     * @ingroup basic_function
+     * @brief Returns an element-wise indication of the sign of a number
+     *
+     * If the number is positive, returns +1. If negative, -1. If the number
+     * is zero, returns 0.
+     *
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto sign(const xexpression<E>& e) noexcept
+    {
+        using functor_type = detail::mf_type<E>;
+        return detail::make_xfunction((functor_type)detail::signum, e.derived_cast());
+    }
+
     /*************************
      * exponential functions *
      *************************/
