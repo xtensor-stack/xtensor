@@ -11,20 +11,24 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+#include <fstream>
+#include <limits>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xbuilder.hpp"
 
+#include "files/xio_expected_results.hpp"
 
 namespace xt
 {
-
     TEST(xio, one_d)
     {
         xarray<double> e{1, 2, 3, 4, 5};
         std::stringstream out;
         out << e;
-        EXPECT_EQ("{1, 2, 3, 4, 5}", out.str());
+        EXPECT_EQ("{ 1.,  2.,  3.,  4.,  5.}", out.str());
     }
 
     TEST(xio, two_d)
@@ -34,9 +38,7 @@ namespace xt
                          {9, 10, 11, 12}};
         std::stringstream out;
         out << e;
-        EXPECT_EQ(R"xio({{1, 2, 3, 4},
- {5, 6, 7, 8},
- {9, 10, 11, 12}})xio", out.str());
+        EXPECT_EQ(twod_double, out.str());
     }
 
     TEST(xio, view)
@@ -50,11 +52,117 @@ namespace xt
 
         std::stringstream out_1;
         out_1 << v_1;
-        EXPECT_EQ("{5, 6, 7, 8}", out_1.str());
+        EXPECT_EQ("{ 5.,  6.,  7.,  8.}", out_1.str());
 
         std::stringstream out_2;
         out_2 << v_2;
-        EXPECT_EQ("{2, 6, 10}", out_2.str());
+        EXPECT_EQ("{  2.,   6.,  10.}", out_2.str());
+    }
+
+    TEST(xio, random_nan_inf)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> rn = xt::random::rand<double>({20, 20}, -10, 10);
+        rn(1, 1) = -1;
+        rn(1, 2) = +1;
+        rn(1, 1) = -1;
+        rn(2, 2) = std::numeric_limits<double>::infinity();  //  inf
+        rn(2, 3) = -std::numeric_limits<double>::infinity(); // -inf
+        rn(4, 4) = std::nan("xnan");
+        std::stringstream out;
+
+        out << rn;
+        EXPECT_EQ(random_nan_inf, out.str());
+    }
+
+    TEST(xio, big_exp)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> rn = xt::random::rand<double>({5, 4}, -10, 10);
+        rn(1, 1) = 1e220;
+        rn(1, 2) = 1e-124;
+
+        std::stringstream out;
+        out << rn;
+
+        EXPECT_EQ(big_exp, out.str());
+    }
+
+    TEST(xio, precision)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> rn = xt::random::rand<double>({5, 4}, -10, 10);
+
+        std::stringstream out;
+        out << std::setprecision(12) << rn;
+        EXPECT_EQ(precision, out.str());
+    }
+
+    TEST(xio, bool_fn)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> rn = xt::random::rand<double>({5, 5}, -10, 10);
+
+        std::stringstream out;
+        out << (rn > 0);
+        EXPECT_EQ(bool_fn, out.str());
+    }
+
+    TEST(xio, cutoff)
+    {
+        xt::xarray<int> rn = xt::ones<int>({1, 1001});
+
+        std::stringstream out;
+        out << rn;
+        EXPECT_EQ("{{1, 1, 1, ..., 1, 1, 1}}", out.str());
+
+        std::stringstream out2;
+        xt::xarray<int> rn2 = xt::ones<int>({1001, 1});
+        out2 << rn2;
+        EXPECT_EQ(cut_high, out2.str());
+    }
+
+    TEST(xio, cut_longwise)
+    {
+        xt::xarray<int> a = xt::ones<int>({5, 1000});
+
+        std::stringstream out;
+        out << a;
+        EXPECT_EQ(cut_long, out.str());
+
+        xt::xarray<int> b = xt::ones<int>({7, 1000});
+
+        std::stringstream outb;
+        outb << b;
+        EXPECT_EQ(cut_both, outb.str());
+
+        xt::xarray<int> c = xt::ones<int>({7, 7, 7, 1000});
+
+        std::stringstream outc;
+        outc << c;
+        EXPECT_EQ(cut_4d, outc.str());
+    }
+
+    TEST(xio, options)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> rn = xt::random::rand<double>({100, 100}, -10, 10);
+
+        xt::print_options::set_line_width(150);
+        xt::print_options::set_edge_items(10);
+        xt::print_options::set_precision(10);
+        xt::print_options::set_threshold(100);
+
+        std::stringstream out;
+        out << rn;
+        EXPECT_EQ(print_options_result, out.str());
+
+        // reset back to default
+        xt::print_options::set_line_width(75);
+        xt::print_options::set_edge_items(3);
+        xt::print_options::set_precision(0);
+        xt::print_options::set_threshold(1000);
+
     }
 
     TEST(xio, three_d)
@@ -73,18 +181,49 @@ namespace xt
                           {4, 3}}};
         std::stringstream out;
         out << e;
-        EXPECT_EQ(R"xio({{{1, 2},
-  {3, 4},
-  {5, 6},
-  {7, 8}},
- {{9, 10},
-  {11, 12},
-  {7, 9},
-  {11, 14}},
- {{5, 26},
-  {7, 8},
-  {10, 8},
-  {4, 3}}})xio", out.str());
+        EXPECT_EQ(threed_double, out.str());
+    }
+
+    TEST(xio, strings)
+    {
+        xt::xarray<std::string> e = {{"some", "random", "boring"}, {"strings", "in", "xtensor xarray"}};
+        std::stringstream out;
+        out << e;
+        EXPECT_EQ(random_strings, out.str());
+    }
+
+    TEST(xio, long_strings)
+    {
+        xt::xarray<std::string> e = {{"some", "random very long and very very", "boring"}, {"strings", "in", "xtensor xarray"}};
+        std::stringstream out;
+        out << e;
+        EXPECT_EQ(long_strings, out.str());
+    }
+
+    TEST(xio, complex)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> real = xt::random::rand<double>({10, 10},-10, 10);
+        xt::xarray<double> imag = xt::random::rand<double>({10, 10}, -5, 5);
+        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1)); 
+
+        std::stringstream out;
+        out << e;
+        EXPECT_EQ(complex_numbers, out.str());
+    }
+
+    TEST(xio, custom_formatter)
+    {
+        xt::xarray<int> e = {{1,2,3,4}, {100, 200, 1000, 10000000}};
+
+        std::stringstream out;
+        pretty_print(e, [](const int& val) {
+            std::stringstream buf;
+            buf << "0x" << std::hex << val;
+            return buf.str();
+        }, out);
+
+        EXPECT_EQ(custom_formatter_result, out.str());
     }
 }
 

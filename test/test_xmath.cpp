@@ -6,6 +6,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include <complex>
 #include <limits>
 
 #include "gtest/gtest.h"
@@ -415,5 +416,23 @@ namespace xt
         shape_type shape = {3, 2};
         xarray<double> a(shape, 0.7);
         EXPECT_EQ(lgamma(a)(0, 0), std::lgamma(a(0, 0)));
+    }
+
+    /*******************************
+     * Complex number functions
+     *******************************/
+
+    TEST(xmath, real)
+    {
+        shape_type shape = {3, 2};
+        xarray<std::complex<double>> a(shape, std::complex<double>(2, 4));
+        EXPECT_EQ(real(a)(0, 0), std::real(a(0, 0)));
+    }
+
+    TEST(xmath, imag)
+    {
+        shape_type shape = {3, 2};
+        xarray<std::complex<double>> a(shape, std::complex<double>(2, 4));
+        EXPECT_EQ(imag(a)(0, 0), std::imag(a(0, 0)));
     }
 }
