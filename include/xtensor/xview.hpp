@@ -372,7 +372,7 @@ namespace xt
     //@{
     /**
      * Returns a reference to the element at the specified position in the view.
-     * @param args a list of indices specifying the position in the voew. Indices
+     * @param args a list of indices specifying the position in the view. Indices
      * must be unsigned integers, the number of indices should be equal or greater
      * than the number of dimensions of the view.
      */
