@@ -181,7 +181,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline auto equal_to(E1&& e1, E2&& e2) noexcept
+    inline auto equal(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_type<std::equal_to, E1, E2>
     {
         return detail::make_xfunction<std::equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));

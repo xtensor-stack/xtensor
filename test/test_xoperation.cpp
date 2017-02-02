@@ -134,11 +134,11 @@ namespace xt
     {
         xarray<double> a = {1, 2, 3, 4, 5};
         xarray<bool> expected = {0, 0, 0, 1, 0};
-        xarray<bool> b = equal_to(a, 4);
+        xarray<bool> b = equal(a, 4);
         EXPECT_EQ(expected, b);
 
         xarray<double> other = {1, 2, 3, 0, 0};
-        xarray<bool> b_2 = equal_to(a, other);
+        xarray<bool> b_2 = equal(a, other);
         xarray<bool> expected_2 = {1, 1, 1, 0, 0};
         EXPECT_EQ(expected_2, b_2);
     }
