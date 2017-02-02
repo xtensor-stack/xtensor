@@ -159,6 +159,28 @@ namespace xt
     }
 
     template <class E1, class E2>
+    inline bool operator==(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        const E1& de1 = e1.derived_cast();
+        const E2& de2 = e2.derived_cast();
+        bool res = de1.shape() == de2.shape();
+        auto iter1 = de1.begin();
+        auto iter2 = de2.begin();
+        auto iter_end = de1.end();
+        while (res && iter1 != iter_end)
+        {
+            res = (*iter1++ == *iter2++);
+        }
+        return res;
+    }
+
+    template <class E1, class E2>
+    inline bool operator!= (const xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        return !(e1 == e2);
+    }
+
+    template <class E1, class E2>
     inline auto equal_to(E1&& e1, E2&& e2) noexcept
         -> detail::get_xfunction_type<std::equal_to, E1, E2>
     {
@@ -173,16 +195,14 @@ namespace xt
     }
 
     template <class E>
-    inline auto any(E&& e)
-        -> bool
+    inline bool any(E&& e)
     {
         return std::any_of(e.storage_begin(), e.storage_end(), 
                            [](const typename std::decay<E>::type::value_type& el) { return el; });
     }
 
     template <class E>
-    inline auto all(E&& e)
-        -> bool
+    inline bool all(E&& e)
     {
         return std::all_of(e.storage_begin(), e.storage_end(),
                            [](const typename std::decay<E>::type::value_type& el) { return el; });
