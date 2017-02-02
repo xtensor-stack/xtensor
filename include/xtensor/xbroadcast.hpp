@@ -69,7 +69,7 @@ namespace xt
     public:
 
         using self_type = xbroadcast<CT, X>;
-        using xexpression_type = typename CT::xexpression_type;
+        using xexpression_type = typename std::decay<typename CT::type>::type;
 
         using value_type = typename xexpression_type::value_type;
         using reference = typename xexpression_type::reference;
@@ -86,7 +86,7 @@ namespace xt
         using const_storage_iterator = const_iterator;
 
         template <class S>
-        xbroadcast(typename CT::xclosure_type e, S s) noexcept;
+        xbroadcast(typename CT::type e, S s) noexcept;
 
         size_type dimension() const noexcept;
         const shape_type & shape() const noexcept;
@@ -131,7 +131,7 @@ namespace xt
 
     private:
 
-        typename CT::xclosure_type m_e;
+        typename CT::type m_e;
         shape_type m_shape;
     };
 
@@ -233,7 +233,7 @@ namespace xt
      */
     template <class CT, class X>
     template <class S>
-    inline xbroadcast<CT, X>::xbroadcast(typename CT::xclosure_type e, S s) noexcept
+    inline xbroadcast<CT, X>::xbroadcast(typename CT::type e, S s) noexcept
         : m_e(e), m_shape(std::move(s))
     {
         xt::broadcast_shape(e.shape(), m_shape);

@@ -118,17 +118,15 @@ namespace xt
     template <class E, class EN = void>
     struct xclosure
     {
-        using xexpression_type = typename std::decay<E>::type;
-        using xclosure_type = typename std::conditional<std::is_lvalue_reference<E>::value,
-                                                        const xexpression_type&,
-                                                        xexpression_type>::type;
+        using type = typename std::conditional<std::is_lvalue_reference<E>::value,
+                                               const typename std::decay<E>::type&,
+                                               typename std::decay<E>::type>::type;
     };
 
     template <class E>
     struct xclosure<E, disable_xexpression<typename std::decay<E>::type>>
     {
-        using xexpression_type = xscalar<typename std::decay<E>::type>;
-        using xclosure_type = xexpression_type;
+        using type = xscalar<typename std::decay<E>::type>;
     };
     
     /******************
