@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include <type_traits>
+#include <complex>
 
 #include "xfunction.hpp"
 
@@ -755,6 +756,59 @@ namespace xt
         return detail::make_xfunction((functor_type)std::lgamma, std::forward<E>(e));
     }
 
+    /********************************
+     * functions on complex numbers *
+     ********************************/
+
+    /**
+     * @defgroup complex_functions Functions on complex numbers
+     */
+
+    namespace detail
+    {
+        template <class E>
+        using cf_type = typename std::decay<E>::type::value_type::value_type (*) (const typename std::decay<E>::type::value_type&);
+
+        template <class E>
+        using get_xfunction_complex_free_type = std::enable_if_t<has_xexpression<typename std::decay<E>::type>::value,
+                                                                 xfunction<cf_type<E>,
+                                                                 typename std::decay<E>::type::value_type::value_type,
+                                                                 xclosure<E>>>;
+    }
+
+    /**
+     * @ingroup complex_functions
+     * @brief return real part of complex numbers
+     *
+     * Returns an \ref xfunction that returns the element-wise real 
+     * part of \em e. Note that this is \em not a view into \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto real(E&& e) noexcept
+        -> detail::get_xfunction_complex_free_type<E>
+    {
+        using functor_type = detail::cf_type<E>;
+        return detail::make_xfunction((functor_type)std::real, std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup complex_functions
+     * @brief return imaginary part of imaginary numbers
+     *
+     * Returns an \ref xfunction that returns the element-wise imaginary
+     * part of \em e. Note that this is \em not a view into the \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto imag(E&& e) noexcept
+        -> detail::get_xfunction_complex_free_type<E>
+    {
+        using functor_type = detail::cf_type<E>;
+        return detail::make_xfunction((functor_type)std::imag, std::forward<E>(e));
+    }
 }
 
 #endif
