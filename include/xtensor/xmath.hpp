@@ -767,7 +767,13 @@ namespace xt
     namespace detail
     {
         template <class E>
-        using cf_type = typename E::value_type (*) (const E&);
+        using cf_type = typename std::decay<E>::type::value_type::value_type (*) (const typename std::decay<E>::type::value_type&);
+
+        template <class E>
+        using get_xfunction_complex_free_type = std::enable_if_t<has_xexpression<typename std::decay<E>::type>::value,
+                                                                 xfunction<cf_type<E>,
+                                                                 typename std::decay<E>::type::value_type::value_type,
+                                                                 xclosure<E>>>;
     }
 
     /**
@@ -780,10 +786,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto real(const xexpression<E>& e) noexcept
+    inline auto real(E&& e) noexcept
+        -> detail::get_xfunction_complex_free_type<E>
     {
-        using functor_type = detail::cf_type<typename E::value_type>;
-        return detail::make_xfunction((functor_type)std::real, e.derived_cast());
+        using functor_type = detail::cf_type<E>;
+        return detail::make_xfunction((functor_type)std::real, std::forward<E>(e));
     }
 
     /**
@@ -796,10 +803,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto imag(const xexpression<E>& e) noexcept
+    inline auto imag(E&& e) noexcept
+        -> detail::get_xfunction_complex_free_type<E>
     {
-        using functor_type = detail::cf_type<typename E::value_type>;
-        return detail::make_xfunction((functor_type)std::imag, e.derived_cast());
+        using functor_type = detail::cf_type<E>;
+        return detail::make_xfunction((functor_type)std::imag, std::forward<E>(e));
     }
 }
 
