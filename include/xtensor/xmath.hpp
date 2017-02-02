@@ -237,19 +237,14 @@ namespace xt
         inline constexpr std::enable_if_t<std::is_signed<T>::value, T>
         sign_impl(T x)
         {
-            if (std::isnan(x))
-            {
-                return std::numeric_limits<T>::quiet_NaN();
-            }
-            return x == 0 ? copysign(T(0), x) : copysign(T(1), x);
+            return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? copysign(T(0), x) : copysign(T(1), x);
         }
 
         template <typename T>
-        inline constexpr std::enable_if_t<detail::is_complex<T>::value, T>
+        inline std::enable_if_t<detail::is_complex<T>::value, T>
         sign_impl(T x)
         {
-            using value_type = typename T::value_type;
-            value_type e = x.real() ? x.real() : x.imag();
+            typename T::value_type e = x.real() ? x.real() : x.imag();
             return T(sign_impl(e), 0);
         }
 
