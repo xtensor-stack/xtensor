@@ -130,7 +130,7 @@ namespace xt
         EXPECT_EQ(expected, b);
     }
 
-    TEST(operation, equal_to)
+    TEST(operation, equal)
     {
         xarray<double> a = {1, 2, 3, 4, 5};
         xarray<bool> expected = {0, 0, 0, 1, 0};
@@ -140,6 +140,19 @@ namespace xt
         xarray<double> other = {1, 2, 3, 0, 0};
         xarray<bool> b_2 = equal(a, other);
         xarray<bool> expected_2 = {1, 1, 1, 0, 0};
+        EXPECT_EQ(expected_2, b_2);
+    }
+
+    TEST(operation, not_equal)
+    {
+        xarray<double> a = { 1, 2, 3, 4, 5 };
+        xarray<bool> expected = { 1, 1, 1, 0, 1 };
+        xarray<bool> b = not_equal(a, 4);
+        EXPECT_EQ(expected, b);
+
+        xarray<double> other = { 1, 2, 3, 0, 0 };
+        xarray<bool> b_2 = not_equal(a, other);
+        xarray<bool> expected_2 = { 0, 0, 0, 1, 1 };
         EXPECT_EQ(expected_2, b_2);
     }
 

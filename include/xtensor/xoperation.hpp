@@ -175,7 +175,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline bool operator!= (const xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline bool operator!=(const xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         return !(e1 == e2);
     }
@@ -185,6 +185,13 @@ namespace xt
         -> detail::get_xfunction_type<std::equal_to, E1, E2>
     {
         return detail::make_xfunction<std::equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    template <class E1, class E2>
+    inline auto not_equal(E1&& e1, E2&& e2) noexcept
+        -> detail::get_xfunction_type<std::not_equal_to, E1, E2>
+    {
+        return detail::make_xfunction<std::not_equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     template <class E1, class E2, class E3>
