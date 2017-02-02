@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <initializer_list>
 #include <algorithm>
+#include <complex>
 #include "xtensor_config.hpp"
 
 namespace xt
@@ -478,6 +479,19 @@ namespace xt
 
     template <class... S>
     using promote_strides_t = typename detail::promote_index<S...>::type;
+
+    /********************************
+     * is_complex implementation    *
+     ********************************/
+
+    namespace detail
+    {
+        template<typename T>
+        struct is_complex : public std::false_type {};
+
+        template<typename T>
+        struct is_complex<std::complex<T>> : public std::true_type {};
+    }
 }
 
 #endif

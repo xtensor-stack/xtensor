@@ -235,14 +235,27 @@ namespace xt
     {
         template <typename T>
         inline constexpr std::enable_if_t<std::is_signed<T>::value, T>
-        signum(T x)
+        sign_impl(T x)
         {
-            return T((x > T(0)) - (x < T(0)));
+            if (std::isnan(x))
+            {
+                return std::numeric_limits<T>::quiet_NaN();
+            }
+            return x == 0 ? copysign(0, x) : copysign(1, x);
+        }
+
+        template <typename T>
+        inline constexpr std::enable_if_t<detail::is_complex<T>::value, T>
+        sign_impl(T x)
+        {
+            using value_type = typename T::value_type;
+            value_type e = x.real() ? x.real() : x.imag();
+            return T(sign_impl(e), 0);
         }
 
         template <typename T>
         inline constexpr std::enable_if_t<std::is_unsigned<T>::value, T>
-        signum(T x)
+        sign_impl(T x)
         {
             return T(x > T(0));
         }
@@ -259,10 +272,11 @@ namespace xt
      * @return an \ref xfunction
      */
     template <class E>
-    inline auto sign(const xexpression<E>& e) noexcept
+    inline auto sign(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)detail::signum, e.derived_cast());
+        return detail::make_xfunction((functor_type)detail::sign_impl, e.derived_cast());
     }
 
     /*************************
