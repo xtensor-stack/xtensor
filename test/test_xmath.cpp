@@ -6,6 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include <limits>
+
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xmath.hpp"
@@ -129,6 +131,56 @@ namespace xt
 
         xarray<double> clipped = clip(a, 2.0, 4.0);
         EXPECT_EQ(res, clipped);
+    }
+
+    TEST(xmath, sign)
+    {
+        shape_type shape = {3, 2};
+        xarray<float> a(shape, 1);
+        a(0, 1) = -1;
+        a(1, 1) = 0;
+        a(2, 1) = -0;
+
+        auto signs = sign(a);
+        EXPECT_EQ(1, signs(0, 0));
+        EXPECT_EQ(-1, signs(0, 1));
+        EXPECT_EQ(0, signs(1, 1));
+        EXPECT_EQ(0, signs(2, 1));
+
+        xarray<unsigned int> b(shape, 1);
+        b(1, 1) = -1;
+        b(2, 1) = 0;
+
+        auto signs_b = sign(b);
+        EXPECT_EQ(1, signs_b(0, 0));
+        // sign from overflow
+        EXPECT_EQ(1, signs_b(1, 1));
+        EXPECT_EQ(0, signs_b(2, 1));
+
+        xarray<double> c(shape, 1);
+        c(0, 0) = std::numeric_limits<double>::infinity();
+        c(0, 1) = -std::numeric_limits<double>::infinity();
+        c(1, 0) = std::numeric_limits<double>::quiet_NaN();
+        c(1, 1) = -std::numeric_limits<double>::quiet_NaN();
+
+        auto signs_c = sign(c);
+        EXPECT_EQ(1, signs_c(0, 0));
+        EXPECT_EQ(-1, signs_c(0, 1));
+        EXPECT_TRUE(std::isnan(signs_c(1, 0)));
+        EXPECT_TRUE(std::isnan(signs_c(1, 1)));
+
+        using ctype = std::complex<double>;
+        xarray<ctype> d(shape, ctype(3, 2));
+        d(0, 0) = ctype(1, 1);
+        d(0, 1) = ctype(-1, 1);
+        d(1, 0) = ctype(0, -1);
+        d(1, 1) = ctype(-0, 1);
+
+        auto signs_d = sign(d);
+        EXPECT_EQ(ctype(1, 0), signs_d(0, 0));
+        EXPECT_EQ(ctype(-1, 0), signs_d(0, 1));
+        EXPECT_EQ(ctype(-1, 0), signs_d(1, 0));
+        EXPECT_EQ(ctype(1, 0), signs_d(1, 1));
     }
 
     /***************************
@@ -364,6 +416,4 @@ namespace xt
         xarray<double> a(shape, 0.7);
         EXPECT_EQ(lgamma(a)(0, 0), std::lgamma(a(0, 0)));
     }
-
 }
-

@@ -231,6 +231,49 @@ namespace xt
         return detail::make_xfunction((functor_type)detail::clamp, std::forward<E1>(e1), std::forward<E2>(hi), std::forward<E3>(lo));
     }
 
+    namespace detail
+    {
+        template <typename T>
+        inline constexpr std::enable_if_t<std::is_signed<T>::value, T>
+        sign_impl(T x)
+        {
+            return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? copysign(T(0), x) : copysign(T(1), x);
+        }
+
+        template <typename T>
+        inline std::enable_if_t<detail::is_complex<T>::value, T>
+        sign_impl(T x)
+        {
+            typename T::value_type e = x.real() ? x.real() : x.imag();
+            return T(sign_impl(e), 0);
+        }
+
+        template <typename T>
+        inline constexpr std::enable_if_t<std::is_unsigned<T>::value, T>
+        sign_impl(T x)
+        {
+            return T(x > T(0));
+        }
+    }
+
+    /**
+     * @ingroup basic_function
+     * @brief Returns an element-wise indication of the sign of a number
+     *
+     * If the number is positive, returns +1. If negative, -1. If the number
+     * is zero, returns 0.
+     *
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto sign(E&& e) noexcept
+        -> detail::get_xfunction_free_type<E>
+    {
+        using functor_type = detail::mf_type<E>;
+        return detail::make_xfunction((functor_type)detail::sign_impl, std::forward<E>(e));
+    }
+
     /*************************
      * exponential functions *
      *************************/
