@@ -141,7 +141,7 @@ namespace xt
 
     namespace detail
     {
-        template <class R, class A>
+        template <class R, class A, class E = void>
         struct shape_forwarder
         {
             static inline R run(const A& r)
@@ -151,7 +151,8 @@ namespace xt
         };
 
         template <class I, std::size_t L, class A>
-        struct shape_forwarder<std::array<I, L>, A>
+        struct shape_forwarder<std::array<I, L>, A, 
+                               std::enable_if_t<!std::is_same<std::array<I, L>, A>::value>>
         {
             using R = std::array<I, L>;
 

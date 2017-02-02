@@ -49,5 +49,11 @@ namespace xt
         std::array<std::size_t, 4> index3 = {4, 0, 1, 1};
         ASSERT_EQ(5.0, m1_broadcast.element(index3.begin(), index3.end()));
     }
+
+    TEST(xbroadcast, shape_forwarding)
+    {
+        std::array<std::size_t, 2> bc_shape;
+        auto m1_broadcast = broadcast(123, bc_shape);
+    }
 }
 
