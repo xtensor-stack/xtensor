@@ -194,12 +194,6 @@ namespace xt
         strides_type m_backstrides;
     };
 
-    template <class D1, class D2>
-    bool operator==(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs);
-
-    template <class D1, class D2>
-    bool operator!=(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs);
-
     /******************************
      * xcontainer implementation *
      ******************************/
@@ -838,36 +832,6 @@ namespace xt
     }
     //@}
 
-    /**************
-     * comparison *
-     **************/
-
-    /**
-     * @memberof xcontainer
-     * Compares the content of two containers.
-     * @param lhs the first container
-     * @param rhs the second container
-     * @return true if the container are equals
-     */
-    template <class D1, class D2>
-    inline bool operator==(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs)
-    {
-        return lhs.shape() == rhs.shape() && lhs.strides() == rhs.strides()
-            && lhs.data() == rhs.data();
-    }
-
-    /**
-     * @memberof xcontainer
-     * Compares the content of two containers.
-     * @param lhs the first container
-     * @param rhs the second container
-     * @return true if the container are different
-     */
-    template <class D1, class D2>
-    inline bool operator!=(const xcontainer<D1>& lhs, const xcontainer<D2>& rhs)
-    {
-        return !(lhs == rhs);
-    }
 }
 
 #endif
