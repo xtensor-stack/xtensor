@@ -241,7 +241,7 @@ namespace xt
             {
                 return std::numeric_limits<T>::quiet_NaN();
             }
-            return x == 0 ? copysign(0, x) : copysign(1, x);
+            return x == 0 ? copysign(T(0), x) : copysign(T(1), x);
         }
 
         template <typename T>
@@ -276,7 +276,7 @@ namespace xt
         -> detail::get_xfunction_free_type<E>
     {
         using functor_type = detail::mf_type<E>;
-        return detail::make_xfunction((functor_type)detail::sign_impl, e.derived_cast());
+        return detail::make_xfunction((functor_type)detail::sign_impl, std::forward<E>(e));
     }
 
     /*************************
