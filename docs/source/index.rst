@@ -4,8 +4,7 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+.. image:: http://quantstack.net/assets/images/xtensor.svg
 
 Multi-dimensional arrays with broadcasting and lazy computing.
 
