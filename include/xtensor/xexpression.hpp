@@ -44,8 +44,10 @@ namespace xt
 
         using derived_type = D;
 
-        derived_type& derived_cast() noexcept;
-        const derived_type& derived_cast() const noexcept;
+        derived_type& derived_cast() & noexcept;
+        const derived_type& derived_cast() const & noexcept;
+
+        derived_type derived_cast() && noexcept;
 
     protected:
 
@@ -71,7 +73,7 @@ namespace xt
      * Returns a reference to the actual derived type of the xexpression.
      */
     template <class D>
-    inline auto xexpression<D>::derived_cast() noexcept -> derived_type&
+    inline auto xexpression<D>::derived_cast() & noexcept -> derived_type&
     {
         return *static_cast<derived_type*>(this);
     }
@@ -80,9 +82,18 @@ namespace xt
      * Returns a constant reference to the actual derived type of the xexpression.
      */
     template <class D>
-    inline auto xexpression<D>::derived_cast() const noexcept -> const derived_type&
+    inline auto xexpression<D>::derived_cast() const & noexcept -> const derived_type&
     {
         return *static_cast<const derived_type*>(this);
+    }
+
+    /**
+     * Returns a constant reference to the actual derived type of the xexpression.
+     */
+    template <class D>
+    inline auto xexpression<D>::derived_cast() && noexcept->derived_type
+    {
+        return *static_cast<derived_type*>(this);
     }
     //@}
 
