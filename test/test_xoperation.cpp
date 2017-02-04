@@ -195,5 +195,36 @@ namespace xt
         xarray<int> b = {{0, 2, 1}, {2, 1, 0}};
         EXPECT_EQ(false, all(b));
     }
+
+    TEST(operation, nonzero)
+    {
+        xarray<int> a = {1, 0, 3};
+        std::vector<xindex> expected = {{0}, {2}};
+        EXPECT_EQ(expected, nonzero(a));
+
+        xarray<int> b = {{0, 2, 1}, {2, 1, 0}};
+        std::vector<xindex> expected_b = {{0, 1}, {0, 2}, {1, 0}, {1, 1}};
+        EXPECT_EQ(expected_b, nonzero(b));
+
+        auto c = equal(b, 0);
+        std::vector<xindex> expected_c = {{0, 0}, {1, 2}};
+        EXPECT_EQ(expected_c, nonzero(c));
+
+        shape_type s = {3, 3, 3};
+        xarray<bool> d(s);
+        std::fill(d.begin(), d.end(), true);
+
+        auto d_nz = nonzero(d);
+        EXPECT_EQ(3 * 3 * 3, d_nz.size());
+        xindex last_idx = {2, 2, 2};
+        EXPECT_EQ(last_idx, d_nz.back());
+    }
+
+    TEST(operation, where_only_condition)
+    {
+        xarray<int> a = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        std::vector<xindex> expected = {{0, 0}, {1, 1}, {2, 2}};
+        EXPECT_EQ(expected, where(a));
+    }
 }
 

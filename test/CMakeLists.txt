@@ -72,6 +72,7 @@ set(XTENSOR_TESTS
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
     test_xfunction.cpp
+    test_xindexview.cpp
     test_xiterator.cpp
     test_xio.cpp
     test_xmath.cpp
