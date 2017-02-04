@@ -24,38 +24,38 @@ namespace xt
         std::vector<double> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
-        auto view1 = make_xview(a, 1, range(1, 4));
+        auto view1 = view(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(1, view1.dimension());
 
-        auto view0 = make_xview(a, 0, range(0, 3));
+        auto view0 = view(a, 0, range(0, 3));
         EXPECT_EQ(a(0, 0), view0(0));
         EXPECT_EQ(a(0, 1), view0(1));
         EXPECT_EQ(1, view0.dimension());
         EXPECT_EQ(3, view0.shape()[0]);
 
-        auto view2 = make_xview(a, range(0, 2), 2);
+        auto view2 = view(a, range(0, 2), 2);
         EXPECT_EQ(a(0, 2), view2(0));
         EXPECT_EQ(a(1, 2), view2(1));
         EXPECT_EQ(1, view2.dimension());
         EXPECT_EQ(2, view2.shape()[0]);
 
-        auto view4 = make_xview(a, 1);
+        auto view4 = view(a, 1);
         EXPECT_EQ(1, view4.dimension());
         EXPECT_EQ(4, view4.shape()[0]);
 
-        auto view5 = make_xview(view4, 1);
+        auto view5 = view(view4, 1);
         EXPECT_EQ(0, view5.dimension());
         EXPECT_EQ(0, view5.shape().size());
 
-        auto view6 = make_xview(a, 1, all());
+        auto view6 = view(a, 1, all());
         EXPECT_EQ(a(1, 0), view6(0));
         EXPECT_EQ(a(1, 1), view6(1));
         EXPECT_EQ(a(1, 2), view6(2));
         EXPECT_EQ(a(1, 3), view6(3));
 
-        auto view7 = make_xview(a, all(), 2);
+        auto view7 = view(a, all(), 2);
         EXPECT_EQ(a(0, 2), view7(0));
         EXPECT_EQ(a(1, 2), view7(1));
         EXPECT_EQ(a(2, 2), view7(2));
@@ -83,7 +83,7 @@ namespace xt
         xarray<double> a(shape);
         std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
-        auto view1 = make_xview(a, 1);
+        auto view1 = view(a, 1);
         EXPECT_EQ(2, view1.dimension());
         EXPECT_EQ(a(1, 0, 0), view1(0, 0));
         EXPECT_EQ(a(1, 0, 1), view1(0, 1));
@@ -124,7 +124,7 @@ namespace xt
                                   13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
-        auto view1 = make_xview(a, range(0, 2), 1, range(1, 4));
+        auto view1 = view(a, range(0, 2), 1, range(1, 4));
         auto iter = view1.begin();
         auto iter_end = view1.end();
 
@@ -142,7 +142,7 @@ namespace xt
         ++iter;
         EXPECT_EQ(iter, iter_end);
 
-        auto view2 = make_xview(view1, range(0, 2), range(1, 3));
+        auto view2 = view(view1, range(0, 2), range(1, 3));
         auto iter2 = view2.begin();
         auto iter_end2 = view2.end();
 
@@ -169,7 +169,7 @@ namespace xt
         std::vector<int> data2 = { 1, 2, 3 };
         std::copy(data2.cbegin(), data2.cend(), b.storage_begin());
 
-        auto func = make_xview(a, 1, range(1, 4)) + b;
+        auto func = view(a, 1, range(1, 4)) + b;
         auto iter = func.begin();
         auto iter_end = func.end();
 
@@ -188,7 +188,7 @@ namespace xt
         std::vector<int> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
         std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
-        auto view1 = make_xview(a, 1, range(1, 4));
+        auto view1 = view(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(1, view1.dimension());
@@ -213,7 +213,7 @@ namespace xt
     {
         xtensor<double, 1> arr1{ {2} };
         std::fill(arr1.begin(), arr1.end(), 6);
-        auto view = xt::make_xview(arr1, 0);
+        auto view = xt::view(arr1, 0);
         auto iter = view.begin();
         auto iter_end = view.end();
         ++iter;
@@ -225,7 +225,7 @@ namespace xt
         const xtensor<double, 3> arr{ {1, 2, 3}, 2.5 };
         xtensor<double, 2> arr2{ {2, 3}, 0.0 };
         xtensor<double, 2> ref{ {2, 3}, 2.5 };
-        arr2 = xt::make_xview(arr, 0);
+        arr2 = xt::view(arr, 0);
         EXPECT_EQ(ref, arr2);
     }
 
@@ -248,7 +248,7 @@ namespace xt
         std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
         std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
-        auto view1 = make_xview(a, all(), newaxis(), all());
+        auto view1 = view(a, all(), newaxis(), all());
         EXPECT_EQ(a(1, 1), view1(1, 0, 1));
         EXPECT_EQ(a(1, 2), view1(1, 0, 2));
         EXPECT_EQ(3, view1.dimension());
@@ -256,7 +256,7 @@ namespace xt
         EXPECT_EQ(1, view1.shape()[1]);
         EXPECT_EQ(4, view1.shape()[2]);
 
-        auto view2 = make_xview(a, all(), all(), newaxis());
+        auto view2 = view(a, all(), all(), newaxis());
         EXPECT_EQ(a(1, 1), view2(1, 1, 0));
         EXPECT_EQ(a(1, 2), view2(1, 2, 0));
         EXPECT_EQ(3, view2.dimension());
@@ -264,22 +264,22 @@ namespace xt
         EXPECT_EQ(4, view2.shape()[1]);
         EXPECT_EQ(1, view2.shape()[2]);
 
-        auto view3 = make_xview(a, 1, newaxis(), all());
+        auto view3 = view(a, 1, newaxis(), all());
         EXPECT_EQ(a(1, 1), view3(0, 1));
         EXPECT_EQ(a(1, 2), view3(0, 2));
         EXPECT_EQ(2, view3.dimension());
 
-        auto view4 = make_xview(a, 1, all(), newaxis());
+        auto view4 = view(a, 1, all(), newaxis());
         EXPECT_EQ(a(1, 1), view4(1, 0));
         EXPECT_EQ(a(1, 2), view4(2, 0));
         EXPECT_EQ(2, view4.dimension());
 
-        auto view5 = make_xview(view1, 1);
+        auto view5 = view(view1, 1);
         EXPECT_EQ(a(1, 1), view5(0, 1));
         EXPECT_EQ(a(1, 2), view5(0, 2));
         EXPECT_EQ(2, view5.dimension());
 
-        auto view6 = make_xview(view2, 1);
+        auto view6 = view(view2, 1);
         EXPECT_EQ(a(1, 1), view6(1, 0));
         EXPECT_EQ(a(1, 2), view6(2, 0));
         EXPECT_EQ(2, view6.dimension());
@@ -298,7 +298,7 @@ namespace xt
         std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
         std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
-        auto view1 = make_xview(a, all(), all(), newaxis());
+        auto view1 = view(a, all(), all(), newaxis());
         auto iter1 = view1.begin();
         auto iter1_end = view1.end();
 
@@ -328,7 +328,7 @@ namespace xt
         ++iter1;
         EXPECT_EQ(iter1_end, iter1);
 
-        auto view2 = make_xview(a, all(), newaxis(), all());
+        auto view2 = view(a, all(), newaxis(), all());
         auto iter2 = view2.begin();
         auto iter2_end = view2.end();
 
@@ -371,8 +371,8 @@ namespace xt
         data_end += 4;
         std::copy(data.cbegin(), data_end, b.storage_begin());
 
-        auto view = make_xview(b, newaxis(), all());
-        xarray<double> res = a + view;
+        auto v = view(b, newaxis(), all());
+        xarray<double> res = a + v;
 
         std::vector<double> data2{ 2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16 };
         xarray<double> expected(shape);

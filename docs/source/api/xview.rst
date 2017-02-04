@@ -11,7 +11,7 @@ xview
    :project: xtensor
    :members:
 
-.. doxygenfunction:: xt::make_xview
+.. doxygenfunction:: xt::view
    :project: xtensor
 
 .. doxygenfunction:: xt::range(T, T)

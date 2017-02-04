@@ -45,8 +45,8 @@ namespace xt
                          {5, 6, 7, 8},
                          {9, 10, 11, 12}};
 
-        auto v_1 = make_xview(e, 1, xt::all());
-        auto v_2 = make_xview(e, xt::all(), 1);
+        auto v_1 = view(e, 1, xt::all());
+        auto v_2 = view(e, xt::all(), 1);
 
         std::stringstream out_1;
         out_1 << v_1;

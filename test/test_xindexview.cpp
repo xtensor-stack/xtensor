@@ -22,7 +22,7 @@ namespace xt
     {
         xarray<double> e = xt::random::rand<double>({3, 3});
         xarray<double> e_copy = e;
-        auto v = make_xindexview(e, {{1, 1}, {1, 2}, {2, 2}});
+        auto v = index_view(e, {{1, 1}, {1, 2}, {2, 2}});
 
         using shape_type = typename decltype(v)::shape_type;
         EXPECT_EQ(shape_type{3}, v.shape());
@@ -55,7 +55,7 @@ namespace xt
     TEST(xindexview, boolean)
     {
         xarray<double> e = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-        auto v = make_xfilter(e, e > 0);
+        auto v = filter(e, e > 0);
         EXPECT_EQ(1, v(0));
 
         v += 2;
@@ -67,7 +67,7 @@ namespace xt
         EXPECT_EQ(6, e(2, 2));
 
         xarray<double> e2 = random::rand<double>({3, 3, 3, 3});
-        auto v2 = make_xfilter(e2, e2 > 0.5);
+        auto v2 = filter(e2, e2 > 0.5);
         v2 *= 0;
         EXPECT_TRUE(!any(e2 > 0.5));
     }
@@ -76,7 +76,7 @@ namespace xt
     {
         xarray<double> e = xt::random::rand<double>({3, 3});
         auto fn = e * 3 - 120;
-        auto v = make_xindexview(fn, {{1, 1}, {1, 2}, {2, 2}});
+        auto v = index_view(fn, {{1, 1}, {1, 2}, {2, 2}});
         EXPECT_EQ(fn(1, 1), v(0));
         EXPECT_EQ(fn(1, 2), v[{1}]);
 
@@ -94,8 +94,8 @@ namespace xt
     TEST(xindexview, view_on_view)
     {
         xarray<double> e = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-        auto v = make_xfilter(e, e > 0);
-        auto v_on_v = make_xview(v, 1);
+        auto v = filter(e, e > 0);
+        auto v_on_v = view(v, 1);
         v_on_v(0) = 10;
         EXPECT_EQ(10, e(1, 1));
     }
