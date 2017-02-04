@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    TEST(xbuilder, random)
+    TEST(xrandom, random)
     {
         auto r = random::rand<double>({3, 3});
         xarray<double> a = r;
