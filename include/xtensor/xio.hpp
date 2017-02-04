@@ -45,7 +45,7 @@ namespace xt
                     out << '{';
                     for (;i != e.shape()[0] - 1; ++i)
                     {
-                        xout<I - 1>::output(out, make_xview(e, i), blanks + 1) << ',';
+                        xout<I - 1>::output(out, view(e, i), blanks + 1) << ',';
                         if (I == 1 || e.dimension() == 1)
                         {
                              out << ' ';
@@ -55,7 +55,7 @@ namespace xt
                              out << std::endl << indents;
                         }
                     }
-                    xout<I - 1>::output(out, make_xview(e, i), blanks + 1) << '}';
+                    xout<I - 1>::output(out, view(e, i), blanks + 1) << '}';
                 }
                 return out;
             }

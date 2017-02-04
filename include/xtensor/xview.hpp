@@ -53,7 +53,7 @@ namespace xt
      * @tparam E the expression type to adapt
      * @tparam S the slices type describing the shape adaptation
      *
-     * @sa make_xview, range, all, newaxis
+     * @sa view, range, all, newaxis
      */
     template <class E, class... S>
     class xview : public xview_semantic<xview<E, S...>>
@@ -195,7 +195,7 @@ namespace xt
     };
 
     template <class E, class... S>
-    xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices);
+    xview<E, get_slice_type<E, S>...> view(E& e, S&&... slices);
 
     /*****************************
      * xview_stepper declaration *
@@ -298,10 +298,10 @@ namespace xt
     /**
      * Constructs a view on the specified xexpression.
      * Users should not call directly this constructor but
-     * use the make_xview function instead.
+     * use the view function instead.
      * @param e the xexpression to adapt
      * @param slices the slices list describing the view
-     * @sa make_xview
+     * @sa view
      */
     template <class E, class... S>
     template <class... SL>
@@ -574,7 +574,7 @@ namespace xt
      * @sa range, all, newaxis
      */
     template <class E, class... S>
-    inline xview<E, get_slice_type<E, S>...> make_xview(E& e, S&&... slices)
+    inline xview<E, get_slice_type<E, S>...> view(E& e, S&&... slices)
     {
         return detail::make_view_impl(e, std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
     }

@@ -693,14 +693,14 @@ namespace xt
      * 
      * \code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};
-     * b = make_xindexview(a, {{0, 0}, {1, 0}, {1, 1}});
+     * b = index_view(a, {{0, 0}, {1, 0}, {1, 1}});
      * std::cout << b << std::endl; // {1, 4, 5}
      * b += 100;
      * std::cout << a << std::endl; // {{101, 5, 3}, {104, 105, 6}}
      * \endcode
      */
     template <class E, class I = std::vector<xindex>>
-    auto inline make_xindexview(E& e, I&& indices) noexcept
+    auto inline index_view(E& e, I&& indices) noexcept
     {
         return xindexview<E, std::array<std::size_t, 1>, I>(e, std::forward<I>(indices));
     }
@@ -714,7 +714,7 @@ namespace xt
      * @param indices the indices to select
      */
     template <class E, std::size_t L>
-    auto inline make_xindexview(E& e, const xindex(&indices)[L]) noexcept
+    auto inline index_view(E& e, const xindex(&indices)[L]) noexcept
     {
         return xindexview<E, std::array<std::size_t, 1>, std::array<xindex, L>>(e, to_array(indices));
     }
@@ -723,19 +723,19 @@ namespace xt
      * @brief create a view into \ref e filtered by \ref condition.
      *        
      * Returns a 1D view with the elements selected where \ref condition evaluates to \em true.
-     * This is equivalent to \verbatim{make_xindexview(e, where(condition));}
+     * This is equivalent to \verbatim{index_view(e, where(condition));}
      * 
      * @param e the underlying xexpression
      * @param condition xexpression with shape of \ref e which selects indices
      *
      * \code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};
-     * b = make_xfilter(a, a >= 5);
+     * b = filter(a, a >= 5);
      * std::cout << b << std::endl; // {5, 5, 6}
      * \endcode
      */
     template <class E, class O>
-    auto inline make_xfilter(E& e, O&& condition) noexcept
+    auto inline filter(E& e, O&& condition) noexcept
     {
         auto indices = where(std::forward<O>(condition));
         return xindexview<E, std::vector<std::size_t>, decltype(indices)>(e, std::move(indices));

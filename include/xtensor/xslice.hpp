@@ -80,10 +80,10 @@ namespace xt
 
     /**
      * Returns a slice representing an interval, to
-     * be used as an argument of make_xview function.
+     * be used as an argument of view function.
      * @param min the first index of the interval
      * @param max the last index of the interval
-     * @sa make_xview
+     * @sa view
      */
     template <class T>
     inline auto range(T min, T max) noexcept
@@ -120,11 +120,11 @@ namespace xt
 
     /**
      * Returns a slice representing an interval, to
-     * be used as an argument of make_xview function.
+     * be used as an argument of view function.
      * @param min the first index of the interval
      * @param max the last index of the interval
      * @param step the space between two indices
-     * @sa make_xview
+     * @sa view
      */
     template <class T>
     inline auto range(T min, T max, T step) noexcept
@@ -163,8 +163,8 @@ namespace xt
 
     /**
      * Returns a slice representing a full dimension,
-     * to be used as an argument of make_xview function.
-     * @sa make_xview
+     * to be used as an argument of view function.
+     * @sa view
      */
     inline auto all() noexcept
     {
@@ -197,8 +197,8 @@ namespace xt
 
     /**
     * Returns a slice representing a new axis of length one,
-    * to be used as an argument of make_xview function.
-    * @sa make_xview
+    * to be used as an argument of view function.
+    * @sa view
     */
     inline auto newaxis() noexcept
     {
