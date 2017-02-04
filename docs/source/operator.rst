@@ -92,7 +92,7 @@ However, equality operators are similar to the traditional ones in C++:
 - ``operator==(const E1& e1, const E2& e2)`` returns ``true`` if ``e1`` and ``e2`` hold the same elements.
 - ``operator!=(const E1& e1, const E2& e2)`` returns ``true`` if ``e1`` and ``e2`` don't hold the same elements.
 
-Element-wise equality comparison can be achieved through the ``xt::equal_to`` function.
+Element-wise equality comparison can be achieved through the ``xt::equal`` function.
 
 .. code::
 
@@ -104,7 +104,7 @@ Element-wise equality comparison can be achieved through the ``xt::equal_to`` fu
     bool res = (a1 == a2);
     // => res = false
 
-    xt::xarray<bool> re = xt::equal_to(a1, a2);
+    xt::xarray<bool> re = xt::equal(a1, a2);
     // => re = { false, false, true, true }
 
 Mathematical functions
