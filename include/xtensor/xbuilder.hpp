@@ -36,8 +36,7 @@ namespace xt
      ********/
 
     /**
-     * @brief Returns an \ref xexpression containing ones of the specified shape.
-     *
+     * Returns an \ref xexpression containing ones of the specified shape.
      * @tparam shape the shape of the returned expression.
      */
     template <class T, class S>
@@ -65,8 +64,7 @@ namespace xt
      *********/
 
     /**
-     * @brief Returns an \ref xexpression containing zeros of the specified shape.
-     *
+     * Returns an \ref xexpression containing zeros of the specified shape.
      * @tparam shape the shape of the returned expression.
      */
     template <class T, class S>
@@ -205,16 +203,12 @@ namespace xt
     }
 
     /**
-     * @function eye(const std::vector<std::size_t>& shape, int k = 0)
-     * @brief generate array with ones on the diagonal
-     *
+     * Generates an array with ones on the diagonal.
      * @param shape shape of the resulting expression
      * @param k index of the diagonal. 0 (default) refers to the main diagonal,
      *          a positive value refers to an upper diagonal, and a negative
      *          value to a lower diagonal.
-     *
      * @tparam T value_type of xexpression
-     *
      * @return xgenerator that generates the values on access
      */
     template <class T = bool>
@@ -224,8 +218,13 @@ namespace xt
     }
 
     /**
-     * @function eye(std::size_t n, int k = 0)
-     * @brief like eye with a shape of n x n
+     * Generates a (n x n) array with ones on the diagonal.
+     * @param n length of the diagonal.
+     * @param k index of the diagonal. 0 (default) refers to the main diagonal,
+     *          a positive value refers to an upper diagonal, and a negative
+     *          value to a lower diagonal.
+     * @tparam T value_type of xexpression
+     * @return xgenerator that generates the values on access
      */
     template <class T = bool>
     inline auto eye(std::size_t n, int k = 0)
@@ -234,15 +233,11 @@ namespace xt
     }
 
     /**
-     * @function arange(T start, T stop, T step = 1)
-     * @brief generate numbers evenly spaced within given half-open interval [start, stop).
-     *
+     * Generates numbers evenly spaced within given half-open interval [start, stop).
      * @param start start of the interval
      * @param stop stop of the interval
      * @param step stepsize
-     *
      * @tparam T value_type of xexpression
-     *
      * @return xgenerator that generates the values on access
      */
     template <class T>
@@ -253,14 +248,10 @@ namespace xt
     }
 
     /**
-     * @function arange(T stop)
-     * @brief generate numbers evenly spaced within given half-open interval [0, stop)
-     *        with a step size of 1.
-     *
+     * Generate numbers evenly spaced within given half-open interval [0, stop)
+     * with a step size of 1.
      * @param stop stop of the interval
-     *
      * @tparam T value_type of xexpression
-     *
      * @return xgenerator that generates the values on access
      */
     template <class T>
@@ -270,16 +261,12 @@ namespace xt
     }
 
     /**
-     * @function linspace
-     * @brief generate @a num_samples evenly spaced numbers over given interval
-     *
+     * Generates @a num_samples evenly spaced numbers over given interval
      * @param start start of interval
      * @param stop stop of interval
      * @param num_samples number of samples (defaults to 50)
      * @param endpoint if true, include endpoint (defaults to true)
-     *
      * @tparam T value_type of xexpression
-     *
      * @return xgenerator that generates the values on access
      */
     template <class T>
@@ -290,17 +277,13 @@ namespace xt
     }
 
     /**
-     * @function logspace
-     * @brief generate @num_samples numbers evenly spaced on a log scale over given interval
-     *
+     * Generates @a num_samples numbers evenly spaced on a log scale over given interval
      * @param start start of interval (pow(base, start) is the first value).
      * @param stop stop of interval (pow(base, stop) is the final value, except if endpoint = false)
      * @param num_samples number of samples (defaults to 50)
      * @param base the base of the log space.
      * @param endpoint if true, include endpoint (defaults to true)
-     *
      * @tparam T value_type of xexpression
-     *
      * @return xgenerator that generates the values on access
      */
     template <class T>

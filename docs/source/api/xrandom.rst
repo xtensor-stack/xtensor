@@ -4,21 +4,20 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xview
-=====
+xrandom
+=======
 
-.. doxygenclass:: xt::xview
-   :project: xtensor
-   :members:
-
-.. doxygenfunction:: xt::make_xview
+.. doxygenfunction:: xt::random::get_default_random_engine
    :project: xtensor
 
-.. doxygenfunction:: xt::range(T, T)
+.. doxygenfunction:: xt::random::seed
    :project: xtensor
 
-.. doxygenfunction:: xt::range(T, T, T)
+.. doxygenfunction:: xt::random::rand
    :project: xtensor
 
-.. doxygenfunction:: xt::all
+.. doxygenfunction:: xt::random::randint
+   :project: xtensor
+
+.. doxygenfunction:: xt::random::randn
    :project: xtensor

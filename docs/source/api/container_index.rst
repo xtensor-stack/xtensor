@@ -4,11 +4,15 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-API reference
-=============
+Containers and views
+====================
 
 .. toctree::
 
-   expression_index
-   container_index
-   xmath
+   xcontainer
+   xarray
+   xarray_adaptor
+   xtensor
+   xtensor_adaptor
+   xview
+   xbroadcast

@@ -61,8 +61,7 @@ namespace xt
         using seed_type = default_engine_type::result_type;
 
         /**
-         * @function get_default_random_engine
-         * @brief returns a reference to the default random number engine
+         * Returns a reference to the default random number engine
          */
         inline default_engine_type& get_default_random_engine()
         {
@@ -71,9 +70,7 @@ namespace xt
         }
 
         /**
-         * @function seed
-         * @brief seed the default random number generator with @p seed
-         *
+         * Seeds the default random number generator with @p seed
          * @param seed The seed
          */
         inline void seed(seed_type seed)
@@ -82,9 +79,8 @@ namespace xt
         }
 
         /**
-         * @function rand
-         * @brief xexpression with specified @p shape containing uniformly distributed random numbers 
-         *        in the interval from @p lower to @p upper, excluding upper.
+         * xexpression with specified @p shape containing uniformly distributed random numbers 
+         * in the interval from @p lower to @p upper, excluding upper.
          * 
          * Numbers are drawn from @c std::uniform_real_distribution.
          * 
@@ -92,7 +88,6 @@ namespace xt
          * @param lower lower bound
          * @param upper upper bound
          * @param engine random number engine
-         *
          * @tparam T number type to use
          */ 
         template <class T, class E = random::default_engine_type>
@@ -104,9 +99,8 @@ namespace xt
         }
 
         /**
-         * @function randint
-         * @brief xexpression with specified @p shape containing uniformly distributed 
-         *        random integers in the interval from @p lower to @p upper, excluding upper.
+         * xexpression with specified @p shape containing uniformly distributed 
+         * random integers in the interval from @p lower to @p upper, excluding upper.
          * 
          * Numbers are drawn from @c std::uniform_int_distribution.
          * 
@@ -114,7 +108,6 @@ namespace xt
          * @param lower lower bound
          * @param upper upper bound
          * @param engine random number engine
-         *
          * @tparam T number type to use
          */
         template <class T, class E = random::default_engine_type>
@@ -127,10 +120,9 @@ namespace xt
         }
 
         /**
-         * @function randn
-         * @brief xexpression with specified @p shape containing numbers sampled from 
-         *        the Normal (Gaussian) random number distribution with mean @p mean and 
-         *        standard deviation @p std_dev.
+         * xexpression with specified @p shape containing numbers sampled from 
+         * the Normal (Gaussian) random number distribution with mean @p mean and 
+         * standard deviation @p std_dev.
          * 
          * Numbers are drawn from @c std::normal_distribution.
          * 
@@ -138,7 +130,6 @@ namespace xt
          * @param mean mean of normal distribution
          * @param std_dev standard deviation of normal distribution
          * @param engine random number engine
-         * 
          * @tparam T number type to use
          */
         template <class T, class E = random::default_engine_type>

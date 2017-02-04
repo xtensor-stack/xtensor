@@ -9,6 +9,7 @@ Mathematical functions
 
 .. toctree::
 
+   operators
    basic_functions
    exponential_functions
    power_functions

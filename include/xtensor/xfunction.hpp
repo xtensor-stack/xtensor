@@ -357,8 +357,8 @@ namespace xt
     /**
      * Returns a constant reference to the element at the specified position in the function.
      * @param first iterator starting the sequence of indices
-     * @param second iterator starting the sequence of indices
-     * The number of indices in the squence should be equal or greater
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the squence should be equal to or greater
      * than the number of dimensions of the container.
      */
     template <class F, class R, class... CT>
