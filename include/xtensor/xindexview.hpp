@@ -198,6 +198,7 @@ namespace xt
         using shape_type = S;
         using index_type = get_index_type<shape_type>;
 
+        xindexview_stepper() = default;
         xindexview_stepper(view_type* func, const shape_type& shape) noexcept;
 
         reference operator*() const;

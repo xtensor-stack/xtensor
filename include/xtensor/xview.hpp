@@ -241,6 +241,7 @@ namespace xt
 
         using shape_type = typename substepper_type::shape_type;
 
+        xview_stepper() = default;
         xview_stepper(view_type* view, substepper_type it,
                       size_type offset, bool end = false);
 

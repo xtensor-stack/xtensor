@@ -140,6 +140,7 @@ namespace xt
         using shape_type = typename xgenerator_type::shape_type;
         using index_type = get_index_type<shape_type>;
 
+        xgenerator_stepper() = default;
         xgenerator_stepper(const xgenerator_type* func, const shape_type& shape) noexcept;
 
         void step(size_type dim, size_type n = 1);
