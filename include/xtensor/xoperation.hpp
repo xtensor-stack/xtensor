@@ -396,11 +396,11 @@ namespace xt
     }
 
     /**
-     * @function nonzero(const T& arr)
+     * @ingroup logical_operators
      * @brief return vector of indices where T is not zero
      * 
      * @param arr input array
-     * @return vector of \ref index_types where arr is not equal to zero
+     * @return vector of \a index_types where arr is not equal to zero
      */
     template <class T>
     inline auto nonzero(const T& arr)
@@ -442,12 +442,12 @@ namespace xt
     }
 
     /**
-     * @function where(const T& condition)
+     * @ingroup logical_operators
      * @brief return vector of indices where condition is true
-     *        (equivalent to \ref nonzero(conditition))
+     *        (equivalent to \a nonzero(condition))
      * 
      * @param condition input array
-     * @return vector of \ref index_types where arr is not equal to zero
+     * @return vector of \a index_types where condition is not equal to zero
      */
     template <class T>
     inline auto where(const T& condition)

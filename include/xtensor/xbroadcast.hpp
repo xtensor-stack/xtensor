@@ -61,6 +61,8 @@ namespace xt
      *
      * @tparam CT the closure type of the \ref xexpression to broadcast
      * @tparam X the type of the specified shape.
+     *
+     * @sa broadcast
      */
     template <class CT, class X>
     class xbroadcast : public xexpression<xbroadcast<CT, X>>

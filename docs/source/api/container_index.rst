@@ -16,3 +16,4 @@ Containers and views
    xtensor_adaptor
    xview
    xbroadcast
+   xindexview

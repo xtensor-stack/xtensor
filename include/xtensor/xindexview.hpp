@@ -42,12 +42,16 @@ namespace xt
      * @class xindexview
      * @brief View into xexpression from vector of indices.
      *
-     * Th xindexview class implements a flat (1D) view into a multidimensional
+     * The xindexview class implements a flat (1D) view into a multidimensional
      * xexpression yielding the values at the indices of the index array.
+     * xindexview is not meant to be used directly, but only with the \ref index_view
+     * and \ref filter helper functions.
      *
-     * @tparam E the xexpression type underlying this view.
+     * @tparam E the xexpression type underlying this view
      * @tparam S the shape type of the view
      * @tparam I the index array type of the view
+     *
+     * @sa index_view, filter
      */
     template <class E, class S, class I>
     class xindexview : public xview_semantic<xindexview<E, S, I>>
@@ -229,7 +233,7 @@ namespace xt
      */
     //@{
     /**
-     * Constructs an xindexview, selecting the indices specified by \ref indices.
+     * Constructs an xindexview, selecting the indices specified by \a indices.
      * The resulting xexpression has a 1D shape with a length of n for n indices.
      * 
      * @param e the underlying xepxression for this view
@@ -335,7 +339,7 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position in the xindexview.
      * @param first iterator starting the sequence of indices
-     * @param second iterator ending the sequence of indices
+     * @param last iterator ending the sequence of indices
      * The number of indices in the squence should be equal to or greater 1.
      */
     template <class E, class S, class I>
@@ -684,9 +688,9 @@ namespace xt
     }
 
     /**
-     * @brief create an indexview from a container of indices.
+     * @brief creates an indexview from a container of indices.
      *        
-     * Returns a 1D view with the elements at \ref indices selected.
+     * Returns a 1D view with the elements at \a indices selected.
      *
      * @param e the underlying xexpression
      * @param indices the indices to select
@@ -705,14 +709,6 @@ namespace xt
         return xindexview<E, std::array<std::size_t, 1>, I>(e, std::forward<I>(indices));
     }
 
-    /**
-     * @brief create an indexview from a initializer list or a static array of indices.
-     *        
-     * Returns a 1D view with the elements at \ref indices selected.
-     *
-     * @param e the underlying xexpression
-     * @param indices the indices to select
-     */
     template <class E, std::size_t L>
     auto inline index_view(E& e, const xindex(&indices)[L]) noexcept
     {
@@ -720,13 +716,13 @@ namespace xt
     }
 
     /**
-     * @brief create a view into \ref e filtered by \ref condition.
+     * @brief creates a view into \a e filtered by \a condition.
      *        
-     * Returns a 1D view with the elements selected where \ref condition evaluates to \em true.
-     * This is equivalent to \verbatim{index_view(e, where(condition));}
+     * Returns a 1D view with the elements selected where \a condition evaluates to \em true.
+     * This is equivalent to \verbatim{index_view(e, where(condition));}\endverbatim
      * 
      * @param e the underlying xexpression
-     * @param condition xexpression with shape of \ref e which selects indices
+     * @param condition xexpression with shape of \a e which selects indices
      *
      * \code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};

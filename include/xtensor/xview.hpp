@@ -48,7 +48,8 @@ namespace xt
      *
      * The xview class implements a multidimensional view with tensor
      * semantic. It is used to adapt the shape of an xexpression without
-     * changing it.
+     * changing it. xview is not meant to be used directly, but
+     * only with the \ref view helper functions.
      *
      * @tparam E the expression type to adapt
      * @tparam S the slices type describing the shape adaptation

@@ -67,10 +67,45 @@ you are actually also altering the underlying expression.
     v1(0, 0) = 1;
     // => a(1, 0, 1) = 1
 
+Index views
+-----------
+
+Index views are one-dimensional views of an ``xexpression``, containing the elements whose positions are specified by a list
+of indices. Like for sliced views, the elements of the underlying ``xexpression`` are not copied. Index views should be built
+with the ``index_view`` helper function.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xindexview.hpp"
+
+    xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
+    auto b = xt::index_view(a, {{0,0}, {1, 0}, {0, 1}});
+    // => b = { 1, 4, 5 }
+    b += 100;
+    // => a = {{101, 5, 3}, {104, 105, 6}}
+
+Filter views
+------------
+
+Filters are one-dimensional views holding elements of an ``xexpression`` that verify a given condition. Like for other views,
+the elements of the underlying ``xexpression`` are not copied. Filters should be built with the ``filter`` helper function.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xindexview.hpp"
+
+    xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
+    auto v = xt::filter(a, a >= 5);
+    // => v = { 5, 5, 6 }
+    v += 100;
+    // => a = {{1, 105, 3}, {4, 105, 106}}
+
 Broadcasting views
 ------------------
 
-The second type of view provided by `xtensor` is *broadcasting view*. Such a view broadcast an expression to the specified
+The last type of view provided by `xtensor` is *broadcasting view*. Such a view broadcast an expression to the specified
 shape. As long as the view is not assigned to an array, no memory allocation or copy occurs. Broadcasting views should be
 built with the ``broadcast`` helper function.
 
