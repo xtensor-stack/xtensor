@@ -83,6 +83,7 @@ namespace xt
         using size_type = typename container_type::size_type;
         using shape_type = typename container_type::shape_type;
 
+        xstepper() = default;
         xstepper(container_type* c, subiterator_type it, size_type offset) noexcept;
 
         reference operator*() const;
@@ -138,6 +139,7 @@ namespace xt
         using shape_type = S;
         using index_type = get_index_type<shape_type>;
 
+        xiterator() = default;
         xiterator(It it, const shape_type& shape);
 
         self_type& operator++();
