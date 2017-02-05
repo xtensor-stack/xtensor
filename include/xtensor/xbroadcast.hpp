@@ -71,7 +71,7 @@ namespace xt
     public:
 
         using self_type = xbroadcast<CT, X>;
-        using xexpression_type = typename std::decay<typename CT::type>::type;
+        using xexpression_type = std::decay_t<CT>;
 
         using value_type = typename xexpression_type::value_type;
         using reference = typename xexpression_type::reference;
@@ -88,7 +88,7 @@ namespace xt
         using const_storage_iterator = const_iterator;
 
         template <class S>
-        xbroadcast(typename CT::type e, S s) noexcept;
+        xbroadcast(CT e, S s) noexcept;
 
         size_type dimension() const noexcept;
         const shape_type & shape() const noexcept;
@@ -133,7 +133,7 @@ namespace xt
 
     private:
 
-        typename CT::type m_e;
+        CT m_e;
         shape_type m_shape;
     };
 
@@ -195,7 +195,7 @@ namespace xt
     template <class E, class S>
     inline auto broadcast(E&& e, const S& s) noexcept
     {
-        using broadcast_type = xbroadcast<xclosure<E>, S>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, S>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
@@ -204,7 +204,7 @@ namespace xt
     template <class E, class I>
     inline auto broadcast(E&& e, std::initializer_list<I> s) noexcept
     {
-        using broadcast_type = xbroadcast<xclosure<E>, std::vector<std::size_t>>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<std::size_t>>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
@@ -212,7 +212,7 @@ namespace xt
     template <class E, class I, std::size_t L>
     inline auto broadcast(E&& e, const I(&s)[L]) noexcept
     {
-        using broadcast_type = xbroadcast<xclosure<E>, std::array<std::size_t, L>>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<std::size_t, L>>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
     }
@@ -235,7 +235,7 @@ namespace xt
      */
     template <class CT, class X>
     template <class S>
-    inline xbroadcast<CT, X>::xbroadcast(typename CT::type e, S s) noexcept
+    inline xbroadcast<CT, X>::xbroadcast(CT e, S s) noexcept
         : m_e(e), m_shape(std::move(s))
     {
         xt::broadcast_shape(e.shape(), m_shape);

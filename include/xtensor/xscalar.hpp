@@ -36,7 +36,7 @@ namespace xt
 
     public:
 
-        using value_type = typename std::decay<CT>::type;
+        using value_type = std::decay_t<CT>;
         using reference = value_type&;
         using const_reference = const value_type&;
         using pointer = value_type*;

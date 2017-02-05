@@ -31,18 +31,18 @@ namespace xt
         template <class R, class... Args, class... E>
         inline auto make_xfunction(R (*f) (Args...), E&&... e) noexcept
         {
-            using type = xfunction<R (*) (Args...), R, xclosure<E>...>;
+            using type = xfunction<R (*) (Args...), R, const_xclosure_t<E>...>;
             return type(f, std::forward<E>(e)...);
         }
 
         template <class... E>
-        using mf_type = common_value_type<typename std::decay<E>::type...> (*) (xvalue_type_t<typename std::decay<E>::type>...);
+        using mf_type = common_value_type<std::decay_t<E>...> (*) (xvalue_type_t<std::decay_t<E>>...);
 
         template <class... E>
-        using get_xfunction_free_type = std::enable_if_t<has_xexpression<typename std::decay<E>::type...>::value,
+        using get_xfunction_free_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
                                                          xfunction<mf_type<E...>,
-                                                                   common_value_type<typename std::decay<E>::type...>,
-                                                                   xclosure<E>...>>;
+                                                                   common_value_type<std::decay_t<E>...>,
+                                                                   const_xclosure_t<E>...>>;
     }
 
     /*******************
