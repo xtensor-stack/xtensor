@@ -107,10 +107,10 @@ namespace xt
         using const_reference = value_type;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = detail::common_size_type<typename std::decay<typename CT::type>::type...>;
-        using difference_type = detail::common_difference_type<typename std::decay<typename CT::type>::type...>;
+        using size_type = detail::common_size_type<std::decay_t<typename CT::type>...>;
+        using difference_type = detail::common_difference_type<std::decay_t<typename CT::type>...>;
 
-        using shape_type = promote_shape_t<typename std::decay<typename CT::type>::type::shape_type...>;
+        using shape_type = promote_shape_t<typename std::decay_t<typename CT::type>::shape_type...>;
 
         using const_stepper = xfunction_stepper<F, R, CT...>;
         using const_iterator = xiterator<const_stepper, shape_type>;
@@ -220,7 +220,7 @@ namespace xt
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
-        std::tuple<typename std::decay<typename CT::type>::type::const_storage_iterator...> m_it;
+        std::tuple<typename std::decay_t<typename CT::type>::const_storage_iterator...> m_it;
 
     };
 
@@ -274,7 +274,7 @@ namespace xt
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
-        std::tuple<typename std::decay<typename CT::type>::type::const_stepper...> m_it;
+        std::tuple<typename std::decay_t<typename CT::type>::const_stepper...> m_it;
     };
 
     template <class F, class R, class... CT>

@@ -131,8 +131,8 @@ namespace xt
         struct const_closure
         {
             using type = typename std::conditional<std::is_lvalue_reference<S>::value,
-                                                   const typename std::decay<S>::type&,
-                                                   typename std::decay<S>::type>::type;
+                                                   const std::decay_t<S>&,
+                                                   std::decay_t<S>>::type;
         };
     }
 
@@ -143,7 +143,7 @@ namespace xt
     };
 
     template <class E>
-    struct xclosure<E, disable_xexpression<typename std::decay<E>::type>>
+    struct xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
         using type = xscalar<typename detail::const_closure<E>::type>;
     };

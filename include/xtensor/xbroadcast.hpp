@@ -71,7 +71,7 @@ namespace xt
     public:
 
         using self_type = xbroadcast<CT, X>;
-        using xexpression_type = typename std::decay<typename CT::type>::type;
+        using xexpression_type = std::decay_t<typename CT::type>;
 
         using value_type = typename xexpression_type::value_type;
         using reference = typename xexpression_type::reference;

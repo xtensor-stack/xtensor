@@ -51,16 +51,16 @@ namespace xt
         template <template <class...> class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
-            using functor_type = F<common_value_type<typename std::decay<E>::type...>>;
+            using functor_type = F<common_value_type<std::decay_t<E>...>>;
             using result_type = typename functor_type::result_type;
             using type = xfunction<functor_type, result_type, xclosure<E>...>;
             return type(functor_type(), std::forward<E>(e)...);
         }
 
         template <template <class...> class F, class... E>
-        using get_xfunction_type = std::enable_if_t<has_xexpression<typename std::decay<E>::type...>::value,
-                                                    xfunction<F<common_value_type<typename std::decay<E>::type...>>,
-                                                              typename F<common_value_type<typename std::decay<E>::type...>>::result_type,
+        using get_xfunction_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
+                                                    xfunction<F<common_value_type<std::decay_t<E>...>>,
+                                                              typename F<common_value_type<std::decay_t<E>...>>::result_type,
                                                               xclosure<E>...>>;
     }
 
@@ -469,7 +469,7 @@ namespace xt
     inline bool any(E&& e)
     {
         return std::any_of(e.storage_cbegin(), e.storage_cend(), 
-                           [](const typename std::decay<E>::type::value_type& el) { return el; });
+                           [](const typename std::decay_t<E>::value_type& el) { return el; });
     }
 
     /**
@@ -485,7 +485,7 @@ namespace xt
     inline bool all(E&& e)
     {
         return std::all_of(e.storage_cbegin(), e.storage_cend(),
-                           [](const typename std::decay<E>::type::value_type& el) { return el; });
+                           [](const typename std::decay_t<E>::value_type& el) { return el; });
     }
 }
 
