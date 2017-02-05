@@ -53,7 +53,7 @@ namespace xt
         {
             using functor_type = F<common_value_type<std::decay_t<E>...>>;
             using result_type = typename functor_type::result_type;
-            using type = xfunction<functor_type, result_type, const_xclosure<E>...>;
+            using type = xfunction<functor_type, result_type, const_xclosure_t<E>...>;
             return type(functor_type(), std::forward<E>(e)...);
         }
 
@@ -61,7 +61,7 @@ namespace xt
         using get_xfunction_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
                                                     xfunction<F<common_value_type<std::decay_t<E>...>>,
                                                               typename F<common_value_type<std::decay_t<E>...>>::result_type,
-                                                              const_xclosure<E>...>>;
+                                                              const_xclosure_t<E>...>>;
     }
 
     /*************

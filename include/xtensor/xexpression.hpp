@@ -163,6 +163,9 @@ namespace xt
         using type = xscalar<detail::closure_t<E>>;
     };
 
+    template <class E>
+    using xclosure_t = typename xclosure<E>::type;
+
     template <class E, class EN = void>
     struct const_xclosure
     {
@@ -174,7 +177,10 @@ namespace xt
     {
         using type = xscalar<detail::const_closure_t<E>>;
     };
-    
+ 
+    template <class E>
+    using const_xclosure_t = typename const_xclosure<E>::type;
+
     /***************
      * xvalue_type *
      ***************/

@@ -30,7 +30,7 @@ namespace xt
         template <class R, class... Args, class... E>
         inline auto make_xfunction(R (*f) (Args...), E&&... e) noexcept
         {
-            using type = xfunction<R (*) (Args...), R, const_xclosure<E>...>;
+            using type = xfunction<R (*) (Args...), R, const_xclosure_t<E>...>;
             return type(f, std::forward<E>(e)...);
         }
 
@@ -41,7 +41,7 @@ namespace xt
         using get_xfunction_free_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
                                                          xfunction<mf_type<E...>,
                                                                    common_value_type<std::decay_t<E>...>,
-                                                                   const_xclosure<E>...>>;
+                                                                   const_xclosure_t<E>...>>;
     }
 
     /*******************

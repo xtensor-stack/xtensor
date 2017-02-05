@@ -107,17 +107,17 @@ namespace xt
         using const_reference = value_type;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = detail::common_size_type<std::decay_t<typename CT::type>...>;
-        using difference_type = detail::common_difference_type<std::decay_t<typename CT::type>...>;
+        using size_type = detail::common_size_type<std::decay_t<CT>...>;
+        using difference_type = detail::common_difference_type<std::decay_t<CT>...>;
 
-        using shape_type = promote_shape_t<typename std::decay_t<typename CT::type>::shape_type...>;
+        using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
 
         using const_stepper = xfunction_stepper<F, R, CT...>;
         using const_iterator = xiterator<const_stepper, shape_type>;
         using const_storage_iterator = xf_storage_iterator<F, R, CT...>;
 
         template <class Func>
-        xfunction(Func&& f, typename CT::type... e) noexcept;
+        xfunction(Func&& f, CT... e) noexcept;
 
         size_type dimension() const noexcept;
         const shape_type& shape() const;
@@ -176,7 +176,7 @@ namespace xt
         template <class Func, std::size_t... I>
         const_storage_iterator build_storage_iterator(Func&& f, std::index_sequence<I...>) const noexcept;
 
-        std::tuple<typename CT::type...> m_e;
+        std::tuple<CT...> m_e;
         functor_type m_f;
         shape_type m_shape;
 
@@ -220,7 +220,7 @@ namespace xt
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
-        std::tuple<typename std::decay_t<typename CT::type>::const_storage_iterator...> m_it;
+        std::tuple<typename std::decay_t<CT>::const_storage_iterator...> m_it;
 
     };
 
@@ -274,7 +274,7 @@ namespace xt
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
-        std::tuple<typename std::decay_t<typename CT::type>::const_stepper...> m_it;
+        std::tuple<typename std::decay_t<CT>::const_stepper...> m_it;
     };
 
     template <class F, class R, class... CT>
@@ -301,7 +301,7 @@ namespace xt
      */
     template <class F, class R, class... CT>
     template <class Func>
-    inline xfunction<F, R, CT...>::xfunction(Func&& f, typename CT::type... e) noexcept
+    inline xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept
         : m_e(e...), m_f(std::forward<Func>(f)), m_shape(make_sequence<shape_type>(dimension(), size_type(1)))
     {
         broadcast_shape(m_shape);
