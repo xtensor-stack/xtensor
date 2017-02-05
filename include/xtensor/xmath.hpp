@@ -15,6 +15,7 @@
 
 #include <cmath>
 #include <type_traits>
+#include <complex>
 
 #include "xfunction.hpp"
 
@@ -237,7 +238,7 @@ namespace xt
         inline constexpr std::enable_if_t<std::is_signed<T>::value, T>
         sign_impl(T x)
         {
-            return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? copysign(T(0), x) : copysign(T(1), x);
+            return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? (T) copysign(T(0), x) : (T) copysign(T(1), x);
         }
 
         template <typename T>
@@ -797,7 +798,6 @@ namespace xt
         using functor_type = detail::mf_type<E>;
         return detail::make_xfunction((functor_type)std::lgamma, std::forward<E>(e));
     }
-
 }
 
 #endif
