@@ -11,7 +11,6 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
-#include <fstream>
 #include <limits>
 
 #include "xtensor/xarray.hpp"
@@ -160,7 +159,7 @@ namespace xt
         // reset back to default
         xt::print_options::set_line_width(75);
         xt::print_options::set_edge_items(3);
-        xt::print_options::set_precision(0);
+        xt::print_options::set_precision(-1);
         xt::print_options::set_threshold(1000);
 
     }

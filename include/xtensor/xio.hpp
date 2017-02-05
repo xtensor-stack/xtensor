@@ -33,7 +33,7 @@ namespace xt
             std::size_t edge_items = 3;
             std::size_t line_width = 75;
             std::size_t threshold = 1000;
-            int precision = -1; // default precision
+            std::streamsize precision = -1; // default precision
         };
 
         inline print_options_impl& print_options()
@@ -81,7 +81,7 @@ namespace xt
          *
          * @param precision The number of digits for floating point output
          */
-        void set_precision(int precision)
+        void set_precision(std::streamsize precision)
         {
             print_options().precision = precision;
         }
@@ -97,8 +97,8 @@ namespace xt
         struct xout
         {
             template <class E, class F>
-            static std::ostream& output(std::ostream& out, const E& e, F& printer, size_t blanks,
-                                        size_t element_width, size_t edge_items, size_t line_width)
+            static std::ostream& output(std::ostream& out, const E& e, F& printer, std::size_t blanks,
+                                        std::size_t element_width, std::size_t edge_items, std::size_t line_width)
             {
                 using size_type = typename E::size_type;
 
@@ -160,7 +160,8 @@ namespace xt
         struct xout<0>
         {
             template <class E, class F>
-            static std::ostream& output(std::ostream& out, const E& e, F& printer, size_t, size_t, size_t, size_t)
+            static std::ostream& output(std::ostream& out, const E& e, F& printer, 
+                                        std::size_t, std::size_t, std::size_t, std::size_t)
             {
                 if (e.dimension() == 0)
                 {
@@ -177,7 +178,7 @@ namespace xt
         struct recurser
         {
             template <class F, class E>
-            static void run(F& fn, const E& e, size_t lim = 0)
+            static void run(F& fn, const E& e, std::size_t lim = 0)
             {
                 using size_type = typename E::size_type;
                 if (e.dimension() == 0)
@@ -204,7 +205,7 @@ namespace xt
         struct recurser<0>
         {
             template <class F, class E>
-            static void run(F& fn, const E& e, int)
+            static void run(F& fn, const E& e, std::size_t)
             {
                 if (e.dimension() == 0)
                 {
@@ -223,7 +224,7 @@ namespace xt
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(int precision) : m_precision(precision)
+            printer(std::streamsize precision) : m_precision(precision)
             {
             }
 
@@ -244,7 +245,7 @@ namespace xt
                 else
                 {
                     // 3 => sign and dot and + 1 (from calculation for exponent)
-                    m_width = 3 + std::log10(std::floor(m_max)) + m_precision;
+                    m_width = (std::streamsize) 3 + std::log10(std::floor(m_max)) + m_precision;
                 }
                 if (!m_required_precision)
                 {
@@ -301,7 +302,7 @@ namespace xt
                 {
                     if (!m_scientific || !m_large_exponent)
                     {
-                        int exponent = 1 + std::log10(std::fabs(val));
+                        int exponent = (int) 1 + std::log10(std::fabs(val));
                         if (exponent <= -5 || exponent > 7)
                         {
                             m_scientific = true;
@@ -327,7 +328,7 @@ namespace xt
                 m_cache.push_back(val);
             }
 
-            int width()
+            std::streamsize width()
             {
                 return m_width;
             }
@@ -335,9 +336,9 @@ namespace xt
         private:
             bool m_large_exponent = false;
             bool m_scientific = false;
-            int m_width = 9;
-            int m_precision;
-            int m_required_precision = 0;
+            std::streamsize m_width = 9;
+            std::streamsize m_precision;
+            std::streamsize m_required_precision = 0;
             value_type m_max = 0;
 
             cache_type m_cache;
@@ -358,7 +359,7 @@ namespace xt
             void init()
             {
                 m_it = m_cache.cbegin();
-                m_width = 1 + std::log10(m_max) + m_sign;
+                m_width = (std::streamsize) 1 + std::log10(m_max) + m_sign;
             }
 
             std::ostream& print_next(std::ostream& out)
@@ -383,13 +384,13 @@ namespace xt
                 m_cache.push_back(val);
             }
 
-            int width()
+            std::streamsize width()
             {
                 return m_width;
             }
 
             private:
-                int m_width;
+                std::streamsize m_width;
                 bool m_sign = false;
                 value_type m_max = 0;
 
@@ -434,13 +435,13 @@ namespace xt
                 m_cache.push_back(val);
             }
 
-            int width()
+            std::streamsize width()
             {
                 return m_width;
             }
 
             private:
-                int m_width = 5;
+                std::streamsize m_width = 5;
 
                 cache_type m_cache;
                 cache_iterator m_it;
@@ -453,7 +454,7 @@ namespace xt
             using cache_type = std::vector<bool>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(int precision) : real_printer(precision), imag_printer(precision)
+            printer(std::streamsize precision) : real_printer(precision), imag_printer(precision)
             {
             }
 
@@ -494,7 +495,7 @@ namespace xt
                 m_signs.push_back(std::signbit(val.imag()));
             }
 
-            int width()
+            std::streamsize width()
             {
                 return real_printer.width() + imag_printer.width() + 2;
             }
@@ -544,13 +545,13 @@ namespace xt
                 m_cache.push_back(s);
             }
 
-            int width()
+            std::streamsize width()
             {
                 return m_width;
             }
 
             private:
-                int m_width = 0;                
+                std::streamsize m_width = 0;                
                 cache_type m_cache;
                 cache_iterator m_it;
         };
@@ -585,7 +586,6 @@ namespace xt
     template <class E>
     std::ostream& pretty_print(const xexpression<E>& e, std::ostream& out = std::cout)
     {
-        detail::printer<E> p(out.precision());
         const E& d = e.derived_cast();
 
         size_t lim = 0;
@@ -601,6 +601,8 @@ namespace xt
             out << std::setprecision(print_options::print_options().precision);
         }
 
+        detail::printer<E> p(out.precision());
+ 
         detail::recurser<5>::run(p, d, lim);
         p.init();
         detail::xout<5>::output(out, d, p, 1, p.width(), lim, print_options::print_options().line_width);
