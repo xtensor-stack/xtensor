@@ -107,13 +107,13 @@ namespace xt
 
             inline T operator[](const xindex& idx) const
             {
-                return T(m_start + m_step * idx[0]);
+                return T(m_start + m_step * T(idx[0]));
             }
 
             template <class It>
             inline T element(It first, It /*last*/) const
             {
-                return T(m_start + m_step * (*first));
+                return T(m_start + m_step * T(*first));
             }
 
         private:
@@ -124,7 +124,7 @@ namespace xt
             template <class T1, class... Args>
             inline T access_impl(T1 t, Args... /*args*/) const
             {
-                return m_start + m_step * t;
+                return m_start + m_step * T(t);
             }
 
             inline T access_impl() const

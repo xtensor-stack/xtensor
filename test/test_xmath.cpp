@@ -22,7 +22,6 @@ namespace xt
      * Basic operations
      **********************/
 
-
     TEST(xmath, abs)
     {
         shape_type shape = {3, 2};
