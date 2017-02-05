@@ -112,7 +112,7 @@ namespace xt
                     
                     size_type i = 0;
                     size_type elems_on_line = 0;
-                    size_type line_lim = std::floor(line_width / (element_width + 2));
+                    size_type line_lim = (size_type) std::floor(line_width / (element_width + 2));
                     
                     out << '{';
                     for (;i != e.shape()[0] - 1; ++i)
@@ -245,7 +245,7 @@ namespace xt
                 else
                 {
                     // 3 => sign and dot and + 1 (from calculation for exponent)
-                    m_width = (std::streamsize) 3 + std::log10(std::floor(m_max)) + m_precision;
+                    m_width = 3 + (std::streamsize) std::log10(std::floor(m_max)) + m_precision;
                 }
                 if (!m_required_precision)
                 {
@@ -352,14 +352,14 @@ namespace xt
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(int)
+            printer(std::streamsize)
             {
             }
 
             void init()
             {
                 m_it = m_cache.cbegin();
-                m_width = (std::streamsize) 1 + std::log10(m_max) + m_sign;
+                m_width = 1 + (std::streamsize) std::log10(m_max) + m_sign;
             }
 
             std::ostream& print_next(std::ostream& out)
@@ -405,7 +405,7 @@ namespace xt
             using cache_type = std::vector<bool>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(int)
+            printer(std::streamsize)
             {
             }
 
@@ -513,7 +513,7 @@ namespace xt
             using cache_type = std::vector<std::string>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(int)
+            printer(std::streamsize)
             {
             }
 
@@ -595,7 +595,7 @@ namespace xt
             lim = print_options::print_options().edge_items;
         }
 
-        int temp_precision = out.precision();
+        std::streamsize temp_precision = out.precision();
         if (print_options::print_options().precision != -1)
         {
             out << std::setprecision(print_options::print_options().precision);
