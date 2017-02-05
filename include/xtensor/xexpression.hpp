@@ -128,24 +128,51 @@ namespace xt
     namespace detail
     {
         template <class S>
+        struct closure
+        {
+            using type = typename std::conditional<std::is_lvalue_reference<S>::value,
+                                                   std::conditional_t<std::is_const<S>::value,
+                                                                      const std::decay_t<S>&, std::decay_t<S>&>,
+                                                   std::decay_t<S>>::type;
+        };
+
+        template <class S>
+        using closure_t = typename closure<S>::type;
+
+        template <class S>
         struct const_closure
         {
             using type = typename std::conditional<std::is_lvalue_reference<S>::value,
                                                    const std::decay_t<S>&,
                                                    std::decay_t<S>>::type;
         };
+        
+        template <class S>
+        using const_closure_t = typename const_closure<S>::type;
     }
 
     template <class E, class EN = void>
     struct xclosure
     {
-        using type = typename detail::const_closure<E>::type;
+        using type = detail::closure_t<E>;
     };
 
     template <class E>
     struct xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<typename detail::const_closure<E>::type>;
+        using type = xscalar<detail::closure_t<E>>;
+    };
+
+    template <class E, class EN = void>
+    struct const_xclosure
+    {
+        using type = detail::const_closure_t<E>;
+    };
+
+    template <class E>
+    struct const_xclosure<E, disable_xexpression<std::decay_t<E>>>
+    {
+        using type = xscalar<detail::const_closure_t<E>>;
     };
     
     /***************
