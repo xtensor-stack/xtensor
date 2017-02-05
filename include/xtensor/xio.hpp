@@ -585,7 +585,7 @@ namespace xt
     template <class E, class F>
     std::ostream& pretty_print(const xexpression<E>& e, F&& func, std::ostream& out = std::cout)
     {
-        xfunction<detail::custom_formatter<E>, std::string, xclosure<E>> print_fun(detail::custom_formatter<E>(std::forward<F>(func)), e);
+        xfunction<detail::custom_formatter<E>, std::string, const_xclosure_t<E>> print_fun(detail::custom_formatter<E>(std::forward<F>(func)), e);
         return pretty_print(print_fun, out);
     }
 
