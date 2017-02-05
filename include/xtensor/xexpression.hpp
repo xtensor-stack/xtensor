@@ -46,7 +46,6 @@ namespace xt
 
         derived_type& derived_cast() & noexcept;
         const derived_type& derived_cast() const & noexcept;
-
         derived_type derived_cast() && noexcept;
 
     protected:
@@ -126,41 +125,53 @@ namespace xt
     template <class T>
     class xscalar;
 
+    namespace detail
+    {
+        template <class S>
+        struct const_closure
+        {
+            using type = typename std::conditional<std::is_lvalue_reference<S>::value,
+                                                   const typename std::decay<S>::type&,
+                                                   typename std::decay<S>::type>::type;
+        };
+    }
+
     template <class E, class EN = void>
     struct xclosure
     {
-        using type = typename std::conditional<std::is_lvalue_reference<E>::value,
-                                               const typename std::decay<E>::type&,
-                                               typename std::decay<E>::type>::type;
+        using type = typename detail::const_closure<E>::type;
     };
 
     template <class E>
     struct xclosure<E, disable_xexpression<typename std::decay<E>::type>>
     {
-        using type = xscalar<typename std::decay<E>::type>;
+        using type = xscalar<typename detail::const_closure<E>::type>;
     };
     
-    /******************
-     * get_value_type *
-     ******************/
+    /***************
+     * xvalue_type *
+     ***************/
 
     namespace detail
     {
         template <class E, class enable = void>
-        struct get_value_type_impl
+        struct xvalue_type_impl
         {
             using type = E;
         };
 
         template <class E>
-        struct get_value_type_impl<E, std::enable_if_t<is_xexpression<E>::value>>
+        struct xvalue_type_impl<E, std::enable_if_t<is_xexpression<E>::value>>
         {
             using type = typename E::value_type;
         };
     }
 
     template <class E>
-    using get_value_type = typename detail::get_value_type_impl<E>::type;
+    using xvalue_type = detail::xvalue_type_impl<E>;
+
+    template <class E>
+    using xvalue_type_t = typename xvalue_type<E>::type;
     
     /***************
      * get_element *
