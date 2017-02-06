@@ -12,4 +12,14 @@
 #define XTENSOR_VERSION_MAJOR 0
 #define XTENSOR_VERSION_MINOR 3
 #define XTENSOR_VERSION_PATCH 1
+
+// DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
+#ifdef __clang__
+    #if __clang_major__ == 3 && __clang_minor__ < 8
+        #define X_OLD_CLANG
+        #include <initializer_list>
+        #include <vector>
+    #endif
+#endif
+
 #endif

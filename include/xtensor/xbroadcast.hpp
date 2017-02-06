@@ -20,15 +20,6 @@
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xiterator.hpp"
 
-// DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
-#ifdef __clang__
-    #if __clang_major__ == 3 && __clang_minor__ < 8
-        #define X_OLD_CLANG
-        #include <initializer_list>
-        #include <vector>
-    #endif
-#endif
-
 namespace xt
 {
 
@@ -88,7 +79,7 @@ namespace xt
         using const_storage_iterator = const_iterator;
 
         template <class S>
-        xbroadcast(CT e, S s) noexcept;
+        xbroadcast(CT e, S&& s) noexcept;
 
         size_type dimension() const noexcept;
         const shape_type & shape() const noexcept;
@@ -235,8 +226,8 @@ namespace xt
      */
     template <class CT, class X>
     template <class S>
-    inline xbroadcast<CT, X>::xbroadcast(CT e, S s) noexcept
-        : m_e(e), m_shape(std::move(s))
+    inline xbroadcast<CT, X>::xbroadcast(CT e, S&& s) noexcept
+        : m_e(e), m_shape(std::forward<S>(s))
     {
         xt::broadcast_shape(e.shape(), m_shape);
     }
