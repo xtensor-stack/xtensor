@@ -268,28 +268,28 @@ namespace xt
 
     template <class CT>
     template <class S>
-    inline auto xscalar<CT>::xbegin(const S& shape) const noexcept -> const_iterator
+    inline auto xscalar<CT>::xbegin(const S&) const noexcept -> const_iterator
     {
         return const_iterator(this);
     }
 
     template <class CT>
     template <class S>
-    inline auto xscalar<CT>::xend(const S& shape) const noexcept -> const_iterator
+    inline auto xscalar<CT>::xend(const S&) const noexcept -> const_iterator
     {
         return const_iterator(this);
     }
 
     template <class CT>
     template <class S>
-    inline auto xscalar<CT>::cxbegin(const S& shape) const noexcept -> const_iterator
+    inline auto xscalar<CT>::cxbegin(const S&) const noexcept -> const_iterator
     {
         return const_iterator(this);
     }
 
     template <class CT>
     template <class S>
-    inline auto xscalar<CT>::cxend(const S& shape) const noexcept -> const_iterator
+    inline auto xscalar<CT>::cxend(const S&) const noexcept -> const_iterator
     {
         return const_iterator(this);
     }

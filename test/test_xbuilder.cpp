@@ -40,6 +40,10 @@ namespace xt
         ASSERT_EQ(m_assigned[{0}], 0);
         ASSERT_EQ(m_assigned[{49}], 49);
         ASSERT_EQ(m_assigned[{29}], 29);
+
+        xarray<double> b({ 2, 50 }, 1.);
+        xarray<double> res = b + ls;
+        ASSERT_EQ(50, res(1, 49));
     }
 
     TEST(xbuilder, arange_min_max)
