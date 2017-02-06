@@ -132,47 +132,6 @@ namespace xt
      * broadcast implementation *
      ****************************/
 
-    namespace detail
-    {
-        template <class R, class A, class E = void>
-        struct shape_forwarder
-        {
-            static inline R run(const A& r)
-            {
-                return R(std::begin(r), std::end(r));
-            }
-        };
-
-        template <class I, std::size_t L, class A>
-        struct shape_forwarder<std::array<I, L>, A, 
-                               std::enable_if_t<!std::is_same<std::array<I, L>, A>::value>>
-        {
-            using R = std::array<I, L>;
-
-            static inline R run(const A& r)
-            {
-                R ret;
-                std::copy(std::begin(r), std::end(r), std::begin(ret));
-                return ret;
-            }
-        };
-
-        template <class R>
-        struct shape_forwarder<R, R>
-        {
-            static inline const R& run(const R& r)
-            {
-                return r;
-            }
-        };
-
-        template <class R, class A>
-        inline auto forward_shape(const A& s)
-        {
-            return shape_forwarder<R, A>::run(s);
-        }
-    }
-
     /**
      * @brief Returns an \ref xexpression broadcasting the given expression to
      * a specified shape.
@@ -188,7 +147,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, S>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }
 
 #ifdef X_OLD_CLANG
@@ -197,7 +156,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<std::size_t>>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }
 #else
     template <class E, class I, std::size_t L>
@@ -205,7 +164,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<std::size_t, L>>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }
 #endif
 

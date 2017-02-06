@@ -43,8 +43,32 @@ namespace xt
     template <class R, class F, class... S>
     R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()));
 
+    template <class T, class S>
+    void nested_copy(T&& iter, const S& s);
+
+    template <class T, class S>
+    void nested_copy(T&& iter, std::initializer_list<S> s);
+
     template <class U>
     struct initializer_dimension;
+
+    template <class R, class T>
+    constexpr R shape(T t);
+
+    template <class T, class S>
+    constexpr bool check_shape(T t, S first, S last);
+
+    template <class C>
+    bool resize_container(C& c, typename C::size_type size);
+
+    template <class T, std::size_t N>
+    bool resize_container(std::array<T, N>& a, typename std::array<T, N>::size_type size);
+
+    template <class S>
+    S make_sequence(typename S::size_type size, typename S::value_type v);
+
+    template <class R, class A>
+    auto forward_sequence(const A& s);
 
     /*******************************
      * remove_class implementation *
@@ -397,6 +421,51 @@ namespace xt
     inline S make_sequence(typename S::size_type size, typename S::value_type v)
     {
         return detail::sequence_builder<S>::make(size, v);
+    }
+
+    /***********************************
+     * forward_sequence implementation *
+     ***********************************/
+
+    namespace detail
+    {
+        template <class R, class A, class E = void>
+        struct sequence_forwarder
+        {
+            static inline R run(const A& r)
+            {
+                return R(std::begin(r), std::end(r));
+            }
+        };
+
+        template <class I, std::size_t L, class A>
+        struct sequence_forwarder<std::array<I, L>, A,
+                                  std::enable_if_t<!std::is_same<std::array<I, L>, A>::value>>
+        {
+            using R = std::array<I, L>;
+
+            static inline R run(const A& r)
+            {
+                R ret;
+                std::copy(std::begin(r), std::end(r), std::begin(ret));
+                return ret;
+            }
+        };
+
+        template <class R>
+        struct sequence_forwarder<R, R>
+        {
+            static inline const R& run(const R& r)
+            {
+                return r;
+            }
+        };
+    }
+
+    template <class R, class A>
+    inline auto forward_sequence(const A& s)
+    {
+        return detail::sequence_forwarder<R, A>::run(s);
     }
 
     /*************************************

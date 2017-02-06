@@ -21,6 +21,59 @@
 
 namespace xt
 {
+    /*********************
+     * Random generators *
+     *********************/
+
+    namespace random
+    {
+        using default_engine_type = std::mt19937;
+        using seed_type = default_engine_type::result_type;
+
+        default_engine_type& get_default_random_engine();
+        void seed(seed_type seed);
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto rand(const S& shape, T lower = 0, T upper = 1,
+                  E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto randint(const S& shape, T lower = 0, T upper = std::numeric_limits<T>::max(),
+                     E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto randn(const S& shape, T mean = 0, T std_dev = 1,
+                   E& engine = random::get_default_random_engine());
+
+#ifdef X_OLD_CLANG
+        template <class T, class I, class E = random::default_engine_type>
+        auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
+                  E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto randint(std::initializer_list<I> shape,
+                     T lower = 0, T upper = std::numeric_limits<T>::max(),
+                     E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto randn(std::initializer_list<I>, T mean = 0, T std_dev = 1,
+                   E& engine = random::get_default_random_engine());
+#else
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto rand(const I(&shape)[L], T lower = 0, T upper = 1,
+                  E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto randint(const I(&shape)[L], T lower = 0, T upper = std::numeric_limits<T>::max(),
+                     E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto randn(const I(&shape)[L], T mean = 0, T std_dev = 1,
+                   E& engine = random::get_default_random_engine());
+#endif
+
+    }
+
     namespace detail
     {
         template <class T>
@@ -57,9 +110,6 @@ namespace xt
     
     namespace random
     {
-        using default_engine_type = std::mt19937;
-        using seed_type = default_engine_type::result_type;
-
         /**
          * Returns a reference to the default random number engine
          */
@@ -90,9 +140,8 @@ namespace xt
          * @param engine random number engine
          * @tparam T number type to use
          */ 
-        template <class T, class E = random::default_engine_type>
-        inline auto rand(std::vector<std::size_t> shape, T lower = 0, T upper = 1,
-                         E& engine = random::get_default_random_engine())
+        template <class T, class S, class E>
+        inline auto rand(const S& shape, T lower, T upper, E& engine)
         {
             std::uniform_real_distribution<T> dist(lower, upper);
             return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
@@ -110,10 +159,8 @@ namespace xt
          * @param engine random number engine
          * @tparam T number type to use
          */
-        template <class T, class E = random::default_engine_type>
-        inline auto randint(std::vector<std::size_t> shape,
-                            T lower = 0, T upper = std::numeric_limits<T>::max(), 
-                            E& engine = random::get_default_random_engine())
+        template <class T, class S, class E>
+        inline auto randint(const S& shape, T lower, T upper, E& engine)
         {
             std::uniform_int_distribution<T> dist(lower, upper - 1);
             return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
@@ -132,14 +179,56 @@ namespace xt
          * @param engine random number engine
          * @tparam T number type to use
          */
-        template <class T, class E = random::default_engine_type>
-        inline auto randn(std::vector<std::size_t> shape,
-                          T mean = 0, T std_dev = 1,
-                          E& engine = random::get_default_random_engine())
+        template <class T, class S, class E>
+        inline auto randn(const S& shape, T mean, T std_dev, E& engine)
         {
             std::normal_distribution<T> dist(mean, std_dev);
             return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
         }
+
+#ifdef X_OLD_CLANG
+        template <class T, class I, class E>
+        inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
+        {
+            std::uniform_real_distribution<T> dist(lower, upper);
+            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+        }
+
+        template <class T, class I, class E>
+        inline auto randint(std::initializer_list<I> shape, T lower, T upper, E& engine)
+        {
+            std::uniform_int_distribution<T> dist(lower, upper - 1);
+            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+        }
+
+        template <class T, class I, class E>
+        inline auto randn(std::initializer_list<I> shape, T mean, T std_dev, E& engine)
+        {
+            std::normal_distribution<T> dist(mean, std_dev);
+            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+        }
+#else
+        template <class T, class I, std::size_t L, class E>
+        inline auto rand(const I(&shape)[L], T lower, T upper, E& engine)
+        {
+            std::uniform_real_distribution<T> dist(lower, upper);
+            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto randint(const I(&shape)[L], T lower, T upper, E& engine)
+        {
+            std::uniform_int_distribution<T> dist(lower, upper - 1);
+            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto randn(const I(&shape)[L], T mean, T std_dev, E& engine)
+        {
+            std::normal_distribution<T> dist(mean, std_dev);
+            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+        }
+#endif
     }
 }
 
