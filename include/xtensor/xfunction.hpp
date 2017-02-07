@@ -113,8 +113,13 @@ namespace xt
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
 
         using const_stepper = xfunction_stepper<F, R, CT...>;
+        using stepper = const_stepper;
+
         using const_iterator = xiterator<const_stepper, shape_type>;
+        using iterator = const_iterator;
+
         using const_storage_iterator = xf_storage_iterator<F, R, CT...>;
+        using storage_iterator = const_storage_iterator;
 
         template <class Func>
         xfunction(Func&& f, CT... e) noexcept;

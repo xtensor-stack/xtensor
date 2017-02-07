@@ -404,10 +404,10 @@ namespace xt
      */
     template <class T>
     inline auto nonzero(const T& arr)
-        -> std::vector<get_index_type<typename T::shape_type>>
+        -> std::vector<xindex_type_t<typename T::shape_type>>
     {
         auto shape = arr.shape();
-        using index_type = get_index_type<typename T::shape_type>;
+        using index_type = xindex_type_t<typename T::shape_type>;
         using size_type = typename T::size_type;
 
         index_type idx(arr.dimension(), 0);
@@ -451,7 +451,7 @@ namespace xt
      */
     template <class T>
     inline auto where(const T& condition)
-        -> std::vector<get_index_type<typename T::shape_type>>
+        -> std::vector<xindex_type_t<typename T::shape_type>>
     {
         return nonzero(condition);
     }

@@ -49,7 +49,7 @@ namespace xt
         }
 
         /**
-         * @brief Sets the line width. After \ref line_width chars,
+         * @brief Sets the line width. After \a line_width chars,
          *        a new line is added.
          *
          * @param line_width The line width
@@ -62,7 +62,7 @@ namespace xt
         /**
          * @brief Sets the threshold after which summarization is triggered (default: 1000).
          *
-         * @param precision The number of elements in the xexpression that triggers
+         * @param threshold The number of elements in the xexpression that triggers
          *                  summarization in the output
          */
         void set_threshold(std::size_t threshold)
