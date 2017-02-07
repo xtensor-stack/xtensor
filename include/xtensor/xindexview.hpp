@@ -86,7 +86,7 @@ namespace xt
         using const_storage_iterator = const_iterator;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
-        using base_index_type = get_index_type<shape_type>;
+        using base_index_type = xindex_type_t<shape_type>;
 
         xindexview(E& f, indices_type&& indices) noexcept;
 
@@ -196,7 +196,7 @@ namespace xt
         using iterator_category = std::input_iterator_tag;
 
         using shape_type = S;
-        using index_type = get_index_type<shape_type>;
+        using index_type = xindex_type_t<shape_type>;
 
         xindexview_stepper() = default;
         xindexview_stepper(view_type* func, const shape_type& shape) noexcept;

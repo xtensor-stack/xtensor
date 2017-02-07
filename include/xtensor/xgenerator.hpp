@@ -138,7 +138,7 @@ namespace xt
         using iterator_category = std::input_iterator_tag;
 
         using shape_type = typename xgenerator_type::shape_type;
-        using index_type = get_index_type<shape_type>;
+        using index_type = xindex_type_t<shape_type>;
 
         xgenerator_stepper() = default;
         xgenerator_stepper(const xgenerator_type* func, size_type offset, bool end = false) noexcept;

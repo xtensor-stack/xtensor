@@ -194,7 +194,7 @@ namespace xt
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
-        using base_index_type = get_index_type<shape_type>;
+        using base_index_type = xindex_type_t<shape_type>;
 
         template <class It>
         base_index_type make_index(It first, It last) const;
