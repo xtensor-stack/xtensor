@@ -130,10 +130,12 @@ namespace xt
         template <class S>
         struct closure
         {
+            using underlying_type = std::conditional_t<std::is_const<std::remove_reference_t<S>>::value,
+                                                       const std::decay_t<S>,
+                                                       std::decay_t<S>>;
             using type = typename std::conditional<std::is_lvalue_reference<S>::value,
-                                                   std::conditional_t<std::is_const<S>::value,
-                                                                      const std::decay_t<S>&, std::decay_t<S>&>,
-                                                   std::decay_t<S>>::type;
+                                                   underlying_type&,
+                                                   underlying_type>::type;
         };
 
         template <class S>
@@ -142,9 +144,10 @@ namespace xt
         template <class S>
         struct const_closure
         {
+            using underlying_type = const std::decay_t<S>;
             using type = typename std::conditional<std::is_lvalue_reference<S>::value,
-                                                   const std::decay_t<S>&,
-                                                   std::decay_t<S>>::type;
+                                                   underlying_type&,
+                                                   underlying_type>::type;
         };
         
         template <class S>

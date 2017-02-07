@@ -13,11 +13,11 @@ xrandom
 .. doxygenfunction:: xt::random::seed
    :project: xtensor
 
-.. doxygenfunction:: xt::random::rand
+.. doxygenfunction:: xt::random::rand(const S&, T, T, E&)
    :project: xtensor
 
-.. doxygenfunction:: xt::random::randint
+.. doxygenfunction:: xt::random::randint(const S&, T, T, E&)
    :project: xtensor
 
-.. doxygenfunction:: xt::random::randn
+.. doxygenfunction:: xt::random::randn(const S&, T, T, E&)
    :project: xtensor

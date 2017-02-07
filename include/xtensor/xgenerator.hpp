@@ -61,8 +61,13 @@ namespace xt
         using strides_type = S;
 
         using const_stepper = xgenerator_stepper<F, R, S>;
+        using stepper = const_stepper;
+
         using const_iterator = xiterator<const_stepper, shape_type>;
+        using iterator = const_iterator;
+
         using const_storage_iterator = const_iterator;
+        using storage_iterator = const_storage_iterator;
 
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;
@@ -138,7 +143,7 @@ namespace xt
         using iterator_category = std::input_iterator_tag;
 
         using shape_type = typename xgenerator_type::shape_type;
-        using index_type = get_index_type<shape_type>;
+        using index_type = xindex_type_t<shape_type>;
 
         xgenerator_stepper() = default;
         xgenerator_stepper(const xgenerator_type* func, size_type offset, bool end = false) noexcept;

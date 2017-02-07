@@ -75,8 +75,13 @@ namespace xt
         using shape_type = promote_shape_t<typename xexpression_type::shape_type, X>;
 
         using const_stepper = typename xexpression_type::const_stepper;
+        using stepper = const_stepper;
+
         using const_iterator = xiterator<const_stepper, shape_type>;
+        using iterator = const_iterator;
+
         using const_storage_iterator = const_iterator;
+        using storage_iterator = const_storage_iterator;
 
         template <class S>
         xbroadcast(CT e, S&& s) noexcept;

@@ -48,8 +48,13 @@ namespace xt
         using shape_type = std::array<size_type, 0>;
 
         using const_stepper = xscalar_stepper<CT>;
+        using stepper = const_stepper;
+
         using const_iterator = xscalar_iterator<CT>;
+        using iterator = const_iterator;
+
         using const_storage_iterator = xscalar_iterator<CT>;
+        using storage_iterator = const_storage_iterator;
 
         xscalar(CT value) noexcept;
 

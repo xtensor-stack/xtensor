@@ -53,7 +53,7 @@ namespace xt
         using lhs_iterator = typename E1::stepper;
         using rhs_iterator = typename E2::const_stepper;
         using shape_type = typename E1::shape_type;
-        using index_type = get_index_type<shape_type>;
+        using index_type = xindex_type_t<shape_type>;
         using size_type = typename lhs_iterator::size_type;
 
         data_assigner(E1& e1, const E2 & e2);

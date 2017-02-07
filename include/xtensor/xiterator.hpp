@@ -65,7 +65,7 @@ namespace xt
     }
 
     template <class C>
-    using get_index_type = typename detail::index_type_impl<C>::type;
+    using xindex_type_t = typename detail::index_type_impl<C>::type;
  
     template <class C>
     class xstepper
@@ -137,7 +137,7 @@ namespace xt
         using iterator_category = std::forward_iterator_tag;
 
         using shape_type = S;
-        using index_type = get_index_type<shape_type>;
+        using index_type = xindex_type_t<shape_type>;
 
         xiterator() = default;
         xiterator(It it, const shape_type& shape);

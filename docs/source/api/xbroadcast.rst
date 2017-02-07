@@ -10,3 +10,6 @@ xbroadcast
 .. doxygenclass:: xt::xbroadcast
    :project: xtensor
    :members:
+
+.. doxygenfunction:: xt::broadcast(E&&, const S&)
+   :project: xtensor
