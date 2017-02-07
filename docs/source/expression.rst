@@ -43,7 +43,7 @@ will produce quite the same assembly as the following loop:
 Lazy evaluation
 ---------------
 
-An expression such as ``x + y * sin(z)`` does not hold the result. **Values are only computed upon access or when the expression is assigned to an xarray object**. This
+An expression such as ``x + y * sin(z)`` does not hold the result. **Values are only computed upon access or when the expression is assigned to a container**. This
 allows to operate symbolically on very large arrays and only compute the result for the indices of interest:
 
 .. code::
@@ -56,7 +56,7 @@ allows to operate symbolically on very large arrays and only compute the result 
     // Only two values have been computed
 
 That means if you use the same expression in two assign statements, the computation of the expression will be done twice. Depending on the complexity of the computation
-and the size of the data, it might be convenient to store the result of the expression in a temporary:
+and the size of the data, it might be convenient to store the result of the expression in a temporary variable:
 
 .. code::
 

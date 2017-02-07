@@ -13,8 +13,8 @@ Python bindings
 The xtensor-python_ project provides the implementation of a container compatible with ``xtensor``, ``pyarray`` which
 effectively wraps numpy arrays, allowing inplace modification, including reshapes.
 
-Cookiecutter
-------------
+Extension Cookiecutter
+----------------------
 
 The xtensor-cookiecutter_ project helps extension authors create Python extension modules making use of `xtensor`.
 
