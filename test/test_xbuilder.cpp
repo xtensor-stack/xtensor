@@ -28,7 +28,7 @@ namespace xt
     {
         auto ls = arange<double>(50);
         ASSERT_EQ(ls.dimension(), 1);
-        shape_t expected_shape = {50};
+        decltype(ls)::shape_type expected_shape = {50};
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 0);
         auto ls_49 = ls(49);
@@ -40,13 +40,17 @@ namespace xt
         ASSERT_EQ(m_assigned[{0}], 0);
         ASSERT_EQ(m_assigned[{49}], 49);
         ASSERT_EQ(m_assigned[{29}], 29);
+
+        xarray<double> b({ 2, 50 }, 1.);
+        xarray<double> res = b + ls;
+        ASSERT_EQ(50, res(1, 49));
     }
 
     TEST(xbuilder, arange_min_max)
     {
         auto ls = arange<unsigned int>(10u, 20u);
         ASSERT_EQ(ls.dimension(), 1);
-        shape_t expected_shape = {10};
+        decltype(ls)::shape_type expected_shape = {10};
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 10);
         ASSERT_EQ(ls(9), 19);
@@ -63,7 +67,7 @@ namespace xt
     {
         auto ls = arange<float>(10, 20, 0.5f);
         ASSERT_EQ(ls.dimension(), 1);
-        shape_t expected_shape = {20};
+        decltype(ls)::shape_type expected_shape = {20};
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 10);
         ASSERT_EQ(ls(10), 15);
@@ -76,7 +80,7 @@ namespace xt
         ASSERT_EQ(m_assigned(3), 11.5f);
 
         auto l3 = arange<float>(0, 1, 0.3f);
-        shape_t expected_shape_2 = {4};
+        decltype(l3)::shape_type expected_shape_2 = {4};
         ASSERT_EQ(l3.shape(), expected_shape_2);
         ASSERT_EQ(l3[{0}], 0);
         ASSERT_EQ(3.f * 0.3f, l3[{3}]);
@@ -86,7 +90,7 @@ namespace xt
     {
         auto ls = linspace<float>(20.f, 50.f);
         ASSERT_EQ(ls.dimension(), 1);
-        shape_t expected_shape = {50};
+        decltype(ls)::shape_type expected_shape = {50};
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 20.f);
         ASSERT_EQ(ls(49), 50.f);
@@ -106,7 +110,7 @@ namespace xt
     {
         auto ls = linspace<float>(20.f, 50.f, 100, false);
         ASSERT_EQ(ls.dimension(), 1);
-        shape_t expected_shape = {100};
+        decltype(ls)::shape_type expected_shape = {100};
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 20.f);
 
@@ -128,7 +132,7 @@ namespace xt
     {
         auto ls = logspace<double>(2., 3., 4);
         ASSERT_EQ(ls.dimension(), 1);
-        shape_t expected_shape = {4};
+        decltype(ls)::shape_type expected_shape = {4};
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 100);
 
@@ -148,7 +152,7 @@ namespace xt
     {
         auto e = eye(5);
         ASSERT_EQ(2, e.dimension());
-        shape_t expected_shape = {5, 5};
+        decltype(e)::shape_type expected_shape = {5, 5};
         ASSERT_EQ(expected_shape, e.shape());
 
         ASSERT_EQ(true, e(1, 1));

@@ -141,7 +141,7 @@ namespace xt
         using index_type = get_index_type<shape_type>;
 
         xgenerator_stepper() = default;
-        xgenerator_stepper(const xgenerator_type* func, const shape_type& shape) noexcept;
+        xgenerator_stepper(const xgenerator_type* func, size_type offset, bool end = false) noexcept;
 
         void step(size_type dim, size_type n = 1);
         void step_back(size_type dim, size_type n = 1);
@@ -154,9 +154,10 @@ namespace xt
         bool equal(const self_type& rhs) const;
 
     private:
+
         const xgenerator_type* p_f;
-        shape_type m_shape;
         index_type m_index;
+        size_type m_offset;
     };
 
     template <class F, class R, class S>
@@ -373,16 +374,16 @@ namespace xt
     template <class O>
     inline auto xgenerator<F, R, S>::stepper_begin(const O& shape) const noexcept -> const_stepper
     {
-        return xgenerator_stepper<F, R, S>(this, shape);
+        size_type offset = shape.size() - dimension();
+        return xgenerator_stepper<F, R, S>(this, offset);
     }
 
     template <class F, class R, class S>
     template <class O>
     inline auto xgenerator<F, R, S>::stepper_end(const O& shape) const noexcept -> const_stepper
     {
-        auto stepper = xgenerator_stepper<F, R, S>(this, shape);
-        stepper.to_end();
-        return stepper;
+        size_type offset = shape.size() - dimension();
+        return xgenerator_stepper<F, R, S>(this, offset, true);
     }
 
     /**
@@ -434,45 +435,52 @@ namespace xt
      ******************************************/
 
     template <class F, class R, class S>
-    inline xgenerator_stepper<F, R, S>::xgenerator_stepper(const xgenerator_type* func, const shape_type& shape) noexcept
-        : p_f(func), m_shape(shape), m_index(make_sequence<index_type>(shape.size(), size_type(0)))
+    inline xgenerator_stepper<F, R, S>::xgenerator_stepper(const xgenerator_type* func, size_type offset, bool end) noexcept
+        : p_f(func), m_index(make_sequence<index_type>(func->shape().size(), size_type(0))), m_offset(offset)
     {
+        if (end)
+        {
+            m_index = p_f->shape();
+        }
     }
 
     template <class F, class R, class S>
     inline void xgenerator_stepper<F, R, S>::step(size_type dim, size_type n)
     {
-        m_index[dim] += n;
+        if(dim >= m_offset)
+            m_index[dim - m_offset] += n;
     }
 
     template <class F, class R, class S>
     inline void xgenerator_stepper<F, R, S>::step_back(size_type dim, size_type n)
     {
-        m_index[dim] -= 1;
+        if(dim >= m_offset)
+            m_index[dim - m_offset] -= n;
     }
 
     template <class F, class R, class S>
     inline void xgenerator_stepper<F, R, S>::reset(size_type dim)
     {
-        m_index[dim] = 0;
+        if(dim >= m_offset)
+            m_index[dim - m_offset] = 0;
     }
 
     template <class F, class R, class S>
     inline void xgenerator_stepper<F, R, S>::to_end()
     {
-        m_index = m_shape;
+        m_index = p_f->shape();
     }
 
     template <class F, class R, class S>
     inline bool xgenerator_stepper<F, R, S>::equal(const self_type& rhs) const
     {
-        return p_f == rhs.p_f && std::equal(m_index.begin(), m_index.end(), rhs.m_index.begin());
+        return (p_f == rhs.p_f) && (m_index == rhs.m_index);
     }
 
     template <class F, class R, class S>
     inline auto xgenerator_stepper<F, R, S>::operator*() const -> reference
     {
-        return (*p_f)[m_index];
+        return p_f->element(m_index.begin(), m_index.end());
     }
 
     template <class F, class R, class S>
@@ -491,17 +499,28 @@ namespace xt
 
     namespace detail
     {
+#ifdef X_OLD_CLANG
         template <class Functor, class I>
         inline auto make_xgenerator(Functor&& f, std::initializer_list<I> shape) noexcept
         {
-            using type = xgenerator<Functor, typename Functor::value_type, std::vector<std::size_t>>;
-            return type(std::forward<Functor>(f), std::vector<std::size_t>(shape));
+            using shape_type = std::vector<std::size_t>;
+            using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
+            return type(std::forward<Functor>(f), forward_sequence<shape_type>(shape));
         }
+#else
+        template <class Functor, class I, std::size_t L>
+        inline auto make_xgenerator(Functor&& f, const I(&shape)[L]) noexcept
+        {
+            using shape_type = std::array<std::size_t, L>;
+            using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
+            return type(std::forward<Functor>(f), forward_sequence<shape_type>(shape));
+        }
+#endif
         
         template <class Functor, class S>
         inline auto make_xgenerator(Functor&& f, const S& shape) noexcept
         {
-            using type = xgenerator<Functor, typename Functor::value_type, std::vector<std::size_t>>;
+            using type = xgenerator<Functor, typename Functor::value_type, S>;
             return type(std::forward<Functor>(f), shape);
         }
     }

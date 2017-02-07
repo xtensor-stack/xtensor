@@ -20,15 +20,6 @@
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xiterator.hpp"
 
-// DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
-#ifdef __clang__
-    #if __clang_major__ == 3 && __clang_minor__ < 8
-        #define X_OLD_CLANG
-        #include <initializer_list>
-        #include <vector>
-    #endif
-#endif
-
 namespace xt
 {
 
@@ -88,7 +79,7 @@ namespace xt
         using const_storage_iterator = const_iterator;
 
         template <class S>
-        xbroadcast(CT e, S s) noexcept;
+        xbroadcast(CT e, S&& s) noexcept;
 
         size_type dimension() const noexcept;
         const shape_type & shape() const noexcept;
@@ -141,47 +132,6 @@ namespace xt
      * broadcast implementation *
      ****************************/
 
-    namespace detail
-    {
-        template <class R, class A, class E = void>
-        struct shape_forwarder
-        {
-            static inline R run(const A& r)
-            {
-                return R(std::begin(r), std::end(r));
-            }
-        };
-
-        template <class I, std::size_t L, class A>
-        struct shape_forwarder<std::array<I, L>, A, 
-                               std::enable_if_t<!std::is_same<std::array<I, L>, A>::value>>
-        {
-            using R = std::array<I, L>;
-
-            static inline R run(const A& r)
-            {
-                R ret;
-                std::copy(std::begin(r), std::end(r), std::begin(ret));
-                return ret;
-            }
-        };
-
-        template <class R>
-        struct shape_forwarder<R, R>
-        {
-            static inline const R& run(const R& r)
-            {
-                return r;
-            }
-        };
-
-        template <class R, class A>
-        inline auto forward_shape(const A& s)
-        {
-            return shape_forwarder<R, A>::run(s);
-        }
-    }
-
     /**
      * @brief Returns an \ref xexpression broadcasting the given expression to
      * a specified shape.
@@ -197,7 +147,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, S>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }
 
 #ifdef X_OLD_CLANG
@@ -206,7 +156,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<std::size_t>>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }
 #else
     template <class E, class I, std::size_t L>
@@ -214,7 +164,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<std::size_t, L>>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), detail::forward_shape<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }
 #endif
 
@@ -235,8 +185,8 @@ namespace xt
      */
     template <class CT, class X>
     template <class S>
-    inline xbroadcast<CT, X>::xbroadcast(CT e, S s) noexcept
-        : m_e(e), m_shape(std::move(s))
+    inline xbroadcast<CT, X>::xbroadcast(CT e, S&& s) noexcept
+        : m_e(e), m_shape(std::forward<S>(s))
     {
         xt::broadcast_shape(e.shape(), m_shape);
     }

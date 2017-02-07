@@ -175,7 +175,7 @@ namespace xt
     template <class E>
     struct const_xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<detail::const_closure_t<E>>;
+        using type = xscalar<std::decay_t<E>>;
     };
  
     template <class E>
