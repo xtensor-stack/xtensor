@@ -164,21 +164,20 @@ namespace xt
         std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.storage_begin());
 
-        view_shape_type shape2 = { 3 };
+        view_shape_type shape2 = { 4 };
         xarray<int> b(shape2);
-        std::vector<int> data2 = { 1, 2, 3 };
+        std::vector<int> data2 = { 1, 2, 3, 4 };
         std::copy(data2.cbegin(), data2.cend(), b.storage_begin());
 
-        //auto func = view(a + b, 1, range(1, 4));
-        auto func = view(a, 1, range(1, 4)) + b;
-        auto iter = func.begin();
-        auto iter_end = func.end();
+        auto v = view(a + b, 1, range(1, 4));
+        auto iter = v.begin();
+        auto iter_end = v.end();
 
-        EXPECT_EQ(7, *iter);
+        EXPECT_EQ(8, *iter);
         ++iter;
-        EXPECT_EQ(9, *iter);
+        EXPECT_EQ(10, *iter);
         ++iter;
-        EXPECT_EQ(11, *iter);
+        EXPECT_EQ(12, *iter);
         ++iter;
         EXPECT_EQ(iter, iter_end);
     }

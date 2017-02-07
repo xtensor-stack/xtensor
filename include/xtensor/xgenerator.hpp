@@ -61,8 +61,13 @@ namespace xt
         using strides_type = S;
 
         using const_stepper = xgenerator_stepper<F, R, S>;
+        using stepper = const_stepper;
+
         using const_iterator = xiterator<const_stepper, shape_type>;
+        using iterator = const_iterator;
+
         using const_storage_iterator = const_iterator;
+        using storage_iterator = const_storage_iterator;
 
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;
