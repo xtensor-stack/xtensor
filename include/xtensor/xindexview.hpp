@@ -723,10 +723,15 @@ namespace xt
     }
 #ifdef X_OLD_CLANG
     template <class E, class I>
-    inline auto index_view(E&& e, std::initializer_list<I> indices) noexcept
+    inline auto index_view(E&& e, std::initializer_list<std::initializer_list<I>> indices) noexcept
     {
+        std::vector<xindex> idx;
+        for (auto it=indices.begin(); it!=indices.end(); ++it)
+        {
+            idx.emplace_back(xindex(it->begin(), it->end()));
+        }
         using view_type = xindexview<xclosure_t<E>, std::array<std::size_t, 1>, std::vector<xindex>>;
-        return view_type(std::forward<E>(e), std::vector<xindex>(indices));
+        return view_type(std::forward<E>(e), std::move(idx));
     }
 #else
     template <class E, std::size_t L>
