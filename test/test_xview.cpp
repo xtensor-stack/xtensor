@@ -169,6 +169,7 @@ namespace xt
         std::vector<int> data2 = { 1, 2, 3 };
         std::copy(data2.cbegin(), data2.cend(), b.storage_begin());
 
+        //auto func = view(a + b, 1, range(1, 4));
         auto func = view(a, 1, range(1, 4)) + b;
         auto iter = func.begin();
         auto iter_end = func.end();
@@ -222,9 +223,9 @@ namespace xt
 
     TEST(xview, const_view)
     {
-        const xtensor<double, 3> arr{ {1, 2, 3}, 2.5 };
-        xtensor<double, 2> arr2{ {2, 3}, 0.0 };
-        xtensor<double, 2> ref{ {2, 3}, 2.5 };
+        const xtensor<double, 3> arr( {1, 2, 3}, 2.5);
+        xtensor<double, 2> arr2( {2, 3}, 0.0 );
+        xtensor<double, 2> ref( {2, 3}, 2.5 );
         arr2 = xt::view(arr, 0);
         EXPECT_EQ(ref, arr2);
     }

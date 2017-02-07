@@ -27,16 +27,17 @@ namespace xt
      * xview declaration *
      *********************/
 
-    template <class E, class... S>
+    template <class CT, class... S>
     class xview;
 
-    template <class E, class... S>
-    struct xcontainer_inner_types<xview<E, S...>>
+    template <class CT, class... S>
+    struct xcontainer_inner_types<xview<CT, S...>>
     {
-        using temporary_type = xarray<typename E::value_type>;
+        using xexpression_type = std::decay_t<CT>;
+        using temporary_type = xarray<typename xexpression_type::value_type>;
     };
 
-    template <bool is_const, class E, class... S>
+    template <bool is_const, class CT, class... S>
     class xview_stepper;
 
     template <class ST, class... S>
@@ -52,35 +53,35 @@ namespace xt
      * changing it. xview is not meant to be used directly, but
      * only with the \ref view helper functions.
      *
-     * @tparam E the expression type to adapt
+     * @tparam CT the closure type of the \ref xexpression to adapt
      * @tparam S the slices type describing the shape adaptation
      *
      * @sa view, range, all, newaxis
      */
-    template <class E, class... S>
-    class xview : public xview_semantic<xview<E, S...>>
+    template <class CT, class... S>
+    class xview : public xview_semantic<xview<CT, S...>>
     {
 
     public:
 
-        using self_type = xview<E, S...>;
-        using expression_type = E;
+        using self_type = xview<CT, S...>;
+        using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
 
-        using value_type = typename E::value_type;
-        using reference = typename E::reference;
-        using const_reference = typename E::const_reference;
-        using pointer = typename E::pointer;
-        using const_pointer = typename E::const_pointer;
-        using size_type = typename E::size_type;
-        using difference_type = typename E::difference_type;
+        using value_type = typename xexpression_type::value_type;
+        using reference = typename xexpression_type::reference;
+        using const_reference = typename xexpression_type::const_reference;
+        using pointer = typename xexpression_type::pointer;
+        using const_pointer = typename xexpression_type::const_pointer;
+        using size_type = typename xexpression_type::size_type;
+        using difference_type = typename xexpression_type::difference_type;
 
-        using shape_type = typename xview_shape_type<typename E::shape_type, S...>::type;
+        using shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
 
         using slice_type = std::tuple<S...>;
 
-        using stepper = xview_stepper<false, E, S...>;
-        using const_stepper = xview_stepper<true, E, S...>;
+        using stepper = xview_stepper<false, CT, S...>;
+        using const_stepper = xview_stepper<true, CT, S...>;
 
         using iterator = xiterator<stepper, shape_type>;
         using const_iterator = xiterator<const_stepper, shape_type>;
@@ -89,10 +90,10 @@ namespace xt
         using const_storage_iterator = const_iterator;
 
         template <class... SL>
-        xview(E& e, SL&&... slices) noexcept;
+        xview(CT e, SL&&... slices) noexcept;
 
-        template <class OE>
-        self_type& operator=(const xexpression<OE>& e);
+        template <class E>
+        self_type& operator=(const xexpression<E>& e);
 
         size_type dimension() const noexcept;
 
@@ -167,29 +168,29 @@ namespace xt
             static constexpr bool value = (I + newaxis_count_before<S...>(I + 1) < sizeof...(S));
         };
 
-        E& m_e;
+        CT m_e;
         slice_type m_slices;
         shape_type m_shape;
 
-        template <size_type... I, class... Args>
+        template <typename std::decay_t<CT>::size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args);
 
-        template <size_type... I, class... Args>
+        template <typename std::decay_t<CT>::size_type... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
-        template <size_type I, class... Args>
+        template <typename std::decay_t<CT>::size_type I, class... Args>
         std::enable_if_t<lesser_condition<I>::value, size_type> index(Args... args) const;
 
-        template <size_type I, class... Args>
+        template <typename std::decay_t<CT>::size_type I, class... Args >
         std::enable_if_t<!lesser_condition<I>::value, size_type> index(Args... args) const;
 
-        template<size_type I, class T>
+        template<typename std::decay_t<CT>::size_type, class T>
         size_type sliced_access(const xslice<T>& slice) const;
 
-        template<size_type I, class T, class Arg, class... Args>
+        template<typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
         size_type sliced_access(const xslice<T>& slice, Arg arg, Args... args) const;
 
-        template<size_type I, class T, class... Args>
+        template<typename std::decay_t<CT>::size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
@@ -200,11 +201,11 @@ namespace xt
 
         void assign_temporary_impl(temporary_type& tmp);
 
-        friend class xview_semantic<xview<E, S...>>;
+        friend class xview_semantic<xview<CT, S...>>;
     };
 
     template <class E, class... S>
-    xview<E, get_slice_type<E, S>...> view(E& e, S&&... slices);
+    auto view(E&& e, S&&... slices);
 
     /*****************************
      * xview_stepper declaration *
@@ -215,30 +216,30 @@ namespace xt
         template <class V>
         struct get_stepper_impl
         {
-            using expression_type = typename V::expression_type;
-            using type = typename expression_type::stepper;
+            using xexpression_type = typename V::xexpression_type;
+            using type = typename xexpression_type::stepper;
         };
 
         template <class V>
         struct get_stepper_impl<const V>
         {
-            using expression_type = typename V::expression_type;
-            using type = typename expression_type::const_stepper;
+            using xexpression_type = typename V::xexpression_type;
+            using type = typename xexpression_type::const_stepper;
         };
     }
 
     template <class V>
     using get_stepper = typename detail::get_stepper_impl<V>::type;
 
-    template <bool is_const, class E, class... S>
+    template <bool is_const, class CT, class... S>
     class xview_stepper
     {
 
     public:
 
         using view_type = std::conditional_t<is_const,
-                                             const xview<E, S...>,
-                                             xview<E, S...>>;
+                                             const xview<CT, S...>,
+                                             xview<CT, S...>>;
         using substepper_type = get_stepper<view_type>;
 
         using value_type = typename substepper_type::value_type;
@@ -275,13 +276,13 @@ namespace xt
         size_type m_offset;
     };
 
-    template <bool is_const, class E, class... S>
-    bool operator==(const xview_stepper<is_const, E, S...>& lhs,
-                    const xview_stepper<is_const, E, S...>& rhs);
+    template <bool is_const, class CT, class... S>
+    bool operator==(const xview_stepper<is_const, CT, S...>& lhs,
+                    const xview_stepper<is_const, CT, S...>& rhs);
 
-    template <bool is_const, class E, class... S>
-    bool operator!=(const xview_stepper<is_const, E, S...>& lhs,
-                    const xview_stepper<is_const, E, S...>& rhs);
+    template <bool is_const, class CT, class... S>
+    bool operator!=(const xview_stepper<is_const, CT, S...>& lhs,
+                    const xview_stepper<is_const, CT, S...>& rhs);
 
 
     // meta-function returning the shape type for an xview 
@@ -313,9 +314,9 @@ namespace xt
      * @param slices the slices list describing the view
      * @sa view
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class... SL>
-    inline xview<E, S...>::xview(E& e, SL&&... slices) noexcept
+    inline xview<CT, S...>::xview(CT e, SL&&... slices) noexcept
         : m_e(e), m_slices(std::forward<SL>(slices)...),
           m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
     {
@@ -336,9 +337,9 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class E, class... S>
-    template <class OE>
-    inline auto xview<E, S...>::operator=(const xexpression<OE>& e) -> self_type&
+    template <class CT, class... S>
+    template <class E>
+    inline auto xview<CT, S...>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
@@ -351,8 +352,8 @@ namespace xt
     /**
      * Returns the number of dimensions of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::dimension() const noexcept -> size_type
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::dimension() const noexcept -> size_type
     {
         return m_e.dimension() - integral_count<S...>() + newaxis_count<S...>();
     }
@@ -360,8 +361,8 @@ namespace xt
     /**
      * Returns the shape of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::shape() const noexcept -> const shape_type&
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
@@ -369,8 +370,8 @@ namespace xt
     /**
      * Returns the slices of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::slices() const noexcept -> const slice_type&
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::slices() const noexcept -> const slice_type&
     {
         return m_slices;
     }
@@ -386,9 +387,9 @@ namespace xt
      * must be unsigned integers, the number of indices should be equal or greater
      * than the number of dimensions of the view.
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class... Args>
-    inline auto xview<E, S...>::operator()(Args... args) -> reference
+    inline auto xview<CT, S...>::operator()(Args... args) -> reference
     {
         return access_impl(std::make_index_sequence<sizeof...(Args)
                                                     + integral_count<S...>()
@@ -396,15 +397,15 @@ namespace xt
                            args...);
     }
 
-    template <class E, class... S>
-    inline auto xview<E, S...>::operator[](const xindex& index) -> reference
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator[](const xindex& index) -> reference
     {
         return element(index.cbegin(), index.cend());
     }
 
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class It>
-    inline auto xview<E, S...>::element(It first, It last) -> reference
+    inline auto xview<CT, S...>::element(It first, It last) -> reference
     {
         auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
@@ -416,9 +417,9 @@ namespace xt
      * unsigned integers, the number of indices should be equal or greater than the number
      * of dimensions of the view.
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class... Args>
-    inline auto xview<E, S...>::operator()(Args... args) const -> const_reference
+    inline auto xview<CT, S...>::operator()(Args... args) const -> const_reference
     {
         return access_impl(std::make_index_sequence<sizeof...(Args)
                                                     + integral_count<S...>()
@@ -426,15 +427,15 @@ namespace xt
                            args...);
     }
     
-    template <class E, class... S>
-    inline auto xview<E, S...>::operator[](const xindex& index) const -> const_reference
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator[](const xindex& index) const -> const_reference
     {
         return element(index.cbegin(), index.cend());
     }
 
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class It>
-    inline auto xview<E, S...>::element(It first, It last) const -> const_reference
+    inline auto xview<CT, S...>::element(It first, It last) const -> const_reference
     {
         auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
@@ -450,9 +451,9 @@ namespace xt
      * @param shape the result shape
      * @return a boolean indicating whether the broadcasting is trivial
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline bool xview<E, S...>::broadcast_shape(ST& shape) const
+    inline bool xview<CT, S...>::broadcast_shape(ST& shape) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
@@ -462,69 +463,69 @@ namespace xt
      * the broadcasting is trivial.
      * @return a boolean indicating whether the broadcasting is trivial
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline bool xview<E, S...>::is_trivial_broadcast(const ST& /*strides*/) const
+    inline bool xview<CT, S...>::is_trivial_broadcast(const ST& /*strides*/) const
     {
         return false;
     }
     //@}
 
-    template <class E, class... S>
-    template <typename E::size_type... I, class... Args>
-    inline auto xview<E, S...>::access_impl(std::index_sequence<I...>, Args... args) -> reference
+    template <class CT, class... S>
+    template <typename std::decay_t<CT>::size_type... I, class... Args>
+    inline auto xview<CT, S...>::access_impl(std::index_sequence<I...>, Args... args) -> reference
     {
         return m_e(index<I>(args...)...);
     }
 
-    template <class E, class... S>
-    template <typename E::size_type... I, class... Args>
-    inline auto xview<E, S...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
+    template <class CT, class... S>
+    template <typename std::decay_t<CT>::size_type... I, class... Args>
+    inline auto xview<CT, S...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
     {
         return m_e(index<I>(args...)...);
     }
 
-    template <class E, class... S>
-    template <typename E::size_type I, class... Args>
-    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<lesser_condition<I>::value, size_type>
+    template <class CT, class... S>
+    template <typename std::decay_t<CT>::size_type I, class... Args>
+    inline auto xview<CT, S...>::index(Args... args) const -> std::enable_if_t<lesser_condition<I>::value, size_type>
     {
         return sliced_access<I - integral_count_before<S...>(I) + newaxis_count_before<S...>(I + 1)>
             (std::get<I + newaxis_count_before<S...>(I + 1)>(m_slices), args...);
     }
 
-    template <class E, class... S>
-    template <typename E::size_type I, class... Args>
-    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<!lesser_condition<I>::value, size_type>
+    template <class CT, class... S>
+    template <typename std::decay_t<CT>::size_type I, class... Args>
+    inline auto xview<CT, S...>::index(Args... args) const -> std::enable_if_t<!lesser_condition<I>::value, size_type>
     {
         return argument<I - integral_count<S...>() + newaxis_count<S...>()>(args...);
     }
 
-    template <class E, class... S>
-    template<typename E::size_type I, class T>
-    inline auto xview<E, S...>::sliced_access(const xslice<T>& slice) const -> size_type
+    template <class CT, class... S>
+    template<typename std::decay_t<CT>::size_type I, class T>
+    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice) const -> size_type
     {
         return slice.derived_cast()(0);
     }
 
-    template <class E, class... S>
-    template<typename E::size_type I, class T, class Arg, class... Args>
-    inline auto xview<E, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
+    template <class CT, class... S>
+    template<typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
+    inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
     {
         return slice.derived_cast()(argument<I>(arg, args...));
     }
 
-    template <class E, class... S>
-    template<typename E::size_type I, class T, class... Args>
-    inline auto xview<E, S...>::sliced_access(const T& squeeze, Args...) const -> disable_xslice<T, size_type>
+    template <class CT, class... S>
+    template<typename std::decay_t<CT>::size_type I, class T, class... Args>
+    inline auto xview<CT, S...>::sliced_access(const T& squeeze, Args...) const -> disable_xslice<T, size_type>
     {
         return squeeze;
     }
 
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class It>
-    inline auto xview<E, S...>::make_index(It first, It last) const -> base_index_type
+    inline auto xview<CT, S...>::make_index(It first, It last) const -> base_index_type
     {
-        auto index = make_sequence<typename E::shape_type>(m_e.dimension(), 0);
+        auto index = make_sequence<typename xexpression_type::shape_type>(m_e.dimension(), 0);
         auto func1 = [&first](const auto& s)
         {
             return get_slice_value(s, first);
@@ -551,8 +552,8 @@ namespace xt
         return index;
     }
 
-    template <class E, class... S>
-    inline void xview<E, S...>::assign_temporary_impl(temporary_type& tmp)
+    template <class CT, class... S>
+    inline void xview<CT, S...>::assign_temporary_impl(temporary_type& tmp)
     {
         std::copy(tmp.storage_cbegin(), tmp.storage_cend(), begin());
     }
@@ -566,11 +567,11 @@ namespace xt
         }
 
         template <class E, std::size_t... I, class... S>
-        inline xview<E, get_slice_type<E, S>...> make_view_impl(E& e, std::index_sequence<I...>, S&&... slices)
+        inline auto make_view_impl(E&& e, std::index_sequence<I...>, S&&... slices)
         {
-            return xview<E, get_slice_type<E, S>...>(
-                e,
-                std::forward<get_slice_type<E, S>>(get_slice_implementation(e, slices, get_underlying_shape_index<E, S...>(I)))...
+            using view_type = xview<closure_t<E>, get_slice_type<std::decay_t<E>, S>...>;
+            return view_type(std::forward<E>(e),
+                get_slice_implementation(e, std::forward<S>(slices), get_underlying_shape_index<std::decay_t<E>, S...>(I))...
             );
         }
     }
@@ -584,9 +585,9 @@ namespace xt
      * @sa range, all, newaxis
      */
     template <class E, class... S>
-    inline xview<E, get_slice_type<E, S>...> view(E& e, S&&... slices)
+    inline auto view(E&& e, S&&... slices)
     {
-        return detail::make_view_impl(e, std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
+        return detail::make_view_impl(std::forward<E>(e), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
     }
 
     /****************
@@ -600,8 +601,8 @@ namespace xt
     /**
      * Returns an iterator to the first element of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::begin() -> iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::begin() -> iterator
     {
         return xbegin(shape());
     }
@@ -610,8 +611,8 @@ namespace xt
      * Returns an iterator to the element following the last element
      * of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::end() -> iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::end() -> iterator
     {
         return xend(shape());
     }
@@ -619,8 +620,8 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::begin() const -> const_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::begin() const -> const_iterator
     {
         return xbegin(shape());
     }
@@ -629,8 +630,8 @@ namespace xt
      * Returns a constant iterator to the element following the last element
      * of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::end() const -> const_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::end() const -> const_iterator
     {
         return xend(shape());
     }
@@ -638,8 +639,8 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::cbegin() const -> const_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::cbegin() const -> const_iterator
     {
         return begin();
     }
@@ -648,8 +649,8 @@ namespace xt
      * Returns a constant iterator to the element following the last element
      * of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::cend() const -> const_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::cend() const -> const_iterator
     {
         return end();
     }
@@ -659,9 +660,9 @@ namespace xt
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for braodcasting
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::xbegin(const ST& shape) -> xiterator<stepper, ST>
+    inline auto xview<CT, S...>::xbegin(const ST& shape) -> xiterator<stepper, ST>
     {
         return xiterator<stepper, ST>(stepper_begin(shape), shape);
     }
@@ -671,9 +672,9 @@ namespace xt
      * view. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::xend(const ST& shape) -> xiterator<stepper, ST>
+    inline auto xview<CT, S...>::xend(const ST& shape) -> xiterator<stepper, ST>
     {
         return xiterator<stepper, ST>(stepper_end(shape), shape);
     }
@@ -683,9 +684,9 @@ namespace xt
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for braodcasting
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::xbegin(const ST& shape) const -> xiterator<const_stepper, ST>
+    inline auto xview<CT, S...>::xbegin(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xiterator<const_stepper, ST>(stepper_begin(shape), shape);
     }
@@ -695,9 +696,9 @@ namespace xt
      * view. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::xend(const ST& shape) const -> xiterator<const_stepper, ST>
+    inline auto xview<CT, S...>::xend(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xiterator<const_stepper, ST>(stepper_end(shape), shape);
     }
@@ -707,9 +708,9 @@ namespace xt
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for braodcasting
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::cxbegin(const ST& shape) const -> xiterator<const_stepper, ST>
+    inline auto xview<CT, S...>::cxbegin(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xbegin(shape);
     }
@@ -719,9 +720,9 @@ namespace xt
      * container. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      */
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::cxend(const ST& shape) const -> xiterator<const_stepper, ST>
+    inline auto xview<CT, S...>::cxend(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xend(shape);
     }
@@ -731,37 +732,37 @@ namespace xt
      * stepper api *
      ***************/
 
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::stepper_begin(const ST& shape) -> stepper
+    inline auto xview<CT, S...>::stepper_begin(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, m_e.stepper_begin(m_e.shape()), offset);
     }
 
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::stepper_end(const ST& shape) -> stepper
+    inline auto xview<CT, S...>::stepper_end(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, m_e.stepper_end(m_e.shape()), offset, true);
     }
 
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::stepper_begin(const ST& shape) const -> const_stepper
+    inline auto xview<CT, S...>::stepper_begin(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        const E& e = m_e;
+        const xexpression_type& e = m_e;
         return const_stepper(this, e.stepper_begin(m_e.shape()), offset);
     }
 
-    template <class E, class... S>
+    template <class CT, class... S>
     template <class ST>
-    inline auto xview<E, S...>::stepper_end(const ST& shape) const -> const_stepper
+    inline auto xview<CT, S...>::stepper_end(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        const E& e = m_e;
+        const xexpression_type& e = m_e;
         return const_stepper(this, e.stepper_end(m_e.shape()), offset, true);
     }
 
@@ -777,8 +778,8 @@ namespace xt
      * Returns an iterator to the first element of the buffer containing
      * the elements of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::storage_begin() -> storage_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::storage_begin() -> storage_iterator
     {
         return begin();
     }
@@ -787,8 +788,8 @@ namespace xt
      * Returns an iterator to the element following the last element of
      * the buffer containing the elements of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::storage_end() -> storage_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::storage_end() -> storage_iterator
     {
         return end();
     }
@@ -797,8 +798,8 @@ namespace xt
      * Returns a constant iterator to the first element of the buffer
      * containing the elements of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::storage_begin() const -> const_storage_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::storage_begin() const -> const_storage_iterator
     {
         return cbegin();
     }
@@ -807,8 +808,8 @@ namespace xt
      * Returns a constant iterator to the element following the last
      * element of the buffer containing the elements of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::storage_end() const -> const_storage_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::storage_end() const -> const_storage_iterator
     {
         return cend();
     }
@@ -817,8 +818,8 @@ namespace xt
      * Returns a constant iterator to the first element of the buffer
      * containing the elements of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::storage_cbegin() const -> const_storage_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::storage_cbegin() const -> const_storage_iterator
     {
         return cbegin();
     }
@@ -827,8 +828,8 @@ namespace xt
      * Returns a constant iterator to the element following the last
      * element of the buffer containing the elements of the view.
      */
-    template <class E, class... S>
-    inline auto xview<E, S...>::storage_cend() const -> const_storage_iterator
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::storage_cend() const -> const_storage_iterator
     {
         return cend();
     }
@@ -838,8 +839,8 @@ namespace xt
      * xview_stepper implementation *
      ********************************/
 
-    template <bool is_const, class E, class... S>
-    inline xview_stepper<is_const, E, S...>::xview_stepper(view_type* view, substepper_type it,
+    template <bool is_const, class CT, class... S>
+    inline xview_stepper<is_const, CT, S...>::xview_stepper(view_type* view, substepper_type it,
                                                            size_type offset, bool end)
         : p_view(view), m_it(it), m_offset(offset)
     {
@@ -858,28 +859,28 @@ namespace xt
         }
     }
 
-    template <bool is_const, class E, class... S>
-    inline auto xview_stepper<is_const, E, S...>::operator*() const -> reference
+    template <bool is_const, class CT, class... S>
+    inline auto xview_stepper<is_const, CT, S...>::operator*() const -> reference
     {
         return *m_it;
     }
 
-    template <bool is_const, class E, class... S>
-    inline void xview_stepper<is_const, E, S...>::step(size_type dim, size_type n)
+    template <bool is_const, class CT, class... S>
+    inline void xview_stepper<is_const, CT, S...>::step(size_type dim, size_type n)
     {
         auto func = [this](size_type index, size_type offset) { m_it.step(index, offset); };
         common_step(dim, n, func);
     }
 
-    template <bool is_const, class E, class... S>
-    inline void xview_stepper<is_const, E, S...>::step_back(size_type dim, size_type n)
+    template <bool is_const, class CT, class... S>
+    inline void xview_stepper<is_const, CT, S...>::step_back(size_type dim, size_type n)
     {
         auto func = [this](size_type index, size_type offset) { m_it.step_back(index, offset); };
         common_step(dim, n, func);
     }
 
-    template <bool is_const, class E, class... S>
-    inline void xview_stepper<is_const, E, S...>::reset(size_type dim)
+    template <bool is_const, class CT, class... S>
+    inline void xview_stepper<is_const, CT, S...>::reset(size_type dim)
     {
         if(dim >= m_offset)
         {
@@ -899,28 +900,28 @@ namespace xt
         }
     }
 
-    template <bool is_const, class E, class... S>
-    inline void xview_stepper<is_const, E, S...>::to_end()
+    template <bool is_const, class CT, class... S>
+    inline void xview_stepper<is_const, CT, S...>::to_end()
     {
         m_it.to_end();
     }
 
-    template <bool is_const, class E, class... S>
-    inline bool xview_stepper<is_const, E, S...>::equal(const xview_stepper& rhs) const
+    template <bool is_const, class CT, class... S>
+    inline bool xview_stepper<is_const, CT, S...>::equal(const xview_stepper& rhs) const
     {
         return p_view == rhs.p_view && m_it == rhs.m_it && m_offset == rhs.m_offset;
     }
 
-    template <bool is_const, class E, class... S>
-    inline bool xview_stepper<is_const, E, S...>::is_newaxis_slice(size_type index) const noexcept
+    template <bool is_const, class CT, class... S>
+    inline bool xview_stepper<is_const, CT, S...>::is_newaxis_slice(size_type index) const noexcept
     {
         // A bit tricky but avoids a lot of template instantiations
         return newaxis_count_before<S...>(index + 1) != newaxis_count_before<S...>(index);
     }
 
-    template <bool is_const, class E, class... S>
+    template <bool is_const, class CT, class... S>
     template <class F>
-    void xview_stepper<is_const, E, S...>::common_step(size_type dim, size_type n, F f)
+    void xview_stepper<is_const, CT, S...>::common_step(size_type dim, size_type n, F f)
     {
         if (dim >= m_offset)
         {
@@ -936,16 +937,16 @@ namespace xt
         }
     }
 
-    template <bool is_const, class E, class... S>
-    inline bool operator==(const xview_stepper<is_const, E, S...>& lhs,
-                           const xview_stepper<is_const, E, S...>& rhs)
+    template <bool is_const, class CT, class... S>
+    inline bool operator==(const xview_stepper<is_const, CT, S...>& lhs,
+                           const xview_stepper<is_const, CT, S...>& rhs)
     {
         return lhs.equal(rhs);
     }
 
-    template <bool is_const, class E, class... S>
-    inline bool operator!=(const xview_stepper<is_const, E, S...>& lhs,
-                           const xview_stepper<is_const, E, S...>& rhs)
+    template <bool is_const, class CT, class... S>
+    inline bool operator!=(const xview_stepper<is_const, CT, S...>& lhs,
+                           const xview_stepper<is_const, CT, S...>& rhs)
     {
         return !(lhs.equal(rhs));
     }
