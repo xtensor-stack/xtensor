@@ -11,7 +11,7 @@ xindexview
    :project: xtensor
    :members:
 
-.. doxygenfunction:: xt::index_view(E&, I&&)
+.. doxygenfunction:: xt::index_view(E&&, I&&)
    :project: xtensor
 
 .. doxygenfunction:: xt::filter

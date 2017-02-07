@@ -716,16 +716,21 @@ namespace xt
      * \endcode
      */
     template <class E, class I>
-    auto inline index_view(E&& e, I&& indices) noexcept
+    inline auto index_view(E&& e, I&& indices) noexcept
     {
         using view_type = xindexview<xclosure_t<E>, std::array<std::size_t, 1>, std::decay_t<I>>;
         return view_type(std::forward<E>(e), std::forward<I>(indices));
     }
 #ifdef X_OLD_CLANG
-    template <class E, 
+    template <class E, class I>
+    inline auto index_view(E&& e, std::initializer_list<I> indices) noexcept
+    {
+        using view_type = xindexview<xclosure_t<E>, std::array<std::size_t, 1>, std::vector<xindex>>;
+        return view_type(std::forward<E>(e), std::vector<xindex>(indices));
+    }
 #else
     template <class E, std::size_t L>
-    auto inline index_view(E&& e, const xindex(&indices)[L]) noexcept
+    inline auto index_view(E&& e, const xindex(&indices)[L]) noexcept
     {
         using view_type = xindexview<xclosure_t<E>, std::array<std::size_t, 1>, std::array<xindex, L>>;
         return view_type(std::forward<E>(e), to_array(indices));
@@ -748,7 +753,7 @@ namespace xt
      * \endcode
      */
     template <class E, class O>
-    auto inline filter(E&& e, O&& condition) noexcept
+    inline auto filter(E&& e, O&& condition) noexcept
     {
         auto indices = where(std::forward<O>(condition));
         using view_type = xindexview<xclosure_t<E>, std::vector<std::size_t>, decltype(indices)>;
