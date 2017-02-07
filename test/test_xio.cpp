@@ -17,6 +17,7 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xview.hpp"
 
 #include "files/xio_expected_results.hpp"
 
@@ -48,6 +49,7 @@ namespace xt
 
         auto v_1 = view(e, 1, xt::all());
         auto v_2 = view(e, xt::all(), 1);
+        auto v_new_axis = view(e, 1, xt::newaxis(), xt::all());
 
         std::stringstream out_1;
         out_1 << v_1;
@@ -56,6 +58,10 @@ namespace xt
         std::stringstream out_2;
         out_2 << v_2;
         EXPECT_EQ("{  2.,   6.,  10.}", out_2.str());
+        
+        std::stringstream out_3;
+        out_3 << v_new_axis;
+        EXPECT_EQ("{{ 5.,  6.,  7.,  8.}}", out_3.str());
     }
 
     TEST(xio, random_nan_inf)

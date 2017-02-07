@@ -42,6 +42,7 @@ namespace xt
     template <class ST, class... S>
     struct xview_shape_type;
 
+
     /**
      * @class xview
      * @brief Multidimensional view with tensor semantic.
@@ -159,6 +160,13 @@ namespace xt
 
     private:
 
+        // VS 2015 workaround (yes, really)
+        template <std::size_t I>
+        struct lesser_condition
+        {
+            static constexpr bool value = (I + newaxis_count_before<S...>(I + 1) < sizeof...(S));
+        };
+
         E& m_e;
         slice_type m_slices;
         shape_type m_shape;
@@ -170,10 +178,10 @@ namespace xt
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
         template <size_type I, class... Args>
-        std::enable_if_t<(I < sizeof...(S)), size_type> index(Args... args) const;
+        std::enable_if_t<lesser_condition<I>::value, size_type> index(Args... args) const;
 
         template <size_type I, class... Args>
-        std::enable_if_t<(I >= sizeof...(S)), size_type> index(Args... args) const;
+        std::enable_if_t<!lesser_condition<I>::value, size_type> index(Args... args) const;
 
         template<size_type I, class T>
         size_type sliced_access(const xslice<T>& slice) const;
@@ -478,7 +486,7 @@ namespace xt
 
     template <class E, class... S>
     template <typename E::size_type I, class... Args>
-    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I < sizeof...(S)), size_type>
+    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<lesser_condition<I>::value, size_type>
     {
         return sliced_access<I - integral_count_before<S...>(I) + newaxis_count_before<S...>(I + 1)>
             (std::get<I + newaxis_count_before<S...>(I + 1)>(m_slices), args...);
@@ -486,7 +494,7 @@ namespace xt
 
     template <class E, class... S>
     template <typename E::size_type I, class... Args>
-    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<(I >= sizeof...(S)), size_type>
+    inline auto xview<E, S...>::index(Args... args) const -> std::enable_if_t<!lesser_condition<I>::value, size_type>
     {
         return argument<I - integral_count<S...>() + newaxis_count<S...>()>(args...);
     }
