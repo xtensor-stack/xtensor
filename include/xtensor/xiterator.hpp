@@ -141,6 +141,7 @@ namespace xt
 
         xiterator() = default;
         xiterator(It it, const shape_type& shape);
+        xiterator(It it, const size_type* shape, size_type dimension);
 
         self_type& operator++();
         self_type operator++(int);
@@ -302,6 +303,13 @@ namespace xt
     inline xiterator<It, S>::xiterator(It it, const shape_type& shape)
         : m_it(it), m_shape(shape),
           m_index(make_sequence<index_type>(shape.size(), size_type(0)))
+    {
+    }
+
+    template <class It, class S>
+    inline xiterator<It, S>::xiterator(It it, const size_type* shape, size_type dimension)
+        : m_it(it), m_shape(shape, shape + dimension),
+          m_index(make_shape<shape_type>(dimension, size_type(0)))
     {
     }
 
