@@ -59,7 +59,7 @@ xt::xarray<double> arr1
 xt::xarray<double> arr2
   {5.0, 6.0, 7.0};
 
-xt::xarray<double> res = xt::make_xview(arr1, 1) + arr2;
+xt::xarray<double> res = xt::view(arr1, 1) + arr2;
 
 std::cout << res;
 ```
