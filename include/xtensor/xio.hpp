@@ -54,7 +54,7 @@ namespace xt
          *
          * @param line_width The line width
          */
-        void set_line_width(std::size_t line_width)
+        inline void set_line_width(std::size_t line_width)
         {
             print_options().line_width = line_width;
         }
@@ -65,7 +65,7 @@ namespace xt
          * @param threshold The number of elements in the xexpression that triggers
          *                  summarization in the output
          */
-        void set_threshold(std::size_t threshold)
+        inline void set_threshold(std::size_t threshold)
         {
             print_options().threshold = threshold;
         }
@@ -77,7 +77,7 @@ namespace xt
          *
          * @param edge_items The number of edge items
          */
-        void set_edge_items(std::size_t edge_items)
+        inline void set_edge_items(std::size_t edge_items)
         {
             print_options().edge_items = edge_items;
         }
@@ -87,7 +87,7 @@ namespace xt
          *
          * @param precision The number of digits for floating point output
          */
-        void set_precision(precision_type precision)
+        inline void set_precision(precision_type precision)
         {
             print_options().precision = precision;
         }
@@ -580,6 +580,22 @@ namespace xt
         private:
             std::function<std::string (const value_type&)> m_func;
         };
+
+        template <class S>
+        struct recursion_depth
+        {
+            static constexpr std::size_t value = 5;
+        };
+
+// Note: std::min is not constexpr on old versions of gcc (4.x) and clang.
+#define XTENSOR_MIN(x, y) (x > y ? y : x)
+        template <class T, std::size_t N>
+        struct recursion_depth<std::array<T, N>>
+        {
+            static constexpr std::size_t value = XTENSOR_MIN(5, N);
+        };
+#undef XTENSOR_MIN
+
     }
 
     template <class E, class F>
@@ -611,9 +627,10 @@ namespace xt
 
         detail::printer<E> p(precision);
  
-        detail::recurser<5>::run(p, d, lim);
+        constexpr std::size_t depth = detail::recursion_depth<typename E::shape_type>::value;
+        detail::recurser<depth>::run(p, d, lim);
         p.init();
-        detail::xout<5>::output(out, d, p, 1, p.width(), lim, print_options::print_options().line_width);
+        detail::xout<depth>::output(out, d, p, 1, p.width(), lim, print_options::print_options().line_width);
 
         out << std::setprecision(temp_precision); // restore precision
 

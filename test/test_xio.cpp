@@ -14,6 +14,7 @@
 #include <limits>
 
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xbuilder.hpp"
@@ -23,7 +24,15 @@
 
 namespace xt
 {
-    TEST(xio, one_d)
+    TEST(xio, xtensor_one_d)
+    {
+        xtensor<double, 1> e = xt::arange<double>(1, 6);
+        std::stringstream out;
+        out << e;
+        EXPECT_EQ("{ 1.,  2.,  3.,  4.,  5.}", out.str());
+    }
+
+    TEST(xio, xarray_one_d)
     {
         xarray<double> e{1, 2, 3, 4, 5};
         std::stringstream out;
@@ -31,7 +40,7 @@ namespace xt
         EXPECT_EQ("{ 1.,  2.,  3.,  4.,  5.}", out.str());
     }
 
-    TEST(xio, two_d)
+    TEST(xio, xarray_two_d)
     {
         xarray<double> e{{1, 2, 3, 4},
                          {5, 6, 7, 8},
