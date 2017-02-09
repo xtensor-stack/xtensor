@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xscalar.hpp"
+#include "xtensor/xarray.hpp"
 
 namespace xt
 {
@@ -23,6 +24,9 @@ namespace xt
         // Calling operator() with no argument returns the wrapped value.
         xscalar<int> x(2);
         EXPECT_EQ(x(), 2);
+
+        x() = 4;
+        EXPECT_EQ(4, x());
     }
 
     TEST(xscalar, dimension)
@@ -30,6 +34,23 @@ namespace xt
         // The dimension of a xscalar is 0
         xscalar<int> x(2);
         EXPECT_EQ(x.dimension(), 0);
+    }
+
+    TEST(xscalar, iterator)
+    {
+        xscalar<int> x(2);
+        auto iter = x.begin();
+        *iter = 4;
+        EXPECT_EQ(4, x());
+    }
+
+    TEST(xscalar, xref)
+    {
+        int ref = 4;
+        int x = 2;
+        auto s = xref(x);
+        s() = ref;
+        EXPECT_EQ(ref, x);
     }
 }
 
