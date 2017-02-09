@@ -16,9 +16,10 @@
 #include <array>
 #include <algorithm>
 
-#include "xarray.hpp"
-#include "xview_utils.hpp"
+#include "xtensor_forward.hpp"
 #include "xiterator.hpp"
+#include "xsemantic.hpp"
+#include "xview_utils.hpp"
 
 namespace xt
 {
@@ -26,9 +27,6 @@ namespace xt
     /*********************
      * xview declaration *
      *********************/
-
-    template <class CT, class... S>
-    class xview;
 
     template <class CT, class... S>
     struct xcontainer_inner_types<xview<CT, S...>>

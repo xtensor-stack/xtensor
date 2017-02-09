@@ -11,6 +11,7 @@
 
 #include <functional>
 #include "test_common.hpp"
+#include "xtensor/xarray.hpp"
 
 namespace xt
 {
