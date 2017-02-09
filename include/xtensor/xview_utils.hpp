@@ -106,9 +106,9 @@ namespace xt
         template <>
         struct integral_count_impl<void>
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr std::size_t count(std::size_t /*i*/) noexcept
             {
-                return i;
+                return 0;
             }
         };
     }
@@ -153,9 +153,9 @@ namespace xt
         template <>
         struct newaxis_count_impl<void>
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr std::size_t count(std::size_t /*i*/) noexcept
             {
-                return i;
+                return 0;
             }
         };
     }

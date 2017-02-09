@@ -327,7 +327,7 @@ namespace xt
         {
             size_type index = integral_skip<S...>(i);
             m_shape[i] = index < sizeof...(S) ?
-                apply<std::size_t>(index, func, m_slices) : m_e.shape()[index];
+                apply<std::size_t>(index, func, m_slices) : m_e.shape()[index - newaxis_count_before<S...>(index)];
         }
     }
     //@}
@@ -411,9 +411,9 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) -> reference
     {
-        return access_impl(std::make_index_sequence<sizeof...(Args)
-                                                    + integral_count<S...>()
-                                                    - newaxis_count<S...>()>(),
+        return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?
+                                                        sizeof...(Args) + integral_count<S...>() - newaxis_count<S...>() :
+                                                        0)>(),
                            args...);
     }
 
@@ -441,12 +441,12 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) const -> const_reference
     {
-        return access_impl(std::make_index_sequence<sizeof...(Args)
-                                                    + integral_count<S...>()
-                                                    - newaxis_count<S...>()>(),
+        return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?
+                                                        sizeof...(Args) + integral_count<S...>() - newaxis_count<S...>() :
+                                                        0)>(),
                            args...);
     }
-    
+
     template <class CT, class... S>
     inline auto xview<CT, S...>::operator[](const xindex& index) const -> const_reference
     {
