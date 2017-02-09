@@ -70,6 +70,14 @@ namespace xt
     template <class R, class A>
     auto forward_sequence(const A& s);
 
+    // equivalent to std::size(c) in c++17
+    template <class C>
+    constexpr auto container_size(const C& c) -> decltype(c.size());
+
+    // equivalent to std::size(a) in c++17
+    template <class T, std::size_t N>
+    constexpr std::size_t container_size(const T(&a)[N]);
+
     /*******************************
      * remove_class implementation *
      *******************************/
@@ -579,6 +587,24 @@ namespace xt
     constexpr std::array<std::remove_cv_t<T>, N> to_array(T (&a)[N])
     {
         return detail::to_array_impl(a, std::make_index_sequence<N>{});
+    }
+
+    /*********************************
+     * container_size implementation *
+     *********************************/
+
+    // equivalent to std::size(c) in c++17
+    template <class C>
+    constexpr auto container_size(const C& c) -> decltype(c.size())
+    {
+        return c.size();
+    }
+
+    // equivalent to std::size(a) in c++17
+    template <class T, std::size_t N>
+    constexpr std::size_t container_size(const T(&a)[N])
+    {
+        return N;
     }
 }
 

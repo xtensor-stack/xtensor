@@ -88,8 +88,16 @@ namespace xt
 
         void transpose();
 
-        template <class Tag = check_policy::none>
-        void transpose(const std::vector<size_type>& permutation, Tag check_policy = Tag());
+        template <class S, class Tag = check_policy::none>
+        void transpose(S&& permutation, Tag check_policy = Tag());
+
+#ifdef X_OLD_CLANG
+        template <class I, class Tag = check_policy::none>
+        void transpose(std::initializer_list<I> permutation, Tag check_policy = Tag());
+#else
+        template <class I, std::size_t N, class Tag = check_policy::none>
+        void transpose(const I(&permutation)[N], Tag check_policy = Tag());
+#endif
 
         template <class... Args>
         reference operator()(Args... args);
@@ -175,8 +183,11 @@ namespace xt
         void adapt_strides() noexcept;
         void adapt_strides(size_type i) noexcept;
 
-        void transpose_impl(const std::vector<size_type>& permutation, check_policy::none);
-        void transpose_impl(const std::vector<size_type>& permutation, check_policy::full);
+        template <class S>
+        void transpose_impl(S&& permutation, check_policy::none);
+
+        template <class S>
+        void transpose_impl(S&& permutation, check_policy::full);
 
         size_type data_size() const noexcept;
 
@@ -392,24 +403,42 @@ namespace xt
 
     /**
      * Transposes the container inplace by permuting the shape with @p permutation.
-     * @param permutation the vector containing permutation
+     * @param permutation the sequence containing permutation
      * @param check_policy the check level (check_policy::full() or check_policy::none())
      * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
      */
     template <class D>
-    template <class Tag>
-    inline void xcontainer<D>::transpose(const std::vector<size_type>& permutation, Tag check_policy)
+    template <class S, class Tag>
+    inline void xcontainer<D>::transpose(S&& permutation, Tag check_policy)
+    {
+        transpose_impl(std::forward<S>(permutation), check_policy);
+    }
+
+#ifdef X_OLD_CLANG
+    template <class D>
+    template <class I, class Tag>
+    inline void xcontainer<D>::transpose(std::initializer_list<I> permutation, Tag check_policy)
+    {
+        std::vector<I> perm(permutation);
+        transpose_impl(std::move(perm), check_policy);
+    }
+#else
+    template <class D>
+    template <class I, std::size_t N, class Tag>
+    inline void xcontainer<D>::transpose(const I(&permutation)[N], Tag check_policy)
     {
         transpose_impl(permutation, check_policy);
     }
+#endif
 
     template <class D>
-    inline void xcontainer<D>::transpose_impl(const std::vector<size_type>& permutation, check_policy::full)
+    template <class S>
+    inline void xcontainer<D>::transpose_impl(S&& permutation, check_policy::full)
     {
         // check if axis appears twice in permutation
-        for (size_type i = 0; i < permutation.size(); ++i)
+        for (size_type i = 0; i < container_size(permutation); ++i)
         {
-            for (size_type j = i + 1; j < permutation.size(); ++j)
+            for (size_type j = i + 1; j < container_size(permutation); ++j)
             {
                 if (permutation[i] == permutation[j])
                 {
@@ -421,9 +450,10 @@ namespace xt
     }
 
     template <class D>
-    inline void xcontainer<D>::transpose_impl(const std::vector<size_type>& permutation, check_policy::none)
+    template <class S>
+    inline void xcontainer<D>::transpose_impl(S&& permutation, check_policy::none)
     {
-        if (permutation.size() != m_shape.size())
+        if (container_size(permutation) != m_shape.size())
         {
             throw transpose_error("Permutation does not have the same size as shape");
         }

@@ -245,6 +245,10 @@ namespace xt
             EXPECT_EQ(vec_copy(0, 1, 0), vec(1, 0, 0));
             EXPECT_EQ(vec_copy(1, 1, 0), vec(1, 1, 0));
             EXPECT_EQ(vec_copy(1, 1, 2), vec(1, 1, 2));
+
+            // Compilation check only
+            std::vector<std::size_t> perm = { 1, 0, 2 };
+            vec.transpose(perm);
         }
 
         {
