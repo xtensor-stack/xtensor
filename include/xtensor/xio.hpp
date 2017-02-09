@@ -15,6 +15,7 @@
 #include <iomanip>
 #include <sstream>
 #include <string>
+#include <numeric>
 
 #include "xexpression.hpp"
 #include "xmath.hpp"
