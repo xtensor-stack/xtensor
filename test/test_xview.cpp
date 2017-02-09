@@ -127,6 +127,8 @@ namespace xt
         EXPECT_EQ(squeeze3, 3);
         size_t squeeze4 = integral_count_before<size_t, xrange<size_t>, size_t>(2);
         EXPECT_EQ(squeeze4, 1);
+        size_t squeeze5 = integral_count<xnewaxis<size_t>>();
+        EXPECT_EQ(squeeze5, 0);
     }
 
     TEST(xview, integral_skip)
@@ -137,6 +139,14 @@ namespace xt
         EXPECT_EQ(index0, 1);
         EXPECT_EQ(index1, 3);
         EXPECT_EQ(index2, 4);
+    }
+
+    TEST(xview, single_newaxis_shape)
+    {
+        xarray<double> a = {1, 2, 3, 4};
+        auto v = view(a, newaxis());
+        view_shape_type s = {1, 4};
+        EXPECT_EQ(s, v.shape());
     }
 
     TEST(xview, iterator)

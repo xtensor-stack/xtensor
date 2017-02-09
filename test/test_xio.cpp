@@ -60,6 +60,9 @@ namespace xt
         auto v_2 = view(e, xt::all(), 1);
         auto v_new_axis = view(e, 1, xt::newaxis(), xt::all());
 
+        xarray<int> c = {1, 2, 3, 4};
+        auto v_just_new_axis = view(c, xt::newaxis());
+
         std::stringstream out_1;
         out_1 << v_1;
         EXPECT_EQ("{ 5.,  6.,  7.,  8.}", out_1.str());
@@ -71,6 +74,10 @@ namespace xt
         std::stringstream out_3;
         out_3 << v_new_axis;
         EXPECT_EQ("{{ 5.,  6.,  7.,  8.}}", out_3.str());
+
+        std::stringstream out_4;
+        out_4 << v_just_new_axis;
+        EXPECT_EQ("{{1, 2, 3, 4}}", out_4.str());
     }
 
     TEST(xio, random_nan_inf)
