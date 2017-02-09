@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include "xtensor_forward.hpp"
+#include "xbroadcast.hpp"
 #include "xiterator.hpp"
 #include "xsemantic.hpp"
 #include "xview_utils.hpp"
@@ -92,6 +93,9 @@ namespace xt
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
+
+        template <class E>
+        disable_xexpression<E, self_type>& operator=(const E& e);
 
         size_type dimension() const noexcept;
 
@@ -339,9 +343,27 @@ namespace xt
     template <class E>
     inline auto xview<CT, S...>::operator=(const xexpression<E>& e) -> self_type&
     {
-        return semantic_base::operator=(e);
+        bool cond = (e.derived_cast().shape().size() == dimension())
+                    && std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
+        if(!cond)
+        {
+            semantic_base::operator=(broadcast(e.derived_cast(), shape()));
+        }
+        else
+        {
+            semantic_base::operator=(e);
+        }
+        return *this;
     }
     //@}
+
+    template <class CT, class... S>
+    template <class E>
+    inline auto xview<CT, S...>::operator=(const E& e) -> disable_xexpression<E, self_type>&
+    {
+        std::fill(storage_begin(), storage_end(), e);
+        return *this;
+    }
 
     /**
      * @name Size and shape
