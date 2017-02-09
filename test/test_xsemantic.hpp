@@ -10,8 +10,8 @@
 #define TEST_XSEMANTIC_HPP
 
 #include <functional>
-#include "test_common.hpp"
 #include "xtensor/xarray.hpp"
+#include "test_common.hpp"
 
 namespace xt
 {

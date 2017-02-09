@@ -9,6 +9,7 @@
 #ifndef XVIEW_UTILS_HPP
 #define XVIEW_UTILS_HPP
 
+#include <array>
 #include "xslice.hpp"
 
 namespace xt
@@ -54,6 +55,37 @@ namespace xt
     {
         return slice.derived_cast()(*it++);
     };
+
+    /***********************
+     * view_temporary_type *
+     ***********************/
+
+    namespace detail
+    {
+        template <class T, class S, class... SL>
+        struct view_temporary_type_impl
+        {
+            using type = xarray<T>;
+        };
+
+        template <class T, class I, std::size_t N, class... SL>
+        struct view_temporary_type_impl<T, std::array<I, N>, SL...>
+        {
+            using type = xtensor<T, N + newaxis_count<SL...>() - integral_count<SL...>()>;
+        };
+    }
+
+    template <class E, class... SL>
+    struct view_temporary_type
+    {
+        using type = typename detail::view_temporary_type_impl<typename E::value_type,
+                                                               typename E::shape_type,
+                                                               SL...>::type;
+    };
+
+    template <class E, class... SL>
+    using view_temporary_type_t = typename view_temporary_type<E, SL...>::type;
+
 
     /************************
     * count integral types *
