@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xview.hpp"
 #include "test_xsemantic.hpp"
-
+#include "xtensor/xnoalias.hpp"
 namespace xt
 {
 
@@ -389,6 +389,40 @@ namespace xt
             viewb /= viewua;
             EXPECT_EQ(t.vres_ru, b);
         }
+    }
+
+    TEST(xview_semantic, broadcast_equal)
+    {
+        xarray<int> a = { {1,  2,  3,  4},
+                          {5,  6,  7,  8},
+                          {9, 10, 11, 12} };
+        xarray<int> b = a;
+        auto viewa = view(a, all(), range(1, 4));
+        auto viewb = view(b, all(), range(1, 4));
+        xarray<int> c = {1, 2, 3};
+        viewa = c;
+        noalias(viewb) = c;
+        xarray<int> res = { {1, 1, 2, 3},
+                            {5, 1, 2, 3},
+                            {9, 1, 2, 3} };
+
+        EXPECT_EQ(res, a);
+        EXPECT_EQ(res, b);
+    }
+
+    TEST(xview_semantic, scalar_equal)
+    {
+        xarray<int> a = { { 1,  2,  3,  4 },
+                          { 5,  6,  7,  8 },
+                          { 9, 10, 11, 12 } };
+        auto viewa = view(a, all(), range(1, 4));
+        int b = 1;
+        viewa = b;
+        xarray<int> res = { { 1, 1, 1, 1 },
+                            { 5, 1, 1, 1 },
+                            { 9, 1, 1, 1 } };
+
+        EXPECT_EQ(res, a);
     }
 }
 

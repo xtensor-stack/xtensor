@@ -10,7 +10,7 @@
 #define XASSIGN_HPP
 
 #include <algorithm>
-
+#include "xtensor_forward.hpp"
 #include "xiterator.hpp"
 
 namespace xt
@@ -80,12 +80,27 @@ namespace xt
      * Assign functions implementation *
      ***********************************/
 
+    namespace detail
+    {
+        template <class E1, class E2>
+        inline bool is_trivial_broadcast(const E1& e1, const E2& e2)
+        {
+            return e2.is_trivial_broadcast(e1.strides());
+        }
+
+        template <class D, class E2, class... SL>
+        inline bool is_trivial_broadcast(const xview<D, SL...>&, const E2&)
+        {
+            return false;
+        }
+    }
+
     template <class E1, class E2>
     inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
-        bool trivial_broadcast = trivial && de2.is_trivial_broadcast(de1.strides());
+        bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
         if(trivial_broadcast)
         {
             std::copy(de2.storage_cbegin(), de2.storage_cend(), de1.storage_begin());
