@@ -53,6 +53,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_forward.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xutils.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp

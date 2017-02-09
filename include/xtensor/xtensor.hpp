@@ -25,9 +25,6 @@ namespace xt
      * xtensor declaration *
      ***********************/
 
-    template <class T, std::size_t N, class A = std::allocator<T>>
-    class xtensor;
-
     template <class T, std::size_t N, class A>
     struct xcontainer_inner_types<xtensor<T, N, A>>
     {

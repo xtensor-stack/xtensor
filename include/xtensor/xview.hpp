@@ -16,9 +16,10 @@
 #include <array>
 #include <algorithm>
 
-#include "xarray.hpp"
-#include "xview_utils.hpp"
+#include "xtensor_forward.hpp"
 #include "xiterator.hpp"
+#include "xsemantic.hpp"
+#include "xview_utils.hpp"
 
 namespace xt
 {
@@ -28,13 +29,10 @@ namespace xt
      *********************/
 
     template <class CT, class... S>
-    class xview;
-
-    template <class CT, class... S>
     struct xcontainer_inner_types<xview<CT, S...>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using temporary_type = xarray<typename xexpression_type::value_type>;
+        using temporary_type = view_temporary_type_t<xexpression_type, S...>;
     };
 
     template <bool is_const, class CT, class... S>

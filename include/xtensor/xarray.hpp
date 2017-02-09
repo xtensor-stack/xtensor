@@ -11,9 +11,7 @@
 
 #include <initializer_list>
 #include <utility>
-#include <vector>
 #include <algorithm>
-#include <memory>
 
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
@@ -24,9 +22,6 @@ namespace xt
     /**********************
      * xarray declaration *
      **********************/
-
-    template <class T, class EA = std::allocator<T>, class SA = std::allocator<typename std::vector<T, EA>::size_type>>
-    class xarray;
 
     template <class T, class EA, class SA>
     struct xcontainer_inner_types<xarray<T, EA, SA>>

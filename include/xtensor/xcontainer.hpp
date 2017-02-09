@@ -15,11 +15,10 @@
 #include "xiterator.hpp"
 #include "xoperation.hpp"
 #include "xmath.hpp"
+#include "xtensor_forward.hpp"
 
 namespace xt
 {
-    template <class C>
-    struct xcontainer_inner_types;
 
     namespace check_policy
     {

@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <utility>
 #include <type_traits>
+#include "xutils.hpp"
 
 namespace xt
 {

@@ -602,7 +602,7 @@ namespace xt
 
     // equivalent to std::size(a) in c++17
     template <class T, std::size_t N>
-    constexpr std::size_t container_size(const T(&a)[N])
+    constexpr std::size_t container_size(const T(&)[N])
     {
         return N;
     }

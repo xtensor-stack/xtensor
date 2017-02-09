@@ -17,6 +17,29 @@ namespace xt
     using std::size_t;
     using view_shape_type = std::vector<size_t>;
 
+    TEST(xview, temporary_type)
+    {
+        {
+            view_shape_type shape = { 3, 4 };
+            xarray<double> a(shape);
+            auto view1 = view(a, 1, range(1, 4));
+            bool check = std::is_same<xarray<double>, typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
+            EXPECT_TRUE(check);
+        }
+
+        {
+            xtensor<double, 2>::shape_type shape = { 3, 4 };
+            xtensor<double, 2> a(shape);
+            auto view1 = view(a, 1, range(1, 4));
+            bool check1 = std::is_same<xtensor<double, 1>, typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
+            EXPECT_TRUE(check1);
+
+            auto view2 = view(a, all(), newaxis(), range(1, 4));
+            bool check2 = std::is_same<xtensor<double, 3>, typename xcontainer_inner_types<decltype(view2)>::temporary_type>::value;
+            EXPECT_TRUE(check2);
+        }
+    }
+    
     TEST(xview, simple)
     {
         view_shape_type shape = {3, 4};
