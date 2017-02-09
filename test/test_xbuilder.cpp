@@ -166,4 +166,18 @@ namespace xt
         xt::xindex idx2({2, 2});
         ASSERT_EQ(true, e.element(idx2.begin(), idx2.end()));
     }
+
+    TEST(xbuilder, concatenate)
+    {
+        xarray<double> a = arange<double>(12);
+        a.reshape({2, 2, 3});
+
+        auto c = concatenate(a, a, 2);
+
+        shape_t expected_shape = {2, 2, 6};
+
+        ASSERT_EQ(c(1, 1, 2), c(1, 1, 5));
+        ASSERT_EQ(c(1, 1, 2), 11);
+        ASSERT_EQ(c(1, 1, 5), 11);
+    }
 }

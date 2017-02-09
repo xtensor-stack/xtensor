@@ -19,6 +19,7 @@
 
 #include "xfunction.hpp"
 #include "xbroadcast.hpp"
+#include "xexpression.hpp"
 #include "xgenerator.hpp"
 
 #ifdef X_OLD_CLANG
@@ -292,5 +293,116 @@ namespace xt
         return pow(base, linspace(start, stop, num_samples, endpoint));
     }
 
+    namespace detail
+    {
+        template <class CA, class CB>
+        struct concatenate_impl
+        {
+            using size_type = std::size_t;
+            using value_type = std::common_type_t<typename std::decay_t<CA>::value_type,
+                                                  typename std::decay_t<CB>::value_type>;
+
+            concatenate_impl(const CA& a, const CB& b, std::size_t axis) :
+                m_a(a), m_b(b), m_axis(axis)
+            {
+            }
+
+            template <class... Args>
+            value_type operator()(Args... args) const
+            {
+                return access_impl(xindex({{static_cast<size_type>(args)...}}));
+            }
+
+            value_type operator[](const xindex& idx) const
+            {
+                return access_impl(idx);
+            }
+
+            template <class It>
+            value_type element(It first, It last) const
+            {
+                return access_impl(xindex(first, last));
+            }
+
+        private:
+            inline value_type access_impl(xindex idx) const
+            {
+                if (idx[m_axis] >= m_a.shape()[m_axis])
+                {
+                    idx[m_axis] -= m_a.shape()[m_axis];
+                    return m_b[idx];
+                }
+                else
+                {
+                    return m_a[idx];
+                }
+            }
+
+            const CA m_a;
+            const CB m_b;
+            const size_type m_axis;
+        };
+    }
+
+    /**
+     * @function concatentate
+     * @brief Concatenate xexpressions along \em axis.
+     *
+     * @param a xexpression to concatenate
+     * @param b xexpression to concatenate
+     * @returns xgenerator evaluating to concatenated elements
+     */
+    template <class T, class U>
+    inline auto concatenate(T&& a, U&& b, std::size_t axis = 0)
+    {
+        std::vector<std::size_t> new_shape(a.shape());
+        new_shape[axis] += b.shape()[axis];
+        using concat_t = detail::concatenate_impl<detail::const_closure_t<T>, detail::const_closure_t<U>>;
+        return detail::make_xgenerator(concat_t(std::forward<T>(a), std::forward<U>(b), axis), new_shape);
+    }
+
+    /**
+     * @function hstack
+     * @brief Stack xexpressions horizontally (column-wise).
+     *        \em a and \em b have to have the same dimensions.
+     *
+     * @param a first xexpression to stack
+     * @param b second xexpression to stack
+     * @returns xgenerator evaluating to stacked elements
+     */
+    template <class T, class U>
+    inline auto hstack(T&& a, U&& b) {
+        if (a.dimension() != b.dimension())
+        {
+            throw std::invalid_argument("All inputs to hstack must have same number of dimensions");
+        }
+        std::size_t axis = 1;
+        if (a.dimension() == 1) 
+        {
+            axis = 0;
+        }
+        return concatenate(std::forward<T>(a), std::forward<U>(b), axis);
+    }
+
+    /**
+     * @function vstack
+     * @brief Stack xexpressions vertically (row-wise). 
+     *        \em a and \em b have to be at least two-dimensional.
+     *
+     * @param a first xexpression to stack
+     * @param b second xexpression to stack
+     * @returns xgenerator evaluating to stacked elements
+     */
+    template <class T, class U>
+    inline auto vstack(T&& a, U&& b) {
+        if (a.dimension() < 2 || b.dimension() < 2)
+        {
+            throw std::invalid_argument("All inputs to vstack must have at least dimension 2.");
+        }
+
+        std::size_t axis = 0;
+        // handle special case for 1D case
+        return concatenate(std::forward<T>(a), std::forward<U>(b), axis);
+    }
 }
 #endif
