@@ -468,7 +468,7 @@ namespace xt
 
         for (size_type i = 0; i < m_shape.size(); ++i)
         {
-            if (permutation[i] >= dimension())
+            if (size_type(permutation[i]) >= dimension())
             {
                 throw transpose_error("Permutation contains wrong axis");
             }

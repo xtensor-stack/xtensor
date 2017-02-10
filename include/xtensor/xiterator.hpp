@@ -366,7 +366,7 @@ namespace xt
 
     template <class It, class S>
     inline xiterator<It, S>::xiterator(It it, shape_param_type shape)
-        : m_it(it), private_base(shape),
+        : private_base(shape), m_it(it),
           m_index(make_sequence<index_type>(this->shape().size(), size_type(0)))
     {
     }
