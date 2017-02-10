@@ -17,6 +17,7 @@
 #include <initializer_list>
 #include <algorithm>
 #include <complex>
+#include <vector>
 #include "xtensor_config.hpp"
 
 namespace xt
