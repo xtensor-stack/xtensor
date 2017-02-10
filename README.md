@@ -20,7 +20,7 @@ Multi-dimensional arrays with broadcasting and lazy computing.
 
 Containers of `xtensor` are inspired by [NumPy](http://www.numpy.org), the Python array programming library. **Adaptors** for existing data structures to be plugged into our expression system can easily be written. In fact, `xtensor` can be used to **process `numpy` data structures inplace** using Python's [buffer protocol](https://docs.python.org/3/c-api/buffer.html). For more details on the numpy bindings, check out the [xtensor-python](https://github.com/QuantStack/xtensor-python) project.
 
-`xtensor` requires a modern C++ compiler supporting C++14. The following C+ compilers are supported:
+`xtensor` requires a modern C++ compiler supporting C++14. The following C++ compilers are supported:
 
  - On Windows platforms, Visual C++ 2015 Update 2, or more recent
  - On Unix platforms, gcc 4.9 or a recent version of Clang

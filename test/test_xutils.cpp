@@ -7,10 +7,11 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xtensor/xutils.hpp"
 #include <initializer_list>
 #include <type_traits>
 #include <tuple>
+#include <complex>
+#include "xtensor/xutils.hpp"
 
 namespace xt
 {
@@ -122,6 +123,21 @@ namespace xt
         EXPECT_EQ(e0, s0);
         EXPECT_EQ(e1, s1);
         EXPECT_EQ(e2, s2);
+    }
+
+    TEST(utils, complex_views)
+    {
+        // Test that lvalues can be modified
+        std::complex<double> clv;
+        real_closure(clv) = 3.0;
+        EXPECT_EQ(std::real(clv), 3.0);
+
+        imag_closure(clv) = 1.0;
+        EXPECT_EQ(std::imag(clv), 1.0);
+
+        double rlv = 2.0;
+        EXPECT_EQ(imag_closure(rlv), 0.0);
+        EXPECT_EQ(real_closure(rlv), 2.0);
     }
 }
 
