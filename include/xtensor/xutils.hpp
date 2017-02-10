@@ -571,6 +571,110 @@ namespace xt
     }
 
     /**************************
+     * closure implementation *
+     **************************/
+
+    namespace detail
+    {
+        template <class S>
+        struct closure
+        {
+            using underlying_type = std::conditional_t<std::is_const<std::remove_reference_t<S>>::value,
+                                                       const std::decay_t<S>,
+                                                       std::decay_t<S>>;
+            using type = typename std::conditional<std::is_lvalue_reference<S>::value,
+                                                   underlying_type&,
+                                                   underlying_type>::type;
+        };
+
+        template <class S>
+        using closure_t = typename closure<S>::type;
+
+        template <class S>
+        struct const_closure
+        {
+            using underlying_type = const std::decay_t<S>;
+            using type = typename std::conditional<std::is_lvalue_reference<S>::value,
+                                                   underlying_type&,
+                                                   underlying_type>::type;
+        };
+        
+        template <class S>
+        using const_closure_t = typename const_closure<S>::type;
+    }
+
+    /**********************************
+     * complex closure implementation *
+     **********************************/
+
+    namespace detail
+    {
+        template <class S>
+        struct value_type
+        {
+            using type = S;
+        };
+
+        template <class S>
+        struct value_type<std::complex<S>>
+        {
+            using type = S;
+        };
+
+        template <class S>
+        struct complex_closure
+        {
+            using underlying_type = std::conditional_t<
+                                               std::is_const<std::remove_reference_t<S>>::value,
+                                               const typename value_type<std::decay_t<S>>::type,
+                                               typename value_type<std::decay_t<S>>::type>;
+
+            using type = std::conditional_t<std::is_lvalue_reference<S>::value,
+                                            underlying_type&,
+                                            underlying_type>;
+        };
+
+        template <class S>
+        using complex_closure_t = typename complex_closure<S>::type;
+    }
+
+    /*************************************************
+     * real_closure & complex_closure implementation *
+     *************************************************/
+
+    // real_closure
+
+    template <class T>
+    auto real_closure(T&& v)
+        -> std::enable_if_t<!detail::is_complex<std::decay_t<T>>::value, detail::closure_t<T>>         // real case -> convert to closure type
+    {
+        return v;
+    }
+
+    template <class T>
+    auto real_closure(T&& v)
+        -> std::enable_if_t<detail::is_complex<std::decay_t<T>>::value, detail::complex_closure_t<T>>  // complex case -> return the closure type on the real part
+    {
+        return *reinterpret_cast<typename std::remove_reference_t<T>::value_type*>(&v);
+    }
+
+    // imag_closure
+
+    template <class T>
+    auto imag_closure(T&&)
+        -> std::enable_if_t<!detail::is_complex<std::decay_t<T>>::value, std::decay_t<T>>              // real case -> always return 0 by value
+    {
+        return 0;
+    }
+    
+    template <class T>
+    auto imag_closure(T&& v)
+        -> std::enable_if_t<detail::is_complex<std::decay_t<T>>::value, detail::complex_closure_t<T>>  // complex case -> return the closure type on the imaginary part
+    {
+        return *(reinterpret_cast<typename std::remove_reference_t<T>::value_type*>(&v) + 1);
+    }
+
+    /**************************
     * to_array implementation *
     ***************************/
 
