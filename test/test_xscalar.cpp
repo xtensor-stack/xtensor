@@ -39,7 +39,7 @@ namespace xt
     TEST(xscalar, iterator)
     {
         xscalar<int> x(2);
-        auto iter = x.begin();
+        auto iter = x.xbegin();
         *iter = 4;
         EXPECT_EQ(4, x());
     }

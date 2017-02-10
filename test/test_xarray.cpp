@@ -151,10 +151,10 @@ namespace xt
         test_broadcast2(a);
     }
 
-    TEST(xarray, storage_iterator)
+    TEST(xarray, iterator)
     {
         xarray<int> a;
-        test_storage_iterator(a);
+        test_iterator(a);
     }
 
     TEST(xarray, initializer_list)

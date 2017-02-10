@@ -77,11 +77,11 @@ namespace xt
         using const_stepper = typename xexpression_type::const_stepper;
         using stepper = const_stepper;
 
-        using const_iterator = xiterator<const_stepper, shape_type>;
-        using iterator = const_iterator;
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using broadcast_iterator = const_broadcast_iterator;
 
-        using const_storage_iterator = const_iterator;
-        using storage_iterator = const_storage_iterator;
+        using const_iterator = const_broadcast_iterator;
+        using iterator = const_iterator;
 
         template <class S>
         xbroadcast(CT e, S&& s) noexcept;
@@ -107,6 +107,11 @@ namespace xt
         const_iterator cbegin() const noexcept;
         const_iterator cend() const noexcept;
 
+        const_broadcast_iterator xbegin() const noexcept;
+        const_broadcast_iterator xend() const noexcept;
+        const_broadcast_iterator cxbegin() const noexcept;
+        const_broadcast_iterator cxend() const noexcept;
+
         template <class S>
         xiterator<const_stepper, S> xbegin(const S& shape) const noexcept;
         template <class S>
@@ -120,12 +125,6 @@ namespace xt
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
         const_stepper stepper_end(const S& shape) const noexcept;
-
-        const_storage_iterator storage_begin() const noexcept;
-        const_storage_iterator storage_end() const noexcept;
-
-        const_storage_iterator storage_cbegin() const noexcept;
-        const_storage_iterator storage_cend() const noexcept;
 
     private:
 
@@ -300,14 +299,58 @@ namespace xt
     /**
      * @name Iterators
      */
+    /**
+     * Returns an iterator to the first element of the buffer
+     * containing the elements of the expression.
+     */
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::begin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+     * Returns an iterator to the element following the last
+     * element of the buffer containing the elements of the expression.
+     */
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::end() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the expression.
+     */
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::cbegin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the expression.
+     */
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::cend() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+    //@}
+
+    /**
+     * @name Broadcast iterators
+     */
     //@{
     /**
      * Returns a constant iterator to the first element of the expression.
      */
     template <class CT, class X>
-    inline auto xbroadcast<CT, X>::begin() const noexcept -> const_iterator
+    inline auto xbroadcast<CT, X>::xbegin() const noexcept -> const_broadcast_iterator
     {
-        return cxbegin(shape());
+        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
     }
 
     /**
@@ -315,18 +358,18 @@ namespace xt
      * of the expression.
      */
     template <class CT, class X>
-    inline auto xbroadcast<CT, X>::end() const noexcept -> const_iterator
+    inline auto xbroadcast<CT, X>::xend() const noexcept -> const_broadcast_iterator
     {
-        return cxend(shape());
+        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
     }
 
     /**
      * Returns a constant iterator to the first element of the expression.
      */
     template <class CT, class X>
-    inline auto xbroadcast<CT, X>::cbegin() const noexcept -> const_iterator
+    inline auto xbroadcast<CT, X>::cxbegin() const noexcept -> const_broadcast_iterator
     {
-        return cxbegin(shape());
+        return xbegin();
     }
 
     /**
@@ -334,9 +377,9 @@ namespace xt
      * of the expression.
      */
     template <class CT, class X>
-    inline auto xbroadcast<CT, X>::cend() const noexcept -> const_iterator
+    inline auto xbroadcast<CT, X>::cxend() const noexcept -> const_broadcast_iterator
     {
-        return cxend(shape());
+        return xend();
     }
 
     /**
@@ -407,50 +450,6 @@ namespace xt
         // Could check if (broadcastable(shape, m_shape)
         return m_e.stepper_end(shape);
     }
-
-    /**
-     * @name Storage iterators
-     */
-    /**
-     * Returns an iterator to the first element of the buffer
-     * containing the elements of the expression.
-     */
-    template <class CT, class X>
-    inline auto xbroadcast<CT, X>::storage_begin() const noexcept -> const_storage_iterator
-    {
-        return cbegin();
-    }
-
-    /**
-     * Returns an iterator to the element following the last
-     * element of the buffer containing the elements of the expression.
-     */
-    template <class CT, class X>
-    inline auto xbroadcast<CT, X>::storage_end() const noexcept -> const_storage_iterator
-    {
-        return cend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the buffer
-     * containing the elements of the expression.
-     */
-    template <class CT, class X>
-    inline auto xbroadcast<CT, X>::storage_cbegin() const noexcept -> const_storage_iterator
-    {
-        return cbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the expression.
-     */
-    template <class CT, class X>
-    inline auto xbroadcast<CT, X>::storage_cend() const noexcept -> const_storage_iterator
-    {
-        return cend();
-    }
-    //@}
 
 }
 

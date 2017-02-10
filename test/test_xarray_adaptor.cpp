@@ -125,11 +125,11 @@ namespace xt
         test_broadcast2(a);
     }
 
-    TEST(xarray_adaptor, storage_iterator)
+    TEST(xarray_adaptor, iterator)
     {
         vec_type v;
         adaptor_type a(v);
-        test_storage_iterator(a);
+        test_iterator(a);
     }
 }
 

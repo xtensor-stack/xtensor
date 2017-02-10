@@ -25,8 +25,8 @@ namespace xt
         size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
         int expected = a(1, 0, 1);
         
-        auto iter = a.begin();
-        auto iter2 = a.begin();
+        auto iter = a.xbegin();
+        auto iter2 = a.xbegin();
         for(size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
@@ -115,8 +115,8 @@ namespace xt
         xarray_adaptor<typename R::vector_type> a(data, result.shape(), result.strides());
 
         size_type size = a.size();
-        auto iter = a.begin();
-        auto last = a.end();
+        auto iter = a.xbegin();
+        auto last = a.xend();
         for(size_type i = 0; i < size; ++i)
         {
             ++iter;

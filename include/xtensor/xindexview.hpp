@@ -79,12 +79,12 @@ namespace xt
         using indices_type = I;
 
         using stepper = xindexview_stepper<false, self_type, shape_type>;
-        using iterator = xiterator<stepper, shape_type>;
-        using storage_iterator = iterator;
+        using broadcast_iterator = xiterator<stepper, shape_type*>;
+        using iterator = broadcast_iterator;
 
         using const_stepper = xindexview_stepper<true, self_type, shape_type>;
-        using const_iterator = xiterator<const_stepper, shape_type>;
-        using const_storage_iterator = const_iterator;
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using const_iterator = const_broadcast_iterator;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
@@ -128,6 +128,14 @@ namespace xt
         const_iterator cbegin() const;
         const_iterator cend() const;
 
+        broadcast_iterator xbegin();
+        broadcast_iterator xend();
+
+        const_broadcast_iterator xbegin() const;
+        const_broadcast_iterator xend() const;
+        const_broadcast_iterator cxbegin() const;
+        const_broadcast_iterator cxend() const;
+
         template <class ST>
         xiterator<xindexview_stepper<false, self_type, ST>, ST> xbegin(const ST& shape);
         template <class ST>
@@ -151,15 +159,6 @@ namespace xt
         xindexview_stepper<true, self_type, ST> stepper_begin(const ST& shape) const;
         template <class ST>
         xindexview_stepper<true, self_type, ST> stepper_end(const ST& shape) const;
-
-        storage_iterator storage_begin();
-        storage_iterator storage_end();
-
-        const_storage_iterator storage_begin() const;
-        const_storage_iterator storage_end() const;
-
-        const_storage_iterator storage_cbegin() const;
-        const_storage_iterator storage_cend() const;
 
     private:
 
@@ -269,7 +268,7 @@ namespace xt
     template <class CT, class S, class I>
     inline void xindexview<CT, S, I>::assign_temporary_impl(temporary_type& tmp)
     {
-        std::copy(tmp.storage_cbegin(), tmp.storage_cend(), begin());
+        std::copy(tmp.cbegin(), tmp.cend(), xbegin());
     }
 
     /**
@@ -405,17 +404,17 @@ namespace xt
     template <class CT, class S, class I>
     inline auto xindexview<CT, S, I>::begin() -> iterator
     {
-        return xbegin(shape());
+        return begin();
     }
 
     /**
-     * Returns an iterator to the element following the last element
-     * of the view.
+     * Returns an iterator to the element following the last element of
+     * the view.
      */
     template <class CT, class S, class I>
     inline auto xindexview<CT, S, I>::end() -> iterator
     {
-        return xend(shape());
+        return end();
     }
 
     /**
@@ -424,18 +423,19 @@ namespace xt
     template <class CT, class S, class I>
     inline auto xindexview<CT, S, I>::begin() const -> const_iterator
     {
-        return xbegin(shape());
+        return xbegin();
     }
 
     /**
-     * Returns a constant iterator to the element following the last element
-     * of the view.
+     * Returns a constant iterator to the element following the last
+     * element of the view.
      */
     template <class CT, class S, class I>
     inline auto xindexview<CT, S, I>::end() const -> const_iterator
     {
-        return xend(shape());
+        return xend();
     }
+    //@}
 
     /**
      * Returns a constant iterator to the first element of the view.
@@ -443,7 +443,54 @@ namespace xt
     template <class CT, class S, class I>
     inline auto xindexview<CT, S, I>::cbegin() const -> const_iterator
     {
-        return begin();
+        return cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the view.
+     */
+    template <class CT, class S, class I>
+    inline auto xindexview<CT, S, I>::cend() const -> const_iterator
+    {
+        return cxend();
+    }
+    //@}
+
+    /**************************
+     * broadcast_iterator api *
+     **************************/
+
+    /**
+     * @name Broadcast iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the view.
+     */
+    template <class CT, class S, class I>
+    inline auto xindexview<CT, S, I>::xbegin() -> broadcast_iterator
+    {
+        return broadcast_iterator(stepper_begin(m_shape), &m_shape);
+    }
+
+    /**
+     * Returns an iterator to the element following the last element
+     * of the view.
+     */
+    template <class CT, class S, class I>
+    inline auto xindexview<CT, S, I>::xend() -> broadcast_iterator
+    {
+        return broadcast_iterator(stepper_end(m_shape), &m_shape);
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the view.
+     */
+    template <class CT, class S, class I>
+    inline auto xindexview<CT, S, I>::xbegin() const -> const_broadcast_iterator
+    {
+        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
     }
 
     /**
@@ -451,9 +498,28 @@ namespace xt
      * of the view.
      */
     template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::cend() const -> const_iterator
+    inline auto xindexview<CT, S, I>::xend() const -> const_broadcast_iterator
     {
-        return end();
+        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the view.
+     */
+    template <class CT, class S, class I>
+    inline auto xindexview<CT, S, I>::cxbegin() const -> const_broadcast_iterator
+    {
+        return xbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the view.
+     */
+    template <class CT, class S, class I>
+    inline auto xindexview<CT, S, I>::cxend() const -> const_broadcast_iterator
+    {
+        return xend();
     }
 
     /**
@@ -564,73 +630,6 @@ namespace xt
         size_type offset = shape.size() - dimension();
         return xindexview_stepper<true, self_type, ST>(this, offset, true);
     }
-
-    /************************
-     * storage_iterator api *
-     ************************/
-
-    /**
-     * @name Storage iterators
-     */
-    //@{
-    /**
-     * Returns an iterator to the first element of the view.
-     */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::storage_begin() -> storage_iterator
-    {
-        return begin();
-    }
-
-    /**
-     * Returns an iterator to the element following the last element of
-     * the view.
-     */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::storage_end() -> storage_iterator
-    {
-        return end();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the view.
-     */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::storage_begin() const -> const_storage_iterator
-    {
-        return cbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the view.
-     */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::storage_end() const -> const_storage_iterator
-    {
-        return cend();
-    }
-    //@}
-
-    /**
-     * Returns a constant iterator to the first element of the view.
-     */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::storage_cbegin() const -> const_storage_iterator
-    {
-        return cbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the view.
-     */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::storage_cend() const -> const_storage_iterator
-    {
-        return cend();
-    }
-    //@}
 
     /*************************************
      * xindexview_stepper implementation *
