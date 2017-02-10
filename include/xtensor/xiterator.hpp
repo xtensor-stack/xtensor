@@ -34,20 +34,20 @@ namespace xt
     namespace detail
     {
         template <class C>
-        struct get_storage_iterator_impl
+        struct get_iterator_impl
         {
-            using type = typename C::storage_iterator;
+            using type = typename C::iterator;
         };
 
         template <class C>
-        struct get_storage_iterator_impl<const C>
+        struct get_iterator_impl<const C>
         {
-            using type = typename C::const_storage_iterator;
+            using type = typename C::const_iterator;
         };
     }
 
     template <class C>
-    using get_storage_iterator = typename detail::get_storage_iterator_impl<C>::type;
+    using get_iterator = typename detail::get_iterator_impl<C>::type;
  
     namespace detail
     {
@@ -74,7 +74,7 @@ namespace xt
     public:
 
         using container_type = C;
-        using subiterator_type = get_storage_iterator<C>;
+        using subiterator_type = get_iterator<C>;
         using subiterator_traits = std::iterator_traits<subiterator_type>;
         using value_type = typename subiterator_traits::value_type;
         using reference = typename subiterator_traits::reference;
@@ -120,8 +120,46 @@ namespace xt
      * xiterator *
      *************/
 
+    namespace detail
+    {
+        template <class S>
+        class shape_storage
+        {
+
+        public:
+
+            using shape_type = S;
+            using param_type = const S&;
+
+            shape_storage() = default;
+            shape_storage(param_type shape);
+            const S& shape() const;
+
+        private:
+
+            S m_shape;
+        };
+
+        template <class S>
+        class shape_storage<S*>
+        {
+
+        public:
+
+            using shape_type = S;
+            using param_type = const S*;
+
+            shape_storage(param_type shape = 0);
+            const S& shape() const;
+
+        private:
+
+            const S* p_shape;
+        };
+    }
+
     template <class It, class S>
-    class xiterator
+    class xiterator : detail::shape_storage<S>
     {
 
     public:
@@ -136,11 +174,13 @@ namespace xt
         using size_type = typename subiterator_type::size_type;
         using iterator_category = std::forward_iterator_tag;
 
-        using shape_type = S;
+        using private_base = detail::shape_storage<S>;
+        using shape_type = typename private_base::shape_type;
+        using shape_param_type = typename private_base::param_type;
         using index_type = xindex_type_t<shape_type>;
 
         xiterator() = default;
-        xiterator(It it, const shape_type& shape);
+        xiterator(It it, shape_param_type shape);
 
         self_type& operator++();
         self_type operator++(int);
@@ -152,7 +192,6 @@ namespace xt
     private:
 
         subiterator_type m_it;
-        shape_type m_shape;
         index_type m_index;
     };
 
@@ -244,7 +283,7 @@ namespace xt
     template <class C>
     inline void xstepper<C>::to_end()
     {
-        m_it = p_c->storage_end();
+        m_it = p_c->end();
     }
 
     template <class C>
@@ -298,17 +337,44 @@ namespace xt
      * xiterator implementation *
      ****************************/
 
+    namespace detail
+    {
+        template <class S>
+        inline shape_storage<S>::shape_storage(param_type shape)
+            : m_shape(shape)
+        {
+        }
+
+        template <class S>
+        inline const S& shape_storage<S>::shape() const
+        {
+            return m_shape;
+        }
+
+        template <class S>
+        inline shape_storage<S*>::shape_storage(param_type shape)
+            : p_shape(shape)
+        {
+        }
+
+        template <class S>
+        inline const S& shape_storage<S*>::shape() const
+        {
+            return *p_shape;
+        }
+    }
+
     template <class It, class S>
-    inline xiterator<It, S>::xiterator(It it, const shape_type& shape)
-        : m_it(it), m_shape(shape),
-          m_index(make_sequence<index_type>(shape.size(), size_type(0)))
+    inline xiterator<It, S>::xiterator(It it, shape_param_type shape)
+        : m_it(it), private_base(shape),
+          m_index(make_sequence<index_type>(this->shape().size(), size_type(0)))
     {
     }
 
     template <class It, class S>
     inline auto xiterator<It, S>::operator++() -> self_type&
     {
-        increment_stepper(m_it, m_index, m_shape);
+        increment_stepper(m_it, m_index, this->shape());
         return *this;
     }
 
@@ -329,7 +395,7 @@ namespace xt
     template <class It, class S>
     inline bool xiterator<It, S>::equal(const xiterator& rhs) const
     {
-        return m_it == rhs.m_it && m_shape == rhs.m_shape;
+        return m_it == rhs.m_it && this->shape() == rhs.shape();
     }
 
     template <class It, class S>

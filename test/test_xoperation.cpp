@@ -212,7 +212,7 @@ namespace xt
 
         shape_type s = {3, 3, 3};
         xarray<bool> d(s);
-        std::fill(d.begin(), d.end(), true);
+        std::fill(d.xbegin(), d.xend(), true);
 
         auto d_nz = nonzero(d);
         EXPECT_EQ(3 * 3 * 3, d_nz.size());

@@ -151,10 +151,10 @@ namespace xt
         test_broadcast(a);
     }
 
-    TEST(xtensor, storage_iterator)
+    TEST(xtensor, iterator)
     {
         xtensor<int, 3> a;
-        test_storage_iterator<xtensor<int, 3>, container_type>(a);
+        test_iterator<xtensor<int, 3>, container_type>(a);
     }
 
     TEST(xtensor, zerod)

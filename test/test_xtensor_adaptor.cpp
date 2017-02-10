@@ -125,10 +125,10 @@ namespace xt
         test_broadcast(a);
     }
 
-    TEST(xtensor_adaptor, storage_iterator)
+    TEST(xtensor_adaptor, iterator)
     {
         vec_type v;
         adaptor_type a(v);
-        test_storage_iterator<adaptor_type, container_type>(a);
+        test_iterator<adaptor_type, container_type>(a);
     }
 }

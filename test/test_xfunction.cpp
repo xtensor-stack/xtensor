@@ -27,11 +27,11 @@ namespace xt
     {
         row_major_result<> rm;
         m_a.reshape(rm.shape(), rm.strides());
-        std::copy(rm.data().cbegin(), rm.data().cend(), m_a.storage_begin());
+        std::copy(rm.data().cbegin(), rm.data().cend(), m_a.begin());
 
         unit_shape_result<> us;
         m_b.reshape(us.shape(), us.strides());
-        std::copy(us.data().cbegin(), us.data().cend(), m_b.storage_begin());
+        std::copy(us.data().cbegin(), us.data().cend(), m_b.begin());
 
         using shape_type = layout_result<>::shape_type;
         shape_type sh = { 4, 3, 2, 4};
@@ -143,8 +143,8 @@ namespace xt
     void test_xfunction_iterator(const xarray<int>& a, const xarray<int>& b)
     {
         auto func = (a + b);
-        auto iter = func.begin();
-        auto itera = a.begin();
+        auto iter = func.xbegin();
+        auto itera = a.xbegin();
         auto iterb = b.xbegin(a.shape());
         auto nb_iter = a.shape().back() * 2 + 1;
         for(size_t i = 0; i < nb_iter; ++i)
@@ -177,8 +177,8 @@ namespace xt
     void test_xfunction_iterator_end(const xarray<int>& a, const xarray<int>& b)
     {
         auto func = (a + b);
-        auto iter = func.begin();
-        auto iter_end = func.end();
+        auto iter = func.xbegin();
+        auto iter_end = func.xend();
         auto size = a.size();
         for(size_t i = 0; i < size; ++i)
         {

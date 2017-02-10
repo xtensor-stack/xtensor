@@ -147,12 +147,12 @@ Element access
 Iterators
 ~~~~~~~~~
 
-- ``begin()`` and ``end()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the expression. The order of the iteration is ``row-major``
+- ``xbegin()`` and ``xend()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the expression. The order of the iteration is ``row-major``
   in that the index of the last dimension is incremented first. This iterator pair permits to use algorithms of the STL with ``xexpression`` as if they were simple containers.
-- ``xbegin()`` and ``xend()`` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in a row-major way, but certain dimensions are repeated to match the
-  provided shape as per the rules described above. For an expression ``e``, ``e.xbegin(e.shape())`` and ``e.begin()`` are equivalent.
-- ``storage_begin()`` and ``storage_end()`` return iterators on the buffer containing the elements of the ``xexpression`` when it is an in-memory container. Otherwise, it is similar
-  to ``begin()`` and ``end()``. For in-memory containers, the iteration is done directly on the buffer and may be faster than the one provided by ``begin()`` / ``end()`` .
+- ``xbegin(shape)`` and ``xend(shape)`` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in a row-major way, but certain dimensions are
+  repeated to match the provided shape as per the rules described above. For an expression ``e``, ``e.xbegin(e.shape())`` and ``e.begin()`` are equivalent.
+- ``begin()`` and ``end()`` return iterators on the buffer containing the elements of the ``xexpression`` when it is an in-memory container. Otherwise, they are similar
+  to ``xbegin()`` and ``xend()``. For in-memory containers, the iteration is done directly on the buffer and may be faster than the one provided by ``xbegin()`` / ``xend()`` .
 
 .. _NumPy: http://www.numpy.org
 .. _libdynd: http://libdynd.org

@@ -103,7 +103,7 @@ namespace xt
         bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
         if(trivial_broadcast)
         {
-            std::copy(de2.storage_cbegin(), de2.storage_cend(), de1.storage_begin());
+            std::copy(de2.cbegin(), de2.cend(), de1.begin());
         }
         else
         {
@@ -161,7 +161,7 @@ namespace xt
     inline void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
     {
         E1& d = e1.derived_cast();
-        std::transform(d.storage_cbegin(), d.storage_cend(), d.storage_begin(),
+        std::transform(d.cbegin(), d.cend(), d.begin(),
                 [e2, &f](const auto& v) { return f(v, e2); });
     }
 

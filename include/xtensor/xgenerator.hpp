@@ -63,11 +63,11 @@ namespace xt
         using const_stepper = xgenerator_stepper<F, R, S>;
         using stepper = const_stepper;
 
-        using const_iterator = xiterator<const_stepper, shape_type>;
-        using iterator = const_iterator;
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using broadcast_iterator = const_broadcast_iterator;
 
-        using const_storage_iterator = const_iterator;
-        using storage_iterator = const_storage_iterator;
+        using const_iterator = const_broadcast_iterator;
+        using iterator = const_iterator;
 
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;
@@ -93,6 +93,11 @@ namespace xt
         const_iterator cbegin() const noexcept;
         const_iterator cend() const noexcept;
 
+        const_broadcast_iterator xbegin() const noexcept;
+        const_broadcast_iterator xend() const noexcept;
+        const_broadcast_iterator cxbegin() const noexcept;
+        const_broadcast_iterator cxend() const noexcept;
+
         template <class O>
         xiterator<const_stepper, O> xbegin(const O& shape) const noexcept;
         template <class O>
@@ -104,15 +109,8 @@ namespace xt
 
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
-
         template <class O>
         const_stepper stepper_end(const O& shape) const noexcept;
-
-        const_storage_iterator storage_begin() const noexcept;
-        const_storage_iterator storage_end() const noexcept;
-
-        const_storage_iterator storage_cbegin() const noexcept;
-        const_storage_iterator storage_cend() const noexcept;
 
     private:
 
@@ -121,9 +119,9 @@ namespace xt
         friend class xgenerator_stepper<F, R, S>;
     };
 
-    /***************************
+    /**********************
      * xgenerator_stepper *
-     ***************************/
+     **********************/
 
     template <class F, class R, class S>
     class xgenerator_stepper
@@ -173,9 +171,9 @@ namespace xt
     bool operator!=(const xgenerator_stepper<F, R, S>& it1,
                     const xgenerator_stepper<F, R, S>& it2);
 
-    /**********************************
+    /*****************************
      * xgenerator implementation *
-     **********************************/
+     *****************************/
 
     /**
      * @name Constructor
@@ -287,14 +285,58 @@ namespace xt
     /**
      * @name Iterators
      */
+    /**
+     * Returns an iterator to the first element of the buffer
+     * containing the elements of the function.
+     */
+    template <class F, class R, class S>
+    inline auto xgenerator<F, R, S>::begin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the function.
+     */
+    template <class F, class R, class S>
+    inline auto xgenerator<F, R, S>::end() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the function.
+     */
+    template <class F, class R, class S>
+    inline auto xgenerator<F, R, S>::cbegin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the function.
+     */
+    template <class F, class R, class S>
+    inline auto xgenerator<F, R, S>::cend() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+    //@}
+
+    /**
+     * @name Broadcast iterators
+     */
     //@{
     /**
      * Returns a constant iterator to the first element of the function.
      */
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::begin() const noexcept -> const_iterator
+    inline auto xgenerator<F, R, S>::xbegin() const noexcept -> const_broadcast_iterator
     {
-        return xbegin(m_shape);
+        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
     }
 
     /**
@@ -302,18 +344,18 @@ namespace xt
      * of the function.
      */
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::end() const noexcept -> const_iterator
+    inline auto xgenerator<F, R, S>::xend() const noexcept -> const_broadcast_iterator
     {
-        return xend(m_shape);
+        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
     }
 
     /**
      * Returns a constant iterator to the first element of the function.
      */
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::cbegin() const noexcept -> const_iterator
+    inline auto xgenerator<F, R, S>::cxbegin() const noexcept -> const_broadcast_iterator
     {
-        return begin();
+        return xbegin();
     }
 
     /**
@@ -321,9 +363,9 @@ namespace xt
      * of the function.
      */
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::cend() const noexcept -> const_iterator
+    inline auto xgenerator<F, R, S>::cxend() const noexcept -> const_broadcast_iterator
     {
-        return end();
+        return xend();
     }
 
     /**
@@ -390,50 +432,6 @@ namespace xt
         size_type offset = shape.size() - dimension();
         return xgenerator_stepper<F, R, S>(this, offset, true);
     }
-
-    /**
-     * @name Storage iterators
-     */
-    /**
-     * Returns an iterator to the first element of the buffer
-     * containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::storage_begin() const noexcept -> const_storage_iterator
-    {
-        return cbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::storage_end() const noexcept -> const_storage_iterator
-    {
-        return cend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the buffer
-     * containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::storage_cbegin() const noexcept -> const_storage_iterator
-    {
-        return cbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::storage_cend() const noexcept -> const_storage_iterator
-    {
-        return cend();
-    }
-    //@}
 
     /******************************************
      * xgenerator_stepper implementation *

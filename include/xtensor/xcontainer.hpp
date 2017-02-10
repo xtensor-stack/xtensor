@@ -64,14 +64,14 @@ namespace xt
         using shape_type = typename inner_types::shape_type;
         using strides_type = typename inner_types::strides_type;
 
+        using iterator = typename container_type::iterator;
+        using const_iterator = typename container_type::const_iterator;
+
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D>;
 
-        using iterator = xiterator<stepper, shape_type>;
-        using const_iterator = xiterator<const_stepper, shape_type>;
-
-        using storage_iterator = typename container_type::iterator;
-        using const_storage_iterator = typename container_type::const_iterator;
+        using broadcast_iterator = xiterator<stepper, shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
 
         size_type size() const noexcept;
 
@@ -129,6 +129,14 @@ namespace xt
         const_iterator cbegin() const noexcept;
         const_iterator cend() const noexcept;
 
+        broadcast_iterator xbegin() noexcept;
+        broadcast_iterator xend() noexcept;
+
+        const_broadcast_iterator xbegin() const noexcept;
+        const_broadcast_iterator xend() const noexcept;
+        const_broadcast_iterator cxbegin() const noexcept;
+        const_broadcast_iterator cxend() const noexcept;
+
         template <class S>
         xiterator<stepper, S> xbegin(const S& shape) noexcept;
         template <class S>
@@ -152,15 +160,6 @@ namespace xt
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
         const_stepper stepper_end(const S& shape) const noexcept;
-
-        storage_iterator storage_begin() noexcept;
-        storage_iterator storage_end() noexcept;
-
-        const_storage_iterator storage_begin() const noexcept;
-        const_storage_iterator storage_end() const noexcept;
-
-        const_storage_iterator storage_cbegin() const noexcept;
-        const_storage_iterator storage_cend() const noexcept;
 
     protected:
 
@@ -529,11 +528,11 @@ namespace xt
     }
 
     /**
-    * Returns a constant reference to the element at the specified position in the container.
-    * @param index a sequence of indices specifying the position in the container. Indices
-    * must be unsigned integers, the number of indices in the list should be equal or greater
-    * than the number of dimensions of the container.
-    */
+     * Returns a constant reference to the element at the specified position in the container.
+     * @param index a sequence of indices specifying the position in the container. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the container.
+     */
     template <class D>
     inline auto xcontainer<D>::operator[](const xindex& index) const -> const_reference
     {
@@ -627,12 +626,81 @@ namespace xt
      */
     //@{
     /**
-     * Returns an iterator to the first element of the container.
+     * Returns an iterator to the first element of the buffer containing
+     * the elements of the container.
      */
     template <class D>
     inline auto xcontainer<D>::begin() noexcept -> iterator
     {
-        return xbegin(shape());
+        return data().begin();
+    }
+
+    /**
+     * Returns an iterator to the element following the last element of
+     * the buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::end() noexcept -> iterator
+    {
+        return data().end();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::begin() const noexcept -> const_iterator
+    {
+        return data().cbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::end() const noexcept -> const_iterator
+    {
+        return data().cend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::cbegin() const noexcept -> const_iterator
+    {
+        return data().cbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::cend() const noexcept -> const_iterator
+    {
+        return data().cend();
+    }
+    //@}
+
+    /**************************
+     * broadcast iterator api *
+     **************************/
+
+    /**
+     * @name Broadcast iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::xbegin() noexcept -> broadcast_iterator
+    {
+        return broadcast_iterator(stepper_begin(m_shape), &m_shape);
     }
 
     /**
@@ -640,18 +708,18 @@ namespace xt
      * of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::end() noexcept -> iterator
+    inline auto xcontainer<D>::xend() noexcept -> broadcast_iterator
     {
-        return xend(shape());
+        return broadcast_iterator(stepper_end(m_shape), &m_shape);
     }
 
     /**
      * Returns a constant iterator to the first element of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::begin() const noexcept -> const_iterator
+    inline auto xcontainer<D>::xbegin() const noexcept -> const_broadcast_iterator
     {
-        return xbegin(shape());
+        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
     }
 
     /**
@@ -659,18 +727,18 @@ namespace xt
      * of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::end() const noexcept -> const_iterator
+    inline auto xcontainer<D>::xend() const noexcept -> const_broadcast_iterator
     {
-        return xend(shape());
+        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
     }
 
     /**
      * Returns a constant iterator to the first element of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::cbegin() const noexcept -> const_iterator
+    inline auto xcontainer<D>::cxbegin() const noexcept -> const_broadcast_iterator
     {
-        return begin();
+        return xbegin();
     }
 
     /**
@@ -678,9 +746,9 @@ namespace xt
      * of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::cend() const noexcept -> const_iterator
+    inline auto xcontainer<D>::cxend() const noexcept -> const_broadcast_iterator
     {
-        return end();
+        return xend();
     }
 
     /**
@@ -791,75 +859,6 @@ namespace xt
         size_type offset = shape.size() - dimension();
         return const_stepper(static_cast<const derived_type*>(this), data().end(), offset);
     }
-
-    /************************
-     * storage_iterator api *
-     ************************/
-
-    /**
-     * @name Storage iterators
-     */
-    //@{
-    /**
-     * Returns an iterator to the first element of the buffer containing
-     * the elements of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::storage_begin() noexcept -> storage_iterator
-    {
-        return data().begin();
-    }
-
-    /**
-     * Returns an iterator to the element following the last element of
-     * the buffer containing the elements of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::storage_end() noexcept -> storage_iterator
-    {
-        return data().end();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the buffer
-     * containing the elements of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::storage_begin() const noexcept -> const_storage_iterator
-    {
-        return data().cbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::storage_end() const noexcept -> const_storage_iterator
-    {
-        return data().cend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the buffer
-     * containing the elements of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::storage_cbegin() const noexcept -> const_storage_iterator
-    {
-        return data().cbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::storage_cend() const noexcept -> const_storage_iterator
-    {
-        return data().cend();
-    }
-    //@}
 
 }
 
