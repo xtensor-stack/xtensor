@@ -19,7 +19,6 @@
 
 #include "xfunction.hpp"
 #include "xbroadcast.hpp"
-#include "xexpression.hpp"
 #include "xgenerator.hpp"
 
 #ifdef X_OLD_CLANG
@@ -464,7 +463,10 @@ namespace xt
         inline T add_axis(T arr, std::size_t axis, std::size_t value)
         {
             T temp(arr);
-            temp.insert(temp.begin() + axis, value);
+            // TODO workaround MSVC iterator bug
+            auto it = temp.begin();
+            it += axis;
+            temp.insert(it, value);
             return temp;
         }
     }
