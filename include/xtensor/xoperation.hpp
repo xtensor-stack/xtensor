@@ -314,7 +314,7 @@ namespace xt
     {
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
-        bool res = de1.shape() == de2.shape();
+        bool res = de1.dimension() == de2.dimension() && std::equal(de1.shape().begin(), de1.shape().end(), de2.shape().begin());
         auto iter1 = de1.xbegin();
         auto iter2 = de2.xbegin();
         auto iter_end = de1.xend();
@@ -468,7 +468,7 @@ namespace xt
     template <class E>
     inline bool any(E&& e)
     {
-        return std::any_of(e.cbegin(), e.cend(), 
+        return std::any_of(e.cbegin(), e.cend(),
                            [](const typename std::decay_t<E>::value_type& el) { return el; });
     }
 

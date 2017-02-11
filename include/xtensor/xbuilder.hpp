@@ -108,13 +108,13 @@ namespace xt
 
             inline T operator[](const xindex& idx) const
             {
-                return T(m_start + m_step * T(idx[0]));
+                return m_start + m_step * T(idx[0]);
             }
 
             template <class It>
             inline T element(It first, It /*last*/) const
             {
-                return T(m_start + m_step * T(*first));
+                return m_start + m_step * T(*first);
             }
 
         private:
@@ -301,7 +301,7 @@ namespace xt
             using size_type = std::size_t;
             using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
 
-            concatenate_impl(std::tuple<T...> t, std::size_t axis) :
+            concatenate_impl(std::tuple<T...>&& t, std::size_t axis) :
                 m_t(t), m_axis(axis)
             {
             }
@@ -332,10 +332,7 @@ namespace xt
                         idx[this->m_axis] -= arr.shape()[this->m_axis];
                         return false;
                     }
-                    else
-                    {
-                        return true;
-                    }
+                    return true;
                 };
 
                 auto get = [&idx](auto& arr) {
@@ -363,7 +360,7 @@ namespace xt
             using size_type = std::size_t;
             using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
 
-            stack_impl(std::tuple<T...> t, std::size_t axis) :
+            stack_impl(std::tuple<T...>&& t, std::size_t axis) :
                 m_t(t), m_axis(axis)
             {
             }
@@ -400,6 +397,11 @@ namespace xt
         };
     }
 
+    /**
+     * @function xtuple
+     * @brief Creates tuples from arguments for \ref concatenate and \ref stack.
+     *        Very similar to std::make_tuple.
+     */
     template <class... Types>
     auto xtuple(Types&&... args)
     {
@@ -410,21 +412,28 @@ namespace xt
      * @function concatentate
      * @brief Concatenate xexpressions along \em axis.
      *
-     * @param a xexpression to concatenate
-     * @param b xexpression to concatenate
+     * @param t \ref xtuple of xexpressions to concatenate
+     * @param axis axis along which elements are concatenated
      * @returns xgenerator evaluating to concatenated elements
+     *
+     * \code{.cpp}
+     * xt::xarray<double> a = {{1, 2, 3}};
+     * xt::xarray<double> b = {{2, 3, 4}};
+     * xt::xarray<double> c = xt::concatenate(xt::xtuple(a, b)); // => {{1, 2, 3},
+     *                                                                  {2, 3, 4}}
+     * xt::xarray<double> d = xt::concatenate(xt::xtuple(a, b), 1); // => {{1, 2, 3, 2, 3, 4}}
+     * \endcode
      */
     template <class... T>
-    inline auto concatenate(std::tuple<T...> t, std::size_t axis = 0)
+    inline auto concatenate(std::tuple<T...>&& t, std::size_t axis = 0)
     {
-        using shape_type = promote_shape_t<std::decay_t<T>...>;
-        shape_type new_shape(std::get<0>(t).shape().begin(), std::get<0>(t).shape().end());
-        auto shape_at_axis = [&axis](std::size_t prev, auto& arr) {
+        using shape_type = promote_shape_t<typename std::decay_t<T>::shape_type...>;
+        shape_type new_shape = forward_sequence<shape_type>(std::get<0>(t).shape());
+        auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
             return prev + arr.shape()[axis];
         };
-        new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - std::get<0>(t).shape()[axis];
-        using concat_t = detail::concatenate_impl<T...>;
-        return detail::make_xgenerator(concat_t(std::forward<std::tuple<T...>>(t), axis), new_shape);
+        new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
+        return detail::make_xgenerator(detail::concatenate_impl<T...>(std::forward<std::tuple<T...>>(t), axis), new_shape);
     }
 
     namespace detail
@@ -465,16 +474,26 @@ namespace xt
      * @brief Stack xexpressions along \em axis.
      *        Stacking always creates a new dimension along which elements are stacked.
      *
-     * @param a tuple of xexpressions to stack
+     * @param t \ref xtuple of xexpressions to concatenate
+     * @param axis axis along which elements are stacked
      * @returns xgenerator evaluating to stacked elements
+     *
+     * \code{.cpp}
+     * xt::xarray<double> a = {1, 2, 3};
+     * xt::xarray<double> b = {5, 6, 7};
+     * xt::xarray<double> s = xt::stack(xt::xtuple(a, b)); // => {{1, 2, 3},
+     *                                                            {5, 6, 7}}
+     * xt::xarray<double> t = xt::stack(xt::xtuple(a, b), 1); // => {{1, 5},
+     *                                                               {2, 6},
+     *                                                               {3, 7}}
+     * \endcode
      */
     template <class... T>
-    inline auto stack(std::tuple<T...> a, std::size_t axis = 0)
+    inline auto stack(std::tuple<T...>&& t, std::size_t axis = 0)
     {
-        using shape_type = promote_shape_t<std::decay_t<T>...>;
-        auto new_shape = detail::add_axis(shape_type(std::get<0>(a).shape().begin(), std::get<0>(a).shape().end()), axis, sizeof...(T)); 
-        using stack_t = detail::stack_impl<T...>;
-        return detail::make_xgenerator(stack_t(std::forward<std::tuple<T...>>(a), axis), new_shape);
+        using shape_type = promote_shape_t<typename std::decay_t<T>::shape_type...>;
+        auto new_shape = detail::add_axis(forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(T));
+        return detail::make_xgenerator(detail::stack_impl<T...>(std::forward<std::tuple<T...>>(t), axis), new_shape);
     }
 }
 #endif
