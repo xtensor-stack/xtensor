@@ -388,7 +388,10 @@ namespace xt
                     return arr[idx];
                 };
                 std::size_t i = idx[m_axis];
-                idx.erase(idx.begin() + m_axis);
+                // TODO workaround MSVC iterator bug
+                auto it = idx.begin();
+                it += m_axis;
+                idx.erase(it);
                 return apply<value_type>(i, get_item, m_t);
             }
             const std::tuple<T...> m_t;
