@@ -119,6 +119,15 @@ namespace xt
         size_type m_step;
     };
 
+    struct xnone_tag
+    {
+    };
+
+    inline auto xnone()
+    {
+        return xnone_tag();
+    }
+
     /**
      * Returns a slice representing an interval, to
      * be used as an argument of view function.
@@ -127,7 +136,7 @@ namespace xt
      * @param step the space between two indices
      * @sa view
      */
-    template <class T>
+    template <class T, class E = std::enable_if_t<!std::is_same<T, xnone_tag>::value>>
     inline auto range(T min, T max, T step) noexcept
     {
         return xstepped_range<T>(min, max, step);
@@ -206,6 +215,96 @@ namespace xt
         return xnewaxis_tag();
     }
 
+    template <class A, class B, class C>
+    struct xrange_adaptor
+    {
+        xrange_adaptor(A min, B max, C step)
+            : m_min(min), m_max(max), m_step(step)
+        {
+        }
+
+        template <class MIN = A, class MAX = B, class STEP = C>
+        std::enable_if_t<!std::is_integral<MIN>::value && std::is_integral<MAX>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        get(std::size_t size)
+        {
+            if (m_step > 0)
+            {
+                return xstepped_range<int>(0, m_max, m_step);
+            }
+            else
+            {
+                return xstepped_range<int>(size - 1, m_max, m_step);
+            }
+        }
+
+        template <class MIN = A, class MAX = B, class STEP = C>
+        std::enable_if_t<!std::is_integral<MAX>::value && std::is_integral<MIN>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        get(std::size_t size)
+        {
+            if (m_step > 0)
+            {
+                return xstepped_range<int>(m_min, size, m_step);
+            }
+            else
+            {
+                return xstepped_range<int>(m_min, -1, m_step);
+            }
+        }
+
+        template <class MIN = A, class MAX = B, class STEP = C>
+        std::enable_if_t<!std::is_integral<MIN>::value && !std::is_integral<MAX>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        get(std::size_t size)
+        {
+            if (m_step > 0)
+            {
+                return xstepped_range<int>(0, size, m_step);
+            }
+            else
+            {
+                return xstepped_range<int>(size - 1, -1, m_step);
+            }
+        }
+
+        template <class MIN = A, class MAX = B, class STEP = C>
+        std::enable_if_t<std::is_integral<MIN>::value && !std::is_integral<MAX>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
+        get(std::size_t size)
+        {
+            return xrange<std::size_t>(m_min, size, 1);
+        }
+
+        template <class MIN = A, class MAX = B, class STEP = C>
+        std::enable_if_t<!std::is_integral<MIN>::value && std::is_integral<MAX>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
+        get(std::size_t size)
+        {
+            return xrange<std::size_t>(0, m_max, 1);
+        }
+
+        template <class MIN = A, class MAX = B, class STEP = C>
+        std::enable_if_t<!std::is_integral<MIN>::value && !std::is_integral<MAX>::value && !std::is_integral<STEP>::value, xall<std::size_t>>
+        get(std::size_t size)
+        {
+            return xall<std::size_t>(size);
+        }
+
+    private:
+        A m_min;
+        B m_max;
+        C m_step;
+    };
+
+    template <class A, class B>
+    inline auto range(A min, B max)
+    {
+        return xrange_adaptor<A, B, std::size_t>(min, max, 1);
+    }
+
+    template <class A, class B, class C>
+    inline auto range(A min, B max, C step)
+    {
+        return xrange_adaptor<A, B, C>(min, max, step);
+    }
+
+
     /******************************************************
      * homogeneous get_size for integral types and slices *
      ******************************************************/
@@ -276,6 +375,13 @@ namespace xt
         return xnewaxis<typename E::size_type>();
     }
 
+    template <class E, class A, class B, class C>
+    inline auto get_slice_implementation(E& e, xrange_adaptor<A, B, C> adaptor, std::size_t index)
+    {
+        return adaptor.get(e.shape()[index]);
+    }
+
+
     /******************************
      * homogeneous get_slice_type *
      ******************************/
@@ -298,6 +404,12 @@ namespace xt
         struct get_slice_type_impl<E, xnewaxis_tag>
         {
             using type = xnewaxis<typename E::size_type>;
+        };
+
+        template <class E, class A, class B, class C>
+        struct get_slice_type_impl<E, xrange_adaptor<A, B, C>>
+        {
+            using type = decltype(xrange_adaptor<A, B, C>(A(), B(), C()).get(0));
         };
     }
 
@@ -354,7 +466,7 @@ namespace xt
 
     template <class T>
     inline xstepped_range<T>::xstepped_range(size_type min, size_type max, size_type step) noexcept
-        : m_min(min), m_size((max - min)/step), m_step(step)
+        : m_min(min), m_size((size_type) std::ceil(double(max - min)/double(step))), m_step(step)
     {
     }
 
