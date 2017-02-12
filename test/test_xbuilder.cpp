@@ -163,7 +163,71 @@ namespace xt
         ASSERT_EQ(true, m_assigned(2, 2));
         ASSERT_EQ(false, m_assigned(4, 2));
 
-        xt::xindex idx2({2, 2});
+        xindex idx2({2, 2});
         ASSERT_EQ(true, e.element(idx2.begin(), idx2.end()));
+    }
+
+    TEST(xbuilder, concatenate)
+    {
+        xarray<double> a = arange<double>(12);
+        a.reshape({2, 2, 3});
+
+        auto c = concatenate(xtuple(a, a, a), 2);
+
+        shape_t expected_shape = {2, 2, 9};
+        ASSERT_EQ(expected_shape, c.shape());
+        ASSERT_EQ(c(1, 1, 2), c(1, 1, 5));
+        ASSERT_EQ(11, c(1, 1, 2));
+        ASSERT_EQ(11, c(1, 1, 5));
+
+        xarray<double> e = {{1,2,3}};
+        xarray<double> f = {{2,3,4}};
+        xarray<double> k = concatenate(xtuple(e, f));
+        xarray<double> l = concatenate(xtuple(e, f), 1);
+
+        shape_t ex_k = {2, 3};
+        shape_t ex_l = {1, 6};
+        ASSERT_EQ(ex_k, k.shape());
+        ASSERT_EQ(ex_l, l.shape());
+        ASSERT_EQ(4, k(1, 2));
+        ASSERT_EQ(3, l(0, 2));
+        ASSERT_EQ(3, l(0, 4));
+
+        auto t = concatenate(xtuple(arange(2), arange(2, 5), arange(5, 8)));
+        ASSERT_TRUE(arange(8) == t);
+    }
+
+    TEST(xbuilder, stack)
+    {
+        xarray<double> a = arange<double>(12);
+        a.reshape({2, 2, 3});
+
+        auto c = stack(xtuple(a, a, a), 2);
+
+        shape_t expected_shape = {2, 2, 3, 3};
+
+        ASSERT_EQ(expected_shape, c.shape());
+        ASSERT_EQ(c(1, 1, 0, 2), c(1, 1, 1, 2));
+        ASSERT_EQ(c(1, 1, 0, 2), c(1, 1, 2, 2));
+        ASSERT_EQ(11, c(1, 1, 1, 2));
+        ASSERT_EQ(11, c(1, 1, 2, 2));
+
+        auto e = arange(1, 4);
+        xarray<double> f = {2,3,4};
+        xarray<double> k = stack(xtuple(e, f));
+        xarray<double> l = stack(xtuple(e, f), 1);
+
+        shape_t ex_k = {2, 3};
+        shape_t ex_l = {3, 2};
+        ASSERT_EQ(ex_k, k.shape());
+        ASSERT_EQ(ex_l, l.shape());
+        ASSERT_EQ(4, k(1, 2));
+        ASSERT_EQ(3, l(1, 1));
+        ASSERT_EQ(3, l(2, 0));
+
+        auto t = stack(xtuple(arange(3), arange(3, 6), arange(6, 9)));
+        xarray<double> ar = arange(9);
+        ar.reshape({3, 3});
+        ASSERT_TRUE(t == ar);
     }
 }

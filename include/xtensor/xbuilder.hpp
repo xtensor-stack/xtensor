@@ -107,13 +107,13 @@ namespace xt
 
             inline T operator[](const xindex& idx) const
             {
-                return T(m_start + m_step * T(idx[0]));
+                return m_start + m_step * T(idx[0]);
             }
 
             template <class It>
             inline T element(It first, It /*last*/) const
             {
-                return T(m_start + m_step * T(*first));
+                return m_start + m_step * T(*first);
             }
 
         private:
@@ -292,5 +292,213 @@ namespace xt
         return pow(base, linspace(start, stop, num_samples, endpoint));
     }
 
+    namespace detail
+    {
+        template <class... T>
+        struct concatenate_impl
+        {
+            using size_type = std::size_t;
+            using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
+
+            concatenate_impl(std::tuple<T...>&& t, std::size_t axis) :
+                m_t(t), m_axis(axis)
+            {
+            }
+
+            template <class... Args>
+            value_type operator()(Args... args) const
+            {
+                return access_impl(xindex({{static_cast<size_type>(args)...}}));
+            }
+
+            value_type operator[](const xindex& idx) const
+            {
+                return access_impl(idx);
+            }
+
+            template <class It>
+            value_type element(It first, It last) const
+            {
+                return access_impl(xindex(first, last));
+            }
+
+        private:
+            inline value_type access_impl(xindex idx) const
+            {
+                auto match = [this, &idx](auto& arr) {
+                    if (idx[this->m_axis] >= arr.shape()[this->m_axis])
+                    {
+                        idx[this->m_axis] -= arr.shape()[this->m_axis];
+                        return false;
+                    }
+                    return true;
+                };
+
+                auto get = [&idx](auto& arr) {
+                    return arr[idx];
+                };
+
+                std::size_t i = 0;
+                for (; i < sizeof...(T); ++i)
+                {
+                    if (apply<bool>(i, match, m_t)) 
+                    {
+                        break;
+                    }
+                }
+                return apply<value_type>(i, get, m_t);
+            }
+
+            std::tuple<T...> m_t;
+            size_type m_axis;
+        };
+
+        template <class... T>
+        struct stack_impl
+        {
+            using size_type = std::size_t;
+            using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
+
+            stack_impl(std::tuple<T...>&& t, std::size_t axis) :
+                m_t(t), m_axis(axis)
+            {
+            }
+
+            template <class... Args>
+            value_type operator()(Args... args) const
+            {
+                return access_impl(xindex({{static_cast<size_type>(args)...}}));
+            }
+
+            value_type operator[](const xindex& idx) const
+            {
+                return access_impl(idx);
+            }
+
+            template <class It>
+            value_type element(It first, It last) const
+            {
+                return access_impl(xindex(first, last));
+            }
+
+        private:
+            inline value_type access_impl(xindex idx) const
+            {
+                auto get_item = [&idx](auto& arr) {
+                    return arr[idx];
+                };
+                std::size_t i = idx[m_axis];
+                // TODO workaround MSVC iterator bug
+                auto it = idx.begin();
+                it += m_axis;
+                idx.erase(it);
+                return apply<value_type>(i, get_item, m_t);
+            }
+            const std::tuple<T...> m_t;
+            const size_type m_axis;
+        };
+    }
+
+    /**
+     * @function xtuple
+     * @brief Creates tuples from arguments for \ref concatenate and \ref stack.
+     *        Very similar to std::make_tuple.
+     */
+    template <class... Types>
+    auto xtuple(Types&&... args)
+    {
+        return std::tuple<detail::const_closure_t<Types>...>(std::forward<Types>(args)...);
+    }
+
+    /**
+     * @function concatentate
+     * @brief Concatenate xexpressions along \em axis.
+     *
+     * @param t \ref xtuple of xexpressions to concatenate
+     * @param axis axis along which elements are concatenated
+     * @returns xgenerator evaluating to concatenated elements
+     *
+     * \code{.cpp}
+     * xt::xarray<double> a = {{1, 2, 3}};
+     * xt::xarray<double> b = {{2, 3, 4}};
+     * xt::xarray<double> c = xt::concatenate(xt::xtuple(a, b)); // => {{1, 2, 3},
+     *                                                                  {2, 3, 4}}
+     * xt::xarray<double> d = xt::concatenate(xt::xtuple(a, b), 1); // => {{1, 2, 3, 2, 3, 4}}
+     * \endcode
+     */
+    template <class... T>
+    inline auto concatenate(std::tuple<T...>&& t, std::size_t axis = 0)
+    {
+        using shape_type = promote_shape_t<typename std::decay_t<T>::shape_type...>;
+        shape_type new_shape = forward_sequence<shape_type>(std::get<0>(t).shape());
+        auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
+            return prev + arr.shape()[axis];
+        };
+        new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
+        return detail::make_xgenerator(detail::concatenate_impl<T...>(std::forward<std::tuple<T...>>(t), axis), new_shape);
+    }
+
+    namespace detail
+    {
+        template <class T, std::size_t N>
+        inline std::array<T, N + 1> add_axis(std::array<T, N> arr, std::size_t axis, std::size_t value)
+        {
+            std::array<T, N + 1> temp;
+            for (std::size_t i = 0; i < N + 1; ++i)
+            {
+                if (i < axis)
+                {
+                    temp[i] = arr[i];
+                }
+                if (i == axis)
+                {
+                    temp[i] = value;
+                }
+                if (i > axis)
+                {
+                    temp[i] = arr[i - 1];
+                }
+            }
+            return temp;
+        }
+
+        template <class T>
+        inline T add_axis(T arr, std::size_t axis, std::size_t value)
+        {
+            T temp(arr);
+            // TODO workaround MSVC iterator bug
+            auto it = temp.begin();
+            it += axis;
+            temp.insert(it, value);
+            return temp;
+        }
+    }
+
+    /**
+     * @function stack
+     * @brief Stack xexpressions along \em axis.
+     *        Stacking always creates a new dimension along which elements are stacked.
+     *
+     * @param t \ref xtuple of xexpressions to concatenate
+     * @param axis axis along which elements are stacked
+     * @returns xgenerator evaluating to stacked elements
+     *
+     * \code{.cpp}
+     * xt::xarray<double> a = {1, 2, 3};
+     * xt::xarray<double> b = {5, 6, 7};
+     * xt::xarray<double> s = xt::stack(xt::xtuple(a, b)); // => {{1, 2, 3},
+     *                                                            {5, 6, 7}}
+     * xt::xarray<double> t = xt::stack(xt::xtuple(a, b), 1); // => {{1, 5},
+     *                                                               {2, 6},
+     *                                                               {3, 7}}
+     * \endcode
+     */
+    template <class... T>
+    inline auto stack(std::tuple<T...>&& t, std::size_t axis = 0)
+    {
+        using shape_type = promote_shape_t<typename std::decay_t<T>::shape_type...>;
+        auto new_shape = detail::add_axis(forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(T));
+        return detail::make_xgenerator(detail::stack_impl<T...>(std::forward<std::tuple<T...>>(t), axis), new_shape);
+    }
 }
 #endif
