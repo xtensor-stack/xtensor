@@ -26,6 +26,12 @@ Numerical ranges
 - ``linspace(start, stop, num_samples)``: generates num_samples evenly spaced numbers over given interval.
 - ``logspace(start, stop, num_samples)``: generates num_samples evenly spaced on a log scale over given interval
 
+Joining expressions
+-------------------
+
+- ``concatenate(tuple, axis=0)``: concatenates a list of expressions along the given axis.
+- ``stack(tuple, axis=0)``: stacks a list of expressions along the given axis.
+
 Random distributions
 --------------------
 

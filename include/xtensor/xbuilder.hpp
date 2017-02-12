@@ -300,24 +300,24 @@ namespace xt
             using size_type = std::size_t;
             using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
 
-            concatenate_impl(std::tuple<T...>&& t, std::size_t axis) :
-                m_t(t), m_axis(axis)
+            inline concatenate_impl(std::tuple<T...>&& t, std::size_t axis)
+                : m_t(t), m_axis(axis)
             {
             }
 
             template <class... Args>
-            value_type operator()(Args... args) const
+            inline value_type operator()(Args... args) const
             {
                 return access_impl(xindex({{static_cast<size_type>(args)...}}));
             }
 
-            value_type operator[](const xindex& idx) const
+            inline value_type operator[](const xindex& idx) const
             {
                 return access_impl(idx);
             }
 
             template <class It>
-            value_type element(It first, It last) const
+            inline value_type element(It first, It last) const
             {
                 return access_impl(xindex(first, last));
             }
@@ -359,24 +359,24 @@ namespace xt
             using size_type = std::size_t;
             using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
 
-            stack_impl(std::tuple<T...>&& t, std::size_t axis) :
-                m_t(t), m_axis(axis)
+            inline stack_impl(std::tuple<T...>&& t, std::size_t axis)
+                : m_t(t), m_axis(axis)
             {
             }
 
             template <class... Args>
-            value_type operator()(Args... args) const
+            inline value_type operator()(Args... args) const
             {
                 return access_impl(xindex({{static_cast<size_type>(args)...}}));
             }
 
-            value_type operator[](const xindex& idx) const
+            inline value_type operator[](const xindex& idx) const
             {
                 return access_impl(idx);
             }
 
             template <class It>
-            value_type element(It first, It last) const
+            inline value_type element(It first, It last) const
             {
                 return access_impl(xindex(first, last));
             }
@@ -400,19 +400,17 @@ namespace xt
     }
 
     /**
-     * @function xtuple
      * @brief Creates tuples from arguments for \ref concatenate and \ref stack.
      *        Very similar to std::make_tuple.
      */
     template <class... Types>
-    auto xtuple(Types&&... args)
+    inline auto xtuple(Types&&... args)
     {
         return std::tuple<detail::const_closure_t<Types>...>(std::forward<Types>(args)...);
     }
 
     /**
-     * @function concatentate
-     * @brief Concatenate xexpressions along \em axis.
+     * @brief Concatenates xexpressions along \em axis.
      *
      * @param t \ref xtuple of xexpressions to concatenate
      * @param axis axis along which elements are concatenated
@@ -475,7 +473,6 @@ namespace xt
     }
 
     /**
-     * @function stack
      * @brief Stack xexpressions along \em axis.
      *        Stacking always creates a new dimension along which elements are stacked.
      *
