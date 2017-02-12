@@ -69,7 +69,7 @@ namespace xt
     S make_sequence(typename S::size_type size, typename S::value_type v);
 
     template <class R, class A>
-    auto forward_sequence(const A& s);
+    decltype(auto) forward_sequence(A&& s);
 
     // equivalent to std::size(c) in c++17
     template <class C>
@@ -441,7 +441,8 @@ namespace xt
         template <class R, class A, class E = void>
         struct sequence_forwarder
         {
-            static inline R run(const A& r)
+            template <class T>
+            static inline R forward(const T& r)
             {
                 return R(std::begin(r), std::end(r));
             }
@@ -453,7 +454,8 @@ namespace xt
         {
             using R = std::array<I, L>;
 
-            static inline R run(const A& r)
+            template <class T>
+            static inline R forward(const T& r)
             {
                 R ret;
                 std::copy(std::begin(r), std::end(r), std::begin(ret));
@@ -464,17 +466,28 @@ namespace xt
         template <class R>
         struct sequence_forwarder<R, R>
         {
-            static inline const R& run(const R& r)
+            template <class T>
+            static inline T&& forward(typename std::remove_reference<T>::type& t) noexcept
             {
-                return r;
+                return static_cast<T&&>(t);
+            }
+
+            template <class T>
+            static inline T&& forward(typename std::remove_reference<T>::type&& t) noexcept 
+            {
+                return static_cast<T&&>(t);
             }
         };
     }
 
     template <class R, class A>
-    inline auto forward_sequence(const A& s)
+    inline decltype(auto) forward_sequence(A&& s)
     {
-        return detail::sequence_forwarder<R, A>::run(s);
+        using forwarder = detail::sequence_forwarder<
+            std::decay_t<R>, 
+            std::remove_cv_t<std::remove_reference_t<A>>
+        >;
+        return forwarder::template forward<A>(s);
     }
 
     /*************************************
