@@ -416,16 +416,17 @@ namespace xt
 
     TEST(xview, range_adaptor)
     {
+        using namespace xt::placeholders;
         using t = xarray<int>;
         t a = {1,2,3,4,5};
 
         auto n = xnone();
 
-        auto v1 = view(a, range(3, n));
+        auto v1 = view(a, range(3, _));
         t v1e = {4, 5};
         EXPECT_TRUE(v1e == v1);
 
-        auto v2 = view(a, range(n, 2));
+        auto v2 = view(a, range(_, 2));
         t v2e = {1, 2};
         EXPECT_TRUE(v2e == v2);
 
