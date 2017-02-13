@@ -413,5 +413,46 @@ namespace xt
 
         EXPECT_EQ(expected, res);
     }
+
+    TEST(xview, range_adaptor)
+    {
+        using namespace xt::placeholders;
+        using t = xarray<int>;
+        t a = {1,2,3,4,5};
+
+        auto n = xnone();
+
+        auto v1 = view(a, range(3, _));
+        t v1e = {4, 5};
+        EXPECT_TRUE(v1e == v1);
+
+        auto v2 = view(a, range(_, 2));
+        t v2e = {1, 2};
+        EXPECT_TRUE(v2e == v2);
+
+        auto v3 = view(a, range(n, n));
+        t v3e = {1,2,3,4,5};
+        EXPECT_TRUE(v3e == v3);
+
+        auto v4 = view(a, range(n, 2, -1));
+        t v4e = {5,4};
+        EXPECT_TRUE(v4e == v4);
+
+        auto v5 = view(a, range(2, n, -1));
+        t v5e = {3,2,1};
+        EXPECT_TRUE(v5e == v5);
+
+        auto v6 = view(a, range(n, n, n));
+        t v6e = {1,2,3,4,5};
+        EXPECT_TRUE(v6e == v6);
+
+        auto v7 = view(a, range(1, n, 2));
+        t v7e = {2,4};
+        EXPECT_TRUE(v7e == v7);
+
+        auto v8 = view(a, range(2, n, 2));
+        t v8e = {3,5};
+        EXPECT_TRUE(v8e == v8);
+    }
 }
 
