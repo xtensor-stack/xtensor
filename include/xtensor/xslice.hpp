@@ -53,6 +53,15 @@ namespace xt
     template <class... E>
     using has_xslice = or_<is_xslice<E>...>;
 
+    struct xnone_tag
+    {
+    };
+
+    inline auto xnone()
+    {
+        return xnone_tag();
+    }
+
     /**********************
      * xrange declaration *
      **********************/
@@ -86,7 +95,7 @@ namespace xt
      * @param max the last index of the interval
      * @sa view
      */
-    template <class T>
+    template <class T, class E = std::enable_if_t<!std::is_same<T, xnone_tag>::value>>
     inline auto range(T min, T max) noexcept
     {
         return xrange<T>(min, max);
@@ -118,15 +127,6 @@ namespace xt
         size_type m_size;
         size_type m_step;
     };
-
-    struct xnone_tag
-    {
-    };
-
-    inline auto xnone()
-    {
-        return xnone_tag();
-    }
 
     /**
      * Returns a slice representing an interval, to
@@ -233,7 +233,7 @@ namespace xt
             }
             else
             {
-                return xstepped_range<int>(size - 1, m_max, m_step);
+                return xstepped_range<int>(int(size) - 1, m_max, m_step);
             }
         }
 
@@ -243,7 +243,7 @@ namespace xt
         {
             if (m_step > 0)
             {
-                return xstepped_range<int>(m_min, size, m_step);
+                return xstepped_range<int>(m_min, int(size), m_step);
             }
             else
             {
@@ -257,11 +257,11 @@ namespace xt
         {
             if (m_step > 0)
             {
-                return xstepped_range<int>(0, size, m_step);
+                return xstepped_range<int>(0, int(size), m_step);
             }
             else
             {
-                return xstepped_range<int>(size - 1, -1, m_step);
+                return xstepped_range<int>(int(size) - 1, -1, m_step);
             }
         }
 
@@ -269,14 +269,14 @@ namespace xt
         std::enable_if_t<std::is_integral<MIN>::value && !std::is_integral<MAX>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
         get(std::size_t size)
         {
-            return xrange<std::size_t>(m_min, size, 1);
+            return xrange<std::size_t>((std::size_t) m_min, size);
         }
 
         template <class MIN = A, class MAX = B, class STEP = C>
         std::enable_if_t<!std::is_integral<MIN>::value && std::is_integral<MAX>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
-        get(std::size_t size)
+        get(std::size_t /*size*/)
         {
-            return xrange<std::size_t>(0, m_max, 1);
+            return xrange<std::size_t>(0, (std::size_t)m_max);
         }
 
         template <class MIN = A, class MAX = B, class STEP = C>
@@ -295,7 +295,7 @@ namespace xt
     template <class A, class B>
     inline auto range(A min, B max)
     {
-        return xrange_adaptor<A, B, std::size_t>(min, max, 1);
+        return xrange_adaptor<A, B, xnone_tag>(min, max, xnone_tag());
     }
 
     template <class A, class B, class C>
