@@ -37,6 +37,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xeval.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
