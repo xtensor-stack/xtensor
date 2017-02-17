@@ -1,0 +1,52 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
+#include "gtest/gtest.h"
+
+#include "xtensor/xeval.hpp"
+#include "xtensor/xbuilder.hpp"
+
+namespace xt
+{
+    TEST(xeval, array_tensor)
+    {
+        xarray<double> a = {1,2,3,4};
+
+        auto&& b = eval(a);
+
+        EXPECT_EQ(a.data().data(), b.data().data());
+        EXPECT_EQ(&a, &b);
+        bool type_eq = std::is_same<decltype(b), xarray<double>&>::value;
+        EXPECT_TRUE(type_eq);
+
+        xtensor<double, 2> t({3, 3});
+
+        auto&& i = eval(t);
+
+        EXPECT_EQ(t.data().data(), i.data().data());
+        EXPECT_EQ(&t, &i);
+        bool type_eq_2 = std::is_same<decltype(i), xtensor<double, 2>&>::value;
+        EXPECT_TRUE(type_eq_2);
+    }
+
+    TEST(xeval, funcs)
+    {
+        xarray<double> a = {1,2,3,4};
+
+        auto f = a * a - 2;
+        auto&& b = eval(f);
+
+        bool type_eq = std::is_same<decltype(b), xarray<double>&&>::value;
+        EXPECT_TRUE(type_eq);
+
+        auto&& i = eval(linspace(0, 100));
+        bool type_eq_2 = std::is_same<decltype(i), xtensor<int, 1>&&>::value;
+        EXPECT_TRUE(type_eq_2);
+    }
+}
+
