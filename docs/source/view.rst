@@ -33,9 +33,9 @@ Slices can be specified in the following ways:
 
     std::vector<size_t> shape = {3, 2, 4};
     xt::xarray<int> a(shape);
-    
+
     // View with same number of dimensions
-    auto v1 = xt::view(a, xt::range(1, 3), xt:all(), xt::range(1, 3));
+    auto v1 = xt::view(a, xt::range(1, 3), xt::all(), xt::range(1, 3));
     // => v1.shape() = { 2, 2, 2 }
     // => v1(0, 0, 0) = a(1, 0, 1)
     // => v1(1, 1, 1) = a(2, 1, 2)
@@ -118,8 +118,6 @@ built with the ``broadcast`` helper function.
     std::vector<size_t> s1 = { 2, 3 };
     std::vector<size_t> s2 = { 3, 2, 3 };
 
-    xt::array<int> a1(s1);
+    xt::xarray<int> a1(s1);
     auto bv = xt::broadcast(a1, s2);
     // => bv(0, 0, 0) = bv(1, 0, 0) = bv(2, 0, 0) = a(0, 0)
-
-

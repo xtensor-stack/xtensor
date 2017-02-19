@@ -56,11 +56,11 @@ and an element-wise ternary function (similar to the ``: ?`` ternary operator):
 
     #include "xtensor/xarray.hpp"
 
-    xt::array<bool> b = { false, true, true, false };
-    xt::array<int> a1 = { 1,   2,  3,  4 };
-    xt::array<int> a2 = { 11, 12, 13, 14 };
+    xt::xarray<bool> b = { false, true, true, false };
+    xt::xarray<int> a1 = { 1,   2,  3,  4 };
+    xt::xarray<int> a2 = { 11, 12, 13, 14 };
 
-    xt::array<int> res = xt::where(b, a1, a2);
+    xt::xarray<int> res = xt::where(b, a1, a2);
     // => res = { 11, 2, 3, 14 }
 
 Unlike in ``numpy.where``, ``xt::where`` takes full advantage of the lazyness of `xtensor`.
@@ -144,8 +144,7 @@ The following snippet shows how to vectorize a scalar function taking two argume
     }
 
     auto vecf = xt::vectorize(f);
-    xt::array<int> a = { 11, 12, 13 };
-    xt::array<int> b = {  1,  2,  3 };
-    xt::array<int> res = vecf(a, b);
+    xt::xarray<int> a = { 11, 12, 13 };
+    xt::xarray<int> b = {  1,  2,  3 };
+    xt::xarray<int> res = vecf(a, b);
     // => res = { 13, 16, 19 }
-
