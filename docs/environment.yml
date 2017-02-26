@@ -4,6 +4,6 @@ channels:
   - conda-forge
 
 dependencies:
-  - sphinx
+  - python=3.5
   - pip:
     - breathe
