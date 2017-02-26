@@ -62,6 +62,11 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
    api/function_index
    api/xmath
 
+.. toctree::
+   :caption: MISCELLANEOUS
+
+   numpy
+
 .. _NumPy: http://www.numpy.org
 .. _Buffer Protocol: https://docs.python.org/3/c-api/buffer.html
 .. _libdynd: http://libdynd.org
