@@ -125,19 +125,19 @@ namespace xt
         EXPECT_EQ(e2, s2);
     }
 
-    TEST(utils, complex_views)
+    TEST(utils, complex_forwarding)
     {
         // Test that lvalues can be modified
         std::complex<double> clv;
-        real_closure(clv) = 3.0;
+        forward_real(clv) = 3.0;
         EXPECT_EQ(std::real(clv), 3.0);
 
-        imag_closure(clv) = 1.0;
+        forward_imag(clv) = 1.0;
         EXPECT_EQ(std::imag(clv), 1.0);
 
         double rlv = 2.0;
-        EXPECT_EQ(imag_closure(rlv), 0.0);
-        EXPECT_EQ(real_closure(rlv), 2.0);
+        EXPECT_EQ(forward_imag(rlv), 0.0);
+        EXPECT_EQ(forward_real(rlv), 2.0);
     }
 }
 
