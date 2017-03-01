@@ -571,18 +571,6 @@ namespace xt
     template <class... S>
     using promote_strides_t = typename detail::promote_index<S...>::type;
 
-    /********************************
-     * is_complex implementation    *
-     ********************************/
-
-    namespace detail
-    {
-        template<typename T>
-        struct is_complex : public std::false_type {};
-
-        template<typename T>
-        struct is_complex<std::complex<T>> : public std::true_type {};
-    }
 
     /**************************
      * closure implementation *
@@ -617,75 +605,153 @@ namespace xt
         using const_closure_t = typename const_closure<S>::type;
     }
 
-    /**********************************
-     * complex closure implementation *
-     **********************************/
+    /***************************
+     * apply_cv implementation *
+     ***************************/
 
     namespace detail
     {
-        template <class S>
-        struct value_type
+        template <class T, class U, bool = std::is_const<std::remove_reference_t<T>>::value,
+                                    bool = std::is_volatile<std::remove_reference_t<T>>::value>
+        struct apply_cv_impl
         {
-            using type = S;
+            using type = U;
         };
 
-        template <class S>
-        struct value_type<std::complex<S>>
+        template <class T, class U>
+        struct apply_cv_impl<T, U, true, false>
         {
-            using type = S;
+            using type = const U;
         };
 
-        template <class S>
-        struct complex_closure
+        template <class T, class U>
+        struct apply_cv_impl<T, U, false, true>
         {
-            using underlying_type = std::conditional_t<
-                                               std::is_const<std::remove_reference_t<S>>::value,
-                                               const typename value_type<std::decay_t<S>>::type,
-                                               typename value_type<std::decay_t<S>>::type>;
-
-            using type = std::conditional_t<std::is_lvalue_reference<S>::value,
-                                            underlying_type&,
-                                            underlying_type>;
+            using type = volatile U;
         };
 
-        template <class S>
-        using complex_closure_t = typename complex_closure<S>::type;
+        template <class T, class U>
+        struct apply_cv_impl<T, U, true, true>
+        {
+            using type = const volatile U;
+        };
+
+        template <class T, class U>
+        struct apply_cv_impl<T&, U, false, false>
+        {
+            using type = U&;
+        };
+
+        template <class T, class U>
+        struct apply_cv_impl<T&, U, true, false>
+        {
+            using type = const U&;
+        };
+
+        template <class T, class U>
+        struct apply_cv_impl<T&, U, false, true>
+        {
+            using type = volatile U&;
+        };
+
+        template <class T, class U>
+        struct apply_cv_impl<T&, U, true, true>
+        {
+            using type = const volatile U&;
+        };
     }
 
-    /*************************************************
-     * real_closure & complex_closure implementation *
-     *************************************************/
-
-    // real_closure
-
-    template <class T>
-    auto real_closure(T&& v)
-        -> std::enable_if_t<!detail::is_complex<std::decay_t<T>>::value, detail::closure_t<T>>         // real case -> convert to closure type
+    template <class T, class U>
+    struct apply_cv
     {
-        return v;
-    }
+        using type = typename detail::apply_cv_impl<T, U>::type;
+    };
 
-    template <class T>
-    auto real_closure(T&& v)
-        -> std::enable_if_t<detail::is_complex<std::decay_t<T>>::value, detail::complex_closure_t<T>>  // complex case -> return the closure type on the real part
+    template <class T, class U>
+    using apply_cv_t = typename apply_cv<T, U>::type;
+
+    /*****************************
+     * is_complex implementation *
+     *****************************/
+
+    namespace detail
     {
-        return *reinterpret_cast<typename std::remove_reference_t<T>::value_type*>(&v);
+        template <typename T>
+        struct is_complex : public std::false_type {};
+
+        template <typename T>
+        struct is_complex<std::complex<T>> : public std::true_type {};
     }
 
-    // imag_closure
+    template <class T>
+    struct is_complex
+    {
+        static constexpr bool value = detail::is_complex<std::decay_t<T>>::value;
+    };
+
+    /*********************************
+     * forward_offset implementation *
+     *********************************/
+
+    namespace detail
+    {
+
+        template <class T, class M>
+        struct forward_type
+        {
+            using type = apply_cv_t<T, M>&&; 
+        };
+
+        template <class T, class M>
+        struct forward_type<T&, M>
+        {
+            using type = apply_cv_t<T, M>&; 
+        };
+
+        template <class T, class M>
+        using forward_type_t = typename forward_type<T, M>::type;
+    }
+
+    template <class M, std::size_t I, class T>
+    constexpr detail::forward_type_t<T, M> forward_offset(T&& v) noexcept
+    {
+        return static_cast<detail::forward_type_t<T, M>>(*(reinterpret_cast<std::remove_reference_t<M>*>(&v) + I));
+    }
+
+    /**********************************************
+     * forward_real & forward_imag implementation *
+     **********************************************/
+
+    // forward_real
 
     template <class T>
-    auto imag_closure(T&&)
-        -> std::enable_if_t<!detail::is_complex<std::decay_t<T>>::value, std::decay_t<T>>              // real case -> always return 0 by value
+    auto forward_real(T&& v)
+        -> std::enable_if_t<!is_complex<T>::value, detail::forward_type_t<T, T>>                                    // real case -> forward
+    {
+        return static_cast<detail::forward_type_t<T, T>>(v);
+    }
+
+    template <class T>
+    auto forward_real(T&& v)
+        -> std::enable_if_t<is_complex<T>::value, detail::forward_type_t<T, typename std::decay_t<T>::value_type>>  // complex case -> forward the real part
+    {
+        return forward_offset<typename std::decay_t<T>::value_type, 0>(v);
+    }
+
+    // forward_imag
+
+    template <class T>
+    auto forward_imag(T&&)
+        -> std::enable_if_t<!is_complex<T>::value, std::decay_t<T>>                                                 // real case -> always return 0 by value
     {
         return 0;
     }
     
     template <class T>
-    auto imag_closure(T&& v)
-        -> std::enable_if_t<detail::is_complex<std::decay_t<T>>::value, detail::complex_closure_t<T>>  // complex case -> return the closure type on the imaginary part
+    auto forward_imag(T&& v)
+        -> std::enable_if_t<is_complex<T>::value, detail::forward_type_t<T, typename std::decay_t<T>::value_type>>  // complex case -> forwards the imaginary part
     {
-        return *(reinterpret_cast<typename std::remove_reference_t<T>::value_type*>(&v) + 1);
+        return forward_offset<typename std::decay_t<T>::value_type, 1>(v);
     }
 
     /**************************
