@@ -94,8 +94,8 @@ namespace xt
         {
             using value_type = T;
 
-            arange_impl(T start, T stop, T step) :
-                m_start(start), m_stop(stop), m_step(step)
+            arange_impl(T start, T stop, T step)
+                : m_start(start), m_stop(stop), m_step(step)
             {
             }
 
@@ -188,13 +188,7 @@ namespace xt
             template <class It>
             inline T operator()(const It& /*begin*/, const It& end) const
             {
-                // workaround windows compile error by using temporary 
-                // iterators and operator-=
-                auto end_1 = end;
-                auto end_2 = end;
-                end_1 -= 1;
-                end_2 -= 2;
-                return *(end_1) == *(end_2) + m_k ? T(1) : T(0);
+                return *(end-1) == *(end-2)+m_k ? T(1) : T(0);
             }
 
         private:
@@ -388,10 +382,7 @@ namespace xt
                     return arr[idx];
                 };
                 std::size_t i = idx[m_axis];
-                // TODO workaround MSVC iterator bug
-                auto it = idx.begin();
-                it += m_axis;
-                idx.erase(it);
+                idx.erase(idx.begin() + m_axis);
                 return apply<value_type>(i, get_item, m_t);
             }
             const std::tuple<T...> m_t;
@@ -442,21 +433,9 @@ namespace xt
         inline std::array<T, N + 1> add_axis(std::array<T, N> arr, std::size_t axis, std::size_t value)
         {
             std::array<T, N + 1> temp;
-            for (std::size_t i = 0; i < N + 1; ++i)
-            {
-                if (i < axis)
-                {
-                    temp[i] = arr[i];
-                }
-                if (i == axis)
-                {
-                    temp[i] = value;
-                }
-                if (i > axis)
-                {
-                    temp[i] = arr[i - 1];
-                }
-            }
+            std::copy(arr.begin(), arr.begin() + axis, temp.begin());
+            temp[axis] = value;
+            std::copy(arr.begin() + axis, arr.end(), temp.begin() + axis + 1);
             return temp;
         }
 
@@ -464,10 +443,7 @@ namespace xt
         inline T add_axis(T arr, std::size_t axis, std::size_t value)
         {
             T temp(arr);
-            // TODO workaround MSVC iterator bug
-            auto it = temp.begin();
-            it += axis;
-            temp.insert(it, value);
+            temp.insert(temp.begin() + axis, value);
             return temp;
         }
     }

@@ -400,9 +400,7 @@ namespace xt
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         xarray<double> b(view_shape_type(1, 4));
-        auto data_end = data.cbegin();
-        data_end += 4;
-        std::copy(data.cbegin(), data_end, b.begin());
+        std::copy(data.cbegin(), data.cbegin() + 4, b.begin());
 
         auto v = view(b, newaxis(), all());
         xarray<double> res = a + v;
