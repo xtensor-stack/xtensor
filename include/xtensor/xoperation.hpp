@@ -58,10 +58,20 @@ namespace xt
         }
 
         template <template <class...> class F, class... E>
-        using get_xfunction_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
-                                                    xfunction<F<common_value_type_t<std::decay_t<E>...>>,
-                                                              typename F<common_value_type_t<std::decay_t<E>...>>::result_type,
-                                                              const_xclosure_t<E>...>>;
+        struct build_xfunction_type
+        {
+            using type = xfunction<F<common_value_type_t<std::decay_t<E>...>>,
+                                   typename F<common_value_type_t<std::decay_t<E>...>>::result_type,
+                                   const_xclosure_t<E>... >;
+        };
+
+        // On MSVC, the second argument of enable_if_t is always evaluated, even if the condition is false.
+        // Wrapping the xfunction type in the build_xfunction_type metafunction avoids this evaluation when
+        // the condition is false, since it leads to a tricky bug preventing from using operator+ and operator-
+        // on vector and arrays iterators.
+        template <template <class...> class F, class... E>
+        using get_xfunction_type_t = typename std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
+                                                               build_xfunction_type<F, E...>>::type;
     }
 
     /*************
@@ -83,7 +93,7 @@ namespace xt
      */
     template <class E>
     inline auto operator+(E&& e) noexcept
-        -> detail::get_xfunction_type<detail::identity, E>
+        -> detail::get_xfunction_type_t<detail::identity, E>
     {
         return detail::make_xfunction<detail::identity>(std::forward<E>(e));
     }
@@ -99,7 +109,7 @@ namespace xt
     */
     template <class E>
     inline auto operator-(E&& e) noexcept
-        -> detail::get_xfunction_type<std::negate, E>
+        -> detail::get_xfunction_type_t<std::negate, E>
     {
         return detail::make_xfunction<std::negate>(std::forward<E>(e));
     }
@@ -116,7 +126,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator+(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::plus, E1, E2>
+        -> detail::get_xfunction_type_t<std::plus, E1, E2>
     {
         return detail::make_xfunction<std::plus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -133,7 +143,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator-(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::minus, E1, E2>
+        -> detail::get_xfunction_type_t<std::minus, E1, E2>
     {
         return detail::make_xfunction<std::minus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -150,7 +160,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator*(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::multiplies, E1, E2>
+        -> detail::get_xfunction_type_t<std::multiplies, E1, E2>
     {
         return detail::make_xfunction<std::multiplies>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -167,7 +177,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator/(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::divides, E1, E2>
+        -> detail::get_xfunction_type_t<std::divides, E1, E2>
     {
         return detail::make_xfunction<std::divides>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -188,7 +198,7 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto operator||(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::logical_or, E1, E2>
+        -> detail::get_xfunction_type_t<std::logical_or, E1, E2>
     {
         return detail::make_xfunction<std::logical_or>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -205,7 +215,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator&&(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::logical_and, E1, E2>
+        -> detail::get_xfunction_type_t<std::logical_and, E1, E2>
     {
         return detail::make_xfunction<std::logical_and>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -221,7 +231,7 @@ namespace xt
     */
     template <class E>
     inline auto operator!(E&& e) noexcept
-        -> detail::get_xfunction_type<std::logical_not, E>
+        -> detail::get_xfunction_type_t<std::logical_not, E>
     {
         return detail::make_xfunction<std::logical_not>(std::forward<E>(e));
     }
@@ -242,7 +252,7 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto operator<(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::less, E1, E2>
+        -> detail::get_xfunction_type_t<std::less, E1, E2>
     {
         return detail::make_xfunction<std::less>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -259,7 +269,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator<=(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::less_equal, E1, E2>
+        -> detail::get_xfunction_type_t<std::less_equal, E1, E2>
     {
         return detail::make_xfunction<std::less_equal>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -276,7 +286,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator>(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::greater, E1, E2>
+        -> detail::get_xfunction_type_t<std::greater, E1, E2>
     {
         return detail::make_xfunction<std::greater>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -293,7 +303,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator>=(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::greater_equal, E1, E2>
+        -> detail::get_xfunction_type_t<std::greater_equal, E1, E2>
     {
         return detail::make_xfunction<std::greater_equal>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -354,7 +364,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto equal(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::equal_to, E1, E2>
+        -> detail::get_xfunction_type_t<std::equal_to, E1, E2>
     {
         return detail::make_xfunction<std::equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -371,7 +381,7 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto not_equal(E1&& e1, E2&& e2) noexcept
-        -> detail::get_xfunction_type<std::not_equal_to, E1, E2>
+        -> detail::get_xfunction_type_t<std::not_equal_to, E1, E2>
     {
         return detail::make_xfunction<std::not_equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
@@ -390,7 +400,7 @@ namespace xt
     */
     template <class E1, class E2, class E3>
     inline auto where(E1&& e1, E2&& e2, E3&& e3) noexcept
-        -> detail::get_xfunction_type<detail::conditional_ternary, E1, E2, E3>
+        -> detail::get_xfunction_type_t<detail::conditional_ternary, E1, E2, E3>
     {
          return detail::make_xfunction<detail::conditional_ternary>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
     }
