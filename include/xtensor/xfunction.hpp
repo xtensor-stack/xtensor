@@ -69,7 +69,13 @@ namespace xt
          *********************/
 
         template <class... Args>
-        using common_value_type = std::common_type_t<xvalue_type_t<Args>...>;
+        struct common_value_type
+        {
+            using type = std::common_type_t<xvalue_type_t<Args>...>;
+        };
+
+        template <class... Args>
+        using common_value_type_t = typename common_value_type<Args...>::type;
     }
 
     template <class F, class R, class... CT>

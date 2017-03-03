@@ -51,7 +51,7 @@ namespace xt
         template <template <class...> class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
-            using functor_type = F<common_value_type<std::decay_t<E>...>>;
+            using functor_type = F<common_value_type_t<std::decay_t<E>...>>;
             using result_type = typename functor_type::result_type;
             using type = xfunction<functor_type, result_type, const_xclosure_t<E>...>;
             return type(functor_type(), std::forward<E>(e)...);
@@ -59,8 +59,8 @@ namespace xt
 
         template <template <class...> class F, class... E>
         using get_xfunction_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
-                                                    xfunction<F<common_value_type<std::decay_t<E>...>>,
-                                                              typename F<common_value_type<std::decay_t<E>...>>::result_type,
+                                                    xfunction<F<common_value_type_t<std::decay_t<E>...>>,
+                                                              typename F<common_value_type_t<std::decay_t<E>...>>::result_type,
                                                               const_xclosure_t<E>...>>;
     }
 

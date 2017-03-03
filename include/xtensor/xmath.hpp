@@ -36,12 +36,12 @@ namespace xt
         }
 
         template <class... E>
-        using mf_type = common_value_type<std::decay_t<E>...> (*) (xvalue_type_t<std::decay_t<E>>...);
+        using mf_type = common_value_type_t<std::decay_t<E>...> (*) (xvalue_type_t<std::decay_t<E>>...);
 
         template <class... E>
         using get_xfunction_free_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
                                                          xfunction<mf_type<E...>,
-                                                                   common_value_type<std::decay_t<E>...>,
+                                                                   common_value_type_t<std::decay_t<E>...>,
                                                                    const_xclosure_t<E>...>>;
     }
 
