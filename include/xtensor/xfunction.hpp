@@ -31,19 +31,19 @@ namespace xt
          ********************/
 
         template <class... Args>
-        struct common_size_type_impl
+        struct common_size_type
         {
             using type = std::common_type_t<typename Args::size_type...>;
         };
 
         template <>
-        struct common_size_type_impl<>
+        struct common_size_type<>
         {
             using type = std::size_t;
         };
 
         template<class... Args>
-        using common_size_type = typename common_size_type_impl<Args...>::type;
+        using common_size_type_t = typename common_size_type<Args...>::type;
 
         /**************************
          * common_difference type *
@@ -113,7 +113,7 @@ namespace xt
         using const_reference = value_type;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = detail::common_size_type<std::decay_t<CT>...>;
+        using size_type = detail::common_size_type_t<std::decay_t<CT>...>;
         using difference_type = detail::common_difference_type_t<std::decay_t<CT>...>;
 
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
