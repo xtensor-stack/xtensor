@@ -82,7 +82,7 @@ expressions.
 | ``np.meshgrid(x0, x1, x2, indexing='ij')``    | ``xt::meshgrid(x0, x1, x2)``                  |
 +-----------------------------------------------+-----------------------------------------------+
 
-xtensor's ``meshgrid`` implementation corresponds to numpy's `'ij'` indexing order.
+xtensor's ``meshgrid`` implementation corresponds to numpy's ``'ij'`` indexing order.
 
 Broadcasting
 ------------
@@ -170,6 +170,21 @@ where ``condition`` is falsy, and it does not evaluate ``b`` where ``condition``
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.logical_or(a, b)``                       | ``a || b``                                    |
 +-----------------------------------------------+-----------------------------------------------+
+
+Complex numbers
+---------------
+
+Functions ``xt::real`` and ``xt::imag`` respectively return views on the real and imaginary part
+of a complex expression. The returned value is an expression holding a closure on the passed
+argument.
+
++--------------------------------------------+-----------------------------------------------+
+|            Python 3 - numpy                |                C++ 14 - xtensor               |
++============================================+===============================================+
+| ``np.real(a)``                             | ``xt::real(a)``                               |
++--------------------------------------------+-----------------------------------------------+
+| ``np.imag(a)``                             | ``xt::imag(a)``                               |
++--------------------------------------------+-----------------------------------------------+
 
 Mathematical functions
 ----------------------

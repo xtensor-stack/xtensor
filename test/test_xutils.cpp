@@ -125,7 +125,7 @@ namespace xt
         EXPECT_EQ(e2, s2);
     }
 
-    TEST(utils, complex_forwarding)
+    TEST(utils, forward_offset)
     {
         // Test that lvalues can be modified
         std::complex<double> clv;

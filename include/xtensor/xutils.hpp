@@ -22,6 +22,9 @@
 
 namespace xt
 {
+    /****************
+     * declarations *
+     ****************/
 
     template <class T>
     struct remove_class;
@@ -734,7 +737,15 @@ namespace xt
     template <class M, std::size_t I, class T>
     constexpr detail::forward_type_t<T, M> forward_offset(T&& v) noexcept
     {
-        return static_cast<detail::forward_type_t<T, M>>(*(reinterpret_cast<std::remove_reference_t<M>*>(&v) + I));
+        using forward_type = detail::forward_type_t<T, M>;
+        using cv_value_type = std::remove_reference_t<forward_type>;
+        using byte_type = apply_cv_t<std::remove_reference_t<T>, char>;
+        
+        return static_cast<forward_type>(
+            *reinterpret_cast<cv_value_type*>(
+                reinterpret_cast<byte_type*>(&v) + I
+            )
+        );
     }
 
     /**********************************************
@@ -770,7 +781,8 @@ namespace xt
     auto forward_imag(T&& v)
         -> std::enable_if_t<is_complex<T>::value, detail::forward_type_t<T, typename std::decay_t<T>::value_type>>  // complex case -> forwards the imaginary part
     {
-        return forward_offset<typename std::decay_t<T>::value_type, 1>(v);
+        using real_type = typename std::decay_t<T>::value_type;
+        return forward_offset<real_type, sizeof(real_type)>(v);
     }
 
     /**************************
