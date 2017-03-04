@@ -521,10 +521,10 @@ namespace xt
 #endif
         
         template <class Functor, class S>
-        inline auto make_xgenerator(Functor&& f, const S& shape) noexcept
+        inline auto make_xgenerator(Functor&& f, S&& shape) noexcept
         {
-            using type = xgenerator<Functor, typename Functor::value_type, S>;
-            return type(std::forward<Functor>(f), shape);
+            using type = xgenerator<Functor, typename Functor::value_type, std::decay_t<S>>;
+            return type(std::forward<Functor>(f), std::forward<S>(shape));
         }
     }
 }

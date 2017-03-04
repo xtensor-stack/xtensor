@@ -10,6 +10,9 @@
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xarray.hpp"
 
+#include "xtensor/xio.hpp"
+#include <iostream>
+
 namespace xt
 {
     using std::size_t;
@@ -229,5 +232,14 @@ namespace xt
         xarray<double> ar = arange(9);
         ar.reshape({3, 3});
         ASSERT_TRUE(t == ar);
+    }
+
+    TEST(xbuilder, meshgrid)
+    {
+        auto mesh = meshgrid(linspace<double>(0.0, 1.0, 3), linspace<double>(0.0, 1.0, 2));
+        xarray<double> expect0 = {{0, 0}, {0.5, 0.5}, {1, 1}};
+        xarray<double> expect1 = {{0, 1}, {0, 1}, {0, 1}};
+        ASSERT_TRUE(all(equal(std::get<0>(mesh), expect0)));
+        ASSERT_TRUE(all(equal(std::get<1>(mesh), expect1)));
     }
 }
