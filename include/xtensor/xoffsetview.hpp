@@ -14,10 +14,15 @@
 #include <type_traits>
 #include <iterator>
 #include <cstddef>
+#include <array>
 
 #include "xtensor/xutils.hpp"
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xiterator.hpp"
+#include "xtensor/xsemantic.hpp"
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 
 namespace xt
 {
@@ -39,13 +44,50 @@ namespace xt
     class xoffset_stepper;
 
     template <class CT, class M, std::size_t I>
-    class xoffsetview : public xexpression<xoffsetview<CT, M, I>>
+    class xoffsetview;
+
+
+    /*****************************
+     * offsetview_temporary_type *
+     *****************************/
+
+    namespace detail
+    {
+        template <class S, class M, std::size_t I>
+        struct offsetview_temporary_type_impl
+        {
+            using type = xarray<M>;
+        };
+
+        template <class T, std::size_t L, class M, std::size_t I>
+        struct offsetview_temporary_type_impl<std::array<T, L>, M, I>
+        {
+            using type = xtensor<M, L>;
+        };
+    }
+
+    template <class E, class M, std::size_t I>
+    struct offsetview_temporary_type
+    {
+        using type = typename detail::offsetview_temporary_type_impl<typename E::shape_type, M, I>::type;
+    };
+
+    template <class CT, class M, std::size_t I>
+    struct xcontainer_inner_types<xoffsetview<CT, M, I>>
+    {
+        using xexpression_type = std::decay_t<CT>;
+        using temporary_type = typename offsetview_temporary_type<xexpression_type, M, I>::type;
+    };
+
+    template <class CT, class M, std::size_t I>
+    class xoffsetview : public xview_semantic<xoffsetview<CT, M, I>>
     {
 
     public:
 
         using self_type = xoffsetview<CT, M, I>;
         using xexpression_type = std::decay_t<CT>;
+        using semantic_base = xview_semantic<self_type>;
 
         using value_type = M;
         using reference = value_type&;
@@ -67,6 +109,9 @@ namespace xt
         using const_iterator = xoffset_iterator<typename xexpression_type::const_iterator, M, I>;
 
         xoffsetview(CT e) noexcept;
+
+        template <class E>
+        self_type& operator=(const xexpression<E>& e);
 
         size_type dimension() const noexcept;
         const shape_type & shape() const noexcept;
@@ -132,6 +177,10 @@ namespace xt
     private:
 
         CT m_e;
+
+        using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
+        void assign_temporary_impl(temporary_type& tmp);
+        friend class xview_semantic<xoffsetview<CT, M, I>>;
     };
 
     /********************************
@@ -285,6 +334,36 @@ namespace xt
     }
     //@}
 
+    /**
+     * @name Extended copy semantic
+     */
+    //@{
+    /**
+     * The extended assignment operator.
+     */
+    template <class CT, class M, std::size_t I>
+    template <class E>
+    inline auto xoffsetview<CT, M, I>::operator=(const xexpression<E>& e) -> self_type&
+    {
+        bool cond = (e.derived_cast().shape().size() == dimension())
+                    && std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
+        if(!cond)
+        {
+            semantic_base::operator=(broadcast(e.derived_cast(), shape()));
+        }
+        else
+        {
+            semantic_base::operator=(e);
+        }
+        return *this;
+    }
+    //@}
+
+    template <class CT, class M, std::size_t I>
+    inline void xoffsetview<CT, M, I>::assign_temporary_impl(temporary_type& tmp)
+    {
+        std::copy(tmp.cbegin(), tmp.cend(), xbegin());
+    }
 
     /**
      * @name Size and shape

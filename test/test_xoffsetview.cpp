@@ -10,6 +10,7 @@
 
 #include <complex>
 #include "xtensor/xarray.hpp"
+#include "xtensor/xbuilder.hpp" 
 #include "xtensor/xoffsetview.hpp"
 
 namespace xt
@@ -22,6 +23,7 @@ namespace xt
             {{1.0       , 1.0 + 1.0i},
              {1.0 - 1.0i, 1.0       }};
 
+        // Test real expression
         auto r = real(e);
         auto i = imag(e);
 
@@ -38,7 +40,19 @@ namespace xt
         ASSERT_EQ(i(1, 0), -1);
         ASSERT_EQ(i(1, 1), 0);
 
+        // Test assignment to an array
         xarray<double> ar = r;
+        EXPECT_TRUE(all(equal(ar, ones<double>({2, 2}))));
+
+        // Test assigning an expression to the offset_view
+        real(e) = zeros<double>({2, 2});
+        xarray<std::complex<double>> expect1 = 
+            {{0.0       , 0.0 + 1.0i},
+             {0.0 - 1.0i, 0.0       }};
+        EXPECT_TRUE(all(equal(e, expect1)));
+        
+        imag(e) = zeros<double>({2, 2});
+        EXPECT_TRUE(all(equal(e, zeros<std::complex<double>>({2, 2}))));
     }
 }
 
