@@ -12,6 +12,7 @@
 #include <utility>
 #include <algorithm>
 #include <type_traits>
+#include <iterator>
 #include <cstddef>
 
 #include "xtensor/xutils.hpp"
@@ -146,7 +147,7 @@ namespace xt
         using reference = apply_cv_t<typename It::reference, value_type>;
         using pointer = std::remove_reference_t<reference>*;
         using difference_type = typename It::difference_type;
-        using iterator_category = std::forward_iterator_tag; // TODO typename It::iterator_category; requires operator-/+
+        using iterator_category = typename It::iterator_category;
 
         using self_type = xoffset_iterator<It, M, I>;
 
@@ -163,7 +164,11 @@ namespace xt
     private:
         It m_it;
 
+        template <class It_, class M_, std::size_t I_>
+        friend xoffset_iterator<It_, M_, I_> operator+(xoffset_iterator<It_, M_, I_>, xoffset_iterator<It_, M_, I_>);
 
+        template <class It_, class M_, std::size_t I_>
+        friend typename xoffset_iterator<It_, M_, I_>::difference_type operator-(xoffset_iterator<It_, M_, I_>, xoffset_iterator<It_, M_, I_>);
     };
 
     template <class It, class M, std::size_t I>
@@ -173,6 +178,18 @@ namespace xt
     template <class It, class M, std::size_t I>
     bool operator!=(const xoffset_iterator<It, M, I>& lhs,
                     const xoffset_iterator<It, M, I>& rhs);
+
+    template <class It, class M, std::size_t I>
+    xoffset_iterator<It, M, I> operator+(xoffset_iterator<It, M, I> it1, xoffset_iterator<It, M, I> it2)
+    {
+        return xoffset_iterator<It, M, I>(it1.m_it + it2.m_it);
+    }
+
+    template <class It, class M, std::size_t I>
+    typename xoffset_iterator<It, M, I>::difference_type operator-(xoffset_iterator<It, M, I> it1, xoffset_iterator<It, M, I> it2)
+    {
+        return it1.m_it - it2.m_it;
+    }
 
     /*******************************
      * xoffset_stepper declaration *
