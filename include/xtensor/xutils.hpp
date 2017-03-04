@@ -249,6 +249,25 @@ namespace xt
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }
 
+    /***************************
+     * nested_initializer_list *
+     ***************************/
+
+    template<class T, std::size_t I>
+    struct nested_initializer_list
+    {
+        using type = std::initializer_list<typename nested_initializer_list<T, I - 1>::type>;
+    };
+
+    template<class T>
+    struct nested_initializer_list<T, 0>
+    {
+        using type = T;
+    };
+
+    template<class T, std::size_t I>
+    using nested_initializer_list_t = typename nested_initializer_list<T, I>::type;
+
     /******************************
      * nested_copy implementation *
      ******************************/

@@ -68,11 +68,11 @@ namespace xt
         explicit xarray(const shape_type& shape, const strides_type& strides, const_reference value);
 
         xarray(const value_type& t);
-        xarray(std::initializer_list<T> t);
-        xarray(std::initializer_list<std::initializer_list<T>> t);
-        xarray(std::initializer_list<std::initializer_list<std::initializer_list<T>>> t);
-        xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>> t);
-        xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>>> t);
+        xarray(nested_initializer_list_t<T, 1> t);
+        xarray(nested_initializer_list_t<T, 2> t);
+        xarray(nested_initializer_list_t<T, 3> t);
+        xarray(nested_initializer_list_t<T, 4> t);
+        xarray(nested_initializer_list_t<T, 5> t);
 
         ~xarray() = default;
 
@@ -264,7 +264,7 @@ namespace xt
      * @param t the elements of the xarray
      */
     template <class T, class EA, class SA>
-    inline xarray<T, EA, SA>::xarray(std::initializer_list<T> t)
+    inline xarray<T, EA, SA>::xarray(nested_initializer_list_t<T, 1> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
@@ -276,7 +276,7 @@ namespace xt
      * @param t the elements of the xarray
      */
     template <class T, class EA, class SA>
-    inline xarray<T, EA, SA>::xarray(std::initializer_list<std::initializer_list<T>> t)
+    inline xarray<T, EA, SA>::xarray(nested_initializer_list_t<T, 2> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
@@ -288,7 +288,7 @@ namespace xt
      * @param t the elements of the xarray
      */
     template <class T, class EA, class SA>
-    inline xarray<T, EA, SA>::xarray(std::initializer_list<std::initializer_list<std::initializer_list<T>>> t)
+    inline xarray<T, EA, SA>::xarray(nested_initializer_list_t<T, 3> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
@@ -300,7 +300,7 @@ namespace xt
      * @param t the elements of the xarray
      */
     template <class T, class EA, class SA>
-    inline xarray<T, EA, SA>::xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>> t)
+    inline xarray<T, EA, SA>::xarray(nested_initializer_list_t<T, 4> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
@@ -312,7 +312,7 @@ namespace xt
      * @param t the elements of the xarray
      */
     template <class T, class EA, class SA>
-    inline xarray<T, EA, SA>::xarray(std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<std::initializer_list<T>>>>> t)
+    inline xarray<T, EA, SA>::xarray(nested_initializer_list_t<T, 5> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), layout::row_major);

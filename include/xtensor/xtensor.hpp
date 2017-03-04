@@ -65,6 +65,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
 
         xtensor();
+        xtensor(nested_initializer_list_t<T, N> t);
         explicit xtensor(const shape_type& shape, layout l = layout::row_major);
         explicit xtensor(const shape_type& shape, const_reference value, layout l = layout::row_major);
         explicit xtensor(const shape_type& shape, const strides_type& strides);
@@ -181,6 +182,17 @@ namespace xt
     inline xtensor<T, N, A>::xtensor()
         : base_type(), m_data(1, value_type())
     {
+    }
+
+     /**
+      * Allocates an xtensor with nested initializer lists.
+      */
+    template <class T, std::size_t N, class A>
+    inline xtensor<T, N, A>::xtensor(nested_initializer_list_t<T, N> t)
+        : base_type()
+    {
+        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
+        nested_copy(m_data.begin(), t);
     }
 
     /**

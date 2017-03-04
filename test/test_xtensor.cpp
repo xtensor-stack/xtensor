@@ -14,6 +14,20 @@ namespace xt
 {
     using container_type = std::array<std::size_t, 3>;
 
+    TEST(xtensor, initializer_constructor)
+    {
+        xtensor<int, 3> t 
+          {{{0, 1, 2}, 
+            {3, 4, 5}, 
+            {6, 7, 8}}, 
+           {{9, 10, 11}, 
+            {12, 13, 14}, 
+            {15, 16, 17}}}; 
+        EXPECT_EQ(t.dimension(), 3);
+        EXPECT_EQ(t(0, 0, 1), 1);
+        EXPECT_EQ(t.shape()[0], 2);
+    }
+
     TEST(xtensor, shaped_constructor)
     {
         {
