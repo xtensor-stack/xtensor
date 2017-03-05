@@ -13,6 +13,7 @@
 #include <type_traits>
 
 #include "xtensor/xoffsetview.hpp"
+#include "xtensor/xbuilder.hpp"
 
 namespace xt
 {
@@ -21,11 +22,6 @@ namespace xt
      * real and imag declarations *
      ******************************/
 
-    template <class E>
-    inline auto real(E&& e) noexcept;
-
-    template <class E>
-    inline auto imag(E&& e) noexcept;
 
     /********************************
      * real and imag implementation *
@@ -40,10 +36,22 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
     template <class E>
-    inline auto real(E&& e) noexcept
+    std::enable_if_t<is_complex<typename std::decay_t<E>::value_type>::value, 
+                     xoffsetview<xclosure_t<E>,
+                                 typename std::decay_t<E>::value_type::value_type, 
+                                 0>>
+    real(E&& e) noexcept
     {
         using real_type = typename std::decay_t<E>::value_type::value_type;
         return xoffsetview<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
+    }
+
+    template <class E>
+    std::enable_if_t<!is_complex<typename std::decay_t<E>::value_type>::value,
+                     detail::forward_type_t<E, E>>
+    real(E&& e) noexcept
+    {
+        return e;
     }
 
     /**
@@ -55,10 +63,23 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
     template <class E>
-    inline auto imag(E&& e) noexcept
+    std::enable_if_t<is_complex<typename std::decay_t<E>::value_type>::value,
+                     xoffsetview<xclosure_t<E>,
+                                 typename std::decay_t<E>::value_type::value_type, 
+                                 sizeof(typename std::decay_t<E>::value_type::value_type)>>
+    imag(E&& e) noexcept
     {
         using real_type = typename std::decay_t<E>::value_type::value_type;
         return xoffsetview<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
+    }
+
+    template <class E>
+    std::enable_if_t<!is_complex<typename std::decay_t<E>::value_type>::value,
+                     xbroadcast<xscalar<const typename std::decay_t<E>::value_type>, 
+                                typename std::decay_t<E>::shape_type>>
+    imag(E&& e) noexcept
+    {
+        return zeros<typename std::decay_t<E>::value_type>(e.shape());
     }
 
 }

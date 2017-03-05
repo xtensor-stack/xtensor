@@ -17,7 +17,7 @@ namespace xt
 {
     using namespace std::complex_literals;
 
-    TEST(xcomplex, real)
+    TEST(xcomplex, expression)
     {
         xarray<std::complex<double>> e =
             {{1.0       , 1.0 + 1.0i},
@@ -43,6 +43,13 @@ namespace xt
         // Test assignment to an array
         xarray<double> ar = r;
         EXPECT_TRUE(all(equal(ar, ones<double>({2, 2}))));
+    }
+
+    TEST(xcomplex, lvalue)
+    {
+        xarray<std::complex<double>> e =
+            {{1.0       , 1.0 + 1.0i},
+             {1.0 - 1.0i, 1.0       }};
 
         // Test assigning an expression to the offset_view
         real(e) = zeros<double>({2, 2});
@@ -54,5 +61,15 @@ namespace xt
         imag(e) = zeros<double>({2, 2});
         EXPECT_TRUE(all(equal(e, zeros<std::complex<double>>({2, 2}))));
     }
+
+    TEST(xcomplex, noncomplex)
+    {
+        xarray<double> e = ones<double>({2, 2});
+        auto r = real(e);
+        auto i = imag(e);
+        EXPECT_TRUE(all(equal(r, e)));
+        EXPECT_TRUE(all(equal(i, zeros<double>({2, 2}))));
+    }
+
 }
 
