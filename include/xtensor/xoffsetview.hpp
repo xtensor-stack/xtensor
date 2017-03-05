@@ -27,15 +27,9 @@
 namespace xt
 {
 
-    /********************************************
-     * real, imag, and xoffsetview declarations *
-     ********************************************/
-
-    template <class E>
-    inline auto real(E&& e) noexcept;
-
-    template <class E>
-    inline auto imag(E&& e) noexcept;
+    /***************************
+     * xoffsetview declaration *
+     ***************************/
 
     template <class It, class M, std::size_t I>
     class xoffset_iterator;
@@ -278,40 +272,6 @@ namespace xt
     template <class St, class M, std::size_t I>
     bool operator!=(const xoffset_stepper<St, M, I>& lhs,
                     const xoffset_stepper<St, M, I>& rhs);
-
-    /********************************
-     * real and imag implementation *
-     ********************************/
-
-    /**
-     * @brief Returns an \ref xexpression representing the real part of the given expression.
-     *
-     * @tparam e the \ref xexpression
-     *
-     * The returned expression either hold a const reference to \p e or a copy
-     * depending on whether \p e is an lvalue or an rvalue.
-     */
-    template <class E>
-    inline auto real(E&& e) noexcept
-    {
-        using real_type = typename std::decay_t<E>::value_type::value_type;
-        return xoffsetview<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
-    }
-
-    /**
-     * @brief Returns an \ref xexpression representing the imaginary part of the given expression.
-     *
-     * @tparam e the \ref xexpression
-     *
-     * The returned expression either hold a const reference to \p e or a copy
-     * depending on whether \p e is an lvalue or an rvalue.
-     */
-    template <class E>
-    inline auto imag(E&& e) noexcept
-    {
-        using real_type = typename std::decay_t<E>::value_type::value_type;
-        return xoffsetview<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
-    }
 
     /******************************
      * xoffsetview implementation *

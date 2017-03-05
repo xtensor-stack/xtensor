@@ -89,7 +89,7 @@ set(XTENSOR_TESTS
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
-    test_xoffsetview.cpp
+    test_xcomplex.cpp
 )
 
 set(XTENSOR_TARGET test_xtensor)

@@ -11,13 +11,13 @@
 #include <complex>
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp" 
-#include "xtensor/xoffsetview.hpp"
+#include "xtensor/xcomplex.hpp"
 
 namespace xt
 {
     using namespace std::complex_literals;
 
-    TEST(xoffsetview, real)
+    TEST(xcomplex, real)
     {
         xarray<std::complex<double>> e =
             {{1.0       , 1.0 + 1.0i},
