@@ -283,7 +283,7 @@ namespace xt
     template <class T>
     inline auto logspace(T start, T stop, std::size_t num_samples, T base = 10, bool endpoint = true) noexcept
     {
-        return pow(base, linspace(start, stop, num_samples, endpoint));
+        return pow(std::forward<T>(base), linspace(start, stop, num_samples, endpoint));
     }
 
     namespace detail
