@@ -288,13 +288,13 @@ namespace xt
 
     namespace detail
     {
-        template <class... T>
+        template <class... CT>
         struct concatenate_impl
         {
             using size_type = std::size_t;
-            using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
+            using value_type = std::common_type_t<typename std::decay_t<CT>::value_type...>;
 
-            inline concatenate_impl(std::tuple<T...>&& t, std::size_t axis)
+            inline concatenate_impl(std::tuple<CT...>&& t, std::size_t axis)
                 : m_t(t), m_axis(axis)
             {
             }
@@ -317,6 +317,7 @@ namespace xt
             }
 
         private:
+
             inline value_type access_impl(xindex idx) const
             {
                 auto match = [this, &idx](auto& arr) {
@@ -333,7 +334,7 @@ namespace xt
                 };
 
                 std::size_t i = 0;
-                for (; i < sizeof...(T); ++i)
+                for (; i < sizeof...(CT); ++i)
                 {
                     if (apply<bool>(i, match, m_t)) 
                     {
@@ -343,17 +344,17 @@ namespace xt
                 return apply<value_type>(i, get, m_t);
             }
 
-            std::tuple<T...> m_t;
+            std::tuple<CT...> m_t;
             size_type m_axis;
         };
 
-        template <class... T>
+        template <class... CT>
         struct stack_impl
         {
             using size_type = std::size_t;
-            using value_type = std::common_type_t<typename std::decay_t<T>::value_type...>;
+            using value_type = std::common_type_t<typename std::decay_t<CT>::value_type...>;
 
-            inline stack_impl(std::tuple<T...>&& t, std::size_t axis)
+            inline stack_impl(std::tuple<CT...>&& t, std::size_t axis)
                 : m_t(t), m_axis(axis)
             {
             }
@@ -376,6 +377,7 @@ namespace xt
             }
 
         private:
+
             inline value_type access_impl(xindex idx) const
             {
                 auto get_item = [&idx](auto& arr) {
@@ -385,8 +387,50 @@ namespace xt
                 idx.erase(idx.begin() + m_axis);
                 return apply<value_type>(i, get_item, m_t);
             }
-            const std::tuple<T...> m_t;
+
+            const std::tuple<CT...> m_t;
             const size_type m_axis;
+        };
+
+        template <class CT>
+        struct repeat_impl
+        {
+            using xexpression_type = std::decay_t<CT>;
+            using size_type = typename xexpression_type::size_type;
+            using value_type = typename xexpression_type::value_type;
+
+            repeat_impl(CT source, size_type axis) :
+                m_source(source), m_axis(axis)
+            {
+            }
+
+            template <class... Args>
+            value_type operator()(Args... args) const
+            {
+                // to catch a -Wuninitialized
+                if (sizeof...(Args))
+                {
+                    std::array<size_type, sizeof...(Args)> args_arr({static_cast<size_type>(args)...});
+                    return m_source(args_arr[m_axis]);
+                }
+                return m_source();
+            }
+
+            value_type operator[](const xindex& idx) const
+            {
+                return m_source[{ idx[m_axis] }];
+            }
+
+            template <class It>
+            inline value_type element(It first, It) const
+            {
+                return m_source[{*(first + m_axis)}];
+            }
+
+        private:
+
+            CT m_source;
+            size_type m_axis;
         };
     }
 
@@ -415,16 +459,16 @@ namespace xt
      * xt::xarray<double> d = xt::concatenate(xt::xtuple(a, b), 1); // => {{1, 2, 3, 2, 3, 4}}
      * \endcode
      */
-    template <class... T>
-    inline auto concatenate(std::tuple<T...>&& t, std::size_t axis = 0)
+    template <class... CT>
+    inline auto concatenate(std::tuple<CT...>&& t, std::size_t axis = 0)
     {
-        using shape_type = promote_shape_t<typename std::decay_t<T>::shape_type...>;
+        using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         shape_type new_shape = forward_sequence<shape_type>(std::get<0>(t).shape());
         auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
             return prev + arr.shape()[axis];
         };
         new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
-        return detail::make_xgenerator(detail::concatenate_impl<T...>(std::forward<std::tuple<T...>>(t), axis), new_shape);
+        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 
     namespace detail
@@ -466,12 +510,51 @@ namespace xt
      *                                                               {3, 7}}
      * \endcode
      */
-    template <class... T>
-    inline auto stack(std::tuple<T...>&& t, std::size_t axis = 0)
+    template <class... CT>
+    inline auto stack(std::tuple<CT...>&& t, std::size_t axis = 0)
     {
-        using shape_type = promote_shape_t<typename std::decay_t<T>::shape_type...>;
-        auto new_shape = detail::add_axis(forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(T));
-        return detail::make_xgenerator(detail::stack_impl<T...>(std::forward<std::tuple<T...>>(t), axis), new_shape);
+        using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
+        auto new_shape = detail::add_axis(forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(CT));
+        return detail::make_xgenerator(detail::stack_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
+    }
+
+    namespace detail
+    {
+
+        template <std::size_t... I, class... E>
+        inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
+        {
+#if defined X_OLD_CLANG || defined _MSC_VER
+            const std::array<std::size_t, sizeof...(E)> shape { e.shape()[0]... };
+            return std::make_tuple(
+                detail::make_xgenerator(
+                    detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
+                    shape
+                )...
+            );
+#else
+            return std::make_tuple(
+                detail::make_xgenerator(
+                    detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
+                    { e.shape()[0]... }
+                )...
+            );
+#endif
+        }
+    }
+
+    /**
+     * @brief Return coordinate tensors from coordinate vectors.
+     *        Make N-D coordinate tensor expressions for vectorized evaluations of N-D scalar/vector
+     *        fields over N-D grids, given one-dimensional coordinate arrays x1, x2,..., xn.
+     *
+     * @param e xexpressions to concatenate
+     * @returns tuple of xgenerator expressions.
+     */
+    template <class... E>
+    inline auto meshgrid(E&&... e) noexcept
+    {
+        return detail::meshgrid_impl(std::make_index_sequence<sizeof...(E)>(), std::forward<E>(e)...);
     }
 }
 #endif
