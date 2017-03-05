@@ -524,7 +524,7 @@ namespace xt
         template <std::size_t... I, class... E>
         inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
         {
-#ifdef X_OLD_CLANG
+#if defined X_OLD_CLANG || defined _MSC_VER
             const std::array<std::size_t, sizeof...(E)> shape { e.shape()[0]... };
             return std::make_tuple(
                 detail::make_xgenerator(
