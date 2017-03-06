@@ -106,7 +106,6 @@ or temporary variables are created.
 | ``a[[0, 1], [0, 0]]``                               | ``xt::index_view(a, {{0, 0}, {1, 0}})``             |
 +-----------------------------------------------------+-----------------------------------------------------+
 
-
 Random
 ------
 
@@ -184,7 +183,6 @@ Comparisons
 | ``np.nonzero(a)``                          | ``xt::nonzero(a)``                            |
 +--------------------------------------------+-----------------------------------------------+
 
-
 Complex numbers
 ---------------
 
@@ -199,6 +197,13 @@ argument.
 +--------------------------------------------+-----------------------------------------------+
 | ``np.imag(a)``                             | ``xt::imag(a)``                               |
 +--------------------------------------------+-----------------------------------------------+
+
+- The constness and value category (rvalue / lvalue) of ``real(a)`` is the same as that of ``a``.
+  Hence, if ``a`` is a non-const lvalue, ``real(a)`` is an non-const lvalue reference, to which
+  one can assign a real expression.
+- If ``a`` has complex values, the same holds for ``imag(a)``. The constness and value category of
+  ``imag(a)`` is the same as that of ``a``.
+- If ``a`` has real values, ``imag(a)`` returns ``zeros(a.shape())``.
 
 Mathematical functions
 ----------------------
