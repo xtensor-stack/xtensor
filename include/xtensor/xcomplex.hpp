@@ -22,10 +22,52 @@ namespace xt
      * real and imag declarations *
      ******************************/
 
+    template <class E>
+    auto real(E&& e) noexcept;
+
+    template <class E>
+    auto imag(E&& e) noexcept;
 
     /********************************
      * real and imag implementation *
      ********************************/
+
+    namespace detail
+    {
+        template <bool iscomplex=true>
+        struct complex_helper
+        {
+            template <class E>
+            static inline auto real(E&& e) noexcept
+            {
+                using real_type = typename std::decay_t<E>::value_type::value_type;
+                return xoffsetview<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
+            }
+
+            template <class E>
+            static inline auto imag(E&& e) noexcept
+            {
+                using real_type = typename std::decay_t<E>::value_type::value_type;
+                return xoffsetview<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
+            }
+        };
+
+        template <>
+        struct complex_helper<false>
+        {
+            template <class E>
+            static inline auto real(E&& e) noexcept
+            {
+                return e;
+            }
+
+            template <class E>
+            static inline auto imag(E&& e) noexcept
+            {
+                return zeros<typename std::decay_t<E>::value_type>(e.shape());
+            }
+        };
+    }
 
     /**
      * @brief Returns an \ref xexpression representing the real part of the given expression.
@@ -36,22 +78,9 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
     template <class E>
-    std::enable_if_t<is_complex<typename std::decay_t<E>::value_type>::value, 
-                     xoffsetview<xclosure_t<E>,
-                                 typename std::decay_t<E>::value_type::value_type, 
-                                 0>>
-    real(E&& e) noexcept
+    inline auto real(E&& e) noexcept
     {
-        using real_type = typename std::decay_t<E>::value_type::value_type;
-        return xoffsetview<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
-    }
-
-    template <class E>
-    std::enable_if_t<!is_complex<typename std::decay_t<E>::value_type>::value,
-                     detail::forward_type_t<E, E>>
-    real(E&& e) noexcept
-    {
-        return e;
+        return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
     }
 
     /**
@@ -63,24 +92,11 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
     template <class E>
-    std::enable_if_t<is_complex<typename std::decay_t<E>::value_type>::value,
-                     xoffsetview<xclosure_t<E>,
-                                 typename std::decay_t<E>::value_type::value_type, 
-                                 sizeof(typename std::decay_t<E>::value_type::value_type)>>
-    imag(E&& e) noexcept
+    inline auto imag(E&& e) noexcept
     {
-        using real_type = typename std::decay_t<E>::value_type::value_type;
-        return xoffsetview<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
+        return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
     }
 
-    template <class E>
-    std::enable_if_t<!is_complex<typename std::decay_t<E>::value_type>::value,
-                     xbroadcast<xscalar<const typename std::decay_t<E>::value_type>, 
-                                typename std::decay_t<E>::shape_type>>
-    imag(E&& e) noexcept
-    {
-        return zeros<typename std::decay_t<E>::value_type>(e.shape());
-    }
 
 }
 #endif
