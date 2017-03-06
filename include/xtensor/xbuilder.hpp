@@ -556,5 +556,259 @@ namespace xt
     {
         return detail::meshgrid_impl(std::make_index_sequence<sizeof...(E)>(), std::forward<E>(e)...);
     }
+
+    namespace detail
+    {
+        template <class CT>
+        struct diagonal_fn
+        {
+            using xexpression_type = std::decay_t<CT>;
+            using value_type = typename xexpression_type::value_type;
+
+            diagonal_fn(CT source) : m_source(source)
+            {
+            }
+
+            template <class It>
+            inline value_type operator()(It begin, It /*end*/) const
+            {
+                return m_source(*begin, *begin);
+            }
+
+        private:
+            CT m_source;
+        };
+
+        template <class CT>
+        struct diag_fn
+        {
+            using xexpression_type = std::decay_t<CT>;
+            using value_type = typename xexpression_type::value_type;
+
+            diag_fn(CT source) : m_source(source)
+            {
+            }
+
+            template <class It>
+            inline value_type operator()(It begin, It /*end*/) const
+            {
+                return *begin == *(begin + 1) ? m_source(*begin) : value_type(0);
+            }
+
+        private:
+            CT m_source;
+        };
+
+        template <class CT>
+        struct flipud_impl
+        {
+            using xexpression_type = std::decay_t<CT>;
+            using value_type = typename xexpression_type::value_type;
+            using size_type = typename xexpression_type::size_type;
+
+            flipud_impl(CT source)
+                : m_source(source), m_shape_first(m_source.shape().front() - 1)
+            {
+            }
+
+            inline value_type operator()() const
+            {
+                // special case when called without args (happens when printing)
+                return value_type();
+            }
+
+            template <class... Args>
+            inline value_type operator()(std::size_t first_idx, Args... args) const
+            {
+                return m_source(m_shape_first - first_idx, args...);
+            }
+
+            inline value_type operator[](xindex idx) const
+            {
+                idx.front() = m_shape_first - idx.front();
+                return m_source[idx];
+            }
+
+            template <class It>
+            inline value_type element(It first, It last) const
+            {
+                return operator[](xindex(first, last));
+            }
+
+        private:
+            CT m_source;
+            const size_type m_shape_first;
+        };
+
+        template <class CT>
+        struct fliplr_impl
+        {
+            using xexpression_type = std::decay_t<CT>;
+            using value_type = typename xexpression_type::value_type;
+            using size_type = typename xexpression_type::size_type;
+
+            fliplr_impl(CT source)
+                : m_source(source), m_shape_last(m_source.shape().back() - 1)
+            {
+            }
+
+            inline value_type operator()() const
+            {
+                // special case when called without args (happens when printing)
+                return value_type();
+            }
+
+            template <class... Args>
+            inline value_type operator()(Args... args, std::size_t last_idx) const
+            {
+                return m_source(args..., m_shape_last - last_idx);
+            }
+
+            inline value_type operator[](xindex idx) const
+            {
+                idx.back() = m_shape_last - idx.back();
+                return m_source[idx];
+            }
+
+            template <class It>
+            inline value_type element(It first, It last) const
+            {
+                return operator[](xindex(first, last));
+            }
+
+        private:
+            CT m_source;
+            const std::size_t m_shape_last;
+        };
+
+        template <class CT, class Comp>
+        struct trilu_fn
+        {
+            using xexpression_type = std::decay_t<CT>;
+            using value_type = typename xexpression_type::value_type;
+            using signed_idx_type = long int;
+
+            trilu_fn(CT source, int k, Comp comp)
+                : m_source(source), m_k(k), m_comp(comp)
+            {
+            }
+
+            template <class It>
+            inline value_type operator()(It begin, It end) const
+            {
+                // have to cast to signed int otherwise -1 can lead to overflow
+                return m_comp(signed_idx_type(*begin) + m_k, signed_idx_type(*(begin + 1))) ? m_source.element(begin, end) : value_type(0);
+            }
+
+        private:
+            CT m_source;
+            const signed_idx_type m_k;
+            const Comp m_comp;
+        };
+    }
+
+    /**
+     * @function diagonal(const xexpression<T>& arr)
+     * @brief Returns the elements on the diagonal of arr
+     *
+     * @param arr the input array
+     *
+     * @return xexpression with values of the diagonal
+     */
+    template <class E>
+    inline auto diagonal(E&& arr)
+    {
+        using CT = detail::const_closure_t<E>;
+        return detail::make_xgenerator(detail::fn_impl<detail::diagonal_fn<CT>>(detail::diagonal_fn<CT>(std::forward<E>(arr))),
+                                       {arr.shape()[0]});
+    }
+
+    /**
+     * @function diag(const xexpression<T>& arr)
+     * @brief xexpression with values of arr on the diagonal, zeroes otherwise
+     *
+     * @param arr the 1D input array of length n
+     *
+     * @return xexpression function with shape n x n and arr on the diagonal
+     */
+    template <class E>
+    inline auto diag(E&& arr)
+    {
+        using CT = detail::const_closure_t<E>;
+        return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr))),
+                                       {arr.shape()[0], arr.shape()[0]});
+    }
+
+    /**
+     * @function fliplr(const xexpression<T>& arr)
+     * @brief Flip xexpression in the left/right direction. Essentially flips the last axis.
+     *
+     * @param arr the input array
+     *
+     * @return xexpression with values flipped in left/right direction
+     */
+    template <class E>
+    inline auto fliplr(E&& arr)
+    {
+        using CT = detail::const_closure_t<E>;
+        return detail::make_xgenerator(detail::fliplr_impl<CT>(std::forward<E>(arr)),
+                                       arr.shape());
+    }
+
+    /**
+     * @function flipud(const xexpression<T>& arr)
+     * @brief Flip xexpression in the up/down direction. Essentially flips the last axis.
+     *
+     * @param arr the input array
+     *
+     * @return xexpression with values flipped in up/down direction
+     */
+    template <class E>
+    inline auto flipud(E&& arr)
+    {
+        using CT = detail::const_closure_t<E>;
+        return detail::make_xgenerator(detail::flipud_impl<CT>(std::forward<E>(arr)),
+                                       arr.shape());
+    }
+
+    /**
+     * @function tril(const xexpression<T>& arr, int k = 0)
+     * @brief Extract lower triangular matrix from xexpression. The parameter k selects the
+     *        offset of the diagonal.
+     *
+     * @param arr the input array
+     * @param k the diagonal above which to zero elements. 0 (default) selects the main diagonal,
+     *          k < 0 is below the main diagonal, k > 0 above.
+     *
+     * @return xexpression containing lower triangle from arr, 0 otherwise
+     */
+    template <class E>
+    inline auto tril(E&& arr, int k = 0)
+    {
+        using CT = detail::const_closure_t<E>;
+        return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::greater_equal<long int>>>(
+                                       detail::trilu_fn<CT, std::greater_equal<long int>>(std::forward<E>(arr), k, std::greater_equal<long int>())),
+                                       arr.shape());
+    }
+
+    /**
+     * @function triu(const xexpression<T>& arr, int k = 0)
+     * @brief Extract upper triangular matrix from xexpression. The parameter k selects the
+     *        offset of the diagonal.
+     *
+     * @param arr the input array
+     * @param k the diagonal below which to zero elements. 0 (default) selects the main diagonal,
+     *          k < 0 is below the main diagonal, k > 0 above.
+     *
+     * @return xexpression containing lower triangle from arr, 0 otherwise
+     */
+    template <class E>
+    inline auto triu(E&& arr, int k = 0)
+    {
+        using CT = detail::const_closure_t<E>;
+        return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::less_equal<long int>>>(
+                                       detail::trilu_fn<CT, std::less_equal<long int>>(std::forward<E>(arr), k, std::less_equal<long int>())),
+                                       arr.shape());
+    }
 }
 #endif
