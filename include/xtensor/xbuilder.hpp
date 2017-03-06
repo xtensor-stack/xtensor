@@ -188,7 +188,7 @@ namespace xt
             template <class It>
             inline T operator()(const It& /*begin*/, const It& end) const
             {
-                return *(end-1) == *(end-2)+m_k ? T(1) : T(0);
+                return *(end - 1) == *(end - 2) + m_k ? T(1) : T(0);
             }
 
         private:

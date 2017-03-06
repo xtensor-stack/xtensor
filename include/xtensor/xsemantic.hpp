@@ -417,9 +417,9 @@ namespace xt
         return this->derived_cast().assign_temporary(tmp);
     }
 
-    /**********************************
+    /**************************************
      * xcontainer_semantic implementation *
-     **********************************/
+     **************************************/
 
     /**
      * Assigns the temporary \c tmp to \c *this.
@@ -527,6 +527,7 @@ namespace xt
         this->derived_cast().assign_temporary_impl(tmp);
         return this->derived_cast();
     }
+
     template <class D>
     template <class E>
     inline auto xview_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
@@ -554,7 +555,6 @@ namespace xt
                 [e, &f](const auto& v) { return f(v, e); });
         return this->derived_cast();
     }
-
 
     template <class D>
     template <class E>
