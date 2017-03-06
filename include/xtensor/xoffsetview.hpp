@@ -107,6 +107,9 @@ namespace xt
         template <class E>
         self_type& operator=(const xexpression<E>& e);
 
+        template <class E>
+        disable_xexpression<E, self_type>& operator=(const E& e);
+
         size_type dimension() const noexcept;
         const shape_type & shape() const noexcept;
 
@@ -318,6 +321,14 @@ namespace xt
         return *this;
     }
     //@}
+
+    template <class CT, class M, std::size_t I>
+    template <class E>
+    inline auto xoffsetview<CT, M, I>::operator=(const E& e) -> disable_xexpression<E, self_type>&
+    {
+        std::fill(begin(), end(), e);
+        return *this;
+    }
 
     template <class CT, class M, std::size_t I>
     inline void xoffsetview<CT, M, I>::assign_temporary_impl(temporary_type& tmp)
