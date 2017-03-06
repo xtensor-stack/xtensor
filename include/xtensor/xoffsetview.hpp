@@ -551,7 +551,7 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class CT, class M, std::size_t I>
     template <class S>
@@ -577,7 +577,7 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class CT, class M, std::size_t I>
     template <class S>
@@ -603,7 +603,7 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class CT, class M, std::size_t I>
     template <class S>

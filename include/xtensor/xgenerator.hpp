@@ -371,7 +371,7 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the function. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class F, class R, class S>
     template <class O>
@@ -395,7 +395,7 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the function. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class F, class R, class S>
     template <class O>

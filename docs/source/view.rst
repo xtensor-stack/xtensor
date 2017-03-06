@@ -105,7 +105,7 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
 Broadcasting views
 ------------------
 
-The last type of view provided by `xtensor` is *broadcasting view*. Such a view broadcast an expression to the specified
+Another type of view provided by `xtensor` is *broadcasting view*. Such a view broadcast an expression to the specified
 shape. As long as the view is not assigned to an array, no memory allocation or copy occurs. Broadcasting views should be
 built with the ``broadcast`` helper function.
 
@@ -121,3 +121,33 @@ built with the ``broadcast`` helper function.
     xt::xarray<int> a1(s1);
     auto bv = xt::broadcast(a1, s2);
     // => bv(0, 0, 0) = bv(1, 0, 0) = bv(2, 0, 0) = a(0, 0)
+
+Complex views
+-------------
+
+In the case of tensor containing complex numbers, `xtensor` provides views returning ``xexpression`` corresponding to the real
+and imaginary parts of the complex numbers. Like for other views, the elements of the underlying ``xexpression`` are not copied.
+
+Functions ``xt::real`` and ``xt::imag`` respectively return views on the real and imaginary part of a complex expression.
+The returned value is an expression holding a closure on the passed argument.
+
+- The constness and value category (rvalue / lvalue) of ``real(a)`` is the same as that of ``a``. Hence, if ``a`` is a non-const lvalue,
+  ``real(a)`` is an non-const lvalue reference, to which one can assign a real expression.
+- If ``a`` has complex values, the same holds for ``imag(a)``. The constness and value category of ``imag(a)`` is the same as that of ``a``.
+- If ``a`` has real values, ``imag(a)`` returns ``zeros(a.shape())``.
+
+.. code::
+
+    #include <complex>
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xcomplex.hpp"
+
+    using namespace std::complex_literals;
+
+    xarray<std::complex<double>> e =
+        {{1.0       , 1.0 + 1.0i},
+         {1.0 - 1.0i, 1.0       }};
+
+    real(e) = zeros<double>({2, 2});
+    // => e = {{0.0, 0.0 + 1.0i}, {0.0 - 1.0i, 0.0}};
+  

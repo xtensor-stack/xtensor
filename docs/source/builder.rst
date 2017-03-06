@@ -42,3 +42,10 @@ Random distributions
 - ``randn(shape, mean, std_dev)``: generates an expression of the specified shape, containing numbers
   sampled from the Normal random number distribution.
 
+Meshes
+------
+
+- ``meshgrid(x1, x2,...)```: generates N-D coordinate expressions given one-dimensional coordinate arrays ``x1``, ``x2``...
+  If specified vectors have lengths ``Ni = len(xi)``, meshgrid returns ``(N1, N2, N3,..., Nn)``-shaped arrays, with the elements
+  of xi repeated to fill the matrix along the first dimension for x1, the second for x2 and so on.
+

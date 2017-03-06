@@ -679,7 +679,7 @@ namespace xt
     //@}
 
     /**************************
-     * braodcast iterator api *
+     * broadcast iterator api *
      **************************/
 
     /**
@@ -746,7 +746,7 @@ namespace xt
     /**
      * Returns an iterator to the first element of the view. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class CT, class... S>
     template <class ST>
@@ -770,7 +770,7 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the view. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class CT, class... S>
     template <class ST>
@@ -794,7 +794,7 @@ namespace xt
     /**
      * Returns a constant iterator to the first element of the view. The
      * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for braodcasting
+     * @param shape the shape used for broadcasting
      */
     template <class CT, class... S>
     template <class ST>

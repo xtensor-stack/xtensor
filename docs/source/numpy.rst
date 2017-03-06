@@ -42,6 +42,14 @@ numpy to xtensor cheat sheet
        border-bottom: none;
        border-left: none;
    }
+
+   .rst-content table.docutils tr:hover {
+       background-color: #d1e0e0;
+   }
+
+   .rst-content table.docutils:not(.field-list) tr:nth-child(2n-1):hover td {
+       background-color: initial;
+   }    
    </style>
 
 Containers
