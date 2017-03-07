@@ -374,7 +374,7 @@ namespace xt
     template <class CT, class... S>
     inline auto xview<CT, S...>::dimension() const noexcept -> size_type
     {
-        return m_e.dimension() - integral_count<S...>() + newaxis_count<S...>();
+        return m_shape.size();
     }
 
     /**

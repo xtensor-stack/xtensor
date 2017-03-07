@@ -185,6 +185,8 @@ namespace xt
         template <class Func, std::size_t... I>
         const_iterator build_iterator(Func&& f, std::index_sequence<I...>) const noexcept;
 
+        size_type compute_dimension() const noexcept;
+
         std::tuple<CT...> m_e;
         functor_type m_f;
         shape_type m_shape;
@@ -311,7 +313,7 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func>
     inline xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept
-        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(make_sequence<shape_type>(dimension(), size_type(1)))
+        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(make_sequence<shape_type>(compute_dimension(), size_type(1)))
     {
         broadcast_shape(m_shape);
     }
@@ -327,8 +329,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::dimension() const noexcept -> size_type
     {
-        auto func = [](size_type d, auto&& e) noexcept { return std::max(d, e.dimension()); };
-        return accumulate(func, size_type(0), m_e);
+        return m_shape.size();
     }
 
     /**
@@ -589,6 +590,13 @@ namespace xt
     inline auto xfunction<F, R, CT...>::build_iterator(Func&& f, std::index_sequence<I...>) const noexcept -> const_iterator
     {
         return const_iterator(this, f(std::get<I>(m_e))...);
+    }
+
+    template <class F, class R, class... CT>
+    inline auto xfunction<F, R, CT...>::compute_dimension() const noexcept -> size_type
+    {
+        auto func = [](size_type d, auto&& e) noexcept { return std::max(d, e.dimension()); };
+        return accumulate(func, size_type(0), m_e);
     }
 
     /*************************************
