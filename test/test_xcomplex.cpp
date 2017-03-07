@@ -85,5 +85,16 @@ namespace xt
         EXPECT_TRUE(all(equal(i, zeros<double>({2, 2}))));
     }
 
+    template <class T>
+    struct print;
+
+    TEST(xcomplex, scalar)
+    {
+        double d = 1.0;
+        ASSERT_EQ(1.0, real(d));
+        ASSERT_EQ(0.0, imag(d));
+        real(d) = 2.0;
+        ASSERT_EQ(2.0, d);
+    }
 }
 

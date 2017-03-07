@@ -4,8 +4,12 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-numpy to xtensor cheat sheet
-============================
+From numpy to xtensor
+=====================
+
+.. image:: numpy.svg
+   :height: 100px
+   :align: right
 
 .. raw:: html
 
@@ -38,6 +42,10 @@ numpy to xtensor cheat sheet
        border: none;
    }
 
+   .rst-content table.docutils thead {
+       background-color: #d1e0e0;
+   }
+
    .rst-content table.docutils td {
        border-bottom: none;
        border-left: none;
@@ -63,6 +71,8 @@ Two container types are provided. ``xarray`` (dynamic number of dimensions) and 
 +================================================+================================================+
 | ``np.array([[3, 4], [5, 6]])``                 | | ``xt::xarray<double>({{3, 4}, {5, 6}})``     |
 |                                                | | ``xt::xtensor<double, 2>({{3, 4}, {5, 6}})`` |
++------------------------------------------------+------------------------------------------------+
+| ``arr.reshape([3, 4])``                        | ``arr.reshape{{3, 4})``                        |
 +------------------------------------------------+------------------------------------------------+
 
 Initializers

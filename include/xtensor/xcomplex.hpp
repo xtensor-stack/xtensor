@@ -12,6 +12,7 @@
 #include <utility>
 #include <type_traits>
 
+#include "xtensor/xexpression.hpp" 
 #include "xtensor/xoffsetview.hpp"
 #include "xtensor/xbuilder.hpp"
 
@@ -23,10 +24,10 @@ namespace xt
      ******************************/
 
     template <class E>
-    auto real(E&& e) noexcept;
+    decltype(auto) real(E&& e) noexcept;
 
     template <class E>
-    auto imag(E&& e) noexcept;
+    decltype(auto) imag(E&& e) noexcept;
 
     /********************************
      * real and imag implementation *
@@ -56,7 +57,7 @@ namespace xt
         struct complex_helper<false>
         {
             template <class E>
-            static inline auto real(E&& e) noexcept
+            static inline decltype(auto) real(E&& e) noexcept
             {
                 return e;
             }
@@ -65,6 +66,38 @@ namespace xt
             static inline auto imag(E&& e) noexcept
             {
                 return zeros<typename std::decay_t<E>::value_type>(e.shape());
+            }
+        };
+
+        template <bool isexpression=true>
+        struct complex_expression_helper
+        {
+            template <class E>
+            static inline auto real(E&& e) noexcept
+            {
+                return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
+            }
+
+            template <class E>
+            static inline auto imag(E&& e) noexcept
+            {
+                return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
+            }
+        };
+
+        template <>
+        struct complex_expression_helper<false>
+        {
+            template <class E>
+            static inline decltype(auto) real(E&& e) noexcept
+            {
+                return forward_real(std::forward<E>(e));
+            }
+
+            template <class E>
+            static inline decltype(auto) imag(E&& e) noexcept
+            {
+                return forward_imag(std::forward<E>(e));
             }
         };
     }
@@ -78,9 +111,9 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
     template <class E>
-    inline auto real(E&& e) noexcept
+    inline decltype(auto) real(E&& e) noexcept
     {
-        return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
+        return detail::complex_expression_helper<is_xexpression<std::decay_t<E>>::value>::real(std::forward<E>(e));
     }
 
     /**
@@ -92,11 +125,10 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
     template <class E>
-    inline auto imag(E&& e) noexcept
+    inline decltype(auto) imag(E&& e) noexcept
     {
-        return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
+        return detail::complex_expression_helper<is_xexpression<std::decay_t<E>>::value>::imag(std::forward<E>(e));
     }
-
 
 }
 #endif

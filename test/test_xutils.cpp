@@ -136,8 +136,9 @@ namespace xt
         EXPECT_EQ(std::imag(clv), 1.0);
 
         double rlv = 2.0;
+        forward_real(rlv) = 1.0;
         EXPECT_EQ(forward_imag(rlv), 0.0);
-        EXPECT_EQ(forward_real(rlv), 2.0);
+        EXPECT_EQ(forward_real(rlv), 1.0);
     }
 }
 
