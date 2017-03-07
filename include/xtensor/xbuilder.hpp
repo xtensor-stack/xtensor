@@ -708,107 +708,115 @@ namespace xt
     }
 
     /**
-     * @function diagonal(const xexpression<T>& arr)
      * @brief Returns the elements on the diagonal of arr
      *
      * @param arr the input array
+     * @returns xexpression with values of the diagonal
      *
-     * @return xexpression with values of the diagonal
+     * \code{.cpp}
+     * xt::xarray<double> a = {{1, 2, 3},
+     *                         {4, 5, 6}
+     *                         {7, 8, 9}};
+     * auto b = xt::diagonal(a); // => {1, 5, 9}
+     * \endcode
      */
     template <class E>
     inline auto diagonal(E&& arr)
     {
         using CT = xclosure_t<E>;
+        std::vector<std::size_t> shape = {arr.shape()[0]};
         return detail::make_xgenerator(detail::fn_impl<detail::diagonal_fn<CT>>(detail::diagonal_fn<CT>(std::forward<E>(arr))),
-                                       {arr.shape()[0]});
+                                       shape);
     }
 
     /**
-     * @function diag(const xexpression<T>& arr)
      * @brief xexpression with values of arr on the diagonal, zeroes otherwise
      *
      * @param arr the 1D input array of length n
+     * @returns xexpression function with shape n x n and arr on the diagonal
      *
-     * @return xexpression function with shape n x n and arr on the diagonal
+     * \code{.cpp}
+     * xt::xarray<double> a = {1, 5, 9};
+     * auto b = xt::diag(a); // => {{1, 0, 0},
+     *                       //     {0, 5, 0},
+     *                       //     {0, 0, 9}}
+     * \endcode
      */
     template <class E>
     inline auto diag(E&& arr)
     {
         using CT = xclosure_t<E>;
+        std::vector<std::size_t> shape = {arr.shape()[0], arr.shape()[0]};
         return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr))),
-                                       {arr.shape()[0], arr.shape()[0]});
+                                       shape);
     }
 
     /**
-     * @function fliplr(const xexpression<T>& arr)
      * @brief Flip xexpression in the left/right direction. Essentially flips the last axis.
      *
      * @param arr the input array
-     *
-     * @return xexpression with values flipped in left/right direction
+     * @returns xexpression with values flipped in left/right direction
      */
     template <class E>
     inline auto fliplr(E&& arr)
     {
         using CT = xclosure_t<E>;
+        auto shape = arr.shape();
         return detail::make_xgenerator(detail::fliplr_impl<CT>(std::forward<E>(arr)),
-                                       arr.shape());
+                                       shape);
     }
 
     /**
-     * @function flipud(const xexpression<T>& arr)
      * @brief Flip xexpression in the up/down direction. Essentially flips the last axis.
      *
      * @param arr the input array
-     *
-     * @return xexpression with values flipped in up/down direction
+     * @returns xexpression with values flipped in up/down direction
      */
     template <class E>
     inline auto flipud(E&& arr)
     {
         using CT = xclosure_t<E>;
+        auto shape = arr.shape();
         return detail::make_xgenerator(detail::flipud_impl<CT>(std::forward<E>(arr)),
-                                       arr.shape());
+                                       shape);
     }
 
     /**
-     * @function tril(const xexpression<T>& arr, int k = 0)
      * @brief Extract lower triangular matrix from xexpression. The parameter k selects the
      *        offset of the diagonal.
      *
      * @param arr the input array
      * @param k the diagonal above which to zero elements. 0 (default) selects the main diagonal,
      *          k < 0 is below the main diagonal, k > 0 above.
-     *
-     * @return xexpression containing lower triangle from arr, 0 otherwise
+     * @returns xexpression containing lower triangle from arr, 0 otherwise
      */
     template <class E>
     inline auto tril(E&& arr, int k = 0)
     {
         using CT = xclosure_t<E>;
+        auto shape = arr.shape();
         return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::greater_equal<long int>>>(
                                        detail::trilu_fn<CT, std::greater_equal<long int>>(std::forward<E>(arr), k, std::greater_equal<long int>())),
-                                       arr.shape());
+                                       shape);
     }
 
     /**
-     * @function triu(const xexpression<T>& arr, int k = 0)
      * @brief Extract upper triangular matrix from xexpression. The parameter k selects the
      *        offset of the diagonal.
      *
      * @param arr the input array
      * @param k the diagonal below which to zero elements. 0 (default) selects the main diagonal,
      *          k < 0 is below the main diagonal, k > 0 above.
-     *
-     * @return xexpression containing lower triangle from arr, 0 otherwise
+     * @returns xexpression containing lower triangle from arr, 0 otherwise
      */
     template <class E>
     inline auto triu(E&& arr, int k = 0)
     {
         using CT = xclosure_t<E>;
+        auto shape = arr.shape();
         return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::less_equal<long int>>>(
                                        detail::trilu_fn<CT, std::less_equal<long int>>(std::forward<E>(arr), k, std::less_equal<long int>())),
-                                       arr.shape());
+                                       shape);
     }
 }
 #endif

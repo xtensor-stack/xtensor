@@ -319,8 +319,7 @@ namespace xt
     {
         xarray<double> e = xt::arange<double>(1, 10);
         e.reshape({3, 3});
-        xarray<double> d = xt::diagonal(e);
-        xarray<double> t = xt::diag(d);
+        xarray<double> t = xt::diag(xt::diagonal(e));
         xarray<double> expected = xt::eye(3) * e;
 
         ASSERT_EQ(expected, t);
