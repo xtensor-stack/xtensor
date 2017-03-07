@@ -724,9 +724,9 @@ namespace xt
     inline auto diagonal(E&& arr)
     {
         using CT = xclosure_t<E>;
-        std::vector<std::size_t> shape = {arr.shape()[0]};
+        std::size_t s = arr.shape()[0];
         return detail::make_xgenerator(detail::fn_impl<detail::diagonal_fn<CT>>(detail::diagonal_fn<CT>(std::forward<E>(arr))),
-                                       shape);
+                                       { s });
     }
 
     /**
@@ -746,9 +746,9 @@ namespace xt
     inline auto diag(E&& arr)
     {
         using CT = xclosure_t<E>;
-        std::vector<std::size_t> shape = {arr.shape()[0], arr.shape()[0]};
+        std::size_t s = arr.shape()[0];
         return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr))),
-                                       shape);
+                                       { s, s });
     }
 
     /**

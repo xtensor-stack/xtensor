@@ -368,6 +368,10 @@ namespace xt
                                       {  5,  4,  3}},
                                      {{  8,  7,  6},
                                       { 11, 10,  9}}};
+
         ASSERT_EQ(expected_2, ft);
+        auto flipped_range = fliplr(stack(xtuple(arange<double>(2), arange<double>(2))));
+        xarray<double> expected_range = {{1, 0}, {1, 0}};
+        ASSERT_TRUE(all(equal(flipped_range, expected_range)));
     }
 }
