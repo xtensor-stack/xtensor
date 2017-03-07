@@ -41,7 +41,7 @@ namespace xt
 
     /**
      * @class xindexview
-     * @brief View into xexpression from vector of indices.
+     * @brief View of an xexpression from vector of indices.
      *
      * The xindexview class implements a flat (1D) view into a multidimensional
      * xexpression yielding the values at the indices of the index array.

@@ -73,6 +73,21 @@ namespace xt
         using temporary_type = typename offsetview_temporary_type<xexpression_type, M, I>::type;
     };
 
+    /**
+     * @class xoffsetview
+     * @brief View of an xexpression .
+     *
+     * The xoffsetview class is an expression addressing a specified attribute of objects contained
+     * in another expression. xoffsetview is used e.g. to access real and imaginary parts of complex
+     * expressions. xoffsetview is not meant to be used directly, but through helper functions such
+     * as \ref real or \ref imag.
+     *
+     * @tparam CT the closure type of the \ref xexpression type underlying this view
+     * @tparam M the type members of the contained objects
+     * @tparam I the offset of the addressed member in the memory layout of the contained object.
+     *
+     * @sa real, imag
+     */
     template <class CT, class M, std::size_t I>
     class xoffsetview : public xview_semantic<xoffsetview<CT, M, I>>
     {
