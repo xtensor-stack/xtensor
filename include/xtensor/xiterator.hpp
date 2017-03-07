@@ -186,6 +186,7 @@ namespace xt
         self_type operator++(int);
 
         reference operator*() const;
+        pointer operator->() const;
 
         bool equal(const xiterator& rhs) const;
 
@@ -390,6 +391,12 @@ namespace xt
     inline auto xiterator<It, S>::operator*() const -> reference
     {
         return *m_it;
+    }
+
+    template <class It, class S>
+    inline auto xiterator<It, S>::operator->() const -> pointer
+    {
+        return &(*m_it);
     }
 
     template <class It, class S>

@@ -219,6 +219,7 @@ namespace xt
         self_type operator++(int);
 
         reference operator*() const;
+        pointer operator->() const;
 
         bool equal(const xoffset_iterator& rhs) const;
 
@@ -704,6 +705,12 @@ namespace xt
     auto xoffset_iterator<It, M, I>::operator*() const -> reference
     {
         return forward_offset<M, I>(*m_it);
+    }
+
+    template <class It, class M, std::size_t I>
+    auto xoffset_iterator<It, M, I>::operator->() const -> pointer
+    {
+        return &(forward_offset<M, I>(*m_it));
     }
 
     template <class It, class M, std::size_t I>
