@@ -678,7 +678,7 @@ namespace xt
 
         private:
             CT m_source;
-            const std::size_t m_shape_last;
+            const size_type m_shape_last;
         };
 
         template <class CT, class Comp>
@@ -718,7 +718,7 @@ namespace xt
     template <class E>
     inline auto diagonal(E&& arr)
     {
-        using CT = detail::const_closure_t<E>;
+        using CT = xclosure_t<E>;
         return detail::make_xgenerator(detail::fn_impl<detail::diagonal_fn<CT>>(detail::diagonal_fn<CT>(std::forward<E>(arr))),
                                        {arr.shape()[0]});
     }
@@ -734,7 +734,7 @@ namespace xt
     template <class E>
     inline auto diag(E&& arr)
     {
-        using CT = detail::const_closure_t<E>;
+        using CT = xclosure_t<E>;
         return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr))),
                                        {arr.shape()[0], arr.shape()[0]});
     }
@@ -750,7 +750,7 @@ namespace xt
     template <class E>
     inline auto fliplr(E&& arr)
     {
-        using CT = detail::const_closure_t<E>;
+        using CT = xclosure_t<E>;
         return detail::make_xgenerator(detail::fliplr_impl<CT>(std::forward<E>(arr)),
                                        arr.shape());
     }
@@ -766,7 +766,7 @@ namespace xt
     template <class E>
     inline auto flipud(E&& arr)
     {
-        using CT = detail::const_closure_t<E>;
+        using CT = xclosure_t<E>;
         return detail::make_xgenerator(detail::flipud_impl<CT>(std::forward<E>(arr)),
                                        arr.shape());
     }
@@ -785,7 +785,7 @@ namespace xt
     template <class E>
     inline auto tril(E&& arr, int k = 0)
     {
-        using CT = detail::const_closure_t<E>;
+        using CT = xclosure_t<E>;
         return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::greater_equal<long int>>>(
                                        detail::trilu_fn<CT, std::greater_equal<long int>>(std::forward<E>(arr), k, std::greater_equal<long int>())),
                                        arr.shape());
@@ -805,7 +805,7 @@ namespace xt
     template <class E>
     inline auto triu(E&& arr, int k = 0)
     {
-        using CT = detail::const_closure_t<E>;
+        using CT = xclosure_t<E>;
         return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::less_equal<long int>>>(
                                        detail::trilu_fn<CT, std::less_equal<long int>>(std::forward<E>(arr), k, std::less_equal<long int>())),
                                        arr.shape());
