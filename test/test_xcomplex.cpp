@@ -85,9 +85,6 @@ namespace xt
         EXPECT_TRUE(all(equal(i, zeros<double>({2, 2}))));
     }
 
-    template <class T>
-    struct print;
-
     TEST(xcomplex, scalar)
     {
         double d = 1.0;
@@ -95,6 +92,16 @@ namespace xt
         ASSERT_EQ(0.0, imag(d));
         real(d) = 2.0;
         ASSERT_EQ(2.0, d);
+    }
+
+    TEST(xcomplex, pointer)
+    {
+        xarray<std::complex<double>> e =
+            {{1.0       , 1.0 + 1.0i},
+             {1.0 - 1.0i, 1.0       }};
+        auto r = real(e);
+        auto it = r.begin();
+        EXPECT_EQ(*(it.operator->()), 1.0);
     }
 }
 
