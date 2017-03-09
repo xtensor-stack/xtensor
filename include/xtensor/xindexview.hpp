@@ -22,9 +22,6 @@
 namespace xt
 {
 
-    template <bool is_const, class V, class S>
-    class xindexview_stepper;
-
     template <class CT, class S, class I>
     class xindexview;
 
@@ -78,11 +75,11 @@ namespace xt
 
         using indices_type = I;
 
-        using stepper = xindexview_stepper<false, self_type, shape_type>;
+        using stepper = xindexed_stepper<self_type, false>;
         using broadcast_iterator = xiterator<stepper, shape_type*>;
         using iterator = broadcast_iterator;
 
-        using const_stepper = xindexview_stepper<true, self_type, shape_type>;
+        using const_stepper = xindexed_stepper<self_type>;
         using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
         using const_iterator = const_broadcast_iterator;
 
@@ -137,28 +134,28 @@ namespace xt
         const_broadcast_iterator cxend() const;
 
         template <class ST>
-        xiterator<xindexview_stepper<false, self_type, ST>, ST> xbegin(const ST& shape);
+        xiterator<stepper, ST> xbegin(const ST& shape);
         template <class ST>
-        xiterator<xindexview_stepper<false, self_type, ST>, ST> xend(const ST& shape);
+        xiterator<stepper, ST> xend(const ST& shape);
 
         template <class ST>
-        xiterator<xindexview_stepper<true, self_type, ST>, ST> xbegin(const ST& shape) const;
+        xiterator<const_stepper, ST> xbegin(const ST& shape) const;
         template <class ST>
-        xiterator<xindexview_stepper<true, self_type, ST>, ST> xend(const ST& shape) const;
+        xiterator<const_stepper, ST> xend(const ST& shape) const;
         template <class ST>
-        xiterator<xindexview_stepper<true, self_type, ST>, ST> cxbegin(const ST& shape) const;
+        xiterator<const_stepper, ST> cxbegin(const ST& shape) const;
         template <class ST>
-        xiterator<xindexview_stepper<true, self_type, ST>, ST> cxend(const ST& shape) const;
+        xiterator<const_stepper, ST> cxend(const ST& shape) const;
 
         template <class ST>
-        xindexview_stepper<false, self_type, ST> stepper_begin(const ST& shape);
+        stepper stepper_begin(const ST& shape);
         template <class ST>
-        xindexview_stepper<false, self_type, ST> stepper_end(const ST& shape);
+        stepper stepper_end(const ST& shape);
 
         template <class ST>
-        xindexview_stepper<true, self_type, ST> stepper_begin(const ST& shape) const;
+        const_stepper stepper_begin(const ST& shape) const;
         template <class ST>
-        xindexview_stepper<true, self_type, ST> stepper_end(const ST& shape) const;
+        const_stepper stepper_end(const ST& shape) const;
 
     private:
 
@@ -170,61 +167,6 @@ namespace xt
 
         friend class xview_semantic<xindexview<CT, S, I>>;
     };
-
-    /***************************
-     * xindexview_stepper      *
-     ***************************/
-
-    template <bool is_const, class V, class S>
-    class xindexview_stepper
-    {
-
-    public:
-
-        using view_type = std::conditional_t<is_const, const V, V>;
-        using self_type = xindexview_stepper<is_const, V, S>;
-
-        using value_type = typename view_type::value_type;
-
-        using reference = std::conditional_t<is_const,
-                                             typename view_type::const_reference,
-                                             typename view_type::reference>;
-
-        using pointer = std::conditional_t<is_const,
-                                           typename view_type::const_pointer,
-                                           typename view_type::pointer>;
-        using size_type = typename view_type::size_type;
-        using difference_type = typename view_type::difference_type;
-
-        using shape_type = S;
-        using index_type = xindex_type_t<shape_type>;
-
-        xindexview_stepper() = default;
-        xindexview_stepper(view_type* func, size_type offset, bool end = false) noexcept;
-
-        reference operator*() const;
-
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
-        void reset(size_type dim);
-
-        void to_end();
-
-        bool equal(const self_type& rhs) const;
-
-    private:
-        view_type* p_view;
-        index_type m_index;
-        size_type m_offset;
-    };
-
-    template <bool is_const, class V, class S>
-    bool operator==(const xindexview_stepper<is_const, V, S>& it1,
-                    const xindexview_stepper<is_const, V, S>& it2);
-
-    template <bool is_const, class V, class S>
-    bool operator!=(const xindexview_stepper<is_const, V, S>& it1,
-                    const xindexview_stepper<is_const, V, S>& it2);
 
     /*****************************
      * xindexview implementation *
@@ -528,7 +470,7 @@ namespace xt
      */
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::xbegin(const ST& shape) -> xiterator<xindexview_stepper<false, self_type, ST>, ST>
+    inline auto xindexview<CT, S, I>::xbegin(const ST& shape) -> xiterator<stepper, ST>
     {
         return xiterator<stepper, ST>(stepper_begin(shape), shape);
     }
@@ -540,7 +482,7 @@ namespace xt
      */
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::xend(const ST& shape) -> xiterator<xindexview_stepper<false, self_type, ST>, ST>
+    inline auto xindexview<CT, S, I>::xend(const ST& shape) -> xiterator<stepper, ST>
     {
         return xiterator<stepper, ST>(stepper_end(shape), shape);
     }
@@ -552,9 +494,9 @@ namespace xt
      */
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::xbegin(const ST& shape) const -> xiterator<xindexview_stepper<true, self_type, ST>, ST>
+    inline auto xindexview<CT, S, I>::xbegin(const ST& shape) const -> xiterator<const_stepper, ST>
     {
-        return xiterator<xindexview_stepper<true, self_type, ST>, ST>(stepper_begin(shape), shape);
+        return xiterator<const_stepper, ST>(stepper_begin(shape), shape);
     }
 
     /**
@@ -564,9 +506,9 @@ namespace xt
      */
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::xend(const ST& shape) const -> xiterator<xindexview_stepper<true, self_type, ST>, ST>
+    inline auto xindexview<CT, S, I>::xend(const ST& shape) const -> xiterator<const_stepper, ST>
     {
-        return xiterator<xindexview_stepper<true, self_type, ST>, ST>(stepper_end(shape), shape);
+        return xiterator<const_stepper, ST>(stepper_end(shape), shape);
     }
 
     /**
@@ -576,7 +518,7 @@ namespace xt
      */
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::cxbegin(const ST& shape) const -> xiterator<xindexview_stepper<true, self_type, ST>, ST>
+    inline auto xindexview<CT, S, I>::cxbegin(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xbegin(shape);
     }
@@ -588,7 +530,7 @@ namespace xt
      */
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::cxend(const ST& shape) const -> xiterator<xindexview_stepper<true, self_type, ST>, ST>
+    inline auto xindexview<CT, S, I>::cxend(const ST& shape) const -> xiterator<const_stepper, ST>
     {
         return xend(shape);
     }
@@ -600,101 +542,34 @@ namespace xt
 
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_begin(const ST& shape) -> xindexview_stepper<false, self_type, ST>
+    inline auto xindexview<CT, S, I>::stepper_begin(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return xindexview_stepper<false, self_type, ST>(this, offset);
+        return stepper(this, offset);
     }
 
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_end(const ST& shape) -> xindexview_stepper<false, self_type, ST>
+    inline auto xindexview<CT, S, I>::stepper_end(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return xindexview_stepper<false, self_type, ST>(this, offset, true);
+        return stepper(this, offset, true);
     }
 
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_begin(const ST& shape) const -> xindexview_stepper<true, self_type, ST>
+    inline auto xindexview<CT, S, I>::stepper_begin(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return xindexview_stepper<true, self_type, ST>(this, offset);
+        return const_stepper(this, offset);
     }
 
     template <class CT, class S, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_end(const ST& shape) const -> xindexview_stepper<true, self_type, ST>
+    inline auto xindexview<CT, S, I>::stepper_end(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return xindexview_stepper<true, self_type, ST>(this, offset, true);
-    }
-
-    /*************************************
-     * xindexview_stepper implementation *
-     *************************************/
-
-    template <bool is_const, class V, class S>
-    inline xindexview_stepper<is_const, V, S>::xindexview_stepper(view_type* view, size_type offset, bool end) noexcept
-        : p_view(view), m_index(make_sequence<index_type>(view->shape().size(), size_type(0))), m_offset(offset)
-    {
-        if (end)
-        {
-            m_index = p_view->shape();
-        }
-    }
-
-    template <bool is_const, class V, class S>
-    inline void xindexview_stepper<is_const, V, S>::step(size_type dim, size_type n)
-    {
-        if(dim >= m_offset)
-            m_index[dim - m_offset] += n;
-    }
-
-    template <bool is_const, class V, class S>
-    inline void xindexview_stepper<is_const, V, S>::step_back(size_type dim, size_type n)
-    {
-        if(dim >= m_offset) 
-            m_index[dim - m_offset] -= n;
-    }
-
-    template <bool is_const, class V, class S>
-    inline void xindexview_stepper<is_const, V, S>::reset(size_type dim)
-    {
-        if(dim >= m_offset)
-            m_index[dim - m_offset] = 0;
-    }
-
-    template <bool is_const, class V, class S>
-    inline void xindexview_stepper<is_const, V, S>::to_end()
-    {
-        m_index = p_view->shape();
-    }
-
-    template <bool is_const, class V, class S>
-    inline bool xindexview_stepper<is_const, V, S>::equal(const self_type& rhs) const
-    {
-        return (p_view == rhs.p_view) && (m_index == rhs.m_index);
-    }
-
-    template <bool is_const, class V, class S>
-    inline auto xindexview_stepper<is_const, V, S>::operator*() const -> reference
-    {
-        return p_view->element(m_index.begin(), m_index.end());
-    }
-
-    template <bool is_const, class V, class S>
-    inline bool operator==(const xindexview_stepper<is_const, V, S>& it1,
-                           const xindexview_stepper<is_const, V, S>& it2)
-    {
-        return it1.equal(it2);
-    }
-
-    template <bool is_const, class V, class S>
-    inline bool operator!=(const xindexview_stepper<is_const, V, S>& it1,
-                           const xindexview_stepper<is_const, V, S>& it2)
-    {
-        return !(it1.equal(it2));
+        return const_stepper(this, offset, true);
     }
 
     /**

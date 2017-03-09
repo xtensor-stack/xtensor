@@ -27,9 +27,9 @@ namespace xt
     template <class S1, class S2>
     bool broadcastable(const S1& s1, S2& s2);
 
-    /************
-     * xstepper *
-     ************/
+    /***********************
+     * iterator meta utils *
+     ***********************/
 
     namespace detail
     {
@@ -67,6 +67,10 @@ namespace xt
     template <class C>
     using xindex_type_t = typename detail::index_type_impl<C>::type;
  
+    /************
+     * xstepper *
+     ************/
+
     template <class C>
     class xstepper
     {
@@ -115,6 +119,60 @@ namespace xt
     void increment_stepper(S& stepper,
                            IT& index,
                            const ST& shape);
+
+    /********************
+     * xindexed_stepper *
+     ********************/
+
+    template <class E, bool is_const = true>
+    class xindexed_stepper
+    {
+
+    public:
+
+        using self_type = xindexed_stepper<E, is_const>;
+        using xexpression_type = std::conditional_t<is_const, const E, E>;
+
+        using value_type = typename xexpression_type::value_type;
+        using reference = std::conditional_t<is_const,
+                                             typename xexpression_type::const_reference,
+                                             typename xexpression_type::reference>;
+        using pointer = std::conditional_t<is_const,
+                                           typename xexpression_type::const_pointer,
+                                           typename xexpression_type::pointer>;
+        using size_type = typename xexpression_type::size_type;
+        using difference_type = typename xexpression_type::difference_type;
+
+        using shape_type = typename xexpression_type::shape_type;
+        using index_type = xindex_type_t<shape_type>;
+
+        xindexed_stepper() = default;
+        xindexed_stepper(xexpression_type* e, size_type offset, bool end = false) noexcept;
+
+        void step(size_type dim, size_type n = 1);
+        void step_back(size_type dim, size_type n = 1);
+        void reset(size_type dim);
+
+        void to_end();
+
+        reference operator*() const;
+
+        bool equal(const self_type& rhs) const;
+
+    private:
+
+        xexpression_type* p_e;
+        index_type m_index;
+        size_type m_offset;
+    };
+
+    template <class C, bool is_const>
+    bool operator==(const xindexed_stepper<C, is_const>& lhs,
+                    const xindexed_stepper<C, is_const>& rhs);
+
+    template <class C, bool is_const>
+    bool operator!=(const xindexed_stepper<C, is_const>& lhs,
+                    const xindexed_stepper<C, is_const>& rhs);
 
     /*************
      * xiterator *
@@ -332,6 +390,71 @@ namespace xt
         {
             stepper.to_end();
         }
+    }
+
+    /***********************************
+     * xindexed_stepper implementation *
+     ***********************************/
+    
+    template <class C, bool is_const>
+    inline xindexed_stepper<C, is_const>::xindexed_stepper(xexpression_type* e, size_type offset, bool end) noexcept
+        : p_e(e), m_index(make_sequence<index_type>(e->shape().size(), size_type(0))), m_offset(offset)
+    {
+        if (end)
+            to_end();
+    }
+
+    template <class C, bool is_const>
+    inline void xindexed_stepper<C, is_const>::step(size_type dim, size_type n)
+    {
+        if (dim >= m_offset)
+            m_index[dim - m_offset] += n;
+    }
+
+    template <class C, bool is_const>
+    inline void xindexed_stepper<C, is_const>::step_back(size_type dim, size_type n)
+    {
+        if (dim >= m_offset)
+            m_index[dim - m_offset] -= n;
+    }
+
+    template <class C, bool is_const>
+    inline void xindexed_stepper<C, is_const>::reset(size_type dim)
+    {
+        if (dim >= m_offset)
+            m_index[dim - m_offset] = 0;
+    }
+
+    template <class C, bool is_const>
+    inline void xindexed_stepper<C, is_const>::to_end()
+    {
+        m_index = p_e->shape();
+    }
+
+    template <class C, bool is_const>
+    inline auto xindexed_stepper<C, is_const>::operator*() const -> reference
+    {
+        return p_e->element(m_index.cbegin(), m_index.cend());
+    }
+
+    template <class C, bool is_const>
+    inline bool xindexed_stepper<C, is_const>::equal(const self_type& rhs) const
+    {
+        return p_e == rhs.p_e && m_index == rhs.m_index && m_offset == rhs.m_offset;
+    }
+
+    template <class C, bool is_const>
+    inline bool operator==(const xindexed_stepper<C, is_const>& lhs,
+                           const xindexed_stepper<C, is_const>& rhs)
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class C, bool is_const>
+    inline bool operator!=(const xindexed_stepper<C, is_const>& lhs,
+                           const xindexed_stepper<C, is_const>& rhs)
+    {
+        return !lhs.equal(rhs);
     }
 
     /****************************
