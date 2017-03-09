@@ -205,7 +205,7 @@ namespace xt
                                            typename container_type::const_pointer,
                                            typename container_type::pointer>;
         using difference_type = typename container_type::difference_type;
-        using iterator_category = std::input_iterator_tag;
+        using iterator_category = std::forward_iterator_tag;
 
         explicit xscalar_iterator(container_type* c) noexcept;
 

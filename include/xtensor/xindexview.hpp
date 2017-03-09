@@ -195,7 +195,6 @@ namespace xt
                                            typename view_type::pointer>;
         using size_type = typename view_type::size_type;
         using difference_type = typename view_type::difference_type;
-        using iterator_category = std::input_iterator_tag;
 
         using shape_type = S;
         using index_type = xindex_type_t<shape_type>;

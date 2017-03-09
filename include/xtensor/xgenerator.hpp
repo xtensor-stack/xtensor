@@ -138,7 +138,6 @@ namespace xt
         using pointer = typename xgenerator_type::const_pointer;
         using size_type = typename xgenerator_type::size_type;
         using difference_type = typename xgenerator_type::difference_type;
-        using iterator_category = std::input_iterator_tag;
 
         using shape_type = typename xgenerator_type::shape_type;
         using index_type = xindex_type_t<shape_type>;

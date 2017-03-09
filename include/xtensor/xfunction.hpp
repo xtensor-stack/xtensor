@@ -262,7 +262,6 @@ namespace xt
         using pointer = typename xfunction_type::const_pointer;
         using size_type = typename xfunction_type::size_type;
         using difference_type = typename xfunction_type::difference_type;
-        using iterator_category = std::input_iterator_tag;
 
         using shape_type = typename xfunction_type::shape_type;
 
