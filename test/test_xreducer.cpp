@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xmath.hpp"
 #include "xtensor/xreducer.hpp"
 
 namespace xt
@@ -69,6 +70,15 @@ namespace xt
     {
         xreducer_features features;
         xarray<double> res = features.m_red;
+        xarray<double> expected = 12 * ones<double>({ 3, 4, 5 });
+        expected(1, 1, 1) = 24;
+        EXPECT_EQ(expected, res);
+    }
+
+    TEST(xreducer, sum)
+    {
+        xreducer_features features;
+        xarray<double> res = sum(features.m_a, features.m_axis);
         xarray<double> expected = 12 * ones<double>({ 3, 4, 5 });
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
