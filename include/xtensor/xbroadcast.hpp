@@ -196,7 +196,6 @@ namespace xt
     }
     //@}
 
-
     /**
      * @name Size and shape
      */

@@ -17,29 +17,58 @@
 namespace xt
 {
 
-    template <class ST, std::size_t N>
+    /**********
+     * reduce *
+     **********/
+
+    template <class F, class E, class X>
+    auto reduce(F&& f, E&& e, const X& axes) noexcept;
+
+#ifdef X_OLD_CLANG
+    template <class F, class E, class I>
+    auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept;
+#else
+    template <class F, class E, class I, std::size_t N>
+    auto reduce(F&& f, E&& e, const I(&axes)[N]) noexcept;
+#endif
+
+    /*************
+     * xreducer  *
+     *************/
+
+    template <class ST, class X>
     struct xreducer_shape_type;
 
     namespace detail
     {
-        template <class F, class CT, std::size_t N>
+        template <class F, class CT, class X>
         class reducing_iterator;
     }
 
-    /************************
-     * xreducer declaration *
-     ************************/
-
-    template <class F, class CT, std::size_t N>
-    class xreducer : public xexpression<xreducer<F, CT, N>>
+    /**
+     * @class xreducer
+     * @brief Reducing function operating over specified axes.
+     *
+     * The xreducer class implements an \ref xexpression applying
+     * a reducing function to an \ref xexpression over the specified
+     * axes.
+     *
+     * @tparam F the function type
+     * @tparam CT the closure type of the \ref xexpression to reduce
+     * @tparam X the list of axes
+     *
+     * @sa reduce
+     */
+    template <class F, class CT, class X>
+    class xreducer : public xexpression<xreducer<F, CT, X>>
     {
 
     public:
 
-        using self_type = xreducer<F, CT, N>;
+        using self_type = xreducer<F, CT, X>;
         using functor_type = typename std::remove_reference<F>::type;
         using xexpression_type = std::decay_t<CT>;
-        using axis_storage = std::array<std::size_t, N>;
+        using axis_storage = X;
 
         using value_type = typename xexpression_type::value_type;
         using reference = value_type;
@@ -50,7 +79,16 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, N>::type;
+        using shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, X>::type;
+
+        using const_stepper = xindexed_stepper<self_type>;
+        using stepper = const_stepper;
+
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using broadcast_iterator = const_broadcast_iterator;
+
+        using const_iterator = const_broadcast_iterator;
+        using iterator = const_iterator;
 
         template <class Func>
         xreducer(Func&& func, CT e, const axis_storage& axis);
@@ -72,6 +110,30 @@ namespace xt
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
 
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+
+        const_broadcast_iterator xbegin() const noexcept;
+        const_broadcast_iterator xend() const noexcept;
+        const_broadcast_iterator cxbegin() const noexcept;
+        const_broadcast_iterator cxend() const noexcept;
+
+        template <class S>
+        xiterator<const_stepper, S> xbegin(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> xend(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> cxbegin(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> cxend(const S& shape) const noexcept;
+
+        template <class S>
+        const_stepper stepper_begin(const S& shape) const noexcept;
+        template <class S>
+        const_stepper stepper_end(const S& shape) const noexcept;
+
     private:
 
         CT m_e;
@@ -82,25 +144,66 @@ namespace xt
         using index_type = xindex_type_t<shape_type>;
         mutable index_type m_index;
 
-        friend class detail::reducing_iterator<F, CT, N>;
+        friend class detail::reducing_iterator<F, CT, X>;
     };
+
+    /*************************
+     * reduce implementation *
+     *************************/
+
+     /**
+     * @brief Returns an \ref xexpression applying the speficied reducing
+     * function to an expresssion over the given axes.
+     *
+     * @param f the \ref reducing function to apply.
+     * @param e the \ref xexpression to reduce.
+     * @param axes the list of axes.
+     *
+     * The returned expression either hold a const reference to \p e or a copy
+     * depending on whether \p e is an lvalue or an rvalue.
+     */
+
+    template <class F, class E, class X>
+    inline auto reduce(F&& f, E&& e, const X& axes) noexcept
+    {
+        using reducer_type = xreducer<F, const_xclosure_t<E>, X>;
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), axes);
+    }
+
+#ifdef X_OLD_CLANG
+    template <class F, class E, class I>
+    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept
+    {
+        using axes_type = std::vector<I>;
+        using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
+    }
+#else
+    template <class F, class E, class I, std::size_t N>
+    inline auto reduce(F&& f, E&& e, const I(&axes)[N]) noexcept
+    {
+        using axes_type = std::array<I, N>;
+        using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
+    }
+#endif
+
+    /******************
+     * xreducer utils *
+     ******************/
 
     // meta-function returning the shape type for an xreducer
-    template <class ST, std::size_t N>
+    template <class ST, class X>
     struct xreducer_shape_type
     {
-        using type = ST;
+        using type = promote_shape_t<ST, X>;
     };
 
-    template <class I, std::size_t N1, std::size_t N2>
-    struct xreducer_shape_type<std::array<I, N1>, N2>
+    template <class I1, std::size_t N1, class I2, std::size_t N2>
+    struct xreducer_shape_type<std::array<I1, N1>, std::array<I2, N2>>
     {
-        using type = std::array<I, N1 - N2>;
+        using type = std::array<I2, N1 - N2>;
     };
-
-    /***************************
-     * xreducer implementation *
-     ***************************/
 
     namespace detail
     {
@@ -151,14 +254,14 @@ namespace xt
         // the same state. However this allows optimization
         // and is not problematic since not in the public
         // interface.
-        template <class F, class CT, std::size_t N>
+        template <class F, class CT, class X>
         class reducing_iterator
         {
 
         public:
 
-            using self_type = reducing_iterator<F, CT, N>;
-            using reducer_type = xreducer<F, CT, N>;
+            using self_type = reducing_iterator<F, CT, X>;
+            using reducer_type = xreducer<F, CT, X>;
             using value_type = typename reducer_type::value_type;
             using reference = typename reducer_type::reference;
             using pointer = typename reducer_type::pointer;
@@ -187,16 +290,16 @@ namespace xt
             bool m_end;
         };
 
-        template <class F, class CT, std::size_t N>
-        inline bool operator==(const reducing_iterator<F, CT, N>& lhs,
-                               const reducing_iterator<F, CT, N>& rhs)
+        template <class F, class CT, class X>
+        inline bool operator==(const reducing_iterator<F, CT, X>& lhs,
+                               const reducing_iterator<F, CT, X>& rhs)
         {
             return lhs.equal(rhs);
         }
 
-        template <class F, class CT, std::size_t N>
-        inline bool operator!=(const reducing_iterator<F, CT, N>& lhs,
-                               const reducing_iterator<F, CT, N>& rhs)
+        template <class F, class CT, class X>
+        inline bool operator!=(const reducing_iterator<F, CT, X>& lhs,
+                               const reducing_iterator<F, CT, X>& rhs)
         {
             return !(lhs.equal(rhs));
         }
@@ -205,41 +308,41 @@ namespace xt
          * xreducing_iterator implementation *
          *************************************/
 
-        template <class F, class CT, std::size_t N>
-        inline reducing_iterator<F, CT, N>::reducing_iterator(const reducer_type& reducer, bool end)
+        template <class F, class CT, class X>
+        inline reducing_iterator<F, CT, X>::reducing_iterator(const reducer_type& reducer, bool end)
             : m_reducer(reducer), m_end(end)
         {
         }
 
-        template <class F, class CT, std::size_t N>
-        inline auto reducing_iterator<F, CT, N>::operator++() -> self_type&
+        template <class F, class CT, class X>
+        inline auto reducing_iterator<F, CT, X>::operator++() -> self_type&
         {
             increment();
             return *this;
         }
 
-        template <class F, class CT, std::size_t N>
-        inline auto reducing_iterator<F, CT, N>::operator++(int) -> self_type
+        template <class F, class CT, class X>
+        inline auto reducing_iterator<F, CT, X>::operator++(int) -> self_type
         {
             self_type tmp(*this);
             ++(*this);
             return tmp;
         }
 
-        template <class F, class CT, std::size_t N>
-        inline auto reducing_iterator<F, CT, N>::operator*() const -> reference
+        template <class F, class CT, class X>
+        inline auto reducing_iterator<F, CT, X>::operator*() const -> reference
         {
             return m_reducer.m_e.element(m_reducer.m_index.cbegin(), m_reducer.m_index.cend());
         }
 
-        template <class F, class CT, std::size_t N>
-        inline bool reducing_iterator<F, CT, N>::equal(const self_type& rhs) const
+        template <class F, class CT, class X>
+        inline bool reducing_iterator<F, CT, X>::equal(const self_type& rhs) const
         {
             return &m_reducer == &(rhs.m_reducer) && m_end == rhs.m_end;
         }
 
-        template <class F, class CT, std::size_t N>
-        inline void reducing_iterator<F, CT, N>::increment()
+        template <class F, class CT, class X>
+        inline void reducing_iterator<F, CT, X>::increment()
         {
             size_type i = m_reducer.m_axis.size();
             while (i != 0)
@@ -260,14 +363,14 @@ namespace xt
             }
         }
 
-        template <class F, class CT, std::size_t N>
-        inline auto reducing_iterator<F, CT, N>::axis(size_type index) const -> size_type
+        template <class F, class CT, class X>
+        inline auto reducing_iterator<F, CT, X>::axis(size_type index) const -> size_type
         {
             return m_reducer.m_axis[index];
         }
 
-        template <class F, class CT, std::size_t N>
-        inline auto reducing_iterator<F, CT, N>::shape(size_type index) const -> size_type
+        template <class F, class CT, class X>
+        inline auto reducing_iterator<F, CT, X>::shape(size_type index) const -> size_type
         {
             return m_reducer.m_e.shape()[index];
         }
@@ -277,9 +380,21 @@ namespace xt
      * xreducer implementation *
      ***************************/
 
-    template <class F, class CT, std::size_t N>
+     /**
+      * @name Constructor
+      */
+     //@{
+     /**
+      * Constructs an xreducer expression applying the specified
+      * function to the given expression over the given axis.
+      *
+      * @param func the function to apply
+      * @param e the expression to reduce
+      * @param axis the axis along which the reduction is performed
+      */
+    template <class F, class CT, class X>
     template <class Func>
-    inline xreducer<F, CT, N>::xreducer(Func&& func, CT e, const axis_storage& axis)
+    inline xreducer<F, CT, X>::xreducer(Func&& func, CT e, const axis_storage& axis)
         : m_e(e), m_f(std::forward<Func>(func)), m_axis(axis),
           m_shape(make_sequence<shape_type>(m_e.dimension() - axis.size(), 0)),
           m_index(make_sequence<index_type>(m_e.dimension(), 0))
@@ -289,59 +404,260 @@ namespace xt
                                m_axis.begin(), m_axis.end(),
                                m_shape.begin());
     }
+    //@}
 
-    template <class F, class CT, std::size_t N>
-    inline auto xreducer<F, CT, N>::dimension() const noexcept -> size_type
+    /**
+     * @name Size and shape
+     */
+    /**
+     * Returns the number of dimensions of the expression.
+     */
+
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::dimension() const noexcept -> size_type
     {
         return m_shape.size();
     }
 
-    template <class F, class CT, std::size_t N>
-    inline auto xreducer<F, CT, N>::shape() const -> const shape_type&
+    /**
+     * Returns the shape of the expression.
+     */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::shape() const -> const shape_type&
     {
         return m_shape;
     }
+    //@}
 
-    template <class F, class CT, std::size_t N>
+    /**
+     * @name Data
+     */
+    /**
+     * Returns a constant reference to the element at the specified position in the reducer.
+     * @param args a list of indices specifying the position in the reducer. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the reducer.
+     */
+    template <class F, class CT, class X>
     template <class... Args>
-    inline auto xreducer<F, CT, N>::operator()(Args... args) const -> const_reference
+    inline auto xreducer<F, CT, X>::operator()(Args... args) const -> const_reference
     {
         std::array<std::size_t, sizeof...(Args)> arg_array = { static_cast<std::size_t>(args)... };
         return element(arg_array.cbegin(), arg_array.cend());
     }
 
-    template <class F, class CT, std::size_t N>
-    inline auto xreducer<F, CT, N>::operator[](const xindex& index) const -> const_reference
+    /**
+     * Returns a constant reference to the element at the specified position in the reducer.
+     * @param index a sequence of indices specifying the position in the reducer. Indices
+     * must be unsigned integers, the number of indices in the sequence should be equal or greater
+     * than the number of dimensions of the reducer.
+     */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::operator[](const xindex& index) const -> const_reference
     {
         return element(index.cbegin(), index.cend());
     }
 
-    template <class F, class CT, std::size_t N>
+    /**
+     * Returns a constant reference to the element at the specified position in the reducer.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the squence should be equal to or greater
+     * than the number of dimensions of the reducer.
+     */
+    template <class F, class CT, class X>
     template <class It>
-    inline auto xreducer<F, CT, N>::element(It first, It last) const -> const_reference
+    inline auto xreducer<F, CT, X>::element(It first, It last) const -> const_reference
     {
         detail::inject(first, last, m_axis.cbegin(), m_axis.cend(),
                        m_index.begin(), size_type(0));
-        using iter_type = detail::reducing_iterator<F, CT, N>;
+        using iter_type = detail::reducing_iterator<F, CT, X>;
         iter_type iter = iter_type(*this);
         iter_type iter_end = iter_type(*this, true);
         value_type init_value = *iter;
         value_type res = std::accumulate(++iter, iter_end, init_value, m_f);
         return res;
     }
+    //@}
 
-    template <class F, class CT, std::size_t N>
+    /**
+     * @name Broadcasting
+     */
+    //@{
+    /**
+     * Broadcast the shape of the reducer to the specified parameter.
+     * @param shape the result shape
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
+    template <class F, class CT, class X>
     template <class S>
-    inline bool xreducer<F, CT, N>::broadcast_shape(S& shape) const
+    inline bool xreducer<F, CT, X>::broadcast_shape(S& shape) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
 
-    template <class F, class CT, std::size_t N>
+    /**
+     * Compares the specified strides with those of the container to see whether
+     * the broadcasting is trivial.
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
+    template <class F, class CT, class X>
     template <class S>
-    inline bool xreducer<F, CT, N>::is_trivial_broadcast(const S& /*strides*/) const noexcept
+    inline bool xreducer<F, CT, X>::is_trivial_broadcast(const S& /*strides*/) const noexcept
     {
         return false;
+    }
+    //@}
+
+    /**
+    * @name Iterators
+    */
+    /**
+    * Returns an iterator to the first element of the buffer
+    * containing the elements of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::begin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+    * Returns an iterator to the element following the last
+    * element of the buffer containing the elements of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::end() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+
+    /**
+    * Returns a constant iterator to the first element of the buffer
+    * containing the elements of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::cbegin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+    * Returns a constant iterator to the element following the last
+    * element of the buffer containing the elements of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::cend() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+    //@}
+
+    /**
+    * @name Broadcast iterators
+    */
+    //@{
+    /**
+    * Returns a constant iterator to the first element of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::xbegin() const noexcept -> const_broadcast_iterator
+    {
+        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
+    }
+
+    /**
+    * Returns a constant iterator to the element following the last element
+    * of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::xend() const noexcept -> const_broadcast_iterator
+    {
+        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
+    }
+
+    /**
+    * Returns a constant iterator to the first element of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::cxbegin() const noexcept -> const_broadcast_iterator
+    {
+        return xbegin();
+    }
+
+    /**
+    * Returns a constant iterator to the element following the last element
+    * of the expression.
+    */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::cxend() const noexcept -> const_broadcast_iterator
+    {
+        return xend();
+    }
+
+    /**
+    * Returns a constant iterator to the first element of the expression. The
+    * iteration is broadcasted to the specified shape.
+    * @param shape the shape used for broadcasting
+    */
+    template <class F, class CT, class X>
+    template <class S>
+    inline auto xreducer<F, CT, X>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return xiterator<const_stepper, S>(stepper_begin(shape), shape);
+    }
+
+    /**
+    * Returns a constant iterator to the element following the last element of the
+    * expression. The iteration is broadcasted to the specified shape.
+    * @param shape the shape used for broadcasting
+    */
+    template <class F, class CT, class X>
+    template <class S>
+    inline auto xreducer<F, CT, X>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return xiterator<const_stepper, S>(stepper_end(shape), shape);
+    }
+
+    /**
+    * Returns a constant iterator to the first element of the expression. The
+    * iteration is broadcasted to the specified shape.
+    * @param shape the shape used for broadcasting
+    */
+    template <class F, class CT, class X>
+    template <class S>
+    inline auto xreducer<F, CT, X>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return xiterator<const_stepper, S>(stepper_begin(shape), shape);
+    }
+
+    /**
+    * Returns a constant iterator to the element following the last element of the
+    * expression. The iteration is broadcasted to the specified shape.
+    * @param shape the shape used for broadcasting
+    */
+    template <class F, class CT, class X>
+    template <class S>
+    inline auto xreducer<F, CT, X>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return xiterator<const_stepper, S>(stepper_end(shape), shape);
+    }
+    //@}
+
+    template <class F, class CT, class X>
+    template <class S>
+    inline auto xreducer<F, CT, X>::stepper_begin(const S& shape) const noexcept -> const_stepper
+    {
+        size_type offset = shape.size() - dimension();
+        return const_stepper(this, offset);
+    }
+
+    template <class F, class CT, class X>
+    template <class S>
+    inline auto xreducer<F, CT, X>::stepper_end(const S& shape) const noexcept -> const_stepper
+    {
+        size_type offset = shape.size() - dimension();
+        return const_stepper(this, offset, true);
     }
 }
 
