@@ -48,6 +48,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
