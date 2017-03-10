@@ -16,3 +16,4 @@ Mathematical functions
    trigonometric_functions
    hyperbolic_functions
    error_functions
+   reducing_functions

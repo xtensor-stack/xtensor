@@ -18,6 +18,7 @@
 #include <complex>
 
 #include "xfunction.hpp"
+#include "xreducer.hpp"
 
 namespace xt
 {
@@ -798,6 +799,80 @@ namespace xt
         using functor_type = detail::mf_type<E>;
         return detail::make_xfunction((functor_type)std::lgamma, std::forward<E>(e));
     }
+
+    /**********************
+     * Reducing functions *
+     **********************/
+
+    /**
+     * @defgroup  red_functions reducing functions
+     */
+
+    /**
+     * @ingroup red_functions
+     * @brief Sum of elements over given axes.
+     *
+     * Returns an \ref xreducer for the sum of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the sum is performed
+     * @return an \ref xreducer
+     */
+    template <class E, class X>
+    inline auto sum(E&& e, const X& axes) noexcept
+    {
+        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto sum(E&& e, std::initializer_list<I> axes) noexcept
+    {
+        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto sum(E&& e, const I(&axes)[N]) noexcept
+    {
+        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#endif
+
+    /**
+     * @ingroup red_functions
+     * @brief Product of elements over given axes.
+     *
+     * Returns an \ref xreducer for the product of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the product is performed
+     * @return an \ref xreducer
+     */
+    template <class E, class X>
+    inline auto prod(E&& e, const X& axes) noexcept
+    {
+        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto prod(E&& e, std::initializer_list<I> axes) noexcept
+    {
+        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto prod(E&& e, const I(&axes)[N]) noexcept
+    {
+        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#endif
 }
 
 #endif

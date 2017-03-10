@@ -4,13 +4,12 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Functions and generators
-========================
+xreducer
+========
 
-.. toctree::
+.. doxygenclass:: xt::xreducer
+   :project: xtensor
+   :members:
 
-   xfunction
-   xreducer
-   xgenerator
-   xbuilder
-   xrandom
+.. doxygenfunction:: xt::reduce(F&&, E&&, const X&)
+   :project: xtensor

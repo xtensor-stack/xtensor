@@ -22,9 +22,6 @@
 namespace xt
 {
 
-    template <class F, class R, class S>
-    class xgenerator_stepper;
-
     /**************
      * xgenerator *
      **************/
@@ -60,7 +57,7 @@ namespace xt
         using shape_type = S;
         using strides_type = S;
 
-        using const_stepper = xgenerator_stepper<F, R, S>;
+        using const_stepper = xindexed_stepper<self_type>;
         using stepper = const_stepper;
 
         using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
@@ -116,60 +113,7 @@ namespace xt
 
         functor_type m_f;
         shape_type m_shape;
-        friend class xgenerator_stepper<F, R, S>;
     };
-
-    /**********************
-     * xgenerator_stepper *
-     **********************/
-
-    template <class F, class R, class S>
-    class xgenerator_stepper
-    {
-
-    public:
-
-        using self_type = xgenerator_stepper<F, R, S>;
-        using functor_type = typename std::remove_reference<F>::type;
-        using xgenerator_type = xgenerator<F, R, S>;
-
-        using value_type = typename xgenerator_type::value_type;
-        using reference = typename xgenerator_type::value_type;
-        using pointer = typename xgenerator_type::const_pointer;
-        using size_type = typename xgenerator_type::size_type;
-        using difference_type = typename xgenerator_type::difference_type;
-        using iterator_category = std::input_iterator_tag;
-
-        using shape_type = typename xgenerator_type::shape_type;
-        using index_type = xindex_type_t<shape_type>;
-
-        xgenerator_stepper() = default;
-        xgenerator_stepper(const xgenerator_type* func, size_type offset, bool end = false) noexcept;
-
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
-        void reset(size_type dim);
-
-        void to_end();
-
-        reference operator*() const;
-
-        bool equal(const self_type& rhs) const;
-
-    private:
-
-        const xgenerator_type* p_f;
-        index_type m_index;
-        size_type m_offset;
-    };
-
-    template <class F, class R, class S>
-    bool operator==(const xgenerator_stepper<F, R, S>& it1,
-                    const xgenerator_stepper<F, R, S>& it2);
-
-    template <class F, class R, class S>
-    bool operator!=(const xgenerator_stepper<F, R, S>& it1,
-                    const xgenerator_stepper<F, R, S>& it2);
 
     /*****************************
      * xgenerator implementation *
@@ -422,7 +366,7 @@ namespace xt
     inline auto xgenerator<F, R, S>::stepper_begin(const O& shape) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return xgenerator_stepper<F, R, S>(this, offset);
+        return const_stepper(this, offset);
     }
 
     template <class F, class R, class S>
@@ -430,77 +374,10 @@ namespace xt
     inline auto xgenerator<F, R, S>::stepper_end(const O& shape) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return xgenerator_stepper<F, R, S>(this, offset, true);
+        return const_stepper(this, offset, true);
     }
 
-    /******************************************
-     * xgenerator_stepper implementation *
-     ******************************************/
-
-    template <class F, class R, class S>
-    inline xgenerator_stepper<F, R, S>::xgenerator_stepper(const xgenerator_type* func, size_type offset, bool end) noexcept
-        : p_f(func), m_index(make_sequence<index_type>(func->shape().size(), size_type(0))), m_offset(offset)
-    {
-        if (end)
-        {
-            m_index = p_f->shape();
-        }
-    }
-
-    template <class F, class R, class S>
-    inline void xgenerator_stepper<F, R, S>::step(size_type dim, size_type n)
-    {
-        if(dim >= m_offset)
-            m_index[dim - m_offset] += n;
-    }
-
-    template <class F, class R, class S>
-    inline void xgenerator_stepper<F, R, S>::step_back(size_type dim, size_type n)
-    {
-        if(dim >= m_offset)
-            m_index[dim - m_offset] -= n;
-    }
-
-    template <class F, class R, class S>
-    inline void xgenerator_stepper<F, R, S>::reset(size_type dim)
-    {
-        if(dim >= m_offset)
-            m_index[dim - m_offset] = 0;
-    }
-
-    template <class F, class R, class S>
-    inline void xgenerator_stepper<F, R, S>::to_end()
-    {
-        m_index = p_f->shape();
-    }
-
-    template <class F, class R, class S>
-    inline bool xgenerator_stepper<F, R, S>::equal(const self_type& rhs) const
-    {
-        return (p_f == rhs.p_f) && (m_index == rhs.m_index);
-    }
-
-    template <class F, class R, class S>
-    inline auto xgenerator_stepper<F, R, S>::operator*() const -> reference
-    {
-        return p_f->element(m_index.begin(), m_index.end());
-    }
-
-    template <class F, class R, class S>
-    inline bool operator==(const xgenerator_stepper<F, R, S>& it1,
-                           const xgenerator_stepper<F, R, S>& it2)
-    {
-        return it1.equal(it2);
-    }
-
-    template <class F, class R, class S>
-    inline bool operator!=(const xgenerator_stepper<F, R, S>& it1,
-                           const xgenerator_stepper<F, R, S>& it2)
-    {
-        return !(it1.equal(it2));
-    }
-
-    namespace detail
+     namespace detail
     {
 #ifdef X_OLD_CLANG
         template <class Functor, class I>

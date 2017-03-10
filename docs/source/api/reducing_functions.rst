@@ -4,13 +4,11 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Functions and generators
-========================
+Reducing functions
+==================
 
-.. toctree::
+**xtensor** provides the following reducing functions for xexpressions:
 
-   xfunction
-   xreducer
-   xgenerator
-   xbuilder
-   xrandom
+.. doxygengroup:: red_functions
+   :project: xtensor
+   :content-only:
