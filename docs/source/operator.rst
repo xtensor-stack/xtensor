@@ -122,11 +122,12 @@ Mathematical functions
 See the API reference for a comprehensive list of available functions. Like operators, the mathematical functions
 are element-wise functions and apply the lazy broadcasting rules.
 
-Reducing functions
-------------------
+Reducers
+--------
 
-`xtensor` provides reducing functions, that is, functions that apply to elements of an ``xexpression`` over given axes.
-Such functions return expressions with the same shape as the input expression, with the specified axis removed.
+`xtensor` provides reducers, that is, means for accumulating values of tensor expressions over prescribed axes.
+The return value of a reducer is an ``xexpression`` with the same shape as the input expression, with the specified
+axes removed. 
 
 .. code::
 
@@ -137,6 +138,18 @@ Such functions return expressions with the same shape as the input expression, w
     xt::xarray<double> res = xt::sum(a, {1, 3});
     // => res.shape() = { 3, 4, 5 };
     // => res(0, 0, 0) = 12
+
+You can also call the ``reduce`` generator with your own reducing function:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xreducer.hpp"
+
+    xt::array<double> a = some_init_function({3, 2, 4, 6, 5});
+    xt::array<double> res = reduce([](double a, double b) { return a*a + b*b; },
+                                   a,
+                                   {1, 3});
 
 Universal functions and vectorization
 -------------------------------------

@@ -111,11 +111,82 @@ namespace xt
             std::cout << "xarray   iteration: " << aiter.count() << "ms" << std::endl;
             std::cout << "xtensor  iteration: " << titer.count() << "ms" << std::endl;
             std::cout << "xarray  xiteration: " << axiter.count() << "ms" << std::endl;
-            std::cout << "xtensor xiteraiton: " << txiter.count() << "ms" << std::endl;
+            std::cout << "xtensor xiteration: " << txiter.count() << "ms" << std::endl;
             std::cout << "xarray    indexing: " << aindex.count() << "ms" << std::endl;
             std::cout << "xtensor   indexing: " << tindex.count() << "ms" << std::endl;
+            std::cout << std::endl;
         }
     }
+
+    namespace func
+    {
+        template <class E>
+        inline auto benchmark_assign(const E& x, const E& y, const E& z, E& res, std::size_t number)
+        {
+            auto start = std::chrono::steady_clock::now();
+            for(std::size_t i = 0; i < number; ++i)
+            {
+                res = 3 * x - 2 * y * z;
+            }
+            auto end = std::chrono::steady_clock::now();
+            auto diff = end - start;
+            return diff;
+        }
+
+        template <class E>
+        inline void init_benchmark(E& x, E& y, E& z, E& res)
+        {
+            using value_type = typename E::value_type;
+            using size_type = typename E::size_type;
+            using shape_type = typename E::shape_type;
+
+            shape_type shape = { 4, 3, 5 };
+
+            x.reshape(shape);
+            y.reshape(shape);
+            z.reshape(shape);
+            res.reshape(shape);
+
+            for(size_type i = 0; i < shape[0]; ++i)
+            {
+                for(size_type j = 0; j < shape[1]; ++j)
+                {
+                    for(size_type k = 0; k < shape[2]; ++k)
+                    {
+                        x(i,j,k) = 0.25 * value_type(i) + 0.5 * value_type(j) - 0.01 * value_type(k);
+                        y(i,j,k) = 0.31 * value_type(i) - 0.2 * value_type(j) + 0.07 * value_type(k);
+                        z(i,j,k) = 0.27 * value_type(i) + 0.4 * value_type(j) - 0.03 * value_type(k);
+                    }
+                }
+            }
+        }
+
+        void benchmark()
+        {
+            using duration_type = std::chrono::duration<double, std::milli>;
+            std::size_t number = 2000;
+
+            xarray<double> ax, ay, az, ares;
+            init_benchmark(ax, ay, az, ares);
+
+            xtensor<double, 3> tx, ty, tz, tres;
+            init_benchmark(tx, ty, tz, tres);
+
+            benchmark_assign(ax, ay, az, ares, 10);
+
+            duration_type aassign = benchmark_assign(ax, ay, az, ares, number);
+            duration_type tassign = benchmark_assign(tx, ty, tz, tres, number);
+
+            std::cout << "******************************" << std::endl;
+            std::cout << "* XFUNCTION ASSIGN BENCHMARK *" << std::endl;
+            std::cout << "******************************" << std::endl << std::endl;
+
+            std::cout << "xarray : " << aassign.count() << "ms" << std::endl;
+            std::cout << "xtensor: " << tassign.count() << "ms" << std::endl;
+        }
+
+    }
+
 }
 
 int main(int argc, char* argv[])
@@ -126,7 +197,8 @@ int main(int argc, char* argv[])
     std::cout << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl;
     std::cout << std::endl;
 
-    xt::axpy_1d::benchmark();
+    //xt::axpy_1d::benchmark();
+    xt::func::benchmark();
 
     return 0;
 }
