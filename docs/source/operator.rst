@@ -109,6 +109,7 @@ Element-wise equality comparison can be achieved through the ``xt::equal`` funct
 
 Mathematical functions
 ----------------------
+
 `xtensor` provides overloads for many of the standard mathematical functions:
 
 - basic functions: ``abs``, ``remainder``, ``fma``, ...
@@ -120,6 +121,22 @@ Mathematical functions
 
 See the API reference for a comprehensive list of available functions. Like operators, the mathematical functions
 are element-wise functions and apply the lazy broadcasting rules.
+
+Reducing functions
+------------------
+
+`xtensor` provides reducing functions, that is, functions that apply to elements of an ``xexpression`` over given axes.
+Such functions return expressions with the same shape as the input expression, with the specified axis removed.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xmath.hpp"
+
+    xt::xarray<double> a = ones<double>({3, 2, 4, 6, 5 });
+    xt::xarray<double> res = xt::sum(a, {1, 3});
+    // => res.shape() = { 3, 4, 5 };
+    // => res(0, 0, 0) = 12
 
 Universal functions and vectorization
 -------------------------------------
