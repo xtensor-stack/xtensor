@@ -262,6 +262,70 @@ namespace xt
     bool operator!=(const xiterator<It, S>& lhs,
                     const xiterator<It, S>& rhs);
 
+    /*************
+     * xiterable *
+     *************/
+
+    template <class D>
+    struct xiterable_inner_types;
+
+    /**
+     * @class xiterable
+     * @brief Base class for multidimensional iterable expressions
+     *
+     * The xiterable class defines the interface for multidimensional
+     * expressions that can be iterated.
+     *
+     * @tparam D The derived type, i.e. the inheriting class for which xiterable
+     *           provides the interface.
+     */
+    template <class D>
+    class xiterable
+    {
+
+    public:
+
+        using derived_type = D;
+        
+        using iterable_types = xiterable_inner_types<D>;
+        using shape_type = typename iterable_types::shape_type;
+        using stepper = typename iterable_types::stepper;
+        using const_stepper = typename iterable_types::const_stepper;
+        using iterator = typename iterable_types::iterator;
+        using const_iterator = typename iterable_types::const_iterator;
+        using broadcast_iterator = typename iterable_types::broadcast_iterator;
+        using const_broadcast_iterator = typename iterable_types::const_broadcast_iterator;
+
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+
+        const_broadcast_iterator xbegin() const noexcept;
+        const_broadcast_iterator xend() const noexcept;
+        const_broadcast_iterator cxbegin() const noexcept;
+        const_broadcast_iterator cxend() const noexcept;
+
+        template <class S>
+        xiterator<const_stepper, S> xbegin(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> xend(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> cxbegin(const S& shape) const noexcept;
+        template <class S>
+        xiterator<const_stepper, S> cxend(const S& shape) const noexcept;
+
+    private:
+
+        template <class S>
+        const_stepper get_stepper_begin(const S& shape) const noexcept;
+        template <class S>
+        const_stepper get_stepper_end(const S& shape) const noexcept;
+
+        const shape_type& get_shape() const;
+        const derived_type& derived_cast() const;
+    };
+
     /**************************************
      * broadcast functions implementation *
      **************************************/
@@ -541,7 +605,170 @@ namespace xt
     {
         return !(lhs.equal(rhs));
     }
+
+    /****************************
+     * xiterable implementation *
+     ****************************/
+
+     /**
+      * @name Iterators
+      */
+     /**
+      * Returns an iterator to the first element of the buffer
+      * containing the elements of the expression.
+      */
+    template <class D>
+    inline auto xiterable<D>::begin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+     * Returns an iterator to the element following the last
+     * element of the buffer containing the elements of the expression.
+     */
+    template <class D>
+    inline auto xiterable<D>::end() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the buffer
+     * containing the elements of the expression.
+     */
+    template <class D>
+    inline auto xiterable<D>::cbegin() const noexcept -> const_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the buffer containing the elements of the expression.
+     */
+    template <class D>
+    inline auto xiterable<D>::cend() const noexcept -> const_iterator
+    {
+        return cxend();
+    }
+    //@}
+
+    /**
+     * @name Broadcast iterators
+     */
+    //@{
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
+    template <class D>
+    inline auto xiterable<D>::xbegin() const noexcept -> const_broadcast_iterator
+    {
+        return cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
+    template <class D>
+    inline auto xiterable<D>::xend() const noexcept -> const_broadcast_iterator
+    {
+        return cxend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
+    template <class D>
+    inline auto xiterable<D>::cxbegin() const noexcept ->const_broadcast_iterator
+    {
+        return const_broadcast_iterator(get_stepper_begin(get_shape()), &get_shape());
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
+    template <class D>
+    inline auto xiterable<D>::cxend() const noexcept -> const_broadcast_iterator
+    {
+        return const_broadcast_iterator(get_stepper_end(get_shape()), &get_shape());
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the expression. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return cxbegin(shape);
+    }
+
+    /**
+    * Returns a constant iterator to the element following the last element of the
+    * expression. The iteration is broadcasted to the specified shape.
+    * @param shape the shape used for broadcasting
+    */
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return cxend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the expression. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return xiterator<const_stepper, S>(get_stepper_begin(shape), shape);
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     */
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
+    {
+        return xiterator<const_stepper, S>(get_stepper_end(shape), shape);
+    }
+    //@}
+
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::get_stepper_begin(const S& shape) const noexcept -> const_stepper
+    {
+        return derived_cast().stepper_begin(shape);
+    }
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::get_stepper_end(const S& shape) const noexcept -> const_stepper
+    {
+        return derived_cast().stepper_end(shape);
+    }
+    
+    template <class D>
+    inline auto xiterable<D>::get_shape() const -> const shape_type&
+    {
+        return derived_cast().shape();
+    }
+
+    template <class D>
+    inline auto xiterable<D>::derived_cast() const -> const derived_type&
+    {
+        return *static_cast<const derived_type*>(this);
+    }
 }
 
 #endif
-

@@ -4,18 +4,9 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Containers and views
-====================
+xiterable
+=========
 
-.. toctree::
-
-   xcontainer
-   xiterable
-   xarray
-   xarray_adaptor
-   xtensor
-   xtensor_adaptor
-   xview
-   xbroadcast
-   xindexview
-   xoffsetview
+.. doxygenclass:: xt::xiterable
+   :project: xtensor
+   :members:
