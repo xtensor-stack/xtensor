@@ -189,7 +189,8 @@ namespace xt
 
         std::tuple<CT...> m_e;
         functor_type m_f;
-        shape_type m_shape;
+        mutable shape_type m_shape;
+        mutable bool m_shape_computed;
 
         friend class xfunction_iterator<F, R, CT...>;
         friend class xfunction_stepper<F, R, CT...>;
@@ -312,9 +313,9 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func>
     inline xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept
-        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(make_sequence<shape_type>(compute_dimension(), size_type(1)))
+        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(make_sequence<shape_type>(0, size_type(1))),
+          m_shape_computed(false)
     {
-        broadcast_shape(m_shape);
     }
     //@}
 
@@ -328,7 +329,8 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::dimension() const noexcept -> size_type
     {
-        return m_shape.size();
+        size_type dimension = m_shape_computed ? m_shape.size() : compute_dimension();
+        return dimension;
     }
 
     /**
@@ -337,6 +339,12 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::shape() const -> const shape_type&
     {
+        if (!m_shape_computed)
+        {
+            m_shape = make_sequence<shape_type>(compute_dimension(), size_type(1));
+            broadcast_shape(m_shape);
+            m_shape_computed = true;
+        }
         return m_shape;
     }
     //@}
@@ -466,7 +474,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::xbegin() const noexcept -> const_broadcast_iterator
     {
-        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
+        return const_broadcast_iterator(stepper_begin(shape()), &shape());
     }
 
     /**
@@ -476,7 +484,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::xend() const noexcept -> const_broadcast_iterator
     {
-        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
+        return const_broadcast_iterator(stepper_end(shape()), &shape());
     }
 
     /**
