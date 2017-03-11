@@ -99,4 +99,14 @@ namespace xt
         v_on_v(0) = 10;
         EXPECT_EQ(10, e(1, 1));
     }
+
+    TEST(xindexview, assign_scalar)
+    {
+        xt::xarray<double> a = { { 1, 5, 3 },{ 4, 5, 6 } };
+        auto v = xt::filter(a, a >= 5);
+        v = 100;
+        EXPECT_EQ(100, v(0));
+        EXPECT_EQ(100, v(1));
+        EXPECT_EQ(100, v(2));
+    }
 }
