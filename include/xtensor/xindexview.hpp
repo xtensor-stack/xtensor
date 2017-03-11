@@ -92,6 +92,9 @@ namespace xt
         template <class E>
         self_type& operator=(const xexpression<E>& e);
 
+        template <class E>
+        disable_xexpression<E, self_type>& operator=(const E& e);
+
         size_type dimension() const noexcept;
         const shape_type& shape() const;
 
@@ -206,6 +209,21 @@ namespace xt
     }
     //@}
     
+    template <class CT, class S, class I>
+    template <class E>
+    inline auto xindexview<CT, S, I>::operator=(const E& e) -> disable_xexpression<E, self_type>&
+    {
+        // TODO : refactor stepper so they read m_indices, that would be more efficient
+        // than the actual implementation. Then replace the for loop with the std::fill
+        // algorithm
+        //std::fill(begin(), end(), e);
+        for (size_type i = 0; i < m_shape[0]; ++i)
+        {
+            this->operator()(i) = e;
+        }
+        return *this;
+    }
+
     template <class CT, class S, class I>
     inline void xindexview<CT, S, I>::assign_temporary_impl(temporary_type& tmp)
     {
@@ -345,7 +363,7 @@ namespace xt
     template <class CT, class S, class I>
     inline auto xindexview<CT, S, I>::begin() -> iterator
     {
-        return begin();
+        return xbegin();
     }
 
     /**
@@ -355,7 +373,7 @@ namespace xt
     template <class CT, class S, class I>
     inline auto xindexview<CT, S, I>::end() -> iterator
     {
-        return end();
+        return xend();
     }
 
     /**
