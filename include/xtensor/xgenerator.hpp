@@ -26,6 +26,21 @@ namespace xt
      * xgenerator *
      **************/
 
+    template <class F, class R, class S>
+    class xgenerator;
+
+    template <class C, class R, class S>
+    struct xiterable_inner_types<xgenerator<C, R, S>>
+    {
+        using shape_type = S;
+        using const_stepper = xindexed_stepper<xgenerator<C, R, S>>;
+        using stepper = const_stepper;
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using broadcast_iterator = const_broadcast_iterator;
+        using const_iterator = const_broadcast_iterator;
+        using iterator = const_iterator;
+    };
+
     /**
      * @class xgenerator
      * @brief Multidimensional function operating on indices.
@@ -38,7 +53,8 @@ namespace xt
      * @tparam S the shape type of the generator
      */
     template <class F, class R, class S>
-    class xgenerator : public xexpression<xgenerator<F, R, S>>
+    class xgenerator : public xexpression<xgenerator<F, R, S>>,
+                       public xconst_iterable<xgenerator<F, R, S>>
     {
 
     public:
@@ -54,17 +70,18 @@ namespace xt
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
 
-        using shape_type = S;
+        using iterable_base = xconst_iterable<self_type>;
+        using shape_type = typename iterable_base::shape_type;
         using strides_type = S;
 
-        using const_stepper = xindexed_stepper<self_type>;
-        using stepper = const_stepper;
+        using stepper = typename iterable_base::stepper;
+        using const_stepper = typename iterable_base::const_stepper;
 
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
-        using broadcast_iterator = const_broadcast_iterator;
+        using broadcast_iterator = typename iterable_base::broadcast_iterator;
+        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
 
-        using const_iterator = const_broadcast_iterator;
-        using iterator = const_iterator;
+        using iterator = typename iterable_base::iterator;
+        using const_iterator = typename iterable_base::const_iterator;
 
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;
@@ -84,25 +101,6 @@ namespace xt
 
         template <class O>
         bool is_trivial_broadcast(const O& /*strides*/) const noexcept;
-
-        const_iterator begin() const noexcept;
-        const_iterator end() const noexcept;
-        const_iterator cbegin() const noexcept;
-        const_iterator cend() const noexcept;
-
-        const_broadcast_iterator xbegin() const noexcept;
-        const_broadcast_iterator xend() const noexcept;
-        const_broadcast_iterator cxbegin() const noexcept;
-        const_broadcast_iterator cxend() const noexcept;
-
-        template <class O>
-        xiterator<const_stepper, O> xbegin(const O& shape) const noexcept;
-        template <class O>
-        xiterator<const_stepper, O> xend(const O& shape) const noexcept;
-        template <class O>
-        xiterator<const_stepper, O> cxbegin(const O& shape) const noexcept;
-        template <class O>
-        xiterator<const_stepper, O> cxend(const O& shape) const noexcept;
 
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
@@ -223,141 +221,6 @@ namespace xt
     inline bool xgenerator<F, R, S>::is_trivial_broadcast(const O& /*strides*/) const noexcept
     {
         return false;
-    }
-    //@}
-
-    /**
-     * @name Iterators
-     */
-    /**
-     * Returns an iterator to the first element of the buffer
-     * containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::begin() const noexcept -> const_iterator
-    {
-        return cxbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::end() const noexcept -> const_iterator
-    {
-        return cxend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the buffer
-     * containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::cbegin() const noexcept -> const_iterator
-    {
-        return cxbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::cend() const noexcept -> const_iterator
-    {
-        return cxend();
-    }
-    //@}
-
-    /**
-     * @name Broadcast iterators
-     */
-    //@{
-    /**
-     * Returns a constant iterator to the first element of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::xbegin() const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::xend() const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::cxbegin() const noexcept -> const_broadcast_iterator
-    {
-        return xbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::cxend() const noexcept -> const_broadcast_iterator
-    {
-        return xend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the function. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class F, class R, class S>
-    template <class O>
-    inline auto xgenerator<F, R, S>::xbegin(const O& shape) const noexcept -> xiterator<const_stepper, O>
-    {
-        return xiterator<const_stepper, S>(stepper_begin(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element of the
-     * function. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class F, class R, class S>
-    template <class O>
-    inline auto xgenerator<F, R, S>::xend(const O& shape) const noexcept -> xiterator<const_stepper, O>
-    {
-        return xiterator<const_stepper, S>(stepper_end(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the function. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class F, class R, class S>
-    template <class O>
-    inline auto xgenerator<F, R, S>::cxbegin(const O& shape) const noexcept -> xiterator<const_stepper, O>
-    {
-        return xbegin(shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element of the
-     * function. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class F, class R, class S>
-    template <class O>
-    inline auto xgenerator<F, R, S>::cxend(const O& shape) const noexcept -> xiterator<const_stepper, O>
-    {
-        return xend(shape);
     }
     //@}
 

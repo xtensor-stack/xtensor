@@ -42,6 +42,18 @@ namespace xt
     template <class ST, class... S>
     struct xview_shape_type;
 
+    template <class CT, class... S>
+    struct xiterable_inner_types<xview<CT, S...>>
+    {
+        using xexpression_type = std::decay_t<CT>;
+        using shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
+        using stepper = xview_stepper<false, CT, S...>;
+        using const_stepper = xview_stepper<true, CT, S...>;
+        using broadcast_iterator = xiterator<stepper, shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using iterator = broadcast_iterator;
+        using const_iterator = const_broadcast_iterator;
+    };
 
     /**
      * @class xview
@@ -58,7 +70,8 @@ namespace xt
      * @sa view, range, all, newaxis
      */
     template <class CT, class... S>
-    class xview : public xview_semantic<xview<CT, S...>>
+    class xview : public xview_semantic<xview<CT, S...>>,
+                  public xiterable<xview<CT, S...>>
     {
 
     public:
@@ -75,18 +88,19 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
+        using iterable_base = xiterable<self_type>;
+        using shape_type = typename iterable_base::shape_type;
 
         using slice_type = std::tuple<S...>;
 
-        using stepper = xview_stepper<false, CT, S...>;
-        using const_stepper = xview_stepper<true, CT, S...>;
+        using stepper = typename iterable_base::stepper;
+        using const_stepper = typename iterable_base::const_stepper;
 
-        using broadcast_iterator = xiterator<stepper, shape_type*>;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
-        
-        using iterator = broadcast_iterator;
-        using const_iterator = const_broadcast_iterator;
+        using broadcast_iterator = typename iterable_base::broadcast_iterator;
+        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
+
+        using iterator = typename iterable_base::iterator;
+        using const_iterator = typename iterable_base::const_iterator;
 
         template <class... SL>
         xview(CT e, SL&&... slices) noexcept;
@@ -119,36 +133,6 @@ namespace xt
 
         template <class ST>
         bool is_trivial_broadcast(const ST& strides) const;
-
-        iterator begin();
-        iterator end();
-
-        const_iterator begin() const;
-        const_iterator end() const;
-        const_iterator cbegin() const;
-        const_iterator cend() const;
-
-        broadcast_iterator xbegin();
-        broadcast_iterator xend();
-
-        const_broadcast_iterator xbegin() const;
-        const_broadcast_iterator xend() const;
-        const_broadcast_iterator cxbegin() const;
-        const_broadcast_iterator cxend() const;
-
-        template <class ST>
-        xiterator<stepper, ST> xbegin(const ST& shape);
-        template <class ST>
-        xiterator<stepper, ST> xend(const ST& shape);
-
-        template <class ST>
-        xiterator<const_stepper, ST> xbegin(const ST& shape) const;
-        template <class ST>
-        xiterator<const_stepper, ST> xend(const ST& shape) const;
-        template <class ST>
-        xiterator<const_stepper, ST> cxbegin(const ST& shape) const;
-        template <class ST>
-        xiterator<const_stepper, ST> cxend(const ST& shape) const;
 
         template <class ST>
         stepper stepper_begin(const ST& shape);
@@ -360,7 +344,7 @@ namespace xt
     template <class E>
     inline auto xview<CT, S...>::operator=(const E& e) -> disable_xexpression<E, self_type>&
     {
-        std::fill(begin(), end(), e);
+        std::fill(this->begin(), this->end(), e);
         return *this;
     }
 
@@ -574,7 +558,7 @@ namespace xt
     template <class CT, class... S>
     inline void xview<CT, S...>::assign_temporary_impl(temporary_type& tmp)
     {
-        std::copy(tmp.cbegin(), tmp.cend(), xbegin());
+        std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
     }
 
     namespace detail
@@ -608,213 +592,6 @@ namespace xt
     {
         return detail::make_view_impl(std::forward<E>(e), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
     }
-
-    /***************
-    * iterator api *
-    ****************/
-
-    /**
-    * @name Iterators
-    */
-    //@{
-    /**
-     * Returns an iterator to the first element of the buffer containing
-     * the elements of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::begin() -> iterator
-    {
-        return xbegin();
-    }
-
-    /**
-     * Returns an iterator to the element following the last element of
-     * the buffer containing the elements of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::end() -> iterator
-    {
-        return xend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the buffer
-     * containing the elements of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::begin() const -> const_iterator
-    {
-        return xbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::end() const -> const_iterator
-    {
-        return xend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the buffer
-     * containing the elements of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::cbegin() const -> const_iterator
-    {
-        return cxbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last
-     * element of the buffer containing the elements of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::cend() const -> const_iterator
-    {
-        return cxend();
-    }
-    //@}
-
-    /**************************
-     * broadcast iterator api *
-     **************************/
-
-    /**
-     * @name Broadcast iterators
-     */
-    //@{
-    /**
-     * Returns an iterator to the first element of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::xbegin() -> broadcast_iterator
-    {
-        return broadcast_iterator(stepper_begin(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns an iterator to the element following the last element
-     * of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::xend() -> broadcast_iterator
-    {
-        return broadcast_iterator(stepper_end(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::xbegin() const -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::xend() const -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::cxbegin() const -> const_broadcast_iterator
-    {
-        return xbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the view.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::cxend() const -> const_broadcast_iterator
-    {
-        return xend();
-    }
-
-    /**
-     * Returns an iterator to the first element of the view. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class CT, class... S>
-    template <class ST>
-    inline auto xview<CT, S...>::xbegin(const ST& shape) -> xiterator<stepper, ST>
-    {
-        return xiterator<stepper, ST>(stepper_begin(shape), shape);
-    }
-
-    /**
-     * Returns an iterator to the element following the last element of the
-     * view. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class CT, class... S>
-    template <class ST>
-    inline auto xview<CT, S...>::xend(const ST& shape) -> xiterator<stepper, ST>
-    {
-        return xiterator<stepper, ST>(stepper_end(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the view. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class CT, class... S>
-    template <class ST>
-    inline auto xview<CT, S...>::xbegin(const ST& shape) const -> xiterator<const_stepper, ST>
-    {
-        return xiterator<const_stepper, ST>(stepper_begin(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element of the
-     * view. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class CT, class... S>
-    template <class ST>
-    inline auto xview<CT, S...>::xend(const ST& shape) const -> xiterator<const_stepper, ST>
-    {
-        return xiterator<const_stepper, ST>(stepper_end(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the view. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class CT, class... S>
-    template <class ST>
-    inline auto xview<CT, S...>::cxbegin(const ST& shape) const -> xiterator<const_stepper, ST>
-    {
-        return xbegin(shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element of the
-     * container. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class CT, class... S>
-    template <class ST>
-    inline auto xview<CT, S...>::cxend(const ST& shape) const -> xiterator<const_stepper, ST>
-    {
-        return xend(shape);
-    }
-    //@}
 
     /***************
      * stepper api *
