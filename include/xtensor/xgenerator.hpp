@@ -54,7 +54,7 @@ namespace xt
      */
     template <class F, class R, class S>
     class xgenerator : public xexpression<xgenerator<F, R, S>>,
-                       public xiterable<xgenerator<F, R, S>>
+                       public xconst_iterable<xgenerator<F, R, S>>
     {
 
     public:
@@ -70,7 +70,7 @@ namespace xt
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
 
-        using iterable_base = xiterable<xgenerator<F, R, S>>;
+        using iterable_base = xconst_iterable<xgenerator<F, R, S>>;
         using shape_type = typename iterable_base::shape_type;
         using strides_type = S;
 

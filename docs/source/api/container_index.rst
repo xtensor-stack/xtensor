@@ -10,6 +10,7 @@ Containers and views
 .. toctree::
 
    xcontainer
+   xconst_iterable
    xiterable
    xarray
    xarray_adaptor

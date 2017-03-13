@@ -76,7 +76,7 @@ namespace xt
      */
     template <class F, class CT, class X>
     class xreducer : public xexpression<xreducer<F, CT, X>>,
-                     public xiterable<xreducer<F, CT, X>>
+                     public xconst_iterable<xreducer<F, CT, X>>
     {
 
     public:
@@ -95,7 +95,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xiterable<xreducer<F, CT, X>>;
+        using iterable_base = xconst_iterable<xreducer<F, CT, X>>;
         using shape_type = typename iterable_base::shape_type;
 
         using stepper = typename iterable_base::stepper;
@@ -153,7 +153,7 @@ namespace xt
      * @brief Returns an \ref xexpression applying the speficied reducing
      * function to an expresssion over the given axes.
      *
-     * @param f the \ref reducing function to apply.
+     * @param f the reducing function to apply.
      * @param e the \ref xexpression to reduce.
      * @param axes the list of axes.
      *
