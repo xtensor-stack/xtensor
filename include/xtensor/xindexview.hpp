@@ -16,7 +16,7 @@
 #include <algorithm>
 
 #include "xexpression.hpp"
-#include "xiterator.hpp"
+#include "xiterable.hpp"
 #include "xutils.hpp"
 
 namespace xt

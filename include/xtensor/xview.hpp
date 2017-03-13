@@ -18,7 +18,7 @@
 
 #include "xtensor_forward.hpp"
 #include "xbroadcast.hpp"
-#include "xiterator.hpp"
+#include "xiterable.hpp"
 #include "xsemantic.hpp"
 #include "xview_utils.hpp"
 
