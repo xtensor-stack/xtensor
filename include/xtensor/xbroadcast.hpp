@@ -16,9 +16,9 @@
 #include <type_traits>
 #include <cstddef>
 
-#include "xtensor/xutils.hpp"
-#include "xtensor/xexpression.hpp"
-#include "xtensor/xiterator.hpp"
+#include "xutils.hpp"
+#include "xexpression.hpp"
+#include "xiterable.hpp"
 
 namespace xt
 {
@@ -313,4 +313,3 @@ namespace xt
 }
 
 #endif
-
