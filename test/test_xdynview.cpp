@@ -338,44 +338,44 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
-    // TEST(xdynview, range_adaptor)
-    // {
-    //     using namespace xt::placeholders;
-    //     using t = xarray<int>;
-    //     t a = {1, 2, 3, 4, 5};
+    TEST(xdynview, range_adaptor)
+    {
+        using namespace xt::placeholders;
+        using t = xarray<int>;
+        t a = {1, 2, 3, 4, 5};
 
-    //     auto n = xnone();
+        auto n = xnone();
 
-    //     auto v1 = dynview(a, {range(3, _)});
-    //     t v1e = {4, 5};
-    //     EXPECT_TRUE(v1e == v1);
+        auto v1 = dynview(a, {range(3, _)});
+        t v1e = {4, 5};
+        EXPECT_TRUE(v1e == v1);
 
-    //     auto v2 = dynview(a, {range(_, 2)});
-    //     t v2e = {1, 2};
-    //     EXPECT_TRUE(v2e == v2);
+        auto v2 = dynview(a, {range(_, 2)});
+        t v2e = {1, 2};
+        EXPECT_TRUE(v2e == v2);
 
-    //     auto v3 = dynview(a, {range(n, n)});
-    //     t v3e = {1, 2, 3, 4, 5};
-    //     EXPECT_TRUE(v3e == v3);
+        auto v3 = dynview(a, {range(n, n)});
+        t v3e = {1, 2, 3, 4, 5};
+        EXPECT_TRUE(v3e == v3);
 
-    //     auto v4 = dynview(a, {range(n, 2, -1)});
-    //     t v4e = {5, 4};
-    //     EXPECT_TRUE(v4e == v4);
+        auto v4 = dynview(a, {range(n, 2, -1)});
+        t v4e = {5, 4};
+        EXPECT_TRUE(v4e == v4);
 
-    //     auto v5 = dynview(a, {range(2, n, -1)});
-    //     t v5e = {3, 2, 1};
-    //     EXPECT_TRUE(v5e == v5);
+        auto v5 = dynview(a, {range(2, n, -1)});
+        t v5e = {3, 2, 1};
+        EXPECT_TRUE(v5e == v5);
 
-    //     auto v6 = dynview(a, {range(n, n, n)});
-    //     t v6e = {1, 2, 3, 4, 5};
-    //     EXPECT_TRUE(v6e == v6);
+        auto v6 = dynview(a, {range(n, n, n)});
+        t v6e = {1, 2, 3, 4, 5};
+        EXPECT_TRUE(v6e == v6);
 
-    //     auto v7 = dynview(a, {range(1, n, 2)});
-    //     t v7e = {2, 4};
-    //     EXPECT_TRUE(v7e == v7);
+        auto v7 = dynview(a, {range(1, n, 2)});
+        t v7e = {2, 4};
+        EXPECT_TRUE(v7e == v7);
 
-    //     auto v8 = dynview(a, {range(2, n, 2)});
-    //     t v8e = {3, 5};
-    //     EXPECT_TRUE(v8e == v8);
-    // }
+        auto v8 = dynview(a, {range(2, n, 2)});
+        t v8e = {3, 5};
+        EXPECT_TRUE(v8e == v8);
+    }
 }

@@ -16,6 +16,7 @@
 #include <typeinfo>
 
 #include "xarray.hpp"
+#include "xexception.hpp"
 #include "xiterator.hpp"
 #include "xslice.hpp"
 #include "xview.hpp"
@@ -322,7 +323,9 @@ namespace xt
             }
             else
             {
-                std::cout << "UNNORMALIZED SLICE TYPE ERROR " << slice.type().name() << std::endl;
+                std::string msg = "Slice template type has to be std::size_t. Is: ";
+                msg += slice.type().name();
+                throw unnormalized_slice_error(msg);
             }
         }
 
@@ -350,7 +353,9 @@ namespace xt
             }
             else
             {
-                std::cout << "UNNORMALIZED SLICE TYPE ERROR" << slice.type().name()<< std::endl;
+                std::string msg = "Slice template type has to be std::size_t. Is: ";
+                msg += slice.type().name();
+                throw unnormalized_slice_error(msg);
             }
         }
 
@@ -378,7 +383,9 @@ namespace xt
             }
             else
             {
-                std::cout << "UNNORMALIZED SLICE TYPE ERROR"<< slice.type().name() << std::endl;
+                std::string msg = "Slice template type has to be std::size_t. Is: ";
+                msg += slice.type().name();
+                throw unnormalized_slice_error(msg);
             }
         }
     }
@@ -419,6 +426,36 @@ namespace xt
                 else if (slices[i].type() == typeid(int))
                 {
                     temp_slices[i] = (std::size_t) linb::any_cast<int>(slices[i]);
+                }
+                else if (slices[i].type() == typeid(xrange_adaptor<int, placeholders::xtuph, placeholders::xtuph>))
+                {
+                    auto slice = linb::any_cast<xrange_adaptor<int, placeholders::xtuph, placeholders::xtuph>>(slices[i]);
+                    temp_slices[i] = get_slice_implementation(e, slice, i);
+                }
+                else if (slices[i].type() == typeid(xrange_adaptor<placeholders::xtuph, int, placeholders::xtuph>))
+                {
+                    auto slice = linb::any_cast<xrange_adaptor<placeholders::xtuph, int, placeholders::xtuph>>(slices[i]);
+                    temp_slices[i] = get_slice_implementation(e, slice, i);
+                }
+                else if (slices[i].type() == typeid(xrange_adaptor<placeholders::xtuph, placeholders::xtuph, placeholders::xtuph>))
+                {
+                    auto slice = linb::any_cast<xrange_adaptor<placeholders::xtuph, placeholders::xtuph, placeholders::xtuph>>(slices[i]);
+                    temp_slices[i] = get_slice_implementation(e, slice, i);
+                }
+                else if (slices[i].type() == typeid(xrange_adaptor<int, placeholders::xtuph, int>))
+                {
+                    auto slice = linb::any_cast<xrange_adaptor<int, placeholders::xtuph, int>>(slices[i]);
+                    temp_slices[i] = get_slice_implementation(e, slice, i);
+                }
+                else if (slices[i].type() == typeid(xrange_adaptor<placeholders::xtuph, int, int>))
+                {
+                    auto slice = linb::any_cast<xrange_adaptor<placeholders::xtuph, int, int>>(slices[i]);
+                    temp_slices[i] = get_slice_implementation(e, slice, i);
+                }
+                else if (slices[i].type() == typeid(xrange_adaptor<placeholders::xtuph, placeholders::xtuph, int>))
+                {
+                    auto slice = linb::any_cast<xrange_adaptor<placeholders::xtuph, placeholders::xtuph, int>>(slices[i]);
+                    temp_slices[i] = get_slice_implementation(e, slice, i);
                 }
                 else {
                     temp_slices[i] = slices[i];
