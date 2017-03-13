@@ -102,6 +102,23 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
     v += 100;
     // => a = {{1, 105, 3}, {4, 105, 106}}
 
+Filtration
+----------
+
+Sometimes, the only thing you want to do with a filter is to assign it a scalar. Though this can be done as shown
+in the previous section, this is not the *optimal* way to do it. `xtensor` provides a specially optimized mechanism
+for that, called filtration. A filtration IS NOT an ``xexpression``, the only methods it provides are scalar and 
+computed scalar assignments.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xindexview.hpp"
+
+    xt::array<double> a = {{1, 5, 3}, {4, 5, 6}};
+    filtration(a, a >= 5) += 100;
+    // => a = {{1, 105, 3}, {4, 105, 106}}
+
 Broadcasting views
 ------------------
 

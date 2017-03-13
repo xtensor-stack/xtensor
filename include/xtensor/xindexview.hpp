@@ -156,6 +156,64 @@ namespace xt
         friend class xview_semantic<xindexview<CT, S, I>>;
     };
 
+    /***************
+     * xfiltration *
+     ***************/
+
+    /**
+     * @class xfiltration
+     * @brief Filter of a xexpression for fast scalar assign.
+     *
+     * The xfiltration class implements a lazy filtration of a multidimentional
+     * \ref xexpression, optimized for scalar and computed scalar assignments.
+     * Actually, the \ref xfiltration class IS NOT an \ref xexpression and the
+     * scalar and computed scalar assignments are the only method it provides.
+     * The filtering condition is not evaluated until the filtration is assigned.
+     *
+     * xfiltration is not meant to be used directly, but only with the \ref filtration
+     * helper function.
+     *
+     * @tparam ECT the closure type of the \ref xexpression type underlying this filtration
+     * @tparam CCR the closure type of the filtering \ref xexpression type
+     *
+     * @sa filtration
+     */
+    template <class ECT, class CCT>
+    class xfiltration
+    {
+
+    public:
+
+        using self_type = xfiltration<ECT, CCT>;
+        using xexpression_type = std::decay_t<ECT>;
+        using const_reference = typename xexpression_type::const_reference;
+
+        xfiltration(ECT e, CCT condition);
+
+        template <class E>
+        disable_xexpression<E, self_type&> operator=(const E&);
+
+        template <class E>
+        disable_xexpression<E, self_type&> operator+=(const E&);
+
+        template <class E>
+        disable_xexpression<E, self_type&> operator-=(const E&);
+
+        template <class E>
+        disable_xexpression<E, self_type&> operator*=(const E&);
+
+        template <class E>
+        disable_xexpression<E, self_type&> operator/=(const E&);
+
+    private:
+
+        template <class F>
+        self_type& apply(F&& func);
+
+        ECT m_e;
+        CCT m_condition;
+    };
+
     /*****************************
      * xindexview implementation *
      *****************************/
@@ -168,7 +226,7 @@ namespace xt
      * Constructs an xindexview, selecting the indices specified by \a indices.
      * The resulting xexpression has a 1D shape with a length of n for n indices.
      * 
-     * @param e the underlying xepxression for this view
+     * @param e the underlying xexpression for this view
      * @param indices the indices to select
      */
     template <class CT, class S, class I>
@@ -370,6 +428,105 @@ namespace xt
         return const_stepper(this, offset, true);
     }
 
+    /******************************
+     * xfiltration implementation *
+     ******************************/
+
+     /**
+      * @name Constructor
+      */
+     //@{
+     /**
+      * Constructs a xfiltration on the given expression \c e, selecting
+      * the elements matching the specified \c condition. 
+      *
+      * @param e the \ref xexpression to filter.
+      * @param condition the filtering \ref xexpression to apply.
+      */
+    template <class ECT, class CCT>
+    inline xfiltration<ECT, CCT>::xfiltration(ECT e, CCT condition)
+        : m_e(e), m_condition(condition)
+    {
+    }
+    //@}
+
+    /**
+     * @name Extended copy semantic
+     */
+    //@{
+    /**
+     * Assigns the scalar \c e to \c *this.
+     * @param e the scalar to assign.
+     * @return a reference to \ *this.
+     */
+    template <class ECT, class CCT>
+    template <class E>
+    inline auto xfiltration<ECT, CCT>::operator=(const E& e) -> disable_xexpression<E, self_type&>
+    {
+        return apply([this, &e](const_reference v, bool cond) { return cond ? e : v; });
+    }
+    //@}
+
+    /**
+     * @name Computed assignement
+     */
+    //@{
+    /**
+     * Adds the scalar \c e to \c *this.
+     * @param e the scalar to add.
+     * @return a reference to \c *this.
+     */
+    template <class ECT, class CCT>
+    template <class E>
+    inline auto xfiltration<ECT, CCT>::operator+=(const E& e) -> disable_xexpression<E, self_type&>
+    {
+        return apply([this, &e](const_reference v, bool cond) { return cond ? v + e : v; });
+    }
+
+    /**
+     * Subtracts the scalar \c e from \c *this.
+     * @param e the scalar to subtract.
+     * @return a reference to \c *this.
+     */
+    template <class ECT, class CCT>
+    template <class E>
+    inline auto xfiltration<ECT, CCT>::operator-=(const E& e) -> disable_xexpression<E, self_type&>
+    {
+        return apply([this, &e](const_reference v, bool cond) { return cond ? v - e : v; });
+    }
+
+    /**
+     * Multiplies \c *this with the scalar \c e.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class ECT, class CCT>
+    template <class E>
+    inline auto xfiltration<ECT, CCT>::operator*=(const E& e) -> disable_xexpression<E, self_type&>
+    {
+        return apply([this, &e](const_reference v, bool cond) { return cond ? v * e : v; });
+    }
+
+    /**
+     * Divides \c *this by the scalar \c e.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class ECT, class CCT>
+    template <class E>
+    inline auto xfiltration<ECT, CCT>::operator/=(const E& e) -> disable_xexpression<E, self_type&>
+    {
+        return apply([this, &e](const_reference v, bool cond) { return cond ? v / e : v; });
+    }
+
+    template <class ECT, class CCT>
+    template <class F>
+    inline auto xfiltration<ECT, CCT>::apply(F&& func) -> self_type&
+    {
+        std::transform(m_e.cbegin(), m_e.cend(), m_condition.cbegin(), m_e.begin(), func);
+        return *this;
+    }
+
     /**
      * @brief creates an indexview from a container of indices.
      *        
@@ -418,7 +575,10 @@ namespace xt
      *        
      * Returns a 1D view with the elements selected where \a condition evaluates to \em true.
      * This is equivalent to \verbatim{index_view(e, where(condition));}\endverbatim
-     * 
+     * The returned view is not optimal if you just want to assign a scalar to the filtered
+     * elements. In that case, you should consider using the \ref filtration function
+     * instead.
+     *
      * @param e the underlying xexpression
      * @param condition xexpression with shape of \a e which selects indices
      *
@@ -427,6 +587,8 @@ namespace xt
      * b = filter(a, a >= 5);
      * std::cout << b << std::endl; // {5, 5, 6}
      * \endcode
+     *
+     * \sa filtration
      */
     template <class E, class O>
     inline auto filter(E&& e, O&& condition) noexcept
@@ -436,6 +598,29 @@ namespace xt
         return view_type(std::forward<E>(e), std::move(indices));
     }
 
+    /**
+     * @brief creates a filtration of \c e filtered by \a condition.
+     *
+     * Returns a lazy filtration optimized for scalar assignment.
+     * Actually, scalar assignment and computed scalar assignments
+     * are the only available methods of the filtration, the filtration
+     * IS NOT an \ref xexpression.
+     *
+     * @param e the \ref xexpression to filter
+     * @param condition the filtering \ref xexpression
+     *
+     * \code{.cpp}
+     * xarray<double> a = {{1,5,3}, {4,5,6}};
+     * filtration(a, a >= 5) += 2;
+     * std::cout << a << std::endl; // {{1, 7, 3}, {4, 7, 8}}
+     * \endcode
+     */
+    template <class E, class C>
+    inline auto filtration(E&& e, C&& condition) noexcept
+    {
+        using filtration_type = xfiltration<xclosure_t<E>, xclosure_t<C>>;
+        return filtration_type(std::forward<E>(e), std::forward<C>(condition));
+    }
 }
 
 #endif
