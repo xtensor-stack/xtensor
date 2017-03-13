@@ -423,7 +423,8 @@ namespace xt
         index_type idx(arr.dimension(), 0);
         std::vector<index_type> indices;
 
-        auto next_idx = [&shape](index_type& idx) {
+        auto next_idx = [&shape](index_type& idx)
+        {
             for (int i = int(shape.size() - 1); i >= 0; --i)
             {
                 if (idx[i] >= shape[i] - 1)
