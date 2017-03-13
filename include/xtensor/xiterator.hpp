@@ -363,8 +363,14 @@ namespace xt
         iterator begin() noexcept;
         iterator end() noexcept;
 
+        using base_type::begin;
+        using base_type::end;
+
         broadcast_iterator xbegin() noexcept;
         broadcast_iterator xend() noexcept;
+
+        using base_type::xbegin;
+        using base_type::xend;
 
         template <class S>
         xiterator<stepper, S> xbegin(const S& shape) noexcept;

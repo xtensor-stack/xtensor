@@ -70,7 +70,7 @@ namespace xt
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
 
-        using iterable_base = xconst_iterable<xgenerator<F, R, S>>;
+        using iterable_base = xconst_iterable<self_type>;
         using shape_type = typename iterable_base::shape_type;
         using strides_type = S;
 
