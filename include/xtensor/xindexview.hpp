@@ -22,22 +22,22 @@
 namespace xt
 {
 
-    template <class CT, class S, class I>
+    template <class CT, class I>
     class xindexview;
 
-    template <class CT, class S, class I>
-    struct xcontainer_inner_types<xindexview<CT, S, I>>
+    template <class CT, class I>
+    struct xcontainer_inner_types<xindexview<CT, I>>
     {
         using xexpression_type = std::decay_t<CT>;
         using temporary_type = xarray<typename xexpression_type::value_type>;
     };
 
-    template <class CT, class S, class I>
-    struct xiterable_inner_types<xindexview<CT, S, I>>
+    template <class CT, class I>
+    struct xiterable_inner_types<xindexview<CT, I>>
     {
-        using shape_type = S;
-        using const_stepper = xindexed_stepper<xindexview<CT, S, I>>;
-        using stepper = xindexed_stepper<xindexview<CT, S, I>, false>;
+        using shape_type = std::array<std::size_t, 1>;
+        using const_stepper = xindexed_stepper<xindexview<CT, I>>;
+        using stepper = xindexed_stepper<xindexview<CT, I>, false>;
         using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
         using broadcast_iterator = xiterator<stepper, shape_type*>;
         using const_iterator = const_broadcast_iterator;
@@ -58,19 +58,18 @@ namespace xt
      * and \ref filter helper functions.
      *
      * @tparam CT the closure type of the \ref xexpression type underlying this view
-     * @tparam S the shape type of the view
      * @tparam I the index array type of the view
      *
      * @sa index_view, filter
      */
-    template <class CT, class S, class I>
-    class xindexview : public xview_semantic<xindexview<CT, S, I>>,
-                       public xiterable<xindexview<CT, S, I>>
+    template <class CT, class I>
+    class xindexview : public xview_semantic<xindexview<CT, I>>,
+                       public xiterable<xindexview<CT, I>>
     {
 
     public:
 
-        using self_type = xindexview<CT, S, I>;
+        using self_type = xindexview<CT, I>;
         using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
 
@@ -84,7 +83,7 @@ namespace xt
 
         using iterable_base = xiterable<self_type>;
         using shape_type = typename iterable_base::shape_type;
-        using strides_type = S;
+        using strides_type = shape_type;
         using closure_type = const self_type;
 
         using indices_type = I;
@@ -153,7 +152,7 @@ namespace xt
         
         void assign_temporary_impl(temporary_type& tmp);
 
-        friend class xview_semantic<xindexview<CT, S, I>>;
+        friend class xview_semantic<xindexview<CT, I>>;
     };
 
     /***************
@@ -229,9 +228,9 @@ namespace xt
      * @param e the underlying xexpression for this view
      * @param indices the indices to select
      */
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class I2>
-    inline xindexview<CT, S, I>::xindexview(CT e, I2&& indices) noexcept
+    inline xindexview<CT, I>::xindexview(CT e, I2&& indices) noexcept
         : m_e(e), m_indices(std::forward<I2>(indices)), m_shape({m_indices.size()})
     {
     }
@@ -244,31 +243,24 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class E>
-    inline auto xindexview<CT, S, I>::operator=(const xexpression<E>& e) -> self_type&
+    inline auto xindexview<CT, I>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
     //@}
     
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class E>
-    inline auto xindexview<CT, S, I>::operator=(const E& e) -> disable_xexpression<E, self_type>&
+    inline auto xindexview<CT, I>::operator=(const E& e) -> disable_xexpression<E, self_type>&
     {
-        // TODO : refactor stepper so they read m_indices, that would be more efficient
-        // than the actual implementation. Then replace the for loop with the std::fill
-        // algorithm
-        //std::fill(begin(), end(), e);
-        for (size_type i = 0; i < m_shape[0]; ++i)
-        {
-            this->operator()(i) = e;
-        }
+        std::fill(this->begin(), this->end(), e);
         return *this;
     }
 
-    template <class CT, class S, class I>
-    inline void xindexview<CT, S, I>::assign_temporary_impl(temporary_type& tmp)
+    template <class CT, class I>
+    inline void xindexview<CT, I>::assign_temporary_impl(temporary_type& tmp)
     {
         std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
     }
@@ -280,8 +272,8 @@ namespace xt
     /**
      * Returns the number of dimensions of the xindexview.
      */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::dimension() const noexcept -> size_type
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::dimension() const noexcept -> size_type
     {
         return 1;
     }
@@ -289,8 +281,8 @@ namespace xt
     /**
      * Returns the shape of the xindexview.
      */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::shape() const -> const shape_type&
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::shape() const -> const shape_type&
     {
         return m_shape;
     }
@@ -299,21 +291,21 @@ namespace xt
     /**
      * @name Data
      */
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::operator()() -> reference
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::operator()() -> reference
     {
         return m_e();
     }
 
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::operator()() const -> const_reference
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::operator()() const -> const_reference
     {
         return m_e();
     }
 
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class... Args>
-    inline auto xindexview<CT, S, I>::operator()(std::size_t idx, Args... /*args*/) -> reference
+    inline auto xindexview<CT, I>::operator()(std::size_t idx, Args... /*args*/) -> reference
     {
         return m_e[m_indices[idx]];
     }
@@ -323,21 +315,21 @@ namespace xt
      * 
      * @param idx the position in the view
      */
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class... Args>
-    inline auto xindexview<CT, S, I>::operator()(std::size_t idx, Args... /*args*/) const -> const_reference
+    inline auto xindexview<CT, I>::operator()(std::size_t idx, Args... /*args*/) const -> const_reference
     {
         return m_e[m_indices[idx]];
     }
 
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::operator[](const xindex& index) -> reference
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::operator[](const xindex& index) -> reference
     {
         return m_e[m_indices[index[0]]];
     }
 
-    template <class CT, class S, class I>
-    inline auto xindexview<CT, S, I>::operator[](const xindex& index) const -> const_reference
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::operator[](const xindex& index) const -> const_reference
     {
         return m_e[m_indices[index[0]]];
     }
@@ -348,16 +340,16 @@ namespace xt
      * @param last iterator ending the sequence of indices
      * The number of indices in the squence should be equal to or greater 1.
      */
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class It>
-    inline auto xindexview<CT, S, I>::element(It first, It /*last*/) -> reference
+    inline auto xindexview<CT, I>::element(It first, It /*last*/) -> reference
     {
         return m_e[m_indices[(*first)]];
     }
 
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class It>
-    inline auto xindexview<CT, S, I>::element(It first, It /*last*/) const -> const_reference
+    inline auto xindexview<CT, I>::element(It first, It /*last*/) const -> const_reference
     {
         return m_e[m_indices[(*first)]];
     }
@@ -372,9 +364,9 @@ namespace xt
      * @param shape the result shape
      * @return a boolean indicating whether the broadcasting is trivial
      */
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class O>
-    inline bool xindexview<CT, S, I>::broadcast_shape(O& shape) const
+    inline bool xindexview<CT, I>::broadcast_shape(O& shape) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
@@ -384,9 +376,9 @@ namespace xt
      * the broadcasting is trivial.
      * @return a boolean indicating whether the broadcasting is trivial
      */
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class O>
-    inline bool xindexview<CT, S, I>::is_trivial_broadcast(const O& /*strides*/) const noexcept
+    inline bool xindexview<CT, I>::is_trivial_broadcast(const O& /*strides*/) const noexcept
     {
         return false;
     }
@@ -396,33 +388,33 @@ namespace xt
      * stepper api *
      ***************/
 
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_begin(const ST& shape) -> stepper
+    inline auto xindexview<CT, I>::stepper_begin(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, offset);
     }
 
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_end(const ST& shape) -> stepper
+    inline auto xindexview<CT, I>::stepper_end(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, offset, true);
     }
 
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_begin(const ST& shape) const -> const_stepper
+    inline auto xindexview<CT, I>::stepper_begin(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset);
     }
 
-    template <class CT, class S, class I>
+    template <class CT, class I>
     template <class ST>
-    inline auto xindexview<CT, S, I>::stepper_end(const ST& shape) const -> const_stepper
+    inline auto xindexview<CT, I>::stepper_end(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset, true);
@@ -546,7 +538,7 @@ namespace xt
     template <class E, class I>
     inline auto index_view(E&& e, I&& indices) noexcept
     {
-        using view_type = xindexview<xclosure_t<E>, std::array<std::size_t, 1>, std::decay_t<I>>;
+        using view_type = xindexview<xclosure_t<E>, std::decay_t<I>>;
         return view_type(std::forward<E>(e), std::forward<I>(indices));
     }
 #ifdef X_OLD_CLANG
@@ -558,14 +550,14 @@ namespace xt
         {
             idx.emplace_back(xindex(it->begin(), it->end()));
         }
-        using view_type = xindexview<xclosure_t<E>, std::array<std::size_t, 1>, std::vector<xindex>>;
+        using view_type = xindexview<xclosure_t<E>, std::vector<xindex>>;
         return view_type(std::forward<E>(e), std::move(idx));
     }
 #else
     template <class E, std::size_t L>
     inline auto index_view(E&& e, const xindex(&indices)[L]) noexcept
     {
-        using view_type = xindexview<xclosure_t<E>, std::array<std::size_t, 1>, std::array<xindex, L>>;
+        using view_type = xindexview<xclosure_t<E>, std::array<xindex, L>>;
         return view_type(std::forward<E>(e), to_array(indices));
     }
 #endif
@@ -594,7 +586,7 @@ namespace xt
     inline auto filter(E&& e, O&& condition) noexcept
     {
         auto indices = where(std::forward<O>(condition));
-        using view_type = xindexview<xclosure_t<E>, std::vector<std::size_t>, decltype(indices)>;
+        using view_type = xindexview<xclosure_t<E>, decltype(indices)>;
         return view_type(std::forward<E>(e), std::move(indices));
     }
 

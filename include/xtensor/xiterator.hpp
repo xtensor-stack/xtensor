@@ -149,13 +149,13 @@ namespace xt
         xindexed_stepper() = default;
         xindexed_stepper(xexpression_type* e, size_type offset, bool end = false) noexcept;
 
+        reference operator*() const;
+
         void step(size_type dim, size_type n = 1);
         void step_back(size_type dim, size_type n = 1);
         void reset(size_type dim);
 
         void to_end();
-
-        reference operator*() const;
 
         bool equal(const self_type& rhs) const;
 
@@ -405,6 +405,12 @@ namespace xt
     }
 
     template <class C, bool is_const>
+    inline auto xindexed_stepper<C, is_const>::operator*() const -> reference
+    {
+        return p_e->element(m_index.cbegin(), m_index.cend());
+    }
+
+    template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::step(size_type dim, size_type n)
     {
         if (dim >= m_offset)
@@ -429,12 +435,6 @@ namespace xt
     inline void xindexed_stepper<C, is_const>::to_end()
     {
         m_index = p_e->shape();
-    }
-
-    template <class C, bool is_const>
-    inline auto xindexed_stepper<C, is_const>::operator*() const -> reference
-    {
-        return p_e->element(m_index.cbegin(), m_index.cend());
     }
 
     template <class C, bool is_const>
