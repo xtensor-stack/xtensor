@@ -441,7 +441,7 @@ namespace xt
     template <class... Types>
     inline auto xtuple(Types&&... args)
     {
-        return std::tuple<detail::const_closure_t<Types>...>(std::forward<Types>(args)...);
+        return std::tuple<const_closure_t<Types>...>(std::forward<Types>(args)...);
     }
 
     /**

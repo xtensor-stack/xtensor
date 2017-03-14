@@ -10,6 +10,16 @@
 #define XREDUCER_HPP
 
 #include <algorithm>
+#include <cstddef>
+#include <initializer_list>
+#include <type_traits>
+#include <utility>
+#include <iterator>
+#include <stdexcept>
+#ifdef X_OLD_CLANG
+#include <vector>
+#endif
+
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xutils.hpp"
@@ -22,7 +32,7 @@ namespace xt
      **********/
 
     template <class F, class E, class X>
-    auto reduce(F&& f, E&& e, const X& axes) noexcept;
+    auto reduce(F&& f, E&& e, X&& axes) noexcept;
 
 #ifdef X_OLD_CLANG
     template <class F, class E, class I>
@@ -60,6 +70,7 @@ namespace xt
         using const_iterator = const_broadcast_iterator;
         using iterator = const_iterator;
     };
+
     /**
      * @class xreducer
      * @brief Reducing function operating over specified axes.
@@ -84,7 +95,7 @@ namespace xt
         using self_type = xreducer<F, CT, X>;
         using functor_type = typename std::remove_reference<F>::type;
         using xexpression_type = std::decay_t<CT>;
-        using axis_storage = X;
+        using axes_type = X;
 
         using value_type = typename xexpression_type::value_type;
         using reference = value_type;
@@ -107,8 +118,8 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
-        template <class Func>
-        xreducer(Func&& func, CT e, const axis_storage& axis);
+        template <class Func, class AX>
+        xreducer(Func&& func, CT e, AX&& axes);
 
         size_type dimension() const noexcept;
         const shape_type& shape() const;
@@ -136,7 +147,7 @@ namespace xt
 
         CT m_e;
         functor_type m_f;
-        axis_storage m_axis;
+        axes_type m_axes;
         shape_type m_shape;
 
         using index_type = xindex_type_t<shape_type>;
@@ -162,10 +173,10 @@ namespace xt
      */
 
     template <class F, class E, class X>
-    inline auto reduce(F&& f, E&& e, const X& axes) noexcept
+    inline auto reduce(F&& f, E&& e, X&& axes) noexcept
     {
-        using reducer_type = xreducer<F, const_xclosure_t<E>, X>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), axes);
+        using reducer_type = xreducer<F, const_xclosure_t<E>, const_closure_t<X>>;
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
     }
 
 #ifdef X_OLD_CLANG
@@ -194,7 +205,7 @@ namespace xt
     template <class ST, class X>
     struct xreducer_shape_type
     {
-        using type = promote_shape_t<ST, X>;
+        using type = promote_shape_t<ST, std::decay_t<X>>;
     };
 
     template <class I1, std::size_t N1, class I2, std::size_t N2>
@@ -210,10 +221,11 @@ namespace xt
                                    ExcludeIt e_first, ExcludeIt e_last,
                                    OutputIt d_first)
         {
+            using difference_type = typename std::iterator_traits<InputIt>::difference_type;
             InputIt iter = first;
             while (iter != last && e_first != e_last)
             {
-                if (std::distance(first, iter) != *e_first)
+                if (std::distance(first, iter) != difference_type(*e_first))
                 {
                     *d_first++ = *iter++;
                 }
@@ -231,10 +243,11 @@ namespace xt
                            ExcludeIt e_first, ExcludeIt e_last,
                            OutputIt d_first, T default_value)
         {
+            using difference_type = typename std::iterator_traits<InputIt>::difference_type;
             OutputIt d_first_bu = d_first;
             while (first != last && e_first != e_last)
             {
-                if (std::distance(d_first_bu, d_first) != *e_first)
+                if (std::distance(d_first_bu, d_first) != difference_type(*e_first))
                 {
                     *d_first++ = *first++;
                 }
@@ -281,7 +294,7 @@ namespace xt
 
             void increment();
 
-            size_type axis(size_type index) const;
+            size_type axes(size_type index) const;
             size_type shape(size_type index) const;
 
             const reducer_type& m_reducer;
@@ -342,17 +355,17 @@ namespace xt
         template <class F, class CT, class X>
         inline void reducing_iterator<F, CT, X>::increment()
         {
-            size_type i = m_reducer.m_axis.size();
+            size_type i = m_reducer.m_axes.size();
             while (i != 0)
             {
                 --i;
-                if (++(m_reducer.m_index[axis(i)]) != shape(axis(i)))
+                if (++(m_reducer.m_index[axes(i)]) != shape(axes(i)))
                 {
                     return;
                 }
                 else
                 {
-                    m_reducer.m_index[axis(i)] = 0;
+                    m_reducer.m_index[axes(i)] = 0;
                 }
             }
             if (i == 0)
@@ -362,9 +375,9 @@ namespace xt
         }
 
         template <class F, class CT, class X>
-        inline auto reducing_iterator<F, CT, X>::axis(size_type index) const -> size_type
+        inline auto reducing_iterator<F, CT, X>::axes(size_type index) const -> size_type
         {
-            return m_reducer.m_axis[index];
+            return m_reducer.m_axes[index];
         }
 
         template <class F, class CT, class X>
@@ -384,22 +397,25 @@ namespace xt
      //@{
      /**
       * Constructs an xreducer expression applying the specified
-      * function to the given expression over the given axis.
+      * function to the given expression over the given axes.
       *
       * @param func the function to apply
       * @param e the expression to reduce
-      * @param axis the axis along which the reduction is performed
+      * @param axes the axes along which the reduction is performed
       */
     template <class F, class CT, class X>
-    template <class Func>
-    inline xreducer<F, CT, X>::xreducer(Func&& func, CT e, const axis_storage& axis)
-        : m_e(e), m_f(std::forward<Func>(func)), m_axis(axis),
-          m_shape(make_sequence<shape_type>(m_e.dimension() - axis.size(), 0)),
+    template <class Func, class AX>
+    inline xreducer<F, CT, X>::xreducer(Func&& func, CT e, AX&& axes)
+        : m_e(e), m_f(std::forward<Func>(func)), m_axes(std::forward<AX>(axes)),
+          m_shape(make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0)),
           m_index(make_sequence<index_type>(m_e.dimension(), 0))
     {
-        std::sort(m_axis.begin(), m_axis.end());
+        if(!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
+        {
+            throw std::runtime_error("Reducing axes should be sorted");
+        }
         detail::excluding_copy(m_e.shape().begin(), m_e.shape().end(),
-                               m_axis.begin(), m_axis.end(),
+                               m_axes.begin(), m_axes.end(),
                                m_shape.begin());
     }
     //@}
@@ -467,7 +483,7 @@ namespace xt
     template <class It>
     inline auto xreducer<F, CT, X>::element(It first, It last) const -> const_reference
     {
-        detail::inject(first, last, m_axis.cbegin(), m_axis.cend(),
+        detail::inject(first, last, m_axes.cbegin(), m_axes.cend(),
                        m_index.begin(), size_type(0));
         using iter_type = detail::reducing_iterator<F, CT, X>;
         iter_type iter = iter_type(*this);

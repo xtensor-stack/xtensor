@@ -247,6 +247,23 @@ argument.
   ``imag(a)`` is the same as that of ``a``.
 - If ``a`` has real values, ``imag(a)`` returns ``zeros(a.shape())``.
 
+Reducers
+--------
+
+Reducers accumulate values of tensor expressions along specified axes. When not specified, values
+are accumulated along all the axes of the expression. Like in the rest of xtensor, return values
+of e.g. ``sum`` and ``prod`` don't hold any values and are computed upon access or assigmnent.
+
+In the case of xtensor, the list of axes must be increasingly sorted.
+
++-----------------------------------------------+-----------------------------------------------+
+|            Python 3 - numpy                   |                C++ 14 - xtensor               |
++===============================================+===============================================+
+| ``np.sum(a, axis=[0, 1])``                    | ``xt::sum(a, {0, 1})``                        |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.prod(a, axis=1)``                        | ``xt::prod(a, {1})``                          |
++-----------------------------------------------+-----------------------------------------------+
+
 Mathematical functions
 ----------------------
 

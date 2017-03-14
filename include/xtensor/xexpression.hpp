@@ -128,13 +128,13 @@ namespace xt
     template <class E, class EN = void>
     struct xclosure
     {
-        using type = detail::closure_t<E>;
+        using type = closure_t<E>;
     };
 
     template <class E>
     struct xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<detail::closure_t<E>>;
+        using type = xscalar<closure_t<E>>;
     };
 
     template <class E>
@@ -143,13 +143,13 @@ namespace xt
     template <class E, class EN = void>
     struct const_xclosure
     {
-        using type = detail::const_closure_t<E>;
+        using type = const_closure_t<E>;
     };
 
     template <class E>
     struct const_xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<detail::const_closure_t<E>>;
+        using type = xscalar<const_closure_t<E>>;
     };
  
     template <class E>
