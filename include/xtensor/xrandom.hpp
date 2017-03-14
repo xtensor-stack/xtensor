@@ -87,18 +87,18 @@ namespace xt
             }
 
             template <class... Args>
-            inline value_type operator()(Args... /*args*/) const
+            inline value_type operator()(Args...) const
             {
                 return m_generator();
             }
 
-            inline value_type operator[](const xindex& /*idx*/) const
+            inline value_type operator[](const xindex&) const
             {
                 return m_generator();
             }
 
             template <class It>
-            inline value_type element(It /*first*/, It /*last*/) const
+            inline value_type element(It, It) const
             {
                 return m_generator();
             }

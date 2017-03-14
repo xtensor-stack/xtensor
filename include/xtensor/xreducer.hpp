@@ -20,9 +20,12 @@
 #include <vector>
 #endif
 
+#include "xgenerator.hpp"
+#include "xreducer.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xutils.hpp"
+#include "xbuilder.hpp"  
 
 namespace xt
 {
@@ -33,6 +36,9 @@ namespace xt
 
     template <class F, class E, class X>
     auto reduce(F&& f, E&& e, X&& axes) noexcept;
+
+    template <class F, class E>
+    auto reduce(F&& f, E&& e) noexcept;
 
 #ifdef X_OLD_CLANG
     template <class F, class E, class I>
@@ -121,13 +127,14 @@ namespace xt
         template <class Func, class AX>
         xreducer(Func&& func, CT e, AX&& axes);
 
+        size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const;
+        const shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
-
         const_reference operator[](const xindex& index) const;
+        const_reference operator[](size_type i) const;
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -177,6 +184,17 @@ namespace xt
     {
         using reducer_type = xreducer<F, const_xclosure_t<E>, const_closure_t<X>>;
         return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
+    }
+
+    template <class F, class E>
+    inline auto reduce(F&& f, E&& e) noexcept
+    {
+        using reducer_type = xreducer<F,
+                                      const_xclosure_t<E>,
+                                      xgenerator<detail::arange_impl<typename std::decay_t<E>::size_type>, 
+                                                 typename std::decay_t<E>::size_type,
+                                                 std::array<std::size_t, 1>>>;
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), arange(e.dimension()));
     }
 
 #ifdef X_OLD_CLANG
@@ -424,9 +442,17 @@ namespace xt
      * @name Size and shape
      */
     /**
+     * Returns the size of the expression.
+     */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::size() const noexcept -> size_type
+    {
+        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
+    }
+
+    /**
      * Returns the number of dimensions of the expression.
      */
-
     template <class F, class CT, class X>
     inline auto xreducer<F, CT, X>::dimension() const noexcept -> size_type
     {
@@ -437,7 +463,7 @@ namespace xt
      * Returns the shape of the expression.
      */
     template <class F, class CT, class X>
-    inline auto xreducer<F, CT, X>::shape() const -> const shape_type&
+    inline auto xreducer<F, CT, X>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
@@ -472,6 +498,12 @@ namespace xt
         return element(index.cbegin(), index.cend());
     }
 
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::operator[](size_type i) const -> const_reference
+    {
+        return operator()(i);
+    }
+ 
     /**
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param first iterator starting the sequence of indices

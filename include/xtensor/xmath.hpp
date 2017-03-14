@@ -825,6 +825,13 @@ namespace xt
         return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
     }
 
+    template <class E>
+    inline auto sum(E&& e) noexcept
+    {
+        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e));
+    }
+
 #ifdef X_OLD_CLANG
     template <class E, class I>
     inline auto sum(E&& e, std::initializer_list<I> axes) noexcept
@@ -856,6 +863,13 @@ namespace xt
     {
         using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
+    }
+
+    template <class E>
+    inline auto prod(E&& e) noexcept
+    {
+        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e));
     }
 
 #ifdef X_OLD_CLANG

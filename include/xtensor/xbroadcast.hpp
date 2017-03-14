@@ -12,6 +12,7 @@
 #include <utility>
 #include <array>
 #include <algorithm>
+#include <numeric>
 #include <iterator>
 #include <type_traits>
 #include <cstddef>
@@ -104,12 +105,14 @@ namespace xt
         template <class S>
         xbroadcast(CT e, S&& s) noexcept;
 
+        size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type & shape() const noexcept;
+        const shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
         const_reference operator[](const xindex& index) const;
+        const_reference operator[](size_type i) const;
 
         template <class It>
         const_reference element(It, It last) const;
@@ -199,6 +202,15 @@ namespace xt
      * @name Size and shape
      */
     /**
+     * Returns the size of the expression.
+     */
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::size() const noexcept -> size_type
+    {
+        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
+    }
+
+    /**
      * Returns the number of dimensions of the expression.
      */
     template <class CT, class X>
@@ -244,7 +256,13 @@ namespace xt
     {
         return element(index.cbegin(), index.cend());
     }
-    
+
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::operator[](size_type i) const -> const_reference
+    {
+        return operator()(i);
+    }
+ 
     /**
      * Returns a constant reference to the element at the specified position in the expression.
      * @param first iterator starting the sequence of indices

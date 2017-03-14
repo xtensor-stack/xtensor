@@ -105,7 +105,9 @@ namespace xt
         const_reference operator()(Args... args) const;
 
         reference operator[](const xindex& index);
+        reference operator[](size_type i);
         const_reference operator[](const xindex& index) const;
+        const_reference operator[](size_type i) const;
 
         template <class It>
         reference element(It first, It last);
@@ -187,7 +189,7 @@ namespace xt
         template <class S>
         void transpose_impl(S&& permutation, check_policy::full);
 
-        size_type data_size() const noexcept;
+        size_type compute_size() const noexcept;
 
         template <size_t dim = 0>
         size_type data_offset() const noexcept;
@@ -249,7 +251,7 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_size() const noexcept -> size_type
+    inline auto xcontainer<D>::compute_size() const noexcept -> size_type
     {
         return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
     }
@@ -384,7 +386,7 @@ namespace xt
         m_strides = strides;
         resize_container(m_backstrides, m_strides.size());
         adapt_strides();
-        data().resize(data_size());
+        data().resize(compute_size());
     }
 
     /**
@@ -527,6 +529,12 @@ namespace xt
         return element(index.cbegin(), index.cend());
     }
 
+    template <class D>
+    inline auto xcontainer<D>::operator[](size_type i) -> reference
+    {
+        return operator()(i);
+    }
+
     /**
      * Returns a constant reference to the element at the specified position in the container.
      * @param index a sequence of indices specifying the position in the container. Indices
@@ -537,6 +545,12 @@ namespace xt
     inline auto xcontainer<D>::operator[](const xindex& index) const -> const_reference
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::operator[](size_type i) const -> const_reference
+    {
+        return operator()(i);
     }
 
     /**

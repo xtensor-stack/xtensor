@@ -113,18 +113,21 @@ namespace xt
 
         size_type dimension() const noexcept;
 
+        size_type size() const noexcept;
         const shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
         reference operator[](const xindex& index);
+        reference operator[](size_type i);
         template <class It>
         reference element(It first, It last);
 
         template <class... Args>
         const_reference operator()(Args... args) const;
         const_reference operator[](const xindex& index) const;
+        const_reference operator[](size_type i) const;
         template <class It>
         const_reference element(It first, It last) const;
 
@@ -353,6 +356,15 @@ namespace xt
      */
     //@{
     /**
+     * Returns the size of the expression.
+     */
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::size() const noexcept -> size_type
+    {
+        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
+    }
+
+    /**
      * Returns the number of dimensions of the view.
      */
     template <class CT, class... S>
@@ -407,6 +419,12 @@ namespace xt
     }
 
     template <class CT, class... S>
+    inline auto xview<CT, S...>::operator[](size_type i) -> reference
+    {
+        return operator()(i);
+    }
+
+    template <class CT, class... S>
     template <class It>
     inline auto xview<CT, S...>::element(It first, It last) -> reference
     {
@@ -434,6 +452,12 @@ namespace xt
     inline auto xview<CT, S...>::operator[](const xindex& index) const -> const_reference
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator[](size_type i) const -> const_reference
+    {
+        return operator()(i);
     }
 
     template <class CT, class... S>
