@@ -37,3 +37,20 @@ xbuilder
 .. doxygenfunction:: xt::logspace
    :project: xtensor
 
+.. doxygenfunction:: xt::diag
+   :project: xtensor
+
+.. doxygenfunction:: xt::diagonal
+   :project: xtensor
+
+.. doxygenfunction:: xt::tril
+   :project: xtensor
+
+.. doxygenfunction:: xt::triu
+   :project: xtensor
+
+.. doxygenfunction:: xt::fliplr
+   :project: xtensor
+
+.. doxygenfunction:: xt::flipud
+   :project: xtensor
