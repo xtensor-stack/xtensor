@@ -189,12 +189,10 @@ namespace xt
     template <class F, class E>
     inline auto reduce(F&& f, E&& e) noexcept
     {
-        using reducer_type = xreducer<F,
-                                      const_xclosure_t<E>,
-                                      xgenerator<detail::arange_impl<typename std::decay_t<E>::size_type>, 
-                                                 typename std::decay_t<E>::size_type,
-                                                 std::array<std::size_t, 1>>>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), arange(e.dimension()));
+        auto ar = arange(e.dimension());
+        using AR = decltype(ar);
+        using reducer_type = xreducer<F, const_xclosure_t<E>, AR>;
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), std::move(ar));
     }
 
 #ifdef X_OLD_CLANG
