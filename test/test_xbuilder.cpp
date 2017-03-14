@@ -313,6 +313,50 @@ namespace xt
 
         xarray<double> expected = {1, 5, 9};
         ASSERT_EQ(expected, t);
+
+        xt::xarray<double> f = xt::arange(12);
+        f.reshape({4, 3});
+
+        xarray<double> exp_1 = {1, 5};
+        ASSERT_TRUE(all(equal(exp_1, xt::diagonal(f, 1))));
+        xarray<double> exp_2 = {0, 4, 8};
+        EXPECT_EQ(exp_2, xt::diagonal(f));
+        xarray<double> exp_3 = {3, 7, 11};
+        EXPECT_EQ(exp_3, xt::diagonal(f, -1));
+        xarray<double> exp_4 = {6, 10};
+        EXPECT_EQ(exp_4, xt::diagonal(f, -2));
+    }
+
+    TEST(xbuilder, diagonal_advanced)
+    {
+        xarray<double> e = xt::arange<double>(0, 24);
+        e.reshape({2, 2, 2, 3});
+
+        xarray<double> d1 = xt::diagonal(e);
+
+        xarray<double> expected = {{{ 0, 18},
+                                    { 1, 19},
+                                    { 2, 20}},
+                                   {{ 3, 21},
+                                    { 4, 22},
+                                    { 5, 23}}};
+        ASSERT_EQ(expected, d1);
+
+        std::vector<double> d2 = {6, 7, 8, 9, 10, 11};
+        xarray<double> expected_2;
+        expected_2.reshape({2, 3, 1});
+        std::copy(d2.begin(), d2.end(), expected_2.data().begin());
+
+        xarray<double> t2 = xt::diagonal(e, 1);
+        ASSERT_EQ(expected_2, t2);
+
+        std::vector<double> d3 = {3, 9, 15, 21};
+        xarray<double> expected_3;
+        expected_3.reshape({2, 2, 1});
+        std::copy(d3.begin(), d3.end(), expected_3.data().begin());
+        xarray<double> t3 = xt::diagonal(e, -1, 2, 3);
+        ASSERT_EQ(expected_3, t3);
+
     }
 
     TEST(xbuilder, diag)
