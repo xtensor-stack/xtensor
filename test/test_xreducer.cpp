@@ -83,4 +83,12 @@ namespace xt
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
     }
+
+    TEST(xreducer, sumi_all)
+    {
+        xreducer_features features;
+        auto res = sum(features.m_a);
+        double expected = 732;
+        EXPECT_EQ(res(), expected);
+    }
 }

@@ -14,6 +14,7 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
+#include <numeric>
 #include <iterator>
 
 #include "xexpression.hpp"
@@ -130,6 +131,7 @@ namespace xt
         template <class Func>
         xfunction(Func&& f, CT... e) noexcept;
 
+        size_type size() const noexcept;
         size_type dimension() const noexcept;
         const shape_type& shape() const;
 
@@ -137,6 +139,7 @@ namespace xt
         const_reference operator()(Args... args) const;
 
         const_reference operator[](const xindex& index) const;
+        const_reference operator[](size_type i) const;
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -324,6 +327,15 @@ namespace xt
      */
     //@{
     /**
+     * Returns the size of the expression.
+     */
+    template <class F, class R, class... CT>
+    inline auto xfunction<F, R, CT...>::size() const noexcept -> size_type
+    {
+        return std::accumulate(shape().begin(), shape().end(), size_type(1), std::multiplies<size_type>());
+    }
+
+    /**
      * Returns the number of dimensions of the function.
      */
     template <class F, class R, class... CT>
@@ -370,7 +382,13 @@ namespace xt
     {
         return element(index.cbegin(), index.cend());
     }
-    
+ 
+    template <class F, class R, class... CT>
+    inline auto xfunction<F, R, CT...>::operator[](size_type i) const -> const_reference
+    {
+        return operator()(i);
+    }
+ 
     /**
      * Returns a constant reference to the element at the specified position in the function.
      * @param first iterator starting the sequence of indices

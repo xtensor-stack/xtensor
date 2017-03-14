@@ -110,12 +110,13 @@ namespace xt
         disable_xexpression<E, self_type>& operator=(const E& e);
 
         size_type dimension() const noexcept;
-        const shape_type& shape() const;
+        const shape_type& shape() const noexcept;
 
         reference operator()();
         template <class... Args>
         reference operator()(std::size_t idx, Args... /*args*/);
         reference operator[](const xindex& index);
+        reference operator[](size_type i);
 
         template <class It>
         reference element(It first, It last);
@@ -124,6 +125,7 @@ namespace xt
         template <class... Args>
         const_reference operator()(std::size_t idx, Args... /*args*/) const;
         const_reference operator[](const xindex& index) const;
+        const_reference operator[](size_type i) const;
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -282,7 +284,7 @@ namespace xt
      * Returns the shape of the xindexview.
      */
     template <class CT, class I>
-    inline auto xindexview<CT, I>::shape() const -> const shape_type&
+    inline auto xindexview<CT, I>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
@@ -329,9 +331,21 @@ namespace xt
     }
 
     template <class CT, class I>
+    inline auto xindexview<CT, I>::operator[](size_type i) -> reference
+    {
+        return operator()(i);
+    }
+
+    template <class CT, class I>
     inline auto xindexview<CT, I>::operator[](const xindex& index) const -> const_reference
     {
         return m_e[m_indices[index[0]]];
+    }
+
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::operator[](size_type i) const -> const_reference
+    {
+        return operator()(i);
     }
 
     /**

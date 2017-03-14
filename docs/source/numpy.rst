@@ -250,18 +250,20 @@ argument.
 Reducers
 --------
 
-Reducers accumulate values of tensor expressions along specified axes. When not specified, values
-are accumulated along all the axes of the expression. Like in the rest of xtensor, return values
-of e.g. ``sum`` and ``prod`` don't hold any values and are computed upon access or assigmnent.
-
-In the case of xtensor, the list of axes must be increasingly sorted.
+Reducers accumulate values of tensor expressions along specified axes. When no axis is specified,
+values are accumulated along all axes. Reducers are lazy, meaning that returned expressons don't
+hold any values and are computed upon access or assigmnent.
 
 +-----------------------------------------------+-----------------------------------------------+
 |            Python 3 - numpy                   |                C++ 14 - xtensor               |
 +===============================================+===============================================+
 | ``np.sum(a, axis=[0, 1])``                    | ``xt::sum(a, {0, 1})``                        |
 +-----------------------------------------------+-----------------------------------------------+
+| ``np.sum(a)``                                 | ``xt::sum(a)``                                |
++-----------------------------------------------+-----------------------------------------------+
 | ``np.prod(a, axis=1)``                        | ``xt::prod(a, {1})``                          |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.prod(a)``                                | ``xt::prod(a)``                               |
 +-----------------------------------------------+-----------------------------------------------+
 
 Mathematical functions

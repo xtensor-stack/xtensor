@@ -14,6 +14,7 @@
 #include <utility>
 #include <tuple>
 #include <algorithm>
+#include <numeric>
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
@@ -86,12 +87,14 @@ namespace xt
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;
 
+        size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const;
+        const shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
         const_reference operator[](const xindex& index) const;
+        const_reference operator[](size_type i) const;
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -140,6 +143,15 @@ namespace xt
      */
     //@{
     /**
+     * Returns the size of the expression.
+     */
+    template <class F, class R, class S>
+    inline auto xgenerator<F, R, S>::size() const noexcept -> size_type
+    {
+        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
+    }
+
+    /**
      * Returns the number of dimensions of the function.
      */
     template <class F, class R, class S>
@@ -152,7 +164,7 @@ namespace xt
      * Returns the shape of the xgenerator.
      */
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::shape() const -> const shape_type&
+    inline auto xgenerator<F, R, S>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
@@ -177,7 +189,13 @@ namespace xt
     template <class F, class R, class S>
     inline auto xgenerator<F, R, S>::operator[](const xindex& index) const -> const_reference
     {
-        return m_f[index];
+        return m_f.element(index.begin(), index.end());
+    }
+
+    template <class F, class R, class S>
+    inline auto xgenerator<F, R, S>::operator[](size_type i) const -> const_reference
+    {
+        return operator()(i);
     }
 
     /**
