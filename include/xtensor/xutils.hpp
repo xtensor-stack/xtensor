@@ -598,34 +598,31 @@ namespace xt
      * closure implementation *
      **************************/
 
-    namespace detail
+    template <class S>
+    struct closure
     {
-        template <class S>
-        struct closure
-        {
-            using underlying_type = std::conditional_t<std::is_const<std::remove_reference_t<S>>::value,
-                                                       const std::decay_t<S>,
-                                                       std::decay_t<S>>;
-            using type = typename std::conditional<std::is_lvalue_reference<S>::value,
-                                                   underlying_type&,
-                                                   underlying_type>::type;
-        };
+        using underlying_type = std::conditional_t<std::is_const<std::remove_reference_t<S>>::value,
+                                                   const std::decay_t<S>,
+                                                   std::decay_t<S>>;
+        using type = typename std::conditional<std::is_lvalue_reference<S>::value,
+                                               underlying_type&,
+                                               underlying_type>::type;
+    };
 
-        template <class S>
-        using closure_t = typename closure<S>::type;
+    template <class S>
+    using closure_t = typename closure<S>::type;
 
-        template <class S>
-        struct const_closure
-        {
-            using underlying_type = const std::decay_t<S>;
-            using type = typename std::conditional<std::is_lvalue_reference<S>::value,
-                                                   underlying_type&,
-                                                   underlying_type>::type;
-        };
-        
-        template <class S>
-        using const_closure_t = typename const_closure<S>::type;
-    }
+    template <class S>
+    struct const_closure
+    {
+        using underlying_type = const std::decay_t<S>;
+        using type = typename std::conditional<std::is_lvalue_reference<S>::value,
+                                               underlying_type&,
+                                               underlying_type>::type;
+    };
+     
+    template <class S>
+    using const_closure_t = typename const_closure<S>::type;
 
     /***************************
      * apply_cv implementation *

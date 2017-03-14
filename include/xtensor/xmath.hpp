@@ -819,10 +819,10 @@ namespace xt
      * @return an \ref xreducer
      */
     template <class E, class X>
-    inline auto sum(E&& e, const X& axes) noexcept
+    inline auto sum(E&& e, X&& axes) noexcept
     {
         using functor_type = std::plus<typename std::decay_t<E>::value_type>;
-        return reduce(functor_type(), std::forward<E>(e), axes);
+        return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
     }
 
 #ifdef X_OLD_CLANG
@@ -852,10 +852,10 @@ namespace xt
      * @return an \ref xreducer
      */
     template <class E, class X>
-    inline auto prod(E&& e, const X& axes) noexcept
+    inline auto prod(E&& e, X&& axes) noexcept
     {
         using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
-        return reduce(functor_type(), std::forward<E>(e), axes);
+        return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
     }
 
 #ifdef X_OLD_CLANG
