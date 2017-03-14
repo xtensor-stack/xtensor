@@ -117,7 +117,7 @@ namespace xt
 
     public:
 
-        using size_type = T;
+        using size_type = typename std::make_signed<T>::type;
 
         xstepped_range() = default;
         xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept;
@@ -230,26 +230,26 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value && std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        inline std::enable_if_t<!std::is_integral<MI>::value && std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<std::size_t>>
         get(std::size_t size)
         {
-            return xstepped_range<int>(m_step > 0 ? 0 : int(size) - 1, m_max, m_step);
+            return xstepped_range<std::size_t>(m_step > 0 ? 0 : int(size) - 1, m_max, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<std::is_integral<MI>::value && !std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        inline std::enable_if_t<std::is_integral<MI>::value && !std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<std::size_t>>
         get(std::size_t size)
         {
-            return xstepped_range<int>(m_min, m_step > 0 ? int(size) : -1, m_step);
+            return xstepped_range<std::size_t>(m_min, m_step > 0 ? int(size) : -1, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value && !std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        inline std::enable_if_t<!std::is_integral<MI>::value && !std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<std::size_t>>
         get(std::size_t size)
         {
             int min_val_arg = m_step > 0 ? 0 : int(size) - 1;
             int max_val_arg = m_step > 0 ? int(size) : -1;
-            return xstepped_range<int>(min_val_arg, max_val_arg, m_step);
+            return xstepped_range<std::size_t>(min_val_arg, max_val_arg, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -453,7 +453,7 @@ namespace xt
 
     template <class T>
     inline xstepped_range<T>::xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept
-        : m_min(min_val), m_size((size_type) std::ceil(double(max_val - min_val)/double(step))), m_step(step)
+        : m_min(min_val), m_size((size_type) std::ceil(double(max_val - min_val) / double(step))), m_step(step)
     {
     }
 

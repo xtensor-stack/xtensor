@@ -84,6 +84,35 @@ namespace xt
     {
         return m_message.c_str();
     }
+
+    /****************************
+     * unnormalized slice error *
+     ****************************/
+
+    class unnormalized_slice_error : public std::exception
+    {
+
+    public:
+
+        unnormalized_slice_error(const std::string& msg);
+
+        virtual const char* what() const noexcept;
+
+    private:
+
+        std::string m_message;
+    };
+
+    /*******************************************
+     * unnormalized_slice_error implementation *
+     *******************************************/
+
+    inline unnormalized_slice_error::unnormalized_slice_error(const std::string& msg) : m_message(msg) {};
+
+    inline const char* unnormalized_slice_error::what() const noexcept
+    {
+        return m_message.c_str();
+    }
 }
 
 #endif
