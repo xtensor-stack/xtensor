@@ -189,7 +189,7 @@ namespace xt
     template <class F, class R, class S>
     inline auto xgenerator<F, R, S>::operator[](const xindex& index) const -> const_reference
     {
-        return m_f[index];
+        return m_f.element(index.begin(), index.end());
     }
 
     template <class F, class R, class S>

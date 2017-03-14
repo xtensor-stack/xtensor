@@ -92,11 +92,6 @@ namespace xt
                 return m_generator();
             }
 
-            inline value_type operator[](const xindex&) const
-            {
-                return m_generator();
-            }
-
             template <class It>
             inline value_type element(It, It) const
             {

@@ -105,13 +105,8 @@ namespace xt
                 return access_impl(args...);
             }
 
-            inline T operator[](const xindex& idx) const
-            {
-                return m_start + m_step * T(idx[0]);
-            }
-
             template <class It>
-            inline T element(It first, It /*last*/) const
+            inline T element(It first, It) const
             {
                 return m_start + m_step * T(*first);
             }
@@ -122,7 +117,7 @@ namespace xt
             value_type m_step;
 
             template <class T1, class... Args>
-            inline T access_impl(T1 t, Args... /*args*/) const
+            inline T access_impl(T1 t, Args...) const
             {
                 return m_start + m_step * T(t);
             }
@@ -154,11 +149,6 @@ namespace xt
             {
                 size_type idx [sizeof...(Args)] = {static_cast<size_type>(args)...};
                 return access_impl(std::begin(idx), std::end(idx));
-            }
-
-            inline value_type operator[](const xindex& idx) const
-            {
-                return access_impl(idx.begin(), idx.end());
             }
 
             template <class It>
@@ -302,17 +292,14 @@ namespace xt
             template <class... Args>
             inline value_type operator()(Args... args) const
             {
+                // TODO: avoid memory allocation
                 return access_impl(xindex({{static_cast<size_type>(args)...}}));
-            }
-
-            inline value_type operator[](const xindex& idx) const
-            {
-                return access_impl(idx);
             }
 
             template <class It>
             inline value_type element(It first, It last) const
             {
+                // TODO: avoid memory allocation
                 return access_impl(xindex(first, last));
             }
 
@@ -320,7 +307,8 @@ namespace xt
 
             inline value_type access_impl(xindex idx) const
             {
-                auto match = [this, &idx](auto& arr) {
+                auto match = [this, &idx](auto& arr)
+                {
                     if (idx[this->m_axis] >= arr.shape()[this->m_axis])
                     {
                         idx[this->m_axis] -= arr.shape()[this->m_axis];
@@ -329,7 +317,8 @@ namespace xt
                     return true;
                 };
 
-                auto get = [&idx](auto& arr) {
+                auto get = [&idx](auto& arr)
+                {
                     return arr[idx];
                 };
 
@@ -362,17 +351,14 @@ namespace xt
             template <class... Args>
             inline value_type operator()(Args... args) const
             {
+                // TODO: avoid memory allocation
                 return access_impl(xindex({{static_cast<size_type>(args)...}}));
-            }
-
-            inline value_type operator[](const xindex& idx) const
-            {
-                return access_impl(idx);
             }
 
             template <class It>
             inline value_type element(It first, It last) const
             {
+                // TODO: avoid memory allocation
                 return access_impl(xindex(first, last));
             }
 
@@ -380,7 +366,8 @@ namespace xt
 
             inline value_type access_impl(xindex idx) const
             {
-                auto get_item = [&idx](auto& arr) {
+                auto get_item = [&idx](auto& arr)
+                {
                     return arr[idx];
                 };
                 std::size_t i = idx[m_axis];
@@ -416,15 +403,10 @@ namespace xt
                 return m_source();
             }
 
-            value_type operator[](const xindex& idx) const
-            {
-                return m_source[{ idx[m_axis] }];
-            }
-
             template <class It>
             inline value_type element(It first, It) const
             {
-                return m_source[{*(first + m_axis)}];
+                return m_source(*(first + m_axis));
             }
 
         private:
@@ -570,7 +552,7 @@ namespace xt
             }
 
             template <class It>
-            inline value_type operator()(It begin, It /*end*/) const
+            inline value_type operator()(It begin, It) const
             {
                 return m_source(*begin, *begin);
             }
@@ -590,7 +572,7 @@ namespace xt
             }
 
             template <class It>
-            inline value_type operator()(It begin, It /*end*/) const
+            inline value_type operator()(It begin, It) const
             {
                 return *begin == *(begin + 1) ? m_source(*begin) : value_type(0);
             }
@@ -623,16 +605,13 @@ namespace xt
                 return m_source(m_shape_first - first_idx, args...);
             }
 
-            inline value_type operator[](xindex idx) const
-            {
-                idx.front() = m_shape_first - idx.front();
-                return m_source[idx];
-            }
-
             template <class It>
             inline value_type element(It first, It last) const
             {
-                return operator[](xindex(first, last));
+                // TODO: avoid memory allocation
+                xindex idx(first, last);
+                idx.front() = m_shape_first - idx.front();
+                return m_source.element(idx.begin(), idx.end());
             }
 
         private:
@@ -664,16 +643,13 @@ namespace xt
                 return m_source(args..., m_shape_last - last_idx);
             }
 
-            inline value_type operator[](xindex idx) const
-            {
-                idx.back() = m_shape_last - idx.back();
-                return m_source[idx];
-            }
-
             template <class It>
             inline value_type element(It first, It last) const
             {
-                return operator[](xindex(first, last));
+                // TODO: avoid memory allocation
+                xindex idx(first, last);
+                idx.back() = m_shape_last - idx.back();
+                return m_source.element(idx.begin(), idx.end());
             }
 
         private:
