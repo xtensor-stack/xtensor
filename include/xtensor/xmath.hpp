@@ -284,6 +284,30 @@ namespace xt
         return detail::make_xfunction((function_type)detail::sign_impl, std::forward<E>(e));
     }
 
+    namespace detail
+    {
+        // Not using std::isnan and std::isinf as a workaround to the following bug in GCC-6.
+        //
+        // C++11 requires that the <cmath> header declares bool std::isnan(double) and bool std::isinf(double).
+        // C99 requires that the <math.h> header declares int ::isnan(double) and int ::isinf(double).
+        // These two definitions would clash when importing both headers and using namespace std.
+        // 
+        // As of version 6, gcc detects whether the obsolete functions are present in the C <math.h> header and uses
+        // them if they are, avoiding the clash. However, this means that the function might return int instead
+        // of bool as C++11 requires, which is a bug.
+        template <class T>
+        inline bool isnan(T x)
+        {
+            return std::isnan(x);
+        }
+
+        template <class T>
+        inline bool isinf(T x)
+        {
+            return std::isinf(x);
+        }
+    }
+
     /**
      * @ingroup basic_functions
      * @brief NaN check
@@ -298,7 +322,24 @@ namespace xt
         -> detail::bool_xfunction_free_type<E>
     {
         using function_type = detail::bool_scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::isnan, std::forward<E>(e));
+        return detail::make_xfunction((function_type)detail::isnan<typename std::decay_t<E>::value_type>, std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief infinity check
+     *
+     * Returns an \ref xfunction for the element-wise infinity check
+     * tangent of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto isinf(E&& e) noexcept
+        -> detail::bool_xfunction_free_type<E>
+    {
+        using function_type = detail::bool_scalar_function_type<E>;
+        return detail::make_xfunction((function_type)detail::isinf<typename std::decay_t<E>::value_type>, std::forward<E>(e));
     }
 
     /*************************
