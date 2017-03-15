@@ -49,8 +49,5 @@ xbuilder
 .. doxygenfunction:: xt::triu
    :project: xtensor
 
-.. doxygenfunction:: xt::fliplr
-   :project: xtensor
-
-.. doxygenfunction:: xt::flipud
+.. doxygenfunction:: xt::flip
    :project: xtensor
