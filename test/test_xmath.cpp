@@ -18,9 +18,9 @@ namespace xt
     using std::size_t;
     using shape_type = std::vector<size_t>;
 
-    /**********************
-     * Basic operations
-     **********************/
+    /********************
+     * Basic operations *
+     ********************/
 
     TEST(xmath, abs)
     {
@@ -183,9 +183,19 @@ namespace xt
         EXPECT_EQ(ctype(1, 0), signs_d(1, 1));
     }
 
-    /***************************
-     * Exponential functions
-     ***************************/
+    TEST(xmath, isnan)
+    {
+        xarray<double> arr
+           {{1.0, std::numeric_limits<double>::quiet_NaN()},
+            {std::numeric_limits<double>::quiet_NaN(), 0.0}};
+        xarray<bool> expected
+           {{false, true}, {true, false}};
+        EXPECT_TRUE(all(equal(expected, xt::isnan(arr))));
+    }
+
+    /*************************
+     * Exponential functions *
+     *************************/
 
     TEST(xmath, exp)
     {
@@ -229,10 +239,9 @@ namespace xt
         EXPECT_EQ(log1p(a)(0, 0), std::log1p(a(0, 0)));
     }
 
-
-    /*********************
-     * Power functions
-     *********************/
+    /*******************
+     * Power functions *
+     *******************/
 
     TEST(xmath, pow)
     {
@@ -276,10 +285,9 @@ namespace xt
         EXPECT_EQ(hypot(sa, b)(0, 0), std::hypot(sa, b(0, 0)));
     }
 
-
-    /*****************************
-     * Trigonometric functions
-     *****************************/
+    /***************************
+     * Trigonometric functions *
+     ***************************/
 
     TEST(xmath, sin)
     {
@@ -338,9 +346,9 @@ namespace xt
     }
 
 
-    /**************************
-     * Hyperbolic functions
-     **************************/
+    /************************
+     * Hyperbolic functions *
+     ************************/
 
     TEST(xmath, sinh)
     {
@@ -385,9 +393,9 @@ namespace xt
     }
 
 
-    /*******************************
-     * Error and gamma functions
-     *******************************/
+    /*****************************
+     * Error and gamma functions *
+     *****************************/
 
     TEST(xmath, erf)
     {
