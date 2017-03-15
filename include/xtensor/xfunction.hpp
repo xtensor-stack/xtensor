@@ -332,7 +332,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::size() const noexcept -> size_type
     {
-        return std::accumulate(shape().begin(), shape().end(), size_type(1), std::multiplies<size_type>());
+        return compute_size(shape());
     }
 
     /**

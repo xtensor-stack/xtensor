@@ -12,6 +12,7 @@
 #include <numeric>
 #include <functional>
 
+#include "xstrides.hpp"
 #include "xiterator.hpp"
 #include "xoperation.hpp"
 #include "xmath.hpp"
@@ -25,12 +26,6 @@ namespace xt
         struct none {};
         struct full {};
     }
-
-    enum class layout
-    {
-        row_major,
-        column_major
-    };
 
     /**
      * @class xcontainer
@@ -180,25 +175,11 @@ namespace xt
 
     private:
 
-        void adapt_strides() noexcept;
-        void adapt_strides(size_type i) noexcept;
-
         template <class S>
         void transpose_impl(S&& permutation, check_policy::none);
 
         template <class S>
         void transpose_impl(S&& permutation, check_policy::full);
-
-        size_type compute_size() const noexcept;
-
-        template <size_t dim = 0>
-        size_type data_offset() const noexcept;
-
-        template <size_t dim = 0, class... Args>
-        size_type data_offset(size_type i, Args... args) const noexcept;
-
-        template <class It>
-        size_type element_offset(It, It last) const noexcept;
 
         shape_type m_shape;
         strides_type m_strides;
@@ -225,58 +206,6 @@ namespace xt
     inline auto xcontainer<D>::get_backstrides() noexcept -> strides_type&
     {
         return m_backstrides;
-    }
-
-    template <class D>
-    inline void xcontainer<D>::adapt_strides() noexcept
-    {
-        for(size_type i = 0; i < m_shape.size(); ++i)
-        {
-            adapt_strides(i);
-        }
-    }
-
-    template <class D>
-    inline void xcontainer<D>::adapt_strides(size_type i) noexcept
-    {
-        if(m_shape[i] == 1)
-        {
-            m_strides[i] = 0;
-            m_backstrides[i] = 0;
-        }
-        else
-        {
-            m_backstrides[i] = m_strides[i] * (m_shape[i] - 1);
-        }
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::compute_size() const noexcept -> size_type
-    {
-        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
-    }
-
-    template <class D>
-    template <size_t dim>
-    inline auto xcontainer<D>::data_offset() const noexcept -> size_type
-    {
-        return 0;
-    }
-
-    template <class D>
-    template <size_t dim, class... Args>
-    inline auto xcontainer<D>::data_offset(size_type i, Args... args) const noexcept -> size_type
-    {
-        return i * m_strides[dim] + data_offset<dim + 1>(args...);
-    }
-
-    template <class D>
-    template <class It>
-    inline auto xcontainer<D>::element_offset(It, It last) const noexcept -> size_type
-    {
-        It first = last;
-        first -= m_strides.size();
-        return std::inner_product(m_strides.begin(), m_strides.end(), first, size_type(0));
     }
 
     /**
@@ -352,25 +281,7 @@ namespace xt
         m_shape = shape;
         resize_container(m_strides, m_shape.size());
         resize_container(m_backstrides, m_shape.size());
-        size_type data_size = 1;
-        if(l == layout::row_major)
-        {
-            for(size_type i = m_strides.size(); i != 0; --i)
-            {
-                m_strides[i - 1] = data_size;
-                data_size = m_strides[i - 1] * m_shape[i - 1];
-                adapt_strides(i - 1);
-            }
-        }
-        else
-        {
-            for(size_type i = 0; i < m_strides.size(); ++i)
-            {
-                m_strides[i] = data_size;
-                data_size = m_strides[i] * m_shape[i];
-                adapt_strides(i);
-            }
-        }
+        size_type data_size = compute_strides(m_shape, l, m_strides, m_backstrides);
         data().resize(data_size);
     }
 
@@ -385,8 +296,8 @@ namespace xt
         m_shape = shape;
         m_strides = strides;
         resize_container(m_backstrides, m_strides.size());
-        adapt_strides();
-        data().resize(compute_size());
+        adapt_strides(m_shape, m_strides, m_backstrides);
+        data().resize(compute_size(this->shape()));
     }
 
     /**
@@ -499,7 +410,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
-        size_type index = data_offset(static_cast<size_type>(args)...);
+        size_type index = data_offset<size_type>(m_strides, static_cast<size_type>(args)...);
         return data()[index];
     }
 
@@ -513,7 +424,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
-        size_type index = data_offset(static_cast<size_type>(args)...);
+        size_type index = data_offset<size_type>(m_strides, static_cast<size_type>(args)...);
         return data()[index];
     }
 
@@ -564,7 +475,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) -> reference
     {
-        return data()[element_offset(first, last)];
+        return data()[element_offset<size_type>(m_strides, first, last)];
     }
 
     /**
@@ -578,7 +489,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) const -> const_reference
     {
-        return data()[element_offset(first, last)];
+        return data()[element_offset<size_type>(m_strides, first, last)];
     }
 
     /**

@@ -612,7 +612,7 @@ namespace xt
         const E& d = e.derived_cast();
 
         size_t lim = 0;
-        std::size_t sz = std::accumulate(d.shape().begin(), d.shape().end(), std::size_t(1), std::multiplies<>());
+        std::size_t sz = compute_size(d.shape());
         if (sz > print_options::print_options().threshold)
         {
             lim = print_options::print_options().edge_items;
