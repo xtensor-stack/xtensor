@@ -93,6 +93,10 @@ Outputs:
  {7, 8, 9}}
 ```
 
+## The Numpy to xtensor cheat sheet
+
+If you are familiar with numpy APIs, and you are interested in xtensor, you can check out the [numpy to xtensor cheat sheet](xtensor.readthedocs.io/en/latest/numpy.html) provided in the documentation.
+
 ## Lazy Broadcasting with `xtensor`
 
 We can operate on arrays of different shapes of dimensions in an elementwise fashion. Broadcasting rules of xtensor are similar to those of [numpy](http://www.numpy.org) and [libdynd](http://libdynd.org).
