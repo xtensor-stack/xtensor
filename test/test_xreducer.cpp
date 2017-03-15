@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xreducer.hpp"
@@ -84,11 +85,28 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
-    TEST(xreducer, sumi_all)
+    TEST(xreducer, sum_all)
     {
         xreducer_features features;
         auto res = sum(features.m_a);
         double expected = 732;
         EXPECT_EQ(res(), expected);
+    }
+
+    TEST(xreducer, mean)
+    {
+        xtensor<double, 2> input
+            {{-1.0, 0.0}, {1.0, 0.0}};
+        auto mean_all = mean(input);
+        auto mean0 = mean(input, {0});
+        auto mean1 = mean(input, {1});
+
+        xtensor<double, 0> expect_all = 0.0;
+        xtensor<double, 1> expect0 = {0.0, 0.0};
+        xtensor<double, 1> expect1 = {-0.5, 0.5};
+
+        EXPECT_EQ(mean_all(), expect_all());
+        EXPECT_TRUE(all(equal(mean0, expect0)));
+        EXPECT_TRUE(all(equal(mean1, expect1)));
     }
 }

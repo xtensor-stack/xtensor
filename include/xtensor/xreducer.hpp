@@ -157,7 +157,7 @@ namespace xt
         axes_type m_axes;
         shape_type m_shape;
 
-        using index_type = xindex_type_t<shape_type>;
+        using index_type = xindex_type_t<typename xexpression_type::shape_type>;
         mutable index_type m_index;
 
         friend class detail::reducing_iterator<F, CT, X>;
@@ -199,7 +199,7 @@ namespace xt
     template <class F, class E, class I>
     inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept
     {
-        using axes_type = std::vector<I>;
+        using axes_type = std::vector<typename std::decay_t<E>::size_type>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
         return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
     }
@@ -207,7 +207,7 @@ namespace xt
     template <class F, class E, class I, std::size_t N>
     inline auto reduce(F&& f, E&& e, const I(&axes)[N]) noexcept
     {
-        using axes_type = std::array<I, N>;
+        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
         return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
     }

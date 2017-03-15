@@ -128,8 +128,8 @@ Element access
 ~~~~~~~~~~~~~~
 
 - ``operator()`` is an access operator which can take multiple integral arguments of none.
-- ``operator[]`` is an access operator which takes a single multi-index argument, which can be of size determined at runtime. This operator also supports braced 
-  initializer arguments.
+- ``operator[]`` has two overloads: one that takes a single integral argument and is equivalent to the call of ``operator()`` with one argument, and one with a single
+multi-index argument, which can be of size determined at runtime. This operator also supports braced initializer arguments.
 - ``element()`` is an access operator which takes a pair of iterators on a container of indices.
 
 .. code::
