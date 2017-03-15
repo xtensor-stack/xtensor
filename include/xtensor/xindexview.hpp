@@ -16,6 +16,7 @@
 #include <algorithm>
 
 #include "xexpression.hpp"
+#include "xstrides.hpp"
 #include "xiterable.hpp"
 #include "xutils.hpp"
 
@@ -109,6 +110,7 @@ namespace xt
         template <class E>
         disable_xexpression<E, self_type>& operator=(const E& e);
 
+        size_type size() const noexcept;
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
 
@@ -271,6 +273,15 @@ namespace xt
      * @name Size and shape
      */
     //@{
+    /**
+     * Returns the size of the xindexview.
+     */
+    template <class CT, class I>
+    inline auto xindexview<CT, I>::size() const noexcept -> size_type
+    {
+        return compute_size(shape());
+    }
+
     /**
      * Returns the number of dimensions of the xindexview.
      */

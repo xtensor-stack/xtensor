@@ -445,7 +445,7 @@ namespace xt
     template <class F, class CT, class X>
     inline auto xreducer<F, CT, X>::size() const noexcept -> size_type
     {
-        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
+        return compute_size(shape());
     }
 
     /**

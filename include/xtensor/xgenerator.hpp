@@ -17,6 +17,7 @@
 #include <numeric>
 
 #include "xexpression.hpp"
+#include "xstrides.hpp"
 #include "xiterable.hpp"
 #include "xutils.hpp"
 
@@ -148,7 +149,7 @@ namespace xt
     template <class F, class R, class S>
     inline auto xgenerator<F, R, S>::size() const noexcept -> size_type
     {
-        return std::accumulate(m_shape.begin(), m_shape.end(), size_type(1), std::multiplies<size_type>());
+        return compute_size(shape());
     }
 
     /**

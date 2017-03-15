@@ -441,7 +441,7 @@ namespace xt
             return index_type();
         };
 
-        size_type total_size = std::accumulate(shape.begin(), shape.end(), size_type(1), std::multiplies<>());
+        size_type total_size = compute_size(shape);
         for (size_type i = 0; i < total_size; i++, next_idx(idx))
         {
             if (arr[idx])
