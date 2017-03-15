@@ -615,14 +615,14 @@ namespace xt
         };
 
         template <class CT>
-        struct flipud_impl
+        struct flip_impl
         {
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
             using size_type = typename xexpression_type::size_type;
 
-            flipud_impl(CT source)
-                : m_source(source), m_shape_first(m_source.shape().front() - 1)
+            flip_impl(CT source, std::size_t axis)
+                : m_source(source), m_axis(axis), m_shape_at_axis(m_source.shape()[m_axis] - 1)
             {
             }
 
@@ -633,61 +633,28 @@ namespace xt
             }
 
             template <class... Args>
-            inline value_type operator()(std::size_t first_idx, Args... args) const
+            inline value_type operator()(Args... args) const
             {
-                return m_source(m_shape_first - first_idx, args...);
+                return access_impl(xindex({ args... }));
             }
 
             template <class It>
             inline value_type element(It first, It last) const
             {
                 // TODO: avoid memory allocation
-                xindex idx(first, last);
-                idx.front() = m_shape_first - idx.front();
-                return m_source.element(idx.begin(), idx.end());
+                return access_impl(xindex(first, last));
             }
 
         private:
-            CT m_source;
-            const size_type m_shape_first;
-        };
-
-        template <class CT>
-        struct fliplr_impl
-        {
-            using xexpression_type = std::decay_t<CT>;
-            using value_type = typename xexpression_type::value_type;
-            using size_type = typename xexpression_type::size_type;
-
-            fliplr_impl(CT source)
-                : m_source(source), m_shape_last(m_source.shape().back() - 1)
+            inline value_type access_impl(xindex idx) const
             {
-            }
-
-            inline value_type operator()() const
-            {
-                // special case when called without args (happens when printing)
-                return value_type();
-            }
-
-            template <class... Args>
-            inline value_type operator()(Args... args, std::size_t last_idx) const
-            {
-                return m_source(args..., m_shape_last - last_idx);
-            }
-
-            template <class It>
-            inline value_type element(It first, It last) const
-            {
-                // TODO: avoid memory allocation
-                xindex idx(first, last);
-                idx.back() = m_shape_last - idx.back();
+                idx[m_axis] = m_shape_at_axis - idx[m_axis];
                 return m_source.element(idx.begin(), idx.end());
             }
 
-        private:
             CT m_source;
-            const size_type m_shape_last;
+            const size_type m_axis;
+            const size_type m_shape_at_axis;
         };
 
         template <class CT, class Comp>
@@ -767,8 +734,10 @@ namespace xt
         }
 
         std::size_t i = 0;
-        for (std::size_t idim = 0; idim < n_dim; ++idim) {
-            if (idim != axis_1 && idim != axis_2) {
+        for (std::size_t idim = 0; idim < n_dim; ++idim)
+        {
+            if (idim != axis_1 && idim != axis_2)
+            {
                 ret_shape[i] = shape[idim];
                 ++i;
             }
@@ -804,32 +773,21 @@ namespace xt
     }
 
     /**
-     * @brief Flip xexpression in the left/right direction. Essentially flips the last axis.
+     * @brief Reverse the order of elements in an xexpression along the given axis.
+     * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
+     * `fliplr(arr)` to `xt::flip(arr, 1)`.
+     * 
+     * @param arr the input xexpression
+     * @param axis the axis along which elements should be reversed
      *
-     * @param arr the input array
-     * @returns xexpression with values flipped in left/right direction
+     * @return xexpression evaluating to reversed array
      */
     template <class E>
-    inline auto fliplr(E&& arr)
+    inline auto flip(E&& arr, std::size_t axis)
     {
         using CT = xclosure_t<E>;
         auto shape = arr.shape();
-        return detail::make_xgenerator(detail::fliplr_impl<CT>(std::forward<E>(arr)),
-                                       shape);
-    }
-
-    /**
-     * @brief Flip xexpression in the up/down direction. Essentially flips the last axis.
-     *
-     * @param arr the input array
-     * @returns xexpression with values flipped in up/down direction
-     */
-    template <class E>
-    inline auto flipud(E&& arr)
-    {
-        using CT = xclosure_t<E>;
-        auto shape = arr.shape();
-        return detail::make_xgenerator(detail::flipud_impl<CT>(std::forward<E>(arr)),
+        return detail::make_xgenerator(detail::flip_impl<CT>(std::forward<E>(arr), axis),
                                        shape);
     }
 

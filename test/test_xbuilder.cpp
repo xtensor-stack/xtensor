@@ -373,7 +373,7 @@ namespace xt
     {
         xarray<double> e = xt::arange<double>(1, 10);
         e.reshape({3, 3});
-        xarray<double> t = xt::flipud(e);
+        xarray<double> t = xt::flip(e, 0);
         xarray<double> expected = {{7,8,9},{4,5,6},{1,2,3}};
         ASSERT_EQ(expected, t);
 
@@ -384,7 +384,7 @@ namespace xt
 
         xarray<double> f = xt::arange<double>(12);
         f.reshape({2, 2, 3});
-        xarray<double> ft = xt::flipud(f);
+        xarray<double> ft = xt::flip(f, 0);
         xarray<double> expected_2 = {{{ 6,  7,  8},
                                       { 9, 10, 11}},
                                      {{ 0,  1,  2},
@@ -396,7 +396,7 @@ namespace xt
     {
         xarray<double> e = xt::arange<double>(1, 10);
         e.reshape({3, 3});
-        xarray<double> t = xt::fliplr(e);
+        xarray<double> t = xt::flip(e, 1);
         xarray<double> expected = {{3,2,1},{6,5,4},{9,8,7}};
         ASSERT_EQ(expected, t);
 
@@ -407,14 +407,14 @@ namespace xt
 
         xarray<double> f = xt::arange<double>(12);
         f.reshape({2, 2, 3});
-        xarray<double> ft = xt::fliplr(f);
-        xarray<double> expected_2 = {{{  2,  1,  0},
-                                      {  5,  4,  3}},
-                                     {{  8,  7,  6},
-                                      { 11, 10,  9}}};
+        xarray<double> ft = xt::flip(f, 1);
+        xarray<double> expected_2 = {{{  3,  4,  5},
+                                      {  0,  1,  2}},
+                                     {{  9, 10, 11},
+                                      {  6,  7,  8}}};
 
         ASSERT_EQ(expected_2, ft);
-        auto flipped_range = fliplr(stack(xtuple(arange<double>(2), arange<double>(2))));
+        auto flipped_range = xt::flip(xt::stack(xt::xtuple(arange<double>(2), arange<double>(2))), 1);
         xarray<double> expected_range = {{1, 0}, {1, 0}};
         ASSERT_TRUE(all(equal(flipped_range, expected_range)));
     }
