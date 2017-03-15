@@ -138,12 +138,6 @@ namespace xt
             {
             }
 
-            inline value_type operator()() const
-            {
-                // special case when called without args (happens when printing)
-                return value_type();
-            }
-
             template <class... Args>
             inline value_type operator()(Args... args) const
             {
@@ -394,13 +388,8 @@ namespace xt
             template <class... Args>
             value_type operator()(Args... args) const
             {
-                // to catch a -Wuninitialized
-                if (sizeof...(Args))
-                {
-                    std::array<size_type, sizeof...(Args)> args_arr({static_cast<size_type>(args)...});
-                    return m_source(args_arr[m_axis]);
-                }
-                return m_source();
+                std::array<size_type, sizeof...(Args)> args_arr({static_cast<size_type>(args)...});
+                return m_source(args_arr[m_axis]);
             }
 
             template <class It>
@@ -561,22 +550,20 @@ namespace xt
                 {
                     if (i != m_axis_1 && i != m_axis_2)
                     {
-                        idx[i] = *begin;
-                        begin++;
+                        idx[i] = *begin++;
                     }
                 }
                 if (m_offset >= 0)
                 {
                     idx[m_axis_1] = *(begin);
                     idx[m_axis_2] = *(begin) + m_offset;
-                    return m_source[idx];
                 }
                 else
                 {
                     idx[m_axis_1] = *(begin) - m_offset;
                     idx[m_axis_2] = *(begin);
-                    return m_source[idx];
                 }
+                return m_source[idx];
             }
 
         private:
@@ -626,30 +613,28 @@ namespace xt
             {
             }
 
-            inline value_type operator()() const
-            {
-                // special case when called without args (happens when printing)
-                return value_type();
-            }
-
             template <class... Args>
             inline value_type operator()(Args... args) const
             {
-                return access_impl(xindex({ args... }));
+                std::array<size_type, sizeof...(Args)> idx({static_cast<size_type>(args)...});
+                return access_impl(idx.begin(), idx.end());
             }
 
             template <class It>
             inline value_type element(It first, It last) const
             {
                 // TODO: avoid memory allocation
-                return access_impl(xindex(first, last));
+                xindex idx(first, last);
+                return access_impl(idx.begin(), idx.end());
             }
 
         private:
-            inline value_type access_impl(xindex idx) const
+            template <class It>
+            inline value_type access_impl(It begin, It end) const
             {
-                idx[m_axis] = m_shape_at_axis - idx[m_axis];
-                return m_source.element(idx.begin(), idx.end());
+                auto it = begin + m_axis;
+                *it = m_shape_at_axis - *it;
+                return m_source.element(begin, end);
             }
 
             CT m_source;
@@ -712,6 +697,10 @@ namespace xt
     {
         using CT = xclosure_t<E>;
         auto shape = arr.shape();
+
+        // the following shape calculation code is an almost verbatim adaptation of numpy:
+        // https://github.com/numpy/numpy/blob/2aabeafb97bea4e1bfa29d946fbf31e1104e7ae0/numpy/core/src/multiarray/item_selection.c#L1799
+
         auto ret_shape = std::vector<std::size_t>(arr.dimension());
 
         std::size_t dim_1 = shape[axis_1];
@@ -719,13 +708,7 @@ namespace xt
 
         std::size_t n_dim = arr.dimension();
 
-        if (offset >= 0)
-        {
-            dim_2 -= offset;
-        }
-        else {
-            dim_1 += offset;
-        }
+        offset >= 0 ? dim_2 -= offset : dim_1 += offset;
 
         auto diag_size = dim_2 < dim_1 ? dim_2 : dim_1;
         if (diag_size < 0)
@@ -738,8 +721,7 @@ namespace xt
         {
             if (idim != axis_1 && idim != axis_2)
             {
-                ret_shape[i] = shape[idim];
-                ++i;
+                ret_shape[i++] = shape[idim];
             }
         }
 
