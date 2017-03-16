@@ -13,6 +13,7 @@
 #include <functional>
 
 #include "xstrides.hpp"
+#include "xiterable.hpp"
 #include "xiterator.hpp"
 #include "xoperation.hpp"
 #include "xmath.hpp"
@@ -27,6 +28,19 @@ namespace xt
         struct full {};
     }
 
+    template <class D>
+    struct xcontainer_iterable_types
+    {
+        using shape_type = typename xcontainer_inner_types<D>::shape_type;
+        using container_type = typename xcontainer_inner_types<D>::container_type;
+        using iterator = typename container_type::iterator;
+        using const_iterator = typename container_type::const_iterator;
+        using stepper = xstepper<D>;
+        using const_stepper = xstepper<const D>;
+        using broadcast_iterator = xiterator<stepper, shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+    };
+
     /**
      * @class xcontainer
      * @brief Base class for dense multidimensional containers.
@@ -39,7 +53,7 @@ namespace xt
      *           provides the interface.
      */
     template <class D>
-    class xcontainer
+    class xcontainer : public xiterable<D>
     {
 
     public:
@@ -59,14 +73,16 @@ namespace xt
         using shape_type = typename inner_types::shape_type;
         using strides_type = typename inner_types::strides_type;
 
-        using iterator = typename container_type::iterator;
-        using const_iterator = typename container_type::const_iterator;
+        using iterable_base = xiterable<D>;
 
-        using stepper = xstepper<D>;
-        using const_stepper = xstepper<const D>;
+        using iterator = typename iterable_base::iterator;
+        using const_iterator = typename iterable_base::const_iterator;
 
-        using broadcast_iterator = xiterator<stepper, shape_type*>;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using stepper = typename iterable_base::stepper;
+        using const_stepper = typename iterable_base::const_stepper;
+
+        using broadcast_iterator = typename iterable_base::broadcast_iterator;
+        using const_broadcast_iterator = typename iterable_base::broadcast_iterator;
 
         size_type size() const noexcept;
 
@@ -125,28 +141,6 @@ namespace xt
         const_iterator end() const noexcept;
         const_iterator cbegin() const noexcept;
         const_iterator cend() const noexcept;
-
-        broadcast_iterator xbegin() noexcept;
-        broadcast_iterator xend() noexcept;
-
-        const_broadcast_iterator xbegin() const noexcept;
-        const_broadcast_iterator xend() const noexcept;
-        const_broadcast_iterator cxbegin() const noexcept;
-        const_broadcast_iterator cxend() const noexcept;
-
-        template <class S>
-        xiterator<stepper, S> xbegin(const S& shape) noexcept;
-        template <class S>
-        xiterator<stepper, S> xend(const S& shape) noexcept;
-
-        template <class S>
-        xiterator<const_stepper, S> xbegin(const S& shape) const noexcept;
-        template <class S>
-        xiterator<const_stepper, S> xend(const S& shape) const noexcept;
-        template <class S>
-        xiterator<const_stepper, S> cxbegin(const S& shape) const noexcept;
-        template <class S>
-        xiterator<const_stepper, S> cxend(const S& shape) const noexcept;
 
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
@@ -577,7 +571,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::begin() const noexcept -> const_iterator
     {
-        return data().cbegin();
+        return cbegin();
     }
 
     /**
@@ -587,7 +581,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::end() const noexcept -> const_iterator
     {
-        return data().cend();
+        return cend();
     }
 
     /**
@@ -608,144 +602,6 @@ namespace xt
     inline auto xcontainer<D>::cend() const noexcept -> const_iterator
     {
         return data().cend();
-    }
-    //@}
-
-    /**************************
-     * broadcast iterator api *
-     **************************/
-
-    /**
-     * @name Broadcast iterators
-     */
-    //@{
-    /**
-     * Returns an iterator to the first element of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::xbegin() noexcept -> broadcast_iterator
-    {
-        return broadcast_iterator(stepper_begin(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns an iterator to the element following the last element
-     * of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::xend() noexcept -> broadcast_iterator
-    {
-        return broadcast_iterator(stepper_end(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::xbegin() const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(stepper_begin(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::xend() const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(stepper_end(m_shape), &m_shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::cxbegin() const noexcept -> const_broadcast_iterator
-    {
-        return xbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the container.
-     */
-    template <class D>
-    inline auto xcontainer<D>::cxend() const noexcept -> const_broadcast_iterator
-    {
-        return xend();
-    }
-
-    /**
-     * Returns an iterator to the first element of the container. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::xbegin(const S& shape) noexcept -> xiterator<stepper, S>
-    {
-        return xiterator<stepper, S>(stepper_begin(shape), shape);
-    }
-
-    /**
-     * Returns an iterator to the element following the last element of the
-     * container. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::xend(const S& shape) noexcept -> xiterator<stepper, S>
-    {
-        return xiterator<stepper, S>(stepper_end(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the container. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::xbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
-    {
-        return xiterator<const_stepper, S>(stepper_begin(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element of the
-     * container. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::xend(const S& shape) const noexcept -> xiterator<const_stepper, S>
-    {
-        return xiterator<const_stepper, S>(stepper_end(shape), shape);
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the container. The
-     * iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::cxbegin(const S& shape) const noexcept -> xiterator<const_stepper, S>
-    {
-        return xbegin(shape);
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element of the
-     * container. The iteration is broadcasted to the specified shape.
-     * @param shape the shape used for broadcasting
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::cxend(const S& shape) const noexcept -> xiterator<const_stepper, S>
-    {
-        return xend(shape);
     }
     //@}
 

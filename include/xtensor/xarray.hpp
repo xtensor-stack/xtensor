@@ -32,6 +32,12 @@ namespace xt
         using temporary_type = xarray<T, EA, SA>;
     };
 
+    template <class T, class EA, class SA>
+    struct xiterable_inner_types<xarray<T, EA, SA>>
+        : xcontainer_iterable_types<xarray<T, EA, SA>>
+    {
+    };
+
     /**
      * @class xarray
      * @brief Dense multidimensional container with tensor
@@ -112,6 +118,12 @@ namespace xt
         using shape_type = std::vector<typename container_type::size_type, SA>;
         using strides_type = shape_type;
         using temporary_type = xarray<typename C::value_type, EA, SA>;
+    };
+
+    template <class C, class EA, class SA>
+    struct xiterable_inner_types<xarray_adaptor<C, EA, SA>>
+        : xcontainer_iterable_types<xarray_adaptor<C, EA, SA>>
+    {
     };
 
     /**
