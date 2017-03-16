@@ -153,7 +153,7 @@ closures on the specified arguments.
 | ``np.concatenate([a, b, c], axis=1)``         | ``xt::concatenate(xtuple(a, b, c), 1)``       |
 +-----------------------------------------------+-----------------------------------------------+
 
-Diagonal, Triangular and Flip
+Diagonal, triangular and flip
 -----------------------------
 
 In the same spirit as concatenation, the following operations do not allocate any memory and do 

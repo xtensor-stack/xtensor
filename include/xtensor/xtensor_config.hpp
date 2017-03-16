@@ -10,7 +10,7 @@
 #define XTENSOR_CONFIG_HPP
 
 #define XTENSOR_VERSION_MAJOR 0
-#define XTENSOR_VERSION_MINOR 6
+#define XTENSOR_VERSION_MINOR 7
 #define XTENSOR_VERSION_PATCH 0
 
 // DETECT 3.6 <= clang < 3.8 for compiler bug workaround.

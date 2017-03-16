@@ -4,7 +4,7 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Compiler Workarounds
+Compiler workarounds
 ====================
 
 This page tracks the workarounds for the various compiler issues that we encountered in the development. This is mostly of interest for developers interested in contributing to xtensor.
@@ -14,10 +14,10 @@ Visual Studio 2015 and ``std::enable_if``
 
 With Visual Studio, ``std::enable_if`` evaluates its second argument, even if the condition is false. This is the reason for the presence of the indirection in the implementation of the ``xfunction_type_t`` meta-function.
 
-GCC-4.9 and Clang < 3.8: ``constexpr`` ``std::min`` and ``std::max``
---------------------------------------------------------------------
+GCC-4.9 and Clang < 3.8 and constexpr ``std::min`` and ``std::max``
+-------------------------------------------------------------------
 
-``std::min`` and ``std::max`` are not constexpr in these compiler. In ``xio.hpp``, we locally define a ``XTENSOR_MIN`` macro used instead of ``std::min``. The macro is undefined right after it is used.
+``std::min`` and ``std::max`` are not constexpr in these compilers. In ``xio.hpp``, we locally define a ``XTENSOR_MIN`` macro used instead of ``std::min``. The macro is undefined right after it is used.
 
 Clang < 3.8 matching ``initializer_list`` with static arrays
 ------------------------------------------------------------
