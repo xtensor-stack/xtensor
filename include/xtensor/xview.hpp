@@ -71,7 +71,7 @@ namespace xt
      */
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,
-                  public xiterable<xview<CT, S...>>
+                  public xexpression_iterable<xview<CT, S...>>
     {
 
     public:
@@ -88,7 +88,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xiterable<self_type>;
+        using iterable_base = xexpression_iterable<self_type>;
         using shape_type = typename iterable_base::shape_type;
 
         using slice_type = std::tuple<S...>;
