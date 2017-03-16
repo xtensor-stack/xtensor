@@ -1,6 +1,7 @@
 #ifndef XEXCEPTION_HPP
 #define XEXCEPTION_HPP
 
+#include <iterator>
 #include <exception>
 #include <string>
 #include <sstream>
