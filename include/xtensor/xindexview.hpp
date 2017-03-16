@@ -65,7 +65,7 @@ namespace xt
      */
     template <class CT, class I>
     class xindexview : public xview_semantic<xindexview<CT, I>>,
-                       public xiterable<xindexview<CT, I>>
+                       public xexpression_iterable<xindexview<CT, I>>
     {
 
     public:
@@ -82,7 +82,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xiterable<self_type>;
+        using iterable_base = xexpression_iterable<self_type>;
         using shape_type = typename iterable_base::shape_type;
         using strides_type = shape_type;
         using closure_type = const self_type;

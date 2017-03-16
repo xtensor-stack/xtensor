@@ -48,11 +48,6 @@ namespace xt
         using broadcast_iterator = typename iterable_types::broadcast_iterator;
         using const_broadcast_iterator = typename iterable_types::const_broadcast_iterator;
 
-        const_iterator begin() const noexcept;
-        const_iterator end() const noexcept;
-        const_iterator cbegin() const noexcept;
-        const_iterator cend() const noexcept;
-
         const_broadcast_iterator xbegin() const noexcept;
         const_broadcast_iterator xend() const noexcept;
         const_broadcast_iterator cxbegin() const noexcept;
@@ -89,7 +84,7 @@ namespace xt
      * @class xiterable
      * @brief Base class for multidimensional iterable expressions
      *
-     * The xconst_iterable class defines the interface for multidimensional
+     * The xiterable class defines the interface for multidimensional
      * expressions that can be iterated.
      *
      * @tparam D The derived type, i.e. the inheriting class for which xiterable
@@ -112,12 +107,6 @@ namespace xt
         using broadcast_iterator = typename base_type::broadcast_iterator;
         using const_broadcast_iterator = typename base_type::const_broadcast_iterator;
 
-        iterator begin() noexcept;
-        iterator end() noexcept;
-
-        using base_type::begin;
-        using base_type::end;
-
         broadcast_iterator xbegin() noexcept;
         broadcast_iterator xend() noexcept;
 
@@ -139,51 +128,84 @@ namespace xt
         derived_type& derived_cast();
     };
 
+    /******************************
+     * xexpression_const_iterable *
+     ******************************/
+
+     /**
+      * @class xexpression_const_iterable
+      * @brief Base class for multidimensional iterable constant expressions
+      *        that don't store any data
+      *
+      * The xexpression_const_iterable class defines the interface for multidimensional
+      * constant expressions that don't store any data and that can be iterated.
+      *
+      * @tparam D The derived type, i.e. the inheriting class for which xexpression_const_iterable
+      *           provides the interface.
+      */
+    template <class D>
+    class xexpression_const_iterable : public xconst_iterable<D>
+    {
+
+    public:
+
+        using base_type = xconst_iterable<D>;
+        using shape_type = typename base_type::shape_type;
+        using stepper = typename base_type::stepper;
+        using const_stepper = typename base_type::const_stepper;
+        using iterator = typename base_type::iterator;
+        using const_iterator = typename base_type::const_iterator;
+        using broadcast_iterator = typename base_type::broadcast_iterator;
+        using const_broadcast_iterator = typename base_type::const_broadcast_iterator;
+
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+    };
+
+    /************************
+     * xexpression_iterable *
+     ************************/
+
+    /**
+     * @class xexpression_iterable
+     * @brief Base class for multidimensional iterable expressions
+     *        that don't store any data
+     *
+     * The xexpression_iterable class defines the interface for multidimensional
+     * expressions that don't store any data and that can be iterated.
+     *
+     * @tparam D The derived type, i.e.the inheriting class for which xexpression_iterable
+     *           provides the interface.
+     */
+    template <class D>
+    class xexpression_iterable : public xiterable<D>
+    {
+
+    public:
+
+        using base_type = xiterable<D>;
+        using shape_type = typename base_type::shape_type;
+        using stepper = typename base_type::stepper;
+        using const_stepper = typename base_type::const_stepper;
+        using iterator = typename base_type::iterator;
+        using const_iterator = typename base_type::const_iterator;
+        using broadcast_iterator = typename base_type::broadcast_iterator;
+        using const_broadcast_iterator = typename base_type::const_broadcast_iterator;
+
+        iterator begin() noexcept;
+        iterator end() noexcept;
+
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+    };
+
     /**********************************
      * xconst_iterable implementation *
      **********************************/
-
-     /**
-      * @name Constant Iterators
-      */
-     /**
-      * Returns a constant iterator to the first element of the expression.
-      */
-    template <class D>
-    inline auto xconst_iterable<D>::begin() const noexcept -> const_iterator
-    {
-        return cxbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the expression.
-     */
-    template <class D>
-    inline auto xconst_iterable<D>::end() const noexcept -> const_iterator
-    {
-        return cxend();
-    }
-
-    /**
-     * Returns a constant iterator to the first element of the expression.
-     */
-    template <class D>
-    inline auto xconst_iterable<D>::cbegin() const noexcept -> const_iterator
-    {
-        return cxbegin();
-    }
-
-    /**
-     * Returns a constant iterator to the element following the last element
-     * of the expression.
-     */
-    template <class D>
-    inline auto xconst_iterable<D>::cend() const noexcept -> const_iterator
-    {
-        return cxend();
-    }
-    //@}
 
     /**
      * @name Constant broadcast iterators
@@ -306,30 +328,6 @@ namespace xt
      ****************************/
 
     /**
-     * @name Iterators
-     */
-    //@{
-    /**
-     * Returns an iterator to the first element of the expression.
-     */
-    template <class D>
-    inline auto xiterable<D>::begin() noexcept -> iterator
-    {
-        return xbegin();
-    }
-
-    /**
-     * Returns an iterator to the element following the last element of
-     * the expression.
-     */
-    template <class D>
-    inline auto xiterable<D>::end() noexcept -> iterator
-    {
-        return xend();
-    }
-    //@}
-
-    /**
      * @name Broadcast iterators
      */
     //@{
@@ -397,6 +395,121 @@ namespace xt
         return *static_cast<derived_type*>(this);
     }
 
+    /*********************************************
+     * xexpression_const_iterable implementation *
+     *********************************************/
+
+     /**
+      * @name Constant Iterators
+      */
+     /**
+      * Returns a constant iterator to the first element of the expression.
+      */
+    template <class D>
+    inline auto xexpression_const_iterable<D>::begin() const noexcept -> const_iterator
+    {
+        return this->cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
+    template <class D>
+    inline auto xexpression_const_iterable<D>::end() const noexcept -> const_iterator
+    {
+        return this->cxend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
+    template <class D>
+    inline auto xexpression_const_iterable<D>::cbegin() const noexcept -> const_iterator
+    {
+        return this->cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
+    template <class D>
+    inline auto xexpression_const_iterable<D>::cend() const noexcept -> const_iterator
+    {
+        return this->cxend();
+    }
+    //@}
+
+    /***************************************
+     * xexpression_iterable implementation *
+     ***************************************/
+
+     /**
+      * @name Iterators
+      */
+     //@{
+     /**
+      * Returns an iterator to the first element of the expression.
+      */
+    template <class D>
+    inline auto xexpression_iterable<D>::begin() noexcept -> iterator
+    {
+        return this->xbegin();
+    }
+
+    /**
+     * Returns an iterator to the element following the last element of
+     * the expression.
+     */
+    template <class D>
+    inline auto xexpression_iterable<D>::end() noexcept -> iterator
+    {
+        return this->xend();
+    }
+    //@}
+
+     /**
+      * @name Constant Iterators
+      */
+     /**
+      * Returns a constant iterator to the first element of the expression.
+      */
+    template <class D>
+    inline auto xexpression_iterable<D>::begin() const noexcept -> const_iterator
+    {
+        return this->cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
+    template <class D>
+    inline auto xexpression_iterable<D>::end() const noexcept -> const_iterator
+    {
+        return this->cxend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
+    template <class D>
+    inline auto xexpression_iterable<D>::cbegin() const noexcept -> const_iterator
+    {
+        return this->cxbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     */
+    template <class D>
+    inline auto xexpression_iterable<D>::cend() const noexcept -> const_iterator
+    {
+        return this->cxend();
+    }
+    //@}
 }
 
 #endif

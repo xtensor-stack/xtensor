@@ -34,6 +34,12 @@ namespace xt
         using temporary_type = xtensor<T, N, A>;
     };
 
+    template <class T, std::size_t N, class A>
+    struct xiterable_inner_types<xtensor<T, N, A>>
+        : xcontainer_iterable_types<xtensor<T, N, A>>
+    {
+    };
+
     /**
      * @class xtensor
      * @brief Dense multidimensional container with tensor
@@ -109,6 +115,12 @@ namespace xt
         using shape_type = std::array<typename container_type::size_type, N>;
         using strides_type = shape_type;
         using temporary_type = xtensor<typename C::value_type, N, A>;
+    };
+
+    template <class C, std::size_t N, class A>
+    struct xiterable_inner_types<xtensor_adaptor<C, N, A>>
+        : xcontainer_iterable_types<xtensor_adaptor<C, N, A>>
+    {
     };
 
     /**

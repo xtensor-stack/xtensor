@@ -93,7 +93,7 @@ namespace xt
      */
     template <class F, class CT, class X>
     class xreducer : public xexpression<xreducer<F, CT, X>>,
-                     public xconst_iterable<xreducer<F, CT, X>>
+                     public xexpression_const_iterable<xreducer<F, CT, X>>
     {
 
     public:
@@ -112,7 +112,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xconst_iterable<self_type>;
+        using iterable_base = xexpression_const_iterable<self_type>;
         using shape_type = typename iterable_base::shape_type;
 
         using stepper = typename iterable_base::stepper;

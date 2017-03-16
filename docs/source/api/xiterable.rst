@@ -7,6 +7,18 @@
 xiterable
 =========
 
+.. doxygenclass:: xt::xconst_iterable
+   :project: xtensor
+   :members:
+
 .. doxygenclass:: xt::xiterable
+   :project: xtensor
+   :members:
+
+.. doxygenclass:: xt::xexpression_const_iterable
+   :project: xtensor
+   :members:
+
+.. doxygenclass:: xt::xexpression_iterable
    :project: xtensor
    :members:
