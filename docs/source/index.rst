@@ -72,6 +72,7 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
    :caption: MISCELLANEOUS
 
    numpy
+   numpy-differences
 
 .. _NumPy: http://www.numpy.org
 .. _Buffer Protocol: https://docs.python.org/3/c-api/buffer.html
