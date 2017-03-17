@@ -95,7 +95,7 @@ Outputs:
 
 ## The Numpy to xtensor cheat sheet
 
-If you are familiar with numpy APIs, and you are interested in xtensor, you can check out the [numpy to xtensor cheat sheet](xtensor.readthedocs.io/en/latest/numpy.html) provided in the documentation.
+If you are familiar with numpy APIs, and you are interested in xtensor, you can check out the [numpy to xtensor cheat sheet](https://xtensor.readthedocs.io/en/latest/numpy.html) provided in the documentation.
 
 ## Lazy Broadcasting with `xtensor`
 
