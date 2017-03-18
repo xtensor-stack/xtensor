@@ -40,7 +40,7 @@ namespace xt
         using derived_type = D;
         
         using iterable_types = xiterable_inner_types<D>;
-        using shape_type = typename iterable_types::shape_type;
+        using inner_shape_type = typename iterable_types::inner_shape_type;
         using stepper = typename iterable_types::stepper;
         using const_stepper = typename iterable_types::const_stepper;
         using iterator = typename iterable_types::iterator;
@@ -64,7 +64,7 @@ namespace xt
 
     protected:
 
-        const shape_type& get_shape() const;
+        const inner_shape_type& get_shape() const;
 
     private:
 
@@ -99,7 +99,7 @@ namespace xt
         using derived_type = D;
 
         using base_type = xconst_iterable<D>;
-        using shape_type = typename base_type::shape_type;
+        using inner_shape_type = typename base_type::inner_shape_type;
         using stepper = typename base_type::stepper;
         using const_stepper = typename base_type::const_stepper;
         using iterator = typename base_type::iterator;
@@ -150,7 +150,7 @@ namespace xt
     public:
 
         using base_type = xconst_iterable<D>;
-        using shape_type = typename base_type::shape_type;
+        using inner_shape_type = typename base_type::inner_shape_type;
         using stepper = typename base_type::stepper;
         using const_stepper = typename base_type::const_stepper;
         using iterator = typename base_type::iterator;
@@ -186,7 +186,7 @@ namespace xt
     public:
 
         using base_type = xiterable<D>;
-        using shape_type = typename base_type::shape_type;
+        using inner_shape_type = typename base_type::inner_shape_type;
         using stepper = typename base_type::stepper;
         using const_stepper = typename base_type::const_stepper;
         using iterator = typename base_type::iterator;
@@ -312,7 +312,7 @@ namespace xt
     }
     
     template <class D>
-    inline auto xconst_iterable<D>::get_shape() const -> const shape_type&
+    inline auto xconst_iterable<D>::get_shape() const -> const inner_shape_type&
     {
         return derived_cast().shape();
     }

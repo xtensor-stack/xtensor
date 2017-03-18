@@ -11,5 +11,5 @@ xreducer
    :project: xtensor
    :members:
 
-.. doxygenfunction:: xt::reduce(F&&, E&&, const X&)
+.. doxygenfunction:: xt::reduce(F&&, E&&, X&&)
    :project: xtensor

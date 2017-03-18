@@ -34,10 +34,10 @@ namespace xt
     template <class C, class R, class S>
     struct xiterable_inner_types<xgenerator<C, R, S>>
     {
-        using shape_type = S;
+        using inner_shape_type = S;
         using const_stepper = xindexed_stepper<xgenerator<C, R, S>>;
         using stepper = const_stepper;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
         using broadcast_iterator = const_broadcast_iterator;
         using const_iterator = const_broadcast_iterator;
         using iterator = const_iterator;
@@ -73,7 +73,8 @@ namespace xt
         using difference_type = std::ptrdiff_t;
 
         using iterable_base = xexpression_const_iterable<self_type>;
-        using shape_type = typename iterable_base::shape_type;
+        using inner_shape_type = typename iterable_base::inner_shape_type;
+        using shape_type = inner_shape_type;
         using strides_type = S;
 
         using stepper = typename iterable_base::stepper;
@@ -90,7 +91,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const noexcept;
+        const inner_shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -114,7 +115,7 @@ namespace xt
     private:
 
         functor_type m_f;
-        shape_type m_shape;
+        inner_shape_type m_shape;
     };
 
     /*****************************
@@ -165,7 +166,7 @@ namespace xt
      * Returns the shape of the xgenerator.
      */
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::shape() const noexcept -> const shape_type&
+    inline auto xgenerator<F, R, S>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }

@@ -29,6 +29,8 @@ namespace xt
         using container_type = std::vector<T, EA>;
         using shape_type = std::vector<typename container_type::size_type, SA>;
         using strides_type = shape_type;
+        using inner_shape_type = shape_type;
+        using inner_strides_type = strides_type;
         using temporary_type = xarray<T, EA, SA>;
     };
 
@@ -117,6 +119,8 @@ namespace xt
         using container_type = C;
         using shape_type = std::vector<typename container_type::size_type, SA>;
         using strides_type = shape_type;
+        using inner_shape_type = shape_type;
+        using inner_strides_type = strides_type;
         using temporary_type = xarray<typename C::value_type, EA, SA>;
     };
 

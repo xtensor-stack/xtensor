@@ -31,6 +31,8 @@ namespace xt
         using container_type = std::vector<T, A>;
         using shape_type = std::array<typename container_type::size_type, N>;
         using strides_type = shape_type;
+        using inner_shape_type = shape_type;
+        using inner_strides_type = strides_type;
         using temporary_type = xtensor<T, N, A>;
     };
 
@@ -114,6 +116,8 @@ namespace xt
         using container_type = C;
         using shape_type = std::array<typename container_type::size_type, N>;
         using strides_type = shape_type;
+        using inner_shape_type = shape_type;
+        using inner_strides_type = strides_type;
         using temporary_type = xtensor<typename C::value_type, N, A>;
     };
 

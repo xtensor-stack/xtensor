@@ -36,11 +36,11 @@ namespace xt
     template <class CT, class I>
     struct xiterable_inner_types<xindexview<CT, I>>
     {
-        using shape_type = std::array<std::size_t, 1>;
+        using inner_shape_type = std::array<std::size_t, 1>;
         using const_stepper = xindexed_stepper<xindexview<CT, I>>;
         using stepper = xindexed_stepper<xindexview<CT, I>, false>;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
-        using broadcast_iterator = xiterator<stepper, shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
+        using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
         using const_iterator = const_broadcast_iterator;
         using iterator = broadcast_iterator;
     };
@@ -83,7 +83,8 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
 
         using iterable_base = xexpression_iterable<self_type>;
-        using shape_type = typename iterable_base::shape_type;
+        using inner_shape_type = typename iterable_base::inner_shape_type;
+        using shape_type = inner_shape_type;
         using strides_type = shape_type;
         using closure_type = const self_type;
 
@@ -112,7 +113,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const noexcept;
+        const inner_shape_type& shape() const noexcept;
 
         reference operator()();
         template <class... Args>
@@ -152,7 +153,7 @@ namespace xt
 
         CT m_e;
         const indices_type m_indices;
-        const shape_type m_shape;
+        const inner_shape_type m_shape;
         
         void assign_temporary_impl(temporary_type& tmp);
 
@@ -295,7 +296,7 @@ namespace xt
      * Returns the shape of the xindexview.
      */
     template <class CT, class I>
-    inline auto xindexview<CT, I>::shape() const noexcept -> const shape_type&
+    inline auto xindexview<CT, I>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }

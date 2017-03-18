@@ -46,11 +46,11 @@ namespace xt
     struct xiterable_inner_types<xview<CT, S...>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
+        using inner_shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
         using stepper = xview_stepper<false, CT, S...>;
         using const_stepper = xview_stepper<true, CT, S...>;
-        using broadcast_iterator = xiterator<stepper, shape_type*>;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
         using iterator = broadcast_iterator;
         using const_iterator = const_broadcast_iterator;
     };
@@ -89,7 +89,8 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
 
         using iterable_base = xexpression_iterable<self_type>;
-        using shape_type = typename iterable_base::shape_type;
+        using inner_shape_type = typename iterable_base::inner_shape_type;
+        using shape_type = inner_shape_type;
 
         using slice_type = std::tuple<S...>;
 
@@ -114,7 +115,7 @@ namespace xt
         size_type dimension() const noexcept;
 
         size_type size() const noexcept;
-        const shape_type& shape() const noexcept;
+        const inner_shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
 
         template <class... Args>
@@ -158,7 +159,7 @@ namespace xt
 
         CT m_e;
         slice_type m_slices;
-        shape_type m_shape;
+        inner_shape_type m_shape;
 
         template <typename std::decay_t<CT>::size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args);
@@ -377,7 +378,7 @@ namespace xt
      * Returns the shape of the view.
      */
     template <class CT, class... S>
-    inline auto xview<CT, S...>::shape() const noexcept -> const shape_type&
+    inline auto xview<CT, S...>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
