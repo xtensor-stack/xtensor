@@ -5,6 +5,14 @@
 #                                                                          #
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
+cmake_minimum_required(VERSION 3.1)
+
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    project(xtensor-benchmark)
+
+    find_package(xtensor REQUIRED CONFIG)
+    set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIR})
+endif ()
 
 message(STATUS "Forcing tests build type to Release")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
