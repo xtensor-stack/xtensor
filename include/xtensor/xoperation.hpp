@@ -406,6 +406,38 @@ namespace xt
     }
 
     /**
+    * @ingroup logical_operators
+    * @brief Elementwise maximum
+    *
+    * Returns an \ref xfunction for the element-wise
+    * maximum between e1 and e2.
+    * @param e1 an \ref xexpression
+    * @param e2 an \ref xexpression
+    * @return an \ref xfunction
+    */
+    template <class E1, class E2>
+    inline auto maximum(E1&& e1, E2&& e2) noexcept
+    {
+         return where(e1 > e2, std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+    * @ingroup logical_operators
+    * @brief Elementwise minimum
+    *
+    * Returns an \ref xfunction for the element-wise
+    * minimum between e1 and e2.
+    * @param e1 an \ref xexpression
+    * @param e2 an \ref xexpression
+    * @return an \ref xfunction
+    */
+    template <class E1, class E2>
+    inline auto minimum(E1&& e1, E2&& e2) noexcept
+    {
+         return where(e1 < e2, std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
      * @ingroup logical_operators
      * @brief return vector of indices where T is not zero
      * 
