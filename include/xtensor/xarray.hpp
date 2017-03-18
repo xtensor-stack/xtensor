@@ -49,14 +49,14 @@ namespace xt
      * @tparam T The type of objects stored in the container.
      */
     template <class T, class EA, class SA>
-    class xarray : public xcontainer<xarray<T, EA, SA>>,
+    class xarray : public xstrided_container<xarray<T, EA, SA>>,
                    public xcontainer_semantic<xarray<T, EA, SA>>
     {
 
     public:
 
         using self_type = xarray<T, EA, SA>;
-        using base_type = xcontainer<self_type>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
@@ -139,14 +139,14 @@ namespace xt
      * @tparam C The container type to adapt.
      */
     template <class C, class EA, class SA>
-    class xarray_adaptor : public xcontainer<xarray_adaptor<C, EA, SA>>,
+    class xarray_adaptor : public xstrided_container<xarray_adaptor<C, EA, SA>>,
                            public xadaptor_semantic<xarray_adaptor<C, EA, SA>>
     {
 
     public:
 
         using self_type = xarray_adaptor<C, EA, SA>;
-        using base_type = xcontainer<self_type>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
@@ -466,9 +466,9 @@ namespace xt
     {
         // TODO (performance improvement) : consider moving tmps
         // shape and strides
-        base_type::get_shape() = tmp.shape();
-        base_type::get_strides() = tmp.strides();
-        base_type::get_backstrides() = tmp.backstrides();
+        base_type::shape_impl() = tmp.shape();
+        base_type::strides_impl() = tmp.strides();
+        base_type::backstrides_impl() = tmp.backstrides();
         m_data.resize(tmp.size());
         std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
     }
