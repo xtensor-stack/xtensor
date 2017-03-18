@@ -416,9 +416,9 @@ namespace xt
     * @return an \ref xfunction
     */
     template <class E1, class E2>
-    inline auto maximum(E1&& e1, E2&& e2) noexcept
+    inline auto maximum(const E1& e1, const E2& e2) noexcept
     {
-         return where(e1 > e2, std::forward<E1>(e1), std::forward<E2>(e2));
+        return where(e1 > e2, e1, e2);
     }
 
     /**
@@ -432,9 +432,9 @@ namespace xt
     * @return an \ref xfunction
     */
     template <class E1, class E2>
-    inline auto minimum(E1&& e1, E2&& e2) noexcept
+    inline auto minimum(const E1& e1, const E2& e2) noexcept
     {
-         return where(e1 < e2, std::forward<E1>(e1), std::forward<E2>(e2));
+        return where(e1 < e2, e1, e2);
     }
 
     /**
