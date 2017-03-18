@@ -31,6 +31,8 @@ namespace xt
         using container_type = std::vector<T, A>;
         using shape_type = std::array<typename container_type::size_type, N>;
         using strides_type = shape_type;
+        using inner_shape_type = shape_type;
+        using inner_strides_type = strides_type;
         using temporary_type = xtensor<T, N, A>;
     };
 
@@ -52,14 +54,14 @@ namespace xt
      * @tparam N The dimension of the container.
      */
     template <class T, size_t N, class A>
-    class xtensor : public xcontainer<xtensor<T, N, A>>,
+    class xtensor : public xstrided_container<xtensor<T, N, A>>,
                     public xcontainer_semantic<xtensor<T, N, A>>
     {
 
     public:
 
         using self_type = xtensor<T, N, A>;
-        using base_type = xcontainer<self_type>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
@@ -114,6 +116,8 @@ namespace xt
         using container_type = C;
         using shape_type = std::array<typename container_type::size_type, N>;
         using strides_type = shape_type;
+        using inner_shape_type = shape_type;
+        using inner_strides_type = strides_type;
         using temporary_type = xtensor<typename C::value_type, N, A>;
     };
 
@@ -137,14 +141,14 @@ namespace xt
      * @tparam N The dimension of the adaptor.
      */
     template <class C, std::size_t N, class A>
-    class xtensor_adaptor : public xcontainer<xtensor_adaptor<C, N, A>>,
+    class xtensor_adaptor : public xstrided_container<xtensor_adaptor<C, N, A>>,
                             public xadaptor_semantic<xtensor_adaptor<C, N, A>>
     {
 
     public:
 
         using self_type = xtensor_adaptor<C, N, A>;
-        using base_type = xcontainer<self_type>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
@@ -395,9 +399,9 @@ namespace xt
     inline void xtensor_adaptor<C, N, A>::assign_temporary_impl(temporary_type& tmp)
     {
         // TODO (performance improvement) : consider moving tmps shape and strides
-        base_type::get_shape() = tmp.shape();
-        base_type::get_strides() = tmp.strides();
-        base_type::get_backstrides() = tmp.backstrides();
+        base_type::shape_impl() = tmp.shape();
+        base_type::strides_impl() = tmp.strides();
+        base_type::backstrides_impl() = tmp.backstrides();
         m_data.resize(tmp.size());
         std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
     }

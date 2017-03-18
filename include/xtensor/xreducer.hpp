@@ -68,10 +68,10 @@ namespace xt
     struct xiterable_inner_types<xreducer<F, CT, X>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, X>::type;
+        using inner_shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, X>::type;
         using const_stepper = xindexed_stepper<xreducer<F, CT, X>>;
         using stepper = const_stepper;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
         using broadcast_iterator = const_broadcast_iterator;
         using const_iterator = const_broadcast_iterator;
         using iterator = const_iterator;
@@ -113,7 +113,8 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
 
         using iterable_base = xexpression_const_iterable<self_type>;
-        using shape_type = typename iterable_base::shape_type;
+        using inner_shape_type = typename iterable_base::inner_shape_type;
+        using shape_type = inner_shape_type;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
@@ -129,7 +130,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const noexcept;
+        const inner_shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -155,7 +156,7 @@ namespace xt
         CT m_e;
         functor_type m_f;
         axes_type m_axes;
-        shape_type m_shape;
+        inner_shape_type m_shape;
 
         using index_type = xindex_type_t<typename xexpression_type::shape_type>;
         mutable index_type m_index;
@@ -461,7 +462,7 @@ namespace xt
      * Returns the shape of the expression.
      */
     template <class F, class CT, class X>
-    inline auto xreducer<F, CT, X>::shape() const noexcept -> const shape_type&
+    inline auto xreducer<F, CT, X>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }

@@ -51,10 +51,10 @@ namespace xt
     struct xiterable_inner_types<xbroadcast<CT, X>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using shape_type = promote_shape_t<typename xexpression_type::shape_type, X>;
+        using inner_shape_type = promote_shape_t<typename xexpression_type::shape_type, X>;
         using const_stepper = typename xexpression_type::const_stepper;
         using stepper = const_stepper;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
         using broadcast_iterator = const_broadcast_iterator;
         using const_iterator = const_broadcast_iterator;
         using iterator = const_iterator;
@@ -92,7 +92,8 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
         
         using iterable_base = xexpression_const_iterable<self_type>;
-        using shape_type = typename iterable_base::shape_type;
+        using inner_shape_type = typename iterable_base::inner_shape_type;
+        using shape_type = inner_shape_type;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
@@ -108,7 +109,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const noexcept;
+        const inner_shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -132,7 +133,7 @@ namespace xt
     private:
 
         CT m_e;
-        shape_type m_shape;
+        inner_shape_type m_shape;
     };
 
     /****************************
@@ -224,7 +225,7 @@ namespace xt
      * Returns the shape of the expression.
      */
     template <class CT, class X>
-    inline auto xbroadcast<CT, X>::shape() const noexcept -> const shape_type &
+    inline auto xbroadcast<CT, X>::shape() const noexcept -> const inner_shape_type &
     {
         return m_shape;
     }

@@ -10,3 +10,8 @@ xcontainer
 .. doxygenclass:: xt::xcontainer
    :project: xtensor
    :members:
+
+.. doxygenclass:: xt::xstrided_container
+   :project: xtensor
+   :members:
+

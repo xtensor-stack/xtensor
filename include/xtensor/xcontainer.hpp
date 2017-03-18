@@ -31,14 +31,14 @@ namespace xt
     template <class D>
     struct xcontainer_iterable_types
     {
-        using shape_type = typename xcontainer_inner_types<D>::shape_type;
+        using inner_shape_type = typename xcontainer_inner_types<D>::inner_shape_type;
         using container_type = typename xcontainer_inner_types<D>::container_type;
         using iterator = typename container_type::iterator;
         using const_iterator = typename container_type::const_iterator;
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D>;
-        using broadcast_iterator = xiterator<stepper, shape_type*>;
-        using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
+        using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
+        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
     };
 
     /**
@@ -73,6 +73,9 @@ namespace xt
         using shape_type = typename inner_types::shape_type;
         using strides_type = typename inner_types::strides_type;
 
+        using inner_shape_type = typename inner_types::inner_shape_type;
+        using inner_strides_type = typename inner_types::inner_strides_type;
+
         using iterable_base = xiterable<D>;
 
         using iterator = typename iterable_base::iterator;
@@ -88,13 +91,9 @@ namespace xt
 
         size_type dimension() const noexcept;
 
-        const shape_type& shape() const noexcept;
-        const strides_type& strides() const noexcept;
-        const strides_type& backstrides() const noexcept;
-
-        void reshape(const shape_type& shape);
-        void reshape(const shape_type& shape, layout l);
-        void reshape(const shape_type& shape, const strides_type& strides);
+        const inner_shape_type& shape() const noexcept;
+        const inner_strides_type& strides() const noexcept;
+        const inner_strides_type& backstrides() const noexcept;
 
         void transpose();
 
@@ -163,10 +162,6 @@ namespace xt
         xcontainer(xcontainer&&) = default;
         xcontainer& operator=(xcontainer&&) = default;
 
-        shape_type& get_shape() noexcept;
-        strides_type& get_strides() noexcept;
-        strides_type& get_backstrides() noexcept;
-
     private:
 
         template <class S>
@@ -175,9 +170,74 @@ namespace xt
         template <class S>
         void transpose_impl(S&& permutation, check_policy::full);
 
-        shape_type m_shape;
-        strides_type m_strides;
-        strides_type m_backstrides;
+        inner_shape_type& mutable_shape();
+        inner_strides_type& mutable_strides();
+        inner_strides_type& mutable_backstrides();
+
+        derived_type& derived_cast();
+        const derived_type& derived_cast() const;
+    };
+
+    /**
+     * @class xstrided_container
+     * @brief Partial implementation of xcontainer that embeds the strides and the shape
+     *
+     * The xstrided_container class is a partial implementation of the xcontainer interface
+     * that embed the strides and the shape of the multidimensional container. It does
+     * not embed the data container, this responsibility is delegated to the inheriting
+     * classes.
+     *
+     * @tparam D The derived type, i.e. the inheriting class for which xstrided
+     *           provides the partial imlpementation of xcontainer.
+     */
+    template <class D>
+    class xstrided_container : public xcontainer<D>
+    {
+
+    public:
+
+        using base_type = xcontainer<D>;
+        using container_type = typename base_type::container_type;
+        using value_type = typename base_type::value_type;
+        using reference = typename base_type::reference;
+        using const_reference = typename base_type::const_reference;
+        using pointer = typename base_type::pointer;
+        using const_pointer = typename base_type::const_pointer;
+        using size_type = typename base_type::size_type;
+        using shape_type = typename base_type::shape_type;
+        using strides_type = typename base_type::strides_type;
+        using inner_shape_type = typename base_type::inner_shape_type;
+        using inner_strides_type = typename base_type::inner_strides_type;
+
+        void reshape(const shape_type& shape);
+        void reshape(const shape_type& shape, layout l);
+        void reshape(const shape_type& shape, const strides_type& strides);
+
+    protected:
+
+        xstrided_container() = default;
+        ~xstrided_container() = default;
+
+        xstrided_container(const xstrided_container&) = default;
+        xstrided_container& operator=(const xstrided_container&) = default;
+
+        xstrided_container(xstrided_container&&) = default;
+        xstrided_container& operator=(xstrided_container&&) = default;
+
+        inner_shape_type& shape_impl() noexcept;
+        const inner_shape_type& shape_impl() const noexcept;
+
+        inner_strides_type& strides_impl() noexcept;
+        const inner_strides_type& strides_impl() const noexcept;
+
+        inner_strides_type& backstrides_impl() noexcept;
+        const inner_strides_type& backstrides_impl() const noexcept;
+
+    private:
+
+        inner_shape_type m_shape;
+        inner_strides_type m_strides;
+        inner_strides_type m_backstrides;
     };
 
     /******************************
@@ -185,21 +245,33 @@ namespace xt
      ******************************/
 
     template <class D>
-    inline auto xcontainer<D>::get_shape() noexcept -> shape_type&
+    inline auto xcontainer<D>::mutable_shape() -> inner_shape_type&
     {
-        return m_shape;
+        return derived_cast().shape_impl();
     }
 
     template <class D>
-    inline auto xcontainer<D>::get_strides() noexcept -> strides_type&
+    inline auto xcontainer<D>::mutable_strides() -> inner_strides_type&
     {
-        return m_strides;
+        return derived_cast().strides_impl();
     }
 
     template <class D>
-    inline auto xcontainer<D>::get_backstrides() noexcept -> strides_type&
+    inline auto xcontainer<D>::mutable_backstrides() -> inner_strides_type&
     {
-        return m_backstrides;
+        return derived_cast().backstrides_impl();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::derived_cast() -> derived_type&
+    {
+        return *static_cast<derived_type*>(this);
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::derived_cast() const -> const derived_type&
+    {
+        return *static_cast<const derived_type*>(this);
     }
 
     /**
@@ -221,77 +293,34 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::dimension() const noexcept -> size_type
     {
-        return m_shape.size();
+        return shape().size();
     }
 
     /**
      * Returns the shape of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::shape() const noexcept -> const shape_type&
+    inline auto xcontainer<D>::shape() const noexcept -> const inner_shape_type&
     {
-        return m_shape;
+        return derived_cast().shape_impl();
     }
 
     /**
      * Returns the strides of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::strides() const noexcept -> const strides_type&
+    inline auto xcontainer<D>::strides() const noexcept -> const inner_strides_type&
     {
-        return m_strides;
+        return derived_cast().strides_impl();
     }
 
     /**
      * Returns the backstrides of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::backstrides() const noexcept -> const strides_type&
+    inline auto xcontainer<D>::backstrides() const noexcept -> const inner_strides_type&
     {
-        return m_backstrides;
-    }
-
-    /**
-     * Reshapes the container.
-     * @param shape the new shape
-     */
-    template <class D>
-    inline void xcontainer<D>::reshape(const shape_type& shape)
-    {
-        if(shape != m_shape)
-        {
-            reshape(shape, layout::row_major);
-        }
-    }
-
-    /**
-     * Reshapes the container.
-     * @param shape the new shape
-     * @param l the new layout
-     */
-    template <class D>
-    inline void xcontainer<D>::reshape(const shape_type& shape, layout l)
-    {
-        m_shape = shape;
-        resize_container(m_strides, m_shape.size());
-        resize_container(m_backstrides, m_shape.size());
-        size_type data_size = compute_strides(m_shape, l, m_strides, m_backstrides);
-        data().resize(data_size);
-    }
-
-    /**
-     * Reshapes the container.
-     * @param shape the new shape
-     * @param strides the new strides
-     */
-    template <class D>
-    inline void xcontainer<D>::reshape(const shape_type& shape, const strides_type& strides)
-    {
-        m_shape = shape;
-        m_strides = strides;
-        resize_container(m_backstrides, m_strides.size());
-        adapt_strides(m_shape, m_strides, m_backstrides);
-        data().resize(compute_size(this->shape()));
+        return derived_cast().backstrides_impl();
     }
 
     /**
@@ -301,9 +330,9 @@ namespace xt
     inline void xcontainer<D>::transpose()
     {
         // reverse stride and shape
-        std::reverse(m_shape.begin(), m_shape.end());
-        std::reverse(m_strides.begin(), m_strides.end());
-        std::reverse(m_backstrides.begin(), m_backstrides.end());
+        std::reverse(mutable_shape().begin(), mutable_shape().end());
+        std::reverse(mutable_strides().begin(), mutable_strides().end());
+        std::reverse(mutable_backstrides().begin(), mutable_backstrides().end());
     }
 
     /**
@@ -358,34 +387,34 @@ namespace xt
     template <class S>
     inline void xcontainer<D>::transpose_impl(S&& permutation, check_policy::none)
     {
-        if (container_size(permutation) != m_shape.size())
+        if (container_size(permutation) != dimension())
         {
             throw transpose_error("Permutation does not have the same size as shape");
         }
 
         // permute stride and shape
         strides_type temp_strides;
-        resize_container(temp_strides, m_strides.size());
+        resize_container(temp_strides, strides().size());
 
         shape_type temp_shape;
-        resize_container(temp_shape, m_shape.size());
+        resize_container(temp_shape, shape().size());
 
         shape_type temp_backstrides;
-        resize_container(temp_backstrides, m_backstrides.size());
+        resize_container(temp_backstrides, backstrides().size());
 
-        for (size_type i = 0; i < m_shape.size(); ++i)
+        for (size_type i = 0; i < shape().size(); ++i)
         {
             if (size_type(permutation[i]) >= dimension())
             {
                 throw transpose_error("Permutation contains wrong axis");
             }
-            temp_shape[i] = m_shape[permutation[i]];
-            temp_strides[i] = m_strides[permutation[i]];
-            temp_backstrides[i] = m_backstrides[permutation[i]];
+            temp_shape[i] = shape()[permutation[i]];
+            temp_strides[i] = strides()[permutation[i]];
+            temp_backstrides[i] = backstrides()[permutation[i]];
         }
-        m_shape = std::move(temp_shape);
-        m_strides = std::move(temp_strides);
-        m_backstrides = std::move(temp_backstrides);
+        mutable_shape() = std::move(temp_shape);
+        mutable_strides() = std::move(temp_strides);
+        mutable_backstrides() = std::move(temp_backstrides);
     }
     //@}
 
@@ -404,7 +433,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
-        size_type index = data_offset<size_type>(m_strides, static_cast<size_type>(args)...);
+        size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return data()[index];
     }
 
@@ -418,7 +447,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
-        size_type index = data_offset<size_type>(m_strides, static_cast<size_type>(args)...);
+        size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return data()[index];
     }
 
@@ -469,7 +498,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) -> reference
     {
-        return data()[element_offset<size_type>(m_strides, first, last)];
+        return data()[element_offset<size_type>(strides(), first, last)];
     }
 
     /**
@@ -483,7 +512,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) const -> const_reference
     {
-        return data()[element_offset<size_type>(m_strides, first, last)];
+        return data()[element_offset<size_type>(strides(), first, last)];
     }
 
     /**
@@ -492,7 +521,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::data() noexcept -> container_type&
     {
-        return static_cast<derived_type*>(this)->data_impl();
+        return derived_cast().data_impl();
     }
 
     /**
@@ -502,7 +531,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::data() const noexcept -> const container_type&
     {
-        return static_cast<const derived_type*>(this)->data_impl();
+        return derived_cast().data_impl();
     }
     //@}
 
@@ -519,7 +548,7 @@ namespace xt
     template <class S>
     inline bool xcontainer<D>::broadcast_shape(S& shape) const
     {
-        return xt::broadcast_shape(m_shape, shape);
+        return xt::broadcast_shape(this->shape(), shape);
     }
 
     /**
@@ -641,6 +670,88 @@ namespace xt
         return const_stepper(static_cast<const derived_type*>(this), data().end(), offset);
     }
 
+    /*************************************
+     * xstrided_container implementation *
+     *************************************/
+
+    template <class D>
+    inline auto xstrided_container<D>::shape_impl() noexcept -> inner_shape_type&
+    {
+        return m_shape;
+    }
+
+    template <class D>
+    inline auto xstrided_container<D>::shape_impl() const noexcept -> const inner_shape_type&
+    {
+        return m_shape;
+    }
+
+    template <class D>
+    inline auto xstrided_container<D>::strides_impl() noexcept -> inner_strides_type&
+    {
+        return m_strides;
+    }
+
+    template <class D>
+    inline auto xstrided_container<D>::strides_impl() const noexcept -> const inner_strides_type&
+    {
+        return m_strides;
+    }
+
+    template <class D>
+    inline auto xstrided_container<D>::backstrides_impl() noexcept -> inner_strides_type&
+    {
+        return m_backstrides;
+    }
+
+    template <class D>
+    inline auto xstrided_container<D>::backstrides_impl() const noexcept -> const inner_strides_type&
+    {
+        return m_backstrides;
+    }
+
+    /**
+     * Reshapes the container.
+     * @param shape the new shape
+     */
+    template <class D>
+    inline void xstrided_container<D>::reshape(const shape_type& shape)
+    {
+        if (shape != m_shape)
+        {
+            reshape(shape, layout::row_major);
+        }
+    }
+
+    /**
+     * Reshapes the container.
+     * @param shape the new shape
+     * @param l the new layout
+     */
+    template <class D>
+    inline void xstrided_container<D>::reshape(const shape_type& shape, layout l)
+    {
+        m_shape = shape;
+        resize_container(m_strides, m_shape.size());
+        resize_container(m_backstrides, m_shape.size());
+        size_type data_size = compute_strides(m_shape, l, m_strides, m_backstrides);
+        this->data().resize(data_size);
+    }
+
+    /**
+     * Reshapes the container.
+     * @param shape the new shape
+     * @param strides the new strides
+     */
+    template <class D>
+    inline void xstrided_container<D>::reshape(const shape_type& shape, const strides_type& strides)
+    {
+        m_shape = shape;
+        m_strides = strides;
+        resize_container(m_backstrides, m_strides.size());
+        adapt_strides(m_shape, m_strides, m_backstrides);
+        this->data().resize(compute_size(m_shape));
+    }
 }
 
 #endif
