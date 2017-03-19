@@ -48,6 +48,28 @@ namespace xt
             }
         };
 
+        template <class T>
+        struct minimum
+        {
+            using result_type = T;
+
+            constexpr result_type operator()(const T& t1, const T& t2) const noexcept
+            {
+                return (t1 < t2) ? t1 : t2;
+            }
+        };
+
+        template <class T>
+        struct maximum
+        {
+            using result_type = T;
+
+            constexpr result_type operator()(const T& t1, const T& t2) const noexcept
+            {
+                return (t1 > t2) ? t1 : t2;
+            }
+        };
+
         template <template <class...> class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
@@ -416,9 +438,10 @@ namespace xt
     * @return an \ref xfunction
     */
     template <class E1, class E2>
-    inline auto maximum(const E1& e1, const E2& e2) noexcept
+    inline auto maximum(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<detail::maximum, E1, E2>
     {
-        return where(e1 > e2, e1, e2);
+        return detail::make_xfunction<detail::maximum>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -432,9 +455,10 @@ namespace xt
     * @return an \ref xfunction
     */
     template <class E1, class E2>
-    inline auto minimum(const E1& e1, const E2& e2) noexcept
+    inline auto minimum(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<detail::minimum, E1, E2>
     {
-        return where(e1 < e2, e1, e2);
+        return detail::make_xfunction<detail::minimum>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
