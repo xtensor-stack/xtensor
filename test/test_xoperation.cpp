@@ -188,6 +188,24 @@ namespace xt
         EXPECT_EQ(false, any(b));
     }
 
+    TEST(operation, minimum)
+    {
+        xarray<int> a = {0, 0, 3};
+        xarray<int> b = {-1, 0, 10};
+        xarray<int> expected = {-1, 0, 3};
+        EXPECT_TRUE(all(equal(minimum(a, b), expected)));
+    }
+
+    TEST(operation, maximum)
+    {
+        xarray<int> a = {0, 0, 3};
+        xarray<int> b = {-1, 0, 10};
+        xarray<int> expected = {0, 0, 10};
+        xarray<int> expected_2 = {0, 1, 10};
+        EXPECT_TRUE(all(equal(maximum(a, b), expected)));
+        EXPECT_TRUE(all(equal(maximum(arange(0, 3), b), expected_2)));
+    }
+
     TEST(operation, all)
     {
         xarray<int> a = {1, 1, 3};
