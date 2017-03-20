@@ -72,9 +72,11 @@ namespace xt
 
         using shape_type = typename inner_types::shape_type;
         using strides_type = typename inner_types::strides_type;
+        using backstrides_type = typename inner_types::backstrides_type;
 
         using inner_shape_type = typename inner_types::inner_shape_type;
         using inner_strides_type = typename inner_types::inner_strides_type;
+        using inner_backstrides_type = typename inner_types::inner_backstrides_type;
 
         using iterable_base = xiterable<D>;
 
@@ -93,7 +95,7 @@ namespace xt
 
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
-        const inner_strides_type& backstrides() const noexcept;
+        const inner_backstrides_type& backstrides() const noexcept;
 
         void transpose();
 
@@ -172,7 +174,7 @@ namespace xt
 
         inner_shape_type& mutable_shape();
         inner_strides_type& mutable_strides();
-        inner_strides_type& mutable_backstrides();
+        inner_backstrides_type& mutable_backstrides();
 
         derived_type& derived_cast();
         const derived_type& derived_cast() const;
@@ -208,6 +210,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
         using inner_shape_type = typename base_type::inner_shape_type;
         using inner_strides_type = typename base_type::inner_strides_type;
+        using inner_backstrides_type = typename base_type::inner_backstrides_type;
 
         void reshape(const shape_type& shape);
         void reshape(const shape_type& shape, layout l);
@@ -230,14 +233,14 @@ namespace xt
         inner_strides_type& strides_impl() noexcept;
         const inner_strides_type& strides_impl() const noexcept;
 
-        inner_strides_type& backstrides_impl() noexcept;
-        const inner_strides_type& backstrides_impl() const noexcept;
+        inner_backstrides_type& backstrides_impl() noexcept;
+        const inner_backstrides_type& backstrides_impl() const noexcept;
 
     private:
 
         inner_shape_type m_shape;
         inner_strides_type m_strides;
-        inner_strides_type m_backstrides;
+        inner_backstrides_type m_backstrides;
     };
 
     /******************************
@@ -257,7 +260,7 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::mutable_backstrides() -> inner_strides_type&
+    inline auto xcontainer<D>::mutable_backstrides() -> inner_backstrides_type&
     {
         return derived_cast().backstrides_impl();
     }
@@ -318,7 +321,7 @@ namespace xt
      * Returns the backstrides of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::backstrides() const noexcept -> const inner_strides_type&
+    inline auto xcontainer<D>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return derived_cast().backstrides_impl();
     }
@@ -699,13 +702,13 @@ namespace xt
     }
 
     template <class D>
-    inline auto xstrided_container<D>::backstrides_impl() noexcept -> inner_strides_type&
+    inline auto xstrided_container<D>::backstrides_impl() noexcept -> inner_backstrides_type&
     {
         return m_backstrides;
     }
 
     template <class D>
-    inline auto xstrided_container<D>::backstrides_impl() const noexcept -> const inner_strides_type&
+    inline auto xstrided_container<D>::backstrides_impl() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
     }
