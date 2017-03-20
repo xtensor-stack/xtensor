@@ -61,6 +61,9 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xutils.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xmissing.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_sequence.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
