@@ -22,4 +22,13 @@
     #endif
 #endif
 
+#ifndef DEFAULT_DATA_CONTAINER
+#define DEFAULT_DATA_CONTAINER(T, A) std::vector<T, A>
+#endif
+
+#ifndef DEFAULT_SHAPE_CONTAINER
+#define DEFAULT_SHAPE_CONTAINER(T, EA, SA) \
+    std::vector<typename DEFAULT_DATA_CONTAINER(T, EA)::size_type, SA>
+#endif
+
 #endif

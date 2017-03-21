@@ -11,14 +11,18 @@
 
 #include <vector>
 #include <memory>
+#include "xtensor_config.hpp"
 
 namespace xt
 {
     template <class C>
     struct xcontainer_inner_types;
 
+    template <class EC, class SC>
+    class xarray_container;
+
     template <class T, class EA = std::allocator<T>, class SA = std::allocator<typename std::vector<T, EA>::size_type>>
-    class xarray;
+    using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, EA), DEFAULT_SHAPE_CONTAINER(T, EA, SA)>;
 
     template <class T, std::size_t N, class A = std::allocator<T>>
     class xtensor;
