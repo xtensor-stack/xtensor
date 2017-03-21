@@ -28,13 +28,13 @@ a simple loop. Assuming ``x``, ``y`` and ``z`` are one-dimensional arrays of len
 
 .. code::
 
-    xt::array<double> res = x + y * sin(z)
+    xt::xarray<double> res = x + y * sin(z)
    
 will produce quite the same assembly as the following loop:
 
 .. code::
 
-    xt::array<double> res(n);
+    xt::xarray<double> res(n);
     for(size_t i = 0; i < n; ++i)
     {
         res(i) = x(i) + y(i) * sin(z(i));
@@ -48,7 +48,7 @@ allows to operate symbolically on very large arrays and only compute the result 
 
 .. code::
 
-    // Assume x and y are arrays each containing 1 000 000 objects
+    // Assume x and y are xarrays each containing 1 000 000 objects
     auto f = cos(x) + sin(y);
 
     double first_res = f(1200);
@@ -61,9 +61,24 @@ and the size of the data, it might be convenient to store the result of the expr
 .. code::
 
     // Assume x and y are small arrays
-    xt::array<double> tmp = cos(x) + sin(y);
-    xt::array<double> res1 = tmp + 2 * x;
-    xt::array<double> res2 = tmp - 2 * x;
+    xt::xarray<double> tmp = cos(x) + sin(y);
+    xt::xarray<double> res1 = tmp + 2 * x;
+    xt::xarray<double> res2 = tmp - 2 * x;
+
+Forcing evaluation
+------------------
+
+If you have to force the evaluation of an xexpression for some reason (for example, you want to have all results in memory to perform a sort, or use external BLAS functions) then you can use ``xt::eval`` on an xexpression. 
+Evaluating will either return an rvalue to a newly allocated container in the case of a xexpression, or a reference to a container in case you are evaluating a ``xarray`` or ``xtensor``. Note that, in order to avoid copies, you should use an universal reference on the lefthand side (``auto&&``). For example:
+
+.. code::
+
+    xt::xarray<double> a = {1, 2, 3};
+    xt::xarray<double> b = {3, 2, 1};
+    auto calc = a + b; // unevaluated xexpression!
+    auto&& e = xt::eval(calc); // a rvalue container xarray!
+    // this just returns a reference to the existing container
+    auto&& a_ref = xt::eval(a);
 
 Broadcasting
 ------------

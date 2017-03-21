@@ -146,10 +146,10 @@ You can also call the ``reduce`` generator with your own reducing function:
     #include "xtensor/xarray.hpp"
     #include "xtensor/xreducer.hpp"
 
-    xt::array<double> a = some_init_function({3, 2, 4, 6, 5});
-    xt::array<double> res = reduce([](double a, double b) { return a*a + b*b; },
-                                   a,
-                                   {1, 3});
+    xt::xarray<double> a = some_init_function({3, 2, 4, 6, 5});
+    xt::xarray<double> res = reduce([](double a, double b) { return a*a + b*b; },
+                                    a,
+                                    {1, 3});
 
 Universal functions and vectorization
 -------------------------------------
