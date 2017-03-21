@@ -37,7 +37,7 @@ enum values, which are particular cases of strided schemes. The previous example
     #include "xtensor/xarray.hpp"
 
     std::vector<size_t> shape = { 3, 2, 4 };
-    xt::array<double> a(shape, xt::layout::row_major);
+    xt::xarray<double> a(shape, xt::layout::row_major);
 
 
 If neither strides nor layout is specified when instantiating an array, the ``row_major`` layout is used.
@@ -89,7 +89,7 @@ automatically and applies the "temporary variable rule" by default. A mechanism 
     #include "xtensor/xarray.hpp"
     #include "xtensor/xnoalias.hpp"
 
-    // a, b, and c are xt::arrays previously initialized
+    // a, b, and c are xt::xarrays previously initialized
     xt::noalias(b) = a + c;
     // Even if b has to be reshaped, a+c will be assigned directly to it
     // No temporary variable will be involved

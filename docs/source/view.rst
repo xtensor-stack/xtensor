@@ -115,7 +115,7 @@ computed scalar assignments.
     #include "xtensor/xarray.hpp"
     #include "xtensor/xindexview.hpp"
 
-    xt::array<double> a = {{1, 5, 3}, {4, 5, 6}};
+    xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     filtration(a, a >= 5) += 100;
     // => a = {{1, 105, 3}, {4, 105, 106}}
 
