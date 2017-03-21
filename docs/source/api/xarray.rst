@@ -7,6 +7,9 @@
 xarray
 ======
 
-.. doxygenclass:: xt::xarray
+.. doxygenclass:: xt::xarray_container
    :project: xtensor
    :members:
+
+.. doxygentypedef:: xt::xarray
+    :project: xtensor
