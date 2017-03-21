@@ -24,8 +24,11 @@ namespace xt
     template <class T, class EA = std::allocator<T>, class SA = std::allocator<typename std::vector<T, EA>::size_type>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, EA), DEFAULT_SHAPE_CONTAINER(T, EA, SA)>;
 
+    template <class EC, std::size_t N>
+    class xtensor_container;
+
     template <class T, std::size_t N, class A = std::allocator<T>>
-    class xtensor;
+    using xtensor = xtensor_container<DEFAULT_DATA_CONTAINER(T, A), N>;
 
     template <class CT, class... S>
     class xview;
