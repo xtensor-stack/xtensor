@@ -7,6 +7,9 @@
 xtensor
 =======
 
-.. doxygenclass:: xt::xtensor
+.. doxygenclass:: xt::xtensor_container
    :project: xtensor
    :members:
+
+.. doxygentypedef:: xt::xtensor
+   :project: xtensor
