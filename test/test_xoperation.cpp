@@ -206,6 +206,26 @@ namespace xt
         EXPECT_TRUE(all(equal(maximum(arange(0, 3), b), expected_2)));
     }
 
+    TEST(operation, amax)
+    {
+        xarray<int> a = {{0, 0, 3}, {1,2, 10}};
+        EXPECT_EQ(10, amax(a)());
+        xarray<int> e1 = {1, 2, 10};
+        EXPECT_EQ(e1, amax(a, {0}));
+        xarray<int> e2 = {3, 10};
+        EXPECT_EQ(e2, amax(a, {1}));
+    }
+
+    TEST(operation, amin)
+    {
+        xarray<int> a = {{0, 0, 3}, {1,2, 10}};
+        EXPECT_EQ(0, amin(a)());
+        xarray<int> e1 = {0, 0, 3};
+        EXPECT_EQ(e1, amin(a, {0}));
+        xarray<int> e2 = {0, 1};
+        EXPECT_EQ(e2, amin(a, {1}));
+    }
+
     TEST(operation, all)
     {
         xarray<int> a = {1, 1, 3};
