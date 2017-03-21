@@ -4,14 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Expressions and semantic
-========================
+xeval
+=====
 
-.. toctree::
-
-   xexpression
-   xsemantic_base
-   xcontainer_semantic
-   xadaptor_semantic
-   xview_semantic
-   xeval
+.. doxygenfunction:: xt::eval(E&& e)
+   :project: xtensor
