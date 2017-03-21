@@ -463,6 +463,86 @@ namespace xt
 
     /**
      * @ingroup logical_operators
+     * @brief Maximum element along given axis.
+     *
+     * Returns an \ref xreducer for the maximum of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the maximum is found (optional)
+     * @return an \ref xreducer
+     */
+    template <class E, class X>
+    inline auto amax(E&& e, X&& axes) noexcept
+    {
+        using functor_type = detail::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
+    }
+
+    template <class E>
+    inline auto amax(E&& e) noexcept
+    {
+        using functor_type = detail::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e));
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto amax(E&& e, std::initializer_list<I> axes) noexcept
+    {
+        using functor_type = detail::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto amax(E&& e, const I(&axes)[N]) noexcept
+    {
+        using functor_type = detail::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#endif
+
+    /**
+     * @ingroup logical_operators
+     * @brief Minimum element along given axis.
+     *
+     * Returns an \ref xreducer for the minimum of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the minimum is found (optional)
+     * @return an \ref xreducer
+     */
+    template <class E, class X>
+    inline auto amin(E&& e, X&& axes) noexcept
+    {
+        using functor_type = detail::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
+    }
+
+    template <class E>
+    inline auto amin(E&& e) noexcept
+    {
+        using functor_type = detail::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e));
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto amin(E&& e, std::initializer_list<I> axes) noexcept
+    {
+        using functor_type = detail::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto amin(E&& e, const I(&axes)[N]) noexcept
+    {
+        using functor_type = detail::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#endif
+
+    /**
+     * @ingroup logical_operators
      * @brief return vector of indices where T is not zero
      * 
      * @param arr input array
