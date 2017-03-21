@@ -18,6 +18,7 @@
 
 #include "xtensor_forward.hpp"
 #include "xbroadcast.hpp"
+#include "xcontainer.hpp"
 #include "xiterable.hpp"
 #include "xsemantic.hpp"
 #include "xview_utils.hpp"
@@ -147,6 +148,26 @@ namespace xt
         const_stepper stepper_begin(const ST& shape) const;
         template <class ST>
         const_stepper stepper_end(const ST& shape) const;
+
+        template <class T = xexpression_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&>
+        data() const;
+
+        template <class T = xexpression_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::strides_type>
+        strides() const;
+
+        template <class T = xexpression_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const value_type*>
+        raw_data() const;
+
+        template <class T = xexpression_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, value_type*>
+        raw_data();
+
+        template <class T = xexpression_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::size_type>
+        raw_data_offset() const;
 
     private:
 
@@ -390,6 +411,78 @@ namespace xt
     inline auto xview<CT, S...>::slices() const noexcept -> const slice_type&
     {
         return m_slices;
+    }
+
+    /**
+     * Returns the data holder of the underlying container (only if the view is on a realized
+     * container). ``xt::eval`` will make sure that the underlying xexpression is 
+     * on a realized container.
+     */
+    template <class E, class... S>
+    template <class T>
+    inline auto xview<E, S...>::data() const ->
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&>
+    {
+        return m_e.data();
+    }
+
+    /**
+     * Return the strides for the underlying container of the view.
+     */
+    template <class E, class... S>
+    template <class T>
+    inline auto xview<E, S...>::strides() const ->
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::strides_type>
+    {
+        using strides_type = typename T::strides_type;
+        strides_type temp = m_e.strides();
+        strides_type strides = make_sequence<strides_type>(sizeof...(S) - integral_count<S...>(), 0);
+
+        auto func = [](const auto& s) { return xt::step_size(s); };
+
+        for (size_type i = 0; i < strides.size(); ++i) {
+            auto idx = integral_skip<S...>(i);
+            strides[i] = m_e.strides()[idx] * apply<size_type>(idx, func, m_slices);
+        }
+        return strides;
+    }
+
+    /**
+     * Return the pointer to the underlying buffer.
+     */
+    template <class E, class... S>
+    template <class T>
+    inline auto xview<E, S...>::raw_data() const ->
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const value_type*>
+    {
+        return m_e.raw_data();
+    }
+
+    template <class E, class... S>
+    template <class T>
+    inline auto xview<E, S...>::raw_data() ->
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, value_type*>
+    {
+        return m_e.raw_data();
+    }
+
+    /**
+     * Return the offset to the first element of the view in the underlying container.
+     */
+    template <class E, class... S>
+    template <class T>
+    inline auto xview<E, S...>::raw_data_offset() const ->
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::size_type>
+    {
+        auto func = [](const auto& s) { return xt::value(s, 0); };
+        typename T::size_type offset = 0;
+
+        for(size_type i = 0; i < sizeof...(S); ++i)
+        {
+            size_type s = apply<size_type>(i, func, m_slices) * m_e.strides()[i];
+            offset += s;
+        }
+        return offset;
     }
     //@}
 

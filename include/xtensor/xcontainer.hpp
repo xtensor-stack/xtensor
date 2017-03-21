@@ -129,6 +129,10 @@ namespace xt
         container_type& data() noexcept;
         const container_type& data() const noexcept;
 
+        value_type* raw_data() noexcept;
+        const value_type* raw_data() const noexcept;
+        const size_type raw_data_offset() const noexcept;
+
         template <class S>
         bool broadcast_shape(S& shape) const;
 
@@ -539,6 +543,30 @@ namespace xt
     inline auto xcontainer<D>::data() const noexcept -> const container_type&
     {
         return derived_cast().data_impl();
+    }
+
+    /**
+     * Returns the offset to the first element in the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::raw_data() noexcept -> value_type*
+    {
+        return data().data();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::raw_data() const noexcept -> const value_type*
+    {
+        return data().data();
+    }
+
+    /**
+     * Returns the offset to the first element in the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::raw_data_offset() const noexcept -> const size_type
+    {
+        return size_type(0);
     }
     //@}
 
