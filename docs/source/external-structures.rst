@@ -15,8 +15,8 @@ Adapting one-dimensional containers
 
 You may want to use your own one-dimensional container as a backend for tensor data containers
 and even for the shape or the strides. This is the simplest structure to plug into ``xtensor``.
-In the following example, we define new array and adaptor types for user-specified storage and
-shape container types.
+In the following example, we define new container and adaptor types for user-specified storage and
+shape types.
 
 .. code::
 
@@ -42,7 +42,7 @@ that is:
 - ``size`` and ``resize`` methods
 
 ``xtensor`` does not require that the container has a contiguous memory layout, only that it
-provides an interface as if it had one. Actually, your container could even be backed by a
+provides the aforementioned interface. In fact, the container could even be backed by a
 file on the disk, a database or a binary message.
 
 Structures that embed shape and strides
@@ -113,7 +113,7 @@ Next step is to inherit from the ``xcontainer`` and the ``xcontainer_semantic`` 
     };
 
 Thanks to the previous structures definition, inheriting from ``xcontainer`` brings almost all the container
-api available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the
+API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the
 support for mathematical operations.
 
 NOTE: if we were to design a class that takes a reference on ``raw_tensor`` instead of embedding an instance,
@@ -170,8 +170,8 @@ The last two methods are extended copy constructor and assign operator. They all
     // .... init a, b and c
     tnesor_type d = a + b - c;
 
-Define the reshape methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Implement the reshape methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The next methods to define are the overloads of ``reshape``. ``xtensor`` provides utilities functions to
 compute strides based on the shape and the layout, so the implementation of the ``reshape`` overloads
@@ -208,8 +208,8 @@ is straightforward:
         m_raw.m_data.resize(compute_size(m_shape));
     }
 
-Define private accessors
-~~~~~~~~~~~~~~~~~~~~~~~~
+Implement private accessors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``xcontainer`` assume the following methods are implemented in its inheriting class:
 
@@ -233,7 +233,7 @@ Embedding a full tensor structure
 
 You may need to plug structures that already provide n-dimensional access methods, instead
 of a one-dimensional container with a strided index scheme. This section illustrates how
-to adapt such structures with the following (minimal) api:
+to adapt such structures with the following (minimal) API:
 
 .. code::
 
@@ -370,8 +370,8 @@ constructor and assign operator.
         }
     };
     
-Define access operators
-~~~~~~~~~~~~~~~~~~~~~~~
+Implement access operators
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``xtensor`` requires that the following access operators are defined
 
@@ -458,10 +458,10 @@ This is very similar to what must be done for one-dimensional containers,
 except you may ignore the layout and the strides in the implementation.
 However, these overloads are still required.
 
-Provide a stepper api
+Provide a stepper API
 ~~~~~~~~~~~~~~~~~~~~~
 
-The last required step is to provide a stepper api, on which are built
+The last required step is to provide a stepper API, on which are built
 iterators.
 
 .. code::
