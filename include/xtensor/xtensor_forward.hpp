@@ -37,11 +37,11 @@ namespace xt
      * \endcode
      * 
      * @tparam T The value type of the elements.
-     * @tparam EA The allocator of the container holding the elements.
+     * @tparam A The allocator of the container holding the elements.
      * @tparam SA The allocator of the containers holding the shape and the strides.
      */
-    template <class T, class EA = std::allocator<T>, class SA = std::allocator<typename std::vector<T, EA>::size_type>>
-    using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, EA), DEFAULT_SHAPE_CONTAINER(T, EA, SA)>;
+    template <class T, class A = std::allocator<T>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
+    using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
     template <class EC, std::size_t N>
     class xtensor_container;
@@ -70,6 +70,34 @@ namespace xt
 
     template <class CT, class... S>
     class xview;
+
+    template <class T, class A, class BA>
+    class xoptional_vector;
+
+    /**
+     * @typedef xarray_optional
+     * Alias template on xarray_container for handling missing values
+     *
+     * @tparam T The value type of the elements.
+     * @tparam A The allocator of the container holding the elements.
+     * @tparam BA The allocator of the container holding the missing flags.
+     * @tparam SA The allocator of the containers holding the shape and the strides.
+     */
+    template <class T, class A = std::allocator<T>, class BA = std::allocator<bool>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
+    using xarray_optional = xarray_container<xoptional_vector<T, A, BA>, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
+
+    /**
+     * @typedef xtensor_optional
+     * Alias template on xtensor_container for handling missing values
+     *
+     * @tparam T The value type of the elements.
+     * @tparam N The dimension of the tensor.
+     * @tparam A The allocator of the containers holding the elements.
+     * @tparam BA The allocator of the container holding the missing flags.
+     */
+    template <class T, std::size_t N, class A = std::allocator<T>, class BA = std::allocator<bool>>
+    using xtensor_optional = xtensor_container<xoptional_vector<T, A, BA>, N>;
+
 }
 
 #endif
