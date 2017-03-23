@@ -380,8 +380,9 @@ namespace xt
             using size_type = typename xexpression_type::size_type;
             using value_type = typename xexpression_type::value_type;
 
-            repeat_impl(CT source, size_type axis) :
-                m_source(source), m_axis(axis)
+            template <class CTA>
+            repeat_impl(CTA&& source, size_type axis) :
+                m_source(std::forward<CTA>(source)), m_axis(axis)
             {
             }
 
@@ -536,8 +537,9 @@ namespace xt
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
 
-            diagonal_fn(CT source, int offset, std::size_t axis_1, std::size_t axis_2)
-                : m_source(source), m_offset(offset), m_axis_1(axis_1), m_axis_2(axis_2)
+            template <class CTA>
+            diagonal_fn(CTA&& source, int offset, std::size_t axis_1, std::size_t axis_2)
+                : m_source(std::forward<CTA>(source)), m_offset(offset), m_axis_1(axis_1), m_axis_2(axis_2)
             {
             }
 
@@ -579,7 +581,8 @@ namespace xt
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
 
-            diag_fn(CT source, int k) : m_source(source), m_k(k)
+            template <class CTA>
+            diag_fn(CTA&& source, int k) : m_source(std::forward<CTA>(source)), m_k(k)
             {
             }
 
@@ -608,8 +611,9 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
             using size_type = typename xexpression_type::size_type;
 
-            flip_impl(CT source, std::size_t axis)
-                : m_source(source), m_axis(axis), m_shape_at_axis(m_source.shape()[m_axis] - 1)
+            template <class CTA>
+            flip_impl(CTA&& source, std::size_t axis)
+                : m_source(std::forward<CTA>(source)), m_axis(axis), m_shape_at_axis(m_source.shape()[m_axis] - 1)
             {
             }
 
@@ -649,8 +653,9 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
             using signed_idx_type = long int;
 
-            trilu_fn(CT source, int k, Comp comp)
-                : m_source(source), m_k(k), m_comp(comp)
+            template <class CTA>
+            trilu_fn(CTA&& source, int k, Comp comp)
+                : m_source(std::forward<CTA>(source)), m_k(k), m_comp(comp)
             {
             }
 

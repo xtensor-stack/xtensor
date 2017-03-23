@@ -104,8 +104,8 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
-        template <class S>
-        xbroadcast(CT e, S&& s) noexcept;
+        template <class CTA, class S>
+        xbroadcast(CTA&& e, S&& s) noexcept;
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
@@ -192,11 +192,11 @@ namespace xt
      * @param s the shape to apply
      */
     template <class CT, class X>
-    template <class S>
-    inline xbroadcast<CT, X>::xbroadcast(CT e, S&& s) noexcept
-        : m_e(e), m_shape(std::forward<S>(s))
+    template <class CTA, class S>
+    inline xbroadcast<CT, X>::xbroadcast(CTA&& e, S&& s) noexcept
+        : m_e(std::forward<CTA>(e)), m_shape(std::forward<S>(s))
     {
-        xt::broadcast_shape(e.shape(), m_shape);
+        xt::broadcast_shape(m_e.shape(), m_shape);
     }
     //@}
 

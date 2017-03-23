@@ -125,8 +125,8 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
-        template <class Func, class AX>
-        xreducer(Func&& func, CT e, AX&& axes);
+        template <class Func, class CTA, class AX>
+        xreducer(Func&& func, CTA&& e, AX&& axes);
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
@@ -421,9 +421,9 @@ namespace xt
       * @param axes the axes along which the reduction is performed
       */
     template <class F, class CT, class X>
-    template <class Func, class AX>
-    inline xreducer<F, CT, X>::xreducer(Func&& func, CT e, AX&& axes)
-        : m_e(e), m_f(std::forward<Func>(func)), m_axes(std::forward<AX>(axes)),
+    template <class Func, class CTA, class AX>
+    inline xreducer<F, CT, X>::xreducer(Func&& func, CTA&& e, AX&& axes)
+        : m_e(std::forward<CTA>(e)), m_f(std::forward<Func>(func)), m_axes(std::forward<AX>(axes)),
           m_shape(make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0)),
           m_index(make_sequence<index_type>(m_e.dimension(), 0))
     {

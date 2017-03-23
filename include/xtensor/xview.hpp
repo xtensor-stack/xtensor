@@ -103,8 +103,8 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
-        template <class... SL>
-        xview(CT e, SL&&... slices) noexcept;
+        template <class CTA, class... SL>
+        xview(CTA&& e, SL&&... slices) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -304,9 +304,9 @@ namespace xt
      * @sa view
      */
     template <class CT, class... S>
-    template <class... SL>
-    inline xview<CT, S...>::xview(CT e, SL&&... slices) noexcept
-        : m_e(e), m_slices(std::forward<SL>(slices)...),
+    template <class CTA, class... SL>
+    inline xview<CT, S...>::xview(CTA&& e, SL&&... slices) noexcept
+        : m_e(std::forward<CTA>(e)), m_slices(std::forward<SL>(slices)...),
           m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
     {
         auto func = [](const auto& s) noexcept { return get_size(s); };
