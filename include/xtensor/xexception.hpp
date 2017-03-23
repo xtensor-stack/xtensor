@@ -34,10 +34,10 @@ namespace xt
 
     template <class S1, class S2>
     inline broadcast_error::broadcast_error(const S1& lhs,
-                                            const S2& rhs)
+        const S2& rhs)
     {
         std::ostringstream buf("Incompatible dimension of arrays:", std::ios_base::ate);
-        
+
         buf << "\n LHS shape = (";
         using size_type1 = typename S1::value_type;
         std::ostream_iterator<size_type1> iter1(buf, ", ");
@@ -85,6 +85,79 @@ namespace xt
     {
         return m_message.c_str();
     }
-}
 
+    /***************
+     * check_index *
+     ***************/
+
+    template <class S, class... Args>
+    void check_index(const S& shape, Args... args);
+
+    template <class S, class It>
+    void check_element_index(const S& shape, It first, It last);
+
+    namespace detail
+    {
+        template <class S, size_t dim>
+        inline void check_index_impl(const S&)
+        {
+        }
+
+        template <class S, size_t dim, class... Args>
+        inline void check_index_impl(const S& shape, size_t i, Args... args)
+        {
+            if (sizeof...(Args)+1 > shape.size())
+            {
+                check_index_impl<S, dim>(shape, args...);
+            }
+            else
+            {
+                if (i >= shape[dim] && shape[dim] != 1)
+                {
+                    throw std::out_of_range("index " + std::to_string(i) + " is out of bounds for axis "
+                        + std::to_string(dim) + " with size " + std::to_string(shape[dim]));
+                }
+                check_index_impl<S, dim + 1>(shape, args...);
+            }
+        }
+    }
+
+    template <class S, class... Args>
+    inline void check_index(const S& shape, Args... args)
+    {
+        detail::check_index_impl<S, 0>(shape, args...);
+    }
+
+    template <class S, class It>
+    inline void check_element_index(const S& shape, It first, It last)
+    {
+        auto dst = static_cast<typename S::size_type>(last - first);
+        It efirst = last - std::min(shape.size(), dst);
+        size_t axis = 0;
+        while (efirst != last)
+        {
+            if (*efirst >= shape[axis] && shape[axis] != 1)
+            {
+                throw std::out_of_range("index " + std::to_string(*efirst) + " is out of bounds for axis "
+                    + std::to_string(axis) + " with size " + std::to_string(shape[axis]));
+            }
+            ++efirst, ++axis;
+        }
+    }
+
+#ifdef XTENSOR_ENABLE_ASSERT
+#define XTENSOR_ASSERT(expr) XTENSOR_ASSERT_IMPL(expr, __FILE__, __LINE__)
+#define XTENSOR_ASSERT_IMPL(expr, file, line)\
+    try {\
+        expr;\
+    }\
+    catch (std::exception& e)\
+    {\
+        throw std::runtime_error(std::string(file) + ':' + std::to_string(line)\
+            + ": check failed\n\t" + std::string(e.what()));\
+    }
+#else
+#define XTENSOR_ASSERT(expr)
+#endif
+}
 #endif

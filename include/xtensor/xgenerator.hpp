@@ -185,13 +185,14 @@ namespace xt
     template <class... Args>
     inline auto xgenerator<F, R, S>::operator()(Args... args) const -> const_reference
     {
+        XTENSOR_ASSERT(check_index(shape(), args...));
         return m_f(args...);
     }
 
     template <class F, class R, class S>
     inline auto xgenerator<F, R, S>::operator[](const xindex& index) const -> const_reference
     {
-        return m_f.element(index.begin(), index.end());
+        return element(index.begin(), index.end());
     }
 
     template <class F, class R, class S>
@@ -211,6 +212,7 @@ namespace xt
     template <class It>
     inline auto xgenerator<F, R, S>::element(It first, It last) const -> const_reference
     {
+        XTENSOR_ASSERT(check_element_index(shape(), first, last));
         return m_f.element(first, last);
     }
     //@}

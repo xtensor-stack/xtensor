@@ -30,6 +30,14 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env: COMPILER=gcc GCC=6 BOUND_CHECKS=1
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
@@ -92,7 +100,11 @@ install:
     - conda env create -f ./test-environment.yml
     - source activate test-xtensor
     - cd ..
-    - cmake .
+    - if [[ "$BOUND_CHECKS" == 1 ]]; then
+        cmake -DXTENSOR_ENABLE_ASSERT=ON .;
+      else
+        cmake .;
+      fi
     - make -j2 test_xtensor
     - cd test
 script:
