@@ -77,5 +77,31 @@ namespace xt
         ASSERT_EQ(m(1, 0).value(), 3.0);
         ASSERT_FALSE(m(1, 1).has_value());
     }
+
+    TEST(xoptional, operation)
+    {
+        xtensor_optional<double, 2> m1
+            {{ 0.0 ,       2.0          },
+             { 3.0 , missing<double>()} };
+
+        xtensor<double, 2> m2
+            {{ 1.0 , 2.0 },
+             { 3.0 , 1.0 }};
+
+        auto res_add = m1 + m2;
+        ASSERT_EQ(res_add(0, 0).value(), 1.0);
+        ASSERT_EQ(res_add(1, 0).value(), 6.0);
+        ASSERT_FALSE(res_add(1, 1).has_value());
+
+        auto res_mul = m1 * m2;
+        ASSERT_EQ(res_mul(0, 0).value(), 0.0);
+        ASSERT_EQ(res_mul(1, 0).value(), 9.0);
+        ASSERT_FALSE(res_mul(1, 1).has_value());
+
+        auto res_div = m1 / m2;
+        ASSERT_EQ(res_div(0, 0).value(), 0.0);
+        ASSERT_EQ(res_div(1, 0).value(), 1.0);
+        ASSERT_FALSE(res_div(1, 1).has_value());
+    }
 }
 
