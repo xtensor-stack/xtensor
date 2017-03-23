@@ -130,7 +130,7 @@ namespace xt
 
         // Access
         std::add_lvalue_reference_t<CT> value() & noexcept;
-        std::add_const_t<std::add_lvalue_reference_t<CT>> value() const & noexcept;
+        std::add_lvalue_reference_t<std::add_const_t<CT>> value() const & noexcept;
         std::conditional_t<std::is_reference<CT>::value, value_type&, value_type> value() && noexcept;
         std::conditional_t<std::is_reference<CT>::value, const value_type&, const value_type> value() const && noexcept;
 
@@ -141,7 +141,7 @@ namespace xt
 
         // Access
         std::add_lvalue_reference_t<CB> has_value() & noexcept;
-        std::add_const_t<std::add_lvalue_reference_t<CB>> has_value() const & noexcept;
+        std::add_lvalue_reference_t<std::add_const_t<CB>> has_value() const & noexcept;
         std::conditional_t<std::is_reference<CB>::value, flag_type&, value_type> has_value() && noexcept;
         std::conditional_t<std::is_reference<CB>::value, const flag_type&, const flag_type> has_value() const && noexcept;
 
@@ -354,7 +354,7 @@ namespace xt
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::value() const & noexcept -> std::add_const_t<std::add_lvalue_reference_t<CT>> 
+    auto xoptional<CT, CB>::value() const & noexcept -> std::add_lvalue_reference_t<std::add_const_t<CT>> 
     {
         return m_value;
     }
@@ -393,7 +393,7 @@ namespace xt
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::has_value() const & noexcept -> std::add_const_t<std::add_lvalue_reference_t<CB>>
+    auto xoptional<CT, CB>::has_value() const & noexcept -> std::add_lvalue_reference_t<std::add_const_t<CB>>
     {
         return m_flag;
     }
@@ -417,6 +417,482 @@ namespace xt
         std::swap(m_value, other.m_flag);
         std::swap(m_flag, other.m_flag);
     }
+
+    template <class T, class B>
+    inline auto operator+(const xoptional<T, B>& e) noexcept
+        -> xoptional<std::decay_t<T>>
+    {
+        return e;
+    }
+
+    // Operations
+    template <class T, class B>
+    inline auto operator-(const xoptional<T, B>& e) noexcept
+        -> xoptional<std::decay_t<T>>
+    {
+        using value_type = std::decay_t<T>;
+        if (e.has_value())
+        {
+            return -e.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator+(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() + e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator+(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e2.has_value())
+        {
+            return e1 + e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator+(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value())
+        {
+            return e1.value() + e2;
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator-(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() - e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator-(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e2.has_value())
+        {
+            return e1 - e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator-(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value())
+        {
+            return e1.value() - e2;
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator*(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() * e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator*(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e2.has_value())
+        {
+            return e1 * e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator*(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value())
+        {
+            return e1.value() * e2;
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator/(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() / e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator/(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e2.has_value())
+        {
+            return e1 / e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator/(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value())
+        {
+            return e1.value() / e2;
+        }
+        else
+        {
+            return missing<value_type>(); 
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator||(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() || e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator||(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e2.has_value())
+        {
+            return e1 || e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator||(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value())
+        {
+            return e1.value() || e2;
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator&&(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() && e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator&&(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e2.has_value())
+        {
+            return e1 && e2.value();
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator&&(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value())
+        {
+            return e1.value() && e2;
+        }
+        else
+        {
+            return missing<value_type>();
+        }
+    }
+
+    template <class T, class B>
+    inline auto operator!(const xoptional<T, B>& e) noexcept
+       -> xoptional<bool>
+    {
+        if (e.has_value())
+        {
+            return !e.value();
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator<(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() < e2.value();
+        }
+        else
+        {
+            return missing<bool>(); 
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator<(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e2.has_value())
+        {
+            return e1 < e2.value();
+        }
+        else
+        {
+            return missing<bool>(); 
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator<(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e1.has_value())
+        {
+            return e1.value() < e2;
+        }
+        else
+        {
+            return missing<bool>(); 
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator<=(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() <= e2.value();
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator<=(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e2.has_value())
+        {
+            return e1 <= e2.value();
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator<=(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e1.has_value())
+        {
+            return e1.value() <= e2;
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator>(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() > e2.value();
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator>(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e2.has_value())
+        {
+            return e1 > e2.value();
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator>(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e1.has_value())
+        {
+            return e1.value() > e2;
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator>=(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e1.has_value() && e2.has_value())
+        {
+            return e1.value() >= e2.value();
+        }
+        else
+        {
+            return missing<bool>();
+        }
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator>=(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e2.has_value())
+        {
+            return e1 >= e2.value();
+        }
+        else
+        {
+            return missing<bool>(); 
+        }
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator>=(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+       -> xoptional<bool>
+    {
+        if (e1.has_value())
+        {
+            return e1.value() >= e2;
+        }
+        else
+        {
+            return missing<bool>(); 
+        }
+    }
+
 }
 
 #endif
