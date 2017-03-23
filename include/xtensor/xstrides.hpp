@@ -86,15 +86,18 @@ namespace xt
     template <class size_type, class S, size_t dim, class... Args>
     inline size_type data_offset(const S& strides, size_type i, Args... args) noexcept
     {
-        return i * strides[dim] + data_offset<size_type, S, dim + 1>(strides, args...);
+        if (sizeof...(Args) + 1 > strides.size())
+            return data_offset<size_type, S, dim>(strides, args...);
+        else
+            return i * strides[dim] + data_offset<size_type, S, dim + 1>(strides, args...);
     }
 
     template <class size_type, class S, class It>
-    inline size_type element_offset(const S& strides, It, It last) noexcept
+    inline size_type element_offset(const S& strides, It first, It last) noexcept
     {
-        It first = last;
-        first -= strides.size();
-        return std::inner_product(strides.begin(), strides.end(), first, size_type(0));
+        auto dst = static_cast<typename S::size_type>(std::distance(first, last));
+        It efirst = last - std::min(strides.size(), dst);
+        return std::inner_product(efirst, last, strides.begin(), size_type(0));
     }
 
     namespace detail
