@@ -278,6 +278,14 @@ namespace xt
         }
     }
 
+    template <class V>
+    void test_bound_check(V& vec)
+    {
+#ifdef XTENSOR_ENABLE_ASSERT
+        EXPECT_ANY_THROW(vec(10,10,10));
+#endif
+    }
+
     template <class V, class C = std::vector<std::size_t>>
     void test_access(V& vec)
     {
@@ -289,6 +297,7 @@ namespace xt
             EXPECT_EQ(vec.data(), rm.m_data);
             EXPECT_EQ(vec(2, 1, 0), vec(2, 1));
             EXPECT_EQ(vec(2, 1, 3), vec(2, 2, 2, 1, 3));
+            test_bound_check(vec);
         }
 
         {
@@ -299,6 +308,7 @@ namespace xt
             EXPECT_EQ(vec.data(), cm.m_data);
             EXPECT_EQ(vec(2, 1, 0), vec(2, 1));
             EXPECT_EQ(vec(2, 1, 3), vec(2, 2, 2, 1, 3));
+            test_bound_check(vec);
         }
 
         {
@@ -309,6 +319,7 @@ namespace xt
             EXPECT_EQ(vec.data(), cem.m_data);
             EXPECT_EQ(vec(2, 1, 0), vec(2, 1));
             EXPECT_EQ(vec(2, 1, 3), vec(2, 2, 2, 1, 3));
+            test_bound_check(vec);
         }
 
         {
@@ -319,6 +330,7 @@ namespace xt
             EXPECT_EQ(vec.data(), usr.m_data);
             EXPECT_EQ(vec(2, 0, 0), vec(2, 0));
             EXPECT_EQ(vec(2, 0, 3), vec(2, 2, 2, 0, 3));
+            test_bound_check(vec);
         }
     }
 

@@ -57,8 +57,8 @@ namespace xt
                        backstrides_type& backstrides) noexcept;
 
     /***********************
-    * broadcast functions *
-    ***********************/
+     * broadcast functions *
+     ***********************/
 
     template <class S1, class S2>
     bool broadcast_shape(const S1& input, S2& output);

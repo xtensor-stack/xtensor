@@ -29,6 +29,10 @@ message(STATUS "xtensor v${${PROJECT_NAME}_VERSION}")
 # Build
 # =====
 
+if(XTENSOR_ENABLE_ASSERT)
+    add_definitions(-DXTENSOR_ENABLE_ASSERT)
+endif()
+
 OPTION(BUILD_TESTS "xtensor test suite" ON)
 
 set(XTENSOR_HEADERS
