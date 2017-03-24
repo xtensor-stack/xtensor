@@ -721,7 +721,7 @@ namespace xt
     }
 
     template <class It, class M, std::size_t I>
-    auto xoffset_iterator<It, M, I>::operator-> () const -> pointer
+    auto xoffset_iterator<It, M, I>::operator->() const -> pointer
     {
         return &(forward_offset<M, I>(*m_it));
     }
