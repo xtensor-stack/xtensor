@@ -125,7 +125,7 @@ The `const_xclosure` follows the same scheme:
 Writing functions that return expressions
 -----------------------------------------
 
-*xtensor closure semantics are not meant to prevent users from doing something wrong, since it would also prevent them from doing something clever*.
+*xtensor closure semantics are not meant to prevent users from doing mistakes, since it would also prevent them from doing something clever*.
 
 This section covers cases where understanding C++ move semantics and xtensor closure semantics helps writing better code with xtensor.
 
@@ -134,16 +134,27 @@ Returning evaluated or unevaluated expressions
 
 A key feature of xtensor is that a function returning e.g. ``x + y / z`` where ``x``, ``y`` and ``z`` are xtensor expressions does not actually perform any
 computation. It is only evaluated upon access or assignment. The returned expression holds values or references for ``x``, ``y`` and ``z`` depending on the
-lvalue-ness of the variables passed to the expression, using the *closure semantics* described earlier.
+lvalue-ness of the variables passed to the expression, using the *closure semantics* described earlier. This may result in dangling references when using
+local variables of a function in an unevaluated expression, unless one properly forwards / move the variables.
 
-However, this may result in dangling references when using local variables of a function in an unevaluated expression, unless one properly forwards / move the variables.
+.. note::
 
-- In any case, if the laziness is not important for your usecase, returning ``xt::eval(x + y / z)`` will return an evaluated container and avoid these complications.
-- Otherwise, the key is to *move* lvalues that become invalid when leaving the current scope.
+   The following rule of thumbs prevents dangling references in the xtensor closure semantics:
+
+   - If the laziness is not important for your usecase, returning ``xt::eval(x + y / z)`` will return an evaluated container and avoid these complications.
+   - Otherwise, the key is to *move* lvalues that become invalid when leaving the current scope.
 
 **Example: moving local variables and forwarding universal references**
 
 Let us first consider the following implementation of the ``mean`` function in xtensor:
+
+.. raw:: html
+
+    <style>
+    .rst-content .admonition-title {
+        display: none;
+    }
+    </style>
 
 .. code:: cpp
 
@@ -156,7 +167,7 @@ Let us first consider the following implementation of the ``mean`` function in x
         return std::move(s) / value_type(size); 
     }
 
-The first thing to understand is that the result of the final division is an expression, which performs the actual computation
+The first thing to take into account is that the result of the final division is an expression, which performs the actual computation
 upon access or assignent.
 
 - In order to perform the division, the expression must hold the values or references on the numerator and denominator.

@@ -18,16 +18,16 @@ Support of missing values in xtensor is primarily provided through the ``xoption
 .. code:: cpp
 
     xtensor_optional<double, 2> m
-        {{ 1.0 ,       2.0          },
-         { 3.0 , missing<double>()} };
+        {{ 1.0 ,       2.0         },
+         { 3.0 , missing<double>() }};
 
 This code is semantically equivalent to
 
 .. code:: cpp
 
     xtensor<xoptional<double>, 2> m
-        {{ 1.0 ,       2.0          },
-         { 3.0 , missing<double>()} };
+        {{ 1.0 ,       2.0         },
+         { 3.0 , missing<double>() }};
 
 The ``xtensor_optional`` container is optimized to handle missing values. Internally, instead of holding a single container
 of optional values, it holds an array of ``double`` and a boolean container where each value occupies a single bit instead of ``sizeof(bool)``
@@ -39,3 +39,25 @@ the reference types of the underlying storage for values and boolean flags.
 
 This technique enables performance improvements in mathematical operations over boolean arrays including SIMD optimizations, and
 reduces the memory footprint of optional arrays. It should be transparent to the user.
+
+Mathematical operators
+----------------------
+
+Mathematical operators are overloaded for optional values so that they can be operated upon in the same way as regular scalars.
+
+.. code:: cpp
+
+    xtensor_optional<double, 2> a
+        {{ 1.0 ,       2.0         },
+         { 3.0 , missing<double>() }};
+
+    xtensor<double, 1> b
+        { 1.0, 2.0 };
+
+    // `b` is broadcasted to match the shape of `a`
+    auto s = a + b;
+    // The result is:
+    // {{ 2.0, 4.0 }
+    //  { 4.0, N/A }}
+
+
