@@ -137,4 +137,9 @@ set(XTENSOR_TARGET test_xtensor)
 add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor DEPENDS gtest_main ${XTENSOR_TARGET})
+if(DOWNLOAD_GTEST)
+    add_custom_target(xtest COMMAND test_xtensor DEPENDS gtest_main ${XTENSOR_TARGET})
+else()
+    add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})
+endif()
+
