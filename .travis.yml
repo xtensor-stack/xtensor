@@ -101,9 +101,9 @@ install:
     - source activate test-xtensor
     - cd ..
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
-        cmake -DXTENSOR_ENABLE_ASSERT=ON .;
+        cmake -DXTENSOR_ENABLE_ASSERT=ON -DBUILD_TESTS=ON .;
       else
-        cmake .;
+        cmake -DBUILD_TESTS=ON .;
       fi
     - make -j2 test_xtensor
     - cd test

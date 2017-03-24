@@ -51,6 +51,7 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
    operator
    view
    builder
+   missing
    related
 
 .. toctree::
@@ -67,6 +68,7 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
 
    compilers
    releasing
+   build-options
    external-structures
 
 .. toctree::
