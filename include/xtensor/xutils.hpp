@@ -9,15 +9,16 @@
 #ifndef XUTILS_HPP
 #define XUTILS_HPP
 
-#include <cstddef>
+#include <algorithm>
 #include <array>
-#include <utility>
+#include <complex>
+#include <cstddef>
+#include <initializer_list>
 #include <tuple>
 #include <type_traits>
-#include <initializer_list>
-#include <algorithm>
-#include <complex>
+#include <utility>
 #include <vector>
+
 #include "xtensor_config.hpp"
 
 namespace xt
@@ -80,7 +81,7 @@ namespace xt
 
     // equivalent to std::size(a) in c++17
     template <class T, std::size_t N>
-    constexpr std::size_t container_size(const T(&a)[N]);
+    constexpr std::size_t container_size(const T (&a)[N]);
 
     /*******************************
      * remove_class implementation *
@@ -92,13 +93,13 @@ namespace xt
     };
 
     template <class C, class R, class... Args>
-    struct remove_class<R (C::*) (Args...)>
+    struct remove_class<R (C::*)(Args...)>
     {
         typedef R type(Args...);
     };
 
     template <class C, class R, class... Args>
-    struct remove_class<R (C::*) (Args...) const>
+    struct remove_class<R (C::*)(Args...) const>
     {
         typedef R type(Args...);
     };
@@ -241,7 +242,7 @@ namespace xt
         R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
         {
             using FT = std::add_pointer_t<R(F&&, const std::tuple<S...>&)>;
-            static const std::array<FT, sizeof...(I)> ar = { &apply_one<R, F, I, S...>... };
+            static const std::array<FT, sizeof...(I)> ar = {&apply_one<R, F, I, S...>...};
             return ar[index](std::forward<F>(func), s);
         }
     }
@@ -256,19 +257,19 @@ namespace xt
      * nested_initializer_list *
      ***************************/
 
-    template<class T, std::size_t I>
+    template <class T, std::size_t I>
     struct nested_initializer_list
     {
         using type = std::initializer_list<typename nested_initializer_list<T, I - 1>::type>;
     };
 
-    template<class T>
+    template <class T>
     struct nested_initializer_list<T, 0>
     {
         using type = T;
     };
 
-    template<class T, std::size_t I>
+    template <class T, std::size_t I>
     using nested_initializer_list_t = typename nested_initializer_list<T, I>::type;
 
     /******************************
@@ -344,7 +345,7 @@ namespace xt
         template <class R, class U, std::size_t... I>
         constexpr R initializer_shape(U t, std::index_sequence<I...>)
         {
-             return { initializer_shape_impl<I>::value(t)... };
+            return {initializer_shape_impl<I>::value(t)...};
         }
     }
 
@@ -363,8 +364,10 @@ namespace xt
         template <class T, class S>
         struct predshape
         {
-            constexpr predshape(S first, S last): m_first(first), m_last(last)
-            {}
+            constexpr predshape(S first, S last)
+                : m_first(first), m_last(last)
+            {
+            }
 
             constexpr bool operator()(const T&) const
             {
@@ -378,8 +381,10 @@ namespace xt
         template <class T, class S>
         struct predshape<std::initializer_list<T>, S>
         {
-            constexpr predshape(S first, S last): m_first(first), m_last(last)
-            {}
+            constexpr predshape(S first, S last)
+                : m_first(first), m_last(last)
+            {
+            }
 
             constexpr bool operator()(std::initializer_list<T> t) const
             {
@@ -495,7 +500,7 @@ namespace xt
             }
 
             template <class T>
-            static inline T&& forward(typename std::remove_reference<T>::type&& t) noexcept 
+            static inline T&& forward(typename std::remove_reference<T>::type&& t) noexcept
             {
                 return static_cast<T&&>(t);
             }
@@ -506,7 +511,7 @@ namespace xt
     inline decltype(auto) forward_sequence(A&& s)
     {
         using forwarder = detail::sequence_forwarder<
-            std::decay_t<R>, 
+            std::decay_t<R>,
             std::remove_cv_t<std::remove_reference_t<A>>
         >;
         return forwarder::template forward<A>(s);
@@ -518,7 +523,7 @@ namespace xt
 
     namespace detail
     {
-        template<class T1, class T2>
+        template <class T1, class T2>
         constexpr std::common_type_t<T1, T2> imax(const T1& a, const T2& b)
         {
             return a > b ? a : b;
@@ -620,7 +625,7 @@ namespace xt
                                                underlying_type&,
                                                underlying_type>::type;
     };
-     
+
     template <class S>
     using const_closure_t = typename const_closure<S>::type;
 
@@ -631,7 +636,7 @@ namespace xt
     namespace detail
     {
         template <class T, class U, bool = std::is_const<std::remove_reference_t<T>>::value,
-                                    bool = std::is_volatile<std::remove_reference_t<T>>::value>
+                  bool = std::is_volatile<std::remove_reference_t<T>>::value>
         struct apply_cv_impl
         {
             using type = U;
@@ -696,10 +701,14 @@ namespace xt
     namespace detail
     {
         template <typename T>
-        struct is_complex : public std::false_type {};
+        struct is_complex : public std::false_type
+        {
+        };
 
         template <typename T>
-        struct is_complex<std::complex<T>> : public std::true_type {};
+        struct is_complex<std::complex<T>> : public std::true_type
+        {
+        };
     }
 
     template <class T>
@@ -718,13 +727,13 @@ namespace xt
         template <class T, class M>
         struct forward_type
         {
-            using type = apply_cv_t<T, M>&&; 
+            using type = apply_cv_t<T, M>&&;
         };
 
         template <class T, class M>
         struct forward_type<T&, M>
         {
-            using type = apply_cv_t<T, M>&; 
+            using type = apply_cv_t<T, M>&;
         };
 
         template <class T, class M>
@@ -737,7 +746,7 @@ namespace xt
         using forward_type = detail::forward_type_t<T, M>;
         using cv_value_type = std::remove_reference_t<forward_type>;
         using byte_type = apply_cv_t<std::remove_reference_t<T>, char>;
-        
+
         return static_cast<forward_type>(
             *reinterpret_cast<cv_value_type*>(
                 reinterpret_cast<byte_type*>(&v) + I
@@ -753,7 +762,7 @@ namespace xt
 
     template <class T>
     auto forward_real(T&& v)
-        -> std::enable_if_t<!is_complex<T>::value, detail::forward_type_t<T, T>>                                    // real case -> forward
+        -> std::enable_if_t<!is_complex<T>::value, detail::forward_type_t<T, T>>  // real case -> forward
     {
         return static_cast<detail::forward_type_t<T, T>>(v);
     }
@@ -768,12 +777,12 @@ namespace xt
     // forward_imag
 
     template <class T>
-    auto forward_imag(T&&)
-        -> std::enable_if_t<!is_complex<T>::value, std::decay_t<T>>                                                 // real case -> always return 0 by value
+    auto forward_imag(T &&)
+        -> std::enable_if_t<!is_complex<T>::value, std::decay_t<T>>  // real case -> always return 0 by value
     {
         return 0;
     }
-    
+
     template <class T>
     auto forward_imag(T&& v)
         -> std::enable_if_t<is_complex<T>::value, detail::forward_type_t<T, typename std::decay_t<T>::value_type>>  // complex case -> forwards the imaginary part
@@ -791,7 +800,7 @@ namespace xt
         template <class T, std::size_t N, std::size_t... I>
         constexpr std::array<std::remove_cv_t<T>, N> to_array_impl(T (&a)[N], std::index_sequence<I...>)
         {
-            return { {a[I]...} };
+            return {{a[I]...}};
         }
     }
 
@@ -814,11 +823,10 @@ namespace xt
 
     // equivalent to std::size(a) in c++17
     template <class T, std::size_t N>
-    constexpr std::size_t container_size(const T(&)[N])
+    constexpr std::size_t container_size(const T (&)[N])
     {
         return N;
     }
 }
 
 #endif
-

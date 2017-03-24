@@ -9,8 +9,8 @@
 #ifndef XVECTORIZE_HPP
 #define XVECTORIZE_HPP
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 #include "xutils.hpp"
 
@@ -48,10 +48,10 @@ namespace xt
     }
 
     template <class R, class... Args>
-    xvectorizer<R (*) (Args...), R> vectorize(R (*f) (Args...));
+    xvectorizer<R (*)(Args...), R> vectorize(R (*f)(Args...));
 
     template <class F, class R, class... Args>
-    xvectorizer<F, R> vectorize(F&& f, R (*) (Args...));
+    xvectorizer<F, R> vectorize(F&& f, R (*)(Args...));
 
     template <class F>
     auto vectorize(F&& f) -> decltype(vectorize(std::forward<F>(f), (detail::get_function_type<F>*)nullptr));
@@ -75,13 +75,13 @@ namespace xt
     }
 
     template <class R, class... Args>
-    inline xvectorizer<R (*)(Args...), R> vectorize(R (*f) (Args...))
+    inline xvectorizer<R (*)(Args...), R> vectorize(R (*f)(Args...))
     {
-        return xvectorizer<R (*) (Args...), R>(f);
+        return xvectorizer<R (*)(Args...), R>(f);
     }
 
     template <class F, class R, class... Args>
-    inline xvectorizer<F, R> vectorize(F&& f, R (*) (Args...))
+    inline xvectorizer<F, R> vectorize(F&& f, R (*)(Args...))
     {
         return xvectorizer<F, R>(std::forward<F>(f));
     }
@@ -89,9 +89,8 @@ namespace xt
     template <class F>
     inline auto vectorize(F&& f) -> decltype(vectorize(std::forward<F>(f), (detail::get_function_type<F>*)nullptr))
     {
-        return vectorize(std::forward<F>(f),(detail::get_function_type<F>*)nullptr);
+        return vectorize(std::forward<F>(f), (detail::get_function_type<F>*)nullptr);
     }
 }
 
 #endif
-

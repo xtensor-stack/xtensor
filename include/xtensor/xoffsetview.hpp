@@ -9,17 +9,17 @@
 #ifndef XOFFSETVIEW_HPP
 #define XOFFSETVIEW_HPP
 
-#include <utility>
 #include <algorithm>
-#include <type_traits>
-#include <iterator>
-#include <cstddef>
 #include <array>
+#include <cstddef>
+#include <iterator>
+#include <type_traits>
+#include <utility>
 
-#include "xtensor/xutils.hpp"
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xiterator.hpp"
 #include "xtensor/xsemantic.hpp"
+#include "xtensor/xutils.hpp"
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
@@ -92,7 +92,6 @@ namespace xt
     {
 
     public:
-
         using self_type = xoffsetview<CT, M, I>;
         using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
@@ -104,7 +103,7 @@ namespace xt
         using const_pointer = const value_type*;
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
-        
+
         using shape_type = typename xexpression_type::shape_type;
 
         using stepper = xoffset_stepper<typename xexpression_type::stepper, M, I>;
@@ -112,7 +111,7 @@ namespace xt
 
         using broadcast_iterator = xoffset_iterator<typename xexpression_type::broadcast_iterator, M, I>;
         using const_broadcast_iterator = xoffset_iterator<typename xexpression_type::const_broadcast_iterator, M, I>;
-        
+
         using iterator = xoffset_iterator<typename xexpression_type::iterator, M, I>;
         using const_iterator = xoffset_iterator<typename xexpression_type::const_iterator, M, I>;
 
@@ -126,7 +125,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type & shape() const noexcept;
+        const shape_type& shape() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -160,23 +159,23 @@ namespace xt
 
         template <class S>
         xoffset_iterator<xiterator<typename xexpression_type::stepper, S>, M, I>
-            xbegin(const S& shape);
+        xbegin(const S& shape);
         template <class S>
         xoffset_iterator<xiterator<typename xexpression_type::stepper, S>, M, I>
-            xend(const S& shape);
+        xend(const S& shape);
 
         template <class S>
-        xoffset_iterator<xiterator<typename xexpression_type::const_stepper, S>, M, I> 
-            xbegin(const S& shape) const;
+        xoffset_iterator<xiterator<typename xexpression_type::const_stepper, S>, M, I>
+        xbegin(const S& shape) const;
         template <class S>
         xoffset_iterator<xiterator<typename xexpression_type::const_stepper, S>, M, I>
-            xend(const S& shape) const;
+        xend(const S& shape) const;
         template <class S>
         xoffset_iterator<xiterator<typename xexpression_type::const_stepper, S>, M, I>
-            cxbegin(const S& shape) const;
+        cxbegin(const S& shape) const;
         template <class S>
         xoffset_iterator<xiterator<typename xexpression_type::const_stepper, S>, M, I>
-            cxend(const S& shape) const;
+        cxend(const S& shape) const;
 
         template <class S>
         stepper stepper_begin(const S& shape);
@@ -188,7 +187,6 @@ namespace xt
         const_stepper stepper_end(const S& shape) const;
 
     private:
-
         CT m_e;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
@@ -262,7 +260,6 @@ namespace xt
     class xoffset_stepper
     {
     public:
-
         using value_type = M;
         using reference = apply_cv_t<typename St::reference, value_type>;
         using pointer = std::remove_reference_t<reference>*;
@@ -325,9 +322,8 @@ namespace xt
     template <class E>
     inline auto xoffsetview<CT, M, I>::operator=(const xexpression<E>& e) -> self_type&
     {
-        bool cond = (e.derived_cast().shape().size() == dimension())
-                    && std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
-        if(!cond)
+        bool cond = (e.derived_cast().shape().size() == dimension()) && std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
+        if (!cond)
         {
             semantic_base::operator=(broadcast(e.derived_cast(), shape()));
         }
@@ -378,7 +374,7 @@ namespace xt
      * Returns the shape of the expression.
      */
     template <class CT, class M, std::size_t I>
-    inline auto xoffsetview<CT, M, I>::shape() const noexcept -> const shape_type &
+    inline auto xoffsetview<CT, M, I>::shape() const noexcept -> const shape_type&
     {
         return m_e.shape();
     }
@@ -411,13 +407,13 @@ namespace xt
     {
         return forward_offset<value_type, I>(m_e[index]);
     }
- 
+
     template <class CT, class M, std::size_t I>
     inline auto xoffsetview<CT, M, I>::operator[](size_type i) const -> const_reference
     {
         return operator()(i);
     }
- 
+
     /**
      * Returns a constant reference to the element at the specified position in the expression.
      * @param first iterator starting the sequence of indices
@@ -445,7 +441,7 @@ namespace xt
     template <class CT, class M, std::size_t I>
     template <class S>
     inline bool xoffsetview<CT, M, I>::broadcast_shape(S& shape) const
-    { 
+    {
         return m_e.broadcast_shape(shape);
     }
 
@@ -698,7 +694,8 @@ namespace xt
      ***********************************/
 
     template <class It, class M, std::size_t I>
-    xoffset_iterator<It, M, I>::xoffset_iterator(const It& it) : m_it(it)
+    xoffset_iterator<It, M, I>::xoffset_iterator(const It& it)
+        : m_it(it)
     {
     }
 
@@ -724,7 +721,7 @@ namespace xt
     }
 
     template <class It, class M, std::size_t I>
-    auto xoffset_iterator<It, M, I>::operator->() const -> pointer
+    auto xoffset_iterator<It, M, I>::operator-> () const -> pointer
     {
         return &(forward_offset<M, I>(*m_it));
     }
@@ -754,7 +751,8 @@ namespace xt
      **********************************/
 
     template <class St, class M, std::size_t I>
-    xoffset_stepper<St, M, I>::xoffset_stepper(const St& stepper) : m_stepper(stepper)
+    xoffset_stepper<St, M, I>::xoffset_stepper(const St& stepper)
+        : m_stepper(stepper)
     {
     }
 
@@ -807,7 +805,5 @@ namespace xt
     {
         return !lhs.equal(rhs);
     }
-
 }
 #endif
-

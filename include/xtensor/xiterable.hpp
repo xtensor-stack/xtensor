@@ -38,7 +38,7 @@ namespace xt
     public:
 
         using derived_type = D;
-        
+
         using iterable_types = xiterable_inner_types<D>;
         using inner_shape_type = typename iterable_types::inner_shape_type;
         using stepper = typename iterable_types::stepper;
@@ -132,17 +132,17 @@ namespace xt
      * xexpression_const_iterable *
      ******************************/
 
-     /**
-      * @class xexpression_const_iterable
-      * @brief Base class for multidimensional iterable constant expressions
-      *        that don't store any data
-      *
-      * The xexpression_const_iterable class defines the interface for multidimensional
-      * constant expressions that don't store any data and that can be iterated.
-      *
-      * @tparam D The derived type, i.e. the inheriting class for which xexpression_const_iterable
-      *           provides the interface.
-      */
+    /**
+     * @class xexpression_const_iterable
+     * @brief Base class for multidimensional iterable constant expressions
+     *        that don't store any data
+     *
+     * The xexpression_const_iterable class defines the interface for multidimensional
+     * constant expressions that don't store any data and that can be iterated.
+     *
+     * @tparam D The derived type, i.e. the inheriting class for which xexpression_const_iterable
+     *           provides the interface.
+     */
     template <class D>
     class xexpression_const_iterable : public xconst_iterable<D>
     {
@@ -234,7 +234,7 @@ namespace xt
      * Returns a constant iterator to the first element of the expression.
      */
     template <class D>
-    inline auto xconst_iterable<D>::cxbegin() const noexcept ->const_broadcast_iterator
+    inline auto xconst_iterable<D>::cxbegin() const noexcept -> const_broadcast_iterator
     {
         return const_broadcast_iterator(get_stepper_begin(get_shape()), &get_shape());
     }
@@ -310,7 +310,7 @@ namespace xt
     {
         return derived_cast().stepper_end(shape);
     }
-    
+
     template <class D>
     inline auto xconst_iterable<D>::get_shape() const -> const inner_shape_type&
     {
@@ -399,12 +399,12 @@ namespace xt
      * xexpression_const_iterable implementation *
      *********************************************/
 
-     /**
-      * @name Constant Iterators
-      */
-     /**
-      * Returns a constant iterator to the first element of the expression.
-      */
+    /**
+     * @name Constant Iterators
+     */
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
     template <class D>
     inline auto xexpression_const_iterable<D>::begin() const noexcept -> const_iterator
     {
@@ -445,13 +445,13 @@ namespace xt
      * xexpression_iterable implementation *
      ***************************************/
 
-     /**
-      * @name Iterators
-      */
-     //@{
-     /**
-      * Returns an iterator to the first element of the expression.
-      */
+    /**
+     * @name Iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the expression.
+     */
     template <class D>
     inline auto xexpression_iterable<D>::begin() noexcept -> iterator
     {
@@ -469,12 +469,12 @@ namespace xt
     }
     //@}
 
-     /**
-      * @name Constant Iterators
-      */
-     /**
-      * Returns a constant iterator to the first element of the expression.
-      */
+    /**
+     * @name Constant Iterators
+     */
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     */
     template <class D>
     inline auto xexpression_iterable<D>::begin() const noexcept -> const_iterator
     {

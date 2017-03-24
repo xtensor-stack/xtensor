@@ -9,11 +9,11 @@
 #ifndef XSEMANTIC_HPP
 #define XSEMANTIC_HPP
 
-#include <utility>
 #include <functional>
+#include <utility>
 
-#include "xexpression.hpp"
 #include "xassign.hpp"
+#include "xexpression.hpp"
 
 namespace xt
 {
@@ -552,7 +552,7 @@ namespace xt
     {
         D& d = this->derived_cast();
         std::transform(d.xbegin(), d.xend(), d.xbegin(),
-                [e, &f](const auto& v) { return f(v, e); });
+                       [e, &f](const auto& v) { return f(v, e); });
         return this->derived_cast();
     }
 
@@ -562,8 +562,6 @@ namespace xt
     {
         return base_type::operator=(e);
     }
-
 }
 
 #endif
-

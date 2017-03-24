@@ -9,9 +9,9 @@
 #ifndef XSCALAR_HPP
 #define XSCALAR_HPP
 
-#include <utility>
-#include <cstddef>
 #include <array>
+#include <cstddef>
+#include <utility>
 
 #include "xexpression.hpp"
 
@@ -47,7 +47,7 @@ namespace xt
         using self_type = xscalar<CT>;
         using shape_type = std::array<size_type, 0>;
 
-        using stepper = xscalar_stepper<false, CT>;;
+        using stepper = xscalar_stepper<false, CT>;
         using const_stepper = xscalar_stepper<true, CT>;
 
         using broadcast_iterator = xscalar_iterator<false, CT>;
@@ -99,7 +99,7 @@ namespace xt
         const_broadcast_iterator xend() const noexcept;
         const_broadcast_iterator cxbegin() const noexcept;
         const_broadcast_iterator cxend() const noexcept;
-        
+
         template <class S>
         broadcast_iterator xbegin(const S& shape) noexcept;
         template <class S>
@@ -204,7 +204,7 @@ namespace xt
         using reference = std::conditional_t<is_const,
                                              typename container_type::const_reference,
                                              typename container_type::reference>;
-        using pointer = std::conditional_t<is_const, 
+        using pointer = std::conditional_t<is_const,
                                            typename container_type::const_pointer,
                                            typename container_type::pointer>;
         using difference_type = typename container_type::difference_type;
@@ -590,4 +590,3 @@ namespace xt
 }
 
 #endif
-

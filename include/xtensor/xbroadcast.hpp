@@ -9,17 +9,17 @@
 #ifndef XBROADCAST_HPP
 #define XBROADCAST_HPP
 
-#include <utility>
-#include <array>
 #include <algorithm>
-#include <numeric>
-#include <iterator>
-#include <type_traits>
+#include <array>
 #include <cstddef>
+#include <iterator>
+#include <numeric>
+#include <type_traits>
+#include <utility>
 
 #include "xexpression.hpp"
-#include "xstrides.hpp"
 #include "xiterable.hpp"
+#include "xstrides.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -37,7 +37,7 @@ namespace xt
     auto broadcast(E&& e, std::initializer_list<I> s) noexcept;
 #else
     template <class E, class I, std::size_t L>
-    auto broadcast(E&& e, const I(&s)[L]) noexcept;
+    auto broadcast(E&& e, const I (&s)[L]) noexcept;
 #endif
 
     /**************
@@ -79,7 +79,6 @@ namespace xt
     {
 
     public:
-
         using self_type = xbroadcast<CT, X>;
         using xexpression_type = std::decay_t<CT>;
 
@@ -90,7 +89,7 @@ namespace xt
         using const_pointer = typename xexpression_type::const_pointer;
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
-        
+
         using iterable_base = xexpression_const_iterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
@@ -131,7 +130,6 @@ namespace xt
         const_stepper stepper_end(const S& shape) const noexcept;
 
     private:
-
         CT m_e;
         inner_shape_type m_shape;
     };
@@ -168,7 +166,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t L>
-    inline auto broadcast(E&& e, const I(&s)[L]) noexcept
+    inline auto broadcast(E&& e, const I (&s)[L]) noexcept
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<std::size_t, L>>;
         using shape_type = typename broadcast_type::shape_type;
@@ -225,7 +223,7 @@ namespace xt
      * Returns the shape of the expression.
      */
     template <class CT, class X>
-    inline auto xbroadcast<CT, X>::shape() const noexcept -> const inner_shape_type &
+    inline auto xbroadcast<CT, X>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
@@ -264,7 +262,7 @@ namespace xt
     {
         return operator()(i);
     }
- 
+
     /**
      * Returns a constant reference to the element at the specified position in the expression.
      * @param first iterator starting the sequence of indices
@@ -295,7 +293,7 @@ namespace xt
     template <class CT, class X>
     template <class S>
     inline bool xbroadcast<CT, X>::broadcast_shape(S& shape) const
-    { 
+    {
         return xt::broadcast_shape(m_shape, shape);
     }
 
@@ -309,8 +307,8 @@ namespace xt
     inline bool xbroadcast<CT, X>::is_trivial_broadcast(const S& strides) const noexcept
     {
         return dimension() == m_e.dimension() &&
-               std::equal(m_shape.cbegin(), m_shape.cend(), m_e.shape().cbegin()) &&
-               m_e.is_trivial_broadcast(strides);
+            std::equal(m_shape.cbegin(), m_shape.cend(), m_e.shape().cbegin()) &&
+            m_e.is_trivial_broadcast(strides);
     }
     //@}
 
@@ -329,7 +327,6 @@ namespace xt
         // Could check if (broadcastable(shape, m_shape)
         return m_e.stepper_end(shape);
     }
-
 }
 
 #endif

@@ -10,6 +10,7 @@
 #define XVIEW_UTILS_HPP
 
 #include <array>
+
 #include "xslice.hpp"
 
 namespace xt

@@ -13,12 +13,12 @@
 #ifndef XBUILDER_HPP
 #define XBUILDER_HPP
 
-#include <utility>
-#include <functional>
 #include <cmath>
+#include <functional>
+#include <utility>
 
-#include "xfunction.hpp"
 #include "xbroadcast.hpp"
+#include "xfunction.hpp"
 #include "xgenerator.hpp"
 
 #ifdef X_OLD_CLANG
@@ -53,7 +53,7 @@ namespace xt
     }
 #else
     template <class T, class I, std::size_t L>
-    inline auto ones(const I(&shape)[L]) noexcept
+    inline auto ones(const I (&shape)[L]) noexcept
     {
         return broadcast(T(1), shape);
     }
@@ -72,7 +72,7 @@ namespace xt
     {
         return broadcast(T(0), std::forward<S>(shape));
     }
-    
+
 #ifdef X_OLD_CLANG
     template <class T, class I>
     inline auto zeros(std::initializer_list<I> shape) noexcept
@@ -81,7 +81,7 @@ namespace xt
     }
 #else
     template <class T, class I, std::size_t L>
-    inline auto zeros(const I(&shape)[L]) noexcept
+    inline auto zeros(const I (&shape)[L]) noexcept
     {
         return broadcast(T(0), shape);
     }
@@ -134,14 +134,15 @@ namespace xt
             using value_type = typename F::value_type;
             using size_type = std::size_t;
 
-            fn_impl(F&& f) : m_ft(f)
+            fn_impl(F&& f)
+                : m_ft(f)
             {
             }
 
             template <class... Args>
             inline value_type operator()(Args... args) const
             {
-                size_type idx [sizeof...(Args)] = {static_cast<size_type>(args)...};
+                size_type idx[sizeof...(Args)] = {static_cast<size_type>(args)...};
                 return access_impl(std::begin(idx), std::end(idx));
             }
 
@@ -165,7 +166,8 @@ namespace xt
         {
             using value_type = T;
 
-            eye_fn(int k) : m_k(k)
+            eye_fn(int k)
+                : m_k(k)
             {
             }
 
@@ -319,7 +321,7 @@ namespace xt
                 std::size_t i = 0;
                 for (; i < sizeof...(CT); ++i)
                 {
-                    if (apply<bool>(i, match, m_t)) 
+                    if (apply<bool>(i, match, m_t))
                     {
                         break;
                     }
@@ -381,8 +383,8 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
 
             template <class CTA>
-            repeat_impl(CTA&& source, size_type axis) :
-                m_source(std::forward<CTA>(source)), m_axis(axis)
+            repeat_impl(CTA&& source, size_type axis)
+                : m_source(std::forward<CTA>(source)), m_axis(axis)
             {
             }
 
@@ -582,7 +584,8 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
 
             template <class CTA>
-            diag_fn(CTA&& source, int k) : m_source(std::forward<CTA>(source)), m_k(k)
+            diag_fn(CTA&& source, int k)
+                : m_source(std::forward<CTA>(source)), m_k(k)
             {
             }
 
@@ -756,7 +759,7 @@ namespace xt
         using CT = xclosure_t<E>;
         std::size_t s = arr.shape()[0] + std::abs(k);
         return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr), k)),
-                                       { s, s });
+                                       {s, s});
     }
 
     /**
@@ -793,7 +796,7 @@ namespace xt
         using CT = xclosure_t<E>;
         auto shape = arr.shape();
         return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::greater_equal<long int>>>(
-                                       detail::trilu_fn<CT, std::greater_equal<long int>>(std::forward<E>(arr), k, std::greater_equal<long int>())),
+                                           detail::trilu_fn<CT, std::greater_equal<long int>>(std::forward<E>(arr), k, std::greater_equal<long int>())),
                                        shape);
     }
 
@@ -812,7 +815,7 @@ namespace xt
         using CT = xclosure_t<E>;
         auto shape = arr.shape();
         return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::less_equal<long int>>>(
-                                       detail::trilu_fn<CT, std::less_equal<long int>>(std::forward<E>(arr), k, std::less_equal<long int>())),
+                                           detail::trilu_fn<CT, std::less_equal<long int>>(std::forward<E>(arr), k, std::less_equal<long int>())),
                                        shape);
     }
 }

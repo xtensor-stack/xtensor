@@ -9,15 +9,15 @@
 #ifndef XINDEXVIEW_HPP
 #define XINDEXVIEW_HPP
 
+#include <algorithm>
 #include <cstddef>
+#include <tuple>
 #include <type_traits>
 #include <utility>
-#include <tuple>
-#include <algorithm>
 
 #include "xexpression.hpp"
-#include "xstrides.hpp"
 #include "xiterable.hpp"
+#include "xstrides.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -154,7 +154,7 @@ namespace xt
         CT m_e;
         const indices_type m_indices;
         const inner_shape_type m_shape;
-        
+
         void assign_temporary_impl(temporary_type& tmp);
 
         friend class xview_semantic<xindexview<CT, I>>;
@@ -255,7 +255,7 @@ namespace xt
         return semantic_base::operator=(e);
     }
     //@}
-    
+
     template <class CT, class I>
     template <class E>
     inline auto xindexview<CT, I>::operator=(const E& e) -> disable_xexpression<E, self_type>&
@@ -380,7 +380,7 @@ namespace xt
         return m_e[m_indices[(*first)]];
     }
     //@}
-    
+
     /**
      * @name Broadcasting
      */
@@ -450,17 +450,17 @@ namespace xt
      * xfiltration implementation *
      ******************************/
 
-     /**
-      * @name Constructor
-      */
-     //@{
-     /**
-      * Constructs a xfiltration on the given expression \c e, selecting
-      * the elements matching the specified \c condition. 
-      *
-      * @param e the \ref xexpression to filter.
-      * @param condition the filtering \ref xexpression to apply.
-      */
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Constructs a xfiltration on the given expression \c e, selecting
+     * the elements matching the specified \c condition. 
+     *
+     * @param e the \ref xexpression to filter.
+     * @param condition the filtering \ref xexpression to apply.
+     */
     template <class ECT, class CCT>
     inline xfiltration<ECT, CCT>::xfiltration(ECT e, CCT condition)
         : m_e(e), m_condition(condition)
@@ -572,7 +572,7 @@ namespace xt
     inline auto index_view(E&& e, std::initializer_list<std::initializer_list<I>> indices) noexcept
     {
         std::vector<xindex> idx;
-        for (auto it=indices.begin(); it!=indices.end(); ++it)
+        for (auto it = indices.begin(); it != indices.end(); ++it)
         {
             idx.emplace_back(xindex(it->begin(), it->end()));
         }
@@ -581,7 +581,7 @@ namespace xt
     }
 #else
     template <class E, std::size_t L>
-    inline auto index_view(E&& e, const xindex(&indices)[L]) noexcept
+    inline auto index_view(E&& e, const xindex (&indices)[L]) noexcept
     {
         using view_type = xindexview<xclosure_t<E>, std::array<xindex, L>>;
         return view_type(std::forward<E>(e), to_array(indices));

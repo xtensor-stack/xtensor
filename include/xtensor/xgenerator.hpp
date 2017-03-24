@@ -9,16 +9,16 @@
 #ifndef XGENERATOR_HPP
 #define XGENERATOR_HPP
 
+#include <algorithm>
 #include <cstddef>
+#include <numeric>
+#include <tuple>
 #include <type_traits>
 #include <utility>
-#include <tuple>
-#include <algorithm>
-#include <numeric>
 
 #include "xexpression.hpp"
-#include "xstrides.hpp"
 #include "xiterable.hpp"
+#include "xstrides.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -216,7 +216,7 @@ namespace xt
         return m_f.element(first, last);
     }
     //@}
-    
+
     /**
      * @name Broadcasting
      */
@@ -262,7 +262,7 @@ namespace xt
         return const_stepper(this, offset, true);
     }
 
-     namespace detail
+    namespace detail
     {
 #ifdef X_OLD_CLANG
         template <class Functor, class I>
@@ -274,14 +274,14 @@ namespace xt
         }
 #else
         template <class Functor, class I, std::size_t L>
-        inline auto make_xgenerator(Functor&& f, const I(&shape)[L]) noexcept
+        inline auto make_xgenerator(Functor&& f, const I (&shape)[L]) noexcept
         {
             using shape_type = std::array<std::size_t, L>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
             return type(std::forward<Functor>(f), forward_sequence<shape_type>(shape));
         }
 #endif
-        
+
         template <class Functor, class S>
         inline auto make_xgenerator(Functor&& f, S&& shape) noexcept
         {

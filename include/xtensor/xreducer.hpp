@@ -12,20 +12,20 @@
 #include <algorithm>
 #include <cstddef>
 #include <initializer_list>
-#include <type_traits>
-#include <utility>
 #include <iterator>
 #include <stdexcept>
+#include <type_traits>
+#include <utility>
 #ifdef X_OLD_CLANG
 #include <vector>
 #endif
 
-#include "xgenerator.hpp"
-#include "xreducer.hpp"
+#include "xbuilder.hpp"
 #include "xexpression.hpp"
+#include "xgenerator.hpp"
 #include "xiterable.hpp"
+#include "xreducer.hpp"
 #include "xutils.hpp"
-#include "xbuilder.hpp"  
 
 namespace xt
 {
@@ -45,7 +45,7 @@ namespace xt
     auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept;
 #else
     template <class F, class E, class I, std::size_t N>
-    auto reduce(F&& f, E&& e, const I(&axes)[N]) noexcept;
+    auto reduce(F&& f, E&& e, const I (&axes)[N]) noexcept;
 #endif
 
     /*************
@@ -168,7 +168,7 @@ namespace xt
      * reduce implementation *
      *************************/
 
-     /**
+    /**
      * @brief Returns an \ref xexpression applying the speficied reducing
      * function to an expresssion over the given axes.
      *
@@ -206,7 +206,7 @@ namespace xt
     }
 #else
     template <class F, class E, class I, std::size_t N>
-    inline auto reduce(F&& f, E&& e, const I(&axes)[N]) noexcept
+    inline auto reduce(F&& f, E&& e, const I (&axes)[N]) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
@@ -408,18 +408,18 @@ namespace xt
      * xreducer implementation *
      ***************************/
 
-     /**
-      * @name Constructor
-      */
-     //@{
-     /**
-      * Constructs an xreducer expression applying the specified
-      * function to the given expression over the given axes.
-      *
-      * @param func the function to apply
-      * @param e the expression to reduce
-      * @param axes the axes along which the reduction is performed
-      */
+    /**
+     * @name Constructor
+     */
+    //@{
+    /**
+     * Constructs an xreducer expression applying the specified
+     * function to the given expression over the given axes.
+     *
+     * @param func the function to apply
+     * @param e the expression to reduce
+     * @param axes the axes along which the reduction is performed
+     */
     template <class F, class CT, class X>
     template <class Func, class CTA, class AX>
     inline xreducer<F, CT, X>::xreducer(Func&& func, CTA&& e, AX&& axes)
@@ -427,7 +427,7 @@ namespace xt
           m_shape(make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0)),
           m_index(make_sequence<index_type>(m_e.dimension(), 0))
     {
-        if(!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
+        if (!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
         {
             throw std::runtime_error("Reducing axes should be sorted");
         }
@@ -481,7 +481,7 @@ namespace xt
     template <class... Args>
     inline auto xreducer<F, CT, X>::operator()(Args... args) const -> const_reference
     {
-        std::array<std::size_t, sizeof...(Args)> arg_array = { static_cast<std::size_t>(args)... };
+        std::array<std::size_t, sizeof...(Args)> arg_array = {static_cast<std::size_t>(args)...};
         return element(arg_array.cbegin(), arg_array.cend());
     }
 
@@ -502,7 +502,7 @@ namespace xt
     {
         return operator()(i);
     }
- 
+
     /**
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param first iterator starting the sequence of indices

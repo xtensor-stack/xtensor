@@ -9,9 +9,9 @@
 #ifndef XTENSOR_FORWARD_HPP
 #define XTENSOR_FORWARD_HPP
 
-#include <vector>
-#include <memory>
 #include "xtensor_config.hpp"
+#include <memory>
+#include <vector>
 
 namespace xt
 {
@@ -97,7 +97,6 @@ namespace xt
      */
     template <class T, std::size_t N, class A = std::allocator<T>, class BA = std::allocator<bool>>
     using xtensor_optional = xtensor_container<xoptional_vector<T, A, BA>, N>;
-
 }
 
 #endif

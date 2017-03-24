@@ -9,22 +9,22 @@
 #ifndef XIO_HPP
 #define XIO_HPP
 
-#include <cstddef>
 #include <complex>
-#include <iostream>
+#include <cstddef>
 #include <iomanip>
+#include <iostream>
+#include <numeric>
 #include <sstream>
 #include <string>
-#include <numeric>
 
 #include "xexpression.hpp"
 #include "xmath.hpp"
 #include "xview.hpp"
 
 #if _WIN32
-    using precision_type = typename std::streamsize;
+using precision_type = typename std::streamsize;
 #else
-    using precision_type = int;
+using precision_type = int;
 #endif
 
 namespace xt
@@ -40,7 +40,7 @@ namespace xt
             std::size_t edge_items = 3;
             std::size_t line_width = 75;
             std::size_t threshold = 1000;
-            precision_type precision = -1; // default precision
+            precision_type precision = -1;  // default precision
         };
 
         inline print_options_impl& print_options()
@@ -116,13 +116,13 @@ namespace xt
                 else
                 {
                     std::string indents(blanks, ' ');
-                    
+
                     size_type i = 0;
                     size_type elems_on_line = 0;
-                    size_type line_lim = (size_type) std::floor(line_width / (element_width + 2));
-                    
+                    size_type line_lim = (size_type)std::floor(line_width / (element_width + 2));
+
                     out << '{';
-                    for (;i != e.shape()[0] - 1; ++i)
+                    for (; i != e.shape()[0] - 1; ++i)
                     {
                         if (edge_items && e.shape()[0] > (edge_items * 2) && i == edge_items)
                         {
@@ -146,11 +146,11 @@ namespace xt
 
                         if (I == 1 || e.dimension() == 1)
                         {
-                             out << ' ';
+                            out << ' ';
                         }
                         else
                         {
-                             out << std::endl << indents;
+                            out << std::endl << indents;
                         }
                     }
                     if (e.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
@@ -167,7 +167,7 @@ namespace xt
         struct xout<0>
         {
             template <class E, class F>
-            static std::ostream& output(std::ostream& out, const E& e, F& printer, 
+            static std::ostream& output(std::ostream& out, const E& e, F& printer,
                                         std::size_t, std::size_t, std::size_t, std::size_t)
             {
                 if (e.dimension() == 0)
@@ -195,7 +195,7 @@ namespace xt
                 else
                 {
                     size_type i = 0;
-                    for (;i != e.shape()[0] - 1; ++i)
+                    for (; i != e.shape()[0] - 1; ++i)
                     {
                         if (lim && e.shape()[0] > (lim * 2) && i == lim)
                         {
@@ -231,7 +231,8 @@ namespace xt
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(precision_type precision) : m_precision(precision)
+            printer(precision_type precision)
+                : m_precision(precision)
             {
             }
 
@@ -252,7 +253,7 @@ namespace xt
                 else
                 {
                     // 3 => sign and dot and + 1 (from calculation for exponent)
-                    m_width = 3 + (precision_type) std::log10(std::floor(m_max)) + m_precision;
+                    m_width = 3 + (precision_type)std::log10(std::floor(m_max)) + m_precision;
                 }
                 if (!m_required_precision)
                 {
@@ -305,11 +306,11 @@ namespace xt
 
             void update(const value_type& val)
             {
-                if(val != 0 && !std::isinf(val) && !std::isnan(val))
+                if (val != 0 && !std::isinf(val) && !std::isnan(val))
                 {
                     if (!m_scientific || !m_large_exponent)
                     {
-                        int exponent = 1 + (int) std::log10(std::fabs(val));
+                        int exponent = 1 + (int)std::log10(std::fabs(val));
                         if (exponent <= -5 || exponent > 7)
                         {
                             m_scientific = true;
@@ -341,6 +342,7 @@ namespace xt
             }
 
         private:
+
             bool m_large_exponent = false;
             bool m_scientific = false;
             precision_type m_width = 9;
@@ -366,7 +368,7 @@ namespace xt
             void init()
             {
                 m_it = m_cache.cbegin();
-                m_width = 1 + (precision_type) std::log10(m_max) + m_sign;
+                m_width = 1 + (precision_type)std::log10(m_max) + m_sign;
             }
 
             std::ostream& print_next(std::ostream& out)
@@ -396,13 +398,13 @@ namespace xt
                 return m_width;
             }
 
-            private:
-                precision_type m_width;
-                bool m_sign = false;
-                value_type m_max = 0;
+        private:
+            precision_type m_width;
+            bool m_sign = false;
+            value_type m_max = 0;
 
-                cache_type m_cache;
-                cache_iterator m_it;
+            cache_type m_cache;
+            cache_iterator m_it;
         };
 
         template <class T>
@@ -447,11 +449,12 @@ namespace xt
                 return m_width;
             }
 
-            private:
-                precision_type m_width = 5;
+        private:
 
-                cache_type m_cache;
-                cache_iterator m_it;
+            precision_type m_width = 5;
+
+            cache_type m_cache;
+            cache_iterator m_it;
         };
 
         template <class T>
@@ -461,7 +464,8 @@ namespace xt
             using cache_type = std::vector<bool>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(precision_type precision) : real_printer(precision), imag_printer(precision)
+            printer(precision_type precision)
+                : real_printer(precision), imag_printer(precision)
             {
             }
 
@@ -486,7 +490,7 @@ namespace xt
                 std::stringstream buf;
                 imag_printer.print_next(buf);
                 std::string s = buf.str();
-                s.erase(0, 1); // erase space for +/-
+                s.erase(0, 1);  // erase space for +/-
                 // insert j at end of number
                 std::size_t idx = s.find_last_not_of(" ");
                 s.insert(idx + 1, "j");
@@ -507,10 +511,11 @@ namespace xt
                 return real_printer.width() + imag_printer.width() + 2;
             }
 
-            private:
-                printer<value_type> real_printer, imag_printer;
-                cache_type m_signs;
-                cache_iterator m_it;
+        private:
+
+            printer<value_type> real_printer, imag_printer;
+            cache_type m_signs;
+            cache_iterator m_it;
         };
 
         template <class T>
@@ -545,7 +550,7 @@ namespace xt
                 std::stringstream buf;
                 buf << val;
                 std::string s = buf.str();
-                if(int(s.size()) > m_width)
+                if (int(s.size()) > m_width)
                 {
                     m_width = int(s.size());
                 }
@@ -557,10 +562,11 @@ namespace xt
                 return m_width;
             }
 
-            private:
-                precision_type m_width = 0;                
-                cache_type m_cache;
-                cache_iterator m_it;
+        private:
+
+            precision_type m_width = 0;
+            cache_type m_cache;
+            cache_iterator m_it;
         };
 
         template <class E>
@@ -569,7 +575,8 @@ namespace xt
             using value_type = typename E::value_type;
 
             template <class F>
-            custom_formatter(F&& func) : m_func(func)
+            custom_formatter(F&& func)
+                : m_func(func)
             {
             }
 
@@ -579,7 +586,7 @@ namespace xt
             }
 
         private:
-            std::function<std::string (const value_type&)> m_func;
+            std::function<std::string(const value_type&)> m_func;
         };
 
         template <class S>
@@ -596,7 +603,6 @@ namespace xt
             static constexpr std::size_t value = XTENSOR_MIN(5, N);
         };
 #undef XTENSOR_MIN
-
     }
 
     template <class E, class F>
@@ -618,7 +624,7 @@ namespace xt
             lim = print_options::print_options().edge_items;
         }
 
-        precision_type temp_precision = (precision_type) out.precision();
+        precision_type temp_precision = (precision_type)out.precision();
         precision_type precision = temp_precision;
         if (print_options::print_options().precision != -1)
         {
@@ -627,13 +633,13 @@ namespace xt
         }
 
         detail::printer<E> p(precision);
- 
+
         constexpr std::size_t depth = detail::recursion_depth<typename E::shape_type>::value;
         detail::recurser<depth>::run(p, d, lim);
         p.init();
         detail::xout<depth>::output(out, d, p, 1, p.width(), lim, print_options::print_options().line_width);
 
-        out << std::setprecision(temp_precision); // restore precision
+        out << std::setprecision(temp_precision);  // restore precision
 
         return out;
     }
