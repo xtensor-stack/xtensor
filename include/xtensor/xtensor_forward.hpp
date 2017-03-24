@@ -10,6 +10,7 @@
 #define XTENSOR_FORWARD_HPP
 
 #include "xtensor_config.hpp"
+#include "xstorage.hpp"
 #include <memory>
 #include <vector>
 

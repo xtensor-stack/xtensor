@@ -23,7 +23,7 @@
 #endif
 
 #ifndef DEFAULT_DATA_CONTAINER
-#define DEFAULT_DATA_CONTAINER(T, A) std::vector<T, A>
+#define DEFAULT_DATA_CONTAINER(T, A) uvector<T, A>
 #endif
 
 #ifndef DEFAULT_SHAPE_CONTAINER
