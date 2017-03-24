@@ -416,7 +416,7 @@ namespace xt
     {
         using namespace xt::placeholders;
         using t = xarray<int>;
-        t a = {1,2,3,4,5};
+        t a = {1, 2, 3, 4, 5};
 
         auto n = xnone();
 
@@ -451,6 +451,55 @@ namespace xt
         auto v8 = view(a, range(2, n, 2));
         t v8e = {3,5};
         EXPECT_TRUE(v8e == v8);
+    }
+
+    TEST(xview, data_interface)
+    {
+        using namespace xt::placeholders;
+        using T = xarray<int>;
+        xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        using shape_type = typename T::shape_type;
+        using index_type = typename T::shape_type;
+
+        auto next_idx = [](index_type& idx, const shape_type& shape)
+        {
+            for (int i = int(shape.size() - 1); i >= 0; --i)
+            {
+                if (idx[i] >= shape[i] - 1)
+                {
+                    idx[i] = 0;
+                }
+                else
+                {
+                    idx[i]++;
+                    return idx;
+                }
+            }
+            // return empty index, happens at last iteration step, but remains unused
+            return index_type();
+        };
+
+        auto v1 = view(a, xt::all(), 1);
+        auto shape1 = v1.shape();
+        auto idx1 = index_type(shape1.size(), 0);
+        auto strides1 = v1.strides();
+        for (std::size_t i = 0; i < v1.size(); ++i)
+        {
+            auto linear_idx = std::inner_product(idx1.begin(), idx1.end(), strides1.begin(), 0);
+            EXPECT_EQ(v1[idx1], v1.raw_data()[v1.raw_data_offset() + linear_idx]);
+            next_idx(idx1, shape1);
+        }
+
+        auto v2 = view(a, 1, range(_, _, 2));
+        auto shape2 = v2.shape();
+        auto idx2 = index_type(shape2.size(), 0);
+        auto strides2 = v2.strides();
+        for (std::size_t i = 0; i < v2.size(); ++i)
+        {
+            auto linear_idx = std::inner_product(idx2.begin(), idx2.end(), strides2.begin(), 0);
+            EXPECT_EQ(v2[idx2], v2.raw_data()[v2.raw_data_offset() + linear_idx]);
+            next_idx(idx2, shape2);
+        }
     }
 }
 
