@@ -8,11 +8,12 @@
 
 #include "gtest/gtest.h"
 
-#include <vector>
 #include <algorithm>
 #include <sstream>
 #include <string>
+#include <vector>
 
+#include "xtensor/xio.hpp"
 #include "xtensor/xmissing.hpp"
 
 namespace xt
@@ -118,6 +119,18 @@ namespace xt
         std::ostringstream oss;
         oss << missing<int>();
         ASSERT_EQ(oss.str(), std::string("N/A"));
+    }
+
+    TEST(xoptional, xio)
+    {
+        std::ostringstream oss;
+        xtensor_optional<double, 2> m
+            {{ 0.0 ,       2.0         },
+             { 3.0 , missing<double>() }};
+
+        oss << m;
+        std::string expect = "{{  0,   2},\n {  3, N/A}}";
+        ASSERT_EQ(oss.str(), expect);
     }
 }
 
