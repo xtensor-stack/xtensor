@@ -429,27 +429,27 @@ namespace xt
         EXPECT_TRUE(v2e == v2);
 
         auto v3 = view(a, range(n, n));
-        t v3e = {1,2,3,4,5};
+        t v3e = {1, 2, 3, 4, 5};
         EXPECT_TRUE(v3e == v3);
 
         auto v4 = view(a, range(n, 2, -1));
-        t v4e = {5,4};
+        t v4e = {5, 4};
         EXPECT_TRUE(v4e == v4);
 
         auto v5 = view(a, range(2, n, -1));
-        t v5e = {3,2,1};
+        t v5e = {3, 2, 1};
         EXPECT_TRUE(v5e == v5);
 
         auto v6 = view(a, range(n, n, n));
-        t v6e = {1,2,3,4,5};
+        t v6e = {1, 2, 3, 4, 5};
         EXPECT_TRUE(v6e == v6);
 
         auto v7 = view(a, range(1, n, 2));
-        t v7e = {2,4};
+        t v7e = {2, 4};
         EXPECT_TRUE(v7e == v7);
 
         auto v8 = view(a, range(2, n, 2));
-        t v8e = {3,5};
+        t v8e = {3, 5};
         EXPECT_TRUE(v8e == v8);
     }
 
@@ -485,7 +485,7 @@ namespace xt
         auto strides1 = v1.strides();
         for (std::size_t i = 0; i < v1.size(); ++i)
         {
-            auto linear_idx = std::inner_product(idx1.begin(), idx1.end(), strides1.begin(), 0);
+            auto linear_idx = std::inner_product(idx1.begin(), idx1.end(), strides1.begin(), std::size_t(0));
             EXPECT_EQ(v1[idx1], v1.raw_data()[v1.raw_data_offset() + linear_idx]);
             next_idx(idx1, shape1);
         }
@@ -496,7 +496,7 @@ namespace xt
         auto strides2 = v2.strides();
         for (std::size_t i = 0; i < v2.size(); ++i)
         {
-            auto linear_idx = std::inner_product(idx2.begin(), idx2.end(), strides2.begin(), 0);
+            auto linear_idx = std::inner_product(idx2.begin(), idx2.end(), strides2.begin(), std::size_t(0));
             EXPECT_EQ(v2[idx2], v2.raw_data()[v2.raw_data_offset() + linear_idx]);
             next_idx(idx2, shape2);
         }
