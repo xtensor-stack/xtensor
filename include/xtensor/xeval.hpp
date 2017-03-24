@@ -9,8 +9,8 @@
 #ifndef XEVAL_HPP
 #define XEVAL_HPP
 
-#include "xtensor.hpp"
 #include "xarray.hpp"
+#include "xtensor.hpp"
 
 namespace xt
 {

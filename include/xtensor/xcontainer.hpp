@@ -9,14 +9,14 @@
 #ifndef XCONTAINER_HPP
 #define XCONTAINER_HPP
 
-#include <numeric>
 #include <functional>
+#include <numeric>
 
-#include "xstrides.hpp"
 #include "xiterable.hpp"
 #include "xiterator.hpp"
-#include "xoperation.hpp"
 #include "xmath.hpp"
+#include "xoperation.hpp"
+#include "xstrides.hpp"
 #include "xtensor_forward.hpp"
 
 namespace xt
@@ -24,8 +24,12 @@ namespace xt
 
     namespace check_policy
     {
-        struct none {};
-        struct full {};
+        struct none
+        {
+        };
+        struct full
+        {
+        };
     }
 
     template <class D>
@@ -107,7 +111,7 @@ namespace xt
         void transpose(std::initializer_list<I> permutation, Tag check_policy = Tag());
 #else
         template <class I, std::size_t N, class Tag = check_policy::none>
-        void transpose(const I(&permutation)[N], Tag check_policy = Tag());
+        void transpose(const I (&permutation)[N], Tag check_policy = Tag());
 #endif
 
         template <class... Args>
@@ -366,7 +370,7 @@ namespace xt
 #else
     template <class D>
     template <class I, std::size_t N, class Tag>
-    inline void xcontainer<D>::transpose(const I(&permutation)[N], Tag check_policy)
+    inline void xcontainer<D>::transpose(const I (&permutation)[N], Tag check_policy)
     {
         transpose_impl(permutation, check_policy);
     }
@@ -790,4 +794,3 @@ namespace xt
 }
 
 #endif
-

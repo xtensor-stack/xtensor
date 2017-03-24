@@ -1,10 +1,10 @@
 #ifndef XEXCEPTION_HPP
 #define XEXCEPTION_HPP
 
-#include <iterator>
 #include <exception>
-#include <string>
+#include <iterator>
 #include <sstream>
+#include <string>
 
 namespace xt
 {
@@ -33,8 +33,7 @@ namespace xt
      **********************************/
 
     template <class S1, class S2>
-    inline broadcast_error::broadcast_error(const S1& lhs,
-        const S2& rhs)
+    inline broadcast_error::broadcast_error(const S1& lhs, const S2& rhs)
     {
         std::ostringstream buf("Incompatible dimension of arrays:", std::ios_base::ate);
 
@@ -79,7 +78,8 @@ namespace xt
      * transpose_error implementation *
      **********************************/
 
-    inline transpose_error::transpose_error(const std::string& msg) : m_message(msg) {};
+    inline transpose_error::transpose_error(const std::string& msg)
+        : m_message(msg){};
 
     inline const char* transpose_error::what() const noexcept
     {
@@ -106,7 +106,7 @@ namespace xt
         template <class S, size_t dim, class... Args>
         inline void check_index_impl(const S& shape, size_t i, Args... args)
         {
-            if (sizeof...(Args)+1 > shape.size())
+            if (sizeof...(Args) + 1 > shape.size())
             {
                 check_index_impl<S, dim>(shape, args...);
             }

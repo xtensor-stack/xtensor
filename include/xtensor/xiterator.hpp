@@ -11,8 +11,8 @@
 
 #include <iterator>
 
-#include "xutils.hpp"
 #include "xexception.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
@@ -38,7 +38,7 @@ namespace xt
 
     template <class C>
     using get_iterator = typename detail::get_iterator_impl<C>::type;
- 
+
     namespace detail
     {
         template <class ST>
@@ -56,7 +56,7 @@ namespace xt
 
     template <class C>
     using xindex_type_t = typename detail::index_type_impl<C>::type;
- 
+
     /************
      * xstepper *
      ************/
@@ -271,21 +271,21 @@ namespace xt
     template <class C>
     inline void xstepper<C>::step(size_type dim, size_type n)
     {
-        if(dim >= m_offset)
+        if (dim >= m_offset)
             m_it += n * p_c->strides()[dim - m_offset];
     }
 
     template <class C>
     inline void xstepper<C>::step_back(size_type dim, size_type n)
     {
-        if(dim >= m_offset)
+        if (dim >= m_offset)
             m_it -= n * p_c->strides()[dim - m_offset];
     }
 
     template <class C>
     inline void xstepper<C>::reset(size_type dim)
     {
-        if(dim >= m_offset)
+        if (dim >= m_offset)
             m_it -= p_c->backstrides()[dim - m_offset];
     }
 
@@ -322,21 +322,21 @@ namespace xt
     {
         using size_type = typename S::size_type;
         size_type i = index.size();
-        while(i != 0)
+        while (i != 0)
         {
             --i;
-            if(++index[i] != shape[i])
+            if (++index[i] != shape[i])
             {
                 stepper.step(i);
                 return;
             }
-            else if(i != 0)
+            else if (i != 0)
             {
                 index[i] = 0;
                 stepper.reset(i);
             }
         }
-        if(i == 0)
+        if (i == 0)
         {
             stepper.to_end();
         }
@@ -345,7 +345,7 @@ namespace xt
     /***********************************
      * xindexed_stepper implementation *
      ***********************************/
-    
+
     template <class C, bool is_const>
     inline xindexed_stepper<C, is_const>::xindexed_stepper(xexpression_type* e, size_type offset, bool end) noexcept
         : p_e(e), m_index(make_sequence<index_type>(e->shape().size(), size_type(0))), m_offset(offset)

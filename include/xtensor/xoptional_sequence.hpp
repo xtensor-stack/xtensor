@@ -9,11 +9,11 @@
 #ifndef XNILSEQUENCE_HPP
 #define XNILSEQUENCE_HPP
 
-#include <cstddef>
 #include <array>
-#include <vector>
+#include <cstddef>
 #include <iterator>
 #include <memory>
+#include <vector>
 
 #include "xoptional.hpp"
 #include "xutils.hpp"
@@ -26,11 +26,11 @@ namespace xt
      **************************************/
 
     template <class T>
-    class xoptional_sequence_inner_types;    
+    class xoptional_sequence_inner_types;
 
     template <class ITV, class ITB>
     class xoptional_iterator;
-    
+
     template <class D>
     class xoptional_sequence
     {
@@ -76,7 +76,7 @@ namespace xt
 
         bool empty() const noexcept;
         size_type size() const noexcept;
-        
+
         reference operator[](size_type i);
         const_reference operator[](size_type i) const;
 
@@ -153,7 +153,7 @@ namespace xt
         xoptional_array(size_type s, const xoptional<CTO, CBO>& v);
     };
 
-    template <class T, class A=std::allocator<T>, class BA=std::allocator<bool>>
+    template <class T, class A = std::allocator<T>, class BA = std::allocator<bool>>
     class xoptional_vector : public xoptional_sequence<xoptional_vector<T, A, BA>>
     {
     public:
@@ -388,24 +388,28 @@ namespace xt
      *******************************************************/
 
     template <class T, std::size_t I>
-    xoptional_array<T, I>::xoptional_array(size_type s, const base_value_type& v) : base_type(s, v)
+    xoptional_array<T, I>::xoptional_array(size_type s, const base_value_type& v)
+        : base_type(s, v)
     {
     }
 
     template <class T, std::size_t I>
     template <class CTO, class CBO>
-    xoptional_array<T, I>::xoptional_array(size_type s, const xoptional<CTO, CBO>& v) : base_type(s, v)
+    xoptional_array<T, I>::xoptional_array(size_type s, const xoptional<CTO, CBO>& v)
+        : base_type(s, v)
     {
     }
 
     template <class T, class A, class BA>
-    xoptional_vector<T, A, BA>::xoptional_vector(size_type s, const base_value_type& v) : base_type(s, v)
+    xoptional_vector<T, A, BA>::xoptional_vector(size_type s, const base_value_type& v)
+        : base_type(s, v)
     {
     }
 
     template <class T, class A, class BA>
     template <class CTO, class CBO>
-    xoptional_vector<T, A, BA>::xoptional_vector(size_type s, const xoptional<CTO, CBO>& v) : base_type(s, v)
+    xoptional_vector<T, A, BA>::xoptional_vector(size_type s, const xoptional<CTO, CBO>& v)
+        : base_type(s, v)
     {
     }
 
@@ -437,7 +441,8 @@ namespace xt
      *************************************/
 
     template <class ITV, class ITB>
-    xoptional_iterator<ITV, ITB>::xoptional_iterator(ITV itv, ITB itb) : m_itv(itv), m_itb(itb)
+    xoptional_iterator<ITV, ITB>::xoptional_iterator(ITV itv, ITB itb)
+        : m_itv(itv), m_itb(itb)
     {
     }
 
@@ -516,7 +521,7 @@ namespace xt
     }
 
     template <class ITV, class ITB>
-    auto xoptional_iterator<ITV, ITB>::operator->() const -> std::nullptr_t
+    auto xoptional_iterator<ITV, ITB>::operator-> () const -> std::nullptr_t
     {
         return nullptr;
     }

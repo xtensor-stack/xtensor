@@ -9,18 +9,18 @@
 #ifndef XVIEW_HPP
 #define XVIEW_HPP
 
-#include <cstddef>
-#include <utility>
-#include <type_traits>
-#include <tuple>
-#include <array>
 #include <algorithm>
+#include <array>
+#include <cstddef>
+#include <tuple>
+#include <type_traits>
+#include <utility>
 
-#include "xtensor_forward.hpp"
 #include "xbroadcast.hpp"
 #include "xcontainer.hpp"
 #include "xiterable.hpp"
 #include "xsemantic.hpp"
+#include "xtensor_forward.hpp"
 #include "xview_utils.hpp"
 
 namespace xt
@@ -191,16 +191,16 @@ namespace xt
         template <typename std::decay_t<CT>::size_type I, class... Args>
         std::enable_if_t<lesser_condition<I>::value, size_type> index(Args... args) const;
 
-        template <typename std::decay_t<CT>::size_type I, class... Args >
+        template <typename std::decay_t<CT>::size_type I, class... Args>
         std::enable_if_t<!lesser_condition<I>::value, size_type> index(Args... args) const;
 
-        template<typename std::decay_t<CT>::size_type, class T>
+        template <typename std::decay_t<CT>::size_type, class T>
         size_type sliced_access(const xslice<T>& slice) const;
 
-        template<typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
+        template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
         size_type sliced_access(const xslice<T>& slice, Arg arg, Args... args) const;
 
-        template<typename std::decay_t<CT>::size_type I, class T, class... Args>
+        template <typename std::decay_t<CT>::size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
@@ -295,7 +295,7 @@ namespace xt
                     const xview_stepper<is_const, CT, S...>& rhs);
 
 
-    // meta-function returning the shape type for an xview 
+    // meta-function returning the shape type for an xview
     template <class ST, class... S>
     struct xview_shape_type
     {
@@ -351,9 +351,9 @@ namespace xt
     template <class E>
     inline auto xview<CT, S...>::operator=(const xexpression<E>& e) -> self_type&
     {
-        bool cond = (e.derived_cast().shape().size() == dimension())
-                    && std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
-        if(!cond)
+        bool cond = (e.derived_cast().shape().size() == dimension()) &&
+                    std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
+        if (!cond)
         {
             semantic_base::operator=(broadcast(e.derived_cast(), shape()));
         }
@@ -622,21 +622,21 @@ namespace xt
     }
 
     template <class CT, class... S>
-    template<typename std::decay_t<CT>::size_type I, class T>
+    template <typename std::decay_t<CT>::size_type I, class T>
     inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice) const -> size_type
     {
         return slice.derived_cast()(0);
     }
 
     template <class CT, class... S>
-    template<typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
+    template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
     inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
     {
         return slice.derived_cast()(argument<I>(arg, args...));
     }
 
     template <class CT, class... S>
-    template<typename std::decay_t<CT>::size_type I, class T, class... Args>
+    template <typename std::decay_t<CT>::size_type I, class T, class... Args>
     inline auto xview<CT, S...>::sliced_access(const T& squeeze, Args...) const -> disable_xslice<T, size_type>
     {
         return squeeze;
@@ -755,13 +755,13 @@ namespace xt
 
     template <bool is_const, class CT, class... S>
     inline xview_stepper<is_const, CT, S...>::xview_stepper(view_type* view, substepper_type it,
-                                                           size_type offset, bool end)
+                                                            size_type offset, bool end)
         : p_view(view), m_it(it), m_offset(offset)
     {
-        if(!end)
+        if (!end)
         {
             auto func = [](const auto& s) { return xt::value(s, 0); };
-            for(size_type i = 0; i < sizeof...(S); ++i)
+            for (size_type i = 0; i < sizeof...(S); ++i)
             {
                 if (!is_newaxis_slice(i))
                 {
@@ -796,18 +796,19 @@ namespace xt
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::reset(size_type dim)
     {
-        if(dim >= m_offset)
+        if (dim >= m_offset)
         {
             auto size_func = [](const auto& s) noexcept { return get_size(s); };
             auto step_func = [](const auto& s) noexcept { return step_size(s); };
             size_type index = integral_skip<S...>(dim);
             if (!is_newaxis_slice(index))
             {
-                size_type size = index < sizeof...(S) ?
-                    apply<size_type>(index, size_func, p_view->slices()) : p_view->shape()[dim];
-                if (size != 0) size = size - 1;
-                size_type step_size = index < sizeof...(S) ?
-                    apply<size_type>(index, step_func, p_view->slices()) : 1;
+                size_type size = index < sizeof...(S) ? apply<size_type>(index, size_func, p_view->slices()) : p_view->shape()[dim];
+                if (size != 0)
+                {
+                    size = size - 1;
+                }
+                size_type step_size = index < sizeof...(S) ? apply<size_type>(index, step_func, p_view->slices()) : 1;
                 index -= newaxis_count_before<S...>(index);
                 m_it.step_back(index, step_size * size);
             }

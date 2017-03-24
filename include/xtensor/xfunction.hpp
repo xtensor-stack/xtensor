@@ -9,13 +9,13 @@
 #ifndef XFUNCTION_HPP
 #define XFUNCTION_HPP
 
+#include <algorithm>
 #include <cstddef>
+#include <iterator>
+#include <numeric>
+#include <tuple>
 #include <type_traits>
 #include <utility>
-#include <tuple>
-#include <algorithm>
-#include <numeric>
-#include <iterator>
 
 #include "xexpression.hpp"
 #include "xiterator.hpp"
@@ -43,7 +43,7 @@ namespace xt
             using type = std::size_t;
         };
 
-        template<class... Args>
+        template <class... Args>
         using common_size_type_t = typename common_size_type<Args...>::type;
 
         /**************************
@@ -62,7 +62,7 @@ namespace xt
             using type = std::size_t;
         };
 
-        template<class... Args>
+        template <class... Args>
         using common_difference_type_t = typename common_difference_type<Args...>::type;
 
         /*********************
@@ -236,7 +236,6 @@ namespace xt
 
         const xfunction_type* p_f;
         std::tuple<typename std::decay_t<CT>::const_iterator...> m_it;
-
     };
 
     template <class F, class R, class... CT>
@@ -382,13 +381,13 @@ namespace xt
     {
         return element(index.cbegin(), index.cend());
     }
- 
+
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::operator[](size_type i) const -> const_reference
     {
         return operator()(i);
     }
- 
+
     /**
      * Returns a constant reference to the element at the specified position in the function.
      * @param first iterator starting the sequence of indices
@@ -403,7 +402,7 @@ namespace xt
         return element_access_impl(std::make_index_sequence<sizeof...(CT)>(), first, last);
     }
     //@}
-    
+
     /**
      * @name Broadcasting
      */
@@ -759,4 +758,3 @@ namespace xt
 }
 
 #endif
-

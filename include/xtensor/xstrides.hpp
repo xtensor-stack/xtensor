@@ -10,8 +10,9 @@
 #define XSTRIDES_HPP
 
 #include <cstddef>
-#include <numeric>
 #include <functional>
+#include <numeric>
+
 #include "xexception.hpp"
 
 namespace xt
@@ -35,7 +36,7 @@ namespace xt
     template <class size_type, class S, size_t dim = 0, class... Args>
     size_type data_offset(const S& strides, size_type i, Args... args) noexcept;
 
-    template <class size_type, class S,  class It>
+    template <class size_type, class S, class It>
     size_type element_offset(const S& strides, It first, It last) noexcept;
 
     /*******************

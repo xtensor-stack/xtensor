@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Plugging your own data structures
-=================================
+Extending xtensor with your data structures
+===========================================
 
 ``xtensor`` provides means to plug external data structures into its expression engine without
 copying any data.

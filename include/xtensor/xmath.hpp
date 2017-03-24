@@ -14,8 +14,8 @@
 #define XMATH_HPP
 
 #include <cmath>
-#include <type_traits>
 #include <complex>
+#include <type_traits>
 
 #include "xfunction.hpp"
 #include "xreducer.hpp"
@@ -30,14 +30,14 @@ namespace xt
     namespace detail
     {
         template <class R, class... Args, class... E>
-        inline auto make_xfunction(R (*f) (Args...), E&&... e) noexcept
+        inline auto make_xfunction(R (*f)(Args...), E&&... e) noexcept
         {
-            using type = xfunction<R (*) (Args...), R, const_xclosure_t<E>...>;
+            using type = xfunction<R (*)(Args...), R, const_xclosure_t<E>...>;
             return type(f, std::forward<E>(e)...);
         }
 
         template <class... E>
-        using scalar_function_type = common_value_type_t<std::decay_t<E>...> (*) (xvalue_type_t<std::decay_t<E>>...);
+        using scalar_function_type = common_value_type_t<std::decay_t<E>...> (*)(xvalue_type_t<std::decay_t<E>>...);
 
         template <class... E>
         using xfunction_free_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
@@ -45,7 +45,7 @@ namespace xt
                                                                common_value_type_t<std::decay_t<E>...>,
                                                                const_xclosure_t<E>...>>;
         template <class... E>
-        using bool_scalar_function_type = bool (*) (xvalue_type_t<std::decay_t<E>>...);
+        using bool_scalar_function_type = bool (*)(xvalue_type_t<std::decay_t<E>>...);
 
         template <class... E>
         using bool_xfunction_free_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
@@ -210,7 +210,7 @@ namespace xt
         using function_type = detail::scalar_function_type<E1, E2>;
         return detail::make_xfunction((function_type)std::fdim, std::forward<E1>(e1), std::forward<E2>(e2));
     }
-    
+
     namespace detail
     {
         // this function will be part of std with C++17
@@ -247,7 +247,7 @@ namespace xt
         inline constexpr std::enable_if_t<std::is_signed<T>::value, T>
         sign_impl(T x)
         {
-            return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? (T) copysign(T(0), x) : (T) copysign(T(1), x);
+            return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? (T)copysign(T(0), x) : (T)copysign(T(1), x);
         }
 
         template <typename T>
@@ -291,7 +291,7 @@ namespace xt
         // C++11 requires that the <cmath> header declares bool std::isnan(double) and bool std::isinf(double).
         // C99 requires that the <math.h> header declares int ::isnan(double) and int ::isinf(double).
         // These two definitions would clash when importing both headers and using namespace std.
-        // 
+        //
         // As of version 6, gcc detects whether the obsolete functions are present in the C <math.h> header and uses
         // them if they are, avoiding the clash. However, this means that the function might return int instead
         // of bool as C++11 requires, which is a bug.
@@ -907,7 +907,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto sum(E&& e, const I(&axes)[N]) noexcept
+    inline auto sum(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = std::plus<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -947,7 +947,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto prod(E&& e, const I(&axes)[N]) noexcept
+    inline auto prod(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -978,7 +978,7 @@ namespace xt
     {
         using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
-        return sum(std::forward<E>(e)) / value_type(size); 
+        return sum(std::forward<E>(e)) / value_type(size);
     }
 
 #ifdef X_OLD_CLANG
@@ -992,7 +992,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto mean(E&& e, const I(&axes)[N]) noexcept
+    inline auto mean(E&& e, const I (&axes)[N]) noexcept
     {
         using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
@@ -1003,4 +1003,3 @@ namespace xt
 }
 
 #endif
-

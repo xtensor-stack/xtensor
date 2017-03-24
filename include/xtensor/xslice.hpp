@@ -10,8 +10,9 @@
 #define XSLICE_HPP
 
 #include <cstddef>
-#include <utility>
 #include <type_traits>
+#include <utility>
+
 #include "xutils.hpp"
 
 namespace xt
@@ -256,14 +257,14 @@ namespace xt
         inline std::enable_if_t<std::is_integral<MI>::value && !std::is_integral<MA>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
         get(std::size_t size)
         {
-            return xrange<std::size_t>((std::size_t) m_min, size);
+            return xrange<std::size_t>((std::size_t)m_min, size);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value && std::is_integral<MA>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
-        get(std::size_t /*size*/)
+            get(std::size_t /*size*/)
         {
-            return xrange<std::size_t>(0, (std::size_t) m_max);
+            return xrange<std::size_t>(0, (std::size_t)m_max);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -355,7 +356,7 @@ namespace xt
     {
         return xall<typename E::size_type>(e.shape()[index]);
     }
-    
+
     template <class E>
     inline auto get_slice_implementation(E& /*e*/, xnewaxis_tag, std::size_t /*index*/)
     {
@@ -453,7 +454,7 @@ namespace xt
 
     template <class T>
     inline xstepped_range<T>::xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept
-        : m_min(min_val), m_size((size_type) std::ceil(double(max_val - min_val)/double(step))), m_step(step)
+        : m_min(min_val), m_size((size_type)std::ceil(double(max_val - min_val) / double(step))), m_step(step)
     {
     }
 

@@ -9,8 +9,8 @@
 #ifndef XOPERATION_HPP
 #define XOPERATION_HPP
 
-#include <functional>
 #include <algorithm>
+#include <functional>
 #include <type_traits>
 
 #include "xfunction.hpp"
@@ -84,7 +84,7 @@ namespace xt
         {
             using type = xfunction<F<common_value_type_t<std::decay_t<E>...>>,
                                    typename F<common_value_type_t<std::decay_t<E>...>>::result_type,
-                                   const_xclosure_t<E>... >;
+                                   const_xclosure_t<E>...>;
         };
 
         // On MSVC, the second argument of enable_if_t is always evaluated, even if the condition is false.
@@ -208,7 +208,7 @@ namespace xt
      * @defgroup logical_operators Logical operators
      */
 
-     /**
+    /**
      * @ingroup logical_operators
      * @brief Or
      *
@@ -424,7 +424,7 @@ namespace xt
     inline auto where(E1&& e1, E2&& e2, E3&& e3) noexcept
         -> detail::xfunction_type_t<detail::conditional_ternary, E1, E2, E3>
     {
-         return detail::make_xfunction<detail::conditional_ternary>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
+        return detail::make_xfunction<detail::conditional_ternary>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
     }
 
     /**
@@ -494,7 +494,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amax(E&& e, const I(&axes)[N]) noexcept
+    inline auto amax(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = detail::maximum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -534,7 +534,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amin(E&& e, const I(&axes)[N]) noexcept
+    inline auto amin(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = detail::minimum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -637,4 +637,3 @@ namespace xt
 }
 
 #endif
-

@@ -9,11 +9,11 @@
 #ifndef XTENSOR_HPP
 #define XTENSOR_HPP
 
+#include <algorithm>
+#include <array>
 #include <cstddef>
 #include <utility>
-#include <array>
 #include <vector>
-#include <algorithm>
 
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
@@ -192,22 +192,22 @@ namespace xt
      * xtensor_container implementation *
      ************************************/
 
-     /**
-      * @name Constructors
-      */
-     //@{
-     /**
-      * Allocates an uninitialized xtensor_container that holds 0 element.
-      */
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Allocates an uninitialized xtensor_container that holds 0 element.
+     */
     template <class EC, std::size_t N>
     inline xtensor_container<EC, N>::xtensor_container()
         : base_type(), m_data(1, value_type())
     {
     }
 
-     /**
-      * Allocates an xtensor_container with nested initializer lists.
-      */
+    /**
+     * Allocates an xtensor_container with nested initializer lists.
+     */
     template <class EC, std::size_t N>
     inline xtensor_container<EC, N>::xtensor_container(nested_initializer_list_t<value_type, N> t)
         : base_type()

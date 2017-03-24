@@ -9,8 +9,8 @@
 #ifndef XEXPRESSION_HPP
 #define XEXPRESSION_HPP
 
-#include <type_traits>
 #include <cstddef>
+#include <type_traits>
 #include <vector>
 
 #include "xutils.hpp"
@@ -151,7 +151,7 @@ namespace xt
     {
         using type = xscalar<const_closure_t<E>>;
     };
- 
+
     template <class E>
     using const_xclosure_t = typename const_xclosure<E>::type;
 
@@ -179,7 +179,7 @@ namespace xt
 
     template <class E>
     using xvalue_type_t = typename xvalue_type<E>::type;
-    
+
     /***************
      * get_element *
      ***************/
@@ -195,7 +195,7 @@ namespace xt
         template <class E, class S, class... Args>
         inline typename E::reference get_element(E& e, S i, Args... args)
         {
-            if(sizeof...(Args) >= e.dimension())
+            if (sizeof...(Args) >= e.dimension())
                 return get_element(e, args...);
             return e(i, args...);
         }
@@ -209,13 +209,11 @@ namespace xt
         template <class E, class S, class... Args>
         inline typename E::const_reference get_element(const E& e, S i, Args... args)
         {
-            if(sizeof...(Args) >= e.dimension())
+            if (sizeof...(Args) >= e.dimension())
                 return get_element(e, args...);
             return e(i, args...);
         }
     }
-
 }
 
 #endif
-

@@ -9,9 +9,9 @@
 #ifndef XARRAY_HPP
 #define XARRAY_HPP
 
+#include <algorithm>
 #include <initializer_list>
 #include <utility>
-#include <algorithm>
 
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"

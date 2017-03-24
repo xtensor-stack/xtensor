@@ -9,11 +9,10 @@
 #ifndef XMISSING_HPP
 #define XMISSING_HPP
 
-#include "xtensor_forward.hpp"
+#include "xarray.hpp"
 #include "xoptional.hpp"
 #include "xoptional_sequence.hpp"
-#include "xarray.hpp"
 #include "xtensor.hpp"
+#include "xtensor_forward.hpp"
 
 #endif
-

@@ -9,12 +9,12 @@
 #ifndef XCOMPLEX_HPP
 #define XCOMPLEX_HPP
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
-#include "xtensor/xexpression.hpp" 
-#include "xtensor/xoffsetview.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xexpression.hpp"
+#include "xtensor/xoffsetview.hpp"
 
 namespace xt
 {
@@ -35,7 +35,7 @@ namespace xt
 
     namespace detail
     {
-        template <bool iscomplex=true>
+        template <bool iscomplex = true>
         struct complex_helper
         {
             template <class E>
@@ -69,7 +69,7 @@ namespace xt
             }
         };
 
-        template <bool isexpression=true>
+        template <bool isexpression = true>
         struct complex_expression_helper
         {
             template <class E>
@@ -129,7 +129,5 @@ namespace xt
     {
         return detail::complex_expression_helper<is_xexpression<std::decay_t<E>>::value>::imag(std::forward<E>(e));
     }
-
 }
 #endif
-
