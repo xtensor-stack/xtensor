@@ -148,6 +148,13 @@ namespace xt
         // Swap
         void swap(xoptional& other);
 
+        // Comparison
+        template <class CTO, class CBO>
+        bool equal(const xoptional<CTO, CBO>& rhs) const noexcept;
+
+        template <class CTO>
+        disable_xoptional<CTO, bool> equal(const CTO& rhs) const noexcept;
+
     private:
         template <class CTO, class CBO>
         friend class xoptional;
@@ -427,11 +434,79 @@ namespace xt
         std::swap(m_flag, other.m_flag);
     }
 
+    // Comparison
+    template <class CT, class CB>
+    template <class CTO, class CBO>
+    auto xoptional<CT, CB>::equal(const xoptional<CTO, CBO>& rhs) const noexcept -> bool
+    {
+        return (!m_flag && !rhs.m_flag) || (m_value == rhs.m_value && (m_flag && rhs.m_flag));
+    }
+
+    template <class CT, class CB>
+    template <class CTO>
+    auto xoptional<CT, CB>::equal(const CTO& rhs) const noexcept -> disable_xoptional<CTO, bool>
+    {
+        return m_flag ? (m_value == rhs) : false;
+    }
+
+    // External operators
+    template <class T, class B, class S>
+    inline S& operator<<(S& out, const xoptional<T, B>& v)
+    {
+        if (v.has_value())
+           out << v.value();
+        else
+           out << "N/A";
+        return out;
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator==(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+        -> bool
+    {
+        return e1.equal(e2);
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator==(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+        -> disable_xoptional<T2, bool>
+    {
+        return e1.equal(e2);
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator==(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+        -> disable_xoptional<T1, bool>
+    {
+        return e2.equal(e1);
+    }
+
     template <class T, class B>
     inline auto operator+(const xoptional<T, B>& e) noexcept
         -> xoptional<std::decay_t<T>>
     {
         return e;
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator!=(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
+        -> bool
+    {
+        return !e1.equal(e2);
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator!=(const xoptional<T1, B1>& e1, const T2& e2) noexcept
+        -> disable_xoptional<T2, bool>
+    {
+        return !e1.equal(e2);
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator!=(const T1& e1, const xoptional<T2, B2>& e2) noexcept
+        -> disable_xoptional<T1, bool>
+    {
+        return !e2.equal(e1);
     }
 
     // Operations

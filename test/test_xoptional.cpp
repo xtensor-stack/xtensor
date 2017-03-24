@@ -10,6 +10,8 @@
 
 #include <vector>
 #include <algorithm>
+#include <sstream>
+#include <string>
 
 #include "xtensor/xmissing.hpp"
 
@@ -69,7 +71,6 @@ namespace xt
     TEST(xoptional, tensor)
     {
         xtensor_optional<double, 2> m
-
             {{ 1.0 ,       2.0          },
              { 3.0 , missing<double>()} };
 
@@ -102,6 +103,21 @@ namespace xt
         ASSERT_EQ(res_div(0, 0).value(), 0.0);
         ASSERT_EQ(res_div(1, 0).value(), 1.0);
         ASSERT_FALSE(res_div(1, 1).has_value());
+    }
+
+    TEST(xoptional, comparison)
+    {
+        ASSERT_TRUE(optional(1.0, true) == 1.0);
+        ASSERT_TRUE(optional(1.0, false) == missing<double>());
+        ASSERT_FALSE(missing<double>() == 1.0);
+        ASSERT_TRUE(missing<double>() != 1.0);
+    }
+
+    TEST(xoptional, io)
+    {
+        std::ostringstream oss;
+        oss << missing<int>();
+        ASSERT_EQ(oss.str(), std::string("N/A"));
     }
 }
 
