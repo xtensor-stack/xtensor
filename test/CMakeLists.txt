@@ -6,6 +6,15 @@
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
 
+cmake_minimum_required(VERSION 3.1)
+
+if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+    project(xtensor-test)
+
+    find_package(xtensor REQUIRED CONFIG)
+    set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIR})
+endif ()
+
 message(STATUS "Forcing tests build type to Release")
 set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
 
@@ -56,7 +65,36 @@ if(MSVC)
     endforeach()
 endif()
 
-find_package(GTest REQUIRED)
+if (DOWNLOAD_GTEST)
+    # Download and unpack googletest at configure time
+    configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+                    RESULT_VARIABLE result
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+    if(result)
+        message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+    endif()
+    execute_process(COMMAND ${CMAKE_COMMAND} --build .
+                    RESULT_VARIABLE result
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googletest-download )
+    if(result)
+        message(FATAL_ERROR "Build step for googletest failed: ${result}")
+    endif()
+
+    # Add googletest directly to our build. This defines
+    # the gtest and gtest_main targets.
+    add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
+                     ${CMAKE_CURRENT_BINARY_DIR}/googletest-build)
+
+    set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
+    set(GTEST_LIBRARY_DIRS "${gtest_BINARY_DIR}")
+    set(GTEST_LIBRARIES "${GTEST_LIBRARY_DIRS}/gtest.lib")
+    set(GTEST_MAIN_LIBRARIES "${GTEST_LIBRARY_DIRS}/gtest_main.lib")
+    set(GTEST_BOTH_LIBRARIES ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
+else()
+    find_package(GTest REQUIRED)
+endif()
+
 find_package(Threads)
 
 include_directories(${XTENSOR_INCLUDE_DIR})
@@ -96,7 +134,7 @@ set(XTENSOR_TESTS
 )
 
 set(XTENSOR_TARGET test_xtensor)
-add_executable(${XTENSOR_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})
+add_custom_target(xtest COMMAND test_xtensor DEPENDS gtest_main ${XTENSOR_TARGET})

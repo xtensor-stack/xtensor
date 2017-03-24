@@ -195,7 +195,16 @@ Once `gtest` and `cmake` are installed, you can build and run the tests:
 ```bash
 mkdir build
 cd build
-cmake ../
+cmake -DBUILD_TESTS=ON ../
+make xtest
+```
+
+You can also use CMake to download the source of `gtest`, build it, and use the generated libraries:
+
+```bash
+mkdir build
+cd build
+cmake -DBUILD_TESTS=ON -DDOWNLOAD_GTEST=ON ../
 make xtest
 ```
 
@@ -206,7 +215,7 @@ cd test
 conda env create -f ./test-environment.yml
 source activate test-xtensor
 cd ..
-cmake .
+cmake -DBUILD_TESTS=ON .
 make xtest
 ```
 

@@ -29,12 +29,6 @@ message(STATUS "xtensor v${${PROJECT_NAME}_VERSION}")
 # Build
 # =====
 
-if(XTENSOR_ENABLE_ASSERT)
-    add_definitions(-DXTENSOR_ENABLE_ASSERT)
-endif()
-
-OPTION(BUILD_TESTS "xtensor test suite" ON)
-
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
@@ -72,6 +66,14 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
 )
+
+OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
+OPTION(BUILD_TESTS "xtensor test suite" OFF)
+OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
+
+if(XTENSOR_ENABLE_ASSERT)
+    add_definitions(-DXTENSOR_ENABLE_ASSERT)
+endif()
 
 if(BUILD_TESTS)
     add_subdirectory(test)
