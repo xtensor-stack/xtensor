@@ -283,6 +283,8 @@ namespace xt
     {
 #ifdef XTENSOR_ENABLE_ASSERT
         EXPECT_ANY_THROW(vec(10,10,10));
+#else
+        (void)vec;
 #endif
     }
 

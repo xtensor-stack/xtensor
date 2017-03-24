@@ -4,13 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Handling of missing values
-==========================
-
-``xtensor`` supports missing values and comprises specialized container types for an optimized support of missing values.
-
 Missing values
---------------
+==============
+
+``xtensor`` handles missing values and comprises specialized container types for an optimized support of missing values.
+
+Optional expressions
+--------------------
 
 Support of missing values in xtensor is primarily provided through the ``xoptional`` value type and the ``xtensor_optional`` and
 ``xarray_optional`` containers. In the following example, we instantiate a 2-D tensor with a missing value:
@@ -40,8 +40,8 @@ the reference types of the underlying storage for values and boolean flags.
 This technique enables performance improvements in mathematical operations over boolean arrays including SIMD optimizations, and
 reduces the memory footprint of optional arrays. It should be transparent to the user.
 
-Mathematical operators
-----------------------
+Mathematical operators and missing values
+-----------------------------------------
 
 Mathematical operators are overloaded for optional values so that they can be operated upon in the same way as regular scalars.
 
@@ -55,9 +55,13 @@ Mathematical operators are overloaded for optional values so that they can be op
         { 1.0, 2.0 };
 
     // `b` is broadcasted to match the shape of `a`
-    auto s = a + b;
-    // The result is:
-    // {{ 2.0, 4.0 }
-    //  { 4.0, N/A }}
+    std::cout << a + b << std::endl;
+
+Outputs:
+
+.. code::
+
+    {{  2,   4},
+     {  4, N/A}}
 
 
