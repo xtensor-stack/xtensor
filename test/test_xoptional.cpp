@@ -71,8 +71,8 @@ namespace xt
     TEST(xoptional, tensor)
     {
         xtensor_optional<double, 2> m
-            {{ 1.0 ,       2.0          },
-             { 3.0 , missing<double>()} };
+            {{ 1.0 ,       2.0         },
+             { 3.0 , missing<double>() }};
 
         ASSERT_EQ(m(0, 0).value(), 1.0);
         ASSERT_EQ(m(1, 0).value(), 3.0);
@@ -82,8 +82,8 @@ namespace xt
     TEST(xoptional, operation)
     {
         xtensor_optional<double, 2> m1
-            {{ 0.0 ,       2.0          },
-             { 3.0 , missing<double>()} };
+            {{ 0.0 ,       2.0         },
+             { 3.0 , missing<double>() }};
 
         xtensor<double, 2> m2
             {{ 1.0 , 2.0 },

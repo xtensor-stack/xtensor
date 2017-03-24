@@ -54,7 +54,7 @@ namespace xt
     template <class S, class It>
     inline auto get_slice_value(const xslice<S>& slice, It& it) noexcept
     {
-        return slice.derived_cast()(*it++);
+        return slice.derived_cast()(typename S::size_type(*it++));
     };
 
     /***********************
