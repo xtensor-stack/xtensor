@@ -399,6 +399,7 @@ namespace xt
             }
 
         private:
+
             precision_type m_width;
             bool m_sign = false;
             value_type m_max = 0;

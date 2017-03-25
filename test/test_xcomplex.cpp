@@ -51,7 +51,7 @@ namespace xt
             {{1.0       , 1.0 + 1.0i},
              {1.0 - 1.0i, 1.0       }};
 
-        // Test assigning an expression to the offset_view
+        // Test assigning an expression to the complex view 
         real(e) = zeros<double>({2, 2});
         xarray<std::complex<double>> expect1 = 
             {{0.0       , 0.0 + 1.0i},
@@ -68,7 +68,7 @@ namespace xt
             {{1.0       , 1.0 + 1.0i},
              {1.0 - 1.0i, 1.0       }};
 
-        // Test assigning an expression to the offset_view
+        // Test assigning an expression to the complex view 
         real(e) = 0.0;
         xarray<std::complex<double>> expect1 = 
             {{0.0       , 0.0 + 1.0i},

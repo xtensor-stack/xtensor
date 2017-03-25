@@ -57,11 +57,32 @@ Mathematical operators are overloaded for optional values so that they can be op
     // `b` is broadcasted to match the shape of `a`
     std::cout << a + b << std::endl;
 
-Outputs:
+outputs:
 
 .. code::
 
     {{  2,   4},
      {  4, N/A}}
 
+Function handling expressions containing missing values
+-------------------------------------------------------
 
+Function ``has_value(E&& e)`` and ``value(E&& e)`` return expressions corresponding to the underlying value and flag of optional elements. When ``e`` is an lvalue, ``value(E&& e)`` and ``has_value(E&& e)`` are lvalues too.
+
+.. code:: cpp
+
+    xtensor_optional<double, 2> a
+        {{ 1.0 ,       2.0         },
+         { 3.0 , missing<double>() }};
+
+
+    xtensor<bool, 2> b = has_value(a);
+
+    std::cout << b << std::endl;
+
+outputs:
+
+.. code::
+
+    {{  true,  true},
+     {  true, false}}

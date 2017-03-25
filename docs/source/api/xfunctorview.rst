@@ -4,10 +4,10 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xoffsetview
-===========
+xfunctorview
+============
 
-.. doxygenclass:: xt::xoffsetview
+.. doxygenclass:: xt::xfunctorview
    :project: xtensor
    :members:
 

@@ -60,7 +60,6 @@ namespace xt
     class xtensor_container : public xstrided_container<xtensor_container<EC, N>>,
                               public xcontainer_semantic<xtensor_container<EC, N>>
     {
-
     public:
 
         using self_type = xtensor_container<EC, N>;
@@ -149,7 +148,6 @@ namespace xt
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N>>,
                             public xadaptor_semantic<xtensor_adaptor<EC, N>>
     {
-
     public:
 
         using self_type = xtensor_adaptor<EC, N>;
