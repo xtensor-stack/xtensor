@@ -19,7 +19,9 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
-    template <class EC, class SC>
+    template <class EC, class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
+                                                           typename EC::allocator_type,
+                                                           std::allocator<typename EC::size_type>)>
     class xarray_container;
 
     /**
