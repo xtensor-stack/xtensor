@@ -204,7 +204,7 @@ namespace xt
     TEST(xiterator, pointer)
     {
         xarray<double> m {{3, 4}, {6, 5}};
-        auto it = m.begin();
+        auto it = m.xbegin();
         EXPECT_EQ(*(it.operator->()), 3);
     }
 }

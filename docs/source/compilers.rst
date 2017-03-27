@@ -26,6 +26,11 @@ Old versions of Clang don't handle overload resolution with braced initializer l
 
 A consequence is that we need to use stack-allocated shape types in these cases. Workarounds for this compiler bug arise in various files of the code base. Everywhere, the handling of `Clang < 3.8` is wrapped with checks for the ``X_OLD_CLANG`` macro.
 
+GCC < 5.1 and ``std::is_trivially_default_constructible``
+---------------------------------------------------------
+
+Versions of GCC older than 5.1 don't implement ``std::is_trivially_default_constructible`` but ``std::has_trivial_default_constructor`` instead. The workaround is to use a macro to do the replacement. This occurs in ``xtensor/xstorage.hpp`` only.
+
 GCC-6 and the signature of ``std::isnan`` and ``std::isinf``
 ------------------------------------------------------------
 

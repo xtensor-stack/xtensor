@@ -204,10 +204,11 @@ namespace xt
     public:
         using member_type = M;
         using value_type = member_type;
-        using reference = apply_cv_t<typename It::reference, value_type>;
+        using subiterator_traits = std::iterator_traits<It>;
+        using reference = apply_cv_t<typename subiterator_traits::reference, value_type>;
         using pointer = std::remove_reference_t<reference>*;
-        using difference_type = typename It::difference_type;
-        using iterator_category = typename It::iterator_category;
+        using difference_type = typename subiterator_traits::difference_type;
+        using iterator_category = typename subiterator_traits::iterator_category;
 
         using self_type = xoffset_iterator<It, M, I>;
 

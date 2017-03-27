@@ -5,9 +5,21 @@
 #include <chrono>
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 namespace xt
 {
+    template <class T, class A>
+    std::string get_container_name(const std::vector<T, A>&)
+    {
+        return "std::vector";
+    }
+
+    template <class T, class A>
+    std::string get_container_name(const uvector<T, A>&)
+    {
+        return "xt::uvector";
+    }
 
     namespace axpy_1d
     {
@@ -33,11 +45,11 @@ namespace xt
         inline auto benchmark_xiteration(const E& x, const E& y, E& res, typename E::value_type a, std::size_t number)
         {
             auto start = std::chrono::steady_clock::now();
-            for(std::size_t i = 0; i < number; ++i)
+            for (std::size_t i = 0; i < number; ++i)
             {
                 auto iterx = x.xbegin();
                 auto itery = y.xbegin();
-                for(auto iter = res.xbegin(); iter != res.xend(); ++iter, ++iterx, ++itery)
+                for (auto iter = res.xbegin(); iter != res.xend(); ++iter, ++iterx, ++itery)
                 {
                     *iter = a * (*iterx) + (*itery);
                 }
@@ -81,6 +93,7 @@ namespace xt
             }
         }
 
+        template <class C>
         void benchmark()
         {
             using duration_type = std::chrono::duration<double, std::milli>;
@@ -89,13 +102,13 @@ namespace xt
             constexpr size_type number = 10000;
             double a = 2.7;
 
-            xarray<double> ax, ay, ares;
+            using array_type = xarray_container<C>;
+            array_type ax, ay, ares;
             init_benchmark(ax, ay, ares, size);
 
-            xtensor<double, 1> tx, ty, tres;
+            using tensor_type = xtensor_container<C, 1>;
+            tensor_type tx, ty, tres;
             init_benchmark(tx, ty, tres, size);
-
-            benchmark_iteration(ax, ay, ares, a, 10);
 
             duration_type aiter = benchmark_iteration(ax, ay, ares, a, number);
             duration_type titer = benchmark_iteration(tx, ty, tres, a, number);
@@ -104,9 +117,10 @@ namespace xt
             duration_type aindex = benchmark_indexing(ax, ay, ares, a, number);
             duration_type tindex = benchmark_indexing(tx, ty, tres, a, number);
 
-            std::cout << "***************************" << std::endl;
-            std::cout << "*    AXPY 1D BENCHMARK    *" << std::endl;
-            std::cout << "***************************" << std::endl << std::endl;
+            std::string cname = get_container_name(C());
+            std::cout << "************************" << std::string(cname.size(), '*') << std::endl;
+            std::cout << "* AXPY 1D BENCHMARK : " << cname << " *" << std::endl;
+            std::cout << "************************" << std::string(cname.size(), '*') << std::endl << std::endl;
 
             std::cout << "xarray   iteration: " << aiter.count() << "ms" << std::endl;
             std::cout << "xtensor  iteration: " << titer.count() << "ms" << std::endl;
@@ -161,35 +175,98 @@ namespace xt
             }
         }
 
+        template <class C>
         void benchmark()
         {
             using duration_type = std::chrono::duration<double, std::milli>;
             std::size_t number = 2000;
 
-            xarray<double> ax, ay, az, ares;
+            using array_type = xarray_container<C>;
+            array_type ax, ay, az, ares;
             init_benchmark(ax, ay, az, ares);
 
-            xtensor<double, 3> tx, ty, tz, tres;
+            using tensor_type = xtensor_container<C, 3>;
+            tensor_type tx, ty, tz, tres;
             init_benchmark(tx, ty, tz, tres);
-
-            benchmark_assign(ax, ay, az, ares, 10);
 
             duration_type aassign = benchmark_assign(ax, ay, az, ares, number);
             duration_type tassign = benchmark_assign(tx, ty, tz, tres, number);
 
-            std::cout << "******************************" << std::endl;
-            std::cout << "* XFUNCTION ASSIGN BENCHMARK *" << std::endl;
-            std::cout << "******************************" << std::endl << std::endl;
+            std::string cname = get_container_name(C());
+            std::cout << "*********************************" << std::string(cname.size(), '*') << std::endl;
+            std::cout << "* XFUNCTION ASSIGN BENCHMARK : " << cname << " *" << std::endl;
+            std::cout << "*********************************" << std::string(cname.size(), '*') << std::endl << std::endl;
 
             std::cout << "xarray : " << aassign.count() << "ms" << std::endl;
             std::cout << "xtensor: " << tassign.count() << "ms" << std::endl;
+            std::cout << std::endl;
         }
-
     }
 
+    namespace sum_assign
+    {
+        template <class E>
+        inline auto benchmark_assign(const E& x, const E& y, E& res)
+        {
+            auto start = std::chrono::steady_clock::now();
+            res = 3 * x - 2 * y;
+            auto end = std::chrono::steady_clock::now();
+            auto diff = end - start;
+            return diff;
+        }
+
+        template <class E>
+        inline void init_benchmark(E& x, E& y)
+        {
+            using value_type = typename E::value_type;
+            using size_type = typename E::size_type;
+            using shape_type = typename E::shape_type;
+
+            shape_type shape = { 100, 100 };
+
+            x.reshape(shape);
+            y.reshape(shape);
+
+            for (size_type i = 0; i < shape[0]; ++i)
+            {
+                for (size_type j = 0; j < shape[1]; ++j)
+                {
+                    x(i, j) = 0.25 * value_type(i) + 0.5 * value_type(j);
+                    y(i, j) = 0.31 * value_type(i) - 0.2 * value_type(j);
+                }
+            }
+        }
+
+        template <class C>
+        void benchmark()
+        {
+            using duration_type = std::chrono::duration<double, std::milli>;
+            std::size_t number = 2000;
+
+            using array_type = xarray_container<C>;
+            array_type ax, ay, ares;
+            init_benchmark(ax, ay);
+
+            using tensor_type = xtensor_container<C, 2>;
+            tensor_type tx, ty, tres;
+            init_benchmark(tx, ty);
+
+            duration_type aassign = benchmark_assign(ax, ay, ares);
+            duration_type tassign = benchmark_assign(tx, ty, tres);
+
+            std::string cname = get_container_name(C());
+            std::cout << "*********************************" << std::string(cname.size(), '*') << std::endl;
+            std::cout << "* SUM FULL ASSIGN BENCHMARK : " << cname << " *" << std::endl;
+            std::cout << "*********************************" << std::string(cname.size(), '*') << std::endl << std::endl;
+
+            std::cout << "xarray : " << aassign.count() << "ms" << std::endl;
+            std::cout << "xtensor: " << tassign.count() << "ms" << std::endl;
+            std::cout << std::endl;
+        }
+    }
 }
 
-int main(int argc, char* argv[])
+int main(int /*argc*/, char** /*argv*/)
 {
     std::cout << "Using steady_clock" << std::endl;
     std::cout << "period num: " << std::chrono::steady_clock::period::num << std::endl;
@@ -197,8 +274,12 @@ int main(int argc, char* argv[])
     std::cout << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl;
     std::cout << std::endl;
 
-    //xt::axpy_1d::benchmark();
-    xt::func::benchmark();
+    xt::axpy_1d::benchmark<std::vector<double>>();
+    xt::axpy_1d::benchmark<xt::uvector<double>>();
+    xt::func::benchmark<std::vector<double>>();
+    xt::func::benchmark<xt::uvector<double>>();
+    xt::sum_assign::benchmark<std::vector<double>>();
+    xt::sum_assign::benchmark<xt::uvector<double>>();
 
     return 0;
 }
