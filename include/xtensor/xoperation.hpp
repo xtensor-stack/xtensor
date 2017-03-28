@@ -15,6 +15,7 @@
 
 #include "xfunction.hpp"
 #include "xscalar.hpp"
+#include "xstrides.hpp"
 
 namespace xt
 {
