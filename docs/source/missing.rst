@@ -4,6 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
+.. _missing-values:
+
 Missing values
 ==============
 
@@ -64,10 +66,10 @@ outputs:
     {{  2,   4},
      {  4, N/A}}
 
-Function handling expressions containing missing values
--------------------------------------------------------
+Handling expressions with missing values
+----------------------------------------
 
-Function ``has_value(E&& e)`` and ``value(E&& e)`` return expressions corresponding to the underlying value and flag of optional elements. When ``e`` is an lvalue, ``value(E&& e)`` and ``has_value(E&& e)`` are lvalues too.
+Functions ``has_value(E&& e)`` and ``value(E&& e)`` return expressions corresponding to the underlying value and flag of optional elements. When ``e`` is an lvalue, ``value(E&& e)`` and ``has_value(E&& e)`` are lvalues too.
 
 .. code:: cpp
 

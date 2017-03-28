@@ -66,3 +66,11 @@ Like most functions of xtensor, functions of the random module return expression
 
 Every time an element is accessed, a new random value is generated. To fix the values of a generator, it should
 be assigned to a container such as xarray or xtensor.
+
+Missing values
+--------------
+
+Support of missing values in numpy can be emulated with the masked array module,
+which provides a means to handle arrays that have missing or invalid data.
+
+Support of missing values in xtensor is done through a notion of optional values, implemented in ``xoptional<T, B>``, which serves both as a value type for container and as a reference proxy for optimized storage types. See :ref:`missing_values`.

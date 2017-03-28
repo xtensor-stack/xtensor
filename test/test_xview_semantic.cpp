@@ -41,9 +41,9 @@ namespace xt
 
         size_t imax = y_slice.size();
         size_t jmax = z_slice.size();
-        for(size_t i = 0; i < imax; ++i)
+        for (size_t i = 0; i < imax; ++i)
         {
-            for(size_t j = 0; j < jmax; ++j)
+            for (size_t j = 0; j < jmax; ++j)
             {
                 size_t si = y_slice(i);
                 size_t sj = z_slice(j);

@@ -281,7 +281,7 @@ namespace xt
     inline uvector<T, A>& uvector<T, A>::operator=(const uvector& rhs)
     {
         // No copy and swap idiom here due to performance issues
-        if(this != &rhs)
+        if (this != &rhs)
         {
             m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
             resize_impl(rhs.size());

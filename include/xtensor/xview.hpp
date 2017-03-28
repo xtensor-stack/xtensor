@@ -477,7 +477,7 @@ namespace xt
         auto func = [](const auto& s) { return xt::value(s, 0); };
         typename T::size_type offset = 0;
 
-        for(size_type i = 0; i < sizeof...(S); ++i)
+        for (size_type i = 0; i < sizeof...(S); ++i)
         {
             size_type s = apply<size_type>(i, func, m_slices) * m_e.strides()[i];
             offset += s;

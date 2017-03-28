@@ -61,7 +61,7 @@ namespace xt
         xoptional_vector<double> v(4, 2.0);
         v[0] = missing<double>();
         std::vector<double> res;
-        for(auto it = v.cbegin(); it != v.cend(); ++it)
+        for (auto it = v.cbegin(); it != v.cend(); ++it)
         {
             res.push_back((*it).value_or(0.0));
         }

@@ -61,16 +61,16 @@ namespace xt
         res_rct.reshape(rmr.shape(), rmr.strides());
         res_ru.reshape(rmr.shape(), rmr.strides());
         
-        for(size_t i = 0; i < rmr.shape()[0]; ++i)
+        for (size_t i = 0; i < rmr.shape()[0]; ++i)
         {
-            for(size_t j = 0; j < rmr.shape()[1]; ++j)
+            for (size_t j = 0; j < rmr.shape()[1]; ++j)
             {
-                for(size_t k = 0; k < rmr.shape()[2]; ++k)
+                for (size_t k = 0; k < rmr.shape()[2]; ++k)
                 {
-                    res_rr(i,j,k) = f(a(i,j,k), ra(i,j,k));
-                    res_rc(i,j,k) = f(a(i,j,k), ca(i,j,k));
-                    res_rct(i,j,k) = f(a(i,j,k), cta(i,j,k));
-                    res_ru(i,j,k) = f(a(i,j,k), ua(i,j,k));
+                    res_rr(i, j, k) = f(a(i, j, k), ra(i, j, k));
+                    res_rc(i, j, k) = f(a(i, j, k), ca(i, j, k));
+                    res_rct(i, j, k) = f(a(i, j, k), cta(i, j, k));
+                    res_ru(i, j, k) = f(a(i, j, k), ua(i, j, k));
                 }
             }
         }
@@ -119,16 +119,16 @@ namespace xt
         res_ct.reshape(ctmr.shape(), ctmr.strides());
         res_u.reshape(usr.shape(), usr.strides());
         
-        for(size_t i = 0; i < rmr.shape()[0]; ++i)
+        for (size_t i = 0; i < rmr.shape()[0]; ++i)
         {
-            for(size_t j = 0; j < rmr.shape()[1]; ++j)
+            for (size_t j = 0; j < rmr.shape()[1]; ++j)
             {
-                for(size_t k = 0; k < rmr.shape()[2]; ++k)
+                for (size_t k = 0; k < rmr.shape()[2]; ++k)
                 {
-                    res_r(i,j,k) = f(ra(i,j,k), b);
-                    res_c(i,j,k) = f( ca(i,j,k), b);
-                    res_ct(i,j,k) = f(cta(i,j,k), b);
-                    res_u(i,j,k) = f(ua(i,j,k), b);
+                    res_r(i, j, k) = f(ra(i, j, k), b);
+                    res_c(i, j, k) = f( ca(i, j, k), b);
+                    res_ct(i, j, k) = f(cta(i, j, k), b);
+                    res_u(i, j, k) = f(ua(i, j, k), b);
                 }
             }
         }
