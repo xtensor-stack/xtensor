@@ -27,6 +27,14 @@ namespace xt
      * Helpers *
      ***********/
 
+    namespace detail
+    {
+        template <class T>
+        struct bool_functor_return_type
+        {
+            using type = bool;
+        };
+    }
 #define UNARY_MATH_FUNCTOR(NAME)\
     template <class T>\
     struct NAME##_fun {\
@@ -67,8 +75,8 @@ namespace xt
     template <class T>\
     struct NAME##_fun {\
         using argument_type = T;\
-        using result_type = bool;\
-        constexpr bool operator()(const T& arg) const {\
+        using result_type = typename xt::detail::bool_functor_return_type<T>::type;\
+        constexpr result_type operator()(const T& arg) const {\
             using std::NAME;\
             return NAME(arg);\
         }\
@@ -338,6 +346,7 @@ namespace xt
         {
             using argument_type = T;
             using result_type = T;
+
             constexpr T operator()(const T& x) const
             {
                 return detail::sign_impl(x);
