@@ -27,13 +27,13 @@ namespace xt
         template <class T>
         void operator()(T t)
         {
-            if(std::is_same<T, short>::value)
+            if (std::is_same<T, short>::value)
                 a = static_cast<short>(t);
-            else if(std::is_same<T, int>::value)
+            else if (std::is_same<T, int>::value)
                 b = static_cast<int>(t);
-            else if(std::is_same<T, float>::value)
+            else if (std::is_same<T, float>::value)
                 c = static_cast<float>(t);
-            else if(std::is_same<T, double>::value)
+            else if (std::is_same<T, double>::value)
                 d = static_cast<double>(t);
         }
     };

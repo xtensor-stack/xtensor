@@ -57,21 +57,26 @@ namespace xt
 
     /**
      * @class xoptional
-     * @brief Closure-type based optional handler.
+     * @brief Optional value handler.
      *
-     * The xoptional is an optional proxy. It holds a closure on a value and a closure on a boolean-convertible type.
+     * The xoptional is an optional proxy. It holds a value (or a reference on a value) and a flag (or reference on a flag)
+     * indicating whether the element should be considered missing.
      *
      * xoptional is different from std::optional
      *
-     *  - no `operator->()` that returns a pointer, since pointer to an rvalue may be an issue.
+     *  - no `operator->()` that returns a pointer.
      *  - no `operator*()` that returns a value.
      *
-     * The only way to access the underlying value is with the `value` and `value_or` methods.
+     * The only way to access the underlying value and flag is with the `value` and `value_or` methods.
      *
      *  - no explicit convertion to bool. This may lead to confusion when the underlying value type is boolean too.
      *
      * @tparam CT Closure type for the value.
-     * @tparam CB Closure type for the missing flag. A falsy flag means that the value is missing. 
+     * @tparam CB Closure type for the missing flag. A falsy flag means that the value is missing.
+     *
+     * \ref xoptional is used both as a value type (with CT and CB being value types) and reference type for containers
+     * with CT and CB being reference types. In other words, it serves as a reference proxy.
+     *
      */
     template <class CT, class CB = bool>
     class xoptional
@@ -168,10 +173,10 @@ namespace xt
         CB m_flag;
     };
 
-
     /***************************************
      * optional and missing implementation *
      ***************************************/
+
     /**
      * @brief Returns an \ref xoptional holding closure types on the specified parameters
      *

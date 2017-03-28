@@ -146,6 +146,7 @@ namespace xt
     class xoptional_array : public xoptional_sequence<xoptional_array<T, I>>
     {
     public:
+
         using self_type = xoptional_array;
         using base_type = xoptional_sequence<self_type>;
         using base_value_type = typename base_type::base_value_type;
@@ -162,6 +163,7 @@ namespace xt
     class xoptional_vector : public xoptional_sequence<xoptional_vector<T, A, BA>>
     {
     public:
+
         using self_type = xoptional_vector;
         using base_type = xoptional_sequence<self_type>;
         using base_value_type = typename base_type::base_value_type;
@@ -601,30 +603,39 @@ namespace xt
     }
 
     template <class E>
-    auto value(E&& e) -> disable_xoptional<typename std::decay_t<E>::value_type, E>
+    auto value(E&& e)
+        -> disable_xoptional<typename std::decay_t<E>::value_type, E>
     {
         return std::forward<E>(e);
     }
 
     template <class E>
-    auto has_value(E&& e) -> disable_xoptional<typename std::decay_t<E>::value_type, decltype(ones<bool>(std::forward<E>(e).shape()))>
+    auto has_value(E&& e)
+        -> disable_xoptional<typename std::decay_t<E>::value_type, decltype(ones<bool>(std::forward<E>(e).shape()))>
     {
         return ones<bool>(std::forward<E>(e).shape());
     }
 
     template <class E>
-    auto value(E&& e) -> enable_xoptional<typename std::decay_t<E>::value_type, xfunctorview<detail::value_forwarder<E>, xclosure_t<E>>>
+    auto value(E&& e)
+        -> enable_xoptional<typename std::decay_t<E>::value_type, xfunctorview<detail::value_forwarder<E>, xclosure_t<E>>>
     {
         using type = xfunctorview<detail::value_forwarder<E>, xclosure_t<E>>;
         return type(std::forward<E>(e));
     }
 
     template <class E>
-    auto has_value(E&& e) -> enable_xoptional<typename std::decay_t<E>::value_type, xfunctorview<detail::flag_forwarder<E>, xclosure_t<E>>>
+    auto has_value(E&& e)
+        -> enable_xoptional<typename std::decay_t<E>::value_type, xfunctorview<detail::flag_forwarder<E>, xclosure_t<E>>>
     {
         using type = xfunctorview<detail::flag_forwarder<E>, xclosure_t<E>>;
         return type(std::forward<E>(e));
     }
+
+    /***************************
+     * value_or implementation *
+     ***************************/
+
 }
 
 #endif
