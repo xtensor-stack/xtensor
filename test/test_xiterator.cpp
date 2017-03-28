@@ -27,7 +27,7 @@ namespace xt
         
         auto iter = a.xbegin();
         auto iter2 = a.xbegin();
-        for(size_type i = 0; i < nb_inc; ++i)
+        for (size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
             iter2++;
@@ -117,7 +117,7 @@ namespace xt
         size_type size = a.size();
         auto iter = a.xbegin();
         auto last = a.xend();
-        for(size_type i = 0; i < size; ++i)
+        for (size_type i = 0; i < size; ++i)
         {
             ++iter;
         }

@@ -37,10 +37,10 @@ namespace xt
         shape_type sh = { 4, 3, 2, 4};
         m_c.reshape(sh);
 
-        for(size_t i = 0; i < sh[0]; ++i)
-            for(size_t j = 0; j < sh[1]; ++j)
-                for(size_t k = 0; k < sh[2]; ++k)
-                    for(size_t l = 0; l < sh[3]; ++l)
+        for (size_t i = 0; i < sh[0]; ++i)
+            for (size_t j = 0; j < sh[1]; ++j)
+                for (size_t k = 0; k < sh[2]; ++k)
+                    for (size_t l = 0; l < sh[3]; ++l)
                         m_c(i, j, k, l) = m_a(j, k, l) + static_cast<int>(i);
     }
 
@@ -147,7 +147,7 @@ namespace xt
         auto itera = a.xbegin();
         auto iterb = b.xbegin(a.shape());
         auto nb_iter = a.shape().back() * 2 + 1;
-        for(size_t i = 0; i < nb_iter; ++i)
+        for (size_t i = 0; i < nb_iter; ++i)
         {
             ++iter, ++itera, ++iterb;
         }
@@ -180,7 +180,7 @@ namespace xt
         auto iter = func.xbegin();
         auto iter_end = func.xend();
         auto size = a.size();
-        for(size_t i = 0; i < size; ++i)
+        for (size_t i = 0; i < size; ++i)
         {
             ++iter;
         }

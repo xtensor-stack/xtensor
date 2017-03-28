@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Extending xtensor with your data structures
-===========================================
+Extending xtensor
+=================
 
 ``xtensor`` provides means to plug external data structures into its expression engine without
 copying any data.
@@ -285,8 +285,8 @@ The following definitions are required:
         using const_broadcast_iterator = const_iterator;
     };
 
-Inherit
-~~~~~~~
+Inheritance
+~~~~~~~~~~~
 
 Next step is to inherit from the ``xiterable`` and ``xcontainer_semantic`` classes,
 and to define a bunch of typedefs.
