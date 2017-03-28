@@ -30,7 +30,7 @@ namespace xt
      * xoptional declaration *
      *************************/
 
-    template <class CT, class CB>
+    template <class CT, class CB = bool>
     class xoptional;
 
     namespace detail
@@ -43,6 +43,12 @@ namespace xt
         template <class CT, class CB>
         struct is_xoptional_impl<xoptional<CT, CB>> : std::true_type
         {
+        };
+
+        template <class CT, class CB>
+        struct bool_functor_return_type<xoptional<CT, CB>>
+        {
+            using type = xoptional<bool>;
         };
     }
 
@@ -78,7 +84,7 @@ namespace xt
      * with CT and CB being reference types. In other words, it serves as a reference proxy.
      *
      */
-    template <class CT, class CB = bool>
+    template <class CT, class CB>
     class xoptional
     {
     public:
@@ -177,12 +183,12 @@ namespace xt
      * optional and missing implementation *
      ***************************************/
 
-    /**
-     * @brief Returns an \ref xoptional holding closure types on the specified parameters
-     *
-     * @tparam t the optional value
-     * @tparam b the boolean flag
-     */
+     /**
+      * @brief Returns an \ref xoptional holding closure types on the specified parameters
+      *
+      * @tparam t the optional value
+      * @tparam b the boolean flag
+      */
     template <class T, class B>
     inline auto optional(T&& t, B&& b) noexcept
     {
@@ -203,7 +209,7 @@ namespace xt
      * xoptional implementation *
      ****************************/
 
-    // Constructors
+     // Constructors
     template <class CT, class CB>
     xoptional<CT, CB>::xoptional()
         : m_value(), m_flag(false)
@@ -386,13 +392,13 @@ namespace xt
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::value() && noexcept -> std::conditional_t<std::is_reference<CT>::value, apply_cv_t<CT, value_type>&, value_type>
+    auto xoptional<CT, CB>::value() && noexcept->std::conditional_t<std::is_reference<CT>::value, apply_cv_t<CT, value_type>&, value_type>
     {
         return m_value;
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::value() const && noexcept -> std::conditional_t<std::is_reference<CT>::value, const value_type&, value_type>
+    auto xoptional<CT, CB>::value() const && noexcept->std::conditional_t<std::is_reference<CT>::value, const value_type&, value_type>
     {
         return m_value;
     }
@@ -406,7 +412,7 @@ namespace xt
 
     template <class CT, class CB>
     template <class U>
-    auto xoptional<CT, CB>::value_or(U&& default_value) const && noexcept -> value_type
+    auto xoptional<CT, CB>::value_or(U&& default_value) const && noexcept->value_type
     {
         return m_flag ? m_value : std::forward<U>(default_value);
     }
@@ -425,13 +431,13 @@ namespace xt
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::has_value() && noexcept -> std::conditional_t<std::is_reference<CB>::value, apply_cv_t<CB, flag_type>&, flag_type>
+    auto xoptional<CT, CB>::has_value() && noexcept->std::conditional_t<std::is_reference<CB>::value, apply_cv_t<CB, flag_type>&, flag_type>
     {
         return m_flag;
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::has_value() const && noexcept -> std::conditional_t<std::is_reference<CB>::value, const flag_type&, flag_type>
+    auto xoptional<CT, CB>::has_value() const && noexcept->std::conditional_t<std::is_reference<CB>::value, const flag_type&, flag_type>
     {
         return m_flag;
     }
@@ -464,9 +470,9 @@ namespace xt
     inline S& operator<<(S& out, const xoptional<T, B>& v)
     {
         if (v.has_value())
-           out << v.value();
+            out << v.value();
         else
-           out << "N/A";
+            out << "N/A";
         return out;
     }
 
@@ -761,6 +767,192 @@ namespace xt
     {
         return e1.has_value() ? e1.value() >= e2 : missing<bool>();
     }
+
+#define UNARY_OPTIONAL(NAME)\
+    template <class T, class B>\
+    inline auto NAME(const xoptional<T, B>& e) {\
+        using std::NAME;\
+        return e.has_value() ? NAME(e.value()) : missing<std::decay_t<T>>();\
+    }
+
+#define UNARY_BOOL_OPTIONAL(NAME)\
+    template <class T, class B>\
+    inline xoptional<bool> NAME(const xoptional<T, B>& e) {\
+        using std::NAME;\
+        return e.has_value() ? bool(NAME(e.value())) : missing<bool>();\
+    }
+
+#define BINARY_OPTIONAL_1(NAME)\
+    template <class T1, class B1, class T2>\
+    inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;\
+        return e1.has_value() ? NAME(e1.value(), e2) : missing<value_type>();\
+    }
+
+
+#define BINARY_OPTIONAL_2(NAME)\
+    template <class T1, class T2, class B2>\
+    inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;\
+        return e2.has_value() ? NAME(e1, e2.value()) : missing<value_type>();\
+    }
+
+#define BINARY_OPTIONAL_12(NAME)\
+    template <class T1, class B1, class T2, class B2>\
+    inline auto NAME(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;\
+        return e1.has_value() && e2.has_value() ? NAME(e1.value(), e2.value()) : missing<value_type>();\
+    }
+
+#define BINARY_OPTIONAL(NAME)\
+    BINARY_OPTIONAL_1(NAME)\
+    BINARY_OPTIONAL_2(NAME)\
+    BINARY_OPTIONAL_12(NAME)
+
+#define TERNARY_OPTIONAL_1(NAME)\
+    template <class T1, class B1, class T2, class T3>\
+    inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2, const T3& e3) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;\
+        return e1.has_value() ? NAME(e1.value(), e2, e3) : missing<value_type>();\
+    }
+
+#define TERNARY_OPTIONAL_2(NAME)\
+    template <class T1, class T2, class B2, class T3>\
+    inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2, const T3& e3) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;\
+        return e2.has_value() ? NAME(e1, e2.value(), e3) : missing<value_type>();\
+    }
+
+#define TERNARY_OPTIONAL_3(NAME)\
+    template <class T1, class T2, class T3, class B3>\
+    inline auto NAME(const T1& e1, const T2& e2, const xoptional<T3, B3>& e3) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;\
+        return e3.has_value() ? NAME(e1, e2, e3.value()) : missing<value_type>();\
+    }
+
+#define TERNARY_OPTIONAL_12(NAME)\
+    template <class T1, class B1, class T2, class B2, class T3>\
+    inline auto NAME(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2, const T3& e3) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;\
+        return (e1.has_value() && e2.has_value()) ? NAME(e1.value(), e2.value(), e3) : missing<value_type>();\
+    }
+
+#define TERNARY_OPTIONAL_13(NAME)\
+    template <class T1, class B1, class T2, class T3, class B3>\
+    inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2, const xoptional<T3, B3>& e3) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;\
+        return (e1.has_value() && e3.has_value()) ? NAME(e1.value(), e2, e3.value()) : missing<value_type>();\
+    }
+
+#define TERNARY_OPTIONAL_23(NAME)\
+    template <class T1, class T2, class B2, class T3, class B3>\
+    inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2, const xoptional<T3, B3>& e3) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;\
+        return (e2.has_value() && e3.has_value()) ? NAME(e1, e2.value(), e3.value()) : missing<value_type>();\
+    }
+
+#define TERNARY_OPTIONAL_123(NAME)\
+    template <class T1, class B1, class T2, class B2, class T3, class B3>\
+    inline auto NAME(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2, const xoptional<T3, B3>& e3) {\
+        using std::NAME;\
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;\
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?\
+                NAME(e1.value(), e2.value(), e3.value()) : missing<value_type>();\
+    }
+
+#define TERNARY_OPTIONAL(NAME)\
+    TERNARY_OPTIONAL_1(NAME)\
+    TERNARY_OPTIONAL_2(NAME)\
+    TERNARY_OPTIONAL_3(NAME)\
+    TERNARY_OPTIONAL_12(NAME)\
+    TERNARY_OPTIONAL_13(NAME)\
+    TERNARY_OPTIONAL_23(NAME)\
+    TERNARY_OPTIONAL_123(NAME)
+
+    namespace math
+    {
+        template <class T, class B>
+        struct sign_fun<xoptional<T, B>>
+        {
+            using argument_type = xoptional<T, B>;
+            using result_type = xoptional<std::decay_t<T>>;
+
+            constexpr result_type operator()(const xoptional<T, B>& x) const
+            {
+                return x.has_value() ? xoptional<T>(detail::sign_impl(x.value()))
+                    : missing<std::decay_t<T>>();
+            }
+        };
+    }
+
+    template <class T, class B>
+    inline auto sign(const xoptional<T, B>& e)
+    {
+            return e.has_value() ? math::detail::sign_impl(e.value()) : missing<std::decay_t<T>>();
+    }
+
+    UNARY_OPTIONAL(abs)
+    UNARY_OPTIONAL(fabs)
+    BINARY_OPTIONAL(fmod)
+    BINARY_OPTIONAL(remainder)
+    TERNARY_OPTIONAL(fma)
+    BINARY_OPTIONAL(fmax)
+    BINARY_OPTIONAL(fmin)
+    BINARY_OPTIONAL(fdim)
+    UNARY_OPTIONAL(exp)
+    UNARY_OPTIONAL(exp2)
+    UNARY_OPTIONAL(expm1)
+    UNARY_OPTIONAL(log)
+    UNARY_OPTIONAL(log10)
+    UNARY_OPTIONAL(log2)
+    UNARY_OPTIONAL(log1p)
+    BINARY_OPTIONAL(pow)
+    UNARY_OPTIONAL(sqrt)
+    UNARY_OPTIONAL(cbrt)
+    BINARY_OPTIONAL(hypot)
+    UNARY_OPTIONAL(sin)
+    UNARY_OPTIONAL(cos)
+    UNARY_OPTIONAL(tan)
+    UNARY_OPTIONAL(acos)
+    UNARY_OPTIONAL(asin)
+    UNARY_OPTIONAL(atan)
+    BINARY_OPTIONAL(atan2)
+    UNARY_OPTIONAL(sinh)
+    UNARY_OPTIONAL(cosh)
+    UNARY_OPTIONAL(tanh)
+    UNARY_OPTIONAL(acosh)
+    UNARY_OPTIONAL(asinh)
+    UNARY_OPTIONAL(atanh)
+    UNARY_OPTIONAL(erf)
+    UNARY_OPTIONAL(erfc)
+    UNARY_OPTIONAL(tgamma)
+    UNARY_OPTIONAL(lgamma)
+    UNARY_BOOL_OPTIONAL(isfinite)
+    UNARY_BOOL_OPTIONAL(isinf)
+    UNARY_BOOL_OPTIONAL(isnan)
+
+#undef TERNARY_OPTIONAL
+#undef TERNARY_OPTIONAL_123
+#undef TERNARY_OPTIONAL_23
+#undef TERNARY_OPTIONAL_13
+#undef TERNARY_OPTIONAL_12
+#undef TERNARY_OPTIONAL_3
+#undef TERNARY_OPTIONAL_2
+#undef TERNARY_OPTIONAL_1
+#undef BINARY_OPTIONAL
+#undef BINARY_OPTIONAL_12
+#undef BINARY_OPTIONAL_2
+#undef BINARY_OPTIONAL_1
+#undef UNARY_OPTIONAL
 }
 
 #endif
