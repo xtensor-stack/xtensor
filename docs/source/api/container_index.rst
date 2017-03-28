@@ -18,4 +18,4 @@ Containers and views
    xview
    xbroadcast
    xindexview
-   xoffsetview
+   xfunctorview

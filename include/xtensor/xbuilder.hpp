@@ -90,8 +90,10 @@ namespace xt
     namespace detail
     {
         template <class T>
-        struct arange_impl
+        class arange_impl
         {
+        public:
+
             using value_type = T;
 
             arange_impl(T start, T stop, T step)
@@ -112,6 +114,7 @@ namespace xt
             }
 
         private:
+
             value_type m_start;
             value_type m_stop;
             value_type m_step;
@@ -129,8 +132,10 @@ namespace xt
         };
 
         template <class F>
-        struct fn_impl
+        class fn_impl
         {
+        public:
+
             using value_type = typename F::value_type;
             using size_type = std::size_t;
 
@@ -162,8 +167,10 @@ namespace xt
         };
 
         template <class T>
-        struct eye_fn
+        class eye_fn
         {
+        public:
+
             using value_type = T;
 
             eye_fn(int k)
@@ -275,8 +282,10 @@ namespace xt
     namespace detail
     {
         template <class... CT>
-        struct concatenate_impl
+        class concatenate_impl
         {
+        public:
+
             using size_type = std::size_t;
             using value_type = std::common_type_t<typename std::decay_t<CT>::value_type...>;
 
@@ -334,8 +343,10 @@ namespace xt
         };
 
         template <class... CT>
-        struct stack_impl
+        class stack_impl
         {
+        public:
+
             using size_type = std::size_t;
             using value_type = std::common_type_t<typename std::decay_t<CT>::value_type...>;
 
@@ -376,8 +387,10 @@ namespace xt
         };
 
         template <class CT>
-        struct repeat_impl
+        class repeat_impl
         {
+        public:
+
             using xexpression_type = std::decay_t<CT>;
             using size_type = typename xexpression_type::size_type;
             using value_type = typename xexpression_type::value_type;
@@ -534,8 +547,10 @@ namespace xt
     namespace detail
     {
         template <class CT>
-        struct diagonal_fn
+        class diagonal_fn
         {
+        public:
+
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
 
@@ -571,6 +586,7 @@ namespace xt
             }
 
         private:
+
             CT m_source;
             const int m_offset;
             const std::size_t m_axis_1;
@@ -578,8 +594,10 @@ namespace xt
         };
 
         template <class CT>
-        struct diag_fn
+        class diag_fn
         {
+        public:
+
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
 
@@ -603,13 +621,16 @@ namespace xt
             }
 
         private:
+
             CT m_source;
             const int m_k;
         };
 
         template <class CT>
-        struct flip_impl
+        class flip_impl
         {
+        public:
+
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
             using size_type = typename xexpression_type::size_type;
@@ -636,6 +657,7 @@ namespace xt
             }
 
         private:
+
             template <class It>
             inline value_type access_impl(It begin, It end) const
             {
@@ -650,8 +672,10 @@ namespace xt
         };
 
         template <class CT, class Comp>
-        struct trilu_fn
+        class trilu_fn
         {
+        public:
+
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
             using signed_idx_type = long int;
@@ -670,6 +694,7 @@ namespace xt
             }
 
         private:
+
             CT m_source;
             const signed_idx_type m_k;
             const Comp m_comp;

@@ -132,5 +132,44 @@ namespace xt
         std::string expect = "{{  0,   2},\n {  3, N/A}}";
         ASSERT_EQ(oss.str(), expect);
     }
+
+    TEST(xoptional, ufunc)
+    {
+        xtensor_optional<double, 2> m
+            {{ 0.0 ,       2.0         },
+             { 3.0 , missing<double>() }};
+
+        auto flag_view = has_value(m);
+
+        xtensor<bool, 2> res = flag_view;
+
+        ASSERT_TRUE(res(0, 0));
+        ASSERT_TRUE(res(0, 1));
+        ASSERT_TRUE(res(1, 0));
+        ASSERT_FALSE(res(1, 1));
+
+        auto value_view = value(m);
+
+        xtensor<double, 2> resv = value_view;
+        flag_view(1, 1) = true;
+        ASSERT_TRUE(m(1, 1).has_value());
+        value_view(1, 1) = 4.0;
+        ASSERT_EQ(m(1, 1).value(), 4.0);
+    }
+
+    TEST(xoptional, ufunc_nonoptional)
+    {
+        xtensor<double, 2> m
+            {{ 0.0 , 2.0 },
+             { 3.0 , 1.0 }};
+
+        auto flag_view = has_value(m);
+
+        xtensor<bool, 2> res = flag_view;
+        ASSERT_TRUE(res(0, 0));
+        ASSERT_TRUE(res(0, 1));
+        ASSERT_TRUE(res(1, 0));
+        ASSERT_TRUE(res(1, 1));
+    }
 }
 

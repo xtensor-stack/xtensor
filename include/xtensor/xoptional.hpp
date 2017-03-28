@@ -52,6 +52,9 @@ namespace xt
     template <class E, class R = void>
     using disable_xoptional = typename std::enable_if<!is_xoptional<E>::value, R>::type;
 
+    template <class E, class R = void>
+    using enable_xoptional = typename std::enable_if<is_xoptional<E>::value, R>::type;
+
     /**
      * @class xoptional
      * @brief Closure-type based optional handler.
@@ -74,6 +77,9 @@ namespace xt
     class xoptional
     {
     public:
+        using value_closure = CT;
+        using flag_closure = CB;
+
         using value_type = std::decay_t<CT>;
         using flag_type = std::decay_t<CB>;
 
@@ -130,8 +136,8 @@ namespace xt
         // Access
         std::add_lvalue_reference_t<CT> value() & noexcept;
         std::add_lvalue_reference_t<std::add_const_t<CT>> value() const & noexcept;
-        std::conditional_t<std::is_reference<CT>::value, value_type&, value_type> value() && noexcept;
-        std::conditional_t<std::is_reference<CT>::value, const value_type&, const value_type> value() const && noexcept;
+        std::conditional_t<std::is_reference<CT>::value, apply_cv_t<CT, value_type>&, value_type> value() && noexcept;
+        std::conditional_t<std::is_reference<CT>::value, const value_type&, value_type> value() const && noexcept;
 
         template <class U>
         value_type value_or(U&&) const & noexcept;
@@ -141,8 +147,8 @@ namespace xt
         // Access
         std::add_lvalue_reference_t<CB> has_value() & noexcept;
         std::add_lvalue_reference_t<std::add_const_t<CB>> has_value() const & noexcept;
-        std::conditional_t<std::is_reference<CB>::value, flag_type&, value_type> has_value() && noexcept;
-        std::conditional_t<std::is_reference<CB>::value, const flag_type&, const flag_type> has_value() const && noexcept;
+        std::conditional_t<std::is_reference<CB>::value, apply_cv_t<CB, flag_type>&, flag_type> has_value() && noexcept;
+        std::conditional_t<std::is_reference<CB>::value, const flag_type&, flag_type> has_value() const && noexcept;
 
         // Swap
         void swap(xoptional& other);
@@ -375,13 +381,13 @@ namespace xt
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::value() && noexcept -> std::conditional_t<std::is_reference<CT>::value, value_type&, value_type>
+    auto xoptional<CT, CB>::value() && noexcept -> std::conditional_t<std::is_reference<CT>::value, apply_cv_t<CT, value_type>&, value_type>
     {
         return m_value;
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::value() const && noexcept -> std::conditional_t<std::is_reference<CT>::value, const value_type&, const value_type>
+    auto xoptional<CT, CB>::value() const && noexcept -> std::conditional_t<std::is_reference<CT>::value, const value_type&, value_type>
     {
         return m_value;
     }
@@ -414,13 +420,13 @@ namespace xt
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::has_value() && noexcept -> std::conditional_t<std::is_reference<CB>::value, flag_type&, value_type>
+    auto xoptional<CT, CB>::has_value() && noexcept -> std::conditional_t<std::is_reference<CB>::value, apply_cv_t<CB, flag_type>&, flag_type>
     {
         return m_flag;
     }
 
     template <class CT, class CB>
-    auto xoptional<CT, CB>::has_value() const && noexcept -> std::conditional_t<std::is_reference<CB>::value, const flag_type&, const flag_type>
+    auto xoptional<CT, CB>::has_value() const && noexcept -> std::conditional_t<std::is_reference<CB>::value, const flag_type&, flag_type>
     {
         return m_flag;
     }
