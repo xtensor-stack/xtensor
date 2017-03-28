@@ -56,7 +56,7 @@ Outputs:
      {4, 5, 6},
      {7, 8, 9}}
 
-**Broadcasting the ``xt::pow`` universal functions.**
+**Broadcasting the** ``xt::pow`` **universal functions.**
 
 .. code::
 

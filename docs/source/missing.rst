@@ -4,8 +4,6 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-.. _missing-values:
-
 Missing values
 ==============
 
@@ -42,10 +40,11 @@ the reference types of the underlying storage for values and boolean flags.
 This technique enables performance improvements in mathematical operations over boolean arrays including SIMD optimizations, and
 reduces the memory footprint of optional arrays. It should be transparent to the user.
 
-Mathematical operators and missing values
------------------------------------------
+Operating on missing values
+---------------------------
 
-Mathematical operators are overloaded for optional values so that they can be operated upon in the same way as regular scalars.
+Arithmetic operators and mathematical universal functions are overloaded for optional values so that they can be operated upon in the
+same way as regular scalars.
 
 .. code:: cpp
 

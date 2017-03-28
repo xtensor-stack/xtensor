@@ -73,4 +73,4 @@ Missing values
 Support of missing values in numpy can be emulated with the masked array module,
 which provides a means to handle arrays that have missing or invalid data.
 
-Support of missing values in xtensor is done through a notion of optional values, implemented in ``xoptional<T, B>``, which serves both as a value type for container and as a reference proxy for optimized storage types. See :ref:`missing_values`.
+Support of missing values in xtensor is done through a notion of optional values, implemented in ``xoptional<T, B>``, which serves both as a value type for container and as a reference proxy for optimized storage types. See the section of the documentation on :doc:`missing`.
