@@ -5,6 +5,7 @@
    The full license is in the file LICENSE, distributed with this software.
 
 .. image:: http://quantstack.net/assets/images/xtensor.svg
+   :alt: xtensor
 
 Multi-dimensional arrays with broadcasting and lazy computing.
 
@@ -52,7 +53,6 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
    view
    builder
    missing
-   related
 
 .. toctree::
    :caption: API REFERENCE
@@ -77,6 +77,7 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
    numpy
    numpy-differences
    closure-semantics
+   related
 
 .. _NumPy: http://www.numpy.org
 .. _Buffer Protocol: https://docs.python.org/3/c-api/buffer.html

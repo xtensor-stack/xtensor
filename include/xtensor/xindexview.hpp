@@ -363,7 +363,6 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position in the xindexview.
      * @param first iterator starting the sequence of indices
-     * @param last iterator ending the sequence of indices
      * The number of indices in the squence should be equal to or greater 1.
      */
     template <class CT, class I>

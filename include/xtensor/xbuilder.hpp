@@ -769,6 +769,7 @@ namespace xt
      * @brief xexpression with values of arr on the diagonal, zeroes otherwise
      *
      * @param arr the 1D input array of length n
+     * @param k the offset of the considered diagonal
      * @returns xexpression function with shape n x n and arr on the diagonal
      *
      * \code{.cpp}
