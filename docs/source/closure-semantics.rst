@@ -10,14 +10,14 @@ Closure semantics
 The ``xtensor`` library is a tensor expression library implementing numpy-style broadcasting and universal functions, but in a lazy fashion.
 
 If ``x`` and ``y`` are two tensor expressions with compatible shapes, the result of ``x + y`` is not a tensor but an expression that does
-not hold any value. Values of ``x + y`` are computed upon access or when it is assigned to a container such as ``xt::xtensor`` or
+not hold any value. Values of ``x + y`` are computed upon access or when the result is assigned to a container such as ``xt::xtensor`` or
 ``xt::xarray``. The same holds for most functions in xtensor, views, broadcasting views, etc.
 
 In order to be able to perform the differed computation of ``x + y``, the returned expression must hold references, const references or
 copies of the members ``x`` and ``y``, depending on how arguments were passed to ``operator+``. The actual types of held by the expressions
 are the **closure types**.
 
-The concept of closure type is key in the implementation of ``xtensor`` and appears in all the expression defined in xtensor, and the
+The concept of closure type is key in the implementation of ``xtensor`` and appears in all the expressions defined in xtensor, and the
 utility functions and meta functions complements the tools of the standard libary for the move semantics. 
 
 Basic rules for determinning closure types
@@ -30,7 +30,7 @@ The two main requirements are the following:
 
 It is important for the closure type not to be a reference when the passed argument is an rvalue, which can result in dangling references.
 
-Following the idioms of the C++ standard library for naming type traits, we provide two type traits classes providing an implementation of these rules
+Following the conventions of the C++ standard library for naming type traits, we provide two type traits classes providing an implementation of these rules
 in the ``xutils.hpp`` header, ``closure``, and ``const_closure``. The latter adds the const qualifier even when the provided argument is not const.
 
 .. code:: cpp
