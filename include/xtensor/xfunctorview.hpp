@@ -321,7 +321,6 @@ namespace xt
      * Constructs an xfunctorview expression wrappering the specified \ref xexpression.
      *
      * @param e the underlying expression
-     * @param s the shape to apply
      */
     template <class F, class CT>
     inline xfunctorview<F, CT>::xfunctorview(CT e) noexcept
