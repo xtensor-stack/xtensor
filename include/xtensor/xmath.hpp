@@ -17,7 +17,7 @@
 #include <complex>
 #include <type_traits>
 
-#include "xfunction.hpp"
+#include "xoperation.hpp"
 #include "xreducer.hpp"
 
 namespace xt
@@ -27,32 +27,100 @@ namespace xt
      * Helpers *
      ***********/
 
-    namespace detail
-    {
-        template <class R, class... Args, class... E>
-        inline auto make_xfunction(R (*f)(Args...), E&&... e) noexcept
-        {
-            using type = xfunction<R (*)(Args...), R, const_xclosure_t<E>...>;
-            return type(f, std::forward<E>(e)...);
-        }
-
-        template <class... E>
-        using scalar_function_type = common_value_type_t<std::decay_t<E>...> (*)(xvalue_type_t<std::decay_t<E>>...);
-
-        template <class... E>
-        using xfunction_free_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
-                                                     xfunction<scalar_function_type<E...>,
-                                                               common_value_type_t<std::decay_t<E>...>,
-                                                               const_xclosure_t<E>...>>;
-        template <class... E>
-        using bool_scalar_function_type = bool (*)(xvalue_type_t<std::decay_t<E>>...);
-
-        template <class... E>
-        using bool_xfunction_free_type = std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
-                                                          xfunction<bool_scalar_function_type<E...>,
-                                                                    bool,
-                                                                    const_xclosure_t<E>...>>;
+#define UNARY_MATH_FUNCTOR(NAME)\
+    template <class T>\
+    struct NAME##_fun {\
+        using argument_type = T;\
+        using result_type = T;\
+        constexpr T operator()(const T& arg) const {\
+            using std::NAME;\
+            return NAME(arg);\
+        }\
     }
+
+#define BINARY_MATH_FUNCTOR(NAME)\
+    template <class T>\
+    struct NAME##_fun {\
+        using first_argument_type = T;\
+        using second_argument_type = T;\
+        using result_type = T;\
+        constexpr T operator()(const T& arg1, const T& arg2) const {\
+            using std::NAME;\
+            return NAME(arg1, arg2);\
+        }\
+    }
+
+#define TERNARY_MATH_FUNCTOR(NAME)\
+    template <class T>\
+    struct NAME##_fun {\
+        using first_argument_type = T;\
+        using second_argument_type = T;\
+        using third_argument_type = T;\
+        using result_type = T;\
+        constexpr T operator()(const T& arg1, const T& arg2, const T& arg3) const {\
+            using std::NAME;\
+            return NAME(arg1, arg2, arg3);\
+        }\
+    }
+
+#define UNARY_BOOL_FUNCTOR(NAME)\
+    template <class T>\
+    struct NAME##_fun {\
+        using argument_type = T;\
+        using result_type = bool;\
+        constexpr bool operator()(const T& arg) const {\
+            using std::NAME;\
+            return NAME(arg);\
+        }\
+    }
+
+    namespace math
+    {
+        UNARY_MATH_FUNCTOR(abs);
+        UNARY_MATH_FUNCTOR(fabs);
+        BINARY_MATH_FUNCTOR(fmod);
+        BINARY_MATH_FUNCTOR(remainder);
+        TERNARY_MATH_FUNCTOR(fma);
+        BINARY_MATH_FUNCTOR(fmax);
+        BINARY_MATH_FUNCTOR(fmin);
+        BINARY_MATH_FUNCTOR(fdim);
+        UNARY_MATH_FUNCTOR(exp);
+        UNARY_MATH_FUNCTOR(exp2);
+        UNARY_MATH_FUNCTOR(expm1);
+        UNARY_MATH_FUNCTOR(log);
+        UNARY_MATH_FUNCTOR(log10);
+        UNARY_MATH_FUNCTOR(log2);
+        UNARY_MATH_FUNCTOR(log1p);
+        BINARY_MATH_FUNCTOR(pow);
+        UNARY_MATH_FUNCTOR(sqrt);
+        UNARY_MATH_FUNCTOR(cbrt);
+        BINARY_MATH_FUNCTOR(hypot);
+        UNARY_MATH_FUNCTOR(sin);
+        UNARY_MATH_FUNCTOR(cos);
+        UNARY_MATH_FUNCTOR(tan);
+        UNARY_MATH_FUNCTOR(asin);
+        UNARY_MATH_FUNCTOR(acos);
+        UNARY_MATH_FUNCTOR(atan);
+        BINARY_MATH_FUNCTOR(atan2);
+        UNARY_MATH_FUNCTOR(sinh);
+        UNARY_MATH_FUNCTOR(cosh);
+        UNARY_MATH_FUNCTOR(tanh);
+        UNARY_MATH_FUNCTOR(asinh);
+        UNARY_MATH_FUNCTOR(acosh);
+        UNARY_MATH_FUNCTOR(atanh);
+        UNARY_MATH_FUNCTOR(erf);
+        UNARY_MATH_FUNCTOR(erfc);
+        UNARY_MATH_FUNCTOR(tgamma);
+        UNARY_MATH_FUNCTOR(lgamma);
+        UNARY_BOOL_FUNCTOR(isfinite);
+        UNARY_BOOL_FUNCTOR(isinf);
+        UNARY_BOOL_FUNCTOR(isnan);
+    }
+
+#undef UNARY_BOOL_FUNCTOR
+#undef TERNARY_MATH_FUNCTOR
+#undef BINARY_MATH_FUNCTOR
+#undef UNARY_MATH_FUNCTOR
 
     /*******************
      * basic functions *
@@ -73,10 +141,9 @@ namespace xt
      */
     template <class E>
     inline auto abs(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::abs_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::abs, std::forward<E>(e));
+        return detail::make_xfunction<math::abs_fun>(std::forward<E>(e));
     }
 
     /**
@@ -90,10 +157,9 @@ namespace xt
      */
     template <class E>
     inline auto fabs(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::fabs_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::fabs, std::forward<E>(e));
+        return detail::make_xfunction<math::fabs_fun>(std::forward<E>(e));
     }
 
     /**
@@ -109,10 +175,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto fmod(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::fmod_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::fmod, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::fmod_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -128,10 +193,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto remainder(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::remainder_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::remainder, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::remainder_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -148,10 +212,9 @@ namespace xt
      */
     template <class E1, class E2, class E3>
     inline auto fma(E1&& e1, E2&& e2, E3&& e3) noexcept
-        -> detail::xfunction_free_type<E1, E2, E3>
+        -> detail::xfunction_type_t<math::fma_fun, E1, E2, E3>
     {
-        using function_type = detail::scalar_function_type<E1, E2, E3>;
-        return detail::make_xfunction((function_type)std::fma, std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
+        return detail::make_xfunction<math::fma_fun>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
     }
 
     /**
@@ -167,10 +230,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto fmax(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::fmax_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::fmax, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::fmax_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -186,10 +248,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto fmin(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::fmin_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::fmin, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::fmin_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -205,20 +266,25 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto fdim(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::fdim_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::fdim, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::fdim_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
-    namespace detail
+    namespace math
     {
-        // this function will be part of std with C++17
         template <class T>
-        constexpr T clamp(T v, T lo, T hi)
+        struct clamp_fun
         {
-            return v < lo ? lo : hi < v ? hi : v;
-        }
+            using first_argument_type = T;
+            using second_argument_type = T;
+            using third_argument_type = T;
+            using result_type = T;
+            constexpr T operator()(const T& v, const T& lo, const T& hi) const
+            {
+                return v < lo ? lo : hi < v ? hi : v;
+            }
+        };
     }
 
     /**
@@ -235,35 +301,48 @@ namespace xt
      */
     template <class E1, class E2, class E3>
     inline auto clip(E1&& e1, E2&& hi, E3&& lo) noexcept
-        -> detail::xfunction_free_type<E1, E2, E3>
+        -> detail::xfunction_type_t<math::clamp_fun, E1, E2, E3>
     {
-        using function_type = detail::scalar_function_type<E1, E2, E3>;
-        return detail::make_xfunction((function_type)detail::clamp, std::forward<E1>(e1), std::forward<E2>(hi), std::forward<E3>(lo));
+        return detail::make_xfunction<math::clamp_fun>(std::forward<E1>(e1), std::forward<E2>(hi), std::forward<E3>(lo));
     }
 
-    namespace detail
+    namespace math
     {
-        template <typename T>
-        inline constexpr std::enable_if_t<std::is_signed<T>::value, T>
-        sign_impl(T x)
+        namespace detail
         {
-            return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? (T)copysign(T(0), x) : (T)copysign(T(1), x);
+            template <typename T>
+            constexpr std::enable_if_t<std::is_signed<T>::value, T>
+            sign_impl(T x)
+            {
+                return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? (T)copysign(T(0), x) : (T)copysign(T(1), x);
+            }
+
+            template <typename T>
+            inline std::enable_if_t<xt::detail::is_complex<T>::value, T>
+            sign_impl(T x)
+            {
+                typename T::value_type e = x.real() ? x.real() : x.imag();
+                return T(sign_impl(e), 0);
+            }
+
+            template <typename T>
+            constexpr std::enable_if_t<std::is_unsigned<T>::value, T>
+            sign_impl(T x)
+            {
+                return T(x > T(0));
+            }
         }
 
-        template <typename T>
-        inline std::enable_if_t<detail::is_complex<T>::value, T>
-        sign_impl(T x)
+        template <class T>
+        struct sign_fun
         {
-            typename T::value_type e = x.real() ? x.real() : x.imag();
-            return T(sign_impl(e), 0);
-        }
-
-        template <typename T>
-        inline constexpr std::enable_if_t<std::is_unsigned<T>::value, T>
-        sign_impl(T x)
-        {
-            return T(x > T(0));
-        }
+            using argument_type = T;
+            using result_type = T;
+            constexpr T operator()(const T& x) const
+            {
+                return detail::sign_impl(x);
+            }
+        };
     }
 
     /**
@@ -278,68 +357,9 @@ namespace xt
      */
     template <class E>
     inline auto sign(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::sign_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)detail::sign_impl, std::forward<E>(e));
-    }
-
-    namespace detail
-    {
-        // Not using std::isnan and std::isinf as a workaround to the following bug in GCC-6.
-        //
-        // C++11 requires that the <cmath> header declares bool std::isnan(double) and bool std::isinf(double).
-        // C99 requires that the <math.h> header declares int ::isnan(double) and int ::isinf(double).
-        // These two definitions would clash when importing both headers and using namespace std.
-        //
-        // As of version 6, gcc detects whether the obsolete functions are present in the C <math.h> header and uses
-        // them if they are, avoiding the clash. However, this means that the function might return int instead
-        // of bool as C++11 requires, which is a bug.
-        template <class T>
-        inline bool isnan(T x)
-        {
-            return std::isnan(x);
-        }
-
-        template <class T>
-        inline bool isinf(T x)
-        {
-            return std::isinf(x);
-        }
-    }
-
-    /**
-     * @ingroup basic_functions
-     * @brief NaN check
-     *
-     * Returns an \ref xfunction for the element-wise NaN check
-     * tangent of \em e.
-     * @param e an \ref xexpression
-     * @return an \ref xfunction
-     */
-    template <class E>
-    inline auto isnan(E&& e) noexcept
-        -> detail::bool_xfunction_free_type<E>
-    {
-        using function_type = detail::bool_scalar_function_type<E>;
-        return detail::make_xfunction((function_type)detail::isnan<typename std::decay_t<E>::value_type>, std::forward<E>(e));
-    }
-
-    /**
-     * @ingroup basic_functions
-     * @brief infinity check
-     *
-     * Returns an \ref xfunction for the element-wise infinity check
-     * tangent of \em e.
-     * @param e an \ref xexpression
-     * @return an \ref xfunction
-     */
-    template <class E>
-    inline auto isinf(E&& e) noexcept
-        -> detail::bool_xfunction_free_type<E>
-    {
-        using function_type = detail::bool_scalar_function_type<E>;
-        return detail::make_xfunction((function_type)detail::isinf<typename std::decay_t<E>::value_type>, std::forward<E>(e));
+        return detail::make_xfunction<math::sign_fun>(std::forward<E>(e));
     }
 
     /*************************
@@ -361,10 +381,9 @@ namespace xt
      */
     template <class E>
     inline auto exp(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::exp_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::exp, std::forward<E>(e));
+        return detail::make_xfunction<math::exp_fun>(std::forward<E>(e));
     }
 
     /**
@@ -378,10 +397,9 @@ namespace xt
      */
     template <class E>
     inline auto exp2(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::exp2_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::exp2, std::forward<E>(e));
+        return detail::make_xfunction<math::exp2_fun>(std::forward<E>(e));
     }
 
     /**
@@ -395,10 +413,9 @@ namespace xt
      */
     template <class E>
     inline auto expm1(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::expm1_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::expm1, std::forward<E>(e));
+        return detail::make_xfunction<math::expm1_fun>(std::forward<E>(e));
     }
 
     /**
@@ -412,10 +429,9 @@ namespace xt
      */
     template <class E>
     inline auto log(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::log_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::log, std::forward<E>(e));
+        return detail::make_xfunction<math::log_fun>(std::forward<E>(e));
     }
 
     /**
@@ -429,10 +445,9 @@ namespace xt
      */
     template <class E>
     inline auto log10(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::log10_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::log10, std::forward<E>(e));
+        return detail::make_xfunction<math::log10_fun>(std::forward<E>(e));
     }
 
     /**
@@ -446,10 +461,9 @@ namespace xt
      */
     template <class E>
     inline auto log2(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::log2_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::log2, std::forward<E>(e));
+        return detail::make_xfunction<math::log2_fun>(std::forward<E>(e));
     }
 
     /**
@@ -463,10 +477,9 @@ namespace xt
      */
     template <class E>
     inline auto log1p(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::log1p_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::log1p, std::forward<E>(e));
+        return detail::make_xfunction<math::log1p_fun>(std::forward<E>(e));
     }
 
     /*******************
@@ -490,10 +503,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto pow(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::pow_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::pow, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::pow_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -507,10 +519,9 @@ namespace xt
      */
     template <class E>
     inline auto sqrt(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::sqrt_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::sqrt, std::forward<E>(e));
+        return detail::make_xfunction<math::sqrt_fun>(std::forward<E>(e));
     }
 
     /**
@@ -524,10 +535,9 @@ namespace xt
      */
     template <class E>
     inline auto cbrt(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::cbrt_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::cbrt, std::forward<E>(e));
+        return detail::make_xfunction<math::cbrt_fun>(std::forward<E>(e));
     }
 
     /**
@@ -544,10 +554,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto hypot(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::hypot_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::hypot, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::hypot_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /***************************
@@ -569,10 +578,9 @@ namespace xt
      */
     template <class E>
     inline auto sin(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::sin_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::sin, std::forward<E>(e));
+        return detail::make_xfunction<math::sin_fun>(std::forward<E>(e));
     }
 
     /**
@@ -586,10 +594,9 @@ namespace xt
      */
     template <class E>
     inline auto cos(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::cos_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::cos, std::forward<E>(e));
+        return detail::make_xfunction<math::cos_fun>(std::forward<E>(e));
     }
 
     /**
@@ -603,10 +610,9 @@ namespace xt
      */
     template <class E>
     inline auto tan(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::tan_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::tan, std::forward<E>(e));
+        return detail::make_xfunction<math::tan_fun>(std::forward<E>(e));
     }
 
     /**
@@ -620,10 +626,9 @@ namespace xt
      */
     template <class E>
     inline auto asin(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::asin_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::asin, std::forward<E>(e));
+        return detail::make_xfunction<math::asin_fun>(std::forward<E>(e));
     }
 
     /**
@@ -637,10 +642,9 @@ namespace xt
      */
     template <class E>
     inline auto acos(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::acos_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::acos, std::forward<E>(e));
+        return detail::make_xfunction<math::acos_fun>(std::forward<E>(e));
     }
 
     /**
@@ -654,10 +658,9 @@ namespace xt
      */
     template <class E>
     inline auto atan(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::atan_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::atan, std::forward<E>(e));
+        return detail::make_xfunction<math::atan_fun>(std::forward<E>(e));
     }
 
     /**
@@ -674,10 +677,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto atan2(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_free_type<E1, E2>
+        -> detail::xfunction_type_t<math::atan2_fun, E1, E2>
     {
-        using function_type = detail::scalar_function_type<E1, E2>;
-        return detail::make_xfunction((function_type)std::atan2, std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::atan2_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /************************
@@ -699,10 +701,9 @@ namespace xt
      */
     template <class E>
     inline auto sinh(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::sinh_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::sinh, std::forward<E>(e));
+        return detail::make_xfunction<math::sinh_fun>(std::forward<E>(e));
     }
 
     /**
@@ -716,10 +717,9 @@ namespace xt
      */
     template <class E>
     inline auto cosh(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::cosh_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::cosh, std::forward<E>(e));
+        return detail::make_xfunction<math::cosh_fun>(std::forward<E>(e));
     }
 
     /**
@@ -733,10 +733,9 @@ namespace xt
      */
     template <class E>
     inline auto tanh(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::tanh_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::tanh, std::forward<E>(e));
+        return detail::make_xfunction<math::tanh_fun>(std::forward<E>(e));
     }
 
     /**
@@ -750,10 +749,9 @@ namespace xt
      */
     template <class E>
     inline auto asinh(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::asinh_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::asinh, std::forward<E>(e));
+        return detail::make_xfunction<math::asinh_fun>(std::forward<E>(e));
     }
 
     /**
@@ -767,10 +765,9 @@ namespace xt
      */
     template <class E>
     inline auto acosh(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::acosh_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::acosh, std::forward<E>(e));
+        return detail::make_xfunction<math::acosh_fun>(std::forward<E>(e));
     }
 
     /**
@@ -784,10 +781,9 @@ namespace xt
      */
     template <class E>
     inline auto atanh(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::atanh_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::atanh, std::forward<E>(e));
+        return detail::make_xfunction<math::atanh_fun>(std::forward<E>(e));
     }
 
     /*****************************
@@ -809,10 +805,9 @@ namespace xt
      */
     template <class E>
     inline auto erf(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::erf_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::erf, std::forward<E>(e));
+        return detail::make_xfunction<math::erf_fun>(std::forward<E>(e));
     }
 
     /**
@@ -826,10 +821,9 @@ namespace xt
      */
     template <class E>
     inline auto erfc(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::erfc_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::erfc, std::forward<E>(e));
+        return detail::make_xfunction<math::erfc_fun>(std::forward<E>(e));
     }
 
     /**
@@ -843,10 +837,9 @@ namespace xt
      */
     template <class E>
     inline auto tgamma(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::tgamma_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::tgamma, std::forward<E>(e));
+        return detail::make_xfunction<math::tgamma_fun>(std::forward<E>(e));
     }
 
     /**
@@ -860,10 +853,65 @@ namespace xt
      */
     template <class E>
     inline auto lgamma(E&& e) noexcept
-        -> detail::xfunction_free_type<E>
+        -> detail::xfunction_type_t<math::lgamma_fun, E>
     {
-        using function_type = detail::scalar_function_type<E>;
-        return detail::make_xfunction((function_type)std::lgamma, std::forward<E>(e));
+        return detail::make_xfunction<math::lgamma_fun>(std::forward<E>(e));
+    }
+
+    /****************************
+     * classification functions *
+     ****************************/
+
+    /**
+     * @defgroup classif_functions Classification functions
+     */
+      
+    /**
+     * @ingroup classif_functions
+     * @brief finite value check
+     *
+     * Returns an \ref xfunction for the element-wise finite value check
+     * tangent of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto isfinite(E&& e) noexcept
+        -> detail::xfunction_type_t<math::isfinite_fun, E>
+    {
+        return detail::make_xfunction<math::isfinite_fun>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup classif_functions
+     * @brief infinity check
+     *
+     * Returns an \ref xfunction for the element-wise infinity check
+     * tangent of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto isinf(E&& e) noexcept
+        -> detail::xfunction_type_t<math::isinf_fun, E>
+    {
+        return detail::make_xfunction<math::isinf_fun>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup classif_functions
+     * @brief NaN check
+     *
+     * Returns an \ref xfunction for the element-wise NaN check
+     * tangent of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto isnan(E&& e) noexcept
+        -> detail::xfunction_type_t<math::isnan_fun, E>
+    {
+        return detail::make_xfunction<math::isnan_fun>(std::forward<E>(e));
     }
 
     /**********************

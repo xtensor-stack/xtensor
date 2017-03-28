@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-Notable differences with numpy APIs
-===================================
+Notable differences with numpy
+==============================
 
 .. image:: numpy.svg
    :height: 100px
