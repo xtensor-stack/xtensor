@@ -345,7 +345,8 @@ namespace xt
         template <class R, class U, std::size_t... I>
         constexpr R initializer_shape(U t, std::index_sequence<I...>)
         {
-            return {initializer_shape_impl<I>::value(t)...};
+            using size_type = typename R::value_type;
+            return { size_type(initializer_shape_impl<I>::value(t))... };
         }
     }
 
