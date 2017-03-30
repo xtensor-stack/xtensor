@@ -14,7 +14,7 @@ The xtensor-python_ project provides the implementation of container types compa
 system,  ``pyarray`` and ``pytensor`` which effectively wrap numpy arrays, allowing operating on numpy arrays inplace.
 
 Example 1: Use an algorithm of the C++ library on a numpy array inplace
------------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **C++ code**
 
@@ -63,7 +63,7 @@ Example 1: Use an algorithm of the C++ library on a numpy array inplace
 
 
 Example 2: Create a universal function from a C++ scalar function
------------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **C++ code**
 
