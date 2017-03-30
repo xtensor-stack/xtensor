@@ -12,4 +12,7 @@ xarray
    :members:
 
 .. doxygentypedef:: xt::xarray
-    :project: xtensor
+   :project: xtensor
+
+.. doxygenfunction:: xt::move_reshape(xarray_container<EC, SC>&&, const SC&, const SC&)
+   :project: xtensor

@@ -10,3 +10,6 @@ xarray_adaptor
 .. doxygenclass:: xt::xarray_adaptor
    :project: xtensor
    :members:
+
+.. doxygenfunction:: xt::move_reshape(xarray_adaptor<EC, SC>&&, const SC&, const SC&)
+   :project: xtensor
