@@ -738,16 +738,11 @@ namespace xt
 
         std::size_t dim_1 = shape[axis_1];
         std::size_t dim_2 = shape[axis_2];
-
         std::size_t n_dim = arr.dimension();
 
         offset >= 0 ? dim_2 -= offset : dim_1 += offset;
 
         auto diag_size = dim_2 < dim_1 ? dim_2 : dim_1;
-        if (diag_size < 0)
-        {
-            diag_size = 0;
-        }
 
         std::size_t i = 0;
         for (std::size_t idim = 0; idim < n_dim; ++idim)
