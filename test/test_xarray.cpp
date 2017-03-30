@@ -172,5 +172,15 @@ namespace xt
         xarray<int> a;
         EXPECT_EQ(0, a());
     }
+
+    TEST(xarray, move_reshape)
+    {
+        xarray<int> a = { { 1, 2, 3, 4, 5, 6 },{ 7, 8, 9, 10, 11, 12 } };
+        std::vector<size_t> shape = { 2, 2, 3 };
+        xarray<int> b = move_reshape(a, shape);
+        EXPECT_EQ(1, b(0, 0, 0));
+        EXPECT_EQ(5, b(0, 1, 1));
+        EXPECT_EQ(12, b(1, 1, 2));
+    }
 }
 

@@ -10,3 +10,6 @@ xtensor_adaptor
 .. doxygenclass:: xt::xtensor_adaptor
    :project: xtensor
    :members:
+
+.. doxygenfunction:: xt::move_reshape(xtensor_adaptor<EC, N1>&&, const std::array<typename EC::size_type, N2>&, const std::array<typename EC::size_type, N2>&)
+   :project: xtensor
