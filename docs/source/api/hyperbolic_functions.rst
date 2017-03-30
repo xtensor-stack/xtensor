@@ -9,6 +9,8 @@ Hyperbolic functions
 
 **xtensor** provides the following hyperbolic functions for xexpressions:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: hyper_functions
    :project: xtensor
    :content-only:

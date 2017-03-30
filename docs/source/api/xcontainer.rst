@@ -7,6 +7,8 @@
 xcontainer
 ==========
 
+Defined in ``xtensor/xcontainer.hpp``
+
 .. doxygenclass:: xt::xcontainer
    :project: xtensor
    :members:

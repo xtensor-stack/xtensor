@@ -10,6 +10,8 @@ Power functions
 
 **xtensor** provides the following power functions for xexpressions and scalars:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: pow_functions
    :project: xtensor
    :content-only:

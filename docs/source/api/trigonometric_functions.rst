@@ -9,6 +9,8 @@ Trigonometric functions
 
 **xtensor** provides the following trigonometric functions for xexpressions and scalars:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: trigo_functions
    :project: xtensor
    :content-only:

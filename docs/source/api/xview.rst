@@ -7,12 +7,16 @@
 xview
 =====
 
+Defined in ``xtensor/xview.hpp``
+
 .. doxygenclass:: xt::xview
    :project: xtensor
    :members:
 
 .. doxygenfunction:: xt::view
    :project: xtensor
+
+Defined in ``xtensor/xslice.hpp``
 
 .. doxygenfunction:: xt::range(T, T)
    :project: xtensor

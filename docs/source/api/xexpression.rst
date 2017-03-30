@@ -7,6 +7,8 @@
 xexpression
 ===========
 
+Defined in ``xtensor/xexpression.hpp``
+
 .. doxygenclass:: xt::xexpression
    :project: xtensor
    :members:

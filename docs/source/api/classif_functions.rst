@@ -9,6 +9,8 @@ Classification functions
 
 **xtensor** provides the following classification functions for xexpressions and scalars:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: classif_functions
    :project: xtensor
    :content-only:

@@ -7,6 +7,8 @@
 xbuilder
 ========
 
+Defined in ``xtensor/xbuilder.hpp``
+
 .. doxygenfunction:: xt::ones(S)
    :project: xtensor
 

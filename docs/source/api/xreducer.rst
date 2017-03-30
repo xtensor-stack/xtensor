@@ -7,6 +7,8 @@
 xreducer
 ========
 
+Defined in ``xtensor/xreducer.hpp``
+
 .. doxygenclass:: xt::xreducer
    :project: xtensor
    :members:

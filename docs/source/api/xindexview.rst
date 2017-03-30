@@ -7,6 +7,8 @@
 xindexview
 ==========
 
+Defined in ``xtensor/xindexview.hpp``
+
 .. doxygenclass:: xt::xindexview
    :project: xtensor
    :members:

@@ -54,8 +54,7 @@ namespace xt
      *
      * @tparam EC The type of the container holding the elements.
      * @tparam N The dimension of the container.
-     * @sa xtensor
-     * @sa move_reshape
+     * @sa xtensor, move_reshape
      */
     template <class EC, size_t N>
     class xtensor_container : public xstrided_container<xtensor_container<EC, N>>,

@@ -7,6 +7,8 @@
 xiterable
 =========
 
+Defined in ``xtensor/xiterable.hpp``
+
 .. doxygenclass:: xt::xconst_iterable
    :project: xtensor
    :members:

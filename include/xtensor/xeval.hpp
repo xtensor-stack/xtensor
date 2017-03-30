@@ -37,6 +37,7 @@ namespace xt
         return t;
     }
 
+    /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class T, class I = std::decay_t<T>>
     inline auto eval(T&& t)
         -> std::enable_if_t<!detail::is_container<I>::value && detail::is_array<typename I::shape_type>::value, xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>>
@@ -50,6 +51,7 @@ namespace xt
     {
         return xarray<typename I::value_type>(std::forward<T>(t));
     }
+    /// @endcond
 }
 
 #endif
