@@ -7,6 +7,8 @@
 xrandom
 =======
 
+Defined in ``xtensor/xrandom.hpp``
+
 .. doxygenfunction:: xt::random::get_default_random_engine
    :project: xtensor
 

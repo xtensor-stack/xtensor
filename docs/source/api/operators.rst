@@ -7,6 +7,8 @@
 Operators
 =========
 
+Defined in ``xtensor/xoperation.hpp``
+
 Arithmetic operators
 --------------------
 

@@ -7,6 +7,8 @@
 xfunction
 =========
 
+Defined in ``xtensor/xfunction.hpp``
+
 .. doxygenclass:: xt::xfunction
    :project: xtensor
    :members:

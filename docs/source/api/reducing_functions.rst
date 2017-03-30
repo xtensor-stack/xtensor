@@ -9,6 +9,8 @@ Reducing functions
 
 **xtensor** provides the following reducing functions for xexpressions:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: red_functions
    :project: xtensor
    :content-only:

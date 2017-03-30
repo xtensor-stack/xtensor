@@ -7,6 +7,8 @@
 xarray_adaptor
 ==============
 
+Defined in ``xtensor/xarray.hpp``
+
 .. doxygenclass:: xt::xarray_adaptor
    :project: xtensor
    :members:

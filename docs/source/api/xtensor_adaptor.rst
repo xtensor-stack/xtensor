@@ -7,6 +7,8 @@
 xtensor_adaptor
 ===============
 
+Defined in ``xtensor/xtensor.hpp``
+
 .. doxygenclass:: xt::xtensor_adaptor
    :project: xtensor
    :members:

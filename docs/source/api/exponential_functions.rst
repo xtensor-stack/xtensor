@@ -9,6 +9,8 @@ Exponential functions
 
 **xtensor** provides the following exponential functions for xexpressions:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: exp_functions
    :project: xtensor
    :content-only:

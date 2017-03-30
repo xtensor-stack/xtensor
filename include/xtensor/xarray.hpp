@@ -51,8 +51,7 @@ namespace xt
      *
      * @tparam EC The type of the container holding the elements.
      * @tparam SC The type of the containers holding the shape and the strides.
-     * @sa xarray
-     * @sa move_reshape
+     * @sa xarray,  move_reshape
      */
     template <class EC, class SC>
     class xarray_container : public xstrided_container<xarray_container<EC, SC>>,

@@ -9,6 +9,8 @@ Basic functions
 
 **xtensor** provides the following basic functions for xexpressions and scalars:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: basic_functions
    :project: xtensor
    :content-only:

@@ -9,6 +9,8 @@ Error and gamma functions
 
 **xtensor** provides the following error and gamma functions for xexpressions:
 
+Defined in ``xtensor/xmath.hpp``
+
 .. doxygengroup:: err_functions
    :project: xtensor
    :content-only:

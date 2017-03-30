@@ -7,9 +7,13 @@
 xfunctorview
 ============
 
+Defined in ``xtensor/xfunctorview.hpp``
+
 .. doxygenclass:: xt::xfunctorview
    :project: xtensor
    :members:
+
+Defined in ``xtensor/xcomplex.hpp``
 
 .. doxygenfunction:: xt::real(E&&)
    :project: xtensor

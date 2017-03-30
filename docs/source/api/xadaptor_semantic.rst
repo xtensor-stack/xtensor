@@ -7,6 +7,8 @@
 xadaptor_semantic
 =================
 
+Defined in ``xtensor/xsemantic.hpp``
+
 .. doxygenclass:: xt::xadaptor_semantic
    :project: xtensor
    :members:
