@@ -14,9 +14,11 @@ Build
 
 - ``BUILD_TESTS``: enables the ``xtest`` and ``xbenchmark`` targets (see below).
 - ``DOWNLOAD_GTEST``: downloads ``gtest`` and builds it locally instead of using a binary installation.
+- ``GTEST_SRC_DIR``: indicates where to find the ``gtest`` sources instead of downloading them.
 - ``XTENSOR_ENABLE_ASSERT``: activates the assertions in ``xtensor``.
 
-All these options are disabled by default.
+All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or setting ``GTEST_SRC_DIR``
+enables ``BUILD_TESTS``.
 
 If the ``BUILD_TESTS`` option is enabled, the following targets are available:
 
@@ -31,6 +33,16 @@ For instance, building the test suite of ``xtensor`` with assertions enabled:
     cd build
     cmake -DBUILD_TESTS=ON -DXTENSOR_ENABLE_ASSERT=ON ../
     make xtest
+
+Building the test suite of ``xtensor`` where the sources of ``gtest`` are located in e.g. ``/usr/share/gtest``:
+
+.. code::
+
+    mkdir build
+    cd build
+    cmake -DGTEST_SRC_DIR=/usr/share/gtest ../
+    make xtest
+
 
 Configuration
 -------------
