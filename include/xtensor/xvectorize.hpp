@@ -71,7 +71,7 @@ namespace xt
     template <class... E>
     inline auto xvectorizer<F, R>::operator()(E&&... e) const -> xfunction_type<E...>
     {
-        return xfunction_type<E...>(m_f, e...);
+        return xfunction_type<E...>(m_f, std::forward<E>(e)...);
     }
 
     template <class R, class... Args>
