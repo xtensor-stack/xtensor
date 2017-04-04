@@ -19,11 +19,17 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
-    template <class EC, class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
-                                                           typename EC::allocator_type,
-                                                           std::allocator<typename EC::size_type>)>
+    template <class EC, class L, class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
+                                                                    typename EC::allocator_type,
+                                                                    std::allocator<typename EC::size_type>)>
     class xarray_container;
 
+    namespace layout_type
+    {
+        struct dynamic;
+        struct row_major;
+        struct column_major;
+    }
     /**
      * @typedef xarray
      * Alias template on xarray_container with default parameters for data container
@@ -43,8 +49,8 @@ namespace xt
      * @tparam A The allocator of the container holding the elements.
      * @tparam SA The allocator of the containers holding the shape and the strides.
      */
-    template <class T, class A = std::allocator<T>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
-    using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
+    template <class T, class L = layout_type::row_major, class A = std::allocator<T>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
+    using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
     template <class EC, std::size_t N>
     class xtensor_container;

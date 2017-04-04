@@ -32,6 +32,19 @@ namespace xt
         };
     }
 
+    namespace layout_type
+    {
+        struct dynamic
+        {
+        };
+        struct row_major
+        {
+        };
+        struct column_major
+        {
+        };
+    }
+
     template <class D>
     struct xcontainer_iterable_types
     {
@@ -200,7 +213,7 @@ namespace xt
      * @tparam D The derived type, i.e. the inheriting class for which xstrided
      *           provides the partial imlpementation of xcontainer.
      */
-    template <class D>
+    template <class D, class L = layout_type::row_major>
     class xstrided_container : public xcontainer<D>
     {
 
@@ -208,6 +221,7 @@ namespace xt
 
         using base_type = xcontainer<D>;
         using container_type = typename base_type::container_type;
+        using layout_type = L;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
@@ -713,38 +727,38 @@ namespace xt
      * xstrided_container implementation *
      *************************************/
 
-    template <class D>
-    inline auto xstrided_container<D>::shape_impl() noexcept -> inner_shape_type&
+    template <class D, class L>
+    inline auto xstrided_container<D, L>::shape_impl() noexcept -> inner_shape_type&
     {
         return m_shape;
     }
 
-    template <class D>
-    inline auto xstrided_container<D>::shape_impl() const noexcept -> const inner_shape_type&
+    template <class D, class L>
+    inline auto xstrided_container<D, L>::shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
 
-    template <class D>
-    inline auto xstrided_container<D>::strides_impl() noexcept -> inner_strides_type&
+    template <class D, class L>
+    inline auto xstrided_container<D, L>::strides_impl() noexcept -> inner_strides_type&
     {
         return m_strides;
     }
 
-    template <class D>
-    inline auto xstrided_container<D>::strides_impl() const noexcept -> const inner_strides_type&
+    template <class D, class L>
+    inline auto xstrided_container<D, L>::strides_impl() const noexcept -> const inner_strides_type&
     {
         return m_strides;
     }
 
-    template <class D>
-    inline auto xstrided_container<D>::backstrides_impl() noexcept -> inner_backstrides_type&
+    template <class D, class L>
+    inline auto xstrided_container<D, L>::backstrides_impl() noexcept -> inner_backstrides_type&
     {
         return m_backstrides;
     }
 
-    template <class D>
-    inline auto xstrided_container<D>::backstrides_impl() const noexcept -> const inner_backstrides_type&
+    template <class D, class L>
+    inline auto xstrided_container<D, L>::backstrides_impl() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
     }
@@ -753,8 +767,8 @@ namespace xt
      * Reshapes the container.
      * @param shape the new shape
      */
-    template <class D>
-    inline void xstrided_container<D>::reshape(const shape_type& shape)
+    template <class D, class L>
+    inline void xstrided_container<D, L>::reshape(const shape_type& shape)
     {
         if (shape != m_shape)
         {
@@ -767,8 +781,8 @@ namespace xt
      * @param shape the new shape
      * @param l the new layout
      */
-    template <class D>
-    inline void xstrided_container<D>::reshape(const shape_type& shape, layout l)
+    template <class D, class L>
+    inline void xstrided_container<D, L>::reshape(const shape_type& shape, layout l)
     {
         m_shape = shape;
         resize_container(m_strides, m_shape.size());
@@ -782,8 +796,8 @@ namespace xt
      * @param shape the new shape
      * @param strides the new strides
      */
-    template <class D>
-    inline void xstrided_container<D>::reshape(const shape_type& shape, const strides_type& strides)
+    template <class D, class L>
+    inline void xstrided_container<D, L>::reshape(const shape_type& shape, const strides_type& strides)
     {
         m_shape = shape;
         m_strides = strides;
