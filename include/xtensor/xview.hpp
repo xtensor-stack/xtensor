@@ -150,6 +150,10 @@ namespace xt
         const_stepper stepper_end(const ST& shape) const;
 
         template <class T = xexpression_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, typename T::container_type&>
+        data();
+
+        template <class T = xexpression_type>
         std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&>
         data() const;
 
@@ -158,12 +162,12 @@ namespace xt
         strides() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const value_type*>
-        raw_data() const;
-
-        template <class T = xexpression_type>
         std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, value_type*>
         raw_data();
+
+        template <class T = xexpression_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const value_type*>
+        raw_data() const;
 
         template <class T = xexpression_type>
         std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::size_type>
@@ -420,11 +424,20 @@ namespace xt
      */
     template <class E, class... S>
     template <class T>
+    inline auto xview<E, S...>::data() ->
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, typename T::container_type&>
+    {
+        return m_e.data();
+    }
+
+    template <class E, class... S>
+    template <class T>
     inline auto xview<E, S...>::data() const ->
         std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&>
     {
         return m_e.data();
     }
+
 
     /**
      * Return the strides for the underlying container of the view.

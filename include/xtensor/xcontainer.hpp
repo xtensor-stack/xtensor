@@ -22,16 +22,6 @@
 namespace xt
 {
 
-    namespace check_policy
-    {
-        struct none
-        {
-        };
-        struct full
-        {
-        };
-    }
-
     namespace layout_type
     {
         struct dynamic
@@ -114,19 +104,6 @@ namespace xt
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
 
-        void transpose();
-
-        template <class S, class Tag = check_policy::none>
-        void transpose(S&& permutation, Tag check_policy = Tag());
-
-#ifdef X_OLD_CLANG
-        template <class I, class Tag = check_policy::none>
-        void transpose(std::initializer_list<I> permutation, Tag check_policy = Tag());
-#else
-        template <class I, std::size_t N, class Tag = check_policy::none>
-        void transpose(const I (&permutation)[N], Tag check_policy = Tag());
-#endif
-
         template <class... Args>
         reference operator()(Args... args);
 
@@ -186,12 +163,6 @@ namespace xt
         xcontainer& operator=(xcontainer&&) = default;
 
     private:
-
-        template <class S>
-        void transpose_impl(S&& permutation, check_policy::none);
-
-        template <class S>
-        void transpose_impl(S&& permutation, check_policy::full);
 
         inner_shape_type& mutable_shape();
         inner_strides_type& mutable_strides();
@@ -346,100 +317,6 @@ namespace xt
     inline auto xcontainer<D>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return derived_cast().backstrides_impl();
-    }
-
-    /**
-     * Transposes the container inplace by reversing the dimensions.
-     */
-    template <class D>
-    inline void xcontainer<D>::transpose()
-    {
-        // reverse stride and shape
-        std::reverse(mutable_shape().begin(), mutable_shape().end());
-        std::reverse(mutable_strides().begin(), mutable_strides().end());
-        std::reverse(mutable_backstrides().begin(), mutable_backstrides().end());
-    }
-
-    /**
-     * Transposes the container inplace by permuting the shape with @p permutation.
-     * @param permutation the sequence containing permutation
-     * @param check_policy the check level (check_policy::full() or check_policy::none())
-     * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
-     */
-    template <class D>
-    template <class S, class Tag>
-    inline void xcontainer<D>::transpose(S&& permutation, Tag check_policy)
-    {
-        transpose_impl(std::forward<S>(permutation), check_policy);
-    }
-
-#ifdef X_OLD_CLANG
-    template <class D>
-    template <class I, class Tag>
-    inline void xcontainer<D>::transpose(std::initializer_list<I> permutation, Tag check_policy)
-    {
-        std::vector<I> perm(permutation);
-        transpose_impl(std::move(perm), check_policy);
-    }
-#else
-    template <class D>
-    template <class I, std::size_t N, class Tag>
-    inline void xcontainer<D>::transpose(const I (&permutation)[N], Tag check_policy)
-    {
-        transpose_impl(permutation, check_policy);
-    }
-#endif
-
-    template <class D>
-    template <class S>
-    inline void xcontainer<D>::transpose_impl(S&& permutation, check_policy::full)
-    {
-        // check if axis appears twice in permutation
-        for (size_type i = 0; i < container_size(permutation); ++i)
-        {
-            for (size_type j = i + 1; j < container_size(permutation); ++j)
-            {
-                if (permutation[i] == permutation[j])
-                {
-                    throw transpose_error("Permutation contains axis more than once");
-                }
-            }
-        }
-        transpose_impl(permutation, check_policy::none());
-    }
-
-    template <class D>
-    template <class S>
-    inline void xcontainer<D>::transpose_impl(S&& permutation, check_policy::none)
-    {
-        if (container_size(permutation) != dimension())
-        {
-            throw transpose_error("Permutation does not have the same size as shape");
-        }
-
-        // permute stride and shape
-        strides_type temp_strides;
-        resize_container(temp_strides, strides().size());
-
-        shape_type temp_shape;
-        resize_container(temp_shape, shape().size());
-
-        shape_type temp_backstrides;
-        resize_container(temp_backstrides, backstrides().size());
-
-        for (size_type i = 0; i < shape().size(); ++i)
-        {
-            if (size_type(permutation[i]) >= dimension())
-            {
-                throw transpose_error("Permutation contains wrong axis");
-            }
-            temp_shape[i] = shape()[permutation[i]];
-            temp_strides[i] = strides()[permutation[i]];
-            temp_backstrides[i] = backstrides()[permutation[i]];
-        }
-        mutable_shape() = std::move(temp_shape);
-        mutable_strides() = std::move(temp_strides);
-        mutable_backstrides() = std::move(temp_backstrides);
     }
     //@}
 

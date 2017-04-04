@@ -54,6 +54,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstorage.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstrides.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xstridedview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_forward.hpp
