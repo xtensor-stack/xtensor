@@ -101,7 +101,7 @@ namespace xt
         using base_index_type = xindex_type_t<shape_type>;
 
         template <class I>
-        xstrided_view(CT e, I&& shape, I&& strides) noexcept;
+        xstrided_view(CT e, I&& shape, I&& strides, std::size_t offset) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -153,6 +153,7 @@ namespace xt
         CT m_e;
         const shape_type m_shape;
         const strides_type m_strides;
+        const std::size_t m_offset;
 
         void assign_temporary_impl(temporary_type& tmp);
 
@@ -176,8 +177,8 @@ namespace xt
      */
     template <class CT>
     template <class I>
-    inline xstrided_view<CT>::xstrided_view(CT e, I&& shape, I&& strides) noexcept
-        : m_e(e), m_shape(std::forward<I>(shape)), m_strides(std::forward<I>(strides))
+    inline xstrided_view<CT>::xstrided_view(CT e, I&& shape, I&& strides, std::size_t offset) noexcept
+        : m_e(e), m_shape(std::forward<I>(shape)), m_strides(std::forward<I>(strides)), m_offset(offset)
     {
     }
     //@}
@@ -269,7 +270,7 @@ namespace xt
     inline auto xstrided_view<CT>::operator()(Args... args) -> reference
     {
         XTENSOR_ASSERT(check_index(shape(), args...));
-        size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        size_type index = m_offset + data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return m_e.data()[index];
     }
 
@@ -283,7 +284,7 @@ namespace xt
     inline auto xstrided_view<CT>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_ASSERT(check_index(shape(), args...));
-        size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        size_type index = m_offset + data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return m_e.data()[index];
     }
 
@@ -320,14 +321,14 @@ namespace xt
     template <class It>
     inline auto xstrided_view<CT>::element(It first, It last) -> reference
     {
-        return m_e.data()[element_offset<size_type>(strides(), first, last)];
+        return m_e.data()[m_offset + element_offset<size_type>(strides(), first, last)];
     }
 
     template <class CT>
     template <class It>
     inline auto xstrided_view<CT>::element(It first, It last) const -> const_reference
     {
-        return m_e.data()[element_offset<size_type>(strides(), first, last)];
+        return m_e.data()[m_offset + element_offset<size_type>(strides(), first, last)];
     }
     //@}
 
@@ -397,10 +398,10 @@ namespace xt
     }
 
     template <class E, class I>
-    inline auto strided_view(E&& e, I&& shape, I&& strides) noexcept
+    inline auto strided_view(E&& e, I&& shape, I&& strides, std::size_t offset = 0) noexcept
     {
         using view_type = xstrided_view<xclosure_t<E>>;
-        return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides));
+        return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides), offset);
     }
 
     template <class E>
@@ -412,20 +413,67 @@ namespace xt
         shape_type strides(e.strides().rbegin(), e.strides().rend());
 
         using view_type = xstrided_view<xclosure_t<E>>;
-        return view_type(std::forward<E>(e), std::move(shape), std::move(strides));
+        return view_type(std::forward<E>(e), std::move(shape), std::move(strides), 0);
     }
 
     template <class E>
-    inline auto diag_view(E&& e) noexcept
+    inline auto diagonal_view(E&& e, int offset = 0, std::size_t axis_1 = 0, std::size_t axis_2 = 1) noexcept
     {
         using shape_type = typename std::decay_t<E>::shape_type;
 
-        shape_type shape(e.shape().rbegin(), e.shape().rend() - 1);
-        shape_type strides(e.strides().rbegin(), e.strides().rend() - 1);
-        strides.back() += e.strides()[0];
+
+        auto shape = e.shape();
+        auto strides = e.strides();
+
+        // the following shape calculation code is an almost verbatim adaptation of numpy:
+        // https://github.com/numpy/numpy/blob/2aabeafb97bea4e1bfa29d946fbf31e1104e7ae0/numpy/core/src/multiarray/item_selection.c#L1799
+
+        auto ret_shape = std::vector<std::size_t>(e.dimension());
+        auto ret_strides = std::vector<std::size_t>(e.dimension());
+
+        std::size_t dim_1 = shape[axis_1];
+        std::size_t dim_2 = shape[axis_2];
+        std::size_t stride_1 = strides[axis_1];
+        std::size_t stride_2 = strides[axis_2];
+        std::size_t offset_stride = 0;
+
+        std::size_t n_dim = e.dimension();
+
+        if (offset >= 0)
+        {
+            offset_stride = stride_2;
+            dim_2 -= offset;
+        }
+        else
+        {
+            offset = -offset;
+            offset_stride = stride_1;
+            dim_1 -= offset;
+        }
+
+        auto diag_size = dim_2 < dim_1 ? dim_2 : dim_1;
+
+        auto data_offset = offset * offset_stride;
+
+        std::size_t i = 0;
+        for (std::size_t idim = 0; idim < n_dim; ++idim)
+        {
+            if (idim != axis_1 && idim != axis_2)
+            {
+                ret_shape[i] = shape[idim];
+                ret_strides[i] = strides[idim];
+                ++i;
+            }
+        }
+
+        ret_shape[n_dim - 2] = diag_size;
+        ret_strides[n_dim - 2] = stride_1 + stride_2;
+
+        ret_shape.pop_back();
+        ret_strides.pop_back();
 
         using view_type = xstrided_view<xclosure_t<E>>;
-        return view_type(std::forward<E>(e), std::move(shape), std::move(strides));
+        return view_type(e, std::move(ret_shape), std::move(ret_strides), data_offset);
     }
 }
 
