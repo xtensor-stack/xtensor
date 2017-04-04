@@ -119,7 +119,7 @@ namespace xt
      * xarray_adaptor declaration *
      ******************************/
 
-    template <class EC, class L, class SC = std::vector<typename EC::size_type>>
+    template <class EC, class L = layout_type::row_major, class SC = std::vector<typename EC::size_type>>
     class xarray_adaptor;
 
     template <class EC, class L, class SC>
@@ -199,8 +199,8 @@ namespace xt
         friend class xcontainer<xarray_adaptor<EC, L, SC>>;
         friend class xadaptor_semantic<xarray_adaptor<EC, L, SC>>;
 
-        template <class EC2, class SC2>
-        friend xarray_adaptor<EC2, SC2> move_reshape(xarray_adaptor<EC2, SC2>&& data, const SC2& shape, const SC2& strides);
+        template <class EC2, class L2, class SC2>
+        friend xarray_adaptor<EC2, L2, SC2> move_reshape(xarray_adaptor<EC2, L2, SC2>&& data, const SC2& shape, const SC2& strides);
     };
 
     /****************
