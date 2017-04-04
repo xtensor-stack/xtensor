@@ -54,7 +54,7 @@ namespace xt
      *
      * @tparam EC The type of the container holding the elements.
      * @tparam N The dimension of the container.
-     * @sa xtensor, move_reshape
+     * @sa xtensor
      */
     template <class EC, size_t N>
     class xtensor_container : public xstrided_container<xtensor_container<EC, N>>,
@@ -72,7 +72,9 @@ namespace xt
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
         using shape_type = typename base_type::shape_type;
+        using inner_shape_type = typename base_type::inner_shape_type;
         using strides_type = typename base_type::strides_type;
+        using inner_strides_type = typename base_type::inner_strides_type;
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
@@ -80,6 +82,7 @@ namespace xt
         explicit xtensor_container(const shape_type& shape, const_reference value, layout l = layout::row_major);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value);
+        explicit xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
 
         ~xtensor_container() = default;
 
@@ -97,19 +100,12 @@ namespace xt
 
     private:
 
-        xtensor_container(EC&& data, const shape_type& shape, const strides_type& strides);
-
         container_type m_data;
 
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
         friend class xcontainer<xtensor_container<EC, N>>;
-
-        template <class EC2, size_t N1, size_t N2>
-        friend xtensor_container<EC2, N2> move_reshape(xtensor_container<EC2, N1>&& t,
-                                                       const std::array<typename EC2::size_type, N2>& shape,
-                                                       const std::array<typename EC2::size_type, N2>& strides);
     };
 
     /*****************************************
@@ -150,7 +146,6 @@ namespace xt
      *
      * @tparam EC The container type to adapt.
      * @tparam N The dimension of the adaptor.
-     * @sa move_reshape
      */
     template <class EC, std::size_t N>
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N>>,
@@ -182,8 +177,6 @@ namespace xt
 
     private:
 
-        xtensor_adaptor(EC&& data, const shape_type& shape, const strides_type& strides);
-
         container_type& m_data;
 
         container_type& data_impl() noexcept;
@@ -194,36 +187,7 @@ namespace xt
 
         friend class xcontainer<xtensor_adaptor<EC, N>>;
         friend class xadaptor_semantic<xtensor_adaptor<EC, N>>;
-
-        template <class EC2, size_t N1, size_t N2>
-        friend xtensor_adaptor<EC2, N2> move_reshape(xtensor_adaptor<EC2, N1>&& t,
-                                                     const std::array<typename EC2::size_type, N2>& shape,
-                                                     const std::array<typename EC2::size_type, N2>& strides);
     };
-
-    /****************
-     * move_reshape *
-     ****************/
-
-    template <template <class, size_t> class C, class EC, size_t N1, size_t N2>
-    C<EC, N2> move_reshape(C<EC, N1>& t, const std::array<typename EC::size_type, N2>& shape);
-
-    template <template <class, size_t> class C, class EC, size_t N1, size_t N2>
-    C<EC, N2> move_reshape(C<EC, N1>&& t, const std::array<typename EC::size_type, N2>& shape);
-
-    template <template <class, size_t> class C, class EC, size_t N1, size_t N2>
-    C<EC, N2> move_reshape(C<EC, N1>& t, const std::array<typename EC::size_type, N2>& shape,
-                                         const std::array<typename EC::size_type, N2>& strides);
-
-    template <class EC, size_t N1, size_t N2>
-    xtensor_container<EC, N2> move_reshape(xtensor_container<EC, N1>&& t,
-                                           const std::array<typename EC::size_type, N2>& shape,
-                                           const std::array<typename EC::size_type, N2>& strides);
-
-    template <class EC, size_t N1, size_t N2>
-    xtensor_adaptor<EC, N2> move_reshape(xtensor_adaptor<EC, N1>&& t,
-                                         const std::array<typename EC::size_type, N2>& shape,
-                                         const std::array<typename EC::size_type, N2>& strides);
 
     /************************************
      * xtensor_container implementation *
@@ -307,6 +271,19 @@ namespace xt
         base_type::reshape(shape, strides);
         std::fill(m_data.begin(), m_data.end(), value);
     }
+
+    /**
+     * Allocates an xtensor_container by moving specified data, shape and strides
+     *
+     * @param data the data for the xtensor_container
+     * @param shape the shape of the xtensor_container
+     * @param strides the strides of the xtensor_container
+     */
+    template <class EC, std::size_t N>
+    inline xtensor_container<EC, N>::xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
+        : base_type(std::move(shape), std::move(strides)), m_data(std::move(data))
+    {
+    }
     //@}
 
     /**
@@ -334,15 +311,6 @@ namespace xt
         return semantic_base::operator=(e);
     }
     //@}
-
-    template <class EC, std::size_t N>
-    inline xtensor_container<EC, N>::xtensor_container(EC&& data,
-                                                       const shape_type& shape,
-                                                       const strides_type& strides)
-        : base_type(), m_data(std::move(data))
-    {
-        base_type::reshape(shape, strides);
-    }
 
     template <class EC, std::size_t N>
     inline auto xtensor_container<EC, N>::data_impl() noexcept -> container_type&
@@ -435,15 +403,6 @@ namespace xt
     //@}
 
     template <class EC, std::size_t N>
-    inline xtensor_adaptor<EC, N>::xtensor_adaptor(EC&& data,
-                                                   const shape_type& shape,
-                                                   const strides_type& strides)
-        : base_type(), m_data(data)
-    {
-        base_type::reshape(shape, strides);
-    }
-
-    template <class EC, std::size_t N>
     inline auto xtensor_adaptor<EC, N>::data_impl() noexcept -> container_type&
     {
         return m_data;
@@ -464,67 +423,6 @@ namespace xt
         base_type::backstrides_impl() = tmp.backstrides();
         m_data.resize(tmp.size());
         std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
-    }
-
-    /*******************************
-     * move_reshape implementation *
-     *******************************/
-
-    template <template <class, size_t> class C, class EC, size_t N1, size_t N2>
-    inline C<EC, N2> move_reshape(C<EC, N1>& t, const std::array<typename EC::size_type, N2>& shape)
-    {
-        return move_reshape(std::move(t), shape);
-    }
-
-    template <template <class, size_t> class C, class EC, size_t N1, size_t N2>
-    inline C<EC, N2> move_reshape(C<EC, N1>&& t, const std::array<typename EC::size_type, N2>& shape)
-    {
-        std::array<typename EC::size_type, N2> strides;
-        compute_strides(shape, layout::row_major, strides);
-        return move_reshape(std::move(t), shape, strides);
-    }
-
-    template <template <class, size_t> class C, class EC, size_t N1, size_t N2>
-    inline C<EC, N2> move_reshape(C<EC, N1>& t, const std::array<typename EC::size_type, N2>& shape,
-                                                const std::array<typename EC::size_type, N2>& strides)
-    {
-        return move_reshape(std::move(t), shape, strides);
-    }
-
-    /**
-     * Moves the data of the specified tensor into a new tensor and reshapes it with the given
-     * shape and strides. The original tensor is invalidated. This emulates the reshape of an xarray,
-     * where the number of dimensions can be changed.
-     *
-     * @param rhs the tensor to reshape. May be passed as lvalue or rvalue reference.
-     * @param shape the new shape.
-     * @param strides the new strides. If omitted, the strides are computed so the new tensor
-     *                has a row major layout.
-     */
-    template <class EC, size_t N1, size_t N2>
-    inline xtensor_container<EC, N2> move_reshape(xtensor_container<EC, N1>&& rhs,
-                                                  const std::array<typename EC::size_type, N2>& shape,
-                                                  const std::array<typename EC::size_type, N2>& strides)
-    {
-        return xtensor_container<EC, N2>(std::move(rhs.m_data), shape, strides);
-    }
-
-    /**
-     * Moves the data of the specified tensor adaptor into a new tensor adaptr and reshapes it with the given
-     * shape and strides. The original tensor is invalidated. This emulates the reshape of an xarray,
-     * where the number of dimensions can be changed.
-     *
-     * @param rhs the tensor adaptor to reshape. May be passed as lvalue or rvalue reference.
-     * @param shape the new shape.
-     * @param strides the new strides. If omitted, the strides are computed so the new tensor
-     *                adaptor has a row major layout.
-     */
-    template <class EC, size_t N1, size_t N2>
-    inline xtensor_adaptor<EC, N2> move_reshape(xtensor_adaptor<EC, N1>&& rhs,
-                                                const std::array<typename EC::size_type, N2>& shape,
-                                                const std::array<typename EC::size_type, N2>& strides)
-    {
-        return xtensor_adaptor<EC, N2>(std::move(rhs.m_data), shape, strides);
     }
 }
 

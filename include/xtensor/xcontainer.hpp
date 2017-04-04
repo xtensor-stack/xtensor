@@ -235,6 +235,8 @@ namespace xt
         xstrided_container(xstrided_container&&) = default;
         xstrided_container& operator=(xstrided_container&&) = default;
 
+        explicit xstrided_container(inner_shape_type&&, inner_strides_type&&) noexcept;
+
         inner_shape_type& shape_impl() noexcept;
         const inner_shape_type& shape_impl() const noexcept;
 
@@ -712,6 +714,14 @@ namespace xt
     /*************************************
      * xstrided_container implementation *
      *************************************/
+
+    template <class D>
+    inline xstrided_container<D>::xstrided_container(inner_shape_type&& shape, inner_strides_type&& strides) noexcept
+        : base_type(), m_shape(std::move(shape)), m_strides(std::move(strides))
+    {
+        m_backstrides = make_sequence<inner_backstrides_type>(m_shape.size(), 0);
+        adapt_strides(m_shape, m_strides, m_backstrides);
+    }
 
     template <class D>
     inline auto xstrided_container<D>::shape_impl() noexcept -> inner_shape_type&

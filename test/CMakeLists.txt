@@ -136,6 +136,7 @@ set(XTENSOR_TESTS
     test_xutils.cpp
     test_xcomplex.cpp
     test_xoptional.cpp
+    test_xcsv.cpp
 )
 
 set(XTENSOR_TARGET test_xtensor)
