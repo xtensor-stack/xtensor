@@ -15,7 +15,3 @@ Defined in ``xtensor/xtensor.hpp``
 
 .. doxygentypedef:: xt::xtensor
    :project: xtensor
-
-.. doxygenfunction:: xt::move_reshape(xtensor_container<EC, N1>&&, const std::array<typename EC::size_type, N2>&, const std::array<typename EC::size_type, N2>&)
-   :project: xtensor
-

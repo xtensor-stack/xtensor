@@ -15,6 +15,3 @@ Defined in ``xtensor/xarray.hpp``
 
 .. doxygentypedef:: xt::xarray
    :project: xtensor
-
-.. doxygenfunction:: xt::move_reshape(xarray_container<EC, SC>&&, const SC&, const SC&)
-   :project: xtensor
