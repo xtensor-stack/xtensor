@@ -101,7 +101,7 @@ install:
     - source activate test-xtensor
     - cd ..
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
-        cmake -DXTENSOR_ENABLE_ASSERT=ON -DBUILD_TESTS=ON .;
+        cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON .;
       else
         cmake -DBUILD_TESTS=ON .;
       fi

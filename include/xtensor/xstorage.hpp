@@ -117,6 +117,7 @@ namespace xt
         void resize_impl(size_type new_size);
 
         allocator_type m_allocator;
+
         // Storing a pair of pointers is more efficient for iterating than
         // storing a pointer to the beginning and the size of the container
         pointer p_begin;

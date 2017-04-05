@@ -68,6 +68,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
 )
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)

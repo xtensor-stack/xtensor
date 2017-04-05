@@ -255,9 +255,11 @@ namespace xt
 
     TEST(xview, const_view)
     {
-        const xtensor<double, 3> arr( {1, 2, 3}, 2.5);
-        xtensor<double, 2> arr2( {2, 3}, 0.0 );
-        xtensor<double, 2> ref( {2, 3}, 2.5 );
+        typename xtensor<double, 3>::shape_type shape3 = {1, 2, 3};
+        typename xtensor<double, 2>::shape_type shape2 = {2, 3};
+        const xtensor<double, 3> arr(shape3, 2.5);
+        xtensor<double, 2> arr2(shape2, 0.0);
+        xtensor<double, 2> ref(shape2, 2.5);
         arr2 = xt::view(arr, 0);
         EXPECT_EQ(ref, arr2);
     }

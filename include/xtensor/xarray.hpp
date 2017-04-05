@@ -51,7 +51,7 @@ namespace xt
      *
      * @tparam EC The type of the container holding the elements.
      * @tparam SC The type of the containers holding the shape and the strides.
-     * @sa xarray,  move_reshape
+     * @sa xarray
      */
     template <class EC, layout L, class SC>
     class xarray_container : public xstrided_container<xarray_container<EC, L, SC>, L>,
@@ -70,13 +70,16 @@ namespace xt
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
         using shape_type = typename base_type::shape_type;
+        using inner_shape_type = typename base_type::inner_shape_type;
         using strides_type = typename base_type::strides_type;
+        using inner_strides_type = typename base_type::inner_strides_type;
 
         xarray_container();
         explicit xarray_container(const shape_type& shape, layout l = L);
         explicit xarray_container(const shape_type& shape, const_reference value, layout l = L);
         explicit xarray_container(const shape_type& shape, const strides_type& strides);
         explicit xarray_container(const shape_type& shape, const strides_type& strides, const_reference value);
+        explicit xarray_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
 
         xarray_container(const value_type& t);
         xarray_container(nested_initializer_list_t<value_type, 1> t);
@@ -101,17 +104,12 @@ namespace xt
 
     private:
 
-        xarray_container(EC&& data, const shape_type& shape, const strides_type& strides);
-
         container_type m_data;
 
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
         friend class xcontainer<xarray_container<EC, L, SC>>;
-
-        template <class EC2, layout L2, class SC2>
-        friend xarray_container<EC2, L2, SC2> move_reshape(xarray_container<EC2, L2, SC2>&& data, const SC2& shape, const SC2& strides);
     };
 
     /******************************
@@ -152,7 +150,6 @@ namespace xt
      *
      * @tparam EC The container type to adapt.
      * @tparam SC The type of the containers holding the shape and the strides.
-     * @sa move_reshape
      */
     template <class EC, layout L, class SC>
     class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC>>,
@@ -185,8 +182,6 @@ namespace xt
 
     private:
 
-        xarray_adaptor(EC&& data, const shape_type& shape, const strides_type& strides);
-
         container_type& m_data;
 
         container_type& data_impl() noexcept;
@@ -195,31 +190,10 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type& tmp);
 
+
         friend class xcontainer<xarray_adaptor<EC, L, SC>>;
         friend class xadaptor_semantic<xarray_adaptor<EC, L, SC>>;
-
-        template <class EC2, layout L2, class SC2>
-        friend xarray_adaptor<EC2, L2, SC2> move_reshape(xarray_adaptor<EC2, L2, SC2>&& data, const SC2& shape, const SC2& strides);
     };
-
-    /****************
-     * move_reshape *
-     ****************/
-
-    template <template <class, layout, class> class C, class EC, layout L, class SC>
-    C<EC, L, SC> move_reshape(C<EC, L, SC>& rhs, const SC& shape);
-
-    template <template <class, layout, class> class C, class EC, layout L, class SC>
-    C<EC, L, SC> move_reshape(C<EC, L, SC>&& rhs, const SC& shape);
-
-    template <template <class, layout, class> class C, class EC, layout L, class SC>
-    C<EC, L, SC> move_reshape(C<EC, L, SC>& rhs, const SC& shape, const SC& strides);
-
-    template <class EC, layout L, class SC>
-    xarray_container<EC, L, SC> move_reshape(xarray_container<EC, L, SC>&& rhs, const SC& shape, const SC& strides);
-
-    template <class EC, layout L, class SC>
-    xarray_adaptor<EC, L, SC> move_reshape(xarray_adaptor<EC, L, SC>&& rhs, const SC& shape, const SC& strides);
 
     /***********************************
      * xarray_container implementation *
@@ -304,6 +278,19 @@ namespace xt
     {
         base_type::reshape(xt::shape<shape_type>(t), true);
         nested_copy(m_data.begin(), t);
+    }
+
+    /**
+     * Allocates an xarray_container by moving specified data, shape and strides
+     *
+     * @param data the data for the xarray_container
+     * @param shape the shape of the xarray_container
+     * @param strides the strides of the xarray_container
+     */
+    template <class EC, layout L, class SC>
+    inline xarray_container<EC, L, SC>::xarray_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
+        : base_type(std::move(shape), std::move(strides)), m_data(std::move(data))
+    {
     }
     //@}
 
@@ -400,13 +387,6 @@ namespace xt
     //@}
 
     template <class EC, layout L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(EC&& data, const shape_type& shape, const strides_type& strides)
-        : base_type(), m_data(std::move(data))
-    {
-        base_type::reshape(shape, strides);
-    }
-
-    template <class EC, layout L, class SC>
     inline auto xarray_container<EC, L, SC>::data_impl() noexcept -> container_type&
     {
         return m_data;
@@ -497,13 +477,6 @@ namespace xt
     //@}
 
     template <class EC, layout L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(EC&& data, const shape_type& shape, const strides_type& strides)
-        : base_type(), m_data(data)
-    {
-        base_type::reshape(shape, strides);
-    }
-
-    template <class EC, layout L, class SC>
     inline auto xarray_adaptor<EC, L, SC>::data_impl() noexcept -> container_type&
     {
         return m_data;
@@ -525,64 +498,6 @@ namespace xt
         base_type::backstrides_impl() = tmp.backstrides();
         m_data.resize(tmp.size());
         std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
-    }
-
-    /*******************************
-     * move_reshape implementation *
-     *******************************/
-
-    template <template <class, layout, class> class C, class EC, layout L, class SC>
-    inline C<EC, L, SC> move_reshape(C<EC, L, SC>& rhs, const SC& shape)
-    {
-        return move_reshape(std::move(rhs), shape);
-    }
-
-    template <template <class, layout, class> class C, class EC, layout L, class SC>
-    inline C<EC, L, SC> move_reshape(C<EC, L, SC>&& rhs, const SC& shape)
-    {
-        SC strides(shape.size());
-        compute_strides(shape, L, strides);
-        return move_reshape(std::move(rhs), shape, strides);
-    }
-
-    template <template <class, layout, class> class C, class EC, layout L, class SC>
-    inline C<EC, L, SC> move_reshape(C<EC, L, SC>& rhs, const SC& shape, const SC& strides)
-    {
-        return move_reshape(std::move(rhs), shape, strides);
-    }
-
-    /**
-     * Moves the data of the specified multidimensional array into a new multidimensional array
-     * that is reshaped with the given shape and strides. The original array is invalidated.
-     * This method should not be used directly, it is provided for consitency with xtensor. The
-     * reshape method should be used instead.
-     *
-     * @param rhs the multidimensional array to reshape. May be passed as lvalue or rvalue reference.
-     * @param shape the new shape.
-     * @param strides the new strides. If omitted, the strides are computed so the new array
-     *                has a row major layout.
-     */
-    template <class EC, layout L, class SC>
-    inline xarray_container<EC, L, SC> move_reshape(xarray_container<EC, L, SC>&& rhs, const SC& shape, const SC& strides)
-    {
-        return xarray_container<EC, L, SC>(std::move(rhs.m_data), shape, strides);
-    }
-
-    /**
-     * Moves the data of the specified multidimensional array adaptor into a new multidimensional array
-     * and reshapes it with the given shape and strides. The original array adapter is invalidated.
-     * This method should not be used directly, it is provided for consitency with xtensor. The reshape
-     * method should be used instead.
-     *
-     * @param rhs the mutldimensional arrat adaptor to reshape. May be passed as lvalue or rvalue reference.
-     * @param shape the new shape.
-     * @param strides the new strides. If omitted, the strides are computed so the new multidimensional array
-     *                adaptor has a row major layout.
-     */
-    template <class EC, layout L, class SC>
-    inline xarray_adaptor<EC, L, SC> move_reshape(xarray_adaptor<EC, L, SC>&& rhs, const SC& shape, const SC& strides)
-    {
-        return xarray_adaptor<EC, L, SC>(std::move(rhs.m_data), shape, strides);
     }
 }
 
