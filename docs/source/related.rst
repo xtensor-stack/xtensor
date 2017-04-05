@@ -7,7 +7,7 @@
 Related projects
 ================
 
-.. image:: http://quantstack.net/assets/images/xtensor-python.svg
+.. image:: xtensor-python.svg
    :alt: xtensor-python
 
 The xtensor-python_ project provides the implementation of container types compatible with ``xtensor``'s expression
@@ -110,7 +110,7 @@ Example 2: Create a universal function from a C++ scalar function
      [-1.499227,  0.136731,  1.646979,  1.643002,  0.128456],
      [-1.084323, -0.583843,  0.45342 ,  1.073811,  0.706945]]
 
-.. image:: http://quantstack.net/assets/images/xtensor-cookiecutter.png
+.. image:: xtensor-cookiecutter.png
    :alt: xtensor-cookiecutter
 
 The xtensor-cookiecutter_ project helps extension authors create Python extension modules making use of `xtensor`.
