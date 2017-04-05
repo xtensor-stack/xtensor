@@ -562,29 +562,6 @@ namespace xt
 
     namespace detail
     {
-        template <class E>
-        inline auto diagonal_impl(E&& e, int offset, std::size_t axis_1, std::size_t axis_2, check_policy::full) noexcept
-        {
-            if (e.dimension() < 2)
-            {
-                throw std::runtime_error("diag requires an xexpression with at least two dimensions");
-            }
-            if (axis_1 == axis_2)
-            {
-                throw std::runtime_error("axis_1 and axis_2 cannot be the same");
-            }
-            else if (axis_1 < 0 || axis_1 >= e.dimension() || axis_2 < 0 || axis_2 >= e.dimension()) {
-                throw std::runtime_error("axis_1 and axis_2 must be in range [0, e.dimension())");
-            }
-
-            if ((std::size_t) std::abs(offset) > e.shape()[axis_1] && (std::size_t) std::abs(offset) > e.shape()[axis_2])
-            {
-                // TODO return empty view instead of throwing error
-                throw std::runtime_error("Offset larger than dim_1 and dim_2");
-            }
-            return diagonal_impl(std::forward<E>(e), offset, axis_1, axis_2, check_policy::none());
-        }
-
         template <class T, std::size_t N>
         inline std::array<T, N - 1> remove_last(const std::array<T, N>& arr)
         {
@@ -599,7 +576,6 @@ namespace xt
             arr.pop_back();
             return arr;
         }
-
 
         template <class E>
         inline auto diagonal_impl(E&& e, int offset, std::size_t axis_1, std::size_t axis_2, check_policy::none)
@@ -663,6 +639,28 @@ namespace xt
             return view_type(std::forward<E>(e), std::move(final_shape), std::move(final_strides), data_offset);
         }
 
+        template <class E>
+        inline auto diagonal_impl(E&& e, int offset, std::size_t axis_1, std::size_t axis_2, check_policy::full)
+        {
+            if (e.dimension() < 2)
+            {
+                throw std::runtime_error("diag requires an xexpression with at least two dimensions");
+            }
+            if (axis_1 == axis_2)
+            {
+                throw std::runtime_error("axis_1 and axis_2 cannot be the same");
+            }
+            else if (axis_1 < 0 || axis_1 >= e.dimension() || axis_2 < 0 || axis_2 >= e.dimension()) {
+                throw std::runtime_error("axis_1 and axis_2 must be in range [0, e.dimension())");
+            }
+
+            if ((std::size_t) std::abs(offset) > e.shape()[axis_1] && (std::size_t) std::abs(offset) > e.shape()[axis_2])
+            {
+                // TODO return empty view instead of throwing error
+                throw std::runtime_error("Offset larger than dim_1 and dim_2");
+            }
+            return diagonal_impl(std::forward<E>(e), offset, axis_1, axis_2, check_policy::none());
+        }
     }
 
     /**

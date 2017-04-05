@@ -649,7 +649,16 @@ namespace xt
     {
         if (shape != m_shape)
         {
-            reshape(shape, layout::row_major);
+            if (std::is_same<L, xt::layout_type::row_major>::value)
+            {
+                std::cout << "RESHAPING WITH ROW_MAJOR" << std::endl;
+                reshape(shape, layout::row_major);
+            }
+            else
+            {
+                std::cout << "RESHAPING WITH COL_MAJOR" << std::endl;
+                reshape(shape, layout::column_major);
+            }
         }
     }
 

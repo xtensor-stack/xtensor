@@ -52,7 +52,7 @@ namespace xt
     template <class T, class L = layout_type::row_major, class A = std::allocator<T>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
-    template <class EC, std::size_t N>
+    template <class EC, std::size_t N, class L>
     class xtensor_container;
 
     /**
@@ -74,8 +74,8 @@ namespace xt
      * @tparam N The dimension of the tensor.
      * @tparam A The allocator of the containers holding the elements.
      */
-    template <class T, std::size_t N, class A = std::allocator<T>>
-    using xtensor = xtensor_container<DEFAULT_DATA_CONTAINER(T, A), N>;
+    template <class T, std::size_t N, class L = layout_type::row_major, class A = std::allocator<T>>
+    using xtensor = xtensor_container<DEFAULT_DATA_CONTAINER(T, A), N, L>;
 
     template <class CT, class... S>
     class xview;
@@ -104,8 +104,8 @@ namespace xt
      * @tparam A The allocator of the containers holding the elements.
      * @tparam BA The allocator of the container holding the missing flags.
      */
-    template <class T, std::size_t N, class A = std::allocator<T>, class BA = std::allocator<bool>>
-    using xtensor_optional = xtensor_container<xoptional_vector<T, A, BA>, N>;
+    template <class T, std::size_t N, class L = layout_type::row_major, class A = std::allocator<T>, class BA = std::allocator<bool>>
+    using xtensor_optional = xtensor_container<xoptional_vector<T, A, BA>, N, L>;
 }
 
 #endif

@@ -54,14 +54,14 @@ namespace xt
      * @sa xarray,  move_reshape
      */
     template <class EC, class L, class SC>
-    class xarray_container : public xstrided_container<xarray_container<EC, L, SC>>,
+    class xarray_container : public xstrided_container<xarray_container<EC, L, SC>, L>,
                              public xcontainer_semantic<xarray_container<EC, L, SC>>
     {
 
     public:
 
         using self_type = xarray_container<EC, L, SC>;
-        using base_type = xstrided_container<self_type>;
+        using base_type = xstrided_container<self_type, L>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using layout_type = typename base_type::layout_type;
@@ -320,7 +320,7 @@ namespace xt
     inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 1> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t));
         nested_copy(m_data.begin(), t);
     }
 
@@ -332,7 +332,7 @@ namespace xt
     inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 2> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t));
         nested_copy(m_data.begin(), t);
     }
 
@@ -344,7 +344,7 @@ namespace xt
     inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 3> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t));
         nested_copy(m_data.begin(), t);
     }
 
@@ -356,7 +356,7 @@ namespace xt
     inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 4> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t));
         nested_copy(m_data.begin(), t);
     }
 
@@ -368,7 +368,7 @@ namespace xt
     inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 5> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t));
         nested_copy(m_data.begin(), t);
     }
     //@}
@@ -448,7 +448,7 @@ namespace xt
     inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_type& data, const shape_type& shape, layout l)
         : base_type(), m_data(data)
     {
-        base_type::reshape(shape, l);
+        base_type::reshape(shape);
     }
 
     /**
