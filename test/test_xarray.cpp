@@ -24,7 +24,7 @@ namespace xt
         {
             SCOPED_TRACE("column_major constructor");
             column_major_result<> cm;
-            xarray<int> ca(cm.m_shape, layout::column_major);
+            xarray<int, layout::column_major> ca(cm.m_shape);
             compare_shape(ca, cm);
         }
     }
@@ -52,7 +52,7 @@ namespace xt
             SCOPED_TRACE("column_major valued constructor");
             column_major_result<> cm;
             int value = 2;
-            xarray<int> ca(cm.m_shape, value, layout::column_major);
+            xarray<int, layout::column_major> ca(cm.m_shape, value);
             compare_shape(ca, cm);
             xarray<int>::container_type vec(ca.size(), value);
             EXPECT_EQ(ca.data(), vec);
@@ -121,7 +121,7 @@ namespace xt
 
     TEST(xarray, reshape)
     {
-        xarray<int> a;
+        xarray<int, layout::dynamic> a;
         test_reshape(a);
     }
 

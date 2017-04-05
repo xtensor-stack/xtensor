@@ -21,20 +21,6 @@
 
 namespace xt
 {
-
-    namespace layout_type
-    {
-        struct dynamic
-        {
-        };
-        struct row_major
-        {
-        };
-        struct column_major
-        {
-        };
-    }
-
     template <class D>
     struct xcontainer_iterable_types
     {
@@ -184,7 +170,7 @@ namespace xt
      * @tparam D The derived type, i.e. the inheriting class for which xstrided
      *           provides the partial imlpementation of xcontainer.
      */
-    template <class D, class L = layout_type::row_major>
+    template <class D, layout L = layout::row_major>
     class xstrided_container : public xcontainer<D>
     {
 
@@ -192,7 +178,6 @@ namespace xt
 
         using base_type = xcontainer<D>;
         using container_type = typename base_type::container_type;
-        using layout_type = L;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
@@ -205,7 +190,7 @@ namespace xt
         using inner_strides_type = typename base_type::inner_strides_type;
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
 
-        void reshape(const shape_type& shape);
+        void reshape(const shape_type& shape, bool force = false);
         void reshape(const shape_type& shape, layout l);
         void reshape(const shape_type& shape, const strides_type& strides);
 
@@ -604,37 +589,37 @@ namespace xt
      * xstrided_container implementation *
      *************************************/
 
-    template <class D, class L>
+    template <class D, layout L>
     inline auto xstrided_container<D, L>::shape_impl() noexcept -> inner_shape_type&
     {
         return m_shape;
     }
 
-    template <class D, class L>
+    template <class D, layout L>
     inline auto xstrided_container<D, L>::shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
 
-    template <class D, class L>
+    template <class D, layout L>
     inline auto xstrided_container<D, L>::strides_impl() noexcept -> inner_strides_type&
     {
         return m_strides;
     }
 
-    template <class D, class L>
+    template <class D, layout L>
     inline auto xstrided_container<D, L>::strides_impl() const noexcept -> const inner_strides_type&
     {
         return m_strides;
     }
 
-    template <class D, class L>
+    template <class D, layout L>
     inline auto xstrided_container<D, L>::backstrides_impl() noexcept -> inner_backstrides_type&
     {
         return m_backstrides;
     }
 
-    template <class D, class L>
+    template <class D, layout L>
     inline auto xstrided_container<D, L>::backstrides_impl() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
@@ -643,21 +628,20 @@ namespace xt
     /**
      * Reshapes the container.
      * @param shape the new shape
+     * @param force force reshaping, even if the shape stays the same (default: false)
      */
-    template <class D, class L>
-    inline void xstrided_container<D, L>::reshape(const shape_type& shape)
+    template <class D, layout L>
+    inline void xstrided_container<D, L>::reshape(const shape_type& shape, bool force)
     {
-        if (shape != m_shape)
+        if (shape != m_shape || force)
         {
-            if (std::is_same<L, xt::layout_type::row_major>::value)
+            if (L == layout::column_major)
             {
-                std::cout << "RESHAPING WITH ROW_MAJOR" << std::endl;
-                reshape(shape, layout::row_major);
+                reshape(shape, layout::column_major);
             }
             else
             {
-                std::cout << "RESHAPING WITH COL_MAJOR" << std::endl;
-                reshape(shape, layout::column_major);
+                reshape(shape, layout::row_major);
             }
         }
     }
@@ -667,7 +651,7 @@ namespace xt
      * @param shape the new shape
      * @param l the new layout
      */
-    template <class D, class L>
+    template <class D, layout L>
     inline void xstrided_container<D, L>::reshape(const shape_type& shape, layout l)
     {
         m_shape = shape;
@@ -682,7 +666,7 @@ namespace xt
      * @param shape the new shape
      * @param strides the new strides
      */
-    template <class D, class L>
+    template <class D, layout L>
     inline void xstrided_container<D, L>::reshape(const shape_type& shape, const strides_type& strides)
     {
         m_shape = shape;

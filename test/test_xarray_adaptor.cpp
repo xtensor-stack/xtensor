@@ -29,7 +29,7 @@ namespace xt
             SCOPED_TRACE("column_major constructor");
             column_major_result<> cm;
             vec_type v;
-            adaptor_type a(v, cm.shape(), layout::column_major);
+            xarray_adaptor<vec_type, layout::column_major> a(v, cm.shape());
             compare_shape(a, cm);
         }
     }
