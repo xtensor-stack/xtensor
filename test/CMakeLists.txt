@@ -31,28 +31,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     else()
         message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
     endif()
-
-    # Enable link time optimization and set the default symbol
-    # visibility to hidden (very important to obtain small binaries)
-    if (NOT ${U_CMAKE_BUILD_TYPE} MATCHES DEBUG)
-        # Default symbol visibility
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-
-        # Check for Link Time Optimization support
-        # (GCC/Clang)
-        CHECK_CXX_COMPILER_FLAG("-flto" HAS_LTO_FLAG)
-        if (HAS_LTO_FLAG)
-            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -flto")
-        endif()
-
-        # Intel equivalent to LTO is called IPO
-        if (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-            CHECK_CXX_COMPILER_FLAG("-ipo" HAS_IPO_FLAG)
-            if (HAS_IPO_FLAG)
-                set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ipo")
-            endif()
-        endif()
-    endif()
 endif()
 
 if(MSVC)
@@ -92,10 +70,7 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
                      ${CMAKE_CURRENT_BINARY_DIR}/googletest-build)
 
     set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-    set(GTEST_LIBRARY_DIRS "${gtest_BINARY_DIR}")
-    set(GTEST_LIBRARIES "${GTEST_LIBRARY_DIRS}/gtest.lib")
-    set(GTEST_MAIN_LIBRARIES "${GTEST_LIBRARY_DIRS}/gtest_main.lib")
-    set(GTEST_BOTH_LIBRARIES ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
+    set(GTEST_BOTH_LIBRARIES  gtest_main gtest)
 else()
     find_package(GTest REQUIRED)
 endif()
@@ -139,12 +114,12 @@ set(XTENSOR_TESTS
 )
 
 set(XTENSOR_TARGET test_xtensor)
+
 add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
+    add_dependencies(${XTENSOR_TARGET} gtest_main)
+endif()
 target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
-    add_custom_target(xtest COMMAND test_xtensor DEPENDS gtest_main ${XTENSOR_TARGET})
-else()
-    add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})
-endif()
+add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})
 
