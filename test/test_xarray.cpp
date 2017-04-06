@@ -32,7 +32,7 @@ namespace xt
     TEST(xarray, strided_constructor)
     {
         central_major_result<> cmr;
-        xarray<int> cma(cmr.m_shape, cmr.m_strides);
+        xarray<int, layout::dynamic> cma(cmr.m_shape, cmr.m_strides);
         compare_shape(cma, cmr);
     }
 
@@ -63,7 +63,7 @@ namespace xt
     {
         central_major_result<> cmr;
         int value = 2;
-        xarray<int> cma(cmr.m_shape, cmr.m_strides, value);
+        xarray<int, layout::dynamic> cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
         xarray<int>::container_type vec(cma.size(), value);
         EXPECT_EQ(cma.data(), vec);
@@ -73,11 +73,11 @@ namespace xt
     {
         central_major_result<> res;
         int value = 2;
-        xarray<int> a(res.m_shape, res.m_strides, value);
+        xarray<int, layout::dynamic> a(res.m_shape, res.m_strides, value);
         
         {
             SCOPED_TRACE("copy constructor");
-            xarray<int> b(a);
+            xarray<int, layout::dynamic> b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
@@ -85,7 +85,7 @@ namespace xt
         {
             SCOPED_TRACE("assignment operator");
             row_major_result<> r;
-            xarray<int> c(r.m_shape, 0);
+            xarray<int, layout::dynamic> c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
             c = a;
             compare_shape(a, c);
@@ -97,12 +97,12 @@ namespace xt
     {
         central_major_result<> res;
         int value = 2;
-        xarray<int> a(res.m_shape, res.m_strides, value);
+        xarray<int, layout::dynamic> a(res.m_shape, res.m_strides, value);
 
         {
             SCOPED_TRACE("move constructor");
-            xarray<int> tmp(a);
-            xarray<int> b(std::move(tmp));
+            xarray<int, layout::dynamic> tmp(a);
+            xarray<int, layout::dynamic> b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
@@ -110,9 +110,9 @@ namespace xt
         {
             SCOPED_TRACE("move assignment");
             row_major_result<> r;
-            xarray<int> c(r.m_shape, 0);
+            xarray<int, layout::dynamic> c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
-            xarray<int> tmp(a);
+            xarray<int, layout::dynamic> tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
             EXPECT_EQ(a.data(), c.data());
@@ -133,14 +133,14 @@ namespace xt
 
     TEST(xarray, access)
     {
-        xarray<int> a;
+        xarray<int, layout::dynamic> a;
         test_access(a);
     }
 
 
     TEST(xarray, indexed_access)
     {
-        xarray<int> a;
+        xarray<int, layout::dynamic> a;
         test_indexed_access(a);
     }
 
@@ -153,7 +153,7 @@ namespace xt
 
     TEST(xarray, iterator)
     {
-        xarray<int> a;
+        xarray<int, layout::dynamic> a;
         test_iterator(a);
     }
 

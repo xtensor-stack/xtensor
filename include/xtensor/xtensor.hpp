@@ -63,7 +63,7 @@ namespace xt
     public:
 
         using self_type = xtensor_container<EC, N, L>;
-        using base_type = xstrided_container<self_type>;
+        using base_type = xstrided_container<self_type, L>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
@@ -148,13 +148,13 @@ namespace xt
      * @tparam N The dimension of the adaptor.
      */
     template <class EC, std::size_t N, layout L = layout::row_major>
-    class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L>>,
+    class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L>, L>,
                             public xadaptor_semantic<xtensor_adaptor<EC, N, L>>
     {
     public:
 
         using self_type = xtensor_adaptor<EC, N, L>;
-        using base_type = xstrided_container<self_type>;
+        using base_type = xstrided_container<self_type, L>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;

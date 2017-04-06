@@ -14,7 +14,6 @@
 #include <numeric>
 
 #include "xexception.hpp"
-#include "xlayout.hpp"
 #include "xtensor_forward.hpp"
 
 namespace xt

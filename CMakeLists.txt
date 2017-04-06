@@ -44,7 +44,6 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterable.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp

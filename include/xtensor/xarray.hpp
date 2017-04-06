@@ -152,14 +152,14 @@ namespace xt
      * @tparam SC The type of the containers holding the shape and the strides.
      */
     template <class EC, layout L, class SC>
-    class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC>>,
+    class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC>, L>,
                            public xadaptor_semantic<xarray_adaptor<EC, L, SC>>
     {
 
     public:
 
         using self_type = xarray_adaptor<EC, L, SC>;
-        using base_type = xstrided_container<self_type>;
+        using base_type = xstrided_container<self_type, L>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;

@@ -13,7 +13,7 @@
 namespace xt
 {
     using vec_type = std::vector<int>;
-    using adaptor_type = xarray_adaptor<vec_type>;
+    using adaptor_type = xarray_adaptor<vec_type, layout::dynamic>;
 
     TEST(xarray_adaptor, shaped_constructor)
     {
@@ -29,7 +29,7 @@ namespace xt
             SCOPED_TRACE("column_major constructor");
             column_major_result<> cm;
             vec_type v;
-            xarray_adaptor<vec_type, layout::column_major> a(v, cm.shape());
+            adaptor_type a(v, cm.shape(), layout::column_major);
             compare_shape(a, cm);
         }
     }

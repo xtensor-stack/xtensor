@@ -16,9 +16,9 @@ namespace xt
 
     struct xfunction_features
     {
-        xarray<int> m_a; // shape = { 3, 2, 4 }
-        xarray<int> m_b; // shape = { 3, 1, 4 }
-        xarray<int> m_c; // shape = { 4, 3, 2, 4 }
+        xarray<int, layout::dynamic> m_a; // shape = { 3, 2, 4 }
+        xarray<int, layout::dynamic> m_b; // shape = { 3, 1, 4 }
+        xarray<int, layout::dynamic> m_c; // shape = { 4, 3, 2, 4 }
 
         xfunction_features();
     };

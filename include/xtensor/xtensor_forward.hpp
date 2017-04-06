@@ -9,7 +9,6 @@
 #ifndef XTENSOR_FORWARD_HPP
 #define XTENSOR_FORWARD_HPP
 
-#include "xlayout.hpp"
 #include "xtensor_config.hpp"
 #include "xstorage.hpp"
 #include <memory>
@@ -20,7 +19,12 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
-    enum class layout;
+    enum class layout
+    {
+        row_major,
+        column_major,
+        dynamic
+    };
 
     template <class EC, layout L, class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
                                                                      typename EC::allocator_type,

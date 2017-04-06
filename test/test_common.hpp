@@ -425,7 +425,7 @@ namespace xt
         using shape_type = typename V::shape_type;
 
         shape_type s = { 3, 1, 4, 2 };
-        vec.reshape(s);
+        vec.reshape(s, layout::row_major);
 
         {
             SCOPED_TRACE("same shape");
@@ -467,7 +467,7 @@ namespace xt
         using shape_type = typename V::shape_type;
 
         shape_type s = { 3, 1, 4, 2 };
-        vec.reshape(s);
+        vec.reshape(s, layout::row_major);
 
         {
             SCOPED_TRACE("different dimensions");

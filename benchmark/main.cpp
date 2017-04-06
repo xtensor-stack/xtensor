@@ -102,7 +102,7 @@ namespace xt
             constexpr size_type number = 10000;
             double a = 2.7;
 
-            using array_type = xarray_container<C>;
+            using array_type = xarray_container<C, layout::row_major>;
             array_type ax, ay, ares;
             init_benchmark(ax, ay, ares, size);
 
@@ -181,7 +181,7 @@ namespace xt
             using duration_type = std::chrono::duration<double, std::milli>;
             std::size_t number = 2000;
 
-            using array_type = xarray_container<C>;
+            using array_type = xarray_container<C, layout::row_major>;
             array_type ax, ay, az, ares;
             init_benchmark(ax, ay, az, ares);
 
@@ -243,7 +243,7 @@ namespace xt
             using duration_type = std::chrono::duration<double, std::milli>;
             std::size_t number = 2000;
 
-            using array_type = xarray_container<C>;
+            using array_type = xarray_container<C, layout::row_major>;
             array_type ax, ay, ares;
             init_benchmark(ax, ay);
 

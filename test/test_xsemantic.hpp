@@ -16,20 +16,22 @@
 namespace xt
 {
     using std::size_t;
+    using arr_type = xarray<int, layout::dynamic>;
 
     template <class F>
     struct operation_tester
     {
-        xarray<int> a;
-        xarray<int> ra;
-        xarray<int> ca;
-        xarray<int> cta;
-        xarray<int> ua;
+        
+        arr_type a;
+        arr_type ra;
+        arr_type ca;
+        arr_type cta;
+        arr_type ua;
 
-        xarray<int> res_rr;
-        xarray<int> res_rc;
-        xarray<int> res_rct;
-        xarray<int> res_ru;
+        arr_type res_rr;
+        arr_type res_rc;
+        arr_type res_rct;
+        arr_type res_ru;
 
         operation_tester();
     };
@@ -80,15 +82,15 @@ namespace xt
     struct scalar_operation_tester
     {
         int b;
-        xarray<int> ra;
-        xarray<int> ca;
-        xarray<int> cta;
-        xarray<int> ua;
+        arr_type ra;
+        arr_type ca;
+        arr_type cta;
+        arr_type ua;
 
-        xarray<int> res_r;
-        xarray<int> res_c;
-        xarray<int> res_ct;
-        xarray<int> res_u;
+        arr_type res_r;
+        arr_type res_c;
+        arr_type res_ct;
+        arr_type res_u;
 
         scalar_operation_tester();
     };
