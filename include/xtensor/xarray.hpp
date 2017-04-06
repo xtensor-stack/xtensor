@@ -424,7 +424,7 @@ namespace xt
      * @param l the layout of the xarray_adaptor
      */
     template <class EC, layout L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_type& data, const shape_type& shape, layout l)
+    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_type& data, const shape_type& shape, xt::layout l)
         : base_type(), m_data(data)
     {
         base_type::reshape(shape, l);
