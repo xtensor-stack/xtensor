@@ -109,6 +109,8 @@ namespace xt
         const_reverse_iterator crbegin() const noexcept;
         const_reverse_iterator crend() const noexcept;
 
+        void swap(uvector& rhs) noexcept;
+
     private:
 
         template <class I>
@@ -141,6 +143,9 @@ namespace xt
 
     template <class T, class A>
     bool operator>=(const uvector<T, A>& lhs, const uvector<T, A>& rhs);
+
+    template <class T, class A>
+    void swap(uvector<T, A>& lhs, uvector<T, A>& rhs) noexcept;
 
     /**************************
      * uvector implementation *
@@ -473,6 +478,15 @@ namespace xt
     }
 
     template <class T, class A>
+    inline void uvector<T, A>::swap(uvector<T, A>& rhs) noexcept
+    {
+        using std::swap;
+        swap(m_allocator, rhs.m_allocator);
+        swap(p_begin, rhs.p_begin);
+        swap(p_end, rhs.p_end);
+    }
+
+    template <class T, class A>
     inline bool operator==(const uvector<T, A>& lhs, const uvector<T, A>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
@@ -514,6 +528,12 @@ namespace xt
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                             rhs.begin(), rhs.end(),
                                             std::greater_equal<T>());
+    }
+
+    template <class T, class A>
+    inline void swap(uvector<T, A>& lhs, uvector<T, A>& rhs) noexcept
+    {
+        lhs.swap(rhs);
     }
 }
 
