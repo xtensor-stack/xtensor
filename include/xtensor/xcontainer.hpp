@@ -226,7 +226,7 @@ namespace xt
 
     protected:
 
-        xstrided_container() = default;
+        xstrided_container() noexcept;
         ~xstrided_container() = default;
 
         xstrided_container(const xstrided_container&) = default;
@@ -714,6 +714,13 @@ namespace xt
     /*************************************
      * xstrided_container implementation *
      *************************************/
+
+    template <class D>
+    inline xstrided_container<D>::xstrided_container() noexcept
+        : base_type()
+    {
+        m_shape = make_sequence<inner_shape_type>(base_type::dimension(), 1);
+    }
 
     template <class D>
     inline xstrided_container<D>::xstrided_container(inner_shape_type&& shape, inner_strides_type&& strides) noexcept
