@@ -169,11 +169,14 @@ namespace xt
         {
             using pointer = typename A::pointer;
             using value_type = typename A::value_type;
-            if (!std::is_trivially_default_constructible<value_type>::value)
+            if (ptr != nullptr)
             {
-                for (pointer p = ptr; p != ptr + size; ++p)
+                if (!std::is_trivially_default_constructible<value_type>::value)
                 {
-                    alloc.destroy(p);
+                    for (pointer p = ptr; p != ptr + size; ++p)
+                    {
+                        alloc.destroy(p);
+                    }
                 }
                 alloc.deallocate(ptr, size);
             }
@@ -197,12 +200,12 @@ namespace xt
     inline void uvector<T, A>::resize_impl(size_type new_size)
     {
         size_type old_size = size();
+        pointer old_begin = p_begin;
         if (new_size != old_size)
         {
-            pointer tmp = detail::safe_init_allocate(m_allocator, new_size);
-            std::swap(tmp, p_begin);
+            p_begin = detail::safe_init_allocate(m_allocator, new_size);
             p_end = p_begin + new_size;
-            detail::safe_destroy_deallocate(m_allocator, tmp, old_size);
+            detail::safe_destroy_deallocate(m_allocator, old_begin, old_size);
         }
     }
 
@@ -261,6 +264,7 @@ namespace xt
     {
         detail::safe_destroy_deallocate(m_allocator, p_begin, size());
         p_begin = nullptr;
+        p_end = nullptr;
     }
 
     template <class T, class A>
