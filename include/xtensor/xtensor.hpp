@@ -198,7 +198,7 @@ namespace xt
      */
     //@{
     /**
-     * Allocates an uninitialized xtensor_container that holds 0 element.
+     * Allocates an uninitialized xtensor_container that holds 1 element.
      */
     template <class EC, std::size_t N>
     inline xtensor_container<EC, N>::xtensor_container()
@@ -207,7 +207,7 @@ namespace xt
     }
 
     /**
-     * Allocates an xtensor_container with nested initializer lists.
+     * Allocates an xtensor_container with a nested initializer list.
      */
     template <class EC, std::size_t N>
     inline xtensor_container<EC, N>::xtensor_container(nested_initializer_list_t<value_type, N> t)
@@ -417,7 +417,7 @@ namespace xt
     template <class EC, std::size_t N>
     inline void xtensor_adaptor<EC, N>::assign_temporary_impl(temporary_type& tmp)
     {
-        // TODO (performance improvement) : consider moving tmps shape and strides
+        // TODO (performance improvement): consider moving tmps shape and strides
         base_type::shape_impl() = tmp.shape();
         base_type::strides_impl() = tmp.strides();
         base_type::backstrides_impl() = tmp.backstrides();
