@@ -203,7 +203,7 @@ namespace xt
      */
     //@{
     /**
-     * Allocates an uninitialized xarray_container that holds 0 element.
+     * Allocates an uninitialized xarray_container that holds 1 element.
      */
     template <class EC, class SC>
     inline xarray_container<EC, SC>::xarray_container()
