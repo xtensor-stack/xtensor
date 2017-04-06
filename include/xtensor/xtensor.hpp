@@ -78,8 +78,8 @@ namespace xt
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
-        explicit xtensor_container(const shape_type& shape, layout l = layout::row_major);
-        explicit xtensor_container(const shape_type& shape, const_reference value, layout l = layout::row_major);
+        explicit xtensor_container(const shape_type& shape, xt::layout l = xt::layout::row_major);
+        explicit xtensor_container(const shape_type& shape, const_reference value, xt::layout l = xt::layout::row_major);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value);
         explicit xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
@@ -161,7 +161,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
 
         xtensor_adaptor(container_type& data);
-        xtensor_adaptor(container_type& data, const shape_type& shape, layout l = layout::row_major);
+        xtensor_adaptor(container_type& data, const shape_type& shape, xt::layout l = xt::layout::row_major);
         xtensor_adaptor(container_type& data, const shape_type& shape, const strides_type& strides);
 
         ~xtensor_adaptor() = default;
@@ -213,7 +213,7 @@ namespace xt
     inline xtensor_container<EC, N, L>::xtensor_container(nested_initializer_list_t<value_type, N> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), layout::row_major);
+        base_type::reshape(xt::shape<shape_type>(t), true);
         L == layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
     }
 
@@ -224,7 +224,7 @@ namespace xt
      * @param l the layout of the xtensor_container
      */
     template <class EC, std::size_t N, layout L>
-    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, layout l)
+    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, xt::layout l)
         : base_type()
     {
         base_type::reshape(shape, l);
@@ -238,7 +238,7 @@ namespace xt
      * @param l the layout of the xtensor_container
      */
     template <class EC, std::size_t N, layout L>
-    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, const_reference value, layout l)
+    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, const_reference value, xt::layout l)
         : base_type()
     {
         base_type::reshape(shape, l);
@@ -350,7 +350,7 @@ namespace xt
      * @param l the layout of the xtensor_adaptor
      */
     template <class EC, std::size_t N, layout L>
-    inline xtensor_adaptor<EC, N, L>::xtensor_adaptor(container_type& data, const shape_type& shape, layout l)
+    inline xtensor_adaptor<EC, N, L>::xtensor_adaptor(container_type& data, const shape_type& shape, xt::layout l)
         : base_type(), m_data(data)
     {
         base_type::reshape(shape, l);

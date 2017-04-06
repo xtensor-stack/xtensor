@@ -75,8 +75,8 @@ namespace xt
         using inner_strides_type = typename base_type::inner_strides_type;
 
         xarray_container();
-        explicit xarray_container(const shape_type& shape, layout l = L);
-        explicit xarray_container(const shape_type& shape, const_reference value, layout l = L);
+        explicit xarray_container(const shape_type& shape, xt::layout l = L);
+        explicit xarray_container(const shape_type& shape, const_reference value, xt::layout l = L);
         explicit xarray_container(const shape_type& shape, const strides_type& strides);
         explicit xarray_container(const shape_type& shape, const strides_type& strides, const_reference value);
         explicit xarray_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
@@ -166,7 +166,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
 
         xarray_adaptor(container_type& data);
-        xarray_adaptor(container_type& data, const shape_type& shape, layout l = L);
+        xarray_adaptor(container_type& data, const shape_type& shape, xt::layout l = L);
         xarray_adaptor(container_type& data, const shape_type& shape, const strides_type& strides);
 
         ~xarray_adaptor() = default;
@@ -219,7 +219,7 @@ namespace xt
      * @param l the layout of the xarray_container
      */
     template <class EC, layout L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, layout l)
+    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, xt::layout l)
         : base_type()
     {
         base_type::reshape(shape, l);
@@ -233,7 +233,7 @@ namespace xt
      * @param l the layout of the xarray_container
      */
     template <class EC, layout L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, const_reference value, layout l)
+    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, const_reference value, xt::layout l)
         : base_type()
     {
         base_type::reshape(shape, l);
@@ -307,7 +307,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
+        L == xt::layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
     }
 
     /**
@@ -319,7 +319,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
+        L == xt::layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
     }
 
     /**
@@ -331,7 +331,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
+        L == xt::layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
     }
 
     /**
@@ -343,7 +343,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
+        L == xt::layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
     }
 
     /**
@@ -355,7 +355,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
+        L == xt::layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
     }
     //@}
 
