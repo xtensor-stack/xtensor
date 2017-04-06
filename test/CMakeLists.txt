@@ -112,6 +112,7 @@ set(XTENSOR_TESTS
     test_xutils.cpp
     test_xcomplex.cpp
     test_xoptional.cpp
+    test_xstorage.cpp
     test_xcsv.cpp
 )
 

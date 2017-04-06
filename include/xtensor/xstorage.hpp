@@ -109,6 +109,8 @@ namespace xt
         const_reverse_iterator crbegin() const noexcept;
         const_reverse_iterator crend() const noexcept;
 
+        void swap(uvector& rhs) noexcept;
+
     private:
 
         template <class I>
@@ -142,6 +144,9 @@ namespace xt
     template <class T, class A>
     bool operator>=(const uvector<T, A>& lhs, const uvector<T, A>& rhs);
 
+    template <class T, class A>
+    void swap(uvector<T, A>& lhs, uvector<T, A>& rhs) noexcept;
+
     /**************************
      * uvector implementation *
      **************************/
@@ -169,11 +174,14 @@ namespace xt
         {
             using pointer = typename A::pointer;
             using value_type = typename A::value_type;
-            if (!std::is_trivially_default_constructible<value_type>::value)
+            if (ptr != nullptr)
             {
-                for (pointer p = ptr; p != ptr + size; ++p)
+                if (!std::is_trivially_default_constructible<value_type>::value)
                 {
-                    alloc.destroy(p);
+                    for (pointer p = ptr; p != ptr + size; ++p)
+                    {
+                        alloc.destroy(p);
+                    }
                 }
                 alloc.deallocate(ptr, size);
             }
@@ -197,12 +205,12 @@ namespace xt
     inline void uvector<T, A>::resize_impl(size_type new_size)
     {
         size_type old_size = size();
+        pointer old_begin = p_begin;
         if (new_size != old_size)
         {
-            pointer tmp = detail::safe_init_allocate(m_allocator, new_size);
-            std::swap(tmp, p_begin);
+            p_begin = detail::safe_init_allocate(m_allocator, new_size);
             p_end = p_begin + new_size;
-            detail::safe_destroy_deallocate(m_allocator, tmp, old_size);
+            detail::safe_destroy_deallocate(m_allocator, old_begin, old_size);
         }
     }
 
@@ -261,6 +269,7 @@ namespace xt
     {
         detail::safe_destroy_deallocate(m_allocator, p_begin, size());
         p_begin = nullptr;
+        p_end = nullptr;
     }
 
     template <class T, class A>
@@ -469,6 +478,15 @@ namespace xt
     }
 
     template <class T, class A>
+    inline void uvector<T, A>::swap(uvector<T, A>& rhs) noexcept
+    {
+        using std::swap;
+        swap(m_allocator, rhs.m_allocator);
+        swap(p_begin, rhs.p_begin);
+        swap(p_end, rhs.p_end);
+    }
+
+    template <class T, class A>
     inline bool operator==(const uvector<T, A>& lhs, const uvector<T, A>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
@@ -510,6 +528,12 @@ namespace xt
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                             rhs.begin(), rhs.end(),
                                             std::greater_equal<T>());
+    }
+
+    template <class T, class A>
+    inline void swap(uvector<T, A>& lhs, uvector<T, A>& rhs) noexcept
+    {
+        lhs.swap(rhs);
     }
 }
 

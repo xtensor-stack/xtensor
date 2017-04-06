@@ -49,6 +49,7 @@ help:
 
 clean:
 	rm -rf $(BUILDDIR)/*
+	rm -rf xml
 
 html:
 	doxygen
