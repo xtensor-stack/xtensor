@@ -663,9 +663,9 @@ namespace xt
     template <class D, layout L>
     inline void xstrided_container<D, L>::reshape(const shape_type& shape, bool force)
     {
-        if (m_layout == layout::dynamic)
+        if (m_layout == xt::layout::dynamic)
         {
-            m_layout = layout::row_major;  // fall back to row major
+            m_layout = xt::layout::row_major;  // fall back to row major
         }
         if (shape != m_shape || force)
         {
@@ -685,7 +685,7 @@ namespace xt
     template <class D, layout L>
     inline void xstrided_container<D, L>::reshape(const shape_type& shape, xt::layout l)
     {
-        if (L != layout::dynamic && l != L)
+        if (L != xt::layout::dynamic && l != L)
         {
             throw std::runtime_error("Cannot change layout if template parameter not layout::dynamic.");
         }
@@ -701,7 +701,7 @@ namespace xt
     template <class D, layout L>
     inline void xstrided_container<D, L>::reshape(const shape_type& shape, const strides_type& strides)
     {
-        if (L != layout::dynamic)
+        if (L != xt::layout::dynamic)
         {
             throw std::runtime_error("Cannot reshape with custom strides when layout() is != layout::dynamic.");
         }
