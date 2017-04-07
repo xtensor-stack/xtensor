@@ -13,7 +13,7 @@
 namespace xt
 {
     using vec_type = std::vector<int>;
-    using adaptor_type = xarray_adaptor<vec_type>;
+    using adaptor_type = xarray_adaptor<vec_type, layout::dynamic>;
 
     TEST(xarray_adaptor, shaped_constructor)
     {

@@ -12,14 +12,15 @@
 #include "xtensor/xnoalias.hpp"
 namespace xt
 {
+    using xarray_dynamic = xarray<int, layout::dynamic>;
 
     template <class F>
     struct view_op_tester : operation_tester<F>
     {
-        xarray<int> vres_rr;
-        xarray<int> vres_rc;
-        xarray<int> vres_rct;
-        xarray<int> vres_ru;
+        xarray_dynamic vres_rr;
+        xarray_dynamic vres_rc;
+        xarray_dynamic vres_rct;
+        xarray_dynamic vres_ru;
 
         size_t x_slice;
         xrange<size_t> y_slice;
@@ -62,7 +63,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major + row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewra;
@@ -71,7 +72,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major + column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewca;
@@ -80,7 +81,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major + central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewcta;
@@ -89,7 +90,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major + unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewua;
@@ -104,7 +105,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major - row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewra;
@@ -113,7 +114,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major - column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewca;
@@ -122,7 +123,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major - central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewcta;
@@ -131,7 +132,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major - unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewua;
@@ -146,7 +147,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major * row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewra;
@@ -155,7 +156,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major * column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewca;
@@ -164,7 +165,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major * central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewcta;
@@ -173,7 +174,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major * unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewua;
@@ -188,7 +189,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major / row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewra;
@@ -197,7 +198,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major / column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewca;
@@ -206,7 +207,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major / central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewcta;
@@ -215,7 +216,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major / unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewua;
@@ -230,7 +231,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major += row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewra;
@@ -239,7 +240,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major += column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewca;
@@ -248,7 +249,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major += central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewcta;
@@ -257,7 +258,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major += unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewua;
@@ -272,7 +273,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major -= row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewra;
@@ -281,7 +282,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major -= column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewca;
@@ -290,7 +291,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major -= central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewcta;
@@ -299,7 +300,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major -= unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewua;
@@ -314,7 +315,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major *= row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewra;
@@ -323,7 +324,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major *= column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewca;
@@ -332,7 +333,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major *= central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewcta;
@@ -341,7 +342,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major *= unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewua;
@@ -356,7 +357,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major /= row_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewra;
@@ -365,7 +366,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major /= column_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewca;
@@ -374,7 +375,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major /= central_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewcta;
@@ -383,7 +384,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major /= unit_major");
-            xarray<int> b = t.a;
+            xarray_dynamic b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewua;
@@ -393,16 +394,16 @@ namespace xt
 
     TEST(xview_semantic, broadcast_equal)
     {
-        xarray<int> a = { {1,  2,  3,  4},
+        xarray_dynamic a = { {1,  2,  3,  4},
                           {5,  6,  7,  8},
                           {9, 10, 11, 12} };
-        xarray<int> b = a;
+        xarray_dynamic b = a;
         auto viewa = view(a, all(), range(1, 4));
         auto viewb = view(b, all(), range(1, 4));
-        xarray<int> c = {1, 2, 3};
+        xarray_dynamic c = {1, 2, 3};
         viewa = c;
         noalias(viewb) = c;
-        xarray<int> res = { {1, 1, 2, 3},
+        xarray_dynamic res = { {1, 1, 2, 3},
                             {5, 1, 2, 3},
                             {9, 1, 2, 3} };
 
@@ -412,13 +413,13 @@ namespace xt
 
     TEST(xview_semantic, scalar_equal)
     {
-        xarray<int> a = { { 1,  2,  3,  4 },
+        xarray_dynamic a = { { 1,  2,  3,  4 },
                           { 5,  6,  7,  8 },
                           { 9, 10, 11, 12 } };
         auto viewa = view(a, all(), range(1, 4));
         int b = 1;
         viewa = b;
-        xarray<int> res = { { 1, 1, 1, 1 },
+        xarray_dynamic res = { { 1, 1, 1, 1 },
                             { 5, 1, 1, 1 },
                             { 9, 1, 1, 1 } };
 

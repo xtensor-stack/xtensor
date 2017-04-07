@@ -12,19 +12,21 @@
 
 namespace xt
 {
+    using xarray_dynamic = xarray<int, layout::dynamic>;
+
     TEST(xarray, shaped_constructor)
     {
         {
             SCOPED_TRACE("row_major constructor");
             row_major_result<> rm;
-            xarray<int> ra(rm.m_shape);
+            xarray_dynamic ra(rm.m_shape);
             compare_shape(ra, rm);
         }
         
         {
             SCOPED_TRACE("column_major constructor");
             column_major_result<> cm;
-            xarray<int> ca(cm.m_shape, layout::column_major);
+            xarray<int, layout::column_major> ca(cm.m_shape);
             compare_shape(ca, cm);
         }
     }
@@ -32,7 +34,7 @@ namespace xt
     TEST(xarray, strided_constructor)
     {
         central_major_result<> cmr;
-        xarray<int> cma(cmr.m_shape, cmr.m_strides);
+        xarray<int, layout::dynamic> cma(cmr.m_shape, cmr.m_strides);
         compare_shape(cma, cmr);
     }
 
@@ -42,9 +44,9 @@ namespace xt
             SCOPED_TRACE("row_major valued constructor");
             row_major_result<> rm;
             int value = 2;
-            xarray<int> ra(rm.m_shape, value);
+            xarray_dynamic ra(rm.m_shape, value);
             compare_shape(ra, rm);
-            xarray<int>::container_type vec(ra.size(), value);
+            xarray_dynamic::container_type vec(ra.size(), value);
             EXPECT_EQ(ra.data(), vec);
         }
 
@@ -52,9 +54,9 @@ namespace xt
             SCOPED_TRACE("column_major valued constructor");
             column_major_result<> cm;
             int value = 2;
-            xarray<int> ca(cm.m_shape, value, layout::column_major);
+            xarray<int, layout::column_major> ca(cm.m_shape, value);
             compare_shape(ca, cm);
-            xarray<int>::container_type vec(ca.size(), value);
+            xarray_dynamic::container_type vec(ca.size(), value);
             EXPECT_EQ(ca.data(), vec);
         }
     }
@@ -63,9 +65,9 @@ namespace xt
     {
         central_major_result<> cmr;
         int value = 2;
-        xarray<int> cma(cmr.m_shape, cmr.m_strides, value);
+        xarray<int, layout::dynamic> cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
-        xarray<int>::container_type vec(cma.size(), value);
+        xarray_dynamic::container_type vec(cma.size(), value);
         EXPECT_EQ(cma.data(), vec);
     }
 
@@ -73,11 +75,11 @@ namespace xt
     {
         central_major_result<> res;
         int value = 2;
-        xarray<int> a(res.m_shape, res.m_strides, value);
+        xarray_dynamic a(res.m_shape, res.m_strides, value);
         
         {
             SCOPED_TRACE("copy constructor");
-            xarray<int> b(a);
+            xarray_dynamic b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
@@ -85,7 +87,7 @@ namespace xt
         {
             SCOPED_TRACE("assignment operator");
             row_major_result<> r;
-            xarray<int> c(r.m_shape, 0);
+            xarray_dynamic c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
             c = a;
             compare_shape(a, c);
@@ -97,12 +99,12 @@ namespace xt
     {
         central_major_result<> res;
         int value = 2;
-        xarray<int> a(res.m_shape, res.m_strides, value);
+        xarray_dynamic a(res.m_shape, res.m_strides, value);
 
         {
             SCOPED_TRACE("move constructor");
-            xarray<int> tmp(a);
-            xarray<int> b(std::move(tmp));
+            xarray_dynamic tmp(a);
+            xarray_dynamic b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
@@ -110,9 +112,9 @@ namespace xt
         {
             SCOPED_TRACE("move assignment");
             row_major_result<> r;
-            xarray<int> c(r.m_shape, 0);
+            xarray_dynamic c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
-            xarray<int> tmp(a);
+            xarray_dynamic tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
             EXPECT_EQ(a.data(), c.data());
@@ -121,47 +123,47 @@ namespace xt
 
     TEST(xarray, reshape)
     {
-        xarray<int> a;
+        xarray_dynamic a;
         test_reshape(a);
     }
 
     TEST(xarray, transpose)
     {
-        xarray<int> a;
+        xarray_dynamic a;
         test_transpose(a);
     }
 
     TEST(xarray, access)
     {
-        xarray<int> a;
+        xarray_dynamic a;
         test_access(a);
     }
 
 
     TEST(xarray, indexed_access)
     {
-        xarray<int> a;
+        xarray_dynamic a;
         test_indexed_access(a);
     }
 
     TEST(xarray, broadcast_shape)
     {
-        xarray<int> a;
+        xarray_dynamic a;
         test_broadcast(a);
         test_broadcast2(a);
     }
 
     TEST(xarray, iterator)
     {
-        xarray<int> a;
+        xarray_dynamic a;
         test_iterator(a);
     }
 
     TEST(xarray, initializer_list)
     {
-        xarray<int> a0(1);
-        xarray<int> a1({1, 2});
-        xarray<int> a2({{1, 2}, {2, 4}, {5, 6}});
+        xarray_dynamic a0(1);
+        xarray_dynamic a1({1, 2});
+        xarray_dynamic a2({{1, 2}, {2, 4}, {5, 6}});
         EXPECT_EQ(1, a0());
         EXPECT_EQ(2, a1(1));
         EXPECT_EQ(4, a2(1, 1));
@@ -169,7 +171,7 @@ namespace xt
     
     TEST(xarray, zerod)
     {
-        xarray<int> a;
+        xarray_dynamic a;
         EXPECT_EQ(0, a());
     }
 }
