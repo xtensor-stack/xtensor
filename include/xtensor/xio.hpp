@@ -252,8 +252,13 @@ namespace xt
                 }
                 else
                 {
-                    // 3 => sign and dot and + 1 (from calculation for exponent)
-                    m_width = 3 + (precision_type)std::log10(std::floor(m_max)) + m_precision;
+                    precision_type decimals = 1; // print a leading 0
+                    if (std::floor(m_max) != 0)
+                    {
+                        decimals += (precision_type) std::log10(std::floor(m_max));
+                    }
+                    // 2 => sign and dot
+                    m_width = 2 + decimals + m_precision;
                 }
                 if (!m_required_precision)
                 {
@@ -310,7 +315,7 @@ namespace xt
                 {
                     if (!m_scientific || !m_large_exponent)
                     {
-                        int exponent = 1 + (int)std::log10(std::fabs(val));
+                        int exponent = 1 + (int)std::log10(std::abs(val));
                         if (exponent <= -5 || exponent > 7)
                         {
                             m_scientific = true;
@@ -491,7 +496,10 @@ namespace xt
                 std::stringstream buf;
                 imag_printer.print_next(buf);
                 std::string s = buf.str();
-                s.erase(0, 1);  // erase space for +/-
+                if (s[0] == ' ')
+                {
+                    s.erase(0, 1);  // erase space for +/-
+                }
                 // insert j at end of number
                 std::size_t idx = s.find_last_not_of(" ");
                 s.insert(idx + 1, "j");
@@ -503,7 +511,7 @@ namespace xt
             void update(const value_type& val)
             {
                 real_printer.update(val.real());
-                imag_printer.update(std::fabs(val.imag()));
+                imag_printer.update(std::abs(val.imag()));
                 m_signs.push_back(std::signbit(val.imag()));
             }
 
