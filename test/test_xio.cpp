@@ -233,6 +233,18 @@ namespace xt
         EXPECT_EQ(complex_numbers, out.str());
     }
 
+    TEST(xio, complex_zero_erasing)
+    {
+        xt::random::seed(123);
+        xt::xarray<double> real = xt::random::rand<double>({10, 10});
+        xt::xarray<double> imag = xt::random::rand<double>({10, 10});
+        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1)); 
+
+        std::stringstream out;
+        out << e;
+        EXPECT_EQ(complex_zero_erasing, out.str());
+    }
+
     TEST(xio, custom_formatter)
     {
         xt::xarray<int> e = {{1,2,3,4}, {100, 200, 1000, 10000000}};

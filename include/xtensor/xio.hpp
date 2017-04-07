@@ -491,7 +491,10 @@ namespace xt
                 std::stringstream buf;
                 imag_printer.print_next(buf);
                 std::string s = buf.str();
-                s.erase(0, 1);  // erase space for +/-
+                if (s[0] == ' ')
+                {
+                    s.erase(0, 1);  // erase space for +/-
+                }
                 // insert j at end of number
                 std::size_t idx = s.find_last_not_of(" ");
                 s.insert(idx + 1, "j");
