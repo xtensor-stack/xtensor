@@ -52,6 +52,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xstridedview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstorage.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstrides.hpp

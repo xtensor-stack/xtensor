@@ -14,12 +14,12 @@
 
 namespace xt
 {
+
     namespace detail
     {
         template <class T>
         using is_container = std::is_base_of<xcontainer<std::remove_const_t<T>>, T>;
     }
-
     /**
      * Force evaluation of xexpression.
      * @return xarray or xtensor depending on shape type
