@@ -54,23 +54,20 @@ namespace xt
         using iterator = broadcast_iterator;
     };
 
-    /**************
+    /*****************
      * xstrided_view *
-     **************/
+     *****************/
 
     /**
      * @class xstrided_view
-     * @brief View of an xexpression from vector of indices.
+     * @brief View of an xexpression using strides
      *
-     * The xstrided_view class implements a flat (1D) view into a multidimensional
-     * xexpression yielding the values at the indices of the index array.
-     * xstrided_view is not meant to be used directly, but only with the \ref index_view
-     * and \ref filter helper functions.
-     *
+     * The xstrided_view class implements a view utilizing an offset and strides 
+     * into a multidimensional xcontainer. The xstridedview is currently used 
+     * to implement `diagonal`, `flip` and `transpose.
      * @tparam CT the closure type of the \ref xexpression type underlying this view
-     * @tparam I the index array type of the view
      *
-     * @sa index_view, filter
+     * @sa stridedview, transpose, diagonal, flip
      */
     template <class CT>
     class xstrided_view : public xview_semantic<xstrided_view<CT>>,
@@ -147,7 +144,7 @@ namespace xt
         bool broadcast_shape(O& shape) const;
 
         template <class O>
-        bool is_trivial_broadcast(const O& /*strides*/) const noexcept;
+        bool is_trivial_broadcast(const O& strides) const noexcept;
 
         template <class ST>
         stepper stepper_begin(const ST& shape);
@@ -170,9 +167,9 @@ namespace xt
     private:
 
         CT m_e;
-        const shape_type m_shape;
-        const strides_type m_strides;
-        const std::size_t m_offset;
+        shape_type m_shape;
+        strides_type m_strides;
+        std::size_t m_offset;
 
         void assign_temporary_impl(temporary_type& tmp);
 
@@ -404,9 +401,10 @@ namespace xt
      */
     template <class CT>
     template <class O>
-    inline bool xstrided_view<CT>::is_trivial_broadcast(const O& /*strides*/) const noexcept
+    inline bool xstrided_view<CT>::is_trivial_broadcast(const O& str) const noexcept
     {
-        return false;
+        return str.size() == strides().size() &&
+            std::equal(str.cbegin(), str.cend(), strides().begin());
     }
     //@}
 
@@ -446,6 +444,19 @@ namespace xt
         return const_stepper(this, offset, true);
     }
 
+    /**
+     * Construct a strided view from an xexpression, shape, strides and offset.
+     *
+     * @param e xexpression
+     * @param shape the shape of the view
+     * @param strides the new strides of the view
+     * @param offset the offset of the first element in the underlying container
+     *
+     * @tparam E type of xexpression
+     * @tparam I shape and strides type
+     *
+     * @return the view
+     */
     template <class E, class I>
     inline auto strided_view(E&& e, I&& shape, I&& strides, std::size_t offset = 0) noexcept
     {
@@ -680,13 +691,19 @@ namespace xt
      *               from which the diagonals should be taken.
      * @param check_policy the check level (check_policy::full() or check_policy::none())
      * @tparam Tag selects the level of error checking on. Default: check_policy::none.
-     * @returns xexpression with values of the diagonal
+     * @returns view with values of the diagonal
      *
      * \code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3},
      *                         {4, 5, 6}
      *                         {7, 8, 9}};
      * auto b = xt::diagonal(a); // => {1, 5, 9}
+     * // as this is a view, you can also easily assign new values to 
+     * // the diagonal, e.g.
+     * b = 10;
+     * // => {{ 10,  2,  3}, 
+     * //     {  4, 10,  6},
+     * //     {  7,  8, 10}}
      * \endcode
      */
     template <class E, class Tag = check_policy::none>
@@ -703,7 +720,7 @@ namespace xt
      * @param arr the input xexpression
      * @param axis the axis along which elements should be reversed
      *
-     * @return xexpression evaluating to reversed array
+     * @return view evaluating to reversed array
      */
     template <class E>
     inline auto flip(E&& e, std::size_t axis)
