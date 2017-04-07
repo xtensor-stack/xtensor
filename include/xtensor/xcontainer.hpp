@@ -191,6 +191,8 @@ namespace xt
         using inner_strides_type = typename base_type::inner_strides_type;
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
 
+        static constexpr xt::layout layout_type = L;
+
         void reshape(const shape_type& shape, bool force = false);
         void reshape(const shape_type& shape, xt::layout l);
         void reshape(const shape_type& shape, const strides_type& strides);

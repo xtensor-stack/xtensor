@@ -22,9 +22,9 @@ namespace xt
     /*! Layout enum for xcontainer based xexpressions */
     enum class layout
     {
-        row_major, /*! row major layout */
-        column_major, /*! column major layout */
-        dynamic /*! dynamic layout: you can reshape to row major, column major, or use custom strides */
+        dynamic = 0, /*! dynamic layout: you can reshape to row major, column major, or use custom strides */
+        row_major = 1, /*! row major layout */
+        column_major = 2 /*! column major layout */
     };
 
     template <class EC, layout L, class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,

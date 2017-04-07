@@ -616,7 +616,7 @@ namespace xt
     template <class E>
     inline bool any(E&& e)
     {
-        return std::any_of(e.cbegin(), e.cend(),
+        return std::any_of(e.cxbegin(), e.cxend(),
                            [](const typename std::decay_t<E>::value_type& el) { return el; });
     }
 
@@ -632,7 +632,9 @@ namespace xt
     template <class E>
     inline bool all(E&& e)
     {
-        return std::all_of(e.cbegin(), e.cend(),
+        // TODO check if elements of xfunction are trivially broadcastable
+        // amongst each other and, if yes, use faster iterators (begin/end)
+        return std::all_of(e.cxbegin(), e.cxend(),
                            [](const typename std::decay_t<E>::value_type& el) { return el; });
     }
 }
