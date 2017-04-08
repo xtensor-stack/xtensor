@@ -43,9 +43,6 @@ namespace xt
     template <class ST, class... S>
     struct xview_shape_type;
 
-    template <class CT>
-    class xaxis_iterator;
-
     template <class CT, class... S>
     struct xiterable_inner_types<xview<CT, S...>>
     {
@@ -219,7 +216,6 @@ namespace xt
         void assign_temporary_impl(temporary_type& tmp);
 
         friend class xview_semantic<xview<CT, S...>>;
-        friend class xaxis_iterator<CT>;
     };
 
     template <class E, class... S>

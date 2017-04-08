@@ -27,17 +27,15 @@ namespace xt
         using self_type = xaxis_iterator<CT>;
 
         using xexpression_type = std::decay_t<CT>;
-        using value_type = typename xexpression_type::value_type;
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
-        using reference = xview<CT, size_type>;
-        using const_reference = const xview<CT, size_type>;
-        using pointer = reference*;
-        using const_pointer = const reference*;
-
+        using value_type = xview<CT, size_type>;
+        using reference = std::remove_reference_t<apply_cv_t<CT, value_type>>;
+        using pointer = std::nullptr_t;
 
         using iterator_category = std::forward_iterator_tag;
 
+        xaxis_iterator();
         template <class CTA>
         xaxis_iterator(CTA&& e, size_type index);
 
@@ -51,7 +49,9 @@ namespace xt
 
     private:
 
-        reference m_view;
+        using storing_type = std::add_pointer_t<std::remove_reference_t<CT>>;
+        storing_type p_expression;
+        size_type m_index;
     };
 
     template <class CT>
@@ -71,16 +71,22 @@ namespace xt
      *********************************/
 
     template <class CT>
+    inline xaxis_iterator<CT>::xaxis_iterator()
+        : p_expression(nullptr), m_index(0)
+    {
+    }
+
+    template <class CT>
     template <class CTA>
     inline xaxis_iterator<CT>::xaxis_iterator(CTA&& e, size_type index)
-        : m_view(view(std::forward<CTA>(e), index))
+        : p_expression(&e), m_index(index)
     {
     }
 
     template <class CT>
     inline auto xaxis_iterator<CT>::operator++() -> self_type&
     {
-        ++std::get<0>(m_view.m_slices);
+        ++m_index;
         return *this;
     }
 
@@ -92,23 +98,25 @@ namespace xt
         return tmp;
     }
 
+    template <class T>
+    struct PRINT;
+
     template <class CT>
     inline auto xaxis_iterator<CT>::operator*() const -> reference
     {
-        return m_view;
+        return view(*p_expression, size_type(m_index));
     }
 
     template <class CT>
     inline auto xaxis_iterator<CT>::operator->() const -> pointer
     {
-        return const_cast<pointer>(&m_view);
+        return nullptr;
     }
 
     template<class CT>
     inline bool xaxis_iterator<CT>::equal(const self_type& rhs) const
     {
-        return &m_view.m_e == &(rhs.m_view.m_e)
-            && (std::get<0>(m_view.m_slices) == std::get<0>(rhs.m_view.m_slices));
+        return p_expression == rhs.p_expression && m_index == rhs.m_index;
     }
 
     template <class CT>
