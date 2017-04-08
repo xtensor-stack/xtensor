@@ -27,16 +27,28 @@ Besides the xtendor headers, all these methods place the `cmake` project configu
 
 .. image:: conda.svg
 
-With the conda package manager
-------------------------------
+Using the conda package
+-----------------------
 
-We provide a package for the conda package manager.
+A package for xtensor is available on the conda package manager.
 
 .. code::
 
-    conda install -c conda-forge xtensor 
+    conda install -c conda-forge xtensor
+
+.. image:: debian.svg
+
+Using the Debian package
+------------------------
+
+A package for xtensor is available on Debian.
+
+.. code::
+
+    sudo apt-get install xtensor-dev
 
 .. image:: cmake.svg
+
 
 From source with cmake
 ----------------------
