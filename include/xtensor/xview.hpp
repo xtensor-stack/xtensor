@@ -105,7 +105,7 @@ namespace xt
         using const_iterator = typename iterable_base::const_iterator;
 
         template <class CTA, class... SL>
-        xview(CTA&& e, SL&&... slices) noexcept;
+        explicit xview(CTA&& e, SL&&... slices) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
