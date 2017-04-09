@@ -13,7 +13,7 @@
 namespace xt
 {
     using vector_type = std::vector<int>;
-    using adaptor_type = xarray_adaptor<std::vector<int>>;
+    using adaptor_type = xarray_adaptor<std::vector<int>, layout::dynamic>;
 
     TEST(xadaptor_semantic, a_plus_b)
     {
