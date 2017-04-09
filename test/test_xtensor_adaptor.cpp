@@ -13,7 +13,7 @@
 namespace xt
 {
     using vec_type = std::vector<int>;
-    using adaptor_type = xtensor_adaptor<vec_type, 3>;
+    using adaptor_type = xtensor_adaptor<vec_type, 3, layout::dynamic>;
     using container_type = std::array<std::size_t, 3>;
 
     TEST(xtensor_adaptor, shaped_constructor)

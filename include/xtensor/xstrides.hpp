@@ -14,15 +14,10 @@
 #include <numeric>
 
 #include "xexception.hpp"
+#include "xtensor_forward.hpp"
 
 namespace xt
 {
-    enum class layout
-    {
-        row_major,
-        column_major
-    };
-
     template <class shape_type>
     typename shape_type::value_type compute_size(const shape_type& shape) noexcept;
 

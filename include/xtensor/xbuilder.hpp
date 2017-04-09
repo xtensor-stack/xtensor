@@ -547,53 +547,6 @@ namespace xt
     namespace detail
     {
         template <class CT>
-        class diagonal_fn
-        {
-        public:
-
-            using xexpression_type = std::decay_t<CT>;
-            using value_type = typename xexpression_type::value_type;
-
-            template <class CTA>
-            diagonal_fn(CTA&& source, int offset, std::size_t axis_1, std::size_t axis_2)
-                : m_source(std::forward<CTA>(source)), m_offset(offset), m_axis_1(axis_1), m_axis_2(axis_2)
-            {
-            }
-
-            template <class It>
-            inline value_type operator()(It begin, It) const
-            {
-                xindex idx(m_source.shape().size());
-
-                for (std::size_t i = 0; i < idx.size(); i++)
-                {
-                    if (i != m_axis_1 && i != m_axis_2)
-                    {
-                        idx[i] = *begin++;
-                    }
-                }
-                if (m_offset >= 0)
-                {
-                    idx[m_axis_1] = *(begin);
-                    idx[m_axis_2] = *(begin) + m_offset;
-                }
-                else
-                {
-                    idx[m_axis_1] = *(begin) - m_offset;
-                    idx[m_axis_2] = *(begin);
-                }
-                return m_source[idx];
-            }
-
-        private:
-
-            CT m_source;
-            const int m_offset;
-            const std::size_t m_axis_1;
-            const std::size_t m_axis_2;
-        };
-
-        template <class CT>
         class diag_fn
         {
         public:
@@ -624,51 +577,6 @@ namespace xt
 
             CT m_source;
             const int m_k;
-        };
-
-        template <class CT>
-        class flip_impl
-        {
-        public:
-
-            using xexpression_type = std::decay_t<CT>;
-            using value_type = typename xexpression_type::value_type;
-            using size_type = typename xexpression_type::size_type;
-
-            template <class CTA>
-            flip_impl(CTA&& source, std::size_t axis)
-                : m_source(std::forward<CTA>(source)), m_axis(axis), m_shape_at_axis(m_source.shape()[m_axis] - 1)
-            {
-            }
-
-            template <class... Args>
-            inline value_type operator()(Args... args) const
-            {
-                std::array<size_type, sizeof...(Args)> idx({static_cast<size_type>(args)...});
-                return access_impl(idx.begin(), idx.end());
-            }
-
-            template <class It>
-            inline value_type element(It first, It last) const
-            {
-                // TODO: avoid memory allocation
-                xindex idx(first, last);
-                return access_impl(idx.begin(), idx.end());
-            }
-
-        private:
-
-            template <class It>
-            inline value_type access_impl(It begin, It end) const
-            {
-                auto it = begin + m_axis;
-                *it = m_shape_at_axis - *it;
-                return m_source.element(begin, end);
-            }
-
-            CT m_source;
-            const size_type m_axis;
-            const size_type m_shape_at_axis;
         };
 
         template <class CT, class Comp>
@@ -702,65 +610,6 @@ namespace xt
     }
 
     /**
-     * @brief Returns the elements on the diagonal of arr
-     * If arr has more than two dimensions, then the axes specified by 
-     * axis_1 and axis_2 are used to determine the 2-D sub-array whose 
-     * diagonal is returned. The shape of the resulting array can be 
-     * determined by removing axis1 and axis2 and appending an index 
-     * to the right equal to the size of the resulting diagonals.
-     *
-     * @param arr the input array
-     * @param offset offset of the diagonal from the main diagonal. Can
-     *               be positive or negative.
-     * @param axis_1 Axis to be used as the first axis of the 2-D sub-arrays 
-     *               from which the diagonals should be taken. 
-     * @param axis_2 Axis to be used as the second axis of the 2-D sub-arrays 
-     *               from which the diagonals should be taken. 
-     * @returns xexpression with values of the diagonal
-     *
-     * \code{.cpp}
-     * xt::xarray<double> a = {{1, 2, 3},
-     *                         {4, 5, 6}
-     *                         {7, 8, 9}};
-     * auto b = xt::diagonal(a); // => {1, 5, 9}
-     * \endcode
-     */
-    template <class E>
-    inline auto diagonal(E&& arr, int offset = 0, std::size_t axis_1 = 0, std::size_t axis_2 = 1)
-    {
-        using CT = xclosure_t<E>;
-        auto shape = arr.shape();
-
-        // the following shape calculation code is an almost verbatim adaptation of numpy:
-        // https://github.com/numpy/numpy/blob/2aabeafb97bea4e1bfa29d946fbf31e1104e7ae0/numpy/core/src/multiarray/item_selection.c#L1799
-
-        auto ret_shape = std::vector<std::size_t>(arr.dimension());
-
-        std::size_t dim_1 = shape[axis_1];
-        std::size_t dim_2 = shape[axis_2];
-        std::size_t n_dim = arr.dimension();
-
-        offset >= 0 ? dim_2 -= offset : dim_1 += offset;
-
-        auto diag_size = dim_2 < dim_1 ? dim_2 : dim_1;
-
-        std::size_t i = 0;
-        for (std::size_t idim = 0; idim < n_dim; ++idim)
-        {
-            if (idim != axis_1 && idim != axis_2)
-            {
-                ret_shape[i++] = shape[idim];
-            }
-        }
-
-        ret_shape[n_dim - 2] = diag_size;
-        ret_shape.pop_back();
-
-        return detail::make_xgenerator(detail::fn_impl<detail::diagonal_fn<CT>>(detail::diagonal_fn<CT>(std::forward<E>(arr), offset, axis_1, axis_2)),
-                                       ret_shape);
-    }
-
-    /**
      * @brief xexpression with values of arr on the diagonal, zeroes otherwise
      *
      * @param arr the 1D input array of length n
@@ -781,25 +630,6 @@ namespace xt
         std::size_t s = arr.shape()[0] + std::abs(k);
         return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr), k)),
                                        {s, s});
-    }
-
-    /**
-     * @brief Reverse the order of elements in an xexpression along the given axis.
-     * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
-     * `fliplr(arr)` to `xt::flip(arr, 1)`.
-     * 
-     * @param arr the input xexpression
-     * @param axis the axis along which elements should be reversed
-     *
-     * @return xexpression evaluating to reversed array
-     */
-    template <class E>
-    inline auto flip(E&& arr, std::size_t axis)
-    {
-        using CT = xclosure_t<E>;
-        auto shape = arr.shape();
-        return detail::make_xgenerator(detail::flip_impl<CT>(std::forward<E>(arr), axis),
-                                       shape);
     }
 
     /**
@@ -840,4 +670,5 @@ namespace xt
                                        shape);
     }
 }
+
 #endif

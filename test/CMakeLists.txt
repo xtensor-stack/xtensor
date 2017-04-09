@@ -94,6 +94,7 @@ set(XTENSOR_TESTS
     test_xindexview.cpp
     test_xiterator.cpp
     test_xio.cpp
+    test_xlayout.cpp
     test_xmath.cpp
     test_xnoalias.cpp
     test_xoperation.cpp
@@ -102,6 +103,7 @@ set(XTENSOR_TESTS
     test_xscalar.cpp
     test_xscalar_semantic.cpp
     test_xsemantic.hpp
+    test_xstridedview.cpp
     test_xtensor.cpp
     test_xtensor_adaptor.cpp
     test_xtensor_semantic.cpp

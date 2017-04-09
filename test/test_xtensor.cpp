@@ -13,10 +13,10 @@
 namespace xt
 {
     using container_type = std::array<std::size_t, 3>;
-
+    using xtensor_type = xtensor<int, 3, layout::dynamic>;
     TEST(xtensor, initializer_constructor)
     {
-        xtensor<int, 3> t 
+        xtensor_type t 
           {{{0, 1, 2}, 
             {3, 4, 5}, 
             {6, 7, 8}}, 
@@ -33,14 +33,14 @@ namespace xt
         {
             SCOPED_TRACE("row_major constructor");
             row_major_result<container_type> rm;
-            xtensor<int, 3> ra(rm.m_shape);
+            xtensor_type ra(rm.m_shape);
             compare_shape(ra, rm);
         }
 
         {
             SCOPED_TRACE("column_major constructor");
             column_major_result<container_type> cm;
-            xtensor<int, 3> ca(cm.m_shape, layout::column_major);
+            xtensor_type ca(cm.m_shape, layout::column_major);
             compare_shape(ca, cm);
         }
     }
@@ -48,7 +48,7 @@ namespace xt
     TEST(xtensor, strided_constructor)
     {
         central_major_result<container_type> cmr;
-        xtensor<int, 3> cma(cmr.m_shape, cmr.m_strides);
+        xtensor_type cma(cmr.m_shape, cmr.m_strides);
         compare_shape(cma, cmr);
     }
 
@@ -58,9 +58,9 @@ namespace xt
             SCOPED_TRACE("row_major valued constructor");
             row_major_result<container_type> rm;
             int value = 2;
-            xtensor<int, 3> ra(rm.m_shape, value);
+            xtensor_type ra(rm.m_shape, value);
             compare_shape(ra, rm);
-            xtensor<int, 3>::container_type vec(ra.size(), value);
+            xtensor_type::container_type vec(ra.size(), value);
             EXPECT_EQ(ra.data(), vec);
         }
 
@@ -68,9 +68,9 @@ namespace xt
             SCOPED_TRACE("column_major valued constructor");
             column_major_result<container_type> cm;
             int value = 2;
-            xtensor<int, 3> ca(cm.m_shape, value, layout::column_major);
+            xtensor_type ca(cm.m_shape, value, layout::column_major);
             compare_shape(ca, cm);
-            xtensor<int, 3>::container_type vec(ca.size(), value);
+            xtensor_type::container_type vec(ca.size(), value);
             EXPECT_EQ(ca.data(), vec);
         }
     }
@@ -79,9 +79,9 @@ namespace xt
     {
         central_major_result<container_type> cmr;
         int value = 2;
-        xtensor<int, 3> cma(cmr.m_shape, cmr.m_strides, value);
+        xtensor_type cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
-        xtensor<int, 3>::container_type vec(cma.size(), value);
+        xtensor_type::container_type vec(cma.size(), value);
         EXPECT_EQ(cma.data(), vec);
     }
 
@@ -89,11 +89,11 @@ namespace xt
     {
         central_major_result<container_type> res;
         int value = 2;
-        xtensor<int, 3> a(res.m_shape, res.m_strides, value);
+        xtensor_type a(res.m_shape, res.m_strides, value);
 
         {
             SCOPED_TRACE("copy constructor");
-            xtensor<int, 3> b(a);
+            xtensor_type b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
@@ -101,7 +101,7 @@ namespace xt
         {
             SCOPED_TRACE("assignment operator");
             row_major_result<container_type> r;
-            xtensor<int, 3> c(r.m_shape, 0);
+            xtensor_type c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
             c = a;
             compare_shape(a, c);
@@ -113,12 +113,12 @@ namespace xt
     {
         central_major_result<container_type> res;
         int value = 2;
-        xtensor<int, 3> a(res.m_shape, res.m_strides, value);
+        xtensor_type a(res.m_shape, res.m_strides, value);
 
         {
             SCOPED_TRACE("move constructor");
-            xtensor<int, 3> tmp(a);
-            xtensor<int, 3> b(std::move(tmp));
+            xtensor_type tmp(a);
+            xtensor_type b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.data(), b.data());
         }
@@ -126,9 +126,9 @@ namespace xt
         {
             SCOPED_TRACE("move assignment");
             row_major_result<container_type> r;
-            xtensor<int, 3> c(r.m_shape, 0);
+            xtensor_type c(r.m_shape, 0);
             EXPECT_NE(a.data(), c.data());
-            xtensor<int, 3> tmp(a);
+            xtensor_type tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
             EXPECT_EQ(a.data(), c.data());
@@ -137,26 +137,26 @@ namespace xt
 
     TEST(xtensor, reshape)
     {
-        xtensor<int, 3> a;
-        test_reshape<xtensor<int, 3>, container_type>(a);
+        xtensor_type a;
+        test_reshape<xtensor_type, container_type>(a);
     }
 
     TEST(xtensor, transpose)
     {
-        xtensor<int, 3> a;
-        test_transpose<xtensor<int, 3>, container_type>(a);
+        xtensor_type a;
+        test_transpose<xtensor_type, container_type>(a);
     }
 
     TEST(xtensor, access)
     {
-        xtensor<int, 3> a;
-        test_access<xtensor<int, 3>, container_type>(a);
+        xtensor_type a;
+        test_access<xtensor_type, container_type>(a);
     }
 
     TEST(xtensor, indexed_access)
     {
-        xtensor<int, 3> a;
-        test_indexed_access<xtensor<int, 3>, container_type>(a);
+        xtensor_type a;
+        test_indexed_access<xtensor_type, container_type>(a);
     }
 
     TEST(xtensor, broadcast_shape)
@@ -167,13 +167,13 @@ namespace xt
 
     TEST(xtensor, iterator)
     {
-        xtensor<int, 3> a;
-        test_iterator<xtensor<int, 3>, container_type>(a);
+        xtensor_type a;
+        test_iterator<xtensor_type, container_type>(a);
     }
 
     TEST(xtensor, zerod)
     {
-        xtensor<int, 3> a;
+        xtensor_type a;
         EXPECT_EQ(0, a());
     }
 }
