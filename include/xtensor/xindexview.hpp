@@ -103,6 +103,7 @@ namespace xt
         using base_index_type = xindex_type_t<shape_type>;
 
         static constexpr xt::layout layout_type = xt::layout::dynamic;
+        static constexpr bool contiguous_layout = false;
 
         template <class I2>
         xindexview(CT e, I2&& indices) noexcept;

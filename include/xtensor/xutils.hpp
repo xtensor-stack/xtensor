@@ -42,6 +42,12 @@ namespace xt
     template <class... T>
     struct and_;
 
+    template <bool... B>
+    struct or_c;
+
+    template <bool... B>
+    struct and_c;
+
     template <std::size_t I, class... Args>
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
@@ -177,9 +183,9 @@ namespace xt
     {
     };
 
-    /**********************
+    /***********************
      * and_ implementation *
-     **********************/
+     ***********************/
 
     template <>
     struct and_<> : std::integral_constant<bool, true>
@@ -189,6 +195,20 @@ namespace xt
     template <class T, class... Ts>
     struct and_<T, Ts...>
         : std::integral_constant<bool, T::value && and_<Ts...>::value>
+    {
+    };
+
+    /**********************************
+     * or_c and and_c implementations *
+     **********************************/
+
+    template <bool... B>
+    struct or_c : or_<std::integral_constant<bool, B>...>
+    {
+    };
+
+    template <bool... B>
+    struct and_c : and_<std::integral_constant<bool, B>...>
     {
     };
 

@@ -58,6 +58,7 @@ namespace xt
         using const_iterator = const_broadcast_iterator;
 
         static constexpr xt::layout layout_type = xt::layout::any;
+        static constexpr bool contiguous_layout = true;
 
         xscalar(CT value) noexcept;
 

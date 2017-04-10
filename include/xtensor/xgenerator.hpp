@@ -86,7 +86,8 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
-        static constexpr xt::layout layout_type = xt::layout::dynamic;
+        static constexpr xt::layout layout_type = xt::layout::any;
+        static constexpr bool contiguous_layout = true;
         
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;

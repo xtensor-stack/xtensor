@@ -104,6 +104,7 @@ namespace xt
         using const_iterator = typename iterable_base::const_iterator;
 
         static constexpr xt::layout layout_type = xexpression_type::layout_type;
+        static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
 
         template <class CTA, class S>
         xbroadcast(CTA&& e, S&& s) noexcept;

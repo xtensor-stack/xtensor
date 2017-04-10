@@ -203,6 +203,7 @@ namespace xt
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
 
         static constexpr xt::layout layout_type = L;
+        static constexpr bool contiguous_layout = layout_type != xt::layout::dynamic;
 
         void reshape(const shape_type& shape, bool force = false);
         void reshape(const shape_type& shape, xt::layout l);

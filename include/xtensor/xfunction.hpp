@@ -130,6 +130,7 @@ namespace xt
         using broadcast_iterator = const_broadcast_iterator;
 
         static constexpr xt::layout layout_type = compute_layout(std::decay_t<CT>::layout_type...);
+        static constexpr bool contiguous_layout = and_c<std::decay_t<CT>::contiguous_layout...>::value;
 
         template <class Func>
         xfunction(Func&& f, CT... e) noexcept;

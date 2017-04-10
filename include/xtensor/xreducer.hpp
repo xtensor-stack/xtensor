@@ -126,6 +126,7 @@ namespace xt
         using const_iterator = typename iterable_base::const_iterator;
 
         static constexpr xt::layout layout_type = xt::layout::dynamic;
+        static constexpr bool contiguous_layout = false;
 
         template <class Func, class CTA, class AX>
         xreducer(Func&& func, CTA&& e, AX&& axes);

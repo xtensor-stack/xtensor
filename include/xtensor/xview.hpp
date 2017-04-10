@@ -105,6 +105,7 @@ namespace xt
         using const_iterator = typename iterable_base::const_iterator;
 
         static constexpr xt::layout layout_type = xt::layout::dynamic;
+        static constexpr bool contiguous_layout = false;
 
         template <class CTA, class... SL>
         explicit xview(CTA&& e, SL&&... slices) noexcept;

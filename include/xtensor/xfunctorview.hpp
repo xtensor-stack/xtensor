@@ -117,6 +117,7 @@ namespace xt
         using const_iterator = xfunctor_iterator<functor_type, typename xexpression_type::const_iterator>;
 
         static constexpr xt::layout layout_type = xexpression_type::layout_type;
+        static constexpr bool contiguous_layout = false;
 
         xfunctorview(CT) noexcept;
 
