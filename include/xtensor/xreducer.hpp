@@ -125,12 +125,15 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
+        static constexpr xt::layout layout_type = xt::layout::dynamic;
+
         template <class Func, class CTA, class AX>
         xreducer(Func&& func, CTA&& e, AX&& axes);
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
+        xt::layout layout() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -465,6 +468,15 @@ namespace xt
     inline auto xreducer<F, CT, X>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
+    }
+
+    /**
+     * Returns the shape of the expression.
+     */
+    template <class F, class CT, class X>
+    inline xt::layout xreducer<F, CT, X>::layout() const noexcept
+    {
+        return layout_type;
     }
     //@}
 

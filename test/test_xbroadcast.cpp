@@ -22,6 +22,7 @@ namespace xt
         ASSERT_EQ(1.0, m1_broadcast(0, 0, 0));
         ASSERT_EQ(4.0, m1_broadcast(0, 1, 0));
         ASSERT_EQ(5.0, m1_broadcast(0, 1, 1));
+        ASSERT_EQ(m1_broadcast.layout(), m1.layout());
 
         auto shape = std::vector<std::size_t> {1, 2, 3};
         auto m1_broadcast2 = broadcast(m1, shape);

@@ -23,6 +23,7 @@ namespace xt
         xarray<double> e = xt::random::rand<double>({3, 3});
         xarray<double> e_copy = e;
         auto v = index_view(e, {{1, 1}, {1, 2}, {2, 2}});
+        EXPECT_EQ(v.layout(), layout::dynamic);
 
         using shape_type = typename decltype(v)::shape_type;
         EXPECT_EQ(shape_type{3}, v.shape());

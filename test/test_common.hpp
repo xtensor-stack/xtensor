@@ -9,6 +9,8 @@
 #ifndef TEST_COMMON_HPP
 #define TEST_COMMON_HPP
 
+#include "xtensor/xlayout.hpp"
+
 namespace xt
 {
     template <class T, class A>
@@ -53,12 +55,14 @@ namespace xt
         strides_type m_strides;
         strides_type m_backstrides;
         vector_type m_data;
+        xt::layout m_layout;
         assigner_type m_assigner;
 
         inline size_type size() const { return m_data.size(); }
         inline const shape_type& shape() const { return m_shape; }
         inline const strides_type& strides() const { return m_strides; }
         inline const strides_type& backstrides() const { return m_backstrides; }
+        inline xt::layout layout() const { return m_layout; }
         inline const vector_type& data() const { return m_data; }
     };
 
@@ -72,6 +76,7 @@ namespace xt
             this->m_data = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9,
                              10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
                              20, 21, 22, 23 };
+            this->m_layout = xt::layout::row_major;
         }
     };
 
@@ -86,6 +91,7 @@ namespace xt
                               1, 9, 17, 5, 13, 21,
                               2, 10, 18, 6, 14, 22,
                               3, 11, 19, 7, 15, 23 };
+            this->m_layout = xt::layout::column_major;
         }
     };
 
@@ -99,6 +105,7 @@ namespace xt
             this->m_data = { -1, 4, 1, 5, 2, 6, 3, 7,
                               8, 12, 9, 13, 10, 14, 11, 15,
                              16, 20, 17, 21, 18, 22, 19, 23 };
+            this->m_layout = xt::layout::dynamic;
         }
     };
 
@@ -118,6 +125,7 @@ namespace xt
             m_strides = { 4, 0, 1 };
             m_backstrides = { 8, 0, 3 };
             m_data = { -1, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19 };
+            m_layout = xt::layout::dynamic;
             m_assigner.resize(m_shape[0]);
             for (std::size_t i = 0; i < m_shape[0]; ++i)
             {
@@ -132,22 +140,28 @@ namespace xt
         strides_type m_strides;
         strides_type m_backstrides;
         vector_type m_data;
+        xt::layout m_layout;
         assigner_type m_assigner;
 
         inline size_type size() const { return m_data.size(); }
         inline const shape_type& shape() const { return m_shape; }
         inline const strides_type& strides() const { return m_strides; }
         inline const strides_type& backstrides() const { return m_backstrides; }
+        inline xt::layout layout() const { return m_layout; }
         inline const vector_type& data() const { return m_data; }
     };
 
     template <class V, class R>
-    void compare_shape(V& vec, const R& result)
+    void compare_shape(V& vec, const R& result, bool compare_layout = true)
     {
         EXPECT_EQ(vec.shape(), result.shape());
         EXPECT_EQ(vec.strides(), result.strides());
         EXPECT_EQ(vec.backstrides(), result.backstrides());
         EXPECT_EQ(vec.size(), result.size());
+        if (compare_layout)
+        {
+            EXPECT_EQ(vec.layout(), result.layout());
+        }
     }
 
     template <class V, class C = std::vector<std::size_t>>
@@ -178,7 +192,8 @@ namespace xt
             SCOPED_TRACE("unit_shape reshape");
             unit_shape_result<C> usr;
             vec.reshape(usr.m_shape, layout::row_major);
-            compare_shape(vec, usr);
+            compare_shape(vec, usr, false);
+            EXPECT_EQ(vec.layout(), layout::row_major);
         }
     }
 

@@ -11,6 +11,7 @@
 
 #include "xtensor_config.hpp"
 #include "xstorage.hpp"
+#include "xlayout.hpp"
 #include <memory>
 #include <vector>
 
@@ -18,14 +19,6 @@ namespace xt
 {
     template <class C>
     struct xcontainer_inner_types;
-
-    /*! Layout enum for xcontainer based xexpressions */
-    enum class layout
-    {
-        dynamic = 0, /*! dynamic layout: you can reshape to row major, column major, or use custom strides */
-        row_major = 1, /*! row major layout */
-        column_major = 2 /*! column major layout */
-    };
 
     template <class EC, layout L, class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
                                                                      typename EC::allocator_type,
