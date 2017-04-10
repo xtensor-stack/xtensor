@@ -116,6 +116,9 @@ namespace xt
         using iterator = xfunctor_iterator<functor_type, typename xexpression_type::iterator>;
         using const_iterator = xfunctor_iterator<functor_type, typename xexpression_type::const_iterator>;
 
+        static constexpr xt::layout layout_type = xexpression_type::layout_type;
+        static constexpr bool contiguous_layout = false;
+
         xfunctorview(CT) noexcept;
 
         template <class Func, class E>
@@ -130,6 +133,7 @@ namespace xt
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
+        xt::layout layout() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
@@ -395,6 +399,15 @@ namespace xt
     inline auto xfunctorview<F, CT>::shape() const noexcept -> const shape_type&
     {
         return m_e.shape();
+    }
+
+    /**
+     * Returns the layout of the expression.
+     */
+    template <class F, class CT>
+    inline xt::layout xfunctorview<F, CT>::layout() const noexcept
+    {
+        return m_e.layout();
     }
     //@}
 

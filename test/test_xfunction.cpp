@@ -74,6 +74,50 @@ namespace xt
         }
     }
 
+    TEST(xfunction, layout)
+    {
+        xarray<int, layout::dynamic> m_d;
+        xarray<int, layout::row_major> m_r;
+        xarray<int, layout::column_major> m_c;
+        xscalar<int> m_a(2);
+
+        auto res_dd = m_d + m_d;
+        EXPECT_EQ(res_dd.layout(), layout::dynamic);
+        auto res_dr = m_d + m_r;
+        EXPECT_EQ(res_dr.layout(), layout::dynamic);
+        auto res_dc = m_d + m_c;
+        EXPECT_EQ(res_dc.layout(), layout::dynamic);
+        auto res_da = m_d + m_a;
+        EXPECT_EQ(res_da.layout(), layout::dynamic);
+
+        auto res_rd = m_r + m_d;
+        EXPECT_EQ(res_rd.layout(), layout::dynamic);
+        auto res_rr = m_r + m_r;
+        EXPECT_EQ(res_rr.layout(), layout::row_major);
+        auto res_rc = m_r + m_c;
+        EXPECT_EQ(res_rc.layout(), layout::dynamic);
+        auto res_ra = m_r + m_a;
+        EXPECT_EQ(res_ra.layout(), layout::row_major);
+
+        auto res_cd = m_c + m_d;
+        EXPECT_EQ(res_cd.layout(), layout::dynamic);
+        auto res_cr = m_c + m_r;
+        EXPECT_EQ(res_cr.layout(), layout::dynamic);
+        auto res_cc = m_c + m_c;
+        EXPECT_EQ(res_cc.layout(), layout::column_major);
+        auto res_ca = m_c + m_a;
+        EXPECT_EQ(res_ca.layout(), layout::column_major);
+
+        auto res_ad = m_a + m_d;
+        EXPECT_EQ(res_ad.layout(), layout::dynamic);
+        auto res_ar = m_a + m_r;
+        EXPECT_EQ(res_ar.layout(), layout::row_major);
+        auto res_ac = m_a + m_c;
+        EXPECT_EQ(res_ac.layout(), layout::column_major);
+        auto res_aa = m_a + m_a;
+        EXPECT_EQ(res_aa.layout(), layout::any);
+    }
+
     TEST(xfunction, access)
     {
         xfunction_features f;

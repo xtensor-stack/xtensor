@@ -103,12 +103,16 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
+        static constexpr xt::layout layout_type = xexpression_type::layout_type;
+        static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
+
         template <class CTA, class S>
         xbroadcast(CTA&& e, S&& s) noexcept;
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
+        xt::layout layout() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -226,6 +230,15 @@ namespace xt
     inline auto xbroadcast<CT, X>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
+    }
+
+    /**
+     * Returns the layout of the expression.
+     */
+    template <class CT, class X>
+    inline xt::layout xbroadcast<CT, X>::layout() const noexcept
+    {
+        return m_e.layout();
     }
     //@}
 

@@ -203,12 +203,13 @@ namespace xt
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
 
         static constexpr xt::layout layout_type = L;
+        static constexpr bool contiguous_layout = layout_type != xt::layout::dynamic;
 
         void reshape(const shape_type& shape, bool force = false);
         void reshape(const shape_type& shape, xt::layout l);
         void reshape(const shape_type& shape, const strides_type& strides);
 
-        xt::layout layout();
+        xt::layout layout() const noexcept;
 
     protected:
 
@@ -663,7 +664,7 @@ namespace xt
      * @return layout of the container
      */
     template <class D, layout L>
-    xt::layout xstrided_container<D, L>::layout()
+    xt::layout xstrided_container<D, L>::layout() const noexcept
     {
         return m_layout;
     }
@@ -676,12 +677,12 @@ namespace xt
     template <class D, layout L>
     inline void xstrided_container<D, L>::reshape(const shape_type& shape, bool force)
     {
-        if (m_layout == xt::layout::dynamic)
-        {
-            m_layout = xt::layout::row_major;  // fall back to row major
-        }
         if (shape != m_shape || force)
         {
+            if (m_layout == xt::layout::dynamic || m_layout == xt::layout::any)
+            {
+                m_layout = xt::layout::row_major;  // fall back to row major
+            }
             m_shape = shape;
             resize_container(m_strides, m_shape.size());
             resize_container(m_backstrides, m_shape.size());
@@ -722,6 +723,7 @@ namespace xt
         m_strides = strides;
         resize_container(m_backstrides, m_strides.size());
         adapt_strides(m_shape, m_strides, m_backstrides);
+        m_layout = xt::layout::dynamic;
         this->data().resize(compute_size(m_shape));
     }
 }

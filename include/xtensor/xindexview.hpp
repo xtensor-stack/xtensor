@@ -102,6 +102,9 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
 
+        static constexpr xt::layout layout_type = xt::layout::dynamic;
+        static constexpr bool contiguous_layout = false;
+
         template <class I2>
         xindexview(CT e, I2&& indices) noexcept;
 
@@ -114,6 +117,7 @@ namespace xt
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
+        xt::layout layout() const noexcept;
 
         reference operator()();
         template <class... Args>
@@ -300,6 +304,13 @@ namespace xt
     {
         return m_shape;
     }
+
+    template <class CT, class I>
+    inline xt::layout xindexview<CT, I>::layout() const noexcept
+    {
+        return layout_type;
+    }
+
     //@}
 
     /**

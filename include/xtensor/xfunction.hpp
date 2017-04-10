@@ -19,6 +19,7 @@
 
 #include "xexpression.hpp"
 #include "xiterator.hpp"
+#include "xlayout.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -128,12 +129,16 @@ namespace xt
         using const_broadcast_iterator = xiterator<const_stepper, shape_type*>;
         using broadcast_iterator = const_broadcast_iterator;
 
+        static constexpr xt::layout layout_type = compute_layout(std::decay_t<CT>::layout_type...);
+        static constexpr bool contiguous_layout = and_c<std::decay_t<CT>::contiguous_layout...>::value;
+
         template <class Func>
         xfunction(Func&& f, CT... e) noexcept;
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const shape_type& shape() const;
+        xt::layout layout() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -175,6 +180,9 @@ namespace xt
         const_stepper stepper_end(const S& shape) const noexcept;
 
     private:
+
+        template <std::size_t... I>
+        xt::layout layout_impl(std::index_sequence<I...>) const noexcept;
 
         template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
@@ -357,6 +365,15 @@ namespace xt
             m_shape_computed = true;
         }
         return m_shape;
+    }
+
+    /**
+     * Returns the layout of the xfunction.
+     */
+    template <class F, class R, class... CT>
+    inline xt::layout xfunction<F, R, CT...>::layout() const noexcept
+    {
+        return layout_impl(std::make_index_sequence<sizeof...(CT)>());
     }
     //@}
 
@@ -586,6 +603,13 @@ namespace xt
     {
         auto f = [&shape](const auto& e) noexcept { return e.stepper_end(shape); };
         return build_stepper(f, std::make_index_sequence<sizeof...(CT)>());
+    }
+
+    template <class F, class R, class... CT>
+    template <std::size_t... I>
+    inline xt::layout xfunction<F, R, CT...>::layout_impl(std::index_sequence<I...>) const noexcept
+    {
+        return compute_layout(std::get<I>(m_e).layout()...);
     }
 
     template <class F, class R, class... CT>

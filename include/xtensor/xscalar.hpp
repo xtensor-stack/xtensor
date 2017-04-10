@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "xexpression.hpp"
+#include "xlayout.hpp"
 
 namespace xt
 {
@@ -56,11 +57,15 @@ namespace xt
         using iterator = broadcast_iterator;
         using const_iterator = const_broadcast_iterator;
 
+        static constexpr xt::layout layout_type = xt::layout::any;
+        static constexpr bool contiguous_layout = true;
+
         xscalar(CT value) noexcept;
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
+        xt::layout layout() const noexcept;
 
         template <class... Args>
         reference operator()(Args...) noexcept;
@@ -259,6 +264,12 @@ namespace xt
     {
         static std::array<size_type, 0> zero_shape;
         return zero_shape;
+    }
+
+    template <class CT>
+    inline xt::layout xscalar<CT>::layout() const noexcept
+    {
+        return layout_type;
     }
 
     template <class CT>

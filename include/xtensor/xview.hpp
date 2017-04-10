@@ -104,6 +104,9 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
+        static constexpr xt::layout layout_type = xt::layout::dynamic;
+        static constexpr bool contiguous_layout = false;
+
         template <class CTA, class... SL>
         explicit xview(CTA&& e, SL&&... slices) noexcept;
 
@@ -118,6 +121,7 @@ namespace xt
         size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
+        xt::layout layout() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
@@ -411,6 +415,15 @@ namespace xt
     inline auto xview<CT, S...>::slices() const noexcept -> const slice_type&
     {
         return m_slices;
+    }
+        
+    /**
+     * Returns the slices of the view.
+     */
+    template <class CT, class... S>
+    inline xt::layout xview<CT, S...>::layout() const noexcept
+    {
+        return layout_type;
     }
 
     /**
