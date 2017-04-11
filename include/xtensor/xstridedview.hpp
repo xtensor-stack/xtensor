@@ -19,6 +19,7 @@
 #include "xiterable.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
+#include "xview.hpp"
 
 namespace xt
 {
