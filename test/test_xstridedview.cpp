@@ -27,7 +27,7 @@ namespace xt
 
         vt(0, 0, 1) = 123;
         EXPECT_EQ(123, e(1, 0, 0));
-        auto val = vt[{1,0,2}];
-        EXPECT_EQ(e(2,0,1), val);
+        auto val = vt[{1,0,1}];
+        EXPECT_EQ(e(1,0,1), val);
     }
 }
