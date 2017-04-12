@@ -20,9 +20,10 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
-    template <class EC, layout L, class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
-                                                                     typename EC::allocator_type,
-                                                                     std::allocator<typename EC::size_type>)>
+    template <class EC, layout L = layout::row_major,
+              class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
+                                                 typename EC::allocator_type,
+                                                 std::allocator<typename EC::size_type>)>
     class xarray_container;
 
     /**
@@ -48,7 +49,7 @@ namespace xt
     template <class T, layout L = layout::row_major, class A = std::allocator<T>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout L = layout::row_major>
     class xtensor_container;
 
     /**
