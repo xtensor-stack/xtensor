@@ -56,7 +56,7 @@ namespace xt
      * @tparam N The dimension of the container.
      * @sa xtensor
      */
-    template <class EC, size_t N, layout L = layout::row_major>
+    template <class EC, size_t N, layout L>
     class xtensor_container : public xstrided_container<xtensor_container<EC, N, L>, L>,
                               public xcontainer_semantic<xtensor_container<EC, N, L>>
     {
@@ -112,7 +112,7 @@ namespace xt
      * xtensor_container_adaptor declaration *
      *****************************************/
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout L = layout::row_major>
     class xtensor_adaptor;
 
     template <class EC, std::size_t N, layout L>
@@ -147,7 +147,7 @@ namespace xt
      * @tparam EC The container type to adapt.
      * @tparam N The dimension of the adaptor.
      */
-    template <class EC, std::size_t N, layout L = layout::row_major>
+    template <class EC, std::size_t N, layout L>
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L>, L>,
                             public xadaptor_semantic<xtensor_adaptor<EC, N, L>>
     {
