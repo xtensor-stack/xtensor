@@ -45,23 +45,23 @@ namespace xt
 
     namespace detail
     {
-        template <class F, class S>
+        template <class F, class S, layout L>
         struct functorview_temporary_type_impl
         {
-            using type = xarray<typename F::value_type>;
+            using type = xarray<typename F::value_type, L>;
         };
 
-        template <class F, class T, std::size_t L>
-        struct functorview_temporary_type_impl<F, std::array<T, L>>
+        template <class F, class T, std::size_t N, layout L>
+        struct functorview_temporary_type_impl<F, std::array<T, N>, L>
         {
-            using type = xtensor<typename F::value_type, L>;
+            using type = xtensor<typename F::value_type, N, L>;
         };
     }
 
     template <class F, class E>
     struct xfunctorview_temporary_type
     {
-        using type = typename detail::functorview_temporary_type_impl<F, typename E::shape_type>::type;
+        using type = typename detail::functorview_temporary_type_impl<F, typename E::shape_type, E::layout_type>::type;
     };
 
     template <class F, class CT>

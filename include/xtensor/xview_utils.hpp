@@ -63,16 +63,16 @@ namespace xt
 
     namespace detail
     {
-        template <class T, class S, class... SL>
+        template <class T, class S, layout L, class... SL>
         struct view_temporary_type_impl
         {
-            using type = xarray<T>;
+            using type = xarray<T, L>;
         };
 
-        template <class T, class I, std::size_t N, class... SL>
-        struct view_temporary_type_impl<T, std::array<I, N>, SL...>
+        template <class T, class I, std::size_t N, layout L, class... SL>
+        struct view_temporary_type_impl<T, std::array<I, N>, L, SL...>
         {
-            using type = xtensor<T, N + newaxis_count<SL...>() - integral_count<SL...>()>;
+            using type = xtensor<T, N + newaxis_count<SL...>() - integral_count<SL...>(), L>;
         };
     }
 
@@ -81,6 +81,7 @@ namespace xt
     {
         using type = typename detail::view_temporary_type_impl<typename E::value_type,
                                                                typename E::shape_type,
+                                                               E::layout_type,
                                                                SL...>::type;
     };
 
