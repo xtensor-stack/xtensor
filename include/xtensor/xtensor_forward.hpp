@@ -111,6 +111,17 @@ namespace xt
      */
     template <class T, std::size_t N, layout L = DEFAULT_LAYOUT, class A = std::allocator<T>, class BA = std::allocator<bool>>
     using xtensor_optional = xtensor_container<xoptional_vector<T, A, BA>, N, L>;
+
+    namespace check_policy
+    {
+        struct none
+        {
+        };
+        struct full
+        {
+        };
+    }
+
 }
 
 #endif

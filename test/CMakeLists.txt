@@ -103,6 +103,7 @@ set(XTENSOR_TESTS
     test_xscalar.cpp
     test_xscalar_semantic.cpp
     test_xsemantic.hpp
+    test_xstridedview.cpp
     test_xtensor.cpp
     test_xtensor_adaptor.cpp
     test_xtensor_semantic.cpp
