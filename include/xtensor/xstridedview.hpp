@@ -37,6 +37,8 @@ namespace xt
     struct xiterable_inner_types<xstrided_view<CT, CD>>
     {
         using inner_shape_type = typename std::decay_t<CT>::shape_type;
+        using inner_strides_type = inner_shape_type;
+        using inner_backstrides_type_type = inner_shape_type;
         using const_stepper = xindexed_stepper<xstrided_view<CT, CD>>;
         using stepper = xindexed_stepper<xstrided_view<CT, CD>, false>;
         using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
@@ -86,6 +88,7 @@ namespace xt
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = shape_type;
+        using backstrides_type = shape_type;
         using closure_type = const self_type;
 
         using stepper = typename iterable_base::stepper;
@@ -103,9 +106,6 @@ namespace xt
         template <class I>
         xstrided_view(CT e, I&& shape, I&& strides, std::size_t offset) noexcept;
 
-        template <class I>
-        xstrided_view(CT e, CD d, I&& shape, I&& strides, std::size_t offset) noexcept;
-
         template <class E>
         self_type& operator=(const xexpression<E>& e);
 
@@ -116,6 +116,7 @@ namespace xt
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
         const strides_type& strides() const noexcept;
+        const backstrides_type& backstrides() const noexcept;
 
         reference operator()();
         template <class... Args>
@@ -165,6 +166,7 @@ namespace xt
         CD m_data;
         shape_type m_shape;
         strides_type m_strides;
+        backstrides_type m_backstrides;
         std::size_t m_offset;
 
         void assign_temporary_impl(temporary_type& tmp);
@@ -192,6 +194,8 @@ namespace xt
     inline xstrided_view<CT, CD>::xstrided_view(CT e, I&& shape, I&& strides, std::size_t offset) noexcept
         : m_e(e), m_data(m_e.data()), m_shape(std::forward<I>(shape)), m_strides(std::forward<I>(strides)), m_offset(offset)
     {
+        m_backstrides = make_sequence<backstrides_type>(m_shape.size(), 0);
+        adapt_strides(m_shape, m_strides, m_backstrides);
     }
     //@}
 
@@ -259,6 +263,12 @@ namespace xt
     inline auto xstrided_view<CT, CD>::strides() const noexcept -> const strides_type&
     {
         return m_strides;
+    }
+
+    template <class CT, class CD>
+    inline auto xstrided_view<CT, CD>::backstrides() const noexcept -> const backstrides_type&
+    {
+        return m_backstrides;
     }
 
     template <class CT, class CD>
