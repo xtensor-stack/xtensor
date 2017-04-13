@@ -105,7 +105,7 @@ namespace xt
         {
             template <class E, class F>
             static std::ostream& output(std::ostream& out, const E& e, F& printer, std::size_t blanks,
-                                        std::size_t element_width, std::size_t edge_items, std::size_t line_width)
+                                        precision_type element_width, std::size_t edge_items, std::size_t line_width)
             {
                 using size_type = typename E::size_type;
 
@@ -168,7 +168,7 @@ namespace xt
         {
             template <class E, class F>
             static std::ostream& output(std::ostream& out, const E& e, F& printer,
-                                        std::size_t, std::size_t, std::size_t, std::size_t)
+                                        std::size_t, precision_type, std::size_t, std::size_t)
             {
                 if (e.dimension() == 0)
                 {
