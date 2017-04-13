@@ -493,9 +493,6 @@ namespace xt
             shape_type temp_shape;
             resize_container(temp_shape, e.shape().size());
 
-            // shape_type temp_backstrides;
-            // resize_container(temp_backstrides, backstrides().size());
-
             for (std::size_t i = 0; i < e.shape().size(); ++i)
             {
                 if (std::size_t(permutation[i]) >= e.dimension())
@@ -504,8 +501,6 @@ namespace xt
                 }
                 temp_shape[i] = e.shape()[permutation[i]];
                 temp_strides[i] = e.strides()[permutation[i]];
-                // TODO figure out what to do with backstrides
-                // temp_backstrides[i] = backstrides()[permutation[i]];
             }
             using view_type = xstrided_view<xclosure_t<E>, decltype(e.data())>;
             return view_type(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), 0);
