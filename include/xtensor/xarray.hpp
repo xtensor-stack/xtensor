@@ -372,6 +372,12 @@ namespace xt
     inline xarray_container<EC, L, SC>::xarray_container(const xexpression<E>& e)
         : base_type()
     {
+        // Avoids unintialized data because of (m_shape == shape) condition
+        // in reshape (called by assign), which is always true when dimension == 0.
+        if (e.derived_cast().dimension() == 0)
+        {
+            m_data.resize(1);
+        }
         semantic_base::assign(e);
     }
 
