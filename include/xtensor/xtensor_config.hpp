@@ -31,4 +31,8 @@
     std::vector<typename DEFAULT_DATA_CONTAINER(T, EA)::size_type, SA>
 #endif
 
+#ifndef DEFAULT_LAYOUT
+#define DEFAULT_LAYOUT layout::row_major
+#endif
+
 #endif

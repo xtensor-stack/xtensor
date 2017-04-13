@@ -51,10 +51,12 @@ Configuration
 available macros:
 
 - ``XTENSOR_ENABLE_ASSERT``: enables assertions in xtensor, such as bound check.
-- ``DEFAULT_DATA_CONTAINER(T, A)``: defines the type used as the default data container for tensor and arrays. ``T``
+- ``DEFAULT_DATA_CONTAINER(T, A)``: defines the type used as the default data container for tensors and arrays. ``T``
   is the ``value_type`` of the container and ``A`` its ``allocator_type``.
-- ``DEFAULT_SHAPE_CONTAINER(T, EA, SA)``: defines the type used as the default shape container for tensor and arrays.
+- ``DEFAULT_SHAPE_CONTAINER(T, EA, SA)``: defines the type used as the default shape container for tensors and arrays.
   ``T`` is the ``value_type`` of the data container, ``EA`` its ``allocator_type``, and ``SA`` is the ``allocator_type``
   of the shape container.
-
+- ``DEFAULT_LAYOUT``: defines the default layout (row_major, column_major, dynamic) for tensors and arrays. We *strongly*
+  discourage using this macro, which is provided for testing purpose. Prefer defining alias types on tensor and array
+  containers instead.
 
