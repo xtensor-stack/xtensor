@@ -112,7 +112,7 @@ namespace xt
      * xtensor_container_adaptor declaration *
      *****************************************/
 
-    template <class EC, std::size_t N, layout L = layout::row_major>
+    template <class EC, std::size_t N, layout L = DEFAULT_LAYOUT>
     class xtensor_adaptor;
 
     template <class EC, std::size_t N, layout L>

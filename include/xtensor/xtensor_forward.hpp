@@ -20,7 +20,7 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
-    template <class EC, layout L = layout::row_major,
+    template <class EC, layout L = DEFAULT_LAYOUT,
               class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
                                                  typename EC::allocator_type,
                                                  std::allocator<typename EC::size_type>)>
@@ -46,10 +46,12 @@ namespace xt
      * @tparam A The allocator of the container holding the elements.
      * @tparam SA The allocator of the containers holding the shape and the strides.
      */
-    template <class T, layout L = layout::row_major, class A = std::allocator<T>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
+    template <class T, layout L = DEFAULT_LAYOUT,
+              class A = std::allocator<T>,
+              class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
-    template <class EC, std::size_t N, layout L = layout::row_major>
+    template <class EC, std::size_t N, layout L = DEFAULT_LAYOUT>
     class xtensor_container;
 
     /**
@@ -72,7 +74,7 @@ namespace xt
      * @tparam L The layout of the tensor (default: row_major).
      * @tparam A The allocator of the containers holding the elements.
      */
-    template <class T, std::size_t N, layout L = layout::row_major, class A = std::allocator<T>>
+    template <class T, std::size_t N, layout L = DEFAULT_LAYOUT, class A = std::allocator<T>>
     using xtensor = xtensor_container<DEFAULT_DATA_CONTAINER(T, A), N, L>;
 
     template <class CT, class... S>
@@ -91,7 +93,10 @@ namespace xt
      * @tparam BA The allocator of the container holding the missing flags.
      * @tparam SA The allocator of the containers holding the shape and the strides.
      */
-    template <class T, layout L = layout::row_major, class A = std::allocator<T>, class BA = std::allocator<bool>, class SA = std::allocator<typename std::vector<T, A>::size_type>>
+    template <class T, layout L = DEFAULT_LAYOUT,
+              class A = std::allocator<T>,
+              class BA = std::allocator<bool>,
+              class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xarray_optional = xarray_container<xoptional_vector<T, A, BA>, L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
     /**
@@ -104,7 +109,7 @@ namespace xt
      * @tparam A The allocator of the containers holding the elements.
      * @tparam BA The allocator of the container holding the missing flags.
      */
-    template <class T, std::size_t N, layout L = layout::row_major, class A = std::allocator<T>, class BA = std::allocator<bool>>
+    template <class T, std::size_t N, layout L = DEFAULT_LAYOUT, class A = std::allocator<T>, class BA = std::allocator<bool>>
     using xtensor_optional = xtensor_container<xoptional_vector<T, A, BA>, N, L>;
 }
 

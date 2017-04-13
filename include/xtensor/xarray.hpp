@@ -116,7 +116,7 @@ namespace xt
      * xarray_adaptor declaration *
      ******************************/
 
-    template <class EC, layout L = layout::row_major, class SC = std::vector<typename EC::size_type>>
+    template <class EC, layout L = DEFAULT_LAYOUT, class SC = std::vector<typename EC::size_type>>
     class xarray_adaptor;
 
     template <class EC, layout L, class SC>
