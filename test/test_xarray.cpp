@@ -71,6 +71,13 @@ namespace xt
         EXPECT_EQ(cma.data(), vec);
     }
 
+    TEST(xarray, xscalar_constructor)
+    {
+        xscalar<int> xs(2);
+        xarray<int> a(xs);
+        EXPECT_EQ(a(), xs());
+    }
+
     TEST(xarray, copy_semantic)
     {
         central_major_result<> res;

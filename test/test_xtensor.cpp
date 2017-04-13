@@ -86,6 +86,13 @@ namespace xt
         EXPECT_EQ(cma.data(), vec);
     }
 
+    TEST(xtensor, xscalar_constructor)
+    {
+        xscalar<int> xs(2);
+        xtensor<int, 0> a(xs);
+        EXPECT_EQ(a(), xs());
+    }
+
     TEST(xtensor, copy_semantic)
     {
         central_major_result<container_type> res;
