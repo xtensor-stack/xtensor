@@ -273,7 +273,6 @@ namespace xt
         {
             return xall<std::size_t>(size);
         }
-
     private:
         A m_min;
         B m_max;

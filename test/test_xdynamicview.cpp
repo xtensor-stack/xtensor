@@ -137,30 +137,30 @@ namespace xt
         EXPECT_EQ(iter2, iter_end2);
     }
 
-    // TEST(xdynview, xdynview_on_xfunction)
-    // {
-    //     view_shape_type shape = {3, 4};
-    //     xarray<int> a(shape);
-    //     std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-    //     std::copy(data.cbegin(), data.cend(), a.begin());
+    TEST(xdynview, xdynview_on_xfunction)
+    {
+        view_shape_type shape = {3, 4};
+        xarray<int> a(shape);
+        std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::copy(data.cbegin(), data.cend(), a.begin());
 
-    //     view_shape_type shape2 = { 3 };
-    //     xarray<int> b(shape2);
-    //     std::vector<int> data2 = { 1, 2, 3 };
-    //     std::copy(data2.cbegin(), data2.cend(), b.begin());
+        view_shape_type shape2 = { 3 };
+        xarray<int> b(shape2);
+        std::vector<int> data2 = { 1, 2, 3 };
+        std::copy(data2.cbegin(), data2.cend(), b.begin());
 
-    //     auto func = dynamic_view(a, slice_vector(a, 1, range(1, 4))) + b;
-    //     auto iter = func.begin();
-    //     auto iter_end = func.end();
+        auto func = dynamic_view(a, slice_vector(a, 1, range(1, 4))) + b;
+        auto iter = func.begin();
+        auto iter_end = func.end();
 
-    //     EXPECT_EQ(7, *iter);
-    //     ++iter;
-    //     EXPECT_EQ(9, *iter);
-    //     ++iter;
-    //     EXPECT_EQ(11, *iter);
-    //     ++iter;
-    //     EXPECT_EQ(iter, iter_end);
-    // }
+        EXPECT_EQ(7, *iter);
+        ++iter;
+        EXPECT_EQ(9, *iter);
+        ++iter;
+        EXPECT_EQ(11, *iter);
+        ++iter;
+        EXPECT_EQ(iter, iter_end);
+    }
 
     TEST(xdynview, xdynview_on_xtensor)
     {

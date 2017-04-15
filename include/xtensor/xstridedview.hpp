@@ -107,6 +107,7 @@ namespace xt
         using base_index_type = xindex_type_t<shape_type>;
 
         xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset) noexcept;
+        xstrided_view(CT e, CD data, S&& shape, S&& strides, std::size_t offset) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -194,6 +195,14 @@ namespace xt
     template <class CT, class S, class CD>
     inline xstrided_view<CT, S, CD>::xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset) noexcept
         : m_e(e), m_data(m_e.data()), m_shape(std::forward<S>(shape)), m_strides(std::forward<S>(strides)), m_offset(offset)
+    {
+        m_backstrides = make_sequence<backstrides_type>(m_shape.size(), 0);
+        adapt_strides(m_shape, m_strides, m_backstrides);
+    }
+
+    template <class CT, class S, class CD>
+    inline xstrided_view<CT, S, CD>::xstrided_view(CT e, CD data, S&& shape, S&& strides, std::size_t offset) noexcept
+        : m_e(e), m_data(data), m_shape(std::forward<S>(shape)), m_strides(std::forward<S>(strides)), m_offset(offset)
     {
         m_backstrides = make_sequence<backstrides_type>(m_shape.size(), 0);
         adapt_strides(m_shape, m_strides, m_backstrides);
@@ -569,13 +578,57 @@ namespace xt
     }
 #endif
 
+    namespace detail
+    {
+        template <class CT>
+        class expression_adaptor
+        {
+        public:
+            using xexpression_type = std::decay_t<CT>;
+            using shape_type = typename xexpression_type::shape_type;
+            using index_type = xindex_type_t<shape_type>;
+            using size_type = typename xexpression_type::size_type;
+            using value_type = typename xexpression_type::value_type;
+            using reference = typename xexpression_type::reference;
+
+            expression_adaptor(CT&& e) : m_e(e)
+            {
+                resize_container(m_index, m_e.dimension());
+                m_size = compute_size(m_e.shape());
+                compute_strides(m_e.shape(), layout::row_major, m_strides);
+            }
+
+            const reference operator[](std::size_t idx) const
+            {
+                std::div_t dv{};
+                for (size_type i = 0; i < m_strides.size(); ++i)
+                {
+                    dv = std::div((int) idx, (int) m_strides[i]);
+                    idx = dv.rem;
+                    m_index[i] = dv.quot;
+                }
+                return m_e.element(m_index.begin(), m_index.end());
+            }
+
+            size_type size() const
+            {
+                return m_size;
+            }
+
+        private:
+            CT m_e;
+            shape_type m_strides;
+            mutable index_type m_index;
+            size_type m_size;
+        };
+    }
+
     class slice_vector : private std::vector<std::array<long int, 3>>
     {
 
     public:
-
-        using base_type = std::vector<std::array<long int, 3>>;
         using index_type = long int;
+        using base_type = std::vector<std::array<index_type, 3>>;
 
         // propagating interface
         using base_type::begin;
@@ -594,7 +647,6 @@ namespace xt
             const auto& de = e.derived_cast();
             m_shape.resize(de.shape().size());
             std::copy(de.shape().begin(), de.shape().end(), m_shape.begin());
-
             append(args...);
         }
 
@@ -614,12 +666,6 @@ namespace xt
 
         inline void append()
         {
-            // noop
-        }
-
-        inline void push_back(const std::array<long int, 3>& s)
-        {
-            base_type::push_back(s);
         }
 
         template <class T>
@@ -635,7 +681,7 @@ namespace xt
             auto idx = size() - newaxis_count;
             if (idx >= m_shape.size())
             {
-                throw std::runtime_error("too many slices in slice vector for shape");
+                throw std::runtime_error("Too many slices in slice vector for shape");
             }
             auto ds = s.get(m_shape[idx]);
             base_type::push_back({(index_type) ds(0), (index_type) ds.size(), (index_type) ds.step_size()});
@@ -646,7 +692,7 @@ namespace xt
             auto idx = size() - newaxis_count;
             if (idx >= m_shape.size())
             {
-                throw std::runtime_error("too many slices in slice vector for shape");
+                throw std::runtime_error("Too many slices in slice vector for shape");
             }
             base_type::push_back({0, (index_type) m_shape[idx], 1});
         }
@@ -667,14 +713,69 @@ namespace xt
          std::size_t newaxis_count = 0;
     };
 
+    namespace detail
+    {
+        template <typename T>
+        class has_raw_data_interface
+        {
+            template <typename C>
+            static std::true_type test(decltype(std::declval<C>().raw_data_offset()));
+
+            template <typename C>
+            static std::false_type test(...);
+
+        public:
+            constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
+        };
+
+        template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline auto&& get_data(E&& e)
+        {
+            return e.data();
+        }
+
+        template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline std::size_t get_offset(E&& e)
+        {
+            return e.raw_data_offset();
+        }
+
+        template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline auto&& get_strides(E&& e)
+        {
+            return e.strides();
+        }
+
+        template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline auto get_data(E&& e) -> expression_adaptor<xclosure_t<E>>
+        {
+            return std::move(expression_adaptor<xclosure_t<E>>(e));
+        }
+
+        template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline std::size_t get_offset(E&& /*e*/)
+        {
+            return 0;
+        }
+
+        template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline auto get_strides(E&& e)
+        {
+            std::vector<std::size_t> strides;
+            strides.resize(e.shape().size());
+            compute_strides(e.shape(), layout::row_major, strides);
+            return strides;
+        }
+    }
+
     template <class E, class S>
     inline auto dynamic_view(E&& e, S&& slices)
     {
-        std::size_t offset = e.raw_data_offset();
+        std::size_t offset = detail::get_offset(e);
         using shape_type = typename std::vector<std::size_t>;
 
         auto old_shape = e.shape();
-        auto old_strides = e.strides();
+        auto&& old_strides = detail::get_strides(e);
 
         shape_type new_shape;
         shape_type new_strides;
@@ -730,8 +831,10 @@ namespace xt
             idx++;
         }
 
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
-        return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), offset);
+        auto data = detail::get_data(e);
+
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
+        return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), offset);
     }
 }
 
