@@ -40,9 +40,18 @@ namespace xt
     TEST(xscalar, iterator)
     {
         xscalar<int> x(2);
-        auto iter = x.xbegin();
-        *iter = 4;
+        auto xiter = x.xbegin();
+        *xiter = 4;
         EXPECT_EQ(4, x());
+        auto xiter_end = x.xend();
+        ++xiter;
+        EXPECT_EQ(xiter, xiter_end);
+        auto iter = x.begin();
+        *iter = 3;
+        EXPECT_EQ(3, x());
+        auto iter_end = x.end();
+        ++iter;
+        EXPECT_EQ(iter, iter_end);
     }
 
     TEST(xscalar, xref)

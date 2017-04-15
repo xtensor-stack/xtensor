@@ -14,6 +14,7 @@
 #include <utility>
 
 #include "xexpression.hpp"
+#include "xiterable.hpp"
 #include "xlayout.hpp"
 
 namespace xt
@@ -32,10 +33,29 @@ namespace xt
     class xscalar_iterator;
 
     template <class CT>
-    class xscalar : public xexpression<xscalar<CT>>
+    class xscalar;
+
+    template <class CT>
+    struct xiterable_inner_types<xscalar<CT>>
+    {
+        using value_type = std::decay_t<CT>;
+        using inner_shape_type = std::array<std::size_t, 0>;
+        using iterator = value_type*;
+        using const_iterator = const value_type*;
+        using const_stepper = xscalar_stepper<true, CT>;
+        using stepper = xscalar_stepper<false, CT>;
+        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
+        using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
+    };
+
+    template <class CT>
+    class xscalar : public xexpression<xscalar<CT>>,
+                    public xiterable<xscalar<CT>>
     {
 
     public:
+
+        using self_type = xscalar<CT>;
 
         using value_type = std::decay_t<CT>;
         using reference = value_type&;
@@ -45,17 +65,18 @@ namespace xt
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
 
-        using self_type = xscalar<CT>;
-        using shape_type = std::array<size_type, 0>;
+        using iterable_base = xiterable<self_type>;
+        using inner_shape_type = typename iterable_base::inner_shape_type;
+        using shape_type = inner_shape_type;
 
-        using stepper = xscalar_stepper<false, CT>;
-        using const_stepper = xscalar_stepper<true, CT>;
+        using stepper = typename iterable_base::stepper;
+        using const_stepper = typename iterable_base::const_stepper;
 
-        using broadcast_iterator = xscalar_iterator<false, CT>;
-        using const_broadcast_iterator = xscalar_iterator<true, CT>;
+        using broadcast_iterator = typename iterable_base::broadcast_iterator;
+        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
 
-        using iterator = broadcast_iterator;
-        using const_iterator = const_broadcast_iterator;
+        using iterator = typename iterable_base::iterator;
+        using const_iterator = typename iterable_base::const_iterator;
 
         static constexpr xt::layout layout_type = xt::layout::any;
         static constexpr bool contiguous_layout = true;
@@ -96,28 +117,6 @@ namespace xt
         const_iterator end() const noexcept;
         const_iterator cbegin() const noexcept;
         const_iterator cend() const noexcept;
-
-        broadcast_iterator xbegin() noexcept;
-        broadcast_iterator xend() noexcept;
-
-        const_broadcast_iterator xbegin() const noexcept;
-        const_broadcast_iterator xend() const noexcept;
-        const_broadcast_iterator cxbegin() const noexcept;
-        const_broadcast_iterator cxend() const noexcept;
-
-        template <class S>
-        broadcast_iterator xbegin(const S& shape) noexcept;
-        template <class S>
-        broadcast_iterator xend(const S& shape) noexcept;
-
-        template <class S>
-        const_broadcast_iterator xbegin(const S& shape) const noexcept;
-        template <class S>
-        const_broadcast_iterator xend(const S& shape) const noexcept;
-        template <class S>
-        const_broadcast_iterator cxbegin(const S& shape) const noexcept;
-        template <class S>
-        const_broadcast_iterator cxend(const S& shape) const noexcept;
 
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
@@ -326,9 +325,9 @@ namespace xt
 
     template <class CT>
     template <class S>
-    inline bool xscalar<CT>::broadcast_shape(S&) const noexcept
+    inline bool xscalar<CT>::broadcast_shape(S& s) const noexcept
     {
-        return true;
+        return xt::broadcast_shape(this->shape(), s);
     }
 
     template <class CT>
@@ -341,115 +340,37 @@ namespace xt
     template <class CT>
     inline auto xscalar<CT>::begin() noexcept -> iterator
     {
-        return iterator(this);
+        return &m_value;
     }
 
     template <class CT>
     inline auto xscalar<CT>::end() noexcept -> iterator
     {
-        return iterator(this);
+        return &m_value + 1;
     }
 
     template <class CT>
     inline auto xscalar<CT>::begin() const noexcept -> const_iterator
     {
-        return const_iterator(this);
+        return &m_value;
     }
 
     template <class CT>
     inline auto xscalar<CT>::end() const noexcept -> const_iterator
     {
-        return const_iterator(this);
+        return &m_value + 1
     }
 
     template <class CT>
     inline auto xscalar<CT>::cbegin() const noexcept -> const_iterator
     {
-        return const_iterator(this);
+        return &m_value;
     }
 
     template <class CT>
     inline auto xscalar<CT>::cend() const noexcept -> const_iterator
     {
-        return const_iterator(this);
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::xbegin() noexcept -> broadcast_iterator
-    {
-        return broadcast_iterator(this);
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::xend() noexcept -> broadcast_iterator
-    {
-        return broadcast_iterator(this);
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::xbegin() const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(this);
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::xend() const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(this);
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::cxbegin() const noexcept -> const_broadcast_iterator
-    {
-        return xbegin();
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::cxend() const noexcept -> const_broadcast_iterator
-    {
-        return xend();
-    }
-
-    template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::xbegin(const S&) noexcept -> broadcast_iterator
-    {
-        return broadcast_iterator(this);
-    }
-
-    template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::xend(const S&) noexcept -> broadcast_iterator
-    {
-        return broadcast_iterator(this);
-    }
-
-    template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::xbegin(const S&) const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(this);
-    }
-
-    template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::xend(const S&) const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(this);
-    }
-
-    template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::cxbegin(const S&) const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(this);
-    }
-
-    template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::cxend(const S&) const noexcept -> const_broadcast_iterator
-    {
-        return const_broadcast_iterator(this);
+        return &m_value + 1;
     }
 
     template <class CT>
@@ -463,7 +384,7 @@ namespace xt
     template <class S>
     inline auto xscalar<CT>::stepper_end(const S&) noexcept -> stepper
     {
-        return stepper(this);
+        return stepper(this + 1);
     }
 
     template <class CT>

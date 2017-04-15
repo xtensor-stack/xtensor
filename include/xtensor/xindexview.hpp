@@ -86,7 +86,6 @@ namespace xt
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = shape_type;
-        using closure_type = const self_type;
 
         using indices_type = I;
 
@@ -551,7 +550,9 @@ namespace xt
     template <class F>
     inline auto xfiltration<ECT, CCT>::apply(F&& func) -> self_type&
     {
-        std::transform(m_e.cbegin(), m_e.cend(), m_condition.cbegin(), m_e.begin(), func);
+        // TODO : not optimal on condition; apply the same optimization as
+        // in assign_data
+        std::transform(m_e.cbegin(), m_e.cend(), m_condition.xbegin(), m_e.begin(), func);
         return *this;
     }
 
