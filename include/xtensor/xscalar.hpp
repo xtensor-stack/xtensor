@@ -30,7 +30,7 @@ namespace xt
     class xscalar_stepper;
 
     template <bool is_const, class CT>
-    class xscalar_iterator;
+    class xdummy_iterator;
 
     template <class CT>
     class xscalar;
@@ -77,6 +77,9 @@ namespace xt
 
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
+
+        using dummy_iterator = xdummy_iterator<false, CT>;
+        using const_dummy_iterator = xdummy_iterator<true, CT>;
 
         static constexpr xt::layout layout_type = xt::layout::any;
         static constexpr bool contiguous_layout = true;
@@ -127,6 +130,12 @@ namespace xt
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
         const_stepper stepper_end(const S& shape) const noexcept;
+
+        dummy_iterator dummy_begin() noexcept;
+        dummy_iterator dummy_end() noexcept;
+
+        const_dummy_iterator dummy_begin() const noexcept;
+        const_dummy_iterator dummy_end() const noexcept;
 
     private:
 
@@ -190,16 +199,16 @@ namespace xt
                     const xscalar_stepper<is_const, CT>& rhs) noexcept;
 
     /********************
-     * xscalar_iterator *
+     * xdummy_iterator *
      ********************/
 
     template <bool is_const, class CT>
-    class xscalar_iterator
+    class xdummy_iterator
     {
 
     public:
 
-        using self_type = xscalar_iterator<is_const, CT>;
+        using self_type = xdummy_iterator<is_const, CT>;
         using container_type = std::conditional_t<is_const,
                                                   const xscalar<CT>,
                                                   xscalar<CT>>;
@@ -214,7 +223,7 @@ namespace xt
         using difference_type = typename container_type::difference_type;
         using iterator_category = std::forward_iterator_tag;
 
-        explicit xscalar_iterator(container_type* c) noexcept;
+        explicit xdummy_iterator(container_type* c) noexcept;
 
         self_type& operator++() noexcept;
         self_type operator++(int) noexcept;
@@ -229,12 +238,43 @@ namespace xt
     };
 
     template <bool is_const, class CT>
-    bool operator==(const xscalar_iterator<is_const, CT>& lhs,
-                    const xscalar_iterator<is_const, CT>& rhs) noexcept;
+    bool operator==(const xdummy_iterator<is_const, CT>& lhs,
+                    const xdummy_iterator<is_const, CT>& rhs) noexcept;
 
     template <bool is_const, class CT>
-    bool operator!=(const xscalar_iterator<is_const, CT>& lhs,
-                    const xscalar_iterator<is_const, CT>& rhs) noexcept;
+    bool operator!=(const xdummy_iterator<is_const, CT>& lhs,
+                    const xdummy_iterator<is_const, CT>& rhs) noexcept;
+
+    /*******************************
+     * trivial_begin / trivial_end *
+     *******************************/
+
+    namespace detail
+    {
+        template <class CT>
+        constexpr auto trivial_begin(xscalar<CT>& c) -> decltype(c.dummy_begin())
+        {
+            return c.dummy_begin();
+        }
+
+        template <class CT>
+        constexpr auto trivial_end(xscalar<CT>& c) -> decltype(c.dummy_end())
+        {
+            return c.dummy_end();
+        }
+
+        template <class CT>
+        constexpr auto trivial_begin(const xscalar<CT>& c) -> decltype(c.dummy_begin())
+        {
+            return c.dummy_begin();
+        }
+
+        template <class CT>
+        constexpr auto trivial_end(const xscalar<CT>& c) -> decltype(c.dummy_end())
+        {
+            return c.dummy_end();
+        }
+    }
 
     /**************************
      * xscalar implementation *
@@ -325,9 +365,9 @@ namespace xt
 
     template <class CT>
     template <class S>
-    inline bool xscalar<CT>::broadcast_shape(S& s) const noexcept
+    inline bool xscalar<CT>::broadcast_shape(S&) const noexcept
     {
-        return xt::broadcast_shape(this->shape(), s);
+        return true;
     }
 
     template <class CT>
@@ -358,7 +398,7 @@ namespace xt
     template <class CT>
     inline auto xscalar<CT>::end() const noexcept -> const_iterator
     {
-        return &m_value + 1
+        return &m_value + 1;
     }
 
     template <class CT>
@@ -399,6 +439,30 @@ namespace xt
     inline auto xscalar<CT>::stepper_end(const S&) const noexcept -> const_stepper
     {
         return const_stepper(this + 1);
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::dummy_begin() noexcept -> dummy_iterator
+    {
+        return dummy_iterator(this);
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::dummy_end() noexcept -> dummy_iterator
+    {
+        return dummy_iterator(this);
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::dummy_begin() const noexcept -> const_dummy_iterator
+    {
+        return const_dummy_iterator(this);
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::dummy_end() const noexcept -> const_dummy_iterator
+    {
+        return const_dummy_iterator(this);
     }
 
     template <class T>
@@ -471,23 +535,23 @@ namespace xt
     }
 
     /***********************************
-     * xscalar_iterator implementation *
+     * xdummy_iterator implementation *
      ***********************************/
 
     template <bool is_const, class CT>
-    inline xscalar_iterator<is_const, CT>::xscalar_iterator(container_type* c) noexcept
+    inline xdummy_iterator<is_const, CT>::xdummy_iterator(container_type* c) noexcept
         : p_c(c)
     {
     }
 
     template <bool is_const, class CT>
-    inline auto xscalar_iterator<is_const, CT>::operator++() noexcept -> self_type&
+    inline auto xdummy_iterator<is_const, CT>::operator++() noexcept -> self_type&
     {
         return *this;
     }
 
     template <bool is_const, class CT>
-    inline auto xscalar_iterator<is_const, CT>::operator++(int) noexcept -> self_type
+    inline auto xdummy_iterator<is_const, CT>::operator++(int) noexcept -> self_type
     {
         self_type tmp(*this);
         ++(*this);
@@ -495,27 +559,27 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline auto xscalar_iterator<is_const, CT>::operator*() const noexcept -> reference
+    inline auto xdummy_iterator<is_const, CT>::operator*() const noexcept -> reference
     {
         return p_c->operator()();
     }
 
     template <bool is_const, class CT>
-    inline bool xscalar_iterator<is_const, CT>::equal(const self_type& rhs) const noexcept
+    inline bool xdummy_iterator<is_const, CT>::equal(const self_type& rhs) const noexcept
     {
         return p_c == rhs.p_c;
     }
 
     template <bool is_const, class CT>
-    inline bool operator==(const xscalar_iterator<is_const, CT>& lhs,
-                           const xscalar_iterator<is_const, CT>& rhs) noexcept
+    inline bool operator==(const xdummy_iterator<is_const, CT>& lhs,
+                           const xdummy_iterator<is_const, CT>& rhs) noexcept
     {
         return lhs.equal(rhs);
     }
 
     template <bool is_const, class CT>
-    inline bool operator!=(const xscalar_iterator<is_const, CT>& lhs,
-                           const xscalar_iterator<is_const, CT>& rhs) noexcept
+    inline bool operator!=(const xdummy_iterator<is_const, CT>& lhs,
+                           const xdummy_iterator<is_const, CT>& rhs) noexcept
     {
         return !(lhs.equal(rhs));
     }

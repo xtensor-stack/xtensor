@@ -21,6 +21,9 @@ namespace xt
      * iterator meta utils *
      ***********************/
 
+    template <class CT>
+    class xscalar;
+
     namespace detail
     {
         template <class C>
@@ -33,6 +36,18 @@ namespace xt
         struct get_iterator_impl<const C>
         {
             using type = typename C::const_iterator;
+        };
+
+        template <class CT>
+        struct get_iterator_impl<xscalar<CT>>
+        {
+            using type = typename xscalar<CT>::dummy_iterator;
+        };
+
+        template <class CT>
+        struct get_iterator_impl<const xscalar<CT>>
+        {
+            using type = typename xscalar<CT>::const_dummy_iterator;
         };
     }
 
@@ -251,6 +266,37 @@ namespace xt
     template <class It, class S>
     bool operator!=(const xiterator<It, S>& lhs,
                     const xiterator<It, S>& rhs);
+
+    /*******************************
+    * trivial_begin / trivial_end *
+    *******************************/
+
+    namespace detail
+    {
+        template <class C>
+        constexpr auto trivial_begin(C& c) -> decltype(c.begin())
+        {
+            return c.begin();
+        }
+
+        template <class C>
+        constexpr auto trivial_end(C& c) -> decltype(c.end())
+        {
+            return c.end();
+        }
+
+        template <class C>
+        constexpr auto trivial_begin(const C& c) -> decltype(c.begin())
+        {
+            return c.begin();
+        }
+
+        template <class C>
+        constexpr auto trivial_end(const C& c) -> decltype(c.end())
+        {
+            return c.end();
+        }
+    }
 
     /***************************
      * xstepper implementation *

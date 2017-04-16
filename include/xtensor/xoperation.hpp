@@ -616,8 +616,7 @@ namespace xt
     template <class E>
     inline bool any(E&& e)
     {
-        // TODO : not optimal on e, apply the same optimization as in assign_data
-        return std::any_of(e.xbegin(), e.xend(),
+        return std::any_of(e.cbegin(), e.cend(),
                            [](const typename std::decay_t<E>::value_type& el) { return el; });
     }
 
@@ -633,8 +632,7 @@ namespace xt
     template <class E>
     inline bool all(E&& e)
     {
-        // TODO : not optimal on e, apply the same optimization as in assign_data
-        return std::all_of(e.xbegin(), e.xend(),
+        return std::all_of(e.cbegin(), e.cend(),
                            [](const typename std::decay_t<E>::value_type& el) { return el; });
     }
 }
