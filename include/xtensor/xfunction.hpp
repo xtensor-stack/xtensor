@@ -20,6 +20,7 @@
 #include "xexpression.hpp"
 #include "xiterator.hpp"
 #include "xlayout.hpp"
+#include "xscalar.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -243,7 +244,7 @@ namespace xt
         reference deref_impl(std::index_sequence<I...>) const;
 
         const xfunction_type* p_f;
-        std::tuple<typename std::decay_t<CT>::const_iterator...> m_it;
+        std::tuple<get_iterator<const std::decay_t<CT>>...> m_it;
     };
 
     template <class F, class R, class... CT>
@@ -462,7 +463,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::begin() const noexcept -> const_iterator
     {
-        auto f = [](const auto& e) noexcept { return e.cbegin(); };
+        auto f = [](const auto& e) noexcept { return detail::trivial_begin(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
@@ -473,7 +474,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction<F, R, CT...>::end() const noexcept -> const_iterator
     {
-        auto f = [](const auto& e) noexcept { return e.cend(); };
+        auto f = [](const auto& e) noexcept { return detail::trivial_end(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 

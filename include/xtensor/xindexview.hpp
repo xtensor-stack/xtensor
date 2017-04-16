@@ -86,7 +86,6 @@ namespace xt
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = shape_type;
-        using closure_type = const self_type;
 
         using indices_type = I;
 

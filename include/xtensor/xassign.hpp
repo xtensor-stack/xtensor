@@ -100,12 +100,6 @@ namespace xt
     {
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
-        
-        if (de2.dimension() == 0)
-        {
-            *de1.begin() = *de2.cbegin();
-            return;
-        }
 
         bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
         if (trivial_broadcast)
