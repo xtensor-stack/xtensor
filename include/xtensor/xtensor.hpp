@@ -54,6 +54,7 @@ namespace xt
      *
      * @tparam EC The type of the container holding the elements.
      * @tparam N The dimension of the container.
+     * @tparam L The layout_type of the tensor.
      * @sa xtensor
      */
     template <class EC, size_t N, layout_type L>
@@ -146,6 +147,7 @@ namespace xt
      *
      * @tparam EC The container type to adapt.
      * @tparam N The dimension of the adaptor.
+     * @tparam L The layout_type of the adaptor.
      */
     template <class EC, std::size_t N, layout_type L>
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L>, L>,

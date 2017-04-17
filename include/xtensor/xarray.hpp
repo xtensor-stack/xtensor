@@ -50,6 +50,7 @@ namespace xt
      * with tensor semantic.
      *
      * @tparam EC The type of the container holding the elements.
+     * @tparam L The layout_type of the container.
      * @tparam SC The type of the containers holding the shape and the strides.
      * @sa xarray
      */
@@ -149,6 +150,7 @@ namespace xt
      * stl-like containers.
      *
      * @tparam EC The container type to adapt.
+     * @tparam L The layout_type of the adaptor.
      * @tparam SC The type of the containers holding the shape and the strides.
      */
     template <class EC, layout_type L, class SC>

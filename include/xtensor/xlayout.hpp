@@ -11,27 +11,35 @@
 
 namespace xt
 {
-    /*! Layout enum for xcontainer based xexpressions */
+    /*! layout_type enum for xcontainer based xexpressions */
     enum class layout_type
     {
-        dynamic = 0x00, /*! dynamic layout_type: you can reshape to row major, column major, or use custom strides */
-        any = 0xFF, /*! layout_type compatible with all others */
-        row_major = 0x01, /*! row major layout_type */
-        column_major = 0x02 /*! column major layout_type */
+        /*! dynamic layout_type: you can reshape to row major, column major, or use custom strides */
+        dynamic = 0x00,
+        /*! layout_type compatible with all others */
+        any = 0xFF,
+        /*! row major layout_type */
+        row_major = 0x01,
+        /*! column major layout_type */
+        column_major = 0x02
     };
 
     /**
      * Implementation of the following logical table:
      *
-     *   | d | a | r | c |
-     * --+---+---+---+---+
-     * d | d | d | d | d |
-     * a | d | a | r | c |
-     * r | d | r | r | d |
-     * c | d | c | d | c |
-     *
-     * d = dynamic, a = any, r = row_major, c = column_major.
+     * @verbatim
+         | d | a | r | c |
+       --+---+---+---+---+
+       d | d | d | d | d |
+       a | d | a | r | c |
+       r | d | r | r | d |
+       c | d | c | d | c |
+       d = dynamic, a = any, r = row_major, c = column_major.
+       @endverbatim
      * Using bitmasks to avoid nested if-else statements.
+     * 
+     * @param args the input layouts.
+     * @return the output layout, computed with the previous logical table.
      */
     template <class... Args>
     constexpr layout_type compute_layout(Args... args) noexcept;

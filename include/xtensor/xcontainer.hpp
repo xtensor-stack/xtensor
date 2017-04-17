@@ -168,8 +168,9 @@ namespace xt
      * not embed the data container, this responsibility is delegated to the inheriting
      * classes.
      *
-     * @tparam D The derived type, i.e. the inheriting class for which xstrided
+     * @tparam D The derived type, i.e. the inheriting class for which xstrided_container
      *           provides the partial imlpementation of xcontainer.
+     * @tparam L The layout_type of the xstrided_container.
      */
     template <class D, layout_type L>
     class xstrided_container : public xcontainer<D>
