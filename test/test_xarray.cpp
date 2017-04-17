@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    using xarray_dynamic = xarray<int, layout::dynamic>;
+    using xarray_dynamic = xarray<int, layout_type::dynamic>;
 
     TEST(xarray, shaped_constructor)
     {
@@ -26,7 +26,7 @@ namespace xt
         {
             SCOPED_TRACE("column_major constructor");
             column_major_result<> cm;
-            xarray<int, layout::column_major> ca(cm.m_shape);
+            xarray<int, layout_type::column_major> ca(cm.m_shape);
             compare_shape(ca, cm);
         }
     }
@@ -34,7 +34,7 @@ namespace xt
     TEST(xarray, strided_constructor)
     {
         central_major_result<> cmr;
-        xarray<int, layout::dynamic> cma(cmr.m_shape, cmr.m_strides);
+        xarray<int, layout_type::dynamic> cma(cmr.m_shape, cmr.m_strides);
         compare_shape(cma, cmr);
     }
 
@@ -54,7 +54,7 @@ namespace xt
             SCOPED_TRACE("column_major valued constructor");
             column_major_result<> cm;
             int value = 2;
-            xarray<int, layout::column_major> ca(cm.m_shape, value);
+            xarray<int, layout_type::column_major> ca(cm.m_shape, value);
             compare_shape(ca, cm);
             xarray_dynamic::container_type vec(ca.size(), value);
             EXPECT_EQ(ca.data(), vec);
@@ -65,7 +65,7 @@ namespace xt
     {
         central_major_result<> cmr;
         int value = 2;
-        xarray<int, layout::dynamic> cma(cmr.m_shape, cmr.m_strides, value);
+        xarray<int, layout_type::dynamic> cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
         xarray_dynamic::container_type vec(cma.size(), value);
         EXPECT_EQ(cma.data(), vec);

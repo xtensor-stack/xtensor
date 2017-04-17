@@ -51,7 +51,7 @@ namespace xt
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(1, view1.dimension());
-        EXPECT_EQ(layout::dynamic, view1.layout());
+        EXPECT_EQ(layout_type::dynamic, view1.layout());
 
         auto view0 = view(a, 0, range(0, 3));
         EXPECT_EQ(a(0, 0), view0(0));

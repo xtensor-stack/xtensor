@@ -12,12 +12,12 @@
 namespace xt
 {
     /*! Layout enum for xcontainer based xexpressions */
-    enum class layout
+    enum class layout_type
     {
-        dynamic = 0x00, /*! dynamic layout: you can reshape to row major, column major, or use custom strides */
-        any = 0xFF, /*! layout compatible with all others */
-        row_major = 0x01, /*! row major layout */
-        column_major = 0x02 /*! column major layout */
+        dynamic = 0x00, /*! dynamic layout_type: you can reshape to row major, column major, or use custom strides */
+        any = 0xFF, /*! layout_type compatible with all others */
+        row_major = 0x01, /*! row major layout_type */
+        column_major = 0x02 /*! column major layout_type */
     };
 
     /**
@@ -34,7 +34,7 @@ namespace xt
      * Using bitmasks to avoid nested if-else statements.
      */
     template <class... Args>
-    constexpr layout compute_layout(Args... args) noexcept;
+    constexpr layout_type compute_layout(Args... args) noexcept;
 
     /******************
      * Implementation *
@@ -42,31 +42,31 @@ namespace xt
 
     namespace detail
     {
-        constexpr layout compute_layout_impl() noexcept
+        constexpr layout_type compute_layout_impl() noexcept
         {
-            return xt::layout::any;
+            return layout_type::any;
         }
 
-        constexpr layout compute_layout_impl(layout l) noexcept
+        constexpr layout_type compute_layout_impl(layout_type l) noexcept
         {
             return l;
         }
 
-        constexpr layout compute_layout_impl(layout lhs, layout rhs) noexcept
+        constexpr layout_type compute_layout_impl(layout_type lhs, layout_type rhs) noexcept
         {
-            using type = std::underlying_type_t<layout>;
-            return layout(static_cast<type>(lhs) & static_cast<type>(rhs));
+            using type = std::underlying_type_t<layout_type>;
+            return layout_type(static_cast<type>(lhs) & static_cast<type>(rhs));
         }
 
         template <class... Args>
-        constexpr layout compute_layout_impl(layout lhs, Args... args) noexcept
+        constexpr layout_type compute_layout_impl(layout_type lhs, Args... args) noexcept
         {
             return compute_layout_impl(lhs, compute_layout_impl(args...));
         }
     }
 
     template <class... Args>
-    constexpr layout compute_layout(Args... args) noexcept
+    constexpr layout_type compute_layout(Args... args) noexcept
     {
         return detail::compute_layout_impl(args...);
     }

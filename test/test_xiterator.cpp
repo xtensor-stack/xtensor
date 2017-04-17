@@ -21,7 +21,7 @@ namespace xt
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.data();
-        xarray_adaptor<typename R::vector_type, layout::dynamic> a(data, result.shape(), result.strides());
+        xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
         size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
         int expected = a(1, 0, 1);
         
@@ -112,7 +112,7 @@ namespace xt
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.data();
-        xarray_adaptor<typename R::vector_type, layout::dynamic> a(data, result.shape(), result.strides());
+        xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
         size_type size = a.size();
         auto iter = a.xbegin();

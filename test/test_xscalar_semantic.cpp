@@ -13,7 +13,7 @@
 
 namespace xt
 {
-    using xarray_dynamic = xarray<int, layout::dynamic>;
+    using xarray_dynamic = xarray<int, layout_type::dynamic>;
 
     template <class T1, class T2>
     inline bool full_equal(const T1& a1, const T2& a2)

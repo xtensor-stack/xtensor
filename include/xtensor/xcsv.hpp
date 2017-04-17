@@ -116,7 +116,7 @@ namespace xt
          }
          inner_shape_type shape = { nbrow, nbcol };
          inner_strides_type strides; // no need for initializer list for stack-allocated strides_type
-         size_type data_size = compute_strides(shape, layout::row_major, strides);
+         size_type data_size = compute_strides(shape, layout_type::row_major, strides);
          // Sanity check for data size.
          if (data.size() != data_size)
          {

@@ -46,7 +46,7 @@ namespace xt
         xreducer_features features;
         xreducer_features::shape_type s = { 3, 4, 5 };
         EXPECT_EQ(s, features.m_red.shape());
-        EXPECT_EQ(features.m_red.layout(), layout::dynamic);
+        EXPECT_EQ(features.m_red.layout(), layout_type::dynamic);
     }
 
     TEST(xreducer, access)

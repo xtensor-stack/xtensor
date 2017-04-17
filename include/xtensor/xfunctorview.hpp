@@ -45,13 +45,13 @@ namespace xt
 
     namespace detail
     {
-        template <class F, class S, layout L>
+        template <class F, class S, layout_type L>
         struct functorview_temporary_type_impl
         {
             using type = xarray<typename F::value_type, L>;
         };
 
-        template <class F, class T, std::size_t N, layout L>
+        template <class F, class T, std::size_t N, layout_type L>
         struct functorview_temporary_type_impl<F, std::array<T, N>, L>
         {
             using type = xtensor<typename F::value_type, N, L>;
@@ -61,7 +61,7 @@ namespace xt
     template <class F, class E>
     struct xfunctorview_temporary_type
     {
-        using type = typename detail::functorview_temporary_type_impl<F, typename E::shape_type, E::layout_type>::type;
+        using type = typename detail::functorview_temporary_type_impl<F, typename E::shape_type, E::static_layout>::type;
     };
 
     template <class F, class CT>
@@ -116,7 +116,7 @@ namespace xt
         using iterator = xfunctor_iterator<functor_type, typename xexpression_type::iterator>;
         using const_iterator = xfunctor_iterator<functor_type, typename xexpression_type::const_iterator>;
 
-        static constexpr xt::layout layout_type = xexpression_type::layout_type;
+        static constexpr layout_type static_layout = xexpression_type::static_layout;
         static constexpr bool contiguous_layout = false;
 
         xfunctorview(CT) noexcept;
@@ -133,7 +133,7 @@ namespace xt
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
-        xt::layout layout() const noexcept;
+        layout_type layout() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
@@ -402,10 +402,10 @@ namespace xt
     }
 
     /**
-     * Returns the layout of the expression.
+     * Returns the layout_type of the expression.
      */
     template <class F, class CT>
-    inline xt::layout xfunctorview<F, CT>::layout() const noexcept
+    inline layout_type xfunctorview<F, CT>::layout() const noexcept
     {
         return m_e.layout();
     }

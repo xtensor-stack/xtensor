@@ -18,9 +18,9 @@ namespace xt
 {
     TEST(xlayout, xarray_initializer_constructors)
     {
-        xarray<double, layout::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout::dynamic> dm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::dynamic> dm = {{1,2,3}, {4,5,6}, {7,8,9}};
         EXPECT_EQ(rm(0, 2), cm(0, 2));
         EXPECT_EQ(dm(0, 2), cm(0, 2));
         EXPECT_EQ(rm(2, 2), cm(2, 2));
@@ -36,15 +36,15 @@ namespace xt
         EXPECT_TRUE(cm.data()[1] == 4);
         EXPECT_TRUE(rm.data()[1] == 2);
 
-        xarray<double, layout::column_major> cm_assigned = rm;
+        xarray<double, layout_type::column_major> cm_assigned = rm;
         EXPECT_EQ(cm.data(), cm_assigned.data());
     }
 
     TEST(xlayout, xtensor_initializer_constructors)
     {
-        xtensor<double, 2, layout::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xtensor<double, 2, layout::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xtensor<double, 2, layout::dynamic> dm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xtensor<double, 2, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xtensor<double, 2, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xtensor<double, 2, layout_type::dynamic> dm = {{1,2,3}, {4,5,6}, {7,8,9}};
         EXPECT_EQ(rm(0, 2), cm(0, 2));
         EXPECT_EQ(dm(0, 2), cm(0, 2));
         EXPECT_EQ(rm(2, 2), cm(2, 2));
@@ -60,14 +60,14 @@ namespace xt
         EXPECT_TRUE(cm.data()[1] == 4);
         EXPECT_TRUE(rm.data()[1] == 2);
 
-        xtensor<double, 2, layout::column_major> cm_assigned = rm;
+        xtensor<double, 2, layout_type::column_major> cm_assigned = rm;
         EXPECT_EQ(cm.data(), cm_assigned.data());
     }
 
     TEST(xlayout, xfunctions_mix_layouts)
     {
-        xarray<double, layout::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
 
         auto f = cm * rm + 5;
         EXPECT_EQ(6, f(0, 0));
@@ -95,13 +95,13 @@ namespace xt
 
     TEST(xlayout, xgenerator_assignment)
     {
-        xarray<double, layout::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
 
-        xarray<double, layout::column_major> cmt1 = triu(cm);
-        xarray<double, layout::column_major> cmt2 = triu(rm);
-        xarray<double, layout::row_major> rmt1 = triu(cm);
-        xarray<double, layout::row_major> rmt2 = triu(rm);
+        xarray<double, layout_type::column_major> cmt1 = triu(cm);
+        xarray<double, layout_type::column_major> cmt2 = triu(rm);
+        xarray<double, layout_type::row_major> rmt1 = triu(cm);
+        xarray<double, layout_type::row_major> rmt2 = triu(rm);
 
         EXPECT_EQ(cmt1.data(), cmt2.data());
         EXPECT_EQ(rmt1.data(), rmt2.data());
@@ -109,16 +109,16 @@ namespace xt
         EXPECT_TRUE(all(equal(rmt1, rmt2)));
 
         random::seed(0);
-        xarray<double, layout::column_major> crand = random::rand<double>({5, 5});
+        xarray<double, layout_type::column_major> crand = random::rand<double>({5, 5});
         random::seed(0);
-        xarray<double, layout::row_major> rrand = random::rand<double>({5, 5});
+        xarray<double, layout_type::row_major> rrand = random::rand<double>({5, 5});
         EXPECT_EQ(rrand(2, 3), crand(2, 3));
     }
 
     TEST(xlayout, xview)
     {
-        xarray<double, layout::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
 
         auto vcm = view(cm, range(0, 2), range(1, 3));
         auto vrm = view(rm, range(0, 2), range(1, 3));
@@ -131,8 +131,8 @@ namespace xt
 
     TEST(xlayout, xreducer)
     {
-        xarray<double, layout::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
 
         auto rcm = sum(cm, {1});
         auto rrm = sum(rm, {1});
@@ -145,8 +145,8 @@ namespace xt
 
     TEST(xlayout, DISABLED_equal_iterator)
     {
-        xarray<double, layout::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
         auto e = equal(cm, rm);
         for (auto el : e)
         {
