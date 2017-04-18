@@ -25,7 +25,7 @@ namespace xt
      * xtensor declaration *
      ***********************/
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     struct xcontainer_inner_types<xtensor_container<EC, N, L>>
     {
         using container_type = EC;
@@ -38,7 +38,7 @@ namespace xt
         using temporary_type = xtensor_container<EC, N, L>;
     };
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     struct xiterable_inner_types<xtensor_container<EC, N, L>>
         : xcontainer_iterable_types<xtensor_container<EC, N, L>>
     {
@@ -54,9 +54,10 @@ namespace xt
      *
      * @tparam EC The type of the container holding the elements.
      * @tparam N The dimension of the container.
+     * @tparam L The layout_type of the tensor.
      * @sa xtensor
      */
-    template <class EC, size_t N, layout L>
+    template <class EC, size_t N, layout_type L>
     class xtensor_container : public xstrided_container<xtensor_container<EC, N, L>, L>,
                               public xcontainer_semantic<xtensor_container<EC, N, L>>
     {
@@ -78,8 +79,8 @@ namespace xt
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
-        explicit xtensor_container(const shape_type& shape, xt::layout l = xt::layout::row_major);
-        explicit xtensor_container(const shape_type& shape, const_reference value, xt::layout l = xt::layout::row_major);
+        explicit xtensor_container(const shape_type& shape, layout_type l = layout_type::row_major);
+        explicit xtensor_container(const shape_type& shape, const_reference value, layout_type l = layout_type::row_major);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value);
         explicit xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
@@ -112,10 +113,10 @@ namespace xt
      * xtensor_container_adaptor declaration *
      *****************************************/
 
-    template <class EC, std::size_t N, layout L = DEFAULT_LAYOUT>
+    template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT>
     class xtensor_adaptor;
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     struct xcontainer_inner_types<xtensor_adaptor<EC, N, L>>
     {
         using container_type = EC;
@@ -128,7 +129,7 @@ namespace xt
         using temporary_type = xtensor_container<EC, N, L>;
     };
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     struct xiterable_inner_types<xtensor_adaptor<EC, N, L>>
         : xcontainer_iterable_types<xtensor_adaptor<EC, N, L>>
     {
@@ -146,8 +147,9 @@ namespace xt
      *
      * @tparam EC The container type to adapt.
      * @tparam N The dimension of the adaptor.
+     * @tparam L The layout_type of the adaptor.
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L>, L>,
                             public xadaptor_semantic<xtensor_adaptor<EC, N, L>>
     {
@@ -161,7 +163,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
 
         xtensor_adaptor(container_type& data);
-        xtensor_adaptor(container_type& data, const shape_type& shape, xt::layout l = xt::layout::row_major);
+        xtensor_adaptor(container_type& data, const shape_type& shape, layout_type l = layout_type::row_major);
         xtensor_adaptor(container_type& data, const shape_type& shape, const strides_type& strides);
 
         ~xtensor_adaptor() = default;
@@ -200,7 +202,7 @@ namespace xt
     /**
      * Allocates an uninitialized xtensor_container that holds 0 element.
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline xtensor_container<EC, N, L>::xtensor_container()
         : base_type(), m_data(1, value_type())
     {
@@ -209,36 +211,36 @@ namespace xt
     /**
      * Allocates an xtensor_container with nested initializer lists.
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline xtensor_container<EC, N, L>::xtensor_container(nested_initializer_list_t<value_type, N> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), true);
-        L == layout::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
+        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->xbegin(), t);
     }
 
     /**
      * Allocates an uninitialized xtensor_container with the specified shape and
-     * layout.
+     * layout_type.
      * @param shape the shape of the xtensor_container
-     * @param l the layout of the xtensor_container
+     * @param l the layout_type of the xtensor_container
      */
-    template <class EC, std::size_t N, layout L>
-    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, xt::layout l)
+    template <class EC, std::size_t N, layout_type L>
+    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, layout_type l)
         : base_type()
     {
         base_type::reshape(shape, l);
     }
 
     /**
-     * Allocates an xtensor_container with the specified shape and layout. Elements
+     * Allocates an xtensor_container with the specified shape and layout_type. Elements
      * are initialized to the specified value.
      * @param shape the shape of the xtensor_container
      * @param value the value of the elements
-     * @param l the layout of the xtensor_container
+     * @param l the layout_type of the xtensor_container
      */
-    template <class EC, std::size_t N, layout L>
-    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, const_reference value, xt::layout l)
+    template <class EC, std::size_t N, layout_type L>
+    inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, const_reference value, layout_type l)
         : base_type()
     {
         base_type::reshape(shape, l);
@@ -250,7 +252,7 @@ namespace xt
      * @param shape the shape of the xtensor_container
      * @param strides the strides of the xtensor_container
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, const strides_type& strides)
         : base_type()
     {
@@ -264,7 +266,7 @@ namespace xt
      * @param strides the strides of the xtensor_container
      * @param value the value of the elements
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline xtensor_container<EC, N, L>::xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value)
         : base_type()
     {
@@ -279,7 +281,7 @@ namespace xt
      * @param shape the shape of the xtensor_container
      * @param strides the strides of the xtensor_container
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline xtensor_container<EC, N, L>::xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
         : base_type(std::move(shape), std::move(strides)), m_data(std::move(data))
     {
@@ -293,7 +295,7 @@ namespace xt
     /**
      * The extended copy constructor.
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     template <class E>
     inline xtensor_container<EC, N, L>::xtensor_container(const xexpression<E>& e)
         : base_type()
@@ -310,7 +312,7 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     template <class E>
     inline auto xtensor_container<EC, N, L>::operator=(const xexpression<E>& e) -> self_type&
     {
@@ -318,13 +320,13 @@ namespace xt
     }
     //@}
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline auto xtensor_container<EC, N, L>::data_impl() noexcept -> container_type&
     {
         return m_data;
     }
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline auto xtensor_container<EC, N, L>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
@@ -342,7 +344,7 @@ namespace xt
      * Constructs an xtensor_adaptor of the given stl-like container.
      * @param data the container to adapt
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline xtensor_adaptor<EC, N, L>::xtensor_adaptor(container_type& data)
         : base_type(), m_data(data)
     {
@@ -350,13 +352,13 @@ namespace xt
 
     /**
      * Constructs an xtensor_adaptor of the given stl-like container,
-     * with the specified shape and layout.
+     * with the specified shape and layout_type.
      * @param data the container to adapt
      * @param shape the shape of the xtensor_adaptor
-     * @param l the layout of the xtensor_adaptor
+     * @param l the layout_type of the xtensor_adaptor
      */
-    template <class EC, std::size_t N, layout L>
-    inline xtensor_adaptor<EC, N, L>::xtensor_adaptor(container_type& data, const shape_type& shape, xt::layout l)
+    template <class EC, std::size_t N, layout_type L>
+    inline xtensor_adaptor<EC, N, L>::xtensor_adaptor(container_type& data, const shape_type& shape, layout_type l)
         : base_type(), m_data(data)
     {
         base_type::reshape(shape, l);
@@ -369,7 +371,7 @@ namespace xt
      * @param shape the shape of the xtensor_adaptor
      * @param strides the strides of the xtensor_adaptor
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline xtensor_adaptor<EC, N, L>::xtensor_adaptor(container_type& data, const shape_type& shape, const strides_type& strides)
         : base_type(), m_data(data)
     {
@@ -377,7 +379,7 @@ namespace xt
     }
     //@}
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline auto xtensor_adaptor<EC, N, L>::operator=(const xtensor_adaptor& rhs) -> self_type&
     {
         base_type::operator=(rhs);
@@ -385,7 +387,7 @@ namespace xt
         return *this;
     }
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline auto xtensor_adaptor<EC, N, L>::operator=(xtensor_adaptor&& rhs) -> self_type&
     {
         base_type::operator=(std::move(rhs));
@@ -400,7 +402,7 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     template <class E>
     inline auto xtensor_adaptor<EC, N, L>::operator=(const xexpression<E>& e) -> self_type&
     {
@@ -408,19 +410,19 @@ namespace xt
     }
     //@}
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline auto xtensor_adaptor<EC, N, L>::data_impl() noexcept -> container_type&
     {
         return m_data;
     }
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline auto xtensor_adaptor<EC, N, L>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
     }
 
-    template <class EC, std::size_t N, layout L>
+    template <class EC, std::size_t N, layout_type L>
     inline void xtensor_adaptor<EC, N, L>::assign_temporary_impl(temporary_type& tmp)
     {
         // TODO (performance improvement) : consider moving tmps shape and strides

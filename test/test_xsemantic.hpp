@@ -16,7 +16,7 @@
 namespace xt
 {
     using std::size_t;
-    using xarray_dynamic = xarray<int, layout::dynamic>;
+    using xarray_dynamic = xarray<int, layout_type::dynamic>;
 
     template <class F>
     struct operation_tester

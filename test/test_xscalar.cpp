@@ -34,7 +34,7 @@ namespace xt
         // The dimension of a xscalar is 0
         xscalar<int> x(2);
         EXPECT_EQ(x.dimension(), 0);
-        EXPECT_EQ(x.layout(), layout::any);
+        EXPECT_EQ(x.layout(), layout_type::any);
     }
 
     TEST(xscalar, iterator)

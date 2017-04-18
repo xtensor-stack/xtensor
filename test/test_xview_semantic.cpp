@@ -12,7 +12,7 @@
 #include "xtensor/xnoalias.hpp"
 namespace xt
 {
-    using xarray_dynamic = xarray<int, layout::dynamic>;
+    using xarray_dynamic = xarray<int, layout_type::dynamic>;
 
     template <class F>
     struct view_op_tester : operation_tester<F>

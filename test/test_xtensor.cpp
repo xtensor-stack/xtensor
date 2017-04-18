@@ -13,7 +13,7 @@
 namespace xt
 {
     using container_type = std::array<std::size_t, 3>;
-    using xtensor_dynamic = xtensor<int, 3, layout::dynamic>;
+    using xtensor_dynamic = xtensor<int, 3, layout_type::dynamic>;
 
     TEST(xtensor, initializer_constructor)
     {
@@ -41,7 +41,7 @@ namespace xt
         {
             SCOPED_TRACE("column_major constructor");
             column_major_result<container_type> cm;
-            xtensor_dynamic ca(cm.m_shape, layout::column_major);
+            xtensor_dynamic ca(cm.m_shape, layout_type::column_major);
             compare_shape(ca, cm);
         }
     }
@@ -69,7 +69,7 @@ namespace xt
             SCOPED_TRACE("column_major valued constructor");
             column_major_result<container_type> cm;
             int value = 2;
-            xtensor_dynamic ca(cm.m_shape, value, layout::column_major);
+            xtensor_dynamic ca(cm.m_shape, value, layout_type::column_major);
             compare_shape(ca, cm);
             xtensor_dynamic::container_type vec(ca.size(), value);
             EXPECT_EQ(ca.data(), vec);

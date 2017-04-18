@@ -81,7 +81,7 @@ namespace xt
         using dummy_iterator = xdummy_iterator<false, CT>;
         using const_dummy_iterator = xdummy_iterator<true, CT>;
 
-        static constexpr xt::layout layout_type = xt::layout::any;
+        static constexpr layout_type static_layout = layout_type::any;
         static constexpr bool contiguous_layout = true;
 
         xscalar(CT value) noexcept;
@@ -89,7 +89,7 @@ namespace xt
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
-        xt::layout layout() const noexcept;
+        layout_type layout() const noexcept;
 
         template <class... Args>
         reference operator()(Args...) noexcept;
@@ -306,9 +306,9 @@ namespace xt
     }
 
     template <class CT>
-    inline xt::layout xscalar<CT>::layout() const noexcept
+    inline layout_type xscalar<CT>::layout() const noexcept
     {
-        return layout_type;
+        return static_layout;
     }
 
     template <class CT>

@@ -40,10 +40,10 @@ namespace xt
      *******************/
 
     template <class shape_type, class strides_type>
-    std::size_t compute_strides(const shape_type& shape, layout l, strides_type& strides);
+    std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides);
 
     template <class shape_type, class strides_type, class backstrides_type>
-    std::size_t compute_strides(const shape_type& shape, layout l,
+    std::size_t compute_strides(const shape_type& shape, layout_type l,
                                 strides_type& strides, backstrides_type& backstrides);
 
     template <class shape_type, class strides_type>
@@ -117,11 +117,11 @@ namespace xt
         }
 
         template <class shape_type, class strides_type, class bs_ptr>
-        inline std::size_t compute_strides(const shape_type& shape, layout l,
+        inline std::size_t compute_strides(const shape_type& shape, layout_type l,
                                            strides_type& strides, bs_ptr bs)
         {
             std::size_t data_size = 1;
-            if (l == layout::row_major)
+            if (l == layout_type::row_major)
             {
                 for (std::size_t i = strides.size(); i != 0; --i)
                 {
@@ -144,13 +144,13 @@ namespace xt
     }
 
     template <class shape_type, class strides_type>
-    inline std::size_t compute_strides(const shape_type& shape, layout l, strides_type& strides)
+    inline std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides)
     {
         return detail::compute_strides(shape, l, strides, nullptr);
     }
 
     template <class shape_type, class strides_type, class backstrides_type>
-    inline std::size_t compute_strides(const shape_type& shape, layout l,
+    inline std::size_t compute_strides(const shape_type& shape, layout_type l,
                                        strides_type& strides,
                                        backstrides_type& backstrides)
     {
