@@ -923,6 +923,43 @@ namespace xt
         return detail::make_xfunction<math::isnan_fun>(std::forward<E>(e));
     }
 
+    /**
+    * @ingroup classif_functions
+    * @brief Element-wise closeness detection
+    *
+    * Returns an \ref xfunction that evaluates to 
+    * true if the element in e1 and e2 are close to each other
+    * according to parameters ``atol`` and ``rtol``.
+    * @param e1, @param e2 input arrays to compare
+    * @param rtol the relative tolerance parameter
+    * @param atol the absolute tolerance parameter
+    * @return an \ref xfunction
+    */
+    template <class E1, class E2>
+    inline auto isclose(E1&& a, E2&& b, double rtol = 1e-05, double atol = 1e-08) noexcept
+    {
+        return xt::fabs(std::forward<E1>(a) - std::forward<E2>(b)) <= (atol + rtol * xt::fabs(b));
+    }
+
+    /**
+    * @ingroup classif_functions
+    * @brief Check if all elements in \em a are close to the 
+    * corresponding elements in \em b.
+    *
+    * Returns an \ref xfunction that evaluates to 
+    * true if all elements in e1 and e2 are close to each other
+    * according to parameters ``atol`` and ``rtol``.
+    * @param e1, @param e2 input arrays to compare
+    * @param rtol the relative tolerance parameter
+    * @param atol the absolute tolerance parameter
+    * @return an \ref xfunction
+    */
+    template <class E1, class E2>
+    inline auto allclose(E1&& a, E2&& b, double rtol = 1e-05, double atol = 1e-08) noexcept
+    {
+        return xt::all(isclose(std::forward<E1>(a), std::forward<E2>(b), rtol, atol));
+    }
+
     /**********************
      * Reducing functions *
      **********************/
