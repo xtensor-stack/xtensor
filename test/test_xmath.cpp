@@ -435,5 +435,14 @@ namespace xt
         EXPECT_FALSE(allclose(a, c));
         b(1, 1) = 1;
         EXPECT_FALSE(allclose(a, b));
+        EXPECT_TRUE(allclose(a, b, 10, 10));
+
+        b = a;
+        b(0, 0) = nan("n");
+        EXPECT_FALSE(isclose(a, b)(0, 0));
+        EXPECT_FALSE(isclose(a, b)(0, 0));
+        a(0, 0) = nan("n");
+        EXPECT_FALSE(isclose(a, b)(0, 0));
+        EXPECT_TRUE(isclose(a, b, 1, 1, true)(0, 0));
     }
 }
