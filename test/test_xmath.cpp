@@ -424,4 +424,25 @@ namespace xt
         xarray<double> a(shape, 0.7);
         EXPECT_EQ(lgamma(a)(0, 0), std::lgamma(a(0, 0)));
     }
+
+    TEST(xmath, isclose)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a(shape, 0.7);
+        xarray<double> b(shape, 0.70000000001);
+        xarray<double> c(shape, 0.80000000001);
+        EXPECT_TRUE(allclose(a, b));
+        EXPECT_FALSE(allclose(a, c));
+        b(1, 1) = 1;
+        EXPECT_FALSE(allclose(a, b));
+        EXPECT_TRUE(allclose(a, b, 10, 10));
+
+        b = a;
+        b(0, 0) = nan("n");
+        EXPECT_FALSE(isclose(a, b)(0, 0));
+        EXPECT_FALSE(isclose(a, b)(0, 0));
+        a(0, 0) = nan("n");
+        EXPECT_FALSE(isclose(a, b)(0, 0));
+        EXPECT_TRUE(isclose(a, b, 1, 1, true)(0, 0));
+    }
 }
