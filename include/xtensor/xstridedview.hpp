@@ -100,7 +100,7 @@ namespace xt
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
 
-        static constexpr xt::layout layout_type = xt::layout::dynamic;
+        static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
@@ -595,7 +595,7 @@ namespace xt
             {
                 resize_container(m_index, m_e.dimension());
                 m_size = compute_size(m_e.shape());
-                compute_strides(m_e.shape(), layout::row_major, m_strides);
+                compute_strides(m_e.shape(), layout_type::row_major, m_strides);
             }
 
             const reference operator[](std::size_t idx) const
@@ -763,7 +763,7 @@ namespace xt
         {
             std::vector<std::size_t> strides;
             strides.resize(e.shape().size());
-            compute_strides(e.shape(), layout::row_major, strides);
+            compute_strides(e.shape(), layout_type::row_major, strides);
             return strides;
         }
     }
