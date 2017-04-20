@@ -79,8 +79,8 @@ namespace xt
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
-        explicit xtensor_container(const shape_type& shape, layout_type l = layout_type::row_major);
-        explicit xtensor_container(const shape_type& shape, const_reference value, layout_type l = layout_type::row_major);
+        explicit xtensor_container(const shape_type& shape, layout_type l = L);
+        explicit xtensor_container(const shape_type& shape, const_reference value, layout_type l = L);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides);
         explicit xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value);
         explicit xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
