@@ -154,24 +154,24 @@ namespace xt
         const_stepper stepper_end(const ST& shape) const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::container_type&>
         data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::strides_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::strides_type>
         strides() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const value_type*>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const value_type*>
         raw_data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, value_type*>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, value_type*>
         raw_data();
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::size_type>
-        raw_data_offset() const;
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const std::size_t>
+        raw_data_offset() const noexcept;
 
     private:
 
@@ -434,7 +434,7 @@ namespace xt
     template <class E, class... S>
     template <class T>
     inline auto xview<E, S...>::data() const ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::container_type&>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::container_type&>
     {
         return m_e.data();
     }
@@ -445,7 +445,7 @@ namespace xt
     template <class E, class... S>
     template <class T>
     inline auto xview<E, S...>::strides() const ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::strides_type>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::strides_type>
     {
         using strides_type = typename T::strides_type;
         strides_type temp = m_e.strides();
@@ -466,7 +466,7 @@ namespace xt
     template <class E, class... S>
     template <class T>
     inline auto xview<E, S...>::raw_data() const ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const value_type*>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const value_type*>
     {
         return m_e.raw_data();
     }
@@ -474,7 +474,7 @@ namespace xt
     template <class E, class... S>
     template <class T>
     inline auto xview<E, S...>::raw_data() ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, value_type*>
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, value_type*>
     {
         return m_e.raw_data();
     }
@@ -484,8 +484,8 @@ namespace xt
      */
     template <class E, class... S>
     template <class T>
-    inline auto xview<E, S...>::raw_data_offset() const ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<T>>, T>::value, const typename T::size_type>
+    inline auto xview<E, S...>::raw_data_offset() const noexcept ->
+        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const std::size_t>
     {
         auto func = [](const auto& s) { return xt::value(s, 0); };
         typename T::size_type offset = 0;

@@ -89,6 +89,7 @@ set(XTENSOR_TESTS
     test_xbroadcast.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
+    test_xdynamicview.cpp
     test_xeval.cpp
     test_xfunction.cpp
     test_xindexview.cpp
