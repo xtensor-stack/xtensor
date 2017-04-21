@@ -113,7 +113,7 @@ Example 2: Create a universal function from a C++ scalar function
 .. image:: xtensor-cookiecutter.png
    :alt: xtensor-cookiecutter
 
-The xtensor-cookiecutter_ project helps extension authors create Python extension modules making use of `xtensor`.
+The xtensor-python-cookiecutter_ project helps extension authors create Python extension modules making use of `xtensor`.
 
 It takes care of the initial work of generating a project skeleton with
 
@@ -127,4 +127,4 @@ A few examples included in the resulting project including
 - The generation of the HTML documentation with sphinx
 
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
-.. _xtensor-cookiecutter: https://github.com/QuantStack/xtensor-cookiecutter
+.. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
