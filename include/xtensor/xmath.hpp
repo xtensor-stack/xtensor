@@ -39,8 +39,8 @@ namespace xt
     template <class T>\
     struct NAME##_fun {\
         using argument_type = T;\
-        using result_type = T;\
-        constexpr T operator()(const T& arg) const {\
+        using result_type = decltype(std::NAME(std::declval<T>()));\
+        constexpr result_type operator()(const T& arg) const {\
             using std::NAME;\
             return NAME(arg);\
         }\

@@ -129,5 +129,86 @@ namespace xt
     {
         return detail::complex_expression_helper<is_xexpression<std::decay_t<E>>::value>::imag(std::forward<E>(e));
     }
+
+#define UNARY_COMPLEX_FUNCTOR(NAME)\
+    template <class T>\
+    struct NAME##_fun {\
+        using argument_type = T;\
+        using result_type = decltype(std::NAME(std::declval<T>()));\
+        constexpr result_type operator()(const T& t) const {\
+            using std::NAME;\
+            return NAME(t);\
+        }\
+    }
+
+    namespace math
+    {
+        const double PI  = 3.141592653589793238463;
+
+        UNARY_COMPLEX_FUNCTOR(conj);
+        UNARY_COMPLEX_FUNCTOR(norm);
+        UNARY_COMPLEX_FUNCTOR(arg);
+    }
+
+    /**
+     * @brief Returns an \ref xfunction evaluating to the complex conjugate of the given expression.
+     *
+     * @param e the \ref xexpression
+     */
+    template <class E>
+    inline auto conj(E&& e) noexcept
+    {
+        using value_type = typename std::decay_t<E>::value_type;
+        using functor = math::conj_fun<value_type>;
+        using result_type = typename functor::result_type;
+        using type = xfunction<functor, result_type, const_xclosure_t<E>>;
+        return type(functor(), std::forward<E>(e));
+    }
+
+    /**
+     * @brief Calculates the phase angle (in radians) elementwise for the complex numbers in e.
+     * @param e the \ref xexpression
+     */
+    template <class E>
+    inline auto arg(E&& e) noexcept
+    {
+        using value_type = typename std::decay_t<E>::value_type;
+        using functor = math::arg_fun<value_type>;
+        using result_type = typename functor::result_type;
+        using type = xfunction<functor, result_type, const_xclosure_t<E>>;
+        return type(functor(), std::forward<E>(e));
+    }
+
+    /**
+     * @brief Calculates the phase angle elementwise for the complex numbers in e.
+     * Note that this function might be slightly less perfomant than \ref arg.
+     * @param e the \ref xexpression
+     * @param deg calculate angle in degrees instead of radians
+     */
+    template <class E>
+    inline auto angle(E&& e, bool deg = false) noexcept
+    {
+        double multiplier = 1.0;
+        if (deg)
+        {
+            multiplier = 180. / math::PI;
+        }
+        return arg(std::forward<E>(e)) * std::move(multiplier);
+    }
+
+    /**
+     * @brief Calculates the squared magnitude elementwise for the complex numbers in e.
+     *
+     * @param e the \ref xexpression
+     */
+    template <class E>
+    inline auto norm(E&& e) noexcept
+    {
+        using value_type = typename std::decay_t<E>::value_type;
+        using functor = math::norm_fun<value_type>;
+        using result_type = typename functor::result_type;
+        using type = xfunction<functor, result_type, const_xclosure_t<E>>;
+        return type(functor(), std::forward<E>(e));
+    }
 }
 #endif
