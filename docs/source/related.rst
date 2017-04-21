@@ -4,14 +4,25 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
+.. raw:: html
+
+   <style>
+   h2 {
+        display: none;
+   }
+   </style>
+
 Related projects
 ================
+
+xtensor-python
+--------------
 
 .. image:: xtensor-python.svg
    :alt: xtensor-python
 
 The xtensor-python_ project provides the implementation of container types compatible with ``xtensor``'s expression
-system,  ``pyarray`` and ``pytensor`` which effectively wrap numpy arrays, allowing operating on numpy arrays inplace.
+system, ``pyarray`` and ``pytensor`` which effectively wrap numpy arrays, allowing operating on numpy arrays inplace.
 
 Example 1: Use an algorithm of the C++ library on a numpy array inplace
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -110,6 +121,9 @@ Example 2: Create a universal function from a C++ scalar function
      [-1.499227,  0.136731,  1.646979,  1.643002,  0.128456],
      [-1.084323, -0.583843,  0.45342 ,  1.073811,  0.706945]]
 
+xtensor-python-cookiecutter
+---------------------------
+
 .. image:: xtensor-cookiecutter.png
    :alt: xtensor-cookiecutter
 
@@ -126,5 +140,16 @@ A few examples included in the resulting project including
 - Unit tests
 - The generation of the HTML documentation with sphinx
 
+xtensor-julia
+-------------
+
+.. image:: xtensor-julia.svg
+   :alt: xtensor-julia
+
+The xtensor-julia_ project provides the implementation of container types compatible with ``xtensor``'s expression
+system, ``jlarray`` and ``jltensor`` which effectively wrap Julia arrays, allowing operating on Julia arrays inplace.
+
+
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
+.. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
