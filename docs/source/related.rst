@@ -146,9 +146,8 @@ xtensor-julia
 .. image:: xtensor-julia.svg
    :alt: xtensor-julia
 
-The xtensor-julia_ project provides the implementation of container types compatible with ``xtensor``'s expression
-system, ``jlarray`` and ``jltensor`` which effectively wrap Julia arrays, allowing operating on Julia arrays inplace.
-
+The xtensor-julia_ project provides the implementation of a container compatible with ``xtensor``'s expression
+system, ``jltensor`` which effectively wrap Julia arrays, allowing operating on Julia arrays inplace.
 
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
