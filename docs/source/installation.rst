@@ -4,7 +4,6 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-
 .. raw:: html
 
    <style>
@@ -48,7 +47,6 @@ A package for xtensor is available on Debian.
     sudo apt-get install xtensor-dev
 
 .. image:: cmake.svg
-
 
 From source with cmake
 ----------------------
