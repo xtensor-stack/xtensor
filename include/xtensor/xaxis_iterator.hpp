@@ -42,16 +42,32 @@ namespace xt
         self_type& operator++();
         self_type operator++(int);
 
-        reference operator*() const;
+        reference operator*();
         pointer operator->() const;
 
         bool equal(const self_type& rhs) const;
 
     private:
 
-        using storing_type = std::add_pointer_t<std::remove_reference_t<CT>>;
+        using storing_type = ptr_closure_t<CT>;
         storing_type p_expression;
         size_type m_index;
+
+        template <class T>
+        std::enable_if_t<std::is_pointer<T>::value, std::add_lvalue_reference_t<std::remove_pointer_t<T>>>
+        deref(T val);
+
+        template <class T>
+        std::enable_if_t<!std::is_pointer<T>::value, T>
+        deref(T& val);
+
+        template <class T, class CTA>
+        std::enable_if_t<std::is_pointer<T>::value, T>
+        get_storage_init(CTA&& e) const;
+
+        template <class T, class CTA>
+        std::enable_if_t<!std::is_pointer<T>::value, T>
+        get_storage_init(CTA&& e) const;
     };
 
     template <class CT>
@@ -71,6 +87,38 @@ namespace xt
      *********************************/
 
     template <class CT>
+    template <class T>
+    inline std::enable_if_t<std::is_pointer<T>::value, std::add_lvalue_reference_t<std::remove_pointer_t<T>>>
+    xaxis_iterator<CT>::deref(T val)
+    {
+        return *val;
+    }
+
+    template <class CT>
+    template <class T>
+    inline std::enable_if_t<!std::is_pointer<T>::value, T>
+    xaxis_iterator<CT>::deref(T& val)
+    {
+        return val;
+    }
+
+    template <class CT>
+    template <class T, class CTA>
+    inline std::enable_if_t<std::is_pointer<T>::value, T>
+    xaxis_iterator<CT>::get_storage_init(CTA&& e) const
+    {
+        return &e;
+    }
+
+    template <class CT>
+    template <class T, class CTA>
+    inline std::enable_if_t<!std::is_pointer<T>::value, T>
+    xaxis_iterator<CT>::get_storage_init(CTA&& e) const
+    {
+        return e;
+    }
+
+    template <class CT>
     inline xaxis_iterator<CT>::xaxis_iterator()
         : p_expression(nullptr), m_index(0)
     {
@@ -79,7 +127,7 @@ namespace xt
     template <class CT>
     template <class CTA>
     inline xaxis_iterator<CT>::xaxis_iterator(CTA&& e, size_type index)
-        : p_expression(&e), m_index(index)
+        : p_expression(get_storage_init<storing_type>(std::forward<CTA>(e))), m_index(index)
     {
     }
 
@@ -98,13 +146,10 @@ namespace xt
         return tmp;
     }
 
-    template <class T>
-    struct PRINT;
-
     template <class CT>
-    inline auto xaxis_iterator<CT>::operator*() const -> reference
+    inline auto xaxis_iterator<CT>::operator*() -> reference
     {
-        return view(*p_expression, size_type(m_index));
+        return view(deref(p_expression), size_type(m_index));
     }
 
     template <class CT>
