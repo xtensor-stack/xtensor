@@ -39,7 +39,18 @@ namespace xt
     template <class T>\
     struct NAME##_fun {\
         using argument_type = T;\
-        using result_type = decltype(std::NAME(std::declval<T>()));\
+        using result_type = T;\
+        constexpr T operator()(const T& arg) const {\
+            using std::NAME;\
+            return NAME(arg);\
+        }\
+    }
+
+#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)\
+    template <class T>\
+    struct NAME##_fun {\
+        using argument_type = T;\
+        using result_type = complex_value_type_t<T>;\
         constexpr result_type operator()(const T& arg) const {\
             using std::NAME;\
             return NAME(arg);\
@@ -84,7 +95,7 @@ namespace xt
 
     namespace math
     {
-        UNARY_MATH_FUNCTOR(abs);
+        UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
         UNARY_MATH_FUNCTOR(fabs);
         BINARY_MATH_FUNCTOR(fmod);
         BINARY_MATH_FUNCTOR(remainder);
@@ -129,6 +140,7 @@ namespace xt
 #undef TERNARY_MATH_FUNCTOR
 #undef BINARY_MATH_FUNCTOR
 #undef UNARY_MATH_FUNCTOR
+#undef UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
 
     /*******************
      * basic functions *

@@ -768,6 +768,25 @@ namespace xt
         static constexpr bool value = detail::is_complex<std::decay_t<T>>::value;
     };
 
+    /*************************************
+     * complex_value_type implementation *
+     *************************************/
+
+    template <typename T>
+    struct complex_value_type
+    {
+        using type = T;
+    };
+
+    template <typename T>
+    struct complex_value_type<std::complex<T>>
+    {
+        using type = T;
+    };
+
+    template <class T>
+    using complex_value_type_t = typename complex_value_type<T>::type;
+
     /*********************************
      * forward_offset implementation *
      *********************************/

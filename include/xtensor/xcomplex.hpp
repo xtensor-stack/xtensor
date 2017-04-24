@@ -150,6 +150,8 @@ namespace xt
         UNARY_COMPLEX_FUNCTOR(arg);
     }
 
+#undef UNARY_COMPLEX_FUNCTOR
+
     /**
      * @brief Returns an \ref xfunction evaluating to the complex conjugate of the given expression.
      *
@@ -197,8 +199,8 @@ namespace xt
     }
 
     /**
-     * @brief Calculates the squared magnitude elementwise for the complex numbers in e.
-     *
+     * Calculates the squared magnitude elementwise for the complex numbers in e.
+     * Equivalent to pow(real(e), 2) + pow(imag(e), 2).
      * @param e the \ref xexpression
      */
     template <class E>
