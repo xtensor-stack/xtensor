@@ -283,7 +283,7 @@ namespace xt
     }
 
     template <class CT, class S, class CD>
-    inline auto xstrided_view<CT, CD>::layout() const noexcept -> layout_type
+    inline auto xstrided_view<CT, S, CD>::layout() const noexcept -> layout_type
     {
         return layout_type::row_major;
     }
