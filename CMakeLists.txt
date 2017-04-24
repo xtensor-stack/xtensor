@@ -32,6 +32,7 @@ message(STATUS "xtensor v${${PROJECT_NAME}_VERSION}")
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_iterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp

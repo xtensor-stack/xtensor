@@ -650,6 +650,36 @@ namespace xt
     template <class S>
     using const_closure_t = typename const_closure<S>::type;
 
+    /******************************
+     * ptr_closure implementation *
+     ******************************/
+
+    template <class S>
+    struct ptr_closure
+    {
+        using underlying_type = std::conditional_t<std::is_const<std::remove_reference_t<S>>::value,
+                                                   const std::decay_t<S>,
+                                                   std::decay_t<S>>;
+        using type = std::conditional_t<std::is_lvalue_reference<S>::value,
+                                        underlying_type*,
+                                        underlying_type>;
+    };
+
+    template <class S>
+    using ptr_closure_t = typename ptr_closure<S>::type;
+
+    template <class S>
+    struct const_ptr_closure
+    {
+        using underlying_type = const std::decay_t<S>;
+        using type = std::conditional_t<std::is_lvalue_reference<S>::value,
+                                        underlying_type*,
+                                        underlying_type>;
+    };
+
+    template <class S>
+    using const_ptr_closure_t = typename const_ptr_closure<S>::type;
+
     /***************************
      * apply_cv implementation *
      ***************************/
