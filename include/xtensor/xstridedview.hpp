@@ -120,6 +120,7 @@ namespace xt
         const shape_type& shape() const noexcept;
         const strides_type& strides() const noexcept;
         const backstrides_type& backstrides() const noexcept;
+        layout_type layout() const noexcept;
 
         reference operator()();
         template <class... Args>
@@ -279,6 +280,12 @@ namespace xt
     inline auto xstrided_view<CT, S, CD>::backstrides() const noexcept -> const backstrides_type&
     {
         return m_backstrides;
+    }
+
+    template <class CT, class S, class CD>
+    inline auto xstrided_view<CT, S, CD>::layout() const noexcept -> layout_type
+    {
+        return layout_type::row_major;
     }
 
     template <class CT, class S, class CD>

@@ -22,6 +22,22 @@
 
 namespace xt
 {
+    template <class T>
+    struct numeric_constants
+    {
+        static constexpr T PI =         3.141592653589793238463;
+        static constexpr T PI_2 =       1.57079632679489661923;
+        static constexpr T PI_4 =       0.785398163397448309616;
+        static constexpr T D_1_PI =     0.318309886183790671538;
+        static constexpr T D_2_PI =     0.636619772367581343076;
+        static constexpr T D_2_SQRTPI = 1.12837916709551257390;
+        static constexpr T SQRT2 =      1.41421356237309504880;
+        static constexpr T SQRT1_2 =    0.707106781186547524401;
+        static constexpr T E =          2.71828182845904523536;
+        static constexpr T LOG2E =      1.44269504088896340736;
+        static constexpr T LOG10E =     0.434294481903251827651;
+        static constexpr T LN2 =        0.693147180559945309417;
+    };
 
     /***********
      * Helpers *
@@ -41,6 +57,17 @@ namespace xt
         using argument_type = T;\
         using result_type = T;\
         constexpr T operator()(const T& arg) const {\
+            using std::NAME;\
+            return NAME(arg);\
+        }\
+    }
+
+#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)\
+    template <class T>\
+    struct NAME##_fun {\
+        using argument_type = T;\
+        using result_type = complex_value_type_t<T>;\
+        constexpr result_type operator()(const T& arg) const {\
             using std::NAME;\
             return NAME(arg);\
         }\
@@ -84,7 +111,7 @@ namespace xt
 
     namespace math
     {
-        UNARY_MATH_FUNCTOR(abs);
+        UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
         UNARY_MATH_FUNCTOR(fabs);
         BINARY_MATH_FUNCTOR(fmod);
         BINARY_MATH_FUNCTOR(remainder);
@@ -129,6 +156,7 @@ namespace xt
 #undef TERNARY_MATH_FUNCTOR
 #undef BINARY_MATH_FUNCTOR
 #undef UNARY_MATH_FUNCTOR
+#undef UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
 
     /*******************
      * basic functions *
