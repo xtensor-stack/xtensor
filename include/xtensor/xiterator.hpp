@@ -100,7 +100,9 @@ namespace xt
         void step(size_type dim, size_type n = 1);
         void step_back(size_type dim, size_type n = 1);
         void reset(size_type dim);
+        void reset_back(size_type dim);
 
+        void to_begin();
         void to_end();
 
         bool equal(const xstepper& rhs) const;
@@ -122,6 +124,11 @@ namespace xt
 
     template <class S, class IT, class ST>
     void increment_stepper(S& stepper,
+                           IT& index,
+                           const ST& shape);
+
+    template <class S, class IT, class ST>
+    void decrement_stepper(S& stepper,
                            IT& index,
                            const ST& shape);
 
@@ -159,7 +166,9 @@ namespace xt
         void step(size_type dim, size_type n = 1);
         void step_back(size_type dim, size_type n = 1);
         void reset(size_type dim);
+        void reset_back(size_type dim);
 
+        void to_begin();
         void to_end();
 
         bool equal(const self_type& rhs) const;
@@ -235,7 +244,7 @@ namespace xt
         using pointer = typename subiterator_type::pointer;
         using difference_type = typename subiterator_type::difference_type;
         using size_type = typename subiterator_type::size_type;
-        using iterator_category = std::forward_iterator_tag;
+        using iterator_category = std::bidirectional_iterator_tag;
 
         using private_base = detail::shape_storage<S>;
         using shape_type = typename private_base::shape_type;
@@ -243,10 +252,13 @@ namespace xt
         using index_type = xindex_type_t<shape_type>;
 
         xiterator() = default;
-        xiterator(It it, shape_param_type shape);
+        xiterator(It it, shape_param_type shape, bool reverse);
 
         self_type& operator++();
         self_type operator++(int);
+
+        self_type& operator--();
+        self_type operator--(int);
 
         reference operator*() const;
         pointer operator->() const;
@@ -336,9 +348,22 @@ namespace xt
     }
 
     template <class C>
+    inline void xstepper<C>::reset_back(size_type dim)
+    {
+        if (dim >= m_offset)
+            m_it += p_c->backstrides()[dim - m_offset];
+    }
+
+    template <class C>
+    inline void xstepper<C>::to_begin()
+    {
+        m_it = p_c->begin();
+    }
+
+    template <class C>
     inline void xstepper<C>::to_end()
     {
-        m_it = p_c->end();
+        m_it = p_c->data_xend();
     }
 
     template <class C>
@@ -388,6 +413,38 @@ namespace xt
         }
     }
 
+    template <class S, class IT, class ST>
+    void decrement_stepper(S& stepper,
+                           IT& index,
+                           const ST& shape)
+    {
+        using size_type = typename S::size_type;
+        size_type i = index.size();
+        while (i != 0)
+        {
+            --i;
+            if (index[i] == 0)
+            {
+                if (i != 0)
+                {
+                    index[i] = shape[i] - 1;
+                    stepper.reset_back(i);
+                }
+                else
+                {
+                    std::fill(index.begin(), index.end(), size_type(0));
+                    stepper.to_begin();
+                }
+            }
+            else
+            {
+                --index[i];
+                stepper.step_back(i);
+                return;
+            }
+        }
+    }
+
     /***********************************
      * xindexed_stepper implementation *
      ***********************************/
@@ -427,6 +484,18 @@ namespace xt
             m_index[dim - m_offset] = 0;
     }
 
+    template <class C, bool is_const>
+    inline void xindexed_stepper<C, is_const>::reset_back(size_type dim)
+    {
+        if (dim >= m_offset)
+            m_index[dim - m_offset] = p_e->shape()[dim - m_offset] - 1;
+    }
+
+    template <class C, bool is_const>
+    inline void xindexed_stepper<C, is_const>::to_begin()
+    {
+        std::fill(m_index.begin(), m_index.end(), size_type(0));
+    }
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::to_end()
     {
@@ -485,10 +554,17 @@ namespace xt
     }
 
     template <class It, class S>
-    inline xiterator<It, S>::xiterator(It it, shape_param_type shape)
+    inline xiterator<It, S>::xiterator(It it, shape_param_type shape, bool reverse)
         : private_base(shape), m_it(it),
-          m_index(make_sequence<index_type>(this->shape().size(), size_type(0)))
+          m_index(reverse ? forward_sequence<index_type, const shape_type&>(this->shape())
+                          : make_sequence<index_type>(this->shape().size(), size_type(0)))
     {
+        if (reverse)
+        {
+            auto iter_end = m_index.end() - 1;
+            std::transform(m_index.begin(), iter_end, m_index.begin(),
+                           [](const auto& v) { return v - 1; });
+        }
     }
 
     template <class It, class S>
@@ -503,6 +579,21 @@ namespace xt
     {
         self_type tmp(*this);
         ++(*this);
+        return tmp;
+    }
+
+    template <class It, class S>
+    inline auto xiterator<It, S>::operator--() -> self_type&
+    {
+        decrement_stepper(m_it, m_index, this->shape());
+        return *this;
+    }
+
+    template <class It, class S>
+    inline auto xiterator<It, S>::operator--(int) -> self_type
+    {
+        self_type tmp(*this);
+        --(*this);
         return tmp;
     }
 

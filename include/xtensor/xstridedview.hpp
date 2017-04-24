@@ -45,6 +45,10 @@ namespace xt
         using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
         using const_iterator = const_broadcast_iterator;
         using iterator = broadcast_iterator;
+        using const_reverse_broadcast_iterator = std::reverse_iterator<const_broadcast_iterator>;
+        using reverse_broadcast_iterator = std::reverse_iterator<broadcast_iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
     };
 
     /*****************

@@ -294,6 +294,9 @@ namespace xt
         void step(size_type dim, size_type n = 1);
         void step_back(size_type dim, size_type n = 1);
         void reset(size_type dim);
+        void reset_back(size_type dim);
+
+        void to_begin();
         void to_end();
 
         bool equal(const xfunctor_stepper& rhs) const;
@@ -859,6 +862,18 @@ namespace xt
     void xfunctor_stepper<F, ST>::reset(size_type dim)
     {
         m_stepper.reset(dim);
+    }
+
+    template <class F, class ST>
+    void xfunctor_stepper<F, ST>::reset_back(size_type dim)
+    {
+        m_stepper.reset_back(dim);
+    }
+
+    template <class F, class ST>
+    void xfunctor_stepper<F, ST>::to_begin()
+    {
+        m_stepper.to_begin();
     }
 
     template <class F, class ST>
