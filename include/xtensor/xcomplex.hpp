@@ -143,23 +143,6 @@ namespace xt
 
     namespace math
     {
-        template <class T>
-        struct numeric_constants
-        {
-            static constexpr T PI =         3.141592653589793238463;
-            static constexpr T PI_2 =       1.57079632679489661923;
-            static constexpr T PI_4 =       0.785398163397448309616;
-            static constexpr T D_1_PI =     0.318309886183790671538;
-            static constexpr T D_2_PI =     0.636619772367581343076;
-            static constexpr T D_2_SQRTPI = 1.12837916709551257390;
-            static constexpr T SQRT2 =      1.41421356237309504880;
-            static constexpr T SQRT1_2 =    0.707106781186547524401;
-            static constexpr T E =          2.71828182845904523536;
-            static constexpr T LOG2E =      1.44269504088896340736;
-            static constexpr T LOG10E =     0.434294481903251827651;
-            static constexpr T LN2 =        0.693147180559945309417;
-        };
-
         UNARY_COMPLEX_FUNCTOR(conj);
         UNARY_COMPLEX_FUNCTOR(norm);
         UNARY_COMPLEX_FUNCTOR(arg);
@@ -205,10 +188,11 @@ namespace xt
     template <class E>
     inline auto angle(E&& e, bool deg = false) noexcept
     {
-        double multiplier = 1.0;
+        using value_type = complex_value_type_t<typename std::decay_t<E>::value_type>;
+        value_type multiplier = 1.0;
         if (deg)
         {
-            multiplier = 180. / math::numeric_constants<double>::PI;
+            multiplier = value_type(180) / numeric_constants<value_type>::PI;
         }
         return arg(std::forward<E>(e)) * std::move(multiplier);
     }
