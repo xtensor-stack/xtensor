@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xview.hpp"
@@ -112,7 +113,7 @@ namespace xt
         xarray<double, layout_type::column_major> crand = random::rand<double>({5, 5});
         random::seed(0);
         xarray<double, layout_type::row_major> rrand = random::rand<double>({5, 5});
-        EXPECT_EQ(rrand(2, 3), crand(2, 3));
+        EXPECT_EQ(rrand(2, 3), crand(3, 2));
     }
 
     TEST(xlayout, xview)
@@ -153,6 +154,5 @@ namespace xt
         {
             EXPECT_TRUE(*iter);
         }
-
     }
 }

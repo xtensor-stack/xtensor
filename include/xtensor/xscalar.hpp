@@ -44,12 +44,8 @@ namespace xt
         using const_iterator = const value_type*;
         using const_stepper = xscalar_stepper<true, CT>;
         using stepper = xscalar_stepper<false, CT>;
-        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
-        using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_broadcast_iterator = std::reverse_iterator<broadcast_iterator>;
-        using const_reverse_broadcast_iterator = std::reverse_iterator<const_broadcast_iterator>;
 
     };
 
@@ -76,9 +72,6 @@ namespace xt
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
-
-        using broadcast_iterator = typename iterable_base::broadcast_iterator;
-        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
 
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;

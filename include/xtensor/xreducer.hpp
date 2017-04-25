@@ -71,12 +71,8 @@ namespace xt
         using inner_shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, X>::type;
         using const_stepper = xindexed_stepper<xreducer<F, CT, X>>;
         using stepper = const_stepper;
-        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
-        using broadcast_iterator = const_broadcast_iterator;
-        using const_iterator = const_broadcast_iterator;
+        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
         using iterator = const_iterator;
-        using const_reverse_broadcast_iterator = std::reverse_iterator<const_broadcast_iterator>;
-        using reverse_broadcast_iterator = std::reverse_iterator<broadcast_iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
         using reverse_iterator = std::reverse_iterator<iterator>;
     };
@@ -122,12 +118,6 @@ namespace xt
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
-
-        using broadcast_iterator = typename iterable_base::broadcast_iterator;
-        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
-
-        using iterator = typename iterable_base::iterator;
-        using const_iterator = typename iterable_base::const_iterator;
 
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;

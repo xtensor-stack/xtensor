@@ -543,6 +543,94 @@ namespace xt
             EXPECT_EQ(vec.end(), vec.data().end());
         }
     }
+
+    template <class V, class C = std::vector<std::size_t>>
+    void test_xiterator(V& vec)
+    {
+        row_major_result<C> rm;
+        vec.reshape(rm.m_shape, layout_type::row_major);
+        indexed_assign_array(vec, rm.m_assigner);
+        size_t nb_iter = vec.size() / 2;
+
+        // broadcast_iterator
+        {
+            auto iter = vec.xbegin();
+            auto iter_end = vec.xend();
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(vec.data()[nb_iter], *iter);
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+
+        // shaped_xiterator
+        {
+            std::vector<size_t> shape(rm.m_shape.size()+1);
+            std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
+            shape[0] = 2;
+            auto iter = vec.xbegin(shape);
+            auto iter_end = vec.xend(shape);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(vec.data()[0], *iter);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+
+        // column broadcast_iterator
+        {
+            auto iter = vec.template xbegin<layout_type::column_major>();
+            auto iter_end = vec.template xend<layout_type::column_major>();
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(vec(0, 0, 2), *iter);
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+
+        // column shaped_xiterator
+        {
+            using shape_type = std::vector<size_t>;
+            shape_type shape(rm.m_shape.size() + 1);
+            std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
+            shape[0] = 2;
+            auto iter = vec.template xbegin<shape_type, layout_type::column_major>(shape);
+            auto iter_end = vec.template xend<shape_type, layout_type::column_major>(shape);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(vec(0, 0, 2), *iter);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+    }
+
+    template <class V, class C = std::vector<std::size_t>>
+    void test_reverse_xiterator(V& vec)
+    {
+        row_major_result<C> rm;
+        vec.reshape(rm.m_shape, layout_type::row_major);
+        indexed_assign_array(vec, rm.m_assigner);
+        size_t nb_iter = vec.size() / 2;
+
+        // broadcast_iterator
+        {
+            auto iter = vec.xrbegin();
+            auto iter_end = vec.xrend();
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(vec.data()[nb_iter-1], *iter);
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+
+        // shaped_xiterator
+        {
+            std::vector<size_t> shape(rm.m_shape.size() + 1);
+            std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
+            shape[0] = 2;
+            auto iter = vec.xrbegin(shape);
+            auto iter_end = vec.xrend(shape);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(vec.data()[2*nb_iter - 1], *iter);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+    }
 }
 
 #endif

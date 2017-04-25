@@ -131,4 +131,18 @@ namespace xt
         adaptor_type a(v);
         test_iterator<adaptor_type, container_type>(a);
     }
+
+    TEST(xtensor_adaptor, xiterator)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_xiterator<adaptor_type, container_type>(a);
+    }
+
+    TEST(xtensor_adaptor, reverse_xiterator)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_reverse_xiterator<adaptor_type, container_type>(a);
+    }
 }
