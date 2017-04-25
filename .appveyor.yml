@@ -7,8 +7,14 @@ platform:
   - x86
 
 environment:
+  MINICONDA: C:\xtensor-conda
   matrix:
-    - MINICONDA: C:\xtensor-conda
+    - COLUMN_MAJOR_LAYOUT: OFF
+    - COLUMN_MAJOR_LAYOUT: ON
+
+matrix:
+  allow_failures:
+    - COLUMN_MAJOR_LAYOUT: ON
 
 init:
   - "ECHO %MINICONDA%"
@@ -23,7 +29,7 @@ install:
   - conda update -q conda
   - conda info -a
   - conda install gtest cmake -c conda-forge
-  - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON .
+  - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDEFAULT_COLUMN_MAJOR=%COLUMN_MAJOR_LAYOUT% .
   - nmake test_xtensor
   - cd test
 

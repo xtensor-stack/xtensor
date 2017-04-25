@@ -75,6 +75,7 @@ set(XTENSOR_HEADERS
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
+OPTION(DEFAULT_COLUMN_MAJOR "set default layout to coumn major" OFF)
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     set(BUILD_TESTS ON)
@@ -82,6 +83,10 @@ endif()
 
 if(XTENSOR_ENABLE_ASSERT)
     add_definitions(-DXTENSOR_ENABLE_ASSERT)
+endif()
+
+if(DEFAULT_COLUMN_MAJOR)
+    add_definitions(-DDEFAULT_LAYOUT=layout_type::column_major)
 endif()
 
 if(BUILD_TESTS)
