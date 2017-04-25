@@ -143,14 +143,15 @@ namespace xt
     }
 
 
-    TEST(xlayout, DISABLED_equal_iterator)
+    TEST(xlayout, equal_iterator)
     {
         xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
         xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
         auto e = equal(cm, rm);
-        for (auto el : e)
+        auto iter_end = e.xend();
+        for (auto iter = e.xbegin(); iter != e.xend(); ++iter)
         {
-            EXPECT_TRUE(el);
+            EXPECT_TRUE(*iter);
         }
 
     }

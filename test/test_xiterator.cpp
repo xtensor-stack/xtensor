@@ -193,6 +193,185 @@ namespace xt
         }
     }
 
+    template <class R, class S>
+    void test_decrement(const R& result, const S& shape)
+    {
+        using size_type = typename R::size_type;
+        using shape_type = typename R::shape_type;
+        using vector_type = typename R::vector_type;
+        vector_type data = result.data();
+        xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
+        size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
+        int expected = a(1, 1, 2);
+
+        auto iter = a.xrbegin();
+        auto iter2 = a.xrbegin();
+        for (size_type i = 0; i < nb_inc; ++i)
+        {
+            ++iter;
+            iter2++;
+        }
+        std::cout << std::endl;
+        EXPECT_EQ(*iter, expected) << "predecrement operator doesn't give expected result";
+        EXPECT_EQ(*iter2, expected) << "postdecrement operator doesn't give expected result";
+    }
+
+    TEST(xiterator, decrement_row_major)
+    {
+        row_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_decrement(rm, rm.shape());
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_decrement(rm, rm.shape());
+        }
+    }
+
+    TEST(xiterator, decrement_column_major)
+    {
+        column_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_decrement(rm, rm.shape());
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_decrement(rm, rm.shape());
+        }
+    }
+
+    TEST(xiterator, decrement_central_major)
+    {
+        central_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_decrement(rm, rm.shape());
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_decrement(rm, rm.shape());
+        }
+    }
+
+    TEST(xiterator, decrement_unit_shape)
+    {
+        unit_shape_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_decrement(rm, rm.shape());
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_decrement(rm, rm.shape());
+        }
+    }
+
+    template <class R>
+    void test_rend(const R& result)
+    {
+        using size_type = typename R::size_type;
+        using shape_type = typename R::shape_type;
+        using vector_type = typename R::vector_type;
+        vector_type data = result.data();
+        xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
+
+        size_type size = a.size();
+        auto iter = a.xrbegin();
+        auto last = a.xrend();
+        for (size_type i = 0; i < size; ++i)
+        {
+            ++iter;
+        }
+
+        EXPECT_EQ(iter, last) << "reverse iterator doesn't reach the end";
+    }
+
+    TEST(xiterator, reverse_end_row_major)
+    {
+        row_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_rend(rm);
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_rend(rm);
+        }
+    }
+
+    TEST(xiterator, reverse_end_column_major)
+    {
+        column_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_rend(rm);
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_rend(rm);
+        }
+    }
+
+    TEST(xiterator, reverse_end_central_major)
+    {
+        central_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_rend(rm);
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_rend(rm);
+        }
+    }
+
+    TEST(xiterator, reverse_end_unit_shape)
+    {
+        unit_shape_result<> rm;
+        {
+            SCOPED_TRACE("same shape");
+            test_rend(rm);
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_rend(rm);
+        }
+    }
+
     TEST(xiterator, broadcast)
     {
         EXPECT_TRUE(broadcastable(std::vector<size_t>({3, 2, 1}), std::vector<size_t>({1, 2, 1})));

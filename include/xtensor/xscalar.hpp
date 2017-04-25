@@ -46,6 +46,11 @@ namespace xt
         using stepper = xscalar_stepper<false, CT>;
         using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
         using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using reverse_broadcast_iterator = std::reverse_iterator<broadcast_iterator>;
+        using const_reverse_broadcast_iterator = std::reverse_iterator<const_broadcast_iterator>;
+
     };
 
     template <class CT>
@@ -180,7 +185,9 @@ namespace xt
         void step(size_type dim, size_type n = 1) noexcept;
         void step_back(size_type dim, size_type n = 1) noexcept;
         void reset(size_type dim) noexcept;
+        void reset_back(size_type dim) noexcept;
 
+        void to_begin() noexcept;
         void to_end() noexcept;
 
         bool equal(const self_type& rhs) const noexcept;
@@ -506,6 +513,17 @@ namespace xt
     template <bool is_const, class CT>
     inline void xscalar_stepper<is_const, CT>::reset(size_type /*dim*/) noexcept
     {
+    }
+
+    template <bool is_const, class CT>
+    inline void xscalar_stepper<is_const, CT>::reset_back(size_type /*dim*/) noexcept
+    {
+    }
+
+    template <bool is_const, class CT>
+    inline void xscalar_stepper<is_const, CT>::to_begin() noexcept
+    {
+        p_c = p_c->stepper_begin(p_c->shap()).pc;
     }
 
     template <bool is_const, class CT>

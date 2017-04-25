@@ -29,10 +29,14 @@ namespace xt
         using container_type = typename xcontainer_inner_types<D>::container_type;
         using iterator = typename container_type::iterator;
         using const_iterator = typename container_type::const_iterator;
+        using reverse_iterator = typename container_type::reverse_iterator;
+        using const_reverse_iterator = typename container_type::const_reverse_iterator;
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D>;
         using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
         using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
+        using reverse_broadcast_iterator = std::reverse_iterator<broadcast_iterator>;
+        using const_reverse_broadcast_iterator = std::reverse_iterator<const_broadcast_iterator>;
     };
 
     /**
@@ -83,6 +87,12 @@ namespace xt
         using broadcast_iterator = typename iterable_base::broadcast_iterator;
         using const_broadcast_iterator = typename iterable_base::broadcast_iterator;
 
+        using reverse_iterator = typename iterable_base::reverse_iterator;
+        using const_reverse_iterator = typename iterable_base::const_reverse_iterator;
+
+        using reverse_broadcast_iterator = typename iterable_base::reverse_broadcast_iterator;
+        using const_reverse_broadcast_iterator = typename iterable_base::const_reverse_broadcast_iterator;
+
         size_type size() const noexcept;
 
         size_type dimension() const noexcept;
@@ -128,6 +138,14 @@ namespace xt
         const_iterator cbegin() const noexcept;
         const_iterator cend() const noexcept;
 
+        reverse_iterator rbegin() noexcept;
+        reverse_iterator rend() noexcept;
+
+        const_reverse_iterator rbegin() const noexcept;
+        const_reverse_iterator rend() const noexcept;
+        const_reverse_iterator crbegin() const noexcept;
+        const_reverse_iterator crend() const noexcept;
+
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
         template <class S>
@@ -137,6 +155,9 @@ namespace xt
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
         const_stepper stepper_end(const S& shape) const noexcept;
+
+        iterator data_xend() noexcept;
+        const_iterator data_xend() const noexcept;
 
     protected:
 
@@ -150,6 +171,9 @@ namespace xt
         xcontainer& operator=(xcontainer&&) = default;
 
     private:
+
+        template <class It>
+        It data_xend_impl(It end) const noexcept;
 
         inner_shape_type& mutable_shape();
         inner_strides_type& mutable_strides();
@@ -224,6 +248,7 @@ namespace xt
         const inner_backstrides_type& backstrides_impl() const noexcept;
 
     private:
+
         inner_shape_type m_shape;
         inner_strides_type m_strides;
         inner_backstrides_type m_backstrides;
@@ -233,6 +258,13 @@ namespace xt
     /******************************
      * xcontainer implementation *
      ******************************/
+
+    template <class D>
+    template <class It>
+    inline It xcontainer<D>::data_xend_impl(It end) const noexcept
+    {
+        return end - 1 + strides().back();
+    }
 
     template <class D>
     inline auto xcontainer<D>::mutable_shape() -> inner_shape_type&
@@ -558,6 +590,71 @@ namespace xt
     }
     //@}
 
+    /**
+     * @name Reverse iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the reversed buffer containing
+     * the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::rbegin() noexcept -> reverse_iterator
+    {
+        return data().rbegin();
+    }
+
+    /**
+     * Returns an iterator to the element following the last element of
+     * the reversed buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::rend() noexcept -> reverse_iterator
+    {
+        return data().rend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the reversed
+     * buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::rbegin() const noexcept -> const_reverse_iterator
+    {
+        return data().rbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the reversed buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::rend() const noexcept -> const_reverse_iterator
+    {
+        return data().rend();
+    }
+
+    /**
+     * Returns a constant iterator to the first element of the reversed
+     * buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::crbegin() const noexcept -> const_reverse_iterator
+    {
+        return data().crbegin();
+    }
+
+    /**
+     * Returns a constant iterator to the element following the last
+     * element of the reversed buffer containing the elements of the container.
+     */
+    template <class D>
+    inline auto xcontainer<D>::crend() const noexcept -> const_reverse_iterator
+    {
+        return data().crend();
+    }
+    //@}
+
     /***************
      * stepper api *
      ***************/
@@ -575,7 +672,7 @@ namespace xt
     inline auto xcontainer<D>::stepper_end(const S& shape) noexcept -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return stepper(static_cast<derived_type*>(this), data().end(), offset);
+        return stepper(static_cast<derived_type*>(this), data_xend(), offset);
     }
 
     template <class D>
@@ -591,7 +688,19 @@ namespace xt
     inline auto xcontainer<D>::stepper_end(const S& shape) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(static_cast<const derived_type*>(this), data().end(), offset);
+        return const_stepper(static_cast<const derived_type*>(this), data_xend(), offset);
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_xend() noexcept -> iterator
+    {
+        return data_xend_impl(data().end());
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_xend() const noexcept -> const_iterator
+    {
+        return data_xend_impl(data().end());
     }
 
     /*************************************
