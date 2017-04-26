@@ -136,4 +136,13 @@ namespace xt
 
         EXPECT_TRUE(allclose(fieldnorm, cmplres_norm));
     }
+
+    TEST(xcomplex, conj_real)
+    {
+        xarray<double> A = {{ 0.81745298, 0.75933774, 0.44016704},
+                            { 0.54959488, 1.01524554, 0.69331814},
+                            { 0.75711643, 0.78897806, 0.38306348}};
+        xarray<double> B = xt::conj(A);
+        EXPECT_EQ(A, B);
+    }
 }
