@@ -143,9 +143,36 @@ namespace xt
 
     namespace math
     {
-        UNARY_COMPLEX_FUNCTOR(conj);
         UNARY_COMPLEX_FUNCTOR(norm);
         UNARY_COMPLEX_FUNCTOR(arg);
+
+        namespace detail
+        {
+            // libc++ (OSX) conj is unfortunately broken and returns 
+            // std::complex<T> instead of T.
+            template <class T>
+            constexpr T conj(const T& c)
+            {
+                return c;
+            }
+
+            template <class T>
+            constexpr std::complex<T> conj(const std::complex<T>& c)
+            {
+                return std::complex<T>(c.real(), -c.imag());
+            }
+        }
+
+        template <class T>
+        struct conj_fun
+        {
+            using argument_type = T;
+            using result_type = decltype(detail::conj(std::declval<T>()));
+            constexpr result_type operator()(const T& t) const
+            {
+                return detail::conj(t);
+            }
+        };
     }
 
 #undef UNARY_COMPLEX_FUNCTOR
