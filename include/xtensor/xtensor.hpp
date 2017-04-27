@@ -85,6 +85,9 @@ namespace xt
         explicit xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value);
         explicit xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
 
+        template <class S = shape_type>
+        static xtensor_container from_shape(S&& s);
+
         ~xtensor_container() = default;
 
         xtensor_container(const xtensor_container&) = default;
@@ -285,6 +288,18 @@ namespace xt
     inline xtensor_container<EC, N, L>::xtensor_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
         : base_type(std::move(shape), std::move(strides)), m_data(std::move(data))
     {
+    }
+
+    template <class EC, std::size_t N, layout_type L>
+    template <class S>
+    inline xtensor_container<EC, N, L> xtensor_container<EC, N, L>::from_shape(S&& s)
+    {
+        if (s.size() != N)
+        {
+            throw std::runtime_error("Cannot change dimension of xtensor.");
+        }
+        shape_type shape = forward_sequence<shape_type>(s);
+        return self_type(shape);
     }
     //@}
 

@@ -176,6 +176,19 @@ namespace xt
         }
 
         {
+            SCOPED_TRACE("different types reshape");
+            row_major_result<C> rm;
+            auto v_copy_a = vec;
+            auto v_copy_b = vec;
+            std::array<std::size_t, 3> ar = {3, 2, 4};
+            std::vector<std::size_t> vr = {3, 2, 4};
+            v_copy_a.reshape(ar, true);
+            compare_shape(v_copy_a, rm);
+            v_copy_b.reshape(vr, true);
+            compare_shape(v_copy_b, rm);
+        }
+
+        {
             SCOPED_TRACE("column_major reshape");
             column_major_result<C> cm;
             vec.reshape(cm.m_shape, layout_type::column_major);
