@@ -234,6 +234,14 @@ namespace xt
         EXPECT_EQ(false, all(b));
     }
 
+    TEST(operation, all_layout)
+    {
+        xarray<int, layout_type::row_major> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<int, layout_type::column_major> b = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        EXPECT_EQ(a(0, 1), b(0, 1));
+        EXPECT_TRUE(all(equal(a, b)));
+    }
+
     TEST(operation, nonzero)
     {
         xarray<int> a = {1, 0, 3};
