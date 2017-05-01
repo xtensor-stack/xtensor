@@ -16,7 +16,23 @@ unsigned integers to the location of an element in the buffer. The range in whic
 
 The scheme used to map indices into a location in the buffer is a strided index scheme. In such a scheme, the index ``(i0, ..., in)``
 corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where ``(s0, ..., sn)`` are the `strides`
-of the array. The strides may be specified when instantiating an array:
+of the array. Some particular cases of strided schemes implement well known memory layouts: 
+
+- the row-major layout (or C layout) is a strided index scheme where the strides grow from right to left
+- the column-major layout (or Fortran layout) is a strided index scheme where the strides grow from left to right
+
+``xtensor`` provides a ``layout_type`` enum that helps to specify the layout used by multi-dimensional arrays. This enum can be used in
+two ways:
+
+- at compile time, as a template argument. The value ``layout_type::dynamic`` allows to specify any strided index scheme at runtime (including
+  row-major and column-major schemes), whereas ``layout_type::row_major`` and ``layout_type::column_major`` fixes the strided index scheme and
+  disable ``reshape`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template
+  parameter is ``DEFAULT_LAYOUT``.
+- at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``reshape`` and constructor overloads allow
+  to aspecify a set of strides or a layout value to avoid strides computation. If neither strides nor layout is specified when instantiating
+  or reshaping a multi-dimensional array, strides corresponding to ``DEFAULT_LAYOUT`` are used.
+
+The following example shows how to initialize a multi-dimensional array of dynamic layout with specified strides:
 
 .. code::
 
@@ -25,11 +41,10 @@ of the array. The strides may be specified when instantiating an array:
     
     std::vector<size_t> shape = { 3, 2, 4 };
     std::vector<size_t> strides = { 8, 4, 1 };
-    xt::xarray<double> a(shape, strides);
+    xt::xarray<double, layout_type::dynamic> a(shape, strides);
 
-However, this requires to carefully compute the strides to avoid buffer overflow when accessing elements of the array. `xtensor` provides
-shortcuts that allow not to specify the strides when you instantiate a multi-dimensional array: ``layout::row_major`` and ``layout::column_major``
-enum values, which are particular cases of strided schemes. The previous example is equivalent to the following one:
+However, this requires to carefully compute the strides to avoid buffer overflow when accessing elements of the array. We can use the layout
+shortcut to specify the strides instead of computing them:
 
 .. code::
 
@@ -37,10 +52,19 @@ enum values, which are particular cases of strided schemes. The previous example
     #include "xtensor/xarray.hpp"
 
     std::vector<size_t> shape = { 3, 2, 4 };
-    xt::xarray<double> a(shape, xt::layout::row_major);
+    xt::xarray<double, layout_type::dynamic> a(shape, xt::layout::row_major);
 
+If the layout of the array can be fixed at compile time, we can even do simpler:
 
-If neither strides nor layout is specified when instantiating an array, the ``row_major`` layout is used.
+.. code::
+
+    #include <vector>
+    #include "xtensor/xarray.hpp"
+
+    std::vector<size_t> shape = { 3, 2, 4 };
+    xt::xarray<double, layout_type::row_major> a(shape);
+
+However, in that latter case, the layout of the array is forced to ``row_major`` at compile time, and therefore cannot be changed at runtime.
 
 Runtime vs Compile-time dimensionality
 --------------------------------------

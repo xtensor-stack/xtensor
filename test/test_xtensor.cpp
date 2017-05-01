@@ -195,4 +195,16 @@ namespace xt
         xtensor_dynamic a;
         EXPECT_EQ(0, a());
     }
+
+    TEST(xtensor, xiterator)
+    {
+        xtensor_dynamic a;
+        test_xiterator<xtensor_dynamic, container_type>(a);
+    }
+
+    TEST(xtensor, reverse_xiterator)
+    {
+        xtensor_dynamic a;
+        test_reverse_xiterator<xtensor_dynamic, container_type>(a);
+    }
 }

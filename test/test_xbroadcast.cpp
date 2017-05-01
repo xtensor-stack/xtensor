@@ -56,5 +56,61 @@ namespace xt
         std::array<std::size_t, 2> bc_shape;
         auto m1_broadcast = broadcast(123, bc_shape);
     }
+
+    TEST(xbroadcast, xiterator)
+    {
+        xarray<int> m1 = { 1, 2, 3 };
+        auto m1_broadcast = broadcast(m1, { 2, 3 });
+        size_t nb_iter = 3;
+
+        // broadcast_iterator
+        {
+            auto iter = m1_broadcast.xbegin();
+            auto iter_end = m1_broadcast.xend();
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(1, *iter);
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+
+        // shaped_xiterator
+        {
+            std::vector<size_t> shape = { 2, 2, 3 };
+            auto iter = m1_broadcast.xbegin(shape);
+            auto iter_end = m1_broadcast.xend(shape);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(1, *iter);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+    }
+    
+    TEST(xbroadcast, reverse_xiterator)
+    {
+        xarray<int> m1 = { 1, 2, 3 };
+        auto m1_broadcast = broadcast(m1, { 2, 3 });
+        size_t nb_iter = 3;
+
+        // reverse_broadcast_iterator
+        {
+            auto iter = m1_broadcast.xrbegin();
+            auto iter_end = m1_broadcast.xrend();
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(3, *iter);
+            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+
+        // reverse_shaped_xiterator
+        {
+            std::vector<size_t> shape = { 2, 2, 3 };
+            auto iter = m1_broadcast.xrbegin(shape);
+            auto iter_end = m1_broadcast.xrend(shape);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(3, *iter);
+            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            EXPECT_EQ(iter, iter_end);
+        }
+    }
 }
 

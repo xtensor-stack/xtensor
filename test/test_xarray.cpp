@@ -192,5 +192,30 @@ namespace xt
         xarray_dynamic a;
         EXPECT_EQ(0, a());
     }
-}
 
+    TEST(xarray, xiterator)
+    {
+        xarray_dynamic a;
+        test_xiterator(a);
+    }
+
+    TEST(xarray, reverse_xiterator)
+    {
+        xarray_dynamic a;
+        test_reverse_xiterator(a);
+    }
+
+    TEST(xarray, cross_layout_assign)
+    {
+        xarray<int, layout_type::row_major> a = { {1, 2, 3, 4},
+                                                  {5, 6, 7, 8} };
+        xarray<int, layout_type::column_major> b = { { 1, 2, 3, 4 },
+                                                     { 5, 6, 7, 8 } };
+
+        xarray<int, layout_type::column_major> ra = a;
+        EXPECT_EQ(b, ra);
+
+        xarray<int, layout_type::row_major> rb = b;
+        EXPECT_EQ(a, rb);
+    }
+}

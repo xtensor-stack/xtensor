@@ -50,12 +50,8 @@ namespace xt
         using inner_shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
         using stepper = xview_stepper<false, CT, S...>;
         using const_stepper = xview_stepper<true, CT, S...>;
-        using broadcast_iterator = xiterator<stepper, inner_shape_type*>;
-        using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*>;
-        using iterator = broadcast_iterator;
-        using const_iterator = const_broadcast_iterator;
-        using reverse_broadcast_iterator = std::reverse_iterator<broadcast_iterator>;
-        using const_reverse_broadcast_iterator = std::reverse_iterator<const_broadcast_iterator>;
+        using iterator = xiterator<stepper, inner_shape_type*, DEFAULT_LAYOUT>;
+        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     };
@@ -101,12 +97,6 @@ namespace xt
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
-
-        using broadcast_iterator = typename iterable_base::broadcast_iterator;
-        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
-
-        using iterator = typename iterable_base::iterator;
-        using const_iterator = typename iterable_base::const_iterator;
 
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
