@@ -193,6 +193,12 @@ different fashions.
 | Iterating with a prescribed broadcasting shape                 | | ``for(auto it=a.xbegin({3, 4});``                            |
 |                                                                | | ``it!=a.xend({3, 4}); ++it)``                                |
 +----------------------------------------------------------------+----------------------------------------------------------------+
+| Iterating in row-major order                                   | | ``for(auto it = a.xbegin<layout_type::row_major>();``        |
+|                                                                | | ``it!=a.xend<layout_type::row_major>(); ++it)``              |
++----------------------------------------------------------------+----------------------------------------------------------------+
+| Iterating in column-major order                                | | ``for(auto it = a.xbegin<layout_type::column_major>();``     |
+|                                                                | | ``it!=a.xend<layout_type::column_major>(); ++it)``           |
++----------------------------------------------------------------+----------------------------------------------------------------+
 
 Logical
 -------
