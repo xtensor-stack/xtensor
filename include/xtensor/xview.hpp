@@ -98,6 +98,12 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
+        using broadcast_iterator = typename iterable_base::broadcast_iterator;
+        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
+
+        using iterator = typename iterable_base::iterator;
+        using const_iterator = typename iterable_base::const_iterator;
+
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
@@ -528,14 +534,23 @@ namespace xt
     {
         using strides_type = typename T::strides_type;
         strides_type temp = m_e.strides();
-        strides_type strides = make_sequence<strides_type>(sizeof...(S)-integral_count<S...>(), 0);
+        strides_type strides = make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
+        size_type i = 0, idx;
 
-        for (size_type i = 0; i < strides.size(); ++i) {
-            auto idx = integral_skip<S...>(i);
+        for (; i < sizeof...(S); ++i) {
+            idx = integral_skip<S...>(i);
+            if (idx >= sizeof...(S))
+            {
+                break;
+            }
             strides[i] = m_e.strides()[idx] * apply<size_type>(idx, func, m_slices);
         }
+        for (; i < strides.size(); ++i) {
+            strides[i] = m_e.strides()[idx++];
+        }
+
         return strides;
     }
 
