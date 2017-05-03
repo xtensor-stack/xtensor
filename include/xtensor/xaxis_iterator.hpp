@@ -42,7 +42,7 @@ namespace xt
         self_type& operator++();
         self_type operator++(int);
 
-        reference operator*();
+        reference operator*() const;
         pointer operator->() const;
 
         bool equal(const self_type& rhs) const;
@@ -50,16 +50,16 @@ namespace xt
     private:
 
         using storing_type = ptr_closure_t<CT>;
-        storing_type p_expression;
+        mutable storing_type p_expression;
         size_type m_index;
 
         template <class T>
         std::enable_if_t<std::is_pointer<T>::value, std::add_lvalue_reference_t<std::remove_pointer_t<T>>>
-        deref(T val);
+        deref(T val) const;
 
         template <class T>
         std::enable_if_t<!std::is_pointer<T>::value, T>
-        deref(T& val);
+        deref(T& val) const;
 
         template <class T, class CTA>
         std::enable_if_t<std::is_pointer<T>::value, T>
@@ -89,7 +89,7 @@ namespace xt
     template <class CT>
     template <class T>
     inline std::enable_if_t<std::is_pointer<T>::value, std::add_lvalue_reference_t<std::remove_pointer_t<T>>>
-    xaxis_iterator<CT>::deref(T val)
+    xaxis_iterator<CT>::deref(T val) const
     {
         return *val;
     }
@@ -97,7 +97,7 @@ namespace xt
     template <class CT>
     template <class T>
     inline std::enable_if_t<!std::is_pointer<T>::value, T>
-    xaxis_iterator<CT>::deref(T& val)
+    xaxis_iterator<CT>::deref(T& val) const
     {
         return val;
     }
@@ -147,7 +147,7 @@ namespace xt
     }
 
     template <class CT>
-    inline auto xaxis_iterator<CT>::operator*() -> reference
+    inline auto xaxis_iterator<CT>::operator*() const -> reference
     {
         return view(deref(p_expression), size_type(m_index));
     }
