@@ -897,6 +897,23 @@ namespace xt
     {
         return N;
     }
+
+    /*****************************************
+     * has_raw_data_interface implementation *
+     *****************************************/
+
+    template <typename T>
+    class has_raw_data_interface
+    {
+        template <typename C>
+        static std::true_type test(decltype(std::declval<C>().raw_data_offset()));
+
+        template <typename C>
+        static std::false_type test(...);
+
+    public:
+        constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
+    };
 }
 
 #endif
