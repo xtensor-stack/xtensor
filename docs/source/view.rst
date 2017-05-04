@@ -42,14 +42,14 @@ Slices can be specified in the following ways:
 
     // View reducing the number of dimensions
     auto v2 = xt::view(a, 1, xt::all(), xt::range(0, 4, 2));
-    // => v1.shape() = { 2, 2 }
-    // => v1(0, 0) = a(1, 0, 0)
-    // => v1(1, 1) = a(1, 1, 2)
+    // => v2.shape() = { 2, 2 }
+    // => v2(0, 0) = a(1, 0, 0)
+    // => v2(1, 1) = a(1, 1, 2)
 
     // View increasing the number of dimensions
     auto v3 = xt::view(a, xt::all(), xt::all(), xt::newaxis(), xt::all());
-    // => v1.shape() = { 3, 2, 1, 4 }
-    // => v1(0, 0, 0, 0) = a(0, 0, 0)
+    // => v3.shape() = { 3, 2, 1, 4 }
+    // => v3(0, 0, 0, 0) = a(0, 0, 0)
 
 ``xview`` does not perform a copy of the underlying expression. This means if you modify an element of the ``xview``,
 you are actually also altering the underlying expression.
