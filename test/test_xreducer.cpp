@@ -86,6 +86,24 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
+    TEST(xreducer, sum2)
+    {
+        xarray<double> u = ones<double>({ 2, 4 });
+        xarray<double> expectedu0 = 2 * ones<double>({ 4 });
+        xarray<double> resu0 = sum(u, { 0 });
+        EXPECT_EQ(expectedu0, resu0);
+        xarray<double> expectedu1 = 4 * ones<double>({ 2 });
+        xarray<double> resu1 = sum(u, { 1 });
+        EXPECT_EQ(expectedu1, resu1);
+        xarray<double> v = ones<double>({ 4, 2 });
+        xarray<double> expectedv0 = 4 * ones<double>({ 2 });
+        xarray<double> resv0 = sum(v, { 0 });
+        EXPECT_EQ(expectedv0, resv0);
+        xarray<double> expectedv1 = 2 * ones<double>({ 4 });
+        xarray<double> resv1 = sum(v, { 1 });
+        EXPECT_EQ(expectedv1, resv1);
+    }
+
     TEST(xreducer, sum_all)
     {
         xreducer_features features;

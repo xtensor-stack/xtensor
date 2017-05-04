@@ -27,7 +27,7 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl;
     std::cout << std::endl;
 
-    //benchmark_container(std::cout);
+    benchmark_container(std::cout);
     benchmark_views(std::cout);
     return 0;
 }
