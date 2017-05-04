@@ -92,6 +92,7 @@ namespace xt
         using iterable_base = xexpression_iterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
+        using strides_type = shape_type;
 
         using slice_type = std::tuple<S...>;
 
@@ -148,23 +149,23 @@ namespace xt
         const_stepper stepper_end(const ST& shape) const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::container_type&>
+        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::container_type&>
         data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
         strides() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const value_type*>
+        std::enable_if_t<has_raw_data_interface<T>::value, const value_type*>
         raw_data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, value_type*>
+        std::enable_if_t<has_raw_data_interface<T>::value, value_type*>
         raw_data();
 
         template <class T = xexpression_type>
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const std::size_t>
+        std::enable_if_t<has_raw_data_interface<T>::value, const std::size_t>
         raw_data_offset() const noexcept;
 
         size_type underlying_size(size_type dim) const;
@@ -513,7 +514,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::data() const ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::container_type&>
+        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::container_type&>
     {
         return m_e.data();
     }
@@ -524,18 +525,27 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::strides() const ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const typename T::strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
     {
         using strides_type = typename T::strides_type;
         strides_type temp = m_e.strides();
-        strides_type strides = make_sequence<strides_type>(sizeof...(S)-integral_count<S...>(), 0);
+        strides_type strides = make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
+        size_type i = 0, idx;
 
-        for (size_type i = 0; i < strides.size(); ++i) {
-            auto idx = integral_skip<S...>(i);
+        for (; i < sizeof...(S); ++i) {
+            idx = integral_skip<S...>(i);
+            if (idx >= sizeof...(S))
+            {
+                break;
+            }
             strides[i] = m_e.strides()[idx] * apply<size_type>(idx, func, m_slices);
         }
+        for (; i < strides.size(); ++i) {
+            strides[i] = m_e.strides()[idx++];
+        }
+
         return strides;
     }
 
@@ -545,7 +555,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::raw_data() const ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const value_type*>
+        std::enable_if_t<has_raw_data_interface<T>::value, const value_type*>
     {
         return m_e.raw_data();
     }
@@ -553,7 +563,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::raw_data() ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, value_type*>
+        std::enable_if_t<has_raw_data_interface<T>::value, value_type*>
     {
         return m_e.raw_data();
     }
@@ -564,10 +574,10 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::raw_data_offset() const noexcept ->
-        std::enable_if_t<std::is_base_of<xcontainer<std::remove_const_t<std::decay_t<T>>>, T>::value, const std::size_t>
+        std::enable_if_t<has_raw_data_interface<T>::value, const std::size_t>
     {
         auto func = [](const auto& s) { return xt::value(s, 0); };
-        typename T::size_type offset = 0;
+        typename T::size_type offset = m_e.raw_data_offset();
 
         for (size_type i = 0; i < sizeof...(S); ++i)
         {
