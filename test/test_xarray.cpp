@@ -191,6 +191,10 @@ namespace xt
     {
         xarray_dynamic a;
         EXPECT_EQ(0, a());
+
+        xarray_dynamic b = { 1, 2, 3 };
+        xarray_dynamic c(2 + xt::sum(b));
+        EXPECT_EQ(8, c());
     }
 
     TEST(xarray, xiterator)
