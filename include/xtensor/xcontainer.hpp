@@ -256,7 +256,7 @@ namespace xt
     template <class It>
     inline It xcontainer<D>::data_xend_impl(It end) const noexcept
     {
-        return end - 1 + strides().back();
+        return strides().size() != 0 ? end - 1 + strides().back() : end;
     }
 
     template <class D>
