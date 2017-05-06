@@ -146,8 +146,14 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape) const noexcept;
 
-        iterator data_xend() noexcept;
-        const_iterator data_xend() const noexcept;
+        using container_iterator = typename container_type::iterator;
+        using const_container_iterator = typename container_type::const_iterator;
+
+        container_iterator data_xbegin() noexcept;
+        const_container_iterator data_xbegin() const noexcept;
+
+        container_iterator data_xend() noexcept;
+        const_container_iterator data_xend() const noexcept;
 
     protected:
 
@@ -685,13 +691,25 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_xend() noexcept -> iterator
+    inline auto xcontainer<D>::data_xbegin() noexcept -> container_iterator
+    {
+        return data().begin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_xbegin() const noexcept -> const_container_iterator
+    {
+        return data().begin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_xend() noexcept -> container_iterator
     {
         return data_xend_impl(data().end());
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_xend() const noexcept -> const_iterator
+    inline auto xcontainer<D>::data_xend() const noexcept -> const_container_iterator
     {
         return data_xend_impl(data().end());
     }

@@ -221,6 +221,39 @@ namespace xt
      * xfunction_iterator *
      **********************/
 
+    template <class CT>
+    class xscalar;
+
+    namespace detail
+    {
+        template <class C>
+        struct get_iterator_impl
+        {
+            using type = typename C::iterator;
+        };
+
+        template <class C>
+        struct get_iterator_impl<const C>
+        {
+            using type = typename C::const_iterator;
+        };
+
+        template <class CT>
+        struct get_iterator_impl<xscalar<CT>>
+        {
+            using type = typename xscalar<CT>::dummy_iterator;
+        };
+
+        template <class CT>
+        struct get_iterator_impl<const xscalar<CT>>
+        {
+            using type = typename xscalar<CT>::const_dummy_iterator;
+        };
+    }
+
+    template <class C>
+    using get_iterator = typename detail::get_iterator_impl<C>::type;
+
     template <class F, class R, class... CT>
     class xfunction_iterator
     {

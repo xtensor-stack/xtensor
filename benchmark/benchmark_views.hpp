@@ -2,6 +2,7 @@
 #define BENCHMARK_VIEWS_HPP
 
 #include "xtensor/xarray.hpp"
+#include "xtensor/xstridedview.hpp"
 #include <cstddef>
 #include <chrono>
 #include <string>
@@ -99,6 +100,55 @@ namespace xt
             out << "strided sum(10, 100000), 1): " << dsu1.count() << "ms" << std::endl;
             out << "strided sum(100000, 10), 0): " << dsv0.count() << "ms" << std::endl;
             out << "strided sum(100000, 10), 1): " << dsv1.count() << "ms" << std::endl;
+            out << std::endl;
+        }
+    }
+
+    namespace stridedview
+    {
+        template <class E1, class E2>
+        inline auto benchmark_stridedview(const E1& x, E2& res, std::size_t number)
+        {
+            auto start = std::chrono::steady_clock::now();
+            for (std::size_t i = 0; i < number; ++i)
+            {
+                res = transpose(x);
+            }
+            auto end = std::chrono::steady_clock::now();
+            auto diff = end - start;
+            return diff;
+        }
+
+        template <class OS>
+        void benchmark(OS& out)
+        {
+            using duration_type = std::chrono::duration<double, std::milli>;
+            std::size_t number = 100;
+
+            xarray<double, layout_type::row_major> ar = xt::arange<double>(100000);
+            ar.reshape({ 10, 20, 500 });
+            xarray<double, layout_type::column_major> ac = xt::arange<double>(100000);
+            ac.reshape({ 10, 20, 500 });
+            
+            xarray<double, layout_type::row_major> resr;
+            resr.reshape({ 500, 20, 10 });
+
+            xarray<double, layout_type::column_major> resc;
+            resc.reshape({ 500, 20, 10 });
+
+            duration_type darr = benchmark_stridedview(ar, resr, number);
+            duration_type dacr = benchmark_stridedview(ac, resr, number);
+            duration_type darc = benchmark_stridedview(ar, resc, number);
+            duration_type dacc = benchmark_stridedview(ac, resc, number);
+
+            out << "*****************************" << std::endl;
+            out << "* STRIDED VIEW BENCHMARK : " << " *" << std::endl;
+            out << "*****************************" << std::endl << std::endl;
+
+            out << "RM - transpose RM(10, 20, 500): " << darr.count() << "ms" << std::endl;
+            out << "RM - transpose CM(10, 20, 500): " << dacr.count() << "ms" << std::endl;
+            out << "CM - transpose RM(10, 20, 500): " << darc.count() << "ms" << std::endl;
+            out << "CM - transpose CM(10, 20, 500): " << dacc.count() << "ms" << std::endl;
             out << std::endl;
         }
     }
