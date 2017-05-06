@@ -28,32 +28,32 @@ namespace xt
     namespace detail
     {
         template <class C>
-        struct get_iterator_impl
+        struct get_stepper_iterator_impl
         {
-            using type = typename C::iterator;
+            using type = typename C::container_iterator;
         };
 
         template <class C>
-        struct get_iterator_impl<const C>
+        struct get_stepper_iterator_impl<const C>
         {
-            using type = typename C::const_iterator;
+            using type = typename C::const_container_iterator;
         };
 
         template <class CT>
-        struct get_iterator_impl<xscalar<CT>>
+        struct get_stepper_iterator_impl<xscalar<CT>>
         {
             using type = typename xscalar<CT>::dummy_iterator;
         };
 
         template <class CT>
-        struct get_iterator_impl<const xscalar<CT>>
+        struct get_stepper_iterator_impl<const xscalar<CT>>
         {
             using type = typename xscalar<CT>::const_dummy_iterator;
         };
     }
 
     template <class C>
-    using get_iterator = typename detail::get_iterator_impl<C>::type;
+    using get_stepper_iterator = typename detail::get_stepper_iterator_impl<C>::type;
 
     namespace detail
     {
@@ -84,7 +84,7 @@ namespace xt
     public:
 
         using container_type = C;
-        using subiterator_type = get_iterator<C>;
+        using subiterator_type = get_stepper_iterator<C>;
         using subiterator_traits = std::iterator_traits<subiterator_type>;
         using value_type = typename subiterator_traits::value_type;
         using reference = typename subiterator_traits::reference;
@@ -368,7 +368,7 @@ namespace xt
     template <class C>
     inline void xstepper<C>::to_begin()
     {
-        m_it = p_c->begin();
+        m_it = p_c->data_xbegin();
     }
 
     template <class C>

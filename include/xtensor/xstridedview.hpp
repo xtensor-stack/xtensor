@@ -39,8 +39,8 @@ namespace xt
         using inner_shape_type = S;
         using inner_strides_type = inner_shape_type;
         using inner_backstrides_type_type = inner_shape_type;
-        using const_stepper = xindexed_stepper<xstrided_view<CT, S, CD>>;
-        using stepper = xindexed_stepper<xstrided_view<CT, S, CD>, false>;
+        using const_stepper = xstepper<const xstrided_view<CT, S, CD>>;
+        using stepper = xstepper<xstrided_view<CT, S, CD>>;
         using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
         using iterator = xiterator<stepper, inner_shape_type*, DEFAULT_LAYOUT>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
@@ -150,6 +150,15 @@ namespace xt
         template <class ST>
         const_stepper stepper_end(const ST& shape) const;
 
+        using container_iterator = typename std::decay_t<CD>::iterator;
+        using const_container_iterator = typename std::decay_t<CD>::const_iterator;
+
+        container_iterator data_xbegin() noexcept;
+        const_container_iterator data_xbegin() const noexcept;
+
+        container_iterator data_xend() noexcept;
+        const_container_iterator data_xend() const noexcept;
+
         underlying_container_type& data() noexcept;
         const underlying_container_type& data() const noexcept;
 
@@ -160,6 +169,14 @@ namespace xt
 
     private:
 
+        template <class It>
+        It data_xbegin_impl(It begin) const noexcept;
+
+        template <class It>
+        It data_xend_impl(It end) const noexcept;
+
+        void assign_temporary_impl(temporary_type& tmp);
+
         CT m_e;
         CD m_data;
         shape_type m_shape;
@@ -167,14 +184,12 @@ namespace xt
         backstrides_type m_backstrides;
         std::size_t m_offset;
 
-        void assign_temporary_impl(temporary_type& tmp);
-
         friend class xview_semantic<xstrided_view<CT, S, CD>>;
     };
 
-    /*****************************
+    /********************************
      * xstrided_view implementation *
-     *****************************/
+     ********************************/
 
     /**
      * @name Constructor
@@ -434,7 +449,7 @@ namespace xt
     inline auto xstrided_view<CT, S, CD>::stepper_begin(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return stepper(this, offset);
+        return stepper(this, data_xbegin(), offset);
     }
 
     template <class CT, class S, class CD>
@@ -442,7 +457,7 @@ namespace xt
     inline auto xstrided_view<CT, S, CD>::stepper_end(const ST& shape) -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return stepper(this, offset, true);
+        return stepper(this, data_xend(), offset);
     }
 
     template <class CT, class S, class CD>
@@ -450,7 +465,7 @@ namespace xt
     inline auto xstrided_view<CT, S, CD>::stepper_begin(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(this, offset);
+        return const_stepper(this, data_xbegin(), offset);
     }
 
     template <class CT, class S, class CD>
@@ -458,7 +473,45 @@ namespace xt
     inline auto xstrided_view<CT, S, CD>::stepper_end(const ST& shape) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(this, offset, true);
+        return const_stepper(this, data_xend(), offset);
+    }
+
+    template <class CT, class S, class CD>
+    template <class It>
+    inline It xstrided_view<CT, S, CD>::data_xbegin_impl(It begin) const noexcept
+    {
+        return begin + m_offset;
+    }
+
+    template <class CT, class S, class CD>
+    template <class It>
+    inline It xstrided_view<CT, S, CD>::data_xend_impl(It end) const noexcept
+    {
+        return m_offset + (strides().size() != 0 ? end - 1 + strides().back() : end);
+    }
+
+    template <class CT, class S, class CD>
+    inline auto xstrided_view<CT, S, CD>::data_xbegin() noexcept -> container_iterator
+    {
+        return data_xbegin_impl(m_data.begin());
+    }
+
+    template <class CT, class S, class CD>
+    inline auto xstrided_view<CT, S, CD>::data_xbegin() const noexcept -> const_container_iterator
+    {
+        return data_xbegin_impl(m_data.begin());
+    }
+
+    template <class CT, class S, class CD>
+    inline auto xstrided_view<CT, S, CD>::data_xend() noexcept -> container_iterator
+    {
+        return data_xend_impl(m_data.end());
+    }
+
+    template <class CT, class S, class CD>
+    inline auto xstrided_view<CT, S, CD>::data_xend() const noexcept -> const_container_iterator
+    {
+        return data_xend_impl(m_data.end());
     }
 
     /**
