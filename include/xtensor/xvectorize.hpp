@@ -30,8 +30,8 @@ namespace xt
         template <class... E>
         using xfunction_type = xfunction<F, R, xclosure_t<E>...>;
 
-        template <class Func>
-        explicit xvectorizer(Func&& f);
+        template <class Func, class = std::enable_if_t<!std::is_same<std::decay_t<Func>, xvectorizer>::value>>
+        xvectorizer(Func&& f);
 
         template <class... E>
         xfunction_type<E...> operator()(E&&... e) const;
@@ -61,7 +61,7 @@ namespace xt
      ******************************/
 
     template <class F, class R>
-    template <class Func>
+    template <class Func, class>
     inline xvectorizer<F, R>::xvectorizer(Func&& f)
         : m_f(std::forward<Func>(f))
     {
