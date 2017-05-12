@@ -88,6 +88,7 @@ set(XTENSOR_TESTS
     test_xarray_adaptor.cpp
     test_xaxis_iterator.cpp
     test_xbroadcast.cpp
+    test_xbuffer_adaptor.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
     test_xdynamicview.cpp

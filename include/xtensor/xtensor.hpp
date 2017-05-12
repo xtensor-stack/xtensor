@@ -15,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include "xbuffer_adaptor.hpp"
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
 

@@ -13,6 +13,7 @@
 #include <initializer_list>
 #include <utility>
 
+#include "xbuffer_adaptor.hpp"
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
 
