@@ -137,7 +137,13 @@ namespace xt
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+        xbuffer_adaptor() = default;
+
+        template <class OW = O, class = std::enable_if_t<std::is_same<OW, acquire_ownership>::value>>
         xbuffer_adaptor(T*& data, size_type size, const allocator_type& alloc = allocator_type());
+
+        template <class OW = O, class = std::enable_if_t<std::is_same<OW, no_ownership>::value>>
+        xbuffer_adaptor(T* data, size_type size, const allocator_type& alloc = allocator_type());
 
         bool empty() const noexcept;
         using base_type::size;
@@ -394,7 +400,15 @@ namespace xt
      **********************************/
 
     template <class T, class O, class A>
+    template <class OW, class>
     inline xbuffer_adaptor<T, O, A>::xbuffer_adaptor(T*& data, size_type size, const allocator_type& alloc)
+        : base_type(data, size, alloc)
+    {
+    }
+
+    template <class T, class O, class A>
+    template <class OW, class>
+    inline xbuffer_adaptor<T, O, A>::xbuffer_adaptor(T* data, size_type size, const allocator_type& alloc)
         : base_type(data, size, alloc)
     {
     }
