@@ -262,7 +262,7 @@ namespace xt
         R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
         {
             using FT = std::add_pointer_t<R(F&&, const std::tuple<S...>&)>;
-            static const std::array<FT, sizeof...(I)> ar = {&apply_one<R, F, I, S...>...};
+            static const std::array<FT, sizeof...(I)> ar = {{&apply_one<R, F, I, S...>...}};
             return ar[index](std::forward<F>(func), s);
         }
     }
