@@ -12,3 +12,20 @@ Defined in ``xtensor/xtensor.hpp``
 .. doxygenclass:: xt::xtensor_adaptor
    :project: xtensor
    :members:
+
+xadapt
+======
+
+Defined in ``xtensor/xadapt.hpp``
+
+.. doxygenfunction:: xt::xadapt(C&, const std::array<typename C::size_type, N>&, layout_type)
+   :project: xtensor
+
+.. doxygenfunction:: xt::xadapt(C&, const std::array<typename C::size_type, N>&, const std::array<typename C::size_type, N>&)
+   :project: xtensor
+
+.. doxygenfunction:: xt::xadapt(P&, typename A::size_type, O, const std::array<typename A::size_type, N>&, layout_type, const A&)
+   :project: xtensor
+
+.. doxygenfunction:: xt::xadapt(P&, typename A::size_type, O, const std::array<typename A::size_type, N>&, const std::array<typename A::size_type, N>&, const A&)
+   :project: xtensor

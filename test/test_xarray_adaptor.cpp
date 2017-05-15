@@ -145,5 +145,6 @@ namespace xt
         adaptor_type a(v);
         test_reverse_xiterator(a);
     }
+
 }
 

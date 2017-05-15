@@ -171,9 +171,11 @@ namespace xt
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
 
-        xarray_adaptor(container_type& data);
-        xarray_adaptor(container_type& data, const shape_type& shape, layout_type l = L);
-        xarray_adaptor(container_type& data, const shape_type& shape, const strides_type& strides);
+        using container_closure_type = adaptor_closure_t<container_type>;
+
+        xarray_adaptor(container_closure_type data);
+        xarray_adaptor(container_closure_type data, const shape_type& shape, layout_type l = L);
+        xarray_adaptor(container_closure_type data, const shape_type& shape, const strides_type& strides);
 
         ~xarray_adaptor() = default;
 
@@ -188,7 +190,7 @@ namespace xt
 
     private:
 
-        container_type& m_data;
+        container_closure_type m_data;
 
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
@@ -431,8 +433,8 @@ namespace xt
      * @param data the container to adapt
      */
     template <class EC, layout_type L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_type& data)
-        : base_type(), m_data(data)
+    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_closure_type data)
+        : base_type(), m_data(std::forward<container_closure_type>(data))
     {
     }
 
@@ -444,8 +446,8 @@ namespace xt
      * @param l the layout_type of the xarray_adaptor
      */
     template <class EC, layout_type L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_type& data, const shape_type& shape, layout_type l)
-        : base_type(), m_data(data)
+    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_closure_type data, const shape_type& shape, layout_type l)
+        : base_type(), m_data(std::forward<container_closure_type>(data))
     {
         base_type::reshape(shape, l);
     }
@@ -458,8 +460,8 @@ namespace xt
      * @param strides the strides of the xarray_adaptor
      */
     template <class EC, layout_type L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_type& data, const shape_type& shape, const strides_type& strides)
-        : base_type(), m_data(data)
+    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_closure_type data, const shape_type& shape, const strides_type& strides)
+        : base_type(), m_data(std::forward<container_closure_type>(data))
     {
         base_type::reshape(shape, strides);
     }
@@ -519,6 +521,7 @@ namespace xt
         m_data.resize(tmp.size());
         std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
     }
+
 }
 
 #endif

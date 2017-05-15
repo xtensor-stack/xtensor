@@ -200,6 +200,28 @@ namespace xt
     void swap(xbuffer_adaptor<T, O, A>& lhs,
               xbuffer_adaptor<T, O, A>& rhs) noexcept;
 
+    /*******************
+     * adaptor_closure *
+     *******************/
+
+    namespace detail
+    {
+        template <class C>
+        struct adaptor_closure_impl
+        {
+            using type = C&;
+        };
+
+        template <class T, class O, class A>
+        struct adaptor_closure_impl<xbuffer_adaptor<T, O, A>>
+        {
+            using type = xbuffer_adaptor<T, O, A>;
+        };
+    }
+
+    template <class C>
+    using adaptor_closure_t = typename detail::adaptor_closure_impl<C>::type;
+
     /**********************************
      * xbuffer_storage implementation *
      **********************************/
