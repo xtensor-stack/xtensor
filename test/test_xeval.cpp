@@ -11,9 +11,29 @@
 #include "xtensor/xtensor_config.hpp"
 #include "xtensor/xeval.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
+
+    TEST(xeval, has_container_base)
+    {
+        xarray<double> a = {1,2,3,4};
+        xtensor<double, 2> b = {{1,2,3}, {4,5,6}};
+        auto c = linspace(0, 10);
+        auto va = view(a, range(0, 2));
+        auto vb = view(b, range(0, 2));
+        auto vc = view(c, range(0, 2));
+
+        EXPECT_TRUE(detail::has_container_base<decltype(a)>::value);
+        EXPECT_TRUE(detail::has_container_base<decltype(b)>::value);
+        EXPECT_TRUE(detail::has_container_base<decltype(va)>::value);
+        EXPECT_TRUE(detail::has_container_base<decltype(vb)>::value);
+        EXPECT_FALSE(detail::has_container_base<decltype(c)>::value);
+        EXPECT_FALSE(detail::has_container_base<decltype(vc)>::value);
+        EXPECT_FALSE(detail::has_container_base<decltype(a * b)>::value);
+    }
+
     TEST(xeval, array_tensor)
     {
         xarray<double> a = {1,2,3,4};

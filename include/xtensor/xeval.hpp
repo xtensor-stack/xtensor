@@ -19,6 +19,27 @@ namespace xt
     {
         template <class T>
         using is_container = std::is_base_of<xcontainer<std::remove_const_t<T>>, T>;
+
+        template <class T, class E = void>
+        struct has_container_base_impl
+        {
+            static constexpr bool value = false;
+        };
+
+        template <class T>
+        struct has_container_base_impl<T, std::enable_if_t<is_container<std::decay_t<T>>::value>>
+        {
+            static constexpr bool value = true;
+        };
+
+        template<class CT, class... S>
+        struct has_container_base_impl<xview<CT, S...>, std::enable_if_t<is_container<std::decay_t<CT>>::value>>
+        {
+            static constexpr bool value = true;
+        };
+
+        template <class T>
+        using has_container_base = has_container_base_impl<T>;
     }
     /**
      * Force evaluation of xexpression.
@@ -32,7 +53,7 @@ namespace xt
      */
     template <class T>
     inline auto eval(T&& t)
-        -> std::enable_if_t<detail::is_container<std::decay_t<T>>::value, T&&>
+        -> std::enable_if_t<detail::has_container_base<T>::value, T&&>
     {
         return std::forward<T>(t);
     }
@@ -40,14 +61,14 @@ namespace xt
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class T, class I = std::decay_t<T>>
     inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && detail::is_array<typename I::shape_type>::value, xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>>
+        -> std::enable_if_t<!detail::has_container_base<T>::value && detail::is_array<typename I::shape_type>::value, xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>>
     {
         return xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>(std::forward<T>(t));
     }
 
     template <class T, class I = std::decay_t<T>>
     inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && !detail::is_array<typename I::shape_type>::value, xt::xarray<typename I::value_type>>
+        -> std::enable_if_t<!detail::has_container_base<T>::value && !detail::is_array<typename I::shape_type>::value, xt::xarray<typename I::value_type>>
     {
         return xarray<typename I::value_type>(std::forward<T>(t));
     }
