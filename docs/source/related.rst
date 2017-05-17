@@ -34,26 +34,28 @@ Example 1: Use an algorithm of the C++ library on a numpy array inplace
     #include <numeric>                        // Standard library import for std::accumulate
     #include "pybind11/pybind11.h"            // Pybind11 import to define Python bindings
     #include "xtensor/xmath.hpp"              // xtensor import for the C++ universal functions
+    #define FORCE_IMPORT_ARRAY                // numpy C api loading
     #include "xtensor-python/pyarray.hpp"     // Numpy bindings
 
     double sum_of_sines(xt::pyarray<double> &m)
     {
         auto sines = xt::sin(m);
-        // sines does not actually hold any value, which are only computed upon access
-        return std::accumulate(sines.begin(), sines.end(), 0.0);
+        // sines does not actually hold any value
+        return std::accumulate(sines.cbegin(), sines.cend(), 0.0);
     }
 
     PYBIND11_PLUGIN(xtensor_python_test)
     {
+        xt::import_numpy();
         pybind11::module m("xtensor_python_test", "Test module for xtensor python bindings");
 
         m.def("sum_of_sines", sum_of_sines,
-            "Computes the sum of the sines of the values of the input array");
+            "Sum the sines of the input values");
 
         return m.ptr();
     }
 
-**Python code:**
+**Python code**
 
 .. code::
 
@@ -81,6 +83,7 @@ Example 2: Create a universal function from a C++ scalar function
 .. code::
 
     #include "pybind11/pybind11.h"
+    #define FORCE_IMPORT_ARRAY
     #include "xtensor-python/pyvectorize.hpp"
     #include <numeric>
     #include <cmath>
@@ -94,6 +97,7 @@ Example 2: Create a universal function from a C++ scalar function
 
     PYBIND11_PLUGIN(xtensor_python_test)
     {
+        xt::import_numpy();
         py::module m("xtensor_python_test", "Test module for xtensor python bindings");
 
         m.def("vectorized_func", xt::pyvectorize(scalar_func), "");
@@ -101,7 +105,7 @@ Example 2: Create a universal function from a C++ scalar function
         return m.ptr();
     }
 
-**Python code:**
+**Python code**
 
 .. code::
 
@@ -146,8 +150,89 @@ xtensor-julia
 .. image:: xtensor-julia.svg
    :alt: xtensor-julia
 
-The xtensor-julia_ project provides the implementation of a container compatible with ``xtensor``'s expression
-system, ``jltensor`` which effectively wrap Julia arrays, allowing operating on Julia arrays inplace.
+The xtensor-julia_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``jlarray`` and ``jltensor`` which effectively wrap Julua arrays, allowing operating on Julia arrays inplace.
+
+Example 1: Use an algorithm of the C++ library with a Julia array
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**C++ code**
+
+.. code::
+
+    #include <numeric>                        // Standard library import for std::accumulate
+    #include <cxx_wrap.hpp>                   // CxxWrap import to define Julia bindings
+    #include "xtensor-julia/jltensor.hpp"     // Import the jltensor container definition
+    #include "xtensor/xmath.hpp"              // xtensor import for the C++ universal functions
+
+    double sum_of_sines(xt::jltensor<double, 2> m)
+    {
+        auto sines = xt::sin(m);  // sines does not actually hold values.
+        return std::accumulate(sines.cbegin(), sines.cend(), 0.0);
+    }
+
+    JULIA_CPP_MODULE_BEGIN(registry)
+        cxx_wrap::Module mod = registry.create_module("xtensor_julia_test");
+        mod.method("sum_of_sines", sum_of_sines);
+    JULIA_CPP_MODULE_END
+
+**Julia code**
+
+.. code::
+
+    using xtensor_julia_test
+
+    arr = [[1.0 2.0]
+           [3.0 4.0]]
+
+    s = sum_of_sines(arr)
+    s
+
+**Outputs**
+
+.. code::
+
+   1.2853996391883833
+
+Example 2: Create a numpy-style universal function from a C++ scalar function
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**C++ code**
+
+.. code::
+
+    #include <cxx_wrap.hpp>
+    #include "xtensor-julia/jlvectorize.hpp"
+
+    double scalar_func(double i, double j)
+    {
+        return std::sin(i) - std::cos(j);
+    }
+
+    JULIA_CPP_MODULE_BEGIN(registry)
+        cxx_wrap::Module mod = registry.create_module("xtensor_julia_test");
+        mod.method("vectorized_func", xt::jlvectorize(scalar_func));
+    JULIA_CPP_MODULE_END
+
+**Julia code**
+
+.. code::
+
+    using xtensor_julia_test
+
+    x = [[ 0.0  1.0  2.0  3.0  4.0]
+         [ 5.0  6.0  7.0  8.0  9.0]
+         [10.0 11.0 12.0 13.0 14.0]]
+    y = [1.0, 2.0, 3.0, 4.0, 5.0]
+    z = xt.vectorized_func(x, y)
+    z
+
+**Outputs**
+
+.. code::
+
+    [[-0.540302  1.257618  1.89929   0.794764 -1.040465],
+     [-1.499227  0.136731  1.646979  1.643002  0.128456],
+     [-1.084323 -0.583843  0.45342   1.073811  0.706945]]
 
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
