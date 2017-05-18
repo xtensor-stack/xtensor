@@ -27,3 +27,11 @@ xtensor has been packaged for the conda package manager. Once the new tag has be
 - Update the hash of the source tarball.
 - Check for the versions of the dependencies.
 - Optionally, rerender the conda-forge feedstock.
+
+Updating the pypi package
+-------------------------
+
+xtensor has been packaged for ``pypi``, the Python package index. Once the new tag has been pushed on GitHub, you can do
+
+- ``python setup.py sdist && python setup.py bdist_wheel``
+- ``twine upload dist/*``

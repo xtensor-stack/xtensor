@@ -47,3 +47,7 @@ docs/build/
 
 # Jupyter artefacts
 .ipynb_checkpoints/
+
+# Python packaging artefacts
+dist/
+*.egg-info/
