@@ -1,5 +1,5 @@
 ############################################################################
-# Copyright (c) 2016, Johan Mabille and Sylvain Corlay                     #
+# Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    #
 #                                                                          #
 # Distributed under the terms of the BSD 3-Clause License.                 #
 #                                                                          #
@@ -37,20 +37,27 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xeval.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctorview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xindexview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xinfo.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterable.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xmissing.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
@@ -65,13 +72,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xutils.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmissing.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctorview.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
 )
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
