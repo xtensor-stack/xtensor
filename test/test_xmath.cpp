@@ -425,6 +425,48 @@ namespace xt
         EXPECT_EQ(lgamma(a)(0, 0), std::lgamma(a(0, 0)));
     }
 
+    TEST(xmath, ceil)
+    {
+        shape_type shape = { 3, 2 };
+        xarray<double> a(shape, 2.3);
+        EXPECT_EQ(ceil(a)(0, 0), std::ceil(a(0, 0)));
+    }
+
+    TEST(xmath, floor)
+    {
+        shape_type shape = { 3, 2 };
+        xarray<double> a(shape, 2.3);
+        EXPECT_EQ(floor(a)(0, 0), std::floor(a(0, 0)));
+    }
+
+    TEST(xmath, trunc)
+    {
+        shape_type shape = { 3, 2 };
+        xarray<double> a(shape, 2.3);
+        EXPECT_EQ(trunc(a)(0, 0), std::trunc(a(0, 0)));
+    }
+
+    TEST(xmath, round)
+    {
+        shape_type shape = { 3, 2 };
+        xarray<double> a(shape, 2.3);
+        EXPECT_EQ(round(a)(0, 0), std::round(a(0, 0)));
+    }
+
+    TEST(xmath, nearbyint)
+    {
+        shape_type shape = { 3, 2 };
+        xarray<double> a(shape, 2.3);
+        EXPECT_EQ(nearbyint(a)(0, 0), std::nearbyint(a(0, 0)));
+    }
+
+    TEST(xmath, rint)
+    {
+        shape_type shape = { 3, 2 };
+        xarray<double> a(shape, 2.3);
+        EXPECT_EQ(rint(a)(0, 0), std::rint(a(0, 0)));
+    }
+
     TEST(xmath, isclose)
     {
         shape_type shape = {3, 2};

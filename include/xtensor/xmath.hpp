@@ -147,6 +147,12 @@ namespace xt
         UNARY_MATH_FUNCTOR(erfc);
         UNARY_MATH_FUNCTOR(tgamma);
         UNARY_MATH_FUNCTOR(lgamma);
+        UNARY_MATH_FUNCTOR(ceil);
+        UNARY_MATH_FUNCTOR(floor);
+        UNARY_MATH_FUNCTOR(trunc);
+        UNARY_MATH_FUNCTOR(round);
+        UNARY_MATH_FUNCTOR(nearbyint);
+        UNARY_MATH_FUNCTOR(rint);
         UNARY_BOOL_FUNCTOR(isfinite);
         UNARY_BOOL_FUNCTOR(isinf);
         UNARY_BOOL_FUNCTOR(isnan);
@@ -895,6 +901,113 @@ namespace xt
         return detail::make_xfunction<math::lgamma_fun>(std::forward<E>(e));
     }
 
+    /*********************************************
+     * nearest integer floating point operations *
+     *********************************************/
+
+     /**
+      * @defgroup nearint_functions Nearest integer floating point operations
+      */
+
+      /**
+       * @ingroup nearint_functions
+       * @brief ceil function.
+       *
+       * Returns an \ref xfunction for the element-wise smallest integer value
+       * not less than \em e.
+       * @param e an \ref xexpression
+       * @return an \ref xfunction
+       */
+    template <class E>
+    inline auto ceil(E&& e) noexcept
+        -> detail::xfunction_type_t<math::ceil_fun, E>
+    {
+        return detail::make_xfunction<math::ceil_fun>(std::forward<E>(e));
+    }
+
+    /**
+    * @ingroup nearint_functions
+    * @brief floor function.
+    *
+    * Returns an \ref xfunction for the element-wise smallest integer value
+    * not greater than \em e.
+    * @param e an \ref xexpression
+    * @return an \ref xfunction
+    */
+    template <class E>
+    inline auto floor(E&& e) noexcept
+        -> detail::xfunction_type_t<math::floor_fun, E>
+    {
+        return detail::make_xfunction<math::floor_fun>(std::forward<E>(e));
+    }
+
+    /**
+    * @ingroup nearint_functions
+    * @brief trunc function.
+    *
+    * Returns an \ref xfunction for the element-wise nearest integer not greater
+    * in magnitude than \em e.
+    * @param e an \ref xexpression
+    * @return an \ref xfunction
+    */
+    template <class E>
+    inline auto trunc(E&& e) noexcept
+        -> detail::xfunction_type_t<math::trunc_fun, E>
+    {
+        return detail::make_xfunction<math::trunc_fun>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup nearint_functions
+     * @brief round function.
+     *
+     * Returns an \ref xfunction for the element-wise nearest integer value
+     * to \em e, rounding halfway cases away from zero, regardless of the
+     * current rounding mode.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto round(E&& e) noexcept
+        -> detail::xfunction_type_t<math::round_fun, E>
+    {
+        return detail::make_xfunction<math::round_fun>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup nearint_functions
+     * @brief nearbyint function.
+     *
+     * Returns an \ref xfunction for the element-wise rounding of \em e to integer
+     * values in floating point format, using the current rounding mode. nearbyint
+     * never raises FE_INEXACT error.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto nearbyint(E&& e) noexcept
+        -> detail::xfunction_type_t<math::nearbyint_fun, E>
+    {
+        return detail::make_xfunction<math::nearbyint_fun>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup nearint_functions
+     * @brief rint function.
+     *
+     * Returns an \ref xfunction for the element-wise rounding of \em e to integer
+     * values in floating point format, using the current rounding mode. Contrary
+     * to nearbyint, rint may raise FE_INEXACT error.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto rint(E&& e) noexcept
+        -> detail::xfunction_type_t<math::rint_fun, E>
+    {
+        return detail::make_xfunction<math::rint_fun>(std::forward<E>(e));
+    }
+
     /****************************
      * classification functions *
      ****************************/
@@ -1025,7 +1138,7 @@ namespace xt
      * Returns an \ref xfunction that evaluates to
      * true if all elements in e1 and e2 are close to each other
      * according to parameters ``atol`` and ``rtol``.
-     * @param e1, @param e2 input arrays to compare
+     * @param a, @param b input arrays to compare
      * @param rtol the relative tolerance parameter (default 1e-05)
      * @param atol the absolute tolerance parameter (default 1e-08)
      * @param equal_nan if true, isclose returns true if both elements of a and b are NaN
