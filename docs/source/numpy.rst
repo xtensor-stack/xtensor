@@ -43,7 +43,7 @@ From numpy to xtensor
    }
 
    .rst-content table.docutils thead {
-       background-color: #d1e0e0;
+       background-color: #d0e0e0;
    }
 
    .rst-content table.docutils td {
@@ -52,12 +52,28 @@ From numpy to xtensor
    }
 
    .rst-content table.docutils tr:hover {
-       background-color: #d1e0e0;
+       background-color: #d0e0e0;
    }
 
    .rst-content table.docutils:not(.field-list) tr:nth-child(2n-1):hover td {
        background-color: initial;
-   }    
+   }
+
+   #linear-algebra table.docutils thead .row-odd {
+       background: #ffdddd;
+   }
+
+   #linear-algebra tr:nth-child(2n-1) td {
+       background: #f9f3f3;
+   }
+
+   #linear-algebra tr:hover {
+       background: #ffdddd;
+   }
+
+   #linear-algebra tr:nth-child(2n-1):hover td {
+       background-color: initial;
+   }
    </style>
 
 Containers
@@ -221,6 +237,10 @@ where ``condition`` is falsy, and it does not evaluate ``b`` where ``condition``
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.logical_or(a, b)``                       | ``a || b``                                    |
 +-----------------------------------------------+-----------------------------------------------+
+| ``np.isclose(a, b)``                          | ``xt::isclose(a, b)``                         |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.allclose(a, b)``                         | ``xt::allclose(a, b)``                        |
++-----------------------------------------------+-----------------------------------------------+
 
 Comparisons
 -----------
@@ -378,3 +398,92 @@ xtensor universal functions are provided for a large set number of mathematical 
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.isfinite(a)``                            | ``xt::isfinite(a)``                           |
 +-----------------------------------------------+-----------------------------------------------+
+
+Linear algebra
+--------------
+
+Many functions found in the ``numpy.linalg`` module are implemented in `xtensor-blas`_, a seperate package offering BLAS and LAPACK bindings, as well as a convenient interface replicating the ``linalg`` module.
+
+Please note, however, that while we're trying to be as close to NumPy as possible, some features are not 
+implemented yet. Most prominently that is broadcasting for all functions except for ``dot``.
+
+
+**Matrix and vector products**
+
++--------------------------------------+--------------------------------------+
+|          Python 3 - numpy            |           C++ 14 - xtensor           |
++======================================+======================================+
+| ``np.dot(a, b)``                     | ``xt::linalg::dot(a, b)``            |
++--------------------------------------+--------------------------------------+
+| ``np.vdot(a, b)``                    | ``xt::linalg::vdot(a, b)``           |
++--------------------------------------+--------------------------------------+
+| ``np.outer(a, b)``                   | ``xt::linalg::outer(a, b)``          |
++--------------------------------------+--------------------------------------+
+| ``np.matrix_power(a, 123)``          | ``xt::linalg::matrix_power(a, 123)`` |
++--------------------------------------+--------------------------------------+
+| ``np.kron(a, b)``                    | ``xt::linalg::kron(a, b)``           |
++--------------------------------------+--------------------------------------+
+
+
+**Decompositions**
+
++-----------------------------+-----------------------------+
+|       Python 3 - numpy      |       C++ 14 - xtensor      |
++=============================+=============================+
+| ``np.linalg.cholesky(a)``   | ``xt::linalg::cholesky(a)`` |
++-----------------------------+-----------------------------+
+| ``np.linalg.qr(a)``         | ``xt::linalg::qr(a)``       |
++-----------------------------+-----------------------------+
+| ``np.linalg.svd(a)``        | ``xt::linalg::svd(a)``      |
++-----------------------------+-----------------------------+
+
+
+**Matrix eigenvalues**
+
++-----------------------------+-----------------------------+
+|       Python 3 - numpy      |       C++ 14 - xtensor      |
++=============================+=============================+
+| ``np.linalg.eig(a)``        | ``xt::linalg::eig(a)``      |
++-----------------------------+-----------------------------+
+| ``np.linalg.eigvals(a)``    | ``xt::linalg::eigvals(a)``  |
++-----------------------------+-----------------------------+
+| ``np.linalg.eigh(a)``       | ``xt::linalg::eigh(a)``     |
++-----------------------------+-----------------------------+
+| ``np.linalg.eigvalsh(a)``   | ``xt::linalg::eigvalsh(a)`` |
++-----------------------------+-----------------------------+
+
+**Norms and other numbers**
+
++--------------------------------+--------------------------------+
+|        Python 3 - numpy        |        C++ 14 - xtensor        |
++================================+================================+
+| ``np.linalg.norm(a, order=2)`` | ``xt::linalg::norm(a, 2)``     |
++--------------------------------+--------------------------------+
+| ``np.linalg.cond(a)``          | ``xt::linalg::cond(a)``        |
++--------------------------------+--------------------------------+
+| ``np.linalg.det(a)``           | ``xt::linalg::det(a)``         |
++--------------------------------+--------------------------------+
+| ``np.linalg.matrix_rank(a)``   | ``xt::linalg::matrix_rank(a)`` |
++--------------------------------+--------------------------------+
+| ``np.linalg.slogdet(a)``       | ``xt::linalg::slogdet(a)``     |
++--------------------------------+--------------------------------+
+| ``np.trace(a)``                | ``xt::linalg::trace(a)``       |
++--------------------------------+--------------------------------+
+
+**Solving equations and inverting matrices**
+
++--------------------------------+--------------------------------+
+|        Python 3 - numpy        |        C++ 14 - xtensor        |
++================================+================================+
+| ``np.linalg.inv(a)``           | ``xt::linalg::inv(a)``         |
++--------------------------------+--------------------------------+
+| ``np.linalg.pinv(a)``          | ``xt::linalg::pinv(a)``        |
++--------------------------------+--------------------------------+
+| ``np.linalg.solve(A, b)``      | ``xt::linalg::solve(A, b)``    |
++--------------------------------+--------------------------------+
+| ``np.linalg.lstsq(A, b)``      | ``xt::linalg::lstsq(A, b)``    |
++--------------------------------+--------------------------------+
+
+
+.. _`xtensor-blas`: https://github.com/QuantStack/xtensor-blas
+
