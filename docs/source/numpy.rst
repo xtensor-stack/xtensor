@@ -43,7 +43,7 @@ From numpy to xtensor
    }
 
    .rst-content table.docutils thead {
-       background-color: #d1e0e0;
+       background-color: #d0e0e0;
    }
 
    .rst-content table.docutils td {
@@ -52,24 +52,27 @@ From numpy to xtensor
    }
 
    .rst-content table.docutils tr:hover {
-       background-color: #d1e0e0;
+       background-color: #d0e0e0;
    }
 
    .rst-content table.docutils:not(.field-list) tr:nth-child(2n-1):hover td {
        background-color: initial;
    }
 
-   #linear-algebra-functions-xtensor-blas table.docutils thead .row-odd {
-       background: #ff6a6a;
+   #linear-algebra table.docutils thead .row-odd {
+       background: #ffdddd;
    }
-   #linear-algebra-functions-xtensor-blas .row-even {
-       background: #ffeded;
+
+   #linear-algebra tr:nth-child(2n-1) td {
+       background: #f9f3f3;
    }
-   #linear-algebra-functions-xtensor-blas tr:hover {
-       background: #ffd1d1;
+
+   #linear-algebra tr:hover {
+       background: #ffdddd;
    }
-   #linear-algebra-functions-xtensor-blas .row-odd {
-       background: #fefefe;
+
+   #linear-algebra tr:nth-child(2n-1):hover td {
+       background-color: initial;
    }
    </style>
 
@@ -396,11 +399,10 @@ xtensor universal functions are provided for a large set number of mathematical 
 | ``np.isfinite(a)``                            | ``xt::isfinite(a)``                           |
 +-----------------------------------------------+-----------------------------------------------+
 
-Linear Algebra Functions (xtensor-blas)
----------------------------------------
+Linear algebra
+--------------
 
-Many functions found in the ``numpy.linalg`` module are implemented in `xtensor-blas https://github.com/QuantStack/xtensor-blas`_,
-a seperate package offering BLAS and LAPACK bindings, as well as a convenient interface replicating the ``linalg`` module.
+Many functions found in the ``numpy.linalg`` module are implemented in `xtensor-blas`_, a seperate package offering BLAS and LAPACK bindings, as well as a convenient interface replicating the ``linalg`` module.
 
 Please note, however, that while we're trying to be as close to NumPy as possible, some features are not 
 implemented yet. Most prominently that is broadcasting for all functions except for ``dot``.
@@ -481,3 +483,7 @@ implemented yet. Most prominently that is broadcasting for all functions except 
 +--------------------------------+--------------------------------+
 | ``np.linalg.lstsq(A, b)``      | ``xt::linalg::lstsq(A, b)``    |
 +--------------------------------+--------------------------------+
+
+
+.. _`xtensor-blas`: https://github.com/QuantStack/xtensor-blas
+

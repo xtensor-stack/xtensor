@@ -234,6 +234,15 @@ Example 2: Create a numpy-style universal function from a C++ scalar function
      [-1.499227  0.136731  1.646979  1.643002  0.128456],
      [-1.084323 -0.583843  0.45342   1.073811  0.706945]]
 
+xtensor-blas
+------------
+
+.. image:: xtensor-blas.svg
+   :alt: xtensor-blas
+
+The xtensor-blas_ project is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the FLENS project.
+
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
-.. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
+.. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
+.. _xtensor-blas: https://github.com/QuantStack/xtensor-blas
