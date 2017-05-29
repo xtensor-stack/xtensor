@@ -8,4 +8,4 @@ dependencies:
   - sphinx_rtd_theme
   - pip:
     - breathe
-    - sphinx==1.5.1
+    - sphinx==1.5.6

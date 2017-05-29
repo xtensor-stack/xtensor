@@ -13,8 +13,8 @@ Defined in ``xtensor/xtensor.hpp``
    :project: xtensor
    :members:
 
-xadapt
-======
+xadapt (xtensor_adaptor)
+========================
 
 Defined in ``xtensor/xadapt.hpp``
 

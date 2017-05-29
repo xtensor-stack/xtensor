@@ -1108,46 +1108,46 @@ namespace xt
             bool m_equal_nan;
         };
     }
+
     /**
      * @ingroup classif_functions
      * @brief Element-wise closeness detection
      *
      * Returns an \ref xfunction that evaluates to
-     * true if the element in e1 and e2 are close to each other
+     * true if the elements in ``e1`` and ``e2`` are close to each other
      * according to parameters ``atol`` and ``rtol``.
      * The equation is: ``std::abs(a - b) <= (m_atol + m_rtol * std::abs(b))``.
-     *
-     * @param e1, @param e2 input arrays to compare
+     * @param e1 input array to compare
+     * @param e2 input array to compare
      * @param rtol the relative tolerance parameter (default 1e-05)
      * @param atol the absolute tolerance parameter (default 1e-08)
-     * @param equal_nan if true, isclose returns true if both elements of a and b are NaN
+     * @param equal_nan if true, isclose returns true if both elements of e1 and e2 are NaN
      * @return an \ref xfunction
      */
     template <class E1, class E2>
-    inline auto isclose(E1&& a, E2&& b, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false) noexcept
+    inline auto isclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false) noexcept
     {
         return detail::make_xfunction<detail::isclose>(std::make_tuple(rtol, atol, equal_nan),
-                                                       std::forward<E1>(a), std::forward<E2>(b));
+                                                       std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
      * @ingroup classif_functions
-     * @brief Check if all elements in \em a are close to the
-     * corresponding elements in \em b.
+     * @brief Check if all elements in \em e1 are close to the
+     * corresponding elements in \em e2.
      *
-     * Returns an \ref xfunction that evaluates to
-     * true if all elements in e1 and e2 are close to each other
+     * Returns true if all elements in ``e1`` and ``e2`` are close to each other
      * according to parameters ``atol`` and ``rtol``.
-     * @param a, @param b input arrays to compare
+     * @param e1 input array to compare
+     * @param e2 input arrays to compare
      * @param rtol the relative tolerance parameter (default 1e-05)
      * @param atol the absolute tolerance parameter (default 1e-08)
-     * @param equal_nan if true, isclose returns true if both elements of a and b are NaN
-     * @return an \ref xfunction
+     * @return a boolean
      */
     template <class E1, class E2>
-    inline auto allclose(E1&& a, E2&& b, double rtol = 1e-05, double atol = 1e-08) noexcept
+    inline auto allclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08) noexcept
     {
-        return xt::all(isclose(std::forward<E1>(a), std::forward<E2>(b), rtol, atol));
+        return xt::all(isclose(std::forward<E1>(e1), std::forward<E2>(e2), rtol, atol));
     }
 
     /**********************

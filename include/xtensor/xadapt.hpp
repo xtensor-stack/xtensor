@@ -49,12 +49,12 @@ namespace xt
      * @param ownership indicates whether the adaptor takes ownership of the array.
      *        Possible values are ``no_ownerhsip()`` or ``accept_ownership()``
      * @param shape the shape of the xarray_adaptor
-     * @param layout the layout_type of the xarray_adaptor
+     * @param l the layout_type of the xarray_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
      */
     template <class P, class O, class SC, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_pointer_t<P>>>
     std::enable_if_t<!detail::is_array<SC>::value, xarray_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, L, SC>>
-    xadapt(P& pointer, typename A::size_type size, O ownerhip, const SC& shape, layout_type l = L, const A& alloc = A());
+    xadapt(P& pointer, typename A::size_type size, O ownership, const SC& shape, layout_type l = L, const A& alloc = A());
     
     /**
      * Constructs an xarray_adaptor of the given dynamically allocated C array,
@@ -78,7 +78,7 @@ namespace xt
      /**
       * Constructs an xtensor_adaptor of the given stl-like container,
       * with the specified shape and layout_type.
-      * @param data the container to adapt
+      * @param container the container to adapt
       * @param shape the shape of the xtensor_adaptor
       * @param l the layout_type of the xtensor_adaptor
       */
@@ -89,7 +89,7 @@ namespace xt
     /**
      * Constructs an xtensor_adaptor of the given stl-like container,
      * with the specified shape and strides.
-     * @param data the container to adapt
+     * @param container the container to adapt
      * @param shape the shape of the xtensor_adaptor
      * @param strides the strides of the xtensor_adaptor
      */
@@ -105,12 +105,12 @@ namespace xt
      * @param ownership indicates whether the adaptor takes ownership of the array.
      *        Possible values are ``no_ownerhsip()`` or ``accept_ownership()``
      * @param shape the shape of the xtensor_adaptor
-     * @param layout the layout_type of the xtensor_adaptor
+     * @param l the layout_type of the xtensor_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
      */
     template <class P, std::size_t N, class O, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_pointer_t<P>>>
     xtensor_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, N, L>
-    xadapt(P& pointer, typename A::size_type size, O ownerhip,
+    xadapt(P& pointer, typename A::size_type size, O ownership,
            const std::array<typename A::size_type, N>& shape, layout_type l = L, const A& alloc = A());
 
     /**
