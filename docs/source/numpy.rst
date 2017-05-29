@@ -206,14 +206,14 @@ different fashions.
 +================================================================+================================================================+
 | | ``for x in np.nditer(a):``                                   | | ``for(auto it=a.xbegin(); it!=a.xend(); ++it)``              |
 +----------------------------------------------------------------+----------------------------------------------------------------+
-| Iterating with a prescribed broadcasting shape                 | | ``for(auto it=a.xbegin({3, 4});``                            |
-|                                                                | | ``it!=a.xend({3, 4}); ++it)``                                |
+| Iterating over ``a`` with a prescribed broadcasting shape      | | ``a.xbegin({3, 4})``                                         |
+|                                                                | | ``a.xend({3, 4})``                                           |
 +----------------------------------------------------------------+----------------------------------------------------------------+
-| Iterating in row-major order                                   | | ``for(auto it = a.xbegin<layout_type::row_major>();``        |
-|                                                                | | ``it!=a.xend<layout_type::row_major>(); ++it)``              |
+| Iterating over ``a`` in a row-major fashion                    | | ``a.xbegin<layout_type::row_major>()``                       |
+|                                                                | | ``a.xbegin<layout_type::row_major>()``                       |
 +----------------------------------------------------------------+----------------------------------------------------------------+
-| Iterating in column-major order                                | | ``for(auto it = a.xbegin<layout_type::column_major>();``     |
-|                                                                | | ``it!=a.xend<layout_type::column_major>(); ++it)``           |
+| Iterating over ``a`` in a column-major fashion                 | | ``a.begin<layout_type::column_major>()``                     |
+|                                                                | | ``a.xend<layout_type::column_major>()``                      |
 +----------------------------------------------------------------+----------------------------------------------------------------+
 
 Logical
