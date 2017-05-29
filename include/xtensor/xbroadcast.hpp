@@ -281,10 +281,7 @@ namespace xt
     template <class It>
     inline auto xbroadcast<CT, X>::element(It, It last) const -> const_reference
     {
-        // Workaround MSVC bug. m_e.element(last - dimension(), last) does not build.
-        It first = last;
-        first -= dimension();
-        return m_e.element(first, last);
+        return m_e.element(last - dimension(), last);
     }
     //@}
 

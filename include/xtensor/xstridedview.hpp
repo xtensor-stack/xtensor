@@ -196,11 +196,12 @@ namespace xt
      */
     //@{
     /**
-     * Constructs an xstrided_view, selecting the indices specified by \a indices.
-     * The resulting xexpression has a 1D shape with a length of n for n indices.
+     * Constructs an xstrided_view 
      * 
      * @param e the underlying xexpression for this view
-     * @param indices the indices to select
+     * @param shape the shape of the view
+     * @param strides the strides of the view
+     * @param offset the offset of the first element in the underlying container
      */
     template <class CT, class S, class CD>
     inline xstrided_view<CT, S, CD>::xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset) noexcept
@@ -355,7 +356,9 @@ namespace xt
     /**
      * Returns the element at the specified position in the xstrided_view. 
      * 
-     * @param idx the position in the view
+     * @param args a list of indices specifying the position in the view. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the view.
      */
     template <class CT, class S, class CD>
     template <class... Args>
@@ -393,7 +396,9 @@ namespace xt
     /**
      * Returns a reference to the element at the specified position in the xstrided_view.
      * @param first iterator starting the sequence of indices
-     * The number of indices in the squence should be equal to or greater 1.
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the squence should be equal to or greater than the the number
+     * of dimensions of the container..
      */
     template <class CT, class S, class CD>
     template <class It>
@@ -607,6 +612,7 @@ namespace xt
 
     /**
      * Returns a transpose view by permuting the xexpression e with @p permutation.
+     * @param e the input expression
      * @param permutation the sequence containing permutation
      * @param check_policy the check level (check_policy::full() or check_policy::none())
      * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
