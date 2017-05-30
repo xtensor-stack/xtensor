@@ -9,6 +9,11 @@
 #ifndef XADAPT_HPP
 #define XADAPT_HPP
 
+#include <array>
+#include <cstddef>
+#include <type_traits>
+#include <memory>
+
 #include "xarray.hpp"
 #include "xtensor.hpp"
 
