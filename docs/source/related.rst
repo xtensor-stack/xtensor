@@ -129,7 +129,7 @@ xtensor-python-cookiecutter
 ---------------------------
 
 .. image:: xtensor-cookiecutter.png
-   :alt: xtensor-cookiecutter
+   :alt: xtensor-python-cookiecutter
 
 The xtensor-python-cookiecutter_ project helps extension authors create Python extension modules making use of `xtensor`.
 
@@ -234,13 +234,32 @@ Example 2: Create a numpy-style universal function from a C++ scalar function
      [-1.499227  0.136731  1.646979  1.643002  0.128456],
      [-1.084323 -0.583843  0.45342   1.073811  0.706945]]
 
+xtensor-python-cookiecutter
+---------------------------
+
+.. image:: xtensor-cookiecutter.png
+   :alt: xtensor-julia-cookiecutter
+
+The xtensor-julia-cookiecutter_ project helps extension authors create Julia extension modules making use of `xtensor`.
+
+It takes care of the initial work of generating a project skeleton with
+
+- A complete read-to-use Julia package 
+
+A few examples included in the resulting project including
+
+- A numpy-style universal function defined from C++
+- A function making use of an algorithm from the STL on a numpy array
+- Unit tests
+- The generation of the HTML documentation with sphinx
+
 xtensor-blas
 ------------
 
 .. image:: xtensor-blas.svg
    :alt: xtensor-blas
 
-The xtensor-blas_ project is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the FLENS project.
+The xtensor-blas_ project is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the FLENS project. ``xtensor-blas`` powers the ``xt::linalg`` functionalities, which are the counterpart to numpy's ``linalg`` module.
 
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
