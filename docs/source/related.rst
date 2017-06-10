@@ -234,7 +234,7 @@ Example 2: Create a numpy-style universal function from a C++ scalar function
      [-1.499227  0.136731  1.646979  1.643002  0.128456],
      [-1.084323 -0.583843  0.45342   1.073811  0.706945]]
 
-xtensor-python-cookiecutter
+xtensor-julia-cookiecutter
 ---------------------------
 
 .. image:: xtensor-cookiecutter.png
