@@ -334,9 +334,9 @@ namespace xt
     template <class CT, class... S>
     template <class CTA, class... SL>
     inline xview<CT, S...>::xview(CTA&& e, SL&&... slices) noexcept
-        : m_e(std::forward<CTA>(e)), m_slices(std::forward<SL>(slices)...),
-          m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
+        : m_e(std::forward<CTA>(e)), m_slices(std::forward<SL>(slices)...)
     {
+        m_shape = make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0);
         auto func = [](const auto& s) noexcept { return get_size(s); };
         for (size_type i = 0; i != dimension(); ++i)
         {
