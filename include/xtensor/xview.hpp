@@ -102,8 +102,10 @@ namespace xt
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
-        template <class CTA, class... SL>
-        explicit xview(CTA&& e, SL&&... slices) noexcept;
+        // The argument FSL avoids the compiler to call this constructor
+        // instead of the copy constructor when sizeof...(SL) == 0.
+        template <class CTA, class FSL, class... SL>
+        explicit xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -328,13 +330,14 @@ namespace xt
      * Users should not call directly this constructor but
      * use the view function instead.
      * @param e the xexpression to adapt
+     * @param first_slice the first slice describing the view
      * @param slices the slices list describing the view
      * @sa view
      */
     template <class CT, class... S>
-    template <class CTA, class... SL>
-    inline xview<CT, S...>::xview(CTA&& e, SL&&... slices) noexcept
-        : m_e(std::forward<CTA>(e)), m_slices(std::forward<SL>(slices)...),
+    template <class CTA, class FSL, class... SL>
+    inline xview<CT, S...>::xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
+        : m_e(std::forward<CTA>(e)), m_slices(std::forward<FSL>(first_slice), std::forward<SL>(slices)...),
           m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
     {
         auto func = [](const auto& s) noexcept { return get_size(s); };
