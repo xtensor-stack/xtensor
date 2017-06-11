@@ -399,7 +399,7 @@ namespace xt
     template <class... Args>
     inline auto xreducer<F, CT, X>::operator()(Args... args) const -> const_reference
     {
-        std::array<std::size_t, sizeof...(Args)> arg_array = {static_cast<std::size_t>(args)...};
+        std::array<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
         return element(arg_array.cbegin(), arg_array.cend());
     }
 

@@ -150,6 +150,22 @@ namespace xt
         EXPECT_EQ(s, v.shape());
     }
 
+    TEST(xview, temporary_view)
+    {
+        xt::xarray<double> arr1
+        { { 1.0, 2.0, 3.0 },
+        { 2.0, 5.0, 7.0 },
+        { 2.0, 5.0, 7.0 } };
+
+        xt::xarray<double> arr2
+        { 5.0, 6.0, 7.0 };
+
+        xt::xarray<double> res = xt::view(arr1, 1) + arr2;
+        EXPECT_EQ(7., res(0));
+        EXPECT_EQ(11., res(1));
+        EXPECT_EQ(14., res(2));
+    }
+    
     TEST(xview, iterator)
     {
         view_shape_type shape = {2, 3, 4};
