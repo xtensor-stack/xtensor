@@ -150,7 +150,7 @@ xtensor-julia
 .. image:: xtensor-julia.svg
    :alt: xtensor-julia
 
-The xtensor-julia_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``jlarray`` and ``jltensor`` which effectively wrap Julua arrays, allowing operating on Julia arrays inplace.
+The xtensor-julia_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``jlarray`` and ``jltensor`` which effectively wrap Julia arrays, allowing operating on Julia arrays inplace.
 
 Example 1: Use an algorithm of the C++ library with a Julia array
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -234,8 +234,8 @@ Example 2: Create a numpy-style universal function from a C++ scalar function
      [-1.499227  0.136731  1.646979  1.643002  0.128456],
      [-1.084323 -0.583843  0.45342   1.073811  0.706945]]
 
-xtensor-python-cookiecutter
----------------------------
+xtensor-julia-cookiecutter
+--------------------------
 
 .. image:: xtensor-cookiecutter.png
    :alt: xtensor-julia-cookiecutter
@@ -253,6 +253,14 @@ A few examples included in the resulting project including
 - Unit tests
 - The generation of the HTML documentation with sphinx
 
+xtensor-r
+---------
+
+.. image:: xtensor-r.svg
+   :alt: xtensor-r
+
+The xtensor-r_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``rarray`` and ``rtensor`` which effectively wrap R arrays, allowing operating on R arrays inplace.
+
 xtensor-blas
 ------------
 
@@ -264,4 +272,6 @@ The xtensor-blas_ project is an extension to the xtensor library, offering bindi
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
+.. _xtensor-julia-cookiecutter: https://github.com/QuantStack/xtensor-julia-cookiecutter
+.. _xtensor-r: https://github.com/QuantStack/xtensor-r
 .. _xtensor-blas: https://github.com/QuantStack/xtensor-blas
