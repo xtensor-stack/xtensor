@@ -818,39 +818,40 @@ namespace xt
     template <class E, class S>
     inline auto dynamic_view(E&& e, S&& slices)
     {
-        std::size_t offset = detail::get_offset(e);
-        using shape_type = typename std::vector<std::size_t>;
-
-        auto old_shape = e.shape();
-        auto&& old_strides = detail::get_strides(e);
-
-        shape_type new_shape;
-        shape_type new_strides;
-
-        std::size_t shape_size = old_shape.size();
+        // Compute dimension
+        std::size_t dimension = e.dimension();
 
         for (const auto& el : slices)
         {
             if (el[0] >= 0 && el[1] == 0)
             {
-                // treat this like a single int and remove from shape
-                shape_size = shape_size - 1;
+                // treat this like a single integral and remove from shape
+                --dimension;
             }
             else if (el[0] == -1 && el[1] == 0)
             {
                 // treat this like a new axis
-                shape_size += 1;
+                ++dimension;
             }
         }
 
-        new_shape.resize(shape_size);
-        new_strides.resize(shape_size);
+        // Compute strided view
+
+        std::size_t offset = detail::get_offset(e);
+        using shape_type = typename std::vector<std::size_t>;
+
+        shape_type new_shape(dimension);
+        shape_type new_strides(dimension);
+
+        auto old_shape = e.shape();
+        auto&& old_strides = detail::get_strides(e);
 
         std::size_t i = 0;
         std::size_t idx = 0;
         std::size_t newaxis_skip = 0;
 
-        for (; i < slices.size(); ++i) {
+        for (; i < slices.size(); ++i)
+        {
             if (slices[i][0] >= 0)
             {
                 offset += slices[i][0] * old_strides[i];
@@ -860,14 +861,14 @@ namespace xt
             {
                 new_shape[idx] = slices[i][1];
                 new_strides[idx] = slices[i][2] * old_strides[i - newaxis_skip];
-                idx++;
+                ++idx;
             }
             else if (slices[i][0] == -1) // newaxis
             {
                 new_shape[idx] = 1;
                 new_strides[idx] = 0;
-                newaxis_skip++;
-                idx++;
+                ++newaxis_skip;
+                ++idx;
             }
         }
 
@@ -875,7 +876,7 @@ namespace xt
         {
             new_shape[idx] = old_shape[i];
             new_strides[idx] = old_strides[i];
-            idx++;
+            ++idx;
         }
 
         auto data = detail::get_data(e);
