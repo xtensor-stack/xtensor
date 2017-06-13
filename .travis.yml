@@ -94,16 +94,14 @@ install:
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
-    # Useful for debugging any issues with conda
-    - conda info -a
-    - cd test
-    - conda env create -f ./test-environment.yml
-    - source activate test-xtensor
-    - cd ..
+    - conda install gtest cmake -c conda-forge 
+    # Testing
+    - mkdir build
+    - cd build
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
-        cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON .;
+        cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON ..;
       else
-        cmake -DBUILD_TESTS=ON .;
+        cmake -DBUILD_TESTS=ON ..;
       fi
     - make -j2 test_xtensor
     - cd test
