@@ -334,18 +334,18 @@ namespace xt
      * @brief Clip values between hi and lo
      * 
      * Returns an \ref xfunction for the element-wise clipped 
-     * values between hi- and lo
+     * values between lo and hi
      * @param e1 an \ref xexpression or a scalar
-     * @param hi a scalar
      * @param lo a scalar
+     * @param hi a scalar
      *
      * @return a \ref xfunction
      */
     template <class E1, class E2, class E3>
-    inline auto clip(E1&& e1, E2&& hi, E3&& lo) noexcept
+    inline auto clip(E1&& e1, E2&& lo, E3&& hi) noexcept
         -> detail::xfunction_type_t<math::clamp_fun, E1, E2, E3>
     {
-        return detail::make_xfunction<math::clamp_fun>(std::forward<E1>(e1), std::forward<E2>(hi), std::forward<E3>(lo));
+        return detail::make_xfunction<math::clamp_fun>(std::forward<E1>(e1), std::forward<E2>(lo), std::forward<E3>(hi));
     }
 
     namespace math
