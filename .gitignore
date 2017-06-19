@@ -47,3 +47,6 @@ docs/build/
 
 # Jupyter artefacts
 .ipynb_checkpoints/
+
+# Generated files
+*.pc
