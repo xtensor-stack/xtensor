@@ -73,6 +73,7 @@ namespace xt
         using shape_type = typename base_type::shape_type;
         using inner_shape_type = typename base_type::inner_shape_type;
         using strides_type = typename base_type::strides_type;
+        using backstrides_type = typename base_type::backstrides_type;
         using inner_strides_type = typename base_type::inner_strides_type;
 
         xarray_container();
@@ -168,6 +169,7 @@ namespace xt
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
+        using backstrides_type = typename base_type::backstrides_type;
 
         using container_closure_type = adaptor_closure_t<container_type>;
 
@@ -194,7 +196,7 @@ namespace xt
         const container_type& data_impl() const noexcept;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
-        void assign_temporary_impl(temporary_type& tmp);
+        void assign_temporary_impl(temporary_type&& tmp);
 
 
         friend class xcontainer<xarray_adaptor<EC, L, SC>>;
@@ -509,15 +511,12 @@ namespace xt
     }
 
     template <class EC, layout_type L, class SC>
-    inline void xarray_adaptor<EC, L, SC>::assign_temporary_impl(temporary_type& tmp)
+    inline void xarray_adaptor<EC, L, SC>::assign_temporary_impl(temporary_type&& tmp)
     {
-        // TODO (performance improvement) : consider moving tmps
-        // shape and strides
-        base_type::shape_impl() = tmp.shape();
-        base_type::strides_impl() = tmp.strides();
-        base_type::backstrides_impl() = tmp.backstrides();
-        m_data.resize(tmp.size());
-        std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
+        base_type::shape_impl() = std::move(const_cast<shape_type&>(tmp.shape()));
+        base_type::strides_impl() = std::move(const_cast<strides_type&>(tmp.strides()));
+        base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(tmp.backstrides()));
+        m_data = std::move(tmp.data());
     }
 }
 

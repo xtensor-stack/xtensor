@@ -149,7 +149,7 @@ namespace xt
         {
             typename E1::temporary_type tmp(shape);
             assign_data(tmp, e2, trivial_broadcast);
-            de1.assign_temporary(tmp);
+            de1.assign_temporary(std::move(tmp));
         }
         else
         {
