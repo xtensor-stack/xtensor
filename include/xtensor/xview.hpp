@@ -211,7 +211,7 @@ namespace xt
         template <class It>
         base_index_type make_index(It first, It last) const;
 
-        void assign_temporary_impl(temporary_type& tmp);
+        void assign_temporary_impl(temporary_type&& tmp);
 
         friend class xview_semantic<xview<CT, S...>>;
     };
@@ -708,7 +708,7 @@ namespace xt
     }
 
     template <class CT, class... S>
-    inline void xview<CT, S...>::assign_temporary_impl(temporary_type& tmp)
+    inline void xview<CT, S...>::assign_temporary_impl(temporary_type&& tmp)
     {
         std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
     }

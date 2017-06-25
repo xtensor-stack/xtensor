@@ -265,7 +265,7 @@ namespace xt
         functor_type m_functor;
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
-        void assign_temporary_impl(temporary_type& tmp);
+        void assign_temporary_impl(temporary_type&& tmp);
         friend class xview_semantic<xfunctorview<F, CT>>;
     };
 
@@ -447,7 +447,7 @@ namespace xt
     }
 
     template <class F, class CT>
-    inline void xfunctorview<F, CT>::assign_temporary_impl(temporary_type& tmp)
+    inline void xfunctorview<F, CT>::assign_temporary_impl(temporary_type&& tmp)
     {
         std::copy(tmp.cbegin(), tmp.cend(), xbegin());
     }

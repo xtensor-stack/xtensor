@@ -151,7 +151,7 @@ namespace xt
         const indices_type m_indices;
         const inner_shape_type m_shape;
 
-        void assign_temporary_impl(temporary_type& tmp);
+        void assign_temporary_impl(temporary_type&& tmp);
 
         friend class xview_semantic<xindexview<CT, I>>;
     };
@@ -260,7 +260,7 @@ namespace xt
     }
 
     template <class CT, class I>
-    inline void xindexview<CT, I>::assign_temporary_impl(temporary_type& tmp)
+    inline void xindexview<CT, I>::assign_temporary_impl(temporary_type&& tmp)
     {
         std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
     }

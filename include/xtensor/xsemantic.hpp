@@ -113,7 +113,7 @@ namespace xt
         using derived_type = D;
         using temporary_type = typename base_type::temporary_type;
 
-        derived_type& assign_temporary(temporary_type&);
+        derived_type& assign_temporary(temporary_type&&);
 
         template <class E>
         derived_type& assign_xexpression(const xexpression<E>& e);
@@ -160,7 +160,7 @@ namespace xt
         using derived_type = D;
         using temporary_type = typename base_type::temporary_type;
 
-        derived_type& assign_temporary(temporary_type&);
+        derived_type& assign_temporary(temporary_type&&);
 
         template <class E>
         derived_type& assign_xexpression(const xexpression<E>& e);
@@ -206,7 +206,7 @@ namespace xt
         using derived_type = D;
         using temporary_type = typename base_type::temporary_type;
 
-        derived_type& assign_temporary(temporary_type&);
+        derived_type& assign_temporary(temporary_type&&);
 
         template <class E>
         derived_type& assign_xexpression(const xexpression<E>& e);
@@ -410,7 +410,7 @@ namespace xt
     inline auto xsemantic_base<D>::operator=(const xexpression<E>& e) -> derived_type&
     {
         temporary_type tmp(e);
-        return this->derived_cast().assign_temporary(tmp);
+        return this->derived_cast().assign_temporary(std::move(tmp));
     }
 
     /**************************************
@@ -423,7 +423,7 @@ namespace xt
      * @return a reference to \c *this.
      */
     template <class D>
-    inline auto xcontainer_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
+    inline auto xcontainer_semantic<D>::assign_temporary(temporary_type&& tmp) -> derived_type&
     {
         using std::swap;
         swap(this->derived_cast(), tmp);
@@ -471,9 +471,9 @@ namespace xt
      * @return a reference to \c *this.
      */
     template <class D>
-    inline auto xadaptor_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
+    inline auto xadaptor_semantic<D>::assign_temporary(temporary_type&& tmp) -> derived_type&
     {
-        this->derived_cast().assign_temporary_impl(tmp);
+        this->derived_cast().assign_temporary_impl(std::move(tmp));
         return this->derived_cast();
     }
 
@@ -518,9 +518,9 @@ namespace xt
      * @return a reference to \c *this.
      */
     template <class D>
-    inline auto xview_semantic<D>::assign_temporary(temporary_type& tmp) -> derived_type&
+    inline auto xview_semantic<D>::assign_temporary(temporary_type&& tmp) -> derived_type&
     {
-        this->derived_cast().assign_temporary_impl(tmp);
+        this->derived_cast().assign_temporary_impl(std::move(tmp));
         return this->derived_cast();
     }
 

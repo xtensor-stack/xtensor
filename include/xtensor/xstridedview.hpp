@@ -174,7 +174,7 @@ namespace xt
         template <class It>
         It data_xend_impl(It end) const noexcept;
 
-        void assign_temporary_impl(temporary_type& tmp);
+        void assign_temporary_impl(temporary_type&& tmp);
 
         CT m_e;
         CD m_data;
@@ -243,7 +243,7 @@ namespace xt
     }
 
     template <class CT, class S, class CD>
-    inline void xstrided_view<CT, S, CD>::assign_temporary_impl(temporary_type& tmp)
+    inline void xstrided_view<CT, S, CD>::assign_temporary_impl(temporary_type&& tmp)
     {
         std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
     }
