@@ -69,15 +69,16 @@ namespace xt
         ASSERT_TRUE(t2::value);
     }
 
-    template <class... T >
-    auto foo(const std::tuple<T...>& t) {
+    template <class... T>
+    auto foo(const std::tuple<T...>& t)
+    {
         auto func = [](int i) { return i; };
         return apply<int>(1, func, t);
     }
 
     TEST(utils, apply)
     {
-        ASSERT_TRUE(foo(std::make_tuple(1, 2, 3))==2);
+        ASSERT_TRUE(foo(std::make_tuple(1, 2, 3)) == 2);
     }
 
     TEST(utils, initializer_dimension)
@@ -109,16 +110,16 @@ namespace xt
     TEST(utils, shape)
     {
         auto s0 = shape<std::vector<size_t>>(3);
-        auto s1 = shape<std::vector<size_t>>(std::initializer_list<size_t> {1, 2});
-        auto s2 = shape<std::vector<size_t>>(std::initializer_list<std::initializer_list<size_t>> {{1, 2, 4}, {1, 3, 5}});
+        auto s1 = shape<std::vector<size_t>>(std::initializer_list<size_t>{1, 2});
+        auto s2 = shape<std::vector<size_t>>(std::initializer_list<std::initializer_list<size_t>>{{1, 2, 4}, {1, 3, 5}});
 
         std::vector<size_t> e0 = {};
         std::vector<size_t> e1 = {2};
         std::vector<size_t> e2 = {2, 3};
 
         ASSERT_TRUE(check_shape(3, s0.begin(), s0.end()));
-        ASSERT_TRUE(check_shape(std::initializer_list<size_t> {1, 2}, s1.begin(), s1.end()));
-        ASSERT_TRUE(check_shape(std::initializer_list<std::initializer_list<size_t>> {{1, 2, 4}, {1, 3, 5}}, s2.begin(), s2.end()));
+        ASSERT_TRUE(check_shape(std::initializer_list<size_t>{1, 2}, s1.begin(), s1.end()));
+        ASSERT_TRUE(check_shape(std::initializer_list<std::initializer_list<size_t>>{{1, 2, 4}, {1, 3, 5}}, s2.begin(), s2.end()));
 
         EXPECT_EQ(e0, s0);
         EXPECT_EQ(e1, s1);
@@ -141,4 +142,3 @@ namespace xt
         EXPECT_EQ(forward_real(rlv), 1.0);
     }
 }
-

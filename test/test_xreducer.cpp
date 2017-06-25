@@ -29,7 +29,7 @@ namespace xt
     };
 
     xreducer_features::xreducer_features()
-        : m_axes({ 1, 3 }), m_a(ones<double>({3, 2, 4, 6, 5})),
+        : m_axes({1, 3}), m_a(ones<double>({3, 2, 4, 6, 5})),
           m_red(func(), m_a, m_axes)
     {
         for (std::size_t i = 0; i < 2; ++i)
@@ -44,7 +44,7 @@ namespace xt
     TEST(xreducer, shape)
     {
         xreducer_features features;
-        xreducer_features::shape_type s = { 3, 4, 5 };
+        xreducer_features::shape_type s = {3, 4, 5};
         EXPECT_EQ(s, features.m_red.shape());
         EXPECT_EQ(features.m_red.layout(), layout_type::dynamic);
     }
@@ -72,7 +72,7 @@ namespace xt
     {
         xreducer_features features;
         xarray<double> res = features.m_red;
-        xarray<double> expected = 12 * ones<double>({ 3, 4, 5 });
+        xarray<double> expected = 12 * ones<double>({3, 4, 5});
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
     }
@@ -81,26 +81,26 @@ namespace xt
     {
         xreducer_features features;
         xarray<double> res = sum(features.m_a, features.m_axes);
-        xarray<double> expected = 12 * ones<double>({ 3, 4, 5 });
+        xarray<double> expected = 12 * ones<double>({3, 4, 5});
         expected(1, 1, 1) = 24;
         EXPECT_EQ(expected, res);
     }
 
     TEST(xreducer, sum2)
     {
-        xarray<double> u = ones<double>({ 2, 4 });
-        xarray<double> expectedu0 = 2 * ones<double>({ 4 });
-        xarray<double> resu0 = sum(u, { 0 });
+        xarray<double> u = ones<double>({2, 4});
+        xarray<double> expectedu0 = 2 * ones<double>({4});
+        xarray<double> resu0 = sum(u, {0});
         EXPECT_EQ(expectedu0, resu0);
-        xarray<double> expectedu1 = 4 * ones<double>({ 2 });
-        xarray<double> resu1 = sum(u, { 1 });
+        xarray<double> expectedu1 = 4 * ones<double>({2});
+        xarray<double> resu1 = sum(u, {1});
         EXPECT_EQ(expectedu1, resu1);
-        xarray<double> v = ones<double>({ 4, 2 });
-        xarray<double> expectedv0 = 4 * ones<double>({ 2 });
-        xarray<double> resv0 = sum(v, { 0 });
+        xarray<double> v = ones<double>({4, 2});
+        xarray<double> expectedv0 = 4 * ones<double>({2});
+        xarray<double> resv0 = sum(v, {0});
         EXPECT_EQ(expectedv0, resv0);
-        xarray<double> expectedv1 = 2 * ones<double>({ 4 });
-        xarray<double> resv1 = sum(v, { 1 });
+        xarray<double> expectedv1 = 2 * ones<double>({4});
+        xarray<double> resv1 = sum(v, {1});
         EXPECT_EQ(expectedv1, resv1);
     }
 

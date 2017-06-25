@@ -16,9 +16,9 @@ namespace xt
 
     struct xfunction_features
     {
-        xarray<int, layout_type::dynamic> m_a; // shape = { 3, 2, 4 }
-        xarray<int, layout_type::dynamic> m_b; // shape = { 3, 1, 4 }
-        xarray<int, layout_type::dynamic> m_c; // shape = { 4, 3, 2, 4 }
+        xarray<int, layout_type::dynamic> m_a;  // shape = { 3, 2, 4 }
+        xarray<int, layout_type::dynamic> m_b;  // shape = { 3, 1, 4 }
+        xarray<int, layout_type::dynamic> m_c;  // shape = { 4, 3, 2, 4 }
 
         xfunction_features();
     };
@@ -34,7 +34,7 @@ namespace xt
         std::copy(us.data().cbegin(), us.data().cend(), m_b.begin());
 
         using shape_type = layout_result<>::shape_type;
-        shape_type sh = { 4, 3, 2, 4};
+        shape_type sh = {4, 3, 2, 4};
         m_c.reshape(sh);
 
         for (size_t i = 0; i < sh[0]; ++i)
@@ -124,7 +124,7 @@ namespace xt
         size_t i = f.m_a.shape()[0] - 1;
         size_t j = f.m_a.shape()[1] - 1;
         size_t k = f.m_a.shape()[2] - 1;
-        
+
         {
             SCOPED_TRACE("same shape");
             int a = (f.m_a + f.m_a)(i, j, k);
@@ -251,4 +251,3 @@ namespace xt
         }
     }
 }
-

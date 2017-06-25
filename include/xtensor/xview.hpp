@@ -74,7 +74,6 @@ namespace xt
     class xview : public xview_semantic<xview<CT, S...>>,
                   public xexpression_iterable<xview<CT, S...>>
     {
-
     public:
 
         using self_type = xview<CT, S...>;
@@ -247,7 +246,6 @@ namespace xt
     template <bool is_const, class CT, class... S>
     class xview_stepper
     {
-
     public:
 
         using view_type = std::conditional_t<is_const,
@@ -422,7 +420,7 @@ namespace xt
     {
         return m_slices;
     }
-        
+
     /**
      * Returns the slices of the view.
      */
@@ -537,7 +535,8 @@ namespace xt
         auto func = [](const auto& s) { return xt::step_size(s); };
         size_type i = 0, idx;
 
-        for (; i < sizeof...(S); ++i) {
+        for (; i < sizeof...(S); ++i)
+        {
             idx = integral_skip<S...>(i);
             if (idx >= sizeof...(S))
             {
@@ -545,7 +544,8 @@ namespace xt
             }
             strides[i] = m_e.strides()[idx] * apply<size_type>(idx, func, m_slices);
         }
-        for (; i < strides.size(); ++i) {
+        for (; i < strides.size(); ++i)
+        {
             strides[i] = m_e.strides()[idx++];
         }
 

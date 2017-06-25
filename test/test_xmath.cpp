@@ -42,7 +42,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(fmod(a, b)(0, 0), std::fmod(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(fmod(a, sb)(0, 0), std::fmod(a(0, 0), sb));
 
@@ -56,7 +56,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(remainder(a, b)(0, 0), std::remainder(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(remainder(a, sb)(0, 0), std::remainder(a(0, 0), sb));
 
@@ -71,7 +71,7 @@ namespace xt
         xarray<double> b(shape, 1.3);
         xarray<double> c(shape, 2.6);
         EXPECT_EQ(xt::fma(a, b, c)(0, 0), std::fma(a(0, 0), b(0, 0), c(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(xt::fma(a, sb, c)(0, 0), std::fma(a(0, 0), sb, c(0, 0)));
 
@@ -87,7 +87,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(fmax(a, b)(0, 0), std::fmax(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(fmax(a, sb)(0, 0), std::fmax(a(0, 0), sb));
 
@@ -101,7 +101,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(fmin(a, b)(0, 0), std::fmin(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(fmin(a, sb)(0, 0), std::fmin(a(0, 0), sb));
 
@@ -115,7 +115,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(fdim(a, b)(0, 0), std::fdim(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(fdim(a, sb)(0, 0), std::fdim(a(0, 0), sb));
 
@@ -126,7 +126,7 @@ namespace xt
     TEST(xmath, clip)
     {
         shape_type shape = {3, 2};
-        xarray<double> a = {1,2,3,4,5,6};
+        xarray<double> a = {1, 2, 3, 4, 5, 6};
         xarray<double> res = {2, 2, 3, 4, 4, 4};
 
         xarray<double> clipped = clip(a, 2.0, 4.0);
@@ -249,7 +249,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(pow(a, b)(0, 0), std::pow(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(pow(a, sb)(0, 0), std::pow(a(0, 0), sb));
 
@@ -277,7 +277,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(hypot(a, b)(0, 0), std::hypot(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(hypot(a, sb)(0, 0), std::hypot(a(0, 0), sb));
 
@@ -337,7 +337,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ(atan2(a, b)(0, 0), std::atan2(a(0, 0), b(0, 0)));
-        
+
         double sb = 1.2;
         EXPECT_EQ(atan2(a, sb)(0, 0), std::atan2(a(0, 0), sb));
 
@@ -427,42 +427,42 @@ namespace xt
 
     TEST(xmath, ceil)
     {
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 2.3);
         EXPECT_EQ(ceil(a)(0, 0), std::ceil(a(0, 0)));
     }
 
     TEST(xmath, floor)
     {
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 2.3);
         EXPECT_EQ(floor(a)(0, 0), std::floor(a(0, 0)));
     }
 
     TEST(xmath, trunc)
     {
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 2.3);
         EXPECT_EQ(trunc(a)(0, 0), std::trunc(a(0, 0)));
     }
 
     TEST(xmath, round)
     {
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 2.3);
         EXPECT_EQ(round(a)(0, 0), std::round(a(0, 0)));
     }
 
     TEST(xmath, nearbyint)
     {
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 2.3);
         EXPECT_EQ(nearbyint(a)(0, 0), std::nearbyint(a(0, 0)));
     }
 
     TEST(xmath, rint)
     {
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 2.3);
         EXPECT_EQ(rint(a)(0, 0), std::rint(a(0, 0)));
     }

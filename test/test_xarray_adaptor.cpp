@@ -33,7 +33,7 @@ namespace xt
             compare_shape(a, cm);
         }
     }
-    
+
     TEST(xarray_adaptor, strided_constructor)
     {
         central_major_result<> cmr;
@@ -145,6 +145,4 @@ namespace xt
         adaptor_type a(v);
         test_reverse_xiterator(a);
     }
-
 }
-

@@ -366,7 +366,7 @@ namespace xt
         constexpr R initializer_shape(U t, std::index_sequence<I...>)
         {
             using size_type = typename R::value_type;
-            return { size_type(initializer_shape_impl<I>::value(t))... };
+            return {size_type(initializer_shape_impl<I>::value(t))...};
         }
     }
 
@@ -912,6 +912,7 @@ namespace xt
         static std::false_type test(...);
 
     public:
+
         constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
     };
 }

@@ -22,7 +22,7 @@ namespace xt
             xarray_dynamic ra(rm.m_shape);
             compare_shape(ra, rm);
         }
-        
+
         {
             SCOPED_TRACE("column_major constructor");
             column_major_result<> cm;
@@ -32,9 +32,9 @@ namespace xt
 
         {
             SCOPED_TRACE("from shape");
-            std::array<std::size_t, 3> shp = {5,4,2};
-            std::vector<std::size_t> shp_as_vec = {5,4,2};
-            auto ca = xarray<int, layout_type::column_major>::from_shape({3,2,1});
+            std::array<std::size_t, 3> shp = {5, 4, 2};
+            std::vector<std::size_t> shp_as_vec = {5, 4, 2};
+            auto ca = xarray<int, layout_type::column_major>::from_shape({3, 2, 1});
             auto cb = xarray<int, layout_type::column_major>::from_shape(shp);
             std::vector<std::size_t> expected_shape = {3, 2, 1};
             EXPECT_EQ(expected_shape, ca.shape());
@@ -94,7 +94,7 @@ namespace xt
         central_major_result<> res;
         int value = 2;
         xarray_dynamic a(res.m_shape, res.m_strides, value);
-        
+
         {
             SCOPED_TRACE("copy constructor");
             xarray_dynamic b(a);
@@ -186,13 +186,13 @@ namespace xt
         EXPECT_EQ(2, a1(1));
         EXPECT_EQ(4, a2(1, 1));
     }
-    
+
     TEST(xarray, zerod)
     {
         xarray_dynamic a;
         EXPECT_EQ(0, a());
 
-        xarray_dynamic b = { 1, 2, 3 };
+        xarray_dynamic b = {1, 2, 3};
         xarray_dynamic c(2 + xt::sum(b));
         EXPECT_EQ(8, c());
     }
@@ -211,10 +211,10 @@ namespace xt
 
     TEST(xarray, cross_layout_assign)
     {
-        xarray<int, layout_type::row_major> a = { {1, 2, 3, 4},
-                                                  {5, 6, 7, 8} };
-        xarray<int, layout_type::column_major> b = { { 1, 2, 3, 4 },
-                                                     { 5, 6, 7, 8 } };
+        xarray<int, layout_type::row_major> a = {{1, 2, 3, 4},
+                                                 {5, 6, 7, 8}};
+        xarray<int, layout_type::column_major> b = {{1, 2, 3, 4},
+                                                    {5, 6, 7, 8}};
 
         xarray<int, layout_type::column_major> ra = a;
         EXPECT_EQ(b, ra);

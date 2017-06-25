@@ -86,7 +86,6 @@ namespace xt
         return (l == layout_type::row_major || l == layout_type::column_major) ?
             l : layout_type::row_major;
     }
-
 }
 
 #endif

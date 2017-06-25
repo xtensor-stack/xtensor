@@ -9,11 +9,12 @@
 #ifndef XTENSOR_FORWARD_HPP
 #define XTENSOR_FORWARD_HPP
 
-#include "xtensor_config.hpp"
-#include "xstorage.hpp"
-#include "xlayout.hpp"
 #include <memory>
 #include <vector>
+
+#include "xlayout.hpp"
+#include "xstorage.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -121,7 +122,6 @@ namespace xt
         {
         };
     }
-
 }
 
 #endif

@@ -172,61 +172,65 @@ namespace xt
         ASSERT_TRUE(res(1, 1));
     }
 
-#define UNARY_OPTIONAL_TEST_IMPL(FUNC)\
-        xtensor_optional<double, 2> m1 {{ 0.25, 1}, {0.75, missing<double>()}};\
-        xtensor<double, 2> m2 {{ 0.25, 1}, {0.75, 1}};\
-        ASSERT_TRUE(FUNC(m1)(0, 1).has_value());\
-        ASSERT_EQ(FUNC(m2)(0, 1), FUNC(m1)(0, 1).value());\
-        ASSERT_FALSE(FUNC(m1)(1, 1).has_value());
+#define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                    \
+    xtensor_optional<double, 2> m1{{0.25, 1}, {0.75, missing<double>()}}; \
+    xtensor<double, 2> m2{{0.25, 1}, {0.75, 1}};                          \
+    ASSERT_TRUE(FUNC(m1)(0, 1).has_value());                              \
+    ASSERT_EQ(FUNC(m2)(0, 1), FUNC(m1)(0, 1).value());                    \
+    ASSERT_FALSE(FUNC(m1)(1, 1).has_value());
 
-#define UNARY_OPTIONAL_TEST(FUNC)\
-    TEST(xoptional, FUNC) {\
-        UNARY_OPTIONAL_TEST_IMPL(FUNC)\
+#define UNARY_OPTIONAL_TEST(FUNC)      \
+    TEST(xoptional, FUNC)              \
+    {                                  \
+        UNARY_OPTIONAL_TEST_IMPL(FUNC) \
     }
 
-#define UNARY_OPTIONAL_TEST_QUALIFIED(FUNC)\
-    TEST(xoptional, FUNC) {\
-        UNARY_OPTIONAL_TEST_IMPL(xt::FUNC)\
+#define UNARY_OPTIONAL_TEST_QUALIFIED(FUNC) \
+    TEST(xoptional, FUNC)                   \
+    {                                       \
+        UNARY_OPTIONAL_TEST_IMPL(xt::FUNC)  \
     }
 
-#define BINARY_OPTIONAL_TEST(FUNC)\
-    TEST(xoptional, FUNC) {\
-        xtensor_optional<double, 2> m1 {{0.25, 0.5}, {0.75, missing<double>()}};\
-        xtensor_optional<double, 2> m2 {{0.25, missing<double>()}, {0.75, 1.}};\
-        xtensor<double, 2> m3 {{0.25, 0.5}, {0.75, 1.}};\
-        ASSERT_TRUE(FUNC(m1, m3)(0, 1).has_value());\
-        ASSERT_EQ(FUNC(m3, m3)(0, 1), FUNC(m1, m3)(0, 1).value());\
-        ASSERT_FALSE(FUNC(m1, m3)(1, 1).has_value());\
-        ASSERT_TRUE(FUNC(m3, m1)(0, 1).has_value());\
-        ASSERT_EQ(FUNC(m3, m3)(0, 1), FUNC(m3, m1)(0, 1).value());\
-        ASSERT_FALSE(FUNC(m3, m1)(1, 1).has_value());\
-        ASSERT_TRUE(FUNC(m1, m2)(1, 0).has_value());\
-        ASSERT_EQ(FUNC(m3, m3)(1, 0), FUNC(m1, m2)(1, 0).value());\
-        ASSERT_FALSE(FUNC(m1, m2)(0,1).has_value());\
-        ASSERT_FALSE(FUNC(m1, m2)(1, 1).has_value());\
+#define BINARY_OPTIONAL_TEST(FUNC)                                              \
+    TEST(xoptional, FUNC)                                                       \
+    {                                                                           \
+        xtensor_optional<double, 2> m1{{0.25, 0.5}, {0.75, missing<double>()}}; \
+        xtensor_optional<double, 2> m2{{0.25, missing<double>()}, {0.75, 1.}};  \
+        xtensor<double, 2> m3{{0.25, 0.5}, {0.75, 1.}};                         \
+        ASSERT_TRUE(FUNC(m1, m3)(0, 1).has_value());                            \
+        ASSERT_EQ(FUNC(m3, m3)(0, 1), FUNC(m1, m3)(0, 1).value());              \
+        ASSERT_FALSE(FUNC(m1, m3)(1, 1).has_value());                           \
+        ASSERT_TRUE(FUNC(m3, m1)(0, 1).has_value());                            \
+        ASSERT_EQ(FUNC(m3, m3)(0, 1), FUNC(m3, m1)(0, 1).value());              \
+        ASSERT_FALSE(FUNC(m3, m1)(1, 1).has_value());                           \
+        ASSERT_TRUE(FUNC(m1, m2)(1, 0).has_value());                            \
+        ASSERT_EQ(FUNC(m3, m3)(1, 0), FUNC(m1, m2)(1, 0).value());              \
+        ASSERT_FALSE(FUNC(m1, m2)(0, 1).has_value());                           \
+        ASSERT_FALSE(FUNC(m1, m2)(1, 1).has_value());                           \
     }
 
-#define TERNARY_OPTIONAL_TEST_IMPL(FUNC)\
-    xtensor_optional<double, 2> m1 {{0.25, 0.5}, {0.75, missing<double>()}};\
-    xtensor<double, 2> m4 {{0.25, 0.5}, {0.75, 1.}};\
-    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m4, m4)(0, 0).value());\
-    ASSERT_FALSE(FUNC(m1, m4, m4)(1, 1).has_value());\
-    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m4, m1, m4)(0, 0).value());\
-    ASSERT_FALSE(FUNC(m4, m1, m4)(1, 1).has_value());\
-    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m4, m4, m1)(0, 0).value());\
-    ASSERT_FALSE(FUNC(m4, m4, m1)(1, 1).has_value());\
-    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m1, m4)(0, 0).value());\
-    ASSERT_FALSE(FUNC(m1, m1, m4)(1, 1).has_value());\
-    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m4, m1)(0, 0).value());\
-    ASSERT_FALSE(FUNC(m1, m4, m1)(1, 1).has_value());\
-    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m4, m1, m1)(0, 0).value());\
-    ASSERT_FALSE(FUNC(m4, m1, m1)(1, 1).has_value());\
-    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m1, m1)(0, 0).value());\
-    ASSERT_FALSE(FUNC(m1, m1, m1)(1, 1).has_value());\
+#define TERNARY_OPTIONAL_TEST_IMPL(FUNC)                                    \
+    xtensor_optional<double, 2> m1{{0.25, 0.5}, {0.75, missing<double>()}}; \
+    xtensor<double, 2> m4{{0.25, 0.5}, {0.75, 1.}};                         \
+    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m4, m4)(0, 0).value());      \
+    ASSERT_FALSE(FUNC(m1, m4, m4)(1, 1).has_value());                       \
+    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m4, m1, m4)(0, 0).value());      \
+    ASSERT_FALSE(FUNC(m4, m1, m4)(1, 1).has_value());                       \
+    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m4, m4, m1)(0, 0).value());      \
+    ASSERT_FALSE(FUNC(m4, m4, m1)(1, 1).has_value());                       \
+    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m1, m4)(0, 0).value());      \
+    ASSERT_FALSE(FUNC(m1, m1, m4)(1, 1).has_value());                       \
+    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m4, m1)(0, 0).value());      \
+    ASSERT_FALSE(FUNC(m1, m4, m1)(1, 1).has_value());                       \
+    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m4, m1, m1)(0, 0).value());      \
+    ASSERT_FALSE(FUNC(m4, m1, m1)(1, 1).has_value());                       \
+    ASSERT_EQ(FUNC(m4, m4, m4)(0, 0), FUNC(m1, m1, m1)(0, 0).value());      \
+    ASSERT_FALSE(FUNC(m1, m1, m1)(1, 1).has_value());
 
-#define TERNARY_OPTIONAL_TEST(FUNC)\
-    TEST(xoptional, FUNC) {\
-        TERNARY_OPTIONAL_TEST_IMPL(xt::FUNC)\
+#define TERNARY_OPTIONAL_TEST(FUNC)          \
+    TEST(xoptional, FUNC)                    \
+    {                                        \
+        TERNARY_OPTIONAL_TEST_IMPL(xt::FUNC) \
     }
 
     UNARY_OPTIONAL_TEST(abs)

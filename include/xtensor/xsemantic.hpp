@@ -31,7 +31,6 @@ namespace xt
     template <class D>
     class xsemantic_base : public xexpression<D>
     {
-
     public:
 
         using base_type = xexpression<D>;
@@ -108,7 +107,6 @@ namespace xt
     template <class D>
     class xcontainer_semantic : public xsemantic_base<D>
     {
-
     public:
 
         using base_type = xsemantic_base<D>;
@@ -156,7 +154,6 @@ namespace xt
     template <class D>
     class xadaptor_semantic : public xsemantic_base<D>
     {
-
     public:
 
         using base_type = xsemantic_base<D>;
@@ -203,7 +200,6 @@ namespace xt
     template <class D>
     class xview_semantic : public xsemantic_base<D>
     {
-
     public:
 
         using base_type = xsemantic_base<D>;

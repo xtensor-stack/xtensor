@@ -58,7 +58,6 @@ namespace xt
     class xgenerator : public xexpression<xgenerator<F, R, S>>,
                        public xexpression_const_iterable<xgenerator<F, R, S>>
     {
-
     public:
 
         using self_type = xgenerator<F, R, S>;
@@ -82,7 +81,7 @@ namespace xt
 
         static constexpr layout_type static_layout = layout_type::any;
         static constexpr bool contiguous_layout = true;
-        
+
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;
 

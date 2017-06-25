@@ -40,7 +40,6 @@ namespace xt
     template <class D>
     class xslice
     {
-
     public:
 
         using derived_type = D;
@@ -76,7 +75,6 @@ namespace xt
     template <class T>
     class xrange : public xslice<xrange<T>>
     {
-
     public:
 
         using size_type = T;
@@ -115,7 +113,6 @@ namespace xt
     template <class T>
     class xstepped_range : public xslice<xstepped_range<T>>
     {
-
     public:
 
         using size_type = T;
@@ -156,7 +153,6 @@ namespace xt
     template <class T>
     class xall : public xslice<xall<T>>
     {
-
     public:
 
         using size_type = T;
@@ -195,7 +191,6 @@ namespace xt
     template <class T>
     class xnewaxis : public xslice<xnewaxis<T>>
     {
-
     public:
 
         using size_type = T;
@@ -273,7 +268,9 @@ namespace xt
         {
             return xall<std::size_t>(size);
         }
+
     private:
+
         A m_min;
         B m_max;
         C m_step;

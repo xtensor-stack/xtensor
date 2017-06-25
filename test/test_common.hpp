@@ -38,18 +38,18 @@ namespace xt
 
         inline layout_result()
         {
-            m_shape = { 3, 2, 4 };
+            m_shape = {3, 2, 4};
             m_assigner.resize(m_shape[0]);
             for (std::size_t i = 0; i < m_shape[0]; ++i)
             {
                 m_assigner[i].resize(m_shape[1]);
             }
-            m_assigner[0][0] = { -1, 1, 2, 3 };
-            m_assigner[0][1] = { 4, 5, 6, 7 };
-            m_assigner[1][0] = { 8, 9, 10, 11 };
-            m_assigner[1][1] = { 12, 13, 14, 15 };
-            m_assigner[2][0] = { 16, 17, 18, 19 };
-            m_assigner[2][1] = { 20, 21, 22, 23 };
+            m_assigner[0][0] = {-1, 1, 2, 3};
+            m_assigner[0][1] = {4, 5, 6, 7};
+            m_assigner[1][0] = {8, 9, 10, 11};
+            m_assigner[1][1] = {12, 13, 14, 15};
+            m_assigner[2][0] = {16, 17, 18, 19};
+            m_assigner[2][1] = {20, 21, 22, 23};
         }
 
         shape_type m_shape;
@@ -72,11 +72,11 @@ namespace xt
     {
         inline row_major_result()
         {
-            this->m_strides = { 8, 4, 1 };
+            this->m_strides = {8, 4, 1};
             this->m_backstrides = {16, 4, 3};
-            this->m_data = { -1, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-                             10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-                             20, 21, 22, 23 };
+            this->m_data = {-1, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+                            10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+                            20, 21, 22, 23};
             this->m_layout = layout_type::row_major;
         }
     };
@@ -86,12 +86,12 @@ namespace xt
     {
         inline column_major_result()
         {
-            this->m_strides = { 1, 3, 6 };
-            this->m_backstrides = { 2, 3, 18 };
-            this->m_data = { -1, 8, 16, 4, 12, 20,
-                              1, 9, 17, 5, 13, 21,
-                              2, 10, 18, 6, 14, 22,
-                              3, 11, 19, 7, 15, 23 };
+            this->m_strides = {1, 3, 6};
+            this->m_backstrides = {2, 3, 18};
+            this->m_data = {-1, 8, 16, 4, 12, 20,
+                             1, 9, 17, 5, 13, 21,
+                             2, 10, 18, 6, 14, 22,
+                             3, 11, 19, 7, 15, 23};
             this->m_layout = layout_type::column_major;
         }
     };
@@ -101,11 +101,11 @@ namespace xt
     {
         inline central_major_result()
         {
-            this->m_strides = { 8, 1, 2 };
-            this->m_backstrides = { 16, 1, 6};
-            this->m_data = { -1, 4, 1, 5, 2, 6, 3, 7,
-                              8, 12, 9, 13, 10, 14, 11, 15,
-                             16, 20, 17, 21, 18, 22, 19, 23 };
+            this->m_strides = {8, 1, 2};
+            this->m_backstrides = {16, 1, 6};
+            this->m_data = {-1, 4, 1, 5, 2, 6, 3, 7,
+                            8, 12, 9, 13, 10, 14, 11, 15,
+                            16, 20, 17, 21, 18, 22, 19, 23};
             this->m_layout = layout_type::dynamic;
         }
     };
@@ -122,19 +122,19 @@ namespace xt
 
         inline unit_shape_result()
         {
-            m_shape = { 3, 1, 4 };
-            m_strides = { 4, 0, 1 };
-            m_backstrides = { 8, 0, 3 };
-            m_data = { -1, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19 };
+            m_shape = {3, 1, 4};
+            m_strides = {4, 0, 1};
+            m_backstrides = {8, 0, 3};
+            m_data = {-1, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19};
             m_layout = layout_type::dynamic;
             m_assigner.resize(m_shape[0]);
             for (std::size_t i = 0; i < m_shape[0]; ++i)
             {
                 m_assigner[i].resize(m_shape[1]);
             }
-            m_assigner[0][0] = { -1, 1, 2, 3 };
-            m_assigner[1][0] = { 8, 9, 10, 11 };
-            m_assigner[2][0] = { 16, 17, 18, 19 };
+            m_assigner[0][0] = {-1, 1, 2, 3};
+            m_assigner[1][0] = {8, 9, 10, 11};
+            m_assigner[2][0] = {16, 17, 18, 19};
         }
 
         shape_type m_shape;
@@ -272,13 +272,13 @@ namespace xt
             EXPECT_EQ(vt.shape(), shape_new);
             EXPECT_EQ(vt.data(), rm.m_data);
 
-            strides_type new_strides = {rm.m_strides[1], 
-                                        rm.m_strides[0], 
+            strides_type new_strides = {rm.m_strides[1],
+                                        rm.m_strides[0],
                                         rm.m_strides[2]};
             EXPECT_EQ(vt.strides(), new_strides);
 
-            // strides_type new_backstrides = {rm.m_backstrides[1], 
-            //                                 rm.m_backstrides[0], 
+            // strides_type new_backstrides = {rm.m_backstrides[1],
+            //                                 rm.m_backstrides[0],
             //                                 rm.m_backstrides[2]};
             // EXPECT_EQ(vt.backstrides(), new_backstrides);
 
@@ -288,7 +288,7 @@ namespace xt
             EXPECT_EQ(vec_copy(1, 1, 2), vt(1, 1, 2));
 
             // Compilation check only
-            std::vector<std::size_t> perm = { 1, 0, 2 };
+            std::vector<std::size_t> perm = {1, 0, 2};
             transpose(vec, perm);
         }
 
@@ -323,7 +323,7 @@ namespace xt
     void test_bound_check(V& vec)
     {
 #ifdef XTENSOR_ENABLE_ASSERT
-        EXPECT_ANY_THROW(vec(10,10,10));
+        EXPECT_ANY_THROW(vec(10, 10, 10));
 #else
         (void)vec;
 #endif
@@ -399,8 +399,8 @@ namespace xt
     template <class V, class C = std::vector<std::size_t>>
     void test_indexed_access(V& vec)
     {
-        xindex index1 = { 2, 1 };
-        xindex index2 = { 2, 2, 2, 1, 3};
+        xindex index1 = {2, 1};
+        xindex index2 = {2, 2, 2, 1, 3};
         {
             SCOPED_TRACE("row_major access");
             row_major_result<C> rm;
@@ -437,8 +437,8 @@ namespace xt
             vec.reshape(usr.m_shape, layout_type::row_major);
             indexed_assign_array(vec, usr.m_assigner);
             EXPECT_EQ(vec.data(), usr.m_data);
-            xindex id1 = { 2, 0 };
-            xindex id2 = { 2, 2, 2, 0, 3 };
+            xindex id1 = {2, 0};
+            xindex id2 = {2, 2, 2, 0, 3};
             EXPECT_EQ(vec(2, 0, 0), vec[id1]);
             EXPECT_EQ(vec(2, 0, 3), vec[id2]);
         }
@@ -449,7 +449,7 @@ namespace xt
     {
         using shape_type = typename V::shape_type;
 
-        shape_type s = { 3, 1, 4, 2 };
+        shape_type s = {3, 1, 4, 2};
         vec.reshape(s);
 
         {
@@ -462,23 +462,22 @@ namespace xt
 
         {
             SCOPED_TRACE("different shape");
-            shape_type s2 = { 3, 5, 1, 2 };
+            shape_type s2 = {3, 5, 1, 2};
             shape_type s2r = {3, 5, 4, 2};
             bool res = vec.broadcast_shape(s2);
             EXPECT_EQ(s2, s2r);
             EXPECT_FALSE(res);
-
         }
 
         {
             SCOPED_TRACE("incompatible shapes");
-            shape_type s4 = { 2, 1, 3, 2 };
+            shape_type s4 = {2, 1, 3, 2};
             bool wit = false;
             try
             {
                 vec.broadcast_shape(s4);
             }
-            catch(broadcast_error&)
+            catch (broadcast_error&)
             {
                 wit = true;
             }
@@ -491,7 +490,7 @@ namespace xt
     {
         using shape_type = typename V::shape_type;
 
-        shape_type s = { 3, 1, 4, 2 };
+        shape_type s = {3, 1, 4, 2};
         vec.reshape(s);
 
         {
@@ -556,22 +555,26 @@ namespace xt
         {
             auto iter = vec.xbegin();
             auto iter_end = vec.xend();
-            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(vec.data()[nb_iter], *iter);
-            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(iter, iter_end);
         }
 
         // shaped_xiterator
         {
-            std::vector<size_t> shape(rm.m_shape.size()+1);
+            std::vector<size_t> shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
             auto iter = vec.xbegin(shape);
             auto iter_end = vec.xend(shape);
-            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < 2 * nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(vec.data()[0], *iter);
-            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < 2 * nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -579,9 +582,11 @@ namespace xt
         {
             auto iter = vec.template xbegin<layout_type::column_major>();
             auto iter_end = vec.template xend<layout_type::column_major>();
-            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(vec(0, 0, 2), *iter);
-            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -593,9 +598,11 @@ namespace xt
             shape[0] = 2;
             auto iter = vec.template xbegin<shape_type, layout_type::column_major>(shape);
             auto iter_end = vec.template xend<shape_type, layout_type::column_major>(shape);
-            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < 2 * nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(vec(0, 0, 2), *iter);
-            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < 2 * nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(iter, iter_end);
         }
     }
@@ -612,9 +619,11 @@ namespace xt
         {
             auto iter = vec.xrbegin();
             auto iter_end = vec.xrend();
-            for (size_t i = 0; i < nb_iter; ++i) ++iter;
-            EXPECT_EQ(vec.data()[nb_iter-1], *iter);
-            for (size_t i = 0; i < nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < nb_iter; ++i)
+                ++iter;
+            EXPECT_EQ(vec.data()[nb_iter - 1], *iter);
+            for (size_t i = 0; i < nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -625,13 +634,14 @@ namespace xt
             shape[0] = 2;
             auto iter = vec.xrbegin(shape);
             auto iter_end = vec.xrend(shape);
-            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
-            EXPECT_EQ(vec.data()[2*nb_iter - 1], *iter);
-            for (size_t i = 0; i < 2 * nb_iter; ++i) ++iter;
+            for (size_t i = 0; i < 2 * nb_iter; ++i)
+                ++iter;
+            EXPECT_EQ(vec.data()[2 * nb_iter - 1], *iter);
+            for (size_t i = 0; i < 2 * nb_iter; ++i)
+                ++iter;
             EXPECT_EQ(iter, iter_end);
         }
     }
 }
 
 #endif
-

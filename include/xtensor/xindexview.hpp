@@ -67,7 +67,6 @@ namespace xt
     class xindexview : public xview_semantic<xindexview<CT, I>>,
                        public xexpression_iterable<xindexview<CT, I>>
     {
-
     public:
 
         using self_type = xindexview<CT, I>;
@@ -182,7 +181,6 @@ namespace xt
     template <class ECT, class CCT>
     class xfiltration
     {
-
     public:
 
         using self_type = xfiltration<ECT, CCT>;

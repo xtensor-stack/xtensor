@@ -92,7 +92,6 @@ namespace xt
     class xreducer : public xexpression<xreducer<F, CT, X>>,
                      public xexpression_const_iterable<xreducer<F, CT, X>>
     {
-
     public:
 
         using self_type = xreducer<F, CT, X>;
@@ -214,7 +213,6 @@ namespace xt
     template <class F, class CT, class X>
     class xreducer_stepper
     {
-
     public:
 
         using self_type = xreducer_stepper<F, CT, X>;
@@ -287,8 +285,8 @@ namespace xt
     {
         template <class InputIt, class ExcludeIt, class OutputIt>
         inline void excluding_copy(InputIt first, InputIt last,
-            ExcludeIt e_first, ExcludeIt e_last,
-            OutputIt d_first, OutputIt map_first)
+                                   ExcludeIt e_first, ExcludeIt e_last,
+                                   OutputIt d_first, OutputIt map_first)
         {
             using difference_type = typename std::iterator_traits<InputIt>::difference_type;
             InputIt iter = first;

@@ -36,25 +36,24 @@ namespace xt
     template <class D>
     class xconst_iterable
     {
-
     public:
 
         using derived_type = D;
 
         using iterable_types = xiterable_inner_types<D>;
         using inner_shape_type = typename iterable_types::inner_shape_type;
-        
+
         using stepper = typename iterable_types::stepper;
         using const_stepper = typename iterable_types::const_stepper;
-        
+
         using iterator = typename iterable_types::iterator;
         using const_iterator = typename iterable_types::const_iterator;
-       
+
         template <layout_type L>
         using broadcast_iterator = xiterator<stepper, inner_shape_type*, L>;
         template <layout_type L>
         using const_broadcast_iterator = xiterator<const_stepper, inner_shape_type*, L>;
-        
+
         template <class S, layout_type L>
         using shaped_xiterator = xiterator<stepper, S, L>;
         template <class S, layout_type L>
@@ -62,7 +61,7 @@ namespace xt
 
         using reverse_iterator = typename iterable_types::reverse_iterator;
         using const_reverse_iterator = typename iterable_types::const_reverse_iterator;
-        
+
         template <layout_type L>
         using reverse_broadcast_iterator = std::reverse_iterator<broadcast_iterator<L>>;
         template <layout_type L>
@@ -150,20 +149,19 @@ namespace xt
     template <class D>
     class xiterable : public xconst_iterable<D>
     {
-
     public:
 
         using derived_type = D;
 
         using base_type = xconst_iterable<D>;
         using inner_shape_type = typename base_type::inner_shape_type;
-        
+
         using stepper = typename base_type::stepper;
         using const_stepper = typename base_type::const_stepper;
-        
+
         using iterator = typename base_type::iterator;
         using const_iterator = typename base_type::const_iterator;
-        
+
         template <layout_type L>
         using broadcast_iterator = typename base_type::template broadcast_iterator<L>;
         template <layout_type L>
@@ -253,18 +251,17 @@ namespace xt
     template <class D>
     class xexpression_const_iterable : public xconst_iterable<D>
     {
-
     public:
 
         using base_type = xconst_iterable<D>;
         using inner_shape_type = typename base_type::inner_shape_type;
-        
+
         using stepper = typename base_type::stepper;
         using const_stepper = typename base_type::const_stepper;
-        
+
         using iterator = typename base_type::iterator;
         using const_iterator = typename base_type::const_iterator;
-        
+
         template <layout_type L>
         using broadcast_iterator = typename base_type::template broadcast_iterator<L>;
         template <layout_type L>
@@ -317,18 +314,17 @@ namespace xt
     template <class D>
     class xexpression_iterable : public xiterable<D>
     {
-
     public:
 
         using base_type = xiterable<D>;
         using inner_shape_type = typename base_type::inner_shape_type;
-        
+
         using stepper = typename base_type::stepper;
         using const_stepper = typename base_type::const_stepper;
-        
+
         using iterator = typename base_type::iterator;
         using const_iterator = typename base_type::const_iterator;
-        
+
         template <layout_type L>
         using broadcast_iterator = typename base_type::template broadcast_iterator<L>;
         template <layout_type L>
@@ -512,7 +508,7 @@ namespace xt
      * @tparam L layout used for the traversal. Default value is \c DEFAULT_LAYOUT.
      */
     template <class D>
-    template<layout_type L>
+    template <layout_type L>
     inline auto xconst_iterable<D>::cxrbegin() const noexcept -> const_reverse_broadcast_iterator<L>
     {
         return const_reverse_broadcast_iterator<L>(get_cxend<L>(true));

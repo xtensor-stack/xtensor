@@ -39,9 +39,9 @@ namespace xt
     template <class F, class CT>
     class xfunctorview;
 
-    /*****************************
+    /*******************************
      * xfunctorview_temporary_type *
-     *****************************/
+     *******************************/
 
     namespace detail
     {

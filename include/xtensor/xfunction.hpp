@@ -121,7 +121,6 @@ namespace xt
     class xfunction : public xexpression<xfunction<F, R, CT...>>,
                       public xconst_iterable<xfunction<F, R, CT...>>
     {
-
     public:
 
         using self_type = xfunction<F, R, CT...>;
@@ -257,7 +256,6 @@ namespace xt
     template <class F, class R, class... CT>
     class xfunction_iterator
     {
-
     public:
 
         using self_type = xfunction_iterator<F, R, CT...>;
@@ -307,7 +305,6 @@ namespace xt
     template <class F, class R, class... CT>
     class xfunction_stepper
     {
-
     public:
 
         using self_type = xfunction_stepper<F, R, CT...>;

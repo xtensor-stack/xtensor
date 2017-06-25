@@ -20,7 +20,7 @@ namespace xt
 
     TEST(xtensor_semantic, tensor_plus_tensor)
     {
-        tensor_shape s = { 3 ,2 };
+        tensor_shape s = {3, 2};
         tensor_type t1(s, 3.2);
         tensor_type t2(s, 2.5);
         tensor_type res = t1 + t2;
@@ -29,9 +29,9 @@ namespace xt
 
     TEST(xtensor_semantic, tensor_plus_array)
     {
-        tensor_shape s1 = { 3 ,2 };
+        tensor_shape s1 = {3, 2};
         tensor_type t1(s1, 3.2);
-        array_shape s2 = { 3 ,2 };
+        array_shape s2 = {3, 2};
         array_type t2(s2, 2.5);
         tensor_type res = t1 + t2;
         EXPECT_EQ(res(0, 0), t1(0, 0) + t2(0, 0));
@@ -39,12 +39,11 @@ namespace xt
 
     TEST(xtensor_semantic, array_plus_tensor)
     {
-        tensor_shape s1 = { 3 ,2 };
+        tensor_shape s1 = {3, 2};
         tensor_type t1(s1, 3.2);
-        array_shape s2 = { 3 ,2 };
+        array_shape s2 = {3, 2};
         array_type t2(s2, 2.5);
         array_type res = t1 + t2;
         EXPECT_EQ(res(0, 0), t1(0, 0) + t2(0, 0));
     }
-
 }

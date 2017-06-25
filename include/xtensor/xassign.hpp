@@ -47,7 +47,6 @@ namespace xt
     template <class E1, class E2>
     class data_assigner
     {
-
     public:
 
         using lhs_iterator = typename E1::stepper;
@@ -227,4 +226,3 @@ namespace xt
 }
 
 #endif
-

@@ -27,7 +27,7 @@ namespace xt
 
         using shape_type = typename decltype(v)::shape_type;
         EXPECT_EQ(shape_type{3}, v.shape());
-        
+
         EXPECT_EQ(e(1, 1), v(0));
         EXPECT_EQ(e(1, 2), v[{1}]);
 
@@ -103,19 +103,19 @@ namespace xt
 
     TEST(xindexview, assign_scalar)
     {
-        xarray<double> a = {{ 1, 5, 3 }, { 4, 5, 6 }};
+        xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
         auto v = filter(a, a >= 5);
         v = 100;
         EXPECT_EQ(100, v(0));
         EXPECT_EQ(100, v(1));
         EXPECT_EQ(100, v(2));
     }
-    
+
     TEST(xindexview, filtration)
     {
-        xarray<double> a = {{ 1, 5, 3 }, { 4, 5, 6 }};
+        xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
         filtration(a, a >= 5) += 2;
-        xarray<double> expected = {{ 1, 7, 3}, {4, 7, 8 }};
+        xarray<double> expected = {{1, 7, 3}, {4, 7, 8}};
         EXPECT_EQ(expected, a);
     }
 }

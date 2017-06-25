@@ -17,13 +17,13 @@ namespace xt
     {
         vec_type v(4, 0);
         using shape_type = std::vector<vec_type::size_type>;
-        shape_type s({ 2, 2 });
+        shape_type s({2, 2});
 
         auto a1 = xadapt(v, s);
         a1(0, 1) = 1;
         EXPECT_EQ(1, v[1]);
 
-        shape_type str({ 2, 1 });
+        shape_type str({2, 1});
         auto a2 = xadapt(v, s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, v[2]);
@@ -34,13 +34,13 @@ namespace xt
         size_t size = 4;
         int* data = new int[size];
         using shape_type = std::vector<vec_type::size_type>;
-        shape_type s({ 2, 2 });
+        shape_type s({2, 2});
 
         auto a1 = xadapt(data, size, no_ownership(), s);
         a1(0, 1) = 1;
         EXPECT_EQ(1, data[1]);
 
-        shape_type str({ 2, 1 });
+        shape_type str({2, 1});
         auto a2 = xadapt(data, size, no_ownership(), s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, data[2]);
@@ -54,13 +54,13 @@ namespace xt
         int* data = new int[size];
         int* data2 = new int[size];
         using shape_type = std::vector<vec_type::size_type>;
-        shape_type s({ 2, 2 });
+        shape_type s({2, 2});
 
         auto a1 = xadapt(data, size, acquire_ownership(), s);
         a1(0, 1) = 1;
         EXPECT_EQ(1, data[1]);
 
-        shape_type str({ 2, 1 });
+        shape_type str({2, 1});
         auto a2 = xadapt(data2, size, acquire_ownership(), s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, data2[2]);
@@ -70,13 +70,13 @@ namespace xt
     {
         vec_type v(4, 0);
         using shape_type = std::array<vec_type::size_type, 2>;
-        shape_type s = { 2, 2 };
+        shape_type s = {2, 2};
 
         auto a1 = xadapt(v, s);
         a1(0, 1) = 1;
         EXPECT_EQ(1, v[1]);
 
-        shape_type str = { 2, 1 };
+        shape_type str = {2, 1};
         auto a2 = xadapt(v, s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, v[2]);
@@ -87,13 +87,13 @@ namespace xt
         size_t size = 4;
         int* data = new int[size];
         using shape_type = std::array<vec_type::size_type, 2>;
-        shape_type s = { 2, 2 };
+        shape_type s = {2, 2};
 
         auto a1 = xadapt(data, size, no_ownership(), s);
         a1(0, 1) = 1;
         EXPECT_EQ(1, data[1]);
 
-        shape_type str = { 2, 1 };
+        shape_type str = {2, 1};
         auto a2 = xadapt(data, size, no_ownership(), s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, data[2]);
@@ -107,13 +107,13 @@ namespace xt
         int* data = new int[size];
         int* data2 = new int[size];
         using shape_type = std::array<vec_type::size_type, 2>;
-        shape_type s = { 2, 2 };
+        shape_type s = {2, 2};
 
         auto a1 = xadapt(data, size, acquire_ownership(), s);
         a1(0, 1) = 1;
         EXPECT_EQ(1, data[1]);
 
-        shape_type str = { 2, 1 };
+        shape_type str = {2, 1};
         auto a2 = xadapt(data2, size, acquire_ownership(), s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, data2[2]);

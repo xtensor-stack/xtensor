@@ -24,7 +24,6 @@ namespace xt
     template <class F, class R>
     class xvectorizer
     {
-
     public:
 
         template <class... E>

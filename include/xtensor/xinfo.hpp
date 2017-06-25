@@ -14,7 +14,7 @@ namespace xt
     struct static_string
     {
         template <std::size_t N>
-        constexpr static_string(const char(&a)[N]) noexcept
+        constexpr static_string(const char (&a)[N]) noexcept
             : data(a), size(N - 1)
         {
         }
@@ -36,11 +36,11 @@ namespace xt
         return static_string(p.data + 31, p.size - 31 - 1);
 #elif defined(__GNUC__)
         static_string p = __PRETTY_FUNCTION__;
-#  if __cplusplus < 201402
+#if __cplusplus < 201402
         return static_string(p.data + 36, p.size - 36 - 1);
-#  else
+#else
         return static_string(p.data + 46, p.size - 46 - 1);
-#  endif
+#endif
 #elif defined(_MSC_VER)
         static_string p = __FUNCSIG__;
         return static_string(p.data + 38, p.size - 38 - 7);

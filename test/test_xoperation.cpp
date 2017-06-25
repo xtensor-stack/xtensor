@@ -18,19 +18,19 @@ namespace xt
 
     TEST(operation, plus)
     {
-        shape_type shape = {3 ,2};
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
-		double ref = +(a(0, 0));
-		double actual = (+a)(0, 0);
+        double ref = +(a(0, 0));
+        double actual = (+a)(0, 0);
         EXPECT_EQ(ref, actual);
     }
 
     TEST(operation, minus)
     {
-        shape_type shape = {3 ,2};
+        shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
-		double ref = -(a(0, 0));
-		double actual = (-a)(0, 0);
+        double ref = -(a(0, 0));
+        double actual = (-a)(0, 0);
         EXPECT_EQ(ref, actual);
     }
 
@@ -40,7 +40,7 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a + b)(0, 0), a(0, 0) + b(0, 0));
-        
+
         double sb = 1.2;
         EXPECT_EQ((a + sb)(0, 0), a(0, 0) + sb);
 
@@ -54,35 +54,35 @@ namespace xt
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a - b)(0, 0), a(0, 0) - b(0, 0));
-        
+
         double sb = 1.2;
         EXPECT_EQ((a - sb)(0, 0), a(0, 0) - sb);
 
         double sa = 4.6;
         EXPECT_EQ((sa - b)(0, 0), sa - b(0, 0));
     }
-    
+
     TEST(operation, multiply)
     {
         shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a * b)(0, 0), a(0, 0) * b(0, 0));
-        
+
         double sb = 1.2;
         EXPECT_EQ((a * sb)(0, 0), a(0, 0) * sb);
 
         double sa = 4.6;
         EXPECT_EQ((sa * b)(0, 0), sa * b(0, 0));
     }
-    
+
     TEST(operation, divide)
     {
         shape_type shape = {3, 2};
         xarray<double> a(shape, 4.5);
         xarray<double> b(shape, 1.3);
         EXPECT_EQ((a / b)(0, 0), a(0, 0) / b(0, 0));
-        
+
         double sb = 1.2;
         EXPECT_EQ((a / sb)(0, 0), a(0, 0) / sb);
 
@@ -94,7 +94,7 @@ namespace xt
     {
         xarray<double> a = {1, 2, 3, 4, 5};
         xarray<bool> expected = {1, 1, 1, 0, 0};
-        xarray<bool> b = a < 4; 
+        xarray<bool> b = a < 4;
         EXPECT_EQ(expected, b);
     }
 
@@ -102,7 +102,7 @@ namespace xt
     {
         xarray<double> a = {1, 2, 3, 4, 5};
         xarray<bool> expected = {1, 1, 1, 1, 0};
-        xarray<bool> b = a <= 4; 
+        xarray<bool> b = a <= 4;
         EXPECT_EQ(expected, b);
     }
 
@@ -118,7 +118,7 @@ namespace xt
     {
         xarray<double> a = {1, 2, 3, 4, 5};
         xarray<bool> expected = {0, 0, 0, 1, 1};
-        xarray<bool> b = a >= 4; 
+        xarray<bool> b = a >= 4;
         EXPECT_EQ(expected, b);
     }
 
@@ -145,14 +145,14 @@ namespace xt
 
     TEST(operation, not_equal)
     {
-        xarray<double> a = { 1, 2, 3, 4, 5 };
-        xarray<bool> expected = { 1, 1, 1, 0, 1 };
+        xarray<double> a = {1, 2, 3, 4, 5};
+        xarray<bool> expected = {1, 1, 1, 0, 1};
         xarray<bool> b = not_equal(a, 4);
         EXPECT_EQ(expected, b);
 
-        xarray<double> other = { 1, 2, 3, 0, 0 };
+        xarray<double> other = {1, 2, 3, 0, 0};
         xarray<bool> b_2 = not_equal(a, other);
-        xarray<bool> expected_2 = { 0, 0, 0, 1, 1 };
+        xarray<bool> expected_2 = {0, 0, 0, 1, 1};
         EXPECT_EQ(expected_2, b_2);
     }
 
@@ -176,7 +176,7 @@ namespace xt
         EXPECT_EQ(b, a);
         EXPECT_EQ(c, a);
 
-        xarray<bool>expected = {1, 1, 1, 1, 1};
+        xarray<bool> expected = {1, 1, 1, 1, 1};
         EXPECT_EQ(expected, d);
     }
 
@@ -208,7 +208,7 @@ namespace xt
 
     TEST(operation, amax)
     {
-        xarray<int> a = {{0, 0, 3}, {1,2, 10}};
+        xarray<int> a = {{0, 0, 3}, {1, 2, 10}};
         EXPECT_EQ(10, amax(a)());
         xarray<int> e1 = {1, 2, 10};
         EXPECT_EQ(e1, amax(a, {0}));
@@ -218,7 +218,7 @@ namespace xt
 
     TEST(operation, amin)
     {
-        xarray<int> a = {{0, 0, 3}, {1,2, 10}};
+        xarray<int> a = {{0, 0, 3}, {1, 2, 10}};
         EXPECT_EQ(0, amin(a)());
         xarray<int> e1 = {0, 0, 3};
         EXPECT_EQ(e1, amin(a, {0}));
@@ -273,4 +273,3 @@ namespace xt
         EXPECT_EQ(expected, where(a));
     }
 }
-

@@ -19,17 +19,17 @@ namespace xt
 {
     TEST(xlayout, xarray_initializer_constructors)
     {
-        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout_type::dynamic> dm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double, layout_type::dynamic> dm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         EXPECT_EQ(rm(0, 2), cm(0, 2));
         EXPECT_EQ(dm(0, 2), cm(0, 2));
         EXPECT_EQ(rm(2, 2), cm(2, 2));
         auto rm1 = rm[{2, 0}];
         auto cm1 = cm[{2, 0}];
         EXPECT_EQ(rm1, cm1);
-        std::vector<double> cm_data = {1,4,7,2,5,8,3,6,9};
-        std::vector<double> rm_data = {1,2,3,4,5,6,7,8,9};
+        std::vector<double> cm_data = {1, 4, 7, 2, 5, 8, 3, 6, 9};
+        std::vector<double> rm_data = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         EXPECT_FALSE(cm.data() == rm.data());
         EXPECT_EQ(cm_data, cm.data());
         EXPECT_EQ(rm_data, rm.data());
@@ -43,17 +43,17 @@ namespace xt
 
     TEST(xlayout, xtensor_initializer_constructors)
     {
-        xtensor<double, 2, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xtensor<double, 2, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xtensor<double, 2, layout_type::dynamic> dm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xtensor<double, 2, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xtensor<double, 2, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xtensor<double, 2, layout_type::dynamic> dm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         EXPECT_EQ(rm(0, 2), cm(0, 2));
         EXPECT_EQ(dm(0, 2), cm(0, 2));
         EXPECT_EQ(rm(2, 2), cm(2, 2));
         auto rm1 = rm[{2, 0}];
         auto cm1 = cm[{2, 0}];
         EXPECT_EQ(rm1, cm1);
-        std::vector<double> cm_data = {1,4,7,2,5,8,3,6,9};
-        std::vector<double> rm_data = {1,2,3,4,5,6,7,8,9};
+        std::vector<double> cm_data = {1, 4, 7, 2, 5, 8, 3, 6, 9};
+        std::vector<double> rm_data = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         EXPECT_FALSE(cm.data() == rm.data());
         EXPECT_EQ(cm_data, cm.data());
         EXPECT_EQ(rm_data, rm.data());
@@ -67,8 +67,8 @@ namespace xt
 
     TEST(xlayout, xfunctions_mix_layouts)
     {
-        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
         auto f = cm * rm + 5;
         EXPECT_EQ(6, f(0, 0));
@@ -96,8 +96,8 @@ namespace xt
 
     TEST(xlayout, xgenerator_assignment)
     {
-        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
         xarray<double, layout_type::column_major> cmt1 = triu(cm);
         xarray<double, layout_type::column_major> cmt2 = triu(rm);
@@ -118,8 +118,8 @@ namespace xt
 
     TEST(xlayout, xview)
     {
-        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
         auto vcm = view(cm, range(0, 2), range(1, 3));
         auto vrm = view(rm, range(0, 2), range(1, 3));
@@ -132,8 +132,8 @@ namespace xt
 
     TEST(xlayout, xreducer)
     {
-        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
 
         auto rcm = sum(cm, {1});
         auto rrm = sum(rm, {1});
@@ -146,8 +146,8 @@ namespace xt
 
     TEST(xlayout, equal_iterator)
     {
-        xarray<double, layout_type::column_major> cm = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double, layout_type::row_major> rm = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         auto e = equal(cm, rm);
         auto iter_end = e.xend();
         for (auto iter = e.xbegin(); iter != e.xend(); ++iter)
