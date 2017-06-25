@@ -17,7 +17,7 @@
 #include <type_traits>
 
 // Compiler bug workaround
-#if (__GNUC__ && (__GNUC__ < 5 || (__GNUC__ == 5 && __GNUC_MINOR__ < 1)) ) && !(defined(__APPLE__)) || defined(X_OLD_CLANG)
+#if (__GNUC__ && (__GNUC__ < 5 || (__GNUC__ == 5 && __GNUC_MINOR__ < 1))) && !(defined(__APPLE__)) || defined(X_OLD_CLANG)
 #define is_trivially_default_constructible has_trivial_default_constructor
 #endif
 
@@ -34,7 +34,6 @@ namespace xt
     template <class T, class Allocator = std::allocator<T>>
     class uvector
     {
-
     public:
 
         using allocator_type = Allocator;

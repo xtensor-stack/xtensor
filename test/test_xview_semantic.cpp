@@ -31,8 +31,7 @@ namespace xt
 
     template <class F>
     view_op_tester<F>::view_op_tester()
-        : operation_tester<F>(), x_slice(0),
-        y_slice(0, 2), z_slice(1, 4)
+        : operation_tester<F>(), x_slice(0), y_slice(0, 2), z_slice(1, 4)
     {
         std::vector<size_t> shape = this->a.shape();
         vres_rr = this->a;
@@ -97,7 +96,7 @@ namespace xt
             EXPECT_EQ(t.vres_ru, b);
         }
     }
-    
+
     TEST(xview_semantic, a_minus_b)
     {
         view_op_tester<std::minus<>> t;
@@ -349,7 +348,7 @@ namespace xt
             EXPECT_EQ(t.vres_ru, b);
         }
     }
-    
+
     TEST(xview_semantic, a_divide_by_equal_b)
     {
         view_op_tester<std::divides<>> t;
@@ -394,18 +393,18 @@ namespace xt
 
     TEST(xview_semantic, broadcast_equal)
     {
-        xarray_dynamic a = { {1,  2,  3,  4},
-                          {5,  6,  7,  8},
-                          {9, 10, 11, 12} };
+        xarray_dynamic a = {{1, 2, 3, 4},
+                            {5, 6, 7, 8},
+                            {9, 10, 11, 12}};
         xarray_dynamic b = a;
         auto viewa = view(a, all(), range(1, 4));
         auto viewb = view(b, all(), range(1, 4));
         xarray_dynamic c = {1, 2, 3};
         viewa = c;
         noalias(viewb) = c;
-        xarray_dynamic res = { {1, 1, 2, 3},
-                            {5, 1, 2, 3},
-                            {9, 1, 2, 3} };
+        xarray_dynamic res = {{1, 1, 2, 3},
+                              {5, 1, 2, 3},
+                              {9, 1, 2, 3}};
 
         EXPECT_EQ(res, a);
         EXPECT_EQ(res, b);
@@ -413,17 +412,16 @@ namespace xt
 
     TEST(xview_semantic, scalar_equal)
     {
-        xarray_dynamic a = { { 1,  2,  3,  4 },
-                          { 5,  6,  7,  8 },
-                          { 9, 10, 11, 12 } };
+        xarray_dynamic a = {{1, 2, 3, 4},
+                            {5, 6, 7, 8},
+                            {9, 10, 11, 12}};
         auto viewa = view(a, all(), range(1, 4));
         int b = 1;
         viewa = b;
-        xarray_dynamic res = { { 1, 1, 1, 1 },
-                            { 5, 1, 1, 1 },
-                            { 9, 1, 1, 1 } };
+        xarray_dynamic res = {{1, 1, 1, 1},
+                              {5, 1, 1, 1},
+                              {9, 1, 1, 1}};
 
         EXPECT_EQ(res, a);
     }
 }
-

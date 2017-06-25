@@ -34,7 +34,7 @@ namespace xt
         ASSERT_EQ(r.shape()[1], 2);
         ASSERT_EQ(i.shape()[0], 2);
         ASSERT_EQ(i.shape()[1], 2);
-        
+
         ASSERT_EQ(i(0, 0), 0);
         ASSERT_EQ(i(0, 1), 1);
         ASSERT_EQ(i(1, 0), -1);
@@ -51,13 +51,13 @@ namespace xt
             {{1.0       , 1.0 + 1.0i},
              {1.0 - 1.0i, 1.0       }};
 
-        // Test assigning an expression to the complex view 
+        // Test assigning an expression to the complex view
         real(e) = zeros<double>({2, 2});
         xarray<std::complex<double>> expect1 = 
             {{0.0       , 0.0 + 1.0i},
              {0.0 - 1.0i, 0.0       }};
         EXPECT_TRUE(all(equal(e, expect1)));
-        
+
         imag(e) = zeros<double>({2, 2});
         EXPECT_TRUE(all(equal(e, zeros<std::complex<double>>({2, 2}))));
     }
@@ -68,7 +68,7 @@ namespace xt
             {{1.0       , 1.0 + 1.0i},
              {1.0 - 1.0i, 1.0       }};
 
-        // Test assigning an expression to the complex view 
+        // Test assigning an expression to the complex view
         real(e) = 0.0;
         xarray<std::complex<double>> expect1 = 
             {{0.0       , 0.0 + 1.0i},
@@ -106,42 +106,42 @@ namespace xt
 
     TEST(xcomplex, abs_angle_conj)
     {
-        xarray<std::complex<double>> cmplarg_0 = {{ 0.40101756+0.71233018i, 0.62731701+0.42786349i, 0.32415089+0.2977805i },
-                                                  { 0.24475928+0.49208478i, 0.69475518+0.74029639i, 0.59390240+0.35772892i},
-                                                  { 0.63179202+0.41720995i, 0.44025718+0.65472131i, 0.08372648+0.37380143i}};
+        xarray<std::complex<double>> cmplarg_0 = {{0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
+                                                  {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
+                                                  {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
         auto cmplres = xt::abs(cmplarg_0);
-        xarray<double> cmplexpected = {{ 0.81745298, 0.75933774, 0.44016704},
-                                       { 0.54959488, 1.01524554, 0.69331814},
-                                       { 0.75711643, 0.78897806, 0.38306348}};
+        xarray<double> cmplexpected = {{0.81745298, 0.75933774, 0.44016704},
+                                       {0.54959488, 1.01524554, 0.69331814},
+                                       {0.75711643, 0.78897806, 0.38306348}};
 
         EXPECT_TRUE(allclose(cmplexpected, cmplres));
 
         auto cmplres_angle = xt::angle(cmplarg_0);
-        xarray<double> cmplexpected_angle = {{ 1.05805307, 0.59857922, 0.74302273},
-                                       { 1.10923689, 0.81712241, 0.54213553},
-                                       { 0.58362348, 0.97881125, 1.35044673}};
+        xarray<double> cmplexpected_angle = {{1.05805307, 0.59857922, 0.74302273},
+                                             {1.10923689, 0.81712241, 0.54213553},
+                                             {0.58362348, 0.97881125, 1.35044673}};
         EXPECT_TRUE(allclose(cmplexpected_angle, cmplres_angle));
 
         auto cmplres_conj = xt::conj(cmplarg_0);
-        xarray<std::complex<double>> cmplexpected_conj = {{ 0.40101756-0.71233018i, 0.62731701-0.42786349i, 0.32415089-0.2977805i },
-                                                          { 0.24475928-0.49208478i, 0.69475518-0.74029639i, 0.59390240-0.35772892i},
-                                                          { 0.63179202-0.41720995i, 0.44025718-0.65472131i, 0.08372648-0.37380143i}};
+        xarray<std::complex<double>> cmplexpected_conj = {{0.40101756 - 0.71233018i, 0.62731701 - 0.42786349i, 0.32415089 - 0.2977805i},
+                                                          {0.24475928 - 0.49208478i, 0.69475518 - 0.74029639i, 0.59390240 - 0.35772892i},
+                                                          {0.63179202 - 0.41720995i, 0.44025718 - 0.65472131i, 0.08372648 - 0.37380143i}};
         EXPECT_TRUE(allclose(imag(cmplexpected_conj), imag(cmplres_conj)));
         EXPECT_TRUE(allclose(real(cmplexpected_conj), real(cmplres_conj)));
 
         auto cmplres_norm = xt::norm(cmplarg_0);
-        xarray<double> fieldnorm = {{ 0.66822937, 0.5765938 , 0.19374703},
-                                    { 0.30205453, 1.0307235 , 0.48069004},
-                                    { 0.57322529, 0.62248637, 0.14673763}};
+        xarray<double> fieldnorm = {{0.66822937, 0.5765938, 0.19374703},
+                                    {0.30205453, 1.0307235, 0.48069004},
+                                    {0.57322529, 0.62248637, 0.14673763}};
 
         EXPECT_TRUE(allclose(fieldnorm, cmplres_norm));
     }
 
     TEST(xcomplex, conj_real)
     {
-        xarray<double> A = {{ 0.81745298, 0.75933774, 0.44016704},
-                            { 0.54959488, 1.01524554, 0.69331814},
-                            { 0.75711643, 0.78897806, 0.38306348}};
+        xarray<double> A = {{0.81745298, 0.75933774, 0.44016704},
+                            {0.54959488, 1.01524554, 0.69331814},
+                            {0.75711643, 0.78897806, 0.38306348}};
         xarray<double> B = xt::conj(A);
         EXPECT_EQ(A, B);
     }

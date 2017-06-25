@@ -569,9 +569,9 @@ namespace xt
             using const_reference = typename optional_const_reference::value_closure;
             using pointer = value_type*;
             using const_pointer = const value_type*;
- 
+
             template <class T>
-            decltype(auto) operator()(T&&t) const
+            decltype(auto) operator()(T&& t) const
             {
                 return std::forward<T>(t).value();
             }
@@ -594,7 +594,7 @@ namespace xt
             using const_pointer = const value_type*;
 
             template <class T>
-            decltype(auto) operator()(T&&t) const
+            decltype(auto) operator()(T&& t) const
             {
                 return std::forward<T>(t).has_value();
             }
@@ -634,7 +634,6 @@ namespace xt
     /***************************
      * value_or implementation *
      ***************************/
-
 }
 
 #endif

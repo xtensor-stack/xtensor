@@ -41,7 +41,7 @@ namespace xt
              {10.0, 12.0, 15.0, 18.0}};
 
         std::stringstream res;
-        
+
         dump_csv(res, data);
         ASSERT_EQ("1,2,3,4\n10,12,15,18\n", res.str());
     }

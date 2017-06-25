@@ -61,7 +61,7 @@ namespace xt
         res_rc.reshape(rmr.shape(), rmr.strides());
         res_rct.reshape(rmr.shape(), rmr.strides());
         res_ru.reshape(rmr.shape(), rmr.strides());
-        
+
         for (size_t i = 0; i < rmr.shape()[0]; ++i)
         {
             for (size_t j = 0; j < rmr.shape()[1]; ++j)
@@ -119,7 +119,7 @@ namespace xt
         res_c.reshape(cmr.shape(), cmr.strides());
         res_ct.reshape(ctmr.shape(), ctmr.strides());
         res_u.reshape(usr.shape(), usr.strides());
-        
+
         for (size_t i = 0; i < rmr.shape()[0]; ++i)
         {
             for (size_t j = 0; j < rmr.shape()[1]; ++j)
@@ -127,7 +127,7 @@ namespace xt
                 for (size_t k = 0; k < rmr.shape()[2]; ++k)
                 {
                     res_r(i, j, k) = f(ra(i, j, k), b);
-                    res_c(i, j, k) = f( ca(i, j, k), b);
+                    res_c(i, j, k) = f(ca(i, j, k), b);
                     res_ct(i, j, k) = f(cta(i, j, k), b);
                     res_u(i, j, k) = f(ua(i, j, k), b);
                 }
@@ -137,4 +137,3 @@ namespace xt
 }
 
 #endif
-

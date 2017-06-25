@@ -70,7 +70,7 @@ namespace xt
         std::stringstream out_2;
         out_2 << v_2;
         EXPECT_EQ("{  2.,   6.,  10.}", out_2.str());
-        
+
         std::stringstream out_3;
         out_3 << v_new_axis;
         EXPECT_EQ("{{ 5.,  6.,  7.,  8.}}", out_3.str());
@@ -88,7 +88,7 @@ namespace xt
         rn(1, 2) = +1;
         rn(1, 1) = -1;
         rn(2, 2) = std::numeric_limits<double>::infinity();  //  inf
-        rn(2, 3) = -std::numeric_limits<double>::infinity(); // -inf
+        rn(2, 3) = -std::numeric_limits<double>::infinity();  // -inf
         rn(4, 4) = std::nan("xnan");
         std::stringstream out;
 
@@ -183,7 +183,6 @@ namespace xt
         xt::print_options::set_edge_items(3);
         xt::print_options::set_precision(-1);
         xt::print_options::set_threshold(1000);
-
     }
 
     TEST(xio, three_d)
@@ -224,9 +223,9 @@ namespace xt
     TEST(xio, complex)
     {
         xt::random::seed(123);
-        xt::xarray<double> real = xt::random::rand<double>({10, 10},-10, 10);
+        xt::xarray<double> real = xt::random::rand<double>({10, 10}, -10, 10);
         xt::xarray<double> imag = xt::random::rand<double>({10, 10}, -5, 5);
-        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1)); 
+        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1));
 
         std::stringstream out;
         out << e;
@@ -238,7 +237,7 @@ namespace xt
         xt::random::seed(123);
         xt::xarray<double> real = xt::random::rand<double>({10, 10}) - 0.5;
         xt::xarray<double> imag = xt::random::rand<double>({10, 10}) - 0.5;
-        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1)); 
+        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1));
 
         std::stringstream out;
         out << e;
@@ -255,7 +254,7 @@ namespace xt
 
     TEST(xio, custom_formatter)
     {
-        xt::xarray<int> e = {{1,2,3,4}, {100, 200, 1000, 10000000}};
+        xt::xarray<int> e = {{1, 2, 3, 4}, {100, 200, 1000, 10000000}};
 
         std::stringstream out;
         pretty_print(e, [](const int& val) {
@@ -267,4 +266,3 @@ namespace xt
         EXPECT_EQ(custom_formatter_result, out.str());
     }
 }
-

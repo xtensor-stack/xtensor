@@ -21,7 +21,6 @@ namespace xt
     template <class CT>
     class xaxis_iterator
     {
-
     public:
 
         using self_type = xaxis_iterator<CT>;
@@ -158,7 +157,7 @@ namespace xt
         return nullptr;
     }
 
-    template<class CT>
+    template <class CT>
     inline bool xaxis_iterator<CT>::equal(const self_type& rhs) const
     {
         return p_expression == rhs.p_expression && m_index == rhs.m_index;

@@ -44,7 +44,7 @@ namespace xt
         ASSERT_EQ(m_assigned[{49}], 49);
         ASSERT_EQ(m_assigned[{29}], 29);
 
-        xarray<double> b({ 2, 50 }, 1.);
+        xarray<double> b({2, 50}, 1.);
         xarray<double> res = b + ls;
         ASSERT_EQ(50, res(1, 49));
     }
@@ -139,7 +139,7 @@ namespace xt
         ASSERT_EQ(ls.shape(), expected_shape);
         ASSERT_EQ(ls[{0}], 100);
 
-        double at_1 = std::pow(10.0, (2.0 + 1.0/3.0));
+        double at_1 = std::pow(10.0, (2.0 + 1.0 / 3.0));
         ASSERT_EQ(ls(1), at_1);
 
         ASSERT_EQ(ls(3), 1000);
@@ -183,8 +183,8 @@ namespace xt
         ASSERT_EQ(11, c(1, 1, 2));
         ASSERT_EQ(11, c(1, 1, 5));
 
-        xarray<double> e = {{1,2,3}};
-        xarray<double> f = {{2,3,4}};
+        xarray<double> e = {{1, 2, 3}};
+        xarray<double> f = {{2, 3, 4}};
         xarray<double> k = concatenate(xtuple(e, f));
         xarray<double> l = concatenate(xtuple(e, f), 1);
 
@@ -216,7 +216,7 @@ namespace xt
         ASSERT_EQ(11, c(1, 1, 2, 2));
 
         auto e = arange(1, 4);
-        xarray<double> f = {2,3,4};
+        xarray<double> f = {2, 3, 4};
         xarray<double> k = stack(xtuple(e, f));
         xarray<double> l = stack(xtuple(e, f), 1);
 
@@ -334,12 +334,12 @@ namespace xt
 
         xarray<double> d1 = xt::diagonal(e);
 
-        xarray<double> expected = {{{ 0, 18},
-                                    { 1, 19},
-                                    { 2, 20}},
-                                   {{ 3, 21},
-                                    { 4, 22},
-                                    { 5, 23}}};
+        xarray<double> expected = {{{0, 18},
+                                    {1, 19},
+                                    {2, 20}},
+                                   {{3, 21},
+                                    {4, 22},
+                                    {5, 23}}};
         ASSERT_EQ(expected, d1);
 
         std::vector<double> d2 = {6, 7, 8, 9, 10, 11};
@@ -356,7 +356,6 @@ namespace xt
         std::copy(d3.begin(), d3.end(), expected_3.data().begin());
         xarray<double> t3 = xt::diagonal(e, -1, 2, 3);
         ASSERT_EQ(expected_3, t3);
-
     }
 
     TEST(xbuilder, diag)
@@ -374,7 +373,7 @@ namespace xt
         xarray<double> e = xt::arange<double>(1, 10);
         e.reshape({3, 3});
         xarray<double> t = xt::flip(e, 0);
-        xarray<double> expected = {{7,8,9},{4,5,6},{1,2,3}};
+        xarray<double> expected = {{7, 8, 9}, {4, 5, 6}, {1, 2, 3}};
         ASSERT_EQ(expected, t);
 
         xindex idx = {0, 0};
@@ -385,10 +384,10 @@ namespace xt
         xarray<double> f = xt::arange<double>(12);
         f.reshape({2, 2, 3});
         xarray<double> ft = xt::flip(f, 0);
-        xarray<double> expected_2 = {{{ 6,  7,  8},
-                                      { 9, 10, 11}},
-                                     {{ 0,  1,  2},
-                                      { 3,  4,  5}}};
+        xarray<double> expected_2 = {{{6, 7, 8},
+                                      {9, 10, 11}},
+                                     {{0, 1, 2},
+                                      {3, 4, 5}}};
         ASSERT_EQ(expected_2, ft);
     }
 
@@ -397,7 +396,7 @@ namespace xt
         xarray<double> e = xt::arange<double>(1, 10);
         e.reshape({3, 3});
         xarray<double> t = xt::flip(e, 1);
-        xarray<double> expected = {{3,2,1},{6,5,4},{9,8,7}};
+        xarray<double> expected = {{3, 2, 1}, {6, 5, 4}, {9, 8, 7}};
         ASSERT_EQ(expected, t);
 
         xindex idx = {0, 0};
@@ -408,10 +407,10 @@ namespace xt
         xarray<double> f = xt::arange<double>(12);
         f.reshape({2, 2, 3});
         xarray<double> ft = xt::flip(f, 1);
-        xarray<double> expected_2 = {{{  3,  4,  5},
-                                      {  0,  1,  2}},
-                                     {{  9, 10, 11},
-                                      {  6,  7,  8}}};
+        xarray<double> expected_2 = {{{3, 4, 5},
+                                      {0, 1, 2}},
+                                     {{9, 10, 11},
+                                      {6, 7, 8}}};
 
         ASSERT_EQ(expected_2, ft);
         auto flipped_range = xt::flip(xt::stack(xt::xtuple(arange<double>(2), arange<double>(2))), 1);

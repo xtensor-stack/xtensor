@@ -67,7 +67,6 @@ namespace xt
     class xstrided_view : public xview_semantic<xstrided_view<CT, S, CD>>,
                           public xexpression_iterable<xstrided_view<CT, S, CD>>
     {
-
     public:
 
         using self_type = xstrided_view<CT, S, CD>;
@@ -732,7 +731,7 @@ namespace xt
         inline void push_back(const xslice<T>& s)
         {
             auto ds = s.derived_cast();
-            base_type::push_back({ds(0), (index_type) ds.size(), (index_type) ds.step_size()});
+            base_type::push_back({ds(0), (index_type)ds.size(), (index_type)ds.step_size()});
         }
 
         template <class A, class B, class C>
@@ -744,7 +743,7 @@ namespace xt
                 throw std::runtime_error("Too many slices in slice vector for shape");
             }
             auto ds = s.get(m_shape[idx]);
-            base_type::push_back({(index_type) ds(0), (index_type) ds.size(), (index_type) ds.step_size()});
+            base_type::push_back({(index_type)ds(0), (index_type)ds.size(), (index_type)ds.step_size()});
         }
 
         inline void push_back(xall_tag /*s*/)
@@ -754,7 +753,7 @@ namespace xt
             {
                 throw std::runtime_error("Too many slices in slice vector for shape");
             }
-            base_type::push_back({0, (index_type) m_shape[idx], 1});
+            base_type::push_back({0, (index_type)m_shape[idx], 1});
         }
 
         inline void push_back(xnewaxis_tag /*s*/)
@@ -769,8 +768,9 @@ namespace xt
         }
 
     private:
-         std::vector<std::size_t> m_shape;
-         std::size_t newaxis_count = 0;
+
+        std::vector<std::size_t> m_shape;
+        std::size_t newaxis_count = 0;
     };
 
     namespace detail
@@ -863,7 +863,7 @@ namespace xt
                 new_strides[idx] = slices[i][2] * old_strides[i - newaxis_skip];
                 ++idx;
             }
-            else if (slices[i][0] == -1) // newaxis
+            else if (slices[i][0] == -1)  // newaxis
             {
                 new_shape[idx] = 1;
                 new_strides[idx] = 0;

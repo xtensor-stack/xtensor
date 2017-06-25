@@ -13,12 +13,18 @@
 #include <functional>
 #include <iterator>
 #include <memory>
+
 #include "xstorage.hpp"
 
 namespace xt
 {
-    struct no_ownership {};
-    struct acquire_ownership {};
+    struct no_ownership
+    {
+    };
+
+    struct acquire_ownership
+    {
+    };
 
     namespace detail
     {
@@ -26,7 +32,6 @@ namespace xt
         template <class T, class A>
         class xbuffer_storage
         {
-
         public:
 
             using self_type = xbuffer_storage<T, A>;
@@ -59,7 +64,6 @@ namespace xt
         template <class T, class A>
         class xbuffer_owner_storage
         {
-
         public:
 
             using self_type = xbuffer_owner_storage<T, A>;
@@ -118,7 +122,6 @@ namespace xt
     template <class T, class O = no_ownership, class A = std::allocator<T>>
     class xbuffer_adaptor : private detail::buffer_storage_t<T, A, O>
     {
-
     public:
 
         using base_type = detail::buffer_storage_t<T, A, O>;
@@ -266,7 +269,7 @@ namespace xt
         }
 
         template <class T, class A>
-        inline auto xbuffer_storage<T, A>::data() const noexcept-> const_pointer
+        inline auto xbuffer_storage<T, A>::data() const noexcept -> const_pointer
         {
             return p_data;
         }
@@ -480,7 +483,7 @@ namespace xt
     }
 
     template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::cbegin() const->const_iterator
+    inline auto xbuffer_adaptor<T, O, A>::cbegin() const -> const_iterator
     {
         return begin();
     }
@@ -579,11 +582,10 @@ namespace xt
 
     template <class T, class O, class A>
     inline void swap(xbuffer_adaptor<T, O, A>& lhs,
-        xbuffer_adaptor<T, O, A>& rhs) noexcept
+                     xbuffer_adaptor<T, O, A>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
-
 }
 
 #endif

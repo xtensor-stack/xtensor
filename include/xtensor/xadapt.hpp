@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cstddef>
-#include <type_traits>
 #include <memory>
+#include <type_traits>
 
 #include "xarray.hpp"
 #include "xtensor.hpp"
@@ -60,7 +60,7 @@ namespace xt
     template <class P, class O, class SC, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_pointer_t<P>>>
     std::enable_if_t<!detail::is_array<SC>::value, xarray_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, L, SC>>
     xadapt(P& pointer, typename A::size_type size, O ownership, const SC& shape, layout_type l = L, const A& alloc = A());
-    
+
     /**
      * Constructs an xarray_adaptor of the given dynamically allocated C array,
      * with the specified shape and layout.
@@ -80,13 +80,13 @@ namespace xt
      * xtensor_adaptor builder *
      ***************************/
 
-     /**
-      * Constructs an xtensor_adaptor of the given stl-like container,
-      * with the specified shape and layout_type.
-      * @param container the container to adapt
-      * @param shape the shape of the xtensor_adaptor
-      * @param l the layout_type of the xtensor_adaptor
-      */
+    /**
+     * Constructs an xtensor_adaptor of the given stl-like container,
+     * with the specified shape and layout_type.
+     * @param container the container to adapt
+     * @param shape the shape of the xtensor_adaptor
+     * @param l the layout_type of the xtensor_adaptor
+     */
     template <class C, std::size_t N, layout_type L = DEFAULT_LAYOUT>
     xtensor_adaptor<C, N, L>
     xadapt(C& container, const std::array<typename C::size_type, N>& shape, layout_type l = L);
@@ -156,7 +156,7 @@ namespace xt
     inline std::enable_if_t<!detail::is_array<SC>::value, xarray_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, L, SC>>
     xadapt(P& pointer, typename A::size_type size, O, const SC& shape, layout_type l, const A& alloc)
     {
-        using buffer_type = xbuffer_adaptor<std::remove_pointer_t <P>, O, A>;
+        using buffer_type = xbuffer_adaptor<std::remove_pointer_t<P>, O, A>;
         buffer_type buf(pointer, size, alloc);
         return xarray_adaptor<buffer_type, L, SC>(std::move(buf), shape, l);
     }
@@ -165,7 +165,7 @@ namespace xt
     inline std::enable_if_t<!detail::is_array<SC>::value, xarray_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, layout_type::dynamic, SC>>
     xadapt(P& pointer, typename A::size_type size, O, const SC& shape, const SC& strides, const A& alloc)
     {
-        using buffer_type = xbuffer_adaptor<std::remove_pointer_t <P>, O, A>;
+        using buffer_type = xbuffer_adaptor<std::remove_pointer_t<P>, O, A>;
         buffer_type buf(pointer, size, alloc);
         return xarray_adaptor<buffer_type, layout_type::dynamic, SC>(std::move(buf), shape, strides);
     }
@@ -193,7 +193,7 @@ namespace xt
     xadapt(P& pointer, typename A::size_type size, O,
            const std::array<typename A::size_type, N>& shape, layout_type l, const A& alloc)
     {
-        using buffer_type = xbuffer_adaptor<std::remove_pointer_t <P>, O, A>;
+        using buffer_type = xbuffer_adaptor<std::remove_pointer_t<P>, O, A>;
         buffer_type buf(pointer, size, alloc);
         return xtensor_adaptor<buffer_type, N, L>(std::move(buf), shape, l);
     }
@@ -203,11 +203,10 @@ namespace xt
     xadapt(P& pointer, typename A::size_type size, O,
            const std::array<typename A::size_type, N>& shape, const std::array<typename A::size_type, N>& strides, const A& alloc)
     {
-        using buffer_type = xbuffer_adaptor<std::remove_pointer_t <P>, O, A>;
+        using buffer_type = xbuffer_adaptor<std::remove_pointer_t<P>, O, A>;
         buffer_type buf(pointer, size, alloc);
         return xtensor_adaptor<buffer_type, N, layout_type::dynamic>(std::move(buf), shape, strides);
     }
-
 }
 
 #endif

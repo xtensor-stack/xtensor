@@ -76,10 +76,9 @@ namespace xt
 
     TEST(xscalar, broadcasting)
     {
-        xarray<int> a = { 1, 2, 3, 4 };
-        xarray<int> ref = { 6, 7, 8, 9 };
+        xarray<int> a = {1, 2, 3, 4};
+        xarray<int> ref = {6, 7, 8, 9};
         xarray<int> b = a + 5;
         EXPECT_EQ(ref, b);
     }
-
 }

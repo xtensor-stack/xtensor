@@ -49,7 +49,6 @@ namespace xt
     template <class D>
     class xcontainer : public xiterable<D>
     {
-
     public:
 
         using derived_type = D;
@@ -195,7 +194,6 @@ namespace xt
     template <class D, layout_type L>
     class xstrided_container : public xcontainer<D>
     {
-
     public:
 
         using base_type = xcontainer<D>;

@@ -24,7 +24,7 @@ namespace xt
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
         size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
         int expected = a(1, 0, 1);
-        
+
         auto iter = a.xbegin();
         auto iter2 = a.xbegin();
         for (size_type i = 0; i < nb_inc; ++i)
@@ -387,4 +387,3 @@ namespace xt
         EXPECT_EQ(*(it.operator->()), 3);
     }
 }
-

@@ -45,7 +45,7 @@ namespace xt
         double* data2 = new double[size2];
         data2[0] = 1.2;
         owner_adaptor adapt2(data2, size2);
-        
+
         adapt1 = adapt2;
         EXPECT_EQ(adapt1.size(), adapt2.size());
         EXPECT_EQ(adapt1[0], adapt2[0]);

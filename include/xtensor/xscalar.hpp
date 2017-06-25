@@ -46,14 +46,12 @@ namespace xt
         using stepper = xscalar_stepper<false, CT>;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-
     };
 
     template <class CT>
     class xscalar : public xexpression<xscalar<CT>>,
                     public xiterable<xscalar<CT>>
     {
-
     public:
 
         using self_type = xscalar<CT>;
@@ -153,7 +151,6 @@ namespace xt
     template <bool is_const, class CT>
     class xscalar_stepper
     {
-
     public:
 
         using self_type = xscalar_stepper<is_const, CT>;
@@ -205,7 +202,6 @@ namespace xt
     template <bool is_const, class CT>
     class xdummy_iterator
     {
-
     public:
 
         using self_type = xdummy_iterator<is_const, CT>;

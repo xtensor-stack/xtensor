@@ -59,7 +59,6 @@ namespace xt
     class xarray_container : public xstrided_container<xarray_container<EC, L, SC>, L>,
                              public xcontainer_semantic<xarray_container<EC, L, SC>>
     {
-
     public:
 
         using self_type = xarray_container<EC, L, SC>;
@@ -161,7 +160,6 @@ namespace xt
     class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC>, L>,
                            public xadaptor_semantic<xarray_adaptor<EC, L, SC>>
     {
-
     public:
 
         using self_type = xarray_adaptor<EC, L, SC>;
@@ -521,7 +519,6 @@ namespace xt
         m_data.resize(tmp.size());
         std::copy(tmp.data().cbegin(), tmp.data().cend(), m_data.begin());
     }
-
 }
 
 #endif

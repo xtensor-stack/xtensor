@@ -80,7 +80,6 @@ namespace xt
     template <class C>
     class xstepper
     {
-
     public:
 
         using container_type = C;
@@ -145,7 +144,6 @@ namespace xt
     template <class E, bool is_const = true>
     class xindexed_stepper
     {
-
     public:
 
         using self_type = xindexed_stepper<E, is_const>;
@@ -203,7 +201,6 @@ namespace xt
         template <class S>
         class shape_storage
         {
-
         public:
 
             using shape_type = S;
@@ -221,7 +218,6 @@ namespace xt
         template <class S>
         class shape_storage<S*>
         {
-
         public:
 
             using shape_type = S;
@@ -242,7 +238,6 @@ namespace xt
     template <class It, class S, layout_type L>
     class xiterator : detail::shape_storage<S>
     {
-
     public:
 
         using self_type = xiterator<It, S, L>;

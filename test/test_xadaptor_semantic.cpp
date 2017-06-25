@@ -326,6 +326,4 @@ namespace xt
             EXPECT_EQ(tester.res_ru, b);
         }
     }
-
 }
-

@@ -20,7 +20,7 @@ namespace xt
     TEST(xview, temporary_type)
     {
         {
-            view_shape_type shape = { 3, 4 };
+            view_shape_type shape = {3, 4};
             xarray<double> a(shape);
             auto view1 = view(a, 1, range(1, 4));
             bool check = std::is_same<xarray<double>, typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
@@ -28,7 +28,7 @@ namespace xt
         }
 
         {
-            xtensor<double, 2>::shape_type shape = { 3, 4 };
+            xtensor<double, 2>::shape_type shape = {3, 4};
             xtensor<double, 2> a(shape);
             auto view1 = view(a, 1, range(1, 4));
             bool check1 = std::is_same<xtensor<double, 1>, typename xcontainer_inner_types<decltype(view1)>::temporary_type>::value;
@@ -39,12 +39,12 @@ namespace xt
             EXPECT_TRUE(check2);
         }
     }
-    
+
     TEST(xview, simple)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = view(a, 1, range(1, 4));
@@ -88,7 +88,7 @@ namespace xt
     TEST(xview, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
-        std::vector<double> data {
+        std::vector<double> data{
             1, 2,
             3, 4,
             5, 6,
@@ -96,7 +96,7 @@ namespace xt
 
             9, 10,
             11, 12,
-            21, 22, 
+            21, 22,
             23, 24,
 
             25, 26,
@@ -113,7 +113,7 @@ namespace xt
         EXPECT_EQ(a(1, 0, 1), view1(0, 1));
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
         EXPECT_EQ(a(1, 1, 1), view1(1, 1));
-        
+
         std::array<std::size_t, 2> idx = {1, 1};
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
@@ -134,9 +134,9 @@ namespace xt
 
     TEST(xview, integral_skip)
     {
-        size_t index0 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>> (0);
-        size_t index1 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>> (1);
-        size_t index2 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>> (2);
+        size_t index0 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>>(0);
+        size_t index1 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>>(1);
+        size_t index2 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>>(2);
         EXPECT_EQ(index0, 1);
         EXPECT_EQ(index1, 3);
         EXPECT_EQ(index2, 4);
@@ -153,25 +153,25 @@ namespace xt
     TEST(xview, temporary_view)
     {
         xt::xarray<double> arr1
-        { { 1.0, 2.0, 3.0 },
-        { 2.0, 5.0, 7.0 },
-        { 2.0, 5.0, 7.0 } };
+         {{1.0, 2.0, 3.0},
+          {2.0, 5.0, 7.0},
+          {2.0, 5.0, 7.0}};
 
         xt::xarray<double> arr2
-        { 5.0, 6.0, 7.0 };
+         {5.0, 6.0, 7.0};
 
         xt::xarray<double> res = xt::view(arr1, 1) + arr2;
         EXPECT_EQ(7., res(0));
         EXPECT_EQ(11., res(1));
         EXPECT_EQ(14., res(2));
     }
-    
+
     TEST(xview, iterator)
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double> a(shape);
-        std::vector<double> data {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-                                  13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
@@ -209,10 +209,10 @@ namespace xt
 
     TEST(xview, reverse_iterator)
     {
-        view_shape_type shape = { 2, 3, 4 };
+        view_shape_type shape = {2, 3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{ 1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
-            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24 };
+        std::vector<double> data{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
@@ -252,12 +252,12 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
-        std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
-        view_shape_type shape2 = { 4 };
+        view_shape_type shape2 = {4};
         xarray<int> b(shape2);
-        std::vector<int> data2 = { 1, 2, 3, 4 };
+        std::vector<int> data2 = {1, 2, 3, 4};
         std::copy(data2.cbegin(), data2.cend(), b.begin());
 
         auto v = view(a + b, 1, range(1, 4));
@@ -275,8 +275,8 @@ namespace xt
 
     TEST(xview, xview_on_xtensor)
     {
-        xtensor<int, 2> a({ 3, 4 });
-        std::vector<int> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        xtensor<int, 2> a({3, 4});
+        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = view(a, 1, range(1, 4));
@@ -293,7 +293,7 @@ namespace xt
         ++iter;
         EXPECT_EQ(8, *iter);
 
-        xarray<int> b({ 3 }, 2);
+        xarray<int> b({3}, 2);
         xtensor<int, 1> res = view1 + b;
         EXPECT_EQ(8, res(0));
         EXPECT_EQ(9, res(1));
@@ -302,7 +302,7 @@ namespace xt
 
     TEST(xview, trivial_iterating)
     {
-        xtensor<double, 1> arr1{ {2} };
+        xtensor<double, 1> arr1{{2}};
         std::fill(arr1.xbegin(), arr1.xend(), 6);
         auto view = xt::view(arr1, 0);
         auto iter = view.xbegin();
@@ -336,9 +336,9 @@ namespace xt
 
     TEST(xview, newaxis)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = view(a, all(), newaxis(), all());
@@ -377,18 +377,18 @@ namespace xt
         EXPECT_EQ(a(1, 2), view6(2, 0));
         EXPECT_EQ(2, view6.dimension());
 
-        std::array<std::size_t, 3> idx1 = { 1, 0, 2 };
+        std::array<std::size_t, 3> idx1 = {1, 0, 2};
         EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
 
-        std::array<std::size_t, 3> idx2 = { 1, 2, 0 };
+        std::array<std::size_t, 3> idx2 = {1, 2, 0};
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
     }
 
     TEST(xview, newaxis_iterating)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = view(a, all(), all(), newaxis());
@@ -454,9 +454,9 @@ namespace xt
 
     TEST(xview, newaxis_function)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         xarray<double> b(view_shape_type(1, 4));
@@ -465,7 +465,7 @@ namespace xt
         auto v = view(b, newaxis(), all());
         xarray<double> res = a + v;
 
-        std::vector<double> data2{ 2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16 };
+        std::vector<double> data2{2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16};
         xarray<double> expected(shape);
         std::copy(data2.cbegin(), data2.cend(), expected.begin());
 
@@ -562,4 +562,3 @@ namespace xt
         }
     }
 }
-

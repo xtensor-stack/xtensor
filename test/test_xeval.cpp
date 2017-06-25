@@ -16,10 +16,10 @@ namespace xt
 {
     TEST(xeval, array_tensor)
     {
-        xarray<double> a = {1,2,3,4};
+        xarray<double> a = {1, 2, 3, 4};
 
         auto&& b = eval(a);
-        auto&& c = eval(xarray<double>{1,2,3,4,5});
+        auto&& c = eval(xarray<double>{1, 2, 3, 4, 5});
 
         EXPECT_EQ(a.data().data(), b.data().data());
         EXPECT_EQ(&a, &b);
@@ -38,7 +38,7 @@ namespace xt
 
     TEST(xeval, funcs)
     {
-        xarray<double> a = {1,2,3,4};
+        xarray<double> a = {1, 2, 3, 4};
 
         auto f = a * a - 2;
         auto&& b = eval(f);
@@ -59,4 +59,3 @@ namespace xt
 #endif
     }
 }
-

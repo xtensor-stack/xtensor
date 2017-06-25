@@ -25,18 +25,18 @@ namespace xt
     template <class T>
     struct numeric_constants
     {
-        static constexpr T PI =         3.141592653589793238463;
-        static constexpr T PI_2 =       1.57079632679489661923;
-        static constexpr T PI_4 =       0.785398163397448309616;
-        static constexpr T D_1_PI =     0.318309886183790671538;
-        static constexpr T D_2_PI =     0.636619772367581343076;
+        static constexpr T PI = 3.141592653589793238463;
+        static constexpr T PI_2 = 1.57079632679489661923;
+        static constexpr T PI_4 = 0.785398163397448309616;
+        static constexpr T D_1_PI = 0.318309886183790671538;
+        static constexpr T D_2_PI = 0.636619772367581343076;
         static constexpr T D_2_SQRTPI = 1.12837916709551257390;
-        static constexpr T SQRT2 =      1.41421356237309504880;
-        static constexpr T SQRT1_2 =    0.707106781186547524401;
-        static constexpr T E =          2.71828182845904523536;
-        static constexpr T LOG2E =      1.44269504088896340736;
-        static constexpr T LOG10E =     0.434294481903251827651;
-        static constexpr T LN2 =        0.693147180559945309417;
+        static constexpr T SQRT2 = 1.41421356237309504880;
+        static constexpr T SQRT1_2 = 0.707106781186547524401;
+        static constexpr T E = 2.71828182845904523536;
+        static constexpr T LOG2E = 1.44269504088896340736;
+        static constexpr T LOG10E = 0.434294481903251827651;
+        static constexpr T LN2 = 0.693147180559945309417;
     };
 
     /***********
@@ -51,62 +51,72 @@ namespace xt
             using type = bool;
         };
     }
-#define UNARY_MATH_FUNCTOR(NAME)\
-    template <class T>\
-    struct NAME##_fun {\
-        using argument_type = T;\
-        using result_type = T;\
-        constexpr T operator()(const T& arg) const {\
-            using std::NAME;\
-            return NAME(arg);\
-        }\
+#define UNARY_MATH_FUNCTOR(NAME)                   \
+    template <class T>                             \
+    struct NAME##_fun                              \
+    {                                              \
+        using argument_type = T;                   \
+        using result_type = T;                     \
+        constexpr T operator()(const T& arg) const \
+        {                                          \
+            using std::NAME;                       \
+            return NAME(arg);                      \
+        }                                          \
     }
 
-#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)\
-    template <class T>\
-    struct NAME##_fun {\
-        using argument_type = T;\
-        using result_type = complex_value_type_t<T>;\
-        constexpr result_type operator()(const T& arg) const {\
-            using std::NAME;\
-            return NAME(arg);\
-        }\
+#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)            \
+    template <class T>                                       \
+    struct NAME##_fun                                        \
+    {                                                        \
+        using argument_type = T;                             \
+        using result_type = complex_value_type_t<T>;         \
+        constexpr result_type operator()(const T& arg) const \
+        {                                                    \
+            using std::NAME;                                 \
+            return NAME(arg);                                \
+        }                                                    \
     }
 
-#define BINARY_MATH_FUNCTOR(NAME)\
-    template <class T>\
-    struct NAME##_fun {\
-        using first_argument_type = T;\
-        using second_argument_type = T;\
-        using result_type = T;\
-        constexpr T operator()(const T& arg1, const T& arg2) const {\
-            using std::NAME;\
-            return NAME(arg1, arg2);\
-        }\
+#define BINARY_MATH_FUNCTOR(NAME)                                  \
+    template <class T>                                             \
+    struct NAME##_fun                                              \
+    {                                                              \
+        using first_argument_type = T;                             \
+        using second_argument_type = T;                            \
+        using result_type = T;                                     \
+        constexpr T operator()(const T& arg1, const T& arg2) const \
+        {                                                          \
+            using std::NAME;                                       \
+            return NAME(arg1, arg2);                               \
+        }                                                          \
     }
 
-#define TERNARY_MATH_FUNCTOR(NAME)\
-    template <class T>\
-    struct NAME##_fun {\
-        using first_argument_type = T;\
-        using second_argument_type = T;\
-        using third_argument_type = T;\
-        using result_type = T;\
-        constexpr T operator()(const T& arg1, const T& arg2, const T& arg3) const {\
-            using std::NAME;\
-            return NAME(arg1, arg2, arg3);\
-        }\
+#define TERNARY_MATH_FUNCTOR(NAME)                                                \
+    template <class T>                                                            \
+    struct NAME##_fun                                                             \
+    {                                                                             \
+        using first_argument_type = T;                                            \
+        using second_argument_type = T;                                           \
+        using third_argument_type = T;                                            \
+        using result_type = T;                                                    \
+        constexpr T operator()(const T& arg1, const T& arg2, const T& arg3) const \
+        {                                                                         \
+            using std::NAME;                                                      \
+            return NAME(arg1, arg2, arg3);                                        \
+        }                                                                         \
     }
 
-#define UNARY_BOOL_FUNCTOR(NAME)\
-    template <class T>\
-    struct NAME##_fun {\
-        using argument_type = T;\
-        using result_type = typename xt::detail::bool_functor_return_type<T>::type;\
-        constexpr result_type operator()(const T& arg) const {\
-            using std::NAME;\
-            return NAME(arg);\
-        }\
+#define UNARY_BOOL_FUNCTOR(NAME)                                                    \
+    template <class T>                                                              \
+    struct NAME##_fun                                                               \
+    {                                                                               \
+        using argument_type = T;                                                    \
+        using result_type = typename xt::detail::bool_functor_return_type<T>::type; \
+        constexpr result_type operator()(const T& arg) const                        \
+        {                                                                           \
+            using std::NAME;                                                        \
+            return NAME(arg);                                                       \
+        }                                                                           \
     }
 
     namespace math
@@ -905,19 +915,19 @@ namespace xt
      * nearest integer floating point operations *
      *********************************************/
 
-     /**
-      * @defgroup nearint_functions Nearest integer floating point operations
-      */
+    /**
+     * @defgroup nearint_functions Nearest integer floating point operations
+     */
 
-      /**
-       * @ingroup nearint_functions
-       * @brief ceil function.
-       *
-       * Returns an \ref xfunction for the element-wise smallest integer value
-       * not less than \em e.
-       * @param e an \ref xexpression
-       * @return an \ref xfunction
-       */
+    /**
+     * @ingroup nearint_functions
+     * @brief ceil function.
+     *
+     * Returns an \ref xfunction for the element-wise smallest integer value
+     * not less than \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
     template <class E>
     inline auto ceil(E&& e) noexcept
         -> detail::xfunction_type_t<math::ceil_fun, E>
@@ -1015,7 +1025,7 @@ namespace xt
     /**
      * @defgroup classif_functions Classification functions
      */
-      
+
     /**
      * @ingroup classif_functions
      * @brief finite value check
@@ -1091,7 +1101,8 @@ namespace xt
             using result_type = bool;
             isclose(double rtol, double atol, bool equal_nan)
                 : m_rtol(rtol), m_atol(atol), m_equal_nan(equal_nan)
-            {}
+            {
+            }
 
             bool operator()(const T& a, const T& b) const
             {

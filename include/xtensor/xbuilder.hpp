@@ -164,6 +164,7 @@ namespace xt
             }
 
         private:
+
             F m_ft;
             template <class It>
             inline value_type access_impl(const It& begin, const It& end) const
@@ -191,6 +192,7 @@ namespace xt
             }
 
         private:
+
             int m_k;
         };
     }

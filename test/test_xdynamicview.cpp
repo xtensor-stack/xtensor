@@ -21,7 +21,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
@@ -64,7 +64,7 @@ namespace xt
     TEST(xdynview, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
-        std::vector<double> data {
+        std::vector<double> data{
             1, 2,
             3, 4,
             5, 6,
@@ -72,7 +72,7 @@ namespace xt
 
             9, 10,
             11, 12,
-            21, 22, 
+            21, 22,
             23, 24,
 
             25, 26,
@@ -91,7 +91,7 @@ namespace xt
         EXPECT_EQ(a(1, 0, 1), view1(0, 1));
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
         EXPECT_EQ(a(1, 1, 1), view1(1, 1));
-        
+
         std::array<std::size_t, 2> idx = {1, 1};
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
@@ -141,12 +141,12 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
-        std::vector<int> data {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
-        view_shape_type shape2 = { 3 };
+        view_shape_type shape2 = {3};
         xarray<int> b(shape2);
-        std::vector<int> data2 = { 1, 2, 3 };
+        std::vector<int> data2 = {1, 2, 3};
         std::copy(data2.cbegin(), data2.cend(), b.begin());
 
         auto func = dynamic_view(a, slice_vector(a, 1, range(1, 4))) + b;
@@ -164,8 +164,8 @@ namespace xt
 
     TEST(xdynview, xdynview_on_xtensor)
     {
-        xtensor<int, 2> a({ 3, 4 });
-        std::vector<int> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        xtensor<int, 2> a({3, 4});
+        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
@@ -182,7 +182,7 @@ namespace xt
         ++iter;
         EXPECT_EQ(8, *iter);
 
-        xarray<int> b({ 3 }, 2);
+        xarray<int> b({3}, 2);
         xtensor<int, 1> res = view1 + b;
         EXPECT_EQ(8, res(0));
         EXPECT_EQ(9, res(1));
@@ -191,18 +191,18 @@ namespace xt
 
     TEST(xdynview, const_view)
     {
-        const xtensor<double, 3> arr{ {1, 2, 3}, 2.5 };
-        xtensor<double, 2> arr2{ {2, 3}, 0.0 };
-        xtensor<double, 2> ref{ {2, 3}, 2.5 };
+        const xtensor<double, 3> arr{{1, 2, 3}, 2.5};
+        xtensor<double, 2> arr2{{2, 3}, 0.0};
+        xtensor<double, 2> ref{{2, 3}, 2.5};
         arr2 = dynamic_view(arr, slice_vector(arr, 0));
         EXPECT_EQ(ref, arr2);
     }
 
     TEST(xdynview, newaxis)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), newaxis(), all()));
@@ -241,18 +241,18 @@ namespace xt
         EXPECT_EQ(a(1, 2), view6(2, 0));
         EXPECT_EQ(2, view6.dimension());
 
-        std::array<std::size_t, 3> idx1 = { 1, 0, 2 };
+        std::array<std::size_t, 3> idx1 = {1, 0, 2};
         EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
 
-        std::array<std::size_t, 3> idx2 = { 1, 2, 0 };
+        std::array<std::size_t, 3> idx2 = {1, 2, 0};
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
     }
 
     TEST(xdynview, newaxis_iterating)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), all(), newaxis()));
@@ -318,9 +318,9 @@ namespace xt
 
     TEST(xdynview, newaxis_function)
     {
-        view_shape_type shape = { 3, 4 };
+        view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.begin());
 
         xarray<double> b(view_shape_type(1, 4));
@@ -331,7 +331,7 @@ namespace xt
         auto v = dynamic_view(b, slice_vector(b, newaxis(), all()));
         xarray<double> res = a + v;
 
-        std::vector<double> data2{ 2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16 };
+        std::vector<double> data2{2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16};
         xarray<double> expected(shape);
         std::copy(data2.cbegin(), data2.cend(), expected.begin());
 

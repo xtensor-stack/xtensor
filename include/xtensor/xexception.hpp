@@ -23,7 +23,6 @@ namespace xt
 
     class broadcast_error : public std::exception
     {
-
     public:
 
         template <class S1, class S2>
@@ -70,7 +69,6 @@ namespace xt
 
     class transpose_error : public std::exception
     {
-
     public:
 
         transpose_error(const std::string& msg);
@@ -87,7 +85,7 @@ namespace xt
      **********************************/
 
     inline transpose_error::transpose_error(const std::string& msg)
-        : m_message(msg){}
+        : m_message(msg) {}
 
     inline const char* transpose_error::what() const noexcept
     {
@@ -155,14 +153,15 @@ namespace xt
 
 #ifdef XTENSOR_ENABLE_ASSERT
 #define XTENSOR_ASSERT(expr) XTENSOR_ASSERT_IMPL(expr, __FILE__, __LINE__)
-#define XTENSOR_ASSERT_IMPL(expr, file, line)\
-    try {\
-        expr;\
-    }\
-    catch (std::exception& e)\
-    {\
-        throw std::runtime_error(std::string(file) + ':' + std::to_string(line)\
-            + ": check failed\n\t" + std::string(e.what()));\
+#define XTENSOR_ASSERT_IMPL(expr, file, line)                                                                                    \
+    try                                                                                                                          \
+    {                                                                                                                            \
+        expr;                                                                                                                    \
+    }                                                                                                                            \
+    catch (std::exception & e)                                                                                                   \
+    {                                                                                                                            \
+        throw std::runtime_error(std::string(file) + ':' + std::to_string(line)                                                  \
+            + ": check failed\n\t" + std::string(e.what()));                                                                     \
     }
 #else
 #define XTENSOR_ASSERT(expr)
