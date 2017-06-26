@@ -138,12 +138,12 @@ namespace xt
         template <class ST>
         stepper stepper_begin(const ST& shape);
         template <class ST>
-        stepper stepper_end(const ST& shape);
+        stepper stepper_end(const ST& shape, layout_type);
 
         template <class ST>
         const_stepper stepper_begin(const ST& shape) const;
         template <class ST>
-        const_stepper stepper_end(const ST& shape) const;
+        const_stepper stepper_end(const ST& shape, layout_type) const;
 
     private:
 
@@ -425,7 +425,7 @@ namespace xt
 
     template <class CT, class I>
     template <class ST>
-    inline auto xindexview<CT, I>::stepper_end(const ST& shape) -> stepper
+    inline auto xindexview<CT, I>::stepper_end(const ST& shape, layout_type) -> stepper
     {
         size_type offset = shape.size() - dimension();
         return stepper(this, offset, true);
@@ -441,7 +441,7 @@ namespace xt
 
     template <class CT, class I>
     template <class ST>
-    inline auto xindexview<CT, I>::stepper_end(const ST& shape) const -> const_stepper
+    inline auto xindexview<CT, I>::stepper_end(const ST& shape, layout_type) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset, true);

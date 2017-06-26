@@ -143,7 +143,7 @@ namespace xt
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
-        const_stepper stepper_end(const S& shape) const noexcept;
+        const_stepper stepper_end(const S& shape, layout_type) const noexcept;
 
     private:
 
@@ -228,7 +228,7 @@ namespace xt
         using substepper_type = typename xexpression_type::const_stepper;
         using shape_type = typename xreducer_type::shape_type;
 
-        xreducer_stepper(const xreducer_type& red, size_type offset, bool end = false);
+        xreducer_stepper(const xreducer_type& red, size_type offset, bool end = false, layout_type l = layout_type::row_major);
 
         reference operator*() const;
 
@@ -238,7 +238,7 @@ namespace xt
         void reset_back(size_type dim);
 
         void to_begin();
-        void to_end();
+        void to_end(layout_type l);
 
         bool equal(const self_type& rhs) const;
 
@@ -479,10 +479,10 @@ namespace xt
 
     template <class F, class CT, class X>
     template <class S>
-    inline auto xreducer<F, CT, X>::stepper_end(const S& shape) const noexcept -> const_stepper
+    inline auto xreducer<F, CT, X>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(*this, offset, true);
+        return const_stepper(*this, offset, true, l);
     }
 
     /***********************************
@@ -490,13 +490,13 @@ namespace xt
      ***********************************/
 
     template <class F, class CT, class X>
-    inline xreducer_stepper<F, CT, X>::xreducer_stepper(const xreducer_type& red, size_type offset, bool end)
+    inline xreducer_stepper<F, CT, X>::xreducer_stepper(const xreducer_type& red, size_type offset, bool end, layout_type l)
         : m_reducer(red), m_offset(offset),
           m_stepper(get_substepper_begin())
     {
         if (end)
         {
-            to_end();
+            to_end(l);
         }
     }
 
@@ -542,9 +542,9 @@ namespace xt
     }
 
     template <class F, class CT, class X>
-    inline void xreducer_stepper<F, CT, X>::to_end()
+    inline void xreducer_stepper<F, CT, X>::to_end(layout_type l)
     {
-        m_stepper.to_end();
+        m_stepper.to_end(l);
     }
 
     template <class F, class CT, class X>

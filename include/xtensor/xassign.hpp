@@ -44,7 +44,7 @@ namespace xt
      * data_assigner *
      *****************/
 
-    template <class E1, class E2>
+    template <class E1, class E2, layout_type L>
     class data_assigner
     {
     public:
@@ -62,7 +62,7 @@ namespace xt
         void step(size_type i);
         void reset(size_type i);
 
-        void to_end();
+        void to_end(layout_type);
 
     private:
 
@@ -107,7 +107,7 @@ namespace xt
         }
         else
         {
-            data_assigner<E1, E2> assigner(de1, de2);
+            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(de1, de2);
             assigner.run();
         }
     }
@@ -185,43 +185,43 @@ namespace xt
      * data_assigner implementation *
      ********************************/
 
-    template <class E1, class E2>
-    inline data_assigner<E1, E2>::data_assigner(E1& e1, const E2& e2)
+    template <class E1, class E2, layout_type L>
+    inline data_assigner<E1, E2, L>::data_assigner(E1& e1, const E2& e2)
         : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
-          m_rhs(e2.stepper_begin(e1.shape())), m_rhs_end(e2.stepper_end(e1.shape())),
+          m_rhs(e2.stepper_begin(e1.shape())), m_rhs_end(e2.stepper_end(e1.shape(), L)),
           m_index(make_sequence<index_type>(e1.shape().size(), size_type(0)))
     {
     }
 
-    template <class E1, class E2>
-    inline void data_assigner<E1, E2>::run()
+    template <class E1, class E2, layout_type L>
+    inline void data_assigner<E1, E2, L>::run()
     {
         while (m_rhs != m_rhs_end)
         {
             *m_lhs = *m_rhs;
-            stepper_tools<default_assignable_layout(E1::static_layout)>::increment_stepper(*this, m_index, m_e1.shape());
+            stepper_tools<L>::increment_stepper(*this, m_index, m_e1.shape());
         }
     }
 
-    template <class E1, class E2>
-    inline void data_assigner<E1, E2>::step(size_type i)
+    template <class E1, class E2, layout_type L>
+    inline void data_assigner<E1, E2, L>::step(size_type i)
     {
         m_lhs.step(i);
         m_rhs.step(i);
     }
 
-    template <class E1, class E2>
-    inline void data_assigner<E1, E2>::reset(size_type i)
+    template <class E1, class E2, layout_type L>
+    inline void data_assigner<E1, E2, L>::reset(size_type i)
     {
         m_lhs.reset(i);
         m_rhs.reset(i);
     }
 
-    template <class E1, class E2>
-    inline void data_assigner<E1, E2>::to_end()
+    template <class E1, class E2, layout_type L>
+    inline void data_assigner<E1, E2, L>::to_end(layout_type l)
     {
-        m_lhs.to_end();
-        m_rhs.to_end();
+        m_lhs.to_end(l);
+        m_rhs.to_end(l);
     }
 }
 

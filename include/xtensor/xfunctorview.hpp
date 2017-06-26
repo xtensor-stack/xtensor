@@ -253,11 +253,11 @@ namespace xt
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
         template <class S>
-        stepper stepper_end(const S& shape) noexcept;
+        stepper stepper_end(const S& shape, layout_type l) noexcept;
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
-        const_stepper stepper_end(const S& shape) const noexcept;
+        const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
     private:
 
@@ -362,7 +362,7 @@ namespace xt
         void reset_back(size_type dim);
 
         void to_begin();
-        void to_end();
+        void to_end(layout_type);
 
         bool equal(const xfunctor_stepper& rhs) const;
 
@@ -1068,9 +1068,9 @@ namespace xt
 
     template <class F, class CT>
     template <class S>
-    inline auto xfunctorview<F, CT>::stepper_end(const S& shape) noexcept -> stepper
+    inline auto xfunctorview<F, CT>::stepper_end(const S& shape, layout_type l) noexcept -> stepper
     {
-        return stepper(m_e.stepper_end(shape), &m_functor);
+        return stepper(m_e.stepper_end(shape, l), &m_functor);
     }
 
     template <class F, class CT>
@@ -1083,10 +1083,10 @@ namespace xt
 
     template <class F, class CT>
     template <class S>
-    inline auto xfunctorview<F, CT>::stepper_end(const S& shape) const noexcept -> const_stepper
+    inline auto xfunctorview<F, CT>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
         const xexpression_type& const_m_e = m_e;
-        return const_stepper(const_m_e.stepper_end(shape), &m_functor);
+        return const_stepper(const_m_e.stepper_end(shape, l), &m_functor);
     }
 
     /************************************
@@ -1193,9 +1193,9 @@ namespace xt
     }
 
     template <class F, class ST>
-    void xfunctor_stepper<F, ST>::to_end()
+    void xfunctor_stepper<F, ST>::to_end(layout_type l)
     {
-        m_stepper.to_end();
+        m_stepper.to_end(l);
     }
 
     template <class F, class ST>
