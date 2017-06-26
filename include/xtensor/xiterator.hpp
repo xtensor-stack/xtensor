@@ -407,15 +407,19 @@ namespace xt
         while (i != 0)
         {
             --i;
-            if (++index[i] != shape[i])
+            if (index[i] != shape[i] - 1)
             {
+                ++index[i];
                 stepper.step(i);
                 return;
             }
-            else if (i != 0)
+            else
             {
                 index[i] = 0;
-                stepper.reset(i);
+                if (i != 0)
+                {
+                    stepper.reset(i);
+                }
             }
         }
         if (i == 0)
@@ -441,10 +445,13 @@ namespace xt
                 stepper.step_back(i);
                 return;
             }
-            else if (i != 0)
+            else
             {
                 index[i] = shape[i] - 1;
-                stepper.reset_back(i);
+                if (i != 0)
+                {
+                     stepper.reset_back(i);
+                }
             }
         }
         if (i == 0)
@@ -462,17 +469,21 @@ namespace xt
         using size_type = typename S::size_type;
         size_type size = index.size();
         size_type i = 0;
-        while (i < size)
+        while (i != size)
         {
-            if (++index[i] != shape[i])
+            if (index[i] != shape[i] - 1)
             {
+                ++index[i];
                 stepper.step(i);
                 return;
             }
-            else if (i != size - 1)
+            else
             {
                 index[i] = 0;
-                stepper.reset(i);
+                if (i != size - 1)
+                {
+                    stepper.reset(i);
+                }
             }
             ++i;
         }
@@ -491,7 +502,7 @@ namespace xt
         using size_type = typename S::size_type;
         size_type size = index.size();
         size_type i = 0;
-        while (i < size)
+        while (i != size)
         {
             if (index[i] != 0)
             {
@@ -499,10 +510,13 @@ namespace xt
                 stepper.step_back(i);
                 return;
             }
-            else if (i != size - 1)
+            else
             {
                 index[i] = shape[i] - 1;
-                stepper.reset_back(i);
+                if (i != size - 1)
+                {
+                    stepper.reset_back(i);
+                }
             }
             ++i;
         }
@@ -641,9 +655,9 @@ namespace xt
     {
         if (reverse)
         {
-            auto iter_end = m_index.end() - 1;
-            std::transform(m_index.begin(), iter_end, m_index.begin(),
-                           [](const auto& v) { return v - 1; });
+            auto iter_begin = (L == layout_type::row_major)  ? m_index.begin() : m_index.begin() + 1;
+            auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
+            std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
         }
     }
 
