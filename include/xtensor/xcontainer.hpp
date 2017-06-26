@@ -661,7 +661,7 @@ namespace xt
     inline auto xcontainer<D>::stepper_begin(const S& shape) noexcept -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return stepper(static_cast<derived_type*>(this), data().begin(), offset);
+        return stepper(static_cast<derived_type*>(this), data_xbegin(), offset);
     }
 
     template <class D>
@@ -677,7 +677,7 @@ namespace xt
     inline auto xcontainer<D>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(static_cast<const derived_type*>(this), data().begin(), offset);
+        return const_stepper(static_cast<const derived_type*>(this), data_xbegin(), offset);
     }
 
     template <class D>

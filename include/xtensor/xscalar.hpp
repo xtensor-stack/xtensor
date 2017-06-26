@@ -195,9 +195,9 @@ namespace xt
     bool operator!=(const xscalar_stepper<is_const, CT>& lhs,
                     const xscalar_stepper<is_const, CT>& rhs) noexcept;
 
-    /********************
+    /*******************
      * xdummy_iterator *
-     ********************/
+     *******************/
 
     template <bool is_const, class CT>
     class xdummy_iterator
@@ -541,9 +541,9 @@ namespace xt
         return !(lhs.equal(rhs));
     }
 
-    /***********************************
+    /**********************************
      * xdummy_iterator implementation *
-     ***********************************/
+     **********************************/
 
     template <bool is_const, class CT>
     inline xdummy_iterator<is_const, CT>::xdummy_iterator(container_type* c) noexcept

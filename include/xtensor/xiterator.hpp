@@ -461,7 +461,8 @@ namespace xt
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
-        for (size_type i = 0; i < size; ++i)
+        size_type i = 0;
+        while (i < size)
         {
             if (++index[i] != shape[i])
             {
@@ -473,10 +474,11 @@ namespace xt
                 index[i] = 0;
                 stepper.reset(i);
             }
-            else
-            {
-                stepper.to_end();
-            }
+            ++i;
+        }
+        if (i == size)
+        {
+            stepper.to_end();
         }
     }
 

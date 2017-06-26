@@ -617,6 +617,7 @@ namespace xt
     {
         return derived_cast().stepper_begin(shape);
     }
+
     template <class D>
     template <class S>
     inline auto xconst_iterable<D>::get_stepper_end(const S& shape) const noexcept -> const_stepper
