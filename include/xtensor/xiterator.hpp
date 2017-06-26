@@ -9,7 +9,11 @@
 #ifndef XITERATOR_HPP
 #define XITERATOR_HPP
 
+#include <array>
+#include <algorithm>
+#include <cstddef>
 #include <iterator>
+#include <vector>
 
 #include "xexception.hpp"
 #include "xlayout.hpp"
@@ -431,25 +435,21 @@ namespace xt
         while (i != 0)
         {
             --i;
-            if (index[i] == 0)
-            {
-                if (i != 0)
-                {
-                    index[i] = shape[i] - 1;
-                    stepper.reset_back(i);
-                }
-                else
-                {
-                    std::fill(index.begin(), index.end(), size_type(0));
-                    stepper.to_begin();
-                }
-            }
-            else
+            if (index[i] != 0)
             {
                 --index[i];
                 stepper.step_back(i);
                 return;
             }
+            else if (i != 0)
+            {
+                index[i] = shape[i] - 1;
+                stepper.reset_back(i);
+            }
+        }
+        if (i == 0)
+        {
+            stepper.to_begin();
         }
     }
 
@@ -490,27 +490,25 @@ namespace xt
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
-        for (size_type i = 0; i < size; ++i)
+        size_type i = 0;
+        while (i < size)
         {
-            if (index[i] == 0)
-            {
-                if (i != size - 1)
-                {
-                    index[i] = shape[i] - 1;
-                    stepper.reset_back(i);
-                }
-                else
-                {
-                    std::fill(index.begin(), index.end(), size_type(0));
-                    stepper.to_begin();
-                }
-            }
-            else
+            if (index[i] != 0)
             {
                 --index[i];
                 stepper.step_back(i);
                 return;
             }
+            else if (i != size - 1)
+            {
+                index[i] = shape[i] - 1;
+                stepper.reset_back(i);
+            }
+            ++i;
+        }
+        if (i == size)
+        {
+            stepper.to_begin();
         }
     }
 
@@ -565,6 +563,7 @@ namespace xt
     {
         std::fill(m_index.begin(), m_index.end(), size_type(0));
     }
+
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::to_end()
     {
