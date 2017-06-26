@@ -107,7 +107,7 @@ namespace xt
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
         template <class O>
-        const_stepper stepper_end(const O& shape) const noexcept;
+        const_stepper stepper_end(const O& shape, layout_type) const noexcept;
 
     private:
 
@@ -260,7 +260,7 @@ namespace xt
 
     template <class F, class R, class S>
     template <class O>
-    inline auto xgenerator<F, R, S>::stepper_end(const O& shape) const noexcept -> const_stepper
+    inline auto xgenerator<F, R, S>::stepper_end(const O& shape, layout_type) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset, true);

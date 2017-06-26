@@ -120,12 +120,12 @@ namespace xt
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
         template <class S>
-        stepper stepper_end(const S& shape) noexcept;
+        stepper stepper_end(const S& shape, layout_type l) noexcept;
 
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
-        const_stepper stepper_end(const S& shape) const noexcept;
+        const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
         dummy_iterator dummy_begin() noexcept;
         dummy_iterator dummy_end() noexcept;
@@ -178,7 +178,7 @@ namespace xt
         void reset_back(size_type dim) noexcept;
 
         void to_begin() noexcept;
-        void to_end() noexcept;
+        void to_end(layout_type l) noexcept;
 
         bool equal(const self_type& rhs) const noexcept;
 
@@ -418,7 +418,7 @@ namespace xt
 
     template <class CT>
     template <class S>
-    inline auto xscalar<CT>::stepper_end(const S&) noexcept -> stepper
+    inline auto xscalar<CT>::stepper_end(const S&, layout_type) noexcept -> stepper
     {
         return stepper(this + 1);
     }
@@ -432,7 +432,7 @@ namespace xt
 
     template <class CT>
     template <class S>
-    inline auto xscalar<CT>::stepper_end(const S&) const noexcept -> const_stepper
+    inline auto xscalar<CT>::stepper_end(const S&, layout_type) const noexcept -> const_stepper
     {
         return const_stepper(this + 1);
     }
@@ -516,9 +516,9 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline void xscalar_stepper<is_const, CT>::to_end() noexcept
+    inline void xscalar_stepper<is_const, CT>::to_end(layout_type l) noexcept
     {
-        p_c = p_c->stepper_end(p_c->shape()).p_c;
+        p_c = p_c->stepper_end(p_c->shape(), l).p_c;
     }
 
     template <bool is_const, class CT>

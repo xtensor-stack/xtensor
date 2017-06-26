@@ -125,7 +125,7 @@ namespace xt
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
-        const_stepper stepper_end(const S& shape) const noexcept;
+        const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
     private:
         CT m_e;
@@ -326,10 +326,10 @@ namespace xt
 
     template <class CT, class X>
     template <class S>
-    inline auto xbroadcast<CT, X>::stepper_end(const S& shape) const noexcept -> const_stepper
+    inline auto xbroadcast<CT, X>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
         // Could check if (broadcastable(shape, m_shape)
-        return m_e.stepper_end(shape);
+        return m_e.stepper_end(shape, l);
     }
 }
 

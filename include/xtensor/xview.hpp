@@ -142,12 +142,12 @@ namespace xt
         template <class ST>
         stepper stepper_begin(const ST& shape);
         template <class ST>
-        stepper stepper_end(const ST& shape);
+        stepper stepper_end(const ST& shape, layout_type l);
 
         template <class ST>
         const_stepper stepper_begin(const ST& shape) const;
         template <class ST>
-        const_stepper stepper_end(const ST& shape) const;
+        const_stepper stepper_end(const ST& shape, layout_type l) const;
 
         template <class T = xexpression_type>
         std::enable_if_t<has_raw_data_interface<T>::value, const typename T::container_type&>
@@ -273,7 +273,7 @@ namespace xt
         void reset_back(size_type dim);
 
         void to_begin();
-        void to_end();
+        void to_end(layout_type);
 
         bool equal(const xview_stepper& rhs) const;
 
@@ -759,10 +759,10 @@ namespace xt
 
     template <class CT, class... S>
     template <class ST>
-    inline auto xview<CT, S...>::stepper_end(const ST& shape) -> stepper
+    inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return stepper(this, m_e.stepper_end(m_e.shape()), offset, true);
+        return stepper(this, m_e.stepper_end(m_e.shape(), l), offset, true);
     }
 
     template <class CT, class... S>
@@ -776,11 +776,11 @@ namespace xt
 
     template <class CT, class... S>
     template <class ST>
-    inline auto xview<CT, S...>::stepper_end(const ST& shape) const -> const_stepper
+    inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) const -> const_stepper
     {
         size_type offset = shape.size() - dimension();
         const xexpression_type& e = m_e;
-        return const_stepper(this, e.stepper_end(m_e.shape()), offset, true);
+        return const_stepper(this, e.stepper_end(m_e.shape(), l), offset, true);
     }
 
     /********************************
@@ -852,9 +852,9 @@ namespace xt
     }
 
     template <bool is_const, class CT, class... S>
-    inline void xview_stepper<is_const, CT, S...>::to_end()
+    inline void xview_stepper<is_const, CT, S...>::to_end(layout_type l)
     {
-        m_it.to_end();
+        m_it.to_end(l);
         to_end_impl();
     }
 

@@ -186,7 +186,7 @@ namespace xt
         template <class S>
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
-        const_stepper stepper_end(const S& shape) const noexcept;
+        const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
     private:
 
@@ -328,7 +328,7 @@ namespace xt
         void reset_back(size_type dim);
 
         void to_begin();
-        void to_end();
+        void to_end(layout_type l);
 
         reference operator*() const;
 
@@ -598,9 +598,9 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <class S>
-    inline auto xfunction<F, R, CT...>::stepper_end(const S& shape) const noexcept -> const_stepper
+    inline auto xfunction<F, R, CT...>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
-        auto f = [&shape](const auto& e) noexcept { return e.stepper_end(shape); };
+        auto f = [&shape, l](const auto& e) noexcept { return e.stepper_end(shape, l); };
         return build_stepper(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
@@ -769,9 +769,9 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline void xfunction_stepper<F, R, CT...>::to_end()
+    inline void xfunction_stepper<F, R, CT...>::to_end(layout_type l)
     {
-        auto f = [](auto& it) { it.to_end(); };
+        auto f = [l](auto& it) { it.to_end(l); };
         for_each(f, m_it);
     }
 

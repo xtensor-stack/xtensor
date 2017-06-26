@@ -107,7 +107,7 @@ namespace xt
         void reset_back(size_type dim);
 
         void to_begin();
-        void to_end();
+        void to_end(layout_type l);
 
         bool equal(const xstepper& rhs) const;
 
@@ -177,7 +177,7 @@ namespace xt
         void reset_back(size_type dim);
 
         void to_begin();
-        void to_end();
+        void to_end(layout_type l);
 
         bool equal(const self_type& rhs) const;
 
@@ -371,9 +371,9 @@ namespace xt
     }
 
     template <class C>
-    inline void xstepper<C>::to_end()
+    inline void xstepper<C>::to_end(layout_type l)
     {
-        m_it = p_c->data_xend();
+        m_it = p_c->data_xend(l);
     }
 
     template <class C>
@@ -424,7 +424,7 @@ namespace xt
         }
         if (i == 0)
         {
-            stepper.to_end();
+            stepper.to_end(layout_type::row_major);
         }
     }
 
@@ -489,7 +489,7 @@ namespace xt
         }
         if (i == size)
         {
-            stepper.to_end();
+            stepper.to_end(layout_type::column_major);
         }
     }
 
@@ -535,7 +535,7 @@ namespace xt
         : p_e(e), m_index(make_sequence<index_type>(e->shape().size(), size_type(0))), m_offset(offset)
     {
         if (end)
-            to_end();
+            to_end(layout_type::row_major);
     }
 
     template <class C, bool is_const>
@@ -579,7 +579,7 @@ namespace xt
     }
 
     template <class C, bool is_const>
-    inline void xindexed_stepper<C, is_const>::to_end()
+    inline void xindexed_stepper<C, is_const>::to_end(layout_type)
     {
         m_index = p_e->shape();
     }
