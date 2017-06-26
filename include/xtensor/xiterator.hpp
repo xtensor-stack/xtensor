@@ -9,7 +9,11 @@
 #ifndef XITERATOR_HPP
 #define XITERATOR_HPP
 
+#include <array>
+#include <algorithm>
+#include <cstddef>
 #include <iterator>
+#include <vector>
 
 #include "xexception.hpp"
 #include "xlayout.hpp"
@@ -403,15 +407,19 @@ namespace xt
         while (i != 0)
         {
             --i;
-            if (++index[i] != shape[i])
+            if (index[i] != shape[i] - 1)
             {
+                ++index[i];
                 stepper.step(i);
                 return;
             }
-            else if (i != 0)
+            else
             {
                 index[i] = 0;
-                stepper.reset(i);
+                if (i != 0)
+                {
+                    stepper.reset(i);
+                }
             }
         }
         if (i == 0)
@@ -431,25 +439,24 @@ namespace xt
         while (i != 0)
         {
             --i;
-            if (index[i] == 0)
-            {
-                if (i != 0)
-                {
-                    index[i] = shape[i] - 1;
-                    stepper.reset_back(i);
-                }
-                else
-                {
-                    std::fill(index.begin(), index.end(), size_type(0));
-                    stepper.to_begin();
-                }
-            }
-            else
+            if (index[i] != 0)
             {
                 --index[i];
                 stepper.step_back(i);
                 return;
             }
+            else
+            {
+                index[i] = shape[i] - 1;
+                if (i != 0)
+                {
+                     stepper.reset_back(i);
+                }
+            }
+        }
+        if (i == 0)
+        {
+            stepper.to_begin();
         }
     }
 
@@ -461,22 +468,28 @@ namespace xt
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
-        for (size_type i = 0; i < size; ++i)
+        size_type i = 0;
+        while (i != size)
         {
-            if (++index[i] != shape[i])
+            if (index[i] != shape[i] - 1)
             {
+                ++index[i];
                 stepper.step(i);
                 return;
             }
-            else if (i != size - 1)
-            {
-                index[i] = 0;
-                stepper.reset(i);
-            }
             else
             {
-                stepper.to_end();
+                index[i] = 0;
+                if (i != size - 1)
+                {
+                    stepper.reset(i);
+                }
             }
+            ++i;
+        }
+        if (i == size)
+        {
+            stepper.to_end();
         }
     }
 
@@ -488,27 +501,28 @@ namespace xt
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
-        for (size_type i = 0; i < size; ++i)
+        size_type i = 0;
+        while (i != size)
         {
-            if (index[i] == 0)
-            {
-                if (i != size - 1)
-                {
-                    index[i] = shape[i] - 1;
-                    stepper.reset_back(i);
-                }
-                else
-                {
-                    std::fill(index.begin(), index.end(), size_type(0));
-                    stepper.to_begin();
-                }
-            }
-            else
+            if (index[i] != 0)
             {
                 --index[i];
                 stepper.step_back(i);
                 return;
             }
+            else
+            {
+                index[i] = shape[i] - 1;
+                if (i != size - 1)
+                {
+                    stepper.reset_back(i);
+                }
+            }
+            ++i;
+        }
+        if (i == size)
+        {
+            stepper.to_begin();
         }
     }
 
@@ -563,6 +577,7 @@ namespace xt
     {
         std::fill(m_index.begin(), m_index.end(), size_type(0));
     }
+
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::to_end()
     {
@@ -640,9 +655,9 @@ namespace xt
     {
         if (reverse)
         {
-            auto iter_end = m_index.end() - 1;
-            std::transform(m_index.begin(), iter_end, m_index.begin(),
-                           [](const auto& v) { return v - 1; });
+            auto iter_begin = (L == layout_type::row_major)  ? m_index.begin() : m_index.begin() + 1;
+            auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
+            std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
         }
     }
 
