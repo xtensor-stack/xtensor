@@ -550,11 +550,12 @@ namespace xt
         vec.reshape(rm.m_shape, layout_type::row_major);
         indexed_assign_array(vec, rm.m_assigner);
         size_t nb_iter = vec.size() / 2;
+        using shape_type = std::vector<size_t>;
 
         // broadcast_iterator
         {
-            auto iter = vec.xbegin();
-            auto iter_end = vec.xend();
+            auto iter = vec.template xbegin<layout_type::row_major>();
+            auto iter_end = vec.template xend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[nb_iter], *iter);
@@ -565,11 +566,11 @@ namespace xt
 
         // shaped_xiterator
         {
-            std::vector<size_t> shape(rm.m_shape.size() + 1);
+            shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.xbegin(shape);
-            auto iter_end = vec.xend(shape);
+            auto iter = vec.template xbegin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = vec.template xend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[0], *iter);
@@ -592,7 +593,6 @@ namespace xt
 
         // column shaped_xiterator
         {
-            using shape_type = std::vector<size_t>;
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
@@ -617,8 +617,8 @@ namespace xt
 
         // broadcast_iterator
         {
-            auto iter = vec.xrbegin();
-            auto iter_end = vec.xrend();
+            auto iter = vec.template xrbegin<layout_type::row_major>();
+            auto iter_end = vec.template xrend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[nb_iter - 1], *iter);
@@ -629,11 +629,12 @@ namespace xt
 
         // shaped_xiterator
         {
-            std::vector<size_t> shape(rm.m_shape.size() + 1);
+            using shape_type = std::vector<size_t>;
+            shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.xrbegin(shape);
-            auto iter_end = vec.xrend(shape);
+            auto iter = vec.template xrbegin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = vec.template xrend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[2 * nb_iter - 1], *iter);

@@ -62,11 +62,12 @@ namespace xt
         xarray<int> m1 = {1, 2, 3};
         auto m1_broadcast = broadcast(m1, {2, 3});
         size_t nb_iter = 3;
+        using shape_type = std::vector<size_t>;
 
         // broadcast_iterator
         {
-            auto iter = m1_broadcast.xbegin();
-            auto iter_end = m1_broadcast.xend();
+            auto iter = m1_broadcast.template xbegin<layout_type::row_major>();
+            auto iter_end = m1_broadcast.template xend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(1, *iter);
@@ -77,9 +78,9 @@ namespace xt
 
         // shaped_xiterator
         {
-            std::vector<size_t> shape = {2, 2, 3};
-            auto iter = m1_broadcast.xbegin(shape);
-            auto iter_end = m1_broadcast.xend(shape);
+            shape_type shape = {2, 2, 3};
+            auto iter = m1_broadcast.template xbegin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = m1_broadcast.template xend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(1, *iter);
@@ -94,11 +95,12 @@ namespace xt
         xarray<int> m1 = {1, 2, 3};
         auto m1_broadcast = broadcast(m1, {2, 3});
         size_t nb_iter = 3;
+        using shape_type = std::vector<size_t>;
 
         // reverse_broadcast_iterator
         {
-            auto iter = m1_broadcast.xrbegin();
-            auto iter_end = m1_broadcast.xrend();
+            auto iter = m1_broadcast.template xrbegin<layout_type::row_major>();
+            auto iter_end = m1_broadcast.template xrend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(3, *iter);
@@ -109,9 +111,9 @@ namespace xt
 
         // reverse_shaped_xiterator
         {
-            std::vector<size_t> shape = {2, 2, 3};
-            auto iter = m1_broadcast.xrbegin(shape);
-            auto iter_end = m1_broadcast.xrend(shape);
+            shape_type shape = {2, 2, 3};
+            auto iter = m1_broadcast.template xrbegin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = m1_broadcast.template xrend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(3, *iter);

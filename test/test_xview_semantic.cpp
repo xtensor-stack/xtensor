@@ -10,6 +10,7 @@
 #include "xtensor/xview.hpp"
 #include "test_xsemantic.hpp"
 #include "xtensor/xnoalias.hpp"
+
 namespace xt
 {
     using xarray_dynamic = xarray<int, layout_type::dynamic>;

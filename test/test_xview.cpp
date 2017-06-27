@@ -45,7 +45,7 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));
@@ -105,7 +105,7 @@ namespace xt
             211, 212
         };
         xarray<double> a(shape);
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, 1);
         EXPECT_EQ(2, view1.dimension());
@@ -169,14 +169,14 @@ namespace xt
     TEST(xview, iterator)
     {
         view_shape_type shape = {2, 3, 4};
-        xarray<double> a(shape);
+        xarray<double, layout_type::row_major> a(shape);
         std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
                                  13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
-        auto iter = view1.xbegin();
-        auto iter_end = view1.xend();
+        auto iter = view1.template xbegin<layout_type::row_major>();
+        auto iter_end = view1.template xend<layout_type::row_major>();
 
         EXPECT_EQ(6, *iter);
         ++iter;
@@ -193,8 +193,8 @@ namespace xt
         EXPECT_EQ(iter, iter_end);
 
         auto view2 = view(view1, range(0, 2), range(1, 3));
-        auto iter2 = view2.xbegin();
-        auto iter_end2 = view2.xend();
+        auto iter2 = view2.template xbegin<layout_type::row_major>();
+        auto iter_end2 = view2.template xend<layout_type::row_major>();
 
         EXPECT_EQ(7, *iter2);
         ++iter2;
@@ -210,14 +210,14 @@ namespace xt
     TEST(xview, reverse_iterator)
     {
         view_shape_type shape = {2, 3, 4};
-        xarray<double> a(shape);
+        xarray<double, layout_type::row_major> a(shape);
         std::vector<double> data{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
             13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
-        auto iter = view1.xrbegin();
-        auto iter_end = view1.xrend();
+        auto iter = view1.template xrbegin<layout_type::row_major>();
+        auto iter_end = view1.template xrend<layout_type::row_major>();
 
         EXPECT_EQ(20, *iter);
         ++iter;
@@ -234,8 +234,8 @@ namespace xt
         EXPECT_EQ(iter, iter_end);
 
         auto view2 = view(view1, range(0, 2), range(1, 3));
-        auto iter2 = view2.xrbegin();
-        auto iter_end2 = view2.xrend();
+        auto iter2 = view2.template xrbegin<layout_type::row_major>();
+        auto iter_end2 = view2.template xrend<layout_type::row_major>();
 
         EXPECT_EQ(20, *iter2);
         ++iter2;
@@ -253,12 +253,12 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
         std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         view_shape_type shape2 = {4};
         xarray<int> b(shape2);
         std::vector<int> data2 = {1, 2, 3, 4};
-        std::copy(data2.cbegin(), data2.cend(), b.begin());
+        std::copy(data2.cbegin(), data2.cend(), b.template xbegin<layout_type::row_major>());
 
         auto v = view(a + b, 1, range(1, 4));
         auto iter = v.xbegin();
@@ -277,15 +277,15 @@ namespace xt
     {
         xtensor<int, 2> a({3, 4});
         std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(1, view1.dimension());
 
-        auto iter = view1.xbegin();
-        auto iter_end = view1.xend();
+        auto iter = view1.template xbegin<layout_type::row_major>();
+        auto iter_end = view1.template xend<layout_type::row_major>();
 
         EXPECT_EQ(6, *iter);
         ++iter;
@@ -339,7 +339,7 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, all(), newaxis(), all());
         EXPECT_EQ(a(1, 1), view1(1, 0, 1));
@@ -389,11 +389,11 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, all(), all(), newaxis());
-        auto iter1 = view1.xbegin();
-        auto iter1_end = view1.xend();
+        auto iter1 = view1.template xbegin<layout_type::row_major>();
+        auto iter1_end = view1.template xend<layout_type::row_major>();
 
         EXPECT_EQ(a(0, 0), *iter1);
         ++iter1;
@@ -422,8 +422,8 @@ namespace xt
         EXPECT_EQ(iter1_end, iter1);
 
         auto view2 = view(a, all(), newaxis(), all());
-        auto iter2 = view2.xbegin();
-        auto iter2_end = view2.xend();
+        auto iter2 = view2.template xbegin<layout_type::row_major>();
+        auto iter2_end = view2.template xend<layout_type::row_major>();
 
         EXPECT_EQ(a(0, 0), *iter2);
         ++iter2;
@@ -457,17 +457,17 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.begin());
+        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         xarray<double> b(view_shape_type(1, 4));
-        std::copy(data.cbegin(), data.cbegin() + 4, b.begin());
+        std::copy(data.cbegin(), data.cbegin() + 4, b.template xbegin<layout_type::row_major>());
 
         auto v = view(b, newaxis(), all());
         xarray<double> res = a + v;
 
         std::vector<double> data2{2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16};
         xarray<double> expected(shape);
-        std::copy(data2.cbegin(), data2.cend(), expected.begin());
+        std::copy(data2.cbegin(), data2.cend(), expected.template xbegin<layout_type::row_major>());
 
         EXPECT_EQ(expected, res);
     }

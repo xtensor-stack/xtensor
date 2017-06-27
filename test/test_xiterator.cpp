@@ -25,8 +25,8 @@ namespace xt
         size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
         int expected = a(1, 0, 1);
 
-        auto iter = a.xbegin();
-        auto iter2 = a.xbegin();
+        auto iter = a.template xbegin<layout_type::row_major>();
+        auto iter2 = a.template xbegin<layout_type::row_major>();
         for (size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
@@ -204,8 +204,8 @@ namespace xt
         size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
         int expected = a(1, 1, 2);
 
-        auto iter = a.xrbegin();
-        auto iter2 = a.xrbegin();
+        auto iter = a.template xrbegin<layout_type::row_major>();
+        auto iter2 = a.template xrbegin<layout_type::row_major>();
         for (size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
