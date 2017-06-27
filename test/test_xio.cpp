@@ -83,7 +83,7 @@ namespace xt
     TEST(xio, random_nan_inf)
     {
         xt::random::seed(123);
-        xt::xarray<double> rn = xt::random::rand<double>({20, 20}, -10, 10);
+        xt::xarray<double, layout_type::row_major> rn = xt::random::rand<double>({20, 20}, -10, 10);
         rn(1, 1) = -1;
         rn(1, 2) = +1;
         rn(1, 1) = -1;
@@ -99,7 +99,7 @@ namespace xt
     TEST(xio, big_exp)
     {
         xt::random::seed(123);
-        xt::xarray<double> rn = xt::random::rand<double>({5, 4}, -10, 10);
+        xt::xarray<double, layout_type::row_major> rn = xt::random::rand<double>({5, 4}, -10, 10);
         rn(1, 1) = 1e220;
         rn(1, 2) = 1e-124;
 
@@ -112,7 +112,7 @@ namespace xt
     TEST(xio, precision)
     {
         xt::random::seed(123);
-        xt::xarray<double> rn = xt::random::rand<double>({5, 4}, -10, 10);
+        xt::xarray<double, layout_type::row_major> rn = xt::random::rand<double>({5, 4}, -10, 10);
 
         std::stringstream out;
         out << std::setprecision(12) << rn;
@@ -122,7 +122,7 @@ namespace xt
     TEST(xio, bool_fn)
     {
         xt::random::seed(123);
-        xt::xarray<double> rn = xt::random::rand<double>({5, 5}, -10, 10);
+        xt::xarray<double, layout_type::row_major> rn = xt::random::rand<double>({5, 5}, -10, 10);
 
         std::stringstream out;
         out << (rn > 0);
@@ -167,7 +167,7 @@ namespace xt
     TEST(xio, options)
     {
         xt::random::seed(123);
-        xt::xarray<double> rn = xt::random::rand<double>({100, 100}, -10, 10);
+        xt::xarray<double, layout_type::row_major> rn = xt::random::rand<double>({100, 100}, -10, 10);
 
         xt::print_options::set_line_width(150);
         xt::print_options::set_edge_items(10);
@@ -223,9 +223,9 @@ namespace xt
     TEST(xio, complex)
     {
         xt::random::seed(123);
-        xt::xarray<double> real = xt::random::rand<double>({10, 10}, -10, 10);
-        xt::xarray<double> imag = xt::random::rand<double>({10, 10}, -5, 5);
-        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1));
+        xt::xarray<double, layout_type::row_major> real = xt::random::rand<double>({10, 10}, -10, 10);
+        xt::xarray<double, layout_type::row_major> imag = xt::random::rand<double>({10, 10}, -5, 5);
+        xt::xarray<std::complex<double>, layout_type::row_major> e = real + (imag * std::complex<double>(0, 1));
 
         std::stringstream out;
         out << e;
@@ -235,9 +235,9 @@ namespace xt
     TEST(xio, complex_zero_erasing)
     {
         xt::random::seed(123);
-        xt::xarray<double> real = xt::random::rand<double>({10, 10}) - 0.5;
-        xt::xarray<double> imag = xt::random::rand<double>({10, 10}) - 0.5;
-        xt::xarray<std::complex<double>> e = real + (imag * std::complex<double>(0, 1));
+        xt::xarray<double, layout_type::row_major> real = xt::random::rand<double>({10, 10}) - 0.5;
+        xt::xarray<double, layout_type::row_major> imag = xt::random::rand<double>({10, 10}) - 0.5;
+        xt::xarray<std::complex<double>, layout_type::row_major> e = real + (imag * std::complex<double>(0, 1));
 
         std::stringstream out;
         out << e;

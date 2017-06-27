@@ -172,8 +172,7 @@ namespace xt
 
     TEST(xbuilder, concatenate)
     {
-        xarray<double> a = arange<double>(12);
-        a.reshape({2, 2, 3});
+        xarray<double> a = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
 
         auto c = concatenate(xtuple(a, a, a), 2);
 
@@ -202,8 +201,7 @@ namespace xt
 
     TEST(xbuilder, stack)
     {
-        xarray<double> a = arange<double>(12);
-        a.reshape({2, 2, 3});
+        xarray<double> a = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
 
         auto c = stack(xtuple(a, a, a), 2);
 
@@ -229,8 +227,7 @@ namespace xt
         ASSERT_EQ(3, l(2, 0));
 
         auto t = stack(xtuple(arange(3), arange(3, 6), arange(6, 9)));
-        xarray<double> ar = arange(9);
-        ar.reshape({3, 3});
+        xarray<double> ar = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
         ASSERT_TRUE(t == ar);
     }
 
@@ -245,8 +242,7 @@ namespace xt
 
     TEST(xbuilder, triu)
     {
-        xarray<double> e = xt::arange<double>(1, 10);
-        e.reshape({3, 3});
+        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::triu(e);
 
         xarray<double> expected = {{1, 2, 3},
@@ -276,8 +272,7 @@ namespace xt
 
     TEST(xbuilder, tril)
     {
-        xarray<double> e = xt::arange<double>(1, 10);
-        e.reshape({3, 3});
+        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::tril(e);
 
         xarray<double> expected = {{1, 0, 0},
@@ -307,15 +302,14 @@ namespace xt
 
     TEST(xbuilder, diagonal)
     {
-        xarray<double> e = xt::arange<double>(1, 10);
-        e.reshape({3, 3});
+        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+
         xarray<double> t = xt::diagonal(e);
 
         xarray<double> expected = {1, 5, 9};
         ASSERT_EQ(expected, t);
 
-        xt::xarray<double> f = xt::arange(12);
-        f.reshape({4, 3});
+        xt::xarray<double> f = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}, {9, 10, 11}};
 
         xarray<double> exp_1 = {1, 5};
         ASSERT_TRUE(all(equal(exp_1, xt::diagonal(f, 1))));
@@ -329,8 +323,10 @@ namespace xt
 
     TEST(xbuilder, diagonal_advanced)
     {
-        xarray<double> e = xt::arange<double>(0, 24);
-        e.reshape({2, 2, 2, 3});
+        xarray<double> e = {{{{0, 1, 2}, {3, 4, 5}}, 
+                             {{6, 7, 8}, {9, 10, 11}}},
+                            {{{12, 13, 14}, {15, 16, 17}}, 
+                             {{18, 19, 20}, {21, 22, 23}}}};
 
         xarray<double> d1 = xt::diagonal(e);
 
@@ -345,7 +341,7 @@ namespace xt
         std::vector<double> d2 = {6, 7, 8, 9, 10, 11};
         xarray<double> expected_2;
         expected_2.reshape({2, 3, 1});
-        std::copy(d2.begin(), d2.end(), expected_2.data().begin());
+        std::copy(d2.begin(), d2.end(), expected_2.template xbegin<layout_type::row_major>());
 
         xarray<double> t2 = xt::diagonal(e, 1);
         ASSERT_EQ(expected_2, t2);
@@ -353,15 +349,14 @@ namespace xt
         std::vector<double> d3 = {3, 9, 15, 21};
         xarray<double> expected_3;
         expected_3.reshape({2, 2, 1});
-        std::copy(d3.begin(), d3.end(), expected_3.data().begin());
+        std::copy(d3.begin(), d3.end(), expected_3.template xbegin<layout_type::row_major>());
         xarray<double> t3 = xt::diagonal(e, -1, 2, 3);
         ASSERT_EQ(expected_3, t3);
     }
 
     TEST(xbuilder, diag)
     {
-        xarray<double> e = xt::arange<double>(1, 10);
-        e.reshape({3, 3});
+        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::diag(xt::diagonal(e));
         xarray<double> expected = xt::eye(3) * e;
 
@@ -370,8 +365,7 @@ namespace xt
 
     TEST(xbuilder, flipud)
     {
-        xarray<double> e = xt::arange<double>(1, 10);
-        e.reshape({3, 3});
+        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::flip(e, 0);
         xarray<double> expected = {{7, 8, 9}, {4, 5, 6}, {1, 2, 3}};
         ASSERT_EQ(expected, t);
@@ -381,8 +375,8 @@ namespace xt
         ASSERT_EQ(2, t(2, 1));
         ASSERT_EQ(7, t.element(idx.begin(), idx.end()));
 
-        xarray<double> f = xt::arange<double>(12);
-        f.reshape({2, 2, 3});
+        xarray<double> f = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
+
         xarray<double> ft = xt::flip(f, 0);
         xarray<double> expected_2 = {{{6, 7, 8},
                                       {9, 10, 11}},
@@ -393,8 +387,7 @@ namespace xt
 
     TEST(xbuilder, fliplr)
     {
-        xarray<double> e = xt::arange<double>(1, 10);
-        e.reshape({3, 3});
+        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::flip(e, 1);
         xarray<double> expected = {{3, 2, 1}, {6, 5, 4}, {9, 8, 7}};
         ASSERT_EQ(expected, t);
@@ -404,8 +397,8 @@ namespace xt
         ASSERT_EQ(8, t(2, 1));
         ASSERT_EQ(3, t.element(idx.begin(), idx.end()));
 
-        xarray<double> f = xt::arange<double>(12);
-        f.reshape({2, 2, 3});
+        xarray<double> f = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
+
         xarray<double> ft = xt::flip(f, 1);
         xarray<double> expected_2 = {{{3, 4, 5},
                                       {0, 1, 2}},
