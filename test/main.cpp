@@ -8,8 +8,12 @@
 
 #include "gtest/gtest.h"
 
+#include <complex>
+#include <type_traits>
+#include <iostream>
+
 int main(int argc, char* argv[])
 {
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+     std::cout << (int)std::is_pod<std::complex<double>>::value;
+     return 0;
 }
