@@ -10,8 +10,10 @@
 
 #include <complex>
 #include <type_traits>
+#include <iostream>
 
 int main(int argc, char* argv[])
 {
-     return (int)std::is_pod<std::complex<double>>::value;
+     std::cout << (int)std::is_pod<std::complex<double>>::value;
+     return 0;
 }
