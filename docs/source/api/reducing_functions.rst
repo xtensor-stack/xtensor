@@ -11,6 +11,15 @@ Reducing functions
 
 Defined in ``xtensor/xmath.hpp``
 
-.. doxygengroup:: red_functions
+.. _sum-function-reference:
+.. doxygenfunction:: sum(E&&, X&&)
    :project: xtensor
-   :content-only:
+
+.. _prod-function-reference:
+.. doxygenfunction:: prod(E&&, X&&)
+   :project: xtensor
+
+.. _mean-function-reference:
+.. doxygenfunction:: mean(E&&, X&&)
+   :project: xtensor
+

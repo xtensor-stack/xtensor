@@ -11,6 +11,27 @@ Nearest integer floating point operations
 
 Defined in ``xtensor/xmath.hpp``
 
-.. doxygengroup:: nearint_functions
+.. _ceil-function-reference:
+.. doxygenfunction:: ceil(E&&)
    :project: xtensor
-   :content-only:
+
+.. _floor-func-ref:
+.. doxygenfunction:: floor(E&&)
+   :project: xtensor
+
+.. _trunc-func-ref:
+.. doxygenfunction:: trunc(E&&)
+   :project: xtensor
+
+.. _round-func-ref:
+.. doxygenfunction:: round(E&&)
+   :project: xtensor
+
+.. _nearbyint-func-ref:
+.. doxygenfunction:: nearbyint(E&&)
+   :project: xtensor
+
+.. _rint-function-reference:
+.. doxygenfunction:: rint(E&&)
+   :project: xtensor
+

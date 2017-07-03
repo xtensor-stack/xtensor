@@ -326,6 +326,28 @@ namespace xt
     namespace math
     {
         template <class T>
+        struct minimum
+        {
+            using result_type = T;
+
+            constexpr result_type operator()(const T& t1, const T& t2) const noexcept
+            {
+                return (t1 < t2) ? t1 : t2;
+            }
+        };
+
+        template <class T>
+        struct maximum
+        {
+            using result_type = T;
+
+            constexpr result_type operator()(const T& t1, const T& t2) const noexcept
+            {
+                return (t1 > t2) ? t1 : t2;
+            }
+        };
+
+        template <class T>
         struct clamp_fun
         {
             using first_argument_type = T;
@@ -338,6 +360,120 @@ namespace xt
             }
         };
     }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Elementwise maximum
+     *
+     * Returns an \ref xfunction for the element-wise
+     * maximum between e1 and e2.
+     * @param e1 an \ref xexpression
+     * @param e2 an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto maximum(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<math::maximum, E1, E2>
+    {
+        return detail::make_xfunction<math::maximum>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Elementwise minimum
+     *
+     * Returns an \ref xfunction for the element-wise
+     * minimum between e1 and e2.
+     * @param e1 an \ref xexpression
+     * @param e2 an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto minimum(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<math::minimum, E1, E2>
+    {
+        return detail::make_xfunction<math::minimum>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Maximum element along given axis.
+     *
+     * Returns an \ref xreducer for the maximum of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the maximum is found (optional)
+     * @return an \ref xreducer
+     */
+    template <class E, class X>
+    inline auto amax(E&& e, X&& axes) noexcept
+    {
+        using functor_type = math::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
+    }
+
+    template <class E>
+    inline auto amax(E&& e) noexcept
+    {
+        using functor_type = math::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e));
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto amax(E&& e, std::initializer_list<I> axes) noexcept
+    {
+        using functor_type = math::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto amax(E&& e, const I(&axes)[N]) noexcept
+    {
+        using functor_type = math::maximum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#endif
+
+    /**
+     * @ingroup basic_functions
+     * @brief Minimum element along given axis.
+     *
+     * Returns an \ref xreducer for the minimum of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the minimum is found (optional)
+     * @return an \ref xreducer
+     */
+    template <class E, class X>
+    inline auto amin(E&& e, X&& axes) noexcept
+    {
+        using functor_type = math::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
+    }
+
+    template <class E>
+    inline auto amin(E&& e) noexcept
+    {
+        using functor_type = math::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e));
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto amin(E&& e, std::initializer_list<I> axes) noexcept
+    {
+        using functor_type = math::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto amin(E&& e, const I(&axes)[N]) noexcept
+    {
+        using functor_type = math::minimum<typename std::decay_t<E>::value_type>;
+        return reduce(functor_type(), std::forward<E>(e), axes);
+    }
+#endif
 
     /**
      * @ingroup basic_functions
