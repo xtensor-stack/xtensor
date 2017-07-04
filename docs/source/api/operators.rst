@@ -38,7 +38,7 @@ Defined in ``xtensor/xmath.hpp``
    :project: xtensor
 
 .. _and-op-ref:
-.. doxygenfunction:: operator &&(E1&&, E2&&)
+.. doxygenfunction:: operator&&(E1&&, E2&&)
    :project: xtensor
 
 .. _not-op-ref:
