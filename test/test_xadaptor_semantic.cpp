@@ -7,18 +7,47 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xtensor/xarray.hpp"
 #include "test_xsemantic.hpp"
 
 namespace xt
 {
     using vector_type = std::vector<int>;
-    using adaptor_type = xarray_adaptor<std::vector<int>, layout_type::dynamic>;
+    using array_adaptor_type = xarray_adaptor<std::vector<int>, layout_type::dynamic>;
+    using tensor_adaptor_type = xtensor_adaptor<std::vector<int>, 3, layout_type::dynamic>;
 
-    TEST(xadaptor_semantic, a_plus_b)
+    template <class C>
+    struct get_test_adaptor;
+
+    template <>
+    struct get_test_adaptor<xarray_dynamic>
     {
-        operation_tester<std::plus<>> tester;
+        using type = array_adaptor_type;
+    };
 
+    template <>
+    struct get_test_adaptor<xtensor_dynamic>
+    {
+        using type = tensor_adaptor_type;
+    };
+
+    template <class C>
+    using get_test_adaptor_t = typename get_test_adaptor<C>::type;
+
+    template <class C>
+    class adaptor_semantic : public ::testing::Test
+    {
+    public:
+        using container_type = C;
+        using adaptor_type = get_test_adaptor_t<C>;
+    };
+
+    using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
+    TYPED_TEST_CASE(adaptor_semantic, testing_types);
+
+    TYPED_TEST(adaptor_semantic, a_plus_b)
+    {
+        operation_tester<std::plus<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
         {
             SCOPED_TRACE("row_major + row_major");
             vector_type v;
@@ -52,9 +81,10 @@ namespace xt
         }
     }
 
-    TEST(xadaptor_semantic, a_minus_b)
+    TYPED_TEST(adaptor_semantic, a_minus_b)
     {
-        operation_tester<std::minus<>> tester;
+        operation_tester<std::minus<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
 
         {
             SCOPED_TRACE("row_major - row_major");
@@ -89,9 +119,10 @@ namespace xt
         }
     }
 
-    TEST(xadaptor_semantic, a_times_b)
+    TYPED_TEST(adaptor_semantic, a_times_b)
     {
-        operation_tester<std::multiplies<>> tester;
+        operation_tester<std::multiplies<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
 
         {
             SCOPED_TRACE("row_major * row_major");
@@ -126,9 +157,10 @@ namespace xt
         }
     }
 
-    TEST(xadaptor_semantic, a_divide_by_b)
+    TYPED_TEST(adaptor_semantic, a_divide_by_b)
     {
-        operation_tester<std::divides<>> tester;
+        operation_tester<std::divides<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
 
         {
             SCOPED_TRACE("row_major / row_major");
@@ -163,9 +195,10 @@ namespace xt
         }
     }
 
-    TEST(xadaptor_semantic, a_plus_equal_b)
+    TYPED_TEST(adaptor_semantic, a_plus_equal_b)
     {
-        operation_tester<std::plus<>> tester;
+        operation_tester<std::plus<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
 
         {
             SCOPED_TRACE("row_major += row_major");
@@ -204,9 +237,10 @@ namespace xt
         }
     }
 
-    TEST(xadaptor_semantic, a_minus_equal_b)
+    TYPED_TEST(adaptor_semantic, a_minus_equal_b)
     {
-        operation_tester<std::minus<>> tester;
+        operation_tester<std::minus<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
 
         {
             SCOPED_TRACE("row_major -= row_major");
@@ -245,9 +279,10 @@ namespace xt
         }
     }
 
-    TEST(xadaptor_semantic, a_times_equal_b)
+    TYPED_TEST(adaptor_semantic, a_times_equal_b)
     {
-        operation_tester<std::multiplies<>> tester;
+        operation_tester<std::multiplies<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
 
         {
             SCOPED_TRACE("row_major *= row_major");
@@ -286,9 +321,10 @@ namespace xt
         }
     }
 
-    TEST(xadaptor_semantic, a_divide_by_equal_b)
+    TYPED_TEST(adaptor_semantic, a_divide_by_equal_b)
     {
-        operation_tester<std::divides<>> tester;
+        operation_tester<std::divides<>, TypeParam> tester;
+        using adaptor_type = typename TestFixture::adaptor_type;
 
         {
             SCOPED_TRACE("row_major /= row_major");

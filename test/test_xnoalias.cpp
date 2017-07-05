@@ -13,268 +13,278 @@
 
 namespace xt
 {
-    TEST(xnoalias, a_plus_b)
+    template <class C>
+    class xnoalias : public ::testing::Test
     {
-        operation_tester<std::plus<>> tester;
+    public:
+
+        using container_type = C;
+    };
+
+    using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
+    TYPED_TEST_CASE(xnoalias, testing_types);
+
+    TYPED_TEST(xnoalias, a_plus_b)
+    {
+        operation_tester<std::plus<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major + row_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a + tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major + column_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a + tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major + central_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a + tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major + unit_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a + tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TEST(xnoalias, a_minus_b)
+    TYPED_TEST(xnoalias, a_minus_b)
     {
-        operation_tester<std::minus<>> tester;
+        operation_tester<std::minus<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major - row_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a - tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major - column_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a - tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major - central_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a - tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major - unit_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a - tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TEST(xnoalias, a_multiplies_b)
+    TYPED_TEST(xnoalias, a_multiplies_b)
     {
-        operation_tester<std::multiplies<>> tester;
+        operation_tester<std::multiplies<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major * row_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a * tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major * column_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a * tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major * central_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a * tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major * unit_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a * tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TEST(xnoalias, a_divides_by_b)
+    TYPED_TEST(xnoalias, a_divides_by_b)
     {
-        operation_tester<std::divides<>> tester;
+        operation_tester<std::divides<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major / row_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a / tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major / column_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a / tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major / central_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a / tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major / unit_major");
-            xarray<int> b(tester.ca.shape(), 0);
+            TypeParam b(tester.ca.shape(), 0);
             noalias(b) = tester.a / tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TEST(xnoalias, a_plus_equal_b)
+    TYPED_TEST(xnoalias, a_plus_equal_b)
     {
-        operation_tester<std::plus<>> tester;
+        operation_tester<std::plus<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major += row_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) += tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major += column_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) += tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major += central_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) += tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major += unit_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) += tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TEST(xnoalias, a_minus_equal_b)
+    TYPED_TEST(xnoalias, a_minus_equal_b)
     {
-        operation_tester<std::minus<>> tester;
+        operation_tester<std::minus<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major -= row_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) -= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major -= column_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) -= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major -= central_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) -= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major -= unit_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) -= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TEST(xnoalias, a_times_equal_b)
+    TYPED_TEST(xnoalias, a_times_equal_b)
     {
-        operation_tester<std::multiplies<>> tester;
+        operation_tester<std::multiplies<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major *= row_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) *= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major *= column_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) *= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major *= central_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) *= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major *= unit_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) *= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 
-    TEST(xnoalias, a_divide_by_equal_b)
+    TYPED_TEST(xnoalias, a_divide_by_equal_b)
     {
-        operation_tester<std::divides<>> tester;
+        operation_tester<std::divides<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major /= row_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) /= tester.ra;
             EXPECT_EQ(tester.res_rr, b);
         }
 
         {
             SCOPED_TRACE("row_major /= column_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) /= tester.ca;
             EXPECT_EQ(tester.res_rc, b);
         }
 
         {
             SCOPED_TRACE("row_major /= central_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) /= tester.cta;
             EXPECT_EQ(tester.res_rct, b);
         }
 
         {
             SCOPED_TRACE("row_major /= unit_major");
-            xarray<int> b = tester.a;
+            TypeParam b = tester.a;
             noalias(b) /= tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }
 }
-
