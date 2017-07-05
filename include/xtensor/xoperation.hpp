@@ -421,7 +421,7 @@ namespace xt
         using index_type = xindex_type_t<typename T::shape_type>;
         using size_type = typename T::size_type;
 
-        index_type idx(arr.dimension(), 0);
+        auto idx = make_sequence<index_type>(arr.dimension(), 0);
         std::vector<index_type> indices;
 
         auto next_idx = [&shape](index_type& idx)
@@ -445,7 +445,7 @@ namespace xt
         size_type total_size = compute_size(shape);
         for (size_type i = 0; i < total_size; i++, next_idx(idx))
         {
-            if (arr[idx])
+            if (arr.element(std::begin(idx), std::end(idx)))
             {
                 indices.push_back(idx);
             }

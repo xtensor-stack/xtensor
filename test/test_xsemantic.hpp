@@ -11,49 +11,54 @@
 
 #include <functional>
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "test_common.hpp"
 
 namespace xt
 {
     using std::size_t;
     using xarray_dynamic = xarray<int, layout_type::dynamic>;
+    using xtensor_dynamic = xtensor<int, 3, layout_type::dynamic>;
 
-    template <class F>
+    template <class F, class C>
     struct operation_tester
     {
-        xarray_dynamic a;
-        xarray_dynamic ra;
-        xarray_dynamic ca;
-        xarray_dynamic cta;
-        xarray_dynamic ua;
+        using container_type = C;
+        using shape_type = typename C::shape_type;
 
-        xarray_dynamic res_rr;
-        xarray_dynamic res_rc;
-        xarray_dynamic res_rct;
-        xarray_dynamic res_ru;
+        container_type a;
+        container_type ra;
+        container_type ca;
+        container_type cta;
+        container_type ua;
+
+        container_type res_rr;
+        container_type res_rc;
+        container_type res_rct;
+        container_type res_ru;
 
         operation_tester();
     };
 
-    template <class F>
-    inline operation_tester<F>::operation_tester()
+    template <class F, class C>
+    inline operation_tester<F, C>::operation_tester()
     {
         F f;
-        row_major_result<> rmr;
+        row_major_result<shape_type> rmr;
         a.reshape(rmr.shape(), rmr.strides());
         assign_array(a, rmr.m_assigner);
         ra.reshape(rmr.shape(), rmr.strides());
         assign_array(ra, rmr.m_assigner);
 
-        column_major_result<> cmr;
+        column_major_result<shape_type> cmr;
         ca.reshape(cmr.shape(), cmr.strides());
         assign_array(ca, cmr.m_assigner);
 
-        central_major_result<> ctmr;
+        central_major_result<shape_type> ctmr;
         cta.reshape(ctmr.shape(), ctmr.strides());
         assign_array(cta, ctmr.m_assigner);
 
-        unit_shape_result<> usr;
+        unit_shape_result<shape_type> usr;
         ua.reshape(usr.shape(), usr.strides());
         assign_array(ua, usr.m_assigner);
 
@@ -77,41 +82,44 @@ namespace xt
         }
     }
 
-    template <class F>
+    template <class F, class C>
     struct scalar_operation_tester
     {
-        int b;
-        xarray_dynamic ra;
-        xarray_dynamic ca;
-        xarray_dynamic cta;
-        xarray_dynamic ua;
+        using container_type = C;
+        using shape_type = typename C::shape_type;
 
-        xarray_dynamic res_r;
-        xarray_dynamic res_c;
-        xarray_dynamic res_ct;
-        xarray_dynamic res_u;
+        int b;
+        container_type ra;
+        container_type ca;
+        container_type cta;
+        container_type ua;
+
+        container_type res_r;
+        container_type res_c;
+        container_type res_ct;
+        container_type res_u;
 
         scalar_operation_tester();
     };
 
-    template <class F>
-    inline scalar_operation_tester<F>::scalar_operation_tester()
+    template <class F, class C>
+    inline scalar_operation_tester<F, C>::scalar_operation_tester()
     {
         F f;
         b = 2;
-        row_major_result<> rmr;
+        row_major_result<shape_type> rmr;
         ra.reshape(rmr.shape(), rmr.strides());
         assign_array(ra, rmr.m_assigner);
 
-        column_major_result<> cmr;
+        column_major_result<shape_type> cmr;
         ca.reshape(cmr.shape(), cmr.strides());
         assign_array(ca, cmr.m_assigner);
 
-        central_major_result<> ctmr;
+        central_major_result<shape_type> ctmr;
         cta.reshape(ctmr.shape(), ctmr.strides());
         assign_array(cta, ctmr.m_assigner);
 
-        unit_shape_result<> usr;
+        unit_shape_result<shape_type> usr;
         ua.reshape(usr.shape(), usr.strides());
         assign_array(ua, usr.m_assigner);
 

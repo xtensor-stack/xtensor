@@ -13,15 +13,15 @@
 
 namespace xt
 {
-    using xarray_dynamic = xarray<int, layout_type::dynamic>;
 
-    template <class F>
-    struct view_op_tester : operation_tester<F>
+    template <class F, class C>
+    struct view_op_tester : operation_tester<F, C>
     {
-        xarray_dynamic vres_rr;
-        xarray_dynamic vres_rc;
-        xarray_dynamic vres_rct;
-        xarray_dynamic vres_ru;
+        using container_type = C;
+        container_type vres_rr;
+        container_type vres_rc;
+        container_type vres_rct;
+        container_type vres_ru;
 
         size_t x_slice;
         xrange<size_t> y_slice;
@@ -30,11 +30,10 @@ namespace xt
         view_op_tester();
     };
 
-    template <class F>
-    view_op_tester<F>::view_op_tester()
-        : operation_tester<F>(), x_slice(0), y_slice(0, 2), z_slice(1, 4)
+    template <class F, class C>
+    view_op_tester<F, C>::view_op_tester()
+        : operation_tester<F, C>(), x_slice(0), y_slice(0, 2), z_slice(1, 4)
     {
-        std::vector<size_t> shape = this->a.shape();
         vres_rr = this->a;
         vres_rc = this->a;
         vres_rct = this->a;
@@ -56,14 +55,40 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_plus_b)
+    template <class C, std::size_t>
+    struct redim_container
     {
-        view_op_tester<std::plus<>> t;
+        using type = C;
+    };
+
+    template <class T, std::size_t N, layout_type L, std::size_t NN>
+    struct redim_container<xtensor<T, N, L>, NN>
+    {
+        using type = xtensor<T, NN, L>;
+    };
+
+    template <class C, std::size_t N>
+    using redim_container_t = typename redim_container<C, N>::type;
+
+    template <class C>
+    class view_semantic : public ::testing::Test
+    {
+    public:
+
+        using container_type = C;
+    };
+
+    using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
+    TYPED_TEST_CASE(view_semantic, testing_types);
+
+    TYPED_TEST(view_semantic, a_plus_b)
+    {
+        view_op_tester<std::plus<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major + row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewra;
@@ -72,7 +97,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major + column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewca;
@@ -81,7 +106,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major + central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewcta;
@@ -90,7 +115,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major + unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa + viewua;
@@ -98,14 +123,14 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_minus_b)
+    TYPED_TEST(view_semantic, a_minus_b)
     {
-        view_op_tester<std::minus<>> t;
+        view_op_tester<std::minus<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major - row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewra;
@@ -114,7 +139,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major - column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewca;
@@ -123,7 +148,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major - central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewcta;
@@ -132,7 +157,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major - unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa - viewua;
@@ -140,14 +165,14 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_times_b)
+    TYPED_TEST(view_semantic, a_times_b)
     {
-        view_op_tester<std::multiplies<>> t;
+        view_op_tester<std::multiplies<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major * row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewra;
@@ -156,7 +181,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major * column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewca;
@@ -165,7 +190,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major * central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewcta;
@@ -174,7 +199,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major * unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa * viewua;
@@ -182,14 +207,14 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_divdide_by_b)
+    TYPED_TEST(view_semantic, a_divdide_by_b)
     {
-        view_op_tester<std::divides<>> t;
+        view_op_tester<std::divides<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major / row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewra;
@@ -198,7 +223,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major / column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewca;
@@ -207,7 +232,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major / central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewcta;
@@ -216,7 +241,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major / unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb = viewa / viewua;
@@ -224,14 +249,14 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_plus_equal_b)
+    TYPED_TEST(view_semantic, a_plus_equal_b)
     {
-        view_op_tester<std::plus<>> t;
+        view_op_tester<std::plus<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major += row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewra;
@@ -240,7 +265,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major += column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewca;
@@ -249,7 +274,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major += central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewcta;
@@ -258,7 +283,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major += unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb += viewua;
@@ -266,14 +291,14 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_minus_equal_b)
+    TYPED_TEST(view_semantic, a_minus_equal_b)
     {
-        view_op_tester<std::minus<>> t;
+        view_op_tester<std::minus<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major -= row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewra;
@@ -282,7 +307,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major -= column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewca;
@@ -291,7 +316,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major -= central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewcta;
@@ -300,7 +325,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major -= unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb -= viewua;
@@ -308,14 +333,14 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_times_equal_b)
+    TYPED_TEST(view_semantic, a_times_equal_b)
     {
-        view_op_tester<std::multiplies<>> t;
+        view_op_tester<std::multiplies<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major *= row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewra;
@@ -324,7 +349,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major *= column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewca;
@@ -333,7 +358,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major *= central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewcta;
@@ -342,7 +367,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major *= unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb *= viewua;
@@ -350,14 +375,14 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, a_divide_by_equal_b)
+    TYPED_TEST(view_semantic, a_divide_by_equal_b)
     {
-        view_op_tester<std::divides<>> t;
+        view_op_tester<std::divides<>, TypeParam> t;
         auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major /= row_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewra = view(t.ra, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewra;
@@ -366,7 +391,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major /= column_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewca = view(t.ca, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewca;
@@ -375,7 +400,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major /= central_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewcta = view(t.cta, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewcta;
@@ -384,7 +409,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major /= unit_major");
-            xarray_dynamic b = t.a;
+            TypeParam b = t.a;
             auto viewb = view(b, t.x_slice, t.y_slice, t.z_slice);
             auto viewua = view(t.ua, t.x_slice, t.y_slice, t.z_slice);
             viewb /= viewua;
@@ -392,36 +417,39 @@ namespace xt
         }
     }
 
-    TEST(xview_semantic, broadcast_equal)
+    TYPED_TEST(view_semantic, broadcast_equal)
     {
-        xarray_dynamic a = {{1, 2, 3, 4},
-                            {5, 6, 7, 8},
-                            {9, 10, 11, 12}};
-        xarray_dynamic b = a;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using container_2d = redim_container_t<TypeParam, 2>;
+        container_2d a = {{1, 2, 3, 4},
+                          {5, 6, 7, 8},
+                          {9, 10, 11, 12}};
+        container_2d b = a;
         auto viewa = view(a, all(), range(1, 4));
         auto viewb = view(b, all(), range(1, 4));
-        xarray_dynamic c = {1, 2, 3};
+        container_1d c = {1, 2, 3};
         viewa = c;
         noalias(viewb) = c;
-        xarray_dynamic res = {{1, 1, 2, 3},
-                              {5, 1, 2, 3},
-                              {9, 1, 2, 3}};
+        container_2d res = {{1, 1, 2, 3},
+                            {5, 1, 2, 3},
+                            {9, 1, 2, 3}};
 
         EXPECT_EQ(res, a);
         EXPECT_EQ(res, b);
     }
 
-    TEST(xview_semantic, scalar_equal)
+    TYPED_TEST(view_semantic, scalar_equal)
     {
-        xarray_dynamic a = {{1, 2, 3, 4},
-                            {5, 6, 7, 8},
-                            {9, 10, 11, 12}};
+        using container_2d = redim_container_t<TypeParam, 2>;
+        container_2d a = {{1, 2, 3, 4},
+                          {5, 6, 7, 8},
+                          {9, 10, 11, 12}};
         auto viewa = view(a, all(), range(1, 4));
         int b = 1;
         viewa = b;
-        xarray_dynamic res = {{1, 1, 1, 1},
-                              {5, 1, 1, 1},
-                              {9, 1, 1, 1}};
+        container_2d res = {{1, 1, 1, 1},
+                            {5, 1, 1, 1},
+                            {9, 1, 1, 1}};
 
         EXPECT_EQ(res, a);
     }

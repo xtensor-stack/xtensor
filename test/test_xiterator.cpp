@@ -211,7 +211,6 @@ namespace xt
             ++iter;
             iter2++;
         }
-        std::cout << std::endl;
         EXPECT_EQ(*iter, expected) << "predecrement operator doesn't give expected result";
         EXPECT_EQ(*iter2, expected) << "postdecrement operator doesn't give expected result";
     }

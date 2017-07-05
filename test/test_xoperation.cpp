@@ -10,35 +10,79 @@
 
 #include <cstddef>
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 
 namespace xt
 {
-    using std::size_t;
-    using shape_type = std::vector<size_t>;
-
-    TEST(operation, plus)
+    template <class C, std::size_t>
+    struct redim_container
     {
+        using type = C;
+    };
+
+    template <class T, std::size_t N, layout_type L, std::size_t NN>
+    struct redim_container<xtensor<T, N, L>, NN>
+    {
+        using type = xtensor<T, NN, L>;
+    };
+
+    template <class C, std::size_t N>
+    using redim_container_t = typename redim_container<C, N>::type;
+
+    template <class C, class T>
+    struct rebind_container;
+
+    template <class T, class NT>
+    struct rebind_container<xarray<T>, NT>
+    {
+        using type = xarray<NT>;
+    };
+
+    template <class T, std::size_t N, class NT>
+    struct rebind_container<xtensor<T, N>, NT>
+    {
+        using type = xtensor<NT, N>;
+    };
+
+    template <class C, class T>
+    using rebind_container_t = typename rebind_container<C, T>::type;
+
+    template <class C>
+    class operation : public ::testing::Test
+    {
+    public:
+        using container_type = C;
+    };
+
+    using testing_types = ::testing::Types<xarray<double>, xtensor<double, 2>>;
+    TYPED_TEST_CASE(operation, testing_types);
+
+    TYPED_TEST(operation, plus)
+    {
+        using shape_type = typename TypeParam::shape_type;
         shape_type shape = {3, 2};
-        xarray<double> a(shape, 4.5);
+        TypeParam a(shape, 4.5);
         double ref = +(a(0, 0));
         double actual = (+a)(0, 0);
         EXPECT_EQ(ref, actual);
     }
 
-    TEST(operation, minus)
+    TYPED_TEST(operation, minus)
     {
+        using shape_type = typename TypeParam::shape_type;
         shape_type shape = {3, 2};
-        xarray<double> a(shape, 4.5);
+        TypeParam a(shape, 4.5);
         double ref = -(a(0, 0));
         double actual = (-a)(0, 0);
         EXPECT_EQ(ref, actual);
     }
 
-    TEST(operation, add)
+    TYPED_TEST(operation, add)
     {
+        using shape_type = typename TypeParam::shape_type;
         shape_type shape = {3, 2};
-        xarray<double> a(shape, 4.5);
-        xarray<double> b(shape, 1.3);
+        TypeParam a(shape, 4.5);
+        TypeParam b(shape, 1.3);
         EXPECT_EQ((a + b)(0, 0), a(0, 0) + b(0, 0));
 
         double sb = 1.2;
@@ -48,11 +92,12 @@ namespace xt
         EXPECT_EQ((sa + b)(0, 0), sa + b(0, 0));
     }
 
-    TEST(operation, subtract)
+    TYPED_TEST(operation, subtract)
     {
+        using shape_type = typename TypeParam::shape_type;
         shape_type shape = {3, 2};
-        xarray<double> a(shape, 4.5);
-        xarray<double> b(shape, 1.3);
+        TypeParam a(shape, 4.5);
+        TypeParam b(shape, 1.3);
         EXPECT_EQ((a - b)(0, 0), a(0, 0) - b(0, 0));
 
         double sb = 1.2;
@@ -62,11 +107,12 @@ namespace xt
         EXPECT_EQ((sa - b)(0, 0), sa - b(0, 0));
     }
 
-    TEST(operation, multiply)
+    TYPED_TEST(operation, multiply)
     {
+        using shape_type = typename TypeParam::shape_type;
         shape_type shape = {3, 2};
-        xarray<double> a(shape, 4.5);
-        xarray<double> b(shape, 1.3);
+        TypeParam a(shape, 4.5);
+        TypeParam b(shape, 1.3);
         EXPECT_EQ((a * b)(0, 0), a(0, 0) * b(0, 0));
 
         double sb = 1.2;
@@ -76,11 +122,12 @@ namespace xt
         EXPECT_EQ((sa * b)(0, 0), sa * b(0, 0));
     }
 
-    TEST(operation, divide)
+    TYPED_TEST(operation, divide)
     {
+        using shape_type = typename TypeParam::shape_type;
         shape_type shape = {3, 2};
-        xarray<double> a(shape, 4.5);
-        xarray<double> b(shape, 1.3);
+        TypeParam a(shape, 4.5);
+        TypeParam b(shape, 1.3);
         EXPECT_EQ((a / b)(0, 0), a(0, 0) / b(0, 0));
 
         double sb = 1.2;
@@ -90,151 +137,185 @@ namespace xt
         EXPECT_EQ((sa / b)(0, 0), sa / b(0, 0));
     }
 
-    TEST(operation, less)
+    TYPED_TEST(operation, less)
     {
-        xarray<double> a = {1, 2, 3, 4, 5};
-        xarray<bool> expected = {1, 1, 1, 0, 0};
-        xarray<bool> b = a < 4;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        container_1d a = {1, 2, 3, 4, 5};
+        bool_container expected = {1, 1, 1, 0, 0};
+        bool_container b = a < 4;
         EXPECT_EQ(expected, b);
     }
 
-    TEST(operation, less_equal)
+    TYPED_TEST(operation, less_equal)
     {
-        xarray<double> a = {1, 2, 3, 4, 5};
-        xarray<bool> expected = {1, 1, 1, 1, 0};
-        xarray<bool> b = a <= 4;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        container_1d a = {1, 2, 3, 4, 5};
+        bool_container expected = {1, 1, 1, 1, 0};
+        bool_container b = a <= 4;
         EXPECT_EQ(expected, b);
     }
 
-    TEST(operation, greater)
+    TYPED_TEST(operation, greater)
     {
-        xarray<double> a = {1, 2, 3, 4, 5};
-        xarray<bool> expected = {0, 0, 0, 0, 1};
-        xarray<bool> b = a > 4;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        container_1d a = {1, 2, 3, 4, 5};
+        bool_container expected = {0, 0, 0, 0, 1};
+        bool_container b = a > 4;
         EXPECT_EQ(expected, b);
     }
 
-    TEST(operation, greater_equal)
+    TYPED_TEST(operation, greater_equal)
     {
-        xarray<double> a = {1, 2, 3, 4, 5};
-        xarray<bool> expected = {0, 0, 0, 1, 1};
-        xarray<bool> b = a >= 4;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        container_1d a = {1, 2, 3, 4, 5};
+        bool_container expected = {0, 0, 0, 1, 1};
+        bool_container b = a >= 4;
         EXPECT_EQ(expected, b);
     }
 
-    TEST(operation, negate)
+    TYPED_TEST(operation, negate)
     {
-        xarray<double> a = {1, 2, 3, 4, 5};
-        xarray<bool> expected = {1, 1, 1, 0, 0};
-        xarray<bool> b = !(a >= 4);
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        container_1d a = {1, 2, 3, 4, 5};
+        bool_container expected = {1, 1, 1, 0, 0};
+        bool_container b = !(a >= 4);
         EXPECT_EQ(expected, b);
     }
 
-    TEST(operation, equal)
+    TYPED_TEST(operation, equal)
     {
-        xarray<double> a = {1, 2, 3, 4, 5};
-        xarray<bool> expected = {0, 0, 0, 1, 0};
-        xarray<bool> b = equal(a, 4);
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        container_1d a = {1, 2, 3, 4, 5};
+        bool_container expected = {0, 0, 0, 1, 0};
+        bool_container b = equal(a, 4);
         EXPECT_EQ(expected, b);
 
-        xarray<double> other = {1, 2, 3, 0, 0};
-        xarray<bool> b_2 = equal(a, other);
-        xarray<bool> expected_2 = {1, 1, 1, 0, 0};
+        container_1d other = {1, 2, 3, 0, 0};
+        bool_container b_2 = equal(a, other);
+        bool_container expected_2 = {1, 1, 1, 0, 0};
         EXPECT_EQ(expected_2, b_2);
     }
 
-    TEST(operation, not_equal)
+    TYPED_TEST(operation, not_equal)
     {
-        xarray<double> a = {1, 2, 3, 4, 5};
-        xarray<bool> expected = {1, 1, 1, 0, 1};
-        xarray<bool> b = not_equal(a, 4);
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        container_1d a = {1, 2, 3, 4, 5};
+        bool_container expected = {1, 1, 1, 0, 1};
+        bool_container b = not_equal(a, 4);
         EXPECT_EQ(expected, b);
 
-        xarray<double> other = {1, 2, 3, 0, 0};
-        xarray<bool> b_2 = not_equal(a, other);
-        xarray<bool> expected_2 = {0, 0, 0, 1, 1};
+        container_1d other = {1, 2, 3, 0, 0};
+        bool_container b_2 = not_equal(a, other);
+        bool_container expected_2 = {0, 0, 0, 1, 1};
         EXPECT_EQ(expected_2, b_2);
     }
 
-    TEST(operation, logical_and)
+    TYPED_TEST(operation, logical_and)
     {
-        xarray<bool> a = {0, 0, 0, 1, 0};
-        xarray<bool> expected = {0, 0, 0, 0, 0};
-        xarray<bool> b = a && 0;
-        xarray<bool> c = a && a;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        bool_container a = {0, 0, 0, 1, 0};
+        bool_container expected = {0, 0, 0, 0, 0};
+        bool_container b = a && 0;
+        bool_container c = a && a;
         EXPECT_EQ(expected, b);
         EXPECT_EQ(c, a);
     }
 
-    TEST(operation, logical_or)
+    TYPED_TEST(operation, logical_or)
     {
-        xarray<bool> a = {0, 0, 0, 1, 0};
-        xarray<bool> other = {0, 0, 0, 0, 0};
-        xarray<bool> b = a || other;
-        xarray<bool> c = a || 0;
-        xarray<bool> d = a || 1;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using bool_container = rebind_container_t<container_1d, bool>;
+        bool_container a = {0, 0, 0, 1, 0};
+        bool_container other = {0, 0, 0, 0, 0};
+        bool_container b = a || other;
+        bool_container c = a || 0;
+        bool_container d = a || 1;
         EXPECT_EQ(b, a);
         EXPECT_EQ(c, a);
 
-        xarray<bool> expected = {1, 1, 1, 1, 1};
+        bool_container expected = {1, 1, 1, 1, 1};
         EXPECT_EQ(expected, d);
     }
 
-    TEST(operation, any)
+    TYPED_TEST(operation, any)
     {
-        xarray<int> a = {0, 0, 3};
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container = rebind_container_t<container_1d, int>;
+        using int_container_2d = rebind_container_t<TypeParam, int>;
+        int_container a = {0, 0, 3};
         EXPECT_EQ(true, any(a));
-        xarray<int> b = {{0, 0, 0}, {0, 0, 0}};
+        int_container_2d b = {{0, 0, 0}, {0, 0, 0}};
         EXPECT_EQ(false, any(b));
     }
 
-    TEST(operation, minimum)
+    TYPED_TEST(operation, minimum)
     {
-        xarray<int> a = {0, 0, 3};
-        xarray<int> b = {-1, 0, 10};
-        xarray<int> expected = {-1, 0, 3};
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container = rebind_container_t<container_1d, int>;
+        int_container a = {0, 0, 3};
+        int_container b = {-1, 0, 10};
+        int_container expected = {-1, 0, 3};
         EXPECT_TRUE(all(equal(minimum(a, b), expected)));
     }
 
-    TEST(operation, maximum)
+    TYPED_TEST(operation, maximum)
     {
-        xarray<int> a = {0, 0, 3};
-        xarray<int> b = {-1, 0, 10};
-        xarray<int> expected = {0, 0, 10};
-        xarray<int> expected_2 = {0, 1, 10};
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container = rebind_container_t<container_1d, int>;
+        int_container a = {0, 0, 3};
+        int_container b = {-1, 0, 10};
+        int_container expected = {0, 0, 10};
+        int_container expected_2 = {0, 1, 10};
         EXPECT_TRUE(all(equal(maximum(a, b), expected)));
         EXPECT_TRUE(all(equal(maximum(arange(0, 3), b), expected_2)));
     }
 
-    TEST(operation, amax)
+    TYPED_TEST(operation, amax)
     {
-        xarray<int> a = {{0, 0, 3}, {1, 2, 10}};
+        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container_1d = rebind_container_t<container_1d, int>;
+        int_container_2d a = {{0, 0, 3}, {1, 2, 10}};
         EXPECT_EQ(10, amax(a)());
-        xarray<int> e1 = {1, 2, 10};
+        int_container_1d e1 = {1, 2, 10};
         EXPECT_EQ(e1, amax(a, {0}));
-        xarray<int> e2 = {3, 10};
+        int_container_1d e2 = {3, 10};
         EXPECT_EQ(e2, amax(a, {1}));
     }
 
-    TEST(operation, amin)
+    TYPED_TEST(operation, amin)
     {
-        xarray<int> a = {{0, 0, 3}, {1, 2, 10}};
+        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container_1d = rebind_container_t<container_1d, int>;
+        int_container_2d a = {{0, 0, 3}, {1, 2, 10}};
         EXPECT_EQ(0, amin(a)());
-        xarray<int> e1 = {0, 0, 3};
+        int_container_1d e1 = {0, 0, 3};
         EXPECT_EQ(e1, amin(a, {0}));
-        xarray<int> e2 = {0, 1};
+        int_container_1d e2 = {0, 1};
         EXPECT_EQ(e2, amin(a, {1}));
     }
 
-    TEST(operation, all)
+    TYPED_TEST(operation, all)
     {
-        xarray<int> a = {1, 1, 3};
+        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container_1d = rebind_container_t<container_1d, int>;
+        int_container_1d a = {1, 1, 3};
         EXPECT_EQ(true, all(a));
-        xarray<int> b = {{0, 2, 1}, {2, 1, 0}};
+        int_container_2d b = {{0, 2, 1}, {2, 1, 0}};
         EXPECT_EQ(false, all(b));
     }
 
-    TEST(operation, all_layout)
+    TYPED_TEST(operation, all_layout)
     {
         xarray<int, layout_type::row_major> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<int, layout_type::column_major> b = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
@@ -242,34 +323,42 @@ namespace xt
         EXPECT_TRUE(all(equal(a, b)));
     }
 
-    TEST(operation, nonzero)
+    TYPED_TEST(operation, nonzero)
     {
-        xarray<int> a = {1, 0, 3};
-        std::vector<xindex> expected = {{0}, {2}};
+        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container_1d = rebind_container_t<container_1d, int>;
+        using container_3d = redim_container_t<TypeParam, 3>;
+        using bool_container = rebind_container_t<container_3d, bool>;
+        using shape_type = typename container_3d::shape_type;
+
+        int_container_1d a = {1, 0, 3};
+        std::vector<xindex_type_t<typename int_container_1d::shape_type>> expected = {{0}, {2}};
         EXPECT_EQ(expected, nonzero(a));
 
-        xarray<int> b = {{0, 2, 1}, {2, 1, 0}};
-        std::vector<xindex> expected_b = {{0, 1}, {0, 2}, {1, 0}, {1, 1}};
+        int_container_2d b = {{0, 2, 1}, {2, 1, 0}};
+        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_b = {{0, 1}, {0, 2}, {1, 0}, {1, 1}};
         EXPECT_EQ(expected_b, nonzero(b));
 
         auto c = equal(b, 0);
-        std::vector<xindex> expected_c = {{0, 0}, {1, 2}};
+        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_c = {{0, 0}, {1, 2}};
         EXPECT_EQ(expected_c, nonzero(c));
 
         shape_type s = {3, 3, 3};
-        xarray<bool> d(s);
+        bool_container d(s);
         std::fill(d.xbegin(), d.xend(), true);
 
         auto d_nz = nonzero(d);
         EXPECT_EQ(3 * 3 * 3, d_nz.size());
-        xindex last_idx = {2, 2, 2};
+        xindex_type_t<typename container_3d::shape_type> last_idx = {2, 2, 2};
         EXPECT_EQ(last_idx, d_nz.back());
     }
 
-    TEST(operation, where_only_condition)
+    TYPED_TEST(operation, where_only_condition)
     {
-        xarray<int> a = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-        std::vector<xindex> expected = {{0, 0}, {1, 1}, {2, 2}};
+        using int_container_2d = rebind_container_t<TypeParam, int>;
+        int_container_2d a = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected = {{0, 0}, {1, 1}, {2, 2}};
         EXPECT_EQ(expected, where(a));
     }
 }
