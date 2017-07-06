@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "benchmark_container.hpp"
+#include "benchmark_math.hpp"
 #include "benchmark_views.hpp"
 #include <iostream>
 
@@ -28,7 +29,7 @@ void benchmark_views(OS& out)
     xt::stridedview::benchmark(out);
 }
 
-int main(int /*argc*/, char** /*argv*/)
+int main(int argc, char* argv[])
 {
     std::cout << "Using steady_clock" << std::endl;
     std::cout << "period num: " << std::chrono::steady_clock::period::num << std::endl;
@@ -36,7 +37,47 @@ int main(int /*argc*/, char** /*argv*/)
     std::cout << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl;
     std::cout << std::endl;
 
-    //benchmark_container(std::cout);
+    benchmark_container(std::cout);
     benchmark_views(std::cout);
+    if (argc != 1)
+    {
+        if (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")
+        {
+            std::cout << "Avalaible options:" << std::endl;
+            std::cout << "container : run benchmark on container basic operations" << std::endl;
+            std::cout << "view      : run benchmark on view basic operations" << std::endl;
+            std::cout << "op        : run benchmark on arithmetic operations" << std::endl;
+            std::cout << "exp       : run benchmark on exponential and logarithm functions" << std::endl;
+            std::cout << "trigo     : run benchmark on trigonomeric functions" << std::endl;
+            std::cout << "hyperbolic: run benchmark on hyperbolic functions" << std::endl;
+            std::cout << "power     : run benchmark on power functions" << std::endl;
+            std::cout << "rounding  : run benchmark on rounding functions" << std::endl;
+        }
+        else
+        {
+            for (int i = 1; i < argc; ++i)
+            {
+                std::string sarg = std::string(argv[i]);
+                if (sarg == "container")
+                {
+                    benchmark_container(std::cout);
+                }
+                else if (sarg == "view")
+                {
+                    benchmark_views(std::cout);
+                }
+                else
+                {
+                    xt::benchmark_math(std::cout, sarg);
+                }
+            }
+        }
+    }
+    else
+    {
+        benchmark_container(std::cout);
+        benchmark_views(std::cout);
+        xt::benchmark_math(std::cout);
+    }
     return 0;
 }
