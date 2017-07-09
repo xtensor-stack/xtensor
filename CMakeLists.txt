@@ -78,7 +78,7 @@ set(XTENSOR_HEADERS
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
-OPTION(DEFAULT_COLUMN_MAJOR "set default layout to coumn major" OFF)
+OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     set(BUILD_TESTS ON)
