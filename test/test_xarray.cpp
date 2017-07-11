@@ -222,4 +222,10 @@ namespace xt
         xarray<int, layout_type::row_major> rb = b;
         EXPECT_EQ(a, rb);
     }
+
+    TEST(xarray, xend_optimized_stride)
+    {
+        xarray_dynamic a = {1};
+        EXPECT_FALSE((a.xbegin() == a.xend()));
+    }
 }

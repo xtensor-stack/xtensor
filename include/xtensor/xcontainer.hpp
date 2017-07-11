@@ -9,6 +9,7 @@
 #ifndef XCONTAINER_HPP
 #define XCONTAINER_HPP
 
+#include <algorithm>
 #include <functional>
 #include <numeric>
 #include <stdexcept>
@@ -267,6 +268,7 @@ namespace xt
         else
         {
             auto leading_stride = (l == layout_type::row_major ? strides().back() : strides().front());
+            leading_stride = std::max(leading_stride, size_type(1));
             return end - 1 + leading_stride;
         }
     }
