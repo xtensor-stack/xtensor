@@ -87,7 +87,7 @@ namespace xt
         }
         s += "\nShape: (";
         bool first = true;
-        for (auto& el : t.shape())
+        for (const auto& el : t.shape())
         {
             if (!first)
             {
@@ -98,7 +98,7 @@ namespace xt
         }
         s += ")\nStrides: (";
         first = true;
-        for (auto& el : t.strides())
+        for (const auto& el : t.strides())
         {
             if (!first)
             {
