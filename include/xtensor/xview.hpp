@@ -467,6 +467,7 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::element(It first, It last) -> reference
     {
+        // TODO: avoid memory allocation
         auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
     }
@@ -503,6 +504,7 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::element(It first, It last) const -> const_reference
     {
+        // TODO: avoid memory allocation
         auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
     }

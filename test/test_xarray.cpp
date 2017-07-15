@@ -157,6 +157,11 @@ namespace xt
         test_access(a);
     }
 
+    TEST(xarray, element)
+    {
+        xarray_dynamic a;
+        test_element(a);
+    }
 
     TEST(xarray, indexed_access)
     {

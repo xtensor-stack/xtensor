@@ -21,7 +21,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
@@ -64,7 +64,7 @@ namespace xt
     TEST(xdynview, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
-        std::vector<double> data{
+        std::vector<double> data = {
             1, 2,
             3, 4,
             5, 6,
@@ -141,7 +141,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
-        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         view_shape_type shape2 = {3};
@@ -165,7 +165,7 @@ namespace xt
     TEST(xdynview, xdynview_on_xtensor)
     {
         xtensor<int, 2> a({3, 4});
-        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.xbegin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
@@ -202,7 +202,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), newaxis(), all()));
@@ -252,7 +252,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), all(), newaxis()));
@@ -320,7 +320,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         xarray<double> b(view_shape_type(1, 4));

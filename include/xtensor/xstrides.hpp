@@ -29,8 +29,8 @@ namespace xt
     template <class size_type, class S, size_t dim = 0>
     size_type data_offset(const S& strides) noexcept;
 
-    template <class size_type, class S, size_t dim = 0, class... Args>
-    size_type data_offset(const S& strides, size_type arg, Args... args) noexcept;
+    template <class size_type, class S, size_t dim = 0, class Arg, class... Args>
+    size_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
 
     template <class size_type, class S, class It>
     size_type element_offset(const S& strides, It first, It last) noexcept;
@@ -74,27 +74,54 @@ namespace xt
         return std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>());
     }
 
-    template <class size_type, class S, size_t dim>
-    inline size_type data_offset(const S& /*strides*/) noexcept
+    namespace detail
+    {
+        template <class size_type, class S, std::size_t dim>
+        inline size_type raw_data_offset(const S&) noexcept
+        {
+            return 0;
+        }
+
+        template <class size_type, class S, std::size_t dim, class Arg, class... Args>
+        inline size_type raw_data_offset(const S& strides, Arg arg, Args... args) noexcept
+        {
+            return arg * strides[dim] + raw_data_offset<size_type, S, dim + 1>(strides, args...);
+        }
+    }
+
+    template <class size_type, class S, std::size_t dim>
+    inline size_type data_offset(const S&) noexcept
     {
         return 0;
     }
 
-    template <class size_type, class S, std::size_t dim, class... Args>
-    inline size_type data_offset(const S& strides, size_type arg, Args... args) noexcept
+    template <class size_type, class S, std::size_t dim, class Arg, class... Args>
+    inline size_type data_offset(const S& strides, Arg arg, Args... args) noexcept
     {
-        if (sizeof...(Args) + 1 > strides.size())
+        constexpr std::size_t nargs = sizeof...(Args) + dim + 1;
+        if (nargs == strides.size())
+        {
+            // Correct number of arguments: iterate
+            return detail::raw_data_offset<size_type, S, dim, Arg, Args...>(strides, arg, args...);
+        }
+        else if (nargs > strides.size())
+        {
+            // Too many arguments: drop the first
             return data_offset<size_type, S, dim>(strides, args...);
+        }
         else
-            return arg * strides[dim] + data_offset<size_type, S, dim + 1>(strides, args...);
+        {
+            // Too few arguments: right to left scalar product
+            auto view = strides.cend() - nargs;
+            return detail::raw_data_offset<size_type, const typename S::const_iterator, dim, Arg, Args...>(view, arg, args...);
+        }
     }
 
     template <class size_type, class S, class It>
     inline size_type element_offset(const S& strides, It first, It last) noexcept
     {
-        auto dst = static_cast<typename S::size_type>(std::distance(first, last));
-        It efirst = last - std::min(strides.size(), dst);
-        return std::inner_product(efirst, last, strides.cbegin(), size_type(0));
+        auto size = std::min(static_cast<typename S::size_type>(std::distance(first, last)), strides.size());
+        return std::inner_product(last - size, last, strides.cend() - size, size_type(0));
     }
 
     namespace detail
