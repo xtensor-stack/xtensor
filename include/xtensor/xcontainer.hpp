@@ -85,7 +85,7 @@ namespace xt
 
         size_type size() const noexcept;
 
-        size_type dimension() const noexcept;
+        constexpr size_type dimension() const noexcept;
 
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
@@ -320,7 +320,7 @@ namespace xt
      * Returns the number of dimensions of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::dimension() const noexcept -> size_type
+    inline constexpr auto xcontainer<D>::dimension() const noexcept -> size_type
     {
         return shape().size();
     }
