@@ -152,12 +152,6 @@ namespace xt
         using container_iterator = typename std::decay_t<CD>::iterator;
         using const_container_iterator = typename std::decay_t<CD>::const_iterator;
 
-        container_iterator data_xbegin() noexcept;
-        const_container_iterator data_xbegin() const noexcept;
-
-        container_iterator data_xend(layout_type l) noexcept;
-        const_container_iterator data_xend(layout_type l) const noexcept;
-
         underlying_container_type& data() noexcept;
         const underlying_container_type& data() const noexcept;
 
@@ -166,7 +160,17 @@ namespace xt
 
         size_type raw_data_offset() const noexcept;
 
+    protected:
+
+        container_iterator data_xbegin() noexcept;
+        const_container_iterator data_xbegin() const noexcept;
+        container_iterator data_xend(layout_type l) noexcept;
+        const_container_iterator data_xend(layout_type l) const noexcept;
+
     private:
+
+        template <class C>
+        friend class xstepper;
 
         template <class It>
         It data_xbegin_impl(It begin) const noexcept;

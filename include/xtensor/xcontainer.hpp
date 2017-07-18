@@ -149,12 +149,6 @@ namespace xt
         using container_iterator = typename container_type::iterator;
         using const_container_iterator = typename container_type::const_iterator;
 
-        container_iterator data_xbegin() noexcept;
-        const_container_iterator data_xbegin() const noexcept;
-
-        container_iterator data_xend(layout_type l) noexcept;
-        const_container_iterator data_xend(layout_type l) const noexcept;
-
     protected:
 
         xcontainer() = default;
@@ -166,7 +160,15 @@ namespace xt
         xcontainer(xcontainer&&) = default;
         xcontainer& operator=(xcontainer&&) = default;
 
+        container_iterator data_xbegin() noexcept;
+        const_container_iterator data_xbegin() const noexcept;
+        container_iterator data_xend(layout_type l) noexcept;
+        const_container_iterator data_xend(layout_type l) const noexcept;
+
     private:
+
+        template <class C>
+        friend class xstepper;
 
         template <class It>
         It data_xend_impl(It end, layout_type l) const noexcept;
