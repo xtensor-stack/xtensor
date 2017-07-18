@@ -44,7 +44,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, 1, range(1, 4));
@@ -88,7 +88,7 @@ namespace xt
     TEST(xview, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
-        std::vector<double> data{
+        std::vector<double> data = {
             1, 2,
             3, 4,
             5, 6,
@@ -170,8 +170,8 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-                                 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                                    13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, range(0, 2), 1, range(1, 4));
@@ -211,7 +211,7 @@ namespace xt
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double, layout_type::row_major> a(shape);
-        std::vector<double> data{1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+        std::vector<double> data = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
             13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
@@ -252,7 +252,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
-        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         view_shape_type shape2 = {4};
@@ -276,7 +276,7 @@ namespace xt
     TEST(xview, xview_on_xtensor)
     {
         xtensor<int, 2> a({3, 4});
-        std::vector<int> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, 1, range(1, 4));
@@ -338,7 +338,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, all(), newaxis(), all());
@@ -382,13 +382,16 @@ namespace xt
 
         std::array<std::size_t, 3> idx2 = {1, 2, 0};
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
+
+        std::array<std::size_t, 3> idx3 = {1, 2};
+        EXPECT_EQ(a(1, 2), view3.element(idx2.begin(), idx2.end()));
     }
 
     TEST(xview, newaxis_iterating)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         auto view1 = view(a, all(), all(), newaxis());
@@ -456,7 +459,7 @@ namespace xt
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
-        std::vector<double> data{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
 
         xarray<double> b(view_shape_type(1, 4));

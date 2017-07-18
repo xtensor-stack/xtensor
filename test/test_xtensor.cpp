@@ -172,6 +172,12 @@ namespace xt
         test_access<xtensor_dynamic, container_type>(a);
     }
 
+    TEST(xtensor, element)
+    {
+        xtensor_dynamic a;
+        test_element<xtensor_dynamic, container_type>(a);
+    }
+
     TEST(xtensor, indexed_access)
     {
         xtensor_dynamic a;

@@ -9,13 +9,16 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="189"
-   height="51"
-   viewBox="0 0 189 51.000001"
+   width="107.50867"
+   height="45.012974"
+   viewBox="0 0 107.50867 45.012975"
    id="svg4217"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="cling-logo.svg">
+   sodipodi:docname="cling-logo.svg"
+   inkscape:export-filename="/home/sylvain/dev/QuantStack/xtensor/notebooks/images/cling-logo.png"
+   inkscape:export-xdpi="90"
+   inkscape:export-ydpi="90">
   <defs
      id="defs4219" />
   <sodipodi:namedview
@@ -26,17 +29,21 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.959798"
-     inkscape:cx="64.383384"
-     inkscape:cy="14.089732"
+     inkscape:cx="14.704636"
+     inkscape:cy="14.409898"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      units="px"
      inkscape:window-width="1726"
      inkscape:window-height="686"
-     inkscape:window-x="174"
+     inkscape:window-x="175"
      inkscape:window-y="73"
-     inkscape:window-maximized="0" />
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
   <metadata
      id="metadata4222">
     <rdf:RDF>
@@ -45,7 +52,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -53,42 +60,58 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(0,-1001.3622)">
+     transform="translate(-64.898033,-1004.0737)">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#00599c"
+       d="m 104.38914,1037.8335 c 0.31386,-0.5437 0.50889,-1.1562 0.50889,-1.7063 l 0,-19.094 c 0,-0.55 -0.19477,-1.1625 -0.50876,-1.7061 l -19.491237,11.2532 19.491107,11.2532 z"
+       id="path3" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#004482"
+       d="m 86.630063,1048.6742 16.535937,-9.547 c 0.47634,-0.275 0.90928,-0.7499 1.22314,-1.2937 l -19.491107,-11.2532 -19.49111,11.2533 c 0.31386,0.5437 0.74693,1.0187 1.22314,1.2936 l 16.53594,9.547 c 0.95255,0.55 2.51151,0.55 3.46406,0 z"
+       id="path5" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#659ad2"
+       d="m 104.38927,1015.327 c -0.31399,-0.5438 -0.74706,-1.0187 -1.22327,-1.2938 l -16.535937,-9.5469 c -0.95255,-0.5501 -2.51151,-0.5501 -3.46406,0 l -16.53594,9.5469 c -0.95268,0.55 -1.73203,1.9 -1.73203,3 l 0,19.094 c 0,0.5501 0.1949,1.1626 0.50889,1.7063 l 19.49111,-11.2532 19.491237,-11.2533 z"
+       id="path7" />
+    <g
+       id="g9"
+       transform="matrix(0.13071895,0,0,0.13071895,64.898033,1004.0737)">
+      <path
+         style="fill:#ffffff"
+         inkscape:connector-curvature="0"
+         d="m 153,274.175 c -56.243,0 -102,-45.757 -102,-102 0,-56.243 45.757,-102 102,-102 36.292,0 70.139,19.53 88.331,50.968 l -44.143,25.544 C 188.083,130.951 171.15,121.175 153,121.175 c -28.122,0 -51,22.878 -51,51 0,28.121 22.878,51 51,51 18.152,0 35.085,-9.776 44.191,-25.515 l 44.143,25.543 c -18.192,31.441 -52.04,50.972 -88.334,50.972 z"
+         id="path11" />
+    </g>
+    <g
+       id="g13"
+       transform="matrix(0.13071895,0,0,0.13071895,64.898033,1004.0737)">
+      <polygon
+         style="fill:#ffffff"
+         points="243.666,189.175 243.666,177.841 255,177.841 255,166.508 243.666,166.508 243.666,155.175 232.334,155.175 232.334,166.508 221,166.508 221,177.841 232.334,177.841 232.334,189.175 "
+         id="polygon15" />
+    </g>
+    <g
+       id="g17"
+       transform="matrix(0.13071895,0,0,0.13071895,64.898033,1004.0737)">
+      <polygon
+         style="fill:#ffffff"
+         points="286.166,189.175 286.166,177.841 297.5,177.841 297.5,166.508 286.166,166.508 286.166,155.175 274.834,155.175 274.834,166.508 263.5,166.508 263.5,177.841 274.834,177.841 274.834,189.175 "
+         id="polygon19" />
+    </g>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:33.72947693px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#5a5a5a;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="66.600609"
-       y="1037.5299"
+       x="103.86076"
+       y="1037.785"
        id="text4765"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan4767"
-         x="66.600609"
-         y="1037.5299"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#5a5a5a;fill-opacity:1">Cling</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:43.04484558px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="22.313026"
-       y="1033.6368"
-       id="text4773"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4775"
-         x="22.313026"
-         y="1033.6368"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#ff0000;fill-opacity:1">+</tspan></text>
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:43.04484558px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       x="31.455755"
-       y="1047.4022"
-       id="text4773-2"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4775-5"
-         x="31.455755"
-         y="1047.4022"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#008500;fill-opacity:1">+</tspan></text>
+         x="103.86076"
+         y="1037.785"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';fill:#5a5a5a;fill-opacity:1">ling</tspan></text>
   </g>
 </svg>
