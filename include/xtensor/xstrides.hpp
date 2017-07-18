@@ -30,7 +30,7 @@ namespace xt
     size_type data_offset(const S& strides) noexcept;
 
     template <class size_type, class S, size_t dim = 0, class... Args>
-    size_type data_offset(const S& strides, size_type i, Args... args) noexcept;
+    size_type data_offset(const S& strides, size_type arg, Args... args) noexcept;
 
     template <class size_type, class S, class It>
     size_type element_offset(const S& strides, It first, It last) noexcept;
@@ -71,7 +71,7 @@ namespace xt
     inline auto compute_size(const shape_type& shape) noexcept
     {
         using size_type = std::decay_t<typename shape_type::value_type>;
-        return std::accumulate(shape.begin(), shape.end(), size_type(1), std::multiplies<size_type>());
+        return std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>());
     }
 
     template <class size_type, class S, size_t dim>
@@ -80,13 +80,13 @@ namespace xt
         return 0;
     }
 
-    template <class size_type, class S, size_t dim, class... Args>
-    inline size_type data_offset(const S& strides, size_type i, Args... args) noexcept
+    template <class size_type, class S, std::size_t dim, class... Args>
+    inline size_type data_offset(const S& strides, size_type arg, Args... args) noexcept
     {
         if (sizeof...(Args) + 1 > strides.size())
             return data_offset<size_type, S, dim>(strides, args...);
         else
-            return i * strides[dim] + data_offset<size_type, S, dim + 1>(strides, args...);
+            return arg * strides[dim] + data_offset<size_type, S, dim + 1>(strides, args...);
     }
 
     template <class size_type, class S, class It>
@@ -94,7 +94,7 @@ namespace xt
     {
         auto dst = static_cast<typename S::size_type>(std::distance(first, last));
         It efirst = last - std::min(strides.size(), dst);
-        return std::inner_product(efirst, last, strides.begin(), size_type(0));
+        return std::inner_product(efirst, last, strides.cbegin(), size_type(0));
     }
 
     namespace detail

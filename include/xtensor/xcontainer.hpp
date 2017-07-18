@@ -428,7 +428,7 @@ namespace xt
      * Returns a reference to the element at the specified position in the container.
      * @param first iterator starting the sequence of indices
      * @param last iterator ending the sequence of indices
-     * The number of indices in the squence should be equal to or greater
+     * The number of indices in the sequence should be equal to or greater
      * than the number of dimensions of the container.
      */
     template <class D>
@@ -443,7 +443,7 @@ namespace xt
      * Returns a reference to the element at the specified position in the container.
      * @param first iterator starting the sequence of indices
      * @param last iterator ending the sequence of indices
-     * The number of indices in the squence should be equal to or greater
+     * The number of indices in the sequence should be equal to or greater
      * than the number of dimensions of the container.
      */
     template <class D>
