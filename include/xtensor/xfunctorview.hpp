@@ -530,7 +530,7 @@ namespace xt
      * Returns a reference to the element at the specified position in the expression.
      * @param first iterator starting the sequence of indices
      * @param last iterator ending the sequence of indices
-     * The number of indices in the squence should be equal to or greater
+     * The number of indices in the sequence should be equal to or greater
      * than the number of dimensions of the function.
      */
     template <class F, class CT>
@@ -575,7 +575,7 @@ namespace xt
      * Returns a constant reference to the element at the specified position in the expression.
      * @param first iterator starting the sequence of indices
      * @param last iterator ending the sequence of indices
-     * The number of indices in the squence should be equal to or greater
+     * The number of indices in the sequence should be equal to or greater
      * than the number of dimensions of the function.
      */
     template <class F, class CT>

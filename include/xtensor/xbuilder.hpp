@@ -412,7 +412,7 @@ namespace xt
             template <class... Args>
             value_type operator()(Args... args) const
             {
-                std::array<size_type, sizeof...(Args)> args_arr({static_cast<size_type>(args)...});
+                std::array<size_type, sizeof...(Args)> args_arr = {static_cast<size_type>(args)...};
                 return m_source(args_arr[m_axis]);
             }
 

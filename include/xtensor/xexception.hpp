@@ -104,13 +104,13 @@ namespace xt
 
     namespace detail
     {
-        template <class S, size_t dim>
+        template <class S, std::size_t dim>
         inline void check_index_impl(const S&)
         {
         }
 
-        template <class S, size_t dim, class... Args>
-        inline void check_index_impl(const S& shape, size_t i, Args... args)
+        template <class S, std::size_t dim, class... Args>
+        inline void check_index_impl(const S& shape, std::size_t arg, Args... args)
         {
             if (sizeof...(Args) + 1 > shape.size())
             {
@@ -118,9 +118,9 @@ namespace xt
             }
             else
             {
-                if (i >= shape[dim] && shape[dim] != 1)
+                if (arg >= shape[dim] && shape[dim] != 1)
                 {
-                    throw std::out_of_range("index " + std::to_string(i) + " is out of bounds for axis "
+                    throw std::out_of_range("index " + std::to_string(arg) + " is out of bounds for axis "
                         + std::to_string(dim) + " with size " + std::to_string(shape[dim]));
                 }
                 check_index_impl<S, dim + 1>(shape, args...);
@@ -139,7 +139,7 @@ namespace xt
     {
         auto dst = static_cast<typename S::size_type>(last - first);
         It efirst = last - std::min(shape.size(), dst);
-        size_t axis = 0;
+        std::size_t axis = 0;
         while (efirst != last)
         {
             if (*efirst >= shape[axis] && shape[axis] != 1)
