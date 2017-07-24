@@ -77,6 +77,7 @@ set(XTENSOR_HEADERS
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
+OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
 OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
 
@@ -94,6 +95,9 @@ endif()
 
 if(BUILD_TESTS)
     add_subdirectory(test)
+endif()
+
+if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
 

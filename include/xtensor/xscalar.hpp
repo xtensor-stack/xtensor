@@ -133,6 +133,9 @@ namespace xt
         const_dummy_iterator dummy_begin() const noexcept;
         const_dummy_iterator dummy_end() const noexcept;
 
+        reference data_element(size_type i) noexcept;
+        const_reference data_element(size_type i) const noexcept;
+
     private:
 
         CT m_value;
@@ -459,6 +462,18 @@ namespace xt
     inline auto xscalar<CT>::dummy_end() const noexcept -> const_dummy_iterator
     {
         return const_dummy_iterator(this);
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::data_element(size_type) noexcept->reference
+    {
+        return m_value;
+    }
+    
+    template <class CT>
+    inline auto xscalar<CT>::data_element(size_type) const noexcept->const_reference
+    {
+        return m_value;
     }
 
     template <class T>

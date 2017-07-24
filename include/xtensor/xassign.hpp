@@ -75,6 +75,17 @@ namespace xt
         index_type m_index;
     };
 
+    /********************
+     * trivial_assigner *
+     ********************/
+
+    template <bool index_assign>
+    struct trivial_assigner
+    {
+        template <class E1, class E2>
+        static void run(E1& e1, const E2& e2);
+    };
+
     /***********************************
      * Assign functions implementation *
      ***********************************/
@@ -103,7 +114,8 @@ namespace xt
         bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
         if (trivial_broadcast)
         {
-            std::copy(de2.cbegin(), de2.cend(), de1.begin());
+            constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
+            trivial_assigner<contiguous_layout>::run(de1, de2);
         }
         else
         {
@@ -222,6 +234,29 @@ namespace xt
     {
         m_lhs.to_end(l);
         m_rhs.to_end(l);
+    }
+
+    /***********************************
+     * trivial_assigner implementation *
+     ***********************************/
+
+    template <bool index_assign>
+    template <class E1, class E2>
+    inline void trivial_assigner<index_assign>::run(E1& e1, const E2& e2)
+    {
+        using size_type = typename E1::size_type;
+        size_type size = e1.size();
+        for (size_type i = 0; i < size; ++i)
+        {
+            e1.data_element(i) = e2.data_element(i);
+        }
+    }
+
+    template <>
+    template <class E1, class E2>
+    inline void trivial_assigner<false>::run(E1& e1, const E2& e2)
+    {
+        std::copy(e2.cbegin(), e2.cend(), e1.begin());
     }
 }
 

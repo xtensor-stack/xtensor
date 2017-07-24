@@ -98,7 +98,8 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
 
         static constexpr layout_type static_layout = xexpression_type::static_layout;
-        static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
+        //static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
+        static constexpr bool contiguous_layout = false;
 
         template <class CTA, class S>
         xbroadcast(CTA&& e, S&& s) noexcept;

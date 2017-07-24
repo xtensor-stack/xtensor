@@ -188,6 +188,8 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
+        const_reference data_element(size_type i) const;
+
     private:
 
         template <std::size_t... I>
@@ -198,6 +200,9 @@ namespace xt
 
         template <std::size_t... I, class It>
         const_reference element_access_impl(std::index_sequence<I...>, It first, It last) const;
+
+        template <std::size_t... I>
+        const_reference data_element_impl(std::index_sequence<I...>, size_type i) const;
 
         template <class Func, std::size_t... I>
         const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const noexcept;
@@ -605,6 +610,12 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
+    inline auto xfunction<F, R, CT...>::data_element(size_type i) const -> const_reference
+    {
+        return data_element_impl(std::make_index_sequence<sizeof...(CT)>(), i);
+    }
+
+    template <class F, class R, class... CT>
     template <std::size_t... I>
     inline layout_type xfunction<F, R, CT...>::layout_impl(std::index_sequence<I...>) const noexcept
     {
@@ -623,6 +634,13 @@ namespace xt
     inline auto xfunction<F, R, CT...>::element_access_impl(std::index_sequence<I...>, It first, It last) const -> const_reference
     {
         return m_f((std::get<I>(m_e).element(first, last))...);
+    }
+
+    template <class F, class R, class... CT>
+    template <std::size_t... I>
+    inline auto xfunction<F, R, CT...>::data_element_impl(std::index_sequence<I...>, size_type i) const ->const_reference
+    {
+        return m_f((std::get<I>(m_e).data_element(i))...);
     }
 
     template <class F, class R, class... CT>

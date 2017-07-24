@@ -205,6 +205,7 @@ namespace xt
             out << "* XFUNCTION ASSIGN BENCHMARK : " << cname << " *" << std::endl;
             out << "*********************************" << std::string(cname.size(), '*') << std::endl << std::endl;
 
+            out << "benchmark: res = 3 * x - 2 * y * z; - res resized out of the benchmark" << std::endl;
             out << "xarray : " << aassign.count() << "ms" << std::endl;
             out << "xtensor: " << tassign.count() << "ms" << std::endl;
             out << std::endl;
@@ -263,10 +264,11 @@ namespace xt
             duration_type tassign = benchmark_assign(tx, ty, tres);
 
             std::string cname = get_container_name(C());
-            out << "*********************************" << std::string(cname.size(), '*') << std::endl;
-            out << "* SUM FULL ASSIGN BENCHMARK : " << cname << " *" << std::endl;
-            out << "*********************************" << std::string(cname.size(), '*') << std::endl << std::endl;
+            out << "***************************************" << std::string(cname.size(), '*') << std::endl;
+            out << "* XFUNCTION FULL ASSIGN BENCHMARK : " << cname << " *" << std::endl;
+            out << "***************************************" << std::string(cname.size(), '*') << std::endl << std::endl;
 
+            out << "benchmark: res = 3 * x - 2 * y; - res resized inside the benchmark" << std::endl;
             out << "xarray : " << aassign.count() << "ms" << std::endl;
             out << "xtensor: " << tassign.count() << "ms" << std::endl;
             out << std::endl;
