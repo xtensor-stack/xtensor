@@ -178,21 +178,21 @@ namespace xt
 #define DEFINE_OP_FUNCTOR_2OP(OP, NAME)\
     struct NAME##_fn {\
         template <class T>\
-        inline T operator()(const T& lhs, const T& rhs) const { return lhs OP rhs; }\
+        inline auto operator()(const T& lhs, const T& rhs) const { return lhs OP rhs; }\
         inline static std::string name() { return #NAME; }\
     }
 
 #define DEFINE_FUNCTOR_1OP(FN)\
     struct FN##_fn {\
         template <class T>\
-        inline T operator()(const T& x) const { using std::FN; using xt::FN; return FN(x); }\
+        inline auto operator()(const T& x) const { using std::FN; using xt::FN; return FN(x); }\
         inline static std::string name() { return #FN; }\
     }
 
 #define DEFINE_FUNCTOR_2OP(FN)\
     struct FN##_fn{\
         template <class T>\
-        inline T operator()(const T&lhs, const T& rhs) const { using std::FN; using xt::FN; return FN(lhs, rhs); }\
+        inline auto operator()(const T&lhs, const T& rhs) const { using std::FN; using xt::FN; return FN(lhs, rhs); }\
         inline static std::string name() { return #FN; }\
     }
 
