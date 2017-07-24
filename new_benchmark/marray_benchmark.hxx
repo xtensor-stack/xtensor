@@ -5,7 +5,9 @@
 
 
 
-
+// this is just to 
+// have humand readable types
+// not sure how good this idea is
 template<class T>
 struct TypeToName;
 
@@ -22,14 +24,6 @@ TYPE_TO_NAME_IMPL(float);
 TYPE_TO_NAME_IMPL(int);
 
 namespace mabm{
-
-    enum PlotType{
-        Boxplot = 0,
-        Plot    = 1,
-        Heatmap = 2
-    };
-
-
 
 
 
@@ -61,7 +55,9 @@ struct BM_NAME##IMPL_NAME { \
     void operator()(benchmark::State& state)const; \
 }; \
 template<std::size_t DIM, class T> \
-void BM_NAME##IMPL_NAME <DIM, T>::operator()(benchmark::State& state)const\
+void BM_NAME##IMPL_NAME <DIM, T>::operator()(benchmark::State& state)const \
+
+
 
 
 
@@ -74,3 +70,4 @@ const auto BM_NAME##IMPL_NAME##DIM##T##___ = benchmark::RegisterBenchmark( \
     ).c_str(), \
     BM_NAME##IMPL_NAME<DIM, T>() \
 )
+
