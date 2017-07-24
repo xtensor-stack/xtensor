@@ -6,6 +6,7 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include "benchmark_assign.hpp"
 #include "benchmark_container.hpp"
 #include "benchmark_math.hpp"
 #include "benchmark_views.hpp"
@@ -29,6 +30,11 @@ void benchmark_views(OS& out)
     xt::stridedview::benchmark(out);
 }
 
+template <class OS>
+void benchmark_assign(OS& out)
+{
+    
+}
 int main(int argc, char* argv[])
 {
     std::cout << "Using steady_clock" << std::endl;
@@ -37,13 +43,12 @@ int main(int argc, char* argv[])
     std::cout << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl;
     std::cout << std::endl;
 
-    benchmark_container(std::cout);
-    benchmark_views(std::cout);
     if (argc != 1)
     {
         if (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")
         {
             std::cout << "Avalaible options:" << std::endl;
+            std::cout << "assign    : run benchmark on tensor assign" << std::endl;
             std::cout << "container : run benchmark on container basic operations" << std::endl;
             std::cout << "view      : run benchmark on view basic operations" << std::endl;
             std::cout << "op        : run benchmark on arithmetic operations" << std::endl;
@@ -58,7 +63,11 @@ int main(int argc, char* argv[])
             for (int i = 1; i < argc; ++i)
             {
                 std::string sarg = std::string(argv[i]);
-                if (sarg == "container")
+                if (sarg == "assign")
+                {
+                    xt::assign::benchmark(std::cout);
+                }
+                else if (sarg == "container")
                 {
                     benchmark_container(std::cout);
                 }
@@ -68,16 +77,17 @@ int main(int argc, char* argv[])
                 }
                 else
                 {
-                    xt::benchmark_math(std::cout, sarg);
+                    xt::math::benchmark_math(std::cout, sarg);
                 }
             }
         }
     }
     else
     {
+        xt::assign::benchmark(std::cout);
         benchmark_container(std::cout);
         benchmark_views(std::cout);
-        xt::benchmark_math(std::cout);
+        xt::math::benchmark_math(std::cout);
     }
     return 0;
 }

@@ -68,6 +68,7 @@ endif()
 include_directories(${XTENSOR_INCLUDE_DIR})
 
 set(XTENSOR_BENCHMARK
+    benchmark_assign.hpp
     benchmark_container.hpp
     benchmark_math.hpp
     benchmark_views.hpp

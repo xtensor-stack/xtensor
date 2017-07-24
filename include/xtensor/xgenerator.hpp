@@ -80,7 +80,7 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
 
         static constexpr layout_type static_layout = layout_type::any;
-        static constexpr bool contiguous_layout = true;
+        static constexpr bool contiguous_layout = false;
 
         template <class Func>
         xgenerator(Func&& f, const S& shape) noexcept;

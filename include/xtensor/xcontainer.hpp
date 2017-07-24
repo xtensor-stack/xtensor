@@ -149,6 +149,9 @@ namespace xt
         using container_iterator = typename container_type::iterator;
         using const_container_iterator = typename container_type::const_iterator;
 
+        reference data_element(size_type i);
+        const_reference data_element(size_type i) const;
+
     protected:
 
         xcontainer() = default;
@@ -722,6 +725,18 @@ namespace xt
     inline auto xcontainer<D>::data_xend(layout_type l) const noexcept -> const_container_iterator
     {
         return data_xend_impl(data().end(), l);
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_element(size_type i) -> reference
+    {
+        return data()[i];
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::data_element(size_type i) const -> const_reference
+    {
+        return data()[i];
     }
 
     /*************************************
