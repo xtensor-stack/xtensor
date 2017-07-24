@@ -110,7 +110,7 @@ namespace xt
             for (std::size_t count = 0; count < number; ++count)
             {
                 auto start = std::chrono::steady_clock::now();
-                xt::noalias(res) = f(lhs);
+                res = f(lhs);
                 auto end = std::chrono::steady_clock::now();
                 auto tmp = end - start;
                 t_res = tmp < t_res ? tmp : t_res;
@@ -127,7 +127,7 @@ namespace xt
             for (std::size_t count = 0; count < number; ++count)
             {
                 auto start = std::chrono::steady_clock::now();
-                xt::noalias(res) = f(lhs, rhs);
+                res = f(lhs, rhs);
                 auto end = std::chrono::steady_clock::now();
                 auto tmp = end - start;
                 t_res = tmp < t_res ? tmp : t_res;
