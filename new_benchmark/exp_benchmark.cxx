@@ -12,10 +12,9 @@
 #include <blitz/array.h>
 
 
-// to avoid dublicate code AND avoid erroneous benchmarks ()
+// to avoid dublicate code AND avoid erroneous benchmarks 
 // we encode the actual expression in structs which are 
 // used by all impls:
-
 struct expr_2_a{
     template<class A,class B, class RES>
     static void op(const A & a, const B & b, RES & res){
@@ -114,26 +113,26 @@ void bm_opt_expr_2(benchmark::State& state) {
 
 
 // benchmark expressions where 2 arrays  are involved to create a result array
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_2,    1, int, expr_2_a, "xtensor")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_2,    2, int, expr_2_a, "xtensor")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_2,    3, int, expr_2_a, "xtensor")->Range(4<<4, 4<<4);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_2,    1, int, expr_2_b, "xtensor")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_2,    2, int, expr_2_b, "xtensor")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_2,    3, int, expr_2_b, "xtensor")->Range(4<<4, 4<<4);
+EXPR_BENCHMARK(bm_xt_expr_2,    1, int, expr_2_a, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_xt_expr_2,    2, int, expr_2_a, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_xt_expr_2,    3, int, expr_2_a, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<5);
+EXPR_BENCHMARK(bm_xt_expr_2,    1, int, expr_2_b, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_xt_expr_2,    2, int, expr_2_b, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_xt_expr_2,    3, int, expr_2_b, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<5);
 
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_2, 1, int, expr_2_a,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_2, 2, int, expr_2_a,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_2, 3, int, expr_2_a,   "blitz")->Range(4<<4, 4<<4);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_2, 1, int, expr_2_b,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_2, 2, int, expr_2_b,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_2, 3, int, expr_2_b,   "blitz")->Range(4<<4, 4<<4);
+EXPR_BENCHMARK(bm_blitz_expr_2, 1, int, expr_2_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_blitz_expr_2, 2, int, expr_2_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_blitz_expr_2, 3, int, expr_2_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
+EXPR_BENCHMARK(bm_blitz_expr_2, 1, int, expr_2_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_blitz_expr_2, 2, int, expr_2_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_blitz_expr_2, 3, int, expr_2_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
 
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_2, 1, int, expr_2_a,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_2, 2, int, expr_2_a,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_2, 3, int, expr_2_a,   "blitz")->Range(4<<4, 4<<4);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_2, 1, int, expr_2_b,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_2, 2, int, expr_2_b,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_2, 3, int, expr_2_b,   "blitz")->Range(4<<4, 4<<4);
+EXPR_BENCHMARK(bm_opt_expr_2, 1, int, expr_2_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_opt_expr_2, 2, int, expr_2_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_opt_expr_2, 3, int, expr_2_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
+EXPR_BENCHMARK(bm_opt_expr_2, 1, int, expr_2_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_opt_expr_2, 2, int, expr_2_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_opt_expr_2, 3, int, expr_2_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
 
 
 
@@ -181,6 +180,7 @@ void bm_opt_expr_3(benchmark::State& state) {
     const uint64_t size = std::pow(s,DIM);
     auto a =   new T[size];
     auto b =   new T[size];
+    auto c =   new T[size];
     auto res = new T[size];
     // to really do the same as the array
     std::fill(a,a+size,1);
@@ -194,6 +194,7 @@ void bm_opt_expr_3(benchmark::State& state) {
     }
     delete[] a;
     delete[] b;
+    delete[] c;
     delete[] res;
     state.SetBytesProcessed(int64_t(state.iterations())*s);
 }
@@ -201,35 +202,32 @@ void bm_opt_expr_3(benchmark::State& state) {
 
 
 // benchmark expressions where 2 arrays  are involved to create a result array
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_3,    1, int, expr_3_a, "xtensor")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_3,    2, int, expr_3_a, "xtensor")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_3,    3, int, expr_3_a, "xtensor")->Range(4<<4, 4<<4);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_3,    1, int, expr_3_b, "xtensor")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_3,    2, int, expr_3_b, "xtensor")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_xt_expr_3,    3, int, expr_3_b, "xtensor")->Range(4<<4, 4<<4);
+EXPR_BENCHMARK(bm_xt_expr_3,    1, int, expr_3_a, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_xt_expr_3,    2, int, expr_3_a, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_xt_expr_3,    3, int, expr_3_a, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<5);
+EXPR_BENCHMARK(bm_xt_expr_3,    1, int, expr_3_b, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_xt_expr_3,    2, int, expr_3_b, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_xt_expr_3,    3, int, expr_3_b, "xtensor")->RangeMultiplier(2)->Range(2<<4, 2<<5);
 
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_3, 1, int, expr_3_a,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_3, 2, int, expr_3_a,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_3, 3, int, expr_3_a,   "blitz")->Range(4<<4, 4<<4);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_3, 1, int, expr_3_b,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_3, 2, int, expr_3_b,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_blitz_expr_3, 3, int, expr_3_b,   "blitz")->Range(4<<4, 4<<4);
+EXPR_BENCHMARK(bm_blitz_expr_3, 1, int, expr_3_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_blitz_expr_3, 2, int, expr_3_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_blitz_expr_3, 3, int, expr_3_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
+EXPR_BENCHMARK(bm_blitz_expr_3, 1, int, expr_3_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_blitz_expr_3, 2, int, expr_3_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_blitz_expr_3, 3, int, expr_3_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
 
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_3, 1, int, expr_3_a,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_3, 2, int, expr_3_a,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_3, 3, int, expr_3_a,   "blitz")->Range(4<<4, 4<<4);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_3, 1, int, expr_3_b,   "blitz")->Range(4<<4, 4<<6);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_3, 2, int, expr_3_b,   "blitz")->Range(4<<4, 4<<5);
-REGISTER_EXPRESSION_BENCHMARK(bm_opt_expr_3, 3, int, expr_3_b,   "blitz")->Range(4<<4, 4<<4);
-
-
+EXPR_BENCHMARK(bm_opt_expr_3, 1, int, expr_3_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_opt_expr_3, 2, int, expr_3_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_opt_expr_3, 3, int, expr_3_a,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
+EXPR_BENCHMARK(bm_opt_expr_3, 1, int, expr_3_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<18);
+EXPR_BENCHMARK(bm_opt_expr_3, 2, int, expr_3_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<9);
+EXPR_BENCHMARK(bm_opt_expr_3, 3, int, expr_3_b,   "blitz")->RangeMultiplier(2)->Range(2<<4, 2<<5);
 
 
 
 
 
 
-#endif
 
 
 BENCHMARK_MAIN();
