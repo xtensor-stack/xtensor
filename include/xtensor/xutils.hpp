@@ -915,6 +915,81 @@ namespace xt
 
         constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
     };
+
+    /*****************************
+     * is_complete implemenation * 
+     *****************************/
+
+    namespace detail
+    {
+        template <typename T>
+        struct is_complete_impl
+        {
+            template <typename U>
+            static auto test(U*)  -> std::integral_constant<bool, sizeof(U) == sizeof(U)>;
+            static auto test(...) -> std::false_type;
+            using type = decltype(test((T*)0));
+        };
+    }
+
+    template <typename T>
+    struct is_complete : detail::is_complete_impl<T>::type {};
+
+    /********************************************
+     * xtrivial_default_construct implemenation * 
+     ********************************************/
+
+#if defined(__clang__)
+#if !(defined(__APPLE__))
+// CLANG && LINUX
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+}
+namespace std { template <class T> struct is_trivially_default_constructible; }
+namespace xt
+{
+
+    namespace detail
+    {
+        template <bool C, class T>
+        struct xtrivial_default_construct_impl;
+
+        template <class T>
+        struct xtrivial_default_construct_impl<true, T> : std::is_trivially_default_constructible<T> {};
+
+        template <class T>
+        struct xtrivial_default_construct_impl<false, T> : std::has_trivial_default_constructor<T> {};
+    }
+
+    template <class T> 
+    using xtrivially_default_constructible = detail::xtrivial_default_construct_impl<is_complete<std::is_trivially_default_constructible<double>>::value, T>;
+
+#pragma clang diagnostic pop
+#else
+// CLANG && APPLE
+
+    template <class T> 
+    using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
+
+#endif
+#else
+// NOT CLANG
+    #if defined(__GNUC__) && (__GNUC__ < 5 || (__GNUC__ == 5 && __GNUC_MINOR__ < 1))
+    // OLD GCC
+
+    template <class T> 
+    using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
+
+    #else
+
+    template <class T> 
+    using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
+
+    #endif
+
+#endif
+    
 }
 
 #endif

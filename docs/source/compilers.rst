@@ -29,7 +29,7 @@ A consequence is that we need to use stack-allocated shape types in these cases.
 GCC < 5.1 and ``std::is_trivially_default_constructible``
 ---------------------------------------------------------
 
-Versions of GCC older than 5.1 don't implement ``std::is_trivially_default_constructible`` but ``std::has_trivial_default_constructor`` instead. The workaround is to use a macro to do the replacement. This occurs in ``xtensor/xstorage.hpp`` only.
+The version of libstdc++ shipped with GCC older than 5.1 (and also used by Clang on linux) does not implement ``std::is_trivially_default_constructible`` but ``std::has_trivial_default_constructor`` instead. With GCC, this is done with a simple check of the version of GCC. In the case of the clang - linux combination, libstdc++ may be used. Since clang overrides the ``__GNUC__``  macro, the version of libstdc++ used cannot be retrived at runtime and some meta-programming techniques are used to determine which function is available.
 
 GCC-6 and the signature of ``std::isnan`` and ``std::isinf``
 ------------------------------------------------------------
