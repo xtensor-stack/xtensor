@@ -947,6 +947,7 @@ namespace xt
 
 }
 namespace std { template <class T> struct is_trivially_default_constructible; }
+namespace std { template <class T> struct has_trivial_default_constructor; }
 namespace xt
 {
 
