@@ -37,6 +37,7 @@ namespace xt
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
         using temporary_type = xtensor_container<EC, N, L>;
+        static constexpr layout_type layout = L;
     };
 
     template <class EC, std::size_t N, layout_type L>
@@ -59,13 +60,13 @@ namespace xt
      * @sa xtensor
      */
     template <class EC, size_t N, layout_type L>
-    class xtensor_container : public xstrided_container<xtensor_container<EC, N, L>, L>,
+    class xtensor_container : public xstrided_container<xtensor_container<EC, N, L>>,
                               public xcontainer_semantic<xtensor_container<EC, N, L>>
     {
     public:
 
         using self_type = xtensor_container<EC, N, L>;
-        using base_type = xstrided_container<self_type, L>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
@@ -132,6 +133,7 @@ namespace xt
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
         using temporary_type = xtensor_container<EC, N, L>;
+        static constexpr layout_type layout = L;
     };
 
     template <class EC, std::size_t N, layout_type L>
@@ -155,13 +157,13 @@ namespace xt
      * @tparam L The layout_type of the adaptor.
      */
     template <class EC, std::size_t N, layout_type L>
-    class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L>, L>,
+    class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L>>,
                             public xadaptor_semantic<xtensor_adaptor<EC, N, L>>
     {
     public:
 
         using self_type = xtensor_adaptor<EC, N, L>;
-        using base_type = xstrided_container<self_type, L>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
@@ -224,7 +226,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), true);
-        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template xbegin<layout_type::row_major>(), t);
+        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**

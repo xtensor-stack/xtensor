@@ -567,43 +567,25 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
-    void test_iterator(V& vec)
+    template <class VRM, class VCM, class C = std::vector<std::size_t>>
+    void test_iterator(VRM& vecrm, VCM& veccm)
     {
         {
             SCOPED_TRACE("row_major storage iterator");
             row_major_result<C> rm;
-            vec.reshape(rm.m_shape, layout_type::row_major);
-            std::copy(rm.data().cbegin(), rm.data().cend(), vec.begin());
-            EXPECT_EQ(rm.data(), vec.data());
-            EXPECT_EQ(vec.end(), vec.data().end());
+            vecrm.reshape(rm.m_shape, layout_type::row_major);
+            std::copy(rm.data().cbegin(), rm.data().cend(), vecrm.template begin<layout_type::row_major>());
+            EXPECT_EQ(rm.data(), vecrm.data());
+            EXPECT_EQ(vecrm.template end<layout_type::row_major>(), vecrm.data().end());
         }
 
         {
             SCOPED_TRACE("column_major storage iterator");
             column_major_result<C> cm;
-            vec.reshape(cm.m_shape, layout_type::column_major);
-            std::copy(cm.data().cbegin(), cm.data().cend(), vec.begin());
-            EXPECT_EQ(cm.data(), vec.data());
-            EXPECT_EQ(vec.end(), vec.data().end());
-        }
-
-        {
-            SCOPED_TRACE("central_major storage iterator");
-            central_major_result<C> cem;
-            vec.reshape(cem.m_shape, cem.m_strides);
-            std::copy(cem.data().cbegin(), cem.data().cend(), vec.begin());
-            EXPECT_EQ(cem.data(), vec.data());
-            EXPECT_EQ(vec.end(), vec.data().end());
-        }
-
-        {
-            SCOPED_TRACE("unit_shape storage iterator");
-            unit_shape_result<C> usr;
-            vec.reshape(usr.m_shape, layout_type::row_major);
-            std::copy(usr.data().cbegin(), usr.data().cend(), vec.begin());
-            EXPECT_EQ(usr.data(), vec.data());
-            EXPECT_EQ(vec.end(), vec.data().end());
+            veccm.reshape(cm.m_shape, layout_type::column_major);
+            std::copy(cm.data().cbegin(), cm.data().cend(), veccm.template begin<layout_type::column_major>());
+            EXPECT_EQ(cm.data(), veccm.data());
+            EXPECT_EQ(veccm.template end<layout_type::column_major>(), veccm.data().end());
         }
     }
 
@@ -618,8 +600,8 @@ namespace xt
 
         // broadcast_iterator
         {
-            auto iter = vec.template xbegin<layout_type::row_major>();
-            auto iter_end = vec.template xend<layout_type::row_major>();
+            auto iter = vec.template begin<layout_type::row_major>();
+            auto iter_end = vec.template end<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[nb_iter], *iter);
@@ -633,8 +615,8 @@ namespace xt
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.template xbegin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = vec.template xend<shape_type, layout_type::row_major>(shape);
+            auto iter = vec.template begin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = vec.template end<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[0], *iter);
@@ -645,8 +627,8 @@ namespace xt
 
         // column broadcast_iterator
         {
-            auto iter = vec.template xbegin<layout_type::column_major>();
-            auto iter_end = vec.template xend<layout_type::column_major>();
+            auto iter = vec.template begin<layout_type::column_major>();
+            auto iter_end = vec.template end<layout_type::column_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec(0, 0, 2), *iter);
@@ -660,8 +642,8 @@ namespace xt
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.template xbegin<shape_type, layout_type::column_major>(shape);
-            auto iter_end = vec.template xend<shape_type, layout_type::column_major>(shape);
+            auto iter = vec.template begin<shape_type, layout_type::column_major>(shape);
+            auto iter_end = vec.template end<shape_type, layout_type::column_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec(0, 0, 2), *iter);
@@ -681,8 +663,8 @@ namespace xt
 
         // broadcast_iterator
         {
-            auto iter = vec.template xrbegin<layout_type::row_major>();
-            auto iter_end = vec.template xrend<layout_type::row_major>();
+            auto iter = vec.template rbegin<layout_type::row_major>();
+            auto iter_end = vec.template rend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[nb_iter - 1], *iter);
@@ -697,8 +679,8 @@ namespace xt
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.template xrbegin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = vec.template xrend<shape_type, layout_type::row_major>(shape);
+            auto iter = vec.template rbegin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = vec.template rend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(vec.data()[2 * nb_iter - 1], *iter);

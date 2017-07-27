@@ -350,7 +350,7 @@ namespace xt
         std::vector<double> d2 = {6, 7, 8, 9, 10, 11};
         xarray<double> expected_2;
         expected_2.reshape({2, 3, 1});
-        std::copy(d2.begin(), d2.end(), expected_2.template xbegin<layout_type::row_major>());
+        std::copy(d2.begin(), d2.end(), expected_2.template begin<layout_type::row_major>());
 
         xarray<double> t2 = xt::diagonal(e, 1);
         ASSERT_EQ(expected_2, t2);
@@ -358,7 +358,7 @@ namespace xt
         std::vector<double> d3 = {3, 9, 15, 21};
         xarray<double> expected_3;
         expected_3.reshape({2, 2, 1});
-        std::copy(d3.begin(), d3.end(), expected_3.template xbegin<layout_type::row_major>());
+        std::copy(d3.begin(), d3.end(), expected_3.template begin<layout_type::row_major>());
         xarray<double> t3 = xt::diagonal(e, -1, 2, 3);
         ASSERT_EQ(expected_3, t3);
     }

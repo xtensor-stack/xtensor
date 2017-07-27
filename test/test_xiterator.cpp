@@ -25,8 +25,8 @@ namespace xt
         size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
         int expected = a(1, 0, 1);
 
-        auto iter = a.template xbegin<layout_type::row_major>();
-        auto iter2 = a.template xbegin<layout_type::row_major>();
+        auto iter = a.template begin<layout_type::row_major>();
+        auto iter2 = a.template begin<layout_type::row_major>();
         for (size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
@@ -115,8 +115,8 @@ namespace xt
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
         size_type size = a.size();
-        auto iter = a.xbegin();
-        auto last = a.xend();
+        auto iter = a.begin();
+        auto last = a.end();
         for (size_type i = 0; i < size; ++i)
         {
             ++iter;
@@ -204,8 +204,8 @@ namespace xt
         size_type nb_inc = shape.back() * shape[shape.size() - 2] + 1;
         int expected = a(1, 1, 2);
 
-        auto iter = a.template xrbegin<layout_type::row_major>();
-        auto iter2 = a.template xrbegin<layout_type::row_major>();
+        auto iter = a.template rbegin<layout_type::row_major>();
+        auto iter2 = a.template rbegin<layout_type::row_major>();
         for (size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
@@ -293,8 +293,8 @@ namespace xt
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
         size_type size = a.size();
-        auto iter = a.xrbegin();
-        auto last = a.xrend();
+        auto iter = a.rbegin();
+        auto last = a.rend();
         for (size_type i = 0; i < size; ++i)
         {
             ++iter;
@@ -382,7 +382,20 @@ namespace xt
     TEST(xiterator, pointer)
     {
         xarray<double> m {{3, 4}, {6, 5}};
-        auto it = m.xbegin();
+        constexpr layout_type l = xarray<double>::static_layout == layout_type::column_major ?
+            layout_type::row_major : layout_type::column_major;
+        auto it = m.begin<l>();
         EXPECT_EQ(*(it.operator->()), 3);
+    }
+
+    TEST(xiterator, cross_layout)
+    {
+        xarray<int, layout_type::row_major> a = { { 1, 2, 3, 4}, { 5, 6, 7, 8}, {9, 10, 11, 12} };
+        xarray<int, layout_type::column_major> b = { { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 } };
+
+        // Performs an element-wise comparison via iterators and ensures the default traversal
+        // of a container is consistent for any layout.
+        bool res = (a == b);
+        EXPECT_TRUE(res);
     }
 }

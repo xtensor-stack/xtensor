@@ -296,27 +296,27 @@ namespace xt
     namespace detail
     {
         template <class C>
-        constexpr auto trivial_begin(C& c) -> decltype(c.begin())
+        constexpr auto trivial_begin(C& c) noexcept
         {
-            return c.begin();
+            return c.storage_begin();
         }
 
         template <class C>
-        constexpr auto trivial_end(C& c) -> decltype(c.end())
+        constexpr auto trivial_end(C& c) noexcept
         {
-            return c.end();
+            return c.storage_end();
         }
 
         template <class C>
-        constexpr auto trivial_begin(const C& c) -> decltype(c.begin())
+        constexpr auto trivial_begin(const C& c) noexcept
         {
-            return c.begin();
+            return c.storage_begin();
         }
 
         template <class C>
-        constexpr auto trivial_end(const C& c) -> decltype(c.end())
+        constexpr auto trivial_end(const C& c) noexcept
         {
-            return c.end();
+            return c.storage_end();
         }
     }
 

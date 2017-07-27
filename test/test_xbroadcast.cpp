@@ -30,7 +30,7 @@ namespace xt
         ASSERT_EQ(4.0, m1_broadcast2(0, 1, 0));
         ASSERT_EQ(5.0, m1_broadcast2(0, 1, 1));
 
-        double f = *(m1_broadcast.xbegin());
+        double f = *(m1_broadcast.begin());
         xarray<double> m1_assigned = m1_broadcast;
         ASSERT_EQ(5.0, m1_assigned(0, 1, 1));
     }
@@ -66,8 +66,8 @@ namespace xt
 
         // broadcast_iterator
         {
-            auto iter = m1_broadcast.template xbegin<layout_type::row_major>();
-            auto iter_end = m1_broadcast.template xend<layout_type::row_major>();
+            auto iter = m1_broadcast.template begin<layout_type::row_major>();
+            auto iter_end = m1_broadcast.template end<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(1, *iter);
@@ -79,8 +79,8 @@ namespace xt
         // shaped_xiterator
         {
             shape_type shape = {2, 2, 3};
-            auto iter = m1_broadcast.template xbegin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = m1_broadcast.template xend<shape_type, layout_type::row_major>(shape);
+            auto iter = m1_broadcast.template begin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = m1_broadcast.template end<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(1, *iter);
@@ -99,8 +99,8 @@ namespace xt
 
         // reverse_broadcast_iterator
         {
-            auto iter = m1_broadcast.template xrbegin<layout_type::row_major>();
-            auto iter_end = m1_broadcast.template xrend<layout_type::row_major>();
+            auto iter = m1_broadcast.template rbegin<layout_type::row_major>();
+            auto iter_end = m1_broadcast.template rend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(3, *iter);
@@ -112,8 +112,8 @@ namespace xt
         // reverse_shaped_xiterator
         {
             shape_type shape = {2, 2, 3};
-            auto iter = m1_broadcast.template xrbegin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = m1_broadcast.template xrend<shape_type, layout_type::row_major>(shape);
+            auto iter = m1_broadcast.template rbegin<shape_type, layout_type::row_major>(shape);
+            auto iter_end = m1_broadcast.template rend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
                 ++iter;
             EXPECT_EQ(3, *iter);
