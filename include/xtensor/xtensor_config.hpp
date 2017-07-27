@@ -11,7 +11,7 @@
 
 #define XTENSOR_VERSION_MAJOR 0
 #define XTENSOR_VERSION_MINOR 10
-#define XTENSOR_VERSION_PATCH 8
+#define XTENSOR_VERSION_PATCH 9
 
 // DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
 #ifdef __clang__
