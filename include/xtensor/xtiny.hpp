@@ -159,7 +159,7 @@ struct NormOfArrayElementsImpl<T, true, false>
        "'char' is not a numeric type, use 'signed char' or 'unsigned char'.");
 
     typedef double              NormType;
-    typedef unsigned long long  SquaredNormType;
+    typedef uint64_t            SquaredNormType;
 };
 
 template <class T>
@@ -197,17 +197,18 @@ struct NormOfVectorImpl
 
     /* NormTraits<T> implement the following default rules, which are
        designed to minimize the possibility of overflow:
-        * T is a 32-bit integer type:
+        * T is an integer type:
                NormType is T itself,
-               SquaredNormType is 'unsigned long long'
-        * T is another built-in arithmetic type:
-               NormType is T itself,
-               SquaredNormType is the NumericTraits<T>::UnsignedPromote
-        * T is a container of 'long double':
+               SquaredNormType is 'uint32_t' (sizeof(T) < 4) or 'uint64_t' (otherwise)
+        * T is a floating-point type:
+               NormType and SquaredNormType are T itself,
+        * T is a container of 'long double' elements:
                NormType and SquaredNormType are 'long double'
-        * T is a container of another built-in arithmetic type:
+        * T is a container of another floating-point type:
+               NormType and SquaredNormType are 'double',
+        * T is a container of integer elements:
                NormType is 'double',
-               SquaredNormType is 'unsigned long long'
+               SquaredNormType is 'uint64_t'
         * T is a container of some other type:
                NormType is the element's norm type,
                SquaredNormType is the element's squared norm type
