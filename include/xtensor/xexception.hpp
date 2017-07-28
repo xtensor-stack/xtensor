@@ -167,4 +167,20 @@ namespace xt
 #define XTENSOR_ASSERT(expr)
 #endif
 }
+
+#ifdef XTENSOR_ENABLE_ASSERT
+#define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE) \
+    if((PREDICATE)) {} else  { \
+        throw std::runtime_error(std::string("Assertion error!\n") + MESSAGE + \
+                                 "\n(" + __FILE__ + ':' +  std::to_string(__LINE__) + ")\n"); }
+
+#else
+#define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)
 #endif
+
+#define xtensor_precondition(PREDICATE, MESSAGE) \
+    if((PREDICATE)) {} else  { \
+        throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE + \
+                                 "\n(" + __FILE__ + ':' +  std::to_string(__LINE__) + ")\n"); }
+
+#endif // XEXCEPTION_HPP
