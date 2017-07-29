@@ -204,16 +204,16 @@ different fashions.
 +----------------------------------------------------------------+----------------------------------------------------------------+
 |            Python 3 - numpy                                    |                C++ 14 - xtensor                                | 
 +================================================================+================================================================+
-| | ``for x in np.nditer(a):``                                   | | ``for(auto it=a.xbegin(); it!=a.xend(); ++it)``              |
+| | ``for x in np.nditer(a):``                                   | | ``for(auto it=a.begin(); it!=a.end(); ++it)``                |
 +----------------------------------------------------------------+----------------------------------------------------------------+
-| Iterating over ``a`` with a prescribed broadcasting shape      | | ``a.xbegin({3, 4})``                                         |
-|                                                                | | ``a.xend({3, 4})``                                           |
+| Iterating over ``a`` with a prescribed broadcasting shape      | | ``a.begin({3, 4})``                                          |
+|                                                                | | ``a.end({3, 4})``                                            |
 +----------------------------------------------------------------+----------------------------------------------------------------+
-| Iterating over ``a`` in a row-major fashion                    | | ``a.xbegin<layout_type::row_major>()``                       |
-|                                                                | | ``a.xbegin<layout_type::row_major>()``                       |
+| Iterating over ``a`` in a row-major fashion                    | | ``a.begin<layout_type::row_major>()``                        |
+|                                                                | | ``a.begin<layout_type::row_major>()``                        |
 +----------------------------------------------------------------+----------------------------------------------------------------+
 | Iterating over ``a`` in a column-major fashion                 | | ``a.begin<layout_type::column_major>()``                     |
-|                                                                | | ``a.xend<layout_type::column_major>()``                      |
+|                                                                | | ``a.end<layout_type::column_major>()``                       |
 +----------------------------------------------------------------+----------------------------------------------------------------+
 
 Logical
