@@ -13,6 +13,7 @@ Releasing a new version
 From the master branch of xtensor
 
 - Make sure that you are in sync with the master branch of the upstream remote.
+- Update the `changelog <https://github.com/QuantStack/xtensor/blob/master/docs/source/changelog.rst>`_.
 - In file ``xtensor_config.hpp``, set the macros for ``XTENSOR_VERSION_MAJOR``, ``XTENSOR_VERSION_MINOR`` and ``XTENSOR_VERSION_PATCH`` to the desired values.
 - Stage the changes (``git add``), commit the changes (``git commit``) and add a tag of the form ``Major.minor.patch``. It is important to not add any other content to the tag name.
 - Push the new commit and tag to the main repository. (``git push``, and ``git push --tags``)
