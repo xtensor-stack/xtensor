@@ -84,12 +84,12 @@ namespace xt
         std::vector<size_t> idx = {2};
         EXPECT_EQ(fn(2, 2), v.element(idx.begin(), idx.end()));
 
-        auto it = v.xbegin();
+        auto it = v.begin();
         EXPECT_EQ(fn(1, 1), *it);
 
         EXPECT_EQ(fn(1, 2), *(++it));
         EXPECT_EQ(fn(2, 2), *(++it));
-        EXPECT_EQ(++it, v.xend());
+        EXPECT_EQ(++it, v.end());
     }
 
     TEST(xindexview, view_on_view)

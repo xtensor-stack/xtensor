@@ -40,17 +40,14 @@ namespace xt
     {
         using value_type = std::decay_t<CT>;
         using inner_shape_type = std::array<std::size_t, 0>;
-        using iterator = value_type*;
-        using const_iterator = const value_type*;
         using const_stepper = xscalar_stepper<true, CT>;
         using stepper = xscalar_stepper<false, CT>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
     };
 
+#define DL DEFAULT_LAYOUT
     template <class CT>
     class xscalar : public xexpression<xscalar<CT>>,
-                    public xiterable<xscalar<CT>>
+                    private xiterable<xscalar<CT>>
     {
     public:
 
@@ -71,8 +68,30 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
-        using iterator = typename iterable_base::iterator;
-        using const_iterator = typename iterable_base::const_iterator;
+        template <layout_type L>
+        using layout_iterator = typename iterable_base::template layout_iterator<L>;
+        template <layout_type L>
+        using const_layout_iterator = typename iterable_base::template const_layout_iterator<L>;
+
+        template <layout_type L>
+        using reverse_layout_iterator = typename iterable_base::template reverse_layout_iterator<L>;
+        template <layout_type L>
+        using const_reverse_layout_iterator = typename iterable_base::template const_reverse_layout_iterator<L>;
+
+        template <class S, layout_type L>
+        using broadcast_iterator = typename iterable_base::template broadcast_iterator<S, L>;
+        template <class S, layout_type L>
+        using const_broadcast_iterator = typename iterable_base::template const_broadcast_iterator<S, L>;
+
+        template <class S, layout_type L>
+        using reverse_broadcast_iterator = typename iterable_base::template reverse_broadcast_iterator<S, L>;
+        template <class S, layout_type L>
+        using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
+
+        using iterator = value_type*;
+        using const_iterator = const value_type*;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
         using dummy_iterator = xdummy_iterator<false, CT>;
         using const_dummy_iterator = xdummy_iterator<true, CT>;
@@ -109,13 +128,90 @@ namespace xt
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
 
+        template <layout_type L = DL>
         iterator begin() noexcept;
+        template <layout_type L = DL>
         iterator end() noexcept;
 
+        template <layout_type L = DL>
         const_iterator begin() const noexcept;
+        template <layout_type L = DL>
         const_iterator end() const noexcept;
+        template <layout_type L = DL>
         const_iterator cbegin() const noexcept;
+        template <layout_type L = DL>
         const_iterator cend() const noexcept;
+
+        template <layout_type L = DL>
+        reverse_iterator rbegin() noexcept;
+        template <layout_type L = DL>
+        reverse_iterator rend() noexcept;
+
+        template <layout_type L = DL>
+        const_reverse_iterator rbegin() const noexcept;
+        template <layout_type L = DL>
+        const_reverse_iterator rend() const noexcept;
+        template <layout_type L = DL>
+        const_reverse_iterator crbegin() const noexcept;
+        template <layout_type L = DL>
+        const_reverse_iterator crend() const noexcept;
+
+        template <class S, layout_type L = DL>
+        broadcast_iterator<S, L> begin(const S& shape) noexcept;
+        template <class S, layout_type L = DL>
+        broadcast_iterator<S, L> end(const S& shape) noexcept;
+
+        template <class S, layout_type L = DL>
+        const_broadcast_iterator<S, L> begin(const S& shape) const noexcept;
+        template <class S, layout_type L = DL>
+        const_broadcast_iterator<S, L> end(const S& shape) const noexcept;
+        template <class S, layout_type L = DL>
+        const_broadcast_iterator<S, L> cbegin(const S& shape) const noexcept;
+        template <class S, layout_type L = DL>
+        const_broadcast_iterator<S, L> cend(const S& shape) const noexcept;
+
+
+        template <class S, layout_type L = DL>
+        reverse_broadcast_iterator<S, L> rbegin(const S& shape) noexcept;
+        template <class S, layout_type L = DL>
+        reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
+
+        template <class S, layout_type L = DL>
+        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const noexcept;
+        template <class S, layout_type L = DL>
+        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const noexcept;
+        template <class S, layout_type L = DL>
+        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const noexcept;
+        template <class S, layout_type L = DL>
+        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
+
+        template <layout_type L = DL>
+        iterator storage_begin() noexcept;
+        template <layout_type L = DL>
+        iterator storage_end() noexcept;
+
+        template <layout_type L = DL>
+        const_iterator storage_begin() const noexcept;
+        template <layout_type L = DL>
+        const_iterator storage_end() const noexcept;
+        template <layout_type L = DL>
+        const_iterator storage_cbegin() const noexcept;
+        template <layout_type L = DL>
+        const_iterator storage_cend() const noexcept;
+
+        template <layout_type L = DL>
+        reverse_iterator storage_rbegin() noexcept;
+        template <layout_type L = DL>
+        reverse_iterator storage_rend() noexcept;
+
+        template <layout_type L = DL>
+        const_reverse_iterator storage_rbegin() const noexcept;
+        template <layout_type L = DL>
+        const_reverse_iterator storage_rend() const noexcept;
+        template <layout_type L = DL>
+        const_reverse_iterator storage_crbegin() const noexcept;
+        template <layout_type L = DL>
+        const_reverse_iterator storage_crend() const noexcept;
 
         template <class S>
         stepper stepper_begin(const S& shape) noexcept;
@@ -139,7 +235,11 @@ namespace xt
     private:
 
         CT m_value;
+
+        friend class xconst_iterable<self_type>;
+        friend class xiterable<self_type>;
     };
+#undef DL
 
     template <class T>
     xscalar<T&> xref(T& t);
@@ -251,25 +351,25 @@ namespace xt
     namespace detail
     {
         template <class CT>
-        constexpr auto trivial_begin(xscalar<CT>& c) -> decltype(c.dummy_begin())
+        constexpr auto trivial_begin(xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
         {
             return c.dummy_begin();
         }
 
         template <class CT>
-        constexpr auto trivial_end(xscalar<CT>& c) -> decltype(c.dummy_end())
+        constexpr auto trivial_end(xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
         {
             return c.dummy_end();
         }
 
         template <class CT>
-        constexpr auto trivial_begin(const xscalar<CT>& c) -> decltype(c.dummy_begin())
+        constexpr auto trivial_begin(const xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
         {
             return c.dummy_begin();
         }
 
         template <class CT>
-        constexpr auto trivial_end(const xscalar<CT>& c) -> decltype(c.dummy_end())
+        constexpr auto trivial_end(const xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
         {
             return c.dummy_end();
         }
@@ -377,39 +477,259 @@ namespace xt
     }
 
     template <class CT>
+    template <layout_type L>
     inline auto xscalar<CT>::begin() noexcept -> iterator
     {
         return &m_value;
     }
 
     template <class CT>
+    template <layout_type L>
     inline auto xscalar<CT>::end() noexcept -> iterator
     {
         return &m_value + 1;
     }
 
     template <class CT>
+    template <layout_type L>
     inline auto xscalar<CT>::begin() const noexcept -> const_iterator
     {
         return &m_value;
     }
 
     template <class CT>
+    template <layout_type L>
     inline auto xscalar<CT>::end() const noexcept -> const_iterator
     {
         return &m_value + 1;
     }
 
     template <class CT>
+    template <layout_type L>
     inline auto xscalar<CT>::cbegin() const noexcept -> const_iterator
     {
         return &m_value;
     }
 
     template <class CT>
+    template <layout_type L>
     inline auto xscalar<CT>::cend() const noexcept -> const_iterator
     {
         return &m_value + 1;
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::rbegin() noexcept -> reverse_iterator
+    {
+        return reverse_storage_iterator(end());
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::rend() noexcept -> reverse_iterator
+    {
+        return reverse_storage_iterator(begin());
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::rbegin() const noexcept -> const_reverse_iterator
+    {
+        return crbegin();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::rend() const noexcept -> const_reverse_iterator
+    {
+        return crend();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::crbegin() const noexcept -> const_reverse_iterator
+    {
+        return const_reverse_storage_iterator(cend());
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::crend() const noexcept -> const_reverse_iterator
+    {
+        return const_reverse_storage_iterator(cbegin());
+    }
+
+    /*****************************
+    * Broadcasting iterator api *
+    *****************************/
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::begin(const S& shape) noexcept -> broadcast_iterator<S, L>
+    {
+        return iterable_base::template begin<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
+    {
+        return iterable_base::template end<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::begin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    {
+        return iterable_base::template begin<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::end(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    {
+        return iterable_base::template end<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::cbegin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    {
+        return iterable_base::template cbegin<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    {
+        return iterable_base::template cend<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    {
+        return iterable_base::template rbegin<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    {
+        return iterable_base::template rend<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::rbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    {
+        return iterable_base::template rbegin<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::rend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    {
+        return iterable_base::template rend<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::crbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    {
+        return iterable_base::template crbegin<S, L>(shape);
+    }
+
+    template <class CT>
+    template <class S, layout_type L>
+    inline auto xscalar<CT>::crend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    {
+        return iterable_base::template crend<S, L>(shape);
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_begin() noexcept -> iterator
+    {
+        return begin<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_end() noexcept -> iterator
+    {
+        return end<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_begin() const noexcept -> const_iterator
+    {
+        return begin<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_end() const noexcept -> const_iterator
+    {
+        return end<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_cbegin() const noexcept -> const_iterator
+    {
+        return cbegin<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_cend() const noexcept -> const_iterator
+    {
+        return cend<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_rbegin() noexcept -> reverse_iterator
+    {
+        return rbegin<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_rend() noexcept -> reverse_iterator
+    {
+        return rend<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_rbegin() const noexcept -> const_reverse_iterator
+    {
+        return rbegin<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_rend() const noexcept -> const_reverse_iterator
+    {
+        return rend<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_crbegin() const noexcept -> const_reverse_iterator
+    {
+        return crbegin<L>();
+    }
+
+    template <class CT>
+    template <layout_type L>
+    inline auto xscalar<CT>::storage_crend() const noexcept -> const_reverse_iterator
+    {
+        return crend<L>();
     }
 
     template <class CT>

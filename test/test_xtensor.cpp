@@ -192,8 +192,11 @@ namespace xt
 
     TEST(xtensor, iterator)
     {
-        xtensor_dynamic a;
-        test_iterator<xtensor_dynamic, container_type>(a);
+        using xtensor_rm = xtensor<int, 3, layout_type::row_major>;
+        using xtensor_cm = xtensor<int, 3, layout_type::column_major>;
+        xtensor_rm arm;
+        xtensor_cm acm;
+        test_iterator<xtensor_rm, xtensor_cm, container_type>(arm, acm);
     }
 
     TEST(xtensor, zerod)

@@ -17,10 +17,3 @@ Defined in ``xtensor/xiterable.hpp``
    :project: xtensor
    :members:
 
-.. doxygenclass:: xt::xexpression_const_iterable
-   :project: xtensor
-   :members:
-
-.. doxygenclass:: xt::xexpression_iterable
-   :project: xtensor
-   :members:

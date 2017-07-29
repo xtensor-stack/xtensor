@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
 #include "test_common.hpp"
 
 namespace xt
@@ -178,8 +179,9 @@ namespace xt
 
     TEST(xarray, iterator)
     {
-        xarray_dynamic a;
-        test_iterator(a);
+        xarray<int, layout_type::row_major> arm;
+        xarray<int, layout_type::column_major> acm;
+        test_iterator(arm, acm);
     }
 
     TEST(xarray, initializer_list)
@@ -228,9 +230,9 @@ namespace xt
         EXPECT_EQ(a, rb);
     }
 
-    TEST(xarray, xend_optimized_stride)
+    TEST(xarray, end_optimized_stride)
     {
         xarray_dynamic a = {1};
-        EXPECT_FALSE((a.xbegin() == a.xend()));
+        EXPECT_FALSE((a.begin() == a.end()));
     }
 }

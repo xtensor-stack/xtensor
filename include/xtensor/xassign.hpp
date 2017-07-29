@@ -256,7 +256,7 @@ namespace xt
     template <class E1, class E2>
     inline void trivial_assigner<false>::run(E1& e1, const E2& e2)
     {
-        std::copy(e2.cbegin(), e2.cend(), e1.begin());
+        std::copy(e2.storage_cbegin(), e2.storage_cend(), e1.storage_begin());
     }
 }
 

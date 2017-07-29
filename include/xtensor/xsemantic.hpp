@@ -547,7 +547,7 @@ namespace xt
     inline auto xview_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
     {
         D& d = this->derived_cast();
-        std::transform(d.xbegin(), d.xend(), d.xbegin(),
+        std::transform(d.begin(), d.end(), d.begin(),
                        [e, &f](const auto& v) { return f(v, e); });
         return this->derived_cast();
     }

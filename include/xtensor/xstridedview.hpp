@@ -41,10 +41,6 @@ namespace xt
         using inner_backstrides_type_type = inner_shape_type;
         using const_stepper = xstepper<const xstrided_view<CT, S, CD>>;
         using stepper = xstepper<xstrided_view<CT, S, CD>>;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using iterator = xiterator<stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
     };
 
     /*****************
@@ -65,7 +61,7 @@ namespace xt
      */
     template <class CT, class S, class CD>
     class xstrided_view : public xview_semantic<xstrided_view<CT, S, CD>>,
-                          public xexpression_iterable<xstrided_view<CT, S, CD>>
+                          public xiterable<xstrided_view<CT, S, CD>>
     {
     public:
 
@@ -83,7 +79,7 @@ namespace xt
 
         using underlying_container_type = CD;
 
-        using iterable_base = xexpression_iterable<self_type>;
+        using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = shape_type;

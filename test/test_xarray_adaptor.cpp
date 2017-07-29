@@ -128,8 +128,11 @@ namespace xt
     TEST(xarray_adaptor, iterator)
     {
         vec_type v;
-        adaptor_type a(v);
-        test_iterator(a);
+        using adaptor_rm = xarray_adaptor<vec_type, layout_type::row_major>;
+        using adaptor_cm = xarray_adaptor<vec_type, layout_type::column_major>;
+        adaptor_rm arm(v);
+        adaptor_cm acm(v);
+        test_iterator(arm, acm);
     }
 
     TEST(xarray_adaptor, xiterator)

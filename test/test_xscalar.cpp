@@ -40,10 +40,10 @@ namespace xt
     TEST(xscalar, iterator)
     {
         xscalar<int> x(2);
-        auto xiter = x.xbegin();
+        auto xiter = x.begin();
         *xiter = 4;
         EXPECT_EQ(4, x());
-        auto xiter_end = x.xend();
+        auto xiter_end = x.end();
         ++xiter;
         EXPECT_EQ(xiter, xiter_end);
         auto iter = x.begin();

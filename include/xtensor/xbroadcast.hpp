@@ -54,10 +54,6 @@ namespace xt
         using inner_shape_type = promote_shape_t<typename xexpression_type::shape_type, X>;
         using const_stepper = typename xexpression_type::const_stepper;
         using stepper = const_stepper;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using iterator = const_iterator;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
     };
 
     /**
@@ -75,7 +71,7 @@ namespace xt
      */
     template <class CT, class X>
     class xbroadcast : public xexpression<xbroadcast<CT, X>>,
-                       public xexpression_const_iterable<xbroadcast<CT, X>>
+                       public xconst_iterable<xbroadcast<CT, X>>
     {
 
     public:
@@ -90,7 +86,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xexpression_const_iterable<self_type>;
+        using iterable_base = xconst_iterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
 
