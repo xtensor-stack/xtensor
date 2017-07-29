@@ -36,7 +36,7 @@ bool equalVector(VECTOR1 const & v1, VECTOR2 const & v2)
 }
 
 template <class ITER1, class ITER2>
-bool equalIter(ITER1 i1, ITER1 i1end, ITER2 i2, xt::ArrayIndex size)
+bool equalIter(ITER1 i1, ITER1 i1end, ITER2 i2, xt::index_t size)
 {
     if (i1end - i1 != size)
         return false;
@@ -63,14 +63,10 @@ namespace xt
     TEST(xtiny, traits)
     {
         EXPECT_TRUE(BV::may_use_uninitialized_memory);
-        // FIXME: should be FALSE
         EXPECT_TRUE((tiny_array<BV, runtime_size>::may_use_uninitialized_memory));
-        EXPECT_TRUE(UninitializedMemoryTraits<BV>::value == (SIZE != runtime_size));
-        EXPECT_TRUE((UninitializedMemoryTraits<tiny_array<tiny_array<int, runtime_size>, SIZE>>::value == false));
-        //EXPECT_TRUE(ValueTypeTraits<BV>::value);
-        //EXPECT_TRUE((std::is_same<unsigned char, typename ValueTypeTraits<BV>::type>::value));
+        EXPECT_FALSE((tiny_array<tiny_array<int, runtime_size>, SIZE>::may_use_uninitialized_memory));
 
-        EXPECT_TRUE((std::is_same<IV, promote_t<IV>>::value));
+        EXPECT_TRUE((std::is_same<IV, promote_t<BV>>::value));
         EXPECT_TRUE((std::is_same<tiny_array<double, 3>, real_promote_t<IV>>::value));
         EXPECT_TRUE((std::is_same<typename IV::template as_type<double>, real_promote_t<IV>>::value));
 
@@ -110,7 +106,7 @@ namespace xt
         EXPECT_EQ(iv1, (IV({ 1 })));
         EXPECT_EQ(iv1, (IV({ 1.1 })));
         EXPECT_EQ(iv1, IV(tags::size = SIZE, 1));
-        // these should not compile:  
+        // these should not compile:
         // EXPECT_EQ(iv1, IV(1));
         // EXPECT_EQ(iv3, IV(1, 2, 4));
 
@@ -122,7 +118,7 @@ namespace xt
         EXPECT_TRUE(equalIter(bv3.begin(), bv3.end(), bv4.begin(), SIZE));
         EXPECT_TRUE(equalVector(bv3, bv4));
 
-        BV bv5(bv3.begin(), ReverseCopy);
+        BV bv5(bv3.begin(), copy_reversed);
         EXPECT_TRUE(equalIter(bv3.begin(), bv3.end(),
             std::reverse_iterator<typename BV::iterator>(bv5.end()), SIZE));
 
@@ -160,22 +156,22 @@ namespace xt
 
         for (int k = 0; k<SIZE; ++k)
         {
-            IV iv = IV::unitVector(k);
+            IV iv = IV::unit_vector(k);
             EXPECT_EQ(iv[k], 1);
             iv[k] = 0;
             EXPECT_TRUE(!any(iv));
         }
 
-        IV seq = IV::linearSequence(), seq_ref(tags::size = seq.size());
+        IV seq = IV::linear_sequence(), seq_ref(tags::size = seq.size());
         std::iota(seq_ref.begin(), seq_ref.end(), 0);
         EXPECT_EQ(seq, seq_ref);
 
-        seq = IV::linearSequence(2);
+        seq = IV::linear_sequence(2);
         std::iota(seq_ref.begin(), seq_ref.end(), 2);
         EXPECT_EQ(seq, seq_ref);
         EXPECT_EQ(seq, IV::range((int)seq.size() + 2));
 
-        seq = IV::linearSequence(20, -1);
+        seq = IV::linear_sequence(20, -1);
         std::iota(seq_ref.rbegin(), seq_ref.rend(), 20 - (int)seq.size() + 1);
         EXPECT_EQ(seq, seq_ref);
 
@@ -183,7 +179,7 @@ namespace xt
         for (int k = 0; k<SIZE; ++k)
             EXPECT_EQ(iv3[k], r[SIZE - 1 - k]);
 
-        EXPECT_EQ(transpose(r, IV::linearSequence(SIZE - 1, -1)), iv3);
+        EXPECT_EQ(transpose(r, IV::linear_sequence(SIZE - 1, -1)), iv3);
 
         r.reverse();
         EXPECT_EQ(r, iv3);
@@ -282,17 +278,15 @@ namespace xt
         EXPECT_TRUE(equalIter(ivi3.begin(), ivi3.end(), ri, SIZE));
         ivi3 = floor(fv3);
         EXPECT_TRUE(equalIter(ivi3.begin(), ivi3.end(), fpi, SIZE));
-        ivi3 = roundi(fv3);
-        EXPECT_TRUE(equalIter(ivi3.begin(), ivi3.end(), ri, SIZE));
         ivi3 = -ceil(fvm3);
         EXPECT_TRUE(equalIter(ivi3.begin(), ivi3.end(), fpi, SIZE));
         ivi3 = -round(fvm3);
         EXPECT_TRUE(equalIter(ivi3.begin(), ivi3.end(), ri, SIZE));
 
-        EXPECT_EQ(clipLower(iv3), iv3);
-        EXPECT_EQ(clipLower(iv3, 11), IV{ 11 });
-        EXPECT_EQ(clipUpper(iv3, 0), IV{ 0 });
-        EXPECT_EQ(clipUpper(iv3, 11), iv3);
+        EXPECT_EQ(clip_lower(iv3), iv3);
+        EXPECT_EQ(clip_lower(iv3, 11), IV{ 11 });
+        EXPECT_EQ(clip_upper(iv3, 0), IV{ 0 });
+        EXPECT_EQ(clip_upper(iv3, 11), iv3);
         EXPECT_EQ(clip(iv3, 0, 11), iv3);
         EXPECT_EQ(clip(iv3, 11, 12), IV{ 11 });
         EXPECT_EQ(clip(iv3, -1, 0), IV{ 0 });
@@ -300,24 +294,27 @@ namespace xt
         EXPECT_EQ(clip(iv3, IV{11}, IV{12}), IV{11});
         EXPECT_EQ(clip(iv3, IV{-1}, IV{0 }), IV{0 });
 
-        EXPECT_TRUE(squaredNorm(bv1) == SIZE);
-        EXPECT_TRUE(squaredNorm(iv1) == SIZE);
-        EXPECT_TRUE(squaredNorm(fv1) == (float)SIZE);
+        EXPECT_TRUE(squared_norm(bv1) == SIZE);
+        EXPECT_TRUE(squared_norm(iv1) == SIZE);
+        EXPECT_TRUE(squared_norm(fv1) == (float)SIZE);
 
         float expectedSM = 1.2f*1.2f + 2.4f*2.4f + 3.6f*3.6f;
-        EXPECT_TRUE(mathfunctions::isclose(squaredNorm(fv3), expectedSM, 1e-7f));
+        EXPECT_NEAR(squared_norm(fv3), expectedSM, 1e-6);
 
-        EXPECT_EQ(dot(bv3, bv3), squaredNorm(bv3));
-        EXPECT_EQ(dot(iv3, bv3), squaredNorm(iv3));
-        EXPECT_TRUE(mathfunctions::isclose(dot(fv3, fv3), squaredNorm(fv3)));
+        EXPECT_EQ(dot(bv3, bv3), squared_norm(bv3));
+        EXPECT_EQ(dot(iv3, bv3), squared_norm(iv3));
+        EXPECT_NEAR(dot(fv3, fv3), squared_norm(fv3), 1e-6);
 
         tiny_array<IV, 3> ivv{ iv3, iv3, iv3 };
-        EXPECT_EQ(squaredNorm(ivv), 3 * squaredNorm(iv3));
-        EXPECT_EQ(norm(ivv), sqrt(3.0*squaredNorm(iv3)));
+        EXPECT_EQ(squared_norm(ivv), 3 * squared_norm(iv3));
+        EXPECT_EQ(norm(ivv), sqrt(3.0*squared_norm(iv3)));
 
-        EXPECT_TRUE(mathfunctions::isclose(sqrt(dot(bv3, bv3)), norm(bv3), 0.0));
-        EXPECT_TRUE(mathfunctions::isclose(sqrt(dot(iv3, bv3)), norm(iv3), 0.0));
-        EXPECT_TRUE(mathfunctions::isclose(sqrt(dot(fv3, fv3)), norm(fv3), 0.0f));
+        EXPECT_TRUE(isclose(sqrt(dot(bv3, bv3)), norm(bv3), 0.0));
+        EXPECT_TRUE(isclose(sqrt(dot(iv3, bv3)), norm(iv3), 0.0));
+        EXPECT_TRUE(isclose(sqrt(dot(fv3, fv3)), norm(fv3), 0.0));
+        EXPECT_NEAR(sqrt(dot(bv3, bv3)), norm(bv3), 1e-6);
+        EXPECT_NEAR(sqrt(dot(iv3, bv3)), norm(iv3), 1e-6);
+        EXPECT_NEAR(sqrt(dot(fv3, fv3)), norm(fv3), 1e-6);
 
         BV bv = bv3;
         bv[2] = 200;
@@ -325,7 +322,7 @@ namespace xt
         if (SIZE == 6)
             expectedSM2 += 189;
         EXPECT_EQ(dot(bv, bv), expectedSM2);
-        EXPECT_EQ(squaredNorm(bv), expectedSM2);
+        EXPECT_EQ(squared_norm(bv), expectedSM2);
 
         EXPECT_TRUE(equalVector(bv0 + 1.0, fv1));
         EXPECT_TRUE(equalVector(1.0 + bv0, fv1));
@@ -349,7 +346,7 @@ namespace xt
 
         bvp = bv3 / 2.0;
         fvp = bv3 / 2.0;
-        int ip[] = { 0, 1, 2, 3, 4, 5 }; 
+        int ip[] = { 0, 1, 2, 3, 4, 5 };
         float fp[] = { 0.5, 1.0, 2.0, 2.5, 4.0, 5.0 };
         EXPECT_TRUE(equalIter(bvp.begin(), bvp.end(), ip, SIZE));
         EXPECT_TRUE(equalIter(fvp.begin(), fvp.end(), fp, SIZE));
@@ -405,7 +402,7 @@ namespace xt
         EXPECT_EQ(sum(fv3),  7.2f);
         EXPECT_EQ(prod(iv3), 8);
         EXPECT_EQ(prod(fv3), 10.368f);
-        EXPECT_TRUE(mathfunctions::isclose(mean(iv3), 7.0 / SIZE, 1e-15));
+        EXPECT_NEAR(mean(iv3), 7.0 / SIZE, 1e-7);
 
         float cumsumRef[] = { 1.2f, 3.6f, 7.2f};
         FV cs = cumsum(fv3), csr(cumsumRef);
@@ -448,7 +445,7 @@ namespace xt
     TEST(xtiny, 2D)
     {
         using Array = tiny_array<int, 2, 3>;
-        using Index = tiny_array<ArrayIndex, 2>;
+        using Index = tiny_array<index_t, 2>;
 
         EXPECT_EQ(Array::static_ndim, 2);
         EXPECT_EQ(Array::static_size, 6);
@@ -511,8 +508,9 @@ namespace xt
         EXPECT_TRUE(!allGreaterEqual(a, b));
         EXPECT_TRUE(isclose(a, b, 10.0f));
 
-        EXPECT_EQ(squaredNorm(a), 55);
-        EXPECT_TRUE(mathfunctions::isclose(norm(a), sqrt(55.0), 1e-15));
+        EXPECT_EQ(squared_norm(a), 55);
+        EXPECT_TRUE(isclose(norm(a), sqrt(55.0), 1e-15));
+        EXPECT_NEAR(norm(a), sqrt(55.0), 1e-15);
         EXPECT_EQ(min(a), 0);
         EXPECT_EQ(max(a), 5);
         EXPECT_EQ(max(a, b), b);
@@ -583,7 +581,7 @@ namespace xt
 
         EXPECT_EQ(cross(a, a), e);
         EXPECT_EQ(dot(a, a), 14);
-        EXPECT_EQ(squaredNorm(a), 14);
+        EXPECT_EQ(squared_norm(a), 14);
 
         EXPECT_EQ(a.erase(1), (A{ 1,3 }));
         EXPECT_EQ(a.insert(3, 4), (A{ 1,2,3,4 }));
@@ -625,7 +623,7 @@ namespace xt
         EXPECT_EQ((A{ 0,0,0 }), A(tags::size = 3));
         EXPECT_EQ((A{ 1,1,1 }), A(tags::size = 3, 1));
 
-        EXPECT_EQ(A::unitVector(tags::size = 3, 1), TA::unitVector(1));
+        EXPECT_EQ(A::unit_vector(tags::size = 3, 1), TA::unit_vector(1));
     }
 
 } // namespace xt

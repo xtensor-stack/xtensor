@@ -409,7 +409,7 @@ namespace xt
     /**
      * @ingroup logical_operators
      * @brief return vector of indices where T is not zero
-     * 
+     *
      * @param arr input array
      * @return vector of \a index_types where arr is not equal to zero
      */
@@ -457,7 +457,7 @@ namespace xt
      * @ingroup logical_operators
      * @brief return vector of indices where condition is true
      *        (equivalent to \a nonzero(condition))
-     * 
+     *
      * @param condition input array
      * @return vector of \a index_types where condition is not equal to zero
      */
@@ -477,6 +477,7 @@ namespace xt
     * @param e an \ref xexpression
     * @return a boolean
     */
+#if 0 // FIXME: this template matches too greedily, add appropriate concept check
     template <class E>
     inline bool any(E&& e)
     {
@@ -492,6 +493,7 @@ namespace xt
                                [](const typename std::decay_t<E>::value_type& el) { return el; });
         }
     }
+#endif
 
     /**
     * @ingroup logical_operators
@@ -502,6 +504,7 @@ namespace xt
     * @param e an \ref xexpression
     * @return a boolean
     */
+#if 0 // FIXME: this template matches too greedily, add appropriate concept check
     template <class E>
     inline bool all(E&& e)
     {
@@ -517,6 +520,7 @@ namespace xt
                                [](const typename std::decay_t<E>::value_type& el) { return el; });
         }
     }
+#endif
 }
 
 #endif

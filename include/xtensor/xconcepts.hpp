@@ -85,9 +85,9 @@ struct iterator_concept
 /**********************************************************/
 
     // result of arithmetic expressions
-    // (e.g. unsigned char * unsigned char => int)
+    // (e.g. unsigned char + unsigned char => int)
 template <class T1, class T2 = T1>
-using promote_t = decltype(*(typename std::decay<T1>::type*)0 * *(typename std::decay<T2>::type*)0);
+using promote_t = decltype(*(typename std::decay<T1>::type*)0 + *(typename std::decay<T2>::type*)0);
 
     // result of algebraic expressions
     // (e.g. sqrt(int) => double)
