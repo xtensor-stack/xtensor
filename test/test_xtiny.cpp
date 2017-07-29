@@ -50,9 +50,9 @@ bool equalIter(ITER1 i1, ITER1 i1end, ITER2 i2, xt::ArrayIndex size)
 namespace xt
 {
     static const int SIZE = 3;
-    using BV = TinyArray<unsigned char, SIZE>;
-    using IV = TinyArray<int, SIZE>;
-    using FV = TinyArray<float, SIZE>;
+    using BV = tiny_array<unsigned char, SIZE>;
+    using IV = tiny_array<int, SIZE>;
+    using FV = tiny_array<float, SIZE>;
 
     static float di[] = { 1, 2, 4};
     static float df[] = { 1.2f, 2.4f, 3.6f};
@@ -64,20 +64,20 @@ namespace xt
     {
         EXPECT_TRUE(BV::may_use_uninitialized_memory);
         // FIXME: should be FALSE
-        EXPECT_TRUE((TinyArray<BV, runtime_size>::may_use_uninitialized_memory));
+        EXPECT_TRUE((tiny_array<BV, runtime_size>::may_use_uninitialized_memory));
         EXPECT_TRUE(UninitializedMemoryTraits<BV>::value == (SIZE != runtime_size));
-        EXPECT_TRUE((UninitializedMemoryTraits<TinyArray<TinyArray<int, runtime_size>, SIZE>>::value == false));
+        EXPECT_TRUE((UninitializedMemoryTraits<tiny_array<tiny_array<int, runtime_size>, SIZE>>::value == false));
         //EXPECT_TRUE(ValueTypeTraits<BV>::value);
         //EXPECT_TRUE((std::is_same<unsigned char, typename ValueTypeTraits<BV>::type>::value));
 
-        EXPECT_TRUE((std::is_same<IV, PromoteType<IV>>::value));
-        EXPECT_TRUE((std::is_same<TinyArray<double, 3>, RealPromoteType<IV>>::value));
-        EXPECT_TRUE((std::is_same<typename IV::template AsType<double>, RealPromoteType<IV>>::value));
+        EXPECT_TRUE((std::is_same<IV, promote_t<IV>>::value));
+        EXPECT_TRUE((std::is_same<tiny_array<double, 3>, real_promote_t<IV>>::value));
+        EXPECT_TRUE((std::is_same<typename IV::template as_type<double>, real_promote_t<IV>>::value));
 
-        EXPECT_TRUE((std::is_same<unsigned long long, SquaredNormType<TinyArray<int, 1> > >::value));
-        EXPECT_TRUE((std::is_same<unsigned long long, SquaredNormType<TinyArray<TinyArray<int, 1>, 1> > >::value));
-        EXPECT_TRUE((std::is_same<double, NormType<TinyArray<int, 1> > >::value));
-        EXPECT_TRUE((std::is_same<double, NormType<TinyArray<TinyArray<int, 1>, 1> > >::value));
+        EXPECT_TRUE((std::is_same<unsigned long long, squared_norm_t<tiny_array<int, 1> > >::value));
+        EXPECT_TRUE((std::is_same<unsigned long long, squared_norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
+        EXPECT_TRUE((std::is_same<double, norm_t<tiny_array<int, 1> > >::value));
+        EXPECT_TRUE((std::is_same<double, norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
     }
 
     TEST(xtiny, construct)
@@ -138,7 +138,7 @@ namespace xt
         EXPECT_TRUE(equalIter(bv3.begin(), bv3.end(), fv.begin(), SIZE));
         EXPECT_TRUE(equalVector(bv3, fv));
 
-        TinyArray<double, 5> fv5;
+        tiny_array<double, 5> fv5;
         fv5.init(fv3.begin(), fv3.end());
         EXPECT_EQ(fv5[0], fv3[0]);
         EXPECT_EQ(fv5[1], fv3[1]);
@@ -188,7 +188,7 @@ namespace xt
         r.reverse();
         EXPECT_EQ(r, iv3);
 
-        typedef TinyArray<typename FV::value_type, SIZE - 1> FV1;
+        typedef tiny_array<typename FV::value_type, SIZE - 1> FV1;
         FV1 fv10(fv3.begin());
         EXPECT_EQ(fv10, fv3.erase(SIZE - 1));
         EXPECT_EQ(fv3, fv10.insert(SIZE - 1, fv3[SIZE - 1]));
@@ -311,7 +311,7 @@ namespace xt
         EXPECT_EQ(dot(iv3, bv3), squaredNorm(iv3));
         EXPECT_TRUE(mathfunctions::isclose(dot(fv3, fv3), squaredNorm(fv3)));
 
-        TinyArray<IV, 3> ivv{ iv3, iv3, iv3 };
+        tiny_array<IV, 3> ivv{ iv3, iv3, iv3 };
         EXPECT_EQ(squaredNorm(ivv), 3 * squaredNorm(iv3));
         EXPECT_EQ(norm(ivv), sqrt(3.0*squaredNorm(iv3)));
 
@@ -414,11 +414,11 @@ namespace xt
         FV cr = cumprod(fv3), crr(cumprodRef);
         EXPECT_TRUE(isclose(cr, crr, 1e-6f));
 
-        TinyArray<int, 4> src{ 1, 2, -3, -4 }, signs{ 2, -3, 4, -5 };
-        EXPECT_EQ(copysign(src, signs), (TinyArray<int, 4>{1, -2, 3, -4}));
+        tiny_array<int, 4> src{ 1, 2, -3, -4 }, signs{ 2, -3, 4, -5 };
+        EXPECT_EQ(copysign(src, signs), (tiny_array<int, 4>{1, -2, 3, -4}));
 
-        TinyArray<double, 3> left{ 3., 5., 8. }, right{ 4., 12., 15. };
-        EXPECT_EQ(hypot(left, right), (TinyArray<double, 3>{5., 13., 17.}));
+        tiny_array<double, 3> left{ 3., 5., 8. }, right{ 4., 12., 15. };
+        EXPECT_EQ(hypot(left, right), (tiny_array<double, 3>{5., 13., 17.}));
 
         int oddRef[] = { 1, 0, 0, 1, 0, 0 };
         EXPECT_TRUE(equalIter(oddRef, oddRef + SIZE, odd(iv3).begin(), SIZE));
@@ -447,8 +447,8 @@ namespace xt
 
     TEST(xtiny, 2D)
     {
-        using Array = TinyArray<int, 2, 3>;
-        using Index = TinyArray<ArrayIndex, 2>;
+        using Array = tiny_array<int, 2, 3>;
+        using Index = tiny_array<ArrayIndex, 2>;
 
         EXPECT_EQ(Array::static_ndim, 2);
         EXPECT_EQ(Array::static_size, 6);
@@ -479,7 +479,7 @@ namespace xt
             EXPECT_EQ(s, ss.str());
         }
 
-        TinySymmetricView<int, 3> sym(a.data());
+        tiny_symmetric_view<int, 3> sym(a.data());
         EXPECT_EQ(sym.shape(), (Index{ 3, 3 }));
         {
             std::string s = "{4, 5, 6,\n 5, 7, 8,\n 6, 8, 9}";
@@ -488,7 +488,7 @@ namespace xt
             EXPECT_EQ(s, ss.str());
         }
 
-        Array::AsType<float> b = a;
+        Array::as_type<float> b = a;
         EXPECT_EQ(a, b);
 
         int adata2[] = { 0,1,2,3,4,5 };
@@ -528,10 +528,10 @@ namespace xt
 
     TEST(xtiny, runtime_size)
     {
-        using A = TinyArray<int>;
-        using V1 = TinyArray<int, 1>;
+        using A = tiny_array<int>;
+        using V1 = tiny_array<int, 1>;
 
-        EXPECT_TRUE(typeid(A) == typeid(TinyArray<int, runtime_size>));
+        EXPECT_TRUE(typeid(A) == typeid(tiny_array<int, runtime_size>));
 
         A a{ 1,2,3 }, b{ 1,2,3 }, c = a, d = a + b, e(3);
         EXPECT_EQ(a.size(), 3);
@@ -614,7 +614,7 @@ namespace xt
 
         EXPECT_THROW(A(3) / A(2), std::runtime_error);
 
-        using TA = TinyArray<int, 3>;
+        using TA = tiny_array<int, 3>;
         TA s(A{ 1,2,3 });
         EXPECT_EQ(s, (TA{ 1,2,3 }));
         s = A{ 3,4,5 };
