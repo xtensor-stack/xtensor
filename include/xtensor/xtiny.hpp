@@ -832,6 +832,14 @@ class TinyArrayBase
         data_[LEVEL] = v1;
     }
 
+    template <class ITERATOR,
+              XTENSOR_REQUIRE<IteratorConcept<ITERATOR>::value>>
+    void initImpl(ITERATOR i)
+    {
+        for(ArrayIndex k=0; k < static_size; ++k, ++i)
+            data_[k] = static_cast<VALUETYPE>(*i);
+    }
+
   public:
 
     template <class NEW_VALUETYPE>
@@ -877,33 +885,20 @@ class TinyArrayBase
     }
 
     // constructor for zero or one argument
-    // activate 'constexpr' in C++ 14
-    explicit /* constexpr */ TinyArrayBase(value_type v = value_type())
+    explicit TinyArrayBase(value_type v = value_type())
     {
         for(int i=0; i<static_size; ++i)
             data_[i] = v;
     }
 
-    // constructor for two or more arguments
-    template <class ... V>
-    constexpr TinyArrayBase(value_type v0, value_type v1, V ... v)
-    : data_{VALUETYPE(v0), VALUETYPE(v1), VALUETYPE(v)...}
-    {
-        static_assert(sizeof...(V)+2 == static_size,
-                      "TinyArrayBase(): number of constructor arguments contradicts size().");
-    }
-
     // // constructor for two or more arguments
-    // constexpr TinyArrayBase(std::initializer_list<value_type> const & init)
-    // : data_(init)
+    // template <class ... V>
+    // constexpr TinyArrayBase(value_type v0, value_type v1, V ... v)
+    // : data_{VALUETYPE(v0), VALUETYPE(v1), VALUETYPE(v)...}
     // {
-        // static_assert(init.size() == static_size,
-                      // "TinyArrayBase(): wrong number of arguments.");
+        // static_assert(sizeof...(V)+2 == static_size,
+                      // "TinyArrayBase(): number of constructor arguments contradicts size().");
     // }
-
-    constexpr TinyArrayBase(value_type const (&v)[static_ndim])
-    : data_{v}
-    {}
 
     template <class U>
     explicit TinyArrayBase(U const * u)
@@ -1286,7 +1281,7 @@ class TinyArrayBase
     TinyArray<value_type, N...>
     linearSequence(value_type start = value_type(), value_type step = value_type(1))
     {
-        TinyArray<value_type, N...> res;
+        TinyArray<value_type, N...> res(DontInit);
         for(int k=0; k < static_size; ++k, start += step)
             res[k] = start;
         return res;
@@ -1298,7 +1293,7 @@ class TinyArrayBase
     range(value_type end)
     {
         value_type start = end - static_size;
-        TinyArray<value_type, N...> res;
+        TinyArray<value_type, N...> res(DontInit);
         for(int k=0; k < static_size; ++k, ++start)
             res[k] = start;
         return res;
@@ -1726,13 +1721,8 @@ class TinyArray
     static const ArrayIndex static_size = base_type::static_size;
 
     explicit constexpr
-    TinyArray(value_type const & v = value_type())
-    : base_type(v)
-    {}
-
-    template <class ... V>
-    constexpr TinyArray(value_type v0, value_type v1, V... v)
-    : base_type(v0, v1, v...)
+    TinyArray()
+    : base_type(value_type())
     {}
 
     explicit
@@ -1740,12 +1730,32 @@ class TinyArray
     : base_type(DontInit)
     {}
 
-        // /** Construction from lemon::Invalid.
-            // Initializes all vector elements with -1.
-        // */
-    // constexpr TinyArray(lemon::Invalid const &)
-    // : base_type(-1)
+        // This constructor would allow construction with round brackets, e.g.:
+        //     TinyArray<int, 1> a(2);
+        // However, this may lead to bugs when fixed-size arrays are mixed with
+        // runtime_size arrays, where
+        //     TinyArray<int, runtime_size> a(2);
+        // constructs an array of length 2 with initial value 0. To avoid such bugs,
+        // construction is restricted to curly braces:
+        //     TinyArray<int, 1> a{2};
+        //
+    // template <class ... V>
+    // constexpr TinyArray(value_type v0, V... v)
+    // : base_type(v0, v...)
     // {}
+
+    template <class V>
+    TinyArray(std::initializer_list<V> v)
+    : base_type(DontInit)
+    {
+        if(v.size() == 1)
+            base_type::init(static_cast<value_type>(*v.begin()));
+        else if(v.size() == static_size)
+            base_type::initImpl(v.begin());
+        else
+            xtensor_precondition(false,
+                "TinyArray(std::initializer_list<V>): wrong initialization size.");
+    }
 
         // for compatibility with TinyArray<VALUETYPE, runtime_size>
     explicit
@@ -1792,12 +1802,23 @@ class TinyArray
         {
             xtensor_precondition(this->size() == other.size(),
                 "TinyArray(): shape mismatch.");
-            this->init(other.begin(), other.end());
+            this->initImpl(other.begin());
         }
     }
 
-    constexpr TinyArray(value_type const (&v)[static_ndim])
-    : base_type(v)
+    explicit TinyArray(value_type const (&u)[1])
+    : base_type(*u)
+    {}
+
+    template <class U>
+    explicit TinyArray(U const (&u)[1])
+    : base_type(static_cast<value_type>(*u))
+    {}
+
+    template <class U, int S=static_size,
+              XTENSOR_REQUIRE<S != 1>>
+    explicit TinyArray(U const (&u)[static_size])
+    : base_type(u)
     {}
 
     template <class U,
@@ -1917,14 +1938,6 @@ class TinyArray<VALUETYPE, runtime_size>
             std::uninitialized_fill(this->begin(), this->end(), value_type());
     }
 
-    // TinyArray(lemon::Invalid const &)
-    // : base_type()
-    // {}
-
-    // TinyArray(ArrayIndex size, lemon::Invalid const &)
-    // : TinyArray(size, value_type(-1))
-    // {}
-
     TinyArray(TinyArray const & rhs )
     : base_type(rhs.size())
     {
@@ -1962,6 +1975,11 @@ class TinyArray<VALUETYPE, runtime_size>
         for(int i=0; i<this->size_; ++i, --end)
             new(this->data_+i) value_type(static_cast<value_type>(*(end-1)));
     }
+
+    template <class U, size_t SIZE>
+    TinyArray(const U (&u)[SIZE])
+    : TinyArray(u, u+SIZE)
+    {}
 
     template <class U>
     TinyArray(std::initializer_list<U> rhs)
@@ -2409,7 +2427,7 @@ class TinySymmetricView
         return base_type::data_[k];
     }
 
-    constexpr index_type shape() const { return index_type(N, N); }
+    constexpr index_type shape() const { return index_type{N, N}; }
     constexpr ArrayIndex ndim () const { return static_ndim; }
 };
 
@@ -3103,7 +3121,7 @@ TinyArray<decltype((*(V1*)0) OP (*(V2*)0)), N...> \
 operator OP(V1 l, \
              TinyArrayBase<V2, D2, N...> const & r) \
 { \
-    TinyArray<decltype((*(V1*)0) OP (*(V2*)0)), N...> res(l); \
+    TinyArray<decltype((*(V1*)0) OP (*(V2*)0)), N...> res{l}; \
     return res OP##= r; \
 } \
  \
