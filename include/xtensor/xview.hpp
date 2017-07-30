@@ -310,9 +310,9 @@ namespace xt
     };
 
     template <class I, std::size_t L, class... S>
-    struct xview_shape_type<std::array<I, L>, S...>
+    struct xview_shape_type<stat_shape<I, L>, S...>
     {
-        using type = std::array<I, L - integral_count<S...>() + newaxis_count<S...>()>;
+        using type = stat_shape<I, (int)(L - integral_count<S...>() + newaxis_count<S...>())>;
     };
 
     /************************

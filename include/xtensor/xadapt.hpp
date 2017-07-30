@@ -89,7 +89,7 @@ namespace xt
      */
     template <class C, std::size_t N, layout_type L = DEFAULT_LAYOUT>
     xtensor_adaptor<C, N, L>
-    xadapt(C& container, const std::array<typename C::size_type, N>& shape, layout_type l = L);
+    xadapt(C& container, const stat_shape<typename C::size_type, N>& shape, layout_type l = L);
 
     /**
      * Constructs an xtensor_adaptor of the given stl-like container,
@@ -100,7 +100,7 @@ namespace xt
      */
     template <class C, std::size_t N>
     xtensor_adaptor<C, N, layout_type::dynamic>
-    xadapt(C& container, const std::array<typename C::size_type, N>& shape, const std::array<typename C::size_type, N>& strides);
+    xadapt(C& container, const stat_shape<typename C::size_type, N>& shape, const stat_shape<typename C::size_type, N>& strides);
 
     /**
      * Constructs an xtensor_adaptor of the given dynamically allocated C array,
@@ -116,7 +116,7 @@ namespace xt
     template <class P, std::size_t N, class O, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_pointer_t<P>>>
     xtensor_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, N, L>
     xadapt(P& pointer, typename A::size_type size, O ownership,
-           const std::array<typename A::size_type, N>& shape, layout_type l = L, const A& alloc = A());
+           const stat_shape<typename A::size_type, N>& shape, layout_type l = L, const A& alloc = A());
 
     /**
      * Constructs an xtensor_adaptor of the given dynamically allocated C array,
@@ -132,7 +132,7 @@ namespace xt
     template <class P, std::size_t N, class O, class A = std::allocator<std::remove_pointer_t<P>>>
     xtensor_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, N, layout_type::dynamic>
     xadapt(P& pointer, typename A::size_type size, O ownership,
-           const std::array<typename A::size_type, N>& shape, const std::array<typename A::size_type, N>& strides, const A& alloc = A());
+           const stat_shape<typename A::size_type, N>& shape, const stat_shape<typename A::size_type, N>& strides, const A& alloc = A());
 
     /*****************************************
      * xarray_adaptor builder implementation *
@@ -176,14 +176,14 @@ namespace xt
 
     template <class C, std::size_t N, layout_type L>
     inline xtensor_adaptor<C, N, L>
-    xadapt(C& container, const std::array<typename C::size_type, N>& shape, layout_type l)
+    xadapt(C& container, const stat_shape<typename C::size_type, N>& shape, layout_type l)
     {
         return xtensor_adaptor<C, N, L>(container, shape, l);
     }
 
     template <class C, std::size_t N>
     inline xtensor_adaptor<C, N, layout_type::dynamic>
-    xadapt(C& container, const std::array<typename C::size_type, N>& shape, const std::array<typename C::size_type, N>& strides)
+    xadapt(C& container, const stat_shape<typename C::size_type, N>& shape, const stat_shape<typename C::size_type, N>& strides)
     {
         return xtensor_adaptor<C, N, layout_type::dynamic>(container, shape, strides);
     }
@@ -191,7 +191,7 @@ namespace xt
     template <class P, std::size_t N, class O, layout_type L, class A>
     inline xtensor_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, N, L>
     xadapt(P& pointer, typename A::size_type size, O,
-           const std::array<typename A::size_type, N>& shape, layout_type l, const A& alloc)
+           const stat_shape<typename A::size_type, N>& shape, layout_type l, const A& alloc)
     {
         using buffer_type = xbuffer_adaptor<std::remove_pointer_t<P>, O, A>;
         buffer_type buf(pointer, size, alloc);
@@ -201,7 +201,7 @@ namespace xt
     template <class P, std::size_t N, class O, class A>
     inline xtensor_adaptor<xbuffer_adaptor<std::remove_pointer_t<P>, O, A>, N, layout_type::dynamic>
     xadapt(P& pointer, typename A::size_type size, O,
-           const std::array<typename A::size_type, N>& shape, const std::array<typename A::size_type, N>& strides, const A& alloc)
+           const stat_shape<typename A::size_type, N>& shape, const stat_shape<typename A::size_type, N>& strides, const A& alloc)
     {
         using buffer_type = xbuffer_adaptor<std::remove_pointer_t<P>, O, A>;
         buffer_type buf(pointer, size, alloc);

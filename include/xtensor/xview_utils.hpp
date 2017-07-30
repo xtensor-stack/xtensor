@@ -12,6 +12,7 @@
 #include <array>
 
 #include "xslice.hpp"
+// #include "xtiny.hpp"
 
 namespace xt
 {
@@ -70,7 +71,7 @@ namespace xt
         };
 
         template <class T, class I, std::size_t N, layout_type L, class... SL>
-        struct view_temporary_type_impl<T, std::array<I, N>, L, SL...>
+        struct view_temporary_type_impl<T, stat_shape<I, N>, L, SL...>
         {
             using type = xtensor<T, N + newaxis_count<SL...>() - integral_count<SL...>(), L>;
         };

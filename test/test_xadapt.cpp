@@ -69,7 +69,7 @@ namespace xt
     TEST(xtensor_adaptor, xadapt)
     {
         vec_type v(4, 0);
-        using shape_type = std::array<vec_type::size_type, 2>;
+        using shape_type = stat_shape<vec_type::size_type, 2>;
         shape_type s = {2, 2};
 
         auto a1 = xadapt(v, s);
@@ -86,7 +86,7 @@ namespace xt
     {
         size_t size = 4;
         int* data = new int[size];
-        using shape_type = std::array<vec_type::size_type, 2>;
+        using shape_type = stat_shape<vec_type::size_type, 2>;
         shape_type s = {2, 2};
 
         auto a1 = xadapt(data, size, no_ownership(), s);
@@ -106,7 +106,7 @@ namespace xt
         size_t size = 4;
         int* data = new int[size];
         int* data2 = new int[size];
-        using shape_type = std::array<vec_type::size_type, 2>;
+        using shape_type = stat_shape<vec_type::size_type, 2>;
         shape_type s = {2, 2};
 
         auto a1 = xadapt(data, size, acquire_ownership(), s);

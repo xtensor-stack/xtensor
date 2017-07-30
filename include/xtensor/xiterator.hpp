@@ -18,6 +18,7 @@
 #include "xexception.hpp"
 #include "xlayout.hpp"
 #include "xutils.hpp"
+// #include "xtiny.hpp"
 
 namespace xt
 {
@@ -64,13 +65,19 @@ namespace xt
         template <class ST>
         struct index_type_impl
         {
-            using type = std::vector<typename ST::value_type>;
+            using type = dyn_shape<typename ST::value_type>;
         };
 
         template <class V, std::size_t L>
         struct index_type_impl<std::array<V, L>>
         {
             using type = std::array<V, L>;
+        };
+
+        template <class V, int L>
+        struct index_type_impl<tiny_array<V, L>>
+        {
+            using type = tiny_array<V, L>;
         };
     }
 

@@ -16,6 +16,7 @@
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
+// #include "xtiny.hpp"
 
 namespace xt
 {
@@ -469,7 +470,7 @@ namespace xt
     {
         return m_value;
     }
-    
+
     template <class CT>
     inline auto xscalar<CT>::data_element(size_type) const noexcept->const_reference
     {

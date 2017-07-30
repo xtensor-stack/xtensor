@@ -17,7 +17,7 @@ namespace xt
 {
     struct xreducer_features
     {
-        using axes_type = std::array<std::size_t, 2>;
+        using axes_type = stat_shape<std::size_t, 2>;
         axes_type m_axes;
         xarray<double> m_a;
         using shape_type = xarray<double>::shape_type;

@@ -26,6 +26,7 @@
 #include "xiterable.hpp"
 #include "xreducer.hpp"
 #include "xutils.hpp"
+// #include "xtiny.hpp"
 
 namespace xt
 {
@@ -192,7 +193,7 @@ namespace xt
     template <class F, class E, class I>
     inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept
     {
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;
+        using axes_type = dyn_shape<typename std::decay_t<E>::size_type>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
         return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
     }
@@ -200,7 +201,7 @@ namespace xt
     template <class F, class E, class I, std::size_t N>
     inline auto reduce(F&& f, E&& e, const I (&axes)[N]) noexcept
     {
-        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
+        using axes_type = stat_shape<typename std::decay_t<E>::size_type, N>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
         return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
     }
@@ -276,9 +277,9 @@ namespace xt
     };
 
     template <class I1, std::size_t N1, class I2, std::size_t N2>
-    struct xreducer_shape_type<std::array<I1, N1>, std::array<I2, N2>>
+    struct xreducer_shape_type<stat_shape<I1, N1>, stat_shape<I2, N2>>
     {
-        using type = std::array<I2, N1 - N2>;
+        using type = stat_shape<I2, N1 - N2>;
     };
 
     namespace detail
@@ -397,7 +398,7 @@ namespace xt
     template <class... Args>
     inline auto xreducer<F, CT, X>::operator()(Args... args) const -> const_reference
     {
-        std::array<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
+        stat_shape<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
         return element(arg_array.cbegin(), arg_array.cend());
     }
 

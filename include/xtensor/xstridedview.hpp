@@ -55,12 +55,12 @@ namespace xt
      * @class xstrided_view
      * @brief View of an xexpression using strides
      *
-     * The xstrided_view class implements a view utilizing an offset and strides 
-     * into a multidimensional xcontainer. The xstridedview is currently used 
+     * The xstrided_view class implements a view utilizing an offset and strides
+     * into a multidimensional xcontainer. The xstridedview is currently used
      * to implement `transpose`.
      * @tparam CT the closure type of the \ref xexpression type underlying this view
      * @tparam CD the closure type of the underlying data container
-     * 
+     *
      * @sa stridedview, transpose
      */
     template <class CT, class S, class CD>
@@ -199,8 +199,8 @@ namespace xt
      */
     //@{
     /**
-     * Constructs an xstrided_view 
-     * 
+     * Constructs an xstrided_view
+     *
      * @param e the underlying xexpression for this view
      * @param shape the shape of the view
      * @param strides the strides of the view
@@ -357,8 +357,8 @@ namespace xt
     }
 
     /**
-     * Returns the element at the specified position in the xstrided_view. 
-     * 
+     * Returns the element at the specified position in the xstrided_view.
+     *
      * @param args a list of indices specifying the position in the view. Indices
      * must be unsigned integers, the number of indices should be equal or greater than
      * the number of dimensions of the view.
@@ -722,7 +722,7 @@ namespace xt
         }
 
         template <class... Args>
-        inline slice_vector(const std::vector<std::size_t>& shape, Args... args)
+        inline slice_vector(const dyn_shape<std::size_t>& shape, Args... args)
         {
             m_shape = shape;
             append(args...);
@@ -781,7 +781,7 @@ namespace xt
 
     private:
 
-        std::vector<std::size_t> m_shape;
+        dyn_shape<std::size_t> m_shape;
         std::size_t newaxis_count = 0;
     };
 
@@ -820,7 +820,7 @@ namespace xt
         template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_strides(E&& e)
         {
-            std::vector<std::size_t> strides;
+            dyn_shape<std::size_t> strides;
             strides.resize(e.shape().size());
             compute_strides(e.shape(), layout_type::row_major, strides);
             return strides;
@@ -850,7 +850,7 @@ namespace xt
         // Compute strided view
 
         std::size_t offset = detail::get_offset(e);
-        using shape_type = typename std::vector<std::size_t>;
+        using shape_type = typename dyn_shape<std::size_t>;
 
         shape_type new_shape(dimension);
         shape_type new_strides(dimension);

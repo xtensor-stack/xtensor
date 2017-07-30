@@ -616,6 +616,11 @@ namespace xt
         {
             static constexpr std::size_t value = XTENSOR_MIN(5, N);
         };
+        template <class T, int N>
+        struct recursion_depth<tiny_array<T, N>>
+        {
+            static constexpr std::size_t value = XTENSOR_MIN(5, N);
+        };
 #undef XTENSOR_MIN
     }
 

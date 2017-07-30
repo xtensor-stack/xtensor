@@ -172,7 +172,7 @@ namespace xt
 #define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE) \
     if((PREDICATE)) {} else  { \
         throw std::runtime_error(std::string("Assertion error!\n") + MESSAGE + \
-                                 "\n(" + __FILE__ + ':' +  std::to_string(__LINE__) + ")\n"); }
+                                 "\n  " + __FILE__ + '(' +  std::to_string(__LINE__) + ")\n"); }
 
 #else
 #define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)
@@ -181,6 +181,6 @@ namespace xt
 #define xtensor_precondition(PREDICATE, MESSAGE) \
     if((PREDICATE)) {} else  { \
         throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE + \
-                                 "\n(" + __FILE__ + ':' +  std::to_string(__LINE__) + ")\n"); }
+                                 "\n  " + __FILE__ + '(' +  std::to_string(__LINE__) + ")\n"); }
 
 #endif // XEXCEPTION_HPP

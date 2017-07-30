@@ -120,7 +120,7 @@ namespace xt
     template <class size_type, class S, class It>
     inline size_type element_offset(const S& strides, It first, It last) noexcept
     {
-        auto size = std::min(static_cast<typename S::size_type>(std::distance(first, last)), strides.size());
+        auto size = min(static_cast<typename S::size_type>(std::distance(first, last)), strides.size());
         return std::inner_product(last - size, last, strides.cend() - size, size_type(0));
     }
 

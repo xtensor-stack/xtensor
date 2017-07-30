@@ -157,7 +157,7 @@ namespace xt
         shape_type shape = make_sequence<shape_type>(dim, size_type(1));
         bool trivial_broadcast = de2.broadcast_shape(shape);
 
-        // FIXME: The second comparison is lexicographic. Comment why this is correct.
+        // FIXME: The second comparison is lexicographic. Comment why this is intended.
         if (dim > de1.dimension() || shape > de1.shape())
         {
             typename E1::temporary_type tmp(shape);

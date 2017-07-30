@@ -18,6 +18,7 @@
 #include "xbuffer_adaptor.hpp"
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
+#include "xtiny.hpp"
 
 namespace xt
 {
@@ -30,7 +31,7 @@ namespace xt
     struct xcontainer_inner_types<xtensor_container<EC, N, L>>
     {
         using container_type = EC;
-        using shape_type = std::array<typename container_type::size_type, N>;
+        using shape_type = stat_shape<typename container_type::size_type, N>;
         using strides_type = shape_type;
         using backstrides_type = shape_type;
         using inner_shape_type = shape_type;
@@ -125,7 +126,7 @@ namespace xt
     struct xcontainer_inner_types<xtensor_adaptor<EC, N, L>>
     {
         using container_type = EC;
-        using shape_type = std::array<typename container_type::size_type, N>;
+        using shape_type = stat_shape<typename container_type::size_type, N>;
         using strides_type = shape_type;
         using backstrides_type = shape_type;
         using inner_shape_type = shape_type;

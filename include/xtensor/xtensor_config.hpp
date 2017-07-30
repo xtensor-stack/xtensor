@@ -28,7 +28,7 @@
 
 #ifndef DEFAULT_SHAPE_CONTAINER
 #define DEFAULT_SHAPE_CONTAINER(T, EA, SA) \
-    std::vector<typename DEFAULT_DATA_CONTAINER(T, EA)::size_type, SA>
+    dyn_shape<typename DEFAULT_DATA_CONTAINER(T, EA)::size_type, SA>
 #endif
 
 #ifndef DEFAULT_LAYOUT

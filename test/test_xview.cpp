@@ -15,7 +15,7 @@
 namespace xt
 {
     using std::size_t;
-    using view_shape_type = std::vector<size_t>;
+    using view_shape_type = dyn_shape<size_t>;
 
     TEST(xview, temporary_type)
     {
@@ -114,7 +114,7 @@ namespace xt
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
         EXPECT_EQ(a(1, 1, 1), view1(1, 1));
 
-        std::array<std::size_t, 2> idx = {1, 1};
+        stat_shape<std::size_t, 2> idx = {1, 1};
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
 
@@ -377,14 +377,15 @@ namespace xt
         EXPECT_EQ(a(1, 2), view6(2, 0));
         EXPECT_EQ(2, view6.dimension());
 
-        std::array<std::size_t, 3> idx1 = {1, 0, 2};
+        stat_shape<std::size_t, 3> idx1 = {1, 0, 2};
         EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
 
-        std::array<std::size_t, 3> idx2 = {1, 2, 0};
+        stat_shape<std::size_t, 3> idx2 = {1, 2, 0};
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
 
-        std::array<std::size_t, 3> idx3 = {1, 2};
-        EXPECT_EQ(a(1, 2), view3.element(idx2.begin(), idx2.end()));
+        // FIXME: test is broken, idx3 is incorrectly initialized and unused
+        //stat_shape<std::size_t, 3> idx3 = {1, 2};
+        //EXPECT_EQ(a(1, 2), view3.element(idx2.begin(), idx2.end()));
     }
 
     TEST(xview, newaxis_iterating)

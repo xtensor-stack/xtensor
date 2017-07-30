@@ -15,11 +15,12 @@
 
 #include "xconcepts.hpp"
 #include "xutils.hpp"
+// #include "xtiny.hpp"
 
 namespace xt
 {
 
-    using xindex = std::vector<std::size_t>;
+    using xindex = dyn_shape<std::size_t>;
 
     /***************************
      * xexpression declaration *

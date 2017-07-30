@@ -20,6 +20,7 @@
 #include "xiterable.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
+// #include "xtiny.hpp"
 
 namespace xt
 {
@@ -124,7 +125,7 @@ namespace xt
      */
     //@{
     /**
-     * Constructs an xgenerator applying the specified function over the 
+     * Constructs an xgenerator applying the specified function over the
      * given shape.
      * @param f the function to apply
      * @param shape the shape of the xgenerator
@@ -272,7 +273,7 @@ namespace xt
         template <class Functor, class I>
         inline auto make_xgenerator(Functor&& f, std::initializer_list<I> shape) noexcept
         {
-            using shape_type = std::vector<std::size_t>;
+            using shape_type = dyn_shape<std::size_t>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
             return type(std::forward<Functor>(f), forward_sequence<shape_type>(shape));
         }
@@ -280,7 +281,7 @@ namespace xt
         template <class Functor, class I, std::size_t L>
         inline auto make_xgenerator(Functor&& f, const I (&shape)[L]) noexcept
         {
-            using shape_type = std::array<std::size_t, L>;
+            using shape_type = stat_shape<std::size_t, L>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
             return type(std::forward<Functor>(f), forward_sequence<shape_type>(shape));
         }

@@ -1078,7 +1078,7 @@ class tiny_array
     using value_type = VALUETYPE;
     static const int static_size = base_type::static_size;
 
-    explicit constexpr
+    constexpr
     tiny_array()
     : base_type(value_type())
     {}
@@ -1088,6 +1088,7 @@ class tiny_array
     : base_type(dont_init)
     {}
 
+        // FIXME
         // This constructor would allow construction with round brackets, e.g.:
         //     tiny_array<int, 1> a(2);
         // However, this may lead to bugs when fixed-size arrays are mixed with
@@ -1097,10 +1098,10 @@ class tiny_array
         // construction is restricted to curly braces:
         //     tiny_array<int, 1> a{2};
         //
-    // template <class ... V>
-    // constexpr tiny_array(value_type v0, V... v)
-    // : base_type(v0, v...)
-    // {}
+    template <class ... V>
+    constexpr tiny_array(value_type v0, V... v)
+    : base_type(v0, v...)
+    {}
 
     template <class V>
     tiny_array(std::initializer_list<V> v)
@@ -1112,7 +1113,8 @@ class tiny_array
             base_type::init_impl(v.begin());
         else
             xtensor_precondition(false,
-                "tiny_array(std::initializer_list<V>): wrong initialization size.");
+                "tiny_array(std::initializer_list<V>): wrong initialization size (expected: "
+                + std::to_string(static_size) + ", got: " + std::to_string(v.size()) +")");
     }
 
         // for compatibility with tiny_array<VALUETYPE, runtime_size>
@@ -1179,10 +1181,29 @@ class tiny_array
     : base_type(u)
     {}
 
+    // FIXME
+    template <class U, int S, int MM=M,
+              XTENSOR_REQUIRE<S == MM>>
+    tiny_array(std::array<U, S> const & a)
+    : tiny_array(&a[0])
+    {}
+
+    // FIXME
+    template <class U, int S, int MM=M,
+              XTENSOR_REQUIRE<S == MM>>
+    bool operator==(std::array<U, S> const & a) const
+    {
+        for(index_t k=0; k<static_size; ++k)
+            if((*this)[k] != a[k])
+                return false;
+        return true;
+    }
+
+        // FIXME: only works for consecutive memory
     template <class U,
               XTENSOR_REQUIRE<iterator_concept<U>::value> >
     explicit tiny_array(U u, U /* end */ = U())
-    : base_type(u)
+    : base_type(&*u)
     {}
 
     template <class U,
@@ -1430,11 +1451,23 @@ class tiny_array<VALUETYPE, runtime_size>
     std::allocator<value_type> alloc_;
 };
 
-
-template <class U>
-bool operator==(std::vector<U> const & l, tiny_array<U, -1> const & r)
+    //FIXME
+template <class U, class V, int N>
+bool operator==(std::vector<U> const & l, tiny_array<V, N> const & r)
 {
     if((int)l.size() != r.size())
+        return false;
+    for(int k=0; k < (int)l.size(); ++k)
+        if(l[k] != r[k])
+            return false;
+    return true;
+}
+
+    //FIXME
+template <class U, class V, int N>
+bool operator==(tiny_array<U, N> const & l, std::vector<V> const & r)
+{
+    if(l.size() != (int)r.size())
         return false;
     for(int k=0; k < (int)l.size(); ++k)
         if(l[k] != r[k])
@@ -1887,7 +1920,7 @@ operator!=(V1 const & l,
     return false;
 }
 
-    /// lexicographical comparison
+    /// lexicographical less
 template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
 operator<(tiny_array_base<V1, D1, N...> const & l,
@@ -1905,66 +1938,93 @@ operator<(tiny_array_base<V1, D1, N...> const & l,
     return false;
 }
 
-    /// lexicographical comparison
-template <class V1, class D, int N, class V2, class A>
+    /// lexicographical less-equal
+template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
-operator<(tiny_array_base<V1, D, N> const & l,
-          std::vector<V2, A> const & r)
+operator<=(tiny_array_base<V1, D1, N...> const & l,
+           tiny_array_base<V2, D2, N...> const & r)
 {
-    index_t size = r.size();
-    bool equal_res  = false;
-    if(l.size() < size)
-    {
-        size      = l.size();
-        equal_res = true;
-    }
-    for(int k=0; k < size; ++k)
-    {
-        if(l[k] < r[k])
-            return true;
-        if(r[k] < l[k])
-            return false;
-    }
-    return equal_res;
+    return !(r < l);
 }
 
-template <class V1, class A, class V2, class D, int N>
+    /// lexicographical greater
+template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
-operator<(std::vector<V1, A> const & l,
-          tiny_array_base<V2, D, N> const & r)
-{
-    index_t size = r.size();
-    bool equal_res  = false;
-    if(l.size() < size)
-    {
-        size      = l.size();
-        equal_res = true;
-    }
-    for(int k=0; k < size; ++k)
-    {
-        if(l[k] < r[k])
-            return true;
-        if(r[k] < l[k])
-            return false;
-    }
-    return equal_res;
-}
-
-template <class V1, class D, int N, class V2, class A>
-inline bool
-operator>(tiny_array_base<V1, D, N> const & l,
-          std::vector<V2, A> const & r)
+operator>(tiny_array_base<V1, D1, N...> const & l,
+          tiny_array_base<V2, D2, N...> const & r)
 {
     return r < l;
 }
 
-template <class V1, class A, class V2, class D, int N>
+    /// lexicographical greater-equal
+template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
-operator>(std::vector<V1, A> const & l,
-          tiny_array_base<V2, D, N> const & r)
+operator>=(tiny_array_base<V1, D1, N...> const & l,
+           tiny_array_base<V2, D2, N...> const & r)
 {
-    return r < l;
+    return !(l < r);
 }
+
+    // /// lexicographical comparison
+// template <class V1, class D, int N, class V2, class A>
+// inline bool
+// operator<(tiny_array_base<V1, D, N> const & l,
+          // std::vector<V2, A> const & r)
+// {
+    // index_t size = r.size();
+    // bool equal_res  = false;
+    // if(l.size() < size)
+    // {
+        // size      = l.size();
+        // equal_res = true;
+    // }
+    // for(int k=0; k < size; ++k)
+    // {
+        // if(l[k] < r[k])
+            // return true;
+        // if(r[k] < l[k])
+            // return false;
+    // }
+    // return equal_res;
+// }
+
+// template <class V1, class A, class V2, class D, int N>
+// inline bool
+// operator<(std::vector<V1, A> const & l,
+          // tiny_array_base<V2, D, N> const & r)
+// {
+    // index_t size = r.size();
+    // bool equal_res  = false;
+    // if(l.size() < size)
+    // {
+        // size      = l.size();
+        // equal_res = true;
+    // }
+    // for(int k=0; k < size; ++k)
+    // {
+        // if(l[k] < r[k])
+            // return true;
+        // if(r[k] < l[k])
+            // return false;
+    // }
+    // return equal_res;
+// }
+
+// template <class V1, class D, int N, class V2, class A>
+// inline bool
+// operator>(tiny_array_base<V1, D, N> const & l,
+          // std::vector<V2, A> const & r)
+// {
+    // return r < l;
+// }
+
+// template <class V1, class A, class V2, class D, int N>
+// inline bool
+// operator>(std::vector<V1, A> const & l,
+          // tiny_array_base<V2, D, N> const & r)
+// {
+    // return r < l;
+// }
 
     /// check if all elements are non-zero (or 'true' if V is bool)
 template <class V, class D, int ... N>

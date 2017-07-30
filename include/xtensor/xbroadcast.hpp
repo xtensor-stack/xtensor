@@ -21,6 +21,7 @@
 #include "xiterable.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
+// #include "xtiny.hpp"
 
 namespace xt
 {
@@ -159,7 +160,7 @@ namespace xt
     template <class E, class I>
     inline auto broadcast(E&& e, std::initializer_list<I> s) noexcept
     {
-        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<std::size_t>>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, dyn_shape<std::size_t>>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }
@@ -167,7 +168,7 @@ namespace xt
     template <class E, class I, std::size_t L>
     inline auto broadcast(E&& e, const I (&s)[L]) noexcept
     {
-        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<std::size_t, L>>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, stat_shape<std::size_t, L>>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
     }

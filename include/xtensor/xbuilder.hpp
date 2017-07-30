@@ -207,7 +207,7 @@ namespace xt
      * @return xgenerator that generates the values on access
      */
     template <class T = bool>
-    inline auto eye(const std::vector<std::size_t>& shape, int k = 0)
+    inline auto eye(const dyn_shape<std::size_t>& shape, int k = 0)
     {
         return detail::make_xgenerator(detail::fn_impl<detail::eye_fn<T>>(detail::eye_fn<T>(k)), shape);
     }
@@ -412,7 +412,7 @@ namespace xt
             template <class... Args>
             value_type operator()(Args... args) const
             {
-                std::array<size_type, sizeof...(Args)> args_arr = {static_cast<size_type>(args)...};
+                stat_shape<size_type, sizeof...(Args)> args_arr = {static_cast<size_type>(args)...};
                 return m_source(args_arr[m_axis]);
             }
 
@@ -469,9 +469,9 @@ namespace xt
     namespace detail
     {
         template <class T, std::size_t N>
-        inline std::array<T, N + 1> add_axis(std::array<T, N> arr, std::size_t axis, std::size_t value)
+        inline stat_shape<T, N + 1> add_axis(stat_shape<T, N> arr, std::size_t axis, std::size_t value)
         {
-            std::array<T, N + 1> temp;
+            stat_shape<T, N + 1> temp;
             std::copy(arr.begin(), arr.begin() + axis, temp.begin());
             temp[axis] = value;
             std::copy(arr.begin() + axis, arr.end(), temp.begin() + axis + 1);
@@ -520,7 +520,7 @@ namespace xt
         inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
         {
 #if defined X_OLD_CLANG || defined _MSC_VER
-            const std::array<std::size_t, sizeof...(E)> shape { e.shape()[0]... };
+            const stat_shape<std::size_t, sizeof...(E)> shape { e.shape()[0]... };
             return std::make_tuple(
                 detail::make_xgenerator(
                     detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
@@ -652,7 +652,7 @@ namespace xt
             template <class... Args>
             inline value_type operator()(Args... args) const
             {
-                std::array<size_type, sizeof...(Args)> idx({static_cast<size_type>(args)...});
+                stat_shape<size_type, sizeof...(Args)> idx({static_cast<size_type>(args)...});
                 return access_impl(idx.begin(), idx.end());
             }
 
@@ -719,27 +719,27 @@ namespace xt
         };
 
         template <class I, std::size_t L>
-        struct diagonal_shape_type<std::array<I, L>>
+        struct diagonal_shape_type<stat_shape<I, L>>
         {
-            using type = std::array<I, L - 1>;
+            using type = stat_shape<I, L - 1>;
         };
     }
 
     /**
      * @brief Returns the elements on the diagonal of arr
-     * If arr has more than two dimensions, then the axes specified by 
-     * axis_1 and axis_2 are used to determine the 2-D sub-array whose 
-     * diagonal is returned. The shape of the resulting array can be 
-     * determined by removing axis1 and axis2 and appending an index 
+     * If arr has more than two dimensions, then the axes specified by
+     * axis_1 and axis_2 are used to determine the 2-D sub-array whose
+     * diagonal is returned. The shape of the resulting array can be
+     * determined by removing axis1 and axis2 and appending an index
      * to the right equal to the size of the resulting diagonals.
      *
      * @param arr the input array
      * @param offset offset of the diagonal from the main diagonal. Can
      *               be positive or negative.
-     * @param axis_1 Axis to be used as the first axis of the 2-D sub-arrays 
-     *               from which the diagonals should be taken. 
-     * @param axis_2 Axis to be used as the second axis of the 2-D sub-arrays 
-     *               from which the diagonals should be taken. 
+     * @param axis_1 Axis to be used as the first axis of the 2-D sub-arrays
+     *               from which the diagonals should be taken.
+     * @param axis_2 Axis to be used as the second axis of the 2-D sub-arrays
+     *               from which the diagonals should be taken.
      * @returns xexpression with values of the diagonal
      *
      * \code{.cpp}
@@ -810,7 +810,7 @@ namespace xt
      * @brief Reverse the order of elements in an xexpression along the given axis.
      * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
      * `fliplr(arr)` to `xt::flip(arr, 1)`.
-     * 
+     *
      * @param arr the input xexpression
      * @param axis the axis along which elements should be reversed
      *

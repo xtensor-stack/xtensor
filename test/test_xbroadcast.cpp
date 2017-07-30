@@ -24,7 +24,7 @@ namespace xt
         ASSERT_EQ(5.0, m1_broadcast(0, 1, 1));
         ASSERT_EQ(m1_broadcast.layout(), m1.layout());
 
-        auto shape = std::vector<std::size_t>{1, 2, 3};
+        auto shape = dyn_shape<std::size_t>{1, 2, 3};
         auto m1_broadcast2 = broadcast(m1, shape);
         ASSERT_EQ(1.0, m1_broadcast2(0, 0, 0));
         ASSERT_EQ(4.0, m1_broadcast2(0, 1, 0));
@@ -44,16 +44,16 @@ namespace xt
         auto m1_broadcast = broadcast(m1, {4, 2, 3});
 
         // access with the right number of arguments
-        std::array<std::size_t, 3> index1 = {0, 1, 1};
+        stat_shape<std::size_t, 3> index1 = {0, 1, 1};
         ASSERT_EQ(5.0, m1_broadcast.element(index1.begin(), index1.end()));
         // too many arguments = using the last ones only
-        std::array<std::size_t, 4> index3 = {4, 0, 1, 1};
+        stat_shape<std::size_t, 4> index3 = {4, 0, 1, 1};
         ASSERT_EQ(5.0, m1_broadcast.element(index3.begin(), index3.end()));
     }
 
     TEST(xbroadcast, shape_forwarding)
     {
-        std::array<std::size_t, 2> bc_shape;
+        stat_shape<std::size_t, 2> bc_shape;
         auto m1_broadcast = broadcast(123, bc_shape);
     }
 
@@ -62,7 +62,7 @@ namespace xt
         xarray<int> m1 = {1, 2, 3};
         auto m1_broadcast = broadcast(m1, {2, 3});
         size_t nb_iter = 3;
-        using shape_type = std::vector<size_t>;
+        using shape_type = dyn_shape<size_t>;
 
         // broadcast_iterator
         {
@@ -95,7 +95,7 @@ namespace xt
         xarray<int> m1 = {1, 2, 3};
         auto m1_broadcast = broadcast(m1, {2, 3});
         size_t nb_iter = 3;
-        using shape_type = std::vector<size_t>;
+        using shape_type = dyn_shape<size_t>;
 
         // reverse_broadcast_iterator
         {

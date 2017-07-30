@@ -41,7 +41,7 @@ namespace xt
      * \code{.cpp}
      * xt::xarray_container<std::vector<double>, std::vector<std::size_t>> a = ...
      * \endcode
-     * 
+     *
      * @tparam T The value type of the elements.
      * @tparam L The layout_type of the xarray_container (default: row_major).
      * @tparam A The allocator of the container holding the elements.
@@ -49,7 +49,7 @@ namespace xt
      */
     template <class T, layout_type L = DEFAULT_LAYOUT,
               class A = std::allocator<T>,
-              class SA = std::allocator<typename std::vector<T, A>::size_type>>
+              class SA = std::allocator<typename dyn_shape<T, A>::size_type>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
     template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT>
@@ -97,7 +97,7 @@ namespace xt
     template <class T, layout_type L = DEFAULT_LAYOUT,
               class A = std::allocator<T>,
               class BA = std::allocator<bool>,
-              class SA = std::allocator<typename std::vector<T, A>::size_type>>
+              class SA = std::allocator<typename dyn_shape<T, A>::size_type>>
     using xarray_optional = xarray_container<xoptional_vector<T, A, BA>, L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
     /**

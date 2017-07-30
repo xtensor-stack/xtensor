@@ -18,7 +18,7 @@
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xstrides.hpp"
-#include "xutils.hpp"
+// #include "xutils.hpp"
 
 namespace xt
 {
@@ -36,7 +36,7 @@ namespace xt
     template <class CT, class I>
     struct xiterable_inner_types<xindexview<CT, I>>
     {
-        using inner_shape_type = std::array<std::size_t, 1>;
+        using inner_shape_type = stat_shape<std::size_t, 1>;
         using const_stepper = xindexed_stepper<xindexview<CT, I>>;
         using stepper = xindexed_stepper<xindexview<CT, I>, false>;
         using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
@@ -224,7 +224,7 @@ namespace xt
     /**
      * Constructs an xindexview, selecting the indices specified by \a indices.
      * The resulting xexpression has a 1D shape with a length of n for n indices.
-     * 
+     *
      * @param e the underlying xexpression for this view
      * @param indices the indices to select
      */
@@ -327,8 +327,8 @@ namespace xt
     }
 
     /**
-     * Returns the element at the specified position in the xindexview. 
-     * 
+     * Returns the element at the specified position in the xindexview.
+     *
      * @param idx the position in the view
      */
     template <class CT, class I>
@@ -457,7 +457,7 @@ namespace xt
     //@{
     /**
      * Constructs a xfiltration on the given expression \c e, selecting
-     * the elements matching the specified \c condition. 
+     * the elements matching the specified \c condition.
      *
      * @param e the \ref xexpression to filter.
      * @param condition the filtering \ref xexpression to apply.
@@ -548,12 +548,12 @@ namespace xt
 
     /**
      * @brief creates an indexview from a container of indices.
-     *        
+     *
      * Returns a 1D view with the elements at \a indices selected.
      *
      * @param e the underlying xexpression
      * @param indices the indices to select
-     * 
+     *
      * \code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};
      * b = index_view(a, {{0, 0}, {1, 0}, {1, 1}});
@@ -591,7 +591,7 @@ namespace xt
 
     /**
      * @brief creates a view into \a e filtered by \a condition.
-     *        
+     *
      * Returns a 1D view with the elements selected where \a condition evaluates to \em true.
      * This is equivalent to \verbatim{index_view(e, where(condition));}\endverbatim
      * The returned view is not optimal if you just want to assign a scalar to the filtered

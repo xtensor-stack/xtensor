@@ -20,9 +20,18 @@
 #include <vector>
 
 #include "xtensor_config.hpp"
+#include "xtiny.hpp"
 
 namespace xt
 {
+        // FIXME: dyn_shape and stat_shape are just a helper classes for refactoring
+    template <class SIZE_TYPE, class ALLOC=std::allocator<SIZE_TYPE>>
+    using dyn_shape = std::vector<SIZE_TYPE, ALLOC>;
+
+    template <class SIZE_TYPE, int SIZE>
+    //using stat_shape = std::array<SIZE_TYPE, SIZE>;
+    using stat_shape = tiny_array<SIZE_TYPE, SIZE>;
+
     /****************
      * declarations *
      ****************/
@@ -440,6 +449,12 @@ namespace xt
         return size == N;
     }
 
+    template <class T, int N>
+    inline bool resize_container(tiny_array<T, N>& a, typename tiny_array<T, N>::size_type size)
+    {
+        return a.size() == size;
+    }
+
     /********************************
      * make_sequence implementation *
      ********************************/
@@ -470,6 +485,19 @@ namespace xt
                 sequence_type s;
                 s.fill(v);
                 return s;
+            }
+        };
+
+        template <class T, int N>
+        struct sequence_builder<tiny_array<T, N>>
+        {
+            using sequence_type = tiny_array<T, N>;
+            using value_type = typename sequence_type::value_type;
+            using size_type = typename sequence_type::size_type;
+
+            inline static sequence_type make(size_type size, value_type v)
+            {
+                return sequence_type(tags::size=size, v );
             }
         };
     }
@@ -577,6 +605,12 @@ namespace xt
         {
             static constexpr bool value = true;
         };
+
+        //template <class T, int N>
+        //struct is_array<tiny_array<T, N>>
+        //{
+        //    static constexpr bool value = true;
+        //};
 
         template <class... S>
         using only_array = and_<is_array<S>...>;
@@ -917,7 +951,7 @@ namespace xt
     };
 
     /*****************************
-     * is_complete implemenation * 
+     * is_complete implemenation *
      *****************************/
 
     namespace detail
@@ -936,7 +970,7 @@ namespace xt
     struct is_complete : detail::is_complete_impl<T>::type {};
 
     /********************************************
-     * xtrivial_default_construct implemenation * 
+     * xtrivial_default_construct implemenation *
      ********************************************/
 
 #if defined(__clang__)
@@ -963,14 +997,14 @@ namespace xt
         struct xtrivial_default_construct_impl<false, T> : std::has_trivial_default_constructor<T> {};
     }
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = detail::xtrivial_default_construct_impl<is_complete<std::is_trivially_default_constructible<double>>::value, T>;
 
 #pragma clang diagnostic pop
 #else
 // CLANG && APPLE
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
 
 #endif
@@ -979,18 +1013,18 @@ namespace xt
     #if defined(__GNUC__) && (__GNUC__ < 5 || (__GNUC__ == 5 && __GNUC_MINOR__ < 1))
     // OLD GCC
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
 
     #else
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
 
     #endif
 
 #endif
-    
+
 }
 
 #endif
