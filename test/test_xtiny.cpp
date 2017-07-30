@@ -74,6 +74,7 @@ namespace xt
         EXPECT_TRUE((std::is_same<unsigned long long, squared_norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
         EXPECT_TRUE((std::is_same<double, norm_t<tiny_array<int, 1> > >::value));
         EXPECT_TRUE((std::is_same<double, norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
+        EXPECT_TRUE((std::is_same<tiny_array<double, SIZE>, decltype(cos(iv3))>::value));
     }
 
     TEST(xtiny, construct)
@@ -253,6 +254,8 @@ namespace xt
 
     TEST(xtiny, arithmetic)
     {
+        using namespace cmath;
+
         IV ivm3 = -iv3;
         FV fvm3 = -fv3;
 
@@ -308,6 +311,8 @@ namespace xt
         tiny_array<IV, 3> ivv{ iv3, iv3, iv3 };
         EXPECT_EQ(squared_norm(ivv), 3 * squared_norm(iv3));
         EXPECT_EQ(norm(ivv), sqrt(3.0*squared_norm(iv3)));
+        EXPECT_EQ(elementwise_norm(iv3), iv3);
+        EXPECT_EQ(elementwise_squared_norm(iv3), (IV{ 1, 4, 16 }));
 
         EXPECT_TRUE(isclose(sqrt(dot(bv3, bv3)), norm(bv3), 0.0));
         EXPECT_TRUE(isclose(sqrt(dot(iv3, bv3)), norm(iv3), 0.0));
@@ -444,6 +449,8 @@ namespace xt
 
     TEST(xtiny, 2D)
     {
+        using std::sqrt;
+
         using Array = tiny_array<int, 2, 3>;
         using Index = tiny_array<index_t, 2>;
 

@@ -41,9 +41,6 @@ class tiny_array;
 template <class VALUETYPE, int M=runtime_size, int ... N>
 class tiny_array_view;
 
-using std::swap;
-using std::sqrt;
-
 namespace detail  {
 
 template<class T>
@@ -572,17 +569,19 @@ class tiny_array_base
 
     tiny_array_base & reverse()
     {
+        using std::swap;
         index_t i=0, j=size()-1;
         while(i < j)
-             xt::swap(data_[i++], data_[j--]);
+             swap(data_[i++], data_[j--]);
         return *this;
     }
 
     void swap(tiny_array_base & other)
     {
+        using std::swap;
         for(int k=0; k<static_size; ++k)
         {
-            xt::swap(data_[k], other[k]);
+            swap(data_[k], other[k]);
         }
     }
 
@@ -977,16 +976,18 @@ class tiny_array_base<VALUETYPE, DERIVED, runtime_size>
 
     tiny_array_base & reverse()
     {
+        using std::swap;
         index_t i=0, j=size_-1;
         while(i < j)
-             xt::swap(data_[i++], data_[j--]);
+             swap(data_[i++], data_[j--]);
         return *this;
     }
 
     void swap(tiny_array_base & other)
     {
-        xt::swap(size_, other.size_);
-        xt::swap(data_, other.data_);
+        using std::swap;
+        swap(size_, other.size_);
+        swap(data_, other.data_);
     }
 
         /// factory function for the fixed-size k-th unit vector
@@ -1007,6 +1008,7 @@ class tiny_array_base<VALUETYPE, DERIVED, runtime_size>
           value_type end,
           value_type step = value_type(1))
     {
+        using namespace cmath;
         xtensor_precondition(step != 0,
             "tiny_array::range(): step must be non-zero.");
         xtensor_precondition((step > 0 && begin <= end) || (step < 0 && begin >= end),
@@ -2457,73 +2459,73 @@ XTENSOR_TINYARRAY_OPERATORS(>>)
 
 #endif // DOXYGEN
 
-#define XTENSOR_TINYARRAY_UNARY_FUNCTION(NAME, FCT) \
+#define XTENSOR_TINYARRAY_UNARY_FUNCTION(FCT) \
 template <class V, class D, int ... N> \
-inline \
-tiny_array<bool_promote_t<decltype(FCT(*(V*)0))>, N...> \
-NAME(tiny_array_base<V, D, N...> const & v) \
+inline auto \
+FCT(tiny_array_base<V, D, N...> const & v) \
 { \
+    using namespace cmath; \
     tiny_array<bool_promote_t<decltype(FCT(*(V*)0))>, N...> res(v.size(), dont_init); \
     for(int k=0; k < v.size(); ++k) \
         res[k] = FCT(v[k]); \
     return res; \
 }
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(abs, abs)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(fabs, std::fabs)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(abs)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(fabs)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(cos, std::cos)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(sin, std::sin)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(tan, std::tan)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(sin_pi, sin_pi)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(cos_pi, cos_pi)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(acos, std::acos)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(asin, std::asin)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(atan, std::atan)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(cos)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(sin)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(tan)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(sin_pi)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(cos_pi)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(acos)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(asin)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(atan)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(cosh, std::cosh)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(sinh, std::sinh)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(tanh, std::tanh)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(acosh, std::acosh)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(asinh, std::asinh)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(atanh, std::atanh)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(cosh)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(sinh)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(tanh)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(acosh)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(asinh)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(atanh)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(sqrt, std::sqrt)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(cbrt, std::cbrt)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(sq, sq)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(elementwiseNorm, elementwiseNorm)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(elementwiseSquaredNorm, elementwiseSquaredNorm)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(sqrt)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(cbrt)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(sq)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(elementwise_norm)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(elementwise_squared_norm)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(exp, std::exp)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(exp2, std::exp2)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(expm1, std::expm1)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(log, std::log)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(log2, std::log2)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(log10, std::log10)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(log1p, std::log1p)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(logb, std::logb)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(ilogb, std::ilogb)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(exp)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(exp2)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(expm1)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(log)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(log2)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(log10)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(log1p)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(logb)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(ilogb)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(ceil, std::ceil)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(floor, std::floor)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(trunc, std::trunc)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(round, std::round)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(lround, std::lround)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(llround, std::llround)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(even, even)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(odd,  odd)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(sign, std::sign)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(signi, std::signi)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(ceil)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(floor)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(trunc)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(round)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(lround)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(llround)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(even)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(odd)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(sign)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(signi)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(erf, std::erf)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(erfc, std::erfc)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(tgamma, std::tgamma)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(lgamma, std::lgamma)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(erf)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(erfc)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(tgamma)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(lgamma)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(conj, std::conj)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(real, std::real)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(imag, std::imag)
-XTENSOR_TINYARRAY_UNARY_FUNCTION(arg, std::arg)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(conj)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(real)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(imag)
+XTENSOR_TINYARRAY_UNARY_FUNCTION(arg)
 
 #undef XTENSOR_TINYARRAY_UNARY_FUNCTION
 
@@ -2563,27 +2565,27 @@ operator~(tiny_array_base<V, D, N...> const & v)
     return res;
 }
 
-#define XTENSOR_TINYARRAY_BINARY_FUNCTION(NAME, FCT) \
+#define XTENSOR_TINYARRAY_BINARY_FUNCTION(FCT) \
 template <class V1, class D1, class V2, class D2, int ... N> \
-inline \
-tiny_array<decltype(FCT(*(V1*)0, *(V2*)0)), N...> \
-NAME(tiny_array_base<V1, D1, N...> const & l, \
+inline auto \
+FCT(tiny_array_base<V1, D1, N...> const & l, \
     tiny_array_base<V2, D2, N...> const & r) \
 { \
     XTENSOR_ASSERT_MSG(l.size() == r.size(), #FCT "(tiny_array, tiny_array): size mismatch."); \
+    using namespace cmath; \
     tiny_array<decltype(FCT(*(V1*)0, *(V2*)0)), N...> res(l.size(), dont_init); \
     for(int k=0; k < l.size(); ++k) \
         res[k] = FCT(l[k], r[k]); \
     return res; \
 }
 
-XTENSOR_TINYARRAY_BINARY_FUNCTION(atan2, std::atan2)
-XTENSOR_TINYARRAY_BINARY_FUNCTION(copysign, std::copysign)
-XTENSOR_TINYARRAY_BINARY_FUNCTION(fdim, std::fdim)
-XTENSOR_TINYARRAY_BINARY_FUNCTION(fmax, std::fmax)
-XTENSOR_TINYARRAY_BINARY_FUNCTION(fmin, std::fmin)
-XTENSOR_TINYARRAY_BINARY_FUNCTION(fmod, std::fmod)
-XTENSOR_TINYARRAY_BINARY_FUNCTION(hypot, std::hypot)
+XTENSOR_TINYARRAY_BINARY_FUNCTION(atan2)
+XTENSOR_TINYARRAY_BINARY_FUNCTION(copysign)
+XTENSOR_TINYARRAY_BINARY_FUNCTION(fdim)
+XTENSOR_TINYARRAY_BINARY_FUNCTION(fmax)
+XTENSOR_TINYARRAY_BINARY_FUNCTION(fmin)
+XTENSOR_TINYARRAY_BINARY_FUNCTION(fmod)
+XTENSOR_TINYARRAY_BINARY_FUNCTION(hypot)
 
 #undef XTENSOR_TINYARRAY_BINARY_FUNCTION
 
@@ -2594,6 +2596,7 @@ inline auto
 pow(tiny_array_base<V, D, N...> const & v, E exponent) ->
          tiny_array<decltype(pow(v[0], exponent)), N...>
 {
+    using namespace cmath;
     tiny_array<decltype(pow(v[0], exponent)), N...> res(v.size(), dont_init);
     for(int k=0; k < v.size(); ++k)
         res[k] = pow(v[k], exponent);
@@ -2693,31 +2696,6 @@ cumprod(tiny_array_base<V, D, N...> const & l)
         res[k] *= res[k-1];
     return res;
 }
-
-    // /// \brief compute the F-order or C-order (default) stride of a given shape.
-    // /// Example: {200, 100, 50}  =>  {5000, 50, 1}
-// template <class V, class D, int N>
-// inline
-// tiny_array<promote_t<V>, N>
-// shapeToStrides(tiny_array_base<V, D, N> const & shape,
-               // MemoryOrder order = C_ORDER)
-// {
-    // tiny_array<promote_t<V>, N> res(shape.size(), dont_init);
-
-    // if(order == C_ORDER)
-    // {
-        // res[shape.size()-1] = 1;
-        // for(int k=shape.size()-2; k >= 0; --k)
-            // res[k] = res[k+1] * shape[k+1];
-    // }
-    // else
-    // {
-        // res[0] = 1;
-        // for(int k=1; k < shape.size(); ++k)
-            // res[k] = res[k-1] * shape[k-1];
-    // }
-    // return res;
-// }
 
     /// element-wise minimum
 template <class V1, class D1, class V2, class D2, int ... N>

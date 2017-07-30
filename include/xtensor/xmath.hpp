@@ -42,96 +42,105 @@ namespace xt
         static constexpr T LN2 = 0.693147180559945309417;
     };
 
-    #if 0 // FIXME: @ukoethe thinks importing <cmath> into namespace xt is desirable
-    using std::abs;
-    using std::fabs;
+    namespace cmath
+    {
+        using std::abs;
+        using std::fabs;
 
-    using std::cos;
-    using std::sin;
-    using std::tan;
-    using std::acos;
-    using std::asin;
-    using std::atan;
+        using std::cos;
+        using std::sin;
+        using std::tan;
+        using std::acos;
+        using std::asin;
+        using std::atan;
 
-    using std::cosh;
-    using std::sinh;
-    using std::tanh;
-    using std::acosh;
-    using std::asinh;
-    using std::atanh;
+        using std::cosh;
+        using std::sinh;
+        using std::tanh;
+        using std::acosh;
+        using std::asinh;
+        using std::atanh;
 
-    using std::sqrt;
-    using std::cbrt;
+        using std::sqrt;
+        using std::cbrt;
 
-    using std::exp;
-    using std::exp2;
-    using std::expm1;
-    using std::log;
-    using std::log2;
-    using std::log10;
-    using std::log1p;
-    using std::logb;
-    using std::ilogb;
+        using std::exp;
+        using std::exp2;
+        using std::expm1;
+        using std::log;
+        using std::log2;
+        using std::log10;
+        using std::log1p;
+        using std::logb;
+        using std::ilogb;
 
-    using std::ceil;
-    using std::floor;
-    using std::trunc;
-    using std::round;
-    using std::lround;
-    using std::llround;
+        using std::floor;
+        using std::ceil;
+        using std::trunc;
+        using std::round;
+        using std::lround;
+        using std::llround;
 
-    using std::erf;
-    using std::erfc;
-    using std::erfc;
-    using std::tgamma;
-    using std::lgamma;
+        using std::erf;
+        using std::erfc;
+        using std::erfc;
+        using std::tgamma;
+        using std::lgamma;
 
-    using std::conj;
-    using std::real;
-    using std::imag;
-    using std::arg;
+        using std::conj;
+        using std::real;
+        using std::imag;
+        using std::arg;
 
-    using std::atan2;
-    using std::copysign;
-    using std::fdim;
-    using std::fmax;
-    using std::fmin;
-    using std::fmod;
-    using std::hypot;
-    using std::pow;
-    #endif
+        using std::atan2;
+        using std::copysign;
+        using std::fdim;
+        using std::fmax;
+        using std::fmin;
+        using std::fmod;
+        using std::hypot;
+        using std::pow;
 
-    // fix/extend <cmath>
+            // add missing abs() overloads for unsigned types
+        #define XTENSOR_DEFINE_UNSIGNED_ABS(T) \
+            inline T abs(T t) { return t; }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                         abs()                          */
-    /*                                                        */
-    /**********************************************************/
+        XTENSOR_DEFINE_UNSIGNED_ABS(bool)
+        XTENSOR_DEFINE_UNSIGNED_ABS(unsigned char)
+        XTENSOR_DEFINE_UNSIGNED_ABS(unsigned short)
+        XTENSOR_DEFINE_UNSIGNED_ABS(unsigned int)
+        XTENSOR_DEFINE_UNSIGNED_ABS(unsigned long)
+        XTENSOR_DEFINE_UNSIGNED_ABS(unsigned long long)
 
-    using std::abs;
+        #undef XTENSOR_DEFINE_UNSIGNED_ABS
 
-        // define missing abs() overloads to avoid 'ambiguous overload'
-        // errors in template functions
-    #define XTENSOR_DEFINE_UNSIGNED_ABS(T) \
-        inline T abs(T t) { return t; }
+            // add missing floor() and ceil() overloads for integral types
+        #define XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(T) \
+            inline T floor(signed T t) { return t; } \
+            inline T floor(unsigned T t) { return t; } \
+            inline T ceil(signed T t) { return t; } \
+            inline T ceil(unsigned T t) { return t; }
 
-    XTENSOR_DEFINE_UNSIGNED_ABS(bool)
-    XTENSOR_DEFINE_UNSIGNED_ABS(unsigned char)
-    XTENSOR_DEFINE_UNSIGNED_ABS(unsigned short)
-    XTENSOR_DEFINE_UNSIGNED_ABS(unsigned int)
-    XTENSOR_DEFINE_UNSIGNED_ABS(unsigned long)
-    XTENSOR_DEFINE_UNSIGNED_ABS(unsigned long long)
+        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(char)
+        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(short)
+        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(int)
+        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(long)
+        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(long long)
 
-    #undef XTENSOR_DEFINE_UNSIGNED_ABS
+        #undef XTENSOR_DEFINE_INTEGER_FLOOR_CEIL
 
-    #define XTENSOR_DEFINE_MISSING_ABS(T) \
-        inline T abs(T t) { return t < 0 ? static_cast<T>(-t) : t; }
+            // support 'double' exponents for all floating point versions of pow()
+        inline float pow(float v, double e)
+        {
+            return std::pow(v, (float)e);
+        }
 
-    XTENSOR_DEFINE_MISSING_ABS(signed char)
-    XTENSOR_DEFINE_MISSING_ABS(signed short)
+        inline long double pow(long double v, double e)
+        {
+            return std::pow(v, (long double)e);
+        }
+    } // namespace cmath
 
-    #undef XTENSOR_DEFINE_MISSING_ABS
 
     /**********************************************************/
     /*                                                        */
@@ -144,6 +153,7 @@ namespace xt
     inline bool
     isclose(U u, V v, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false)
     {
+        using namespace cmath;
         using P = promote_t<U, V>;
         P a = static_cast<P>(u),
           b = static_cast<P>(v);
@@ -238,30 +248,6 @@ namespace xt
 
     /**********************************************************/
     /*                                                        */
-    /*                   floor(), ceil()                      */
-    /*                                                        */
-    /**********************************************************/
-
-    using std::floor;
-    using std::ceil;
-
-        // add missing floor() and ceil() overloads for integral types
-    #define XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(T) \
-        inline T floor(signed T t) { return t; } \
-        inline T floor(unsigned T t) { return t; } \
-        inline T ceil(signed T t) { return t; } \
-        inline T ceil(unsigned T t) { return t; }
-
-    XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(char)
-    XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(short)
-    XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(int)
-    XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(long)
-    XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(long long)
-
-    #undef XTENSOR_DEFINE_INTEGER_FLOOR_CEIL
-
-    /**********************************************************/
-    /*                                                        */
     /*                           dot()                        */
     /*                                                        */
     /**********************************************************/
@@ -286,25 +272,6 @@ namespace xt
     XTENSOR_DEFINE_SCALAR_DOT(long double)
 
     #undef XTENSOR_DEFINE_SCALAR_DOT
-
-    /**********************************************************/
-    /*                                                        */
-    /*                           pow()                        */
-    /*                                                        */
-    /**********************************************************/
-
-    using std::pow;
-
-        // support 'double' exponents for all floating point versions of pow()
-    inline float pow(float v, double e)
-    {
-        return std::pow(v, (float)e);
-    }
-
-    inline long double pow(long double v, double e)
-    {
-        return std::pow(v, (long double)e);
-    }
 
     /**********************************************************/
     /*                                                        */
@@ -401,9 +368,9 @@ namespace xt
             otherwise: implemented as <tt>sqrt(squared_norm(t))</tt>.
         */
     template <class T>
-    inline auto
-    norm(T const & t) -> decltype(sqrt(squared_norm(t)))
+    inline auto norm(T const & t) // -> decltype(std::sqrt(squared_norm(t)))
     {
+        using cmath::sqrt;
         return sqrt(squared_norm(t));
     }
 
@@ -422,8 +389,10 @@ namespace xt
 
     #define XTENSOR_DEFINE_NORM(T) \
         inline squared_norm_t<T> squared_norm(T t) { return sq(t); } \
-        inline norm_t<T> norm(T t) { return abs(t); } \
-        inline squared_norm_t<T> mean_square(T t) { return sq(t); }
+        inline norm_t<T> norm(T t) { using cmath::abs; return abs(t); } \
+        inline squared_norm_t<T> mean_square(T t) { return sq(t); } \
+        inline squared_norm_t<T> elementwise_squared_norm(T t) { return squared_norm(t); } \
+        inline norm_t<T> elementwise_norm(T t) { return norm(t); }
 
     XTENSOR_DEFINE_NORM(signed char)
     XTENSOR_DEFINE_NORM(unsigned char)

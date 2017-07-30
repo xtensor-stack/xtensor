@@ -89,10 +89,18 @@ struct iterator_concept
 template <class T1, class T2 = T1>
 using promote_t = decltype(*(std::decay_t<T1>*)0 + *(std::decay_t<T2>*)0);
 
+namespace promote_detail
+{
+    using std::sqrt;
+
+    template <class T>
+    using real_promote_t = decltype(sqrt(*(std::decay_t<T>*)0));
+}
+
     // result of algebraic expressions
     // (e.g. sqrt(int) => double)
 template <class T>
-using real_promote_t = decltype(sqrt(*(std::decay_t<T>*)0));
+using real_promote_t = promote_detail::real_promote_t<T>;
 
     // replace 'bool' with 'uint8_t', keep everything else
 template <class T>
