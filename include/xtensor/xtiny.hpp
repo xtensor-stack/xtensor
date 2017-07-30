@@ -2593,8 +2593,7 @@ XTENSOR_TINYARRAY_BINARY_FUNCTION(hypot)
     */
 template <class V, class D, class E, int ... N>
 inline auto
-pow(tiny_array_base<V, D, N...> const & v, E exponent) ->
-         tiny_array<decltype(pow(v[0], exponent)), N...>
+pow(tiny_array_base<V, D, N...> const & v, E exponent)
 {
     using namespace cmath;
     tiny_array<decltype(pow(v[0], exponent)), N...> res(v.size(), dont_init);
