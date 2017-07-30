@@ -139,13 +139,21 @@ namespace xt
     /*                                                        */
     /**********************************************************/
 
-    template <class V1, class V2,
-              XTENSOR_REQUIRE<std::is_floating_point<promote_t<V1, V2> >::value> >
+    template <class U, class V,
+              XTENSOR_REQUIRE<std::is_floating_point<promote_t<U, V> >::value> >
     inline bool
-    isclose(V1 v1, V2 v2, double rtol = 1e-05, double atol = 1e-08)
+    isclose(U u, V v, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false)
     {
-        using P = promote_t<V1, V2>;
-        return abs(v1-v2) <= (atol + rtol * std::max(abs(static_cast<P>(v1)), abs(static_cast<P>(v2))));
+        using P = promote_t<U, V>;
+        P a = static_cast<P>(u),
+          b = static_cast<P>(v);
+
+        if(std::isnan(a) && std::isnan(b))
+            return equal_nan;
+        if(std::isinf(a) && std::isinf(b))
+            return std::signbit(a) == std::signbit(b);
+        P d = abs(a - b);
+        return d <= atol || d <= rtol * std::max(abs(a), abs(b));
     }
 
     /**********************************************************/
@@ -1672,7 +1680,8 @@ namespace xt
      * @return an \ref xfunction
      */
 #if 0 // FIXME: this template matches too greedily, add appropriate concept check
-     template <class E1, class E2>
+    template <class E1, class E2,
+              XTENSOR_REQUIRE<!std::is_arithmetic<E1>::value && !std::is_arithmetic<E2>::value>>
     inline auto isclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false) noexcept
     {
         return detail::make_xfunction<detail::isclose>(std::make_tuple(rtol, atol, equal_nan),
