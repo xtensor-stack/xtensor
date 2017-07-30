@@ -1070,7 +1070,8 @@ namespace xt
      * @return an \ref xfunction
      * @note e1 and e2 can't be both scalars.
      */
-    template <class E1, class E2>
+    template <class E1, class E2,
+              XTENSOR_REQUIRE<xexpression_concept<E1>::value || xexpression_concept<E2>::value> >
     inline auto pow(E1&& e1, E2&& e2) noexcept
         -> detail::xfunction_type_t<math::pow_fun, E1, E2>
     {
