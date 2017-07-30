@@ -213,8 +213,8 @@ class tiny_array_base
     using difference_type        = std::ptrdiff_t;
     using index_type             = tiny_array<index_t, sizeof...(N)>;
 
-    static constexpr index_t static_ndim  = sizeof...(N);
-    static constexpr index_t static_size  = shape_helper::total_size;
+    static const index_t static_ndim  = sizeof...(N);
+    static const index_t static_size  = shape_helper::total_size;
     static const bool may_use_uninitialized_memory =
                                    detail::may_use_uninitialized_memory<VALUETYPE>::value;
 
@@ -314,14 +314,14 @@ class tiny_array_base
 
     template <class OTHER, class OTHER_DERIVED, int ... M>
     constexpr bool
-    is_same_shape(tiny_array_base<OTHER, OTHER_DERIVED, M...> const & other) const
+    is_same_shape(tiny_array_base<OTHER, OTHER_DERIVED, M...> const &) const
     {
         return false;
     }
 
     template <class OTHER, class OTHER_DERIVED>
     constexpr bool
-    is_same_shape(tiny_array_base<OTHER, OTHER_DERIVED, N...> const & other) const
+    is_same_shape(tiny_array_base<OTHER, OTHER_DERIVED, N...> const &) const
     {
         return true;
     }
@@ -1074,10 +1074,7 @@ class tiny_array
 {
   public:
     using base_type = tiny_array_base<VALUETYPE, tiny_array<VALUETYPE, M, N...>, M, N...>;
-
-    typedef typename base_type::value_type value_type;
-    static constexpr index_t static_ndim = base_type::static_ndim;
-    static constexpr index_t static_size = base_type::static_size;
+    using value_type = VALUETYPE;
 
     explicit constexpr
     tiny_array()
@@ -1219,12 +1216,6 @@ class tiny_array
         base_type::operator=(other);
         return *this;
     }
-
-    constexpr bool       empty() const { return static_size == 0; }
-    constexpr index_t size()  const { return static_size; }
-    constexpr index_t max_size()  const { return static_size; }
-    constexpr typename base_type::index_type shape() const { return typename base_type::index_type{ M, N... }; }
-    constexpr index_t ndim()  const { return static_ndim; }
 };
 
 /********************************************************/
@@ -1261,7 +1252,6 @@ class tiny_array<VALUETYPE, runtime_size>
 {
   public:
     using base_type = tiny_array_base<VALUETYPE, tiny_array<VALUETYPE, runtime_size>, runtime_size>;
-
     using value_type = VALUETYPE;
 
     tiny_array()
@@ -1485,11 +1475,11 @@ class tiny_array_view
 : public tiny_array_base<VALUETYPE, tiny_array_view<VALUETYPE, M, N...>, M, N...>
 {
   public:
-    using base_type = tiny_array_base<VALUETYPE, tiny_array_view<VALUETYPE, M, N...>, M, N...>;
+    using base_type     = tiny_array_base<VALUETYPE, tiny_array_view<VALUETYPE, M, N...>, M, N...>;
+    using value_type    = VALUETYPE;
+    using pointer       = typename base_type::pointer;
+    using const_pointer = typename base_type::const_pointer;
 
-    typedef typename base_type::value_type value_type;
-    typedef typename base_type::pointer pointer;
-    typedef typename base_type::const_pointer const_pointer;
     static const index_t static_size  = base_type::static_size;
     static const index_t static_ndim  = base_type::static_ndim;
 
@@ -1550,12 +1540,6 @@ class tiny_array_view
             base_type::data_[k] = static_cast<value_type>(r[k]);
         return *this;
     }
-
-    constexpr bool       empty() const { return static_size == 0; }
-    constexpr index_t size()  const { return static_size; }
-    constexpr index_t max_size()  const { return static_size; }
-    constexpr typename base_type::index_type shape() const { return typename base_type::index_type{ M, N... }; }
-    constexpr index_t ndim()  const { return static_ndim; }
 };
 
 template <class VALUETYPE>
@@ -1571,7 +1555,7 @@ class tiny_array_view<VALUETYPE, runtime_size>
 
 /********************************************************/
 /*                                                      */
-/*               tiny_symmetric_view              */
+/*                  tiny_symmetric_view                 */
 /*                                                      */
 /********************************************************/
 
@@ -1605,17 +1589,16 @@ class tiny_symmetric_view
 : public tiny_array_base<VALUETYPE, tiny_symmetric_view<VALUETYPE, N>, N*(N+1)/2>
 {
   public:
-    using base_type = tiny_array_base<VALUETYPE, tiny_symmetric_view<VALUETYPE, N>, N*(N+1)/2>;
+    using base_type       = tiny_array_base<VALUETYPE, tiny_symmetric_view<VALUETYPE, N>, N*(N+1)/2>;
+    using value_type      = VALUETYPE;
+    using reference       = typename base_type::reference;
+    using const_reference = typename base_type::const_reference;
+    using pointer         = typename base_type::pointer;
+    using const_pointer   = typename base_type::const_pointer;
+    using index_type      = tiny_array<index_t, 2>;
 
-    typedef typename base_type::value_type value_type;
-    typedef typename base_type::pointer pointer;
-    typedef typename base_type::const_pointer const_pointer;
-    typedef typename base_type::reference reference;
-    typedef typename base_type::const_reference const_reference;
-    using index_type = tiny_array<index_t, 2>;
-
-    static const index_t static_size = base_type::static_size;
-    static const index_t static_ndim = 2;
+    static const index_t static_size  = base_type::static_size;
+    static const index_t static_ndim  = 2;
 
     tiny_symmetric_view()
     : base_type(dont_init)
@@ -1777,7 +1760,7 @@ class tiny_symmetric_view
 
 /********************************************************/
 /*                                                      */
-/*            tiny_symmetric_view output             */
+/*              tiny_symmetric_view output              */
 /*                                                      */
 /********************************************************/
 
@@ -2006,7 +1989,7 @@ any(tiny_array_base<V, D, N...> const & t)
     /// check if all elements are zero (or 'false' if V is bool)
 template <class V, class D, int ... N>
 inline bool
-allZero(tiny_array_base<V, D, N...> const & t)
+all_zero(tiny_array_base<V, D, N...> const & t)
 {
     for(int i=0; i<t.size(); ++i)
         if(t[i] != V())
@@ -2017,11 +2000,11 @@ allZero(tiny_array_base<V, D, N...> const & t)
     /// pointwise less-than
 template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
-allLess(tiny_array_base<V1, D1, N...> const & l,
+all_less(tiny_array_base<V1, D1, N...> const & l,
         tiny_array_base<V2, D2, N...> const & r)
 {
     XTENSOR_ASSERT_RUNTIME_SIZE(N..., l.size() == r.size(),
-        "tiny_array_base::allLess(): size mismatch.");
+        "tiny_array_base::all_less(): size mismatch.");
     for(int k=0; k < l.size(); ++k)
         if (l[k] >= r[k])
             return false;
@@ -2034,7 +2017,7 @@ template <class V1, class D1, class V2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V2>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allLess(tiny_array_base<V1, D1, N...> const & l,
+all_less(tiny_array_base<V1, D1, N...> const & l,
         V2 const & r)
 {
     for(int k=0; k < l.size(); ++k)
@@ -2049,7 +2032,7 @@ template <class V1, class V2, class D2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V1>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allLess(V1 const & l,
+all_less(V1 const & l,
         tiny_array_base<V2, D2, N...> const & r)
 {
     for(int k=0; k < r.size(); ++k)
@@ -2061,11 +2044,11 @@ allLess(V1 const & l,
     /// pointwise less-equal
 template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
-allLessEqual(tiny_array_base<V1, D1, N...> const & l,
+all_less_equal(tiny_array_base<V1, D1, N...> const & l,
              tiny_array_base<V2, D2, N...> const & r)
 {
     XTENSOR_ASSERT_RUNTIME_SIZE(N..., l.size() == r.size(),
-        "tiny_array_base::allLessEqual(): size mismatch.");
+        "tiny_array_base::all_less_equal(): size mismatch.");
     for(int k=0; k < l.size(); ++k)
         if (l[k] > r[k])
             return false;
@@ -2078,7 +2061,7 @@ template <class V1, class D1, class V2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V2>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allLessEqual(tiny_array_base<V1, D1, N...> const & l,
+all_less_equal(tiny_array_base<V1, D1, N...> const & l,
              V2 const & r)
 {
     for(int k=0; k < l.size(); ++k)
@@ -2093,7 +2076,7 @@ template <class V1, class V2, class D2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V1>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allLessEqual(V1 const & l,
+all_less_equal(V1 const & l,
              tiny_array_base<V2, D2, N...> const & r)
 {
     for(int k=0; k < r.size(); ++k)
@@ -2105,11 +2088,11 @@ allLessEqual(V1 const & l,
     /// pointwise greater-than
 template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
-allGreater(tiny_array_base<V1, D1, N...> const & l,
+all_greater(tiny_array_base<V1, D1, N...> const & l,
            tiny_array_base<V2, D2, N...> const & r)
 {
     XTENSOR_ASSERT_RUNTIME_SIZE(N..., l.size() == r.size(),
-        "tiny_array_base::allGreater(): size mismatch.");
+        "tiny_array_base::all_greater(): size mismatch.");
     for(int k=0; k < l.size(); ++k)
         if (l[k] <= r[k])
             return false;
@@ -2122,7 +2105,7 @@ template <class V1, class D1, class V2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V2>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allGreater(tiny_array_base<V1, D1, N...> const & l,
+all_greater(tiny_array_base<V1, D1, N...> const & l,
            V2 const & r)
 {
     for(int k=0; k < l.size(); ++k)
@@ -2137,7 +2120,7 @@ template <class V1, class V2, class D2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V1>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allGreater(V1 const & l,
+all_greater(V1 const & l,
            tiny_array_base<V2, D2, N...> const & r)
 {
     for(int k=0; k < r.size(); ++k)
@@ -2149,11 +2132,11 @@ allGreater(V1 const & l,
     /// pointwise greater-equal
 template <class V1, class D1, class V2, class D2, int ... N>
 inline bool
-allGreaterEqual(tiny_array_base<V1, D1, N...> const & l,
+all_greater_equal(tiny_array_base<V1, D1, N...> const & l,
                 tiny_array_base<V2, D2, N...> const & r)
 {
     XTENSOR_ASSERT_RUNTIME_SIZE(N..., l.size() == r.size(),
-        "tiny_array_base::allGreaterEqual(): size mismatch.");
+        "tiny_array_base::all_greater_equal(): size mismatch.");
     for(int k=0; k < l.size(); ++k)
         if (l[k] < r[k])
             return false;
@@ -2166,7 +2149,7 @@ template <class V1, class D1, class V2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V2>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allGreaterEqual(tiny_array_base<V1, D1, N...> const & l,
+all_greater_equal(tiny_array_base<V1, D1, N...> const & l,
                 V2 const & r)
 {
     for(int k=0; k < l.size(); ++k)
@@ -2181,7 +2164,7 @@ template <class V1, class V2, class D2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V1>::value &&
                           std::is_convertible<V2, V1>::value> >
 inline bool
-allGreaterEqual(V1 const & l,
+all_greater_equal(V1 const & l,
                 tiny_array_base<V2, D2, N...> const & r)
 {
     for(int k=0; k < r.size(); ++k)
@@ -2206,7 +2189,7 @@ isclose(tiny_array_base<V1, D1, N...> const & l,
 
 /********************************************************/
 /*                                                      */
-/*                 tiny_array-Arithmetic                 */
+/*                 tiny_array-Arithmetic                */
 /*                                                      */
 /********************************************************/
 
@@ -2379,7 +2362,7 @@ operator%(V1 l,
 template <class V1, class DERIVED, int ... N, class V2, \
           XTENSOR_REQUIRE<!tiny_array_concept<V2>::value && \
                           std::is_convertible<V2, V1>::value> > \
-DERIVED & \
+inline DERIVED & \
 operator OP##=(tiny_array_base<V1, DERIVED, N...> & l, \
                V2 r) \
 { \
@@ -2715,11 +2698,11 @@ min(tiny_array_base<V1, D1, N...> const & l,
 template <class V1, class D1, class V2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V2>::value>>
 inline
-tiny_array<promote_t<V1, V2>, N...>
+tiny_array<std::common_type_t<V1, V2>, N...>
 min(tiny_array_base<V1, D1, N...> const & l,
     V2 const & r)
 {
-    tiny_array<promote_t<V1, V2>, N...> res(l.size(), dont_init);
+    tiny_array<std::common_type_t<V1, V2>, N...> res(l.size(), dont_init);
     for(int k=0; k < l.size(); ++k)
         res[k] =  min(l[k], r);
     return res;
@@ -2729,11 +2712,11 @@ min(tiny_array_base<V1, D1, N...> const & l,
 template <class V1, class V2, class D2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V1>::value>>
 inline
-tiny_array<promote_t<V1, V2>, N...>
+tiny_array<std::common_type_t<V1, V2>, N...>
 min(V1 const & l,
     tiny_array_base<V2, D2, N...> const & r)
 {
-    tiny_array<promote_t<V1, V2>, N...> res(r.size(), dont_init);
+    tiny_array<std::common_type_t<V1, V2>, N...> res(r.size(), dont_init);
     for(int k=0; k < r.size(); ++k)
         res[k] =  min(l, r[k]);
     return res;
@@ -2770,13 +2753,13 @@ min(tiny_array_base<V, D, N...> const & l)
     /// element-wise maximum
 template <class V1, class D1, class V2, class D2, int ... N>
 inline
-tiny_array<promote_t<V1, V2>, N...>
+tiny_array<std::common_type_t<V1, V2>, N...>
 max(tiny_array_base<V1, D1, N...> const & l,
     tiny_array_base<V2, D2, N...> const & r)
 {
     XTENSOR_ASSERT_RUNTIME_SIZE(N..., l.size() == r.size(),
         "max(): size mismatch.");
-    tiny_array<promote_t<V1, V2>, N...> res(l.size(), dont_init);
+    tiny_array<std::common_type_t<V1, V2>, N...> res(l.size(), dont_init);
     for(int k=0; k < l.size(); ++k)
         res[k] =  max(l[k], r[k]);
     return res;
@@ -2786,11 +2769,11 @@ max(tiny_array_base<V1, D1, N...> const & l,
 template <class V1, class D1, class V2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V2>::value>>
 inline
-tiny_array<promote_t<V1, V2>, N...>
+tiny_array<std::common_type_t<V1, V2>, N...>
 max(tiny_array_base<V1, D1, N...> const & l,
     V2 const & r)
 {
-    tiny_array<promote_t<V1, V2>, N...> res(l.size(), dont_init);
+    tiny_array<std::common_type_t<V1, V2>, N...> res(l.size(), dont_init);
     for(int k=0; k < l.size(); ++k)
         res[k] =  max(l[k], r);
     return res;
@@ -2800,11 +2783,11 @@ max(tiny_array_base<V1, D1, N...> const & l,
 template <class V1, class V2, class D2, int ... N,
           XTENSOR_REQUIRE<!tiny_array_concept<V1>::value>>
 inline
-tiny_array<promote_t<V1, V2>, N...>
+tiny_array<std::common_type_t<V1, V2>, N...>
 max(V1 const & l,
     tiny_array_base<V2, D2, N...> const & r)
 {
-    tiny_array<promote_t<V1, V2>, N...> res(r.size(), dont_init);
+    tiny_array<std::common_type_t<V1, V2>, N...> res(r.size(), dont_init);
     for(int k=0; k < r.size(); ++k)
         res[k] =  max(l, r[k]);
     return res;

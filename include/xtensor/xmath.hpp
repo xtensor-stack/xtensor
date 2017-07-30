@@ -181,7 +181,7 @@ namespace xt
         */
     template <class T,
               XTENSOR_REQUIRE<std::is_arithmetic<T>::value> >
-    inline promote_t<T>
+    inline auto
     sq(T t)
     {
         return t*t;
@@ -258,7 +258,7 @@ namespace xt
         // scalar dot is needed for generic functions that should work with
         // scalars and vectors alike
     #define XTENSOR_DEFINE_SCALAR_DOT(T) \
-        inline promote_t<T> dot(T l, T r) { return l*r; }
+        inline auto dot(T l, T r) { return l*r; }
 
     XTENSOR_DEFINE_SCALAR_DOT(unsigned char)
     XTENSOR_DEFINE_SCALAR_DOT(unsigned short)
@@ -371,7 +371,7 @@ namespace xt
             otherwise: implemented as <tt>sqrt(squared_norm(t))</tt>.
         */
     template <class T>
-    inline auto norm(T const & t) // -> decltype(std::sqrt(squared_norm(t)))
+    inline auto norm(T const & t)
     {
         using cmath::sqrt;
         return sqrt(squared_norm(t));
@@ -384,18 +384,18 @@ namespace xt
     /**********************************************************/
 
     template <class T>
-    inline squared_norm_t<std::complex<T> >
+    inline auto
     squared_norm(std::complex<T> const & t)
     {
         return sq(t.real()) + sq(t.imag());
     }
 
     #define XTENSOR_DEFINE_NORM(T) \
-        inline squared_norm_t<T> squared_norm(T t) { return sq(t); } \
-        inline norm_t<T> norm(T t) { using cmath::abs; return abs(t); } \
-        inline squared_norm_t<T> mean_square(T t) { return sq(t); } \
-        inline squared_norm_t<T> elementwise_squared_norm(T t) { return squared_norm(t); } \
-        inline norm_t<T> elementwise_norm(T t) { return norm(t); }
+        inline auto squared_norm(T t) { return sq(t); } \
+        inline auto mean_square(T t) { return sq(t); } \
+        inline auto elementwise_squared_norm(T t) { return sq(t); } \
+        inline auto norm(T t) { return cmath::abs(t); } \
+        inline auto elementwise_norm(T t) { return cmath::abs(t); }
 
     XTENSOR_DEFINE_NORM(signed char)
     XTENSOR_DEFINE_NORM(unsigned char)

@@ -103,12 +103,7 @@ struct iterator_concept
 /*                                                        */
 /**********************************************************/
 
-    // result of arithmetic expressions
-    // (e.g. unsigned char + unsigned char => int)
-template <class T1, class T2 = T1>
-using promote_t = decltype(*(std::decay_t<T1>*)0 + *(std::decay_t<T2>*)0);
-
-namespace promote_detail
+namespace concepts_detail
 {
     using std::sqrt;
 
@@ -116,10 +111,15 @@ namespace promote_detail
     using real_promote_t = decltype(sqrt(*(std::decay_t<T>*)0));
 }
 
+    // result of arithmetic expressions
+    // (e.g. unsigned char + unsigned char => int)
+template <class T1, class T2 = T1>
+using promote_t = decltype(*(std::decay_t<T1>*)0 + *(std::decay_t<T2>*)0);
+
     // result of algebraic expressions
     // (e.g. sqrt(int) => double)
 template <class T>
-using real_promote_t = promote_detail::real_promote_t<T>;
+using real_promote_t = concepts_detail::real_promote_t<T>;
 
     // replace 'bool' with 'uint8_t', keep everything else
 template <class T>
@@ -134,7 +134,7 @@ using bool_promote_t = typename std::conditional<std::is_same<T, bool>::value, u
 template<class T>
 struct norm_traits;
 
-namespace detail {
+namespace concepts_detail {
 
 template <class T, bool scalar = std::is_arithmetic<T>::value>
 struct norm_of_scalar_impl;
@@ -143,22 +143,16 @@ template <class T>
 struct norm_of_scalar_impl<T, false>
 {
     static const bool value = false;
-    typedef void *            norm_type;
-    typedef void *            squared_norm_type;
+    using norm_type         = void *;
+    using squared_norm_type = void *;
 };
 
 template <class T>
 struct norm_of_scalar_impl<T, true>
 {
     static const bool value = true;
-    typedef T                 norm_type;
-    typedef typename
-        std::conditional<std::is_integral<T>::value,
-            typename std::conditional<sizeof(T) >= 4,
-                uint64_t,
-                uint32_t>::type,
-            T>::type
-        squared_norm_type;
+    using norm_type         = decltype(norm(*(T*)0));
+    using squared_norm_type = decltype(squared_norm(*(T*)0));
 };
 
 template <class T, bool integral = std::is_integral<T>::value,
@@ -168,15 +162,15 @@ struct norm_of_array_elements_impl;
 template <>
 struct norm_of_array_elements_impl<void *, false, false>
 {
-    typedef void *  norm_type;
-    typedef void *  squared_norm_type;
+    using norm_type         = void *;
+    using squared_norm_type = void *;
 };
 
 template <class T>
 struct norm_of_array_elements_impl<T, false, false>
 {
-    typedef typename norm_traits<T>::norm_type          norm_type;
-    typedef typename norm_traits<T>::squared_norm_type  squared_norm_type;
+    using norm_type         = typename norm_traits<T>::norm_type;
+    using squared_norm_type = typename norm_traits<T>::squared_norm_type;
 };
 
 template <class T>
@@ -185,22 +179,22 @@ struct norm_of_array_elements_impl<T, true, false>
     static_assert(!std::is_same<T, char>::value,
        "'char' is not a numeric type, use 'signed char' or 'unsigned char'.");
 
-    typedef double              norm_type;
-    typedef uint64_t            squared_norm_type;
+    using norm_type         = double;
+    using squared_norm_type = uint64_t;
 };
 
 template <class T>
 struct norm_of_array_elements_impl<T, false, true>
 {
-    typedef double              norm_type;
-    typedef double              squared_norm_type;
+    using norm_type         = double;
+    using squared_norm_type = double;
 };
 
 template <>
 struct norm_of_array_elements_impl<long double, false, true>
 {
-    typedef long double         norm_type;
-    typedef long double         squared_norm_type;
+    using norm_type         = long double;
+    using squared_norm_type = long double;
 };
 
 template <class ARRAY>
@@ -211,23 +205,21 @@ struct norm_of_vector_impl
     template <class U>
     static typename U::value_type test(U*, typename U::value_type * = 0);
 
-    typedef decltype(test((ARRAY*)0)) T;
+    using T = decltype(test((ARRAY*)0));
 
     static const bool value = !std::is_same<T, void*>::value;
 
-    typedef typename norm_of_array_elements_impl<T>::norm_type          norm_type;
-    typedef typename norm_of_array_elements_impl<T>::squared_norm_type  squared_norm_type;
+    using norm_type         = typename norm_of_array_elements_impl<T>::norm_type;
+    using squared_norm_type = typename norm_of_array_elements_impl<T>::squared_norm_type;
 };
 
-} // namespace detail
+} // namespace concepts_detail
 
     /* norm_traits<T> implement the following default rules, which are
        designed to minimize the possibility of overflow:
-        * T is an integer type:
-               norm_type is T itself,
-               squared_norm_type is 'uint32_t' (sizeof(T) < 4) or 'uint64_t' (otherwise)
-        * T is a floating-point type:
-               norm_type and squared_norm_type are T itself,
+        * T is a built-in type:
+               norm_type is the result type of abs(),
+               squared_norm_type is the result type of sq()
         * T is a container of 'long double' elements:
                norm_type and squared_norm_type are 'long double'
         * T is a container of another floating-point type:
@@ -251,22 +243,22 @@ struct norm_traits
     static_assert(!std::is_same<T, char>::value,
        "'char' is not a numeric type, use 'signed char' or 'unsigned char'.");
 
-    typedef detail::norm_of_scalar_impl<T>   norm_of_scalar;
-    typedef detail::norm_of_vector_impl<T>   norm_of_vector;
+    using norm_of_scalar = concepts_detail::norm_of_scalar_impl<T>;
+    using norm_of_vector = concepts_detail::norm_of_vector_impl<T>;
 
     static const bool value = norm_of_scalar::value || norm_of_vector::value;
 
     static_assert(value, "norm_traits<T> are undefined for type U.");
 
-    typedef typename std::conditional<norm_of_vector::value,
-                typename norm_of_vector::norm_type,
-                typename norm_of_scalar::norm_type>::type
-            norm_type;
+    using norm_type =
+        typename std::conditional<norm_of_vector::value,
+                    typename norm_of_vector::norm_type,
+                    typename norm_of_scalar::norm_type>::type;
 
-    typedef typename std::conditional<norm_of_vector::value,
-                typename norm_of_vector::squared_norm_type,
-                typename norm_of_scalar::squared_norm_type>::type
-            squared_norm_type;
+    using squared_norm_type =
+        typename std::conditional<norm_of_vector::value,
+                    typename norm_of_vector::squared_norm_type,
+                    typename norm_of_scalar::squared_norm_type>::type;
 };
 
 template <class T>
@@ -274,7 +266,6 @@ using squared_norm_t = typename norm_traits<T>::squared_norm_type;
 
 template <class T>
 using norm_t = typename norm_traits<T>::norm_type;
-
 
 } // namespace xt
 

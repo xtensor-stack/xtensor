@@ -70,8 +70,9 @@ namespace xt
         EXPECT_TRUE((std::is_same<tiny_array<double, 3>, real_promote_t<IV>>::value));
         EXPECT_TRUE((std::is_same<typename IV::template as_type<double>, real_promote_t<IV>>::value));
 
-        EXPECT_TRUE((std::is_same<unsigned long long, squared_norm_t<tiny_array<int, 1> > >::value));
-        EXPECT_TRUE((std::is_same<unsigned long long, squared_norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
+        EXPECT_TRUE((std::is_same<uint64_t, squared_norm_t<tiny_array<int, 1> > >::value));
+        EXPECT_TRUE((std::is_same<uint64_t, squared_norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
+        EXPECT_TRUE((std::is_same<uint64_t, squared_norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
         EXPECT_TRUE((std::is_same<double, norm_t<tiny_array<int, 1> > >::value));
         EXPECT_TRUE((std::is_same<double, norm_t<tiny_array<tiny_array<int, 1>, 1> > >::value));
         EXPECT_TRUE((std::is_same<tiny_array<double, SIZE>, decltype(cos(iv3))>::value));
@@ -219,18 +220,18 @@ namespace xt
 
         EXPECT_TRUE(bv0 < bv1);
 
-        EXPECT_TRUE(allLess(bv0, bv1));
-        EXPECT_TRUE(!allLess(bv1, bv3));
-        EXPECT_TRUE(allGreater(bv1, bv0));
-        EXPECT_TRUE(!allGreater(bv3, bv1));
-        EXPECT_TRUE(allLessEqual(bv0, bv1));
-        EXPECT_TRUE(allLessEqual(0, bv0));
-        EXPECT_TRUE(allLessEqual(bv0, 0));
-        EXPECT_TRUE(allLessEqual(bv1, bv3));
-        EXPECT_TRUE(!allLessEqual(bv3, bv1));
-        EXPECT_TRUE(allGreaterEqual(bv1, bv0));
-        EXPECT_TRUE(allGreaterEqual(bv3, bv1));
-        EXPECT_TRUE(!allGreaterEqual(bv1, bv3));
+        EXPECT_TRUE(all_less(bv0, bv1));
+        EXPECT_TRUE(!all_less(bv1, bv3));
+        EXPECT_TRUE(all_greater(bv1, bv0));
+        EXPECT_TRUE(!all_greater(bv3, bv1));
+        EXPECT_TRUE(all_less_equal(bv0, bv1));
+        EXPECT_TRUE(all_less_equal(0, bv0));
+        EXPECT_TRUE(all_less_equal(bv0, 0));
+        EXPECT_TRUE(all_less_equal(bv1, bv3));
+        EXPECT_TRUE(!all_less_equal(bv3, bv1));
+        EXPECT_TRUE(all_greater_equal(bv1, bv0));
+        EXPECT_TRUE(all_greater_equal(bv3, bv1));
+        EXPECT_TRUE(!all_greater_equal(bv1, bv3));
 
         EXPECT_TRUE(isclose(fv3, fv3));
 
@@ -454,8 +455,8 @@ namespace xt
         using Array = tiny_array<int, 2, 3>;
         using Index = tiny_array<index_t, 2>;
 
-        EXPECT_EQ(Array::static_ndim, 2);
-        EXPECT_EQ(Array::static_size, 6);
+        EXPECT_TRUE(Array::static_ndim == 2);
+        EXPECT_TRUE(Array::static_size == 6);
         EXPECT_TRUE((std::is_same<Index, Array::index_type>::value));
 
         int adata[] = { 4,5,6,7,8,9 };
@@ -508,11 +509,11 @@ namespace xt
         EXPECT_TRUE(!all(a));
         EXPECT_TRUE(any(b));
         EXPECT_TRUE(all(b));
-        EXPECT_TRUE(!allZero(a));
-        EXPECT_TRUE(allLess(a, b));
-        EXPECT_TRUE(allLessEqual(a, b));
-        EXPECT_TRUE(!allGreater(a, b));
-        EXPECT_TRUE(!allGreaterEqual(a, b));
+        EXPECT_TRUE(!all_zero(a));
+        EXPECT_TRUE(all_less(a, b));
+        EXPECT_TRUE(all_less_equal(a, b));
+        EXPECT_TRUE(!all_greater(a, b));
+        EXPECT_TRUE(!all_greater_equal(a, b));
         EXPECT_TRUE(isclose(a, b, 10.0f));
 
         EXPECT_EQ(squared_norm(a), 55);
@@ -578,10 +579,10 @@ namespace xt
         EXPECT_TRUE(all(d));
         EXPECT_TRUE(!all(c));
         EXPECT_TRUE(any(c));
-        EXPECT_TRUE(!allZero(c));
+        EXPECT_TRUE(!all_zero(c));
         EXPECT_TRUE(!all(e));
         EXPECT_TRUE(!any(e));
-        EXPECT_TRUE(allZero(e));
+        EXPECT_TRUE(all_zero(e));
 
         EXPECT_EQ(prod(a), 6);
         EXPECT_EQ(prod(A()), 0);
