@@ -638,7 +638,7 @@ class tiny_array_base
     linear_sequence(value_type start = value_type(), value_type step = value_type(1))
     {
         tiny_array<value_type, N...> res(dont_init);
-        for(int k=0; k < static_size; ++k, start += step)
+        for(index_t k=0; k < static_size; ++k, start += step)
             res[k] = start;
         return res;
     }
@@ -648,9 +648,9 @@ class tiny_array_base
     tiny_array<value_type, N...>
     range(value_type end)
     {
-        value_type start = end - static_size;
+        value_type start = end - static_cast<value_type>(static_size);
         tiny_array<value_type, N...> res(dont_init);
-        for(int k=0; k < static_size; ++k, ++start)
+        for(index_t k=0; k < static_size; ++k, ++start)
             res[k] = start;
         return res;
     }
@@ -1075,6 +1075,7 @@ class tiny_array
   public:
     using base_type = tiny_array_base<VALUETYPE, tiny_array<VALUETYPE, M, N...>, M, N...>;
     using value_type = VALUETYPE;
+    static const int static_size = base_type::static_size;
 
     explicit constexpr
     tiny_array()
@@ -1179,7 +1180,7 @@ class tiny_array
 
     template <class U,
               XTENSOR_REQUIRE<iterator_concept<U>::value> >
-    explicit tiny_array(U u, U end = U())
+    explicit tiny_array(U u, U /* end */ = U())
     : base_type(u)
     {}
 
