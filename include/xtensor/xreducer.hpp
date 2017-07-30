@@ -26,7 +26,6 @@
 #include "xiterable.hpp"
 #include "xreducer.hpp"
 #include "xutils.hpp"
-// #include "xtiny.hpp"
 
 namespace xt
 {
@@ -127,6 +126,7 @@ namespace xt
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
 
+        const_reference operator()() const;
         template <class... Args>
         const_reference operator()(Args... args) const;
         const_reference operator[](const xindex& index) const;
@@ -400,6 +400,15 @@ namespace xt
     {
         stat_shape<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
         return element(arg_array.cbegin(), arg_array.cend());
+    }
+
+        // FIXME: what does it mean if a reducer is called with zero arguments?
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::operator()() const -> const_reference
+    {
+        stat_shape<std::size_t, 1> arg_array;
+        // call element() with empty range
+        return element(arg_array.cbegin(), arg_array.cbegin());
     }
 
     /**
