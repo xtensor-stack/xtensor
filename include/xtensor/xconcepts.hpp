@@ -35,6 +35,25 @@ using concept_check = typename std::enable_if<CONCEPTS, require_ok>::type;
 
 /**********************************************************/
 /*                                                        */
+/*                  xexpression_concept                   */
+/*                                                        */
+/**********************************************************/
+
+struct xexpression_tag {};
+
+    // xexpression_concept is fulfilled by data structures that can be used
+    // in xexpressions (xarray, xtensor, xfunction). By default, 'T' fulfills
+    // the concept if it is derived from xexpression_tag.
+    //
+    // Alternatively, one can partially specialize xexpression_concept.
+template <class T>
+struct xexpression_concept
+{
+    static const bool value = std::is_base_of<xexpression_tag, std::decay_t<T> >::value;
+};
+
+/**********************************************************/
+/*                                                        */
 /*                  tiny_array_concept                    */
 /*                                                        */
 /**********************************************************/
@@ -49,7 +68,7 @@ struct tiny_array_tag {};
 template <class ARRAY>
 struct tiny_array_concept
 {
-    static const bool value = std::is_base_of<tiny_array_tag, ARRAY>::value;
+    static const bool value = std::is_base_of<tiny_array_tag, std::decay_t<ARRAY> >::value;
 };
 
 /**********************************************************/
@@ -65,7 +84,7 @@ struct tiny_array_concept
 template <class T>
 struct iterator_concept
 {
-    typedef typename std::decay<T>::type V;
+    using V = std::decay_t<T>;
 
     static char test(...);
 

@@ -13,6 +13,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "xconcepts.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -38,6 +39,7 @@ namespace xt
      */
     template <class D>
     class xexpression
+    : public xexpression_tag
     {
     public:
 

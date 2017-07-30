@@ -13,6 +13,7 @@
 #include <functional>
 #include <type_traits>
 
+#include "xconcepts.hpp"
 #include "xfunction.hpp"
 #include "xscalar.hpp"
 #include "xstrides.hpp"
@@ -477,8 +478,8 @@ namespace xt
     * @param e an \ref xexpression
     * @return a boolean
     */
-#if 0 // FIXME: this template matches too greedily, add appropriate concept check
-    template <class E>
+    template <class E,
+              XTENSOR_REQUIRE<xexpression_concept<E>::value> >
     inline bool any(E&& e)
     {
         using xtype = std::decay_t<E>;
@@ -493,7 +494,6 @@ namespace xt
                                [](const typename std::decay_t<E>::value_type& el) { return el; });
         }
     }
-#endif
 
     /**
     * @ingroup logical_operators
@@ -504,8 +504,8 @@ namespace xt
     * @param e an \ref xexpression
     * @return a boolean
     */
-#if 0 // FIXME: this template matches too greedily, add appropriate concept check
-    template <class E>
+    template <class E,
+              XTENSOR_REQUIRE<xexpression_concept<E>::value> >
     inline bool all(E&& e)
     {
         using xtype = std::decay_t<E>;
@@ -520,7 +520,6 @@ namespace xt
                                [](const typename std::decay_t<E>::value_type& el) { return el; });
         }
     }
-#endif
 }
 
 #endif

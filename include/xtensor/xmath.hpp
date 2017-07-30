@@ -44,6 +44,9 @@ namespace xt
 
     namespace cmath
     {
+        // create a namespace for just the algebraic functions from std
+        // and add a few fixes to avoid ambiguous overloads in templates
+
         using std::abs;
         using std::fabs;
 
@@ -129,7 +132,7 @@ namespace xt
 
         #undef XTENSOR_DEFINE_INTEGER_FLOOR_CEIL
 
-            // support 'double' exponents for all floating point versions of pow()
+            // support 'double' exponents for all floating-point versions of pow()
         inline float pow(float v, double e)
         {
             return std::pow(v, (float)e);
@@ -1648,15 +1651,13 @@ namespace xt
      * @param equal_nan if true, isclose returns true if both elements of e1 and e2 are NaN
      * @return an \ref xfunction
      */
-#if 0 // FIXME: this template matches too greedily, add appropriate concept check
     template <class E1, class E2,
-              XTENSOR_REQUIRE<!std::is_arithmetic<E1>::value && !std::is_arithmetic<E2>::value>>
+              XTENSOR_REQUIRE<xexpression_concept<E1>::value || xexpression_concept<E2>::value> >
     inline auto isclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false) noexcept
     {
         return detail::make_xfunction<detail::isclose>(std::make_tuple(rtol, atol, equal_nan),
                                                        std::forward<E1>(e1), std::forward<E2>(e2));
     }
-#endif
 
     /**
      * @ingroup classif_functions
@@ -1695,7 +1696,6 @@ namespace xt
      * @param axes the axes along which the sum is performed (optional)
      * @return an \ref xreducer
      */
-#if 0 // FIXME: this template matches too greedily, add appropriate concept check
     template <class E, class X>
     inline auto sum(E&& e, X&& axes) noexcept
     {
@@ -1703,7 +1703,8 @@ namespace xt
         return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
     }
 
-    template <class E>
+    template <class E,
+              XTENSOR_REQUIRE<xexpression_concept<E>::value> >
     inline auto sum(E&& e) noexcept
     {
         using functor_type = std::plus<typename std::decay_t<E>::value_type>;
@@ -1725,7 +1726,6 @@ namespace xt
         return reduce(functor_type(), std::forward<E>(e), axes);
     }
 #endif
-#endif
 
     /**
      * @ingroup red_functions
@@ -1737,7 +1737,6 @@ namespace xt
      * @param axes the axes along which the product is computed (optional)
      * @return an \ref xreducer
      */
-#if 0 // FIXME: this template matches too greedily, add appropriate concept check
     template <class E, class X>
     inline auto prod(E&& e, X&& axes) noexcept
     {
@@ -1745,7 +1744,8 @@ namespace xt
         return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
     }
 
-    template <class E>
+    template <class E,
+              XTENSOR_REQUIRE<xexpression_concept<E>::value> >
     inline auto prod(E&& e) noexcept
     {
         using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
@@ -1767,7 +1767,6 @@ namespace xt
         return reduce(functor_type(), std::forward<E>(e), axes);
     }
 #endif
-#endif
 
     /**
      * @ingroup red_functions
@@ -1779,7 +1778,6 @@ namespace xt
      * @param axes the axes along which the mean is computed (optional)
      * @return an \ref xexpression
      */
-#if 0 // FIXME: this template matches too greedily, add appropriate concept check
     template <class E, class X>
     inline auto mean(E&& e, X&& axes) noexcept
     {
@@ -1789,7 +1787,8 @@ namespace xt
         return std::move(s) / value_type(size / s.size());
     }
 
-    template <class E>
+    template <class E,
+              XTENSOR_REQUIRE<xexpression_concept<E>::value> >
     inline auto mean(E&& e) noexcept
     {
         using value_type = typename std::decay_t<E>::value_type;
@@ -1815,7 +1814,6 @@ namespace xt
         auto s = sum(std::forward<E>(e), axes);
         return std::move(s) / value_type(size / s.size());
     }
-#endif
 #endif
 }
 

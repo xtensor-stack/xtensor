@@ -224,7 +224,7 @@ class tiny_array_base
 
   protected:
 
-    tiny_array_base(skip_initialization)
+    tiny_array_base(skip_initialization_tag)
     {}
 
     // constructors to be used by tiny_array
@@ -1085,7 +1085,7 @@ class tiny_array
     {}
 
     explicit
-    tiny_array(skip_initialization)
+    tiny_array(skip_initialization_tag)
     : base_type(dont_init)
     {}
 
@@ -1127,7 +1127,7 @@ class tiny_array
     }
 
         // for compatibility with tiny_array<VALUETYPE, runtime_size>
-    tiny_array(tags::size_proxy const & size, skip_initialization)
+    tiny_array(tags::size_proxy const & size, skip_initialization_tag)
     : base_type(dont_init)
     {
         XTENSOR_ASSERT_MSG(size.value == static_size,
@@ -1135,7 +1135,7 @@ class tiny_array
     }
 
         // for compatibility with tiny_array<VALUETYPE, runtime_size>
-    tiny_array(index_t size, skip_initialization)
+    tiny_array(index_t size, skip_initialization_tag)
     : base_type(dont_init)
     {
         XTENSOR_ASSERT_MSG(size == static_size,
@@ -1283,7 +1283,7 @@ class tiny_array<VALUETYPE, runtime_size>
     : tiny_array(size.value, initial)
     {}
 
-    tiny_array(index_t size, skip_initialization)
+    tiny_array(index_t size, skip_initialization_tag)
     : base_type(size)
     {
         this->data_ = alloc_.allocate(this->size_);

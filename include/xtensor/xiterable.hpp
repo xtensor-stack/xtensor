@@ -9,6 +9,7 @@
 #ifndef XITERABLE_HPP
 #define XITERABLE_HPP
 
+#include "xconcepts.hpp"
 #include "xiterator.hpp"
 
 namespace xt
@@ -35,6 +36,7 @@ namespace xt
      */
     template <class D>
     class xconst_iterable
+    : public xexpression_tag
     {
     public:
 

@@ -22,7 +22,7 @@ namespace xt
 static const int runtime_size  = -1;
 
     /// Don't initialize memory that gets overwritten anyway.
-enum skip_initialization { dont_init };
+enum skip_initialization_tag { dont_init };
 
     /// Copy-construct array in reversed order.
 enum reverse_copy_tag { copy_reversed };
