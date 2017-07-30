@@ -1076,8 +1076,8 @@ class tiny_array
     using base_type = tiny_array_base<VALUETYPE, tiny_array<VALUETYPE, M, N...>, M, N...>;
 
     typedef typename base_type::value_type value_type;
-    static const index_t static_ndim = base_type::static_ndim;
-    static const index_t static_size = base_type::static_size;
+    static constexpr index_t static_ndim = base_type::static_ndim;
+    static constexpr index_t static_size = base_type::static_size;
 
     explicit constexpr
     tiny_array()
