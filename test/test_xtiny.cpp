@@ -306,7 +306,7 @@ namespace xt
         EXPECT_NEAR(squared_norm(fv3), expectedSM, 1e-6);
 
         EXPECT_EQ(static_cast<uint64_t>(dot(bv3, bv3)), squared_norm(bv3));
-        EXPECT_EQ(dot(iv3, bv3), squared_norm(iv3));
+        EXPECT_EQ(static_cast<uint64_t>(dot(iv3, bv3)), squared_norm(iv3));
         EXPECT_NEAR(dot(fv3, fv3), squared_norm(fv3), 1e-6);
 
         tiny_array<IV, 3> ivv{ iv3, iv3, iv3 };
@@ -514,7 +514,7 @@ namespace xt
         EXPECT_TRUE(!all_greater_equal(a, b));
         EXPECT_TRUE(isclose(a, b, 10.0f));
 
-        EXPECT_EQ(squared_norm(a), 55);
+        EXPECT_EQ(squared_norm(a), 55u);
         EXPECT_TRUE(isclose(norm(a), sqrt(55.0), 1e-15));
         EXPECT_NEAR(norm(a), sqrt(55.0), 1e-15);
         EXPECT_EQ(min(a), 0);
