@@ -587,7 +587,7 @@ namespace xt
 
         EXPECT_EQ(cross(a, a), e);
         EXPECT_EQ(dot(a, a), 14);
-        EXPECT_EQ(squared_norm(a), 14);
+        EXPECT_EQ(squared_norm(a), 14u);
 
         EXPECT_EQ(a.erase(1), (A{ 1,3 }));
         EXPECT_EQ(a.insert(3, 4), (A{ 1,2,3,4 }));
