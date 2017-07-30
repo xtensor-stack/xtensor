@@ -9,15 +9,16 @@
 #ifndef XTENSOR_XTINY_HPP
 #define XTENSOR_XTINY_HPP
 
-#include "xtags.hpp"
-#include "xconcepts.hpp"
-#include "xexception.hpp"
-#include "xmath.hpp"
 #include <iosfwd>
 #include <algorithm>
 #include <memory>
 #include <iterator>
 #include <utility>
+
+#include "xtags.hpp"
+#include "xconcepts.hpp"
+#include "xexception.hpp"
+#include "xmathutil.hpp"
 
 #ifdef XTENSOR_CHECK_BOUNDS
     #define XTENSOR_ASSERT_INSIDE(array, diff) \
