@@ -1193,7 +1193,7 @@ class tiny_array
         // for compatibility with tiny_array<..., runtime_size>
     template <class U,
               XTENSOR_REQUIRE<iterator_concept<U>::value> >
-    tiny_array(U u, U end, reverse_copy_tag)
+    tiny_array(U u, U /* end */, reverse_copy_tag)
     : base_type(u, copy_reversed)
     {}
 
@@ -2636,7 +2636,7 @@ mean(tiny_array_base<V, D, N...> const & t)
     using Promote = real_promote_t<V>;
     const Promote sumVal = static_cast<Promote>(sum(t));
     if(t.size() > 0)
-        return sumVal / t.size();
+        return sumVal / static_cast<Promote>(t.size());
     else
         return sumVal;
 }

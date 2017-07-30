@@ -311,7 +311,7 @@ namespace xt
 
         tiny_array<IV, 3> ivv{ iv3, iv3, iv3 };
         EXPECT_EQ(squared_norm(ivv), 3 * squared_norm(iv3));
-        EXPECT_EQ(norm(ivv), sqrt(3.0*squared_norm(iv3)));
+        EXPECT_EQ(norm(ivv), sqrt(3.0*static_cast<double>(squared_norm(iv3))));
         EXPECT_EQ(elementwise_norm(iv3), iv3);
         EXPECT_EQ(elementwise_squared_norm(iv3), (IV{ 1, 4, 16 }));
 
