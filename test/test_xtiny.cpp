@@ -305,7 +305,7 @@ namespace xt
         float expectedSM = 1.2f*1.2f + 2.4f*2.4f + 3.6f*3.6f;
         EXPECT_NEAR(squared_norm(fv3), expectedSM, 1e-6);
 
-        EXPECT_EQ(dot(bv3, bv3), squared_norm(bv3));
+        EXPECT_EQ(static_cast<uint64_t>(dot(bv3, bv3)), squared_norm(bv3));
         EXPECT_EQ(dot(iv3, bv3), squared_norm(iv3));
         EXPECT_NEAR(dot(fv3, fv3), squared_norm(fv3), 1e-6);
 
@@ -324,10 +324,8 @@ namespace xt
 
         BV bv = bv3;
         bv[2] = 200;
-        int expectedSM2 = 40005;
-        if (SIZE == 6)
-            expectedSM2 += 189;
-        EXPECT_EQ(dot(bv, bv), expectedSM2);
+        uint64_t expectedSM2 = 40005;
+        EXPECT_EQ(static_cast<uint64_t>(dot(bv, bv)), expectedSM2);
         EXPECT_EQ(squared_norm(bv), expectedSM2);
 
         EXPECT_TRUE(equalVector(bv0 + 1.0, fv1));
