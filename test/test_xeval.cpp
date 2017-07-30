@@ -26,7 +26,8 @@ namespace xt
         bool type_eq = std::is_same<decltype(b), xarray<double>&>::value;
         EXPECT_TRUE(type_eq);
 
-        xtensor<double, 2> t({3, 3});
+        //FIXME: xtensor<double, 2> t({3, 3}) is ambiguous
+        xtensor<double, 2> t(xtensor<double, 2>::shape_type{3, 3});
 
         auto&& i = eval(t);
 
@@ -46,7 +47,8 @@ namespace xt
         bool type_eq = std::is_same<decltype(b), xarray<double>&&>::value;
         EXPECT_TRUE(type_eq);
 
-        xtensor<int, 2> k({3, 3});
+        // FIXME: xtensor<int, 2> k({3, 3}) is ambiguous
+        xtensor<int, 2> k(xtensor<int, 2>::shape_type{3, 3});
         auto m = k * k - 4;
         auto&& n = eval(m);
         bool type_eq_3 = std::is_same<decltype(n), xtensor<int, 2>&&>::value;
