@@ -12,6 +12,19 @@
 
 namespace xt
 {
+    template <class SHAPE>
+    void shape_insert(SHAPE & s, int i, int j)
+    {
+        s.insert(s.begin(), i);
+        s.insert(s.begin(), j);
+    }
+
+    template <class T, int N>
+    void shape_insert(tiny_array<T, N> & s, int i, int j)
+    {
+        s.insert(0, i).insert(0, j).swap(s);
+    }
+
     using std::size_t;
 
     template <class R, class S>
@@ -48,8 +61,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_increment(rm, rm.shape());
         }
     }
@@ -65,8 +77,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_increment(rm, rm.shape());
         }
     }
@@ -82,8 +93,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_increment(rm, rm.shape());
         }
     }
@@ -99,8 +109,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_increment(rm, rm.shape());
         }
     }
@@ -136,8 +145,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_end(rm);
         }
     }
@@ -153,8 +161,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_end(rm);
         }
     }
@@ -170,8 +177,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_end(rm);
         }
     }
@@ -187,8 +193,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_end(rm);
         }
     }
@@ -226,8 +231,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_decrement(rm, rm.shape());
         }
     }
@@ -243,8 +247,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_decrement(rm, rm.shape());
         }
     }
@@ -260,8 +263,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_decrement(rm, rm.shape());
         }
     }
@@ -277,8 +279,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_decrement(rm, rm.shape());
         }
     }
@@ -314,8 +315,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_rend(rm);
         }
     }
@@ -331,8 +331,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_rend(rm);
         }
     }
@@ -348,8 +347,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_rend(rm);
         }
     }
@@ -365,8 +363,7 @@ namespace xt
         {
             SCOPED_TRACE("broadcasting shape");
             layout_result<>::shape_type sh = rm.shape();
-            sh.insert(sh.begin(), 2);
-            sh.insert(sh.begin(), 4);
+            shape_insert(sh, 2, 4);
             test_rend(rm);
         }
     }

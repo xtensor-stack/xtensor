@@ -342,8 +342,7 @@ namespace xt
 
         auto c = equal(b, 0);
         std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_c = {{0, 0}, {1, 2}};
-        // FIXME: vector<vector> == vector<tiny_array> undefined
-        // EXPECT_EQ(expected_c, nonzero(c));
+        EXPECT_EQ(expected_c, nonzero(c));
 
         shape_type s = {3, 3, 3};
         bool_container d(s);

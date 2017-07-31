@@ -165,8 +165,7 @@ namespace xt
     TEST(xdynview, xdynview_on_xtensor)
     {
         using X = xtensor<int, 2>;
-        // FIXME: xtensor<int, 2> a({3, 4}) is ambiguous
-        xtensor<int, 2> a(X::shape_type{3, 4});
+        xtensor<int, 2> a({ 3, 4 });
         std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::copy(data.cbegin(), data.cend(), a.xbegin<layout_type::row_major>());
 

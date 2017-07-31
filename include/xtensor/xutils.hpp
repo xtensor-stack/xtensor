@@ -24,7 +24,8 @@
 
 namespace xt
 {
-        // FIXME: dyn_shape and stat_shape are just a helper classes for refactoring
+        // dyn_shape and stat_shape are centralized declarations of
+        // shape types for xarray and xtensor respectively
     template <class SIZE_TYPE, class ALLOC=std::allocator<SIZE_TYPE>>
     //using dyn_shape = std::vector<SIZE_TYPE, ALLOC>;
     using dyn_shape = tiny_array<SIZE_TYPE, runtime_size>;
@@ -639,10 +640,9 @@ namespace xt
         template <class... S>
         using only_array = and_<is_array<S>...>;
 
-        // FIXME: port promote_index_impl to tiny_array
-        // The promote_index meta-function returns std::vector<promoted_value_type> in the
+        // The promote_index meta-function returns dyn_shape<promoted_value_type> in the
         // general case and an array of the promoted value type and maximal size if all
-        // arguments are of type std::array
+        // arguments are of type stat_shape
 
         template <bool A, class... S>
         struct promote_index_impl;

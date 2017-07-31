@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    using container_type = std::array<std::size_t, 3>;
+    using container_type = stat_shape<std::size_t, 3>;
     using xtensor_dynamic = xtensor<int, 3, layout_type::dynamic>;
 
     TEST(xtensor, initializer_constructor)

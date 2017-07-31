@@ -379,7 +379,8 @@ namespace xt
 
         private:
 
-            inline value_type access_impl(xindex idx) const
+            template <class T, class A>
+            inline value_type access_impl(std::vector<T, A> idx) const
             {
                 auto get_item = [&idx](auto& arr)
                 {
@@ -387,6 +388,18 @@ namespace xt
                 };
                 size_type i = idx[m_axis];
                 idx.erase(idx.begin() + m_axis);
+                return apply<value_type>(i, get_item, m_t);
+            }
+
+            template <class T>
+            inline value_type access_impl(tiny_array<T, runtime_size> const & old_idx) const
+            {
+                size_type i = old_idx[m_axis];
+                auto idx = old_idx.erase(m_axis);
+                auto get_item = [&idx](auto& arr)
+                {
+                    return arr[idx];
+                };
                 return apply<value_type>(i, get_item, m_t);
             }
 

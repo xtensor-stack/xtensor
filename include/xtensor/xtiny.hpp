@@ -256,7 +256,7 @@ class tiny_array_base
     // }
 
     template <class U>
-    explicit tiny_array_base(U const * u)
+    explicit tiny_array_base(U const * u, U const * /* end */ = 0)
     {
         for(int i=0; i<static_size; ++i)
             data_[i] = static_cast<value_type>(u[i]);
@@ -274,6 +274,14 @@ class tiny_array_base
     tiny_array_base(U const * u, U const * /* end */, reverse_copy_tag)
     : tiny_array_base(u, copy_reversed)
     {}
+
+    template <class U,
+              XTENSOR_REQUIRE<iterator_concept<U>::value> >
+    tiny_array_base(U u, U /* end */)
+    {
+        for(int i=0; i<static_size; ++i, ++u)
+            data_[i] = static_cast<value_type>(*u);
+    }
 
   public:
 
@@ -1088,7 +1096,6 @@ class tiny_array
     : base_type(dont_init)
     {}
 
-        // FIXME
         // This constructor would allow construction with round brackets, e.g.:
         //     tiny_array<int, 1> a(2);
         // However, this may lead to bugs when fixed-size arrays are mixed with
@@ -1098,10 +1105,10 @@ class tiny_array
         // construction is restricted to curly braces:
         //     tiny_array<int, 1> a{2};
         //
-    template <class ... V>
-    constexpr tiny_array(value_type v0, V... v)
-    : base_type(v0, v...)
-    {}
+    // template <class ... V>
+    // constexpr tiny_array(value_type v0, V... v)
+    // : base_type(v0, v...)
+    // {}
 
     template <class V>
     tiny_array(std::initializer_list<V> v)
@@ -1181,35 +1188,22 @@ class tiny_array
     : base_type(u)
     {}
 
-    // FIXME
-    template <class U, int S, int MM=M,
-              XTENSOR_REQUIRE<S == MM>>
-    tiny_array(std::array<U, S> const & a)
-    : tiny_array(&a[0])
-    {}
-
-    // FIXME
-    template <class U, int S, int MM=M,
-              XTENSOR_REQUIRE<S == MM>>
-    bool operator==(std::array<U, S> const & a) const
-    {
-        for(index_t k=0; k<static_size; ++k)
-            if((*this)[k] != a[k])
-                return false;
-        return true;
-    }
-
-        // FIXME: only works for consecutive memory
-    template <class U,
-              XTENSOR_REQUIRE<iterator_concept<U>::value> >
-    explicit tiny_array(U u, U /* end */ = U())
-    : base_type(&*u)
+    template <class U>
+    explicit tiny_array(U const * u, U const * /* end */ = 0)
+    : base_type(u)
     {}
 
     template <class U,
               XTENSOR_REQUIRE<iterator_concept<U>::value> >
     tiny_array(U u, reverse_copy_tag)
     : base_type(u, copy_reversed)
+    {}
+
+        // for compatibility with tiny_array<..., runtime_size>
+    template <class U,
+              XTENSOR_REQUIRE<iterator_concept<U>::value> >
+    explicit tiny_array(U u, U end = U())
+    : base_type(u, end)
     {}
 
         // for compatibility with tiny_array<..., runtime_size>
@@ -1398,121 +1392,19 @@ class tiny_array<VALUETYPE, runtime_size>
         alloc_.deallocate(this->data_, this->size_);
     }
 
-#if 1
-    // FIXME: hacks to use tiny_array as shape in xtensor
-    using base_type::erase;
-
-    void erase(base_type::pointer p)
+    void resize(size_t new_size)
     {
-        base_type::erase(p-this->begin()).swap(*this);
-    }
-
-    // FIXME: hacks to use tiny_array as shape in xtensor
-    using base_type::insert;
-
-    void insert(base_type::pointer p, value_type v)
-    {
-        base_type::insert(p-this->begin(), v).swap(*this);
-    }
-
-    // FIXME: hacks to use tiny_array as shape in xtensor
-    void resize(size_t s)
-    {
-        if(s > this->size_)
+        if(new_size != this->size())
         {
-            alloc_.deallocate(this->data_, this->size_);
-            this->data_ = alloc_.allocate(s);
+            tiny_array(new_size).swap(*this);
         }
-        this->size_ = s;
     }
-
-    // FIXME: hacks to use tiny_array as shape in xtensor
-    template <class U>
-    tiny_array(std::vector<U> const & rhs)
-    : tiny_array(rhs.cbegin(), rhs.cend())
-    {}
-
-    // FIXME: hacks to use tiny_array as shape in xtensor
-    template <class U>
-    tiny_array & operator=(std::vector<U> const & rhs)
-    {
-        resize(rhs.size());
-        for(int k=0; k < this->size_; ++k)
-            this->data_[k] = rhs[k];
-        return *this;
-    }
-
-    // FIXME: hacks to use tiny_array as shape in xtensor
-    template <class U>
-    bool operator==(std::vector<U> const & rhs) const
-    {
-        if(this->size_ != (int)rhs.size())
-            return false;
-        for(int k=0; k < this->size_; ++k)
-            if(this->data_[k] != rhs[k])
-                return false;
-        return true;
-    }
-#endif
 
   private:
     // FIXME: implement an optimized allocator
     // FIXME: (look at Alexandrescu's Loki library or Kolmogorov's code)
     std::allocator<value_type> alloc_;
 };
-
-    //FIXME
-template <class U, class V, int N>
-bool operator==(std::vector<U> const & l, tiny_array<V, N> const & r)
-{
-    if((int)l.size() != r.size())
-        return false;
-    for(int k=0; k < (int)l.size(); ++k)
-        if(l[k] != r[k])
-            return false;
-    return true;
-}
-
-    //FIXME
-template <class U, class V, int N>
-bool operator==(tiny_array<U, N> const & l, std::vector<V> const & r)
-{
-    if(l.size() != (int)r.size())
-        return false;
-    for(int k=0; k < (int)l.size(); ++k)
-        if(l[k] != r[k])
-            return false;
-    return true;
-}
-
-// // FIXME
-// template <class VALUETYPE>
-// class tiny_array<VALUETYPE, -2>
-// : public tiny_array<VALUETYPE, runtime_size>
-// {
-  // public:
-    // using base_type = tiny_array<VALUETYPE, runtime_size>;
-    // using base_type::base_type;
-
-    // tiny_array(base_type const & other)
-    // : base_type(other)
-    // {}
-// };
-
-// // FIXME
-// template <class VALUETYPE>
-// class tiny_array<VALUETYPE, -3>
-// : public tiny_array<VALUETYPE, runtime_size>
-// {
-  // public:
-    // using base_type = tiny_array<VALUETYPE, runtime_size>;
-    // using base_type::base_type;
-
-    // tiny_array(base_type const & other)
-    // : base_type(other)
-    // {}
-// };
-
 
 /********************************************************/
 /*                                                      */
@@ -2002,67 +1894,6 @@ operator>=(tiny_array_base<V1, D1, N...> const & l,
 {
     return !(l < r);
 }
-
-    // /// lexicographical comparison
-// template <class V1, class D, int N, class V2, class A>
-// inline bool
-// operator<(tiny_array_base<V1, D, N> const & l,
-          // std::vector<V2, A> const & r)
-// {
-    // index_t size = r.size();
-    // bool equal_res  = false;
-    // if(l.size() < size)
-    // {
-        // size      = l.size();
-        // equal_res = true;
-    // }
-    // for(int k=0; k < size; ++k)
-    // {
-        // if(l[k] < r[k])
-            // return true;
-        // if(r[k] < l[k])
-            // return false;
-    // }
-    // return equal_res;
-// }
-
-// template <class V1, class A, class V2, class D, int N>
-// inline bool
-// operator<(std::vector<V1, A> const & l,
-          // tiny_array_base<V2, D, N> const & r)
-// {
-    // index_t size = r.size();
-    // bool equal_res  = false;
-    // if(l.size() < size)
-    // {
-        // size      = l.size();
-        // equal_res = true;
-    // }
-    // for(int k=0; k < size; ++k)
-    // {
-        // if(l[k] < r[k])
-            // return true;
-        // if(r[k] < l[k])
-            // return false;
-    // }
-    // return equal_res;
-// }
-
-// template <class V1, class D, int N, class V2, class A>
-// inline bool
-// operator>(tiny_array_base<V1, D, N> const & l,
-          // std::vector<V2, A> const & r)
-// {
-    // return r < l;
-// }
-
-// template <class V1, class A, class V2, class D, int N>
-// inline bool
-// operator>(std::vector<V1, A> const & l,
-          // tiny_array_base<V2, D, N> const & r)
-// {
-    // return r < l;
-// }
 
     /// check if all elements are non-zero (or 'true' if V is bool)
 template <class V, class D, int ... N>

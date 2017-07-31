@@ -16,7 +16,7 @@
 namespace xt
 {
     using std::size_t;
-    using shape_type = std::vector<size_t>;
+    using shape_type = dyn_shape<size_t>;
 
     /********************
      * Basic operations *

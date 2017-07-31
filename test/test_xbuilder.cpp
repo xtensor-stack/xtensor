@@ -16,7 +16,7 @@
 namespace xt
 {
     using std::size_t;
-    using shape_t = std::vector<std::size_t>;
+    using shape_t = dyn_shape<std::size_t>;
 
     TEST(xbuilder, ones)
     {

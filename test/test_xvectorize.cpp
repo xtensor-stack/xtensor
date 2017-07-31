@@ -18,7 +18,7 @@ namespace xt
         return d1 + d2;
     }
 
-    using shape_type = std::vector<size_t>;
+    using shape_type = dyn_shape<size_t>;
 
     TEST(xvectorize, function)
     {
