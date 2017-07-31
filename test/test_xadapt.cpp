@@ -16,7 +16,7 @@ namespace xt
     TEST(xarray_adaptor, xadapt)
     {
         vec_type v(4, 0);
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = dyn_shape<vec_type::size_type>;
         shape_type s({2, 2});
 
         auto a1 = xadapt(v, s);
@@ -33,7 +33,7 @@ namespace xt
     {
         size_t size = 4;
         int* data = new int[size];
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = dyn_shape<vec_type::size_type>;
         shape_type s({2, 2});
 
         auto a1 = xadapt(data, size, no_ownership(), s);
@@ -53,7 +53,7 @@ namespace xt
         size_t size = 4;
         int* data = new int[size];
         int* data2 = new int[size];
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = dyn_shape<vec_type::size_type>;
         shape_type s({2, 2});
 
         auto a1 = xadapt(data, size, acquire_ownership(), s);
