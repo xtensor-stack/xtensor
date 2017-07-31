@@ -850,7 +850,7 @@ namespace xt
         // Compute strided view
 
         std::size_t offset = detail::get_offset(e);
-        using shape_type = typename dyn_shape<std::size_t>;
+        using shape_type = dyn_shape<std::size_t>;
 
         shape_type new_shape(dimension);
         shape_type new_strides(dimension);
