@@ -277,9 +277,17 @@ namespace xt
     };
 
     template <class I1, std::size_t N1, class I2, std::size_t N2>
-    struct xreducer_shape_type<stat_shape<I1, N1>, stat_shape<I2, N2>>
+    struct xreducer_shape_type<std::array<I1, N1>, std::array<I2, N2>>
     {
-        using type = stat_shape<I2, N1 - N2>;
+        using type = std::array<I2, N1 - N2>;
+    };
+
+    template <class I1, int N1, class I2, int N2>
+    struct xreducer_shape_type<tiny_array<I1, N1>, tiny_array<I2, N2>>
+    {
+        using type = std::conditional_t<(N1 > 0 && N2 > 0 && N1 > N2), 
+                                        tiny_array<I2, N1 - N2>, 
+                                        tiny_array<I2, runtime_size>>;
     };
 
     namespace detail

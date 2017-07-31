@@ -19,11 +19,28 @@ namespace xt
     {
         template <class T>
         using is_container = std::is_base_of<xcontainer<std::remove_const_t<T>>, T>;
+
+        template <class S>
+        struct shape_ndim
+        : public std::tuple_size<S>
+        {};
+
+        template <class T, int N>
+        struct shape_ndim<tiny_array<T, N>>
+        {
+            static const int value = N;
+        };
+
+        template <class T>
+        struct shape_ndim<tiny_array<T, runtime_size>>
+        {
+            static const int value = 0;
+        };
     }
     /**
      * Force evaluation of xexpression.
      * @return xarray or xtensor depending on shape type
-     * 
+     *
      * \code{.cpp}
      * xarray<double> a = {1,2,3,4};
      * auto&& b = xt::eval(a); // b is a reference to a, no copy!
@@ -40,9 +57,9 @@ namespace xt
     /// @cond DOXYGEN_INCLUDE_SFINAE
     template <class T, class I = std::decay_t<T>>
     inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && detail::is_array<typename I::shape_type>::value, xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>>
+        -> std::enable_if_t<!detail::is_container<I>::value && detail::is_array<typename I::shape_type>::value, xtensor<typename I::value_type, detail::shape_ndim<typename I::shape_type>::value>>
     {
-        return xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>(std::forward<T>(t));
+        return xtensor<typename I::value_type, detail::shape_ndim<typename I::shape_type>::value>(std::forward<T>(t));
     }
 
     template <class T, class I = std::decay_t<T>>

@@ -469,13 +469,19 @@ namespace xt
     namespace detail
     {
         template <class T, std::size_t N>
-        inline stat_shape<T, N + 1> add_axis(stat_shape<T, N> arr, std::size_t axis, std::size_t value)
+        inline std::array<T, N + 1> add_axis(std::array<T, N> arr, std::size_t axis, std::size_t value)
         {
-            stat_shape<T, N + 1> temp;
+            std::array<T, N + 1> temp;
             std::copy(arr.begin(), arr.begin() + axis, temp.begin());
             temp[axis] = value;
             std::copy(arr.begin() + axis, arr.end(), temp.begin() + axis + 1);
             return temp;
+        }
+
+        template <class T, int N>
+        inline auto add_axis(tiny_array<T, N> arr, std::size_t axis, std::size_t value)
+        {
+            return arr.insert(axis, value);
         }
 
         template <class T>
@@ -719,9 +725,17 @@ namespace xt
         };
 
         template <class I, std::size_t L>
-        struct diagonal_shape_type<stat_shape<I, L>>
+        struct diagonal_shape_type<std::array<I, L>>
         {
-            using type = stat_shape<I, L - 1>;
+            using type = std::array<I, L - 1>;
+        };
+
+        template <class I, int L>
+        struct diagonal_shape_type<tiny_array<I, L>>
+        {
+            using type = std::conditional_t<(L > 0),
+                                            tiny_array<I, L - 1>,
+                                            tiny_array<I, runtime_size>>;
         };
     }
 

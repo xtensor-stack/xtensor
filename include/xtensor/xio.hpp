@@ -609,7 +609,13 @@ namespace xt
             static constexpr std::size_t value = 5;
         };
 
-// Note: std::min is not constexpr on old versions of gcc (4.x) and clang.
+        template <class T>
+        struct recursion_depth<tiny_array<T, runtime_size>>
+        {
+            static constexpr std::size_t value = 5;
+        };
+
+        // Note: std::min is not constexpr on old versions of gcc (4.x) and clang.
 #define XTENSOR_MIN(x, y) (x > y ? y : x)
         template <class T, std::size_t N>
         struct recursion_depth<std::array<T, N>>

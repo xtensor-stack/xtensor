@@ -18,7 +18,6 @@
 #include "xexception.hpp"
 #include "xlayout.hpp"
 #include "xutils.hpp"
-// #include "xtiny.hpp"
 
 namespace xt
 {

@@ -94,13 +94,13 @@ namespace xt
     TEST(utils, promote_shape)
     {
         bool expect_v = std::is_same<
-            std::vector<size_t>,
-            promote_shape_t<std::vector<size_t>, std::array<size_t, 3>, std::array<size_t, 2>>
+            dyn_shape<size_t>,
+            promote_shape_t<dyn_shape<size_t>, stat_shape<size_t, 3>, stat_shape<size_t, 2>>
         >::value;
 
         bool expect_a = std::is_same<
-            std::array<size_t, 3>,
-            promote_shape_t<std::array<size_t, 2>, std::array<size_t, 3>, std::array<size_t, 2>>
+            stat_shape<size_t, 3>,
+            promote_shape_t<stat_shape<size_t, 2>, stat_shape<size_t, 3>, stat_shape<size_t, 2>>
         >::value;
 
         ASSERT_TRUE(expect_v);

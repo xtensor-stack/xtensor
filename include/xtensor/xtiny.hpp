@@ -1176,7 +1176,7 @@ class tiny_array
     {}
 
     template <class U, int S=static_size,
-              XTENSOR_REQUIRE<S != 1>>
+              XTENSOR_REQUIRE<(S > 1)>>
     explicit tiny_array(U const (&u)[static_size])
     : base_type(u)
     {}
@@ -1398,17 +1398,24 @@ class tiny_array<VALUETYPE, runtime_size>
         alloc_.deallocate(this->data_, this->size_);
     }
 
-#if 0
+#if 1
     // FIXME: hacks to use tiny_array as shape in xtensor
     using base_type::erase;
 
     void erase(base_type::pointer p)
     {
-        --this->size_;
-        for(; p < this->data_ + this->size_; ++p)
-            *p = p[1];
+        base_type::erase(p-this->begin()).swap(*this);
     }
 
+    // FIXME: hacks to use tiny_array as shape in xtensor
+    using base_type::insert;
+
+    void insert(base_type::pointer p, value_type v)
+    {
+        base_type::insert(p-this->begin(), v).swap(*this);
+    }
+
+    // FIXME: hacks to use tiny_array as shape in xtensor
     void resize(size_t s)
     {
         if(s > this->size_)
@@ -1419,11 +1426,13 @@ class tiny_array<VALUETYPE, runtime_size>
         this->size_ = s;
     }
 
+    // FIXME: hacks to use tiny_array as shape in xtensor
     template <class U>
     tiny_array(std::vector<U> const & rhs)
     : tiny_array(rhs.cbegin(), rhs.cend())
     {}
 
+    // FIXME: hacks to use tiny_array as shape in xtensor
     template <class U>
     tiny_array & operator=(std::vector<U> const & rhs)
     {
@@ -1433,6 +1442,7 @@ class tiny_array<VALUETYPE, runtime_size>
         return *this;
     }
 
+    // FIXME: hacks to use tiny_array as shape in xtensor
     template <class U>
     bool operator==(std::vector<U> const & rhs) const
     {
@@ -1474,6 +1484,35 @@ bool operator==(tiny_array<U, N> const & l, std::vector<V> const & r)
             return false;
     return true;
 }
+
+// // FIXME
+// template <class VALUETYPE>
+// class tiny_array<VALUETYPE, -2>
+// : public tiny_array<VALUETYPE, runtime_size>
+// {
+  // public:
+    // using base_type = tiny_array<VALUETYPE, runtime_size>;
+    // using base_type::base_type;
+
+    // tiny_array(base_type const & other)
+    // : base_type(other)
+    // {}
+// };
+
+// // FIXME
+// template <class VALUETYPE>
+// class tiny_array<VALUETYPE, -3>
+// : public tiny_array<VALUETYPE, runtime_size>
+// {
+  // public:
+    // using base_type = tiny_array<VALUETYPE, runtime_size>;
+    // using base_type::base_type;
+
+    // tiny_array(base_type const & other)
+    // : base_type(other)
+    // {}
+// };
+
 
 /********************************************************/
 /*                                                      */
@@ -1926,16 +1965,15 @@ inline bool
 operator<(tiny_array_base<V1, D1, N...> const & l,
           tiny_array_base<V2, D2, N...> const & r)
 {
-    XTENSOR_ASSERT_RUNTIME_SIZE(N..., l.size() == r.size(),
-        "tiny_array_base::operator<(): size mismatch.");
-    for(int k=0; k < l.size(); ++k)
+    const int min_size = min(l.size(), r.size());
+    for(int k = 0; k < min_size; ++k)
     {
         if(l[k] < r[k])
             return true;
         if(r[k] < l[k])
             return false;
     }
-    return false;
+    return (l.size() < r.size());
 }
 
     /// lexicographical less-equal
@@ -2504,6 +2542,19 @@ XTENSOR_TINYARRAY_OPERATORS(>>)
 
 #endif // DOXYGEN
 
+    // define sqrt() explicitly because its return type
+    // is needed for type inference
+template <class V, class D, int ... N>
+inline tiny_array<real_promote_t<V>, N...>
+sqrt(tiny_array_base<V, D, N...> const & v)
+{
+    using namespace cmath;
+    tiny_array<real_promote_t<V>, N...> res(v.size(), dont_init);
+    for(int k=0; k < v.size(); ++k)
+        res[k] = sqrt(v[k]);
+    return res;
+}
+
 #define XTENSOR_TINYARRAY_UNARY_FUNCTION(FCT) \
 template <class V, class D, int ... N> \
 inline auto \
@@ -2535,7 +2586,6 @@ XTENSOR_TINYARRAY_UNARY_FUNCTION(acosh)
 XTENSOR_TINYARRAY_UNARY_FUNCTION(asinh)
 XTENSOR_TINYARRAY_UNARY_FUNCTION(atanh)
 
-XTENSOR_TINYARRAY_UNARY_FUNCTION(sqrt)
 XTENSOR_TINYARRAY_UNARY_FUNCTION(cbrt)
 XTENSOR_TINYARRAY_UNARY_FUNCTION(sq)
 XTENSOR_TINYARRAY_UNARY_FUNCTION(elementwise_norm)

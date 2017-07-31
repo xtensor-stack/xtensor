@@ -26,7 +26,8 @@ namespace xt
 {
         // FIXME: dyn_shape and stat_shape are just a helper classes for refactoring
     template <class SIZE_TYPE, class ALLOC=std::allocator<SIZE_TYPE>>
-    using dyn_shape = std::vector<SIZE_TYPE, ALLOC>;
+    //using dyn_shape = std::vector<SIZE_TYPE, ALLOC>;
+    using dyn_shape = tiny_array<SIZE_TYPE, runtime_size>;
 
     template <class SIZE_TYPE, int SIZE>
     //using stat_shape = std::array<SIZE_TYPE, SIZE>;
@@ -452,7 +453,14 @@ namespace xt
     template <class T, int N>
     inline bool resize_container(tiny_array<T, N>& a, typename tiny_array<T, N>::size_type size)
     {
-        return a.size() == size;
+        return size == N;
+    }
+
+    template <class T>
+    inline bool resize_container(tiny_array<T, runtime_size>& a, typename tiny_array<T, runtime_size>::size_type size)
+    {
+        tiny_array<T, runtime_size>(size).swap(a);
+        return true;
     }
 
     /********************************
@@ -573,7 +581,7 @@ namespace xt
     namespace detail
     {
         template <class T1, class T2>
-        constexpr std::common_type_t<T1, T2> imax(const T1& a, const T2& b)
+        constexpr std::common_type_t<T1, T2> imax(const T1 a, const T2 b)
         {
             return a > b ? a : b;
         }
@@ -593,6 +601,16 @@ namespace xt
         {
         };
 
+        template <class T, int N, class... Ts>
+        struct max_array_size<tiny_array<T, N>, Ts...> : std::integral_constant<std::size_t, imax(N, max_array_size<Ts...>::value)>
+        {
+        };
+
+        template <class T, class... Ts>
+        struct max_array_size<tiny_array<T, runtime_size>, Ts...> : std::integral_constant<std::size_t, max_array_size<Ts...>::value>
+        {
+        };
+
         // Simple is_array and only_array meta-functions
         template <class S>
         struct is_array
@@ -606,15 +624,22 @@ namespace xt
             static constexpr bool value = true;
         };
 
-        //template <class T, int N>
-        //struct is_array<tiny_array<T, N>>
-        //{
-        //    static constexpr bool value = true;
-        //};
+        template <class T, int N>
+        struct is_array<tiny_array<T, N>>
+        {
+           static constexpr bool value = true;
+        };
+
+        template <class T>
+        struct is_array<tiny_array<T, runtime_size>>
+        {
+           static constexpr bool value = false;
+        };
 
         template <class... S>
         using only_array = and_<is_array<S>...>;
 
+        // FIXME: port promote_index_impl to tiny_array
         // The promote_index meta-function returns std::vector<promoted_value_type> in the
         // general case and an array of the promoted value type and maximal size if all
         // arguments are of type std::array
@@ -625,19 +650,19 @@ namespace xt
         template <class... S>
         struct promote_index_impl<false, S...>
         {
-            using type = std::vector<typename std::common_type<typename S::value_type...>::type>;
+            using type = dyn_shape<typename std::common_type<typename S::value_type...>::type>;
         };
 
         template <class... S>
         struct promote_index_impl<true, S...>
         {
-            using type = std::array<typename std::common_type<typename S::value_type...>::type, max_array_size<S...>::value>;
+            using type = stat_shape<typename std::common_type<typename S::value_type...>::type, max_array_size<S...>::value>;
         };
 
         template <>
         struct promote_index_impl<true>
         {
-            using type = std::array<std::size_t, 0>;
+            using type = stat_shape<std::size_t, 0>;
         };
 
         template <class... S>

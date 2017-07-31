@@ -310,9 +310,21 @@ namespace xt
     };
 
     template <class I, std::size_t L, class... S>
-    struct xview_shape_type<stat_shape<I, L>, S...>
+    struct xview_shape_type<std::array<I, L>, S...>
     {
-        using type = stat_shape<I, (int)(L - integral_count<S...>() + newaxis_count<S...>())>;
+        using type = std::array<I, L - integral_count<S...>() + newaxis_count<S...>()>;
+    };
+
+    template <class I, int L, class... S>
+    struct xview_shape_type<tiny_array<I, L>, S...>
+    {
+        using type = tiny_array<I, (int)(L - integral_count<S...>() + newaxis_count<S...>())>;
+    };
+
+    template <class I, class... S>
+    struct xview_shape_type<tiny_array<I, runtime_size>, S...>
+    {
+        using type = tiny_array<I, runtime_size>;
     };
 
     /************************

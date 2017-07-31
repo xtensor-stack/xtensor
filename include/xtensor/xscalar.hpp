@@ -16,7 +16,6 @@
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
-// #include "xtiny.hpp"
 
 namespace xt
 {
