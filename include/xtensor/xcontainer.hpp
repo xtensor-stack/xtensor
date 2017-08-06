@@ -61,6 +61,7 @@ namespace xt
         using const_pointer = typename container_type::const_pointer;
         using size_type = typename container_type::size_type;
         using difference_type = typename container_type::difference_type;
+        using simd_value_type = xsimd::simd_type<value_type>;
 
         using shape_type = typename inner_types::shape_type;
         using strides_type = typename inner_types::strides_type;
@@ -76,6 +77,8 @@ namespace xt
 
         static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
+        using data_alignment = xsimd::container_alignment<container_type>;
+        using simd_type = xsimd::simd_type<value_type>;
 
         size_type size() const noexcept;
 
@@ -133,6 +136,10 @@ namespace xt
         reference data_element(size_type i);
         const_reference data_element(size_type i) const;
 
+        template <class align, class simd = simd_value_type>
+        void store_simd(size_type i, const simd& e);
+        template <class align, class simd = simd_value_type>
+        simd load_simd(size_type i) const;
 
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
@@ -1053,6 +1060,22 @@ namespace xt
     inline auto xcontainer<D>::data_element(size_type i) const -> const_reference
     {
         return data()[i];
+    }
+
+    template <class D>
+    template <class alignment, class simd>
+    inline void xcontainer<D>::store_simd(size_type i, const simd& e)
+    {
+        using align_mode = driven_align_mode_t<alignment, data_alignment>;
+        xsimd::store_simd<value_type, typename simd::value_type>(&(data()[i]), e, align_mode());
+    }
+
+    template <class D>
+    template <class alignment, class simd>
+    inline auto xcontainer<D>::load_simd(size_type i) const -> simd
+    {
+        using align_mode = driven_align_mode_t<alignment, data_alignment>;
+        return xsimd::load_simd<value_type, typename simd::value_type>(&(data()[i]), align_mode());
     }
 
     /*************************************

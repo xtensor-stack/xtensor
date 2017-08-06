@@ -77,6 +77,7 @@ set(XTENSOR_HEADERS
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(XTENSOR_CHECK_DIMENSION "xtensor dimension check" OFF)
+OPTION(XTENSOR_USE_XSIMD "simd acceleration for xtensor" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
@@ -92,6 +93,13 @@ endif()
 
 if(XTENSOR_CHECK_DIMENSION)
     add_definitions(-DXTENSOR_ENABLE_CHECK_DIMENSION)
+endif()
+
+if(XTENSOR_USE_XSIMD)
+    MESSAGE(STATUS "compiling with simd acceleration")
+    add_definitions(-DXTENSOR_USE_XSIMD)
+    find_package(xsimd REQUIRED)
+    include_directories(${xsimd_INCLUDE_DIRS})
 endif()
 
 if(DEFAULT_COLUMN_MAJOR)

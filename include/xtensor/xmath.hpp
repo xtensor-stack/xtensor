@@ -43,87 +43,105 @@ namespace xt
      * Helpers *
      ***********/
 
-    namespace detail
-    {
-        template <class T>
-        struct bool_functor_return_type
-        {
-            using type = bool;
-        };
+#define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
+    template <class T>                                                          \
+    struct NAME##_fun                                                           \
+    {                                                                           \
+        using return_type = xt::detail::functor_return_type<T, R>;              \
+        using argument_type = T;                                                \
+        using result_type = typename return_type::type;                         \
+        using simd_value_type = xsimd::simd_type<T>;                            \
+        using simd_result_type = typename return_type::simd_type;               \
+        constexpr result_type operator()(const T& arg) const                    \
+        {                                                                       \
+            using std::NAME;                                                    \
+            return NAME(arg);                                                   \
+        }                                                                       \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
+        {                                                                       \
+            using std::NAME;                                                    \
+            return NAME(arg);                                                   \
+        }                                                                       \
     }
 
-#define UNARY_MATH_FUNCTOR(NAME)                   \
-    template <class T>                             \
-    struct NAME##_fun                              \
-    {                                              \
-        using argument_type = T;                   \
-        using result_type = T;                     \
-                                                   \
-        constexpr T operator()(const T& arg) const \
-        {                                          \
-            using std::NAME;                       \
-            return NAME(arg);                      \
-        }                                          \
+#define UNARY_MATH_FUNCTOR(NAME) UNARY_MATH_FUNCTOR_IMPL(NAME, T)
+#define UNARY_BOOL_FUNCTOR(NAME) UNARY_MATH_FUNCTOR_IMPL(NAME, bool)
+
+#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)                               \
+    template <class T>                                                          \
+    struct NAME##_fun                                                           \
+    {                                                                           \
+        using argument_type = T;                                                \
+        using result_type = complex_value_type_t<T>;                            \
+        using simd_value_type = argument_type;                                  \
+        using simd_result_type = result_type;                                   \
+        constexpr result_type operator()(const T& arg) const                    \
+        {                                                                       \
+            using std::NAME;                                                    \
+            return NAME(arg);                                                   \
+        }                                                                       \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
+        {                                                                       \
+            using std::NAME;                                                    \
+            return NAME(arg);                                                   \
+        }                                                                       \
     }
 
-#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)            \
-    template <class T>                                       \
-    struct NAME##_fun                                        \
-    {                                                        \
-        using argument_type = T;                             \
-        using result_type = complex_value_type_t<T>;         \
-                                                             \
-        constexpr result_type operator()(const T& arg) const \
-        {                                                    \
-            using std::NAME;                                 \
-            return NAME(arg);                                \
-        }                                                    \
+#define BINARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
+    template <class T>                                                           \
+    struct NAME##_fun                                                            \
+    {                                                                            \
+        using return_type = xt::detail::functor_return_type<T, R>;               \
+        using first_argument_type = T;                                           \
+        using second_argument_type = T;                                          \
+        using result_type = typename return_type::type;                          \
+        using simd_value_type = xsimd::simd_type<T>;                             \
+        using simd_result_type = typename return_type::simd_type;                \
+        constexpr result_type operator()(const T& arg1, const T& arg2) const     \
+        {                                                                        \
+            using std::NAME;                                                     \
+            return NAME(arg1, arg2);                                             \
+        }                                                                        \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg1,       \
+                                              const simd_value_type& arg2) const \
+        {                                                                        \
+            using std::NAME;                                                     \
+            return NAME(arg1, arg2);                                             \
+        }                                                                        \
     }
 
-#define BINARY_MATH_FUNCTOR(NAME)                                  \
-    template <class T>                                             \
-    struct NAME##_fun                                              \
-    {                                                              \
-        using first_argument_type = T;                             \
-        using second_argument_type = T;                            \
-        using result_type = T;                                     \
-                                                                   \
-        constexpr T operator()(const T& arg1, const T& arg2) const \
-        {                                                          \
-            using std::NAME;                                       \
-            return NAME(arg1, arg2);                               \
-        }                                                          \
+#define BINARY_MATH_FUNCTOR(NAME) BINARY_MATH_FUNCTOR_IMPL(NAME, T)
+#define BINARY_BOOL_FUNCTOR(NAME) BINARY_MATH_FUNCTOR_IMPL(NAME, bool)
+
+#define TERNARY_MATH_FUNCTOR_IMPL(NAME, R)                                       \
+    template <class T>                                                           \
+    struct NAME##_fun                                                            \
+    {                                                                            \
+        using return_type = xt::detail::functor_return_type<T, R>;               \
+        using first_argument_type = T;                                           \
+        using second_argument_type = T;                                          \
+        using third_argument_type = T;                                           \
+        using result_type = typename return_type::type;                          \
+        using simd_value_type = xsimd::simd_type<T>;                             \
+        using simd_result_type = typename return_type::simd_type;                \
+        constexpr result_type operator()(const T& arg1,                          \
+                                         const T& arg2,                          \
+                                          const T& arg3) const                   \
+        {                                                                        \
+            using std::NAME;                                                     \
+            return NAME(arg1, arg2, arg3);                                       \
+        }                                                                        \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg1,       \
+                                              const simd_value_type& arg2,       \
+                                              const simd_value_type& arg3) const \
+        {                                                                        \
+            using std::NAME;                                                     \
+            return NAME(arg1, arg2, arg3);                                       \
+        }                                                                        \
     }
 
-#define TERNARY_MATH_FUNCTOR(NAME)                                                \
-    template <class T>                                                            \
-    struct NAME##_fun                                                             \
-    {                                                                             \
-        using first_argument_type = T;                                            \
-        using second_argument_type = T;                                           \
-        using third_argument_type = T;                                            \
-        using result_type = T;                                                    \
-                                                                                  \
-        constexpr T operator()(const T& arg1, const T& arg2, const T& arg3) const \
-        {                                                                         \
-            using std::NAME;                                                      \
-            return NAME(arg1, arg2, arg3);                                        \
-        }                                                                         \
-    }
-
-#define UNARY_BOOL_FUNCTOR(NAME)                                                    \
-    template <class T>                                                              \
-    struct NAME##_fun                                                               \
-    {                                                                               \
-        using argument_type = T;                                                    \
-        using result_type = typename xt::detail::bool_functor_return_type<T>::type; \
-                                                                                    \
-        constexpr result_type operator()(const T& arg) const                        \
-        {                                                                           \
-            using std::NAME;                                                        \
-            return NAME(arg);                                                       \
-        }                                                                           \
-    }
+#define TERNARY_MATH_FUNCTOR(NAME) TERNARY_MATH_FUNCTOR_IMPL(NAME, T)
+#define TERNARY_BOOL_FUNCTOR(NAME) TERNARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
     namespace math
     {
@@ -174,10 +192,15 @@ namespace xt
         UNARY_BOOL_FUNCTOR(isnan);
     }
 
-#undef UNARY_BOOL_FUNCTOR
-#undef TERNARY_MATH_FUNCTOR
-#undef BINARY_MATH_FUNCTOR
 #undef UNARY_MATH_FUNCTOR
+#undef UNARY_BOOL_FUNCTOR
+#undef UNARY_MATH_FUNCTOR_IMPL
+#undef BINARY_MATH_FUNCTOR
+#undef BINARY_BOOL_FUNCTOR
+#undef BINARY_MATH_FUNCTOR_IMPL
+#undef TERNARY_MATH_FUNCTOR
+#undef TERNARY_BOOL_FUNCTOR
+#undef TERNARY_MATH_FUNCTOR_IMPL
 #undef UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
 
     /*******************
@@ -335,10 +358,16 @@ namespace xt
         struct minimum
         {
             using result_type = T;
-
+            using simd_value_type = xsimd::simd_type<T>;
+            
             constexpr result_type operator()(const T& t1, const T& t2) const noexcept
             {
                 return (t1 < t2) ? t1 : t2;
+            }
+
+            constexpr simd_value_type simd_apply(const simd_value_type& t1, const simd_value_type& t2) const noexcept
+            {
+                return xsimd::select(t1 < t2, t1, t2);
             }
         };
 
@@ -346,10 +375,16 @@ namespace xt
         struct maximum
         {
             using result_type = T;
+            using simd_value_type = xsimd::simd_type<T>;
 
             constexpr result_type operator()(const T& t1, const T& t2) const noexcept
             {
                 return (t1 > t2) ? t1 : t2;
+            }
+
+            constexpr simd_value_type simd_apply(const simd_value_type& t1, const simd_value_type& t2) const noexcept
+            {
+                return xsimd::select(t1 > t2, t1, t2);
             }
         };
 
@@ -360,9 +395,18 @@ namespace xt
             using second_argument_type = T;
             using third_argument_type = T;
             using result_type = T;
+            using simd_value_type = xsimd::simd_type<T>;
+            
             constexpr T operator()(const T& v, const T& lo, const T& hi) const
             {
                 return v < lo ? lo : hi < v ? hi : v;
+            }
+
+            constexpr simd_value_type simd_apply(const simd_value_type& v,
+                                                 const simd_value_type& lo,
+                                                 const simd_value_type& hi) const
+            {
+                return xsimd::select(v < lo, lo, xsimd::select(hi < v, hi, v));
             }
         };
     }

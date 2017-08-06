@@ -16,6 +16,7 @@
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
+#include "xtensor_simd.hpp"
 
 namespace xt
 {
@@ -60,6 +61,7 @@ namespace xt
         using const_pointer = const value_type*;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
+        using simd_value_type = xsimd::simd_type<value_type>;
 
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
@@ -235,6 +237,11 @@ namespace xt
 
         reference data_element(size_type i) noexcept;
         const_reference data_element(size_type i) const noexcept;
+
+        template <class align, class simd = simd_value_type>
+        void store_simd(size_type i, const simd& e);
+        template <class align, class simd = simd_value_type>
+        simd load_simd(size_type i) const;
 
     private:
 
@@ -850,6 +857,20 @@ namespace xt
     inline auto xscalar<CT>::data_element(size_type) const noexcept -> const_reference
     {
         return m_value;
+    }
+
+    template <class CT>
+    template <class align, class simd>
+    inline void xscalar<CT>::store_simd(size_type, const simd& e)
+    {
+        m_value = static_cast<value_type>(e[0]);
+    }
+
+    template <class CT>
+    template <class align, class simd>
+    inline auto xscalar<CT>::load_simd(size_type) const -> simd
+    {
+        return xsimd::set_simd<value_type, typename simd::value_type>(m_value);
     }
 
     template <class T>
