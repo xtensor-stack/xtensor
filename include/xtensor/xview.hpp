@@ -102,6 +102,9 @@ namespace xt
         template <class CTA, class FSL, class... SL>
         explicit xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept;
 
+        xview(const xview&) = default;
+        self_type& operator=(const xview& rhs);
+
         template <class E>
         self_type& operator=(const xexpression<E>& e);
 
@@ -343,6 +346,13 @@ namespace xt
         }
     }
     //@}
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator=(const xview& rhs) -> self_type&
+    {
+        temporary_type tmp(rhs);
+        return this->assign_temporary(std::move(tmp));
+    }
 
     /**
      * @name Extended copy semantic
