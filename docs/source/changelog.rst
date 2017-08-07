@@ -21,3 +21,5 @@ Breaking changes
 Other changes
 ~~~~~~~~~~~~~
 
+- ``xview`` copy semantic and move semantic fixed.
+  `#377 <https://github.com/QuantStack/xtensor/pull/377>`_.

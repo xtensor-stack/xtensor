@@ -85,6 +85,62 @@ namespace xt
         EXPECT_EQ(a(2, 2), view7(2));
     }
 
+    TEST(xview, copy_semantic)
+    {
+        view_shape_type shape = { 3, 4 };
+        xarray<double> a(shape);
+        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+
+        {
+            SCOPED_TRACE("copy constructor");
+            auto view1 = view(a, 1, range(1, 4));
+            auto view2(view1);
+            EXPECT_EQ(a(1, 1), view2(0));
+            EXPECT_EQ(a(1, 2), view2(1));
+            EXPECT_EQ(1, view2.dimension());
+            EXPECT_EQ(layout_type::dynamic, view2.layout());
+        }
+
+        {
+            SCOPED_TRACE("copy assignment operator");
+            auto view1 = view(a, 1, range(1, 4));
+            auto view2 = view(a, 2, range(0, 3));
+            view2 = view1;
+            EXPECT_EQ(a(2, 0), a(1, 1));
+            EXPECT_EQ(a(2, 1), a(1, 2));
+            EXPECT_EQ(a(2, 2), a(1, 3));
+        }
+    }
+
+    TEST(xview, move_semantic)
+    {
+        view_shape_type shape = { 3, 4 };
+        xarray<double> a(shape);
+        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+
+        {
+            SCOPED_TRACE("copy constructor");
+            auto view1 = view(a, 1, range(1, 4));
+            auto view2(std::move(view1));
+            EXPECT_EQ(a(1, 1), view2(0));
+            EXPECT_EQ(a(1, 2), view2(1));
+            EXPECT_EQ(1, view2.dimension());
+            EXPECT_EQ(layout_type::dynamic, view2.layout());
+        }
+
+        {
+            SCOPED_TRACE("copy assignment operator");
+            auto view1 = view(a, 1, range(1, 4));
+            auto view2 = view(a, 2, range(0, 3));
+            view2 = std::move(view1);
+            EXPECT_EQ(a(2, 0), a(1, 1));
+            EXPECT_EQ(a(2, 1), a(1, 2));
+            EXPECT_EQ(a(2, 2), a(1, 3));
+        }
+    }
+
     TEST(xview, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
