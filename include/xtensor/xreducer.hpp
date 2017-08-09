@@ -507,28 +507,36 @@ namespace xt
     inline void xreducer_stepper<F, CT, X>::step(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_stepper.step(get_dim(dim), n);
+        }
     }
 
     template <class F, class CT, class X>
     inline void xreducer_stepper<F, CT, X>::step_back(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_stepper.step_back(get_dim(dim), n);
+        }
     }
 
     template <class F, class CT, class X>
     inline void xreducer_stepper<F, CT, X>::reset(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_stepper.reset(get_dim(dim));
+        }
     }
 
     template <class F, class CT, class X>
     inline void xreducer_stepper<F, CT, X>::reset_back(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_stepper.reset_back(get_dim(dim));
+        }
     }
 
     template <class F, class CT, class X>

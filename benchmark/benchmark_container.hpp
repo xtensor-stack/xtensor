@@ -250,7 +250,6 @@ namespace xt
         void benchmark(OS& out)
         {
             using duration_type = std::chrono::duration<double, std::milli>;
-            std::size_t number = 2000;
 
             using array_type = xarray_container<C>;
             array_type ax, ay, ares;

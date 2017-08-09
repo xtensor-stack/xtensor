@@ -104,8 +104,6 @@ namespace xt
         template <class F, class V>
         inline duration_type benchmark_xtensor(F f, const V& lhs, V& res, std::size_t number)
         {
-            size_t s0 = lhs.shape()[0];
-            size_t s1 = lhs.shape()[1];
             duration_type t_res = duration_type::max();
             for (std::size_t count = 0; count < number; ++count)
             {
@@ -336,7 +334,9 @@ namespace xt
             {
                 auto iter = bm.find(meth);
                 if (iter != bm.end())
+                {
                     (iter->second)(out, size0, size1, nb_iter);
+                }
             }
             else
             {

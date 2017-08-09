@@ -751,12 +751,12 @@ namespace xt
 
     namespace detail
     {
-        template <typename T>
+        template <class T>
         struct is_complex : public std::false_type
         {
         };
 
-        template <typename T>
+        template <class T>
         struct is_complex<std::complex<T>> : public std::true_type
         {
         };
@@ -772,13 +772,13 @@ namespace xt
      * complex_value_type implementation *
      *************************************/
 
-    template <typename T>
+    template <class T>
     struct complex_value_type
     {
         using type = T;
     };
 
-    template <typename T>
+    template <class T>
     struct complex_value_type<std::complex<T>>
     {
         using type = T;
@@ -902,13 +902,13 @@ namespace xt
      * has_raw_data_interface implementation *
      *****************************************/
 
-    template <typename T>
+    template <class T>
     class has_raw_data_interface
     {
-        template <typename C>
+        template <class C>
         static std::true_type test(decltype(std::declval<C>().raw_data_offset()));
 
-        template <typename C>
+        template <class C>
         static std::false_type test(...);
 
     public:
@@ -932,17 +932,21 @@ namespace xt
 
     namespace detail
     {
-        template <typename T>
-        struct is_complete_impl
+        template <class T>
+        class is_complete_impl
         {
-            template <typename U>
+            template <class U>
             static auto test(U*)  -> std::integral_constant<bool, sizeof(U) == sizeof(U)>;
+
             static auto test(...) -> std::false_type;
+
+        public:
+
             using type = decltype(test((T*)0));
         };
     }
 
-    template <typename T>
+    template <class T>
     struct is_complete : detail::is_complete_impl<T>::type {};
 
     /*************

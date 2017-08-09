@@ -38,10 +38,18 @@ namespace xt
         m_c.reshape(sh);
 
         for (size_t i = 0; i < sh[0]; ++i)
+        {
             for (size_t j = 0; j < sh[1]; ++j)
+            {
                 for (size_t k = 0; k < sh[2]; ++k)
+                {
                     for (size_t l = 0; l < sh[3]; ++l)
+                    {
                         m_c(i, j, k, l) = m_a(j, k, l) + static_cast<int>(i);
+                    }
+                }
+            }
+        }
     }
 
     TEST(xfunction, broadcast_shape)

@@ -73,8 +73,8 @@ namespace xt
     class xbroadcast : public xexpression<xbroadcast<CT, X>>,
                        public xconst_iterable<xbroadcast<CT, X>>
     {
-
     public:
+
         using self_type = xbroadcast<CT, X>;
         using xexpression_type = std::decay_t<CT>;
 
@@ -125,6 +125,7 @@ namespace xt
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
     private:
+
         CT m_e;
         inner_shape_type m_shape;
     };

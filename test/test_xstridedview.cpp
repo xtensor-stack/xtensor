@@ -31,3 +31,4 @@ namespace xt
         EXPECT_EQ(e(1, 0, 1), val);
     }
 }
+

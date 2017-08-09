@@ -603,10 +603,14 @@ namespace xt
             auto iter = vec.template begin<layout_type::row_major>();
             auto iter_end = vec.template end<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(vec.data()[nb_iter], *iter);
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -618,10 +622,14 @@ namespace xt
             auto iter = vec.template begin<shape_type, layout_type::row_major>(shape);
             auto iter_end = vec.template end<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(vec.data()[0], *iter);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -630,10 +638,14 @@ namespace xt
             auto iter = vec.template begin<layout_type::column_major>();
             auto iter_end = vec.template end<layout_type::column_major>();
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(vec(0, 0, 2), *iter);
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -645,10 +657,14 @@ namespace xt
             auto iter = vec.template begin<shape_type, layout_type::column_major>(shape);
             auto iter_end = vec.template end<shape_type, layout_type::column_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(vec(0, 0, 2), *iter);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
     }
@@ -666,10 +682,14 @@ namespace xt
             auto iter = vec.template rbegin<layout_type::row_major>();
             auto iter_end = vec.template rend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(vec.data()[nb_iter - 1], *iter);
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -682,10 +702,14 @@ namespace xt
             auto iter = vec.template rbegin<shape_type, layout_type::row_major>(shape);
             auto iter_end = vec.template rend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(vec.data()[2 * nb_iter - 1], *iter);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
     }

@@ -260,7 +260,9 @@ namespace xt
         inline void xbuffer_storage<T, A>::resize(size_type size)
         {
             if (size != m_size)
+            {
                 throw std::runtime_error("xbuffer_storage not resizable");
+            }
         }
 
         template <class T, class A>

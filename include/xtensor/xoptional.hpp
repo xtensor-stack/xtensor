@@ -308,7 +308,9 @@ namespace xt
     {
         m_flag = m_flag && rhs.m_flag;
         if (m_flag)
+        {
             m_value += rhs.m_value;
+        }
         return *this;
     }
 
@@ -318,7 +320,9 @@ namespace xt
     {
         m_flag = m_flag && rhs.m_flag;
         if (m_flag)
+        {
             m_value -= rhs.m_value;
+        }
         return *this;
     }
 
@@ -328,7 +332,9 @@ namespace xt
     {
         m_flag = m_flag && rhs.m_flag;
         if (m_flag)
+        {
             m_value *= rhs.m_value;
+        }
         return *this;
     }
 
@@ -338,7 +344,9 @@ namespace xt
     {
         m_flag = m_flag && rhs.m_flag;
         if (m_flag)
+        {
             m_value /= rhs.m_value;
+        }
         return *this;
     }
 
@@ -347,7 +355,9 @@ namespace xt
     auto xoptional<CT, CB>::operator+=(const T& rhs) -> disable_xoptional<T, xoptional&>
     {
         if (m_flag)
+        {
             m_value += rhs;
+        }
         return *this;
     }
 
@@ -356,7 +366,9 @@ namespace xt
     auto xoptional<CT, CB>::operator-=(const T& rhs) -> disable_xoptional<T, xoptional&>
     {
         if (m_flag)
+        {
             m_value -= rhs;
+        }
         return *this;
     }
 
@@ -365,7 +377,9 @@ namespace xt
     auto xoptional<CT, CB>::operator*=(const T& rhs) -> disable_xoptional<T, xoptional&>
     {
         if (m_flag)
+        {
             m_value *= rhs;
+        }
         return *this;
     }
 
@@ -374,7 +388,9 @@ namespace xt
     auto xoptional<CT, CB>::operator/=(const T& rhs) -> disable_xoptional<T, xoptional&>
     {
         if (m_flag)
+        {
             m_value /= rhs;
+        }
         return *this;
     }
 
@@ -470,9 +486,13 @@ namespace xt
     inline S& operator<<(S& out, const xoptional<T, B>& v)
     {
         if (v.has_value())
+        {
             out << v.value();
+        }
         else
+        {
             out << "N/A";
+        }
         return out;
     }
 

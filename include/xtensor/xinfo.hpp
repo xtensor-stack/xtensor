@@ -6,6 +6,9 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#ifndef XINFO_HPP
+#define XINFO_HPP
+
 #include <string>
 
 namespace xt
@@ -111,3 +114,6 @@ namespace xt
         return s;
     }
 }
+
+#endif
+

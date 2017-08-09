@@ -131,7 +131,9 @@ namespace xt
                                   bs_ptr backstrides, typename strides_type::size_type i) noexcept
         {
             if (shape[i] == 1)
+            {
                 strides[i] = 0;
+            }
             (*backstrides)[i] = strides[i] * (shape[i] - 1);
         }
 
@@ -140,7 +142,9 @@ namespace xt
                                   std::nullptr_t, typename strides_type::size_type i) noexcept
         {
             if (shape[i] == 1)
+            {
                 strides[i] = 0;
+            }
         }
 
         template <class shape_type, class strides_type, class bs_ptr>

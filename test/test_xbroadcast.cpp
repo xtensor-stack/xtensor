@@ -69,10 +69,14 @@ namespace xt
             auto iter = m1_broadcast.template begin<layout_type::row_major>();
             auto iter_end = m1_broadcast.template end<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(1, *iter);
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -82,10 +86,14 @@ namespace xt
             auto iter = m1_broadcast.template begin<shape_type, layout_type::row_major>(shape);
             auto iter_end = m1_broadcast.template end<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(1, *iter);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
     }
@@ -102,10 +110,14 @@ namespace xt
             auto iter = m1_broadcast.template rbegin<layout_type::row_major>();
             auto iter_end = m1_broadcast.template rend<layout_type::row_major>();
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(3, *iter);
             for (size_t i = 0; i < nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
 
@@ -115,10 +127,14 @@ namespace xt
             auto iter = m1_broadcast.template rbegin<shape_type, layout_type::row_major>(shape);
             auto iter_end = m1_broadcast.template rend<shape_type, layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(3, *iter);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
+            {
                 ++iter;
+            }
             EXPECT_EQ(iter, iter_end);
         }
     }

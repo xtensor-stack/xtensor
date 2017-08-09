@@ -340,28 +340,36 @@ namespace xt
     inline void xstepper<C>::step(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_it += n * p_c->strides()[dim - m_offset];
+        }
     }
 
     template <class C>
     inline void xstepper<C>::step_back(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_it -= n * p_c->strides()[dim - m_offset];
+        }
     }
 
     template <class C>
     inline void xstepper<C>::reset(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_it -= p_c->backstrides()[dim - m_offset];
+        }
     }
 
     template <class C>
     inline void xstepper<C>::reset_back(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_it += p_c->backstrides()[dim - m_offset];
+        }
     }
 
     template <class C>
@@ -535,7 +543,9 @@ namespace xt
         : p_e(e), m_index(make_sequence<index_type>(e->shape().size(), size_type(0))), m_offset(offset)
     {
         if (end)
+        {
             to_end(layout_type::row_major);
+        }
     }
 
     template <class C, bool is_const>
@@ -548,28 +558,36 @@ namespace xt
     inline void xindexed_stepper<C, is_const>::step(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] += n;
+        }
     }
 
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::step_back(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] -= n;
+        }
     }
 
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::reset(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] = 0;
+        }
     }
 
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::reset_back(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] = p_e->shape()[dim - m_offset] - 1;
+        }
     }
 
     template <class C, bool is_const>
