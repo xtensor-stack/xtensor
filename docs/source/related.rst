@@ -128,7 +128,7 @@ Example 2: Create a universal function from a C++ scalar function
 xtensor-python-cookiecutter
 ---------------------------
 
-.. image:: xtensor-cookiecutter.png
+.. image:: xtensor-cookiecutter.svg
    :alt: xtensor-python-cookiecutter
 
 The xtensor-python-cookiecutter_ project helps extension authors create Python extension modules making use of `xtensor`.
@@ -237,7 +237,7 @@ Example 2: Create a numpy-style universal function from a C++ scalar function
 xtensor-julia-cookiecutter
 --------------------------
 
-.. image:: xtensor-cookiecutter.png
+.. image:: xtensor-cookiecutter.svg
    :alt: xtensor-julia-cookiecutter
 
 The xtensor-julia-cookiecutter_ project helps extension authors create Julia extension modules making use of `xtensor`.
