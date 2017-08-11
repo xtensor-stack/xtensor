@@ -13,6 +13,7 @@
 #include <utility>
 
 #include "xtensor/xutils.hpp"
+#include "xtensor/xmath.hpp"
 
 namespace xt
 {
@@ -107,6 +108,8 @@ namespace xt
 
         xoptional(const value_type&);
         xoptional(value_type&&);
+        template <class T>
+        xoptional(const T&);
 
         xoptional(value_type&&, flag_type&&);
         xoptional(std::add_lvalue_reference_t<CT>, std::add_lvalue_reference_t<CB>);
@@ -124,6 +127,9 @@ namespace xt
 
         xoptional& operator=(const value_type&);
         xoptional& operator=(value_type&&);
+
+        template <class T>
+        xoptional& operator=(const T&);
 
         // Operators
         template <class CTO, class CBO>
@@ -243,6 +249,13 @@ namespace xt
     }
 
     template <class CT, class CB>
+    template <class T>
+    xoptional<CT, CB>::xoptional(const T& value)
+        : m_value(value), m_flag(true)
+    {
+    }
+
+    template <class CT, class CB>
     xoptional<CT, CB>::xoptional(value_type&& value, flag_type&& flag)
         : m_value(std::move(value)), m_flag(std::move(flag))
     {
@@ -298,6 +311,15 @@ namespace xt
     {
         m_flag = true;
         m_value = std::move(value);
+        return *this;
+    }
+
+    template <class CT, class CB>
+    template <class T>
+    auto xoptional<CT, CB>::operator=(const T& value) -> xoptional&
+    {
+        m_flag = true;
+        m_value = value;
         return *this;
     }
 
