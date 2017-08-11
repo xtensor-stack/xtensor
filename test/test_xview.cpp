@@ -367,6 +367,18 @@ namespace xt
         EXPECT_EQ(iter, iter_end);
     }
 
+    TEST(xview, const_trivial_iterating)
+    {
+        xtensor<double, 1> arr1{{2}};
+        std::fill(arr1.begin(), arr1.end(), 6);
+        const xtensor<double, 1> arr2=arr1;
+        auto view = xt::view(arr2, 0);
+        auto iter = view.begin();
+        auto iter_end = view.end();
+        ++iter;
+        EXPECT_EQ(iter, iter_end);
+    }
+
     TEST(xview, const_view)
     {
         typename xtensor<double, 3>::shape_type shape3 = {1, 2, 3};

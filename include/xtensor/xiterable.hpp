@@ -256,6 +256,11 @@ namespace xt
         template <class S>
         stepper get_stepper_end(const S& shape, layout_type l) noexcept;
 
+        template <class S>
+        const_stepper get_stepper_begin(const S& shape) const noexcept;
+        template <class S>
+        const_stepper get_stepper_end(const S& shape, layout_type l) const noexcept;
+
         derived_type& derived_cast();
     };
 
@@ -791,6 +796,20 @@ namespace xt
     template <class D>
     template <class S>
     inline auto xiterable<D>::get_stepper_end(const S& shape, layout_type l) noexcept -> stepper
+    {
+        return derived_cast().stepper_end(shape, l);
+    }
+
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::get_stepper_begin(const S& shape) const noexcept -> const_stepper
+    {
+        return derived_cast().stepper_begin(shape);
+    }
+
+    template <class D>
+    template <class S>
+    inline auto xiterable<D>::get_stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
         return derived_cast().stepper_end(shape, l);
     }
