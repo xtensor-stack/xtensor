@@ -89,6 +89,7 @@ namespace xt
     class xoptional
     {
     public:
+
         using value_closure = CT;
         using flag_closure = CB;
 
@@ -178,6 +179,7 @@ namespace xt
         disable_xoptional<CTO, bool> equal(const CTO& rhs) const noexcept;
 
     private:
+
         template <class CTO, class CBO>
         friend class xoptional;
 
