@@ -927,7 +927,7 @@ namespace xt
     };
 
     /*****************************
-     * is_complete implemenation * 
+     * is_complete implemenation *
      *****************************/
 
     namespace detail
@@ -984,11 +984,11 @@ namespace xt
     }
 
     /********************************************
-     * xtrivial_default_construct implemenation * 
+     * xtrivial_default_construct implemenation *
      ********************************************/
 
 #if defined(__clang__)
-#if !(defined(__APPLE__))
+#if !(defined(__APPLE__)) && !(defined(__EMSCRIPTEN__))
 // CLANG && LINUX
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
@@ -1011,14 +1011,14 @@ namespace xt
         struct xtrivial_default_construct_impl<false, T> : std::has_trivial_default_constructor<T> {};
     }
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = detail::xtrivial_default_construct_impl<is_complete<std::is_trivially_default_constructible<double>>::value, T>;
 
 #pragma clang diagnostic pop
 #else
-// CLANG && APPLE
+// CLANG && ( APPLE || EMSCRIPTEN )
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
 
 #endif
@@ -1027,18 +1027,18 @@ namespace xt
     #if defined(__GNUC__) && (__GNUC__ < 5 || (__GNUC__ == 5 && __GNUC_MINOR__ < 1))
     // OLD GCC
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
 
     #else
 
-    template <class T> 
+    template <class T>
     using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
 
     #endif
 
 #endif
-    
+
 }
 
 #endif
