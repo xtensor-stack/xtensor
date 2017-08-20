@@ -63,6 +63,26 @@ namespace xt
     template <class S1, class S2>
     bool broadcastable(const S1& s1, S2& s2);
 
+    /********************************************
+     * utility functions for strided containers *
+     ********************************************/
+    
+    template <class C, class It>
+    It strided_data_end(const C& c, It end, layout_type l)
+    {
+        using strides_type = std::decay_t<decltype(c.strides())>;
+        if (c.dimension() == 0)
+        {
+            return end;
+        }
+        else
+        {
+            auto leading_stride = (l == layout_type::row_major ? c.strides().back() : c.strides().front());
+            leading_stride = std::max(leading_stride, typename strides_type::value_type(1));
+            return end - 1 + leading_stride;
+        }
+    }
+     
     /******************
      * Implementation *
      ******************/

@@ -371,16 +371,7 @@ namespace xt
     template <class It>
     inline It xcontainer<D>::data_xend_impl(It end, layout_type l) const noexcept
     {
-        if (dimension() == 0)
-        {
-            return end;
-        }
-        else
-        {
-            auto leading_stride = (l == layout_type::row_major ? strides().back() : strides().front());
-            leading_stride = std::max(leading_stride, typename inner_strides_type::value_type(1));
-            return end - 1 + leading_stride;
-        }
+        return strided_data_end(*this, end, l);
     }
 
     template <class D>

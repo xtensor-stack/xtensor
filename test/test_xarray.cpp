@@ -152,6 +152,19 @@ namespace xt
         test_transpose(a);
     }
 
+    TEST(xarray, transpose_row)
+    {
+        xarray<float> a = { { 0,1,1,1 } };
+        xarray<float> res = xt::transpose(a);
+
+        xarray<float>::shape_type sh = { 4, 1 };
+        EXPECT_EQ(res.shape(), sh);
+        EXPECT_EQ(res(0, 0), 0);
+        EXPECT_EQ(res(1, 0), 1);
+        EXPECT_EQ(res(2, 0), 1);
+        EXPECT_EQ(res(3, 0), 1);
+    }
+
     TEST(xarray, access)
     {
         xarray_dynamic a;
