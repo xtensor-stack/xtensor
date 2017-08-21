@@ -916,9 +916,9 @@ namespace xt
         constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
     };
 
-    /*****************************
-     * is_complete implemenation * 
-     *****************************/
+    /******************************
+     * is_complete implementation * 
+     ******************************/
 
     namespace detail
     {
@@ -935,9 +935,9 @@ namespace xt
     template <typename T>
     struct is_complete : detail::is_complete_impl<T>::type {};
 
-    /********************************************
-     * xtrivial_default_construct implemenation * 
-     ********************************************/
+    /*********************************************
+     * xtrivial_default_construct implementation * 
+     *********************************************/
 
 #if defined(__clang__)
 #if !(defined(__APPLE__))
