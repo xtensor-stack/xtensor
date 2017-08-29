@@ -537,7 +537,6 @@ namespace xt
         std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
     {
         using strides_type = typename T::strides_type;
-        strides_type temp = m_e.strides();
         strides_type strides = make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
