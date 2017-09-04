@@ -75,6 +75,11 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
 )
 
+set(XTENSOR_TESTING_HEADERS
+    ${XTENSOR_INCLUDE_DIR}/xtensor/testing/test_common.hpp
+)
+
+
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
@@ -109,6 +114,8 @@ include(CMakePackageConfigHelpers)
 
 install(FILES ${XTENSOR_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor)
+install(FILES ${XTENSOR_TESTING_HEADERS}
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor/testing)
 
 set(XTENSOR_CMAKECONFIG_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}" CACHE
     STRING "install path for xtensorConfig.cmake")
