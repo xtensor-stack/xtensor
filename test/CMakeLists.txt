@@ -77,7 +77,6 @@ include_directories(${GTEST_INCLUDE_DIRS})
 
 set(XTENSOR_TESTS
     main.cpp
-    test_common.hpp
     test_xadapt.cpp
     test_xadaptor_semantic.cpp
     test_xarray.cpp

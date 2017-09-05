@@ -7,13 +7,15 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xio.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xrandom.hpp"
-#include "xtensor/xview.hpp"
 #include "xtensor/xmath.hpp"
-#include "test_common.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
+
+#include "xtensor/testing/test_common.hpp"
 
 namespace xt
 {
