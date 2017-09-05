@@ -987,58 +987,17 @@ namespace xt
      * xtrivial_default_construct implemenation *
      ********************************************/
 
-#if defined(__clang__)
-#if !(defined(__APPLE__)) && !(defined(__EMSCRIPTEN__))
-// CLANG && LINUX
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-
-}
-namespace std { template <class T> struct is_trivially_default_constructible; }
-namespace std { template <class T> struct has_trivial_default_constructor; }
-namespace xt
-{
-
-    namespace detail
-    {
-        template <bool C, class T>
-        struct xtrivial_default_construct_impl;
-
-        template <class T>
-        struct xtrivial_default_construct_impl<true, T> : std::is_trivially_default_constructible<T> {};
-
-        template <class T>
-        struct xtrivial_default_construct_impl<false, T> : std::has_trivial_default_constructor<T> {};
-    }
-
-    template <class T>
-    using xtrivially_default_constructible = detail::xtrivial_default_construct_impl<is_complete<std::is_trivially_default_constructible<double>>::value, T>;
-
-#pragma clang diagnostic pop
-#else
-// CLANG && ( APPLE || EMSCRIPTEN )
+    #if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(_GLIBCXX_USE_CXX11_ABI)
 
     template <class T>
     using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
-
-#endif
-#else
-// NOT CLANG
-    #if defined(__GNUC__) && (__GNUC__ < 5 || (__GNUC__ == 5 && __GNUC_MINOR__ < 1))
-    // OLD GCC
-
-    template <class T>
-    using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
 
     #else
 
     template <class T>
-    using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
+    using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
 
     #endif
-
-#endif
-
 }
 
 #endif
