@@ -66,6 +66,6 @@ namespace xt
         shape_type shape = {3, 2};
         xarray<double> a(shape, 1.5);
         a = vecfunc();
-        EXPECT_EQ(0, a.dimension());
+        EXPECT_EQ(size_t(0), a.dimension());
     }
 }

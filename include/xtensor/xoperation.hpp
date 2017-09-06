@@ -426,8 +426,9 @@ namespace xt
 
         auto next_idx = [&shape](index_type& idx)
         {
-            for (int i = int(shape.size() - 1); i >= 0; --i)
+            for (size_type j = shape.size(); j > 0; --j)
             {
+                size_type i = j - 1;
                 if (idx[i] >= shape[i] - 1)
                 {
                     idx[i] = 0;

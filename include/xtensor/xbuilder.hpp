@@ -188,7 +188,8 @@ namespace xt
             template <class It>
             inline T operator()(const It& /*begin*/, const It& end) const
             {
-                return *(end - 1) == *(end - 2) + m_k ? T(1) : T(0);
+                using vlaue_type = typename std::iterator_traits<It>::value_type;
+                return *(end - 1) == *(end - 2) + value_type(m_k) ? T(1) : T(0);
             }
 
         private:
@@ -386,7 +387,7 @@ namespace xt
                     return arr[idx];
                 };
                 size_type i = idx[m_axis];
-                idx.erase(idx.begin() + m_axis);
+                idx.erase(idx.begin() + std::ptrdiff_t(m_axis));
                 return apply<value_type>(i, get_item, m_t);
             }
 
@@ -482,7 +483,7 @@ namespace xt
         inline T add_axis(T arr, std::size_t axis, std::size_t value)
         {
             T temp(arr);
-            temp.insert(temp.begin() + axis, value);
+            temp.insert(temp.begin() + std::ptrdiff_t(axis), value);
             return temp;
         }
     }
@@ -580,14 +581,16 @@ namespace xt
                         idx[i] = *begin++;
                     }
                 }
+                using it_vtype = typename std::iterator_traits<It>::value_type;
+                it_vtype uoffset = static_cast<it_vtype>(m_offset);
                 if (m_offset >= 0)
                 {
                     idx[m_axis_1] = *(begin);
-                    idx[m_axis_2] = *(begin) + m_offset;
+                    idx[m_axis_2] = *(begin) + uoffset;
                 }
                 else
                 {
-                    idx[m_axis_1] = *(begin) - m_offset;
+                    idx[m_axis_1] = *(begin) - uoffset;
                     idx[m_axis_2] = *(begin);
                 }
                 return m_source[idx];
@@ -618,13 +621,15 @@ namespace xt
             template <class It>
             inline value_type operator()(It begin, It) const
             {
+                using it_vtype = typename std::iterator_traits<It>::value_type;
+                it_vtype umk = static_cast<it_vtype>(m_k);
                 if (m_k > 0)
                 {
-                    return *begin + m_k == *(begin + 1) ? m_source(*begin) : value_type(0);
+                    return *begin + umk == *(begin + 1) ? m_source(*begin) : value_type(0);
                 }
                 else
                 {
-                    return *begin + m_k == *(begin + 1) ? m_source(*begin + m_k) : value_type(0);
+                    return *begin + umk == *(begin + 1) ? m_source(*begin + umk) : value_type(0);
                 }
             }
 
@@ -669,7 +674,8 @@ namespace xt
             template <class It>
             inline value_type access_impl(It begin, It end) const
             {
-                auto it = begin + m_axis;
+                using difference_type = typename std::iterator_traits<It>::difference_type;
+                auto it = begin + difference_type(m_axis);
                 *it = m_shape_at_axis - *it;
                 return m_source.element(begin, end);
             }
@@ -761,12 +767,12 @@ namespace xt
         // The following shape calculation code is an almost verbatim adaptation of numpy:
         // https://github.com/numpy/numpy/blob/2aabeafb97bea4e1bfa29d946fbf31e1104e7ae0/numpy/core/src/multiarray/item_selection.c#L1799
         auto ret_shape = make_sequence<shape_type>(dimension - 1, 0);
-        std::size_t dim_1 = shape[axis_1];
-        std::size_t dim_2 = shape[axis_2];
+        int dim_1 = static_cast<int>(shape[axis_1]);
+        int dim_2 = static_cast<int>(shape[axis_2]);
 
         offset >= 0 ? dim_2 -= offset : dim_1 += offset;
 
-        auto diag_size = dim_2 < dim_1 ? dim_2 : dim_1;
+        auto diag_size = std::size_t(dim_2 < dim_1 ? dim_2 : dim_1);
 
         std::size_t i = 0;
         for (std::size_t idim = 0; idim < dimension; ++idim)
@@ -801,7 +807,8 @@ namespace xt
     inline auto diag(E&& arr, int k = 0)
     {
         using CT = xclosure_t<E>;
-        std::size_t s = arr.shape()[0] + std::abs(k);
+        std::size_t sk = std::size_t(std::abs(k));
+        std::size_t s = arr.shape()[0] + sk;
         return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr), k)),
                                        {s, s});
     }

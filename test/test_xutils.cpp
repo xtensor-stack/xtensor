@@ -94,9 +94,9 @@ namespace xt
         size_t d0 = initializer_dimension<double>::value;
         size_t d1 = initializer_dimension<std::initializer_list<double>>::value;
         size_t d2 = initializer_dimension<std::initializer_list<std::initializer_list<double>>>::value;
-        EXPECT_EQ(0, d0);
-        EXPECT_EQ(1, d1);
-        EXPECT_EQ(2, d2);
+        EXPECT_EQ(size_t(0), d0);
+        EXPECT_EQ(size_t(1), d1);
+        EXPECT_EQ(size_t(2), d2);
     }
 
     TEST(utils, promote_shape)

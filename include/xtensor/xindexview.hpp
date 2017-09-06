@@ -109,7 +109,7 @@ namespace xt
 
         reference operator()();
         template <class... Args>
-        reference operator()(std::size_t idx, Args... /*args*/);
+        reference operator()(size_type idx, Args... /*args*/);
         reference operator[](const xindex& index);
         reference operator[](size_type i);
 
@@ -118,7 +118,7 @@ namespace xt
 
         const_reference operator()() const;
         template <class... Args>
-        const_reference operator()(std::size_t idx, Args... /*args*/) const;
+        const_reference operator()(size_type idx, Args... /*args*/) const;
         const_reference operator[](const xindex& index) const;
         const_reference operator[](size_type i) const;
 
@@ -317,7 +317,7 @@ namespace xt
 
     template <class CT, class I>
     template <class... Args>
-    inline auto xindexview<CT, I>::operator()(std::size_t idx, Args... /*args*/) -> reference
+    inline auto xindexview<CT, I>::operator()(size_type idx, Args... /*args*/) -> reference
     {
         return m_e[m_indices[idx]];
     }
@@ -329,7 +329,7 @@ namespace xt
      */
     template <class CT, class I>
     template <class... Args>
-    inline auto xindexview<CT, I>::operator()(std::size_t idx, Args... /*args*/) const -> const_reference
+    inline auto xindexview<CT, I>::operator()(size_type idx, Args... /*args*/) const -> const_reference
     {
         return m_e[m_indices[idx]];
     }

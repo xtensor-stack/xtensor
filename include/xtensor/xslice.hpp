@@ -103,7 +103,8 @@ namespace xt
     template <class T, class E = std::enable_if_t<!std::is_same<T, placeholders::xtuph>::value>>
     inline auto range(T min_val, T max_val) noexcept
     {
-        return xrange<T>(min_val, max_val);
+        using UT = std::make_unsigned_t<T>;
+        return xrange<UT>(static_cast<UT>(min_val), static_cast<UT>(max_val));
     }
 
     /******************************
@@ -143,6 +144,8 @@ namespace xt
     template <class T, class E = std::enable_if_t<!std::is_same<T, placeholders::xtuph>::value>>
     inline auto range(T min_val, T max_val, T step) noexcept
     {
+        //using UT = std::make_unsigned_t<T>;
+        //return xstepped_range<UT>(static_cast<UT>(min_val), static_cast<UT>(max_val), static_cast<UT>(step));
         return xstepped_range<T>(min_val, max_val, step);
     }
 
@@ -216,6 +219,10 @@ namespace xt
     {
         return xnewaxis_tag();
     }
+
+    /******************
+     * xrange_adaptor *
+     ******************/
 
     template <class A, class B, class C>
     struct xrange_adaptor
@@ -328,13 +335,14 @@ namespace xt
     template <class S, class I>
     inline disable_xslice<S, std::size_t> value(const S& s, I) noexcept
     {
-        return s;
+        return static_cast<std::size_t>(s);
     }
 
     template <class S, class I>
     inline auto value(const xslice<S>& slice, I i) noexcept
     {
-        return slice.derived_cast()(i);
+        using ST = typename S::size_type;
+        return slice.derived_cast()(static_cast<ST>(i));
     }
 
     /****************************************

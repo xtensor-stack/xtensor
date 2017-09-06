@@ -119,7 +119,8 @@ namespace xt
 
                     size_type i = 0;
                     size_type elems_on_line = 0;
-                    size_type line_lim = (size_type)std::floor(line_width / (element_width + 2));
+                    size_type ewp2 = static_cast<size_type>(element_width) + size_type(2);
+                    size_type line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
 
                     out << '{';
                     for (; i != e.shape()[0] - 1; ++i)

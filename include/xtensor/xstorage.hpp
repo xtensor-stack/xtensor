@@ -344,7 +344,7 @@ namespace xt
     template <class T, class A>
     inline auto uvector<T, A>::size() const noexcept -> size_type
     {
-        return p_end - p_begin;
+        return static_cast<size_type>(p_end - p_begin);
     }
 
     template <class T, class A>

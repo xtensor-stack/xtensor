@@ -71,6 +71,7 @@ namespace xt
     It strided_data_end(const C& c, It end, layout_type l)
     {
         using strides_type = std::decay_t<decltype(c.strides())>;
+        using difference_type = typename std::iterator_traits<It>::difference_type;
         if (c.dimension() == 0)
         {
             return end;
@@ -79,7 +80,7 @@ namespace xt
         {
             auto leading_stride = (l == layout_type::row_major ? c.strides().back() : c.strides().front());
             leading_stride = std::max(leading_stride, typename strides_type::value_type(1));
-            return end - 1 + leading_stride;
+            return end + difference_type(leading_stride - 1);
         }
     }
      
@@ -140,7 +141,8 @@ namespace xt
     template <class size_type, class S, class It>
     inline size_type element_offset(const S& strides, It first, It last) noexcept
     {
-        auto size = std::min(static_cast<typename S::size_type>(std::distance(first, last)), strides.size());
+        using difference_type = typename std::iterator_traits<It>::difference_type;
+        auto size = static_cast<difference_type>(std::min(static_cast<typename S::size_type>(std::distance(first, last)), strides.size()));
         return std::inner_product(last - size, last, strides.cend() - size, size_type(0));
     }
 

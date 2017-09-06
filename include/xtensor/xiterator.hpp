@@ -341,7 +341,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_it += n * p_c->strides()[dim - m_offset];
+            m_it += difference_type(n * p_c->strides()[dim - m_offset]);
         }
     }
 
@@ -350,7 +350,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_it -= n * p_c->strides()[dim - m_offset];
+            m_it -= difference_type(n * p_c->strides()[dim - m_offset]);
         }
     }
 
@@ -359,7 +359,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_it -= p_c->backstrides()[dim - m_offset];
+            m_it -= difference_type(p_c->backstrides()[dim - m_offset]);
         }
     }
 
@@ -368,7 +368,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_it += p_c->backstrides()[dim - m_offset];
+            m_it += difference_type(p_c->backstrides()[dim - m_offset]);
         }
     }
 

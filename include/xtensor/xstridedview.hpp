@@ -561,14 +561,16 @@ namespace xt
             shape_type temp_shape;
             resize_container(temp_shape, e.shape().size());
 
+            using size_type = typename std::decay_t<E>::size_type;
             for (std::size_t i = 0; i < e.shape().size(); ++i)
             {
                 if (std::size_t(permutation[i]) >= e.dimension())
                 {
                     throw transpose_error("Permutation contains wrong axis");
                 }
-                temp_shape[i] = e.shape()[permutation[i]];
-                temp_strides[i] = e.strides()[permutation[i]];
+                size_type perm = static_cast<size_type>(permutation[i]);
+                temp_shape[i] = e.shape()[perm];
+                temp_strides[i] = e.strides()[perm];
             }
             using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
             return view_type(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), 0);
@@ -663,7 +665,7 @@ namespace xt
                 for (size_type i = 0; i < m_strides.size(); ++i)
                 {
                     dv = std::div((int) idx, (int) m_strides[i]);
-                    idx = dv.rem;
+                    idx = static_cast<std::size_t>(dv.rem);
                     m_index[i] = dv.quot;
                 }
                 return m_e.element(m_index.begin(), m_index.end());
@@ -731,7 +733,7 @@ namespace xt
         inline void push_back(const xslice<T>& s)
         {
             auto ds = s.derived_cast();
-            base_type::push_back({ds(0), (index_type)ds.size(), (index_type)ds.step_size()});
+            base_type::push_back({(index_type)ds(0), (index_type)ds.size(), (index_type)ds.step_size()});
         }
 
         template <class A, class B, class C>
@@ -854,13 +856,16 @@ namespace xt
         {
             if (slices[i][0] >= 0)
             {
-                offset += slices[i][0] * old_strides[i];
+                std::size_t slice0 = static_cast<std::size_t>(slices[i][0]);
+                offset += slice0 * old_strides[i];
             }
 
             if (slices[i][1] != 0 && slices[i][2] != 0)
             {
-                new_shape[idx] = slices[i][1];
-                new_strides[idx] = slices[i][2] * old_strides[i - newaxis_skip];
+                std::size_t slice1 = static_cast<std::size_t>(slices[i][1]);
+                std::size_t slice2 = static_cast<std::size_t>(slices[i][2]);
+                new_shape[idx] = slice1;
+                new_strides[idx] = slice2 * old_strides[i - newaxis_skip];
                 ++idx;
             }
             else if (slices[i][0] == -1)  // newaxis

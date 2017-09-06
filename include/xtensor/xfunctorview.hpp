@@ -930,7 +930,7 @@ namespace xt
      */
     template <class F, class CT>
     template <class S, layout_type L>
-    inline auto xfunctorview<F, CT>::rend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    inline auto xfunctorview<F, CT>::rend(const S& /*shape*/) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
         return crend<S, L>();
     }
@@ -944,7 +944,7 @@ namespace xt
      */
     template <class F, class CT>
     template <class S, layout_type L>
-    inline auto xfunctorview<F, CT>::crbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    inline auto xfunctorview<F, CT>::crbegin(const S& /*shape*/) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
         return const_reverse_broadcast_iterator<S, L>(m_e.template crbegin<S, L>(), &m_functor);
     }
@@ -1116,6 +1116,7 @@ namespace xt
     template <class F, class IT>
     auto xfunctor_iterator<F, IT>::operator->() const -> pointer
     {
+        // Returning the address of a temporary
         return &((*p_functor)(*m_it));
     }
 

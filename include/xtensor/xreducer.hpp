@@ -285,6 +285,7 @@ namespace xt
                                    OutputIt d_first, OutputIt map_first)
         {
             using difference_type = typename std::iterator_traits<InputIt>::difference_type;
+            using value_type = typename std::iterator_traits<OutputIt>::value_type;
             InputIt iter = first;
             while (iter != last && e_first != e_last)
             {
@@ -292,7 +293,7 @@ namespace xt
                 if (diff != difference_type(*e_first))
                 {
                     *d_first++ = *iter++;
-                    *map_first++ = diff;
+                    *map_first++ = value_type(diff);
                 }
                 else
                 {

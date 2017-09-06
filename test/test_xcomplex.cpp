@@ -27,13 +27,13 @@ namespace xt
         auto r = real(e);
         auto i = imag(e);
 
-        ASSERT_EQ(r.dimension(), 2);
-        ASSERT_EQ(i.dimension(), 2);
+        ASSERT_EQ(r.dimension(), size_t(2));
+        ASSERT_EQ(i.dimension(), size_t(2));
 
-        ASSERT_EQ(r.shape()[0], 2);
-        ASSERT_EQ(r.shape()[1], 2);
-        ASSERT_EQ(i.shape()[0], 2);
-        ASSERT_EQ(i.shape()[1], 2);
+        ASSERT_EQ(r.shape()[0], size_t(2));
+        ASSERT_EQ(r.shape()[1], size_t(2));
+        ASSERT_EQ(i.shape()[0], size_t(2));
+        ASSERT_EQ(i.shape()[1], size_t(2));
 
         ASSERT_EQ(i(0, 0), 0);
         ASSERT_EQ(i(0, 1), 1);

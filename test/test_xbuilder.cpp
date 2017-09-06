@@ -21,7 +21,7 @@ namespace xt
     TEST(xbuilder, ones)
     {
         auto m = ones<double>({1, 2});
-        ASSERT_EQ(2, m.dimension());
+        ASSERT_EQ(size_t(2), m.dimension());
         ASSERT_EQ(1.0, m(0, 1));
         xarray<double> m_assigned = m;
         ASSERT_EQ(1.0, m_assigned(0, 1));
@@ -30,19 +30,19 @@ namespace xt
     TEST(xbuilder, arange_simple)
     {
         auto ls = arange<double>(50);
-        ASSERT_EQ(ls.dimension(), 1);
+        ASSERT_EQ(ls.dimension(), size_t(1));
         decltype(ls)::shape_type expected_shape = {50};
         ASSERT_EQ(ls.shape(), expected_shape);
-        ASSERT_EQ(ls[{0}], 0);
+        ASSERT_EQ(ls[xindex({0})], 0);
         auto ls_49 = ls(49);
         ASSERT_EQ(49, ls_49);
         ASSERT_EQ(ls(29), 29);
         xarray<double> m_assigned = ls;
-        ASSERT_EQ(m_assigned.dimension(), 1);
-        ASSERT_EQ(m_assigned.shape()[0], 50);
-        ASSERT_EQ(m_assigned[{0}], 0);
-        ASSERT_EQ(m_assigned[{49}], 49);
-        ASSERT_EQ(m_assigned[{29}], 29);
+        ASSERT_EQ(m_assigned.dimension(), size_t(1));
+        ASSERT_EQ(m_assigned.shape()[0], size_t(50));
+        ASSERT_EQ(m_assigned[xindex({0})], 0);
+        ASSERT_EQ(m_assigned[xindex({49})], 49);
+        ASSERT_EQ(m_assigned[xindex({29})], 29);
 
         xarray<double> b({2, 50}, 1.);
         xarray<double> res = b + ls;
@@ -52,70 +52,70 @@ namespace xt
     TEST(xbuilder, arange_min_max)
     {
         auto ls = arange<unsigned int>(10u, 20u);
-        ASSERT_EQ(ls.dimension(), 1);
+        ASSERT_EQ(ls.dimension(), size_t(1));
         decltype(ls)::shape_type expected_shape = {10};
         ASSERT_EQ(ls.shape(), expected_shape);
-        ASSERT_EQ(ls[{0}], 10);
-        ASSERT_EQ(ls(9), 19);
-        ASSERT_EQ(ls(2), 12);
+        ASSERT_EQ(ls[xindex({0})], 10u);
+        ASSERT_EQ(ls(9), 19u);
+        ASSERT_EQ(ls(2), 12u);
         xarray<unsigned int> m_assigned = ls;
-        ASSERT_EQ(m_assigned.dimension(), 1);
-        ASSERT_EQ(m_assigned.shape()[0], 10);
-        ASSERT_EQ(m_assigned[{0}], 10);
-        ASSERT_EQ(m_assigned[{9}], 19);
-        ASSERT_EQ(m_assigned[{2}], 12);
+        ASSERT_EQ(m_assigned.dimension(), size_t(1));
+        ASSERT_EQ(m_assigned.shape()[0], size_t(10));
+        ASSERT_EQ(m_assigned[xindex({0})], 10u);
+        ASSERT_EQ(m_assigned[xindex({9})], 19u);
+        ASSERT_EQ(m_assigned[xindex({2})], 12u);
     }
 
     TEST(xbuilder, arange_min_max_step)
     {
         auto ls = arange<float>(10, 20, 0.5f);
-        ASSERT_EQ(ls.dimension(), 1);
+        ASSERT_EQ(ls.dimension(), size_t(1));
         decltype(ls)::shape_type expected_shape = {20};
         ASSERT_EQ(ls.shape(), expected_shape);
-        ASSERT_EQ(ls[{0}], 10);
-        ASSERT_EQ(ls(10), 15);
+        ASSERT_EQ(ls[xindex({0})], 10.f);
+        ASSERT_EQ(ls(10), 15.f);
         ASSERT_EQ(ls(3), 11.5f);
         xarray<float> m_assigned = ls;
-        ASSERT_EQ(m_assigned.dimension(), 1);
-        ASSERT_EQ(m_assigned.shape()[0], 20);
-        ASSERT_EQ(m_assigned[{0}], 10);
-        ASSERT_EQ(m_assigned(10), 15);
+        ASSERT_EQ(m_assigned.dimension(), size_t(1));
+        ASSERT_EQ(m_assigned.shape()[0], size_t(20));
+        ASSERT_EQ(m_assigned[xindex({0})], 10.f);
+        ASSERT_EQ(m_assigned(10), 15.f);
         ASSERT_EQ(m_assigned(3), 11.5f);
 
         auto l3 = arange<float>(0, 1, 0.3f);
         decltype(l3)::shape_type expected_shape_2 = {4};
         ASSERT_EQ(l3.shape(), expected_shape_2);
-        ASSERT_EQ(l3[{0}], 0);
-        ASSERT_EQ(3.f * 0.3f, l3[{3}]);
+        ASSERT_EQ(l3[xindex({0})], 0.f);
+        ASSERT_EQ(3.f * 0.3f, l3[xindex({3})]);
     }
 
     TEST(xbuilder, linspace)
     {
         auto ls = linspace<float>(20.f, 50.f);
-        ASSERT_EQ(ls.dimension(), 1);
+        ASSERT_EQ(ls.dimension(), size_t(1));
         decltype(ls)::shape_type expected_shape = {50};
         ASSERT_EQ(ls.shape(), expected_shape);
-        ASSERT_EQ(ls[{0}], 20.f);
+        ASSERT_EQ(ls[xindex({0})], 20.f);
         ASSERT_EQ(ls(49), 50.f);
 
         float at_3 = 20 + 3 * (50.f - 20.f) / (50.f - 1.f);
         ASSERT_EQ(ls(3), at_3);
 
         xarray<float> m_assigned = ls;
-        ASSERT_EQ(m_assigned.dimension(), 1);
-        ASSERT_EQ(m_assigned.shape()[0], 50);
-        ASSERT_EQ(m_assigned[{0}], 20);
-        ASSERT_EQ(m_assigned(49), 50);
+        ASSERT_EQ(m_assigned.dimension(), size_t(1));
+        ASSERT_EQ(m_assigned.shape()[0], size_t(50));
+        ASSERT_EQ(m_assigned[xindex({0})], 20.f);
+        ASSERT_EQ(m_assigned(49), 50.f);
         ASSERT_EQ(m_assigned(3), at_3);
     }
 
     TEST(xbuilder, linspace_n_samples_endpoint)
     {
         auto ls = linspace<float>(20.f, 50.f, 100, false);
-        ASSERT_EQ(ls.dimension(), 1);
+        ASSERT_EQ(ls.dimension(), size_t(1));
         decltype(ls)::shape_type expected_shape = {100};
         ASSERT_EQ(ls.shape(), expected_shape);
-        ASSERT_EQ(ls[{0}], 20.f);
+        ASSERT_EQ(ls[xindex({0})], 20.f);
 
         float at_end = 49.7f;
         ASSERT_EQ(ls(99), at_end);
@@ -124,9 +124,9 @@ namespace xt
         ASSERT_EQ(ls(3), at_3);
 
         xarray<float> m_assigned = ls;
-        ASSERT_EQ(m_assigned.dimension(), 1);
-        ASSERT_EQ(m_assigned.shape()[0], 100);
-        ASSERT_EQ(m_assigned[{0}], 20);
+        ASSERT_EQ(m_assigned.dimension(), size_t(1));
+        ASSERT_EQ(m_assigned.shape()[0], size_t(100));
+        ASSERT_EQ(m_assigned[xindex({0})], 20.f);
         ASSERT_EQ(m_assigned(99), at_end);
         ASSERT_EQ(m_assigned(3), at_3);
     }
@@ -134,19 +134,19 @@ namespace xt
     TEST(xbuilder, logspace)
     {
         auto ls = logspace<double>(2., 3., 4);
-        ASSERT_EQ(ls.dimension(), 1);
+        ASSERT_EQ(ls.dimension(), size_t(1));
         decltype(ls)::shape_type expected_shape = {4};
         ASSERT_EQ(ls.shape(), expected_shape);
-        ASSERT_EQ(ls[{0}], 100);
+        ASSERT_EQ(ls[xindex({0})], 100);
 
         double at_1 = std::pow(10.0, (2.0 + 1.0 / 3.0));
         ASSERT_EQ(ls(1), at_1);
 
         ASSERT_EQ(ls(3), 1000);
         xarray<double> m_assigned = ls;
-        ASSERT_EQ(m_assigned.dimension(), 1);
-        ASSERT_EQ(m_assigned.shape()[0], 4);
-        ASSERT_EQ(m_assigned[{0}], 100);
+        ASSERT_EQ(m_assigned.dimension(), size_t(1));
+        ASSERT_EQ(m_assigned.shape()[0], size_t(4));
+        ASSERT_EQ(m_assigned[xindex({0})], 100);
         ASSERT_EQ(m_assigned(1), at_1);
         ASSERT_EQ(m_assigned(3), 1000);
     }
@@ -154,20 +154,20 @@ namespace xt
     TEST(xbuilder, eye)
     {
         auto e = eye(5);
-        ASSERT_EQ(2, e.dimension());
+        ASSERT_EQ(size_t(2), e.dimension());
         decltype(e)::shape_type expected_shape = {5, 5};
         ASSERT_EQ(expected_shape, e.shape());
 
-        ASSERT_EQ(true, e(1, 1));
+        ASSERT_TRUE(e(1, 1));
         xindex idx({1, 0});
-        ASSERT_EQ(false, e[idx]);
+        ASSERT_FALSE(e[idx]);
 
         xarray<bool> m_assigned = e;
-        ASSERT_EQ(true, m_assigned(2, 2));
-        ASSERT_EQ(false, m_assigned(4, 2));
+        ASSERT_TRUE(m_assigned(2, 2));
+        ASSERT_FALSE(m_assigned(4, 2));
 
         xindex idx2({2, 2});
-        ASSERT_EQ(true, e.element(idx2.begin(), idx2.end()));
+        ASSERT_TRUE(e.element(idx2.begin(), idx2.end()));
     }
 
     TEST(xbuilder, concatenate)
@@ -266,7 +266,7 @@ namespace xt
                                      {0, 0, 6},
                                      {0, 0, 0}};
 
-        ASSERT_EQ(2, t.dimension());
+        ASSERT_EQ(size_t(2), t.dimension());
         shape_t expected_shape = {3, 3};
         ASSERT_EQ(expected_shape, t.shape());
 
@@ -296,7 +296,7 @@ namespace xt
                                      {4, 0, 0},
                                      {7, 8, 0}};
 
-        ASSERT_EQ(2, t.dimension());
+        ASSERT_EQ(size_t(2), t.dimension());
         shape_t expected_shape = {3, 3};
         ASSERT_EQ(expected_shape, t.shape());
 
