@@ -50,28 +50,28 @@ namespace xt
         auto view1 = view(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
-        EXPECT_EQ(1, view1.dimension());
+        EXPECT_EQ(size_t(1), view1.dimension());
         EXPECT_EQ(layout_type::dynamic, view1.layout());
 
         auto view0 = view(a, 0, range(0, 3));
         EXPECT_EQ(a(0, 0), view0(0));
         EXPECT_EQ(a(0, 1), view0(1));
-        EXPECT_EQ(1, view0.dimension());
-        EXPECT_EQ(3, view0.shape()[0]);
+        EXPECT_EQ(size_t(1), view0.dimension());
+        EXPECT_EQ(size_t(3), view0.shape()[0]);
 
         auto view2 = view(a, range(0, 2), 2);
         EXPECT_EQ(a(0, 2), view2(0));
         EXPECT_EQ(a(1, 2), view2(1));
-        EXPECT_EQ(1, view2.dimension());
-        EXPECT_EQ(2, view2.shape()[0]);
+        EXPECT_EQ(size_t(1), view2.dimension());
+        EXPECT_EQ(size_t(2), view2.shape()[0]);
 
         auto view4 = view(a, 1);
-        EXPECT_EQ(1, view4.dimension());
-        EXPECT_EQ(4, view4.shape()[0]);
+        EXPECT_EQ(size_t(1), view4.dimension());
+        EXPECT_EQ(size_t(4), view4.shape()[0]);
 
         auto view5 = view(view4, 1);
-        EXPECT_EQ(0, view5.dimension());
-        EXPECT_EQ(0, view5.shape().size());
+        EXPECT_EQ(size_t(0), view5.dimension());
+        EXPECT_EQ(size_t(0), view5.shape().size());
 
         auto view6 = view(a, 1, all());
         EXPECT_EQ(a(1, 0), view6(0));
@@ -98,7 +98,7 @@ namespace xt
             auto view2(view1);
             EXPECT_EQ(a(1, 1), view2(0));
             EXPECT_EQ(a(1, 2), view2(1));
-            EXPECT_EQ(1, view2.dimension());
+            EXPECT_EQ(size_t(1), view2.dimension());
             EXPECT_EQ(layout_type::dynamic, view2.layout());
         }
 
@@ -126,7 +126,7 @@ namespace xt
             auto view2(std::move(view1));
             EXPECT_EQ(a(1, 1), view2(0));
             EXPECT_EQ(a(1, 2), view2(1));
-            EXPECT_EQ(1, view2.dimension());
+            EXPECT_EQ(size_t(1), view2.dimension());
             EXPECT_EQ(layout_type::dynamic, view2.layout());
         }
 
@@ -164,7 +164,7 @@ namespace xt
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = view(a, 1);
-        EXPECT_EQ(2, view1.dimension());
+        EXPECT_EQ(size_t(2), view1.dimension());
         EXPECT_EQ(a(1, 0, 0), view1(0, 0));
         EXPECT_EQ(a(1, 0, 1), view1(0, 1));
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
@@ -177,15 +177,15 @@ namespace xt
     TEST(xview, integral_count)
     {
         size_t squeeze1 = integral_count<size_t, size_t, size_t, xrange<size_t>>();
-        EXPECT_EQ(squeeze1, 3);
+        EXPECT_EQ(squeeze1, size_t(3));
         size_t squeeze2 = integral_count<size_t, xrange<size_t>, size_t>();
-        EXPECT_EQ(squeeze2, 2);
+        EXPECT_EQ(squeeze2, size_t(2));
         size_t squeeze3 = integral_count_before<size_t, size_t, size_t, xrange<size_t>>(3);
-        EXPECT_EQ(squeeze3, 3);
+        EXPECT_EQ(squeeze3, size_t(3));
         size_t squeeze4 = integral_count_before<size_t, xrange<size_t>, size_t>(2);
-        EXPECT_EQ(squeeze4, 1);
+        EXPECT_EQ(squeeze4, size_t(1));
         size_t squeeze5 = integral_count<xnewaxis<size_t>>();
-        EXPECT_EQ(squeeze5, 0);
+        EXPECT_EQ(squeeze5, size_t(0));
     }
 
     TEST(xview, integral_skip)
@@ -193,9 +193,9 @@ namespace xt
         size_t index0 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>>(0);
         size_t index1 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>>(1);
         size_t index2 = integral_skip<size_t, xrange<size_t>, size_t, xrange<size_t>>(2);
-        EXPECT_EQ(index0, 1);
-        EXPECT_EQ(index1, 3);
-        EXPECT_EQ(index2, 4);
+        EXPECT_EQ(index0, size_t(1));
+        EXPECT_EQ(index1, size_t(3));
+        EXPECT_EQ(index2, size_t(4));
     }
 
     TEST(xview, single_newaxis_shape)
@@ -338,7 +338,7 @@ namespace xt
         auto view1 = view(a, 1, range(1, 4));
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
-        EXPECT_EQ(1, view1.dimension());
+        EXPECT_EQ(size_t(1), view1.dimension());
 
         auto iter = view1.template begin<layout_type::row_major>();
         auto iter_end = view1.template end<layout_type::row_major>();
@@ -358,7 +358,9 @@ namespace xt
 
     TEST(xview, trivial_iterating)
     {
-        xtensor<double, 1> arr1{{2}};
+        using tensor_type = xtensor<double, 1>;
+        using shape_type = tensor_type::shape_type;
+        tensor_type arr1{shape_type{2}};
         std::fill(arr1.begin(), arr1.end(), 6);
         auto view = xt::view(arr1, 0);
         auto iter = view.begin();
@@ -369,9 +371,11 @@ namespace xt
 
     TEST(xview, const_trivial_iterating)
     {
-        xtensor<double, 1> arr1{{2}};
+        using tensor_type = xtensor<double, 1>;
+        using shape_type = tensor_type::shape_type;
+        tensor_type arr1{shape_type{2}};
         std::fill(arr1.begin(), arr1.end(), 6);
-        const xtensor<double, 1> arr2=arr1;
+        const tensor_type arr2=arr1;
         auto view = xt::view(arr2, 0);
         auto iter = view.begin();
         auto iter_end = view.end();
@@ -393,13 +397,13 @@ namespace xt
     TEST(xview, newaxis_count)
     {
         size_t count1 = newaxis_count<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>();
-        EXPECT_EQ(count1, 3);
+        EXPECT_EQ(count1, size_t(3));
         size_t count2 = newaxis_count<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>();
-        EXPECT_EQ(count2, 2);
+        EXPECT_EQ(count2, size_t(2));
         size_t count3 = newaxis_count_before<xnewaxis<size_t>, xnewaxis<size_t>, xnewaxis<size_t>, xrange<size_t>>(3);
-        EXPECT_EQ(count3, 3);
+        EXPECT_EQ(count3, size_t(3));
         size_t count4 = newaxis_count_before<xnewaxis<size_t>, xrange<size_t>, xnewaxis<size_t>>(2);
-        EXPECT_EQ(count4, 1);
+        EXPECT_EQ(count4, size_t(1));
     }
 
     TEST(xview, newaxis)
@@ -412,38 +416,38 @@ namespace xt
         auto view1 = view(a, all(), newaxis(), all());
         EXPECT_EQ(a(1, 1), view1(1, 0, 1));
         EXPECT_EQ(a(1, 2), view1(1, 0, 2));
-        EXPECT_EQ(3, view1.dimension());
-        EXPECT_EQ(3, view1.shape()[0]);
-        EXPECT_EQ(1, view1.shape()[1]);
-        EXPECT_EQ(4, view1.shape()[2]);
+        EXPECT_EQ(size_t(3), view1.dimension());
+        EXPECT_EQ(size_t(3), view1.shape()[0]);
+        EXPECT_EQ(size_t(1), view1.shape()[1]);
+        EXPECT_EQ(size_t(4), view1.shape()[2]);
 
         auto view2 = view(a, all(), all(), newaxis());
         EXPECT_EQ(a(1, 1), view2(1, 1, 0));
         EXPECT_EQ(a(1, 2), view2(1, 2, 0));
-        EXPECT_EQ(3, view2.dimension());
-        EXPECT_EQ(3, view2.shape()[0]);
-        EXPECT_EQ(4, view2.shape()[1]);
-        EXPECT_EQ(1, view2.shape()[2]);
+        EXPECT_EQ(size_t(3), view2.dimension());
+        EXPECT_EQ(size_t(3), view2.shape()[0]);
+        EXPECT_EQ(size_t(4), view2.shape()[1]);
+        EXPECT_EQ(size_t(1), view2.shape()[2]);
 
         auto view3 = view(a, 1, newaxis(), all());
         EXPECT_EQ(a(1, 1), view3(0, 1));
         EXPECT_EQ(a(1, 2), view3(0, 2));
-        EXPECT_EQ(2, view3.dimension());
+        EXPECT_EQ(size_t(2), view3.dimension());
 
         auto view4 = view(a, 1, all(), newaxis());
         EXPECT_EQ(a(1, 1), view4(1, 0));
         EXPECT_EQ(a(1, 2), view4(2, 0));
-        EXPECT_EQ(2, view4.dimension());
+        EXPECT_EQ(size_t(2), view4.dimension());
 
         auto view5 = view(view1, 1);
         EXPECT_EQ(a(1, 1), view5(0, 1));
         EXPECT_EQ(a(1, 2), view5(0, 2));
-        EXPECT_EQ(2, view5.dimension());
+        EXPECT_EQ(size_t(2), view5.dimension());
 
         auto view6 = view(view2, 1);
         EXPECT_EQ(a(1, 1), view6(1, 0));
         EXPECT_EQ(a(1, 2), view6(2, 0));
-        EXPECT_EQ(2, view6.dimension());
+        EXPECT_EQ(size_t(2), view6.dimension());
 
         std::array<std::size_t, 3> idx1 = {1, 0, 2};
         EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
@@ -591,11 +595,13 @@ namespace xt
         xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         using shape_type = typename T::shape_type;
         using index_type = typename T::shape_type;
+        using size_type = typename T::size_type;
 
         auto next_idx = [](index_type& idx, const shape_type& shape)
         {
-            for (int i = int(shape.size() - 1); i >= 0; --i)
+            for (size_type j = shape.size(); j != 0; --j)
             {
+                size_type i = j - 1;
                 if (idx[i] >= shape[i] - 1)
                 {
                     idx[i] = 0;

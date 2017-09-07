@@ -17,8 +17,8 @@ namespace xt
 {
 
     /********************************
-    * helper functions declaration *
-    ********************************/
+     * helper functions declaration *
+     ********************************/
 
     // number of integral types in the specified sequence of types
     template <class... S>
@@ -48,7 +48,7 @@ namespace xt
     template <class S, class It>
     inline disable_xslice<S, std::size_t> get_slice_value(const S& s, It&) noexcept
     {
-        return s;
+        return static_cast<std::size_t>(s);
     }
 
     template <class S, class It>

@@ -509,7 +509,7 @@ namespace xt
             inline std::enable_if_t<xt::detail::is_complex<T>::value, T>
             sign_impl(T x)
             {
-                typename T::value_type e = x.real() ? x.real() : x.imag();
+                typename T::value_type e = (x.real() != T(0)) ? x.real() : x.imag();
                 return T(sign_impl(e), 0);
             }
 

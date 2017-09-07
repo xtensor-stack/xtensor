@@ -24,9 +24,9 @@ namespace xt
            {{9, 10, 11}, 
             {12, 13, 14}, 
             {15, 16, 17}}}; 
-        EXPECT_EQ(t.dimension(), 3);
+        EXPECT_EQ(t.dimension(), size_t(3));
         EXPECT_EQ(t(0, 0, 1), 1);
-        EXPECT_EQ(t.shape()[0], 2);
+        EXPECT_EQ(t.shape()[0], size_t(2));
     }
 
     TEST(xtensor, shaped_constructor)

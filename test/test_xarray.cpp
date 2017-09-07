@@ -159,10 +159,10 @@ namespace xt
 
         xarray<float>::shape_type sh = { 4, 1 };
         EXPECT_EQ(res.shape(), sh);
-        EXPECT_EQ(res(0, 0), 0);
-        EXPECT_EQ(res(1, 0), 1);
-        EXPECT_EQ(res(2, 0), 1);
-        EXPECT_EQ(res(3, 0), 1);
+        EXPECT_EQ(res(0, 0), 0.f);
+        EXPECT_EQ(res(1, 0), 1.f);
+        EXPECT_EQ(res(2, 0), 1.f);
+        EXPECT_EQ(res(3, 0), 1.f);
     }
 
     TEST(xarray, access)

@@ -480,7 +480,9 @@ namespace xt
     template <class... Args>
     inline auto xfunction<F, R, CT...>::operator()(Args... args) const -> const_reference
     {
-        return access_impl(std::make_index_sequence<sizeof...(CT)>(), args...);
+        // The static cast prevents the compiler from instantiating the template methods with signed integers,
+        // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
+        return access_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
     }
 
     template <class F, class R, class... CT>

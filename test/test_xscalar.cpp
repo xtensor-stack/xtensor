@@ -16,7 +16,7 @@ namespace xt
     {
         // The shape of a 0-D xarray is ().  The size of the buffer is 1.
         xscalar<int> x(1);
-        EXPECT_EQ(x.size(), 1);
+        EXPECT_EQ(x.size(), size_t(1));
     }
 
     TEST(xscalar, access)
@@ -33,7 +33,7 @@ namespace xt
     {
         // The dimension of a xscalar is 0
         xscalar<int> x(2);
-        EXPECT_EQ(x.dimension(), 0);
+        EXPECT_EQ(x.dimension(), size_t(0));
         EXPECT_EQ(x.layout(), layout_type::any);
     }
 
