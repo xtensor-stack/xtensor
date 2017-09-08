@@ -1,8 +1,8 @@
 name: xtensor
 channels:
   - nodefaults
-  - conda-forge
-  - SylvainCorlay
+  - QuantStack
 dependencies:
-  - cling_ubuntu14
   - xtensor
+  - xeus-cling
+  - notebook
