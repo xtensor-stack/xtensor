@@ -55,9 +55,9 @@ namespace xt
             auto start = std::chrono::steady_clock::now();
             for (std::size_t i = 0; i < number; ++i)
             {
-                auto iterx = x.xbegin();
-                auto itery = y.xbegin();
-                for (auto iter = res.xbegin(); iter != res.xend(); ++iter, ++iterx, ++itery)
+                auto iterx = x.begin();
+                auto itery = y.begin();
+                for (auto iter = res.begin(); iter != res.end(); ++iter, ++iterx, ++itery)
                 {
                     *iter = a * (*iterx) + (*itery);
                 }
