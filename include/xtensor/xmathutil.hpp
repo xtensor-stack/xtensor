@@ -40,10 +40,19 @@ namespace xt
         static constexpr T LN2 = 0.693147180559945309417;
     };
 
+        /** @brief Namespace for the standard algebraic functions.
+
+            Often, one only wants to import the algebraic functions from
+            namespace 'std'. Standard C++ doesn't support this -- one either
+            has to import every function individually, or writes <tt>using namespace std</tt>
+            to import everything. Now you can write <tt>using namespace xt::cmath</tt>.
+
+            This namespace also adds a few overloads to the standard function (abs() for unsigned
+            types, floor() and ceil() for integer types) which are needed to dismbiguate
+            templated code.
+        */
     namespace cmath
     {
-        // create a namespace for just the algebraic functions from std
-        // and add a few fixes to avoid ambiguous overloads in templates
 
         using std::abs;
         using std::fabs;
