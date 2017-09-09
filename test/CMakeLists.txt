@@ -88,16 +88,19 @@ set(XTENSOR_TESTS
     test_xbuffer_adaptor.cpp
     test_xbuilder.cpp
     test_xcomplex.cpp
+    test_xconcepts.cpp
     test_xcontainer_semantic.cpp
     test_xcsv.cpp
     test_xdynamicview.cpp
     test_xeval.cpp
+    test_xexception.cpp
     test_xfunction.cpp
     test_xindexview.cpp
     test_xiterator.cpp
     test_xio.cpp
     test_xlayout.cpp
     test_xmath.cpp
+    test_xmathutil.cpp
     test_xnoalias.cpp
     test_xoperation.cpp
     test_xoptional.cpp
