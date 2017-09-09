@@ -153,15 +153,15 @@ namespace xt
 
 #ifdef XTENSOR_ENABLE_ASSERT
 #define XTENSOR_ASSERT(expr) XTENSOR_ASSERT_IMPL(expr, __FILE__, __LINE__)
-#define XTENSOR_ASSERT_IMPL(expr, file, line)                                                                                    \
-    try                                                                                                                          \
-    {                                                                                                                            \
-        expr;                                                                                                                    \
-    }                                                                                                                            \
-    catch (std::exception & e)                                                                                                   \
-    {                                                                                                                            \
-        throw std::runtime_error(std::string(file) + ':' + std::to_string(line)                                                  \
-            + ": check failed\n\t" + std::string(e.what()));                                                                     \
+#define XTENSOR_ASSERT_IMPL(expr, file, line)                                                       \
+    try                                                                                             \
+    {                                                                                               \
+        expr;                                                                                       \
+    }                                                                                               \
+    catch (std::exception & e)                                                                      \
+    {                                                                                               \
+        throw std::runtime_error(std::string(file) + ':' + std::to_string(line)                     \
+            + ": check failed\n\t" + std::string(e.what()));                                        \
     }
 #else
 #define XTENSOR_ASSERT(expr)
@@ -169,18 +169,18 @@ namespace xt
 }
 
 #ifdef XTENSOR_ENABLE_ASSERT
-#define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE) \
-    if((PREDICATE)) {} else  { \
-        throw std::runtime_error(std::string("Assertion error!\n") + MESSAGE + \
+#define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)                                                      \
+    if((PREDICATE)) {} else  {                                                                      \
+        throw std::runtime_error(std::string("Assertion error!\n") + MESSAGE +                      \
                                  "\n  " + __FILE__ + '(' +  std::to_string(__LINE__) + ")\n"); }
 
 #else
 #define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)
 #endif
 
-#define xtensor_precondition(PREDICATE, MESSAGE) \
-    if((PREDICATE)) {} else  { \
-        throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE + \
+#define xtensor_precondition(PREDICATE, MESSAGE)                                                    \
+    if((PREDICATE)) {} else  {                                                                      \
+        throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE +               \
                                  "\n  " + __FILE__ + '(' +  std::to_string(__LINE__) + ")\n"); }
 
 #endif // XEXCEPTION_HPP

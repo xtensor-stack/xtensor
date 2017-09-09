@@ -417,6 +417,6 @@ namespace xt
     XTENSOR_DEFINE_NORM(long double)
 
     #undef XTENSOR_DEFINE_NORM
-}
+} // namespace xt
 
 #endif
