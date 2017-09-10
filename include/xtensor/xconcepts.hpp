@@ -135,17 +135,17 @@ namespace xt
     template <class T>
     struct norm_of_scalar_impl<T, false>
     {
-        static const bool value = false;
-        using norm_type         = void *;
-        using squared_norm_type = void *;
+        static constexpr bool value = false;
+        using norm_type             = void *;
+        using squared_norm_type     = void *;
     };
 
     template <class T>
     struct norm_of_scalar_impl<T, true>
     {
-        static const bool value = true;
-        using norm_type         = T;
-        using squared_norm_type = decltype((*(T*)0) * (*(T*)0));
+        static constexpr bool value = true;
+        using norm_type             = T;
+        using squared_norm_type     = decltype((*(T*)0) * (*(T*)0));
     };
 
     template <class T, bool integral = std::is_integral<T>::value,
@@ -224,9 +224,9 @@ namespace xt
 
     } // namespace concepts_detail
 
-        /** @brief Traits class for the result type of the <tt>norm()</tt> function.
+        /** @brief Traits class for the result type of the <tt>norm_l2()</tt> function.
 
-            Member 'type' defines the result of <tt>norm(t)</tt>, where <tt>t</tt>
+            Member 'type' defines the result of <tt>norm_l2(t)</tt>, where <tt>t</tt>
             is of type @tparam T. It implements the following rules designed to
             minimize the potential for overflow:
                 - @tparam T is an arithmetic type: 'type' is the result type of <tt>abs(t)</tt>.
@@ -255,9 +255,9 @@ namespace xt
     template <class T>
     using norm_t = typename norm_traits<T>::type;
 
-        /** @brief Traits class for the result type of the <tt>squared_norm()</tt> function.
+        /** @brief Traits class for the result type of the <tt>norm_sq()</tt> function.
 
-            Member 'type' defines the result of <tt>squared_norm(t)</tt>, where <tt>t</tt>
+            Member 'type' defines the result of <tt>norm_sq(t)</tt>, where <tt>t</tt>
             is of type @tparam T. It implements the following rules designed to
             minimize the potential for overflow:
                 - @tparam T is an arithmetic type: 'type' is the result type of <tt>t*t</tt>.
@@ -271,7 +271,7 @@ namespace xt
            <tt>concepts_detail::norm_traits_base</tt> template.
         */
     template<class T>
-    struct squared_norm_traits
+    struct norm_sq_traits
     : public concepts_detail::norm_traits_base<T>
     {
         using base_type = concepts_detail::norm_traits_base<T>;
@@ -282,10 +282,10 @@ namespace xt
                         typename base_type::norm_of_scalar::squared_norm_type>::type;
     };
 
-        /** Abbreviation of 'typename squared_norm_traits<T>::type'.
+        /** Abbreviation of 'typename norm_sq_traits<T>::type'.
         */
     template <class T>
-    using squared_norm_t = typename squared_norm_traits<T>::type;
+    using norm_sq_t = typename norm_sq_traits<T>::type;
 
 } // namespace xt
 

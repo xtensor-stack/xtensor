@@ -26,11 +26,6 @@ namespace xt
 
         // without XTENSOR_DEFINE_UNSIGNED_ABS, this causes 'ambiguous call to overloaded function'
         EXPECT_TRUE((std::is_same<decltype(test_abs(1u)), unsigned int>::value));
-
-        EXPECT_TRUE((std::is_same<decltype(cmath::floor(1.1)), double>::value));
-
-        // without XTENSOR_DEFINE_INTEGER_FLOOR_CEIL, this results in 'double'
-        EXPECT_TRUE((std::is_same<decltype(cmath::floor(1)), int>::value));
     }
 
     TEST(xmathutil, isclose)
@@ -72,14 +67,35 @@ namespace xt
         EXPECT_EQ(cos_pi(1.0), -1.0);
         EXPECT_EQ(cos_pi(1.5), 0.0);
 
-        EXPECT_EQ(norm(2), 2);
-        EXPECT_EQ(norm(-2), 2);
-        EXPECT_EQ(norm(2.0), 2.0);
-        EXPECT_EQ(norm(-2.0), 2.0);
+        EXPECT_EQ(norm_l0(2), 1);
+        EXPECT_EQ(norm_l0(-2), 1);
+        EXPECT_EQ(norm_l0(0), 0);
+        EXPECT_EQ(norm_l0(2.0), 1);
+        EXPECT_EQ(norm_l0(-2.0), 1);
+        EXPECT_EQ(norm_l0(0.0), 0);
 
-        EXPECT_EQ(squared_norm(2), 4);
-        EXPECT_EQ(squared_norm(-2), 4);
-        EXPECT_EQ(squared_norm(2.0), 4.0);
-        EXPECT_EQ(squared_norm(-2.0), 4.0);
+        EXPECT_EQ(norm_l1(2), 2);
+        EXPECT_EQ(norm_l1(-2), 2);
+        EXPECT_EQ(norm_l1(2.0), 2.0);
+        EXPECT_EQ(norm_l1(-2.0), 2.0);
+
+        EXPECT_EQ(norm_l2(2), 2);
+        EXPECT_EQ(norm_l2(-2), 2);
+        EXPECT_EQ(norm_l2(2.0), 2.0);
+        EXPECT_EQ(norm_l2(-2.0), 2.0);
+
+        EXPECT_EQ(norm_max(2), 2);
+        EXPECT_EQ(norm_max(-2), 2);
+        EXPECT_EQ(norm_max(2.0), 2.0);
+        EXPECT_EQ(norm_max(-2.0), 2.0);
+
+        EXPECT_EQ(norm_sq(2), 4);
+        EXPECT_EQ(norm_sq(-2), 4);
+        EXPECT_EQ(norm_sq(2.5), 6.25);
+        EXPECT_EQ(norm_sq(-2.5), 6.25);
+
+        std::complex<double> c{ 2.0, 3.0 };
+        EXPECT_EQ(norm_sq(c), 13.0);
+        EXPECT_EQ(norm_sq(c), std::norm(c));
     }
 } // namespace xt

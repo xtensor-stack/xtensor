@@ -84,14 +84,14 @@ namespace xt
         using std::logb;
         using std::ilogb;
 
-        using std::floor;
         using std::ceil;
-        using std::trunc;
-        using std::round;
+        using std::floor;
         using std::lround;
         using std::llround;
         using std::nearbyint;
         using std::rint;
+        using std::round;
+        using std::trunc;
 
         using std::isfinite;
         using std::isinf;
@@ -99,14 +99,13 @@ namespace xt
 
         using std::erf;
         using std::erfc;
-        using std::tgamma;
         using std::lgamma;
+        using std::tgamma;
 
         using std::conj;
         using std::real;
         using std::imag;
         using std::arg;
-        using std::norm;
 
         using std::atan2;
         using std::copysign;
@@ -132,21 +131,6 @@ namespace xt
         XTENSOR_DEFINE_UNSIGNED_ABS(unsigned long long)
 
         #undef XTENSOR_DEFINE_UNSIGNED_ABS
-
-            // add missing floor() and ceil() overloads for integral types
-        #define XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(T) \
-            inline T floor(signed T t) { return t; } \
-            inline T floor(unsigned T t) { return t; } \
-            inline T ceil(signed T t) { return t; } \
-            inline T ceil(unsigned T t) { return t; }
-
-        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(char)
-        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(short)
-        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(int)
-        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(long)
-        XTENSOR_DEFINE_INTEGER_FLOOR_CEIL(long long)
-
-        #undef XTENSOR_DEFINE_INTEGER_FLOOR_CEIL
     } // namespace cmath
 
 
@@ -167,9 +151,13 @@ namespace xt
           b = static_cast<P>(v);
 
         if(std::isnan(a) && std::isnan(b))
+        {
             return equal_nan;
+        }
         if(std::isinf(a) && std::isinf(b))
+        {
             return std::signbit(a) == std::signbit(b);
+        }
         P d = abs(a - b);
         return d <= atol || d <= rtol * std::max(abs(a), abs(b));
     }
@@ -326,9 +314,13 @@ namespace xt
     REAL sin_pi(REAL x)
     {
         if(x < 0.0)
+        {
             return -sin_pi(-x);
+        }
         if(x < 0.5)
+        {
             return std::sin(numeric_constants<REAL>::PI * x);
+        }
 
         bool invert = false;
         if(x < 1.0)
@@ -338,15 +330,23 @@ namespace xt
         }
 
         REAL rem = std::floor(x);
-        if(odd((int)rem))
+        if(odd((int64_t)rem))
+        {
             invert = !invert;
+        }
         rem = x - rem;
         if(rem > 0.5)
+        {
             rem = 1.0 - rem;
+        }
         if(rem == 0.5)
+        {
             rem = REAL(1);
+        }
         else
+        {
             rem = std::sin(numeric_constants<REAL>::PI * rem);
+        }
         return invert
                   ? -rem
                   : rem;
@@ -366,41 +366,42 @@ namespace xt
 
     /**********************************************************/
     /*                                                        */
-    /*                          norm()                        */
+    /*                        norm_l2()                       */
     /*                                                        */
     /**********************************************************/
 
-        /** \brief The norm of a numerical object.
+        /** \brief The L2-norm of a numerical object.
 
             For scalar types: implemented as <tt>abs(t)</tt><br>
-            otherwise: implemented as <tt>sqrt(squared_norm(t))</tt>.
+            otherwise: implemented as <tt>sqrt(norm_sq(t))</tt>.
         */
     template <class T>
-    inline auto norm(T const & t)
+    inline auto norm_l2(T const & t)
     {
         using cmath::sqrt;
-        return sqrt(squared_norm(t));
+        return sqrt(norm_sq(t));
     }
 
     /**********************************************************/
     /*                                                        */
-    /*                     squared_norm()                     */
+    /*                        norm_sq()                       */
     /*                                                        */
     /**********************************************************/
 
     template <class T>
     inline auto
-    squared_norm(std::complex<T> const & t)
+    norm_sq(std::complex<T> const & t)
     {
-        return sq(t.real()) + sq(t.imag());
+        return std::norm(t);
     }
 
-    #define XTENSOR_DEFINE_NORM(T) \
-        inline auto squared_norm(T t) { return sq(t); } \
-        inline auto mean_square(T t) { return sq(t); } \
-        inline auto elementwise_squared_norm(T t) { return sq(t); } \
-        inline auto norm(T t) { return cmath::abs(t); } \
-        inline auto elementwise_norm(T t) { return cmath::abs(t); }
+    #define XTENSOR_DEFINE_NORM(T)                                   \
+        inline size_t norm_l0(T t)     { return t != 0 ? 1 : 0; }    \
+        inline auto   norm_l1(T t)     { return cmath::abs(t); }     \
+        inline auto   norm_l2(T t)     { return cmath::abs(t); }     \
+        inline auto   norm_max(T t)    { return cmath::abs(t); }     \
+        inline auto   norm_sq(T t)     { return sq(t); }             \
+        inline auto   mean_square(T t) { return sq(t); }
 
     XTENSOR_DEFINE_NORM(signed char)
     XTENSOR_DEFINE_NORM(unsigned char)

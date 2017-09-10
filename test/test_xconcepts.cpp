@@ -55,12 +55,12 @@ namespace xt
         EXPECT_TRUE((std::is_same<norm_t<std::vector<double>>, double>::value));
         EXPECT_TRUE((std::is_same<norm_t<std::vector<long double>>, long double>::value));
 
-        EXPECT_TRUE((std::is_same<squared_norm_t<uint8_t>, int>::value));
-        EXPECT_TRUE((std::is_same<squared_norm_t<int>, int>::value));
-        EXPECT_TRUE((std::is_same<squared_norm_t<double>, double>::value));
-        EXPECT_TRUE((std::is_same<squared_norm_t<std::vector<uint8_t>>, uint64_t>::value));
-        EXPECT_TRUE((std::is_same<squared_norm_t<std::vector<int>>, uint64_t>::value));
-        EXPECT_TRUE((std::is_same<squared_norm_t<std::vector<double>>, double>::value));
-        EXPECT_TRUE((std::is_same<squared_norm_t<std::vector<long double>>, long double>::value));
+        EXPECT_TRUE((std::is_same<norm_sq_t<uint8_t>, int>::value));
+        EXPECT_TRUE((std::is_same<norm_sq_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<norm_sq_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<uint8_t>>, uint64_t>::value));
+        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<int>>, uint64_t>::value));
+        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<double>>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<long double>>, long double>::value));
     }
 } // namespace xt
