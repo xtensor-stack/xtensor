@@ -10,6 +10,7 @@
 #define XCONCEPTS_HPP
 
 #include <type_traits>
+#include <cmath>
 
 /**********************************************************/
 /*                                                        */
@@ -135,17 +136,17 @@ namespace xt
     template <class T>
     struct norm_of_scalar_impl<T, false>
     {
-        static constexpr bool value = false;
-        using norm_type             = void *;
-        using squared_norm_type     = void *;
+        static const bool value = false;
+        using norm_type         = void *;
+        using squared_norm_type = void *;
     };
 
     template <class T>
     struct norm_of_scalar_impl<T, true>
     {
-        static constexpr bool value = true;
-        using norm_type             = T;
-        using squared_norm_type     = decltype((*(T*)0) * (*(T*)0));
+        static const bool value = true;
+        using norm_type         = T;
+        using squared_norm_type = decltype((*(T*)0) * (*(T*)0));
     };
 
     template <class T, bool integral = std::is_integral<T>::value,

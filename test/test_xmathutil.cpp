@@ -95,7 +95,7 @@ namespace xt
         EXPECT_EQ(norm_sq(-2.5), 6.25);
 
         std::complex<double> c{ 2.0, 3.0 };
-        EXPECT_EQ(norm_sq(c), 13.0);
+//        EXPECT_EQ(norm_sq(c), 13.0);
         EXPECT_EQ(norm_sq(c), std::norm(c));
     }
 } // namespace xt
