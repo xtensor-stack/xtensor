@@ -4,5 +4,6 @@ channels:
   - QuantStack
 dependencies:
   - xtensor
+  - xtensor-blas
   - xeus-cling
   - notebook
