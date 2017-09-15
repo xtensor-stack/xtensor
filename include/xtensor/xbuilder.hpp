@@ -296,7 +296,7 @@ namespace xt
         public:
 
             using size_type = std::size_t;
-            using value_type = std::common_type_t<typename std::decay_t<CT>::value_type...>;
+            using value_type = promote_t<typename std::decay_t<CT>::value_type...>;
 
             inline concatenate_impl(std::tuple<CT...>&& t, size_type axis)
                 : m_t(t), m_axis(axis)
@@ -357,7 +357,7 @@ namespace xt
         public:
 
             using size_type = std::size_t;
-            using value_type = std::common_type_t<typename std::decay_t<CT>::value_type...>;
+            using value_type = promote_t<typename std::decay_t<CT>::value_type...>;
 
             inline stack_impl(std::tuple<CT...>&& t, size_type axis)
                 : m_t(t), m_axis(axis)
@@ -733,19 +733,19 @@ namespace xt
 
     /**
      * @brief Returns the elements on the diagonal of arr
-     * If arr has more than two dimensions, then the axes specified by 
-     * axis_1 and axis_2 are used to determine the 2-D sub-array whose 
-     * diagonal is returned. The shape of the resulting array can be 
-     * determined by removing axis1 and axis2 and appending an index 
+     * If arr has more than two dimensions, then the axes specified by
+     * axis_1 and axis_2 are used to determine the 2-D sub-array whose
+     * diagonal is returned. The shape of the resulting array can be
+     * determined by removing axis1 and axis2 and appending an index
      * to the right equal to the size of the resulting diagonals.
      *
      * @param arr the input array
      * @param offset offset of the diagonal from the main diagonal. Can
      *               be positive or negative.
-     * @param axis_1 Axis to be used as the first axis of the 2-D sub-arrays 
-     *               from which the diagonals should be taken. 
-     * @param axis_2 Axis to be used as the second axis of the 2-D sub-arrays 
-     *               from which the diagonals should be taken. 
+     * @param axis_1 Axis to be used as the first axis of the 2-D sub-arrays
+     *               from which the diagonals should be taken.
+     * @param axis_2 Axis to be used as the second axis of the 2-D sub-arrays
+     *               from which the diagonals should be taken.
      * @returns xexpression with values of the diagonal
      *
      * \code{.cpp}
@@ -817,7 +817,7 @@ namespace xt
      * @brief Reverse the order of elements in an xexpression along the given axis.
      * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
      * `fliplr(arr)` to `xt::flip(arr, 1)`.
-     * 
+     *
      * @param arr the input xexpression
      * @param axis the axis along which elements should be reversed
      *

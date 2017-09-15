@@ -61,7 +61,7 @@ namespace xt
         template <>
         struct common_difference_type<>
         {
-            using type = std::size_t;
+            using type = std::ptrdiff_t;
         };
 
         template <class... Args>
@@ -74,7 +74,7 @@ namespace xt
         template <class... Args>
         struct common_value_type
         {
-            using type = std::common_type_t<xvalue_type_t<Args>...>;
+            using type = promote_t<xvalue_type_t<Args>...>;
         };
 
         template <class... Args>
