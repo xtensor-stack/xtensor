@@ -51,7 +51,7 @@ namespace xt
     }
 
     template <class T>
-    constexpr std::string type_to_string()
+    std::string type_to_string()
     {
         static_string static_name = type_name<T>();
         return std::string(static_name.data, static_name.size);
