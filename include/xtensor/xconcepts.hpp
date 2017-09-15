@@ -56,7 +56,8 @@ namespace xt
             Currently, we apply the simple rule that class @tparam T
             is either a pointer or a C-array or has an embedded typedef
             'iterator_category'. More sophisticated checks can easily
-            be added when needed.
+            be added when needed. If @tparam T is an iterator, the class'
+            <tt>value</tt> member is <tt>true</tt>.
         */
     template <class T>
     struct iterator_concept
