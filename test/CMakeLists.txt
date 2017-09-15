@@ -92,6 +92,7 @@ set(XTENSOR_TESTS
     test_xcsv.cpp
     test_xdynamicview.cpp
     test_xeval.cpp
+    test_xexception.cpp
     test_xfunction.cpp
     test_xindexview.cpp
     test_xiterator.cpp
