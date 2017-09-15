@@ -17,28 +17,12 @@
 #include <complex>
 #include <type_traits>
 
+#include "xmathutil.hpp"
 #include "xoperation.hpp"
 #include "xreducer.hpp"
 
 namespace xt
 {
-    template <class T>
-    struct numeric_constants
-    {
-        static constexpr T PI = 3.141592653589793238463;
-        static constexpr T PI_2 = 1.57079632679489661923;
-        static constexpr T PI_4 = 0.785398163397448309616;
-        static constexpr T D_1_PI = 0.318309886183790671538;
-        static constexpr T D_2_PI = 0.636619772367581343076;
-        static constexpr T D_2_SQRTPI = 1.12837916709551257390;
-        static constexpr T SQRT2 = 1.41421356237309504880;
-        static constexpr T SQRT1_2 = 0.707106781186547524401;
-        static constexpr T E = 2.71828182845904523536;
-        static constexpr T LOG2E = 1.44269504088896340736;
-        static constexpr T LOG10E = 0.434294481903251827651;
-        static constexpr T LN2 = 0.693147180559945309417;
-    };
-
     /***********
      * Helpers *
      ***********/
@@ -185,7 +169,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Absolute value function.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise absolute value
      * of \em e.
      * @param e an \ref xexpression
@@ -201,7 +185,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Absolute value function.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise absolute value
      * of \em e.
      * @param e an \ref xexpression
@@ -217,7 +201,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Remainder of the floating point division operation.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise remainder of
      * the floating point division operation <em>e1 / e2</em>.
      * @param e1 an \ref xexpression or a scalar
@@ -235,7 +219,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Signed remainder of the division operation.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise signed remainder
      * of the floating point division operation <em>e1 / e2</em>.
      * @param e1 an \ref xexpression or a scalar
@@ -478,8 +462,8 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Clip values between hi and lo
-     * 
-     * Returns an \ref xfunction for the element-wise clipped 
+     *
+     * Returns an \ref xfunction for the element-wise clipped
      * values between lo and hi
      * @param e1 an \ref xexpression or a scalar
      * @param lo a scalar
@@ -701,7 +685,7 @@ namespace xt
      * @ingroup pow_functions
      * @brief Square root function.
      *
-     * Returns an \ref xfunction for the element-wise square 
+     * Returns an \ref xfunction for the element-wise square
      * root of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction

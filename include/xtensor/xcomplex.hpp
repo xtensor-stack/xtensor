@@ -12,6 +12,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtensor/xmathutil.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xoffsetview.hpp"

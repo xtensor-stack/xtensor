@@ -11,6 +11,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <complex>
 #include <cstddef>
 #include <initializer_list>
@@ -998,6 +999,251 @@ namespace xt
     using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
 
     #endif
+
+    /************************************
+     * arithmetic type promotion traits *
+     ************************************/
+
+        /** @brief Traits class for the result type of mixed arithmetic expressions.
+
+            For example, <tt>promote_type<unsigned char, unsigned char>::type</tt> tells
+            the user that <tt>unsigned char + unsigned char => int</tt>.
+        */
+    template <class ... T>
+	struct promote_type;
+
+    template <class T>
+	struct promote_type<T>
+	{
+        using type = typename promote_type<T, T>::type;
+	};
+
+    template <class T0, class T1>
+	struct promote_type<T0, T1>
+	{
+        using type = decltype(*(std::decay_t<T0>*)0 + *(std::decay_t<T1>*)0);
+	};
+
+    template<class T0, class ... REST>
+	struct promote_type<T0, REST...>
+	{
+        using type = decltype(*(std::decay_t<T0>*)0 + *(typename promote_type<REST...>::type*)0);
+	};
+
+        /** @brief Abbreviation of 'typename promote_type<T>::type'.
+        */
+    template <class ... T>
+    using promote_t = typename promote_type<T...>::type;
+
+    namespace traits_detail
+    {
+        using std::sqrt;
+
+        template <class T>
+        using real_promote_t = decltype(sqrt(*(std::decay_t<T>*)0));
+    }
+
+        /** @brief Result type of algebraic expressions.
+
+            For example, <tt>real_promote_type<int>::type</tt> tells the
+            user that <tt>sqrt(int) => double</tt>.
+        */
+    template <class T>
+	struct real_promote_type
+	{
+        using type = traits_detail::real_promote_t<T>;
+	};
+
+        /** @brief Abbreviation of 'typename real_promote_type<T>::type'.
+        */
+    template <class T>
+    using real_promote_t = typename real_promote_type<T>::type;
+
+        /** @brief Traits class to replace 'bool' with 'uint8_t' and keep everything else.
+
+            This is useful for scientific computing, where a boolean mask array is
+            usually implemented as an array of bytes.
+        */
+    template <class T>
+	struct bool_promote_type
+	{
+        using type = typename std::conditional<std::is_same<T, bool>::value, uint8_t, T>::type;
+	};
+
+        /** @brief Abbreviation for typename bool_promote_type<T>::type
+        */
+    template <class T>
+    using bool_promote_t = typename bool_promote_type<T>::type;
+
+    /********************************************
+     * type inference for norm and squared norm *
+     ********************************************/
+
+    template<class T>
+    struct norm_type;
+
+    template<class T>
+    struct squared_norm_type;
+
+    namespace traits_detail
+    {
+
+        template <class T, bool scalar = std::is_arithmetic<T>::value>
+        struct norm_of_scalar_impl;
+
+        template <class T>
+        struct norm_of_scalar_impl<T, false>
+        {
+            static const bool value = false;
+            using norm_type         = void *;
+            using squared_norm_type = void *;
+        };
+
+        template <class T>
+        struct norm_of_scalar_impl<T, true>
+        {
+            static const bool value = true;
+            using norm_type         = T;
+            using squared_norm_type = decltype((*(T*)0) * (*(T*)0));
+        };
+
+        template <class T, bool integral = std::is_integral<T>::value,
+                           bool floating = std::is_floating_point<T>::value>
+        struct norm_of_array_elements_impl;
+
+        template <>
+        struct norm_of_array_elements_impl<void *, false, false>
+        {
+            using norm_type         = void *;
+            using squared_norm_type = void *;
+        };
+
+        template <class T>
+        struct norm_of_array_elements_impl<T, false, false>
+        {
+            using norm_type         = typename norm_type<T>::type;
+            using squared_norm_type = typename squared_norm_type<T>::type;
+        };
+
+        template <class T>
+        struct norm_of_array_elements_impl<T, true, false>
+        {
+            static_assert(!std::is_same<T, char>::value,
+               "'char' is not a numeric type, use 'signed char' or 'unsigned char'.");
+
+            using norm_type         = double;
+            using squared_norm_type = uint64_t;
+        };
+
+        template <class T>
+        struct norm_of_array_elements_impl<T, false, true>
+        {
+            using norm_type         = double;
+            using squared_norm_type = double;
+        };
+
+        template <>
+        struct norm_of_array_elements_impl<long double, false, true>
+        {
+            using norm_type         = long double;
+            using squared_norm_type = long double;
+        };
+
+        template <class ARRAY>
+        struct norm_of_vector_impl
+        {
+            static void * test(...);
+
+            template <class U>
+            static typename U::value_type test(U*, typename U::value_type * = 0);
+
+            using T = decltype(test((ARRAY*)0));
+
+            static const bool value = !std::is_same<T, void*>::value;
+
+            using norm_type         = typename norm_of_array_elements_impl<T>::norm_type;
+            using squared_norm_type = typename norm_of_array_elements_impl<T>::squared_norm_type;
+        };
+
+        template<class U>
+        struct norm_type_base
+        {
+            using T = std::decay_t<U>;
+
+            static_assert(!std::is_same<T, char>::value,
+               "'char' is not a numeric type, use 'signed char' or 'unsigned char'.");
+
+            using norm_of_scalar = norm_of_scalar_impl<T>;
+            using norm_of_vector = norm_of_vector_impl<T>;
+
+            static const bool value = norm_of_scalar::value || norm_of_vector::value;
+
+            static_assert(value, "norm_type<T> are undefined for type U.");
+        };
+    } // namespace traits_detail
+
+        /** @brief Traits class for the result type of the <tt>norm_l2()</tt> function.
+
+            Member 'type' defines the result of <tt>norm_l2(t)</tt>, where <tt>t</tt>
+            is of type @tparam T. It implements the following rules designed to
+            minimize the potential for overflow:
+                - @tparam T is an arithmetic type: 'type' is the result type of <tt>abs(t)</tt>.
+                - @tparam T is a container of 'long double' elements: 'type' is <tt>long double</tt>.
+                - @tparam T is a container of another arithmetic type: 'type' is <tt>double</tt>.
+                - @tparam T is a container of some other type: 'type' is the element's norm type,
+
+           Containers are recognized by having an embedded typedef 'value_type'.
+           To change the behavior for a case not covered here, specialize the
+           <tt>traits_detail::norm_type_base</tt> template.
+        */
+    template<class T>
+    struct norm_type
+    : public traits_detail::norm_type_base<T>
+    {
+        using base_type = traits_detail::norm_type_base<T>;
+
+        using type =
+            typename std::conditional<base_type::norm_of_vector::value,
+                        typename base_type::norm_of_vector::norm_type,
+                        typename base_type::norm_of_scalar::norm_type>::type;
+    };
+
+        /** Abbreviation of 'typename norm_type<T>::type'.
+        */
+    template <class T>
+    using norm_t = typename norm_type<T>::type;
+
+        /** @brief Traits class for the result type of the <tt>norm_sq()</tt> function.
+
+            Member 'type' defines the result of <tt>norm_sq(t)</tt>, where <tt>t</tt>
+            is of type @tparam T. It implements the following rules designed to
+            minimize the potential for overflow:
+                - @tparam T is an arithmetic type: 'type' is the result type of <tt>t*t</tt>.
+                - @tparam T is a container of 'long double' elements: 'type' is <tt>long double</tt>.
+                - @tparam T is a container of another floating-point type: 'type' is <tt>double</tt>.
+                - @tparam T is a container of integer elements: 'type' is <tt>uint64_t</tt>.
+                - @tparam T is a container of some other type: 'type' is the element's squared norm type,
+
+           Containers are recognized by having an embedded typedef 'value_type'.
+           To change the behavior for a case not covered here, specialize the
+           <tt>traits_detail::norm_type_base</tt> template.
+        */
+    template<class T>
+    struct norm_sq_traits
+    : public traits_detail::norm_type_base<T>
+    {
+        using base_type = traits_detail::norm_type_base<T>;
+
+        using type =
+            typename std::conditional<base_type::norm_of_vector::value,
+                        typename base_type::norm_of_vector::squared_norm_type,
+                        typename base_type::norm_of_scalar::squared_norm_type>::type;
+    };
+
+        /** Abbreviation of 'typename norm_sq_traits<T>::type'.
+        */
+    template <class T>
+    using norm_sq_t = typename norm_sq_traits<T>::type;
 }
 
 #endif
