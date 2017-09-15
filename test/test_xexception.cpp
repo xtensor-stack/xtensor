@@ -30,7 +30,7 @@ namespace xt
         }
         try
         {
-            xtensor_precondition(false, "Intentional error");
+            XTENSOR_PRECONDITION(false, "Intentional error");
             FAIL() << "No exception thrown.";
         }
         catch(std::runtime_error & e)

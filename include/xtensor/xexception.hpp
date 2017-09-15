@@ -178,7 +178,7 @@ namespace xt
 #define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)
 #endif
 
-#define xtensor_precondition(PREDICATE, MESSAGE)                                                    \
+#define XTENSOR_PRECONDITION(PREDICATE, MESSAGE)                                                    \
     if((PREDICATE)) {} else  {                                                                      \
         throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE +               \
                                  "\n  " + __FILE__ + '(' +  std::to_string(__LINE__) + ")\n"); }
