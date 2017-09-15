@@ -296,7 +296,7 @@ namespace xt
         public:
 
             using size_type = std::size_t;
-            using value_type = promote_t<typename std::decay_t<CT>::value_type...>;
+            using value_type = promote_type_t<typename std::decay_t<CT>::value_type...>;
 
             inline concatenate_impl(std::tuple<CT...>&& t, size_type axis)
                 : m_t(t), m_axis(axis)
@@ -357,7 +357,7 @@ namespace xt
         public:
 
             using size_type = std::size_t;
-            using value_type = promote_t<typename std::decay_t<CT>::value_type...>;
+            using value_type = promote_type_t<typename std::decay_t<CT>::value_type...>;
 
             inline stack_impl(std::tuple<CT...>&& t, size_type axis)
                 : m_t(t), m_axis(axis)

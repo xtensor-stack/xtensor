@@ -580,95 +580,95 @@ namespace xt
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator+(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() + e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator+(const T1& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 + e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator+(const xoptional<T1, B1>& e1, const T2& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() + e2 : missing<value_type>();
     }
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator-(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() - e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator-(const T1& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 - e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator-(const xoptional<T1, B1>& e1, const T2& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() - e2 : missing<value_type>();
     }
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator*(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() * e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator*(const T1& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 * e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator*(const xoptional<T1, B1>& e1, const T2& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() * e2 : missing<value_type>();
     }
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator/(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<promote_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() / e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator/(const T1& e1, const xoptional<T2, B2>& e2) noexcept
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 / e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator/(const xoptional<T1, B1>& e1, const T2& e2) noexcept
     {
-        using value_type = promote_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() / e2 : missing<value_type>();
     }
 

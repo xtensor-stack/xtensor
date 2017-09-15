@@ -1033,14 +1033,14 @@ namespace xt
         /** @brief Abbreviation of 'typename promote_type<T>::type'.
         */
     template <class ... T>
-    using promote_t = typename promote_type<T...>::type;
+    using promote_type_t = typename promote_type<T...>::type;
 
     namespace traits_detail
     {
         using std::sqrt;
 
         template <class T>
-        using real_promote_t = decltype(sqrt(*(std::decay_t<T>*)0));
+        using real_promote_type_t = decltype(sqrt(*(std::decay_t<T>*)0));
     }
 
         /** @brief Result type of algebraic expressions.
@@ -1051,13 +1051,13 @@ namespace xt
     template <class T>
 	struct real_promote_type
 	{
-        using type = traits_detail::real_promote_t<T>;
+        using type = traits_detail::real_promote_type_t<T>;
 	};
 
         /** @brief Abbreviation of 'typename real_promote_type<T>::type'.
         */
     template <class T>
-    using real_promote_t = typename real_promote_type<T>::type;
+    using real_promote_type_t = typename real_promote_type<T>::type;
 
         /** @brief Traits class to replace 'bool' with 'uint8_t' and keep everything else.
 
@@ -1073,7 +1073,7 @@ namespace xt
         /** @brief Abbreviation for typename bool_promote_type<T>::type
         */
     template <class T>
-    using bool_promote_t = typename bool_promote_type<T>::type;
+    using bool_promote_type_t = typename bool_promote_type<T>::type;
 
     /********************************************
      * type inference for norm and squared norm *
@@ -1211,7 +1211,7 @@ namespace xt
         /** Abbreviation of 'typename norm_type<T>::type'.
         */
     template <class T>
-    using norm_t = typename norm_type<T>::type;
+    using norm_type_t = typename norm_type<T>::type;
 
         /** @brief Traits class for the result type of the <tt>norm_sq()</tt> function.
 
@@ -1229,7 +1229,7 @@ namespace xt
            <tt>traits_detail::norm_type_base</tt> template.
         */
     template<class T>
-    struct norm_sq_traits
+    struct squared_norm_type
     : public traits_detail::norm_type_base<T>
     {
         using base_type = traits_detail::norm_type_base<T>;
@@ -1240,10 +1240,10 @@ namespace xt
                         typename base_type::norm_of_scalar::squared_norm_type>::type;
     };
 
-        /** Abbreviation of 'typename norm_sq_traits<T>::type'.
+        /** Abbreviation of 'typename squared_norm_type<T>::type'.
         */
     template <class T>
-    using norm_sq_t = typename norm_sq_traits<T>::type;
+    using squared_norm_type_t = typename squared_norm_type<T>::type;
 }
 
 #endif

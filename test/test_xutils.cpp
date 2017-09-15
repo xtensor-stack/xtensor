@@ -152,36 +152,36 @@ namespace xt
 
     TEST(utils, promote_traits)
     {
-        EXPECT_TRUE((std::is_same<promote_t<uint8_t>, int>::value));
-        EXPECT_TRUE((std::is_same<promote_t<int>, int>::value));
-        EXPECT_TRUE((std::is_same<promote_t<float>, float>::value));
-        EXPECT_TRUE((std::is_same<promote_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<uint8_t>, int>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<float>, float>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<double>, double>::value));
 
-        EXPECT_TRUE((std::is_same<real_promote_t<uint8_t>, double>::value));
-        EXPECT_TRUE((std::is_same<real_promote_t<int>, double>::value));
-        EXPECT_TRUE((std::is_same<real_promote_t<float>, float>::value));
-        EXPECT_TRUE((std::is_same<real_promote_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<real_promote_type_t<uint8_t>, double>::value));
+        EXPECT_TRUE((std::is_same<real_promote_type_t<int>, double>::value));
+        EXPECT_TRUE((std::is_same<real_promote_type_t<float>, float>::value));
+        EXPECT_TRUE((std::is_same<real_promote_type_t<double>, double>::value));
 
-        EXPECT_TRUE((std::is_same<bool_promote_t<bool>, uint8_t>::value));
-        EXPECT_TRUE((std::is_same<bool_promote_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<bool_promote_type_t<bool>, uint8_t>::value));
+        EXPECT_TRUE((std::is_same<bool_promote_type_t<int>, int>::value));
     }
 
     TEST(utils, norm_traits)
     {
-        EXPECT_TRUE((std::is_same<norm_t<uint8_t>, uint8_t>::value));
-        EXPECT_TRUE((std::is_same<norm_t<int>, int>::value));
-        EXPECT_TRUE((std::is_same<norm_t<double>, double>::value));
-        EXPECT_TRUE((std::is_same<norm_t<std::vector<uint8_t>>, double>::value));
-        EXPECT_TRUE((std::is_same<norm_t<std::vector<int>>, double>::value));
-        EXPECT_TRUE((std::is_same<norm_t<std::vector<double>>, double>::value));
-        EXPECT_TRUE((std::is_same<norm_t<std::vector<long double>>, long double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<uint8_t>, uint8_t>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<uint8_t>>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<int>>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<double>>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<long double>>, long double>::value));
 
-        EXPECT_TRUE((std::is_same<norm_sq_t<uint8_t>, int>::value));
-        EXPECT_TRUE((std::is_same<norm_sq_t<int>, int>::value));
-        EXPECT_TRUE((std::is_same<norm_sq_t<double>, double>::value));
-        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<uint8_t>>, uint64_t>::value));
-        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<int>>, uint64_t>::value));
-        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<double>>, double>::value));
-        EXPECT_TRUE((std::is_same<norm_sq_t<std::vector<long double>>, long double>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<uint8_t>, int>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<uint8_t>>, uint64_t>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<int>>, uint64_t>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<double>>, double>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<long double>>, long double>::value));
     }
 }

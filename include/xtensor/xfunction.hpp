@@ -74,7 +74,7 @@ namespace xt
         template <class... Args>
         struct common_value_type
         {
-            using type = promote_t<xvalue_type_t<Args>...>;
+            using type = promote_type_t<xvalue_type_t<Args>...>;
         };
 
         template <class... Args>
