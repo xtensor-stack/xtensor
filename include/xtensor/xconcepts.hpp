@@ -10,7 +10,6 @@
 #define XCONCEPTS_HPP
 
 #include <type_traits>
-#include <cmath>
 
 /*****************************************************
  * concept checking and type inference functionality *
@@ -56,8 +55,16 @@ namespace xt
             Currently, we apply the simple rule that class @tparam T
             is either a pointer or a C-array or has an embedded typedef
             'iterator_category'. More sophisticated checks can easily
-            be added when needed. If @tparam T is an iterator, the class'
-            <tt>value</tt> member is <tt>true</tt>.
+            be added when needed.
+
+            If @tparam T is indeed an iterator, the class' <tt>value</tt> member
+            is <tt>true</tt>:
+            \code
+            template <class T,
+                      XTENSOR_REQUIRE<std::iterator_concept<T>::value>>
+            T foo(T t)
+            {...}
+            \endcode
         */
     template <class T>
     struct iterator_concept
