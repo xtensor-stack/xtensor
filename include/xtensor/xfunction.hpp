@@ -647,7 +647,7 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <std::size_t... I>
-    inline auto xfunction<F, R, CT...>::data_element_impl(std::index_sequence<I...>, size_type i) const ->const_reference
+    inline auto xfunction<F, R, CT...>::data_element_impl(std::index_sequence<I...>, size_type i) const -> const_reference
     {
         return m_f((std::get<I>(m_e).data_element(i))...);
     }

@@ -217,7 +217,7 @@ namespace xt
     }
 
     template <class T, class A>
-    inline uvector< T, A>::uvector(const allocator_type& alloc) noexcept
+    inline uvector<T, A>::uvector(const allocator_type& alloc) noexcept
         : m_allocator(alloc), p_begin(nullptr), p_end(nullptr)
     {
     }

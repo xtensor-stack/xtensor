@@ -428,7 +428,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amax(E&& e, const I(&axes)[N]) noexcept
+    inline auto amax(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = math::maximum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -468,7 +468,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amin(E&& e, const I(&axes)[N]) noexcept
+    inline auto amin(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = math::minimum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);

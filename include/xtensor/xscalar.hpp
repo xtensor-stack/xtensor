@@ -785,13 +785,13 @@ namespace xt
     }
 
     template <class CT>
-    inline auto xscalar<CT>::data_element(size_type) noexcept->reference
+    inline auto xscalar<CT>::data_element(size_type) noexcept -> reference
     {
         return m_value;
     }
-    
+
     template <class CT>
-    inline auto xscalar<CT>::data_element(size_type) const noexcept->const_reference
+    inline auto xscalar<CT>::data_element(size_type) const noexcept -> const_reference
     {
         return m_value;
     }
@@ -893,7 +893,7 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline auto xdummy_iterator<is_const, CT>::operator++(int) noexcept -> self_type
+    inline auto xdummy_iterator<is_const, CT>::operator++(int)noexcept -> self_type
     {
         self_type tmp(*this);
         ++(*this);

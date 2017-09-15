@@ -66,7 +66,7 @@ namespace xt
     /********************************************
      * utility functions for strided containers *
      ********************************************/
-    
+
     template <class C, class It>
     It strided_data_end(const C& c, It end, layout_type l)
     {
@@ -83,7 +83,7 @@ namespace xt
             return end + difference_type(leading_stride - 1);
         }
     }
-     
+
     /******************
      * Implementation *
      ******************/

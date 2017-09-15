@@ -153,7 +153,7 @@ namespace xt
 
         template <layout_type L, class It1, class It2>
         using select_iterator_impl = std::conditional_t<L == static_layout, It1, It2>;
-        
+
         template <layout_type L>
         using select_iterator = select_iterator_impl<L, storage_iterator, layout_iterator<L>>;
         template <layout_type L>
@@ -162,7 +162,7 @@ namespace xt
         using select_reverse_iterator = select_iterator_impl<L, reverse_storage_iterator, reverse_layout_iterator<L>>;
         template <layout_type L>
         using select_const_reverse_iterator = select_iterator_impl<L, const_reverse_storage_iterator, const_reverse_layout_iterator<L>>;
-        
+
         using iterator = select_iterator<DL>;
         using const_iterator = select_const_iterator<DL>;
         using reverse_iterator = select_reverse_iterator<DL>;

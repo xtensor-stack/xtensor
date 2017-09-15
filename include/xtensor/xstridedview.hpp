@@ -652,7 +652,8 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
             using reference = typename xexpression_type::reference;
 
-            expression_adaptor(CT&& e) : m_e(e)
+            expression_adaptor(CT&& e)
+                : m_e(e)
             {
                 resize_container(m_index, m_e.dimension());
                 m_size = compute_size(m_e.shape());
@@ -664,7 +665,7 @@ namespace xt
                 std::div_t dv{};
                 for (size_type i = 0; i < m_strides.size(); ++i)
                 {
-                    dv = std::div((int) idx, (int) m_strides[i]);
+                    dv = std::div((int)idx, (int)m_strides[i]);
                     idx = static_cast<std::size_t>(dv.rem);
                     m_index[i] = dv.quot;
                 }

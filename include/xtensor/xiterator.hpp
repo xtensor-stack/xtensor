@@ -9,8 +9,8 @@
 #ifndef XITERATOR_HPP
 #define XITERATOR_HPP
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <vector>
@@ -458,7 +458,7 @@ namespace xt
                 index[i] = shape[i] - 1;
                 if (i != 0)
                 {
-                     stepper.reset_back(i);
+                    stepper.reset_back(i);
                 }
             }
         }
@@ -673,7 +673,7 @@ namespace xt
     {
         if (reverse)
         {
-            auto iter_begin = (L == layout_type::row_major)  ? m_index.begin() : m_index.begin() + 1;
+            auto iter_begin = (L == layout_type::row_major) ? m_index.begin() : m_index.begin() + 1;
             auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
             std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
         }
