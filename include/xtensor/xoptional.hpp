@@ -580,95 +580,95 @@ namespace xt
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator+(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() + e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator+(const T1& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 + e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator+(const xoptional<T1, B1>& e1, const T2& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() + e2 : missing<value_type>();
     }
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator-(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() - e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator-(const T1& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 - e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator-(const xoptional<T1, B1>& e1, const T2& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() - e2 : missing<value_type>();
     }
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator*(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() * e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator*(const T1& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 * e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator*(const xoptional<T1, B1>& e1, const T2& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() * e2 : missing<value_type>();
     }
 
     template <class T1, class B1, class T2, class B2>
     inline auto operator/(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2) noexcept
-        -> xoptional<std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+        -> xoptional<promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() && e2.has_value() ? e1.value() / e2.value() : missing<value_type>();
     }
 
     template <class T1, class T2, class B2>
     inline auto operator/(const T1& e1, const xoptional<T2, B2>& e2) noexcept
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e2.has_value() ? e1 / e2.value() : missing<value_type>();
     }
 
     template <class T1, class B1, class T2>
     inline auto operator/(const xoptional<T1, B1>& e1, const T2& e2) noexcept
     {
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        using value_type = promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
         return e1.has_value() ? e1.value() / e2 : missing<value_type>();
     }
 
@@ -833,7 +833,7 @@ namespace xt
     inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2)                    \
     {                                                                              \
         using std::NAME;                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>; \
+        using value_type = decltype(NAME(e1.value(), e2));                         \
         return e1.has_value() ? NAME(e1.value(), e2) : missing<value_type>();      \
     }
 
@@ -843,7 +843,7 @@ namespace xt
     inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2)                    \
     {                                                                              \
         using std::NAME;                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>; \
+        using value_type = decltype(NAME(e1, e2.value()));                         \
         return e2.has_value() ? NAME(e1, e2.value()) : missing<value_type>();      \
     }
 
@@ -852,7 +852,7 @@ namespace xt
     inline auto NAME(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2)                          \
     {                                                                                                   \
         using std::NAME;                                                                                \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;                      \
+        using value_type = decltype(NAME(e1.value(), e2.value()));                                      \
         return e1.has_value() && e2.has_value() ? NAME(e1.value(), e2.value()) : missing<value_type>(); \
     }
 
@@ -866,7 +866,7 @@ namespace xt
     inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2, const T3& e3)                        \
     {                                                                                                \
         using std::NAME;                                                                             \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
+        using value_type = decltype(NAME(e1.value(), e2, e3));                                       \
         return e1.has_value() ? NAME(e1.value(), e2, e3) : missing<value_type>();                    \
     }
 
@@ -875,7 +875,7 @@ namespace xt
     inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2, const T3& e3)                        \
     {                                                                                                \
         using std::NAME;                                                                             \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
+        using value_type = decltype(NAME(e1, e2.value(), e3));                                       \
         return e2.has_value() ? NAME(e1, e2.value(), e3) : missing<value_type>();                    \
     }
 
@@ -884,7 +884,7 @@ namespace xt
     inline auto NAME(const T1& e1, const T2& e2, const xoptional<T3, B3>& e3)                        \
     {                                                                                                \
         using std::NAME;                                                                             \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
+        using value_type = decltype(NAME(e1, e2, e3.value()));                                       \
         return e3.has_value() ? NAME(e1, e2, e3.value()) : missing<value_type>();                    \
     }
 
@@ -893,7 +893,7 @@ namespace xt
     inline auto NAME(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2, const T3& e3)                  \
     {                                                                                                         \
         using std::NAME;                                                                                      \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;          \
+        using value_type = decltype(NAME(e1.value(), e2.value(), e3));                                        \
         return (e1.has_value() && e2.has_value()) ? NAME(e1.value(), e2.value(), e3) : missing<value_type>(); \
     }
 
@@ -902,7 +902,7 @@ namespace xt
     inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2, const xoptional<T3, B3>& e3)                  \
     {                                                                                                         \
         using std::NAME;                                                                                      \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;          \
+        using value_type = decltype(NAME(e1.value(), e2, e3.value()));                                        \
         return (e1.has_value() && e3.has_value()) ? NAME(e1.value(), e2, e3.value()) : missing<value_type>(); \
     }
 
@@ -911,7 +911,7 @@ namespace xt
     inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2, const xoptional<T3, B3>& e3)                  \
     {                                                                                                         \
         using std::NAME;                                                                                      \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;          \
+        using value_type = decltype(NAME(e1, e2.value(), e3.value()));                                        \
         return (e2.has_value() && e3.has_value()) ? NAME(e1, e2.value(), e3.value()) : missing<value_type>(); \
     }
 
@@ -920,7 +920,7 @@ namespace xt
     inline auto NAME(const xoptional<T1, B1>& e1, const xoptional<T2, B2>& e2, const xoptional<T3, B3>& e3)                             \
     {                                                                                                                                   \
         using std::NAME;                                                                                                                \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                    \
+        using value_type = decltype(NAME(e1.value(), e2.value(), e3.value()));                                                          \
         return (e1.has_value() && e2.has_value() && e3.has_value()) ? NAME(e1.value(), e2.value(), e3.value()) : missing<value_type>(); \
     }
 

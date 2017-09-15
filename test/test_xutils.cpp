@@ -149,4 +149,39 @@ namespace xt
         EXPECT_EQ(forward_imag(rlv), 0.0);
         EXPECT_EQ(forward_real(rlv), 1.0);
     }
+
+    TEST(utils, promote_traits)
+    {
+        EXPECT_TRUE((std::is_same<promote_type_t<uint8_t>, int>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<float>, float>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<double>, double>::value));
+
+        EXPECT_TRUE((std::is_same<real_promote_type_t<uint8_t>, double>::value));
+        EXPECT_TRUE((std::is_same<real_promote_type_t<int>, double>::value));
+        EXPECT_TRUE((std::is_same<real_promote_type_t<float>, float>::value));
+        EXPECT_TRUE((std::is_same<real_promote_type_t<double>, double>::value));
+
+        EXPECT_TRUE((std::is_same<bool_promote_type_t<bool>, uint8_t>::value));
+        EXPECT_TRUE((std::is_same<bool_promote_type_t<int>, int>::value));
+    }
+
+    TEST(utils, norm_traits)
+    {
+        EXPECT_TRUE((std::is_same<norm_type_t<uint8_t>, uint8_t>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<uint8_t>>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<int>>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<double>>, double>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<std::vector<long double>>, long double>::value));
+
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<uint8_t>, int>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<int>, int>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<uint8_t>>, uint64_t>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<int>>, uint64_t>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<double>>, double>::value));
+        EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<long double>>, long double>::value));
+    }
 }
