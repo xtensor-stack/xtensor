@@ -185,7 +185,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Absolute value function.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise absolute value
      * of \em e.
      * @param e an \ref xexpression
@@ -201,7 +201,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Absolute value function.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise absolute value
      * of \em e.
      * @param e an \ref xexpression
@@ -217,7 +217,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Remainder of the floating point division operation.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise remainder of
      * the floating point division operation <em>e1 / e2</em>.
      * @param e1 an \ref xexpression or a scalar
@@ -235,7 +235,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Signed remainder of the division operation.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise signed remainder
      * of the floating point division operation <em>e1 / e2</em>.
      * @param e1 an \ref xexpression or a scalar
@@ -478,8 +478,8 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Clip values between hi and lo
-     * 
-     * Returns an \ref xfunction for the element-wise clipped 
+     *
+     * Returns an \ref xfunction for the element-wise clipped
      * values between lo and hi
      * @param e1 an \ref xexpression or a scalar
      * @param lo a scalar
@@ -701,7 +701,7 @@ namespace xt
      * @ingroup pow_functions
      * @brief Square root function.
      *
-     * Returns an \ref xfunction for the element-wise square 
+     * Returns an \ref xfunction for the element-wise square
      * root of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
@@ -1242,11 +1242,18 @@ namespace xt
 
             bool operator()(const T& a, const T& b) const
             {
-                if (m_equal_nan && std::isnan(a) && std::isnan(b))
+                using std::abs;
+
+                if(std::isnan(a) && std::isnan(b))
                 {
-                    return true;
+                    return m_equal_nan;
                 }
-                return std::abs(a - b) <= (m_atol + m_rtol * std::abs(b));
+                if(std::isinf(a) && std::isinf(b))
+                {
+                    return std::signbit(a) == std::signbit(b);
+                }
+                auto d = abs(a - b);
+                return d <= m_atol || d <= m_rtol * std::max(abs(a), abs(b));
             }
 
         private:
