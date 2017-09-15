@@ -30,6 +30,7 @@ namespace xt
     TEST(concepts, iterator_concept)
     {
         EXPECT_FALSE((iterator_concept<int>::value));
+        EXPECT_TRUE((iterator_concept<int[3]>::value));
         EXPECT_TRUE((iterator_concept<int *>::value));
         EXPECT_TRUE((iterator_concept<decltype(std::vector<int>().begin())>::value));
     }
