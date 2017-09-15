@@ -20,6 +20,7 @@
 #include <type_traits>
 
 #include "xconcepts.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
@@ -134,19 +135,17 @@ namespace xt
     } // namespace cmath
 
 
-    /**********************************************************/
-    /*                                                        */
-    /*                       isclose()                        */
-    /*                                                        */
-    /**********************************************************/
+    /*************
+     * isclose() *
+     *************/
 
     template <class U, class V,
-              XTENSOR_REQUIRE<std::is_floating_point<promote_t<U, V> >::value> >
+              XTENSOR_REQUIRE<std::is_arithmetic<U>::value && std::is_arithmetic<V>::value> >
     inline bool
     isclose(U u, V v, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false)
     {
         using namespace cmath;
-        using P = promote_t<U, V>;
+        using P = real_promote_t<promote_t<U, V>>;
         P a = static_cast<P>(u),
           b = static_cast<P>(v);
 
@@ -162,11 +161,9 @@ namespace xt
         return d <= atol || d <= rtol * std::max(abs(a), abs(b));
     }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                          sq()                          */
-    /*                                                        */
-    /**********************************************************/
+    /********
+     * sq() *
+     ********/
 
         /** \brief The square function.
 
@@ -180,38 +177,9 @@ namespace xt
         return t*t;
     }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                           dot()                        */
-    /*                                                        */
-    /**********************************************************/
-
-        // scalar dot is needed for generic functions that should work with
-        // scalars and vectors alike
-    #define XTENSOR_DEFINE_SCALAR_DOT(T) \
-        inline auto dot(T l, T r) { return l*r; }
-
-    XTENSOR_DEFINE_SCALAR_DOT(unsigned char)
-    XTENSOR_DEFINE_SCALAR_DOT(unsigned short)
-    XTENSOR_DEFINE_SCALAR_DOT(unsigned int)
-    XTENSOR_DEFINE_SCALAR_DOT(unsigned long)
-    XTENSOR_DEFINE_SCALAR_DOT(unsigned long long)
-    XTENSOR_DEFINE_SCALAR_DOT(signed char)
-    XTENSOR_DEFINE_SCALAR_DOT(signed short)
-    XTENSOR_DEFINE_SCALAR_DOT(signed int)
-    XTENSOR_DEFINE_SCALAR_DOT(signed long)
-    XTENSOR_DEFINE_SCALAR_DOT(signed long long)
-    XTENSOR_DEFINE_SCALAR_DOT(float)
-    XTENSOR_DEFINE_SCALAR_DOT(double)
-    XTENSOR_DEFINE_SCALAR_DOT(long double)
-
-    #undef XTENSOR_DEFINE_SCALAR_DOT
-
-    /**********************************************************/
-    /*                                                        */
-    /*                         min()                          */
-    /*                                                        */
-    /**********************************************************/
+    /*********
+     * min() *
+     *********/
 
         /** \brief A proper minimum function.
 
@@ -238,11 +206,9 @@ namespace xt
         return std::min(t1, t2);
     }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                         max()                          */
-    /*                                                        */
-    /**********************************************************/
+    /*********
+     * max() *
+     *********/
 
         /** \brief A proper maximum function.
 
@@ -269,11 +235,9 @@ namespace xt
         return std::max(t1, t2);
     }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                       even(), odd()                    */
-    /*                                                        */
-    /**********************************************************/
+    /********************
+     * even() and odd() *
+     ********************/
 
         /** \brief Check if an integer is even.
         */
@@ -297,11 +261,9 @@ namespace xt
         return (static_cast<UT>(t)&1) != 0;
     }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                   sin_pi(), cos_pi()                   */
-    /*                                                        */
-    /**********************************************************/
+    /**********************
+     * sin_pi(), cos_pi() *
+     **********************/
 
         /** \brief sin(pi*x).
 
@@ -364,11 +326,9 @@ namespace xt
         return sin_pi(x+0.5);
     }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                        norm_l2()                       */
-    /*                                                        */
-    /**********************************************************/
+    /******************
+     * norm functions *
+     ******************/
 
         /** \brief The L2-norm of a numerical object.
 
@@ -382,12 +342,21 @@ namespace xt
         return sqrt(norm_sq(t));
     }
 
-    /**********************************************************/
-    /*                                                        */
-    /*                        norm_sq()                       */
-    /*                                                        */
-    /**********************************************************/
+        /** \brief The infinity norm of a numerical object.
 
+            Defined as an alias for <tt>norm_max()</tt>.
+        */
+    template <class T>
+    inline auto norm_linf(T const & t)
+    {
+        return norm_max(l);
+    }
+
+        /** \brief Squared norm of a complex number.
+
+            Equivalent to <tt>std::norm(t)</tt> (yes, the C++ standard really defines
+            <tt>norm()</tt> to compute the squared norm).
+        */
     template <class T>
     inline auto
     norm_sq(std::complex<T> const & t)
@@ -395,13 +364,21 @@ namespace xt
         return std::norm(t);
     }
 
-    #define XTENSOR_DEFINE_NORM(T)                                   \
-        inline size_t norm_l0(T t)     { return t != 0 ? 1 : 0; }    \
-        inline auto   norm_l1(T t)     { return cmath::abs(t); }     \
-        inline auto   norm_l2(T t)     { return cmath::abs(t); }     \
-        inline auto   norm_max(T t)    { return cmath::abs(t); }     \
-        inline auto   norm_sq(T t)     { return sq(t); }             \
-        inline auto   mean_square(T t) { return sq(t); }
+    #define XTENSOR_DEFINE_NORM(T)                                         \
+        inline auto     norm_lp(T t, int p) -> decltype(cmath::abs(t))     \
+                        {                                                  \
+                            return p == 0                                  \
+                                      ? t != 0                             \
+                                          ? 1                              \
+                                          : 0                              \
+                                      : cmath::abs(t);                     \
+                        }                                                  \
+        inline size_t   norm_l0(T t)         { return t != 0 ? 1 : 0; }    \
+        inline auto     norm_l1(T t)         { return cmath::abs(t); }     \
+        inline auto     norm_l2(T t)         { return cmath::abs(t); }     \
+        inline auto     norm_max(T t)        { return cmath::abs(t); }     \
+        inline auto     norm_sq(T t)         { return sq(t); }             \
+        inline auto     mean_square(T t)     { return sq(t); }
 
     XTENSOR_DEFINE_NORM(signed char)
     XTENSOR_DEFINE_NORM(unsigned char)

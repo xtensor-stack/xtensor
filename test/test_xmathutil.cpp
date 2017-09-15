@@ -51,8 +51,6 @@ namespace xt
     {
         EXPECT_EQ(sq(2), 4);
         EXPECT_EQ(sq(1.5), 2.25);
-        EXPECT_EQ(dot(2, 3), 6);
-        EXPECT_EQ(dot(1.5, 2.5), 3.75);
 
         EXPECT_EQ(min(1.5, 2), 1.5);
         EXPECT_EQ(max(1.5, 2), 2.0);
@@ -93,6 +91,11 @@ namespace xt
         EXPECT_EQ(norm_sq(-2), 4);
         EXPECT_EQ(norm_sq(2.5), 6.25);
         EXPECT_EQ(norm_sq(-2.5), 6.25);
+
+        EXPECT_EQ(norm_lp(0, 0), 0);
+        EXPECT_EQ(norm_lp(2, 0), 1);
+        EXPECT_EQ(norm_lp(0, 1), 0);
+        EXPECT_EQ(norm_lp(2, 1), 2);
 
         std::complex<double> c{ 2.0, 3.0 };
 //        EXPECT_EQ(norm_sq(c), 13.0);
