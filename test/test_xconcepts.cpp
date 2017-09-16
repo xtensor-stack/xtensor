@@ -9,10 +9,8 @@
 #include "gtest/gtest.h"
 #include "xtensor/xconcepts.hpp"
 
-#include <type_traits>
-
 namespace xt
-{
+{    
     template <class T,
               XTENSOR_REQUIRE<std::is_integral<T>::value>>
     int test_concept_check(T) {}
@@ -29,10 +27,22 @@ namespace xt
 
     TEST(concepts, iterator_concept)
     {
-        EXPECT_FALSE((iterator_concept<int>::value));
-        EXPECT_TRUE((iterator_concept<int[3]>::value));
-        EXPECT_TRUE((iterator_concept<int *>::value));
-        EXPECT_TRUE((iterator_concept<decltype(std::vector<int>().begin())>::value));
+        {
+            bool is_iter = iterator_concept<int>::value;
+            EXPECT_FALSE(is_iter);
+        }
+        {
+            bool is_iter = iterator_concept<int[3]>::value;
+            EXPECT_TRUE(is_iter);
+        }
+        {
+            bool is_iter = iterator_concept<int *>::value;
+            EXPECT_TRUE(is_iter);
+        }
+        {
+            bool is_iter = iterator_concept<decltype(std::vector<int>().begin())>::value;
+            EXPECT_TRUE(is_iter);
+        }
     }
 
 } // namespace xt
