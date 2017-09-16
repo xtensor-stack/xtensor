@@ -257,8 +257,21 @@ namespace xt
     template <class E>
     using is_xscalar = detail::is_xscalar_impl<E>;
 
+    namespace detail
+    {
+        template <class... E>
+        struct all_xscalar
+        {
+            static constexpr bool value = and_<is_xscalar<std::decay_t<E>>...>::value;
+        };
+    }
+
+    // Note: MSVC bug workaround. Cannot just define 
+    // template <class... E>
+    // using all_xscalar = and_<is_xscalar<std::decay_t<E>>...>;
+
     template <class... E>
-    using all_xscalar = and_<is_xscalar<std::decay_t<E>>...>;
+    using all_xscalar = detail::all_xscalar<E...>;
 
     /******************
      * xref and xcref *
