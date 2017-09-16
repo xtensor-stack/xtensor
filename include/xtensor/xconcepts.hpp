@@ -61,7 +61,7 @@ namespace xt
             is <tt>true</tt>:
             \code
             template <class T,
-                      XTENSOR_REQUIRE<std::iterator_concept<T>::value>>
+                      XTENSOR_REQUIRE<iterator_concept<T>::value>>
             T foo(T t)
             {...}
             \endcode
