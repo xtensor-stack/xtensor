@@ -42,7 +42,7 @@ namespace xt
             {...}
             \endcode
         */
-    #define XTENSOR_REQUIRE typename Require = concept_check
+    #define XTENSOR_REQUIRE typename = concept_check
 
     /********************
      * iterator_concept *
