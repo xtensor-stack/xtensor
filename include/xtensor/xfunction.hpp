@@ -122,6 +122,7 @@ namespace xt
     public:
 
         using self_type = xfunction<F, R, CT...>;
+        using only_scalar = all_xscalar<CT...>;
         using functor_type = typename std::remove_reference<F>::type;
 
         using value_type = R;
@@ -226,6 +227,9 @@ namespace xt
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
         const_reference data_element(size_type i) const;
+
+        template <class UT = self_type, class = typename std::enable_if<UT::only_scalar::value>::type>
+        operator value_type() const;
 
     private:
 
@@ -622,6 +626,13 @@ namespace xt
     inline auto xfunction<F, R, CT...>::data_element(size_type i) const -> const_reference
     {
         return data_element_impl(std::make_index_sequence<sizeof...(CT)>(), i);
+    }
+
+    template <class F, class R, class... CT>
+    template <class UT, class>
+    inline xfunction<F, R, CT...>::operator value_type() const
+    {
+        return operator()();
     }
 
     template <class F, class R, class... CT>

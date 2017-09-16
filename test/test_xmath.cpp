@@ -487,4 +487,13 @@ namespace xt
         EXPECT_FALSE(isclose(a, b)(0, 0));
         EXPECT_TRUE(isclose(a, b, 1, 1, true)(0, 0));
     }
+
+    TEST(xmath, scalar_cast)
+    {
+        double arg = 1.0;
+        double res = ::xt::atan(xscalar<double>(arg));
+        EXPECT_EQ(res, std::atan(arg));
+        bool close = ::xt::isclose(1.0, 1.0);
+        EXPECT_EQ(close, true);
+    }
 }

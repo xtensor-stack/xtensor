@@ -241,6 +241,29 @@ namespace xt
     };
 #undef DL
 
+    namespace detail
+    {
+        template <class E>
+        struct is_xscalar_impl : std::false_type
+        {
+        };
+
+        template <class E>
+        struct is_xscalar_impl<xscalar<E>> : std::true_type
+        {
+        };
+    }
+
+    template <class E>
+    using is_xscalar = detail::is_xscalar_impl<E>;
+
+    template <class... E>
+    using all_xscalar = and_<is_xscalar<std::decay_t<E>>...>;
+
+    /******************
+     * xref and xcref *
+     ******************/
+
     template <class T>
     xscalar<T&> xref(T& t);
 

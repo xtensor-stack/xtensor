@@ -51,12 +51,14 @@ namespace xt
             using type = bool;
         };
     }
+
 #define UNARY_MATH_FUNCTOR(NAME)                   \
     template <class T>                             \
     struct NAME##_fun                              \
     {                                              \
         using argument_type = T;                   \
         using result_type = T;                     \
+                                                   \
         constexpr T operator()(const T& arg) const \
         {                                          \
             using std::NAME;                       \
@@ -70,6 +72,7 @@ namespace xt
     {                                                        \
         using argument_type = T;                             \
         using result_type = complex_value_type_t<T>;         \
+                                                             \
         constexpr result_type operator()(const T& arg) const \
         {                                                    \
             using std::NAME;                                 \
@@ -84,6 +87,7 @@ namespace xt
         using first_argument_type = T;                             \
         using second_argument_type = T;                            \
         using result_type = T;                                     \
+                                                                   \
         constexpr T operator()(const T& arg1, const T& arg2) const \
         {                                                          \
             using std::NAME;                                       \
@@ -99,6 +103,7 @@ namespace xt
         using second_argument_type = T;                                           \
         using third_argument_type = T;                                            \
         using result_type = T;                                                    \
+                                                                                  \
         constexpr T operator()(const T& arg1, const T& arg2, const T& arg3) const \
         {                                                                         \
             using std::NAME;                                                      \
@@ -112,6 +117,7 @@ namespace xt
     {                                                                               \
         using argument_type = T;                                                    \
         using result_type = typename xt::detail::bool_functor_return_type<T>::type; \
+                                                                                    \
         constexpr result_type operator()(const T& arg) const                        \
         {                                                                           \
             using std::NAME;                                                        \
