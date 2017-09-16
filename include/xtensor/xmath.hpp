@@ -51,12 +51,14 @@ namespace xt
             using type = bool;
         };
     }
+
 #define UNARY_MATH_FUNCTOR(NAME)                   \
     template <class T>                             \
     struct NAME##_fun                              \
     {                                              \
         using argument_type = T;                   \
         using result_type = T;                     \
+                                                   \
         constexpr T operator()(const T& arg) const \
         {                                          \
             using std::NAME;                       \
@@ -70,6 +72,7 @@ namespace xt
     {                                                        \
         using argument_type = T;                             \
         using result_type = complex_value_type_t<T>;         \
+                                                             \
         constexpr result_type operator()(const T& arg) const \
         {                                                    \
             using std::NAME;                                 \
@@ -84,6 +87,7 @@ namespace xt
         using first_argument_type = T;                             \
         using second_argument_type = T;                            \
         using result_type = T;                                     \
+                                                                   \
         constexpr T operator()(const T& arg1, const T& arg2) const \
         {                                                          \
             using std::NAME;                                       \
@@ -99,6 +103,7 @@ namespace xt
         using second_argument_type = T;                                           \
         using third_argument_type = T;                                            \
         using result_type = T;                                                    \
+                                                                                  \
         constexpr T operator()(const T& arg1, const T& arg2, const T& arg3) const \
         {                                                                         \
             using std::NAME;                                                      \
@@ -112,6 +117,7 @@ namespace xt
     {                                                                               \
         using argument_type = T;                                                    \
         using result_type = typename xt::detail::bool_functor_return_type<T>::type; \
+                                                                                    \
         constexpr result_type operator()(const T& arg) const                        \
         {                                                                           \
             using std::NAME;                                                        \
@@ -428,7 +434,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amax(E&& e, const I(&axes)[N]) noexcept
+    inline auto amax(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = math::maximum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -468,7 +474,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amin(E&& e, const I(&axes)[N]) noexcept
+    inline auto amin(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = math::minimum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);

@@ -14,8 +14,8 @@
 #define XBUILDER_HPP
 
 #include <array>
-#include <cstddef>
 #include <cmath>
+#include <cstddef>
 #include <functional>
 #include <utility>
 #include <vector>

@@ -241,6 +241,42 @@ namespace xt
     };
 #undef DL
 
+    namespace detail
+    {
+        template <class E>
+        struct is_xscalar_impl : std::false_type
+        {
+        };
+
+        template <class E>
+        struct is_xscalar_impl<xscalar<E>> : std::true_type
+        {
+        };
+    }
+
+    template <class E>
+    using is_xscalar = detail::is_xscalar_impl<E>;
+
+    namespace detail
+    {
+        template <class... E>
+        struct all_xscalar
+        {
+            static constexpr bool value = and_<is_xscalar<std::decay_t<E>>...>::value;
+        };
+    }
+
+    // Note: MSVC bug workaround. Cannot just define 
+    // template <class... E>
+    // using all_xscalar = and_<is_xscalar<std::decay_t<E>>...>;
+
+    template <class... E>
+    using all_xscalar = detail::all_xscalar<E...>;
+
+    /******************
+     * xref and xcref *
+     ******************/
+
     template <class T>
     xscalar<T&> xref(T& t);
 
@@ -785,13 +821,13 @@ namespace xt
     }
 
     template <class CT>
-    inline auto xscalar<CT>::data_element(size_type) noexcept->reference
+    inline auto xscalar<CT>::data_element(size_type) noexcept -> reference
     {
         return m_value;
     }
-    
+
     template <class CT>
-    inline auto xscalar<CT>::data_element(size_type) const noexcept->const_reference
+    inline auto xscalar<CT>::data_element(size_type) const noexcept -> const_reference
     {
         return m_value;
     }
@@ -893,7 +929,7 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline auto xdummy_iterator<is_const, CT>::operator++(int) noexcept -> self_type
+    inline auto xdummy_iterator<is_const, CT>::operator++(int)noexcept -> self_type
     {
         self_type tmp(*this);
         ++(*this);

@@ -81,4 +81,12 @@ namespace xt
         xarray<int> b = a + 5;
         EXPECT_EQ(ref, b);
     }
+
+    TEST(xscalar, all_scalar)
+    {
+        auto tr = all_xscalar<xscalar<double>, xscalar<int>>::value;
+        EXPECT_TRUE(tr);
+        auto fa = all_xscalar<xscalar<double>, xarray<int>>::value;
+        EXPECT_FALSE(fa);
+    }
 }

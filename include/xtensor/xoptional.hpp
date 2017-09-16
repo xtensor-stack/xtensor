@@ -12,8 +12,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "xtensor/xutils.hpp"
 #include "xtensor/xmath.hpp"
+#include "xtensor/xutils.hpp"
 
 namespace xt
 {
@@ -153,20 +153,20 @@ namespace xt
 
         // Access
         std::add_lvalue_reference_t<CT> value() & noexcept;
-        std::add_lvalue_reference_t<std::add_const_t<CT>> value() const& noexcept;
+        std::add_lvalue_reference_t<std::add_const_t<CT>> value() const & noexcept;
         std::conditional_t<std::is_reference<CT>::value, apply_cv_t<CT, value_type>&, value_type> value() && noexcept;
-        std::conditional_t<std::is_reference<CT>::value, const value_type&, value_type> value() const&& noexcept;
+        std::conditional_t<std::is_reference<CT>::value, const value_type&, value_type> value() const && noexcept;
 
         template <class U>
-        value_type value_or(U&&) const& noexcept;
+        value_type value_or(U&&) const & noexcept;
         template <class U>
-        value_type value_or(U&&) const&& noexcept;
+        value_type value_or(U&&) const && noexcept;
 
         // Access
         std::add_lvalue_reference_t<CB> has_value() & noexcept;
-        std::add_lvalue_reference_t<std::add_const_t<CB>> has_value() const& noexcept;
+        std::add_lvalue_reference_t<std::add_const_t<CB>> has_value() const & noexcept;
         std::conditional_t<std::is_reference<CB>::value, apply_cv_t<CB, flag_type>&, flag_type> has_value() && noexcept;
-        std::conditional_t<std::is_reference<CB>::value, const flag_type&, flag_type> has_value() const&& noexcept;
+        std::conditional_t<std::is_reference<CB>::value, const flag_type&, flag_type> has_value() const && noexcept;
 
         // Swap
         void swap(xoptional& other);
@@ -828,23 +828,23 @@ namespace xt
         return e.has_value() ? bool(NAME(e.value())) : missing<bool>(); \
     }
 
-#define BINARY_OPTIONAL_1(NAME)                                                    \
-    template <class T1, class B1, class T2>                                        \
-    inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2)                    \
-    {                                                                              \
-        using std::NAME;                                                           \
-        using value_type = decltype(NAME(e1.value(), e2));                         \
-        return e1.has_value() ? NAME(e1.value(), e2) : missing<value_type>();      \
+#define BINARY_OPTIONAL_1(NAME)                                               \
+    template <class T1, class B1, class T2>                                   \
+    inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2)               \
+    {                                                                         \
+        using std::NAME;                                                      \
+        using value_type = decltype(NAME(e1.value(), e2));                    \
+        return e1.has_value() ? NAME(e1.value(), e2) : missing<value_type>(); \
     }
 
 
-#define BINARY_OPTIONAL_2(NAME)                                                    \
-    template <class T1, class T2, class B2>                                        \
-    inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2)                    \
-    {                                                                              \
-        using std::NAME;                                                           \
-        using value_type = decltype(NAME(e1, e2.value()));                         \
-        return e2.has_value() ? NAME(e1, e2.value()) : missing<value_type>();      \
+#define BINARY_OPTIONAL_2(NAME)                                               \
+    template <class T1, class T2, class B2>                                   \
+    inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2)               \
+    {                                                                         \
+        using std::NAME;                                                      \
+        using value_type = decltype(NAME(e1, e2.value()));                    \
+        return e2.has_value() ? NAME(e1, e2.value()) : missing<value_type>(); \
     }
 
 #define BINARY_OPTIONAL_12(NAME)                                                                        \
@@ -861,31 +861,31 @@ namespace xt
     BINARY_OPTIONAL_2(NAME)   \
     BINARY_OPTIONAL_12(NAME)
 
-#define TERNARY_OPTIONAL_1(NAME)                                                                     \
-    template <class T1, class B1, class T2, class T3>                                                \
-    inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2, const T3& e3)                        \
-    {                                                                                                \
-        using std::NAME;                                                                             \
-        using value_type = decltype(NAME(e1.value(), e2, e3));                                       \
-        return e1.has_value() ? NAME(e1.value(), e2, e3) : missing<value_type>();                    \
+#define TERNARY_OPTIONAL_1(NAME)                                                  \
+    template <class T1, class B1, class T2, class T3>                             \
+    inline auto NAME(const xoptional<T1, B1>& e1, const T2& e2, const T3& e3)     \
+    {                                                                             \
+        using std::NAME;                                                          \
+        using value_type = decltype(NAME(e1.value(), e2, e3));                    \
+        return e1.has_value() ? NAME(e1.value(), e2, e3) : missing<value_type>(); \
     }
 
-#define TERNARY_OPTIONAL_2(NAME)                                                                     \
-    template <class T1, class T2, class B2, class T3>                                                \
-    inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2, const T3& e3)                        \
-    {                                                                                                \
-        using std::NAME;                                                                             \
-        using value_type = decltype(NAME(e1, e2.value(), e3));                                       \
-        return e2.has_value() ? NAME(e1, e2.value(), e3) : missing<value_type>();                    \
+#define TERNARY_OPTIONAL_2(NAME)                                                  \
+    template <class T1, class T2, class B2, class T3>                             \
+    inline auto NAME(const T1& e1, const xoptional<T2, B2>& e2, const T3& e3)     \
+    {                                                                             \
+        using std::NAME;                                                          \
+        using value_type = decltype(NAME(e1, e2.value(), e3));                    \
+        return e2.has_value() ? NAME(e1, e2.value(), e3) : missing<value_type>(); \
     }
 
-#define TERNARY_OPTIONAL_3(NAME)                                                                     \
-    template <class T1, class T2, class T3, class B3>                                                \
-    inline auto NAME(const T1& e1, const T2& e2, const xoptional<T3, B3>& e3)                        \
-    {                                                                                                \
-        using std::NAME;                                                                             \
-        using value_type = decltype(NAME(e1, e2, e3.value()));                                       \
-        return e3.has_value() ? NAME(e1, e2, e3.value()) : missing<value_type>();                    \
+#define TERNARY_OPTIONAL_3(NAME)                                                  \
+    template <class T1, class T2, class T3, class B3>                             \
+    inline auto NAME(const T1& e1, const T2& e2, const xoptional<T3, B3>& e3)     \
+    {                                                                             \
+        using std::NAME;                                                          \
+        using value_type = decltype(NAME(e1, e2, e3.value()));                    \
+        return e3.has_value() ? NAME(e1, e2, e3.value()) : missing<value_type>(); \
     }
 
 #define TERNARY_OPTIONAL_12(NAME)                                                                             \

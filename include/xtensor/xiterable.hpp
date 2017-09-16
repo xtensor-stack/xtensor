@@ -819,7 +819,6 @@ namespace xt
     {
         return *static_cast<derived_type*>(this);
     }
-
 }
 
 #endif
