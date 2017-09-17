@@ -308,9 +308,18 @@ xtensor-blas
 
 The xtensor-blas_ project is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the FLENS project. ``xtensor-blas`` powers the ``xt::linalg`` functionalities, which are the counterpart to numpy's ``linalg`` module.
 
+xtensor-fftw
+------------
+
+.. image:: xtensor-fftw.svg
+   :alt: xtensor-fftw
+
+The xtensor-fftw_ project is an extension to the xtensor library, offering bindings to the fftw library.  ``xtensor-fftw`` powers the ``xt::fftw`` functionalities, which are the counterpart to numpy's ``fft`` module.
+
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
 .. _xtensor-julia-cookiecutter: https://github.com/QuantStack/xtensor-julia-cookiecutter
 .. _xtensor-r: https://github.com/QuantStack/xtensor-r
 .. _xtensor-blas: https://github.com/QuantStack/xtensor-blas
+.. _xtensor-fftw: https://github.com/egpbos/xtensor-fftw
