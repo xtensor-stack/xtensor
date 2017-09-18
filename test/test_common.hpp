@@ -319,6 +319,20 @@ namespace xt
         }
     }
 
+    template <class V1, class V2>
+    void safe_assign_array(V1& dst, const V2& src)
+    {
+        for (std::size_t i = 0; i < dst.shape()[0]; ++i)
+        {
+            for (std::size_t j = 0; j < dst.shape()[1]; ++j)
+            {
+                for (std::size_t k = 0; k < dst.shape()[2]; ++k)
+                {
+                    dst.at(i, j, k) = src[i][j][k];
+                }
+            }
+        }
+    }
     template <class V>
     void test_bound_check(V& vec)
     {
@@ -327,6 +341,13 @@ namespace xt
 #else
         (void)vec;
 #endif
+    }
+
+    template <class V>
+    void test_access_check(V& vec)
+    {
+        EXPECT_ANY_THROW(vec.at(10, 10, 10));
+        EXPECT_ANY_THROW(vec.at(0, 0, 0, 0, 0, 0));
     }
 
     template <class V, class C = std::vector<std::size_t>>
@@ -374,6 +395,46 @@ namespace xt
             EXPECT_EQ(vec(0, 1, 0), vec(1, 0));
             EXPECT_EQ(vec(2, 0, 3), vec(2, 2, 2, 0, 3));
             test_bound_check(vec);
+        }
+    }
+
+    template <class V, class C = std::vector<std::size_t>>
+    void test_at(V& vec)
+    {
+        {
+            SCOPED_TRACE("row_major access");
+            row_major_result<C> rm;
+            vec.reshape(rm.m_shape, layout_type::row_major);
+            safe_assign_array(vec, rm.m_assigner);
+            EXPECT_TRUE(std::equal(vec.data().cbegin(), vec.data().cend(), rm.m_data.cbegin()));
+            test_access_check(vec);
+        }
+
+        {
+            SCOPED_TRACE("column_major access");
+            column_major_result<C> cm;
+            vec.reshape(cm.m_shape, layout_type::column_major);
+            safe_assign_array(vec, cm.m_assigner);
+            EXPECT_TRUE(std::equal(vec.data().cbegin(), vec.data().cend(), cm.m_data.cbegin()));
+            test_access_check(vec);
+        }
+
+        {
+            SCOPED_TRACE("central_major access");
+            central_major_result<C> cem;
+            vec.reshape(cem.m_shape, cem.m_strides);
+            safe_assign_array(vec, cem.m_assigner);
+            EXPECT_TRUE(std::equal(vec.data().cbegin(), vec.data().cend(), cem.m_data.cbegin()));
+            test_access_check(vec);
+        }
+
+        {
+            SCOPED_TRACE("unit_shape access");
+            unit_shape_result<C> usr;
+            vec.reshape(usr.m_shape, layout_type::row_major);
+            safe_assign_array(vec, usr.m_assigner);
+            EXPECT_TRUE(std::equal(vec.data().cbegin(), vec.data().cend(), usr.m_data.cbegin()));
+            test_access_check(vec);
         }
     }
 

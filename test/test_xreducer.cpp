@@ -56,6 +56,15 @@ namespace xt
         EXPECT_EQ(24, features.m_red(1, 1, 1));
     }
 
+    TEST(xreducer, at)
+    {
+        xreducer_features features;
+        EXPECT_EQ(12, features.m_red.at(0, 0, 0));
+        EXPECT_EQ(24, features.m_red.at(1, 1, 1));
+        EXPECT_ANY_THROW(features.m_red.at(10, 10, 10));
+        EXPECT_ANY_THROW(features.m_red.at(0, 0, 0, 0));
+    }
+
     TEST(xreducer, iterator)
     {
         xreducer_features features;

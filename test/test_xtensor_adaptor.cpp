@@ -111,6 +111,13 @@ namespace xt
         test_access<adaptor_type, container_type>(a);
     }
 
+    TEST(xtensor_adaptor, at)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_at<adaptor_type, container_type>(a);
+    }
+
     TEST(xtensor_adaptor, indexed_access)
     {
         vec_type v;

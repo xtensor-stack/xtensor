@@ -171,6 +171,12 @@ namespace xt
         test_access(a);
     }
 
+    TEST(xarray, at)
+    {
+        xarray_dynamic a;
+        test_at(a);
+    }
+
     TEST(xarray, element)
     {
         xarray_dynamic a;
