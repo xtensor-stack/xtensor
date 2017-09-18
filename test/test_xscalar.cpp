@@ -29,6 +29,12 @@ namespace xt
         EXPECT_EQ(4, x());
     }
 
+    TEST(xscalar, at)
+    {
+        xscalar<int> x(2);
+        EXPECT_ANY_THROW(x.at(0));
+    }
+
     TEST(xscalar, dimension)
     {
         // The dimension of a xscalar is 0
