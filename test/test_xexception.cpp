@@ -6,7 +6,9 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#ifndef XTENSOR_ENABLE_ASSERT
 #define XTENSOR_ENABLE_ASSERT
+#endif
 
 #include <string>
 

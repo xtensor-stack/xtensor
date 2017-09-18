@@ -88,6 +88,8 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args... args) const;
+        template <class... Args>
+        const_reference at(Args... args) const;
         const_reference operator[](const xindex& index) const;
         const_reference operator[](size_type i) const;
 
@@ -187,6 +189,23 @@ namespace xt
     {
         XTENSOR_ASSERT(check_index(shape(), args...));
         return m_f(args...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the expression.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
+    template <class F, class R, class S>
+    template <class... Args>
+    inline auto xgenerator<F, R, S>::at(Args... args) const -> const_reference
+    {
+        check_access(shape(), args...);
+        return this->operator()(args...);
     }
 
     template <class F, class R, class S>

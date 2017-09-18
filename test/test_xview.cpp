@@ -52,6 +52,8 @@ namespace xt
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(size_t(1), view1.dimension());
         EXPECT_EQ(layout_type::dynamic, view1.layout());
+        EXPECT_ANY_THROW(view1.at(10));
+        EXPECT_ANY_THROW(view1.at(0, 0));
 
         auto view0 = view(a, 0, range(0, 3));
         EXPECT_EQ(a(0, 0), view0(0));
@@ -169,6 +171,8 @@ namespace xt
         EXPECT_EQ(a(1, 0, 1), view1(0, 1));
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
         EXPECT_EQ(a(1, 1, 1), view1(1, 1));
+        EXPECT_ANY_THROW(view1.at(10, 10));
+        EXPECT_ANY_THROW(view1.at(0, 0, 0));
 
         std::array<std::size_t, 2> idx = {1, 1};
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));

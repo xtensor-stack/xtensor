@@ -29,6 +29,8 @@ namespace xt
         EXPECT_EQ(123, e(1, 0, 0));
         auto val = vt[{1, 0, 1}];
         EXPECT_EQ(e(1, 0, 1), val);
+        EXPECT_ANY_THROW(vt.at(10, 10, 10));
+        EXPECT_ANY_THROW(vt.at(0, 0, 0, 0));
     }
 }
 

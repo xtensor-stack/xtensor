@@ -151,6 +151,31 @@ namespace xt
         }
     }
 
+    /*******************
+     * check_dimension *
+     *******************/
+
+    template <class S, class... Args>
+    inline void check_dimension(const S& shape, Args... args)
+    {
+        if (sizeof...(Args) > shape.size())
+        {
+            throw std::out_of_range("Number of arguments (" + std::to_string(sizeof...(Args)) + ") us greater "
+                + "than the number of dimensions (" + std::to_string(shape.size()) + ")");
+        }
+    }
+
+    /****************
+     * check_access *
+     ****************/
+
+    template <class S, class... Args>
+    inline void check_access(const S& shape, Args... args)
+    {
+        check_dimension(shape, args...);
+        check_index(shape, args...);
+    }
+
 #ifdef XTENSOR_ENABLE_ASSERT
 #define XTENSOR_ASSERT(expr) XTENSOR_ASSERT_IMPL(expr, __FILE__, __LINE__)
 #define XTENSOR_ASSERT_IMPL(expr, file, line)                                                                                    \
@@ -158,7 +183,7 @@ namespace xt
     {                                                                                                                            \
         expr;                                                                                                                    \
     }                                                                                                                            \
-    catch (std::exception & e)                                                                                                   \
+    catch (std::exception& e)                                                                                                    \
     {                                                                                                                            \
         throw std::runtime_error(std::string(file) + ':' + std::to_string(line) + ": check failed\n\t" + std::string(e.what())); \
     }
@@ -167,12 +192,15 @@ namespace xt
 #endif
 }
 
+#ifdef XTENSOR_ENABLE_CHECK_DIMENSION
+#define XTENSOR_CHECK_DIMENSION(S, ARGS) XTENSOR_ASSERT(check_dimension(S, ARGS))
+#else
+#define XTENSOR_CHECK_DIMENSION(S, ARGS)
+#endif
+
 #ifdef XTENSOR_ENABLE_ASSERT
 #define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)                                                \
-    if ((PREDICATE))                                                                          \
-    {                                                                                         \
-    }                                                                                         \
-    else                                                                                      \
+    if (!(PREDICATE))                                                                         \
     {                                                                                         \
         throw std::runtime_error(std::string("Assertion error!\n") + MESSAGE +                \
                                  "\n  " + __FILE__ + '(' + std::to_string(__LINE__) + ")\n"); \
@@ -183,10 +211,7 @@ namespace xt
 #endif
 
 #define XTENSOR_PRECONDITION(PREDICATE, MESSAGE)                                              \
-    if ((PREDICATE))                                                                          \
-    {                                                                                         \
-    }                                                                                         \
-    else                                                                                      \
+    if (!(PREDICATE))                                                                         \
     {                                                                                         \
         throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE +         \
                                  "\n  " + __FILE__ + '(' + std::to_string(__LINE__) + ")\n"); \

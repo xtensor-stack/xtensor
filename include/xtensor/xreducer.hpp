@@ -124,6 +124,8 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args... args) const;
+        template <class... Args>
+        const_reference at(Args... args) const;
         const_reference operator[](const xindex& index) const;
         const_reference operator[](size_type i) const;
 
@@ -398,6 +400,22 @@ namespace xt
         return element(arg_array.cbegin(), arg_array.cend());
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the expression,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the expression.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
+    template <class F, class CT, class X>
+    template <class... Args>
+    inline auto xreducer<F, CT, X>::at(Args... args) const -> const_reference
+    {
+        check_access(shape(), args...);
+        return this->operator()(args...);
+    }
     /**
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param index a sequence of indices specifying the position in the reducer. Indices

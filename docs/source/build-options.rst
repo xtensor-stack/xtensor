@@ -16,6 +16,8 @@ Build
 - ``DOWNLOAD_GTEST``: downloads ``gtest`` and builds it locally instead of using a binary installation.
 - ``GTEST_SRC_DIR``: indicates where to find the ``gtest`` sources instead of downloading them.
 - ``XTENSOR_ENABLE_ASSERT``: activates the assertions in ``xtensor``.
+- ``XTENSOR_CHECK_DIMENSION``: turns on ``XTENSOR_ENABLE_ASSERT`` and activates dimensions check in ``xtensor``.
+  Note that the dimensions check should not be activated if you expect ``operator()`` to perform broadcasting.
 
 All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or setting ``GTEST_SRC_DIR``
 enables ``BUILD_TESTS``.

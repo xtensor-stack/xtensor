@@ -76,6 +76,7 @@ set(XTENSOR_HEADERS
 )
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
+OPTION(XTENSOR_CHECK_DIMENSION "xtensor dimension check" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
@@ -85,8 +86,12 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     set(BUILD_TESTS ON)
 endif()
 
-if(XTENSOR_ENABLE_ASSERT)
+if(XTENSOR_ENABLE_ASSERT OR XTENSOR_CHECK_DIMENSION)
     add_definitions(-DXTENSOR_ENABLE_ASSERT)
+endif()
+
+if(XTENSOR_CHECK_DIMENSION)
+    add_definitions(-DXTENSOR_ENABLE_CHECK_DIMENSION)
 endif()
 
 if(DEFAULT_COLUMN_MAJOR)

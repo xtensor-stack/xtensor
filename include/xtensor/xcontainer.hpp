@@ -91,6 +91,12 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
+        template <class... Args>
+        reference at(Args... args);
+
+        template <class... Args>
+        const_reference at(Args... args) const;
+
         reference operator[](const xindex& index);
         reference operator[](size_type i);
         const_reference operator[](const xindex& index) const;
@@ -470,6 +476,7 @@ namespace xt
     inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
         XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return data()[index];
     }
@@ -485,8 +492,43 @@ namespace xt
     inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return data()[index];
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the expression,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the expression.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::at(Args... args) -> reference
+    {
+        check_access(shape(), args...);
+        return this->operator()(args...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the expression.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::at(Args... args) const -> const_reference
+    {
+        check_access(shape(), args...);
+        return this->operator()(args...);
     }
 
     /**
