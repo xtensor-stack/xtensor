@@ -305,7 +305,7 @@ namespace xt
         {
             throw std::runtime_error("Cannot change dimension of xtensor.");
         }
-        shape_type shape = forward_sequence<shape_type>(s);
+        shape_type shape = xtl::forward_sequence<shape_type>(s);
         return self_type(shape);
     }
     //@}

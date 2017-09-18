@@ -11,6 +11,11 @@ project(xtensor)
 
 set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+# Dependencies
+# ============
+
+find_package(xtl REQUIRED)
+
 # Versionning
 # ===========
 
@@ -53,7 +58,6 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmissing.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
@@ -113,6 +117,8 @@ endif()
 if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
+
+include_directories(${xtl_INCLUDE_DIRS})
 
 # Installation
 # ============

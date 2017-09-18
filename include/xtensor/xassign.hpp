@@ -9,11 +9,14 @@
 #ifndef XASSIGN_HPP
 #define XASSIGN_HPP
 
+#include <algorithm>
+
+#include "xtl/xsequence.hpp"
+
 #include "xiterator.hpp"
 #include "xtensor_forward.hpp"
 #include "xconcepts.hpp"
 #include "xutils.hpp"
-#include <algorithm>
 
 namespace xt
 {
@@ -150,7 +153,7 @@ namespace xt
         using size_type = typename E1::size_type;
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
-        shape_type shape = make_sequence<shape_type>(size, size_type(1));
+        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
         bool trivial_broadcast = de2.broadcast_shape(shape);
         e1.derived_cast().reshape(shape);
         return trivial_broadcast;
@@ -173,7 +176,7 @@ namespace xt
         const E2& de2 = e2.derived_cast();
 
         size_type dim = de2.dimension();
-        shape_type shape = make_sequence<shape_type>(dim, size_type(1));
+        shape_type shape = xtl::make_sequence<shape_type>(dim, size_type(1));
         bool trivial_broadcast = de2.broadcast_shape(shape);
 
         if (dim > de1.dimension() || shape > de1.shape())
@@ -204,7 +207,7 @@ namespace xt
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
-        shape_type shape = make_sequence<shape_type>(size, size_type(1));
+        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
         de2.broadcast_shape(shape);
         if (shape.size() > de1.shape().size() || shape > de1.shape())
         {
@@ -220,7 +223,7 @@ namespace xt
     inline data_assigner<E1, E2, L>::data_assigner(E1& e1, const E2& e2)
         : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
           m_rhs(e2.stepper_begin(e1.shape())), m_rhs_end(e2.stepper_end(e1.shape(), L)),
-          m_index(make_sequence<index_type>(e1.shape().size(), size_type(0)))
+          m_index(xtl::make_sequence<index_type>(e1.shape().size(), size_type(0)))
     {
     }
 

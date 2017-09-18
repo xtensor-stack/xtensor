@@ -15,6 +15,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtl/xsequence.hpp"
+
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xstrides.hpp"
@@ -210,7 +212,7 @@ namespace xt
     inline xstrided_view<CT, S, CD>::xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset) noexcept
         : m_e(e), m_data(m_e.data()), m_shape(std::forward<S>(shape)), m_strides(std::forward<S>(strides)), m_offset(offset)
     {
-        m_backstrides = make_sequence<backstrides_type>(m_shape.size(), 0);
+        m_backstrides = xtl::make_sequence<backstrides_type>(m_shape.size(), 0);
         adapt_strides(m_shape, m_strides, m_backstrides);
     }
 
@@ -218,7 +220,7 @@ namespace xt
     inline xstrided_view<CT, S, CD>::xstrided_view(CT e, CD data, S&& shape, S&& strides, std::size_t offset) noexcept
         : m_e(e), m_data(data), m_shape(std::forward<S>(shape)), m_strides(std::forward<S>(strides)), m_offset(offset)
     {
-        m_backstrides = make_sequence<backstrides_type>(m_shape.size(), 0);
+        m_backstrides = xtl::make_sequence<backstrides_type>(m_shape.size(), 0);
         adapt_strides(m_shape, m_strides, m_backstrides);
     }
     //@}

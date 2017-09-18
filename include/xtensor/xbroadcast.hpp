@@ -17,6 +17,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtl/xsequence.hpp"
+
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xstrides.hpp"
@@ -153,7 +155,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, S>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type>(s));
     }
 
 #ifdef X_OLD_CLANG
@@ -162,7 +164,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<std::size_t>>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type>(s));
     }
 #else
     template <class E, class I, std::size_t L>
@@ -170,7 +172,7 @@ namespace xt
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<std::size_t, L>>;
         using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), forward_sequence<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type>(s));
     }
 #endif
 

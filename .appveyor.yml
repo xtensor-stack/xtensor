@@ -29,6 +29,7 @@ install:
   - conda update -q conda
   - conda info -a
   - conda install gtest cmake -c conda-forge
+  - conda install xtl -c conda-forge
   - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDEFAULT_COLUMN_MAJOR=%COLUMN_MAJOR_LAYOUT% .
   - nmake test_xtensor
   - cd test

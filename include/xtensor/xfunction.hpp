@@ -17,6 +17,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtl/xsequence.hpp"
+
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
@@ -442,7 +444,7 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func>
     inline xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept
-        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(make_sequence<shape_type>(0, size_type(1))),
+        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(1))),
           m_shape_computed(false)
     {
     }
@@ -479,7 +481,7 @@ namespace xt
     {
         if (!m_shape_computed)
         {
-            m_shape = make_sequence<shape_type>(compute_dimension(), size_type(1));
+            m_shape = xtl::make_sequence<shape_type>(compute_dimension(), size_type(1));
             broadcast_shape(m_shape);
             m_shape_computed = true;
         }

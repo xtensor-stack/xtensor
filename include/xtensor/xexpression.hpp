@@ -13,6 +13,8 @@
 #include <type_traits>
 #include <vector>
 
+#include "xtl/xclosure.hpp"
+
 #include "xutils.hpp"
 
 namespace xt
@@ -127,13 +129,13 @@ namespace xt
     template <class E, class EN = void>
     struct xclosure
     {
-        using type = closure_t<E>;
+        using type = xtl::closure_type_t<E>;
     };
 
     template <class E>
     struct xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<closure_t<E>>;
+        using type = xscalar<xtl::closure_type_t<E>>;
     };
 
     template <class E>
@@ -142,13 +144,13 @@ namespace xt
     template <class E, class EN = void>
     struct const_xclosure
     {
-        using type = const_closure_t<E>;
+        using type = xtl::const_closure_type_t<E>;
     };
 
     template <class E>
     struct const_xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<const_closure_t<E>>;
+        using type = xscalar<xtl::const_closure_type_t<E>>;
     };
 
     template <class E>

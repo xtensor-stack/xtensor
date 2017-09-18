@@ -76,20 +76,6 @@ namespace xt
     template <class T, std::size_t N>
     bool resize_container(std::array<T, N>& a, typename std::array<T, N>::size_type size);
 
-    template <class S>
-    S make_sequence(typename S::size_type size, typename S::value_type v);
-
-    template <class R, class A>
-    decltype(auto) forward_sequence(A&& s);
-
-    // equivalent to std::size(c) in c++17
-    template <class C>
-    constexpr auto sequence_size(const C& c) -> decltype(c.size());
-
-    // equivalent to std::size(a) in c++17
-    template <class T, std::size_t N>
-    constexpr std::size_t sequence_size(const T (&a)[N]);
-
     namespace detail
     {
         template <class T>
@@ -447,104 +433,6 @@ namespace xt
         return size == N;
     }
 
-    /********************************
-     * make_sequence implementation *
-     ********************************/
-
-    namespace detail
-    {
-        template <class S>
-        struct sequence_builder
-        {
-            using value_type = typename S::value_type;
-            using size_type = typename S::size_type;
-
-            inline static S make(size_type size, value_type v)
-            {
-                return S(size, v);
-            }
-        };
-
-        template <class T, std::size_t N>
-        struct sequence_builder<std::array<T, N>>
-        {
-            using sequence_type = std::array<T, N>;
-            using value_type = typename sequence_type::value_type;
-            using size_type = typename sequence_type::size_type;
-
-            inline static sequence_type make(size_type /*size*/, value_type v)
-            {
-                sequence_type s;
-                s.fill(v);
-                return s;
-            }
-        };
-    }
-
-    template <class S>
-    inline S make_sequence(typename S::size_type size, typename S::value_type v)
-    {
-        return detail::sequence_builder<S>::make(size, v);
-    }
-
-    /***********************************
-     * forward_sequence implementation *
-     ***********************************/
-
-    namespace detail
-    {
-        template <class R, class A, class E = void>
-        struct sequence_forwarder
-        {
-            template <class T>
-            static inline R forward(const T& r)
-            {
-                return R(std::begin(r), std::end(r));
-            }
-        };
-
-        template <class I, std::size_t L, class A>
-        struct sequence_forwarder<std::array<I, L>, A,
-                                  std::enable_if_t<!std::is_same<std::array<I, L>, A>::value>>
-        {
-            using R = std::array<I, L>;
-
-            template <class T>
-            static inline R forward(const T& r)
-            {
-                R ret;
-                std::copy(std::begin(r), std::end(r), std::begin(ret));
-                return ret;
-            }
-        };
-
-        template <class R>
-        struct sequence_forwarder<R, R>
-        {
-            template <class T>
-            static inline T&& forward(typename std::remove_reference<T>::type& t) noexcept
-            {
-                return static_cast<T&&>(t);
-            }
-
-            template <class T>
-            static inline T&& forward(typename std::remove_reference<T>::type&& t) noexcept
-            {
-                return static_cast<T&&>(t);
-            }
-        };
-    }
-
-    template <class R, class A>
-    inline decltype(auto) forward_sequence(A&& s)
-    {
-        using forwarder = detail::sequence_forwarder<
-            std::decay_t<R>,
-            std::remove_cv_t<std::remove_reference_t<A>>
-        >;
-        return forwarder::template forward<A>(s);
-    }
-
     /*************************************
      * promote_shape and promote_strides *
      *************************************/
@@ -625,67 +513,6 @@ namespace xt
 
     template <class... S>
     using promote_strides_t = typename detail::promote_index<S...>::type;
-
-
-    /**************************
-     * closure implementation *
-     **************************/
-
-    template <class S>
-    struct closure
-    {
-        using underlying_type = std::conditional_t<std::is_const<std::remove_reference_t<S>>::value,
-                                                   const std::decay_t<S>,
-                                                   std::decay_t<S>>;
-        using type = typename std::conditional<std::is_lvalue_reference<S>::value,
-                                               underlying_type&,
-                                               underlying_type>::type;
-    };
-
-    template <class S>
-    using closure_t = typename closure<S>::type;
-
-    template <class S>
-    struct const_closure
-    {
-        using underlying_type = const std::decay_t<S>;
-        using type = typename std::conditional<std::is_lvalue_reference<S>::value,
-                                               underlying_type&,
-                                               underlying_type>::type;
-    };
-
-    template <class S>
-    using const_closure_t = typename const_closure<S>::type;
-
-    /******************************
-     * ptr_closure implementation *
-     ******************************/
-
-    template <class S>
-    struct ptr_closure
-    {
-        using underlying_type = std::conditional_t<std::is_const<std::remove_reference_t<S>>::value,
-                                                   const std::decay_t<S>,
-                                                   std::decay_t<S>>;
-        using type = std::conditional_t<std::is_lvalue_reference<S>::value,
-                                        underlying_type*,
-                                        underlying_type>;
-    };
-
-    template <class S>
-    using ptr_closure_t = typename ptr_closure<S>::type;
-
-    template <class S>
-    struct const_ptr_closure
-    {
-        using underlying_type = const std::decay_t<S>;
-        using type = std::conditional_t<std::is_lvalue_reference<S>::value,
-                                        underlying_type*,
-                                        underlying_type>;
-    };
-
-    template <class S>
-    using const_ptr_closure_t = typename const_ptr_closure<S>::type;
 
     /***************************
      * apply_cv implementation *

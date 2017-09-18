@@ -41,6 +41,7 @@ Or you can directly install it from the sources:
 cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
+
 ## Optional dependency on xsimd
 
 `xtensor` has an optional dependency on the `xsimd` library:
