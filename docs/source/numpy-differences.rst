@@ -74,3 +74,9 @@ Support of missing values in numpy can be emulated with the masked array module,
 which provides a means to handle arrays that have missing or invalid data.
 
 Support of missing values in xtensor is done through a notion of optional values, implemented in ``xoptional<T, B>``, which serves both as a value type for container and as a reference proxy for optimized storage types. See the section of the documentation on :doc:`missing`.
+
+Strides
+-------
+
+Strided containers of xtensor and numpy having the same exact memory layout may have different strides when accessing them through the ``strides`` attribute.
+The reason is an optimization in xtensor, which is to set the strides to ``0`` in dimensions of length ``1``, which simplifies the implementation of broadcasting of universal functions.

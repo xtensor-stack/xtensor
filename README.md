@@ -3,7 +3,7 @@
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
 [![Documentation Status](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](http://mybinder.org/repo/QuantStack/xtensor/notebooks/notebooks/xtensor.ipynb)
+[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://beta.mybinder.org/v2/gh/QuantStack/xtensor/0.11.1?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
@@ -44,7 +44,7 @@ make install
 
 ## Usage
 
-### Basic Usage
+### Basic usage
 
 **Initialize a 2-D array and compute the sum of one of its rows and a 1-D array.**
 
@@ -95,11 +95,11 @@ Outputs:
  {7, 8, 9}}
 ```
 
-## The Numpy to xtensor cheat sheet
+## The numpy to xtensor cheat sheet
 
 If you are familiar with numpy APIs, and you are interested in xtensor, you can check out the [numpy to xtensor cheat sheet](https://xtensor.readthedocs.io/en/latest/numpy.html) provided in the documentation.
 
-## Lazy Broadcasting with `xtensor`
+## Lazy broadcasting with `xtensor`
 
 We can operate on arrays of different shapes of dimensions in an elementwise fashion. Broadcasting rules of xtensor are similar to those of [numpy](http://www.numpy.org) and [libdynd](http://libdynd.org).
 
@@ -134,7 +134,7 @@ If matched up dimensions of two input arrays are different, and one of them has 
 (4, 2, 3) # Result
 ```
 
-### Universal functions, Laziness and Vectorization
+### Universal functions, laziness and vectorization
 
 With `xtensor`, if `x`, `y` and `z` are arrays of *broadcastable shapes*, the return type of an expression such as `x + y * sin(z)` is **not an array**. It is an `xexpression` object offering the same interface as an N-dimensional array, which does not hold the result. **Values are only computed upon access or when the expression is assigned to an xarray object**. This allows to operate symbolically on very large arrays and only compute the result for the indices of interest.
 
@@ -142,14 +142,14 @@ We provide utilities to **vectorize any scalar function** (taking multiple scala
 
 In `xtensor`, arithmetic operations (`+`, `-`, `*`, `/`) and all special functions are *xfunction*s.
 
-### Iterating over `xexpression`s and Broadcasting Iterators
+### Iterating over `xexpression`s and broadcasting Iterators
 
 All `xexpression`s offer two sets of functions to retrieve iterator pairs (and their `const` counterpart).
 
  - `begin()` and `end()` provide instances of `xiterator`s which can be used to iterate over all the elements of the expression. The order in which elements are listed is `row-major` in that the index of last dimension is incremented first.
  - `xbegin(shape)` and `xend(shape)` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in a row-major way, but certain dimensions are repeated to match the provided shape as per the rules described above. For an expression `e`, `e.xbegin(e.shape())` and `e.begin()` are equivalent.
 
-### Runtime vs Compile-time dimensionality
+### Runtime vs compile-time dimensionality
 
 Two container classes implementing multi-dimensional arrays are provided: `xarray` and `xtensor`.
 
@@ -182,7 +182,7 @@ Therefore, when building an application with xtensor, we recommend using statica
 The [xtensor-python](https://github.com/QuantStack/xtensor-python) project provides the implementation of two `xtensor` containers, `pyarray` and `pytensor` which
 effectively wrap numpy arrays, allowing inplace modification, including reshapes.
 
-## Building and Running the Tests
+## Building and running the tests
 
 Building the tests requires the [GTest](https://github.com/google/googletest) testing framework and [cmake](https://cmake.org).
 
@@ -221,7 +221,7 @@ cmake -DBUILD_TESTS=ON .
 make xtest
 ```
 
-## Building the HTML Documentation
+## Building the HTML documentation
 
 xtensor's documentation is built with three tools
 

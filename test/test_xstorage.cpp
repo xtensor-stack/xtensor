@@ -17,18 +17,18 @@ namespace xt
     TEST(uvector, constructor)
     {
         vector_type a;
-        EXPECT_EQ(0, a.size());
+        EXPECT_EQ(size_t(0), a.size());
 
         vector_type b(10);
-        EXPECT_EQ(10, b.size());
+        EXPECT_EQ(size_t(10), b.size());
 
         vector_type c(10, 2.5);
-        EXPECT_EQ(10, c.size());
+        EXPECT_EQ(size_t(10), c.size());
         EXPECT_EQ(2.5, c[2]);
 
         std::vector<double> src(10, 1.5);
         vector_type d(src.cbegin(), src.cend());
-        EXPECT_EQ(10, d.size());
+        EXPECT_EQ(size_t(10), d.size());
         EXPECT_EQ(1.5, d[2]);
     }
 
@@ -73,3 +73,4 @@ namespace xt
         }
     }
 }
+

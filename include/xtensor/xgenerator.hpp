@@ -37,10 +37,6 @@ namespace xt
         using inner_shape_type = S;
         using const_stepper = xindexed_stepper<xgenerator<C, R, S>>;
         using stepper = const_stepper;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using iterator = const_iterator;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
     };
 
     /**
@@ -56,7 +52,7 @@ namespace xt
      */
     template <class F, class R, class S>
     class xgenerator : public xexpression<xgenerator<F, R, S>>,
-                       public xexpression_const_iterable<xgenerator<F, R, S>>
+                       public xconst_iterable<xgenerator<F, R, S>>
     {
     public:
 
@@ -71,7 +67,7 @@ namespace xt
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
 
-        using iterable_base = xexpression_const_iterable<self_type>;
+        using iterable_base = xconst_iterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = S;

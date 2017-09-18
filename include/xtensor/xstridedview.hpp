@@ -41,10 +41,6 @@ namespace xt
         using inner_backstrides_type_type = inner_shape_type;
         using const_stepper = xstepper<const xstrided_view<CT, S, CD>>;
         using stepper = xstepper<xstrided_view<CT, S, CD>>;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using iterator = xiterator<stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
     };
 
     /*****************
@@ -65,7 +61,7 @@ namespace xt
      */
     template <class CT, class S, class CD>
     class xstrided_view : public xview_semantic<xstrided_view<CT, S, CD>>,
-                          public xexpression_iterable<xstrided_view<CT, S, CD>>
+                          public xiterable<xstrided_view<CT, S, CD>>
     {
     public:
 
@@ -83,7 +79,7 @@ namespace xt
 
         using underlying_container_type = CD;
 
-        using iterable_base = xexpression_iterable<self_type>;
+        using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = shape_type;
@@ -495,15 +491,7 @@ namespace xt
     template <class It>
     inline It xstrided_view<CT, S, CD>::data_xend_impl(It end, layout_type l) const noexcept
     {
-        if (dimension() == 0)
-        {
-            return end;
-        }
-        else
-        {
-            auto leading_stride = (l == layout_type::row_major ? strides().back() : strides().front());
-            return end - 1 + leading_stride;
-        }
+        return strided_data_end(*this, end, l);
     }
 
     template <class CT, class S, class CD>
@@ -573,14 +561,16 @@ namespace xt
             shape_type temp_shape;
             resize_container(temp_shape, e.shape().size());
 
+            using size_type = typename std::decay_t<E>::size_type;
             for (std::size_t i = 0; i < e.shape().size(); ++i)
             {
                 if (std::size_t(permutation[i]) >= e.dimension())
                 {
                     throw transpose_error("Permutation contains wrong axis");
                 }
-                temp_shape[i] = e.shape()[permutation[i]];
-                temp_strides[i] = e.strides()[permutation[i]];
+                size_type perm = static_cast<size_type>(permutation[i]);
+                temp_shape[i] = e.shape()[perm];
+                temp_strides[i] = e.strides()[perm];
             }
             using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
             return view_type(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), 0);
@@ -662,7 +652,8 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
             using reference = typename xexpression_type::reference;
 
-            expression_adaptor(CT&& e) : m_e(e)
+            expression_adaptor(CT&& e)
+                : m_e(e)
             {
                 resize_container(m_index, m_e.dimension());
                 m_size = compute_size(m_e.shape());
@@ -674,8 +665,8 @@ namespace xt
                 std::div_t dv{};
                 for (size_type i = 0; i < m_strides.size(); ++i)
                 {
-                    dv = std::div((int) idx, (int) m_strides[i]);
-                    idx = dv.rem;
+                    dv = std::div((int)idx, (int)m_strides[i]);
+                    idx = static_cast<std::size_t>(dv.rem);
                     m_index[i] = dv.quot;
                 }
                 return m_e.element(m_index.begin(), m_index.end());
@@ -743,7 +734,7 @@ namespace xt
         inline void push_back(const xslice<T>& s)
         {
             auto ds = s.derived_cast();
-            base_type::push_back({ds(0), (index_type)ds.size(), (index_type)ds.step_size()});
+            base_type::push_back({(index_type)ds(0), (index_type)ds.size(), (index_type)ds.step_size()});
         }
 
         template <class A, class B, class C>
@@ -866,13 +857,16 @@ namespace xt
         {
             if (slices[i][0] >= 0)
             {
-                offset += slices[i][0] * old_strides[i];
+                std::size_t slice0 = static_cast<std::size_t>(slices[i][0]);
+                offset += slice0 * old_strides[i];
             }
 
             if (slices[i][1] != 0 && slices[i][2] != 0)
             {
-                new_shape[idx] = slices[i][1];
-                new_strides[idx] = slices[i][2] * old_strides[i - newaxis_skip];
+                std::size_t slice1 = static_cast<std::size_t>(slices[i][1]);
+                std::size_t slice2 = static_cast<std::size_t>(slices[i][2]);
+                new_shape[idx] = slice1;
+                new_strides[idx] = slice2 * old_strides[i - newaxis_skip];
                 ++idx;
             }
             else if (slices[i][0] == -1)  // newaxis

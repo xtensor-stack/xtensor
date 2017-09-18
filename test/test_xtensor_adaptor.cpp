@@ -128,8 +128,11 @@ namespace xt
     TEST(xtensor_adaptor, iterator)
     {
         vec_type v;
-        adaptor_type a(v);
-        test_iterator<adaptor_type, container_type>(a);
+        using adaptor_rm = xtensor_adaptor<vec_type, 3, layout_type::row_major>;
+        using adaptor_cm = xtensor_adaptor<vec_type, 3, layout_type::column_major>;
+        adaptor_rm arm(v);
+        adaptor_cm acm(v);
+        test_iterator<adaptor_rm, adaptor_cm, container_type>(arm, acm);
     }
 
     TEST(xtensor_adaptor, xiterator)

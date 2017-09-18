@@ -46,6 +46,16 @@ namespace xt
         ASSERT_EQ(value2, 2.0);
     }
 
+    TEST(xoptional, string)
+    {
+        xoptional<std::string, bool> opt1;
+        opt1 = "foo";
+        ASSERT_TRUE(opt1.has_value());
+
+        xoptional<std::string, bool> opt2 = "bar";
+        ASSERT_TRUE(opt2.has_value());
+    }
+
     TEST(xoptional, vector)
     {
         xoptional_vector<double> v(3, 2.0);

@@ -29,7 +29,7 @@ namespace xt
         EXPECT_EQ(shape_type{3}, v.shape());
 
         EXPECT_EQ(e(1, 1), v(0));
-        EXPECT_EQ(e(1, 2), v[{1}]);
+        EXPECT_EQ(e(1, 2), v[xindex({1})]);
 
         std::vector<size_t> idx = {2};
         EXPECT_EQ(e(2, 2), v.element(idx.begin(), idx.end()));
@@ -79,17 +79,17 @@ namespace xt
         auto fn = e * 3 - 120;
         auto v = index_view(fn, {{1, 1}, {1, 2}, {2, 2}});
         EXPECT_EQ(fn(1, 1), v(0));
-        EXPECT_EQ(fn(1, 2), v[{1}]);
+        EXPECT_EQ(fn(1, 2), v[xindex({1})]);
 
         std::vector<size_t> idx = {2};
         EXPECT_EQ(fn(2, 2), v.element(idx.begin(), idx.end()));
 
-        auto it = v.xbegin();
+        auto it = v.begin();
         EXPECT_EQ(fn(1, 1), *it);
 
         EXPECT_EQ(fn(1, 2), *(++it));
         EXPECT_EQ(fn(2, 2), *(++it));
-        EXPECT_EQ(++it, v.xend());
+        EXPECT_EQ(++it, v.end());
     }
 
     TEST(xindexview, view_on_view)
@@ -119,3 +119,4 @@ namespace xt
         EXPECT_EQ(expected, a);
     }
 }
+

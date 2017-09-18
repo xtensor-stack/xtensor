@@ -22,32 +22,32 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
-        EXPECT_EQ(1, view1.dimension());
+        EXPECT_EQ(size_t(1), view1.dimension());
 
         auto view0 = dynamic_view(a, slice_vector(a, 0, range(0, 3)));
         EXPECT_EQ(a(0, 0), view0(0));
         EXPECT_EQ(a(0, 1), view0(1));
-        EXPECT_EQ(1, view0.dimension());
-        EXPECT_EQ(3, view0.shape()[0]);
+        EXPECT_EQ(size_t(1), view0.dimension());
+        EXPECT_EQ(size_t(3), view0.shape()[0]);
 
         auto view2 = dynamic_view(a, slice_vector(a, range(0, 2), 2));
         EXPECT_EQ(a(0, 2), view2(0));
         EXPECT_EQ(a(1, 2), view2(1));
-        EXPECT_EQ(1, view2.dimension());
-        EXPECT_EQ(2, view2.shape()[0]);
+        EXPECT_EQ(size_t(1), view2.dimension());
+        EXPECT_EQ(size_t(2), view2.shape()[0]);
 
         auto view4 = dynamic_view(a, slice_vector(a, 1));
-        EXPECT_EQ(1, view4.dimension());
-        EXPECT_EQ(4, view4.shape()[0]);
+        EXPECT_EQ(size_t(1), view4.dimension());
+        EXPECT_EQ(size_t(4), view4.shape()[0]);
 
         auto view5 = dynamic_view(view4, slice_vector(a, 1));
-        EXPECT_EQ(0, view5.dimension());
-        EXPECT_EQ(0, view5.shape().size());
+        EXPECT_EQ(size_t(0), view5.dimension());
+        EXPECT_EQ(size_t(0), view5.shape().size());
 
         auto view6 = dynamic_view(a, slice_vector(a, 1, all()));
         EXPECT_EQ(a(1, 0), view6(0));
@@ -81,10 +81,10 @@ namespace xt
             211, 212
         };
         xarray<double> a(shape);
-        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1));
-        EXPECT_EQ(2, view1.dimension());
+        EXPECT_EQ(size_t(2), view1.dimension());
         view_shape_type expected_shape = {4, 2};
         EXPECT_EQ(expected_shape, view1.shape());
         EXPECT_EQ(a(1, 0, 0), view1(0, 0));
@@ -102,7 +102,7 @@ namespace xt
         xarray<double> a(shape);
         std::vector<double> data {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
                                   13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
-        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, range(0, 2), 1, range(1, 4)));
         auto iter = view1.begin();
@@ -142,12 +142,12 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
         std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         view_shape_type shape2 = {3};
         xarray<int> b(shape2);
         std::vector<int> data2 = {1, 2, 3};
-        std::copy(data2.cbegin(), data2.cend(), b.template xbegin<layout_type::row_major>());
+        std::copy(data2.cbegin(), data2.cend(), b.template begin<layout_type::row_major>());
 
         auto func = dynamic_view(a, slice_vector(a, 1, range(1, 4))) + b;
         auto iter = func.begin();
@@ -166,12 +166,12 @@ namespace xt
     {
         xtensor<int, 2> a({3, 4});
         std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
-        EXPECT_EQ(1, view1.dimension());
+        EXPECT_EQ(size_t(1), view1.dimension());
 
         auto iter = view1.begin();
         auto iter_end = view1.end();
@@ -203,43 +203,43 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), newaxis(), all()));
         EXPECT_EQ(a(1, 1), view1(1, 0, 1));
         EXPECT_EQ(a(1, 2), view1(1, 0, 2));
-        EXPECT_EQ(3, view1.dimension());
-        EXPECT_EQ(3, view1.shape()[0]);
-        EXPECT_EQ(1, view1.shape()[1]);
-        EXPECT_EQ(4, view1.shape()[2]);
+        EXPECT_EQ(size_t(3), view1.dimension());
+        EXPECT_EQ(size_t(3), view1.shape()[0]);
+        EXPECT_EQ(size_t(1), view1.shape()[1]);
+        EXPECT_EQ(size_t(4), view1.shape()[2]);
 
         auto view2 = dynamic_view(a, slice_vector(a, all(), all(), newaxis()));
         EXPECT_EQ(a(1, 1), view2(1, 1, 0));
         EXPECT_EQ(a(1, 2), view2(1, 2, 0));
-        EXPECT_EQ(3, view2.dimension());
-        EXPECT_EQ(3, view2.shape()[0]);
-        EXPECT_EQ(4, view2.shape()[1]);
-        EXPECT_EQ(1, view2.shape()[2]);
+        EXPECT_EQ(size_t(3), view2.dimension());
+        EXPECT_EQ(size_t(3), view2.shape()[0]);
+        EXPECT_EQ(size_t(4), view2.shape()[1]);
+        EXPECT_EQ(size_t(1), view2.shape()[2]);
 
         auto view3 = dynamic_view(a, slice_vector(a, 1, newaxis(), all()));
         EXPECT_EQ(a(1, 1), view3(0, 1));
         EXPECT_EQ(a(1, 2), view3(0, 2));
-        EXPECT_EQ(2, view3.dimension());
+        EXPECT_EQ(size_t(2), view3.dimension());
 
         auto view4 = dynamic_view(a, slice_vector(a, 1, all(), newaxis()));
         EXPECT_EQ(a(1, 1), view4(1, 0));
         EXPECT_EQ(a(1, 2), view4(2, 0));
-        EXPECT_EQ(2, view4.dimension());
+        EXPECT_EQ(size_t(2), view4.dimension());
 
         auto view5 = dynamic_view(view1, slice_vector(a, 1));
         EXPECT_EQ(a(1, 1), view5(0, 1));
         EXPECT_EQ(a(1, 2), view5(0, 2));
-        EXPECT_EQ(2, view5.dimension());
+        EXPECT_EQ(size_t(2), view5.dimension());
 
         auto view6 = dynamic_view(view2, slice_vector(a, 1));
         EXPECT_EQ(a(1, 1), view6(1, 0));
         EXPECT_EQ(a(1, 2), view6(2, 0));
-        EXPECT_EQ(2, view6.dimension());
+        EXPECT_EQ(size_t(2), view6.dimension());
 
         std::array<std::size_t, 3> idx1 = {1, 0, 2};
         EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
@@ -253,7 +253,7 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), all(), newaxis()));
         auto iter1 = view1.begin();
@@ -321,19 +321,19 @@ namespace xt
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         xarray<double> b(view_shape_type(1, 4));
         auto data_end = data.cbegin();
         data_end += 4;
-        std::copy(data.cbegin(), data_end, b.template xbegin<layout_type::row_major>());
+        std::copy(data.cbegin(), data_end, b.template begin<layout_type::row_major>());
 
         auto v = dynamic_view(b, slice_vector(b, newaxis(), all()));
         xarray<double> res = a + v;
 
         std::vector<double> data2{2, 4, 6, 8, 6, 8, 10, 12, 10, 12, 14, 16};
         xarray<double> expected(shape);
-        std::copy(data2.cbegin(), data2.cend(), expected.template xbegin<layout_type::row_major>());
+        std::copy(data2.cbegin(), data2.cend(), expected.template begin<layout_type::row_major>());
 
         EXPECT_EQ(expected, res);
     }

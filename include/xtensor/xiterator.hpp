@@ -9,8 +9,8 @@
 #ifndef XITERATOR_HPP
 #define XITERATOR_HPP
 
-#include <array>
 #include <algorithm>
+#include <array>
 #include <cstddef>
 #include <iterator>
 #include <vector>
@@ -296,27 +296,27 @@ namespace xt
     namespace detail
     {
         template <class C>
-        constexpr auto trivial_begin(C& c) -> decltype(c.begin())
+        constexpr auto trivial_begin(C& c) noexcept
         {
-            return c.begin();
+            return c.storage_begin();
         }
 
         template <class C>
-        constexpr auto trivial_end(C& c) -> decltype(c.end())
+        constexpr auto trivial_end(C& c) noexcept
         {
-            return c.end();
+            return c.storage_end();
         }
 
         template <class C>
-        constexpr auto trivial_begin(const C& c) -> decltype(c.begin())
+        constexpr auto trivial_begin(const C& c) noexcept
         {
-            return c.begin();
+            return c.storage_begin();
         }
 
         template <class C>
-        constexpr auto trivial_end(const C& c) -> decltype(c.end())
+        constexpr auto trivial_end(const C& c) noexcept
         {
-            return c.end();
+            return c.storage_end();
         }
     }
 
@@ -340,28 +340,36 @@ namespace xt
     inline void xstepper<C>::step(size_type dim, size_type n)
     {
         if (dim >= m_offset)
-            m_it += n * p_c->strides()[dim - m_offset];
+        {
+            m_it += difference_type(n * p_c->strides()[dim - m_offset]);
+        }
     }
 
     template <class C>
     inline void xstepper<C>::step_back(size_type dim, size_type n)
     {
         if (dim >= m_offset)
-            m_it -= n * p_c->strides()[dim - m_offset];
+        {
+            m_it -= difference_type(n * p_c->strides()[dim - m_offset]);
+        }
     }
 
     template <class C>
     inline void xstepper<C>::reset(size_type dim)
     {
         if (dim >= m_offset)
-            m_it -= p_c->backstrides()[dim - m_offset];
+        {
+            m_it -= difference_type(p_c->backstrides()[dim - m_offset]);
+        }
     }
 
     template <class C>
     inline void xstepper<C>::reset_back(size_type dim)
     {
         if (dim >= m_offset)
-            m_it += p_c->backstrides()[dim - m_offset];
+        {
+            m_it += difference_type(p_c->backstrides()[dim - m_offset]);
+        }
     }
 
     template <class C>
@@ -450,7 +458,7 @@ namespace xt
                 index[i] = shape[i] - 1;
                 if (i != 0)
                 {
-                     stepper.reset_back(i);
+                    stepper.reset_back(i);
                 }
             }
         }
@@ -535,7 +543,9 @@ namespace xt
         : p_e(e), m_index(make_sequence<index_type>(e->shape().size(), size_type(0))), m_offset(offset)
     {
         if (end)
+        {
             to_end(layout_type::row_major);
+        }
     }
 
     template <class C, bool is_const>
@@ -548,28 +558,36 @@ namespace xt
     inline void xindexed_stepper<C, is_const>::step(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] += n;
+        }
     }
 
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::step_back(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] -= n;
+        }
     }
 
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::reset(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] = 0;
+        }
     }
 
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::reset_back(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_index[dim - m_offset] = p_e->shape()[dim - m_offset] - 1;
+        }
     }
 
     template <class C, bool is_const>
@@ -655,7 +673,7 @@ namespace xt
     {
         if (reverse)
         {
-            auto iter_begin = (L == layout_type::row_major)  ? m_index.begin() : m_index.begin() + 1;
+            auto iter_begin = (L == layout_type::row_major) ? m_index.begin() : m_index.begin() + 1;
             auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
             std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
         }

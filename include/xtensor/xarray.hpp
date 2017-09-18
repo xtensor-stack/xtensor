@@ -35,6 +35,7 @@ namespace xt
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
         using temporary_type = xarray_container<EC, L, SC>;
+        static constexpr layout_type layout = L;
     };
 
     template <class EC, layout_type L, class SC>
@@ -56,13 +57,13 @@ namespace xt
      * @sa xarray
      */
     template <class EC, layout_type L, class SC>
-    class xarray_container : public xstrided_container<xarray_container<EC, L, SC>, L>,
+    class xarray_container : public xstrided_container<xarray_container<EC, L, SC>>,
                              public xcontainer_semantic<xarray_container<EC, L, SC>>
     {
     public:
 
         using self_type = xarray_container<EC, L, SC>;
-        using base_type = xstrided_container<self_type, L>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using value_type = typename base_type::value_type;
@@ -135,6 +136,7 @@ namespace xt
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
         using temporary_type = xarray_container<EC, L, SC>;
+        static constexpr layout_type layout = L;
     };
 
     template <class EC, layout_type L, class SC>
@@ -158,13 +160,13 @@ namespace xt
      * @tparam SC The type of the containers holding the shape and the strides.
      */
     template <class EC, layout_type L, class SC>
-    class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC>, L>,
+    class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC>>,
                            public xadaptor_semantic<xarray_adaptor<EC, L, SC>>
     {
     public:
 
         using self_type = xarray_adaptor<EC, L, SC>;
-        using base_type = xstrided_container<self_type, L>;
+        using base_type = xstrided_container<self_type>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
@@ -315,7 +317,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template xbegin<layout_type::row_major>(), t);
+        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -327,7 +329,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template xbegin<layout_type::row_major>(), t);
+        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -339,7 +341,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template xbegin<layout_type::row_major>(), t);
+        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -351,7 +353,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template xbegin<layout_type::row_major>(), t);
+        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -363,7 +365,7 @@ namespace xt
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
-        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template xbegin<layout_type::row_major>(), t);
+        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     template <class EC, layout_type L, class SC>

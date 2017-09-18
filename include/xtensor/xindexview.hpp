@@ -39,10 +39,6 @@ namespace xt
         using inner_shape_type = std::array<std::size_t, 1>;
         using const_stepper = xindexed_stepper<xindexview<CT, I>>;
         using stepper = xindexed_stepper<xindexview<CT, I>, false>;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using iterator = xiterator<stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
     };
 
     /**************
@@ -65,7 +61,7 @@ namespace xt
      */
     template <class CT, class I>
     class xindexview : public xview_semantic<xindexview<CT, I>>,
-                       public xexpression_iterable<xindexview<CT, I>>
+                       public xiterable<xindexview<CT, I>>
     {
     public:
 
@@ -81,7 +77,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xexpression_iterable<self_type>;
+        using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = shape_type;
@@ -113,7 +109,7 @@ namespace xt
 
         reference operator()();
         template <class... Args>
-        reference operator()(std::size_t idx, Args... /*args*/);
+        reference operator()(size_type idx, Args... /*args*/);
         reference operator[](const xindex& index);
         reference operator[](size_type i);
 
@@ -122,7 +118,7 @@ namespace xt
 
         const_reference operator()() const;
         template <class... Args>
-        const_reference operator()(std::size_t idx, Args... /*args*/) const;
+        const_reference operator()(size_type idx, Args... /*args*/) const;
         const_reference operator[](const xindex& index) const;
         const_reference operator[](size_type i) const;
 
@@ -262,7 +258,7 @@ namespace xt
     template <class CT, class I>
     inline void xindexview<CT, I>::assign_temporary_impl(temporary_type&& tmp)
     {
-        std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
+        std::copy(tmp.cbegin(), tmp.cend(), this->begin());
     }
 
     /**
@@ -321,7 +317,7 @@ namespace xt
 
     template <class CT, class I>
     template <class... Args>
-    inline auto xindexview<CT, I>::operator()(std::size_t idx, Args... /*args*/) -> reference
+    inline auto xindexview<CT, I>::operator()(size_type idx, Args... /*args*/) -> reference
     {
         return m_e[m_indices[idx]];
     }
@@ -333,7 +329,7 @@ namespace xt
      */
     template <class CT, class I>
     template <class... Args>
-    inline auto xindexview<CT, I>::operator()(std::size_t idx, Args... /*args*/) const -> const_reference
+    inline auto xindexview<CT, I>::operator()(size_type idx, Args... /*args*/) const -> const_reference
     {
         return m_e[m_indices[idx]];
     }

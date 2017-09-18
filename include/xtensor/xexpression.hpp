@@ -44,7 +44,7 @@ namespace xt
         using derived_type = D;
 
         derived_type& derived_cast() & noexcept;
-        const derived_type& derived_cast() const& noexcept;
+        const derived_type& derived_cast() const & noexcept;
         derived_type derived_cast() && noexcept;
 
     protected:
@@ -195,7 +195,9 @@ namespace xt
         inline typename E::reference get_element(E& e, S i, Args... args)
         {
             if (sizeof...(Args) >= e.dimension())
+            {
                 return get_element(e, args...);
+            }
             return e(i, args...);
         }
 
@@ -209,7 +211,9 @@ namespace xt
         inline typename E::const_reference get_element(const E& e, S i, Args... args)
         {
             if (sizeof...(Args) >= e.dimension())
+            {
                 return get_element(e, args...);
+            }
             return e(i, args...);
         }
     }

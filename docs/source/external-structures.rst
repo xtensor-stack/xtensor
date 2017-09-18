@@ -63,6 +63,7 @@ with the following simple example:
         shape_type m_shape;
         shape_type m_strides;
         shape_type m_backstrides;
+        static constexpr layout_type layout = layout_type::dynamic;
     };
 
 Define inner types
@@ -82,6 +83,7 @@ The following tells ``xtensor`` which types must be used for getting shape, stri
         using shape_type = inner_shape_type;
         using strides_type = inner_shape_type;
         using backstrides_type = inner_shape_type;
+        static constexpr layout_type layout = raw_tensor<T>::layout;
     };
 
 The ``inner_XXX_type`` are the types used to store and read the shape, strides an backstrides, while the
@@ -94,7 +96,7 @@ Next, bring all the iterable features with this simple definition:
 
     template <class T>
     struct xiterable_inner_types<raw_tensor<T>>
-        : xcontainer_iteratble_types<raw_tensor<T>>
+        : xcontainer_iterable_types<raw_tensor<T>>
     {
     };
 
@@ -279,10 +281,6 @@ The following definitions are required:
         using inner_shape_type = typename table<T>::shape_type;
         using stepper = xindexed_stepper<table<T>, false>;
         using const_stepper = xindexed_stepper<table<T>, true>;
-        using iterator = xiterator<stepper, inner_shape_type*>;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*>;
-        using broadcast_iterator = iterator;
-        using const_broadcast_iterator = const_iterator;
     };
 
 Inheritance
@@ -294,7 +292,7 @@ and to define a bunch of typedefs.
 .. code::
 
     template<class T>
-    class table_adaptor : public xexpression_iterable<table_adaptor<T>>,
+    class table_adaptor : public xiterable<table_adaptor<T>>,
                           public xcontainer_semantic<table_adaptor<T>>
     {
 
@@ -318,10 +316,6 @@ and to define a bunch of typedefs.
         using iterable_base = xexpression_iterable<self_type>;
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
-        using iterator = typename iterable_base::iterator;
-        using const_iterator = typename iterable_base::const_iterator;
-        using broadcast_iterator = typename iterable_base::iterator;
-        using const_broadcast_iterator = typename iterable_base::const_broadcast_iterator;
     };
 
 The iterator and stepper used here may not be the most optimal for ``table``, however they
@@ -341,7 +335,7 @@ constructor and assign operator.
 .. code::
 
     template <class T>
-    class table_adaptor : public xexpression_iterable<table_adaptor<T>>,
+    class table_adaptor : public xiterable<table_adaptor<T>>,
                           public xcontainer_semantic<table_adaptor<T>>
     {
 

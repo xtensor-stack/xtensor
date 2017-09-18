@@ -16,7 +16,7 @@ namespace xt
     {
         // The shape of a 0-D xarray is ().  The size of the buffer is 1.
         xscalar<int> x(1);
-        EXPECT_EQ(x.size(), 1);
+        EXPECT_EQ(x.size(), size_t(1));
     }
 
     TEST(xscalar, access)
@@ -33,17 +33,17 @@ namespace xt
     {
         // The dimension of a xscalar is 0
         xscalar<int> x(2);
-        EXPECT_EQ(x.dimension(), 0);
+        EXPECT_EQ(x.dimension(), size_t(0));
         EXPECT_EQ(x.layout(), layout_type::any);
     }
 
     TEST(xscalar, iterator)
     {
         xscalar<int> x(2);
-        auto xiter = x.xbegin();
+        auto xiter = x.begin();
         *xiter = 4;
         EXPECT_EQ(4, x());
-        auto xiter_end = x.xend();
+        auto xiter_end = x.end();
         ++xiter;
         EXPECT_EQ(xiter, xiter_end);
         auto iter = x.begin();
@@ -80,5 +80,13 @@ namespace xt
         xarray<int> ref = {6, 7, 8, 9};
         xarray<int> b = a + 5;
         EXPECT_EQ(ref, b);
+    }
+
+    TEST(xscalar, all_scalar)
+    {
+        auto tr = all_xscalar<xscalar<double>, xscalar<int>>::value;
+        EXPECT_TRUE(tr);
+        auto fa = all_xscalar<xscalar<double>, xarray<int>>::value;
+        EXPECT_FALSE(fa);
     }
 }

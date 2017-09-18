@@ -128,8 +128,9 @@ Example 2: Create a universal function from a C++ scalar function
 xtensor-python-cookiecutter
 ---------------------------
 
-.. image:: xtensor-cookiecutter.png
+.. image:: xtensor-cookiecutter.svg
    :alt: xtensor-python-cookiecutter
+   :width: 50%
 
 The xtensor-python-cookiecutter_ project helps extension authors create Python extension modules making use of `xtensor`.
 
@@ -237,8 +238,9 @@ Example 2: Create a numpy-style universal function from a C++ scalar function
 xtensor-julia-cookiecutter
 --------------------------
 
-.. image:: xtensor-cookiecutter.png
+.. image:: xtensor-cookiecutter.svg
    :alt: xtensor-julia-cookiecutter
+   :width: 50%
 
 The xtensor-julia-cookiecutter_ project helps extension authors create Julia extension modules making use of `xtensor`.
 
@@ -261,6 +263,43 @@ xtensor-r
 
 The xtensor-r_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``rarray`` and ``rtensor`` which effectively wrap R arrays, allowing operating on R arrays inplace.
 
+Example 1: Use an algorithm of the C++ library on a R array inplace
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**C++ code**
+
+.. code::
+
+    #include <numeric>                    // Standard library import for std::accumulate
+    #include "xtensor/xmath.hpp"          // xtensor import for the C++ universal functions
+    #include "xtensor-r/rarray.hpp"       // R bindings
+    #include <Rcpp.h>
+
+    using namespace Rcpp;
+
+    // [[Rcpp::plugins(cpp14)]]
+
+    // [[Rcpp::export]]
+    double sum_of_sines(xt::rarray<double>& m)
+    {
+        auto sines = xt::sin(m);  // sines does not actually hold values.
+        return std::accumulate(sines.cbegin(), sines.cend(), 0.0);
+    }
+
+**R code**
+
+.. code::
+
+    v <- matrix(0:14, nrow=3, ncol=5)
+    s <- sum_of_sines(v)
+    s
+
+**Outputs**
+
+.. code::
+
+    1.2853996391883833
+
 xtensor-blas
 ------------
 
@@ -269,9 +308,18 @@ xtensor-blas
 
 The xtensor-blas_ project is an extension to the xtensor library, offering bindings to BLAS and LAPACK libraries through cxxblas and cxxlapack from the FLENS project. ``xtensor-blas`` powers the ``xt::linalg`` functionalities, which are the counterpart to numpy's ``linalg`` module.
 
+xtensor-fftw
+------------
+
+.. image:: xtensor-fftw.svg
+   :alt: xtensor-fftw
+
+The xtensor-fftw_ project is an extension to the xtensor library, offering bindings to the fftw library.  ``xtensor-fftw`` powers the ``xt::fftw`` functionalities, which are the counterpart to numpy's ``fft`` module.
+
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
 .. _xtensor-julia-cookiecutter: https://github.com/QuantStack/xtensor-julia-cookiecutter
 .. _xtensor-r: https://github.com/QuantStack/xtensor-r
 .. _xtensor-blas: https://github.com/QuantStack/xtensor-blas
+.. _xtensor-fftw: https://github.com/egpbos/xtensor-fftw

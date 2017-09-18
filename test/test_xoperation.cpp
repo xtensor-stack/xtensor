@@ -346,10 +346,10 @@ namespace xt
 
         shape_type s = {3, 3, 3};
         bool_container d(s);
-        std::fill(d.xbegin(), d.xend(), true);
+        std::fill(d.begin(), d.end(), true);
 
         auto d_nz = nonzero(d);
-        EXPECT_EQ(3 * 3 * 3, d_nz.size());
+        EXPECT_EQ(size_t(3 * 3 * 3), d_nz.size());
         xindex_type_t<typename container_3d::shape_type> last_idx = {2, 2, 2};
         EXPECT_EQ(last_idx, d_nz.back());
     }

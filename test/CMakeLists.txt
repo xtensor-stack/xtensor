@@ -23,7 +23,8 @@ include(CheckCXXCompilerFlag)
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
+    #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion")
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
 
     if (HAS_CPP14_FLAG)
@@ -36,11 +37,6 @@ endif()
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
-    foreach(flag_var
-            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE
-            CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
-        string(REPLACE "/MD" "-MT" ${flag_var} "${${flag_var}}")
-    endforeach()
 endif()
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
@@ -91,9 +87,13 @@ set(XTENSOR_TESTS
     test_xbroadcast.cpp
     test_xbuffer_adaptor.cpp
     test_xbuilder.cpp
+    test_xcomplex.cpp
+    test_xconcepts.cpp
     test_xcontainer_semantic.cpp
+    test_xcsv.cpp
     test_xdynamicview.cpp
     test_xeval.cpp
+    test_xexception.cpp
     test_xfunction.cpp
     test_xindexview.cpp
     test_xiterator.cpp
@@ -102,11 +102,13 @@ set(XTENSOR_TESTS
     test_xmath.cpp
     test_xnoalias.cpp
     test_xoperation.cpp
+    test_xoptional.cpp
     test_xrandom.cpp
     test_xreducer.cpp
     test_xscalar.cpp
     test_xscalar_semantic.cpp
     test_xsemantic.hpp
+    test_xstorage.cpp
     test_xstridedview.cpp
     test_xtensor.cpp
     test_xtensor_adaptor.cpp
@@ -115,10 +117,6 @@ set(XTENSOR_TESTS
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
-    test_xcomplex.cpp
-    test_xoptional.cpp
-    test_xstorage.cpp
-    test_xcsv.cpp
 )
 
 set(XTENSOR_TARGET test_xtensor)

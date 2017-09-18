@@ -51,12 +51,14 @@ namespace xt
             using type = bool;
         };
     }
+
 #define UNARY_MATH_FUNCTOR(NAME)                   \
     template <class T>                             \
     struct NAME##_fun                              \
     {                                              \
         using argument_type = T;                   \
         using result_type = T;                     \
+                                                   \
         constexpr T operator()(const T& arg) const \
         {                                          \
             using std::NAME;                       \
@@ -70,6 +72,7 @@ namespace xt
     {                                                        \
         using argument_type = T;                             \
         using result_type = complex_value_type_t<T>;         \
+                                                             \
         constexpr result_type operator()(const T& arg) const \
         {                                                    \
             using std::NAME;                                 \
@@ -84,6 +87,7 @@ namespace xt
         using first_argument_type = T;                             \
         using second_argument_type = T;                            \
         using result_type = T;                                     \
+                                                                   \
         constexpr T operator()(const T& arg1, const T& arg2) const \
         {                                                          \
             using std::NAME;                                       \
@@ -99,6 +103,7 @@ namespace xt
         using second_argument_type = T;                                           \
         using third_argument_type = T;                                            \
         using result_type = T;                                                    \
+                                                                                  \
         constexpr T operator()(const T& arg1, const T& arg2, const T& arg3) const \
         {                                                                         \
             using std::NAME;                                                      \
@@ -112,6 +117,7 @@ namespace xt
     {                                                                               \
         using argument_type = T;                                                    \
         using result_type = typename xt::detail::bool_functor_return_type<T>::type; \
+                                                                                    \
         constexpr result_type operator()(const T& arg) const                        \
         {                                                                           \
             using std::NAME;                                                        \
@@ -185,7 +191,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Absolute value function.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise absolute value
      * of \em e.
      * @param e an \ref xexpression
@@ -201,7 +207,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Absolute value function.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise absolute value
      * of \em e.
      * @param e an \ref xexpression
@@ -217,7 +223,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Remainder of the floating point division operation.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise remainder of
      * the floating point division operation <em>e1 / e2</em>.
      * @param e1 an \ref xexpression or a scalar
@@ -235,7 +241,7 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Signed remainder of the division operation.
-     * 
+     *
      * Returns an \ref xfunction for the element-wise signed remainder
      * of the floating point division operation <em>e1 / e2</em>.
      * @param e1 an \ref xexpression or a scalar
@@ -428,7 +434,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amax(E&& e, const I(&axes)[N]) noexcept
+    inline auto amax(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = math::maximum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -468,7 +474,7 @@ namespace xt
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto amin(E&& e, const I(&axes)[N]) noexcept
+    inline auto amin(E&& e, const I (&axes)[N]) noexcept
     {
         using functor_type = math::minimum<typename std::decay_t<E>::value_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
@@ -478,8 +484,8 @@ namespace xt
     /**
      * @ingroup basic_functions
      * @brief Clip values between hi and lo
-     * 
-     * Returns an \ref xfunction for the element-wise clipped 
+     *
+     * Returns an \ref xfunction for the element-wise clipped
      * values between lo and hi
      * @param e1 an \ref xexpression or a scalar
      * @param lo a scalar
@@ -509,7 +515,7 @@ namespace xt
             inline std::enable_if_t<xt::detail::is_complex<T>::value, T>
             sign_impl(T x)
             {
-                typename T::value_type e = x.real() ? x.real() : x.imag();
+                typename T::value_type e = (x.real() != T(0)) ? x.real() : x.imag();
                 return T(sign_impl(e), 0);
             }
 
@@ -701,7 +707,7 @@ namespace xt
      * @ingroup pow_functions
      * @brief Square root function.
      *
-     * Returns an \ref xfunction for the element-wise square 
+     * Returns an \ref xfunction for the element-wise square
      * root of \em e.
      * @param e an \ref xexpression
      * @return an \ref xfunction
@@ -1242,11 +1248,18 @@ namespace xt
 
             bool operator()(const T& a, const T& b) const
             {
-                if (m_equal_nan && std::isnan(a) && std::isnan(b))
+                using std::abs;
+
+                if(std::isnan(a) && std::isnan(b))
                 {
-                    return true;
+                    return m_equal_nan;
                 }
-                return std::abs(a - b) <= (m_atol + m_rtol * std::abs(b));
+                if(std::isinf(a) && std::isinf(b))
+                {
+                    return std::signbit(a) == std::signbit(b);
+                }
+                auto d = abs(a - b);
+                return d <= m_atol || d <= m_rtol * std::max(abs(a), abs(b));
             }
 
         private:

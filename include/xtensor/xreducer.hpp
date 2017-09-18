@@ -68,10 +68,6 @@ namespace xt
         using inner_shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, X>::type;
         using const_stepper = xreducer_stepper<F, CT, X>;
         using stepper = const_stepper;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using iterator = const_iterator;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
     };
 
     /**
@@ -90,7 +86,7 @@ namespace xt
      */
     template <class F, class CT, class X>
     class xreducer : public xexpression<xreducer<F, CT, X>>,
-                     public xexpression_const_iterable<xreducer<F, CT, X>>
+                     public xconst_iterable<xreducer<F, CT, X>>
     {
     public:
 
@@ -108,7 +104,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xexpression_const_iterable<self_type>;
+        using iterable_base = xconst_iterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
 
@@ -289,6 +285,7 @@ namespace xt
                                    OutputIt d_first, OutputIt map_first)
         {
             using difference_type = typename std::iterator_traits<InputIt>::difference_type;
+            using value_type = typename std::iterator_traits<OutputIt>::value_type;
             InputIt iter = first;
             while (iter != last && e_first != e_last)
             {
@@ -296,7 +293,7 @@ namespace xt
                 if (diff != difference_type(*e_first))
                 {
                     *d_first++ = *iter++;
-                    *map_first++ = diff;
+                    *map_first++ = value_type(diff);
                 }
                 else
                 {
@@ -511,28 +508,36 @@ namespace xt
     inline void xreducer_stepper<F, CT, X>::step(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_stepper.step(get_dim(dim), n);
+        }
     }
 
     template <class F, class CT, class X>
     inline void xreducer_stepper<F, CT, X>::step_back(size_type dim, size_type n)
     {
         if (dim >= m_offset)
+        {
             m_stepper.step_back(get_dim(dim), n);
+        }
     }
 
     template <class F, class CT, class X>
     inline void xreducer_stepper<F, CT, X>::reset(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_stepper.reset(get_dim(dim));
+        }
     }
 
     template <class F, class CT, class X>
     inline void xreducer_stepper<F, CT, X>::reset_back(size_type dim)
     {
         if (dim >= m_offset)
+        {
             m_stepper.reset_back(get_dim(dim));
+        }
     }
 
     template <class F, class CT, class X>

@@ -142,20 +142,20 @@ namespace xt
         a(2, 1) = -0;
 
         auto signs = sign(a);
-        EXPECT_EQ(1, signs(0, 0));
-        EXPECT_EQ(-1, signs(0, 1));
-        EXPECT_EQ(0, signs(1, 1));
-        EXPECT_EQ(0, signs(2, 1));
+        EXPECT_EQ(1.f, signs(0, 0));
+        EXPECT_EQ(-1.f, signs(0, 1));
+        EXPECT_EQ(0.f, signs(1, 1));
+        EXPECT_EQ(0.f, signs(2, 1));
 
         xarray<unsigned int> b(shape, 1);
-        b(1, 1) = -1;
+        b(1, 1) = static_cast<unsigned int>(-1);
         b(2, 1) = 0;
 
         auto signs_b = sign(b);
-        EXPECT_EQ(1, signs_b(0, 0));
+        EXPECT_EQ(1u, signs_b(0, 0));
         // sign from overflow
-        EXPECT_EQ(1, signs_b(1, 1));
-        EXPECT_EQ(0, signs_b(2, 1));
+        EXPECT_EQ(1u, signs_b(1, 1));
+        EXPECT_EQ(0u, signs_b(2, 1));
 
         xarray<double> c(shape, 1);
         c(0, 0) = std::numeric_limits<double>::infinity();
@@ -486,5 +486,14 @@ namespace xt
         a(0, 0) = nan("n");
         EXPECT_FALSE(isclose(a, b)(0, 0));
         EXPECT_TRUE(isclose(a, b, 1, 1, true)(0, 0));
+    }
+
+    TEST(xmath, scalar_cast)
+    {
+        double arg = 1.0;
+        double res = ::xt::atan(xscalar<double>(arg));
+        EXPECT_EQ(res, std::atan(arg));
+        bool close = ::xt::isclose(1.0, 1.0);
+        EXPECT_EQ(close, true);
     }
 }

@@ -260,7 +260,9 @@ namespace xt
         inline void xbuffer_storage<T, A>::resize(size_type size)
         {
             if (size != m_size)
+            {
                 throw std::runtime_error("xbuffer_storage not resizable");
+            }
         }
 
         template <class T, class A>
@@ -321,7 +323,7 @@ namespace xt
             {
                 allocator_type al = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
                 pointer tmp = safe_init_allocate(al, rhs.m_size);
-                if (std::is_trivially_default_constructible<value_type>::value)
+                if (xtrivially_default_constructible<value_type>::value)
                 {
                     std::uninitialized_copy(*(rhs.p_data), *(rhs.p_data) + rhs.m_size, tmp);
                 }

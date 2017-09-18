@@ -38,10 +38,18 @@ namespace xt
         m_c.reshape(sh);
 
         for (size_t i = 0; i < sh[0]; ++i)
+        {
             for (size_t j = 0; j < sh[1]; ++j)
+            {
                 for (size_t k = 0; k < sh[2]; ++k)
+                {
                     for (size_t l = 0; l < sh[3]; ++l)
+                    {
                         m_c(i, j, k, l) = m_a(j, k, l) + static_cast<int>(i);
+                    }
+                }
+            }
+        }
     }
 
     TEST(xfunction, broadcast_shape)
@@ -187,9 +195,9 @@ namespace xt
     void test_xfunction_iterator(const xarray<int>& a, const xarray<int>& b)
     {
         auto func = (a + b);
-        auto iter = func.xbegin();
-        auto itera = a.xbegin();
-        auto iterb = b.xbegin(a.shape());
+        auto iter = func.begin();
+        auto itera = a.begin();
+        auto iterb = b.begin(a.shape());
         auto nb_iter = a.shape().back() * 2 + 1;
         for (size_t i = 0; i < nb_iter; ++i)
         {
@@ -204,25 +212,31 @@ namespace xt
 
         {
             SCOPED_TRACE("same shape");
+            std::cout << "before same shape" << std::endl;
             test_xfunction_iterator(f.m_a, f.m_a);
+            std::cout << "after same shape" << std::endl;
         }
 
         {
             SCOPED_TRACE("different shape");
+            std::cout << "before different shape" << std::endl;
             test_xfunction_iterator(f.m_a, f.m_b);
+            std::cout << "after different shape" << std::endl;
         }
 
         {
             SCOPED_TRACE("different dimensions");
+            std::cout << "before different dimensions" << std::endl;
             test_xfunction_iterator(f.m_c, f.m_a);
+            std::cout << "after different dimensions" << std::endl;
         }
     }
 
     void test_xfunction_iterator_end(const xarray<int>& a, const xarray<int>& b)
     {
         auto func = (a + b);
-        auto iter = func.xbegin();
-        auto iter_end = func.xend();
+        auto iter = func.begin();
+        auto iter_end = func.end();
         auto size = a.size();
         for (size_t i = 0; i < size; ++i)
         {

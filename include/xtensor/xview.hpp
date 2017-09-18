@@ -48,12 +48,8 @@ namespace xt
     {
         using xexpression_type = std::decay_t<CT>;
         using inner_shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
-        using stepper = xview_stepper<false, CT, S...>;
-        using const_stepper = xview_stepper<true, CT, S...>;
-        using iterator = xiterator<stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using const_iterator = xiterator<const_stepper, inner_shape_type*, DEFAULT_LAYOUT>;
-        using reverse_iterator = std::reverse_iterator<iterator>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using stepper = xview_stepper<std::is_const<std::remove_reference_t<CT>>::value, CT, S...>;
+        using const_stepper = xview_stepper<true, std::remove_cv_t<CT>, S...>;
     };
 
     /**
@@ -72,7 +68,7 @@ namespace xt
      */
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,
-                  public xexpression_iterable<xview<CT, S...>>
+                  public xiterable<xview<CT, S...>>
     {
     public:
 
@@ -88,7 +84,7 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using iterable_base = xexpression_iterable<self_type>;
+        using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
         using strides_type = shape_type;
@@ -101,10 +97,13 @@ namespace xt
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
-        // The argument FSL avoids the compiler to call this constructor
+        // The FSL argument prevents the compiler from calling this constructor
         // instead of the copy constructor when sizeof...(SL) == 0.
         template <class CTA, class FSL, class... SL>
         explicit xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept;
+
+        xview(const xview&) = default;
+        self_type& operator=(const xview& rhs);
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -348,6 +347,13 @@ namespace xt
     }
     //@}
 
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator=(const xview& rhs) -> self_type&
+    {
+        temporary_type tmp(rhs);
+        return this->assign_temporary(std::move(tmp));
+    }
+
     /**
      * @name Extended copy semantic
      */
@@ -445,10 +451,12 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) -> reference
     {
+        // The static cast prevents the compiler from instantiating the template methods with signed integers,
+        // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?
                                                         sizeof...(Args) + integral_count<S...>() - newaxis_count<S...>() :
                                                         0)>(),
-                           args...);
+                           static_cast<size_type>(args)...);
     }
 
     template <class CT, class... S>
@@ -482,10 +490,12 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) const -> const_reference
     {
+        // The static cast prevents the compiler from instantiating the template methods with signed integers,
+        // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?
                                                         sizeof...(Args) + integral_count<S...>() - newaxis_count<S...>() :
                                                         0)>(),
-                           args...);
+                           static_cast<size_type>(args)...);
     }
 
     template <class CT, class... S>
@@ -531,7 +541,6 @@ namespace xt
         std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
     {
         using strides_type = typename T::strides_type;
-        strides_type temp = m_e.strides();
         strides_type strides = make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
@@ -668,14 +677,15 @@ namespace xt
     template <typename std::decay_t<CT>::size_type I, class T, class Arg, class... Args>
     inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
     {
-        return slice.derived_cast()(argument<I>(arg, args...));
+        using ST = typename T::size_type;
+        return slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...));
     }
 
     template <class CT, class... S>
     template <typename std::decay_t<CT>::size_type I, class T, class... Args>
     inline auto xview<CT, S...>::sliced_access(const T& squeeze, Args...) const -> disable_xslice<T, size_type>
     {
-        return squeeze;
+        return static_cast<size_type>(squeeze);
     }
 
     template <class CT, class... S>
@@ -712,7 +722,7 @@ namespace xt
     template <class CT, class... S>
     inline void xview<CT, S...>::assign_temporary_impl(temporary_type&& tmp)
     {
-        std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
+        std::copy(tmp.cbegin(), tmp.cend(), this->begin());
     }
 
     namespace detail

@@ -326,9 +326,9 @@ namespace xt
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
         bool res = de1.dimension() == de2.dimension() && std::equal(de1.shape().begin(), de1.shape().end(), de2.shape().begin());
-        auto iter1 = de1.xbegin();
-        auto iter2 = de2.xbegin();
-        auto iter_end = de1.xend();
+        auto iter1 = de1.begin();
+        auto iter2 = de2.begin();
+        auto iter_end = de1.end();
         while (res && iter1 != iter_end)
         {
             res = (*iter1++ == *iter2++);
@@ -426,8 +426,9 @@ namespace xt
 
         auto next_idx = [&shape](index_type& idx)
         {
-            for (int i = int(shape.size() - 1); i >= 0; --i)
+            for (size_type j = shape.size(); j > 0; --j)
             {
+                size_type i = j - 1;
                 if (idx[i] >= shape[i] - 1)
                 {
                     idx[i] = 0;
@@ -488,7 +489,7 @@ namespace xt
         }
         else
         {
-            return std::any_of(e.xbegin(), e.xend(),
+            return std::any_of(e.begin(), e.end(),
                                [](const typename std::decay_t<E>::value_type& el) { return el; });
         }
     }
@@ -513,7 +514,7 @@ namespace xt
         }
         else
         {
-            return std::all_of(e.xbegin(), e.xend(),
+            return std::all_of(e.begin(), e.end(),
                                [](const typename std::decay_t<E>::value_type& el) { return el; });
         }
     }

@@ -82,7 +82,7 @@ namespace xt
         EXPECT_TRUE(e(0, 1));
         EXPECT_TRUE(e(1, 1));
 
-        for (auto it = e.xbegin(); it != e.xend(); it++)
+        for (auto it = e.begin(); it != e.end(); it++)
         {
             EXPECT_TRUE(*it);
         }
@@ -149,10 +149,11 @@ namespace xt
         xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double, layout_type::row_major> rm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         auto e = equal(cm, rm);
-        auto iter_end = e.xend();
-        for (auto iter = e.xbegin(); iter != e.xend(); ++iter)
+        auto iter_end = e.end();
+        for (auto iter = e.begin(); iter != e.end(); ++iter)
         {
             EXPECT_TRUE(*iter);
         }
     }
 }
+
