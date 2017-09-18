@@ -108,11 +108,15 @@ namespace xt
 
         template <class... Args>
         reference operator()(Args...) noexcept;
+        template <class... Args>
+        reference at(Args...);
         reference operator[](const xindex&) noexcept;
         reference operator[](size_type) noexcept;
 
         template <class... Args>
         const_reference operator()(Args...) const noexcept;
+        template <class... Args>
+        const_reference at(Args...) const;
         const_reference operator[](const xindex&) const noexcept;
         const_reference operator[](size_type) const noexcept;
 
@@ -454,6 +458,14 @@ namespace xt
     }
 
     template <class CT>
+    template <class... Args>
+    inline auto xscalar<CT>::at(Args... args) -> reference
+    {
+        check_dimension(shape(), args...);
+        return this->operator()(args...);
+    }
+
+    template <class CT>
     inline auto xscalar<CT>::operator[](const xindex&) noexcept -> reference
     {
         return m_value;
@@ -470,6 +482,14 @@ namespace xt
     inline auto xscalar<CT>::operator()(Args...) const noexcept -> const_reference
     {
         return m_value;
+    }
+
+    template <class CT>
+    template <class... Args>
+    inline auto xscalar<CT>::at(Args... args) const -> const_reference
+    {
+        check_dimension(shape(), args...);
+        return this->operator()(args...);
     }
 
     template <class CT>
