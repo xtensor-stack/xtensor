@@ -41,6 +41,16 @@ Or you can directly install it from the sources:
 cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
+## Optional dependency on xsimd
+
+`xtensor` has an optional dependency on the `xsimd` library:
+
+| `xtensor` | `xsimd` |
+|-----------|---------|
+|  master   |  ^3.1.0 |
+
+This dependency is required if you want to enable simd acceleration in `xtensor`. This can be done
+by defining the macro `XTENSOR_USE_XSIMD` *before* including any header of `xtensor`.
 
 ## Usage
 
