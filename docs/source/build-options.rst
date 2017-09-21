@@ -18,6 +18,8 @@ Build
 - ``XTENSOR_ENABLE_ASSERT``: activates the assertions in ``xtensor``.
 - ``XTENSOR_CHECK_DIMENSION``: turns on ``XTENSOR_ENABLE_ASSERT`` and activates dimensions check in ``xtensor``.
   Note that the dimensions check should not be activated if you expect ``operator()`` to perform broadcasting.
+- ``XTENSOR_USE_XSIMD``: enables simd acceleration in ``xtensor``. This requires that you have xsimd_ installed
+  on your system.
 
 All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or setting ``GTEST_SRC_DIR``
 enables ``BUILD_TESTS``.
@@ -53,6 +55,10 @@ Configuration
 available macros:
 
 - ``XTENSOR_ENABLE_ASSERT``: enables assertions in xtensor, such as bound check.
+- ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
+  on if you expect ``operator()`` to perform broadcasting.
+- ``XTENSOR_USE_XSIMD``: enables simd acceleration in ``xtensor``. This requires that you have xsimd_ installed
+  on your system.
 - ``DEFAULT_DATA_CONTAINER(T, A)``: defines the type used as the default data container for tensors and arrays. ``T``
   is the ``value_type`` of the container and ``A`` its ``allocator_type``.
 - ``DEFAULT_SHAPE_CONTAINER(T, EA, SA)``: defines the type used as the default shape container for tensors and arrays.
@@ -62,3 +68,4 @@ available macros:
   discourage using this macro, which is provided for testing purpose. Prefer defining alias types on tensor and array
   containers instead.
 
+.. _xsimd: https://github.com/QuantStack/xsimd
