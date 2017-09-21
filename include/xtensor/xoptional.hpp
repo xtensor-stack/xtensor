@@ -47,9 +47,10 @@ namespace xt
         };
 
         template <class CT, class CB>
-        struct bool_functor_return_type<xoptional<CT, CB>>
+        struct functor_return_type<xoptional<CT, CB>, bool>
         {
             using type = xoptional<bool>;
+            using simd_type = xoptional<bool>;
         };
     }
 

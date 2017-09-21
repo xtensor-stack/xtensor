@@ -20,32 +20,108 @@
 namespace xt
 {
 
+    /***********
+     * helpers *
+     ***********/
+
+    namespace detail
+    {
+        template <class T, class R>
+        struct functor_return_type
+        {
+            using type = R;
+            using simd_type = xsimd::simd_type<R>;
+        };
+
+        template <class T>
+        struct functor_return_type<T, bool>
+        {
+            using type = bool;
+            using simd_type = xsimd::simd_bool_type<T>;
+        };
+    }
+
+#define UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
+    template <class T>                                                          \
+    struct NAME                                                                 \
+    {                                                                           \
+        using return_type = xt::detail::functor_return_type<T, R>;              \
+        using argument_type = T;                                                \
+        using result_type = typename return_type::type;                         \
+        using simd_value_type = xsimd::simd_type<T>;                            \
+        using simd_result_type = typename return_type::simd_type;               \
+        constexpr result_type operator()(const T& arg) const                    \
+        {                                                                       \
+            return OP arg;                                                      \
+        }                                                                       \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
+        {                                                                       \
+            return OP arg;                                                      \
+        }                                                                       \
+    }
+
+#define UNARY_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
+#define UNARY_BOOL_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, bool)
+
+#define BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
+    template <class T>                                                           \
+    struct NAME                                                                  \
+    {                                                                            \
+        using return_type = xt::detail::functor_return_type<T, R>;               \
+        using first_argument_type = T;                                           \
+        using second_argument_type = T;                                          \
+        using result_type = typename return_type::type;                          \
+        using simd_value_type = xsimd::simd_type<T>;                             \
+        using simd_result_type = typename return_type::simd_type;                \
+        constexpr result_type operator()(const T& arg1, const T& arg2) const     \
+        {                                                                        \
+            return (arg1 OP arg2);                                               \
+        }                                                                        \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg1,       \
+                                              const simd_value_type& arg2) const \
+        {                                                                        \
+            return (arg1 OP arg2);                                               \
+        }                                                                        \
+    }
+
+#define BINARY_OPERATOR_FUNCTOR(NAME, OP) BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
+#define BINARY_BOOL_OPERATOR_FUNCTOR(NAME, OP) BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, bool)
+
     namespace detail
     {
 
-        /***********
-         * helpers *
-         ***********/
-
-        template <class T>
-        struct identity
-        {
-            using result_type = T;
-
-            constexpr T operator()(const T& t) const noexcept
-            {
-                return +t;
-            }
-        };
+        UNARY_OPERATOR_FUNCTOR(identity, +);
+        UNARY_OPERATOR_FUNCTOR(negate, -);
+        BINARY_OPERATOR_FUNCTOR(plus, +);
+        BINARY_OPERATOR_FUNCTOR(minus, -);
+        BINARY_OPERATOR_FUNCTOR(multiplies, *);
+        BINARY_OPERATOR_FUNCTOR(divides, /);
+        BINARY_BOOL_OPERATOR_FUNCTOR(logical_or, ||);
+        BINARY_BOOL_OPERATOR_FUNCTOR(logical_and, &&);
+        UNARY_BOOL_OPERATOR_FUNCTOR(logical_not, !);
+        BINARY_BOOL_OPERATOR_FUNCTOR(less, <);
+        BINARY_BOOL_OPERATOR_FUNCTOR(less_equal, <=);
+        BINARY_BOOL_OPERATOR_FUNCTOR(greater, >);
+        BINARY_BOOL_OPERATOR_FUNCTOR(greater_equal, >=);
+        BINARY_BOOL_OPERATOR_FUNCTOR(equal_to, ==);
+        BINARY_BOOL_OPERATOR_FUNCTOR(not_equal_to, !=);
 
         template <class T>
         struct conditional_ternary
         {
             using result_type = T;
+            using simd_value_type = xsimd::simd_type<T>;
+            using simd_bool_type = xsimd::simd_bool_type<T>;
 
-            constexpr result_type operator()(const T& t1, const T& t2, const T& t3) const noexcept
+            constexpr result_type operator()(bool t1, const T& t2, const T& t3) const noexcept
             {
                 return t1 ? t2 : t3;
+            }
+            constexpr simd_value_type simd_apply(const simd_bool_type& t1,
+                                                 const simd_value_type& t2,
+                                                 const simd_value_type& t3) const noexcept
+            {
+                return xsimd::select(t1, t2, t3);
             }
         };
 
@@ -74,6 +150,13 @@ namespace xt
         using xfunction_type_t = typename std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
                                                            xfunction_type<F, E...>>::type;
     }
+
+#undef UNARY_OPERATOR_FUNCTOR
+#undef UNARY_BOOL_OPERATOR_FUNCTOR
+#undef UNARY_OPERATOR_FUNCTOR_IMPL
+#undef BINARY_OPERATOR_FUNCTOR
+#undef BINARY_BOOL_OPERATOR_FUNCTOR
+#undef BINARY_OPERATOR_FUNCTOR_IMPL
 
     /*************
      * operators *
@@ -110,9 +193,9 @@ namespace xt
     */
     template <class E>
     inline auto operator-(E&& e) noexcept
-        -> detail::xfunction_type_t<std::negate, E>
+        -> detail::xfunction_type_t<detail::negate, E>
     {
-        return detail::make_xfunction<std::negate>(std::forward<E>(e));
+        return detail::make_xfunction<detail::negate>(std::forward<E>(e));
     }
 
     /**
@@ -127,9 +210,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator+(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::plus, E1, E2>
+        -> detail::xfunction_type_t<detail::plus, E1, E2>
     {
-        return detail::make_xfunction<std::plus>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::plus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -144,9 +227,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator-(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::minus, E1, E2>
+        -> detail::xfunction_type_t<detail::minus, E1, E2>
     {
-        return detail::make_xfunction<std::minus>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::minus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -161,9 +244,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator*(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::multiplies, E1, E2>
+        -> detail::xfunction_type_t<detail::multiplies, E1, E2>
     {
-        return detail::make_xfunction<std::multiplies>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::multiplies>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -178,9 +261,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator/(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::divides, E1, E2>
+        -> detail::xfunction_type_t<detail::divides, E1, E2>
     {
-        return detail::make_xfunction<std::divides>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::divides>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -199,9 +282,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto operator||(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::logical_or, E1, E2>
+        -> detail::xfunction_type_t<detail::logical_or, E1, E2>
     {
-        return detail::make_xfunction<std::logical_or>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::logical_or>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -216,9 +299,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator&&(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::logical_and, E1, E2>
+        -> detail::xfunction_type_t<detail::logical_and, E1, E2>
     {
-        return detail::make_xfunction<std::logical_and>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::logical_and>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -232,9 +315,9 @@ namespace xt
     */
     template <class E>
     inline auto operator!(E&& e) noexcept
-        -> detail::xfunction_type_t<std::logical_not, E>
+        -> detail::xfunction_type_t<detail::logical_not, E>
     {
-        return detail::make_xfunction<std::logical_not>(std::forward<E>(e));
+        return detail::make_xfunction<detail::logical_not>(std::forward<E>(e));
     }
 
     /**
@@ -253,9 +336,9 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto operator<(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::less, E1, E2>
+        -> detail::xfunction_type_t<detail::less, E1, E2>
     {
-        return detail::make_xfunction<std::less>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::less>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -270,9 +353,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator<=(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::less_equal, E1, E2>
+        -> detail::xfunction_type_t<detail::less_equal, E1, E2>
     {
-        return detail::make_xfunction<std::less_equal>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::less_equal>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -287,9 +370,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator>(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::greater, E1, E2>
+        -> detail::xfunction_type_t<detail::greater, E1, E2>
     {
-        return detail::make_xfunction<std::greater>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::greater>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -304,9 +387,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto operator>=(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::greater_equal, E1, E2>
+        -> detail::xfunction_type_t<detail::greater_equal, E1, E2>
     {
-        return detail::make_xfunction<std::greater_equal>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::greater_equal>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -365,9 +448,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto equal(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::equal_to, E1, E2>
+        -> detail::xfunction_type_t<detail::equal_to, E1, E2>
     {
-        return detail::make_xfunction<std::equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -382,9 +465,9 @@ namespace xt
     */
     template <class E1, class E2>
     inline auto not_equal(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<std::not_equal_to, E1, E2>
+        -> detail::xfunction_type_t<detail::not_equal_to, E1, E2>
     {
-        return detail::make_xfunction<std::not_equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<detail::not_equal_to>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**

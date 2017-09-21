@@ -90,6 +90,12 @@ namespace xt
     template <class T, std::size_t N>
     constexpr std::size_t sequence_size(const T (&a)[N]);
 
+    namespace detail
+    {
+        template <class T>
+        using void_t = void;
+    }
+
     /*******************************
      * remove_class implementation *
      *******************************/

@@ -79,7 +79,7 @@ namespace xt
      * trivial_assigner *
      ********************/
 
-    template <bool index_assign>
+    template <bool simd_assign>
     struct trivial_assigner
     {
         template <class E1, class E2>
@@ -103,6 +103,19 @@ namespace xt
         {
             return false;
         }
+
+        template <class E, class = void_t<int>>
+        struct forbid_simd_assign
+        {
+            static constexpr bool value = true;
+        };
+
+        template <class E>
+        struct forbid_simd_assign<E,
+            void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
+        {
+            static constexpr bool value = false;
+        };
     }
 
     template <class E1, class E2>
@@ -115,7 +128,11 @@ namespace xt
         if (trivial_broadcast)
         {
             constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
-            trivial_assigner<contiguous_layout>::run(de1, de2);
+            constexpr bool same_type = std::is_same<typename E1::value_type, typename E2::value_type>::value;
+            constexpr bool simd_size = xsimd::simd_traits<typename E1::value_type>::size > 1;
+            constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
+            constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
+            trivial_assigner<simd_assign>::run(de1, de2);
         }
         else
         {
@@ -240,13 +257,29 @@ namespace xt
      * trivial_assigner implementation *
      ***********************************/
 
-    template <bool index_assign>
+    template <bool simd_assign>
     template <class E1, class E2>
-    inline void trivial_assigner<index_assign>::run(E1& e1, const E2& e2)
+    inline void trivial_assigner<simd_assign>::run(E1& e1, const E2& e2)
     {
+        using lhs_align_mode = xsimd::container_alignment_t<E1>;
+        constexpr bool is_aligned = std::is_same<lhs_align_mode, aligned_mode>::value;
+        using rhs_align_mode = std::conditional_t<is_aligned, inner_aligned_mode, unaligned_mode>;
+        using value_type = std::common_type_t<typename E1::value_type, typename E2::value_type>;
+        using simd_type = xsimd::simd_type<value_type>;
         using size_type = typename E1::size_type;
         size_type size = e1.size();
-        for (size_type i = 0; i < size; ++i)
+        size_type simd_size = simd_type::size;
+        size_type align_begin = is_aligned ? 0 : xsimd::get_alignment_offset(&(e1.data()), size, simd_size);
+        size_type align_end = align_begin + ((size - align_begin) &~(simd_size - 1));
+        for (size_type i = 0; i < align_begin; ++i)
+        {
+            e1.data_element(i) = e2.data_element(i);
+        }
+        for (size_type i = align_begin; i < align_end; i += simd_size)
+        {
+            e1.template store_simd<lhs_align_mode, simd_type>(i, e2.template load_simd<rhs_align_mode, simd_type>(i));
+        }
+        for (size_type i = align_end; i < size; ++i)
         {
             e1.data_element(i) = e2.data_element(i);
         }

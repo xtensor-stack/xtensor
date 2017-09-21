@@ -170,7 +170,12 @@ namespace xt
         {
             using argument_type = T;
             using result_type = decltype(detail::conj(std::declval<T>()));
+            using simd_value_type = xsimd::simd_type<T>;                            \
             constexpr result_type operator()(const T& t) const
+            {
+                return detail::conj(t);
+            }
+            constexpr simd_value_type simd_apply(const simd_value_type& t) const
             {
                 return detail::conj(t);
             }

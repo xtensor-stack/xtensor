@@ -188,8 +188,8 @@ namespace xt
             template <class It>
             inline T operator()(const It& /*begin*/, const It& end) const
             {
-                using value_type = typename std::iterator_traits<It>::value_type;
-                return *(end - 1) == *(end - 2) + value_type(m_k) ? T(1) : T(0);
+                using lvalue_type = typename std::iterator_traits<It>::value_type;
+                return *(end - 1) == *(end - 2) + lvalue_type(m_k) ? T(1) : T(0);
             }
 
         private:
