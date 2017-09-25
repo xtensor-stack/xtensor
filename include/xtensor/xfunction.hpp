@@ -21,6 +21,7 @@
 #include "xiterable.hpp"
 #include "xlayout.hpp"
 #include "xscalar.hpp"
+#include "xstrides.hpp"
 #include "xutils.hpp"
 
 namespace xt

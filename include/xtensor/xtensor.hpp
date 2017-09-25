@@ -323,8 +323,10 @@ namespace xt
         : base_type()
     {
         // Avoids unintialized data because of (m_shape == shape) condition
-        // in reshape (called by assign), which is always true when dimension == 0.
-        if (e.derived_cast().dimension() == 0)
+        // in reshape (called by assign), which is always true when size() == 1.
+        // The condition dimension() == 0 as in xarray is not sufficient because
+        // the shape is always initialized since it has a static number of dimensions.
+        if (e.derived_cast().size() == 1)
         {
             m_data.resize(1);
         }
