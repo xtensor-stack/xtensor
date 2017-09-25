@@ -111,6 +111,10 @@ namespace xt
         xarray<double> expectedv1 = 2 * ones<double>({4});
         xarray<double> resv1 = sum(v, {1});
         EXPECT_EQ(expectedv1, resv1);
+
+        // check that there is no overflow
+        xarray<uint8_t> c = ones<uint8_t>({1000});
+        EXPECT_EQ(1000, sum(c)());
     }
 
     TEST(xreducer, sum_all)
@@ -119,6 +123,13 @@ namespace xt
         auto res = sum(features.m_a);
         double expected = 732;
         EXPECT_EQ(res(), expected);
+    }
+
+    TEST(xreducer, prod)
+    {
+        // check that there is no overflow
+        xarray<uint8_t> c = 2*ones<uint8_t>({34});
+        EXPECT_EQ(1ULL << 34, prod(c)());
     }
 
     TEST(xreducer, mean)
@@ -136,5 +147,8 @@ namespace xt
         EXPECT_EQ(mean_all(), expect_all());
         EXPECT_TRUE(all(equal(mean0, expect0)));
         EXPECT_TRUE(all(equal(mean1, expect1)));
+
+        xarray<uint8_t> c = { 1, 2};
+        EXPECT_EQ(mean(c)(), 1.5);
     }
 }
