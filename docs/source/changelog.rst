@@ -7,6 +7,21 @@
 Changelog
 =========
 
+0.11.3
+------
+
+- Fixed bug in length-1 statically dimensioned tensor construction.
+
+0.11.2
+------
+
+- Fixup compilation issue with latest clang compiler. (missing `constexpr` keyword).
+
+0.11.1
+------
+
+- Fixes some warnings in julia and python bindings
+
 0.11.0
 ------
 
