@@ -29,7 +29,6 @@
 
 namespace xt
 {
-
     /**********
      * reduce *
      **********/
@@ -78,9 +77,12 @@ namespace xt
      * a reducing function to an \ref xexpression over the specified
      * axes.
      *
-     * @tparam F the function type
+     * @tparam F a binary function type
      * @tparam CT the closure type of the \ref xexpression to reduce
      * @tparam X the list of axes
+     *
+     * The reducer's result_type is deduced from the result type of function @tparam F
+     * when called with elements of the expression @tparam CT.
      *
      * @sa reduce
      */
@@ -95,7 +97,13 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using axes_type = X;
 
-        using value_type = typename xexpression_type::value_type;
+        struct result_type_helper
+        {
+            functor_type m_f;
+        };
+
+        using substepper_type = typename xexpression_type::const_stepper;
+        using value_type = std::decay_t<decltype(((result_type_helper*)0)->m_f(**(substepper_type*)0, **(substepper_type*)0))>;
         using reference = value_type;
         using const_reference = value_type;
         using pointer = value_type*;

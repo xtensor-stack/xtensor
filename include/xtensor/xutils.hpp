@@ -1080,6 +1080,42 @@ namespace xt
     template <class... T>
     using promote_type_t = typename promote_type<T...>::type;
 
+    /** @brief Traits class to find the biggest type of the same kind.
+     *   For example, <tt>big_promote_type<unsigned char>::type</tt> is <tt>unsigned long long</tt>.
+     *   The default implementation only supports built-in types and <tt>std::complex</tt>. All
+     *   other types remain unchanged unless <tt>big_promote_type</tt> gets specialized for them.
+     */
+    template <class T>
+    struct big_promote_type
+    {
+      private:
+        using V = std::decay_t<T>;
+        static const bool is_arithmetic = std::is_arithmetic<V>::value;
+        static const bool is_signed = std::is_signed<V>::value;
+        static const bool is_integral = std::is_integral<V>::value;
+        static const bool is_long_double = std::is_same<V, long double>::value;
+
+      public:
+        using type = std::conditional_t<is_arithmetic,
+                        std::conditional_t<is_integral,
+                            std::conditional_t<is_signed, long long, unsigned long long>,
+                            std::conditional_t<is_long_double, long double, double>
+                        >,
+                        V
+                     >;
+    };
+
+    template <class T>
+    struct big_promote_type<std::complex<T>>
+    {
+        using type = std::complex<typename big_promote_type<T>::type>;
+    };
+
+    /** @brief Abbreviation of 'typename big_promote_type<T>::type'.
+     */
+    template <class T>
+    using big_promote_type_t = typename big_promote_type<T>::type;
+
     namespace traits_detail
     {
         using std::sqrt;

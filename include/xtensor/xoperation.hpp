@@ -63,6 +63,12 @@ namespace xt
 #define UNARY_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
 #define UNARY_BOOL_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, bool)
 
+    /* In this macro, T is assumed to be the promote_type of all arguments.
+       Nonetheless, operator() is implemented as a function template,
+       because automatic conversion of the actual argument types to T may
+       cause 'possible loss of data' warnings, e.g. when T is double and an
+       argument is uint64_t.
+    */
 #define BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
     template <class T>                                                           \
     struct NAME                                                                  \
@@ -73,7 +79,8 @@ namespace xt
         using result_type = typename return_type::type;                          \
         using simd_value_type = xsimd::simd_type<T>;                             \
         using simd_result_type = typename return_type::simd_type;                \
-        constexpr result_type operator()(const T& arg1, const T& arg2) const     \
+        template <class T1, class T2>                                            \
+        constexpr result_type operator()(const T1& arg1, const T2& arg2) const   \
         {                                                                        \
             return (arg1 OP arg2);                                               \
         }                                                                        \
@@ -492,7 +499,7 @@ namespace xt
     /**
      * @ingroup logical_operators
      * @brief return vector of indices where T is not zero
-     * 
+     *
      * @param arr input array
      * @return vector of \a index_types where arr is not equal to zero
      */
@@ -541,7 +548,7 @@ namespace xt
      * @ingroup logical_operators
      * @brief return vector of indices where condition is true
      *        (equivalent to \a nonzero(condition))
-     * 
+     *
      * @param condition input array
      * @return vector of \a index_types where condition is not equal to zero
      */
