@@ -25,6 +25,11 @@ namespace xt
         ASSERT_EQ(1.0, m(0, 1));
         xarray<double> m_assigned = m;
         ASSERT_EQ(1.0, m_assigned(0, 1));
+
+        // assignment with narrowing type cast
+        // (check that the compiler doesn't issue a warning)
+        xarray<uint8_t> c = m;
+        ASSERT_EQ(1, c(0, 1));
     }
 
     TEST(xbuilder, arange_simple)
@@ -332,9 +337,9 @@ namespace xt
 
     TEST(xbuilder, diagonal_advanced)
     {
-        xarray<double> e = {{{{0, 1, 2}, {3, 4, 5}}, 
+        xarray<double> e = {{{{0, 1, 2}, {3, 4, 5}},
                              {{6, 7, 8}, {9, 10, 11}}},
-                            {{{12, 13, 14}, {15, 16, 17}}, 
+                            {{{12, 13, 14}, {15, 16, 17}},
                              {{18, 19, 20}, {21, 22, 23}}}};
 
         xarray<double> d1 = xt::diagonal(e);
