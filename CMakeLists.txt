@@ -7,6 +7,7 @@
 ############################################################################
 
 cmake_minimum_required(VERSION 3.1)
+set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
 project(xtensor)
 
 set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
@@ -80,6 +81,7 @@ OPTION(XTENSOR_CHECK_DIMENSION "xtensor dimension check" OFF)
 OPTION(XTENSOR_USE_XSIMD "simd acceleration for xtensor" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
+OPTION(BUILD_NEW_BENCHMARK "xtensor new benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
 OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
 
@@ -112,6 +114,10 @@ endif()
 
 if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
+endif()
+
+if(BUILD_NEW_BENCHMARK)
+    add_subdirectory(new_benchmark)
 endif()
 
 # Installation
