@@ -1006,6 +1006,46 @@ namespace xt
 
     #endif
 
+    /*************************
+     * conditional type cast *
+     *************************/
+
+    template <bool condition, class T>
+    struct conditional_cast_functor;
+
+    template <class T>
+    struct conditional_cast_functor<false, T>
+    {
+        template <class U>
+        inline U && operator()(U && u) const
+        {
+            return std::forward<U>(u);
+        }
+    };
+
+    template <class T>
+    struct conditional_cast_functor<true, T>
+    {
+        template <class U>
+        inline auto operator()(U && u) const
+        {
+            return static_cast<T>(std::forward<U>(u));
+        }
+    };
+
+    /** @brief Perform a type cast when a condition is true.
+        If <tt>condition</tt> is true, return <tt>static_cast<T>(u)</tt>,
+        otherwise return <tt>u</tt> unchanged. This is useful when an unconditional
+        static_cast would force undesired type conversions in some situations where
+        an error or warning would be desired. The condition determines when the
+        explicit cast is ok.
+     */
+    template <bool condition, class T, class U>
+    inline auto conditional_cast(U && u)
+    {
+        return conditional_cast_functor<condition, T>()(std::forward<U>(u));
+    };
+
     /************************************
      * arithmetic type promotion traits *
      ************************************/

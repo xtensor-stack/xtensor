@@ -11,6 +11,8 @@
 
 #include "xiterator.hpp"
 #include "xtensor_forward.hpp"
+#include "xconcepts.hpp"
+#include "xutils.hpp"
 #include <algorithm>
 
 namespace xt
@@ -225,9 +227,13 @@ namespace xt
     template <class E1, class E2, layout_type L>
     inline void data_assigner<E1, E2, L>::run()
     {
+        using argument_type = std::decay_t<decltype(*m_rhs)>;
+        using result_type = std::decay_t<decltype(*m_lhs)>;
+        constexpr bool is_narrowing = is_narrowing_conversion<argument_type, result_type>::value;
+
         while (m_rhs != m_rhs_end)
         {
-            *m_lhs = *m_rhs;
+            *m_lhs = conditional_cast<is_narrowing, result_type>(*m_rhs);
             stepper_tools<L>::increment_stepper(*this, m_index, m_e1.shape());
         }
     }
@@ -285,11 +291,32 @@ namespace xt
         }
     }
 
+    namespace assigner_detail
+    {
+        template <class E1, class E2>
+        inline void trivial_assigner_run_impl(E1& e1, const E2& e2, std::true_type)
+        {
+            std::copy(e2.storage_cbegin(), e2.storage_cend(), e1.storage_begin());
+        }
+
+        template <class E1, class E2>
+        inline void trivial_assigner_run_impl(E1&, const E2&, std::false_type)
+        {
+            XTENSOR_PRECONDITION(false,
+                "Internal error: trivial_assigner called with unequal types.");
+        }
+    }
+
     template <>
     template <class E1, class E2>
     inline void trivial_assigner<false>::run(E1& e1, const E2& e2)
     {
-        std::copy(e2.storage_cbegin(), e2.storage_cend(), e1.storage_begin());
+        using is_same_type = std::is_same<typename std::decay_t<E1>::value_type,
+                                          typename std::decay_t<E2>::value_type>;
+        // If the types differ, this function is still instantiated but never called.
+        // To avoid compilation problems in effectively unused code (e.g. warnings
+        // on narrowing type conversions), trivial_assigner_run_impl is empty in this case.
+        assigner_detail::trivial_assigner_run_impl(e1, e2, is_same_type());
     }
 }
 
