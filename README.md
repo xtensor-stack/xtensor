@@ -44,7 +44,7 @@ make install
 
 ## Dependencies
 
-`xtensor` depends on the [xtl](https://github.com/QuantStack/xtl) library has an optional dependency on the [xsimd](https://github.com/QuantStack/xsimd) library:
+`xtensor` depends on the [xtl](https://github.com/QuantStack/xtl) library and has an optional dependency on the [xsimd](https://github.com/QuantStack/xsimd) library:
 
 | `xtensor` | `xtl`  |`xsimd` (optional) |
 |-----------|--------|-------------------|
@@ -218,17 +218,6 @@ You can also use CMake to download the source of `gtest`, build it, and use the 
 mkdir build
 cd build
 cmake -DBUILD_TESTS=ON -DDOWNLOAD_GTEST=ON ../
-make xtest
-```
-
-In the context of continuous integration with Travis CI, tests are run in a `conda` environment, which can be activated with
-
-```bash
-cd test
-conda env create -f ./test-environment.yml
-source activate test-xtensor
-cd ..
-cmake -DBUILD_TESTS=ON .
 make xtest
 ```
 
