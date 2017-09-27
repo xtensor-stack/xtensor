@@ -97,13 +97,8 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using axes_type = X;
 
-        struct result_type_helper
-        {
-            functor_type m_f;
-        };
-
         using substepper_type = typename xexpression_type::const_stepper;
-        using value_type = std::decay_t<decltype(((result_type_helper*)0)->m_f(**(substepper_type*)0, **(substepper_type*)0))>;
+        using value_type = std::decay_t<decltype(std::declval<functor_type>()(**(substepper_type*)0, **(substepper_type*)0))>;
         using reference = value_type;
         using const_reference = value_type;
         using pointer = value_type*;
