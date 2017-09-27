@@ -48,7 +48,7 @@ namespace xt
 
     private:
 
-        using storing_type = ptr_closure_t<CT>;
+        using storing_type = xtl::ptr_closure_type_t<CT>;
         mutable storing_type p_expression;
         size_type m_index;
 
@@ -178,7 +178,7 @@ namespace xt
     template <class E>
     inline auto axis_begin(E&& e)
     {
-        using return_type = xaxis_iterator<closure_t<E>>;
+        using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
         using size_type = typename std::decay_t<E>::size_type;
         return return_type(std::forward<E>(e), size_type(0));
     }
@@ -186,7 +186,7 @@ namespace xt
     template <class E>
     inline auto axis_end(E&& e)
     {
-        using return_type = xaxis_iterator<closure_t<E>>;
+        using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
         using size_type = typename std::decay_t<E>::size_type;
         return return_type(std::forward<E>(e), size_type(e.shape()[0]));
     }

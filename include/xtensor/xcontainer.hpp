@@ -14,6 +14,8 @@
 #include <numeric>
 #include <stdexcept>
 
+#include "xtl/xsequence.hpp"
+
 #include "xiterable.hpp"
 #include "xiterator.hpp"
 #include "xmath.hpp"
@@ -1086,14 +1088,14 @@ namespace xt
     inline xstrided_container<D>::xstrided_container() noexcept
         : base_type()
     {
-        m_shape = make_sequence<inner_shape_type>(base_type::dimension(), 1);
+        m_shape = xtl::make_sequence<inner_shape_type>(base_type::dimension(), 1);
     }
 
     template <class D>
     inline xstrided_container<D>::xstrided_container(inner_shape_type&& shape, inner_strides_type&& strides) noexcept
         : base_type(), m_shape(std::move(shape)), m_strides(std::move(strides))
     {
-        m_backstrides = make_sequence<inner_backstrides_type>(m_shape.size(), 0);
+        m_backstrides = xtl::make_sequence<inner_backstrides_type>(m_shape.size(), 0);
         adapt_strides(m_shape, m_strides, m_backstrides);
     }
 
@@ -1158,7 +1160,7 @@ namespace xt
             {
                 m_layout = layout_type::row_major;  // fall back to row major
             }
-            m_shape = forward_sequence<shape_type>(shape);
+            m_shape = xtl::forward_sequence<shape_type>(shape);
             resize_container(m_strides, m_shape.size());
             resize_container(m_backstrides, m_shape.size());
             size_type data_size = compute_strides(m_shape, m_layout, m_strides, m_backstrides);
@@ -1196,7 +1198,7 @@ namespace xt
         {
             throw std::runtime_error("Cannot reshape with custom strides when layout() is != layout_type::dynamic.");
         }
-        m_shape = forward_sequence<shape_type>(shape);
+        m_shape = xtl::forward_sequence<shape_type>(shape);
         m_strides = strides;
         resize_container(m_backstrides, m_strides.size());
         adapt_strides(m_shape, m_strides, m_backstrides);

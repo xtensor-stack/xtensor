@@ -105,6 +105,7 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda install gtest cmake -c conda-forge 
+    - conda install xtl -c conda-forge 
     # Testing
     - mkdir build
     - cd build

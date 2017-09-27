@@ -13,6 +13,8 @@
 #include <functional>
 #include <type_traits>
 
+#include "xtl/xsequence.hpp"
+
 #include "xfunction.hpp"
 #include "xscalar.hpp"
 #include "xstrides.hpp"
@@ -504,7 +506,7 @@ namespace xt
         using index_type = xindex_type_t<typename T::shape_type>;
         using size_type = typename T::size_type;
 
-        auto idx = make_sequence<index_type>(arr.dimension(), 0);
+        auto idx = xtl::make_sequence<index_type>(arr.dimension(), 0);
         std::vector<index_type> indices;
 
         auto next_idx = [&shape](index_type& idx)

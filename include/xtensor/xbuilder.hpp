@@ -19,14 +19,16 @@
 #include <functional>
 #include <utility>
 #include <vector>
+#ifdef X_OLD_CLANG
+    #include <initializer_list>
+#endif
+
+#include "xtl/xclosure.hpp"
+#include "xtl/xsequence.hpp"
 
 #include "xbroadcast.hpp"
 #include "xfunction.hpp"
 #include "xgenerator.hpp"
-
-#ifdef X_OLD_CLANG
-    #include <initializer_list>
-#endif
 
 namespace xt
 {
@@ -437,7 +439,7 @@ namespace xt
     template <class... Types>
     inline auto xtuple(Types&&... args)
     {
-        return std::tuple<const_closure_t<Types>...>(std::forward<Types>(args)...);
+        return std::tuple<xtl::const_closure_type_t<Types>...>(std::forward<Types>(args)...);
     }
 
     /**
@@ -459,7 +461,7 @@ namespace xt
     inline auto concatenate(std::tuple<CT...>&& t, std::size_t axis = 0)
     {
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
-        shape_type new_shape = forward_sequence<shape_type>(std::get<0>(t).shape());
+        shape_type new_shape = xtl::forward_sequence<shape_type>(std::get<0>(t).shape());
         auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
             return prev + arr.shape()[axis];
         };
@@ -510,7 +512,7 @@ namespace xt
     inline auto stack(std::tuple<CT...>&& t, std::size_t axis = 0)
     {
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
-        auto new_shape = detail::add_axis(forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(CT));
+        auto new_shape = detail::add_axis(xtl::forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(CT));
         return detail::make_xgenerator(detail::stack_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 
@@ -766,7 +768,7 @@ namespace xt
 
         // The following shape calculation code is an almost verbatim adaptation of numpy:
         // https://github.com/numpy/numpy/blob/2aabeafb97bea4e1bfa29d946fbf31e1104e7ae0/numpy/core/src/multiarray/item_selection.c#L1799
-        auto ret_shape = make_sequence<shape_type>(dimension - 1, 0);
+        auto ret_shape = xtl::make_sequence<shape_type>(dimension - 1, 0);
         int dim_1 = static_cast<int>(shape[axis_1]);
         int dim_2 = static_cast<int>(shape[axis_2]);
 

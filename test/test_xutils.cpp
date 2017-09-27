@@ -134,22 +134,6 @@ namespace xt
         EXPECT_EQ(e2, s2);
     }
 
-    TEST(utils, forward_offset)
-    {
-        // Test that lvalues can be modified
-        std::complex<double> clv;
-        forward_real(clv) = 3.0;
-        EXPECT_EQ(std::real(clv), 3.0);
-
-        forward_imag(clv) = 1.0;
-        EXPECT_EQ(std::imag(clv), 1.0);
-
-        double rlv = 2.0;
-        forward_real(rlv) = 1.0;
-        EXPECT_EQ(forward_imag(rlv), 0.0);
-        EXPECT_EQ(forward_real(rlv), 1.0);
-    }
-
     TEST(utils, conditional_cast)
     {
         EXPECT_TRUE((std::is_same<decltype(conditional_cast<false, double>(1)), int>::value));

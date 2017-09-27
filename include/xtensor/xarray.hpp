@@ -13,6 +13,8 @@
 #include <initializer_list>
 #include <utility>
 
+#include "xtl/xsequence.hpp"
+
 #include "xbuffer_adaptor.hpp"
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
@@ -372,7 +374,7 @@ namespace xt
     template <class S>
     inline xarray_container<EC, L, SC> xarray_container<EC, L, SC>::from_shape(S&& s)
     {
-        shape_type shape = forward_sequence<shape_type>(s);
+        shape_type shape = xtl::forward_sequence<shape_type>(s);
         return self_type(shape);
     }
     //@}

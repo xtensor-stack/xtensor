@@ -74,6 +74,7 @@ endif()
 find_package(Threads)
 
 include_directories(${XTENSOR_INCLUDE_DIR})
+include_directories(${xtl_INCLUDE_DIRS})
 include_directories(${GTEST_INCLUDE_DIRS})
 
 set(XTENSOR_TESTS
@@ -87,7 +88,6 @@ set(XTENSOR_TESTS
     test_xbroadcast.cpp
     test_xbuffer_adaptor.cpp
     test_xbuilder.cpp
-    test_xcomplex.cpp
     test_xconcepts.cpp
     test_xcontainer_semantic.cpp
     test_xcsv.cpp

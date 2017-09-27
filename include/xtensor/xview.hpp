@@ -16,6 +16,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtl/xsequence.hpp"
+
 #include "xbroadcast.hpp"
 #include "xcontainer.hpp"
 #include "xiterable.hpp"
@@ -339,7 +341,7 @@ namespace xt
     template <class CTA, class FSL, class... SL>
     inline xview<CT, S...>::xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
         : m_e(std::forward<CTA>(e)), m_slices(std::forward<FSL>(first_slice), std::forward<SL>(slices)...),
-          m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
+          m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
     {
         auto func = [](const auto& s) noexcept { return get_size(s); };
         for (size_type i = 0; i != dimension(); ++i)
@@ -579,7 +581,7 @@ namespace xt
         std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
     {
         using strides_type = typename T::strides_type;
-        strides_type strides = make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
+        strides_type strides = xtl::make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
         size_type i = 0, idx;
@@ -730,7 +732,7 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::make_index(It first, It last) const -> base_index_type
     {
-        auto index = make_sequence<typename xexpression_type::shape_type>(m_e.dimension(), 0);
+        auto index = xtl::make_sequence<typename xexpression_type::shape_type>(m_e.dimension(), 0);
         auto func1 = [&first](const auto& s)
         {
             return get_slice_value(s, first);
@@ -774,7 +776,7 @@ namespace xt
         template <class E, std::size_t... I, class... S>
         inline auto make_view_impl(E&& e, std::index_sequence<I...>, S&&... slices)
         {
-            using view_type = xview<closure_t<E>, get_slice_type<std::decay_t<E>, S>...>;
+            using view_type = xview<xtl::closure_type_t<E>, get_slice_type<std::decay_t<E>, S>...>;
             return view_type(std::forward<E>(e),
                 get_slice_implementation(e, std::forward<S>(slices), get_underlying_shape_index<std::decay_t<E>, S...>(I))...
             );

@@ -20,6 +20,8 @@
 #include <vector>
 #endif
 
+#include "xtl/xsequence.hpp"
+
 #include "xbuilder.hpp"
 #include "xexpression.hpp"
 #include "xgenerator.hpp"
@@ -173,7 +175,7 @@ namespace xt
     template <class F, class E, class X>
     inline auto reduce(F&& f, E&& e, X&& axes) noexcept
     {
-        using reducer_type = xreducer<F, const_xclosure_t<E>, const_closure_t<X>>;
+        using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<X>>;
         return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
     }
 
@@ -192,7 +194,7 @@ namespace xt
     {
         using axes_type = std::vector<typename std::decay_t<E>::size_type>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes));
     }
 #else
     template <class F, class E, class I, std::size_t N>
@@ -200,7 +202,7 @@ namespace xt
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), forward_sequence<axes_type>(axes));
+        return reducer_type(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes));
     }
 #endif
 
@@ -330,8 +332,8 @@ namespace xt
     template <class Func, class CTA, class AX>
     inline xreducer<F, CT, X>::xreducer(Func&& func, CTA&& e, AX&& axes)
         : m_e(std::forward<CTA>(e)), m_f(std::forward<Func>(func)), m_axes(std::forward<AX>(axes)),
-          m_shape(make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0)),
-          m_dim_mapping(make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0))
+          m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0)),
+          m_dim_mapping(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0))
     {
         if (!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
         {
