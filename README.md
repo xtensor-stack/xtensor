@@ -42,15 +42,15 @@ cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
 
-## Optional dependency on xsimd
+## Dependencies
 
-`xtensor` has an optional dependency on the `xsimd` library:
+`xtensor` depends on the [xtl](https://github.com/QuantStack/xtl) library has an optional dependency on the [xsimd](https://github.com/QuantStack/xsimd) library:
 
-| `xtensor` | `xsimd` |
-|-----------|---------|
-|  master   |  ^3.1.0 |
+| `xtensor` | `xtl`  |`xsimd` (optional) |
+|-----------|--------|-------------------|
+|  master   | ^0.2.4 |       ^3.1.0      |
 
-This dependency is required if you want to enable simd acceleration in `xtensor`. This can be done
+The dependency on `xsimd` is required if you want to enable simd acceleration in `xtensor`. This can be done
 by defining the macro `XTENSOR_USE_XSIMD` *before* including any header of `xtensor`.
 
 ## Usage

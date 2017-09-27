@@ -7,15 +7,50 @@
 Changelog
 =========
 
+master branch
+-------------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- ``xtensor`` now depends on ``xtl``.
+  `#421 <https://github.com/QuantStack/xtensor/pull/421>`_.
+
+New features
+~~~~~~~~~~~~
+
+- ``xtensor`` has an optional dependency on ``xsimd`` for enabling simd acceleration
+  `#426 <https://github.com/QuantStack/xtenros/pull/426`_.
+
+- All expressions have an additional safe access function (``at``)
+  `#420 <https://github.com/QuantStack/xtensor/pull/420`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- Preconditions and exceptions
+  `#409 <https://github.com/QuantStack/xtensor/pull/409`_.
+
+- ``isclose`` is now symmetric
+  `#411 <https://github.com/QuantStack/xtensor/pull/411`_.
+
+- concepts added
+  `#414 <https://github.com/QuantStack/xtensor/pull/414`_.
+
+- narrowing cast for mixed arithmetic
+  `#432 <https://github.com/QuantStack/xtensor/pull/432`_.
+
 0.11.3
 ------
 
-- Fixed bug in length-1 statically dimensioned tensor construction.
+- Fixed bug in length-1 statically dimensioned tensor construction
+  `#431 <https://github.com/QuantStack/xtensor/pull/431`_.
 
 0.11.2
 ------
 
-- Fixup compilation issue with latest clang compiler. (missing `constexpr` keyword).
+- Fixup compilation issue with latest clang compiler. (missing `constexpr` keyword)
+  `#407 <https://github.com/QuantStack/xtensor/pull/407`_.
 
 0.11.1
 ------
