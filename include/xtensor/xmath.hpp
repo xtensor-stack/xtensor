@@ -43,13 +43,37 @@ namespace xt
      * Helpers *
      ***********/
 
+#define UNSIGNED_ABS_FUNCTOR(T)                                                 \
+    template <>                                                                 \
+    struct abs_fun<T>                                                           \
+    {                                                                           \
+        using return_type = xt::detail::functor_return_type<T, T>;              \
+        using argument_type = T;                                                \
+        using result_type = T;                                                  \
+        using simd_value_type = xsimd::simd_type<T>;                            \
+        using simd_result_type = typename return_type::simd_type;               \
+        constexpr result_type operator()(const T& arg) const                    \
+        {                                                                       \
+            return arg;                                                         \
+        }                                                                       \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
+        {                                                                       \
+            return arg;                                                         \
+        }                                                                       \
+    }
+
 #define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
     template <class T>                                                          \
     struct NAME##_fun                                                           \
     {                                                                           \
+        static auto exec(const T& arg)                                          \
+        {                                                                       \
+            using std::NAME;                                                    \
+            return NAME(arg);                                                   \
+        }                                                                       \
         using return_type = xt::detail::functor_return_type<T, R>;              \
         using argument_type = T;                                                \
-        using result_type = typename return_type::type;                         \
+        using result_type = decltype(exec(*(T*)0));                             \
         using simd_value_type = xsimd::simd_type<T>;                            \
         using simd_result_type = typename return_type::simd_type;               \
         constexpr result_type operator()(const T& arg) const                    \
@@ -71,8 +95,13 @@ namespace xt
     template <class T>                                                          \
     struct NAME##_fun                                                           \
     {                                                                           \
+        static auto exec(const T& arg)                                          \
+        {                                                                       \
+            using std::NAME;                                                    \
+            return NAME(arg);                                                   \
+        }                                                                       \
         using argument_type = T;                                                \
-        using result_type = complex_value_type_t<T>;                            \
+        using result_type = decltype(exec(*(T*)0));                             \
         using simd_value_type = argument_type;                                  \
         using simd_result_type = result_type;                                   \
         constexpr result_type operator()(const T& arg) const                    \
@@ -91,10 +120,15 @@ namespace xt
     template <class T>                                                           \
     struct NAME##_fun                                                            \
     {                                                                            \
+        static auto exec(const T& arg1, const T& arg2)                           \
+        {                                                                        \
+            using std::NAME;                                                     \
+            return NAME(arg1, arg2);                                             \
+        }                                                                        \
         using return_type = xt::detail::functor_return_type<T, R>;               \
         using first_argument_type = T;                                           \
         using second_argument_type = T;                                          \
-        using result_type = typename return_type::type;                          \
+        using result_type = decltype(exec(*(T*)0, *(T*)0));                      \
         using simd_value_type = xsimd::simd_type<T>;                             \
         using simd_result_type = typename return_type::simd_type;                \
         constexpr result_type operator()(const T& arg1, const T& arg2) const     \
@@ -117,16 +151,21 @@ namespace xt
     template <class T>                                                           \
     struct NAME##_fun                                                            \
     {                                                                            \
+        static auto exec(const T& arg1, const T& arg2, const T& arg3)            \
+        {                                                                        \
+            using std::NAME;                                                     \
+            return NAME(arg1, arg2, arg3);                                       \
+        }                                                                        \
         using return_type = xt::detail::functor_return_type<T, R>;               \
         using first_argument_type = T;                                           \
         using second_argument_type = T;                                          \
         using third_argument_type = T;                                           \
-        using result_type = typename return_type::type;                          \
+        using result_type = decltype(exec(*(T*)0, *(T*)0, *(T*)0));              \
         using simd_value_type = xsimd::simd_type<T>;                             \
         using simd_result_type = typename return_type::simd_type;                \
         constexpr result_type operator()(const T& arg1,                          \
                                          const T& arg2,                          \
-                                          const T& arg3) const                   \
+                                         const T& arg3) const                    \
         {                                                                        \
             using std::NAME;                                                     \
             return NAME(arg1, arg2, arg3);                                       \
@@ -146,6 +185,12 @@ namespace xt
     namespace math
     {
         UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
+        // The following specializations are needed to avoid 'ambiguous overload' errors,
+        // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
+        UNSIGNED_ABS_FUNCTOR(unsigned int);
+        UNSIGNED_ABS_FUNCTOR(unsigned long);
+        UNSIGNED_ABS_FUNCTOR(unsigned long long);
+
         UNARY_MATH_FUNCTOR(fabs);
         BINARY_MATH_FUNCTOR(fmod);
         BINARY_MATH_FUNCTOR(remainder);
@@ -202,6 +247,7 @@ namespace xt
 #undef TERNARY_BOOL_FUNCTOR
 #undef TERNARY_MATH_FUNCTOR_IMPL
 #undef UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
+#undef UNSIGNED_ABS_FUNCTOR
 
     /*******************
      * basic functions *
@@ -359,7 +405,7 @@ namespace xt
         {
             using result_type = T;
             using simd_value_type = xsimd::simd_type<T>;
-            
+
             constexpr result_type operator()(const T& t1, const T& t2) const noexcept
             {
                 return (t1 < t2) ? t1 : t2;
@@ -396,7 +442,7 @@ namespace xt
             using third_argument_type = T;
             using result_type = T;
             using simd_value_type = xsimd::simd_type<T>;
-            
+
             constexpr T operator()(const T& v, const T& lo, const T& hi) const
             {
                 return v < lo ? lo : hi < v ? hi : v;
@@ -1375,14 +1421,16 @@ namespace xt
     template <class E, class X>
     inline auto sum(E&& e, X&& axes) noexcept
     {
-        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::plus<result_type>;
         return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
     }
 
     template <class E>
     inline auto sum(E&& e) noexcept
     {
-        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::plus<result_type>;
         return reduce(functor_type(), std::forward<E>(e));
     }
 
@@ -1390,14 +1438,16 @@ namespace xt
     template <class E, class I>
     inline auto sum(E&& e, std::initializer_list<I> axes) noexcept
     {
-        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::plus<result_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
     }
 #else
     template <class E, class I, std::size_t N>
     inline auto sum(E&& e, const I (&axes)[N]) noexcept
     {
-        using functor_type = std::plus<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::plus<result_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
     }
 #endif
@@ -1415,14 +1465,16 @@ namespace xt
     template <class E, class X>
     inline auto prod(E&& e, X&& axes) noexcept
     {
-        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::multiplies<result_type>;
         return reduce(functor_type(), std::forward<E>(e), std::forward<X>(axes));
     }
 
     template <class E>
     inline auto prod(E&& e) noexcept
     {
-        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::multiplies<result_type>;
         return reduce(functor_type(), std::forward<E>(e));
     }
 
@@ -1430,14 +1482,16 @@ namespace xt
     template <class E, class I>
     inline auto prod(E&& e, std::initializer_list<I> axes) noexcept
     {
-        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::multiplies<result_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
     }
 #else
     template <class E, class I, std::size_t N>
     inline auto prod(E&& e, const I (&axes)[N]) noexcept
     {
-        using functor_type = std::multiplies<typename std::decay_t<E>::value_type>;
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using functor_type = std::multiplies<result_type>;
         return reduce(functor_type(), std::forward<E>(e), axes);
     }
 #endif
@@ -1455,10 +1509,9 @@ namespace xt
     template <class E, class X>
     inline auto mean(E&& e, X&& axes) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
         auto s = sum(std::forward<E>(e), std::forward<X>(axes));
-        return std::move(s) / value_type(size / s.size());
+        return std::move(s) / static_cast<double>(size / s.size());
     }
 
     template <class E>
@@ -1466,7 +1519,7 @@ namespace xt
     {
         using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
-        return sum(std::forward<E>(e)) / value_type(size);
+        return sum(std::forward<E>(e)) / static_cast<double>(size);
     }
 
 #ifdef X_OLD_CLANG
@@ -1476,7 +1529,7 @@ namespace xt
         using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
         auto s = sum(std::forward<E>(e), axes);
-        return std::move(s) / value_type(size / s.size());
+        return std::move(s) / static_cast<double>(size / s.size());
     }
 #else
     template <class E, class I, std::size_t N>
@@ -1485,7 +1538,7 @@ namespace xt
         using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
         auto s = sum(std::forward<E>(e), axes);
-        return std::move(s) / value_type(size / s.size());
+        return std::move(s) / static_cast<double>(size / s.size());
     }
 #endif
 }
