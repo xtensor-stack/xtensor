@@ -568,7 +568,7 @@ namespace xt
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::minimum<result_type>;
         return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
-   }
+    }
 #else
     template <class E, class I, std::size_t N>
     inline auto amin(E&& e, const I (&axes)[N]) noexcept
