@@ -787,28 +787,25 @@ namespace xt
      * static_if *
      *************/
 
-    namespace static_if_detail
+    struct identity_functor
     {
-        struct identity
+        template <class T>
+        T&& operator()(T&& x) const
         {
-            template <class T>
-            T&& operator()(T&& x) const
-            {
-                return std::forward<T>(x);
-            }
-        };
-    }
+            return std::forward<T>(x);
+        }
+    };
 
     template <class TF, class FF>
     auto static_if(std::true_type, const TF& tf, const FF&)
     {
-        return tf(static_if_detail::identity());
+        return tf(identity_functor());
     }
 
     template <class TF, class FF>
     auto static_if(std::false_type, const TF&, const FF& ff)
     {
-        return ff(static_if_detail::identity());
+        return ff(identity_functor());
     }
 
     template <bool cond, class TF, class FF>
@@ -842,12 +839,8 @@ namespace xt
 
     template <class T>
     struct conditional_cast_functor<false, T>
+    : public identity_functor
     {
-        template <class U>
-        inline U && operator()(U && u) const
-        {
-            return std::forward<U>(u);
-        }
     };
 
     template <class T>
@@ -1011,8 +1004,8 @@ namespace xt
         struct norm_of_scalar_impl<T, true>
         {
             static const bool value = true;
-            using norm_type = T;
-            using squared_norm_type = decltype((*(T*)0) * (*(T*)0));
+            using norm_type = promote_type_t<T>;
+            using squared_norm_type = promote_type_t<T>;
         };
 
         template <class T, bool integral = std::is_integral<T>::value,

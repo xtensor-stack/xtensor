@@ -163,7 +163,7 @@ namespace xt
 
     TEST(utils, norm_traits)
     {
-        EXPECT_TRUE((std::is_same<norm_type_t<uint8_t>, uint8_t>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<uint8_t>, int>::value));
         EXPECT_TRUE((std::is_same<norm_type_t<int>, int>::value));
         EXPECT_TRUE((std::is_same<norm_type_t<double>, double>::value));
         EXPECT_TRUE((std::is_same<norm_type_t<std::vector<uint8_t>>, double>::value));
