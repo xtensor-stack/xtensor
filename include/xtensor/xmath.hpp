@@ -506,7 +506,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), std::forward<X>(axes));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
     }
 
     template <class E>
@@ -514,7 +514,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
     }
 
 #ifdef X_OLD_CLANG
@@ -523,7 +523,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #else
     template <class E, class I, std::size_t N>
@@ -531,7 +531,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #endif
 
@@ -550,7 +550,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), std::forward<X>(axes));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
     }
 
     template <class E>
@@ -558,7 +558,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
     }
 
 #ifdef X_OLD_CLANG
@@ -567,7 +567,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #else
     template <class E, class I, std::size_t N>
@@ -575,7 +575,7 @@ namespace xt
     {
         using result_type = typename std::decay_t<E>::value_type;
         using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #endif
 
@@ -1431,7 +1431,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), std::forward<X>(axes));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
     }
 
     template <class E>
@@ -1439,7 +1439,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
     }
 
 #ifdef X_OLD_CLANG
@@ -1448,7 +1448,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #else
     template <class E, class I, std::size_t N>
@@ -1456,7 +1456,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #endif
 
@@ -1475,7 +1475,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), std::forward<X>(axes));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
     }
 
     template <class E>
@@ -1483,7 +1483,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e));
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
     }
 
 #ifdef X_OLD_CLANG
@@ -1492,7 +1492,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #else
     template <class E, class I, std::size_t N>
@@ -1500,7 +1500,7 @@ namespace xt
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor<result_type>(functor_type()), std::forward<E>(e), axes);
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
     }
 #endif
 

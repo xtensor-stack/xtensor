@@ -67,11 +67,12 @@ namespace xt
         xarray<int> i1 = -ones<int>({9});
 
         EXPECT_EQ(norm_l0(i1)(), 9);
+        EXPECT_EQ(norm_lp_to_p(i1, 0.0)(), 9.0);
         EXPECT_EQ(norm_l1(i1)(), 9);
-        EXPECT_EQ(norm_lp(i1, 1.0)(), 9);
+        EXPECT_EQ(norm_lp(i1, 1.0)(), 9.0);
         EXPECT_EQ(norm_sq(i1)(), 9);
-        EXPECT_EQ(norm_l2(i1)(), 3);
-        EXPECT_EQ(norm_lp(i1, 2.0)(), 3);
+        EXPECT_EQ(norm_l2(i1)(), 3.0);
+        EXPECT_EQ(norm_lp(i1, 2.0)(), 3.0);
         EXPECT_EQ(norm_linf(i1)(), 1);
     }
 
