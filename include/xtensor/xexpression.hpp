@@ -100,7 +100,7 @@ namespace xt
     namespace detail
     {
         template <class E>
-        struct is_xexpression_impl : std::is_base_of<xexpression<E>, E>
+        struct is_xexpression_impl : std::is_base_of<xexpression<std::decay_t<E>>, std::decay_t<E>>
         {
         };
 
