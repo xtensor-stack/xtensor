@@ -9,6 +9,7 @@
 #ifndef XAXIS_ITERATOR_HPP
 #define XAXIS_ITERATOR_HPP
 
+#include "xtl/xclosure.hpp"
 #include "xview.hpp"
 
 namespace xt
@@ -30,7 +31,7 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
         using value_type = xview<CT, size_type>;
         using reference = std::remove_reference_t<apply_cv_t<CT, value_type>>;
-        using pointer = std::nullptr_t;
+        using pointer = xtl::xclosure_pointer<std::remove_reference_t<apply_cv_t<CT, value_type>>>;
 
         using iterator_category = std::forward_iterator_tag;
 
@@ -154,7 +155,7 @@ namespace xt
     template <class CT>
     inline auto xaxis_iterator<CT>::operator->() const -> pointer
     {
-        return nullptr;
+        return xtl::closure_pointer(operator*());
     }
 
     template <class CT>

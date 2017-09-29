@@ -25,6 +25,9 @@ New features
 - All expressions have an additional safe access function (``at``)
   `#420 <https://github.com/QuantStack/xtensor/pull/420`_.
 
+- norm functions
+  `#440 <https://github.com/QuantStack/xtensor/pull/440`_.
+
 Other changes
 ~~~~~~~~~~~~~
 
@@ -39,6 +42,9 @@ Other changes
 
 - narrowing cast for mixed arithmetic
   `#432 <https://github.com/QuantStack/xtensor/pull/432`_.
+
+- ``is_xexpression`` concept fixed
+  `#439 <https://github.com/QuantStack/xtensor/pull/439`_.
 
 0.11.3
 ------

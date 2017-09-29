@@ -15,6 +15,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtl/xproxy_wrapper.hpp"
+
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xiterator.hpp"
 #include "xtensor/xsemantic.hpp"
@@ -305,12 +307,11 @@ namespace xt
     public:
 
         using functor_type = std::decay_t<F>;
-        using value_type = typename functor_type::value_type;
-
         using subiterator_traits = std::iterator_traits<IT>;
 
-        using reference = apply_cv_t<typename subiterator_traits::reference, value_type>;
-        using pointer = std::remove_reference_t<reference>*;
+        using value_type = typename functor_type::value_type;
+        using reference = xtl::xproxy_wrapper<decltype(std::declval<functor_type>()(*(IT())))>;
+        using pointer = xtl::xclosure_pointer<std::remove_reference_t<reference>>;
         using difference_type = typename subiterator_traits::difference_type;
         using iterator_category = typename subiterator_traits::iterator_category;
 
@@ -1152,14 +1153,13 @@ namespace xt
     template <class F, class IT>
     auto xfunctor_iterator<F, IT>::operator*() const -> reference
     {
-        return (*p_functor)(*m_it);
+        return xtl::proxy_wrapper((*p_functor)(*m_it));
     }
 
     template <class F, class IT>
     auto xfunctor_iterator<F, IT>::operator->() const -> pointer
     {
-        // Returning the address of a temporary
-        return &((*p_functor)(*m_it));
+        return &(operator*());
     }
 
     template <class F, class IT>
