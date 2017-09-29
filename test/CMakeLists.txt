@@ -101,6 +101,7 @@ set(XTENSOR_TESTS
     test_xlayout.cpp
     test_xmath.cpp
     test_xnoalias.cpp
+    test_xnorm.cpp
     test_xoperation.cpp
     test_xoptional.cpp
     test_xrandom.cpp

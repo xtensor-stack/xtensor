@@ -22,7 +22,7 @@ namespace xt
         xarray<double> m_a;
         using shape_type = xarray<double>::shape_type;
 
-        using func = std::plus<double>;
+        using func = xreducer_functors<std::plus<double>>;
         xreducer<func, const xarray<double>&, axes_type> m_red;
 
         xreducer_features();

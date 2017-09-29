@@ -16,6 +16,7 @@
 #include <stdexcept>
 #include <type_traits>
 #include <utility>
+#include <tuple>
 #ifdef X_OLD_CLANG
 #include <vector>
 #endif
@@ -56,6 +57,59 @@ namespace xt
     template <class ST, class X>
     struct xreducer_shape_type;
 
+    template <class REDUCE_FUNC, class INIT_FUNC=identity_functor, class MERGE_FUNC=REDUCE_FUNC>
+    struct xreducer_functors
+    :  public std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>
+    {
+        using self_type = xreducer_functors<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>;
+        using base_type = std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>;
+        using reduce_functor_type = REDUCE_FUNC;
+        using init_functor_type = INIT_FUNC;
+        using merge_functor_type = MERGE_FUNC;
+
+        xreducer_functors()
+        : base_type()
+        {}
+
+        template <class RF>
+        xreducer_functors(RF&& reduce_func)
+        : base_type(std::forward<RF>(reduce_func), INIT_FUNC(), reduce_func)
+        {}
+
+        template <class RF, class IF>
+        xreducer_functors(RF&& reduce_func, IF&& init_func)
+        : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), reduce_func)
+        {}
+
+        template <class RF, class IF, class MF>
+        xreducer_functors(RF&& reduce_func, IF&& init_func, MF&& merge_func)
+        : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), std::forward<MF>(merge_func))
+        {}
+    };
+
+    template <class RF>
+    auto make_xreducer_functor(RF && reduce_func)
+    {
+        using reducer_type = xreducer_functors<std::remove_reference_t<RF>>;
+        return reducer_type(std::forward<RF>(reduce_func));
+    }
+
+    template <class RF, class IF>
+    auto make_xreducer_functor(RF && reduce_func, IF && init_func)
+    {
+        using reducer_type = xreducer_functors<std::remove_reference_t<RF>, std::remove_reference_t<IF>>;
+        return reducer_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func));
+    }
+
+    template <class RF, class IF, class MF>
+    auto make_xreducer_functor(RF && reduce_func, IF && init_func, MF && merge_func)
+    {
+        using reducer_type = xreducer_functors<std::remove_reference_t<RF>,
+                                               std::remove_reference_t<IF>,
+                                               std::remove_reference_t<MF>>;
+        return reducer_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), std::forward<MF>(merge_func));
+    }
+
     template <class F, class CT, class X>
     class xreducer;
 
@@ -79,12 +133,12 @@ namespace xt
      * a reducing function to an \ref xexpression over the specified
      * axes.
      *
-     * @tparam F a binary function type
+     * @tparam F a tuple of functors (class \ref xreducer_functors or compatible)
      * @tparam CT the closure type of the \ref xexpression to reduce
      * @tparam X the list of axes
      *
-     * The reducer's result_type is deduced from the result type of function @tparam F
-     * when called with elements of the expression @tparam CT.
+     * The reducer's result_type is deduced from the result type of function
+     * <tt>F::reduce_functor_type</tt> when called with elements of the expression @tparam CT.
      *
      * @sa reduce
      */
@@ -95,12 +149,15 @@ namespace xt
     public:
 
         using self_type = xreducer<F, CT, X>;
-        using functor_type = typename std::remove_reference<F>::type;
+        using reduce_functor_type = typename F::reduce_functor_type;
+        using init_functor_type = typename F::init_functor_type;
+        using merge_functor_type = typename F::merge_functor_type;
         using xexpression_type = std::decay_t<CT>;
         using axes_type = X;
 
         using substepper_type = typename xexpression_type::const_stepper;
-        using value_type = std::decay_t<decltype(std::declval<functor_type>()(**(substepper_type*)0, **(substepper_type*)0))>;
+        using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
+            std::declval<init_functor_type>()(**(substepper_type*)0), **(substepper_type*)0))>;
         using reference = value_type;
         using const_reference = value_type;
         using pointer = value_type*;
@@ -151,7 +208,9 @@ namespace xt
     private:
 
         CT m_e;
-        functor_type m_f;
+        reduce_functor_type m_reduce;
+        init_functor_type m_init;
+        merge_functor_type m_merge;
         axes_type m_axes;
         inner_shape_type m_shape;
         shape_type m_dim_mapping;
@@ -334,9 +393,13 @@ namespace xt
     template <class F, class CT, class X>
     template <class Func, class CTA, class AX>
     inline xreducer<F, CT, X>::xreducer(Func&& func, CTA&& e, AX&& axes)
-        : m_e(std::forward<CTA>(e)), m_f(std::forward<Func>(func)), m_axes(std::forward<AX>(axes)),
-          m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0)),
-          m_dim_mapping(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0))
+        : m_e(std::forward<CTA>(e))
+        , m_reduce(std::get<0>(func))
+        , m_init(std::get<1>(func))
+        , m_merge(std::get<2>(func))
+        , m_axes(std::forward<AX>(axes))
+        , m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0))
+        , m_dim_mapping(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0))
     {
         if (!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
         {
@@ -593,16 +656,16 @@ namespace xt
             for (size_type i = 1; i != size; ++i)
             {
                 m_stepper.step(index);
-                res = m_reducer.m_f(res, aggregate(dim + 1));
+                res = m_reducer.m_merge(res, aggregate(dim + 1));
             }
         }
         else
         {
-            res = *m_stepper;
+            res = m_reducer.m_init(*m_stepper);
             for (size_type i = 1; i != size; ++i)
             {
                 m_stepper.step(index);
-                res = m_reducer.m_f(res, *m_stepper);
+                res = m_reducer.m_reduce(res, *m_stepper);
             }
         }
         m_stepper.reset(index);
