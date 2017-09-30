@@ -29,9 +29,9 @@ namespace xt
     {
         xarray<int> a = get_test_array();
         auto iter_begin = axis_begin(a);
-        EXPECT_EQ(size_t(2), (*iter_begin).dimension());
-        EXPECT_EQ(a.shape()[1], (*iter_begin).shape()[0]);
-        EXPECT_EQ(a.shape()[2], (*iter_begin).shape()[1]);
+        EXPECT_EQ(size_t(2), iter_begin->dimension());
+        EXPECT_EQ(a.shape()[1], iter_begin->shape()[0]);
+        EXPECT_EQ(a.shape()[2], iter_begin->shape()[1]);
 
         EXPECT_EQ(a(0, 0, 0), (*iter_begin)(0, 0));
         EXPECT_EQ(a(0, 1, 1), (*iter_begin)(1, 1));
@@ -44,9 +44,9 @@ namespace xt
         auto iter = axis_begin(a);
         ++iter;
 
-        EXPECT_EQ(size_t(2), (*iter).dimension());
-        EXPECT_EQ(a.shape()[1], (*iter).shape()[0]);
-        EXPECT_EQ(a.shape()[2], (*iter).shape()[1]);
+        EXPECT_EQ(size_t(2), iter->dimension());
+        EXPECT_EQ(a.shape()[1], iter->shape()[0]);
+        EXPECT_EQ(a.shape()[2], iter->shape()[1]);
 
         EXPECT_EQ(a(1, 0, 0), (*iter)(0, 0));
         EXPECT_EQ(a(1, 1, 1), (*iter)(1, 1));
@@ -69,8 +69,8 @@ namespace xt
         ++iter;
         auto niter = axis_begin(*iter);
         ++niter;
-        EXPECT_EQ(size_t(1), (*niter).dimension());
-        EXPECT_EQ(a.shape()[2], (*niter).shape()[0]);
+        EXPECT_EQ(size_t(1), niter->dimension());
+        EXPECT_EQ(a.shape()[2], niter->shape()[0]);
         EXPECT_EQ(a(1, 1, 0), (*niter)(0));
         EXPECT_EQ(a(1, 1, 1), (*niter)(1));
         EXPECT_EQ(a(1, 1, 2), (*niter)(2));
@@ -83,9 +83,9 @@ namespace xt
         auto iter = axis_begin(a);
         ++iter;
 
-        EXPECT_EQ(size_t(2), (*iter).dimension());
-        EXPECT_EQ(a.shape()[1], (*iter).shape()[0]);
-        EXPECT_EQ(a.shape()[2], (*iter).shape()[1]);
+        EXPECT_EQ(size_t(2), iter->dimension());
+        EXPECT_EQ(a.shape()[1], iter->shape()[0]);
+        EXPECT_EQ(a.shape()[2], iter->shape()[1]);
 
         EXPECT_EQ(a(1, 0, 0), (*iter)(0, 0));
         EXPECT_EQ(a(1, 1, 1), (*iter)(1, 1));

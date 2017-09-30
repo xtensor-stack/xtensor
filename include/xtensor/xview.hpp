@@ -16,6 +16,7 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtl/xclosure.hpp"
 #include "xtl/xsequence.hpp"
 
 #include "xbroadcast.hpp"
@@ -175,6 +176,10 @@ namespace xt
         raw_data_offset() const noexcept;
 
         size_type underlying_size(size_type dim) const;
+
+        xtl::xclosure_pointer<self_type&> operator&() &;
+        xtl::xclosure_pointer<const self_type&> operator&() const&;
+        xtl::xclosure_pointer<self_type> operator&() && ;
 
     private:
 
@@ -646,6 +651,24 @@ namespace xt
     inline auto xview<CT, S...>::underlying_size(size_type dim) const -> size_type
     {
         return m_e.shape()[dim];
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator&() & -> xtl::xclosure_pointer<self_type&>
+    {
+        return xtl::closure_pointer(*this);
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator&() const& -> xtl::xclosure_pointer<const self_type&>
+    {
+        return xtl::closure_pointer(*this);
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator&() && ->xtl::xclosure_pointer<self_type>
+    {
+        return xtl::closure_pointer(std::move(*this));
     }
 
     /**
