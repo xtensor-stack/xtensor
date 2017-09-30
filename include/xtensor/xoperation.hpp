@@ -134,21 +134,47 @@ namespace xt
             }
         };
 
+        template <class Tag, class F, class... E>
+        struct select_xfunction_expression;
+
+        template <class F, class... E>
+        struct select_xfunction_expression<xtensor_expression_tag, F, E...>
+        {
+            using type = xfunction<F, typename F::result_type, E...>;
+        };
+
+        template <class Tag, class F, class... E>
+        using select_xfunction_expression_t = typename select_xfunction_expression<Tag, F, E...>::type;
+
+        template <class Tag, template <class...> class F, class... E>
+        struct build_functor_type;
+
+        template <template <class...> class F, class... E>
+        struct build_functor_type<xtensor_expression_tag, F, E...>
+        {
+            using type = F<common_value_type_t<std::decay_t<E>...>>;
+        };
+
+        template <class Tag, template <class...> class F, class... E>
+        using build_functor_type_t = typename build_functor_type<Tag, F, E...>::type;
+
         template <template <class...> class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
-            using functor_type = F<common_value_type_t<std::decay_t<E>...>>;
-            using result_type = typename functor_type::result_type;
-            using type = xfunction<functor_type, result_type, const_xclosure_t<E>...>;
+            using expression_tag = xexpression_tag_t<E...>;
+            using functor_type = build_functor_type_t<expression_tag, F, E...>;
+            using type = select_xfunction_expression_t<expression_tag, functor_type, const_xclosure_t<E>...>;
             return type(functor_type(), std::forward<E>(e)...);
         }
 
         template <template <class...> class F, class... E>
         struct xfunction_type
         {
-            using type = xfunction<F<common_value_type_t<std::decay_t<E>...>>,
-                                   typename F<common_value_type_t<std::decay_t<E>...>>::result_type,
-                                   const_xclosure_t<E>...>;
+            using expression_tag = xexpression_tag_t<E...>;
+            using functor_type = build_functor_type_t<expression_tag, F, E...>;
+            using type = select_xfunction_expression_t<expression_tag,
+                                                       functor_type,
+                                                       const_xclosure_t<E>...>;
         };
 
         // On MSVC, the second argument of enable_if_t is always evaluated, even if the condition is false.

@@ -13,15 +13,14 @@
 
 #include "xtl/xsequence.hpp"
 
+#include "xconcepts.hpp"
+#include "xexpression.hpp"
 #include "xiterator.hpp"
 #include "xtensor_forward.hpp"
-#include "xconcepts.hpp"
 #include "xutils.hpp"
 
 namespace xt
 {
-    template <class E>
-    class xexpression;
 
     /********************
      * Assign functions *
@@ -29,9 +28,6 @@ namespace xt
 
     template <class E1, class E2>
     void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
-
-    template <class E1, class E2>
-    bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     template <class E1, class E2>
     void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
@@ -44,6 +40,39 @@ namespace xt
 
     template <class E1, class E2>
     void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
+
+    /************************
+     * xexpression_assigner *
+     ************************/
+
+    template <class Tag>
+    class xexpression_assigner;
+
+    template <>
+    class xexpression_assigner<xtensor_expression_tag>
+    {
+    public:
+
+        template <class E1, class E2>
+        static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
+
+        template <class E1, class E2>
+        static void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+
+        template <class E1, class E2>
+        static void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
+
+        template <class E1, class E2, class F>
+        static void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f);
+
+        template <class E1, class E2>
+        static void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
+
+    private:
+
+        template <class E1, class E2>
+        static bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2);
+    };
 
     /*****************
      * data_assigner *
@@ -95,6 +124,45 @@ namespace xt
      * Assign functions implementation *
      ***********************************/
 
+    template <class E1, class E2>
+    inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+    {
+        using tag = xexpression_tag_t<E1, E2>;
+        xexpression_assigner<tag>::assign_data(e1, e2, trivial);
+    }
+
+    template <class E1, class E2>
+    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        using tag = xexpression_tag_t<E1, E2>;
+        xexpression_assigner<tag>::assign_xexpression(e1, e2);
+    }
+
+    template <class E1, class E2>
+    inline void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        using tag = xexpression_tag_t<E1, E2>;
+        xexpression_assigner<tag>::computed_assign(e1, e2);
+    }
+
+    template <class E1, class E2, class F>
+    inline void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
+    {
+        using tag = xexpression_tag_t<E1, E2>;
+        xexpression_assigner<tag>::scalar_computed_assign(e1, e2, std::forward<F>(f));
+    }
+
+    template <class E1, class E2>
+    inline void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        using tag = xexpression_tag_t<E1, E2>;
+        xexpression_assigner<tag>::assert_compatible_shape(e1, e2);
+    }
+
+    /***************************************
+     * xexpression_assigner implementation *
+     ***************************************/
+
     namespace detail
     {
         template <class E1, class E2>
@@ -124,7 +192,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+    inline void xexpression_assigner<xtensor_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
@@ -147,7 +215,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline bool xexpression_assigner<xtensor_expression_tag>::reshape(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
@@ -160,14 +228,14 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<xtensor_expression_tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         bool trivial_broadcast = reshape(e1, e2);
         assign_data(e1, e2, trivial_broadcast);
     }
 
     template <class E1, class E2>
-    inline void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<xtensor_expression_tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
@@ -192,7 +260,7 @@ namespace xt
     }
 
     template <class E1, class E2, class F>
-    inline void scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
+    inline void xexpression_assigner<xtensor_expression_tag>::scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
     {
         E1& d = e1.derived_cast();
         std::transform(d.cbegin(), d.cend(), d.begin(),
@@ -200,7 +268,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<xtensor_expression_tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
