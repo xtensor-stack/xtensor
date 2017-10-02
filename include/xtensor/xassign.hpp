@@ -109,7 +109,7 @@ namespace xt
             return false;
         }
 
-        template <class E, class = void_t<int>>
+        template <class E, class = void_t<>>
         struct forbid_simd_assign
         {
             static constexpr bool value = true;

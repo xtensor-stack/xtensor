@@ -84,7 +84,7 @@ namespace xt
         template <class... Args>
         using common_value_type_t = typename common_value_type<Args...>::type;
 
-        template <class F, class R, class = void_t<int>>
+        template <class F, class R, class = void_t<>>
         struct simd_return_type
         {
         };
