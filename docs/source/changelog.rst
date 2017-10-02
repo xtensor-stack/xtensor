@@ -7,8 +7,8 @@
 Changelog
 =========
 
-master branch
--------------
+0.12.0
+------
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
