@@ -75,6 +75,16 @@ Two container classes implementing multi-dimensional arrays are provided: ``xarr
 - ``xtensor`` has a dimension set at compilation time, which enables many optimizations. For example, shapes and strides
   of ``xtensor`` instances are allocated on the stack instead of the heap.
 
+Let's use ``xtensor`` instead of ``xarray`` in the previous example:
+
+.. code::
+
+    #include <array>
+    #include "xtensor/xtensor.hpp"
+
+    std::array<size_t, 3> shape = { 3, 2, 4 };
+    xt::xtensor<double, 3, layout_type::row_major> a(shape);
+
 ``xarray`` and ``xtensor`` containers are both ``xexpression`` s and can be involved and mixed in mathematical expressions, assigned to each
 other etc... They provide an augmented interface compared to other ``xexpression`` types:
 

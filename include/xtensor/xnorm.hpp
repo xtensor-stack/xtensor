@@ -10,7 +10,8 @@
 #define XNORM_HPP
 
 #include <cmath>
-#include <cstdlib>   // std::abs(int) prior to C++ 17
+// std::abs(int) prior to C++ 17
+#include <cstdlib>
 #include <complex>
 
 #include "xconcepts.hpp"
@@ -24,6 +25,7 @@ namespace xt
      * norm functions for built-in types *
      *************************************/
 
+    ///@cond DOXYGEN_INCLUDE_SFINAE
     #define XTENSOR_DEFINE_SIGNED_NORMS(T)                              \
         inline auto                                                     \
         norm_lp(T t, double p) noexcept                                 \
@@ -93,57 +95,60 @@ namespace xt
      * norm functions for std::complex *
      ***********************************/
 
-        /** \brief L0 pseudo-norm of a complex number.
-
-            Equivalent to <tt>t != 0</tt>.
-        */
+    /**
+     * \brief L0 pseudo-norm of a complex number.
+     * Equivalent to <tt>t != 0</tt>.
+     */
     template <class T>
-    inline uint64_t norm_l0(std::complex<T> const & t) noexcept
+    inline uint64_t norm_l0(const std::complex<T>& t) noexcept
     {
         return t.real() != 0 || t.imag() != 0;
     }
-
-        /** \brief L1 norm of a complex number.
-        */
+    
+    /**
+     * \brief L1 norm of a complex number.
+     */
     template <class T>
-    inline auto norm_l1(std::complex<T> const & t) noexcept
+    inline auto norm_l1(const std::complex<T>& t) noexcept
     {
         return std::abs(t.real()) + std::abs(t.imag());
     }
 
-        /** \brief L2 norm of a complex number.
-
-            Equivalent to <tt>std::abs(t)</tt>.
-        */
+    /**
+     * \brief L2 norm of a complex number.
+     * Equivalent to <tt>std::abs(t)</tt>.
+     */
     template <class T>
-    inline auto norm_l2(std::complex<T> const & t) noexcept
+    inline auto norm_l2(const std::complex<T>& t) noexcept
     {
         return std::abs(t);
     }
-
-        /** \brief Squared norm of a complex number.
-
-            Equivalent to <tt>std::norm(t)</tt> (yes, the C++ standard really defines
-            <tt>norm()</tt> to compute the squared norm).
-        */
+    
+    /**
+     * \brief Squared norm of a complex number.
+     * Equivalent to <tt>std::norm(t)</tt> (yes, the C++ standard really defines
+     * <tt>norm()</tt> to compute the squared norm).
+     */
     template <class T>
-    inline auto norm_sq(std::complex<T> const & t) noexcept
+    inline auto norm_sq(const std::complex<T>& t) noexcept
     {
         return std::norm(t);
     }
 
-        /** \brief L-infinity norm of a complex number.
-        */
+    /**
+     * \brief L-infinity norm of a complex number.
+     */
     template <class T>
-    inline auto norm_linf(std::complex<T> const & t) noexcept
+    inline auto norm_linf(const std::complex<T>& t) noexcept
     {
         return std::max(std::abs(t.real()), std::abs(t.imag()));
     }
 
-        /** \brief p-th power of the Lp norm of a complex number.
-        */
+    /**
+     * \brief p-th power of the Lp norm of a complex number.
+     */
     template <class T>
-    inline auto norm_lp_to_p(std::complex<T> const & t, double p) noexcept
+    inline auto norm_lp_to_p(const std::complex<T>& t, double p) noexcept
     {
         using rt = decltype(std::pow(std::abs(t.real()), static_cast<T>(p)));
         return p == 0
@@ -151,11 +156,12 @@ namespace xt
                    : std::pow(std::abs(t.real()), static_cast<T>(p)) +
                      std::pow(std::abs(t.imag()), static_cast<T>(p));
     }
-
-        /** \brief Lp norm of a complex number.
-        */
+    
+    /**
+     * \brief Lp norm of a complex number.
+     */
     template <class T>
-    inline auto norm_lp(std::complex<T> const & t, double p) noexcept
+    inline auto norm_lp(const std::complex<T>& t, double p) noexcept
     {
         return p == 0
                    ? norm_lp_to_p(t, p)
@@ -190,7 +196,7 @@ namespace xt
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC)   \
     template <class E, class X>                                                        \
-    inline auto NAME(E && e, X&& axes) noexcept                                        \
+    inline auto NAME(E&& e, X&& axes) noexcept                                         \
     {                                                                                  \
         using value_type = typename std::decay_t<E>::value_type;                       \
         using result_type = RESULT_TYPE;                                               \
@@ -209,9 +215,8 @@ namespace xt
                       std::forward<E>(e), std::forward<X>(axes));                      \
     }                                                                                  \
                                                                                        \
-    template <class E,                                                                 \
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>                               \
-    inline auto NAME(E && e) noexcept                                                  \
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>                      \
+    inline auto NAME(E&& e) noexcept                                                   \
     {                                                                                  \
         return NAME(std::forward<E>(e), arange(e.dimension()));                        \
     }                                                                                  \
@@ -226,7 +231,7 @@ namespace xt
 #undef XTENSOR_COMMA
 #undef XTENSOR_NORM_FUNCTION
 #undef XTENSOR_NORM_FUNCTION_AXES
-
+    /// @endcond
     /**
      * @ingroup red_functions
      * @brief L0 (count) pseudo-norm of an array-like argument over given axes.
@@ -239,7 +244,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X>
-    inline auto norm_l0(E && e, X && axes) noexcept;
+    auto norm_l0(E&& e, X && axes) noexcept;
 
     /**
      * @ingroup red_functions
@@ -253,7 +258,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X>
-    inline auto norm_l1(E && e, X && axes) noexcept;
+    auto norm_l1(E&& e, X&& axes) noexcept;
 
     /**
      * @ingroup red_functions
@@ -267,7 +272,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X>
-    inline auto norm_sq(E && e, X && axes) noexcept;
+    auto norm_sq(E&& e, X&& axes) noexcept;
 
     /**
      * @ingroup red_functions
@@ -277,7 +282,7 @@ namespace xt
      *  otherwise: implemented as <tt>sqrt(norm_sq(t))</tt>.
     */
     template <class E>
-    inline auto norm_l2(E && e) noexcept
+    inline auto norm_l2(E&& e) noexcept
     {
         using std::sqrt;
         return sqrt(norm_sq(std::forward<E>(e)));
@@ -293,7 +298,7 @@ namespace xt
      * @return an \ref xreducer (specifically: <tt>sqrt(norm_sq(e, axes))</tt>)
     */
     template <class E, class X>
-    inline auto norm_l2(E && e, X && axes) noexcept
+    inline auto norm_l2(E&& e, X&& axes) noexcept
     {
         return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes)));
     }
@@ -310,7 +315,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X>
-    inline auto norm_linf(E && e, X && axes) noexcept;
+    auto norm_linf(E&& e, X&& axes) noexcept;
 
     /**
      * @ingroup red_functions
@@ -318,13 +323,14 @@ namespace xt
      *
      * Returns an \ref xreducer for the p-th power of the Lp norm of the elements across given \em axes.
      * @param e an \ref xexpression
+     * @param p
      * @param axes the axes along which the norm is computed (optional)
      * @return an \ref xreducer
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X>
-    inline auto norm_lp_to_p(E && e, double p, X && axes) noexcept
+    inline auto norm_lp_to_p(E&& e, double p, X&& axes) noexcept
     {
         using value_type = typename std::decay_t<E>::value_type;
         using result_type = norm_type_t<std::decay_t<E>>;
@@ -341,8 +347,7 @@ namespace xt
                       std::forward<E>(e), std::forward<X>(axes));
     }
 
-    template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
     inline auto norm_lp_to_p(E && e, double p) noexcept
     {
         return norm_lp_to_p(std::forward<E>(e), p, arange(e.dimension()));
@@ -370,21 +375,21 @@ namespace xt
      *
      * Returns an \ref xreducer for the Lp norm (p != 0) of the elements across given \em axes.
      * @param e an \ref xexpression
+     * @param p
      * @param axes the axes along which the norm is computed (optional)
      * @return an \ref xreducer
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X>
-    inline auto norm_lp(E && e, double p, X && axes)
+    inline auto norm_lp(E&& e, double p, X&& axes)
     {
         XTENSOR_PRECONDITION(p != 0,
             "norm_lp(): p must be nonzero, use norm_l0() instead.");
         return pow(norm_lp_to_p(std::forward<E>(e), p), 1.0/p);
     }
 
-    template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
     inline auto norm_lp(E && e, double p) noexcept
     {
         return norm_lp(std::forward<E>(e), p, arange(e.dimension()));
@@ -414,9 +419,8 @@ namespace xt
      * @param e a 2D \ref xexpression
      * @return an \ref xreducer
      */
-    template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_induced_l1(E && e)
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    inline auto norm_induced_l1(E&& e)
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,
             "norm_induced_l1(): only applicable to matrices (e.dimension() must be 2).");
@@ -431,9 +435,8 @@ namespace xt
      * @param e a 2D \ref xexpression
      * @return an \ref xreducer
      */
-    template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_induced_linf(E && e)
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    inline auto norm_induced_linf(E&& e)
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,
             "norm_induced_linf(): only applicable to matrices (e.dimension() must be 2).");
