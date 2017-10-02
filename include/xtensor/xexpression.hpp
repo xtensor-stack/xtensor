@@ -219,6 +219,63 @@ namespace xt
             return e(i, args...);
         }
     }
+
+    /*************************
+     * expression tag system *
+     *************************/
+
+    struct xtensor_expression_tag {};
+
+    namespace detail
+    {
+        template <class E, class = void_t<int>>
+        struct get_expression_tag
+        {
+            using type = xtensor_expression_tag;
+        };
+
+        template <class E>
+        struct get_expression_tag<E, void_t<typename std::decay_t<E>::expression_tag>>
+        {
+            using type = typename std::decay_t<E>::expression_tag;
+        };
+
+        template <class E>
+        using get_expression_tag_t = typename get_expression_tag<E>::type;
+
+        template <class... T>
+        struct expression_tag_and;
+
+        template <class T>
+        struct expression_tag_and<T>
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct expression_tag_and<T, T>
+        {
+            using type = T;
+        };
+
+        template <class T1, class... T>
+        struct expression_tag_and<T1, T...>
+            : expression_tag_and<T1, typename expression_tag_and<T...>::type>
+        {
+        };
+
+        template <class... T>
+        using expression_tag_and_t = typename expression_tag_and<T...>::type;
+    }
+
+    template <class... T>
+    struct xexpression_tag
+    {
+        using type = detail::expression_tag_and_t<detail::get_expression_tag_t<T>...>;
+    };
+
+    template <class... T>
+    using xexpression_tag_t = typename xexpression_tag<T...>::type;
 }
 
 #endif

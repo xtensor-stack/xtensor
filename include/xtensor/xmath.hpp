@@ -1326,8 +1326,10 @@ namespace xt
         inline auto make_xfunction(std::tuple<A...>&& f_args, E&&... e) noexcept
         {
             using functor_type = F<common_value_type_t<std::decay_t<E>...>>;
-            using result_type = typename functor_type::result_type;
-            using type = xfunction<functor_type, result_type, const_xclosure_t<E>...>;
+            using expression_tag = xexpression_tag_t<E...>;
+            using type = select_xfunction_expression_t<expression_tag,
+                                                       functor_type,
+                                                       const_xclosure_t<E>...>;
             auto functor = get_functor<functor_type>(
                 std::forward<std::tuple<A...>>(f_args),
                 std::make_index_sequence<sizeof...(A)>{}
