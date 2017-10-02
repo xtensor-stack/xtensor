@@ -20,43 +20,53 @@ New features
 ~~~~~~~~~~~~
 
 - ``xtensor`` has an optional dependency on ``xsimd`` for enabling simd acceleration
-  `#426 <https://github.com/QuantStack/xtenros/pull/426`_.
+  `#426 <https://github.com/QuantStack/xtensor/pull/426>`_.
 
 - All expressions have an additional safe access function (``at``)
-  `#420 <https://github.com/QuantStack/xtensor/pull/420`_.
+  `#420 <https://github.com/QuantStack/xtensor/pull/420>`_.
 
 - norm functions
-  `#440 <https://github.com/QuantStack/xtensor/pull/440`_.
+  `#440 <https://github.com/QuantStack/xtensor/pull/440>`_.
+
+- ``closure_pointer`` used in iterators returning temporaries so their ``operator->`` can be
+  correctly defined
+  `#446 <https://github.com/QuantStack/xtensor/pull/446>`_.
+
+- expressions tags added so ``xtensor`` expression system can be extended
+  `#447 <https://github.com/QuantStack/xtensor/pull/447>`_.
 
 Other changes
 ~~~~~~~~~~~~~
 
 - Preconditions and exceptions
-  `#409 <https://github.com/QuantStack/xtensor/pull/409`_.
+  `#409 <https://github.com/QuantStack/xtensor/pull/409>`_.
 
 - ``isclose`` is now symmetric
-  `#411 <https://github.com/QuantStack/xtensor/pull/411`_.
+  `#411 <https://github.com/QuantStack/xtensor/pull/411>`_.
 
 - concepts added
-  `#414 <https://github.com/QuantStack/xtensor/pull/414`_.
+  `#414 <https://github.com/QuantStack/xtensor/pull/414>`_.
 
 - narrowing cast for mixed arithmetic
-  `#432 <https://github.com/QuantStack/xtensor/pull/432`_.
+  `#432 <https://github.com/QuantStack/xtensor/pull/432>`_.
 
 - ``is_xexpression`` concept fixed
-  `#439 <https://github.com/QuantStack/xtensor/pull/439`_.
+  `#439 <https://github.com/QuantStack/xtensor/pull/439>`_.
+
+- ``void_t`` implementation fixed for compilers affected by C++14 defect CWG 1558
+  `#448 <https://github.com/QuantStack/xtensor/pull/448>`_.
 
 0.11.3
 ------
 
 - Fixed bug in length-1 statically dimensioned tensor construction
-  `#431 <https://github.com/QuantStack/xtensor/pull/431`_.
+  `#431 <https://github.com/QuantStack/xtensor/pull/431>`_.
 
 0.11.2
 ------
 
 - Fixup compilation issue with latest clang compiler. (missing `constexpr` keyword)
-  `#407 <https://github.com/QuantStack/xtensor/pull/407`_.
+  `#407 <https://github.com/QuantStack/xtensor/pull/407>`_.
 
 0.11.1
 ------

@@ -11,11 +11,6 @@ project(xtensor)
 
 set(XTENSOR_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Dependencies
-# ============
-
-find_package(xtl REQUIRED)
-
 # Versionning
 # ===========
 
@@ -28,8 +23,13 @@ foreach(ver ${xtensor_version_defines})
 endforeach()
 set(${PROJECT_NAME}_VERSION 
     ${XTENSOR_VERSION_MAJOR}.${XTENSOR_VERSION_MINOR}.${XTENSOR_VERSION_PATCH})
-message(STATUS "xtensor v${${PROJECT_NAME}_VERSION}")
+message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 
+# Dependencies
+# ============
+
+find_package(xtl REQUIRED)
+message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
 # Build
 # =====
@@ -102,10 +102,10 @@ if(XTENSOR_CHECK_DIMENSION)
 endif()
 
 if(XTENSOR_USE_XSIMD)
-    MESSAGE(STATUS "compiling with simd acceleration")
     add_definitions(-DXTENSOR_USE_XSIMD)
     find_package(xsimd REQUIRED)
     include_directories(${xsimd_INCLUDE_DIRS})
+    message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
 endif()
 
 if(DEFAULT_COLUMN_MAJOR)
