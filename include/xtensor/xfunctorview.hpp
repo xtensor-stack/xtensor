@@ -823,7 +823,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xfunctorview<F, CT>::cbegin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return const_broadcast_iterator<S, L>(m_e.template cxbegin<S, L>(shape), &m_functor);
+        return const_broadcast_iterator<S, L>(m_e.template cbegin<S, L>(shape), &m_functor);
     }
 
     /**
@@ -837,7 +837,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xfunctorview<F, CT>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return const_broadcast_iterator<S, L>(m_e.template cxend<S, L>(shape), &m_functor);
+        return const_broadcast_iterator<S, L>(m_e.template cend<S, L>(shape), &m_functor);
     }
     //@}
 
@@ -933,7 +933,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xfunctorview<F, CT>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
     {
-        return reverse_broadcast_iterator<S, L>(m_e.template xrbegin<S, L>(shape), &m_functor);
+        return reverse_broadcast_iterator<S, L>(m_e.template rbegin<S, L>(shape), &m_functor);
     }
 
     /**
@@ -947,7 +947,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xfunctorview<F, CT>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
     {
-        return reverse_broadcast_iterator<S, L>(m_e.template xrend<S, L>(shape), &m_functor);
+        return reverse_broadcast_iterator<S, L>(m_e.template rend<S, L>(shape), &m_functor);
     }
 
     /**
