@@ -251,7 +251,7 @@ namespace xt
     template <class CT, class S, class CD>
     inline void xstrided_view<CT, S, CD>::assign_temporary_impl(temporary_type&& tmp)
     {
-        std::copy(tmp.cbegin(), tmp.cend(), this->xbegin());
+        std::copy(tmp.cbegin(), tmp.cend(), this->begin());
     }
 
     /**
