@@ -17,6 +17,7 @@
 
 #include "xtl/xsequence.hpp"
 
+#include "xarray.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xstrides.hpp"
