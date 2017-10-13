@@ -108,6 +108,10 @@ namespace xt
         BINARY_BOOL_OPERATOR_FUNCTOR(logical_or, ||);
         BINARY_BOOL_OPERATOR_FUNCTOR(logical_and, &&);
         UNARY_BOOL_OPERATOR_FUNCTOR(logical_not, !);
+        BINARY_OPERATOR_FUNCTOR(bitwise_or, | );
+        BINARY_OPERATOR_FUNCTOR(bitwise_and, &);
+        BINARY_OPERATOR_FUNCTOR(bitwise_xor, ^);
+        UNARY_OPERATOR_FUNCTOR(bitwise_not, ~);
         BINARY_BOOL_OPERATOR_FUNCTOR(less, <);
         BINARY_BOOL_OPERATOR_FUNCTOR(less_equal, <=);
         BINARY_BOOL_OPERATOR_FUNCTOR(greater, >);
@@ -353,6 +357,77 @@ namespace xt
         -> detail::xfunction_type_t<detail::logical_not, E>
     {
         return detail::make_xfunction<detail::logical_not>(std::forward<E>(e));
+    }
+
+    /**
+     * @defgroup bitwise_operators
+     */
+
+    /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise and
+     *
+     * Returns an \ref xfunction for the element-wise bitwise and
+     * of \a e1 and \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto operator&(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<detail::bitwise_and, E1, E2>
+    {
+        return detail::make_xfunction<detail::bitwise_and>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise or
+     *
+     * Returns an \ref xfunction for the element-wise bitwise or
+     * of \a e1 and \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto operator|(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<detail::bitwise_or, E1, E2>
+    {
+        return detail::make_xfunction<detail::bitwise_or>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise xor
+     *
+     * Returns an \ref xfunction for the element-wise bitwise xor
+     * of \a e1 and \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto operator^(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<detail::bitwise_xor, E1, E2>
+    {
+        return detail::make_xfunction<detail::bitwise_xor>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise not
+     *
+     * Returns an \ref xfunction for the element-wise bitwise not
+     * of \a e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto operator~(E&& e) noexcept
+        -> detail::xfunction_type_t<detail::bitwise_not, E>
+    {
+        return detail::make_xfunction<detail::bitwise_not>(std::forward<E>(e));
     }
 
     /**

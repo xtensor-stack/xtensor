@@ -137,6 +137,81 @@ namespace xt
         EXPECT_EQ((sa / b)(0, 0), sa / b(0, 0));
     }
 
+    template <class T>
+    struct int_rebind;
+
+    template <>
+    struct int_rebind<xarray<double>>
+    {
+        using type = xarray<int>;
+    };
+    
+    template <>
+    struct int_rebind<xtensor<double, 2>>
+    {
+        using type = xtensor<int, 2>;
+    };
+
+    template <class T>
+    using int_rebind_t = typename int_rebind<T>::type;
+
+    TYPED_TEST(operation, bitwise_and)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = { 3, 2 };
+        int_tensor a(shape, 14);
+        int_tensor b(shape, 15);
+        EXPECT_EQ((a & b)(0, 0), a(0, 0) & b(0, 0));
+
+        int sb = 48;
+        EXPECT_EQ((a & sb)(0, 0), a(0, 0) & sb);
+
+        int sa = 24;
+        EXPECT_EQ((sa & b)(0, 0), sa & b(0, 0));
+    }
+
+    TYPED_TEST(operation, bitwise_or)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = { 3, 2 };
+        int_tensor a(shape, 14);
+        int_tensor b(shape, 15);
+        EXPECT_EQ((a | b)(0, 0), a(0, 0) | b(0, 0));
+
+        int sb = 48;
+        EXPECT_EQ((a | sb)(0, 0), a(0, 0) | sb);
+
+        int sa = 24;
+        EXPECT_EQ((sa | b)(0, 0), sa | b(0, 0));
+    }
+
+    TYPED_TEST(operation, bitwise_xor)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = { 3, 2 };
+        int_tensor a(shape, 14);
+        int_tensor b(shape, 15);
+        EXPECT_EQ((a ^ b)(0, 0), a(0, 0) ^ b(0, 0));
+
+        int sb = 48;
+        EXPECT_EQ((a ^ sb)(0, 0), a(0, 0) ^ sb);
+
+        int sa = 24;
+        EXPECT_EQ((sa ^ b)(0, 0), sa ^ b(0, 0));
+    }
+    
+    TYPED_TEST(operation, bitwise_not)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = { 3, 2 };
+        int_tensor a(shape, 15);
+        EXPECT_EQ((~a)(0, 0), ~(a(0, 0)));
+    }
+
     TYPED_TEST(operation, less)
     {
         using container_1d = redim_container_t<TypeParam, 1>;

@@ -858,12 +858,13 @@ namespace xt
         }
     };
 
-    /** @brief Perform a type cast when a condition is true.
-        If <tt>condition</tt> is true, return <tt>static_cast<T>(u)</tt>,
-        otherwise return <tt>u</tt> unchanged. This is useful when an unconditional
-        static_cast would force undesired type conversions in some situations where
-        an error or warning would be desired. The condition determines when the
-        explicit cast is ok.
+    /**
+     * @brief Perform a type cast when a condition is true.
+     * If <tt>condition</tt> is true, return <tt>static_cast<T>(u)</tt>,
+     * otherwise return <tt>u</tt> unchanged. This is useful when an unconditional
+     * static_cast would force undesired type conversions in some situations where
+     * an error or warning would be desired. The condition determines when the
+     * explicit cast is ok.
      */
     template <bool condition, class T, class U>
     inline auto conditional_cast(U && u)
@@ -875,9 +876,10 @@ namespace xt
      * arithmetic type promotion traits *
      ************************************/
 
-    /** @brief Traits class for the result type of mixed arithmetic expressions.
-     *   For example, <tt>promote_type<unsigned char, unsigned char>::type</tt> tells
-     *  the user that <tt>unsigned char + unsigned char => int</tt>.
+    /**
+     * @brief Traits class for the result type of mixed arithmetic expressions.
+     * For example, <tt>promote_type<unsigned char, unsigned char>::type</tt> tells
+     * the user that <tt>unsigned char + unsigned char => int</tt>.
      */
     template <class... T>
     struct promote_type;
@@ -900,27 +902,49 @@ namespace xt
         using type = decltype(*(std::decay_t<T0>*)0 + *(typename promote_type<REST...>::type*)0);
     };
 
-    /** @brief Abbreviation of 'typename promote_type<T>::type'.
-        */
+    template <>
+    struct promote_type<bool>
+    {
+        using type = bool;
+    };
+
+    template <class T>
+    struct promote_type<bool, T>
+    {
+        using type = T;
+    };
+
+    template <class... REST>
+    struct promote_type<bool, REST...>
+    {
+        using type = typename promote_type<bool, typename promote_type<REST...>::type>::type;
+    };
+
+    /** 
+     * @brief Abbreviation of 'typename promote_type<T>::type'.
+     */
     template <class... T>
     using promote_type_t = typename promote_type<T...>::type;
 
-    /** @brief Traits class to find the biggest type of the same kind.
-     *   For example, <tt>big_promote_type<unsigned char>::type</tt> is <tt>unsigned long long</tt>.
-     *   The default implementation only supports built-in types and <tt>std::complex</tt>. All
-     *   other types remain unchanged unless <tt>big_promote_type</tt> gets specialized for them.
+    /**
+     * @brief Traits class to find the biggest type of the same kind.
+     *
+     * For example, <tt>big_promote_type<unsigned char>::type</tt> is <tt>unsigned long long</tt>.
+     * The default implementation only supports built-in types and <tt>std::complex</tt>. All
+     * other types remain unchanged unless <tt>big_promote_type</tt> gets specialized for them.
      */
     template <class T>
     struct big_promote_type
     {
-      private:
+    private:
+        
         using V = std::decay_t<T>;
-        static const bool is_arithmetic = std::is_arithmetic<V>::value;
-        static const bool is_signed = std::is_signed<V>::value;
-        static const bool is_integral = std::is_integral<V>::value;
-        static const bool is_long_double = std::is_same<V, long double>::value;
+        static constexpr bool is_arithmetic = std::is_arithmetic<V>::value;
+        static constexpr bool is_signed = std::is_signed<V>::value;
+        static constexpr bool is_integral = std::is_integral<V>::value;
+        static constexpr bool is_long_double = std::is_same<V, long double>::value;
 
-      public:
+    public:
         using type = std::conditional_t<is_arithmetic,
                         std::conditional_t<is_integral,
                             std::conditional_t<is_signed, long long, unsigned long long>,
@@ -936,7 +960,8 @@ namespace xt
         using type = std::complex<typename big_promote_type<T>::type>;
     };
 
-    /** @brief Abbreviation of 'typename big_promote_type<T>::type'.
+    /**
+     * @brief Abbreviation of 'typename big_promote_type<T>::type'.
      */
     template <class T>
     using big_promote_type_t = typename big_promote_type<T>::type;
@@ -949,10 +974,11 @@ namespace xt
         using real_promote_type_t = decltype(sqrt(*(std::decay_t<T>*)0));
     }
 
-    /** @brief Result type of algebraic expressions.
+    /**
+     * @brief Result type of algebraic expressions.
      *
-     *   For example, <tt>real_promote_type<int>::type</tt> tells the
-     *   user that <tt>sqrt(int) => double</tt>.
+     * For example, <tt>real_promote_type<int>::type</tt> tells the
+     * user that <tt>sqrt(int) => double</tt>.
      */
     template <class T>
     struct real_promote_type
@@ -960,15 +986,17 @@ namespace xt
         using type = traits_detail::real_promote_type_t<T>;
     };
 
-    /** @brief Abbreviation of 'typename real_promote_type<T>::type'.
-        */
+    /**
+     * @brief Abbreviation of 'typename real_promote_type<T>::type'.
+     */
     template <class T>
     using real_promote_type_t = typename real_promote_type<T>::type;
 
-    /** @brief Traits class to replace 'bool' with 'uint8_t' and keep everything else.
+    /**
+     * @brief Traits class to replace 'bool' with 'uint8_t' and keep everything else.
      *
-     *  This is useful for scientific computing, where a boolean mask array is
-     *  usually implemented as an array of bytes.
+     * This is useful for scientific computing, where a boolean mask array is
+     * usually implemented as an array of bytes.
      */
     template <class T>
     struct bool_promote_type
@@ -976,8 +1004,9 @@ namespace xt
         using type = typename std::conditional<std::is_same<T, bool>::value, uint8_t, T>::type;
     };
 
-    /** @brief Abbreviation for typename bool_promote_type<T>::type
-      */
+    /**
+     * @brief Abbreviation for typename bool_promote_type<T>::type
+     */
     template <class T>
     using bool_promote_type_t = typename bool_promote_type<T>::type;
 
@@ -1088,20 +1117,21 @@ namespace xt
         };
     }  // namespace traits_detail
 
-    /** @brief Traits class for the result type of the <tt>norm_l2()</tt> function.
-
-            Member 'type' defines the result of <tt>norm_l2(t)</tt>, where <tt>t</tt>
-            is of type @tparam T. It implements the following rules designed to
-            minimize the potential for overflow:
-                - @tparam T is an arithmetic type: 'type' is the result type of <tt>abs(t)</tt>.
-                - @tparam T is a container of 'long double' elements: 'type' is <tt>long double</tt>.
-                - @tparam T is a container of another arithmetic type: 'type' is <tt>double</tt>.
-                - @tparam T is a container of some other type: 'type' is the element's norm type,
-
-           Containers are recognized by having an embedded typedef 'value_type'.
-           To change the behavior for a case not covered here, specialize the
-           <tt>traits_detail::norm_type_base</tt> template.
-        */
+    /**
+     * @brief Traits class for the result type of the <tt>norm_l2()</tt> function.
+     *
+     * Member 'type' defines the result of <tt>norm_l2(t)</tt>, where <tt>t</tt>
+     * is of type @tparam T. It implements the following rules designed to
+     * minimize the potential for overflow:
+     *   - @tparam T is an arithmetic type: 'type' is the result type of <tt>abs(t)</tt>.
+     *   - @tparam T is a container of 'long double' elements: 'type' is <tt>long double</tt>.
+     *   - @tparam T is a container of another arithmetic type: 'type' is <tt>double</tt>.
+     *   - @tparam T is a container of some other type: 'type' is the element's norm type,
+     *
+     * Containers are recognized by having an embedded typedef 'value_type'.
+     * To change the behavior for a case not covered here, specialize the
+     * <tt>traits_detail::norm_type_base</tt> template.
+     */
     template <class T>
     struct norm_type
         : public traits_detail::norm_type_base<T>
@@ -1114,12 +1144,14 @@ namespace xt
                                       typename base_type::norm_of_scalar::norm_type>::type;
     };
 
-    /** Abbreviation of 'typename norm_type<T>::type'.
-        */
+    /**
+     * Abbreviation of 'typename norm_type<T>::type'.
+     */
     template <class T>
     using norm_type_t = typename norm_type<T>::type;
 
-    /** @brief Traits class for the result type of the <tt>norm_sq()</tt> function.
+    /**
+     * @brief Traits class for the result type of the <tt>norm_sq()</tt> function.
      *
      * Member 'type' defines the result of <tt>norm_sq(t)</tt>, where <tt>t</tt>
      * is of type @tparam T. It implements the following rules designed to
@@ -1146,7 +1178,8 @@ namespace xt
                                       typename base_type::norm_of_scalar::squared_norm_type>::type;
     };
 
-    /** Abbreviation of 'typename squared_norm_type<T>::type'.
+    /**
+     * Abbreviation of 'typename squared_norm_type<T>::type'.
      */
     template <class T>
     using squared_norm_type_t = typename squared_norm_type<T>::type;
