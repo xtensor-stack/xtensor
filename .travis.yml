@@ -1,6 +1,8 @@
 language: cpp
 dist: precise
+env:
 matrix:
+  fast_finish: true
   include:
     - os: linux
       addons:
@@ -73,6 +75,16 @@ matrix:
     - os: osx
       osx_image: xcode8
       compiler: clang
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
+  allow_failures:
+      - env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -111,6 +123,8 @@ install:
     - cd build
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
         cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON ..;
+      elif [[ "$COLUMN_MAJOR_LAYOUT" == 1 ]]; then
+        cmake -DBUILD_TESTS=ON -DDEFAULT_COLUMN_MAJOR=ON ..;
       else
         cmake -DBUILD_TESTS=ON ..;
       fi
