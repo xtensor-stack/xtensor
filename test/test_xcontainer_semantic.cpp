@@ -138,6 +138,93 @@ namespace xt
         }
     }
 
+    TYPED_TEST(container_semantic, a_bitwise_and_b)
+    {
+        operation_tester<std::bit_and<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major & row_major");
+            TypeParam b = tester.a & tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major & column_major");
+            TypeParam b = tester.a & tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major & central_major");
+            TypeParam b = tester.a & tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major & unit_major");
+            TypeParam b = tester.a & tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TYPED_TEST(container_semantic, a_bitwise_or_b)
+    {
+        operation_tester<std::bit_or<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major | row_major");
+            TypeParam b = tester.a | tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major | column_major");
+            TypeParam b = tester.a | tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major | central_major");
+            TypeParam b = tester.a | tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major | unit_major");
+            TypeParam b = tester.a | tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TYPED_TEST(container_semantic, a_bitwise_xor_b)
+    {
+        operation_tester<std::bit_xor<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major ^ row_major");
+            TypeParam b = tester.a ^ tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^ column_major");
+            TypeParam b = tester.a ^ tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^ central_major");
+            TypeParam b = tester.a ^ tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^ unit_major");
+            TypeParam b = tester.a ^ tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
     TYPED_TEST(container_semantic, a_plus_equal_b)
     {
         operation_tester<std::plus<>, TypeParam> tester;
@@ -270,6 +357,105 @@ namespace xt
         }
     }
 
+    TYPED_TEST(container_semantic, a_bitwise_and_equal_b)
+    {
+        operation_tester<std::bit_and<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major &= row_major");
+            TypeParam b = tester.a;
+            b &= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major &= column_major");
+            TypeParam b = tester.a;
+            b &= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major &= central_major");
+            TypeParam b = tester.a;
+            b &= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major &= unit_major");
+            TypeParam b = tester.a;
+            b &= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TYPED_TEST(container_semantic, a_bitwise_or_equal_b)
+    {
+        operation_tester<std::bit_or<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major |= row_major");
+            TypeParam b = tester.a;
+            b |= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major |= column_major");
+            TypeParam b = tester.a;
+            b |= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major |= central_major");
+            TypeParam b = tester.a;
+            b |= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major |= unit_major");
+            TypeParam b = tester.a;
+            b |= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TYPED_TEST(container_semantic, a_bitwise_xor_equal_b)
+    {
+        operation_tester<std::bit_xor<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major ^= row_major");
+            TypeParam b = tester.a;
+            b ^= tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^= column_major");
+            TypeParam b = tester.a;
+            b ^= tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^= central_major");
+            TypeParam b = tester.a;
+            b ^= tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^= unit_major");
+            TypeParam b = tester.a;
+            b ^= tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
     TYPED_TEST(container_semantic, assign_a_plus_b)
     {
         operation_tester<std::plus<>, TypeParam> tester;
@@ -371,7 +557,7 @@ namespace xt
 
     TYPED_TEST(container_semantic, assign_a_divides_by_b)
     {
-        operation_tester < std::divides<>, TypeParam> tester;
+        operation_tester<std::divides<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major / row_major");
@@ -398,6 +584,105 @@ namespace xt
             SCOPED_TRACE("row_major / unit_major");
             TypeParam b(tester.ca.shape(), 0);
             b = tester.a / tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TYPED_TEST(container_semantic, assign_a_bitwise_and_b)
+    {
+        operation_tester<std::bit_and<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major & row_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a & tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major & column_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a & tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major & central_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a & tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major & unit_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a & tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TYPED_TEST(container_semantic, assign_a_bitwise_or_b)
+    {
+        operation_tester<std::bit_or<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major | row_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a | tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major | column_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a | tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major | central_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a | tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major | unit_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a | tester.ua;
+            EXPECT_EQ(tester.res_ru, b);
+        }
+    }
+
+    TYPED_TEST(container_semantic, assign_a_bitwise_xor_b)
+    {
+        operation_tester<std::bit_xor<>, TypeParam> tester;
+
+        {
+            SCOPED_TRACE("row_major ^ row_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a ^ tester.ra;
+            EXPECT_EQ(tester.res_rr, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^ column_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a ^ tester.ca;
+            EXPECT_EQ(tester.res_rc, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^ central_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a ^ tester.cta;
+            EXPECT_EQ(tester.res_rct, b);
+        }
+
+        {
+            SCOPED_TRACE("row_major ^ unit_major");
+            TypeParam b(tester.ca.shape(), 0);
+            b = tester.a ^ tester.ua;
             EXPECT_EQ(tester.res_ru, b);
         }
     }

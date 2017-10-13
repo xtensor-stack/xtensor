@@ -51,6 +51,15 @@ namespace xt
         disable_xexpression<E, derived_type&> operator/=(const E&);
 
         template <class E>
+        disable_xexpression<E, derived_type&> operator&=(const E&);
+
+        template <class E>
+        disable_xexpression<E, derived_type&> operator|=(const E&);
+
+        template <class E>
+        disable_xexpression<E, derived_type&> operator^=(const E&);
+
+        template <class E>
         derived_type& operator+=(const xexpression<E>&);
 
         template <class E>
@@ -61,6 +70,15 @@ namespace xt
 
         template <class E>
         derived_type& operator/=(const xexpression<E>&);
+
+        template <class E>
+        derived_type& operator&=(const xexpression<E>&);
+
+        template <class E>
+        derived_type& operator|=(const xexpression<E>&);
+
+        template <class E>
+        derived_type& operator^=(const xexpression<E>&);
 
         template <class E>
         derived_type& assign(const xexpression<E>&);
@@ -289,6 +307,42 @@ namespace xt
     }
 
     /**
+     * Computes the bitwise and of \c *this and the scalar \c e and assigns it to \c *this.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::operator&=(const E& e) -> disable_xexpression<E, derived_type&>
+    {
+        return this->derived_cast().scalar_computed_assign(e, std::bit_and<>());
+    }
+
+    /**
+     * Computes the bitwise or of \c *this and the scalar \c e and assigns it to \c *this.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::operator|=(const E& e) -> disable_xexpression<E, derived_type&>
+    {
+        return this->derived_cast().scalar_computed_assign(e, std::bit_or<>());
+    }
+
+    /**
+     * Computes the bitwise xor of \c *this and the scalar \c e and assigns it to \c *this.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::operator^=(const E& e) ->disable_xexpression<E, derived_type&>
+    {
+        return this->derived_cast().scalar_computed_assign(e, std::bit_xor<>());
+    }
+
+    /**
      * Adds the xexpression \c e to \c *this.
      * @param e the xexpression to add.
      * @return a reference to \c *this.
@@ -334,6 +388,42 @@ namespace xt
     inline auto xsemantic_base<D>::operator/=(const xexpression<E>& e) -> derived_type&
     {
         return operator=(this->derived_cast() / e.derived_cast());
+    }
+
+    /**
+     * Computes the bitwise and of \c *this and the xexpression \c e and assigns it to \c *this.
+     * @param e the xexpression involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::operator&=(const xexpression<E>& e) -> derived_type&
+    {
+        return operator=(this->derived_cast() & e.derived_cast());
+    }
+
+    /**
+     * Computes the bitwise or of \c *this and the xexpression \c e and assigns it to \c *this.
+     * @param e the xexpression involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::operator|=(const xexpression<E>& e) -> derived_type&
+    {
+        return operator=(this->derived_cast() | e.derived_cast());
+    }
+
+    /**
+     * Computes the bitwise xor of \c *this and the xexpression \c e and assigns it to \c *this.
+     * @param e the xexpression involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::operator^=(const xexpression<E>& e) -> derived_type&
+    {
+        return operator=(this->derived_cast() ^ e.derived_cast());
     }
     //@}
 
