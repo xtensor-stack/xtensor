@@ -234,8 +234,8 @@ xtensor's documentation is built with three tools
 While doxygen must be installed separately, you can install breathe by typing
 
 ```bash
-pip install breathe
-``` 
+pip install breathe sphinx_rtd_theme
+```
 
 Breathe can also be installed with `conda`
 
@@ -243,13 +243,12 @@ Breathe can also be installed with `conda`
 conda install -c conda-forge breathe
 ```
 
-Finally, build the documentation with
+Finally, go to `docs` subdirectory and build the documentation with the following command:
 
 ```bash
 make html
 ```
 
-from the `docs` subdirectory.
 
 ## License
 
