@@ -16,6 +16,7 @@ Containers and views
    xtensor
    xtensor_adaptor
    xview
+   xstridedview
    xbroadcast
    xindexview
    xfunctorview
