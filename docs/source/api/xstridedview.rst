@@ -4,28 +4,27 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xview
-=====
+xstridedview
+============
 
-Defined in ``xtensor/xview.hpp``
+Defined in ``xtensor/xstridedview.hpp``
 
-.. doxygenclass:: xt::xview
+.. doxygenclass:: xt::xstrided_view
    :project: xtensor
    :members:
 
-.. doxygenfunction:: xt::view
+.. doxygenfunction:: xt::strided_view
    :project: xtensor
 
-Defined in ``xtensor/xslice.hpp``
-
-.. doxygenfunction:: xt::range(A, B)
+.. doxygenfunction:: xt::transpose(E&&)
    :project: xtensor
 
-.. doxygenfunction:: xt::range(A, B, C)
+.. doxygenfunction:: xt::transpose(E&&, S&&, Tag)
    :project: xtensor
 
-.. doxygenfunction:: xt::all
+.. doxygenclass:: xt::slice_vector
    :project: xtensor
+   :members:
 
-.. doxygenfunction:: xt::newaxis
+.. doxygenfunction:: xt::dynamic_view
    :project: xtensor

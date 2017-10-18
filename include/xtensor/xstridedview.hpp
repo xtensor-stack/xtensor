@@ -635,7 +635,10 @@ namespace xt
         }
     }
 
-    /// @cond DOXYGEN_INCLUDE_SFINAE
+    /**
+     * Returns a transpose view by reversing the dimensions of xexpression e
+     * @param e the input expression
+     */
     template <class E>
     inline auto transpose(E&& e) noexcept
     {
@@ -652,7 +655,6 @@ namespace xt
         using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
         return view_type(std::forward<E>(e), std::move(shape), std::move(strides), 0);
     }
-    /// @endcond
 
     /**
      * Returns a transpose view by permuting the xexpression e with @p permutation.
