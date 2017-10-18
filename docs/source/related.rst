@@ -316,6 +316,16 @@ xtensor-fftw
 
 The xtensor-fftw_ project is an extension to the xtensor library, offering bindings to the fftw library.  ``xtensor-fftw`` powers the ``xt::fftw`` functionalities, which are the counterpart to numpy's ``fft`` module.
 
+xsimd
+-----
+
+.. image:: xsimd.svg
+   :alt: xsimd
+
+The xsimd_ project provides a unified API for making use of the SIMD features of modern preprocessors for C++ library authors. It also provides accelerated implementation of common mathematical functions operating on batches.
+
+xsimd_ is an optional dependency to ``xtensor`` which enable SIMD vectorization of xtensor operations. This feature is enabled with the ``XTENSOR_USE_XSIMD`` compilation flag, which is set to *false* by default.
+
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
@@ -323,3 +333,4 @@ The xtensor-fftw_ project is an extension to the xtensor library, offering bindi
 .. _xtensor-r: https://github.com/QuantStack/xtensor-r
 .. _xtensor-blas: https://github.com/QuantStack/xtensor-blas
 .. _xtensor-fftw: https://github.com/egpbos/xtensor-fftw
+.. _xsimd: https://github.com/egpbos/xsimd
