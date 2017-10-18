@@ -74,6 +74,12 @@ namespace xt
         static bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2);
     };
 
+    template <>
+    class xexpression_assigner<xoptional_expression_tag>
+        : public xexpression_assigner<xtensor_expression_tag>
+    {
+    };
+
     /*****************
      * data_assigner *
      *****************/

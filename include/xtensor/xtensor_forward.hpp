@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 
+#include "xexpression.hpp"
 #include "xlayout.hpp"
 #include "xstorage.hpp"
 #include "xtensor_config.hpp"
@@ -24,10 +25,12 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
-    template <class EC, layout_type L = DEFAULT_LAYOUT,
+    template <class EC,
+              layout_type L = DEFAULT_LAYOUT,
               class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
                                                  typename EC::allocator_type,
-                                                 std::allocator<typename EC::size_type>)>
+                                                 std::allocator<typename EC::size_type>),
+              class Tag = xtensor_expression_tag>
     class xarray_container;
 
     /**
@@ -55,7 +58,7 @@ namespace xt
               class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
-    template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT>
+    template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_container;
 
     /**
@@ -98,7 +101,7 @@ namespace xt
               class A = std::allocator<T>,
               class BA = std::allocator<bool>,
               class SA = std::allocator<typename std::vector<T, A>::size_type>>
-    using xarray_optional = xarray_container<xtl::xoptional_vector<T, A, BA>, L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
+    using xarray_optional = xarray_container<xtl::xoptional_vector<T, A, BA>, L, DEFAULT_SHAPE_CONTAINER(T, A, SA), xoptional_expression_tag>;
 
     /**
      * @typedef xtensor_optional
@@ -111,7 +114,7 @@ namespace xt
      * @tparam BA The allocator of the container holding the missing flags.
      */
     template <class T, std::size_t N, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<T>, class BA = std::allocator<bool>>
-    using xtensor_optional = xtensor_container<xtl::xoptional_vector<T, A, BA>, N, L>;
+    using xtensor_optional = xtensor_container<xtl::xoptional_vector<T, A, BA>, N, L, xoptional_expression_tag>;
 
     namespace check_policy
     {

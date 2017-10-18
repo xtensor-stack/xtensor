@@ -147,6 +147,12 @@ namespace xt
             using type = xfunction<F, typename F::result_type, E...>;
         };
 
+        template <class F, class... E>
+        struct select_xfunction_expression<xoptional_expression_tag, F, E...>
+        {
+            using type = xfunction<F, typename F::result_type, E...>;
+        };
+
         template <class Tag, class F, class... E>
         using select_xfunction_expression_t = typename select_xfunction_expression<Tag, F, E...>::type;
 
@@ -155,6 +161,12 @@ namespace xt
 
         template <template <class...> class F, class... E>
         struct build_functor_type<xtensor_expression_tag, F, E...>
+        {
+            using type = F<common_value_type_t<std::decay_t<E>...>>;
+        };
+
+        template <template <class...> class F, class... E>
+        struct build_functor_type<xoptional_expression_tag, F, E...>
         {
             using type = F<common_value_type_t<std::decay_t<E>...>>;
         };

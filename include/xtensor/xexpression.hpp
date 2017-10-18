@@ -225,6 +225,7 @@ namespace xt
      *************************/
 
     struct xtensor_expression_tag {};
+    struct xoptional_expression_tag {};
 
     namespace detail
     {
@@ -256,6 +257,18 @@ namespace xt
         struct expression_tag_and<T, T>
         {
             using type = T;
+        };
+
+        template <>
+        struct expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+        {
+            using type = xoptional_expression_tag;
+        };
+
+        template<>
+        struct expression_tag_and<xoptional_expression_tag, xtensor_expression_tag>
+            : expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+        {
         };
 
         template <class T1, class... T>
