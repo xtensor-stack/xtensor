@@ -36,6 +36,7 @@ message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xadapt.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xany.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_iterator.hpp
