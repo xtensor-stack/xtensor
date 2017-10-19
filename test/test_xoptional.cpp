@@ -43,6 +43,7 @@ namespace xt
         ASSERT_EQ(res_add(0, 0).value(), 1.0);
         ASSERT_EQ(res_add(1, 0).value(), 6.0);
         ASSERT_FALSE(res_add(1, 1).has_value());
+        ASSERT_EQ(res_add.value()(0, 0), 1.0);
 
         auto res_mul = m1 * m2;
         ASSERT_EQ(res_mul(0, 0).value(), 0.0);
@@ -109,6 +110,16 @@ namespace xt
         ASSERT_TRUE(res(0, 1));
         ASSERT_TRUE(res(1, 0));
         ASSERT_TRUE(res(1, 1));
+    }
+
+    TEST(xoptional, compilation)
+    {
+        using functor_type = detail::plus<double>;
+        using tensor_type = xtensor_optional<double, 2>;
+        using function_type = xoptional_function<functor_type, xoptional<double>, tensor_type, tensor_type>;
+
+        tensor_type t1, t2;
+        function_type f(functor_type(), t1, t2);
     }
 
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                    \

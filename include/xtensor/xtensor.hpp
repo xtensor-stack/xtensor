@@ -121,9 +121,6 @@ namespace xt
      * xtensor_container_adaptor declaration *
      *****************************************/
 
-    template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
-    class xtensor_adaptor;
-
     template <class EC, std::size_t N, layout_type L, class Tag>
     struct xcontainer_inner_types<xtensor_adaptor<EC, N, L, Tag>>
     {

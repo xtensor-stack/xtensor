@@ -255,7 +255,7 @@ namespace xt
         template <class align, class simd = simd_value_type>
         detail::simd_return_type_t<functor_type, simd> load_simd(size_type i) const;
 
-    private:
+    protected:
 
         template <std::size_t... I>
         layout_type layout_impl(std::index_sequence<I...>) const noexcept;

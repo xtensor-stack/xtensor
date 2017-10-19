@@ -126,12 +126,6 @@ namespace xt
      * xarray_adaptor declaration *
      ******************************/
 
-    template <class EC,
-              layout_type L = DEFAULT_LAYOUT,
-              class SC = std::vector<typename EC::size_type>,
-              class Tag = xtensor_expression_tag>
-    class xarray_adaptor;
-
     template <class EC, layout_type L, class SC, class Tag>
     struct xcontainer_inner_types<xarray_adaptor<EC, L, SC, Tag>>
     {

@@ -16,11 +16,15 @@
 #include "xtl/xsequence.hpp"
 
 #include "xfunction.hpp"
+//#include "xoptional.hpp"
 #include "xscalar.hpp"
 #include "xstrides.hpp"
 
 namespace xt
 {
+
+    template <class F, class R, class... CT>
+    class xoptional_function;
 
     /***********
      * helpers *
@@ -60,6 +64,11 @@ namespace xt
         {                                                                       \
             return OP arg;                                                      \
         }                                                                       \
+        template <class U>                                                      \
+        struct rebind                                                           \
+        {                                                                       \
+            using type = NAME<U>;                                               \
+        };                                                                      \
     }
 
 #define UNARY_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
@@ -91,6 +100,11 @@ namespace xt
         {                                                                        \
             return (arg1 OP arg2);                                               \
         }                                                                        \
+        template <class U>                                                      \
+        struct rebind                                                           \
+        {                                                                       \
+            using type = NAME<U>;                                               \
+        };                                                                      \
     }
 
 #define BINARY_OPERATOR_FUNCTOR(NAME, OP) BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
@@ -136,6 +150,11 @@ namespace xt
             {
                 return xsimd::select(t1, t2, t3);
             }
+            template <class U>
+            struct rebind
+            {
+                using type = conditional_ternary<U>;
+            };
         };
 
         template <class Tag, class F, class... E>
@@ -150,7 +169,7 @@ namespace xt
         template <class F, class... E>
         struct select_xfunction_expression<xoptional_expression_tag, F, E...>
         {
-            using type = xfunction<F, typename F::result_type, E...>;
+            using type = xoptional_function<F, typename F::result_type, E...>;
         };
 
         template <class Tag, class F, class... E>
