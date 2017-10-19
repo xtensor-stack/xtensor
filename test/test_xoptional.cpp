@@ -44,6 +44,8 @@ namespace xt
         ASSERT_EQ(res_add(1, 0).value(), 6.0);
         ASSERT_FALSE(res_add(1, 1).has_value());
         ASSERT_EQ(res_add.value()(0, 0), 1.0);
+        ASSERT_TRUE(res_add.has_value()(0, 0));
+        ASSERT_FALSE(res_add.has_value()(1, 1));
 
         auto res_mul = m1 * m2;
         ASSERT_EQ(res_mul(0, 0).value(), 0.0);

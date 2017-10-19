@@ -46,15 +46,32 @@ namespace xt
      ************************/
 
     template <class Tag>
-    class xexpression_assigner;
+    class xexpression_assigner_base;
 
     template <>
-    class xexpression_assigner<xtensor_expression_tag>
+    class xexpression_assigner_base<xtensor_expression_tag>
     {
     public:
 
         template <class E1, class E2>
         static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
+    };
+
+    template <>
+    class xexpression_assigner_base<xoptional_expression_tag>
+    {
+    public:
+
+        template <class E1, class E2>
+        static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
+    };
+
+    template <class Tag>
+    class xexpression_assigner : public xexpression_assigner_base<Tag>
+    {
+    public:
+
+        using base_type = xexpression_assigner_base<Tag>;
 
         template <class E1, class E2>
         static void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
@@ -72,12 +89,6 @@ namespace xt
 
         template <class E1, class E2>
         static bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2);
-    };
-
-    template <>
-    class xexpression_assigner<xoptional_expression_tag>
-        : public xexpression_assigner<xtensor_expression_tag>
-    {
     };
 
     /*****************
@@ -198,7 +209,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void xexpression_assigner<xtensor_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+    inline void xexpression_assigner_base<xtensor_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
@@ -221,27 +232,44 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline bool xexpression_assigner<xtensor_expression_tag>::reshape(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner_base<xoptional_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
-        using shape_type = typename E1::shape_type;
-        using size_type = typename E1::size_type;
+        E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
-        size_type size = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
-        bool trivial_broadcast = de2.broadcast_shape(shape);
-        e1.derived_cast().reshape(shape);
-        return trivial_broadcast;
+
+        bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
+        if (trivial_broadcast)
+        {
+            using base_value_type1 = typename std::decay_t<decltype(value(de1))>::value_type;
+            using base_value_type2 = typename std::decay_t<decltype(value(de2))>::value_type;
+            constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
+            constexpr bool same_type = std::is_same<base_value_type1, base_value_type2>::value;
+            constexpr bool simd_size = xsimd::simd_traits<base_value_type1>::size > 1;
+            constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
+            constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
+            auto bde1 = value(de1);
+            auto hde1 = has_value(de1);
+            trivial_assigner<simd_assign>::run(bde1, value(de2));
+            trivial_assigner<false>::run(hde1, has_value(de2));
+        }
+        else
+        {
+            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(de1, de2);
+            assigner.run();
+        }
     }
 
+    template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<xtensor_expression_tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<Tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         bool trivial_broadcast = reshape(e1, e2);
-        assign_data(e1, e2, trivial_broadcast);
+        base_type::assign_data(e1, e2, trivial_broadcast);
     }
 
+    template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<xtensor_expression_tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<Tag>::computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
@@ -256,25 +284,27 @@ namespace xt
         if (dim > de1.dimension() || shape > de1.shape())
         {
             typename E1::temporary_type tmp(shape);
-            assign_data(tmp, e2, trivial_broadcast);
+            base_type::assign_data(tmp, e2, trivial_broadcast);
             de1.assign_temporary(std::move(tmp));
         }
         else
         {
-            assign_data(e1, e2, trivial_broadcast);
+            base_type::assign_data(e1, e2, trivial_broadcast);
         }
     }
 
+    template <class Tag>
     template <class E1, class E2, class F>
-    inline void xexpression_assigner<xtensor_expression_tag>::scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
+    inline void xexpression_assigner<Tag>::scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
     {
         E1& d = e1.derived_cast();
         std::transform(d.cbegin(), d.cend(), d.begin(),
                        [e2, &f](const auto& v) { return f(v, e2); });
     }
 
+    template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<xtensor_expression_tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<Tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
@@ -288,6 +318,26 @@ namespace xt
             throw broadcast_error(shape, de1.shape());
         }
     }
+
+    template <class Tag>
+    template <class E1, class E2>
+    inline bool xexpression_assigner<Tag>::reshape(xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        using shape_type = typename E1::shape_type;
+        using size_type = typename E1::size_type;
+        const E2& de2 = e2.derived_cast();
+        size_type size = de2.dimension();
+        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
+        bool trivial_broadcast = de2.broadcast_shape(shape);
+        e1.derived_cast().reshape(shape);
+        return trivial_broadcast;
+    }
+
+    /***************************************
+     * xexpression_assigner implementation *
+     ***************************************/
+
+
 
     /********************************
      * data_assigner implementation *

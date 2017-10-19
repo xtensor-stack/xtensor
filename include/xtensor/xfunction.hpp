@@ -255,7 +255,9 @@ namespace xt
         template <class align, class simd = simd_value_type>
         detail::simd_return_type_t<functor_type, simd> load_simd(size_type i) const;
 
-    protected:
+        const std::tuple<CT...>& arguments() const noexcept;
+
+    private:
 
         template <std::size_t... I>
         layout_type layout_impl(std::index_sequence<I...>) const noexcept;
@@ -684,6 +686,12 @@ namespace xt
     inline auto xfunction<F, R, CT...>::load_simd(size_type i) const -> detail::simd_return_type_t<functor_type, simd>
     {
         return load_simd_impl<align, simd>(std::make_index_sequence<sizeof...(CT)>(), i);
+    }
+
+    template <class F, class R, class... CT>
+    inline auto xfunction<F, R, CT...>::arguments() const noexcept -> const std::tuple<CT...>&
+    {
+        return m_e;
     }
 
     template <class F, class R, class... CT>

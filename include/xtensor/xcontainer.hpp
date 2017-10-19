@@ -1154,9 +1154,8 @@ namespace xt
         }
 
         template <class C, class S>
-        inline void resize_data_container(const C& c, S size)
+        inline void resize_data_container(const C&, S)
         {
-            XTENSOR_ASSERT_MSG(c.size() >= size, "const container size is too small")
         }
     }
 
