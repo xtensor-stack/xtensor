@@ -102,6 +102,7 @@ set(XTENSOR_TESTS
     test_xmath.cpp
     test_xnoalias.cpp
     test_xnorm.cpp
+    test_xnpy.cpp
     test_xoperation.cpp
     test_xoptional.cpp
     test_xoptional_assembly.cpp
@@ -123,6 +124,18 @@ set(XTENSOR_TESTS
 )
 
 set(XTENSOR_TARGET test_xtensor)
+
+# Add files for npy tests
+set(XNPY_FILES
+    bool.npy
+    double.npy
+    double_fortran.npy
+    unsignedlong.npy
+)
+foreach(filename IN LISTS XNPY_FILES)
+    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files/xnpy_files/${filename}
+        ${CMAKE_CURRENT_BINARY_DIR}/files/xnpy_files/${filename} COPYONLY)
+endforeach()
 
 add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)

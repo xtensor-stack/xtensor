@@ -61,6 +61,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xnpy.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
