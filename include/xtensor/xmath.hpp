@@ -60,6 +60,11 @@ namespace xt
         {                                                                       \
             return arg;                                                         \
         }                                                                       \
+        template <class U>                                                      \
+        struct rebind                                                           \
+        {                                                                       \
+            using type = abs_fun<U>;                                            \
+        };                                                                      \
     }
 
 #define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
@@ -86,6 +91,11 @@ namespace xt
             using std::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
+        template <class U>                                                      \
+        struct rebind                                                           \
+        {                                                                       \
+            using type = NAME##_fun<U>;                                         \
+        };                                                                      \
     }
 
 #define UNARY_MATH_FUNCTOR(NAME) UNARY_MATH_FUNCTOR_IMPL(NAME, T)
@@ -114,6 +124,11 @@ namespace xt
             using std::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
+        template <class U>                                                      \
+        struct rebind                                                           \
+        {                                                                       \
+            using type = NAME##_fun<U>;                                         \
+        };                                                                      \
     }
 
 #define BINARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
@@ -142,6 +157,11 @@ namespace xt
             using std::NAME;                                                     \
             return NAME(arg1, arg2);                                             \
         }                                                                        \
+        template <class U>                                                       \
+        struct rebind                                                            \
+        {                                                                        \
+            using type = NAME##_fun<U>;                                          \
+        };                                                                       \
     }
 
 #define BINARY_MATH_FUNCTOR(NAME) BINARY_MATH_FUNCTOR_IMPL(NAME, T)
@@ -177,6 +197,11 @@ namespace xt
             using std::NAME;                                                     \
             return NAME(arg1, arg2, arg3);                                       \
         }                                                                        \
+        template <class U>                                                       \
+        struct rebind                                                            \
+        {                                                                        \
+            using type = NAME##_fun<U>;                                          \
+        };                                                                       \
     }
 
 #define TERNARY_MATH_FUNCTOR(NAME) TERNARY_MATH_FUNCTOR_IMPL(NAME, T)
@@ -1361,6 +1386,12 @@ namespace xt
                 auto d = abs(a - b);
                 return d <= m_atol || d <= m_rtol * std::max(abs(a), abs(b));
             }
+
+            template <class U>
+            struct rebind
+            {
+                using type = isclose<U>;
+            };
 
         private:
             double m_rtol;

@@ -1145,6 +1145,20 @@ namespace xt
         return m_layout;
     }
 
+    namespace detail
+    {
+        template <class C, class S>
+        inline void resize_data_container(C& c, S size)
+        {
+            c.resize(size);
+        }
+
+        template <class C, class S>
+        inline void resize_data_container(const C&, S)
+        {
+        }
+    }
+
     /**
      * Reshapes the container.
      * @param shape the new shape
@@ -1164,7 +1178,7 @@ namespace xt
             resize_container(m_strides, m_shape.size());
             resize_container(m_backstrides, m_shape.size());
             size_type data_size = compute_strides(m_shape, m_layout, m_strides, m_backstrides);
-            this->data().resize(data_size);
+            detail::resize_data_container(this->data(), data_size);
         }
     }
 
@@ -1203,7 +1217,7 @@ namespace xt
         resize_container(m_backstrides, m_strides.size());
         adapt_strides(m_shape, m_strides, m_backstrides);
         m_layout = layout_type::dynamic;
-        this->data().resize(compute_size(m_shape));
+        detail::resize_data_container(this->data(), compute_size(m_shape));
     }
 }
 

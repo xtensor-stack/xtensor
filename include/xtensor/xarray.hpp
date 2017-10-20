@@ -26,8 +26,8 @@ namespace xt
      * xarray_container declaration *
      ********************************/
 
-    template <class EC, layout_type L, class SC>
-    struct xcontainer_inner_types<xarray_container<EC, L, SC>>
+    template <class EC, layout_type L, class SC, class Tag>
+    struct xcontainer_inner_types<xarray_container<EC, L, SC, Tag>>
     {
         using container_type = EC;
         using shape_type = SC;
@@ -36,13 +36,13 @@ namespace xt
         using inner_shape_type = shape_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
-        using temporary_type = xarray_container<EC, L, SC>;
+        using temporary_type = xarray_container<EC, L, SC, Tag>;
         static constexpr layout_type layout = L;
     };
 
-    template <class EC, layout_type L, class SC>
-    struct xiterable_inner_types<xarray_container<EC, L, SC>>
-        : xcontainer_iterable_types<xarray_container<EC, L, SC>>
+    template <class EC, layout_type L, class SC, class Tag>
+    struct xiterable_inner_types<xarray_container<EC, L, SC, Tag>>
+        : xcontainer_iterable_types<xarray_container<EC, L, SC, Tag>>
     {
     };
 
@@ -56,15 +56,16 @@ namespace xt
      * @tparam EC The type of the container holding the elements.
      * @tparam L The layout_type of the container.
      * @tparam SC The type of the containers holding the shape and the strides.
+     * @tparam Tag The expression tag.
      * @sa xarray
      */
-    template <class EC, layout_type L, class SC>
-    class xarray_container : public xstrided_container<xarray_container<EC, L, SC>>,
-                             public xcontainer_semantic<xarray_container<EC, L, SC>>
+    template <class EC, layout_type L, class SC, class Tag>
+    class xarray_container : public xstrided_container<xarray_container<EC, L, SC, Tag>>,
+                             public xcontainer_semantic<xarray_container<EC, L, SC, Tag>>
     {
     public:
 
-        using self_type = xarray_container<EC, L, SC>;
+        using self_type = xarray_container<EC, L, SC, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
@@ -78,6 +79,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
         using inner_strides_type = typename base_type::inner_strides_type;
+        using expression_tag = Tag;
 
         xarray_container();
         explicit xarray_container(const shape_type& shape, layout_type l = L);
@@ -117,18 +119,15 @@ namespace xt
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
-        friend class xcontainer<xarray_container<EC, L, SC>>;
+        friend class xcontainer<xarray_container<EC, L, SC, Tag>>;
     };
 
     /******************************
      * xarray_adaptor declaration *
      ******************************/
 
-    template <class EC, layout_type L = DEFAULT_LAYOUT, class SC = std::vector<typename EC::size_type>>
-    class xarray_adaptor;
-
-    template <class EC, layout_type L, class SC>
-    struct xcontainer_inner_types<xarray_adaptor<EC, L, SC>>
+    template <class EC, layout_type L, class SC, class Tag>
+    struct xcontainer_inner_types<xarray_adaptor<EC, L, SC, Tag>>
     {
         using container_type = EC;
         using shape_type = SC;
@@ -137,13 +136,13 @@ namespace xt
         using inner_shape_type = shape_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
-        using temporary_type = xarray_container<EC, L, SC>;
+        using temporary_type = xarray_container<EC, L, SC, Tag>;
         static constexpr layout_type layout = L;
     };
 
-    template <class EC, layout_type L, class SC>
-    struct xiterable_inner_types<xarray_adaptor<EC, L, SC>>
-        : xcontainer_iterable_types<xarray_adaptor<EC, L, SC>>
+    template <class EC, layout_type L, class SC, class Tag>
+    struct xiterable_inner_types<xarray_adaptor<EC, L, SC, Tag>>
+        : xcontainer_iterable_types<xarray_adaptor<EC, L, SC, Tag>>
     {
     };
 
@@ -160,14 +159,15 @@ namespace xt
      * @tparam EC The container type to adapt.
      * @tparam L The layout_type of the adaptor.
      * @tparam SC The type of the containers holding the shape and the strides.
+     * @tparam Tag The expression tag.
      */
-    template <class EC, layout_type L, class SC>
-    class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC>>,
-                           public xadaptor_semantic<xarray_adaptor<EC, L, SC>>
+    template <class EC, layout_type L, class SC, class Tag>
+    class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC, Tag>>,
+                           public xadaptor_semantic<xarray_adaptor<EC, L, SC, Tag>>
     {
     public:
 
-        using self_type = xarray_adaptor<EC, L, SC>;
+        using self_type = xarray_adaptor<EC, L, SC, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xadaptor_semantic<self_type>;
         using container_type = typename base_type::container_type;
@@ -176,6 +176,7 @@ namespace xt
         using backstrides_type = typename base_type::backstrides_type;
 
         using container_closure_type = adaptor_closure_t<container_type>;
+        using expression_tag = Tag;
 
         xarray_adaptor(container_closure_type data);
         xarray_adaptor(container_closure_type data, const shape_type& shape, layout_type l = L);
@@ -203,8 +204,8 @@ namespace xt
         void assign_temporary_impl(temporary_type&& tmp);
 
 
-        friend class xcontainer<xarray_adaptor<EC, L, SC>>;
-        friend class xadaptor_semantic<xarray_adaptor<EC, L, SC>>;
+        friend class xcontainer<xarray_adaptor<EC, L, SC, Tag>>;
+        friend class xadaptor_semantic<xarray_adaptor<EC, L, SC, Tag>>;
     };
 
     /***********************************
@@ -218,8 +219,8 @@ namespace xt
     /**
      * Allocates an uninitialized xarray_container that holds 0 element.
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container()
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container()
         : base_type(), m_data(1, value_type())
     {
     }
@@ -230,8 +231,8 @@ namespace xt
      * @param shape the shape of the xarray_container
      * @param l the layout_type of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, layout_type l)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, layout_type l)
         : base_type()
     {
         base_type::reshape(shape, l);
@@ -244,8 +245,8 @@ namespace xt
      * @param value the value of the elements
      * @param l the layout_type of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, const_reference value, layout_type l)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const_reference value, layout_type l)
         : base_type()
     {
         base_type::reshape(shape, l);
@@ -257,8 +258,8 @@ namespace xt
      * @param shape the shape of the xarray_container
      * @param strides the strides of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, const strides_type& strides)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const strides_type& strides)
         : base_type()
     {
         base_type::reshape(shape, strides);
@@ -271,8 +272,8 @@ namespace xt
      * @param strides the strides of the xarray_container
      * @param value the value of the elements
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(const shape_type& shape, const strides_type& strides, const_reference value)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const strides_type& strides, const_reference value)
         : base_type()
     {
         base_type::reshape(shape, strides);
@@ -284,8 +285,8 @@ namespace xt
      * specified value.
      * @param t the value of the element
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(const value_type& t)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(const value_type& t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t), true);
@@ -299,8 +300,8 @@ namespace xt
      * @param shape the shape of the xarray_container
      * @param strides the strides of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
         : base_type(std::move(shape), std::move(strides)), m_data(std::move(data))
     {
     }
@@ -314,8 +315,8 @@ namespace xt
      * Allocates a one-dimensional xarray_container.
      * @param t the elements of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 1> t)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 1> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -326,8 +327,8 @@ namespace xt
      * Allocates a two-dimensional xarray_container.
      * @param t the elements of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 2> t)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 2> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -338,8 +339,8 @@ namespace xt
      * Allocates a three-dimensional xarray_container.
      * @param t the elements of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 3> t)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 3> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -350,8 +351,8 @@ namespace xt
      * Allocates a four-dimensional xarray_container.
      * @param t the elements of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 4> t)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 4> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -362,17 +363,17 @@ namespace xt
      * Allocates a five-dimensional xarray_container.
      * @param t the elements of the xarray_container
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_container<EC, L, SC>::xarray_container(nested_initializer_list_t<value_type, 5> t)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 5> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
-    template <class EC, layout_type L, class SC>
+    template <class EC, layout_type L, class SC, class Tag>
     template <class S>
-    inline xarray_container<EC, L, SC> xarray_container<EC, L, SC>::from_shape(S&& s)
+    inline xarray_container<EC, L, SC, Tag> xarray_container<EC, L, SC, Tag>::from_shape(S&& s)
     {
         shape_type shape = xtl::forward_sequence<shape_type>(s);
         return self_type(shape);
@@ -387,9 +388,9 @@ namespace xt
     /**
      * The extended copy constructor.
      */
-    template <class EC, layout_type L, class SC>
+    template <class EC, layout_type L, class SC, class Tag>
     template <class E>
-    inline xarray_container<EC, L, SC>::xarray_container(const xexpression<E>& e)
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(const xexpression<E>& e)
         : base_type()
     {
         // Avoids unintialized data because of (m_shape == shape) condition
@@ -404,22 +405,22 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class EC, layout_type L, class SC>
+    template <class EC, layout_type L, class SC, class Tag>
     template <class E>
-    inline auto xarray_container<EC, L, SC>::operator=(const xexpression<E>& e) -> self_type&
+    inline auto xarray_container<EC, L, SC, Tag>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
     //@}
 
-    template <class EC, layout_type L, class SC>
-    inline auto xarray_container<EC, L, SC>::data_impl() noexcept -> container_type&
+    template <class EC, layout_type L, class SC, class Tag>
+    inline auto xarray_container<EC, L, SC, Tag>::data_impl() noexcept -> container_type&
     {
         return m_data;
     }
 
-    template <class EC, layout_type L, class SC>
-    inline auto xarray_container<EC, L, SC>::data_impl() const noexcept -> const container_type&
+    template <class EC, layout_type L, class SC, class Tag>
+    inline auto xarray_container<EC, L, SC, Tag>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
     }
@@ -436,8 +437,8 @@ namespace xt
      * Constructs an xarray_adaptor of the given stl-like container.
      * @param data the container to adapt
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_closure_type data)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(container_closure_type data)
         : base_type(), m_data(std::forward<container_closure_type>(data))
     {
     }
@@ -449,8 +450,8 @@ namespace xt
      * @param shape the shape of the xarray_adaptor
      * @param l the layout_type of the xarray_adaptor
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_closure_type data, const shape_type& shape, layout_type l)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(container_closure_type data, const shape_type& shape, layout_type l)
         : base_type(), m_data(std::forward<container_closure_type>(data))
     {
         base_type::reshape(shape, l);
@@ -463,24 +464,24 @@ namespace xt
      * @param shape the shape of the xarray_adaptor
      * @param strides the strides of the xarray_adaptor
      */
-    template <class EC, layout_type L, class SC>
-    inline xarray_adaptor<EC, L, SC>::xarray_adaptor(container_closure_type data, const shape_type& shape, const strides_type& strides)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(container_closure_type data, const shape_type& shape, const strides_type& strides)
         : base_type(), m_data(std::forward<container_closure_type>(data))
     {
         base_type::reshape(shape, strides);
     }
     //@}
 
-    template <class EC, layout_type L, class SC>
-    inline auto xarray_adaptor<EC, L, SC>::operator=(const xarray_adaptor& rhs) -> self_type&
+    template <class EC, layout_type L, class SC, class Tag>
+    inline auto xarray_adaptor<EC, L, SC, Tag>::operator=(const xarray_adaptor& rhs) -> self_type&
     {
         base_type::operator=(rhs);
         m_data = rhs.m_data;
         return *this;
     }
 
-    template <class EC, layout_type L, class SC>
-    inline auto xarray_adaptor<EC, L, SC>::operator=(xarray_adaptor&& rhs) -> self_type&
+    template <class EC, layout_type L, class SC, class Tag>
+    inline auto xarray_adaptor<EC, L, SC, Tag>::operator=(xarray_adaptor&& rhs) -> self_type&
     {
         base_type::operator=(std::move(rhs));
         m_data = rhs.m_data;
@@ -494,28 +495,28 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class EC, layout_type L, class SC>
+    template <class EC, layout_type L, class SC, class Tag>
     template <class E>
-    inline auto xarray_adaptor<EC, L, SC>::operator=(const xexpression<E>& e) -> self_type&
+    inline auto xarray_adaptor<EC, L, SC, Tag>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
     //@}
 
-    template <class EC, layout_type L, class SC>
-    inline auto xarray_adaptor<EC, L, SC>::data_impl() noexcept -> container_type&
+    template <class EC, layout_type L, class SC, class Tag>
+    inline auto xarray_adaptor<EC, L, SC, Tag>::data_impl() noexcept -> container_type&
     {
         return m_data;
     }
 
-    template <class EC, layout_type L, class SC>
-    inline auto xarray_adaptor<EC, L, SC>::data_impl() const noexcept -> const container_type&
+    template <class EC, layout_type L, class SC, class Tag>
+    inline auto xarray_adaptor<EC, L, SC, Tag>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
     }
 
-    template <class EC, layout_type L, class SC>
-    inline void xarray_adaptor<EC, L, SC>::assign_temporary_impl(temporary_type&& tmp)
+    template <class EC, layout_type L, class SC, class Tag>
+    inline void xarray_adaptor<EC, L, SC, Tag>::assign_temporary_impl(temporary_type&& tmp)
     {
         base_type::shape_impl() = std::move(const_cast<shape_type&>(tmp.shape()));
         base_type::strides_impl() = std::move(const_cast<strides_type&>(tmp.strides()));
