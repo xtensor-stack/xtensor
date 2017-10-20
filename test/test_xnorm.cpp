@@ -19,12 +19,12 @@ namespace xt
 {
     TEST(xnorm, scalar)
     {
-        EXPECT_EQ(norm_l0(2), 1);
-        EXPECT_EQ(norm_l0(-2), 1);
-        EXPECT_EQ(norm_l0(0), 0);
-        EXPECT_EQ(norm_l0(2.0), 1);
-        EXPECT_EQ(norm_l0(-2.0), 1);
-        EXPECT_EQ(norm_l0(0.0), 0);
+        EXPECT_EQ(norm_l0(2), 1u);
+        EXPECT_EQ(norm_l0(-2), 1u);
+        EXPECT_EQ(norm_l0(0), 0u);
+        EXPECT_EQ(norm_l0(2.0), 1u);
+        EXPECT_EQ(norm_l0(-2.0), 1u);
+        EXPECT_EQ(norm_l0(0.0), 0u);
 
         EXPECT_EQ(norm_l1(2), 2);
         EXPECT_EQ(norm_l1(-2), 2);
@@ -56,7 +56,7 @@ namespace xt
     {
         std::complex<double> c{ 3.0, -4.0 };
 
-        EXPECT_EQ(norm_l0(c), 1);
+        EXPECT_EQ(norm_l0(c), 1u);
         EXPECT_EQ(norm_lp(c, 0), 1.0);
 
         EXPECT_EQ(norm_l1(c), 7.0);
@@ -77,7 +77,7 @@ namespace xt
     {
         xarray<int> a = -ones<int>({9});
 
-        EXPECT_EQ(norm_l0(a)(), 9);
+        EXPECT_EQ(norm_l0(a)(), 9u);
         EXPECT_EQ(norm_lp_to_p(a, 0.0)(), 9.0);
         EXPECT_EQ(norm_l1(a)(), 9);
         EXPECT_EQ(norm_lp(a, 1.0)(), 9.0);
@@ -91,7 +91,7 @@ namespace xt
     {
         xarray<std::complex<double>> a = -ones<std::complex<double>>({9});
 
-        EXPECT_EQ(norm_l0(a)(), 9);
+        EXPECT_EQ(norm_l0(a)(), 9u);
         EXPECT_EQ(norm_lp_to_p(a, 0.0)(), 9.0);
         EXPECT_EQ(norm_l1(a)(), 9.0);
         EXPECT_EQ(norm_lp(a, 1.0)(), 9.0);
@@ -106,7 +106,7 @@ namespace xt
         xarray<double> a = {{ -1.0, 2.0},
                             { -3.0, 4.0}};
 
-        EXPECT_EQ(norm_l0(a)(), 4);
+        EXPECT_EQ(norm_l0(a)(), 4u);
         EXPECT_EQ(norm_l1(a)(), 10.0);
         EXPECT_EQ(norm_sq(a)(), 30.0);
         EXPECT_EQ(norm_linf(a)(), 4.0);

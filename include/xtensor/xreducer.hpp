@@ -481,7 +481,7 @@ namespace xt
     template <class... Args>
     inline auto xreducer<F, CT, X>::at(Args... args) const -> const_reference
     {
-        check_access(shape(), args...);
+        check_access(shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
     /**

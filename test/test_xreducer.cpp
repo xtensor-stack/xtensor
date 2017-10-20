@@ -114,7 +114,7 @@ namespace xt
 
         // check that there is no overflow
         xarray<uint8_t> c = ones<uint8_t>({1000});
-        EXPECT_EQ(1000, sum(c)());
+        EXPECT_EQ(1000u, sum(c)());
     }
 
     TEST(xreducer, sum_all)

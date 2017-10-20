@@ -156,7 +156,7 @@ namespace xt
      *******************/
 
     template <class S, class... Args>
-    inline void check_dimension(const S& shape, Args... args)
+    inline void check_dimension(const S& shape, Args...)
     {
         if (sizeof...(Args) > shape.size())
         {

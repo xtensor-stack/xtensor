@@ -253,7 +253,7 @@ namespace xt
         template <class R, class F, std::size_t I, class... S>
         R apply_one(F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
         {
-            return func(std::get<I>(s));
+            return static_cast<R>(func(std::get<I>(s)));
         }
 
         template <class R, class F, std::size_t... I, class... S>

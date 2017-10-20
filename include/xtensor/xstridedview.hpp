@@ -388,7 +388,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view<CT, S, CD>::at(Args... args) -> reference
     {
-        check_access(shape(), args...);
+        check_access(shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -405,7 +405,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view<CT, S, CD>::at(Args... args) const -> const_reference
     {
-        check_access(shape(), args...);
+        check_access(shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
