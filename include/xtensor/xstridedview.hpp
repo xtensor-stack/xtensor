@@ -341,13 +341,13 @@ namespace xt
     template <class CT, class S, class CD>
     inline auto xstrided_view<CT, S, CD>::operator()() -> reference
     {
-        return m_e();
+        return m_data[m_offset];
     }
 
     template <class CT, class S, class CD>
     inline auto xstrided_view<CT, S, CD>::operator()() const -> const_reference
     {
-        return m_e();
+        return m_data[m_offset];
     }
 
     template <class CT, class S, class CD>
@@ -692,6 +692,7 @@ namespace xt
         class expression_adaptor
         {
         public:
+
             using xexpression_type = std::decay_t<CT>;
             using shape_type = typename xexpression_type::shape_type;
             using index_type = xindex_type_t<shape_type>;
@@ -716,7 +717,7 @@ namespace xt
                     idx = static_cast<std::size_t>(dv.rem);
                     m_index[i] = dv.quot;
                 }
-                return m_e.element(m_index.begin(), m_index.end());
+                return m_e.element(m_index.cbegin(), m_index.cend());
             }
 
             size_type size() const
@@ -725,6 +726,7 @@ namespace xt
             }
 
         private:
+
             CT m_e;
             shape_type m_strides;
             mutable index_type m_index;
@@ -756,8 +758,8 @@ namespace xt
      */
     class slice_vector : private std::vector<std::array<long int, 3>>
     {
-
     public:
+
         using index_type = long int;
         using base_type = std::vector<std::array<index_type, 3>>;
 
@@ -769,6 +771,7 @@ namespace xt
         using base_type::size;
         using base_type::operator[];
         using base_type::push_back;
+        using base_type::pop_back;
 
         inline slice_vector() = default;
 
@@ -783,7 +786,7 @@ namespace xt
         {
             const auto& de = e.derived_cast();
             m_shape.resize(de.shape().size());
-            std::copy(de.shape().begin(), de.shape().end(), m_shape.begin());
+            std::copy(de.shape().cbegin(), de.shape().cend(), m_shape.begin());
             append(args...);
         }
 
