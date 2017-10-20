@@ -9,34 +9,46 @@
 #ifndef BENCHMARK_VIEWS_HPP
 #define BENCHMARK_VIEWS_HPP
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xstridedview.hpp"
+#include <benchmark/benchmark.h>
+
 #include <cstddef>
 #include <chrono>
 #include <string>
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xstrides.hpp"
+#include "xtensor/xstridedview.hpp"
 
 namespace xt
 {
     namespace reducer
     {
         template <class E, class X>
-        inline auto benchmark_reducer(const E& x, E& res, const X& axes, std::size_t number)
+        void benchmark_reducer(benchmark::State& state, const E& x, E& res, const X& axes)
         {
-            auto start = std::chrono::steady_clock::now();
-            for (std::size_t i = 0; i < number; ++i)
+            while (state.KeepRunning())
             {
                 res = sum(x, axes);
             }
-            auto end = std::chrono::steady_clock::now();
-            auto diff = end - start;
-            return diff;
         }
 
-        template <class E, class X>
-        inline auto benchmark_strided_reducer(const E& x, E& res, const X& axes, std::size_t number)
-        {
-            auto start = std::chrono::steady_clock::now();
+        xarray<double> u = ones<double>({ 10, 100000 });
+        xarray<double> v = ones<double>({ 100000, 10 });
 
+        std::vector<std::size_t> axis0 = { 0 };
+        std::vector<std::size_t> axis1 = { 1 };
+
+        static auto res0 = xarray<double>::from_shape({ 100000 });
+        static auto res1 = xarray<double>::from_shape({ 10 });
+
+        BENCHMARK_CAPTURE(benchmark_reducer, 10x100000/axis 0, u, res0, axis0);
+        BENCHMARK_CAPTURE(benchmark_reducer, 10x100000/axis 1, u, res1, axis1);
+        BENCHMARK_CAPTURE(benchmark_reducer, 100000x10/axis 1, v, res1, axis0);
+        BENCHMARK_CAPTURE(benchmark_reducer, 100000x10/axis 0, v, res0, axis1);
+
+        template <class E, class X>
+        inline auto benchmark_strided_reducer(benchmark::State& state, const E& x, E& res, const X& axes)
+        {
             using value_type = typename E::value_type;
             std::size_t stride = x.strides()[axes[0]];
             std::size_t offset_end = x.strides()[axes[0]] * x.shape()[axes[0]];
@@ -50,7 +62,7 @@ namespace xt
                 offset_iter = x.strides()[1];
             }
 
-            for (std::size_t i = 0; i < number; ++i)
+            while (state.KeepRunning())
             {
                 for (std::size_t j = 0; j < res.shape()[0]; ++j)
                 {
@@ -65,100 +77,42 @@ namespace xt
                     res(j) = temp;
                 }
             }
-            auto end = std::chrono::steady_clock::now();
-            auto diff = end - start;
-            return diff;
         }
 
-        template <class OS>
-        void benchmark(OS& out)
-        {
-            using duration_type = std::chrono::duration<double, std::milli>;
-            std::size_t number = 100;
-
-            xarray<double> u = ones<double>({ 10, 100000 });
-            xarray<double> v = ones<double>({ 100000, 10 });
-
-            std::vector<std::size_t> axis0 = { 0 };
-            std::vector<std::size_t> axis1 = { 1 };
-
-            xarray<double> res0;
-            res0.reshape({ 100000 });
-            xarray<double> res1;
-            res1.reshape({ 10 });
-
-            duration_type du0 = benchmark_reducer(u, res0, axis0, number);
-            duration_type du1 = benchmark_reducer(u, res1, axis1, number);
-            duration_type dv0 = benchmark_reducer(v, res1, axis0, number);
-            duration_type dv1 = benchmark_reducer(v, res0, axis1, number);
-            duration_type dsu0 = benchmark_strided_reducer(u, res0, axis0, number);
-            duration_type dsu1 = benchmark_strided_reducer(u, res1, axis1, number);
-            duration_type dsv0 = benchmark_strided_reducer(v, res1, axis0, number);
-            duration_type dsv1 = benchmark_strided_reducer(v, res0, axis1, number);
-
-            out << "************************" << std::endl;
-            out << "* REDUCER BENCHMARK : " << " *" << std::endl;
-            out << "************************" << std::endl << std::endl;
-
-            out << "sum((10, 100000), 0): " << du0.count() << "ms" << std::endl;
-            out << "sum((10, 100000), 1): " << du1.count() << "ms" << std::endl;
-            out << "sum((100000, 10), 0): " << dv0.count() << "ms" << std::endl;
-            out << "sum((100000, 10), 1): " << dv1.count() << "ms" << std::endl;
-            out << "strided sum(10, 100000), 0): " << dsu0.count() << "ms" << std::endl;
-            out << "strided sum(10, 100000), 1): " << dsu1.count() << "ms" << std::endl;
-            out << "strided sum(100000, 10), 0): " << dsv0.count() << "ms" << std::endl;
-            out << "strided sum(100000, 10), 1): " << dsv1.count() << "ms" << std::endl;
-            out << std::endl;
-        }
+        BENCHMARK_CAPTURE(benchmark_strided_reducer, 10x100000/axis 0, u, res0, axis0);
+        BENCHMARK_CAPTURE(benchmark_strided_reducer, 10x100000/axis 1, u, res1, axis1);
+        BENCHMARK_CAPTURE(benchmark_strided_reducer, 100000x10/axis 1, v, res1, axis0);
+        BENCHMARK_CAPTURE(benchmark_strided_reducer, 100000x10/axis 0, v, res0, axis1);
     }
 
     namespace stridedview
     {
-        template <class E1, class E2>
-        inline auto benchmark_stridedview(const E1& x, E2& res, std::size_t number)
+
+        template <layout_type L1, layout_type L2>
+        inline auto benchmark_stridedview(benchmark::State& state, std::vector<std::size_t> shape)
         {
-            auto start = std::chrono::steady_clock::now();
-            for (std::size_t i = 0; i < number; ++i)
+            xarray<double, L1> x = xt::arange<double>(compute_size(shape));
+            x.reshape(shape);
+
+            xarray<double, L2> res;
+            res.reshape(std::vector<std::size_t>(shape.rbegin(), shape.rend()));
+
+            while (state.KeepRunning())
             {
                 res = transpose(x);
             }
-            auto end = std::chrono::steady_clock::now();
-            auto diff = end - start;
-            return diff;
         }
 
-        template <class OS>
-        void benchmark(OS& out)
-        {
-            using duration_type = std::chrono::duration<double, std::milli>;
-            std::size_t number = 100;
+        auto benchmark_stridedview_rm_rm = benchmark_stridedview<layout_type::row_major, layout_type::row_major>;
+        auto benchmark_stridedview_cm_cm = benchmark_stridedview<layout_type::column_major, layout_type::column_major>;
+        auto benchmark_stridedview_rm_cm = benchmark_stridedview<layout_type::row_major, layout_type::column_major>;
+        auto benchmark_stridedview_cm_rm = benchmark_stridedview<layout_type::column_major, layout_type::row_major>;
 
-            xarray<double, layout_type::row_major> ar = xt::arange<double>(100000);
-            ar.reshape({ 10, 20, 500 });
-            xarray<double, layout_type::column_major> ac = xt::arange<double>(100000);
-            ac.reshape({ 10, 20, 500 });
-            
-            xarray<double, layout_type::row_major> resr;
-            resr.reshape({ 500, 20, 10 });
+        BENCHMARK_CAPTURE(benchmark_stridedview_rm_rm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(benchmark_stridedview_cm_cm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(benchmark_stridedview_rm_cm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(benchmark_stridedview_cm_rm, 10x20x500, {10, 20, 500});
 
-            xarray<double, layout_type::column_major> resc;
-            resc.reshape({ 500, 20, 10 });
-
-            duration_type darr = benchmark_stridedview(ar, resr, number);
-            duration_type dacr = benchmark_stridedview(ac, resr, number);
-            duration_type darc = benchmark_stridedview(ar, resc, number);
-            duration_type dacc = benchmark_stridedview(ac, resc, number);
-
-            out << "*****************************" << std::endl;
-            out << "* STRIDED VIEW BENCHMARK : " << " *" << std::endl;
-            out << "*****************************" << std::endl << std::endl;
-
-            out << "RM - transpose RM(10, 20, 500): " << darr.count() << "ms" << std::endl;
-            out << "RM - transpose CM(10, 20, 500): " << dacr.count() << "ms" << std::endl;
-            out << "CM - transpose RM(10, 20, 500): " << darc.count() << "ms" << std::endl;
-            out << "CM - transpose CM(10, 20, 500): " << dacc.count() << "ms" << std::endl;
-            out << std::endl;
-        }
     }
 }
 

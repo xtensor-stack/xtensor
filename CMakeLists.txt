@@ -87,6 +87,7 @@ OPTION(XTENSOR_USE_XSIMD "simd acceleration for xtensor" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
+OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" ON)
 OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)

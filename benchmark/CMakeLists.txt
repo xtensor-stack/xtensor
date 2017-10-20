@@ -23,7 +23,7 @@ include(CheckCXXCompilerFlag)
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder")
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
 
     if (HAS_CPP14_FLAG)
@@ -65,7 +65,40 @@ if(MSVC)
     endforeach()
 endif()
 
-include_directories(${XTENSOR_INCLUDE_DIR})
+
+if(DOWNLOAD_GBENCHMARK OR GBENCHMARK_SRC_DIR)
+    if(DOWNLOAD_GBENCHMARK)
+        # Download and unpack googlebenchmark at configure time
+        configure_file(downloadGBenchmark.cmake.in googlebenchmark-download/CMakeLists.txt)
+    else()
+        # Copy local source of googlebenchmark at configure time
+        configure_file(copyGBenchmark.cmake.in googlebenchmark-download/CMakeLists.txt)
+    endif()
+    execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+                    RESULT_VARIABLE result
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googlebenchmark-download )
+    if(result)
+        message(FATAL_ERROR "CMake step for googlebenchmark failed: ${result}")
+    endif()
+    execute_process(COMMAND ${CMAKE_COMMAND} --build .
+                    RESULT_VARIABLE result
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/googlebenchmark-download )
+    if(result)
+        message(FATAL_ERROR "Build step for googlebenchmark failed: ${result}")
+    endif()
+
+    # Add googlebenchmark directly to our build. This defines
+    # the gtest and gtest_main targets.
+    add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googlebenchmark-src
+                     ${CMAKE_CURRENT_BINARY_DIR}/googlebenchmark-build)
+
+    set(GBENCHMARK_INCLUDE_DIRS "${googlebenchmark_SOURCE_DIR}/include")
+    set(GBENCHMARK_LIBRARIES benchmark)
+else()
+    find_package(benchmark REQUIRED)
+endif()
+
+include_directories(${XTENSOR_INCLUDE_DIR} ${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
     benchmark_assign.hpp
@@ -77,5 +110,6 @@ set(XTENSOR_BENCHMARK
 
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
+target_link_libraries(${XTENSOR_BENCHMARK_TARGET} ${GBENCHMARK_LIBRARIES})
 
 add_custom_target(xbenchmark COMMAND benchmark_xtensor DEPENDS ${XTENSOR_BENCHMARK_TARGET})
