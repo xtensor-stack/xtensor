@@ -483,7 +483,7 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::at(Args... args) -> reference
     {
-        check_access(shape(), args...);
+        check_access(shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -539,7 +539,7 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::at(Args... args) const -> const_reference
     {
-        check_access(shape(), args...);
+        check_access(shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -741,7 +741,7 @@ namespace xt
     inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
     {
         using ST = typename T::size_type;
-        return slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...));
+        return static_cast<size_type>(slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
     }
 
     template <class CT, class... S>

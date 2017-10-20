@@ -386,7 +386,7 @@ namespace xt
     {
         XTENSOR_PRECONDITION(p != 0,
             "norm_lp(): p must be nonzero, use norm_l0() instead.");
-        return pow(norm_lp_to_p(std::forward<E>(e), p), 1.0/p);
+        return pow(norm_lp_to_p(std::forward<E>(e), p, std::forward<X>(axes)), 1.0/p);
     }
 
     template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>

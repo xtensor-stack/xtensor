@@ -206,7 +206,7 @@ namespace xt
         inline std::enable_if_t<std::is_integral<MI>::value &&
                                 std::is_integral<MA>::value &&
                                 std::is_integral<STEP>::value, xstepped_range<int>>
-        get(std::size_t size) const
+        get(std::size_t /*size*/) const
         {
             return xstepped_range<int>(m_min, m_max, m_step);
         }
@@ -233,7 +233,7 @@ namespace xt
         inline std::enable_if_t<std::is_integral<MI>::value &&
                                 std::is_integral<MA>::value &&
                                !std::is_integral<STEP>::value, xrange<int>>
-        get(std::size_t size) const
+        get(std::size_t /*size*/) const
         {
             return xrange<int>(m_min, m_max);
         }
