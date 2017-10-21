@@ -110,7 +110,6 @@ namespace xt
         derived_type& operator=(const xexpression<E>&);
     };
 
-
     /**
      * @class xcontainer_semantic
      * @brief Implementation of the xsemantic_base interface
@@ -156,54 +155,6 @@ namespace xt
         template <class E>
         derived_type& operator=(const xexpression<E>&);
     };
-
-
-    /**
-     * @class xadaptor_semantic
-     * @brief Implementation of the xsemantic_base interface
-     * for dense multidimensional container adaptors.
-     *
-     * The xadaptor_semantic class is an implementation of the
-     * xsemantic_base interface for dense multidimensional
-     * container adaptors.
-     *
-     * @tparam D the derived type
-     */
-    template <class D>
-    class xadaptor_semantic : public xsemantic_base<D>
-    {
-    public:
-
-        using base_type = xsemantic_base<D>;
-        using derived_type = D;
-        using temporary_type = typename base_type::temporary_type;
-
-        derived_type& assign_temporary(temporary_type&&);
-
-        template <class E>
-        derived_type& assign_xexpression(const xexpression<E>& e);
-
-        template <class E>
-        derived_type& computed_assign(const xexpression<E>& e);
-
-        template <class E, class F>
-        derived_type& scalar_computed_assign(const E& e, F&& f);
-
-    protected:
-
-        xadaptor_semantic() = default;
-        ~xadaptor_semantic() = default;
-
-        xadaptor_semantic(const xadaptor_semantic&) = default;
-        xadaptor_semantic& operator=(const xadaptor_semantic&) = default;
-
-        xadaptor_semantic(xadaptor_semantic&&) = default;
-        xadaptor_semantic& operator=(xadaptor_semantic&&) = default;
-
-        template <class E>
-        derived_type& operator=(const xexpression<E>&);
-    };
-
 
     /**
      * @class xview_semantic
@@ -515,9 +466,7 @@ namespace xt
     template <class D>
     inline auto xcontainer_semantic<D>::assign_temporary(temporary_type&& tmp) -> derived_type&
     {
-        using std::swap;
-        swap(this->derived_cast(), tmp);
-        return this->derived_cast();
+        return (this->derived_cast() = std::move(tmp));
     }
 
     template <class D>
@@ -547,53 +496,6 @@ namespace xt
     template <class D>
     template <class E>
     inline auto xcontainer_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
-    {
-        return base_type::operator=(e);
-    }
-
-    /************************************
-     * xadaptor_semantic implementation *
-     ************************************/
-
-    /**
-     * Assigns the temporary \c tmp to \c *this.
-     * @param tmp the temporary to assign.
-     * @return a reference to \c *this.
-     */
-    template <class D>
-    inline auto xadaptor_semantic<D>::assign_temporary(temporary_type&& tmp) -> derived_type&
-    {
-        this->derived_cast().assign_temporary_impl(std::move(tmp));
-        return this->derived_cast();
-    }
-
-    template <class D>
-    template <class E>
-    inline auto xadaptor_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
-    {
-        xt::assign_xexpression(*this, e);
-        return this->derived_cast();
-    }
-
-    template <class D>
-    template <class E>
-    inline auto xadaptor_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
-    {
-        xt::computed_assign(*this, e);
-        return this->derived_cast();
-    }
-
-    template <class D>
-    template <class E, class F>
-    inline auto xadaptor_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
-    {
-        xt::scalar_computed_assign(this, e, std::forward<F>(f));
-        return this->derived_cast();
-    }
-
-    template <class D>
-    template <class E>
-    inline auto xadaptor_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
     {
         return base_type::operator=(e);
     }

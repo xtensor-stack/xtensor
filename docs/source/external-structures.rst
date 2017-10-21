@@ -118,9 +118,6 @@ Thanks to the previous structures definition, inheriting from ``xcontainer`` bri
 API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the
 support for mathematical operations.
 
-NOTE: if we were to design a class that takes a reference on ``raw_tensor`` instead of embedding an instance,
-we would inherit from ``xadaptor_semantic`` instead of ``xcontainer_semantic``.
-
 Define semantic
 ~~~~~~~~~~~~~~~
 

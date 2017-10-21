@@ -12,6 +12,5 @@ Expressions and semantic
    xexpression
    xsemantic_base
    xcontainer_semantic
-   xadaptor_semantic
    xview_semantic
    xeval

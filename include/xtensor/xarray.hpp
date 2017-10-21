@@ -79,6 +79,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
         using inner_strides_type = typename base_type::inner_strides_type;
+        using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
         xarray_container();
@@ -163,18 +164,18 @@ namespace xt
      */
     template <class EC, layout_type L, class SC, class Tag>
     class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC, Tag>>,
-                           public xadaptor_semantic<xarray_adaptor<EC, L, SC, Tag>>
+                           public xcontainer_semantic<xarray_adaptor<EC, L, SC, Tag>>
     {
     public:
 
         using self_type = xarray_adaptor<EC, L, SC, Tag>;
         using base_type = xstrided_container<self_type>;
-        using semantic_base = xadaptor_semantic<self_type>;
+        using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
-
+        using temporary_type = typename semantic_base::temporary_type;
         using container_closure_type = adaptor_closure_t<container_type>;
         using expression_tag = Tag;
 
@@ -189,6 +190,7 @@ namespace xt
 
         xarray_adaptor(xarray_adaptor&&) = default;
         xarray_adaptor& operator=(xarray_adaptor&&);
+        xarray_adaptor& operator=(temporary_type&&);
 
         template <class E>
         xarray_adaptor& operator=(const xexpression<E>& e);
@@ -200,12 +202,8 @@ namespace xt
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
-        using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
-        void assign_temporary_impl(temporary_type&& tmp);
-
 
         friend class xcontainer<xarray_adaptor<EC, L, SC, Tag>>;
-        friend class xadaptor_semantic<xarray_adaptor<EC, L, SC, Tag>>;
     };
 
     /***********************************
@@ -488,6 +486,16 @@ namespace xt
         return *this;
     }
 
+    template <class EC, layout_type L, class SC, class Tag>
+    inline auto xarray_adaptor<EC, L, SC, Tag>::operator=(temporary_type&& rhs) -> self_type&
+    {
+        base_type::shape_impl() = std::move(const_cast<shape_type&>(rhs.shape()));
+        base_type::strides_impl() = std::move(const_cast<strides_type&>(rhs.strides()));
+        base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(rhs.backstrides()));
+        m_data = std::move(rhs.data());
+        return *this;
+    }
+
     /**
      * @name Extended copy semantic
      */
@@ -513,15 +521,6 @@ namespace xt
     inline auto xarray_adaptor<EC, L, SC, Tag>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
-    }
-
-    template <class EC, layout_type L, class SC, class Tag>
-    inline void xarray_adaptor<EC, L, SC, Tag>::assign_temporary_impl(temporary_type&& tmp)
-    {
-        base_type::shape_impl() = std::move(const_cast<shape_type&>(tmp.shape()));
-        base_type::strides_impl() = std::move(const_cast<strides_type&>(tmp.strides()));
-        base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(tmp.backstrides()));
-        m_data = std::move(tmp.data());
     }
 }
 
