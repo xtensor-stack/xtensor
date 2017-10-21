@@ -469,7 +469,7 @@ namespace xt
         };
 
         template <class T>
-        struct printer<T, std::enable_if_t<is_complex<typename T::value_type>::value>>
+        struct printer<T, std::enable_if_t<xtl::is_complex<typename T::value_type>::value>>
         {
             using value_type = typename T::value_type;
             using cache_type = std::vector<bool>;
@@ -533,7 +533,7 @@ namespace xt
         };
 
         template <class T>
-        struct printer<T, std::enable_if_t<!std::is_fundamental<typename T::value_type>::value && !is_complex<typename T::value_type>::value>>
+        struct printer<T, std::enable_if_t<!std::is_fundamental<typename T::value_type>::value && !xtl::is_complex<typename T::value_type>::value>>
         {
             using value_type = typename T::value_type;
             using cache_type = std::vector<std::string>;

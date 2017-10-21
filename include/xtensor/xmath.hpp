@@ -20,6 +20,8 @@
 #include "xoperation.hpp"
 #include "xreducer.hpp"
 
+#include "xtl/xcomplex.hpp"
+
 namespace xt
 {
     template <class T>
@@ -635,7 +637,7 @@ namespace xt
             }
 
             template <typename T>
-            inline std::enable_if_t<xt::detail::is_complex<T>::value, T>
+            inline std::enable_if_t<xtl::is_complex<T>::value, T>
             sign_impl(T x)
             {
                 typename T::value_type e = (x.real() != T(0)) ? x.real() : x.imag();
