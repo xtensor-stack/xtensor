@@ -20,7 +20,7 @@
 #include "xoperation.hpp"
 #include "xreducer.hpp"
 
-#include <xtl/xcomplex.hpp>
+#include "xtl/xcomplex.hpp"
 
 namespace xt
 {
