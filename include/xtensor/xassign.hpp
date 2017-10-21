@@ -57,15 +57,6 @@ namespace xt
         static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
     };
 
-    template <>
-    class xexpression_assigner_base<xoptional_expression_tag>
-    {
-    public:
-
-        template <class E1, class E2>
-        static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
-    };
-
     template <class Tag>
     class xexpression_assigner : public xexpression_assigner_base<Tag>
     {
@@ -223,40 +214,6 @@ namespace xt
             constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
             constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
             trivial_assigner<simd_assign>::run(de1, de2);
-        }
-        else
-        {
-            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(de1, de2);
-            assigner.run();
-        }
-    }
-
-    template <class E>
-    auto value(E&&);
-
-    template <class E>
-    auto has_value(E&&);
-
-    template <class E1, class E2>
-    inline void xexpression_assigner_base<xoptional_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
-    {
-        E1& de1 = e1.derived_cast();
-        const E2& de2 = e2.derived_cast();
-
-        bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
-        if (trivial_broadcast)
-        {
-            using base_value_type1 = typename std::decay_t<decltype(value(de1))>::value_type;
-            using base_value_type2 = typename std::decay_t<decltype(value(de2))>::value_type;
-            constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
-            constexpr bool same_type = std::is_same<base_value_type1, base_value_type2>::value;
-            constexpr bool simd_size = xsimd::simd_traits<base_value_type1>::size > 1;
-            constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
-            constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
-            auto bde1 = value(de1);
-            auto hde1 = has_value(de1);
-            trivial_assigner<simd_assign>::run(bde1, value(de2));
-            trivial_assigner<false>::run(hde1, has_value(de2));
         }
         else
         {

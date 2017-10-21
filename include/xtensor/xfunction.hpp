@@ -344,7 +344,7 @@ namespace xt
         using reference = typename xfunction_type::value_type;
         using pointer = typename xfunction_type::const_pointer;
         using difference_type = typename xfunction_type::difference_type;
-        using iterator_category = std::forward_iterator_tag;
+        using iterator_category = std::bidirectional_iterator_tag;
 
         template <class... It>
         xfunction_iterator(const xfunction_type* func, It&&... it) noexcept;

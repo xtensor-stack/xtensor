@@ -104,6 +104,7 @@ set(XTENSOR_TESTS
     test_xnorm.cpp
     test_xoperation.cpp
     test_xoptional.cpp
+    test_xoptional_assembly.cpp
     test_xrandom.cpp
     test_xreducer.cpp
     test_xscalar.cpp

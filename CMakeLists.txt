@@ -60,16 +60,19 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_base.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xstridedview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstorage.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xstridedview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstrides.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp
