@@ -80,6 +80,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
         using inner_strides_type = typename base_type::inner_strides_type;
+        using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
         xtensor_container();
@@ -158,18 +159,18 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L, Tag>>,
-                            public xadaptor_semantic<xtensor_adaptor<EC, N, L, Tag>>
+                            public xcontainer_semantic<xtensor_adaptor<EC, N, L, Tag>>
     {
     public:
 
         using self_type = xtensor_adaptor<EC, N, L, Tag>;
         using base_type = xstrided_container<self_type>;
-        using semantic_base = xadaptor_semantic<self_type>;
+        using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
-
+        using temporary_type = typename semantic_base::temporary_type;
         using container_closure_type = adaptor_closure_t<container_type>;
         using expression_tag = Tag;
 
@@ -184,6 +185,7 @@ namespace xt
 
         xtensor_adaptor(xtensor_adaptor&&) = default;
         xtensor_adaptor& operator=(xtensor_adaptor&&);
+        xtensor_adaptor& operator=(temporary_type&&);
 
         template <class E>
         xtensor_adaptor& operator=(const xexpression<E>& e);
@@ -195,11 +197,7 @@ namespace xt
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
-        using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
-        void assign_temporary_impl(temporary_type&& tmp);
-
         friend class xcontainer<xtensor_adaptor<EC, N, L, Tag>>;
-        friend class xadaptor_semantic<xtensor_adaptor<EC, N, L, Tag>>;
     };
 
     /************************************
@@ -420,6 +418,16 @@ namespace xt
         return *this;
     }
 
+    template <class EC, std::size_t N, layout_type L, class Tag>
+    inline auto xtensor_adaptor<EC, N, L, Tag>::operator=(temporary_type&& rhs) -> self_type&
+    {
+        base_type::shape_impl() = std::move(const_cast<shape_type&>(rhs.shape()));
+        base_type::strides_impl() = std::move(const_cast<strides_type&>(rhs.strides()));
+        base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(rhs.backstrides()));
+        m_data = std::move(rhs.data());
+        return *this;
+    }
+
     /**
      * @name Extended copy semantic
      */
@@ -445,15 +453,6 @@ namespace xt
     inline auto xtensor_adaptor<EC, N, L, Tag>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
-    }
-
-    template <class EC, std::size_t N, layout_type L, class Tag>
-    inline void xtensor_adaptor<EC, N, L, Tag>::assign_temporary_impl(temporary_type&& tmp)
-    {
-        base_type::shape_impl() = std::move(const_cast<shape_type&>(tmp.shape()));
-        base_type::strides_impl() = std::move(const_cast<strides_type&>(tmp.strides()));
-        base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(tmp.backstrides()));
-        m_data = std::move(tmp.data());
     }
 }
 
