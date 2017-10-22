@@ -16,6 +16,8 @@
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xoffsetview.hpp"
 
+#include "xtl/xcomplex.hpp"
+
 namespace xt
 {
 
@@ -91,13 +93,13 @@ namespace xt
             template <class E>
             static inline decltype(auto) real(E&& e) noexcept
             {
-                return forward_real(std::forward<E>(e));
+                return xtl::forward_real(std::forward<E>(e));
             }
 
             template <class E>
             static inline decltype(auto) imag(E&& e) noexcept
             {
-                return forward_imag(std::forward<E>(e));
+                return xtl::forward_imag(std::forward<E>(e));
             }
         };
     }
