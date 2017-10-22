@@ -10,6 +10,7 @@
 #define XOFFSETVIEW_HPP
 
 #include "xtensor/xfunctorview.hpp"
+#include "xtl/xcomplex.hpp"
 
 namespace xt
 {
@@ -27,7 +28,7 @@ namespace xt
             template <class T>
             decltype(auto) operator()(T&& t) const
             {
-                return forward_offset<M, I>(t);
+                return xtl::forward_offset<M, I>(t);
             }
         };
     }
