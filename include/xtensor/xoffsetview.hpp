@@ -9,8 +9,9 @@
 #ifndef XOFFSETVIEW_HPP
 #define XOFFSETVIEW_HPP
 
-#include "xtensor/xfunctorview.hpp"
 #include "xtl/xcomplex.hpp"
+
+#include "xtensor/xfunctorview.hpp"
 
 namespace xt
 {
