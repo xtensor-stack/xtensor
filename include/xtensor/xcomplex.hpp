@@ -16,6 +16,8 @@
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xoffsetview.hpp"
 
+#include "xtl/xcomplex.hpp"
+
 namespace xt
 {
 
@@ -75,13 +77,13 @@ namespace xt
             template <class E>
             static inline auto real(E&& e) noexcept
             {
-                return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
+                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
             }
 
             template <class E>
             static inline auto imag(E&& e) noexcept
             {
-                return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
+                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
             }
         };
 
@@ -91,13 +93,13 @@ namespace xt
             template <class E>
             static inline decltype(auto) real(E&& e) noexcept
             {
-                return forward_real(std::forward<E>(e));
+                return xtl::forward_real(std::forward<E>(e));
             }
 
             template <class E>
             static inline decltype(auto) imag(E&& e) noexcept
             {
-                return forward_imag(std::forward<E>(e));
+                return xtl::forward_imag(std::forward<E>(e));
             }
         };
     }
@@ -222,7 +224,7 @@ namespace xt
     template <class E>
     inline auto angle(E&& e, bool deg = false) noexcept
     {
-        using value_type = complex_value_type_t<typename std::decay_t<E>::value_type>;
+        using value_type = xtl::complex_value_type_t<typename std::decay_t<E>::value_type>;
         value_type multiplier = 1.0;
         if (deg)
         {
