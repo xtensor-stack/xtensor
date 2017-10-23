@@ -88,6 +88,7 @@ set(XTENSOR_TESTS
     test_xbroadcast.cpp
     test_xbuffer_adaptor.cpp
     test_xbuilder.cpp
+    test_xcomplex.cpp
     test_xconcepts.cpp
     test_xcontainer_semantic.cpp
     test_xcsv.cpp
