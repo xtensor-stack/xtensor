@@ -1001,7 +1001,7 @@ namespace xt
             ++idx;
         }
 
-        auto data = detail::get_data(e);
+        decltype(auto) data = detail::get_data(e);
 
         using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
         return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), offset);
