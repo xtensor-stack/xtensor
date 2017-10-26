@@ -145,7 +145,7 @@ namespace xt
 
     TEST(xio, cut_longwise)
     {
-        xt::xarray<int> a = xt::ones<int>({5, 1000});
+        xt::xarray<unsigned int> a = xt::ones<unsigned int>({5, 1000});
 
         std::stringstream out;
         out << a;
