@@ -26,7 +26,6 @@ namespace xt
     using xtl::disable_xoptional;
     using xtl::enable_xoptional;
 
-
     /****************************************************
      * Metafunction for splitting xoptional expressions *
      ****************************************************/
@@ -121,8 +120,8 @@ namespace xt
             using optional_array = OA;
             using value_container = typename optional_containers<optional_array>::value_container;
             using flag_container = typename optional_containers<optional_array>::flag_container;
-            using value_expression = xarray_adaptor<value_container, L>;
-            using flag_expression = xarray_adaptor<flag_container, L>;
+            using value_expression = xarray_adaptor<typename optional_containers<optional_array>::value_container, L>;
+            using flag_expression = xarray_adaptor<typename optional_containers<optional_array>::flag_container, L>;
 
             static inline value_expression value(OA& arg)
             {
@@ -179,8 +178,8 @@ namespace xt
             using optional_tensor = OT;
             using value_container = typename optional_containers<optional_tensor>::value_container;
             using flag_container = typename optional_containers<optional_tensor>::flag_container;
-            using value_expression = xtensor_adaptor<value_container, N, L>;
-            using flag_expression = xtensor_adaptor<flag_container, N, L>;
+            using value_expression = xtensor_adaptor<value_container&, N, L>;
+            using flag_expression = xtensor_adaptor<flag_container&, N, L>;
 
             static inline value_expression value(OT& arg)
             {

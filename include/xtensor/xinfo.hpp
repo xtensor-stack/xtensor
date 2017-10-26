@@ -62,14 +62,6 @@ namespace xt
     {
         std::string s;
         using shape_type = typename T::shape_type;
-        if (detail::is_array<shape_type>::value)
-        {
-            s += "Type: xtensor, fixed dimension " + std::to_string(t.dimension());
-        }
-        else
-        {
-            s += "Type: xarray, dimension " + std::to_string(t.dimension());
-        }
         s += "\nValue type: " + type_to_string<typename T::value_type>();
         s += "\nLayout: ";
         if (t.layout() == layout_type::row_major)

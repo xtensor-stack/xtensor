@@ -15,7 +15,6 @@
 #include <utility>
 #include <vector>
 
-#include "xbuffer_adaptor.hpp"
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
 
@@ -125,14 +124,14 @@ namespace xt
     template <class EC, std::size_t N, layout_type L, class Tag>
     struct xcontainer_inner_types<xtensor_adaptor<EC, N, L, Tag>>
     {
-        using container_type = EC;
+        using container_type = std::remove_reference_t<EC>;
         using shape_type = std::array<typename container_type::size_type, N>;
         using strides_type = shape_type;
         using backstrides_type = shape_type;
         using inner_shape_type = shape_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
-        using temporary_type = xtensor_container<EC, N, L, Tag>;
+        using temporary_type = xtensor_container<container_type, N, L, Tag>;
         static constexpr layout_type layout = L;
     };
 
@@ -152,7 +151,7 @@ namespace xt
      * is used to provide a multidimensional container semantic and a
      * tensor semantic to stl-like containers.
      *
-     * @tparam EC The container type to adapt.
+     * @tparam EC The closure for the container type to adapt.
      * @tparam N The dimension of the adaptor.
      * @tparam L The layout_type of the adaptor.
      * @tparam Tag The expression tag.
@@ -163,6 +162,8 @@ namespace xt
     {
     public:
 
+        using container_closure_type = EC;
+
         using self_type = xtensor_adaptor<EC, N, L, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
@@ -171,12 +172,16 @@ namespace xt
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
         using temporary_type = typename semantic_base::temporary_type;
-        using container_closure_type = adaptor_closure_t<container_type>;
         using expression_tag = Tag;
 
-        xtensor_adaptor(container_closure_type data);
-        xtensor_adaptor(container_closure_type data, const shape_type& shape, layout_type l = layout_type::row_major);
-        xtensor_adaptor(container_closure_type data, const shape_type& shape, const strides_type& strides);
+        xtensor_adaptor(container_type&& data);
+        xtensor_adaptor(const container_type& data);
+
+        template <class D>
+        xtensor_adaptor(D&& data, const shape_type& shape, layout_type l = layout_type::row_major);
+
+        template <class D>
+        xtensor_adaptor(D&& data, const shape_type& shape, const strides_type& strides);
 
         ~xtensor_adaptor() = default;
 
@@ -368,8 +373,18 @@ namespace xt
      * @param data the container to adapt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
-    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(container_closure_type data)
-        : base_type(), m_data(std::forward<container_closure_type>(data))
+    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(container_type&& data)
+        : base_type(), m_data(std::move(data))
+    {
+    }
+
+    /**
+     * Constructs an xtensor_adaptor of the given stl-like container.
+     * @param data the container to adapt
+     */
+    template <class EC, std::size_t N, layout_type L, class Tag>
+    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(const container_type& data)
+        : base_type(), m_data(data)
     {
     }
 
@@ -381,8 +396,9 @@ namespace xt
      * @param l the layout_type of the xtensor_adaptor
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
-    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(container_closure_type data, const shape_type& shape, layout_type l)
-        : base_type(), m_data(std::forward<container_closure_type>(data))
+    template <class D>
+    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(D&& data, const shape_type& shape, layout_type l)
+        : base_type(), m_data(std::forward<D>(data))
     {
         base_type::reshape(shape, l);
     }
@@ -395,8 +411,9 @@ namespace xt
      * @param strides the strides of the xtensor_adaptor
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
-    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(container_closure_type data, const shape_type& shape, const strides_type& strides)
-        : base_type(), m_data(std::forward<container_closure_type>(data))
+    template <class D>
+    inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(D&& data, const shape_type& shape, const strides_type& strides)
+        : base_type(), m_data(std::forward<D>(data))
     {
         base_type::reshape(shape, strides);
     }
