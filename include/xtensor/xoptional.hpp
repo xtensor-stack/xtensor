@@ -246,10 +246,10 @@ namespace xt
     auto sign(const xoptional<T, B>& e);
 
     template <class E>
-    detail::value_expression_t<E> value(E&&);
+    auto value(E&&);
 
     template <class E>
-    detail::flag_expression_t<E> has_value(E&&);
+    auto has_value(E&&);
 
     /**********************
      * xoptional_function *
@@ -654,13 +654,13 @@ namespace xt
      ******************************************/
 
     template <class E>
-    inline auto value(E&& e) -> detail::value_expression_t<E>
+    inline auto value(E&& e)
     {
         return detail::split_optional_expression<E>::value(std::forward<E>(e));
     }
 
     template <class E>
-    inline auto has_value(E&& e) -> detail::flag_expression_t<E>
+    inline auto has_value(E&& e)
     {
         return detail::split_optional_expression<E>::has_value(std::forward<E>(e));
     }
