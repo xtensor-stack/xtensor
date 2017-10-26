@@ -231,6 +231,12 @@ namespace xt
         }
     }
 
+    template <class E>
+    auto value(E&&);
+
+    template <class E>
+    auto has_value(E&&);
+
     template <class E1, class E2>
     inline void xexpression_assigner_base<xoptional_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
     {
