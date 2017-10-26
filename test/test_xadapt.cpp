@@ -118,4 +118,22 @@ namespace xt
         a2(1, 0) = 1;
         EXPECT_EQ(1, data2[2]);
     }
+
+    TEST(xtensor_adaptor, move_pointer_acquire_ownership)
+    {
+        size_t size = 4;
+        int* data = new int[size];
+        int* data2 = new int[size];
+        using shape_type = std::array<vec_type::size_type, 2>;
+        shape_type s = {2, 2};
+
+        auto a1 = xadapt(std::move(data), size, acquire_ownership(), s);
+        a1(0, 1) = 1;
+        EXPECT_EQ(1, data[1]);
+
+        shape_type str = {2, 1};
+        auto a2 = xadapt(std::move(data2), size, acquire_ownership(), s, str);
+        a2(1, 0) = 1;
+        EXPECT_EQ(1, data2[2]);
+    }
 }
