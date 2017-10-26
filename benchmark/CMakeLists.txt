@@ -114,3 +114,10 @@ add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK}
 target_link_libraries(${XTENSOR_BENCHMARK_TARGET} ${GBENCHMARK_LIBRARIES})
 
 add_custom_target(xbenchmark COMMAND benchmark_xtensor DEPENDS ${XTENSOR_BENCHMARK_TARGET})
+
+add_custom_target(xpowerbench
+    COMMAND echo "sudo needed to set cpu power governor to performance"
+    COMMAND sudo cpupower frequency-set --governor performance
+    COMMAND benchmark_xtensor
+    COMMAND sudo cpupower frequency-set --governor powersave
+    DEPENDS ${XTENSOR_BENCHMARK_TARGET})

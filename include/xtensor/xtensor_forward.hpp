@@ -140,6 +140,24 @@ namespace xt
         {
         };
     }
+
+    namespace evaluation_strategy
+    {
+        struct base
+        {
+        };
+        struct immediate : base
+        {
+        };
+        struct lazy : base
+        {
+        };
+        /*
+        struct cached
+        {
+        };
+        */
+    }
 }
 
 #endif

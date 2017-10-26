@@ -12,11 +12,11 @@ Reducing functions
 Defined in ``xtensor/xmath.hpp``
 
 .. _sum-function-reference:
-.. doxygenfunction:: sum(E&&, X&&)
+.. doxygenfunction:: sum(E&&, X&&, ES)
    :project: xtensor
 
 .. _prod-function-reference:
-.. doxygenfunction:: prod(E&&, X&&)
+.. doxygenfunction:: prod(E&&, X&&, ES)
    :project: xtensor
 
 .. _mean-function-reference:
