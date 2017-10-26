@@ -7,13 +7,42 @@
 Changelog
 =========
 
+0.13.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- The API for ``xbuffer_adaptor`` has changed. The template parameter is the type of the buffer, not just the value type.
+  `#482 <https://github.com/QuantStack/xtensor/pull/482>`_
+- xtensor now depends on ``xtl`` version `0.3.x`.
+
+Other changes
+~~~~~~~~~~~~~
+
+- Various fixes and improvements of the strided views.
+  `#480 <https://github.com/QuantStack/xtensor/pull/480>`_
+  `#481 <https://github.com/QuantStack/xtensor/pull/481>`_
+- Addition of broadcasting bitwise operators.
+  `#459 <https://github.com/QuantStack/xtensor/pull/459>`_.
+- Migration of benchmarks to the Google benchmark framework.
+  `#473 <https://github.com/QuantStack/xtensor/pull/473>`_.
+- More efficient optional expression system.
+  `#467 <https://github.com/QuantStack/xtensor/pull/467>`_.
+
+0.12.1
+------
+
+- Fix issue with slicing when using heterogeneous integral types
+  `#451 <https://github.com/QuantStack/xtensor/pull/451>`_.
+
 0.12.0
 ------
 
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
-- ``xtensor`` now depends on ``xtl``.
+- ``xtensor`` now depends on ``xtl`` version `0.2.x`.
   `#421 <https://github.com/QuantStack/xtensor/pull/421>`_.
 
 New features
