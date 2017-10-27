@@ -436,4 +436,15 @@ namespace xt
         std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected = {{0, 0}, {1, 1}, {2, 2}};
         EXPECT_EQ(expected, where(a));
     }
+
+    TYPED_TEST(operation, cast)
+    {
+        using int_container_t = rebind_container_t<TypeParam, int>;
+        using shape_type = typename int_container_t::shape_type;
+        shape_type shape = {3, 2};
+        int_container_t a(shape, 5);
+        auto ref = static_cast<double>(a(0, 0)) / 2;
+        auto actual = (cast<double>(a) / 2)(0, 0);
+        EXPECT_EQ(ref, actual);
+    }
 }

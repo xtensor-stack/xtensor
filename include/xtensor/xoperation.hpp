@@ -157,6 +157,33 @@ namespace xt
             };
         };
 
+        template <class R>
+        struct cast
+        {
+            template <class T>
+            struct functor
+            {
+                using return_type = xt::detail::functor_return_type<T, R>;
+                using argument_type = T;
+                using result_type = typename return_type::type;
+                using simd_value_type = xsimd::simd_type<T>;
+                using simd_result_type = typename return_type::simd_type;
+                constexpr result_type operator()(const T& arg) const
+                {
+                    return static_cast<R>(arg);
+                }
+                constexpr simd_result_type simd_apply(const simd_value_type& arg) const
+                {
+                    return static_cast<R>(arg);
+                }
+                template <class U>
+                struct rebind
+                {
+                    using type = functor<U>;
+                };
+            };
+        };
+
         template <class Tag, class F, class... E>
         struct select_xfunction_expression;
 
@@ -742,6 +769,29 @@ namespace xt
                                [](const typename std::decay_t<E>::value_type& el) { return el; });
         }
     }
+
+    /**
+     * @defgroup casting_operators Casting operators
+     */
+    
+    /**
+     * @ingroup casting_operators
+     * @brief Element-wise ``static_cast``.
+     *
+     * Returns an \ref xfunction for the element-wise
+     * static_cast of \a e to type R.
+     *
+     * @param e an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
+    
+    template <class R, class E>
+    inline auto cast(E&& e) noexcept
+    -> detail::xfunction_type_t<detail::cast<R>::template functor, E>
+    {
+        return detail::make_xfunction<detail::cast<R>::template functor>(std::forward<E>(e));
+    }
+
 }
 
 #endif

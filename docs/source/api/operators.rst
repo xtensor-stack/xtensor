@@ -7,7 +7,7 @@
 Operators and related functions
 ===============================
 
-Defined in ``xtensor/xmath.hpp``
+Defined in ``xtensor/xmath.hpp`` and ``xtensor/xoperation.hpp``
 
 .. _identity-op-ref:
 .. doxygenfunction:: operator+(E&&)
@@ -97,3 +97,6 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: not_equal(E1&&, E2&&)
    :project: xtensor
 
+.. _cast-ref:
+.. doxygenfunction:: cast(E&&)
+   :project: xtensor

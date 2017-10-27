@@ -123,6 +123,25 @@ Mathematical functions
 See the API reference for a comprehensive list of available functions. Like operators, the mathematical functions
 are element-wise functions and apply the lazy broadcasting rules.
 
+Casting
+-------
+
+`xtensor` will implicitly promote and/or cast tensor expression elements as needed,
+which suffices for most use-cases. But explicit casting can be performed
+via ``cast``, which performs an element-wise ``static_cast``.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+
+    xt::xarray<int> a = { 3, 5, 7 };
+
+    auto res = a / 2;
+    // => res = { 1, 2, 3 }
+
+    auto res2 = xt::cast<double>(a) / 2;
+    // => res2 = { 1.5, 2.5, 3.5 }
+
 Reducers
 --------
 
