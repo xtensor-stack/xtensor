@@ -143,6 +143,17 @@ namespace xt
         template <class align, class simd = simd_value_type>
         simd load_simd(size_type i) const;
 
+#if defined(_MSC_VER) && _MSC_VER >= 1910
+        // Workaround for compiler bug in Visual Studio 2017 with respect to alias templates with non-type parameters.
+        template <layout_type L>
+        using layout_iterator = xiterator<typename iterable_base::stepper, typename iterable_base::inner_shape_type*, L>;
+        template <layout_type L>
+        using const_layout_iterator = xiterator<typename iterable_base::const_stepper, typename iterable_base::inner_shape_type*, L>;
+        template <layout_type L>
+        using reverse_layout_iterator = std::reverse_iterator<layout_iterator<L>>;
+        template <layout_type L>
+        using const_reverse_layout_iterator = std::reverse_iterator<const_layout_iterator<L>>;
+#else
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
         template <layout_type L>
@@ -151,6 +162,7 @@ namespace xt
         using reverse_layout_iterator = typename iterable_base::template reverse_layout_iterator<L>;
         template <layout_type L>
         using const_reverse_layout_iterator = typename iterable_base::template const_reverse_layout_iterator<L>;
+#endif
 
         template <class S, layout_type L>
         using broadcast_iterator = typename iterable_base::template broadcast_iterator<S, L>;

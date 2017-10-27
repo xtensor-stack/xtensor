@@ -14,6 +14,11 @@ Visual Studio 2015 and ``std::enable_if``
 
 With Visual Studio, ``std::enable_if`` evaluates its second argument, even if the condition is false. This is the reason for the presence of the indirection in the implementation of the ``xfunction_type_t`` meta-function.
 
+Visual Studio 2017 and alias templates with non-class template parameters and multiple aliasing levels
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Alias template with non-class parameters only, and multiple levels of aliasing are not properly considered as types by Visual Studio 2017. The base ``xcontainer`` template class underlying xtensor container types has such alias templates defined. We avoid the multiple levels of aliasing in the case of Visual Studio.
+
 GCC-4.9 and Clang < 3.8 and constexpr ``std::min`` and ``std::max``
 -------------------------------------------------------------------
 
