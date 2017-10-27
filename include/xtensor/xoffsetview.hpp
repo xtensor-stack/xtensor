@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XOFFSETVIEW_HPP
-#define XOFFSETVIEW_HPP
+#ifndef XTENSOR_OFFSETVIEW_HPP
+#define XTENSOR_OFFSETVIEW_HPP
 
 #include "xtl/xcomplex.hpp"
 

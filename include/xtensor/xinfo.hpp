@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XINFO_HPP
-#define XINFO_HPP
+#ifndef XTENSOR_INFO_HPP
+#define XTENSOR_INFO_HPP
 
 #include <string>
 

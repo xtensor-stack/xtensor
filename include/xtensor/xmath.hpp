@@ -10,8 +10,8 @@
  * @brief standard mathematical functions for xexpressions
  */
 
-#ifndef XMATH_HPP
-#define XMATH_HPP
+#ifndef XTENSOR_MATH_HPP
+#define XTENSOR_MATH_HPP
 
 #include <cmath>
 #include <complex>

@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XREDUCER_HPP
-#define XREDUCER_HPP
+#ifndef XTENSOR_REDUCER_HPP
+#define XTENSOR_REDUCER_HPP
 
 #include <algorithm>
 #include <cstddef>

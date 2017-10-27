@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XSEMANTIC_HPP
-#define XSEMANTIC_HPP
+#ifndef XTENSOR_SEMANTIC_HPP
+#define XTENSOR_SEMANTIC_HPP
 
 #include <functional>
 #include <utility>

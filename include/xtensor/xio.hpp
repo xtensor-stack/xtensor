@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XIO_HPP
-#define XIO_HPP
+#ifndef XTENSOR_IO_HPP
+#define XTENSOR_IO_HPP
 
 #include <complex>
 #include <cstddef>
@@ -37,7 +37,7 @@ namespace xt
     {
         struct print_options_impl
         {
-            std::size_t edge_items = 3;
+            std::size_t edgeitems = 3;
             std::size_t line_width = 75;
             std::size_t threshold = 1000;
             precision_type precision = -1;  // default precision
@@ -76,11 +76,11 @@ namespace xt
          *        triggered, this value defines how many items of each dimension
          *        are printed.
          *
-         * @param edge_items The number of edge items
+         * @param edgeitems The number of edge items
          */
-        inline void set_edge_items(std::size_t edge_items)
+        inline void set_edgeitems(std::size_t edgeitems)
         {
-            print_options().edge_items = edge_items;
+            print_options().edgeitems = edgeitems;
         }
 
         /**
@@ -118,7 +118,7 @@ namespace xt
         {
             template <class E, class F>
             static std::ostream& output(std::ostream& out, const E& e, F& printer, std::size_t blanks,
-                                        precision_type element_width, std::size_t edge_items, std::size_t line_width)
+                                        precision_type element_width, std::size_t edgeitems, std::size_t line_width)
             {
                 using size_type = typename E::size_type;
 
@@ -138,7 +138,7 @@ namespace xt
                     out << '{';
                     for (; i != e.shape()[0] - 1; ++i)
                     {
-                        if (edge_items && e.shape()[0] > (edge_items * 2) && i == edge_items)
+                        if (edgeitems && e.shape()[0] > (edgeitems * 2) && i == edgeitems)
                         {
                             out << "..., ";
                             if (e.dimension() > 1)
@@ -147,7 +147,7 @@ namespace xt
                                 out << std::endl
                                     << indents;
                             }
-                            i = e.shape()[0] - edge_items;
+                            i = e.shape()[0] - edgeitems;
                         }
                         if (e.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
                         {
@@ -156,7 +156,7 @@ namespace xt
                             elems_on_line = 0;
                         }
 
-                        xout<I - 1>::output(out, view(e, i), printer, blanks + 1, element_width, edge_items, line_width) << ',';
+                        xout<I - 1>::output(out, view(e, i), printer, blanks + 1, element_width, edgeitems, line_width) << ',';
 
                         elems_on_line++;
 
@@ -175,7 +175,7 @@ namespace xt
                         out << std::endl
                             << indents;
                     }
-                    xout<I - 1>::output(out, view(e, i), printer, blanks + 1, element_width, edge_items, line_width) << '}';
+                    xout<I - 1>::output(out, view(e, i), printer, blanks + 1, element_width, edgeitems, line_width) << '}';
                 }
                 return out;
             }
@@ -649,7 +649,7 @@ namespace xt
         std::size_t sz = compute_size(d.shape());
         if (sz > print_options::print_options().threshold)
         {
-            lim = print_options::print_options().edge_items;
+            lim = print_options::print_options().edgeitems;
         }
         if (sz == 0)
         {

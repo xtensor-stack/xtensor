@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XCSV_HPP
-#define XCSV_HPP
+#ifndef XTENSOR_CSV_HPP
+#define XTENSOR_CSV_HPP
 
 #include <exception>
 #include <istream>

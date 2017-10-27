@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XAXIS_ITERATOR_HPP
-#define XAXIS_ITERATOR_HPP
+#ifndef XTENSOR_AXIS_ITERATOR_HPP
+#define XTENSOR_AXIS_ITERATOR_HPP
 
 #include "xtl/xclosure.hpp"
 #include "xview.hpp"

@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XNORM_HPP
-#define XNORM_HPP
+#ifndef XTENSOR_NORM_HPP
+#define XTENSOR_NORM_HPP
 
 #include <cmath>
 // std::abs(int) prior to C++ 17

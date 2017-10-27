@@ -170,7 +170,7 @@ namespace xt
         xt::xarray<double, layout_type::row_major> rn = xt::random::rand<double>({100, 100}, -10, 10);
 
         xt::print_options::set_line_width(150);
-        xt::print_options::set_edge_items(10);
+        xt::print_options::set_edgeitems(10);
         xt::print_options::set_precision(10);
         xt::print_options::set_threshold(100);
 
@@ -180,7 +180,7 @@ namespace xt
 
         // reset back to default
         xt::print_options::set_line_width(75);
-        xt::print_options::set_edge_items(3);
+        xt::print_options::set_edgeitems(3);
         xt::print_options::set_precision(-1);
         xt::print_options::set_threshold(1000);
     }

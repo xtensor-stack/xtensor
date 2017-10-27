@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XITERATOR_HPP
-#define XITERATOR_HPP
+#ifndef XTENSOR_ITERATOR_HPP
+#define XTENSOR_ITERATOR_HPP
 
 #include <algorithm>
 #include <array>

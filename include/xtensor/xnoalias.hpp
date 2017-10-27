@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XNOALIAS_HPP
-#define XNOALIAS_HPP
+#ifndef XTENSOR_NOALIAS_HPP
+#define XTENSOR_NOALIAS_HPP
 
 #include "xsemantic.hpp"
 

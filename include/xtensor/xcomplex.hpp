@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XCOMPLEX_HPP
-#define XCOMPLEX_HPP
+#ifndef XTENSOR_COMPLEX_HPP
+#define XTENSOR_COMPLEX_HPP
 
 #include <type_traits>
 #include <utility>

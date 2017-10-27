@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XUTILS_HPP
-#define XUTILS_HPP
+#ifndef XTENSOR_UTILS_HPP
+#define XTENSOR_UTILS_HPP
 
 #include <algorithm>
 #include <array>
