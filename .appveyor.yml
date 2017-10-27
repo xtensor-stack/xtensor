@@ -4,16 +4,13 @@ platform:
   - x64
   - x86
 
+image:
+  - Visual Studio 2015 
+  - Visual Studio 2017
+
 environment:
   matrix:
     - MINICONDA: C:\xtensor-conda
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
-    - MINICONDA: C:\xtensor-conda
-      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
-
-matrix:
-  allow_failures:
-    - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
 
 init:
   - "ECHO %MINICONDA%"
