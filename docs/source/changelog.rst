@@ -15,7 +15,7 @@ Breaking changes
 
 - The API for ``xbuffer_adaptor`` has changed. The template parameter is the type of the buffer, not just the value type.
   `#482 <https://github.com/QuantStack/xtensor/pull/482>`_
-- xtensor now depends on ``xtl`` version `0.3.x`.
+- xtensor now depends on ``xtl`` version `~0.3.1`.
 
 Other changes
 ~~~~~~~~~~~~~
