@@ -19,6 +19,7 @@
 
 #include "xoperation.hpp"
 #include "xreducer.hpp"
+#include "xaccumulator.hpp"
 
 #include "xtl/xcomplex.hpp"
 
@@ -1677,6 +1678,58 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         return std::move(s) / static_cast<double>(size / s.size());
     }
 #endif
+
+    /**
+     * @defgroup acc_functions accumulating functions
+     */
+
+    /**
+     * @ingroup acc_functions
+     * @brief Cumulative sum.
+     *
+     * Returns the accumulated sum for the elements over given
+     * \em axes (or flattened).
+     * @param e an \ref xexpression
+     * @param axes the axes along which the cumulative sum is computed (optional)
+     * @return an \ref xarray<T>
+     */
+    template <class E>
+    inline auto cumsum(E&& e, std::size_t axis) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::plus<result_type>(), std::forward<E>(e), axis);
+    }
+
+    template <class E>
+    inline auto cumsum(E&& e) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::plus<result_type>(), std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup acc_functions
+     * @brief Cumulative sum.
+     *
+     * Returns the accumulated sum for the elements over given
+     * \em axes (or flattened).
+     * @param e an \ref xexpression
+     * @param axes the axes along which the cumulative sum is computed (optional)
+     * @return an \ref xarray<T>
+     */
+    template <class E>
+    inline auto cumprod(E&& e, std::size_t axis) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::multiplies<result_type>(), std::forward<E>(e), axis);
+    }
+
+    template <class E>
+    inline auto cumprod(E&& e) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::multiplies<result_type>(), std::forward<E>(e));
+    }
 }
 
 #endif

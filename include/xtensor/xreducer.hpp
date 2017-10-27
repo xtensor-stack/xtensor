@@ -37,8 +37,8 @@ namespace xt
      * reduce *
      **********/
 
-    template <class F, class E, class X>
-    auto reduce(F&& f, E&& e, X&& axes) noexcept;
+    template <class F, class E, class X, class ES = evaluation_strategy::lazy>
+    auto reduce(F&& f, E&& e, X&& axes, ES es = ES()) noexcept;
 
     template <class F, class E>
     auto reduce(F&& f, E&& e) noexcept;
@@ -50,6 +50,114 @@ namespace xt
     template <class F, class E, class I, std::size_t N>
     auto reduce(F&& f, E&& e, const I (&axes)[N]) noexcept;
 #endif
+
+    template <class F, class E, class X>
+    auto reduce_immediate(F&& f, E&& e, X&& axes)
+    {
+        using shape_type = std::vector<std::size_t>;
+        using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
+        using result_type = typename accumulate_functor::result_type;
+        auto acc_fct = std::get<0>(f);
+        auto init_fct = std::get<1>(f);
+
+        shape_type shape(e.dimension() - axes.size());
+        shape_type strides(axes.size());
+        shape_type sizes(axes.size());
+        shape_type offsets(e.dimension() - axes.size() ? e.dimension() - axes.size() : 1);
+
+        if (!std::is_sorted(axes.cbegin(), axes.cend()))
+        {
+            // TODO make this untrue
+            throw std::runtime_error("Reducing axes should be sorted");
+        }
+
+        std::size_t shape_idx = 0;
+        std::size_t stride_idx = 0;
+        std::size_t sizes_idx = 0;
+        for (std::size_t i = 0; i < e.strides().size(); ++i)
+        {
+            if (std::find(axes.begin(), axes.end(), i) != axes.end())
+            {
+                strides[stride_idx++] = e.strides()[i];
+                std::size_t curr_size = sizes_idx != 0 ? sizes[sizes_idx - 1] : 1;
+                sizes[sizes_idx++] = e.shape()[i] * curr_size;
+            }
+            else
+            {
+                offsets[shape_idx] = e.strides()[i];
+                shape[shape_idx++] = e.shape()[i];
+            }
+        }
+        // allocate result array
+        // TODO layout?
+        auto result = xarray<result_type>::from_shape(shape);
+
+        // auto& de = e.derived_cast();
+        auto begin = e.raw_data();
+        auto out = result.raw_data();
+        auto inner_stride = strides.back();
+
+        std::size_t next_stride;
+
+        xindex temp_idx(shape.size());
+
+        auto next_idx = [&shape, &e, &temp_idx]()
+        {
+            for (int i = int(shape.size() - 2); i >= 0; --i)
+            {
+                if (temp_idx[i] >= shape[i] - 1)
+                {
+                    temp_idx[i] = 0;
+                }
+                else
+                {
+                    temp_idx[i]++;
+                    return e.strides()[i];
+                }
+            }
+            // return empty index, happens at last iteration step, but remains unused
+            return std::size_t(0);
+        };
+
+        do
+        {
+            // Decide if going about it row-wise or col-wise
+            if (inner_stride == 1)
+            {
+                for (std::size_t i = 0; i < shape.back(); ++i)
+                {
+                    *(out + i)  = init_fct(*begin);
+                    for (std::size_t j = 1; j < sizes.back(); ++j)
+                    {
+                        *(out + i) = acc_fct(*(out + i), *(begin + j));
+                    }
+                    begin += offsets.back();
+                }
+            }
+            else
+            {
+                for (std::size_t i = 0; i < shape.back(); ++i)
+                {
+                    *(out + i) = init_fct(*(begin + i));
+                }
+                begin += inner_stride;
+
+                for (std::size_t i = 1; i < sizes.back(); ++i)
+                {
+                    for (std::size_t j = 0; j < shape.back(); ++j)
+                    {
+                        *(out + j) = acc_fct(*(out + j), *(begin + j));
+                    }
+                    begin += inner_stride;
+                }
+            }
+
+            next_stride = next_idx();
+            out += next_stride;
+        } while (next_stride);
+
+        return result;
+    }
 
     /*************
      * xreducer  *
@@ -230,6 +338,22 @@ namespace xt
      * reduce implementation *
      *************************/
 
+    namespace detail
+    {
+        template <class F, class E, class X>
+        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::lazy) noexcept
+        {
+            using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<X>>;
+            return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
+        }
+
+        template <class F, class E, class X>
+        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::immediate) noexcept
+        {
+            return reduce_immediate(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
+        }
+    }
+
     /**
      * @brief Returns an \ref xexpression applying the speficied reducing
      * function to an expresssion over the given axes.
@@ -237,16 +361,16 @@ namespace xt
      * @param f the reducing function to apply.
      * @param e the \ref xexpression to reduce.
      * @param axes the list of axes.
+     * @param evaluation_strategy evaluation strategy to use (lazy (default), or immediate)
      *
      * The returned expression either hold a const reference to \p e or a copy
      * depending on whether \p e is an lvalue or an rvalue.
      */
 
-    template <class F, class E, class X>
-    inline auto reduce(F&& f, E&& e, X&& axes) noexcept
+    template <class F, class E, class X, class ES>
+    inline auto reduce(F&& f, E&& e, X&& axes, ES evaluation_strategy) noexcept
     {
-        using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<X>>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
+        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes), evaluation_strategy);
     }
 
     template <class F, class E>

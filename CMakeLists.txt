@@ -21,7 +21,7 @@ foreach(ver ${xtensor_version_defines})
         set(XTENSOR_VERSION_${CMAKE_MATCH_1} "${CMAKE_MATCH_2}" CACHE INTERNAL "")
     endif()
 endforeach()
-set(${PROJECT_NAME}_VERSION 
+set(${PROJECT_NAME}_VERSION
     ${XTENSOR_VERSION_MAJOR}.${XTENSOR_VERSION_MINOR}.${XTENSOR_VERSION_PATCH})
 message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 
@@ -35,6 +35,7 @@ message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 # =====
 
 set(XTENSOR_HEADERS
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xaccumulator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xadapt.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp

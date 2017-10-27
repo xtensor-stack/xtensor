@@ -137,6 +137,7 @@ namespace xt
         EXPECT_TRUE((std::is_same<promote_type_t<bool>, bool>::value));
 
         EXPECT_TRUE((std::is_same<big_promote_type_t<uint8_t>, unsigned long long>::value));
+        EXPECT_TRUE((std::is_same<big_promote_type_t<short>, long long>::value));
         EXPECT_TRUE((std::is_same<big_promote_type_t<int>, long long>::value));
         EXPECT_TRUE((std::is_same<big_promote_type_t<float>, double>::value));
         EXPECT_TRUE((std::is_same<big_promote_type_t<double>, double>::value));

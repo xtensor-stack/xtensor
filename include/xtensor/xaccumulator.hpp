@@ -6,92 +6,96 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XACCUMULATOR_HPP
-#define XACCUMULATOR_HPP
+#ifndef XTENSOR_ACCUMULATOR_HPP
+#define XTENSOR_ACCUMULATOR_HPP
 
 #include <algorithm>
-#include <cstddef>
-#include <initializer_list>
-#include <iterator>
-#include <stdexcept>
+#include <numeric>
 #include <type_traits>
-#include <utility>
-#include <tuple>
+#include <cstddef>
 
-#ifdef X_OLD_CLANG
-#include <vector>
-#endif
-
-#include "xtl/xsequence.hpp"
-
-#include "xbuilder.hpp"
-#include "xreducer.hpp"
+#include "xtensor_forward.hpp"
+#include "xstrides.hpp"
 #include "xexpression.hpp"
-#include "xgenerator.hpp"
-#include "xiterable.hpp"
-#include "xutils.hpp"
 #include <iostream>
 
 namespace xt
 {
+
+#define DEFAULT_STRATEGY_ACCUMULATORS evaluation_strategy::immediate
+
     /**************
      * accumulate *
      **************/
 
-    template <class F, class E>
-    xarray<typename std::decay_t<E>::value_type> accumulate_greedy(F&& f, E&& e)
+    namespace detail
     {
-        using T = typename std::decay_t<E>::value_type;
-        std::size_t sz = compute_size(e.shape());
-        auto result = xarray<T>::from_shape({sz});
-        result[0] = e[0];
-        for (std::size_t i = 0; i < sz - 1; ++i)
+        template <class F, class E, class ES>
+        xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, std::size_t, ES)
         {
-            result[i + 1] = f(result[i], e[i + 1]);
-        }
-        return result;
-    }
-
-    template <class F, class E>
-    xarray<typename std::decay_t<E>::value_type> accumulate_greedy(F&& f, E&& e, std::size_t axis)
-    {
-        using T = typename std::decay_t<E>::value_type;
-        std::size_t sz = compute_size(e.shape());
-
-        xarray<T> result = e;  // assign + make a copy, we need it anyways
-
-        std::size_t outer_stride = result.strides().back();
-        std::size_t inner_stride = result.strides()[axis];
-
-        std::size_t inner_loop_dim = 1, outer_loop_dim = 1;
-
-        std::size_t i = 0;
-        for (; i < axis; ++i)
-        {
-            outer_loop_dim *= result.shape()[i];
+            static_assert(!std::is_same<evaluation_strategy::lazy, ES>::value, "Lazy accumulators not yet implemented.");
         }
 
-        for (; i < result.dimension(); ++i)
+        template <class F, class E, class ES>
+        xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, ES)
         {
-            inner_loop_dim *= result.shape()[i];
+            static_assert(!std::is_same<evaluation_strategy::lazy, ES>::value, "Lazy accumulators not yet implemented.");
         }
 
-        inner_loop_dim -= inner_stride;
-
-        std::size_t pos = 0;
-        for (std::size_t i = 0; i < outer_loop_dim; ++i)
+        template <class F, class E>
+        inline auto accumulator_impl(F&& f, E&& e, evaluation_strategy::immediate)
         {
-            for (std::size_t j = 0; j < inner_loop_dim; ++j)
+            using T = typename F::result_type;
+            std::size_t sz = compute_size(e.shape());
+            auto result = xarray<T>::from_shape({sz});
+
+            // Initialize result with first variable
+            result.data()[0] = e.data()[0];
+
+            for (std::size_t i = 0; i < sz - 1; ++i)
             {
-                result[pos + inner_stride] = f(result[pos], result[pos + inner_stride]);
-                pos += outer_stride;
+                result.data()[i + 1] = f(result.data()[i], e.data()[i + 1]);
             }
-            pos += inner_stride;
+            return std::move(result);
         }
 
-        return result;
-    }
+        template <class F, class E>
+        inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate)
+        {
+            using T = typename F::result_type;
 
+            if (axis >= e.dimension())
+            {
+                throw std::runtime_error("Axis larger than expression dimension in accumulator.");
+            }
+
+            xarray<T> result = e; // assign + make a copy, we need it anyways
+
+            std::size_t outer_stride = result.strides().back();
+            std::size_t inner_stride = result.strides()[axis];
+
+            std::size_t outer_loop_dim = std::accumulate(result.shape().cbegin(),
+                                                         result.shape().cbegin() + std::ptrdiff_t(axis),
+                                                         std::size_t(1), std::multiplies<std::size_t>());
+            std::size_t inner_loop_dim = std::accumulate(result.shape().cbegin() + std::ptrdiff_t(axis),
+                                                         result.shape().cend(),
+                                                         std::size_t(1), std::multiplies<std::size_t>());
+            inner_loop_dim -= inner_stride;
+
+            std::size_t pos = 0;
+            for (std::size_t i = 0; i < outer_loop_dim; ++i)
+            {
+                for (std::size_t j = 0; j < inner_loop_dim; ++j)
+                {
+                    result.data()[pos + inner_stride] = f(result.data()[pos],
+                                                          result.data()[pos + inner_stride]);
+                    pos += outer_stride;
+                }
+                pos += inner_stride;
+            }
+            return std::move(result);
+        }
+    }
 
     /**
      * Accumulate and flatten array
@@ -102,10 +106,13 @@ namespace xt
      *
      * @return returns xarray<T> filled with accumulated values
      */
-    template <class F, class E>
-    auto accumulate(F&& f, E&& e)
+    template <class F, class E, class ES = DEFAULT_STRATEGY_ACCUMULATORS,
+              typename std::enable_if_t<!std::is_integral<ES>::value, int> = 0>
+    inline auto accumulate(F&& f, E&& e, ES evaluation_strategy = ES())
     {
-        return accumulate_greedy(std::forward<F>(f), std::forward<E>(e));
+        // Note we need to check is_integral above in order to prohibit ES = int, and not taking the std::size_t
+        // overload below!
+        return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), evaluation_strategy);
     }
 
     /**
@@ -118,10 +125,10 @@ namespace xt
      *
      * @return returns xarray<T> filled with accumulated values
      */
-    template <class F, class E>
-    auto accumulate(F&& f, E&& e, std::size_t axis)
+    template <class F, class E, class ES = DEFAULT_STRATEGY_ACCUMULATORS>
+    inline auto accumulate(F&& f, E&& e, std::size_t axis, ES evaluation_strategy = ES())
     {
-        return accumulate_greedy(std::forward<F>(f), std::forward<E>(e), axis);
+        return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), axis, evaluation_strategy);
     }
 
 }
