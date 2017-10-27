@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XEXPRESSION_HPP
-#define XEXPRESSION_HPP
+#ifndef XTENSOR_EXPRESSION_HPP
+#define XTENSOR_EXPRESSION_HPP
 
 #include <cstddef>
 #include <type_traits>

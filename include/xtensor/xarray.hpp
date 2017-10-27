@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XARRAY_HPP
-#define XARRAY_HPP
+#ifndef XTENSOR_ARRAY_HPP
+#define XTENSOR_ARRAY_HPP
 
 #include <algorithm>
 #include <initializer_list>

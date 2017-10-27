@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XBUFFER_ADAPTOR_HPP
-#define XBUFFER_ADAPTOR_HPP
+#ifndef XTENSOR_BUFFER_ADAPTOR_HPP
+#define XTENSOR_BUFFER_ADAPTOR_HPP
 
 #include <algorithm>
 #include <functional>

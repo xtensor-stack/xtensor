@@ -304,6 +304,21 @@ More generally, one can use the ``xt::reduce(function, input, axes)`` which allo
 of an arbitrary binary function for the reduction. The binary function must be cummutative and
 associative up to rounding errors.
 
+I/0
+---
+
+These options determine the way floating point numbers, tensors and other xtensor expressions are displayed.
+
++-----------------------------------------------+-----------------------------------------------+
+|            Python 3 - numpy                   |                C++ 14 - xtensor               |
++===============================================+===============================================+
+| ``np.set_printoptions(precision=4)``          | ``xt::print_options::set_precision(4)``       |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.set_printoptions(threshold=5)``          | ``xt::print_options::set_threshold(5)``       |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.set_printoptions(edgeitems=3)``          | ``xt::print_options::set_edgeitems(3)``       |
++-----------------------------------------------+-----------------------------------------------+
+
 Mathematical functions
 ----------------------
 

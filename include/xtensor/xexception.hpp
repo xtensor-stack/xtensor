@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XEXCEPTION_HPP
-#define XEXCEPTION_HPP
+#ifndef XTENSOR_EXCEPTION_HPP
+#define XTENSOR_EXCEPTION_HPP
 
 #include <exception>
 #include <iterator>

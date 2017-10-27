@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XLAYOUT_HPP
-#define XLAYOUT_HPP
+#ifndef XTENSOR_LAYOUT_HPP
+#define XTENSOR_LAYOUT_HPP
 
 namespace xt
 {

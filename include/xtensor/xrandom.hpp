@@ -10,8 +10,8 @@
  * @brief functions to obtain xgenerators generating random numbers with given shape
  */
 
-#ifndef XRANDOM_HPP
-#define XRANDOM_HPP
+#ifndef XTENSOR_RANDOM_HPP
+#define XTENSOR_RANDOM_HPP
 
 #include <functional>
 #include <random>

@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XASSIGN_HPP
-#define XASSIGN_HPP
+#ifndef XTENSOR_ASSIGN_HPP
+#define XTENSOR_ASSIGN_HPP
 
 #include <algorithm>
 

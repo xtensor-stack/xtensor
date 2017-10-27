@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XGENERATOR_HPP
-#define XGENERATOR_HPP
+#ifndef XTENSOR_GENERATOR_HPP
+#define XTENSOR_GENERATOR_HPP
 
 #include <algorithm>
 #include <cstddef>

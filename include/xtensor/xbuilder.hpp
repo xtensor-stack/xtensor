@@ -10,8 +10,8 @@
  * @brief standard mathematical functions for xexpressions
  */
 
-#ifndef XBUILDER_HPP
-#define XBUILDER_HPP
+#ifndef XTENSOR_BUILDER_HPP
+#define XTENSOR_BUILDER_HPP
 
 #include <array>
 #include <cmath>

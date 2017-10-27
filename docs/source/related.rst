@@ -326,6 +326,14 @@ The xsimd_ project provides a unified API for making use of the SIMD features of
 
 xsimd_ is an optional dependency to ``xtensor`` which enable SIMD vectorization of xtensor operations. This feature is enabled with the ``XTENSOR_USE_XSIMD`` compilation flag, which is set to *false* by default.
 
+xtl
+---
+
+.. image:: xtl.svg
+   :alt: xtl
+
+The xtl_ project, the only dependency of ``xtensor`` is a C++ template library holding the implementation of basic tools used accross the libraries in the QuantStack ecosystem.
+
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
@@ -334,3 +342,4 @@ xsimd_ is an optional dependency to ``xtensor`` which enable SIMD vectorization 
 .. _xtensor-blas: https://github.com/QuantStack/xtensor-blas
 .. _xtensor-fftw: https://github.com/egpbos/xtensor-fftw
 .. _xsimd: https://github.com/egpbos/xsimd
+.. _xtl: https://github.com/QuantStack/xtl

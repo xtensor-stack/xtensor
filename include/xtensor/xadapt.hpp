@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XADAPT_HPP
-#define XADAPT_HPP
+#ifndef XTENSOR_ADAPT_HPP
+#define XTENSOR_ADAPT_HPP
 
 #include <array>
 #include <cstddef>

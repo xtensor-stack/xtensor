@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XSTRIDES_HPP
-#define XSTRIDES_HPP
+#ifndef XTENSOR_STRIDES_HPP
+#define XTENSOR_STRIDES_HPP
 
 #include <cstddef>
 #include <functional>

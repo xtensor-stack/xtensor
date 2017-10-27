@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XBROADCAST_HPP
-#define XBROADCAST_HPP
+#ifndef XTENSOR_BROADCAST_HPP
+#define XTENSOR_BROADCAST_HPP
 
 #include <algorithm>
 #include <array>

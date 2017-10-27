@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XEVAL_HPP
-#define XEVAL_HPP
+#ifndef XTENSOR_EVAL_HPP
+#define XTENSOR_EVAL_HPP
 
 #include "xarray.hpp"
 #include "xtensor.hpp"
