@@ -71,7 +71,7 @@ namespace xt
     {
     public:
 
-        transpose_error(const std::string& msg);
+        explicit transpose_error(const std::string& msg);
 
         virtual const char* what() const noexcept;
 

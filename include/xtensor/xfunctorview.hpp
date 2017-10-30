@@ -146,7 +146,7 @@ namespace xt
         using reverse_iterator = xfunctor_iterator<functor_type, typename xexpression_type::reverse_iterator>;
         using const_reverse_iterator = xfunctor_iterator<functor_type, typename xexpression_type::const_reverse_iterator>;
 
-        xfunctorview(CT) noexcept;
+        explicit xfunctorview(CT) noexcept;
 
         template <class Func, class E>
         xfunctorview(Func&&, E&&) noexcept;

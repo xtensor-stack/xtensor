@@ -17,7 +17,7 @@ namespace xt
     struct static_string
     {
         template <std::size_t N>
-        constexpr static_string(const char (&a)[N]) noexcept
+        explicit constexpr static_string(const char (&a)[N]) noexcept
             : data(a), size(N - 1)
         {
         }
