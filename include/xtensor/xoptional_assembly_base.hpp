@@ -372,7 +372,7 @@ namespace xt
     template <class D>
     inline auto constexpr xoptional_assembly_base<D>::dimension() const noexcept -> size_type
     {
-        return value().size();
+        return value().dimension();
     }
 
     /**

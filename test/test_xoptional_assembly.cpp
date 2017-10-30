@@ -448,4 +448,24 @@ namespace xt
         EXPECT_EQ(d(1, 0), a(1, 0) + b(1, 0));
         EXPECT_EQ(d(1, 1), a(1, 1) + b(1, 1));
     }
+
+    TEST(xoptional_assembly, mixed_semantic)
+    {
+        using d_opt_ass_type = xoptional_assembly<xarray<double, layout_type::row_major>, xarray<bool, layout_type::row_major>>;
+        using opt = xoptional<double>;
+        d_opt_ass_type a = { { opt(1.), opt(2., false), opt(3., false), opt(4.) },
+                             { opt(5., false), opt(6.), opt(7.), opt(8.,false) } };
+        xarray_optional<double> b = { { opt(1.), opt(2.), opt(3., false), opt(4., false) },
+                                      { opt(5., false), opt(6.), opt(7.), opt(8.) } };
+
+        d_opt_ass_type res = a + b;
+        EXPECT_EQ(res(0, 0), opt(2.));
+        EXPECT_EQ(res(0, 1), opt(4., false));
+        EXPECT_EQ(res(0, 2), opt(6., false));
+        EXPECT_EQ(res(0, 3), opt(8., false));
+        EXPECT_EQ(res(1, 0), opt(10., false));
+        EXPECT_EQ(res(1, 1), opt(12.));
+        EXPECT_EQ(res(1, 2), opt(14.));
+        EXPECT_EQ(res(1, 3), opt(16., false));
+    }
 }
