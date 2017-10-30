@@ -441,7 +441,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::size() const noexcept -> size_type
     {
-        return data().size();
+        return compute_size(shape());
     }
 
     /**
