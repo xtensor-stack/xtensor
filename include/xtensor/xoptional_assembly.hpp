@@ -110,6 +110,79 @@ namespace xt
         friend class xoptional_assembly_base<xoptional_assembly<VE, FE>>;
     };
 
+    /******************************************
+     * xoptional_assembly_adaptor declaration *
+     ******************************************/
+
+    template <class VEC, class FEC>
+    class xoptional_assembly_adaptor;
+
+    template <class VEC, class FEC>
+    struct xcontainer_inner_types<xoptional_assembly_adaptor<VEC, FEC>>
+    {
+        using value_expression = std::remove_reference_t<VEC>;
+        using flag_expression = std::remove_reference_t<FEC>;;
+        using temporary_type = xoptional_assembly<value_expression, flag_expression>;
+    };
+
+    template <class VEC, class FEC>
+    struct xiterable_inner_types<xoptional_assembly_adaptor<VEC, FEC>>
+    {
+        using assembly_type = xoptional_assembly_adaptor<VEC, FEC>;
+        using inner_shape_type = typename std::decay_t<VEC>::inner_shape_type;
+        using stepper = xoptional_assembly_stepper<assembly_type, false>;
+        using const_stepper = xoptional_assembly_stepper<assembly_type, true>;
+    };
+
+    template <class VEC, class FEC>
+    class xoptional_assembly_adaptor : public xoptional_assembly_base<xoptional_assembly_adaptor<VEC, FEC>>,
+                                       public xcontainer_semantic<xoptional_assembly_adaptor<VEC, FEC>>
+    {
+    public:
+
+        using self_type = xoptional_assembly_adaptor<VEC, FEC>;
+        using base_type = xoptional_assembly_base<self_type>;
+        using semantic_base = xcontainer_semantic<self_type>;
+        using value_expression = typename base_type::value_expression;
+        using flag_expression = typename base_type::flag_expression;
+        using value_type = typename base_type::value_type;
+        using reference = typename base_type::reference;
+        using const_reference = typename base_type::const_reference;
+        using pointer = typename base_type::pointer;
+        using const_pointer = typename base_type::const_pointer;
+        using shape_type = typename base_type::shape_type;
+        using strides_type = typename base_type::strides_type;
+        using temporary_type = typename semantic_base::temporary_type;
+
+        template <class OVE, class OFE>
+        xoptional_assembly_adaptor(OVE&& ve, OFE&& fe);
+
+        ~xoptional_assembly_adaptor() = default;
+
+        xoptional_assembly_adaptor(const xoptional_assembly_adaptor&) = default;
+        xoptional_assembly_adaptor& operator=(const xoptional_assembly_adaptor&);
+
+        xoptional_assembly_adaptor(xoptional_assembly_adaptor&&) = default;
+        xoptional_assembly_adaptor& operator=(xoptional_assembly_adaptor&&);
+        xoptional_assembly_adaptor& operator=(temporary_type&&);
+
+        template <class E>
+        xoptional_assembly_adaptor& operator=(const xexpression<E>& e);
+
+    private:
+
+        value_expression& value_impl() noexcept;
+        const value_expression& value_impl() const noexcept;
+
+        flag_expression& has_value_impl() noexcept;
+        const flag_expression& has_value_impl() const noexcept;
+
+        VEC m_value;
+        FEC m_has_value;
+
+        friend class xoptional_assembly_base<xoptional_assembly_adaptor<VEC, FEC>>;
+    };
+
     /*************************************
      * xoptional_assembly implementation *
      *************************************/
@@ -277,6 +350,74 @@ namespace xt
 
     template <class VE, class FE>
     inline auto xoptional_assembly<VE, FE>::has_value_impl() const noexcept -> const flag_expression&
+    {
+        return m_has_value;
+    }
+
+    /*********************************************
+     * xoptional_assembly_adaptor implementation *
+     *********************************************/
+
+    template <class VEC, class FEC>
+    template <class OVE, class OFE>
+    inline xoptional_assembly_adaptor<VEC, FEC>::xoptional_assembly_adaptor(OVE&& ve, OFE&& fe)
+        : m_value(std::forward<OVE>(ve)), m_has_value(std::forward<OFE>(fe))
+    {
+    }
+
+    template <class VEC, class FEC>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(const self_type& rhs) -> self_type&
+    {
+        base_type::operator=(rhs);
+        m_value = rhs.m_value;
+        m_has_value = rhs.m_has_value;
+        return *this;
+    }
+
+    template <class VEC, class FEC>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(self_type&& rhs) -> self_type&
+    {
+        base_type::operator=(std::move(rhs));
+        m_value = rhs.m_value;
+        m_has_value = rhs.m_has_value;
+        return *this;
+    }
+
+    template <class VEC, class FEC>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(temporary_type&& tmp) -> self_type&
+    {
+        m_value = std::move(tmp.value());
+        m_has_value = std::move(tmp.has_value());
+        return *this;
+    }
+
+    template <class VEC, class FEC>
+    template <class E>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(const xexpression<E>& e) -> self_type&
+    {
+        return semantic_base::operator=(e);
+    }
+
+    template <class VEC, class FEC>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::value_impl() noexcept -> value_expression&
+    {
+        return m_value;
+    }
+
+    template <class VEC, class FEC>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::value_impl() const noexcept -> const value_expression&
+    {
+        return m_value;
+    }
+
+    template <class VEC, class FEC>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::has_value_impl() noexcept -> flag_expression&
+    {
+        return m_has_value;
+    }
+
+    template <class VEC, class FEC>
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::has_value_impl() const noexcept -> const flag_expression&
     {
         return m_has_value;
     }
