@@ -481,7 +481,6 @@ namespace xt
     }
     //@}
 
-
     /**
      * @name Data
      */
@@ -519,11 +518,11 @@ namespace xt
     }
 
     /**
-     * Returns a reference to the element at the specified position in the expression,
+     * Returns a reference to the element at the specified position in the container,
      * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
+     * @param args a list of indices specifying the position in the container. Indices
      * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
+     * of the container.
      * @exception std::out_of_range if the number of argument is greater than the number of dimensions
      * or if indices are out of bounds.
      */
@@ -536,11 +535,11 @@ namespace xt
     }
 
     /**
-     * Returns a constant reference to the element at the specified position in the expression,
+     * Returns a constant reference to the element at the specified position in the container,
      * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
+     * @param args a list of indices specifying the position in the container. Indices
      * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
+     * of the container.
      * @exception std::out_of_range if the number of argument is greater than the number of dimensions
      * or if indices are out of bounds.
      */

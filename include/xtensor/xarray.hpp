@@ -373,7 +373,12 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t));
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
+    //@}
 
+    /**
+     * Allocates and returns an xarray_container with the specified shape.
+     * @param s the shape of the xarray_container
+     */
     template <class EC, layout_type L, class SC, class Tag>
     template <class S>
     inline xarray_container<EC, L, SC, Tag> xarray_container<EC, L, SC, Tag>::from_shape(S&& s)
@@ -381,8 +386,6 @@ namespace xt
         shape_type shape = xtl::forward_sequence<shape_type>(s);
         return self_type(shape);
     }
-    //@}
-
 
     /**
      * @name Extended copy semantic

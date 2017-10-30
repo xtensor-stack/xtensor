@@ -61,8 +61,8 @@ namespace xt
         template <class T>
         struct split_optional_expression_impl<T, xoptional_expression_tag>
         {
-            using value_expression = typename std::decay_t<T>::value_expression;
-            using flag_expression = typename std::decay_t<T>::flag_expression;
+            using value_expression = decltype(std::declval<T>().value());
+            using flag_expression = decltype(std::declval<T>().has_value());
 
             template <class U>
             static inline value_expression value(U&& arg)
@@ -108,7 +108,7 @@ namespace xt
                 return value_expression(std::move(arg.data().value()), arg.shape());
             }
 
-            static inline value_expression has_value(OA arg)
+            static inline flag_expression has_value(OA arg)
             {
                 return flag_expression(std::move(arg.data().has_value()), arg.shape());
             }
@@ -166,7 +166,7 @@ namespace xt
                 return value_expression(std::move(arg.data().value()), arg.shape());
             }
 
-            static inline value_expression has_value(OT arg)
+            static inline flag_expression has_value(OT arg)
             {
                 return flag_expression(std::move(arg.data().has_value()), arg.shape());
             }
@@ -246,10 +246,19 @@ namespace xt
     auto sign(const xoptional<T, B>& e);
 
     template <class E>
-    auto value(E&&);
+    detail::value_expression_t<E> value(E&&);
 
     template <class E>
-    auto has_value(E&&);
+    detail::flag_expression_t<E> has_value(E&&);
+
+    template <>
+    class xexpression_assigner_base<xoptional_expression_tag>
+    {
+    public:
+
+        template <class E1, class E2>
+        static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
+    };
 
     /**********************
      * xoptional_function *
@@ -447,7 +456,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xoptional_function<F, R, CT...>::layout() const noexcept -> layout_type
     {
-        return m_func.layout;
+        return m_func.layout();
     }
 
     template <class F, class R, class... CT>
@@ -654,17 +663,44 @@ namespace xt
      ******************************************/
 
     template <class E>
-    inline auto value(E&& e)
+    inline auto value(E&& e) -> detail::value_expression_t<E>
     {
         return detail::split_optional_expression<E>::value(std::forward<E>(e));
     }
 
     template <class E>
-    inline auto has_value(E&& e)
+    inline auto has_value(E&& e) -> detail::flag_expression_t<E>
     {
         return detail::split_optional_expression<E>::has_value(std::forward<E>(e));
     }
 
+    template <class E1, class E2>
+    inline void xexpression_assigner_base<xoptional_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
+    {
+        E1& de1 = e1.derived_cast();
+        const E2& de2 = e2.derived_cast();
+
+        bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
+        if (trivial_broadcast)
+        {
+            using base_value_type1 = typename std::decay_t<decltype(value(de1))>::value_type;
+            using base_value_type2 = typename std::decay_t<decltype(value(de2))>::value_type;
+            constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
+            constexpr bool same_type = std::is_same<base_value_type1, base_value_type2>::value;
+            constexpr bool simd_size = xsimd::simd_traits<base_value_type1>::size > 1;
+            constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
+            constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
+            decltype(auto) bde1 = value(de1);
+            decltype(auto) hde1 = has_value(de1);
+            trivial_assigner<simd_assign>::run(bde1, value(de2));
+            trivial_assigner<false>::run(hde1, has_value(de2));
+        }
+        else
+        {
+            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(de1, de2);
+            assigner.run();
+        }
+    }
 }
 
 #endif

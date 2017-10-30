@@ -597,16 +597,7 @@ namespace xt
         {
             SCOPED_TRACE("incompatible shapes");
             shape_type s4 = {2, 1, 3, 2};
-            bool wit = false;
-            try
-            {
-                vec.broadcast_shape(s4);
-            }
-            catch (broadcast_error&)
-            {
-                wit = true;
-            }
-            EXPECT_TRUE(wit);
+            EXPECT_THROW(vec.broadcast_shape(s4), broadcast_error);
         }
     }
 

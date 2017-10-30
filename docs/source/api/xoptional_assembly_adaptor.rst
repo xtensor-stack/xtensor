@@ -4,17 +4,11 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor
-=======
+xoptional_assembly_adaptor
+==========================
 
-Defined in ``xtensor/xtensor.hpp``
+Defined in ``xtensor/xoptional_assembly.hpp``
 
-.. doxygenclass:: xt::xtensor_container
+.. doxygenclass:: xt::xoptional_assembly_adaptor
    :project: xtensor
    :members:
-
-.. doxygentypedef:: xt::xtensor
-   :project: xtensor
-
-.. doxygentypedef:: xt::xtensor_optional
-   :project: xtensor

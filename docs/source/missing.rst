@@ -65,6 +65,36 @@ outputs:
     {{  2,   4},
      {  4, N/A}}
 
+Optional assemblies
+-------------------
+
+The classes ``xoptional_assembly`` and ``xoptional_assembly_adaptor`` provide containers and adaptors holding missing values that are optimized
+for element-wise operations.
+Contrary to ``xtensor_optional`` and ``xarray_optional``, the optional assemblies hold two expressions, one holding the values, the other holding
+the mask for the missing values. The difference between ``xoptional_assembly`` and ``xoptional_assembly_adaptor`` is that the first one is the owner
+of the two expressions while the last one holds a reference on at least one of the two expressions.
+
+.. code:: cpp
+
+    xarray<double> v
+        {{ 1.0, 2.0 },
+         { 3.0, 4.0 }};
+
+    xarray<bool> hv
+        {{ true, true  },
+         { true, false }};
+
+    xoptional_assembly<xarray<double>, xarray<bool>>
+    assembly(v, vh);
+    std::cout << assembly << std::endl;
+
+outputs:
+
+.. code::
+
+    {{ 1,  2 },
+     { 3, N/A}}
+
 Handling expressions with missing values
 ----------------------------------------
 
