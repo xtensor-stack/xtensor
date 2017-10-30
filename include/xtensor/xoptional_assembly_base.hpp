@@ -29,6 +29,18 @@ namespace xt
      * xoptional_assembly_base *
      ***************************/
 
+     /**
+      * @class xcontainer
+      * @brief Base class for dense multidimensional optional assemblies.
+      *
+      * The xoptional_assembly_base class defines the interface for dense multidimensional
+      * optional assembly classes. Optional assembly classes hold optional values and are
+      * optimized for tensor operations. xoptional_assembly_base does not embed any data
+      * container, this responsibility is delegated to the inheriting classes.
+      *
+      * @tparam D The derived type, i.e. the inheriting class for which xoptional_assembly_base
+      *           provides the interface.
+      */
     template <class D>
     class xoptional_assembly_base : private xiterable<D>
     {
@@ -341,36 +353,61 @@ namespace xt
      * xoptional_assembly_base implementation *
      ******************************************/
 
+    /**
+     * @name Size and shape
+     */
+    //@{
+    /**
+     * Returns the number of element in the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::size() const noexcept -> size_type
     {
         return value().size();
     }
     
+    /**
+     * Returns the number of dimensions of the optional assembly.
+     */
     template <class D>
     inline auto constexpr xoptional_assembly_base<D>::dimension() const noexcept -> size_type
     {
         return value().size();
     }
 
+    /**
+     * Returns the shape of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::shape() const noexcept -> const inner_shape_type&
     {
         return value().shape();
     }
 
+    /**
+     * Returns the strides of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::strides() const noexcept -> const inner_strides_type&
     {
         return value().strides();
     }
 
+    /**
+     * Returns the backstrides of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return value().backstrides();
     }
+    //@}
 
+    /**
+     * Reshapes the optional assembly.
+     * @param shape the new shape
+     * @param force force reshaping, even if the shape stays the same (default: false)
+     */
     template <class D>
     template <class S>
     inline void xoptional_assembly_base<D>::reshape(const S& shape, bool force)
@@ -379,6 +416,11 @@ namespace xt
         has_value().reshape(shape, force);
     }
     
+    /**
+     * Reshapes the optional assembly.
+     * @param shape the new shape
+     * @param l the new layout_type
+     */
     template <class D>
     template <class S>
     inline void xoptional_assembly_base<D>::reshape(const S& shape, layout_type l)
@@ -387,6 +429,11 @@ namespace xt
         has_value().reshape(shape, l);
     }
     
+    /**
+     * Reshapes the optional assembly.
+     * @param shape the new shape
+     * @param strides the new strides
+     */
     template <class D>
     template <class S>
     inline void xoptional_assembly_base<D>::reshape(const S& shape, const strides_type& strides)
@@ -395,12 +442,26 @@ namespace xt
         has_value().reshape(shape, strides);
     }
 
+    /**
+     * Return the layout_type of the container
+     * @return layout_type of the container
+     */
     template <class D>
     inline layout_type xoptional_assembly_base<D>::layout() const noexcept
     {
         return value().layout();
     }
 
+    /**
+     * @name Data
+     */
+    //@{
+    /**
+     * Returns a reference to the element at the specified position in the optional assembly.
+     * @param args a list of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the optional assembly.
+     */
     template <class D>
     template <class... Args>
     inline auto xoptional_assembly_base<D>::operator()(Args... args) -> reference
@@ -408,6 +469,12 @@ namespace xt
         return reference(value()(args...), has_value()(args...));
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the optional assembly.
+     * @param args a list of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the optional assembly.
+     */
     template <class D>
     template <class... Args>
     inline auto xoptional_assembly_base<D>::operator()(Args... args) const -> const_reference
@@ -415,6 +482,15 @@ namespace xt
         return const_reference(value()(args...), has_value()(args...));
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the optional assembly,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the optional assembly.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
     template <class D>
     template <class... Args>
     inline auto xoptional_assembly_base<D>::at(Args... args) -> reference
@@ -422,6 +498,15 @@ namespace xt
         return reference(value().at(args...), has_value().at(args...));
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the optional assembly,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the optional assembly.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
     template <class D>
     template <class... Args>
     inline auto xoptional_assembly_base<D>::at(Args... args) const -> const_reference
@@ -429,6 +514,12 @@ namespace xt
         return const_reference(value().at(args...), has_value().at(args...));
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the optional assembly.
+     * @param index a sequence of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::operator[](const xindex& index) -> reference
     {
@@ -441,6 +532,12 @@ namespace xt
         return reference(value()[i], has_value()[i]);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the optional assembly.
+     * @param index a sequence of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::operator[](const xindex& index) const -> const_reference
     {
@@ -453,6 +550,13 @@ namespace xt
         return const_reference(value()[i], has_value()[i]);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the optional assembly.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
+     * than the number of dimensions of the optional assembly.
+     */
     template <class D>
     template <class It>
     inline auto xoptional_assembly_base<D>::element(It first, It last) -> reference
@@ -460,13 +564,30 @@ namespace xt
         return reference(value().element(first, last), has_value().element(first, last));
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the optional assembly.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
+     * than the number of dimensions of the optional assembly.
+     */
     template <class D>
     template <class It>
     inline auto xoptional_assembly_base<D>::element(It first, It last) const -> const_reference
     {
         return const_reference(value().element(first, last), has_value().element(first, last));
     }
+    //@}
 
+    /**
+     * @name Broadcasting
+     */
+    //@{
+    /**
+     * Broadcast the shape of the optional assembly to the specified parameter.
+     * @param shape the result shape
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
     template <class D>
     template <class S>
     inline bool xoptional_assembly_base<D>::broadcast_shape(S& shape) const
@@ -475,12 +596,18 @@ namespace xt
         return res && has_value().broadcast_shape(shape);
     }
 
+    /**
+     * Compares the specified strides with those of the optional assembly to see whether
+     * the broadcasting is trivial.
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
     template <class D>
     template <class S>
     inline bool xoptional_assembly_base<D>::is_trivial_broadcast(const S& strides) const noexcept
     {
         return value().is_trivial_broadcast(strides) && has_value().is_trivial_broadcast(strides);
     }
+    //@}
 
     template <class D>
     template <layout_type L>
@@ -610,24 +737,36 @@ namespace xt
         return const_reference(value().data_element(i), has_value().data_element(i));
     }
 
+    /**
+     * Return an expression for the values of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::value() noexcept -> value_expression&
     {
         return derived_cast().value_impl();
     }
 
+    /**
+     * Return a constant expression for the values of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::value() const noexcept -> const value_expression&
     {
         return derived_cast().value_impl();
     }
 
+    /**
+     * Return an expression for the missing mask of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::has_value() noexcept -> flag_expression&
     {
         return derived_cast().has_value_impl();
     }
 
+    /**
+     * Return a constant expression for the missing mask of the optional assembly.
+     */
     template <class D>
     inline auto xoptional_assembly_base<D>::has_value() const noexcept -> const flag_expression&
     {

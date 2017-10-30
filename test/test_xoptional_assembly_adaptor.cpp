@@ -207,7 +207,6 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major storage iterator");
-            // TODO: initialize rma directly when xoptional constructors are explicit
             xarray<int, layout_type::row_major> v;
             xarray<bool, layout_type::row_major> hv;
             xoptional_assembly_adaptor<decltype(v)&, decltype(hv)&> rma(v, hv);
@@ -222,7 +221,6 @@ namespace xt
 
         {
             SCOPED_TRACE("column_major storage iterator");
-            // TODO: initialize cma directly when xoptional constructors are explicit
             xarray<int, layout_type::row_major> v;
             xarray<bool, layout_type::row_major> hv;
             xoptional_assembly_adaptor<decltype(v)&, decltype(hv)&> cma(v, hv);

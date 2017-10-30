@@ -281,9 +281,7 @@ namespace xt
 
         {
             SCOPED_TRACE("row_major storage iterator");
-            // TODO: initialize rma directly when xoptional constructors are explicit
-            opt_ass_type rma;
-            rma.reshape({ 2, 2 });
+            opt_ass_type rma(opt_ass_type::shape_type({ 2, 2 }));
             std::copy(vec.cbegin(), vec.cend(), rma.begin<layout_type::row_major>());
             EXPECT_EQ(vec[0], rma(0, 0));
             EXPECT_EQ(vec[1], rma(0, 1));
@@ -294,9 +292,7 @@ namespace xt
 
         {
             SCOPED_TRACE("column_major storage iterator");
-            // TODO: initialize cma directly when xoptional constructors are explicit
-            cm_opt_ass_type cma;
-            cma.reshape({ 2, 2 });
+            cm_opt_ass_type cma(opt_ass_type::shape_type({ 2, 2 }));
             std::copy(vec.cbegin(), vec.cend(), cma.begin<layout_type::column_major>());
             EXPECT_EQ(vec[0], cma(0, 0));
             EXPECT_EQ(vec[1], cma(1, 0));

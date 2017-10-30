@@ -418,7 +418,7 @@ namespace xt
     }
 
     /**
-     * @defgroup bitwise_operators
+     * @defgroup bitwise_operators Bitwise operators
      */
 
     /**
