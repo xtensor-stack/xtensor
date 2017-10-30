@@ -14,6 +14,7 @@
 #include <vector>
 
 #include "xtl/xclosure.hpp"
+#include "xtl/xtype_traits.hpp"
 
 #include "xutils.hpp"
 
@@ -117,7 +118,7 @@ namespace xt
     using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
 
     template <class... E>
-    using has_xexpression = or_<is_xexpression<E>...>;
+    using has_xexpression = xtl::disjunction<is_xexpression<E>...>;
 
     /************
      * xclosure *

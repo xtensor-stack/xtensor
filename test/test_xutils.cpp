@@ -65,18 +65,6 @@ namespace xt
         EXPECT_EQ(8, accumulate(func, 0, t));
     }
 
-    TEST(utils, or)
-    {
-        using true_t = std::true_type;
-        using false_t = std::false_type;
-
-        using t1 = or_<false_t, false_t, false_t>;
-        using t2 = or_<false_t, true_t, false_t>;
-
-        ASSERT_TRUE(!t1::value);
-        ASSERT_TRUE(t2::value);
-    }
-
     template <class... T>
     auto foo(const std::tuple<T...>& t)
     {
