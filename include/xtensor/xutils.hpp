@@ -20,6 +20,8 @@
 #include <utility>
 #include <vector>
 
+#include "xtl/xtype_traits.hpp"
+
 #include "xtensor_config.hpp"
 
 namespace xt
@@ -36,18 +38,6 @@ namespace xt
 
     template <class F, class R, class... T>
     R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()));
-
-    template <class... T>
-    struct or_;
-
-    template <class... T>
-    struct and_;
-
-    template <bool... B>
-    struct or_c;
-
-    template <bool... B>
-    struct and_c;
 
     template <std::size_t I, class... Args>
     constexpr decltype(auto) argument(Args&&... args) noexcept;
@@ -165,50 +155,6 @@ namespace xt
     {
         return detail::accumulate_impl<0, F, R, T...>(f, init, t);
     }
-
-    /**********************
-     * or_ implementation *
-     **********************/
-
-    template <>
-    struct or_<> : std::integral_constant<bool, false>
-    {
-    };
-
-    template <class T, class... Ts>
-    struct or_<T, Ts...>
-        : std::integral_constant<bool, T::value || or_<Ts...>::value>
-    {
-    };
-
-    /***********************
-     * and_ implementation *
-     ***********************/
-
-    template <>
-    struct and_<> : std::integral_constant<bool, true>
-    {
-    };
-
-    template <class T, class... Ts>
-    struct and_<T, Ts...>
-        : std::integral_constant<bool, T::value && and_<Ts...>::value>
-    {
-    };
-
-    /**********************************
-     * or_c and and_c implementations *
-     **********************************/
-
-    template <bool... B>
-    struct or_c : or_<std::integral_constant<bool, B>...>
-    {
-    };
-
-    template <bool... B>
-    struct and_c : and_<std::integral_constant<bool, B>...>
-    {
-    };
 
     /***************************
      * argument implementation *
@@ -479,7 +425,7 @@ namespace xt
         };
 
         template <class... S>
-        using only_array = and_<is_array<S>...>;
+        using only_array = xtl::conjunction<is_array<S>...>;
 
         // The promote_index meta-function returns std::vector<promoted_value_type> in the
         // general case and an array of the promoted value type and maximal size if all

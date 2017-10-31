@@ -13,6 +13,8 @@
 #include <type_traits>
 #include <utility>
 
+#include "xtl/xtype_traits.hpp"
+
 #include "xutils.hpp"
 
 namespace xt
@@ -66,7 +68,7 @@ namespace xt
     using disable_xslice = typename std::enable_if<!is_xslice<E>::value, R>::type;
 
     template <class... E>
-    using has_xslice = or_<is_xslice<E>...>;
+    using has_xslice = xtl::disjunction<is_xslice<E>...>;
 
     /**********************
      * xrange declaration *
