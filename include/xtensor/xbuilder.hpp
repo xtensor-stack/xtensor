@@ -29,6 +29,7 @@
 #include "xbroadcast.hpp"
 #include "xfunction.hpp"
 #include "xgenerator.hpp"
+#include "xoperation.hpp"
 
 namespace xt
 {
@@ -270,8 +271,8 @@ namespace xt
     template <class T>
     inline auto linspace(T start, T stop, std::size_t num_samples = 50, bool endpoint = true) noexcept
     {
-        T step = (stop - start) / T(num_samples - (endpoint ? 1 : 0));
-        return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step), {num_samples});
+        double step = double(stop - start) / double(num_samples - (endpoint ? 1 : 0));
+        return cast<T>(detail::make_xgenerator(detail::arange_impl<double>(double(start), double(stop), step), {num_samples}));
     }
 
     /**
@@ -287,7 +288,7 @@ namespace xt
     template <class T>
     inline auto logspace(T start, T stop, std::size_t num_samples, T base = 10, bool endpoint = true) noexcept
     {
-        return pow(std::forward<T>(base), linspace(start, stop, num_samples, endpoint));
+        return cast<T>(pow(base, linspace(start, stop, num_samples, endpoint)));
     }
 
     namespace detail
