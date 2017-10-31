@@ -53,6 +53,9 @@ namespace xt
         template <class... Args>
         using common_size_type_t = typename common_size_type<Args...>::type;
 
+        template <bool... B>
+        using conjunction_c = xtl::conjunction<std::integral_constant<bool, B>...>;
+
         /**************************
          * common_difference type *
          **************************/
@@ -160,7 +163,7 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
 
         static constexpr layout_type static_layout = compute_layout(std::decay_t<CT>::static_layout...);
-        static constexpr bool contiguous_layout = xtl::conjunction<std::integral_constant<bool, std::decay_t<CT>::contiguous_layout>...>::value;
+        static constexpr bool contiguous_layout = detail::conjunction_c<std::decay_t<CT>::contiguous_layout...>::value;
 
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
