@@ -1560,7 +1560,6 @@ namespace xt
     template <class E>
     inline auto mean(E&& e) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
         return sum(std::forward<E>(e)) / static_cast<double>(size);
     }
@@ -1569,7 +1568,6 @@ namespace xt
     template <class E, class I>
     inline auto mean(E&& e, std::initializer_list<I> axes) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
         auto s = sum(std::forward<E>(e), axes);
         return std::move(s) / static_cast<double>(size / s.size());
@@ -1578,7 +1576,6 @@ namespace xt
     template <class E, class I, std::size_t N>
     inline auto mean(E&& e, const I (&axes)[N]) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
         auto s = sum(std::forward<E>(e), axes);
         return std::move(s) / static_cast<double>(size / s.size());
