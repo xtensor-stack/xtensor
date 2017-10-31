@@ -17,7 +17,17 @@ Breaking changes
   `#482 <https://github.com/QuantStack/xtensor/pull/482>`_
 - Change ``edge_items`` print option to ``edgeitems`` for better numpy consistency.
   `#489 <https://github.com/QuantStack/xtensor/pull/489>`_.
-- xtensor now depends on ``xtl`` version `~0.3.1`.
+- xtensor now depends on ``xtl`` version `~0.3.3`.
+
+New features
+------------
+
+- Support for parsing the ``npy`` file format.
+  `#465 <https://github.com/QuantStack/xtensor/pull/465>`_
+- Creation of optional expressions from value and boolean expressions (optional assembly).
+  `#496 <https://github.com/QuantStack/xtensor/pull/496>`_
+- Support for the explicit cast of expressions with different value types
+  `#491 <https://github.com/QuantStack/xtensor/pull/491>`_
 
 Other changes
 ~~~~~~~~~~~~~
@@ -31,6 +41,8 @@ Other changes
   `#473 <https://github.com/QuantStack/xtensor/pull/473>`_.
 - More efficient optional expression system.
   `#467 <https://github.com/QuantStack/xtensor/pull/467>`_.
+- Workaround for a compiler bug in Visual Studio 2017
+  `#490 <https://github.com/QuantStack/xtensor/pull/490>`_
 
 0.12.1
 ------
