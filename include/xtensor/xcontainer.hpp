@@ -13,6 +13,7 @@
 #include <functional>
 #include <numeric>
 #include <stdexcept>
+#include <iostream>
 
 #include "xtl/xsequence.hpp"
 
@@ -352,11 +353,11 @@ namespace xt
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
 
         template <class S = shape_type>
-        void reshape(const S& shape, bool force = false);
+        void reshape(S&& shape, bool force = false);
         template <class S = shape_type>
-        void reshape(const S& shape, layout_type l);
+        void reshape(S&& shape, layout_type l);
         template <class S = shape_type>
-        void reshape(const S& shape, const strides_type& strides);
+        void reshape(S&& shape, const strides_type& strides);
 
         layout_type layout() const noexcept;
 
@@ -1177,7 +1178,7 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(const S& shape, bool force)
+    inline void xstrided_container<D>::reshape(S&& shape, bool force)
     {
         if (m_shape.size() != shape.size() || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
@@ -1200,14 +1201,14 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(const S& shape, layout_type l)
+    inline void xstrided_container<D>::reshape(S&& shape, layout_type l)
     {
         if (base_type::static_layout != layout_type::dynamic && l != base_type::static_layout)
         {
             throw std::runtime_error("Cannot change layout_type if template parameter not layout_type::dynamic.");
         }
         m_layout = l;
-        reshape(shape, true);
+        reshape(std::forward<S>(shape), true);
     }
 
     /**
@@ -1217,7 +1218,7 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(const S& shape, const strides_type& strides)
+    inline void xstrided_container<D>::reshape(S&& shape, const strides_type& strides)
     {
         if (base_type::static_layout != layout_type::dynamic)
         {

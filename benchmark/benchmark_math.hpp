@@ -18,7 +18,7 @@
 #include "xtensor/xtensor.hpp"
 
 // For how many sizes should math functions be tested?
-#define MATH_RANGE 10, 10
+#define MATH_RANGE 10, 10 << 3
 
 namespace xt
 {
@@ -76,7 +76,7 @@ namespace xt
 
             while(state.KeepRunning())
             {
-                xt::noalias(res) = f(lhs, rhs);
+                benchmark::DoNotOptimize(xt::noalias(res) = f(lhs, rhs));
             }
         }
 
@@ -90,12 +90,12 @@ namespace xt
 
             while(state.KeepRunning())
             {
-                xt::noalias(res) = f(lhs);
+                benchmark::DoNotOptimize(xt::noalias(res) = f(lhs));
             }
         }
 
         template <class F>
-        void math_ref_2(benchmark::State& state)
+        inline auto math_ref_2(benchmark::State& state)
         {
             auto f = F();
             xtensor<double, 2> lhs, rhs, res;
@@ -106,13 +106,13 @@ namespace xt
             {
                 for (std::size_t i = 0; i < size; ++i)
                 {
-                    res.data()[i] = f(lhs.data()[i], rhs.data()[i]);
+                    benchmark::DoNotOptimize(res.data()[i] = f(lhs.data()[i], res.data()[i]));
                 }
             }
         }
 
         template <class F>
-        void math_ref_1(benchmark::State& state)
+        inline void math_ref_1(benchmark::State& state)
         {
             auto f = F();
             xtensor<double, 2> lhs, rhs, res;
@@ -123,7 +123,7 @@ namespace xt
             {
                 for (std::size_t i = 0; i < size; ++i)
                 {
-                    res.data()[i] = f(lhs.data()[i]);
+                    benchmark::DoNotOptimize(res.data()[i] = f(lhs.data()[i]));
                 }
             }
         }

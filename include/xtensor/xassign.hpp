@@ -292,7 +292,7 @@ namespace xt
         size_type size = de2.dimension();
         shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
         bool trivial_broadcast = de2.broadcast_shape(shape);
-        e1.derived_cast().reshape(shape);
+        e1.derived_cast().reshape(std::move(shape));
         return trivial_broadcast;
     }
 
