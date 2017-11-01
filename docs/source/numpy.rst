@@ -306,8 +306,10 @@ More generally, one can use the ``xt::reduce(function, input, axes)`` which allo
 of an arbitrary binary function for the reduction. The binary function must be cummutative and
 associative up to rounding errors.
 
-I/0
+I/O
 ---
+
+**Print options**
 
 These options determine the way floating point numbers, tensors and other xtensor expressions are displayed.
 
@@ -319,6 +321,18 @@ These options determine the way floating point numbers, tensors and other xtenso
 | ``np.set_printoptions(threshold=5)``          | ``xt::print_options::set_threshold(5)``       |
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.set_printoptions(edgeitems=3)``          | ``xt::print_options::set_edgeitems(3)``       |
++-----------------------------------------------+-----------------------------------------------+
+
+**Reading npy, csv file formats**
+
+Functions ``load_csv`` and ``dump_csv`` respectively take input and output streams as arguments.
+
++-----------------------------------------------+-----------------------------------------------+
+|            Python 3 - numpy                   |                C++ 14 - xtensor               |
++===============================================+===============================================+
+| ``np.load(file)``                             | ``xt::load_npy<double>(filename)``            |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.load_txt(filename, delimiter=',')``      | ``xt::load_csv<double>(stream)``              |
 +-----------------------------------------------+-----------------------------------------------+
 
 Mathematical functions

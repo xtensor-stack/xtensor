@@ -17,7 +17,7 @@ Breaking changes
   `#482 <https://github.com/QuantStack/xtensor/pull/482>`_
 - Change ``edge_items`` print option to ``edgeitems`` for better numpy consistency.
   `#489 <https://github.com/QuantStack/xtensor/pull/489>`_.
-- xtensor now depends on ``xtl`` version `~0.3.3`.
+- xtensor now depends on ``xtl`` version `~0.3.3` (instead of `0.2.x`).
 
 New features
 ------------
@@ -43,6 +43,10 @@ Other changes
   `#467 <https://github.com/QuantStack/xtensor/pull/467>`_.
 - Workaround for a compiler bug in Visual Studio 2017
   `#490 <https://github.com/QuantStack/xtensor/pull/490>`_
+- The ``size()`` method for containers now returns the total number of elements instead of the buffer size, which may differ when the smallest stride is greater than ``1``.
+  `#502 <https://github.com/QuantStack/xtensor/pull/502>`_
+- The behavior of ``linspace`` with integral types has been made consistent with numpy.
+  `#510 <https://github.com/QuantStack/xtensor/pull/510>`_
 
 0.12.1
 ------
