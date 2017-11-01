@@ -287,7 +287,7 @@ namespace xt
             EXPECT_EQ(vec[1], rma(0, 1));
             EXPECT_EQ(vec[2], rma(1, 0));
             EXPECT_EQ(vec[3], rma(1, 1));
-            EXPECT_EQ(vec.size(), std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>()));
+            EXPECT_EQ(vec.size(), std::size_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>())));
         }
 
         {
@@ -298,7 +298,7 @@ namespace xt
             EXPECT_EQ(vec[1], cma(1, 0));
             EXPECT_EQ(vec[2], cma(0, 1));
             EXPECT_EQ(vec[3], cma(1, 1));
-            EXPECT_EQ(vec.size(), std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>()));
+            EXPECT_EQ(vec.size(), std::size_t(std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>())));
         }
     }
 
