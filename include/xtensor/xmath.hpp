@@ -1472,7 +1472,7 @@ namespace xt
                     return a == b;
                 }
                 auto d = math::abs(a - b);
-                return d <= m_atol || d <= m_rtol * math::max(math::abs(a), math::abs(b));
+                return d <= m_atol || d <= m_rtol * std::max(math::abs(a), math::abs(b));
             }
 
             template <class U>
