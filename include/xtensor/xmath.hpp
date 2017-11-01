@@ -75,7 +75,7 @@ namespace xt
     {                                                                           \
         static auto exec(const T& arg)                                          \
         {                                                                       \
-            using std::NAME;                                                    \
+            using math::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
         using return_type = xt::detail::functor_return_type<T, R>;              \
@@ -85,12 +85,12 @@ namespace xt
         using simd_result_type = typename return_type::simd_type;               \
         constexpr result_type operator()(const T& arg) const                    \
         {                                                                       \
-            using std::NAME;                                                    \
+            using math::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
         constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
         {                                                                       \
-            using std::NAME;                                                    \
+            using math::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
         template <class U>                                                      \
@@ -109,7 +109,7 @@ namespace xt
     {                                                                           \
         static auto exec(const T& arg)                                          \
         {                                                                       \
-            using std::NAME;                                                    \
+            using math::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
         using argument_type = T;                                                \
@@ -118,12 +118,12 @@ namespace xt
         using simd_result_type = result_type;                                   \
         constexpr result_type operator()(const T& arg) const                    \
         {                                                                       \
-            using std::NAME;                                                    \
+            using math::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
         constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
         {                                                                       \
-            using std::NAME;                                                    \
+            using math::NAME;                                                    \
             return NAME(arg);                                                   \
         }                                                                       \
         template <class U>                                                      \
@@ -139,7 +139,7 @@ namespace xt
     {                                                                            \
         static auto exec(const T& arg1, const T& arg2)                           \
         {                                                                        \
-            using std::NAME;                                                     \
+            using math::NAME;                                                     \
             return NAME(arg1, arg2);                                             \
         }                                                                        \
         using return_type = xt::detail::functor_return_type<T, R>;               \
@@ -150,13 +150,13 @@ namespace xt
         using simd_result_type = typename return_type::simd_type;                \
         constexpr result_type operator()(const T& arg1, const T& arg2) const     \
         {                                                                        \
-            using std::NAME;                                                     \
+            using math::NAME;                                                     \
             return NAME(arg1, arg2);                                             \
         }                                                                        \
         constexpr simd_result_type simd_apply(const simd_value_type& arg1,       \
                                               const simd_value_type& arg2) const \
         {                                                                        \
-            using std::NAME;                                                     \
+            using math::NAME;                                                     \
             return NAME(arg1, arg2);                                             \
         }                                                                        \
         template <class U>                                                       \
@@ -175,7 +175,7 @@ namespace xt
     {                                                                            \
         static auto exec(const T& arg1, const T& arg2, const T& arg3)            \
         {                                                                        \
-            using std::NAME;                                                     \
+            using math::NAME;                                                    \
             return NAME(arg1, arg2, arg3);                                       \
         }                                                                        \
         using return_type = xt::detail::functor_return_type<T, R>;               \
@@ -189,14 +189,14 @@ namespace xt
                                          const T& arg2,                          \
                                          const T& arg3) const                    \
         {                                                                        \
-            using std::NAME;                                                     \
+            using math::NAME;                                                    \
             return NAME(arg1, arg2, arg3);                                       \
         }                                                                        \
         constexpr simd_result_type simd_apply(const simd_value_type& arg1,       \
                                               const simd_value_type& arg2,       \
                                               const simd_value_type& arg3) const \
         {                                                                        \
-            using std::NAME;                                                     \
+            using math::NAME;                                                    \
             return NAME(arg1, arg2, arg3);                                       \
         }                                                                        \
         template <class U>                                                       \
@@ -211,6 +211,93 @@ namespace xt
 
     namespace math
     {
+        using std::abs;
+        using std::fabs;
+
+        using std::cos;
+        using std::sin;
+        using std::tan;
+        using std::acos;
+        using std::asin;
+        using std::atan;
+
+        using std::cosh;
+        using std::sinh;
+        using std::tanh;
+        using std::acosh;
+        using std::asinh;
+        using std::atanh;
+
+        using std::sqrt;
+        using std::cbrt;
+
+        using std::exp;
+        using std::exp2;
+        using std::expm1;
+        using std::log;
+        using std::log2;
+        using std::log10;
+        using std::log1p;
+        using std::logb;
+        using std::ilogb;
+
+        using std::floor;
+        using std::ceil;
+        using std::trunc;
+        using std::round;
+        using std::lround;
+        using std::llround;
+        using std::rint;
+        using std::nearbyint;
+        using std::remainder;
+
+        using std::erf;
+        using std::erfc;
+        using std::erfc;
+        using std::tgamma;
+        using std::lgamma;
+
+        using std::conj;
+        using std::real;
+        using std::imag;
+        using std::arg;
+
+        using std::atan2;
+        using std::copysign;
+        using std::fdim;
+        using std::fmax;
+        using std::fmin;
+        using std::fmod;
+        using std::hypot;
+        using std::pow;
+
+        using std::fma;
+
+        using std::isnan;
+        using std::isinf;
+        using std::isfinite;
+        using std::fpclassify;
+
+        // Overload isinf, isnan and isfinite for complex datatypes,
+        // following the Python specification:
+        template <class T>
+        inline bool isinf(std::complex<T>& c)
+        {
+            return std::isinf(std::real(c)) || std::isinf(std::imag(c));
+        }
+
+        template <class T>
+        inline bool isnan(std::complex<T>& c)
+        {
+            return std::isnan(std::real(c)) || std::isinf(std::imag(c));
+        }
+
+        template <class T>
+        inline bool isfinite(std::complex<T>& c)
+        {
+            return !isinf(c) && !isnan(c);
+        }
+
         UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
         // The following specializations are needed to avoid 'ambiguous overload' errors,
         // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
@@ -1375,18 +1462,17 @@ namespace xt
 
             bool operator()(const T& a, const T& b) const
             {
-                using std::abs;
-
-                if (std::isnan(a) && std::isnan(b))
+                if(math::isnan(a) && math::isnan(b))
                 {
                     return m_equal_nan;
                 }
-                if (std::isinf(a) && std::isinf(b))
+                if(math::isinf(a) && math::isinf(b))
                 {
-                    return std::signbit(a) == std::signbit(b);
+                    // check for both infinity signs equal
+                    return a == b;
                 }
-                auto d = abs(a - b);
-                return d <= m_atol || d <= m_rtol * std::max(abs(a), abs(b));
+                auto d = math::abs(a - b);
+                return d <= m_atol || d <= m_rtol * math::max(math::abs(a), math::abs(b));
             }
 
             template <class U>

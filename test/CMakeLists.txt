@@ -90,6 +90,7 @@ set(XTENSOR_TESTS
     test_xbuilder.cpp
     test_xconcepts.cpp
     test_xcontainer_semantic.cpp
+    test_xcomplex.cpp
     test_xcsv.cpp
     test_xdynamicview.cpp
     test_xeval.cpp
