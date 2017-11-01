@@ -13,40 +13,47 @@ Changelog
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
-- The API for ``xbuffer_adaptor`` has changed. The template parameter is the type of the buffer, not just the value type.
-  `#482 <https://github.com/QuantStack/xtensor/pull/482>`_
-- Change ``edge_items`` print option to ``edgeitems`` for better numpy consistency.
+- The API for ``xbuffer_adaptor`` has changed. The template parameter is the type of the buffer, not just the value type
+  `#482 <https://github.com/QuantStack/xtensor/pull/482>`_.
+- Change ``edge_items`` print option to ``edgeitems`` for better numpy consistency
   `#489 <https://github.com/QuantStack/xtensor/pull/489>`_.
-- xtensor now depends on ``xtl`` version `~0.3.3` (instead of `0.2.x`).
+- xtensor now depends on ``xtl`` version `~0.3.3`
+  `#508 <https://github.com/QuantStack/xtensor/pull/508>`_.
 
 New features
-------------
+~~~~~~~~~~~~
 
-- Support for parsing the ``npy`` file format.
-  `#465 <https://github.com/QuantStack/xtensor/pull/465>`_
-- Creation of optional expressions from value and boolean expressions (optional assembly).
-  `#496 <https://github.com/QuantStack/xtensor/pull/496>`_
+- Support for parsing the ``npy`` file format
+  `#465 <https://github.com/QuantStack/xtensor/pull/465>`_.
+- Creation of optional expressions from value and boolean expressions (optional assembly)
+  `#496 <https://github.com/QuantStack/xtensor/pull/496>`_.
 - Support for the explicit cast of expressions with different value types
-  `#491 <https://github.com/QuantStack/xtensor/pull/491>`_
+  `#491 <https://github.com/QuantStack/xtensor/pull/491>`_.
 
 Other changes
 ~~~~~~~~~~~~~
 
-- Various fixes and improvements of the strided views.
-  `#480 <https://github.com/QuantStack/xtensor/pull/480>`_
-  `#481 <https://github.com/QuantStack/xtensor/pull/481>`_
-- Addition of broadcasting bitwise operators.
+- Addition of broadcasting bitwise operators
   `#459 <https://github.com/QuantStack/xtensor/pull/459>`_.
-- Migration of benchmarks to the Google benchmark framework.
-  `#473 <https://github.com/QuantStack/xtensor/pull/473>`_.
-- More efficient optional expression system.
+- More efficient optional expression system
   `#467 <https://github.com/QuantStack/xtensor/pull/467>`_.
+- Migration of benchmarks to the Google benchmark framework
+  `#473 <https://github.com/QuantStack/xtensor/pull/473>`_.
+- Container semantic and adaptor semantic merged
+  `#475 <https://github.com/QuantStack/xtensor/pull/475>`_.
+- Various fixes and improvements of the strided views
+  `#480 <https://github.com/QuantStack/xtensor/pull/480>`_.
+  `#481 <https://github.com/QuantStack/xtensor/pull/481>`_.
+- Assignment now performs basic type conversion
+  `#486 <https://github.com/QuantStack/xtensor/pull/486>`_.
 - Workaround for a compiler bug in Visual Studio 2017
-  `#490 <https://github.com/QuantStack/xtensor/pull/490>`_
-- The ``size()`` method for containers now returns the total number of elements instead of the buffer size, which may differ when the smallest stride is greater than ``1``.
-  `#502 <https://github.com/QuantStack/xtensor/pull/502>`_
-- The behavior of ``linspace`` with integral types has been made consistent with numpy.
-  `#510 <https://github.com/QuantStack/xtensor/pull/510>`_
+  `#490 <https://github.com/QuantStack/xtensor/pull/490>`_.
+- MSVC 2017 workaround
+  `#492 <https://github.com/QuantStack/xtensor/pull/492>`_.
+- The ``size()`` method for containers now returns the total number of elements instead of the buffer size, which may differ when the smallest stride is greater than ``1``
+  `#502 <https://github.com/QuantStack/xtensor/pull/502>`_.
+- The behavior of ``linspace`` with integral types has been made consistent with numpy
+  `#510 <https://github.com/QuantStack/xtensor/pull/510>`_.
 
 0.12.1
 ------
@@ -60,7 +67,7 @@ Other changes
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
-- ``xtensor`` now depends on ``xtl`` version `0.2.x`.
+- ``xtensor`` now depends on ``xtl`` version `0.2.x`
   `#421 <https://github.com/QuantStack/xtensor/pull/421>`_.
 
 New features
