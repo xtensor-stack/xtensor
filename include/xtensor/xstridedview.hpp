@@ -114,6 +114,16 @@ namespace xt
         const backstrides_type& backstrides() const noexcept;
         layout_type layout() const noexcept;
 
+        std::size_t offset() const noexcept
+        {
+            return m_offset;
+        }
+
+        void set_offset(std::size_t offset) noexcept
+        {
+            m_offset = offset;
+        }
+
         reference operator()();
         template <class... Args>
         reference operator()(Args... args);
@@ -1005,6 +1015,119 @@ namespace xt
 
         using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
         return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), offset);
+    }
+
+    template <class V>
+    class xaxis_view_iterator
+    {
+    public:
+        using self_type = xaxis_view_iterator<V>;
+        xaxis_view_iterator(V& v, std::size_t position,
+                            std::size_t increment)
+            : m_view(v),
+              m_offset(position),
+              m_increment(increment)
+        {
+        }
+
+        self_type& operator++()
+        {
+            m_offset += m_increment;
+            return *this;
+        }
+
+        self_type operator++(int)
+        {
+            self_type tmp(*this);
+            ++(*this);
+            return tmp;
+        }
+
+        V& operator*()
+        {
+            m_view.set_offset(m_offset);
+            return m_view;
+        }
+
+        bool equal(const self_type& rhs) const
+        {
+            return &m_view == &(rhs.m_view) && m_offset == rhs.m_offset;
+        }
+
+        V& m_view;
+        std::size_t m_offset;
+        std::size_t m_increment;
+    };
+
+    template <class V>
+    inline bool operator==(const xaxis_view_iterator<V>& lhs,
+                           const xaxis_view_iterator<V>& rhs)
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class V>
+    inline bool operator!=(const xaxis_view_iterator<V>& lhs,
+                           const xaxis_view_iterator<V>& rhs)
+    {
+        return !lhs.equal(rhs);
+    }
+
+    template <class E, std::size_t N>
+    class xaxis_view
+    {
+    public:
+        using view_type = std::decay_t<E>;
+
+        xaxis_view(E&& e, std::size_t increment, std::size_t end)
+            : m_view(std::forward<E>(e)), m_increment(increment), m_end(end)
+        {
+        }
+
+        auto begin()
+        {
+            return xaxis_view_iterator<view_type>(m_view, 0, m_increment);
+        }
+
+        auto end()
+        {
+            return xaxis_view_iterator<view_type>(m_view, m_end, m_increment);
+        }
+
+    private:
+        view_type m_view;
+        std::size_t m_increment;
+        std::size_t m_end;
+    };
+
+    template <std::size_t N, class E>
+    auto axis_view(E& e)
+    {
+        std::size_t dim_e = e.dimension();
+        std::size_t end = 1;
+        slice_vector sv(e);
+        for (std::size_t i = 0; i < dim_e - N - 1; i++)
+        {
+            sv.push_back(0);
+        }
+        sv.push_back(1); // trick to get the offset increment
+        for (std::size_t i = 0; i < N; i++)
+        {
+            sv.push_back(xt::all());
+        }
+
+        for (std::size_t i = 0; i < dim_e - N; i++)
+        {
+            end *= e.shape()[i];
+        }
+        auto v = dynamic_view(e, sv);
+
+        std::size_t increment = 0;
+        increment = v.offset();
+        v.set_offset(0);
+        end *= increment;
+
+        return xaxis_view<decltype(v), N>(std::move(v), increment, end);
     }
 }
 
