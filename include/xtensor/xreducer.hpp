@@ -149,9 +149,9 @@ namespace xt
     public:
 
         using self_type = xreducer<F, CT, X>;
-        using reduce_functor_type = typename F::reduce_functor_type;
-        using init_functor_type = typename F::init_functor_type;
-        using merge_functor_type = typename F::merge_functor_type;
+        using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
+        using init_functor_type = typename std::decay_t<F>::init_functor_type;
+        using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
         using xexpression_type = std::decay_t<CT>;
         using axes_type = X;
 
