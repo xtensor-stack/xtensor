@@ -40,6 +40,17 @@ namespace xt
             }
         }
     }
+    TEST(xreducer, functor_type)
+    {
+        auto sum = [](auto const & left, auto const & right){ return left + right; };
+        auto sum_functor = xt::make_xreducer_functor(sum);
+        xt::xarray<int> a = {{1,2,3}, {4,5,6}};
+        xt::xarray<int> a_sums = xt::reduce(std::move(sum_functor), a, {1});
+        xt::xarray<int> a_sums2 = xt::reduce(sum_functor, a, {1});
+        xt::xarray<int> expect = {6, 15};
+        EXPECT_EQ(a_sums, expect);
+        EXPECT_EQ(a_sums2, expect);
+    }
 
     TEST(xreducer, shape)
     {
