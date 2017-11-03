@@ -33,4 +33,3 @@ namespace xt
         EXPECT_ANY_THROW(vt.at(0, 0, 0, 0));
     }
 }
-

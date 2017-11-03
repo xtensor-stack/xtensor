@@ -82,7 +82,7 @@ namespace xt
 
     TYPED_TEST(container_semantic, a_times_b)
     {
-        operation_tester<std::multiplies<>,TypeParam > tester;
+        operation_tester<std::multiplies<>, TypeParam> tester;
 
         {
             SCOPED_TRACE("row_major * row_major");

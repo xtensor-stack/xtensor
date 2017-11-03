@@ -178,8 +178,8 @@ namespace xt
         size_type underlying_size(size_type dim) const;
 
         xtl::xclosure_pointer<self_type&> operator&() &;
-        xtl::xclosure_pointer<const self_type&> operator&() const&;
-        xtl::xclosure_pointer<self_type> operator&() && ;
+        xtl::xclosure_pointer<const self_type&> operator&() const &;
+        xtl::xclosure_pointer<self_type> operator&() &&;
 
     private:
 
@@ -377,7 +377,7 @@ namespace xt
     inline auto xview<CT, S...>::operator=(const xexpression<E>& e) -> self_type&
     {
         bool cond = (e.derived_cast().shape().size() == dimension()) &&
-                    std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
+            std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
         if (!cond)
         {
             semantic_base::operator=(broadcast(e.derived_cast(), shape()));
@@ -660,13 +660,13 @@ namespace xt
     }
 
     template <class CT, class... S>
-    inline auto xview<CT, S...>::operator&() const& -> xtl::xclosure_pointer<const self_type&>
+    inline auto xview<CT, S...>::operator&() const & -> xtl::xclosure_pointer<const self_type&>
     {
         return xtl::closure_pointer(*this);
     }
 
     template <class CT, class... S>
-    inline auto xview<CT, S...>::operator&() && ->xtl::xclosure_pointer<self_type>
+    inline auto xview<CT, S...>::operator&() && -> xtl::xclosure_pointer<self_type>
     {
         return xtl::closure_pointer(std::move(*this));
     }

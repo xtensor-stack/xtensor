@@ -139,7 +139,7 @@ namespace xt
     TEST(xbuilder, linspace_integer)
     {
         xarray<int> ls = linspace<int>(0, 10, 13);
-        xarray<int> expected = {0,  0,  1,  2,  3,  4,  5,  5,  6,  7,  8,  9, 10};
+        xarray<int> expected = {0, 0, 1, 2, 3, 4, 5, 5, 6, 7, 8, 9, 10};
 
         ASSERT_TRUE(all(equal(ls, expected)));
     }

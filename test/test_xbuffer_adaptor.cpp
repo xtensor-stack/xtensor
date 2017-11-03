@@ -177,4 +177,3 @@ namespace xt
         delete[] data;
     }
 }
-

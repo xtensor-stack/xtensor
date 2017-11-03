@@ -54,7 +54,7 @@ namespace xt
 
     TEST(xnorm, complex)
     {
-        std::complex<double> c{ 3.0, -4.0 };
+        std::complex<double> c{3.0, -4.0};
 
         EXPECT_EQ(norm_l0(c), 1u);
         EXPECT_EQ(norm_lp(c, 0), 1.0);
@@ -113,4 +113,4 @@ namespace xt
         EXPECT_EQ(norm_induced_l1(a)(), 6.0);
         EXPECT_EQ(norm_induced_linf(a)(), 7.0);
     }
-} // namespace xt
+}  // namespace xt

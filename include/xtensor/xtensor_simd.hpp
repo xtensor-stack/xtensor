@@ -16,7 +16,7 @@
 
 #include "xsimd/xsimd.hpp"
 
-#else // XTENSOR_USE_XSIMD
+#else  // XTENSOR_USE_XSIMD
 
 namespace xsimd
 {
@@ -108,7 +108,7 @@ namespace xsimd
     }
 }
 
-#endif // XTENSOR_USE_XSIMD
+#endif  // XTENSOR_USE_XSIMD
 
 namespace xt
 {
@@ -139,7 +139,6 @@ namespace xt
 
     template <class A1, class A2>
     using driven_align_mode_t = typename detail::driven_align_mode_impl<A1, A2>::type;
-
 }
 
 #endif

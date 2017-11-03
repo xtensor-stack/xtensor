@@ -145,7 +145,7 @@ namespace xt
     {
         using type = xarray<int>;
     };
-    
+
     template <>
     struct int_rebind<xtensor<double, 2>>
     {
@@ -159,7 +159,7 @@ namespace xt
     {
         using int_tensor = int_rebind_t<TypeParam>;
         using shape_type = typename int_tensor::shape_type;
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         int_tensor a(shape, 14);
         int_tensor b(shape, 15);
         EXPECT_EQ((a & b)(0, 0), a(0, 0) & b(0, 0));
@@ -175,7 +175,7 @@ namespace xt
     {
         using int_tensor = int_rebind_t<TypeParam>;
         using shape_type = typename int_tensor::shape_type;
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         int_tensor a(shape, 14);
         int_tensor b(shape, 15);
         EXPECT_EQ((a | b)(0, 0), a(0, 0) | b(0, 0));
@@ -191,7 +191,7 @@ namespace xt
     {
         using int_tensor = int_rebind_t<TypeParam>;
         using shape_type = typename int_tensor::shape_type;
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         int_tensor a(shape, 14);
         int_tensor b(shape, 15);
         EXPECT_EQ((a ^ b)(0, 0), a(0, 0) ^ b(0, 0));
@@ -202,12 +202,12 @@ namespace xt
         int sa = 24;
         EXPECT_EQ((sa ^ b)(0, 0), sa ^ b(0, 0));
     }
-    
+
     TYPED_TEST(operation, bitwise_not)
     {
         using int_tensor = int_rebind_t<TypeParam>;
         using shape_type = typename int_tensor::shape_type;
-        shape_type shape = { 3, 2 };
+        shape_type shape = {3, 2};
         int_tensor a(shape, 15);
         EXPECT_EQ((~a)(0, 0), ~(a(0, 0)));
     }

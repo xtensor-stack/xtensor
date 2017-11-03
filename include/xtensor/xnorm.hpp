@@ -48,7 +48,7 @@ namespace xt
         inline auto   norm_l1(T t) noexcept   { return std::abs(t); }   \
         inline auto   norm_l2(T t) noexcept   { return std::abs(t); }   \
         inline auto   norm_linf(T t) noexcept { return std::abs(t); }   \
-        inline auto   norm_sq(T t) noexcept   { return t*t; }
+        inline auto   norm_sq(T t) noexcept   { return t * t; }
 
     XTENSOR_DEFINE_SIGNED_NORMS(signed char)
     XTENSOR_DEFINE_SIGNED_NORMS(short)
@@ -81,7 +81,7 @@ namespace xt
         inline T    norm_l1(T t) noexcept   { return t; }               \
         inline T    norm_l2(T t) noexcept   { return t; }               \
         inline T    norm_linf(T t) noexcept { return t; }               \
-        inline auto norm_sq(T t) noexcept   { return t*t; }
+        inline auto norm_sq(T t) noexcept   { return t * t; }
 
     XTENSOR_DEFINE_UNSIGNED_NORMS(unsigned char)
     XTENSOR_DEFINE_UNSIGNED_NORMS(unsigned short)
@@ -104,7 +104,7 @@ namespace xt
     {
         return t.real() != 0 || t.imag() != 0;
     }
-    
+
     /**
      * \brief L1 norm of a complex number.
      */
@@ -123,7 +123,7 @@ namespace xt
     {
         return std::abs(t);
     }
-    
+
     /**
      * \brief Squared norm of a complex number.
      * Equivalent to <tt>std::norm(t)</tt> (yes, the C++ standard really defines
@@ -156,7 +156,7 @@ namespace xt
                    : std::pow(std::abs(t.real()), static_cast<T>(p)) +
                      std::pow(std::abs(t.imag()), static_cast<T>(p));
     }
-    
+
     /**
      * \brief Lp norm of a complex number.
      */
@@ -164,8 +164,8 @@ namespace xt
     inline auto norm_lp(const std::complex<T>& t, double p) noexcept
     {
         return p == 0
-                   ? norm_lp_to_p(t, p)
-                   : std::pow(norm_lp_to_p(t, p), 1.0 / p);
+            ? norm_lp_to_p(t, p)
+            : std::pow(norm_lp_to_p(t, p), 1.0 / p);
     }
 
     /***********************************
@@ -173,53 +173,51 @@ namespace xt
      ***********************************/
 
 #ifdef X_OLD_CLANG
-# define XTENSOR_NORM_FUNCTION_AXES(NAME)                                              \
-    template <class E, class I>                                                        \
-    inline auto NAME(E&& e, std::initializer_list<I> axes) noexcept                    \
-    {                                                                                  \
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;            \
-        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes));       \
+#define XTENSOR_NORM_FUNCTION_AXES(NAME)                                         \
+    template <class E, class I>                                                  \
+    inline auto NAME(E&& e, std::initializer_list<I> axes) noexcept              \
+    {                                                                            \
+        using axes_type = std::vector<typename std::decay_t<E>::size_type>;      \
+        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes)); \
     }
 
 #else
-# define XTENSOR_NORM_FUNCTION_AXES(NAME)                                              \
-    template <class E, class I, std::size_t N>                                         \
-    inline auto NAME(E&& e, const I (&axes)[N]) noexcept                               \
-    {                                                                                  \
-        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;          \
-        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes));       \
+#define XTENSOR_NORM_FUNCTION_AXES(NAME)                                         \
+    template <class E, class I, std::size_t N>                                   \
+    inline auto NAME(E&& e, const I(&axes)[N]) noexcept                          \
+    {                                                                            \
+        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;    \
+        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes)); \
     }
 #endif
 
 
 #define XTENSOR_EMPTY
 #define XTENSOR_COMMA ,
-#define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC)   \
-    template <class E, class X>                                                        \
-    inline auto NAME(E&& e, X&& axes) noexcept                                         \
-    {                                                                                  \
-        using value_type = typename std::decay_t<E>::value_type;                       \
-        using result_type = RESULT_TYPE;                                               \
-                                                                                       \
-        auto reduce_func = [](result_type const & r, value_type const & v)             \
-                           {                                                           \
-                               return REDUCE_EXPR(r REDUCE_OP NAME(v));                \
-                           };                                                          \
-        auto init_func = [](value_type const & v)                                      \
-                         {                                                             \
-                             return NAME(v);                                           \
-                         };                                                            \
-        return reduce(make_xreducer_functor(std::move(reduce_func),                    \
-                                            std::move(init_func),                      \
-                                            MERGE_FUNC<result_type>()),                \
-                      std::forward<E>(e), std::forward<X>(axes));                      \
-    }                                                                                  \
-                                                                                       \
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>                      \
-    inline auto NAME(E&& e) noexcept                                                   \
-    {                                                                                  \
-        return NAME(std::forward<E>(e), arange(e.dimension()));                        \
-    }                                                                                  \
+#define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC) \
+    template <class E, class X>                                                      \
+    inline auto NAME(E&& e, X&& axes) noexcept                                       \
+    {                                                                                \
+        using value_type = typename std::decay_t<E>::value_type;                     \
+        using result_type = RESULT_TYPE;                                             \
+                                                                                     \
+        auto reduce_func = [](result_type const& r, value_type const& v) {           \
+            return REDUCE_EXPR(r REDUCE_OP NAME(v));                                 \
+        };                                                                           \
+        auto init_func = [](value_type const& v) {                                   \
+            return NAME(v);                                                          \
+        };                                                                           \
+        return reduce(make_xreducer_functor(std::move(reduce_func),                  \
+                                            std::move(init_func),                    \
+                                            MERGE_FUNC<result_type>()),              \
+                      std::forward<E>(e), std::forward<X>(axes));                    \
+    }                                                                                \
+                                                                                     \
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>                    \
+    inline auto NAME(E&& e) noexcept                                                 \
+    {                                                                                \
+        return NAME(std::forward<E>(e), arange(e.dimension()));                      \
+    }                                                                                \
     XTENSOR_NORM_FUNCTION_AXES(NAME)
 
     XTENSOR_NORM_FUNCTION(norm_l0, unsigned long long, XTENSOR_EMPTY, +, std::plus)
@@ -244,7 +242,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X>
-    auto norm_l0(E&& e, X && axes) noexcept;
+    auto norm_l0(E&& e, X&& axes) noexcept;
 
     /**
      * @ingroup red_functions
@@ -335,20 +333,19 @@ namespace xt
         using value_type = typename std::decay_t<E>::value_type;
         using result_type = norm_type_t<std::decay_t<E>>;
 
-        auto reduce_func = [p](result_type const & r, value_type const & v)
-                           {
-                               return r + norm_lp_to_p(v, p);
-                           };
-        auto init_func = [p](value_type const & v)
-                         {
-                             return norm_lp_to_p(v, p);
-                         };
+        auto reduce_func = [p](result_type const& r, value_type const& v) {
+            return r + norm_lp_to_p(v, p);
+        };
+
+        auto init_func = [p](value_type const& v) {
+            return norm_lp_to_p(v, p);
+        };
         return reduce(make_xreducer_functor(std::move(reduce_func), std::move(init_func), std::plus<result_type>()),
                       std::forward<E>(e), std::forward<X>(axes));
     }
 
     template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_lp_to_p(E && e, double p) noexcept
+    inline auto norm_lp_to_p(E&& e, double p) noexcept
     {
         return norm_lp_to_p(std::forward<E>(e), p, arange(e.dimension()));
     }
@@ -385,12 +382,12 @@ namespace xt
     inline auto norm_lp(E&& e, double p, X&& axes)
     {
         XTENSOR_PRECONDITION(p != 0,
-            "norm_lp(): p must be nonzero, use norm_l0() instead.");
-        return pow(norm_lp_to_p(std::forward<E>(e), p, std::forward<X>(axes)), 1.0/p);
+                             "norm_lp(): p must be nonzero, use norm_l0() instead.");
+        return pow(norm_lp_to_p(std::forward<E>(e), p, std::forward<X>(axes)), 1.0 / p);
     }
 
     template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_lp(E && e, double p) noexcept
+    inline auto norm_lp(E&& e, double p) noexcept
     {
         return norm_lp(std::forward<E>(e), p, arange(e.dimension()));
     }
@@ -423,7 +420,7 @@ namespace xt
     inline auto norm_induced_l1(E&& e)
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,
-            "norm_induced_l1(): only applicable to matrices (e.dimension() must be 2).");
+                             "norm_induced_l1(): only applicable to matrices (e.dimension() must be 2).");
         return norm_linf(norm_l1(std::forward<E>(e), {0}));
     }
 
@@ -439,10 +436,10 @@ namespace xt
     inline auto norm_induced_linf(E&& e)
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,
-            "norm_induced_linf(): only applicable to matrices (e.dimension() must be 2).");
+                             "norm_induced_linf(): only applicable to matrices (e.dimension() must be 2).");
         return norm_linf(norm_l1(std::forward<E>(e), {1}));
     }
 
-} // namespace xt
+}  // namespace xt
 
 #endif

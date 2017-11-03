@@ -266,7 +266,7 @@ namespace xt
             using type = xoptional_expression_tag;
         };
 
-        template<>
+        template <>
         struct expression_tag_and<xoptional_expression_tag, xtensor_expression_tag>
             : expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
         {
