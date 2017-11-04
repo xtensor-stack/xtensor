@@ -106,6 +106,15 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
+    TEST(xreducer, sum_tensor)
+    {
+        xtensor<double, 2> m = {{1, 2}, {3, 4}};
+        xarray<double> res = xt::sum(m, {0});
+        EXPECT_EQ(res.dimension(), 1);
+        EXPECT_EQ(res(0), 4.0);
+        EXPECT_EQ(res(1), 6.0);
+    }
+
     TEST(xreducer, sum2)
     {
         xarray<double> u = ones<double>({2, 4});
