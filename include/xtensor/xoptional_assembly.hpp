@@ -134,7 +134,7 @@ namespace xt
     struct xcontainer_inner_types<xoptional_assembly_adaptor<VEC, FEC>>
     {
         using value_expression = std::remove_reference_t<VEC>;
-        using flag_expression = std::remove_reference_t<FEC>;;
+        using flag_expression = std::remove_reference_t<FEC>;
         using temporary_type = xoptional_assembly<value_expression, flag_expression>;
     };
 
@@ -304,7 +304,7 @@ namespace xt
         : m_value(value.value()), m_has_value(value.has_value())
     {
     }
-    
+
     /** 
      * Allocates an xoptional_assembly from the specified value expression. The flag
      * expression is initialized as if no value is missing.
@@ -359,7 +359,7 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
-            : nested_copy(this->template begin<layout_type::row_major>(), t);
+                  : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -373,7 +373,7 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
-            : nested_copy(this->template begin<layout_type::row_major>(), t);
+                  : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -387,7 +387,7 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
-            : nested_copy(this->template begin<layout_type::row_major>(), t);
+                  : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -401,7 +401,7 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
-            : nested_copy(this->template begin<layout_type::row_major>(), t);
+                  : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
     /**
@@ -415,7 +415,7 @@ namespace xt
         base_type::reshape(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
-            : nested_copy(this->template begin<layout_type::row_major>(), t);
+                  : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
     //@}
 

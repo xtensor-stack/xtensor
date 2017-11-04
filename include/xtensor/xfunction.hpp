@@ -193,7 +193,7 @@ namespace xt
         using reverse_iterator = typename iterable_base::reverse_iterator;
         using const_reverse_iterator = typename iterable_base::const_reverse_iterator;
 
-        template <class Func>
+        template <class Func, class U = std::enable_if<!std::is_base_of<Func, self_type>::value>>
         xfunction(Func&& f, CT... e) noexcept;
 
         size_type size() const noexcept;
@@ -448,7 +448,7 @@ namespace xt
      * @param e the \ref xexpression arguments
      */
     template <class F, class R, class... CT>
-    template <class Func>
+    template <class Func, class U>
     inline xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept
         : m_e(e...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(1))),
           m_shape_computed(false)

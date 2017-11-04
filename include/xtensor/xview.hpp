@@ -756,12 +756,10 @@ namespace xt
     inline auto xview<CT, S...>::make_index(It first, It last) const -> base_index_type
     {
         auto index = xtl::make_sequence<typename xexpression_type::shape_type>(m_e.dimension(), 0);
-        auto func1 = [&first](const auto& s)
-        {
+        auto func1 = [&first](const auto& s) {
             return get_slice_value(s, first);
         };
-        auto func2 = [](const auto& s)
-        {
+        auto func2 = [](const auto& s) {
             return xt::value(s, 0);
         };
         for (size_type i = 0; i != m_e.dimension(); ++i)

@@ -29,18 +29,18 @@ namespace xt
      * xoptional_assembly_base *
      ***************************/
 
-     /**
-      * @class xcontainer
-      * @brief Base class for dense multidimensional optional assemblies.
-      *
-      * The xoptional_assembly_base class defines the interface for dense multidimensional
-      * optional assembly classes. Optional assembly classes hold optional values and are
-      * optimized for tensor operations. xoptional_assembly_base does not embed any data
-      * container, this responsibility is delegated to the inheriting classes.
-      *
-      * @tparam D The derived type, i.e. the inheriting class for which xoptional_assembly_base
-      *           provides the interface.
-      */
+    /**
+     * @class xcontainer
+     * @brief Base class for dense multidimensional optional assemblies.
+     *
+     * The xoptional_assembly_base class defines the interface for dense multidimensional
+     * optional assembly classes. Optional assembly classes hold optional values and are
+     * optimized for tensor operations. xoptional_assembly_base does not embed any data
+     * container, this responsibility is delegated to the inheriting classes.
+     *
+     * @tparam D The derived type, i.e. the inheriting class for which xoptional_assembly_base
+     *           provides the interface.
+     */
     template <class D>
     class xoptional_assembly_base : private xiterable<D>
     {
@@ -54,7 +54,7 @@ namespace xt
         using base_value_type = typename value_expression::value_type;
         using base_reference = typename value_expression::reference;
         using base_const_reference = typename value_expression::const_reference;
-        
+
         using flag_expression = typename inner_types::flag_expression;
         using flag_type = typename flag_expression::value_type;
         using flag_reference = typename flag_expression::reference;
@@ -80,12 +80,12 @@ namespace xt
         using iterable_base = xiterable<D>;
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
-        
+
         static constexpr layout_type static_layout = value_expression::static_layout;
         static constexpr bool contiguous_layout = value_expression::contiguous_layout;
 
         using expression_tag = xoptional_expression_tag;
-        
+
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
         template <layout_type L>
@@ -365,7 +365,7 @@ namespace xt
     {
         return value().size();
     }
-    
+
     /**
      * Returns the number of dimensions of the optional assembly.
      */
@@ -415,7 +415,7 @@ namespace xt
         value().reshape(shape, force);
         has_value().reshape(shape, force);
     }
-    
+
     /**
      * Reshapes the optional assembly.
      * @param shape the new shape
@@ -428,7 +428,7 @@ namespace xt
         value().reshape(shape, l);
         has_value().reshape(shape, l);
     }
-    
+
     /**
      * Reshapes the optional assembly.
      * @param shape the new shape
@@ -804,7 +804,7 @@ namespace xt
     }
 
     template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator++(int) ->self_type
+    inline auto xoptional_assembly_iterator<D, C>::operator++(int) -> self_type
     {
         self_type tmp(*this);
         ++(*this);
@@ -834,7 +834,7 @@ namespace xt
     }
 
     template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator->() const -> pointer
+    inline auto xoptional_assembly_iterator<D, C>::operator-> () const -> pointer
     {
         return &(this->operator*());
     }

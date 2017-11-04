@@ -325,8 +325,7 @@ namespace xt
 
             inline value_type access_impl(xindex idx) const
             {
-                auto match = [this, &idx](auto& arr)
-                {
+                auto match = [this, &idx](auto& arr) {
                     if (idx[this->m_axis] >= arr.shape()[this->m_axis])
                     {
                         idx[this->m_axis] -= arr.shape()[this->m_axis];
@@ -335,8 +334,7 @@ namespace xt
                     return true;
                 };
 
-                auto get = [&idx](auto& arr)
-                {
+                auto get = [&idx](auto& arr) {
                     return arr[idx];
                 };
 
@@ -386,8 +384,7 @@ namespace xt
 
             inline value_type access_impl(xindex idx) const
             {
-                auto get_item = [&idx](auto& arr)
-                {
+                auto get_item = [&idx](auto& arr) {
                     return arr[idx];
                 };
                 size_type i = idx[m_axis];
@@ -525,7 +522,7 @@ namespace xt
         inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
         {
 #if defined X_OLD_CLANG || defined _MSC_VER
-            const std::array<std::size_t, sizeof...(E)> shape { e.shape()[0]... };
+            const std::array<std::size_t, sizeof...(E)> shape = {e.shape()[0]...};
             return std::make_tuple(
                 detail::make_xgenerator(
                     detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
@@ -536,7 +533,7 @@ namespace xt
             return std::make_tuple(
                 detail::make_xgenerator(
                     detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
-                    { e.shape()[0]... }
+                    {e.shape()[0]...}
                 )...
             );
 #endif

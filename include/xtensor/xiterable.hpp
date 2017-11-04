@@ -611,7 +611,7 @@ namespace xt
     /**
      * @name Iterators
      */
-     //@{
+    //@{
     /**
      * Returns an iterator to the first element of the expression.
      * @tparam L layout used for the traversal. Default value is \c DEFAULT_LAYOUT.

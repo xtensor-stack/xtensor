@@ -279,7 +279,7 @@ namespace xt
         };
     }
 
-    // Note: MSVC bug workaround. Cannot just define 
+    // Note: MSVC bug workaround. Cannot just define
     // template <class... E>
     // using all_xscalar = xtl::conjunction<is_xscalar<std::decay_t<E>>...>;
 
