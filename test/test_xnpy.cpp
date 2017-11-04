@@ -52,13 +52,13 @@ namespace xt
     {
         std::ifstream stream1(fn1, std::ios::in | std::ios::binary);
         std::vector<uint8_t> fn1_contents((std::istreambuf_iterator<char>(stream1)),
-                                           std::istreambuf_iterator<char>());
+                                          std::istreambuf_iterator<char>());
 
         std::ifstream stream2(fn2, std::ios::in | std::ios::binary);
         std::vector<uint8_t> fn2_contents((std::istreambuf_iterator<char>(stream2)),
-                                           std::istreambuf_iterator<char>());
+                                          std::istreambuf_iterator<char>());
         return std::equal(fn1_contents.begin(), fn1_contents.end(), fn2_contents.begin()) &&
-               fn1_contents.size() == fn2_contents.size();
+            fn1_contents.size() == fn2_contents.size();
     }
 
     std::string get_filename()
@@ -71,15 +71,15 @@ namespace xt
     TEST(xnpy, dump)
     {
         std::string filename = get_filename();
-        xarray<bool> barr = {{{ 0, 0, 1},
-                              { 1, 1, 0},
-                              { 1, 0, 1}},
-                             {{ 1, 1, 0},
-                              { 0, 1, 0},
-                              { 0, 1, 0}},
-                             {{ 0, 0, 1},
-                              { 1, 1, 1},
-                              { 0, 0, 0}}};
+        xarray<bool> barr = {{{0, 0, 1},
+                              {1, 1, 0},
+                              {1, 0, 1}},
+                             {{1, 1, 0},
+                              {0, 1, 0},
+                              {0, 1, 0}},
+                             {{0, 0, 1},
+                              {1, 1, 1},
+                              {0, 0, 0}}};
 
         xtensor<uint64_t, 1> ularr = {12ul, 14ul, 16ul, 18ul, 1234321ul};
         dump_npy(filename, barr);
@@ -93,5 +93,4 @@ namespace xt
         EXPECT_TRUE(compare_binary_files(filename, "files/xnpy_files/unsignedlong.npy"));
         std::remove(filename.c_str());
     }
-
 }

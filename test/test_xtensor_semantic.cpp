@@ -72,4 +72,3 @@ namespace xt
         EXPECT_EQ(dres, dt);
     }
 }
-

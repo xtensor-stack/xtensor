@@ -379,7 +379,7 @@ namespace xt
         using shape_type = tensor_type::shape_type;
         tensor_type arr1{shape_type{2}};
         std::fill(arr1.begin(), arr1.end(), 6);
-        const tensor_type arr2=arr1;
+        const tensor_type arr2 = arr1;
         auto view = xt::view(arr2, 0);
         auto iter = view.begin();
         auto iter_end = view.end();

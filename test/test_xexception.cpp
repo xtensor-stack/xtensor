@@ -24,22 +24,22 @@ namespace xt
             XTENSOR_ASSERT_MSG(false, "Intentional error");
             FAIL() << "No exception thrown.";
         }
-        catch(std::runtime_error & e)
+        catch (std::runtime_error& e)
         {
             std::string expected("Assertion error!\nIntentional error");
             std::string message(e.what());
-            EXPECT_TRUE(0 == expected.compare(message.substr(0,expected.size())));
+            EXPECT_TRUE(0 == expected.compare(message.substr(0, expected.size())));
         }
         try
         {
             XTENSOR_PRECONDITION(false, "Intentional error");
             FAIL() << "No exception thrown.";
         }
-        catch(std::runtime_error & e)
+        catch (std::runtime_error& e)
         {
             std::string expected("Precondition violation!\nIntentional error");
             std::string message(e.what());
-            EXPECT_TRUE(0 == expected.compare(message.substr(0,expected.size())));
+            EXPECT_TRUE(0 == expected.compare(message.substr(0, expected.size())));
         }
     }
-} // namespace xt
+}  // namespace xt

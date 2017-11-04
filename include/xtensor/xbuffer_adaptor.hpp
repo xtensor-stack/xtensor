@@ -238,7 +238,7 @@ namespace xt
         }
 
         template <class CP, class A>
-        template <class P> 
+        template <class P>
         inline xbuffer_storage<CP, A>::xbuffer_storage(P&& data, size_type size, const allocator_type&)
             : p_data(std::forward<P>(data)), m_size(size)
         {

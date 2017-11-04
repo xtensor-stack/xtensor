@@ -40,11 +40,11 @@ namespace xt
 
         {
             SCOPED_TRACE("from shape");
-            std::array<std::size_t, 3> shp = { 5, 4, 2 };
-            std::vector<std::size_t> shp_as_vec = { 5, 4, 2 };
-            auto ca = cm_opt_ass_type::from_shape({ 3, 2, 1 });
+            std::array<std::size_t, 3> shp = {5, 4, 2};
+            std::vector<std::size_t> shp_as_vec = {5, 4, 2};
+            auto ca = cm_opt_ass_type::from_shape({3, 2, 1});
             auto cb = cm_opt_ass_type::from_shape(shp);
-            std::vector<std::size_t> expected_shape = { 3, 2, 1 };
+            std::vector<std::size_t> expected_shape = {3, 2, 1};
             EXPECT_EQ(expected_shape, ca.shape());
             EXPECT_EQ(shp_as_vec, cb.shape());
         }
@@ -101,19 +101,19 @@ namespace xt
     {
         using opt = xoptional<int>;
         opt_ass_type a0(opt(1));
-        opt_ass_type a1({ opt(1), opt(2, false) });
-        opt_ass_type a2({ { opt(1, true), opt(2, false) },{ opt(2), opt(4, true) },{ opt(5), opt(6) } });
+        opt_ass_type a1({opt(1), opt(2, false)});
+        opt_ass_type a2({{opt(1, true), opt(2, false)}, {opt(2), opt(4, true)}, {opt(5), opt(6)}});
         EXPECT_EQ(opt(1, true), a0());
         EXPECT_EQ(opt(2, false), a1(1));
         EXPECT_EQ(opt(4), a2(1, 1));
     }
-    
+
     TEST(xoptional_assembly, expression_constructor)
     {
         using opt = xoptional<int>;
-        array_type value = { { 1, 2}, {3, 4} };
-        flag_array_type flag = { {true, false}, {false, true} };
-        
+        array_type value = {{1, 2}, {3, 4}};
+        flag_array_type flag = {{true, false}, {false, true}};
+
         opt_ass_type a(std::move(value), flag);
         EXPECT_EQ(a(0, 0), opt(1, true));
         EXPECT_EQ(a(0, 1), opt(2, false));
@@ -192,7 +192,7 @@ namespace xt
     TEST(xoptional_assembly, access)
     {
         using opt = xoptional<int>;
-        opt_ass_type a = { { opt(1), opt(2, false)}, {opt(3, false), opt(4)} };
+        opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         EXPECT_EQ(a(0, 0), opt(1, true));
         EXPECT_EQ(a(0, 1), opt(2, false));
         EXPECT_EQ(a(1, 0), opt(3, false));
@@ -202,7 +202,7 @@ namespace xt
     TEST(xoptional_assembly, at)
     {
         using opt = xoptional<int>;
-        opt_ass_type a = { { opt(1), opt(2, false) },{ opt(3, false), opt(4) } };
+        opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         EXPECT_EQ(a.at(0, 0), opt(1, true));
         EXPECT_EQ(a.at(0, 1), opt(2, false));
         EXPECT_EQ(a.at(1, 0), opt(3, false));
@@ -213,8 +213,8 @@ namespace xt
     TEST(xoptional_assembly, element)
     {
         using opt = xoptional<int>;
-        opt_ass_type a = { { opt(1), opt(2, false) },{ opt(3, false), opt(4) } };
-        std::vector<std::size_t> v0({ 0, 0 }), v1({ 0, 1 }), v2({ 1, 0 }), v3({ 1, 1 });
+        opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
+        std::vector<std::size_t> v0({0, 0}), v1({0, 1}), v2({1, 0}), v3({1, 1});
         EXPECT_EQ(a.element(v0.begin(), v0.end()), opt(1, true));
         EXPECT_EQ(a.element(v1.begin(), v1.end()), opt(2, false));
         EXPECT_EQ(a.element(v2.begin(), v2.end()), opt(3, false));
@@ -224,8 +224,8 @@ namespace xt
     TEST(xoptional_assembly, indexed_access)
     {
         using opt = xoptional<int>;
-        opt_ass_type a = { { opt(1), opt(2, false) },{ opt(3, false), opt(4) } };
-        xindex i0({ 0,0 }), i1({ 0,1 }), i2({ 1,0 }), i3({ 1,1 });
+        opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
+        xindex i0({0, 0}), i1({0, 1}), i2({1, 0}), i3({1, 1});
         EXPECT_EQ(a[i0], opt(1, true));
         EXPECT_EQ(a[i1], opt(2, false));
         EXPECT_EQ(a[i2], opt(3, false));
@@ -236,7 +236,7 @@ namespace xt
     {
         using shape_type = typename opt_ass_type::shape_type;
 
-        shape_type s = { 3, 1, 4, 2 };
+        shape_type s = {3, 1, 4, 2};
         opt_ass_type vec(s);
 
         {
@@ -249,8 +249,8 @@ namespace xt
 
         {
             SCOPED_TRACE("different shape");
-            shape_type s2 = { 3, 5, 1, 2 };
-            shape_type s2r = { 3, 5, 4, 2 };
+            shape_type s2 = {3, 5, 1, 2};
+            shape_type s2r = {3, 5, 4, 2};
             bool res = vec.broadcast_shape(s2);
             EXPECT_EQ(s2, s2r);
             EXPECT_FALSE(res);
@@ -258,15 +258,15 @@ namespace xt
 
         {
             SCOPED_TRACE("incompatible shapes");
-            shape_type s4 = { 2, 1, 3, 2 };
+            shape_type s4 = {2, 1, 3, 2};
             EXPECT_THROW(vec.broadcast_shape(s4), broadcast_error);
         }
 
         {
-            shape_type s2 = { 3, 1, 4, 2 };
+            shape_type s2 = {3, 1, 4, 2};
             vec.reshape(s2);
             SCOPED_TRACE("different dimensions");
-            shape_type s3 = { 5, 3, 1, 4, 2 };
+            shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
             bool res = vec.broadcast_shape(s3);
             EXPECT_EQ(s3, s3r);
@@ -277,11 +277,11 @@ namespace xt
     TEST(xoptional_assembly, iterator)
     {
         using opt = xoptional<int>;
-        std::vector<opt> vec = { opt(1), opt(2, false), opt(3, false), opt(4) };
+        std::vector<opt> vec = {opt(1), opt(2, false), opt(3, false), opt(4)};
 
         {
             SCOPED_TRACE("row_major storage iterator");
-            opt_ass_type rma(opt_ass_type::shape_type({ 2, 2 }));
+            opt_ass_type rma(opt_ass_type::shape_type({2, 2}));
             std::copy(vec.cbegin(), vec.cend(), rma.begin<layout_type::row_major>());
             EXPECT_EQ(vec[0], rma(0, 0));
             EXPECT_EQ(vec[1], rma(0, 1));
@@ -292,7 +292,7 @@ namespace xt
 
         {
             SCOPED_TRACE("column_major storage iterator");
-            cm_opt_ass_type cma(opt_ass_type::shape_type({ 2, 2 }));
+            cm_opt_ass_type cma(opt_ass_type::shape_type({2, 2}));
             std::copy(vec.cbegin(), vec.cend(), cma.begin<layout_type::column_major>());
             EXPECT_EQ(vec[0], cma(0, 0));
             EXPECT_EQ(vec[1], cma(1, 0));
@@ -432,7 +432,7 @@ namespace xt
     TEST(xoptional_assembly, semantic)
     {
         using opt = xoptional<int>;
-        dyn_opt_ass_type a = { { opt(1), opt(2, false) },{ opt(3, false), opt(4) } };
+        dyn_opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         dyn_opt_ass_type b(a);
 
         dyn_opt_ass_type c = a + b;
@@ -453,10 +453,10 @@ namespace xt
     {
         using d_opt_ass_type = xoptional_assembly<xarray<double, layout_type::row_major>, xarray<bool, layout_type::row_major>>;
         using opt = xoptional<double>;
-        d_opt_ass_type a = { { opt(1.), opt(2., false), opt(3., false), opt(4.) },
-                             { opt(5., false), opt(6.), opt(7.), opt(8.,false) } };
-        xarray_optional<double> b = { { opt(1.), opt(2.), opt(3., false), opt(4., false) },
-                                      { opt(5., false), opt(6.), opt(7.), opt(8.) } };
+        d_opt_ass_type a = {{opt(1.), opt(2., false), opt(3., false), opt(4.)},
+                            {opt(5., false), opt(6.), opt(7.), opt(8., false)}};
+        xarray_optional<double> b = {{opt(1.), opt(2.), opt(3., false), opt(4., false)},
+                                     {opt(5., false), opt(6.), opt(7.), opt(8.)}};
 
         d_opt_ass_type res = a + b;
         EXPECT_EQ(res(0, 0), opt(2.));

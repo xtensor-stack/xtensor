@@ -15,8 +15,8 @@
 #include <type_traits>
 
 #include "xarray.hpp"
-#include "xtensor.hpp"
 #include "xbuffer_adaptor.hpp"
+#include "xtensor.hpp"
 
 namespace xt
 {
@@ -51,7 +51,7 @@ namespace xt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
-     *        Possible values are ``no_ownerhsip()`` or ``accept_ownership()``
+     *        Possible values are ``no_ownerhsip()`` or ``acquire_ownership()``
      * @param shape the shape of the xarray_adaptor
      * @param l the layout_type of the xarray_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
@@ -65,7 +65,7 @@ namespace xt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
-     *        Possible values are ``no_ownerhsip()`` or ``accept_ownership()``
+     *        Possible values are ``no_ownerhsip()`` or ``acquire_ownership()``
      * @param shape the shape of the xarray_adaptor
      * @param strides the strides of the xarray_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
@@ -105,7 +105,7 @@ namespace xt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
-     *        Possible values are ``no_ownerhsip()`` or ``accept_ownership()``
+     *        Possible values are ``no_ownerhsip()`` or ``acquire_ownership()``
      * @param shape the shape of the xtensor_adaptor
      * @param l the layout_type of the xtensor_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
@@ -121,7 +121,7 @@ namespace xt
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
-     *        Possible values are ``no_ownerhsip()`` or ``accept_ownership()``
+     *        Possible values are ``no_ownerhsip()`` or ``acquire_ownership()``
      * @param shape the shape of the xtensor_adaptor
      * @param strides the strides of the xtensor_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
@@ -129,7 +129,7 @@ namespace xt
     template <class P, std::size_t N, class O, class A = std::allocator<std::remove_pointer_t<std::remove_reference_t<P>>>>
     xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, N, layout_type::dynamic>
     xadapt(P&& pointer, typename A::size_type size, O ownership,
-                const std::array<typename A::size_type, N>& shape, const std::array<typename A::size_type, N>& strides, const A& alloc = A());
+           const std::array<typename A::size_type, N>& shape, const std::array<typename A::size_type, N>& strides, const A& alloc = A());
 
     /*****************************************
      * xarray_adaptor builder implementation *

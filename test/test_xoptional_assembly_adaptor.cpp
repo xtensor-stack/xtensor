@@ -22,16 +22,16 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, constructor)
     {
-        array_type v = { {1, 2, 3}, {4, 5, 6} };
-        flag_array_type hv = { {true, false, true}, { false, true, false} };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
         compare_shape(a, v);
     }
 
     TEST(xoptional_assembly_adaptor, copy_semantic)
     {
-        array_type v = { { 1, 2, 3 },{ 4, 5, 6 } };
-        flag_array_type hv = { { true, false, true },{ false, true, false } };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
 
         {
@@ -44,8 +44,8 @@ namespace xt
 
         {
             SCOPED_TRACE("assignment operator");
-            array_type v2 = { { 1, 2, 13 },{ 14, 15, 16 } };
-            flag_array_type hv2 = { { false, true, true },{ false, true, false } };
+            array_type v2 = {{1, 2, 13}, {14, 15, 16}};
+            flag_array_type hv2 = {{false, true, true}, {false, true, false}};
             adaptor_type c(v2, hv2);
             EXPECT_NE(a.value().data(), c.value().data());
             EXPECT_NE(a.has_value().data(), c.has_value().data());
@@ -58,8 +58,8 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, move_semantic)
     {
-        array_type v = { { 1, 2, 3 },{ 4, 5, 6 } };
-        flag_array_type hv = { { true, false, true },{ false, true, false } };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
 
         {
@@ -73,8 +73,8 @@ namespace xt
 
         {
             SCOPED_TRACE("assignment operator");
-            array_type v2 = { { 1, 2, 13 },{ 14, 15, 16 } };
-            flag_array_type hv2 = { { false, true, true },{ false, true, false } };
+            array_type v2 = {{1, 2, 13}, {14, 15, 16}};
+            flag_array_type hv2 = {{false, true, true}, {false, true, false}};
             adaptor_type c(v2, hv2);
             EXPECT_NE(a.value().data(), c.value().data());
             EXPECT_NE(a.has_value().data(), c.has_value().data());
@@ -88,8 +88,8 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, reshape)
     {
-        array_type v = { { 1, 2, 3 },{ 4, 5, 6 } };
-        flag_array_type hv = { { true, false, true },{ false, true, false } };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
         test_reshape(a);
         compare_shape(a.value(), a.has_value());
@@ -98,8 +98,8 @@ namespace xt
     TEST(xoptional_assembly_adaptor, access)
     {
         using opt = xoptional<int>;
-        array_type v = { { 1, 2, 3 },{ 4, 5, 6 } };
-        flag_array_type hv = { { true, false, true },{ false, true, false } };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
         EXPECT_EQ(a(0, 0), opt(1, true));
         EXPECT_EQ(a(0, 1), opt(2, false));
@@ -112,8 +112,8 @@ namespace xt
     TEST(xoptional_assembly_adaptor, at)
     {
         using opt = xoptional<int>;
-        array_type v = { { 1, 2, 3 },{ 4, 5, 6 } };
-        flag_array_type hv = { { true, false, true },{ false, true, false } };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
         EXPECT_EQ(a.at(0, 0), opt(1, true));
         EXPECT_EQ(a.at(0, 1), opt(2, false));
@@ -126,11 +126,11 @@ namespace xt
     TEST(xoptional_assembly_adaptor, element)
     {
         using opt = xoptional<int>;
-        array_type v = { { 1, 2, 3 },{ 4, 5, 6 } };
-        flag_array_type hv = { { true, false, true },{ false, true, false } };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
-        std::vector<std::size_t> v00({ 0, 0 }), v01({ 0, 1 }), v02({ 0, 2 }),
-            v10({ 1, 0 }), v11({ 1, 1 }), v12({ 1, 2 });
+        std::vector<std::size_t> v00({0, 0}), v01({0, 1}), v02({0, 2}),
+            v10({1, 0}), v11({1, 1}), v12({1, 2});
 
         EXPECT_EQ(a.element(v00.begin(), v00.end()), opt(1, true));
         EXPECT_EQ(a.element(v01.begin(), v01.end()), opt(2, false));
@@ -143,11 +143,11 @@ namespace xt
     TEST(xoptional_assembly_adaptor, indexed_access)
     {
         using opt = xoptional<int>;
-        array_type v = { { 1, 2, 3 },{ 4, 5, 6 } };
-        flag_array_type hv = { { true, false, true },{ false, true, false } };
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
-        xindex i00({ 0, 0 }), i01({ 0, 1 }), i02({ 0, 2 }),
-            i10({ 1, 0 }), i11({ 1, 1 }), i12({ 1, 2 });
+        xindex i00({0, 0}), i01({0, 1}), i02({0, 2}),
+            i10({1, 0}), i11({1, 1}), i12({1, 2});
 
         EXPECT_EQ(a[i00], opt(1, true));
         EXPECT_EQ(a[i01], opt(2, false));
@@ -160,7 +160,7 @@ namespace xt
     TEST(xoptional_assembly_adaptor, broadcast_shape)
     {
         using shape_type = adaptor_type::shape_type;
-        shape_type s = { 3, 1, 4, 2 };
+        shape_type s = {3, 1, 4, 2};
         array_type v(s);
         flag_array_type hv(s);
         adaptor_type a(v, hv);
@@ -175,8 +175,8 @@ namespace xt
 
         {
             SCOPED_TRACE("different shape");
-            shape_type s2 = { 3, 5, 1, 2 };
-            shape_type s2r = { 3, 5, 4, 2 };
+            shape_type s2 = {3, 5, 1, 2};
+            shape_type s2r = {3, 5, 4, 2};
             bool res = a.broadcast_shape(s2);
             EXPECT_EQ(s2, s2r);
             EXPECT_FALSE(res);
@@ -184,15 +184,15 @@ namespace xt
 
         {
             SCOPED_TRACE("incompatible shapes");
-            shape_type s4 = { 2, 1, 3, 2 };
+            shape_type s4 = {2, 1, 3, 2};
             EXPECT_THROW(a.broadcast_shape(s4), broadcast_error);
         }
 
         {
-            shape_type s2 = { 3, 1, 4, 2 };
+            shape_type s2 = {3, 1, 4, 2};
             a.reshape(s2);
             SCOPED_TRACE("different dimensions");
-            shape_type s3 = { 5, 3, 1, 4, 2 };
+            shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
             bool res = a.broadcast_shape(s3);
             EXPECT_EQ(s3, s3r);
@@ -203,14 +203,14 @@ namespace xt
     TEST(xoptional_assembly_adaptor, iterator)
     {
         using opt = xoptional<int>;
-        std::vector<opt> vec = { opt(1), opt(2, false), opt(3, false), opt(4) };
+        std::vector<opt> vec = {opt(1), opt(2, false), opt(3, false), opt(4)};
 
         {
             SCOPED_TRACE("row_major storage iterator");
             xarray<int, layout_type::row_major> v;
             xarray<bool, layout_type::row_major> hv;
             xoptional_assembly_adaptor<decltype(v)&, decltype(hv)&> rma(v, hv);
-            rma.reshape({ 2, 2 });
+            rma.reshape({2, 2});
             std::copy(vec.cbegin(), vec.cend(), rma.begin<layout_type::row_major>());
             EXPECT_EQ(vec[0], rma(0, 0));
             EXPECT_EQ(vec[1], rma(0, 1));
@@ -224,7 +224,7 @@ namespace xt
             xarray<int, layout_type::row_major> v;
             xarray<bool, layout_type::row_major> hv;
             xoptional_assembly_adaptor<decltype(v)&, decltype(hv)&> cma(v, hv);
-            cma.reshape({ 2, 2 });
+            cma.reshape({2, 2});
             std::copy(vec.cbegin(), vec.cend(), cma.begin<layout_type::column_major>());
             EXPECT_EQ(vec[0], cma(0, 0));
             EXPECT_EQ(vec[1], cma(1, 0));
@@ -367,8 +367,8 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, semantic)
     {
-        array_type v = { {1, 2}, {3, 4} };
-        flag_array_type hv = { {true, false}, {false, true} };
+        array_type v = {{1, 2}, {3, 4}};
+        flag_array_type hv = {{true, false}, {false, true}};
 
         adaptor_type a(v, hv);
         adaptor_type b(a);

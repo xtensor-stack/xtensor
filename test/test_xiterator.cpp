@@ -390,8 +390,8 @@ namespace xt
 
     TEST(xiterator, cross_layout)
     {
-        xarray<int, layout_type::row_major> a = { { 1, 2, 3, 4}, { 5, 6, 7, 8}, {9, 10, 11, 12} };
-        xarray<int, layout_type::column_major> b = { { 1, 2, 3, 4 }, { 5, 6, 7, 8 }, { 9, 10, 11, 12 } };
+        xarray<int, layout_type::row_major> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+        xarray<int, layout_type::column_major> b = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
 
         // Performs an element-wise comparison via iterators and ensures the default traversal
         // of a container is consistent for any layout.

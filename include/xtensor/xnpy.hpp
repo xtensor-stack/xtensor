@@ -10,10 +10,10 @@
 // Derived from https://github.com/llohse/libnpy by Leon Merten Lohse,
 // relicensed from MIT License with permission
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xstrides.hpp"
 #include "xtensor/xadapt.hpp"
+#include "xtensor/xarray.hpp"
 #include "xtensor/xeval.hpp"
+#include "xtensor/xstrides.hpp"
 
 #include "xtl/xsequence.hpp"
 
@@ -41,7 +41,7 @@ namespace xt
        one of these constants manually.
        Defaults to little endian order. */
 #if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || defined(__BIG_ENDIAN__) || \
-    defined(__ARMEB__) || defined(__THUMBEB__) || defined(__AARCH64EB__) || \
+    defined(__ARMEB__) || defined(__THUMBEB__) || defined(__AARCH64EB__) ||             \
     defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
         const bool big_endian = true;
 #else
@@ -63,8 +63,8 @@ namespace xt
                                 unsigned char v_minor = 0)
         {
             ostream.write(magic_string, magic_string_length);
-            ostream.put((char) v_major);
-            ostream.put((char) v_minor);
+            ostream.put((char)v_major);
+            ostream.put((char)v_minor);
         }
 
         inline void read_magic(std::istream& istream,
@@ -87,35 +87,35 @@ namespace xt
                 }
             }
 
-            *v_major = (unsigned char) buf[magic_string_length];
-            *v_minor = (unsigned char) buf[magic_string_length + 1];
+            *v_major = (unsigned char)buf[magic_string_length];
+            *v_minor = (unsigned char)buf[magic_string_length + 1];
             delete[] buf;
         }
 
         template <class T>
         inline char map_type()
         {
-            if(std::is_same<T, float>::value) return 'f';
-            if(std::is_same<T, double>::value) return 'f';
-            if(std::is_same<T, long double>::value) return 'f';
+            if (std::is_same<T, float>::value) return 'f';
+            if (std::is_same<T, double>::value) return 'f';
+            if (std::is_same<T, long double>::value) return 'f';
 
-            if(std::is_same<T, char>::value) return 'i';
-            if(std::is_same<T, short>::value) return 'i';
-            if(std::is_same<T, int>::value) return 'i';
-            if(std::is_same<T, long>::value) return 'i';
-            if(std::is_same<T, long long>::value) return 'i';
+            if (std::is_same<T, char>::value) return 'i';
+            if (std::is_same<T, short>::value) return 'i';
+            if (std::is_same<T, int>::value) return 'i';
+            if (std::is_same<T, long>::value) return 'i';
+            if (std::is_same<T, long long>::value) return 'i';
 
-            if(std::is_same<T, unsigned char>::value) return 'u';
-            if(std::is_same<T, unsigned short>::value) return 'u';
-            if(std::is_same<T, unsigned int>::value) return 'u';
-            if(std::is_same<T, unsigned long>::value) return 'u';
-            if(std::is_same<T, unsigned long long>::value) return 'u';
+            if (std::is_same<T, unsigned char>::value) return 'u';
+            if (std::is_same<T, unsigned short>::value) return 'u';
+            if (std::is_same<T, unsigned int>::value) return 'u';
+            if (std::is_same<T, unsigned long>::value) return 'u';
+            if (std::is_same<T, unsigned long long>::value) return 'u';
 
-            if(std::is_same<T, bool>::value) return 'b';
+            if (std::is_same<T, bool>::value) return 'b';
 
-            if(std::is_same<T, std::complex<float>>::value) return 'c';
-            if(std::is_same<T, std::complex<double>>::value) return 'c';
-            if(std::is_same<T, std::complex<long double>>::value) return 'c';
+            if (std::is_same<T, std::complex<float>>::value) return 'c';
+            if (std::is_same<T, std::complex<double>>::value) return 'c';
+            if (std::is_same<T, std::complex<long double>>::value) return 'c';
 
             throw std::runtime_error("Type not known.");
         }
@@ -382,7 +382,7 @@ namespace xt
             std::size_t header_len_pre = ss_header.str().length() + 1;
             std::size_t metadata_len = magic_string_length + 2 + 2 + header_len_pre;
 
-            unsigned char version[2] = { 1, 0 };
+            unsigned char version[2] = {1, 0};
             if (metadata_len >= 255 * 255)
             {
                 metadata_len = magic_string_length + 2 + 4 + header_len_pre;
@@ -403,21 +403,21 @@ namespace xt
             if (version[0] == 1 && version[1] == 0)
             {
                 char header_len_le16[2];
-                uint16_t header_len = (uint16_t) header.length();
+                uint16_t header_len = (uint16_t)header.length();
 
-                header_len_le16[0] = (char) ((header_len >> 0) & 0xff);
-                header_len_le16[1] = (char) ((header_len >> 8) & 0xff);
+                header_len_le16[0] = (char)((header_len >> 0) & 0xff);
+                header_len_le16[1] = (char)((header_len >> 8) & 0xff);
                 out.write(reinterpret_cast<char*>(header_len_le16), 2);
             }
             else
             {
                 char header_len_le32[4];
-                uint32_t header_len = (uint32_t) header.length();
+                uint32_t header_len = (uint32_t)header.length();
 
-                header_len_le32[0] = (char) ((header_len >> 0) &  0xff);
-                header_len_le32[1] = (char) ((header_len >> 8) &  0xff);
-                header_len_le32[2] = (char) ((header_len >> 16) &  0xff);
-                header_len_le32[3] = (char) ((header_len >> 24) &  0xff);
+                header_len_le32[0] = (char)((header_len >> 0) & 0xff);
+                header_len_le32[1] = (char)((header_len >> 8) & 0xff);
+                header_len_le32[2] = (char)((header_len >> 16) & 0xff);
+                header_len_le32[3] = (char)((header_len >> 24) & 0xff);
                 out.write(reinterpret_cast<char*>(header_len_le32), 4);
             }
 
@@ -430,7 +430,7 @@ namespace xt
             char header_len_le16[2];
             istream.read(header_len_le16, 2);
 
-            uint16_t header_length = (uint16_t) (header_len_le16[0] << 0) | (uint16_t) (header_len_le16[1] << 8);
+            uint16_t header_length = (uint16_t)(header_len_le16[0] << 0) | (uint16_t)(header_len_le16[1] << 8);
 
             if ((magic_string_length + 2 + 2 + header_length) % 16 != 0)
             {
@@ -451,8 +451,8 @@ namespace xt
             char header_len_le32[4];
             istream.read(header_len_le32, 4);
 
-            uint32_t header_length = (uint32_t) (header_len_le32[0] << 0) | (uint32_t) (header_len_le32[1] << 8) |
-                                     (uint32_t) (header_len_le32[2] << 16) | (uint32_t) (header_len_le32[3] << 24);
+            uint32_t header_length = (uint32_t)(header_len_le32[0] << 0) | (uint32_t)(header_len_le32[1] << 8) |
+                (uint32_t)(header_len_le32[2] << 16) | (uint32_t)(header_len_le32[3] << 24);
 
             if ((magic_string_length + 2 + 4 + header_length) % 16 != 0)
             {
@@ -476,7 +476,7 @@ namespace xt
                 : m_shape(shape), m_fortran_order(fortran_order), m_typestring(typestring)
             {
                 // Allocate memory
-                m_word_size = (std::size_t) atoi(&typestring[2]);
+                m_word_size = (std::size_t)atoi(&typestring[2]);
                 m_n_bytes = compute_size(shape) * m_word_size;
                 m_buffer = new char[m_n_bytes];
             }
@@ -625,7 +625,7 @@ namespace xt
 
             npy_file result(shape, fortran_order, typestr);
             // read the data
-            stream.read(result.ptr(), (std::streamsize) (result.n_bytes()));
+            stream.read(result.ptr(), (std::streamsize)(result.n_bytes()));
             return result;
         }
 
@@ -648,10 +648,9 @@ namespace xt
 
             std::size_t size = compute_size(shape);
             stream.write(reinterpret_cast<const char*>(eval_ex.raw_data()),
-                         (std::streamsize) (sizeof(value_type) * size));
-
+                         (std::streamsize)(sizeof(value_type) * size));
         }
-    } // namespace detail
+    }  // namespace detail
 
 
     /**
@@ -686,11 +685,12 @@ namespace xt
     auto load_npy(const std::string& filename)
     {
         std::ifstream stream(filename, std::ifstream::binary);
-        if (!stream) {
+        if (!stream)
+        {
             throw std::runtime_error("io error: failed to open a file.");
         }
         detail::npy_file file = detail::load_npy_file(stream);
         return std::move(file).cast<T, L>();
     }
 
-} // namespace xt
+}  // namespace xt

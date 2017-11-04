@@ -1377,11 +1377,11 @@ namespace xt
             {
                 using std::abs;
 
-                if(std::isnan(a) && std::isnan(b))
+                if (std::isnan(a) && std::isnan(b))
                 {
                     return m_equal_nan;
                 }
-                if(std::isinf(a) && std::isinf(b))
+                if (std::isinf(a) && std::isinf(b))
                 {
                     return std::signbit(a) == std::signbit(b);
                 }
