@@ -288,7 +288,7 @@ namespace xt
      */
     template <class D>
     template <class E>
-    inline auto xsemantic_base<D>::operator^=(const E& e) ->disable_xexpression<E, derived_type&>
+    inline auto xsemantic_base<D>::operator^=(const E& e) -> disable_xexpression<E, derived_type&>
     {
         return this->derived_cast().scalar_computed_assign(e, std::bit_xor<>());
     }

@@ -606,7 +606,7 @@ namespace xt
         class is_complete_impl
         {
             template <class U>
-            static auto test(U*)  -> std::integral_constant<bool, sizeof(U) == sizeof(U)>;
+            static auto test(U*) -> std::integral_constant<bool, sizeof(U) == sizeof(U)>;
 
             static auto test(...) -> std::false_type;
 
@@ -617,7 +617,9 @@ namespace xt
     }
 
     template <class T>
-    struct is_complete : detail::is_complete_impl<T>::type {};
+    struct is_complete : detail::is_complete_impl<T>::type
+    {
+    };
 
     /*************
      * static_if *
@@ -683,7 +685,7 @@ namespace xt
     struct conditional_cast_functor<true, T>
     {
         template <class U>
-        inline auto operator()(U && u) const
+        inline auto operator()(U&& u) const
         {
             return static_cast<T>(std::forward<U>(u));
         }
@@ -698,7 +700,7 @@ namespace xt
      * explicit cast is ok.
      */
     template <bool condition, class T, class U>
-    inline auto conditional_cast(U && u)
+    inline auto conditional_cast(U&& u)
     {
         return conditional_cast_functor<condition, T>()(std::forward<U>(u));
     };

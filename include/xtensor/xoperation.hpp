@@ -100,11 +100,11 @@ namespace xt
         {                                                                        \
             return (arg1 OP arg2);                                               \
         }                                                                        \
-        template <class U>                                                      \
-        struct rebind                                                           \
-        {                                                                       \
-            using type = NAME<U>;                                               \
-        };                                                                      \
+        template <class U>                                                       \
+        struct rebind                                                            \
+        {                                                                        \
+            using type = NAME<U>;                                                \
+        };                                                                       \
     }
 
 #define BINARY_OPERATOR_FUNCTOR(NAME, OP) BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
@@ -122,7 +122,7 @@ namespace xt
         BINARY_BOOL_OPERATOR_FUNCTOR(logical_or, ||);
         BINARY_BOOL_OPERATOR_FUNCTOR(logical_and, &&);
         UNARY_BOOL_OPERATOR_FUNCTOR(logical_not, !);
-        BINARY_OPERATOR_FUNCTOR(bitwise_or, | );
+        BINARY_OPERATOR_FUNCTOR(bitwise_or, |);
         BINARY_OPERATOR_FUNCTOR(bitwise_and, &);
         BINARY_OPERATOR_FUNCTOR(bitwise_xor, ^);
         UNARY_OPERATOR_FUNCTOR(bitwise_not, ~);
@@ -675,8 +675,7 @@ namespace xt
         auto idx = xtl::make_sequence<index_type>(arr.dimension(), 0);
         std::vector<index_type> indices;
 
-        auto next_idx = [&shape](index_type& idx)
-        {
+        auto next_idx = [&shape](index_type& idx) {
             for (size_type j = shape.size(); j > 0; --j)
             {
                 size_type i = j - 1;
@@ -773,7 +772,7 @@ namespace xt
     /**
      * @defgroup casting_operators Casting operators
      */
-    
+
     /**
      * @ingroup casting_operators
      * @brief Element-wise ``static_cast``.
@@ -784,14 +783,13 @@ namespace xt
      * @param e an \ref xexpression or a scalar
      * @return an \ref xfunction
      */
-    
+
     template <class R, class E>
     inline auto cast(E&& e) noexcept
-    -> detail::xfunction_type_t<detail::cast<R>::template functor, E>
+        -> detail::xfunction_type_t<detail::cast<R>::template functor, E>
     {
         return detail::make_xfunction<detail::cast<R>::template functor>(std::forward<E>(e));
     }
-
 }
 
 #endif

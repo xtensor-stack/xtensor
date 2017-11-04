@@ -279,7 +279,7 @@ namespace xt
         // lead to ambiguous call when the function parameter is xexpression<E>
         // on gcc: the compiler can't choose between xexpression<xoptional_function>
         // and xexpression<xfunction>.
-        
+
         using only_scalar = typename implementation_type::only_scalar;
         using functor_type = typename implementation_type::functor_type;
         using value_type = typename implementation_type::value_type;
@@ -317,7 +317,7 @@ namespace xt
         using reverse_broadcast_iterator = typename iterable_base::template reverse_broadcast_iterator<S, L>;
         template <class S, layout_type L>
         using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
-        
+
         using storage_iterator = typename implementation_type::storage_iterator;
         using const_storage_iterator = typename implementation_type::const_storage_iterator;
         using reverse_storage_iterator = typename implementation_type::reverse_storage_iterator;
@@ -327,7 +327,7 @@ namespace xt
         using const_iterator = typename iterable_base::const_iterator;
         using reverse_iterator = typename iterable_base::reverse_iterator;
         using const_reverse_iterator = typename iterable_base::const_reverse_iterator;
-        
+
         template <class Func>
         xoptional_function(Func&& func, CT... e) noexcept;
 
@@ -393,7 +393,7 @@ namespace xt
 
         template <class align, class simd = simd_value_type>
         detail::simd_return_type_t<functor_type, simd> load_simd(size_type i) const;
-        
+
         // Specific to xoptional_function
 
         using expression_tag = xoptional_expression_tag;
@@ -414,7 +414,7 @@ namespace xt
     private:
 
         implementation_type m_func;
-        
+
         template <std::size_t... I>
         value_expression value_impl(std::index_sequence<I...>) const;
 
@@ -573,7 +573,7 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <class S>
-    inline auto xoptional_function<F, R, CT...>::stepper_end(const S& shape, layout_type l) const noexcept  -> const_stepper
+    inline auto xoptional_function<F, R, CT...>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
         return m_func.stepper_end(shape, l);
     }

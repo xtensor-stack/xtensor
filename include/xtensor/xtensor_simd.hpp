@@ -10,6 +10,7 @@
 #define XTENSOR_SIMD_HPP
 
 #include <vector>
+
 #include "xstorage.hpp"
 
 #ifdef XTENSOR_USE_XSIMD
@@ -20,8 +21,13 @@
 
 namespace xsimd
 {
-    struct aligned_mode {};
-    struct unaligned_mode {};
+    struct aligned_mode
+    {
+    };
+
+    struct unaligned_mode
+    {
+    };
 
     template <class A>
     struct allocator_alignment
@@ -114,7 +120,10 @@ namespace xt
 {
     using xsimd::aligned_mode;
     using xsimd::unaligned_mode;
-    struct inner_aligned_mode {};
+
+    struct inner_aligned_mode
+    {
+    };
 
     namespace detail
     {

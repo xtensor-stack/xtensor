@@ -14,9 +14,9 @@
 #include <initializer_list>
 #include <iterator>
 #include <stdexcept>
+#include <tuple>
 #include <type_traits>
 #include <utility>
-#include <tuple>
 #ifdef X_OLD_CLANG
 #include <vector>
 #endif
@@ -57,9 +57,9 @@ namespace xt
     template <class ST, class X>
     struct xreducer_shape_type;
 
-    template <class REDUCE_FUNC, class INIT_FUNC=identity_functor, class MERGE_FUNC=REDUCE_FUNC>
+    template <class REDUCE_FUNC, class INIT_FUNC = identity_functor, class MERGE_FUNC = REDUCE_FUNC>
     struct xreducer_functors
-    :  public std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>
+        : public std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>
     {
         using self_type = xreducer_functors<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>;
         using base_type = std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>;
@@ -68,41 +68,45 @@ namespace xt
         using merge_functor_type = MERGE_FUNC;
 
         xreducer_functors()
-        : base_type()
-        {}
+            : base_type()
+        {
+        }
 
         template <class RF>
         xreducer_functors(RF&& reduce_func)
-        : base_type(std::forward<RF>(reduce_func), INIT_FUNC(), reduce_func)
-        {}
+            : base_type(std::forward<RF>(reduce_func), INIT_FUNC(), reduce_func)
+        {
+        }
 
         template <class RF, class IF>
         xreducer_functors(RF&& reduce_func, IF&& init_func)
-        : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), reduce_func)
-        {}
+            : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), reduce_func)
+        {
+        }
 
         template <class RF, class IF, class MF>
         xreducer_functors(RF&& reduce_func, IF&& init_func, MF&& merge_func)
-        : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), std::forward<MF>(merge_func))
-        {}
+            : base_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), std::forward<MF>(merge_func))
+        {
+        }
     };
 
     template <class RF>
-    auto make_xreducer_functor(RF && reduce_func)
+    auto make_xreducer_functor(RF&& reduce_func)
     {
         using reducer_type = xreducer_functors<std::remove_reference_t<RF>>;
         return reducer_type(std::forward<RF>(reduce_func));
     }
 
     template <class RF, class IF>
-    auto make_xreducer_functor(RF && reduce_func, IF && init_func)
+    auto make_xreducer_functor(RF&& reduce_func, IF&& init_func)
     {
         using reducer_type = xreducer_functors<std::remove_reference_t<RF>, std::remove_reference_t<IF>>;
         return reducer_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func));
     }
 
     template <class RF, class IF, class MF>
-    auto make_xreducer_functor(RF && reduce_func, IF && init_func, MF && merge_func)
+    auto make_xreducer_functor(RF&& reduce_func, IF&& init_func, MF&& merge_func)
     {
         using reducer_type = xreducer_functors<std::remove_reference_t<RF>,
                                                std::remove_reference_t<IF>,

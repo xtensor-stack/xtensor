@@ -225,8 +225,13 @@ namespace xt
      * expression tag system *
      *************************/
 
-    struct xtensor_expression_tag {};
-    struct xoptional_expression_tag {};
+    struct xtensor_expression_tag
+    {
+    };
+
+    struct xoptional_expression_tag
+    {
+    };
 
     namespace detail
     {

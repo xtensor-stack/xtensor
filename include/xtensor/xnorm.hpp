@@ -11,44 +11,44 @@
 
 #include <cmath>
 // std::abs(int) prior to C++ 17
-#include <cstdlib>
 #include <complex>
+#include <cstdlib>
 
 #include "xconcepts.hpp"
-#include "xutils.hpp"
 #include "xmath.hpp"
 #include "xoperation.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
-    /*************************************
+/*************************************
      * norm functions for built-in types *
      *************************************/
 
-    ///@cond DOXYGEN_INCLUDE_SFINAE
-    #define XTENSOR_DEFINE_SIGNED_NORMS(T)                              \
-        inline auto                                                     \
-        norm_lp(T t, double p) noexcept                                 \
-        {                                                               \
-            using rt = decltype(std::abs(t));                           \
-            return p == 0.0                                             \
-                      ? static_cast<rt>(t != 0)                                        \
-                      : std::abs(t);                                    \
-        }                                                               \
-        inline auto                                                     \
-        norm_lp_to_p(T t, double p) noexcept                            \
-        {                                                               \
-            using rt = real_promote_type_t<T>;                          \
-            return p == 0.0                                             \
-                      ? static_cast<rt>(t != 0)                         \
-                      : std::pow(static_cast<rt>(std::abs(t)),          \
-                                 static_cast<rt>(p));                   \
-        }                                                               \
-        inline size_t norm_l0(T t) noexcept   { return (t != 0); }      \
-        inline auto   norm_l1(T t) noexcept   { return std::abs(t); }   \
-        inline auto   norm_l2(T t) noexcept   { return std::abs(t); }   \
-        inline auto   norm_linf(T t) noexcept { return std::abs(t); }   \
-        inline auto   norm_sq(T t) noexcept   { return t * t; }
+///@cond DOXYGEN_INCLUDE_SFINAE
+#define XTENSOR_DEFINE_SIGNED_NORMS(T)                          \
+    inline auto                                                 \
+    norm_lp(T t, double p) noexcept                             \
+    {                                                           \
+        using rt = decltype(std::abs(t));                       \
+        return p == 0.0                                         \
+            ? static_cast<rt>(t != 0)                           \
+            : std::abs(t);                                      \
+    }                                                           \
+    inline auto                                                 \
+    norm_lp_to_p(T t, double p) noexcept                        \
+    {                                                           \
+        using rt = real_promote_type_t<T>;                      \
+        return p == 0.0                                         \
+            ? static_cast<rt>(t != 0)                           \
+            : std::pow(static_cast<rt>(std::abs(t)),            \
+                       static_cast<rt>(p));                     \
+    }                                                           \
+    inline size_t norm_l0(T t) noexcept { return (t != 0); }    \
+    inline auto norm_l1(T t) noexcept { return std::abs(t); }   \
+    inline auto norm_l2(T t) noexcept { return std::abs(t); }   \
+    inline auto norm_linf(T t) noexcept { return std::abs(t); } \
+    inline auto norm_sq(T t) noexcept { return t * t; }
 
     XTENSOR_DEFINE_SIGNED_NORMS(signed char)
     XTENSOR_DEFINE_SIGNED_NORMS(short)
@@ -59,29 +59,29 @@ namespace xt
     XTENSOR_DEFINE_SIGNED_NORMS(double)
     XTENSOR_DEFINE_SIGNED_NORMS(long double)
 
-    #undef XTENSOR_DEFINE_SIGNED_NORMS
+#undef XTENSOR_DEFINE_SIGNED_NORMS
 
-    #define XTENSOR_DEFINE_UNSIGNED_NORMS(T)                            \
-        inline T norm_lp(T t, double p) noexcept                        \
-        {                                                               \
-            return p == 0.0                                             \
-                      ? (t != 0)                                        \
-                      : t;                                              \
-        }                                                               \
-        inline auto                                                     \
-        norm_lp_to_p(T t, double p) noexcept                            \
-        {                                                               \
-            using rt = real_promote_type_t<T>;                          \
-            return p == 0.0                                             \
-                      ? static_cast<rt>(t != 0)                         \
-                      : std::pow(static_cast<rt>(t),                    \
-                                 static_cast<rt>(p));                   \
-        }                                                               \
-        inline T    norm_l0(T t) noexcept   { return t != 0 ? 1 : 0; }  \
-        inline T    norm_l1(T t) noexcept   { return t; }               \
-        inline T    norm_l2(T t) noexcept   { return t; }               \
-        inline T    norm_linf(T t) noexcept { return t; }               \
-        inline auto norm_sq(T t) noexcept   { return t * t; }
+#define XTENSOR_DEFINE_UNSIGNED_NORMS(T)                      \
+    inline T norm_lp(T t, double p) noexcept                  \
+    {                                                         \
+        return p == 0.0                                       \
+            ? (t != 0)                                        \
+            : t;                                              \
+    }                                                         \
+    inline auto                                               \
+    norm_lp_to_p(T t, double p) noexcept                      \
+    {                                                         \
+        using rt = real_promote_type_t<T>;                    \
+        return p == 0.0                                       \
+            ? static_cast<rt>(t != 0)                         \
+            : std::pow(static_cast<rt>(t),                    \
+                       static_cast<rt>(p));                   \
+    }                                                         \
+    inline T norm_l0(T t) noexcept { return t != 0 ? 1 : 0; } \
+    inline T norm_l1(T t) noexcept { return t; }              \
+    inline T norm_l2(T t) noexcept { return t; }              \
+    inline T norm_linf(T t) noexcept { return t; }            \
+    inline auto norm_sq(T t) noexcept { return t * t; }
 
     XTENSOR_DEFINE_UNSIGNED_NORMS(unsigned char)
     XTENSOR_DEFINE_UNSIGNED_NORMS(unsigned short)
@@ -89,7 +89,7 @@ namespace xt
     XTENSOR_DEFINE_UNSIGNED_NORMS(unsigned long)
     XTENSOR_DEFINE_UNSIGNED_NORMS(unsigned long long)
 
-    #undef XTENSOR_DEFINE_UNSIGNED_NORMS
+#undef XTENSOR_DEFINE_UNSIGNED_NORMS
 
     /***********************************
      * norm functions for std::complex *
@@ -152,9 +152,9 @@ namespace xt
     {
         using rt = decltype(std::pow(std::abs(t.real()), static_cast<T>(p)));
         return p == 0
-                   ? static_cast<rt>(t.real() != 0 || t.imag() != 0)
-                   : std::pow(std::abs(t.real()), static_cast<T>(p)) +
-                     std::pow(std::abs(t.imag()), static_cast<T>(p));
+            ? static_cast<rt>(t.real() != 0 || t.imag() != 0)
+            : std::pow(std::abs(t.real()), static_cast<T>(p)) +
+                std::pow(std::abs(t.imag()), static_cast<T>(p));
     }
 
     /**

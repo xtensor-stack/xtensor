@@ -11,9 +11,9 @@
 
 #include <algorithm>
 #include <functional>
+#include <iostream>
 #include <numeric>
 #include <stdexcept>
-#include <iostream>
 
 #include "xtl/xsequence.hpp"
 

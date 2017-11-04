@@ -22,7 +22,9 @@ namespace xt
      * XTENSOR_REQUIRE concept checking macro *
      ******************************************/
 
-    struct concept_check_successful {};
+    struct concept_check_successful
+    {
+    };
 
     template <bool CONCEPTS>
     using concept_check = typename std::enable_if<CONCEPTS, concept_check_successful>::type;
@@ -74,7 +76,7 @@ namespace xt
         static char test(...);
 
         template <class U>
-        static int test(U*, typename U::iterator_category * = 0);
+        static int test(U*, typename U::iterator_category* = 0);
 
         static const bool value =
             std::is_array<T>::value ||
@@ -104,8 +106,8 @@ namespace xt
 
         static const bool value = std::is_arithmetic<result_type>::value &&
             (sizeof(result_type) < sizeof(argument_type) ||
-            (std::is_integral<result_type>::value && std::is_floating_point<argument_type>::value));
+             (std::is_integral<result_type>::value && std::is_floating_point<argument_type>::value));
     };
-} // namespace xt
+}  // namespace xt
 
-#endif // XCONCEPTS_HPP
+#endif  // XCONCEPTS_HPP
