@@ -124,7 +124,7 @@ namespace xt
     struct xiterable_inner_types<xreducer<F, CT, X>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using inner_shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, X>::type;
+        using inner_shape_type = typename xreducer_shape_type<typename xexpression_type::shape_type, std::decay_t<X>>::type;
         using const_stepper = xreducer_stepper<F, CT, X>;
         using stepper = const_stepper;
     };
@@ -402,15 +402,15 @@ namespace xt
         , m_init(std::get<1>(func))
         , m_merge(std::get<2>(func))
         , m_axes(std::forward<AX>(axes))
-        , m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0))
+        , m_shape(xtl::make_sequence<inner_shape_type>(m_e.dimension() - m_axes.size(), 0))
         , m_dim_mapping(xtl::make_sequence<shape_type>(m_e.dimension() - m_axes.size(), 0))
     {
         if (!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
         {
             throw std::runtime_error("Reducing axes should be sorted");
         }
-        detail::excluding_copy(m_e.shape().begin(), m_e.shape().end(),
-                               m_axes.begin(), m_axes.end(),
+        detail::excluding_copy(m_e.shape().cbegin(), m_e.shape().cend(),
+                               m_axes.cbegin(), m_axes.cend(),
                                m_shape.begin(), m_dim_mapping.begin());
     }
     //@}
