@@ -281,15 +281,15 @@ namespace xt
         // Overload isinf, isnan and isfinite for complex datatypes,
         // following the Python specification:
         template <class T>
-        inline bool isinf(std::complex<T>& c)
+        inline bool isinf(const std::complex<T>& c)
         {
             return std::isinf(std::real(c)) || std::isinf(std::imag(c));
         }
 
         template <class T>
-        inline bool isnan(std::complex<T>& c)
+        inline bool isnan(const std::complex<T>& c)
         {
-            return std::isnan(std::real(c)) || std::isinf(std::imag(c));
+            return std::isnan(std::real(c)) || std::isnan(std::imag(c));
         }
 
         template <class T>
