@@ -32,4 +32,18 @@ namespace xt
         EXPECT_ANY_THROW(vt.at(10, 10, 10));
         EXPECT_ANY_THROW(vt.at(0, 0, 0, 0));
     }
+
+    TEST(xstridedview, expression_adapter)
+    {
+        auto e = xt::arange<double>(24);
+        auto sv = slice_vector(e, range(2, 10, 3));
+        auto vt = dynamic_view(e, sv);
+
+        EXPECT_EQ(vt(0), 2);
+        EXPECT_EQ(vt(1), 5);
+
+        xt::xarray<double> assigned = vt;
+        EXPECT_EQ(assigned, vt);
+        EXPECT_EQ(assigned(1), 5);
+    }
 }

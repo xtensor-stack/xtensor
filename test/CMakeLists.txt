@@ -145,4 +145,4 @@ endif()
 target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})
-
+	
