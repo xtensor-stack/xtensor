@@ -69,6 +69,12 @@ namespace xt
         };                                                                      \
     }
 
+#define UNSIGNED_ABS_FUNC(T)                                                    \
+constexpr inline T abs(const T& x)                                              \
+{                                                                               \
+    return x;                                                                   \
+}                                                                               \
+
 #define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
     template <class T>                                                          \
     struct NAME##_fun                                                           \
@@ -298,12 +304,9 @@ namespace xt
             return !isinf(c) && !isnan(c);
         }
 
-        template <class T>
-        inline std::enable_if_t<std::is_unsigned<T>::value, T>
-        abs(const T& x)
-        {
-            return x;
-        }
+        UNSIGNED_ABS_FUNC(unsigned int);
+        UNSIGNED_ABS_FUNC(unsigned long);
+        UNSIGNED_ABS_FUNC(unsigned long long);
 
         UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
         // The following specializations are needed to avoid 'ambiguous overload' errors,
@@ -369,6 +372,7 @@ namespace xt
 #undef TERNARY_MATH_FUNCTOR_IMPL
 #undef UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
 #undef UNSIGNED_ABS_FUNCTOR
+#undef UNSIGNED_ABS_FUNC
 
     /*******************
      * basic functions *
