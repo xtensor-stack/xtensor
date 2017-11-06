@@ -622,6 +622,38 @@ namespace xt
         EXPECT_TRUE(isclose(a, b, 1, 1, true)(0, 0));
     }
 
+    TEST(xmath, isclose_int)
+    {
+        EXPECT_FALSE(isclose(1, 2)());
+        EXPECT_TRUE(isclose(1, 2, 1)());
+        EXPECT_TRUE(isclose(1u, 2u, 1u)());
+        EXPECT_TRUE(isclose(1ul, 2ul, 1ul)());
+        EXPECT_TRUE(isclose(1ul, 10ul, 1ul)());
+        EXPECT_TRUE(isclose(1ul, 10ul, 1ul, 100ul)());
+    }
+
+    TEST(xmath, integer_abs)
+    {
+        EXPECT_EQ(math::abs(1ul), 1ul);
+        EXPECT_EQ(math::abs(1u), 1u);
+        EXPECT_EQ(math::abs((unsigned char) 1), (unsigned char) 1);
+        EXPECT_EQ(math::abs((char) 1), 1);
+        EXPECT_EQ(math::abs((int) 1), 1);
+        EXPECT_EQ(math::abs((int) -1), 1);
+        EXPECT_EQ(math::abs((long) -1), (long) 1);
+        EXPECT_EQ(math::abs(-1.5), 1.5);
+    }
+
+    TEST(xmath, isinf_nan_int)
+    {
+        EXPECT_FALSE(math::isinf(132));
+        EXPECT_FALSE(math::isinf(-123123));
+        EXPECT_FALSE(math::isnan(132));
+        EXPECT_FALSE(math::isnan(-123123));
+        EXPECT_FALSE(math::isinf(132ul));
+        EXPECT_FALSE(math::isnan(123123ul));
+    }
+
     TEST(xmath, scalar_cast)
     {
         double arg = 1.0;

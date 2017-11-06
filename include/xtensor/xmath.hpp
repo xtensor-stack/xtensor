@@ -298,6 +298,29 @@ namespace xt
             return !isinf(c) && !isnan(c);
         }
 
+        template <class T>
+        inline std::enable_if_t<std::is_unsigned<T>::value, T>
+        abs(const T& x)
+        {
+            return x;
+        }
+
+#ifdef WIN32
+        template <class T>
+        inline std::enable_if_t<std::is_integral<T>::value, bool>
+        isinf(const T& x)
+        {
+            return std::isinf((double) x);
+        }
+
+        template <class T>
+        inline std::enable_if_t<std::is_integral<T>::value, bool>
+        isinf(const T& x)
+        {
+            return std::isnan((double) x);
+        }
+#endif
+
         UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
         // The following specializations are needed to avoid 'ambiguous overload' errors,
         // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
@@ -1462,6 +1485,7 @@ namespace xt
 
             bool operator()(const T& a, const T& b) const
             {
+                using internal_type = promote_type_t<T, double>;
                 if(math::isnan(a) && math::isnan(b))
                 {
                     return m_equal_nan;
@@ -1471,7 +1495,7 @@ namespace xt
                     // check for both infinity signs equal
                     return a == b;
                 }
-                auto d = math::abs(a - b);
+                auto d = math::abs((internal_type) a - (internal_type) b);
                 return d <= m_atol || d <= m_rtol * std::max(math::abs(a), math::abs(b));
             }
 
