@@ -305,22 +305,6 @@ namespace xt
             return x;
         }
 
-#ifdef WIN32
-        template <class T>
-        inline std::enable_if_t<std::is_integral<T>::value, bool>
-        isinf(const T& x)
-        {
-            return std::isinf((double) x);
-        }
-
-        template <class T>
-        inline std::enable_if_t<std::is_integral<T>::value, bool>
-        isinf(const T& x)
-        {
-            return std::isnan((double) x);
-        }
-#endif
-
         UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
         // The following specializations are needed to avoid 'ambiguous overload' errors,
         // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
