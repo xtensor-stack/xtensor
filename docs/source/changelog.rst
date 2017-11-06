@@ -7,6 +7,18 @@
 Changelog
 =========
 
+0.13.1
+------
+
+- More general floating point type
+  `#518 <https://github.com/QuantStack/xtensor/pull/518>`_.
+- Do not require functor to be passed via rvalue reference
+  `#519 <https://github.com/QuantStack/xtensor/pull/519>`_.
+- Documentation improved
+  `#520 <https://github.com/QuantStack/xtensor/pull/520>`_.
+- Fix in xreducer
+  `#521 <https://github.com/QuantStack/xtensor/pull/521>`_.
+
 0.13.0
 ------
 
