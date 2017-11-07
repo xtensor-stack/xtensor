@@ -12,7 +12,6 @@
 #include "xtensor/xstridedview.hpp"
 
 #include "xtensor/xio.hpp"
-#include <iostream>
 
 namespace xt
 {

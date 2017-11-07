@@ -754,6 +754,7 @@ namespace xt
                 : m_e(e)
             {
                 resize_container(m_index, m_e.dimension());
+                resize_container(m_strides, m_e.dimension());
                 m_size = compute_size(m_e.shape());
                 compute_strides(m_e.shape(), layout_type::row_major, m_strides);
             }
