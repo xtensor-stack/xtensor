@@ -65,8 +65,6 @@ namespace xt
                 xstepper<const xstrided_view<CT, S, CD>>
             >;
 
-        // using const_stepper = xstepper<const xstrided_view<CT, S, CD>>;
-
         using stepper = xstepper<xstrided_view<CT, S, CD>>;
     };
 
@@ -762,12 +760,12 @@ namespace xt
 
             const reference operator[](std::size_t idx) const
             {
-                std::div_t dv{};
+                std::size_t quot;
                 for (size_type i = 0; i < m_strides.size(); ++i)
                 {
-                    dv = std::div((int)idx, (int)m_strides[i]);
-                    idx = static_cast<std::size_t>(dv.rem);
-                    m_index[i] = static_cast<std::size_t>(dv.quot);
+                    quot = idx / m_strides[i];
+                    idx = idx % m_strides[i];
+                    m_index[i] = quot;
                 }
                 return m_e.element(m_index.cbegin(), m_index.cend());
             }
