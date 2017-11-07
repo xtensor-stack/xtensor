@@ -153,8 +153,8 @@ namespace xt
 
         xarray<std::complex<double>> e = {c_t(0, 1), c_t(0, nan), c_t(-nan, 2), c_t(nan, -nan)};
         xarray<bool> expected = {false, true, true, true};
-
-        EXPECT_TRUE(all(equal(expected, isnan(e))));
+        // Full qualification required by Windows
+        EXPECT_TRUE(all(equal(expected, xt::isnan(e))));
     }
 
     TEST(xcomplex, isinf)
@@ -165,7 +165,7 @@ namespace xt
         xarray<std::complex<double>> e = {c_t(0, 1), c_t(0, inf), c_t(-inf, 2), c_t(inf, -inf), c_t(0, -inf)};
         xarray<bool> expected = {false, true, true, true, true};
 
-        EXPECT_TRUE(all(equal(expected, isinf(e))));
+        EXPECT_TRUE(all(equal(expected, xt::isinf(e))));
     }
 
     TEST(xcomplex, isclose)
