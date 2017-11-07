@@ -311,7 +311,7 @@ namespace xt
 
         using value_type = typename functor_type::value_type;
         using reference = xtl::xproxy_wrapper<decltype(std::declval<functor_type>()(*(IT())))>;
-        using pointer = xtl::xclosure_pointer<std::remove_reference_t<reference>>;
+        using pointer = typename reference::pointer;
         using difference_type = typename subiterator_traits::difference_type;
         using iterator_category = typename subiterator_traits::iterator_category;
 

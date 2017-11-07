@@ -100,19 +100,6 @@ namespace xt
 
     namespace detail
     {
-
-        template <class T>
-        auto abs(T& x) -> std::enable_if_t<std::is_signed<T>::value, T>
-        {
-            return std::abs(x);
-        }
-
-        template <class T>
-        auto abs(T& x) -> std::enable_if_t<std::is_unsigned<T>::value, T&>
-        {
-            return x;
-        }
-
         template <std::size_t I>
         struct xout
         {
@@ -333,7 +320,7 @@ namespace xt
                 {
                     if (!m_scientific || !m_large_exponent)
                     {
-                        int exponent = 1 + (int)std::log10(detail::abs(val));
+                        int exponent = 1 + (int)std::log10(math::abs(val));
                         if (exponent <= -5 || exponent > 7)
                         {
                             m_scientific = true;
@@ -344,9 +331,9 @@ namespace xt
                             }
                         }
                     }
-                    if (detail::abs(val) > m_max)
+                    if (math::abs(val) > m_max)
                     {
-                        m_max = detail::abs(val);
+                        m_max = math::abs(val);
                     }
                     if (m_required_precision < m_precision)
                     {
@@ -405,9 +392,9 @@ namespace xt
 
             void update(const value_type& val)
             {
-                if (detail::abs(val) > m_max)
+                if (math::abs(val) > m_max)
                 {
-                    m_max = detail::abs(val);
+                    m_max = math::abs(val);
                 }
                 if (std::is_signed<value_type>::value && val < 0)
                 {
