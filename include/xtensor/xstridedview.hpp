@@ -36,13 +36,35 @@ namespace xt
         using temporary_type = xarray<typename xexpression_type::value_type>;
     };
 
+    namespace detail
+    {
+        template <class T>
+        struct is_indexed_stepper
+        {
+            static const bool value = false;
+        };
+
+        template <class T>
+        struct is_indexed_stepper<xindexed_stepper<T>>
+        {
+            static const bool value = true;
+        };
+    }
+
+
     template <class CT, class S, class CD>
     struct xiterable_inner_types<xstrided_view<CT, S, CD>>
     {
         using inner_shape_type = S;
         using inner_strides_type = inner_shape_type;
         using inner_backstrides_type_type = inner_shape_type;
-        using const_stepper = xstepper<const xstrided_view<CT, S, CD>>;
+
+        using const_stepper = std::conditional_t<
+                detail::is_indexed_stepper<typename std::decay_t<CT>::stepper>::value,
+                xindexed_stepper<xstrided_view<CT, S, CD>>,
+                xstepper<const xstrided_view<CT, S, CD>>
+            >;
+
         using stepper = xstepper<xstrided_view<CT, S, CD>>;
     };
 
@@ -147,10 +169,19 @@ namespace xt
         template <class ST>
         stepper stepper_end(const ST& shape, layout_type l);
 
-        template <class ST>
-        const_stepper stepper_begin(const ST& shape) const;
-        template <class ST>
-        const_stepper stepper_end(const ST& shape, layout_type l) const;
+        template <class ST, class STEP = const_stepper>
+        std::enable_if_t<!detail::is_indexed_stepper<STEP>::value, STEP>
+        stepper_begin(const ST& shape) const;
+        template <class ST, class STEP = const_stepper>
+        std::enable_if_t<!detail::is_indexed_stepper<STEP>::value, STEP>
+        stepper_end(const ST& shape, layout_type l) const;
+
+        template <class ST, class STEP = const_stepper>
+        std::enable_if_t<detail::is_indexed_stepper<STEP>::value, STEP>
+        stepper_begin(const ST& shape) const;
+        template <class ST, class STEP = const_stepper>
+        std::enable_if_t<detail::is_indexed_stepper<STEP>::value, STEP>
+        stepper_end(const ST& shape, layout_type l) const;
 
         using container_iterator = typename std::decay_t<CD>::iterator;
         using const_container_iterator = typename std::decay_t<CD>::const_iterator;
@@ -506,19 +537,35 @@ namespace xt
     }
 
     template <class CT, class S, class CD>
-    template <class ST>
-    inline auto xstrided_view<CT, S, CD>::stepper_begin(const ST& shape) const -> const_stepper
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, CD>::stepper_begin(const ST& shape) const -> std::enable_if_t<!detail::is_indexed_stepper<STEP>::value, STEP>
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, data_xbegin(), offset);
     }
 
     template <class CT, class S, class CD>
-    template <class ST>
-    inline auto xstrided_view<CT, S, CD>::stepper_end(const ST& shape, layout_type l) const -> const_stepper
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, CD>::stepper_end(const ST& shape, layout_type l) const -> std::enable_if_t<!detail::is_indexed_stepper<STEP>::value, STEP>
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, data_xend(l), offset);
+    }
+
+    template <class CT, class S, class CD>
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, CD>::stepper_begin(const ST& shape) const -> std::enable_if_t<detail::is_indexed_stepper<STEP>::value, STEP>
+    {
+        size_type offset = shape.size() - dimension();
+        return const_stepper(this, offset);
+    }
+
+    template <class CT, class S, class CD>
+    template <class ST, class STEP>
+    inline auto xstrided_view<CT, S, CD>::stepper_end(const ST& shape, layout_type /*l*/) const -> std::enable_if_t<detail::is_indexed_stepper<STEP>::value, STEP>
+    {
+        size_type offset = shape.size() - dimension();
+        return const_stepper(this, offset, true);
     }
 
     template <class CT, class S, class CD>
@@ -700,22 +747,26 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
             using reference = typename xexpression_type::reference;
 
+            using iterator = typename xexpression_type::iterator;
+            using const_iterator = typename xexpression_type::const_iterator;
+
             expression_adaptor(CT&& e)
                 : m_e(e)
             {
                 resize_container(m_index, m_e.dimension());
+                resize_container(m_strides, m_e.dimension());
                 m_size = compute_size(m_e.shape());
                 compute_strides(m_e.shape(), layout_type::row_major, m_strides);
             }
 
             const reference operator[](std::size_t idx) const
             {
-                std::div_t dv{};
+                std::size_t quot;
                 for (size_type i = 0; i < m_strides.size(); ++i)
                 {
-                    dv = std::div((int)idx, (int)m_strides[i]);
-                    idx = static_cast<std::size_t>(dv.rem);
-                    m_index[i] = dv.quot;
+                    quot = idx / m_strides[i];
+                    idx = idx % m_strides[i];
+                    m_index[i] = quot;
                 }
                 return m_e.element(m_index.cbegin(), m_index.cend());
             }
