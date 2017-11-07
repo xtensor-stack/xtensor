@@ -305,7 +305,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         UNSIGNED_ABS_FUNC(unsigned long);
         UNSIGNED_ABS_FUNC(unsigned long long);
 
-#ifdef WIN32
+#ifdef _WIN32
         INT_SPECIALIZATION(isinf, false);
         INT_SPECIALIZATION(isnan, false);
         INT_SPECIALIZATION(isfinite, true);
