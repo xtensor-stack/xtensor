@@ -58,7 +58,6 @@ constexpr inline bool FUNC_NAME(const T& /*x*/) throw()                         
 }                                                                                \
 
 #define INT_SPECIALIZATION(FUNC_NAME, RETURN_VAL)                                \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, bool);                            \
 INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, char);                            \
 INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, short);                           \
 INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, int);                             \
