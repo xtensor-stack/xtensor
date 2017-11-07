@@ -378,4 +378,22 @@ namespace xt
         t v8e = {3, 5};
         EXPECT_TRUE(v8e == v8);
     }
+
+    TEST(xdynview, assign)
+    {
+        using t = xarray<int>;
+        t a = {1, 2, 3, 4, 5};
+
+        auto v = dynamic_view(a, slice_vector(a, range(0, 2)));
+        v = 1000;
+        EXPECT_EQ(v(0), 1000);
+        EXPECT_EQ(a(0), 1000);
+        EXPECT_EQ(a(1), 1000);
+
+        auto v2 = dynamic_view(a, slice_vector(a, range(3, 5)));
+        t b = {-100, -100};
+        v2 = b;
+        EXPECT_EQ(v2(1), -100);
+        EXPECT_EQ(a(4), -100);
+    }
 }
