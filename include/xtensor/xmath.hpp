@@ -52,7 +52,7 @@ constexpr inline T abs(const T& x)                                              
 }                                                                                \
 
 #define INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, T)                        \
-constexpr inline bool FUNC_NAME(const T& /*x*/) throw()                          \
+constexpr inline bool FUNC_NAME(const T& /*x*/) noexcept                         \
 {                                                                                \
     return RETURN_VAL;                                                           \
 }                                                                                \
