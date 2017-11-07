@@ -45,98 +45,94 @@ namespace xt
      * Helpers *
      ***********/
 
-#define UNSIGNED_ABS_FUNCTOR(T)                                                 \
-    template <>                                                                 \
-    struct abs_fun<T>                                                           \
-    {                                                                           \
-        using return_type = xt::detail::functor_return_type<T, T>;              \
-        using argument_type = T;                                                \
-        using result_type = T;                                                  \
-        using simd_value_type = xsimd::simd_type<T>;                            \
-        using simd_result_type = typename return_type::simd_type;               \
-        constexpr result_type operator()(const T& arg) const                    \
-        {                                                                       \
-            return arg;                                                         \
-        }                                                                       \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
-        {                                                                       \
-            return arg;                                                         \
-        }                                                                       \
-        template <class U>                                                      \
-        struct rebind                                                           \
-        {                                                                       \
-            using type = abs_fun<U>;                                            \
-        };                                                                      \
-    }
+#define UNSIGNED_ABS_FUNC(T)                                                     \
+constexpr inline T abs(const T& x)                                               \
+{                                                                                \
+    return x;                                                                    \
+}                                                                                \
 
-#define UNSIGNED_ABS_FUNC(T)                                                    \
-constexpr inline T abs(const T& x)                                              \
-{                                                                               \
-    return x;                                                                   \
-}                                                                               \
+#define INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, T)                        \
+constexpr inline bool FUNC_NAME(const T& /*x*/)                                  \
+{                                                                                \
+    return RETURN_VAL;                                                           \
+}                                                                                \
 
-#define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
-    template <class T>                                                          \
-    struct NAME##_fun                                                           \
-    {                                                                           \
-        static auto exec(const T& arg)                                          \
-        {                                                                       \
+#define INT_SPECIALIZATION(FUNC_NAME, RETURN_VAL)                                \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, bool);                            \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, char);                            \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, short);                           \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, int);                             \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long);                            \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long long);                       \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned char);                   \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned short);                  \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned int);                    \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long);                   \
+INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);              \
+
+
+#define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                         \
+    template <class T>                                                           \
+    struct NAME##_fun                                                            \
+    {                                                                            \
+        static auto exec(const T& arg)                                           \
+        {                                                                        \
             using math::NAME;                                                    \
-            return NAME(arg);                                                   \
-        }                                                                       \
-        using return_type = xt::detail::functor_return_type<T, R>;              \
-        using argument_type = T;                                                \
-        using result_type = decltype(exec(*(T*)0));                             \
-        using simd_value_type = xsimd::simd_type<T>;                            \
-        using simd_result_type = typename return_type::simd_type;               \
-        constexpr result_type operator()(const T& arg) const                    \
-        {                                                                       \
+            return NAME(arg);                                                    \
+        }                                                                        \
+        using return_type = xt::detail::functor_return_type<T, R>;               \
+        using argument_type = T;                                                 \
+        using result_type = decltype(exec(*(T*)0));                              \
+        using simd_value_type = xsimd::simd_type<T>;                             \
+        using simd_result_type = typename return_type::simd_type;                \
+        constexpr result_type operator()(const T& arg) const                     \
+        {                                                                        \
             using math::NAME;                                                    \
-            return NAME(arg);                                                   \
-        }                                                                       \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
-        {                                                                       \
+            return NAME(arg);                                                    \
+        }                                                                        \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg) const  \
+        {                                                                        \
             using math::NAME;                                                    \
-            return NAME(arg);                                                   \
-        }                                                                       \
-        template <class U>                                                      \
-        struct rebind                                                           \
-        {                                                                       \
-            using type = NAME##_fun<U>;                                         \
-        };                                                                      \
+            return NAME(arg);                                                    \
+        }                                                                        \
+        template <class U>                                                       \
+        struct rebind                                                            \
+        {                                                                        \
+            using type = NAME##_fun<U>;                                          \
+        };                                                                       \
     }
 
 #define UNARY_MATH_FUNCTOR(NAME) UNARY_MATH_FUNCTOR_IMPL(NAME, T)
 #define UNARY_BOOL_FUNCTOR(NAME) UNARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
-#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)                               \
-    template <class T>                                                          \
-    struct NAME##_fun                                                           \
-    {                                                                           \
-        static auto exec(const T& arg)                                          \
-        {                                                                       \
+#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)                                \
+    template <class T>                                                           \
+    struct NAME##_fun                                                            \
+    {                                                                            \
+        static auto exec(const T& arg)                                           \
+        {                                                                        \
             using math::NAME;                                                    \
-            return NAME(arg);                                                   \
-        }                                                                       \
-        using argument_type = T;                                                \
-        using result_type = decltype(exec(*(T*)0));                             \
-        using simd_value_type = argument_type;                                  \
-        using simd_result_type = result_type;                                   \
-        constexpr result_type operator()(const T& arg) const                    \
-        {                                                                       \
+            return NAME(arg);                                                    \
+        }                                                                        \
+        using argument_type = T;                                                 \
+        using result_type = decltype(exec(*(T*)0));                              \
+        using simd_value_type = argument_type;                                   \
+        using simd_result_type = result_type;                                    \
+        constexpr result_type operator()(const T& arg) const                     \
+        {                                                                        \
             using math::NAME;                                                    \
-            return NAME(arg);                                                   \
-        }                                                                       \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
-        {                                                                       \
+            return NAME(arg);                                                    \
+        }                                                                        \
+        constexpr simd_result_type simd_apply(const simd_value_type& arg) const  \
+        {                                                                        \
             using math::NAME;                                                    \
-            return NAME(arg);                                                   \
-        }                                                                       \
-        template <class U>                                                      \
-        struct rebind                                                           \
-        {                                                                       \
-            using type = NAME##_fun<U>;                                         \
-        };                                                                      \
+            return NAME(arg);                                                    \
+        }                                                                        \
+        template <class U>                                                       \
+        struct rebind                                                            \
+        {                                                                        \
+            using type = NAME##_fun<U>;                                          \
+        };                                                                       \
     }
 
 #define BINARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
@@ -145,7 +141,7 @@ constexpr inline T abs(const T& x)                                              
     {                                                                            \
         static auto exec(const T& arg1, const T& arg2)                           \
         {                                                                        \
-            using math::NAME;                                                     \
+            using math::NAME;                                                    \
             return NAME(arg1, arg2);                                             \
         }                                                                        \
         using return_type = xt::detail::functor_return_type<T, R>;               \
@@ -156,13 +152,13 @@ constexpr inline T abs(const T& x)                                              
         using simd_result_type = typename return_type::simd_type;                \
         constexpr result_type operator()(const T& arg1, const T& arg2) const     \
         {                                                                        \
-            using math::NAME;                                                     \
+            using math::NAME;                                                    \
             return NAME(arg1, arg2);                                             \
         }                                                                        \
         constexpr simd_result_type simd_apply(const simd_value_type& arg1,       \
                                               const simd_value_type& arg2) const \
         {                                                                        \
-            using math::NAME;                                                     \
+            using math::NAME;                                                    \
             return NAME(arg1, arg2);                                             \
         }                                                                        \
         template <class U>                                                       \
@@ -299,21 +295,24 @@ constexpr inline T abs(const T& x)                                              
         }
 
         template <class T>
-        inline bool isfinite(std::complex<T>& c)
+        inline bool isfinite(const std::complex<T>& c)
         {
             return !isinf(c) && !isnan(c);
         }
 
+        // The following specializations are needed to avoid 'ambiguous overload' errors,
+        // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
         UNSIGNED_ABS_FUNC(unsigned int);
         UNSIGNED_ABS_FUNC(unsigned long);
         UNSIGNED_ABS_FUNC(unsigned long long);
 
+#ifdef WIN32
+        INT_SPECIALIZATION(isinf, false);
+        INT_SPECIALIZATION(isnan, false);
+        INT_SPECIALIZATION(isfinite, true);
+#endif
+
         UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
-        // The following specializations are needed to avoid 'ambiguous overload' errors,
-        // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
-        UNSIGNED_ABS_FUNCTOR(unsigned int);
-        UNSIGNED_ABS_FUNCTOR(unsigned long);
-        UNSIGNED_ABS_FUNCTOR(unsigned long long);
 
         UNARY_MATH_FUNCTOR(fabs);
         BINARY_MATH_FUNCTOR(fmod);
