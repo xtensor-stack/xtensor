@@ -46,7 +46,7 @@ namespace xt
 #endif
 #elif defined(_MSC_VER)
         static_string p(__FUNCSIG__);
-        return static_string(p.data + 38, p.size - 38 - 7);
+        return static_string(p.data + 47, p.size - 47 - 7);
 #endif
     }
 
