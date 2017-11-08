@@ -97,6 +97,7 @@ set(XTENSOR_TESTS
     test_xexception.cpp
     test_xfunction.cpp
     test_xindexview.cpp
+    test_xinfo.cpp
     test_xiterator.cpp
     test_xio.cpp
     test_xlayout.cpp

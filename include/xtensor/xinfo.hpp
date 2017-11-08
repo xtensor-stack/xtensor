@@ -35,10 +35,10 @@ namespace xt
     constexpr static_string type_name()
     {
 #ifdef __clang__
-        static_string p = __PRETTY_FUNCTION__;
-        return static_string(p.data + 31, p.size - 31 - 1);
+        static_string p(__PRETTY_FUNCTION__);
+        return static_string(p.data + 39, p.size - 39 - 1);
 #elif defined(__GNUC__)
-        static_string p = __PRETTY_FUNCTION__;
+        static_string p(__PRETTY_FUNCTION__);
 #if __cplusplus < 201402
         return static_string(p.data + 36, p.size - 36 - 1);
 #else
