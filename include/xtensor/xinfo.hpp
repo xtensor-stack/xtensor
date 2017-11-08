@@ -42,10 +42,10 @@ namespace xt
 #if __cplusplus < 201402
         return static_string(p.data + 36, p.size - 36 - 1);
 #else
-        return static_string(p.data + 46, p.size - 46 - 1);
+        return static_string(p.data + 54, p.size - 54 - 1);
 #endif
 #elif defined(_MSC_VER)
-        static_string p = __FUNCSIG__;
+        static_string p(__FUNCSIG__);
         return static_string(p.data + 38, p.size - 38 - 7);
 #endif
     }
