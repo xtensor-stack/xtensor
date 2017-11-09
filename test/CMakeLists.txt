@@ -125,6 +125,11 @@ set(XTENSOR_TESTS
     test_xutils.cpp
 )
 
+# remove xinfo tests for compilers <= GCC 4.9
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.9)
+    list(REMOVE_ITEM XTENSOR_TESTS test_xinfo.cpp)
+endif()
+
 set(XTENSOR_TARGET test_xtensor)
 
 # Add files for npy tests
