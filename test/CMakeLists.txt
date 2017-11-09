@@ -97,6 +97,7 @@ set(XTENSOR_TESTS
     test_xexception.cpp
     test_xfunction.cpp
     test_xindexview.cpp
+    test_xinfo.cpp
     test_xiterator.cpp
     test_xio.cpp
     test_xlayout.cpp
@@ -123,6 +124,11 @@ set(XTENSOR_TESTS
     test_xview_semantic.cpp
     test_xutils.cpp
 )
+
+# remove xinfo tests for compilers < GCC 5
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5))
+    list(REMOVE_ITEM XTENSOR_TESTS test_xinfo.cpp)
+endif()
 
 set(XTENSOR_TARGET test_xtensor)
 
