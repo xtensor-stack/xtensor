@@ -125,6 +125,13 @@ namespace xt
         EXPECT_EQ(a2(0, 1), opt(2, true));
         EXPECT_EQ(a2(1, 0), opt(3, true));
         EXPECT_EQ(a2(1, 1), opt(4, true));
+
+        array_type value2 = { {1, 2}, {3, 4} };
+        opt_ass_type a3(std::move(value2));
+        EXPECT_EQ(a3(0, 0), opt(1, true));
+        EXPECT_EQ(a3(0, 1), opt(2, true));
+        EXPECT_EQ(a3(1, 0), opt(3, true));
+        EXPECT_EQ(a3(1, 1), opt(4, true));
     }
 
     TEST(xoptional_assembly, copy_semantic)
