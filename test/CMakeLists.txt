@@ -125,8 +125,8 @@ set(XTENSOR_TESTS
     test_xutils.cpp
 )
 
-# remove xinfo tests for compilers <= GCC 4.9
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 4.9)
+# remove xinfo tests for compilers < GCC 5
+if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5))
     list(REMOVE_ITEM XTENSOR_TESTS test_xinfo.cpp)
 endif()
 
