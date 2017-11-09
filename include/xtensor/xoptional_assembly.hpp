@@ -325,9 +325,8 @@ namespace xt
      */
     template <class VE, class FE>
     inline xoptional_assembly<VE, FE>::xoptional_assembly(VE&& ve)
-        : m_value(std::move(ve))
+        : m_value(std::move(ve)), m_has_value(ve.shape(), true, ve.layout())
     {
-        m_has_value.reshape(ve.shape(), true, ve.layout());
     }
 
     /**
