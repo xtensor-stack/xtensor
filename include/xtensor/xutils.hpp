@@ -20,6 +20,7 @@
 #include <utility>
 #include <vector>
 
+#include "xtl/xfunctional.hpp"
 #include "xtl/xtype_traits.hpp"
 
 #include "xtensor_config.hpp"
@@ -596,62 +597,6 @@ namespace xt
         using type = void;
     };
 
-    /*****************************
-     * is_complete implemenation *
-     *****************************/
-
-    namespace detail
-    {
-        template <class T>
-        class is_complete_impl
-        {
-            template <class U>
-            static auto test(U*) -> std::integral_constant<bool, sizeof(U) == sizeof(U)>;
-
-            static auto test(...) -> std::false_type;
-
-        public:
-
-            using type = decltype(test((T*)0));
-        };
-    }
-
-    template <class T>
-    struct is_complete : detail::is_complete_impl<T>::type
-    {
-    };
-
-    /*************
-     * static_if *
-     *************/
-
-    struct identity_functor
-    {
-        template <class T>
-        T&& operator()(T&& x) const
-        {
-            return std::forward<T>(x);
-        }
-    };
-
-    template <class TF, class FF>
-    auto static_if(std::true_type, const TF& tf, const FF&)
-    {
-        return tf(identity_functor());
-    }
-
-    template <class TF, class FF>
-    auto static_if(std::false_type, const TF&, const FF& ff)
-    {
-        return ff(identity_functor());
-    }
-
-    template <bool cond, class TF, class FF>
-    auto static_if(const TF& tf, const FF& ff)
-    {
-        return static_if(std::integral_constant<bool, cond>(), tf, ff);
-    }
-
     /********************************************
      * xtrivial_default_construct implemenation *
      ********************************************/
@@ -677,7 +622,7 @@ namespace xt
 
     template <class T>
     struct conditional_cast_functor<false, T>
-    : public identity_functor
+    : public xtl::identity
     {
     };
 
