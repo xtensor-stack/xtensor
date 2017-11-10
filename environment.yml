@@ -3,7 +3,7 @@ channels:
   - nodefaults
   - QuantStack
 dependencies:
-  - xtensor=0.12.1
-  - xtensor-blas=0.4.0
+  - xtensor
+  - xtensor-blas
   - xeus-cling
   - notebook
