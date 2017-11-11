@@ -21,6 +21,7 @@
 #include <vector>
 #endif
 
+#include "xtl/xfunctional.hpp"
 #include "xtl/xsequence.hpp"
 
 #include "xbuilder.hpp"
@@ -57,7 +58,7 @@ namespace xt
     template <class ST, class X>
     struct xreducer_shape_type;
 
-    template <class REDUCE_FUNC, class INIT_FUNC = identity_functor, class MERGE_FUNC = REDUCE_FUNC>
+    template <class REDUCE_FUNC, class INIT_FUNC = xtl::identity, class MERGE_FUNC = REDUCE_FUNC>
     struct xreducer_functors
         : public std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>
     {

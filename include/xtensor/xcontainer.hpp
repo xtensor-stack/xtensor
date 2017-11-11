@@ -15,6 +15,7 @@
 #include <numeric>
 #include <stdexcept>
 
+#include "xtl/xmeta_utils.hpp"
 #include "xtl/xsequence.hpp"
 
 #include "xiterable.hpp"
@@ -700,7 +701,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::begin() noexcept -> select_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_begin<L>();
         }, /*else*/ [&](auto self)
@@ -713,7 +714,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::end() noexcept -> select_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_end<L>();
         }, /*else*/ [&](auto self)
@@ -740,7 +741,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::cbegin() const noexcept -> select_const_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_cbegin<L>();
         }, /*else*/ [&](auto self)
@@ -753,7 +754,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::cend() const noexcept -> select_const_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_cend<L>();
         }, /*else*/ [&](auto self)
@@ -766,7 +767,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::rbegin() noexcept -> select_reverse_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_rbegin<L>();
         }, /*else*/ [&](auto self)
@@ -779,7 +780,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::rend() noexcept -> select_reverse_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_rend<L>();
         }, /*else*/ [&](auto self)
@@ -806,7 +807,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::crbegin() const noexcept -> select_const_reverse_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_crbegin<L>();
         }, /*else*/ [&](auto self)
@@ -819,7 +820,7 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::crend() const noexcept -> select_const_reverse_iterator<L>
     {
-        return static_if<L == static_layout>([&](auto self)
+        return xtl::mpl::static_if<L == static_layout>([&](auto self)
         {
             return self(*this).template storage_crend<L>();
         }, /*else*/ [&](auto self)
