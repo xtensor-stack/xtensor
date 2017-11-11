@@ -45,4 +45,26 @@ namespace xt
         EXPECT_EQ(assigned, vt);
         EXPECT_EQ(assigned(1), 5);
     }
+
+    TEST(xstridedview, transpose_layout_swap)
+    {
+        xarray<double, layout_type::row_major> a = xt::ones<double>({5, 5});
+
+        auto tv = transpose(a);
+        EXPECT_EQ(tv.layout(), layout_type::column_major);
+
+        auto tvt = transpose(tv);
+        EXPECT_EQ(tvt.layout(), layout_type::row_major);
+
+        xarray<double, layout_type::column_major> b = xt::ones<double>({5, 5, 5});
+        auto cbt = transpose(b);
+        EXPECT_EQ(cbt.layout(), layout_type::row_major);
+
+        auto cbw1 = transpose(b, {0, 1 ,2});
+        auto cbw2 = transpose(b, {2, 1, 0});
+        auto cbw3 = transpose(b, {2, 0, 1});
+        EXPECT_EQ(cbw1.layout(), layout_type::column_major);
+        EXPECT_EQ(cbw2.layout(), layout_type::row_major);
+        EXPECT_EQ(cbw3.layout(), layout_type::dynamic);
+    }
 }
