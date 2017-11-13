@@ -193,7 +193,10 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference at(Args... args) const;
-        const_reference operator[](const xindex& index) const;
+        template <class S>
+        disable_integral_t<S, const_reference> operator[](const S& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -496,9 +499,19 @@ namespace xt
      * than the number of dimensions of the reducer.
      */
     template <class F, class CT, class X>
-    inline auto xreducer<F, CT, X>::operator[](const xindex& index) const -> const_reference
+    template <class S>
+    inline auto xreducer<F, CT, X>::operator[](const S& index) const
+        -> disable_integral_t<S, const_reference>
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class F, class CT, class X>
+    template <class I>
+    inline auto xreducer<F, CT, X>::operator[](std::initializer_list<I> index) const
+        -> const_reference
+    {
+        return element(index.begin(), index.end());
     }
 
     template <class F, class CT, class X>

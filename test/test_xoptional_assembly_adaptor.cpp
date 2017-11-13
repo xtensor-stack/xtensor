@@ -150,11 +150,17 @@ namespace xt
             i10({1, 0}), i11({1, 1}), i12({1, 2});
 
         EXPECT_EQ(a[i00], opt(1, true));
+        EXPECT_EQ((a[{0, 0}]), opt(1, true));
         EXPECT_EQ(a[i01], opt(2, false));
+        EXPECT_EQ((a[{0, 1}]), opt(2, false));
         EXPECT_EQ(a[i02], opt(3, true));
+        EXPECT_EQ((a[{0, 2}]), opt(3, true));
         EXPECT_EQ(a[i10], opt(4, false));
+        EXPECT_EQ((a[{1, 0}]), opt(4, false));
         EXPECT_EQ(a[i11], opt(5, true));
+        EXPECT_EQ((a[{1, 1}]), opt(5, true));
         EXPECT_EQ(a[i12], opt(6, false));
+        EXPECT_EQ((a[{1, 2}]), opt(6, false));
     }
 
     TEST(xoptional_assembly_adaptor, broadcast_shape)

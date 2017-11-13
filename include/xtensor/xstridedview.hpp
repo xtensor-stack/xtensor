@@ -141,7 +141,10 @@ namespace xt
         reference operator()(Args... args);
         template <class... Args>
         reference at(Args... args);
-        reference operator[](const xindex& index);
+        template <class OS>
+        disable_integral_t<OS, reference> operator[](const OS& index);
+        template <class I>
+        reference operator[](std::initializer_list<I> index);
         reference operator[](size_type i);
 
         template <class It>
@@ -152,7 +155,10 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference at(Args... args) const;
-        const_reference operator[](const xindex& index) const;
+        template <class OS>
+        disable_integral_t<OS, const_reference> operator[](const OS& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -442,9 +448,19 @@ namespace xt
     }
 
     template <class CT, class S, class CD>
-    inline auto xstrided_view<CT, S, CD>::operator[](const xindex& index) -> reference
+    template <class OS>
+    inline auto xstrided_view<CT, S, CD>::operator[](const OS& index)
+        -> disable_integral_t<OS, reference>
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class CT, class S, class CD>
+    template <class I>
+    inline auto xstrided_view<CT, S, CD>::operator[](std::initializer_list<I> index)
+        -> reference
+    {
+        return element(index.begin(), index.end());
     }
 
     template <class CT, class S, class CD>
@@ -454,9 +470,19 @@ namespace xt
     }
 
     template <class CT, class S, class CD>
-    inline auto xstrided_view<CT, S, CD>::operator[](const xindex& index) const -> const_reference
+    template <class OS>
+    inline auto xstrided_view<CT, S, CD>::operator[](const OS& index) const
+        -> disable_integral_t<OS, const_reference>
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class CT, class S, class CD>
+    template <class I>
+    inline auto xstrided_view<CT, S, CD>::operator[](std::initializer_list<I> index) const
+        -> const_reference
+    {
+        return element(index.begin(), index.end());
     }
 
     template <class CT, class S, class CD>

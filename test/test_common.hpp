@@ -533,7 +533,9 @@ namespace xt
             indexed_assign_array(vec, rm.m_assigner);
             EXPECT_TRUE(std::equal(vec.data().cbegin(), vec.data().cend(), rm.m_data.cbegin()));
             EXPECT_EQ(vec(0, 1, 1), vec[index1]);
+            EXPECT_EQ(vec(0, 1, 1), (vec[{1, 1}]));
             EXPECT_EQ(vec(2, 1, 3), vec[index2]);
+            EXPECT_EQ(vec(2, 1, 3), (vec[{2, 2, 2, 1, 3}]));
         }
 
         {
@@ -543,7 +545,9 @@ namespace xt
             indexed_assign_array(vec, cm.m_assigner);
             EXPECT_TRUE(std::equal(vec.data().cbegin(), vec.data().cend(), cm.m_data.cbegin()));
             EXPECT_EQ(vec(0, 1, 1), vec[index1]);
+            EXPECT_EQ(vec(0, 1, 1), (vec[{1, 1}]));
             EXPECT_EQ(vec(2, 1, 3), vec[index2]);
+            EXPECT_EQ(vec(2, 1, 3), (vec[{2, 2, 2, 1, 3}]));
         }
 
         {
@@ -553,7 +557,9 @@ namespace xt
             indexed_assign_array(vec, cem.m_assigner);
             EXPECT_TRUE(std::equal(vec.data().cbegin(), vec.data().cend(), cem.m_data.cbegin()));
             EXPECT_EQ(vec(0, 1, 1), vec[index1]);
+            EXPECT_EQ(vec(0, 1, 1), (vec[{1, 1}]));
             EXPECT_EQ(vec(2, 1, 3), vec[index2]);
+            EXPECT_EQ(vec(2, 1, 3), (vec[{2, 2, 2, 1, 3}]));
         }
 
         {
@@ -565,7 +571,9 @@ namespace xt
             xindex id1 = {1, 0};
             xindex id2 = {2, 2, 2, 0, 3};
             EXPECT_EQ(vec(0, 1, 0), vec[id1]);
+            EXPECT_EQ(vec(0, 1, 0), (vec[{1, 0}]));
             EXPECT_EQ(vec(2, 0, 3), vec[id2]);
+            EXPECT_EQ(vec(2, 0, 3), (vec[{2, 2, 2, 0, 3}]));
         }
     }
 

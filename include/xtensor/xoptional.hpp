@@ -342,7 +342,10 @@ namespace xt
         template <class... Args>
         const_reference at(Args... args) const;
 
-        const_reference operator[](const xindex& index) const;
+        template <class S>
+        disable_integral_t<S, const_reference> operator[](const S& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -474,7 +477,17 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xoptional_function<F, R, CT...>::operator[](const xindex& index) const -> const_reference
+    template <class S>
+    inline auto xoptional_function<F, R, CT...>::operator[](const S& index) const
+        -> disable_integral_t<S, const_reference>
+    {
+        return m_func[index];
+    }
+
+    template <class F, class R, class... CT>
+    template <class I>
+    inline auto xoptional_function<F, R, CT...>::operator[](std::initializer_list<I> index) const
+        -> const_reference
     {
         return m_func[index];
     }

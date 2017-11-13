@@ -67,6 +67,13 @@ namespace xt
         EXPECT_EQ(24, features.m_red(1, 1, 1));
     }
 
+    TEST(xreducer, indexed_access)
+    {
+        xreducer_features features;
+        EXPECT_EQ(12, (features.m_red[{0, 0, 0}]));
+        EXPECT_EQ(24, (features.m_red[{1, 1, 1}]));
+    }
+
     TEST(xreducer, at)
     {
         xreducer_features features;

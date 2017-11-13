@@ -110,7 +110,10 @@ namespace xt
         reference operator()();
         template <class... Args>
         reference operator()(size_type idx, Args... /*args*/);
-        reference operator[](const xindex& index);
+        template <class S>
+        disable_integral_t<S, reference> operator[](const S& index);
+        template <class OI>
+        reference operator[](std::initializer_list<OI> index);
         reference operator[](size_type i);
 
         template <class It>
@@ -119,7 +122,10 @@ namespace xt
         const_reference operator()() const;
         template <class... Args>
         const_reference operator()(size_type idx, Args... /*args*/) const;
-        const_reference operator[](const xindex& index) const;
+        template <class S>
+        disable_integral_t<S, const_reference> operator[](const S& index) const;
+        template <class OI>
+        const_reference operator[](std::initializer_list<OI> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -335,9 +341,19 @@ namespace xt
     }
 
     template <class CT, class I>
-    inline auto xindexview<CT, I>::operator[](const xindex& index) -> reference
+    template <class S>
+    inline auto xindexview<CT, I>::operator[](const S& index)
+        -> disable_integral_t<S, reference>
     {
         return m_e[m_indices[index[0]]];
+    }
+
+    template <class CT, class I>
+    template <class OI>
+    inline auto xindexview<CT, I>::operator[](std::initializer_list<OI> index)
+        -> reference
+    {
+        return m_e[m_indices[*(index.begin())]];
     }
 
     template <class CT, class I>
@@ -347,9 +363,19 @@ namespace xt
     }
 
     template <class CT, class I>
-    inline auto xindexview<CT, I>::operator[](const xindex& index) const -> const_reference
+    template <class S>
+    inline auto xindexview<CT, I>::operator[](const S& index) const
+        -> disable_integral_t<S, const_reference>
     {
         return m_e[m_indices[index[0]]];
+    }
+
+    template <class CT, class I>
+    template <class OI>
+    inline auto xindexview<CT, I>::operator[](std::initializer_list<OI> index) const
+        -> const_reference
+    {
+        return m_e[m_indices[*(index.begin())]];
     }
 
     template <class CT, class I>
