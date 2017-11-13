@@ -168,7 +168,10 @@ namespace xt
         template <class... Args>
         reference at(Args... args);
 
-        reference operator[](const xindex& index);
+        template <class S>
+        disable_integral_t<S, reference> operator[](const S& index);
+        template <class I>
+        reference operator[](std::initializer_list<I> index);
         reference operator[](size_type i);
 
         template <class IT>
@@ -180,7 +183,10 @@ namespace xt
         template <class... Args>
         const_reference at(Args... args) const;
 
-        const_reference operator[](const xindex& index) const;
+        template <class S>
+        disable_integral_t<S, const_reference> operator[](const S& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class IT>
@@ -557,7 +563,17 @@ namespace xt
      * than the number of dimensions of the container.
      */
     template <class F, class CT>
-    inline auto xfunctorview<F, CT>::operator[](const xindex& index) -> reference
+    template <class S>
+    inline auto xfunctorview<F, CT>::operator[](const S& index)
+        -> disable_integral_t<S, reference>
+    {
+        return m_functor(m_e[index]);
+    }
+
+    template <class F, class CT>
+    template <class I>
+    inline auto xfunctorview<F, CT>::operator[](std::initializer_list<I> index)
+        -> reference
     {
         return m_functor(m_e[index]);
     }
@@ -619,7 +635,17 @@ namespace xt
      * than the number of dimensions of the container.
      */
     template <class F, class CT>
-    inline auto xfunctorview<F, CT>::operator[](const xindex& index) const -> const_reference
+    template <class S>
+    inline auto xfunctorview<F, CT>::operator[](const S& index) const
+        -> disable_integral_t<S, const_reference>
+    {
+        return m_functor(m_e[index]);
+    }
+
+    template <class F, class CT>
+    template <class I>
+    inline auto xfunctorview<F, CT>::operator[](std::initializer_list<I> index) const
+        -> const_reference
     {
         return m_functor(m_e[index]);
     }

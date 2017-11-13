@@ -113,7 +113,10 @@ namespace xt
         template <class... Args>
         const_reference at(Args... args) const;
 
-        const_reference operator[](const xindex& index) const;
+        template <class S>
+        disable_integral_t<S, const_reference> operator[](const S& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -280,9 +283,18 @@ namespace xt
      * than the number of dimensions of the container.
      */
     template <class CT, class X>
-    inline auto xbroadcast<CT, X>::operator[](const xindex& index) const -> const_reference
+    template <class S>
+    inline auto xbroadcast<CT, X>::operator[](const S& index) const
+        -> disable_integral_t<S, const_reference>
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class CT, class X>
+    template <class I>
+    inline auto xbroadcast<CT, X>::operator[](std::initializer_list<I> index) const -> const_reference
+    {
+        return element(index.begin(), index.end());
     }
 
     template <class CT, class X>

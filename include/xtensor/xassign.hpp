@@ -392,7 +392,7 @@ namespace xt
         inline void trivial_assigner_run_impl(E1&, const E2&, std::false_type)
         {
             XTENSOR_PRECONDITION(false,
-                "Internal error: trivial_assigner called with unequal types.");
+                "Internal error: trivial_assigner called with unrelated types.");
         }
     }
 

@@ -27,6 +27,7 @@ namespace xt
         ASSERT_EQ(m(0, 0).value(), 1.0);
         ASSERT_EQ(m(1, 0).value(), 3.0);
         ASSERT_FALSE(m(1, 1).has_value());
+        ASSERT_EQ((m[{0, 0}].value()), 1.0);
     }
 
     TEST(xoptional, operation)

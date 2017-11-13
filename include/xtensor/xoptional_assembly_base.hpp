@@ -142,9 +142,16 @@ namespace xt
         template <class... Args>
         const_reference at(Args... args) const;
 
-        reference operator[](const xindex& index);
+        template <class S>
+        disable_integral_t<S, reference> operator[](const S& index);
+        template <class I>
+        reference operator[](std::initializer_list<I> index);
         reference operator[](size_type i);
-        const_reference operator[](const xindex& index) const;
+
+        template <class S>
+        disable_integral_t<S, const_reference> operator[](const S& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -521,7 +528,17 @@ namespace xt
      * than the number of dimensions of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::operator[](const xindex& index) -> reference
+    template <class S>
+    inline auto xoptional_assembly_base<D>::operator[](const S& index)
+        -> disable_integral_t<S, reference>
+    {
+        return reference(value()[index], has_value()[index]);
+    }
+
+    template <class D>
+    template <class I>
+    inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index)
+        -> reference
     {
         return reference(value()[index], has_value()[index]);
     }
@@ -539,7 +556,17 @@ namespace xt
      * than the number of dimensions of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::operator[](const xindex& index) const -> const_reference
+    template <class S>
+    inline auto xoptional_assembly_base<D>::operator[](const S& index) const
+        -> disable_integral_t<S, const_reference>
+    {
+        return const_reference(value()[index], has_value()[index]);
+    }
+
+    template <class D>
+    template <class I>
+    inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index) const
+        -> const_reference
     {
         return const_reference(value()[index], has_value()[index]);
     }

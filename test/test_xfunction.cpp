@@ -203,6 +203,7 @@ namespace xt
             int a = (f.m_a + f.m_a)[index];
             int b = f.m_a[index] + f.m_a[index];
             EXPECT_EQ(a, b);
+            EXPECT_EQ(((f.m_a + f.m_a)[{0, 0, 0}]), (f.m_a[{0, 0, 0}] + f.m_a[{0, 0, 0}]));
         }
 
         {
@@ -212,6 +213,7 @@ namespace xt
             index2[1] = 0;
             int b = f.m_a[index] + f.m_b[index2];
             EXPECT_EQ(a, b);
+            EXPECT_EQ(((f.m_a + f.m_b)[{0, 0, 0}]), (f.m_a[{0, 0, 0}] + f.m_b[{0, 0, 0}]));
         }
 
         {
@@ -224,6 +226,7 @@ namespace xt
             int a = (f.m_a + f.m_c)[index2];
             int b = f.m_a[index] + f.m_c[index2];
             EXPECT_EQ(a, b);
+            EXPECT_EQ(((f.m_a + f.m_c)[{0, 0, 0, 0}]), (f.m_a[{0, 0, 0, 0}] + f.m_c[{0, 0, 0, 0}]));
         }
     }
 

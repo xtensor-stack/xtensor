@@ -78,6 +78,9 @@ namespace xt
     template <class... T>
     using void_t = typename make_void<T...>::type;
 
+    template <class T, class R>
+    using disable_integral_t = std::enable_if_t<!std::is_integral<T>::value, R>;
+
     /*******************************
      * remove_class implementation *
      *******************************/

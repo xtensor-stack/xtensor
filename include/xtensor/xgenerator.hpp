@@ -92,7 +92,10 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference at(Args... args) const;
-        const_reference operator[](const xindex& index) const;
+        template <class OS>
+        disable_integral_t<OS, const_reference> operator[](const OS& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -211,7 +214,17 @@ namespace xt
     }
 
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::operator[](const xindex& index) const -> const_reference
+    template <class OS>
+    inline auto xgenerator<F, R, S>::operator[](const OS& index) const
+        -> disable_integral_t<OS, const_reference>
+    {
+        return element(index.cbegin(), index.cend());
+    }
+
+    template <class F, class R, class S>
+    template <class I>
+    inline auto xgenerator<F, R, S>::operator[](std::initializer_list<I> index) const
+        -> const_reference
     {
         return element(index.begin(), index.end());
     }

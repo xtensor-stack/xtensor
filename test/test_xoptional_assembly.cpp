@@ -234,9 +234,13 @@ namespace xt
         opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         xindex i0({0, 0}), i1({0, 1}), i2({1, 0}), i3({1, 1});
         EXPECT_EQ(a[i0], opt(1, true));
+        EXPECT_EQ((a[{0, 0}]), opt(1, true));
         EXPECT_EQ(a[i1], opt(2, false));
+        EXPECT_EQ((a[{0, 1}]), opt(2, false));
         EXPECT_EQ(a[i2], opt(3, false));
+        EXPECT_EQ((a[{1, 0}]), opt(3, false));
         EXPECT_EQ(a[i3], opt(4, true));
+        EXPECT_EQ((a[{1, 1}]), opt(4, true));
     }
 
     TEST(xoptional_assembly, broadcast_shape)
