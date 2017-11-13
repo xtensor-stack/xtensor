@@ -1483,7 +1483,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
                     return a == b;
                 }
                 auto d = math::abs((internal_type) a - (internal_type) b);
-                return d <= m_atol || d <= m_rtol * std::max(math::abs(a), math::abs(b));
+                return d <= m_atol || d <= m_rtol * (double) std::max(math::abs(a), math::abs(b));
             }
 
             template <class U>
