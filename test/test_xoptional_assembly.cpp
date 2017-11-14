@@ -99,7 +99,7 @@ namespace xt
 
     TEST(xoptional_assembly, initializer_list)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         opt_ass_type a0(opt(1));
         opt_ass_type a1({opt(1), opt(2, false)});
         opt_ass_type a2({{opt(1, true), opt(2, false)}, {opt(2), opt(4, true)}, {opt(5), opt(6)}});
@@ -110,7 +110,7 @@ namespace xt
 
     TEST(xoptional_assembly, expression_constructor)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         array_type value = {{1, 2}, {3, 4}};
         flag_array_type flag = {{true, false}, {false, true}};
 
@@ -198,7 +198,7 @@ namespace xt
 
     TEST(xoptional_assembly, access)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         EXPECT_EQ(a(0, 0), opt(1, true));
         EXPECT_EQ(a(0, 1), opt(2, false));
@@ -208,7 +208,7 @@ namespace xt
 
     TEST(xoptional_assembly, at)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         EXPECT_EQ(a.at(0, 0), opt(1, true));
         EXPECT_EQ(a.at(0, 1), opt(2, false));
@@ -219,7 +219,7 @@ namespace xt
 
     TEST(xoptional_assembly, element)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         std::vector<std::size_t> v0({0, 0}), v1({0, 1}), v2({1, 0}), v3({1, 1});
         EXPECT_EQ(a.element(v0.begin(), v0.end()), opt(1, true));
@@ -230,7 +230,7 @@ namespace xt
 
     TEST(xoptional_assembly, indexed_access)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         xindex i0({0, 0}), i1({0, 1}), i2({1, 0}), i3({1, 1});
         EXPECT_EQ(a[i0], opt(1, true));
@@ -287,7 +287,7 @@ namespace xt
 
     TEST(xoptional_assembly, iterator)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         std::vector<opt> vec = {opt(1), opt(2, false), opt(3, false), opt(4)};
 
         {
@@ -442,7 +442,7 @@ namespace xt
 
     TEST(xoptional_assembly, semantic)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         dyn_opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
         dyn_opt_ass_type b(a);
 
@@ -463,7 +463,7 @@ namespace xt
     TEST(xoptional_assembly, mixed_semantic)
     {
         using d_opt_ass_type = xoptional_assembly<xarray<double, layout_type::row_major>, xarray<bool, layout_type::row_major>>;
-        using opt = xoptional<double>;
+        using opt = xtl::xoptional<double>;
         d_opt_ass_type a = {{opt(1.), opt(2., false), opt(3., false), opt(4.)},
                             {opt(5., false), opt(6.), opt(7.), opt(8., false)}};
         xarray_optional<double> b = {{opt(1.), opt(2.), opt(3., false), opt(4., false)},
