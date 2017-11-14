@@ -21,11 +21,6 @@
 namespace xt
 {
 
-    using xtl::xoptional;
-    using xtl::missing;
-    using xtl::disable_xoptional;
-    using xtl::enable_xoptional;
-
     /****************************************************
      * Metafunction for splitting xoptional expressions *
      ****************************************************/
@@ -33,10 +28,10 @@ namespace xt
     namespace detail
     {
         template <class CT, class CB>
-        struct functor_return_type<xoptional<CT, CB>, bool>
+        struct functor_return_type<xtl::xoptional<CT, CB>, bool>
         {
-            using type = ::xtl::xoptional<bool>;
-            using simd_type = ::xtl::xoptional<bool>;
+            using type = xtl::xoptional<bool>;
+            using simd_type = xtl::xoptional<bool>;
         };
 
         template <class T, class Tag>
@@ -243,12 +238,12 @@ namespace xt
      **********************/
 
     template <class T, class B>
-    auto sign(const xoptional<T, B>& e);
+    auto sign(const xtl::xoptional<T, B>& e);
 
-    template <class E>
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
     detail::value_expression_t<E> value(E&&);
 
-    template <class E>
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
     detail::flag_expression_t<E> has_value(E&&);
 
     template <>
@@ -646,15 +641,15 @@ namespace xt
     namespace math
     {
         template <class T, class B>
-        struct sign_fun<xoptional<T, B>>
+        struct sign_fun<xtl::xoptional<T, B>>
         {
-            using argument_type = xoptional<T, B>;
-            using result_type = xoptional<std::decay_t<T>>;
+            using argument_type = xtl::xoptional<T, B>;
+            using result_type = xtl::xoptional<std::decay_t<T>>;
 
-            constexpr result_type operator()(const xoptional<T, B>& x) const
+            constexpr result_type operator()(const xtl::xoptional<T, B>& x) const
             {
-                return x.has_value() ? xoptional<T>(detail::sign_impl(x.value()))
-                                     : missing<std::decay_t<T>>();
+                return x.has_value() ? xtl::xoptional<T>(detail::sign_impl(x.value()))
+                                     : xtl::missing<std::decay_t<T>>();
             }
 
             template <class U>
@@ -666,22 +661,22 @@ namespace xt
     }
 
     template <class T, class B>
-    inline auto sign(const xoptional<T, B>& e)
+    inline auto sign(const xtl::xoptional<T, B>& e)
     {
-        return e.has_value() ? math::detail::sign_impl(e.value()) : missing<std::decay_t<T>>();
+        return e.has_value() ? math::detail::sign_impl(e.value()) : xtl::missing<std::decay_t<T>>();
     }
 
     /******************************************
      * value() and has_value() implementation *
      ******************************************/
 
-    template <class E>
+    template <class E, class>
     inline auto value(E&& e) -> detail::value_expression_t<E>
     {
         return detail::split_optional_expression<E>::value(std::forward<E>(e));
     }
 
-    template <class E>
+    template <class E, class>
     inline auto has_value(E&& e) -> detail::flag_expression_t<E>
     {
         return detail::split_optional_expression<E>::has_value(std::forward<E>(e));
@@ -696,17 +691,17 @@ namespace xt
         bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
         if (trivial_broadcast)
         {
-            using base_value_type1 = typename std::decay_t<decltype(value(de1))>::value_type;
-            using base_value_type2 = typename std::decay_t<decltype(value(de2))>::value_type;
+            using base_value_type1 = typename std::decay_t<decltype(xt::value(de1))>::value_type;
+            using base_value_type2 = typename std::decay_t<decltype(xt::value(de2))>::value_type;
             constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
             constexpr bool same_type = std::is_same<base_value_type1, base_value_type2>::value;
             constexpr bool simd_size = xsimd::simd_traits<base_value_type1>::size > 1;
             constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
             constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
-            decltype(auto) bde1 = value(de1);
-            decltype(auto) hde1 = has_value(de1);
-            trivial_assigner<simd_assign>::run(bde1, value(de2));
-            trivial_assigner<false>::run(hde1, has_value(de2));
+            decltype(auto) bde1 = xt::value(de1);
+            decltype(auto) hde1 = xt::has_value(de1);
+            trivial_assigner<simd_assign>::run(bde1, xt::value(de2));
+            trivial_assigner<false>::run(hde1, xt::has_value(de2));
         }
         else
         {

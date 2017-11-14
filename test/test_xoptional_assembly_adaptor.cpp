@@ -97,7 +97,7 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, access)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         array_type v = {{1, 2, 3}, {4, 5, 6}};
         flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
@@ -111,7 +111,7 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, at)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         array_type v = {{1, 2, 3}, {4, 5, 6}};
         flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
@@ -125,7 +125,7 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, element)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         array_type v = {{1, 2, 3}, {4, 5, 6}};
         flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
@@ -142,7 +142,7 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, indexed_access)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         array_type v = {{1, 2, 3}, {4, 5, 6}};
         flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
@@ -208,7 +208,7 @@ namespace xt
 
     TEST(xoptional_assembly_adaptor, iterator)
     {
-        using opt = xoptional<int>;
+        using opt = xtl::xoptional<int>;
         std::vector<opt> vec = {opt(1), opt(2, false), opt(3, false), opt(4)};
 
         {
