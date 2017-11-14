@@ -7,6 +7,21 @@
 Changelog
 =========
 
+0.13.2
+------
+
+- Support for complex version of ``isclose``
+  `#512 <https://github.com/QuantStack/xtensor/pull/512>`_.
+- Fixup static layout in ``xstrided_view``
+  `#536 <https://github.com/QuantStack/xtensor/pull/536>`_.
+- ``xexpression::operator[]`` now take support any type of sequence
+  `#537 <https://github.com/QuantStack/xtensor/pull/537`_.
+- Fixing ``xinfo`` issues for Visual Studio.
+  `#529 <https://github.com/QuantStack/xtensor/pull/529>`_.
+- Fix const-correctness in ``xstrided_view``.
+  `#526 <https://github.com/QuantStack/xtensor/pull/526>`_.
+
+
 0.13.1
 ------
 
