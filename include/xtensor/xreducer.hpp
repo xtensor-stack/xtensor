@@ -37,18 +37,22 @@ namespace xt
      * reduce *
      **********/
 
-    template <class F, class E, class X, class ES = evaluation_strategy::lazy>
+#define DEFAULT_STRATEGY_REDUCERS evaluation_strategy::lazy
+
+    template <class F, class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>>
     auto reduce(F&& f, E&& e, X&& axes, ES es = ES()) noexcept;
 
-    template <class F, class E>
-    auto reduce(F&& f, E&& e) noexcept;
+    template <class F, class E, class ES = DEFAULT_STRATEGY_REDUCERS,
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>
+    auto reduce(F&& f, E&& e, ES es = ES()) noexcept;
 
 #ifdef X_OLD_CLANG
     template <class F, class E, class I>
     auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept;
 #else
-    template <class F, class E, class I, std::size_t N>
-    auto reduce(F&& f, E&& e, const I (&axes)[N]) noexcept;
+    template <class F, class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>
+    auto reduce(F&& f, E&& e, const I (&axes)[N], ES es = ES()) noexcept;
 #endif
 
     template <class F, class E, class X>
@@ -60,9 +64,21 @@ namespace xt
         auto acc_fct = std::get<0>(f);
         auto init_fct = std::get<1>(f);
 
+        if (axes.size() == e.dimension())
+        {
+            // reducing over all axes
+            auto result = xarray<result_type>::from_shape({});
+            auto it = e.begin();
+            auto init = init_fct(*(it++));
+            result(0) = std::accumulate(it, e.end(), init);
+            return result;
+        }
+
         shape_type shape(e.dimension() - axes.size());
         shape_type strides(axes.size());
-        shape_type sizes(axes.size());
+        // shape_type sizes(axes.size());
+        std::size_t inner_loop_size = 1;
+        std::size_t out_increment = 0;
         shape_type offsets(e.dimension() - axes.size() ? e.dimension() - axes.size() : 1);
 
         if (!std::is_sorted(axes.cbegin(), axes.cend()))
@@ -74,18 +90,23 @@ namespace xt
         std::size_t shape_idx = 0;
         std::size_t stride_idx = 0;
         std::size_t sizes_idx = 0;
-        for (std::size_t i = 0; i < e.strides().size(); ++i)
+
+        for (std::size_t i = 0; i < e.dimension(); ++i)
         {
             if (std::find(axes.begin(), axes.end(), i) != axes.end())
             {
                 strides[stride_idx++] = e.strides()[i];
-                std::size_t curr_size = sizes_idx != 0 ? sizes[sizes_idx - 1] : 1;
-                sizes[sizes_idx++] = e.shape()[i] * curr_size;
+                // std::size_t curr_size = sizes_idx != 0 ? sizes[sizes_idx - 1] : 1;
+                // inner_loop_size *= e.shape()[i];
             }
             else
             {
                 offsets[shape_idx] = e.strides()[i];
                 shape[shape_idx++] = e.shape()[i];
+                if (i > axes.back())
+                {
+                    inner_loop_size *= e.shape()[i];
+                }
             }
         }
         // allocate result array
@@ -97,7 +118,7 @@ namespace xt
         auto out = result.raw_data();
         auto inner_stride = strides.back();
 
-        std::size_t next_stride;
+        std::size_t next_stride = 0;
 
         xindex temp_idx(shape.size());
 
@@ -105,19 +126,23 @@ namespace xt
         {
             for (int i = int(shape.size() - 2); i >= 0; --i)
             {
-                if (temp_idx[i] >= shape[i] - 1)
+                if (temp_idx[(std::size_t) i] >= shape[(std::size_t) i] - 1)
                 {
-                    temp_idx[i] = 0;
+                    temp_idx[(std::size_t) i] = 0;
                 }
                 else
                 {
-                    temp_idx[i]++;
-                    return e.strides()[i];
+                    temp_idx[(std::size_t) i]++;
+                    return e.strides()[(std::size_t) i];
                 }
             }
             // return empty index, happens at last iteration step, but remains unused
             return std::size_t(0);
         };
+        // sizes.back() = 3;
+        std::cout << "SIZE: " << inner_loop_size << std::endl;
+        std::cout << "INNER STRIDE: " << inner_stride << std::endl
+                  << "OUTER STRIDE: " << next_stride << std::endl;
 
         do
         {
@@ -127,7 +152,7 @@ namespace xt
                 for (std::size_t i = 0; i < shape.back(); ++i)
                 {
                     *(out + i)  = init_fct(*begin);
-                    for (std::size_t j = 1; j < sizes.back(); ++j)
+                    for (std::size_t j = 1; j < inner_loop_size; ++j)
                     {
                         *(out + i) = acc_fct(*(out + i), *(begin + j));
                     }
@@ -136,24 +161,25 @@ namespace xt
             }
             else
             {
-                for (std::size_t i = 0; i < shape.back(); ++i)
+                std::cout << "OFFSET: " << offsets.back() << std::endl;
+                for (std::size_t i = 0; i < inner_loop_size; ++i)
                 {
                     *(out + i) = init_fct(*(begin + i));
                 }
                 begin += inner_stride;
 
-                for (std::size_t i = 1; i < sizes.back(); ++i)
+                for (std::size_t i = 1; i < shape.back(); ++i)
                 {
-                    for (std::size_t j = 0; j < shape.back(); ++j)
+                    for (std::size_t j = 0; j < inner_loop_size; ++j)
                     {
                         *(out + j) = acc_fct(*(out + j), *(begin + j));
                     }
                     begin += inner_stride;
                 }
             }
-
             next_stride = next_idx();
-            out += next_stride;
+            std::cout << next_stride << std::endl;
+            out += 0;
         } while (next_stride);
 
         return result;
@@ -367,19 +393,17 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
 
-    template <class F, class E, class X, class ES>
+    template <class F, class E, class X, class ES, class>
     inline auto reduce(F&& f, E&& e, X&& axes, ES evaluation_strategy) noexcept
     {
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes), evaluation_strategy);
     }
 
-    template <class F, class E>
-    inline auto reduce(F&& f, E&& e) noexcept
+    template <class F, class E, class ES, class>
+    inline auto reduce(F&& f, E&& e, ES evaluation_strategy) noexcept
     {
         auto ar = arange(e.dimension());
-        using AR = decltype(ar);
-        using reducer_type = xreducer<F, const_xclosure_t<E>, AR>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), std::move(ar));
+        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ar), evaluation_strategy);
     }
 
 #ifdef X_OLD_CLANG
@@ -391,12 +415,15 @@ namespace xt
         return reducer_type(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes));
     }
 #else
-    template <class F, class E, class I, std::size_t N>
-    inline auto reduce(F&& f, E&& e, const I (&axes)[N]) noexcept
+    template <class F, class E, class I, std::size_t N, class ES>
+    inline auto reduce(F&& f, E&& e, const I (&axes)[N], ES evaluation_strategy) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
-        using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes));
+        // using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
+        // return reducer_type(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
+        auto ar = arange(e.dimension());
+        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
+
     }
 #endif
 
@@ -659,7 +686,7 @@ namespace xt
         size_type dim = 0;
         while (first != last)
         {
-            stepper.step(dim++, *first++);
+            stepper.step(dim++, (std::size_t) *first++);
         }
         return *stepper;
     }

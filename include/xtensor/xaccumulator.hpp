@@ -69,23 +69,23 @@ namespace xt
                 throw std::runtime_error("Axis larger than expression dimension in accumulator.");
             }
 
-            xarray<T> result = e; // assign + make a copy, we need it anyways
+            xarray<T> result = e;  // assign + make a copy, we need it anyways
 
             std::size_t outer_stride = result.strides().back();
             std::size_t inner_stride = result.strides()[axis];
 
-            std::size_t outer_loop_dim = std::accumulate(result.shape().cbegin(),
-                                                         result.shape().cbegin() + std::ptrdiff_t(axis),
-                                                         std::size_t(1), std::multiplies<std::size_t>());
-            std::size_t inner_loop_dim = std::accumulate(result.shape().cbegin() + std::ptrdiff_t(axis),
-                                                         result.shape().cend(),
-                                                         std::size_t(1), std::multiplies<std::size_t>());
-            inner_loop_dim -= inner_stride;
+            std::size_t outer_loop_size = std::accumulate(result.shape().cbegin(),
+                                                          result.shape().cbegin() + std::ptrdiff_t(axis),
+                                                          std::size_t(1), std::multiplies<std::size_t>());
+            std::size_t inner_loop_size = std::accumulate(result.shape().cbegin() + std::ptrdiff_t(axis),
+                                                          result.shape().cend(),
+                                                          std::size_t(1), std::multiplies<std::size_t>());
+            inner_loop_size -= inner_stride;
 
             std::size_t pos = 0;
-            for (std::size_t i = 0; i < outer_loop_dim; ++i)
+            for (std::size_t i = 0; i < outer_loop_size; ++i)
             {
-                for (std::size_t j = 0; j < inner_loop_dim; ++j)
+                for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
                     result.data()[pos + inner_stride] = f(result.data()[pos],
                                                           result.data()[pos + inner_stride]);
@@ -93,7 +93,7 @@ namespace xt
                 }
                 pos += inner_stride;
             }
-            return std::move(result);
+            return result;
         }
     }
 

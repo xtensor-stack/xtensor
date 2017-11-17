@@ -143,10 +143,13 @@ namespace xt
 
     namespace evaluation_strategy
     {
-        struct immediate
+        struct base
         {
         };
-        struct lazy
+        struct immediate : base
+        {
+        };
+        struct lazy : base
         {
         };
         /*
