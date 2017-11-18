@@ -28,7 +28,7 @@ namespace xt
 
         // assignment with narrowing type cast
         // (check that the compiler doesn't issue a warning)
-        xarray<uint8_t> c = m;
+        xarray<uint8_t> c = cast<uint8_t>(m);
         ASSERT_EQ(1, c(0, 1));
     }
 

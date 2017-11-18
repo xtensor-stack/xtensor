@@ -296,11 +296,6 @@ namespace xt
         return trivial_broadcast;
     }
 
-    /***************************************
-     * xexpression_assigner implementation *
-     ***************************************/
-
-
     /********************************
      * data_assigner implementation *
      ********************************/
