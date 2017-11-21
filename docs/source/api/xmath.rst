@@ -25,7 +25,7 @@
        background: initial;
    }
    </style>
-   
+
 Mathematical functions
 ======================
 
@@ -260,3 +260,13 @@ Mathematical functions
 +---------------------------------------+----------------------------------------------------+
 | :ref:`norm_induced_linf <nilinf-ref>` | Induced L-infinity norm of a matrix                |
 +---------------------------------------+----------------------------------------------------+
+
+.. toctree::
+
+   accumulating_functions
+
++---------------------------------------------+-------------------------------------------------+
+| :ref:`cumsum <cumsum-function-reference>`   | cumulative sum of elements over a given axis    |
++---------------------------------------------+-------------------------------------------------+
+| :ref:`cumprod <cumprod-function-reference>` | cumulative product of elements over given axes  |
++---------------------------------------------+-------------------------------------------------+

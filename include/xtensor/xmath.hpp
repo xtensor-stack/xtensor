@@ -9,7 +9,7 @@
 /**
  * @brief standard mathematical functions for xexpressions
  */
-
+\
 #ifndef XTENSOR_MATH_HPP
 #define XTENSOR_MATH_HPP
 
@@ -19,12 +19,13 @@
 
 #include "xoperation.hpp"
 #include "xreducer.hpp"
+#include "xaccumulator.hpp"
 
 #include "xtl/xcomplex.hpp"
 
 namespace xt
 {
-    template <class T>
+    template <class T = double>
     struct numeric_constants
     {
         static constexpr T PI = 3.141592653589793238463;
@@ -372,6 +373,45 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 #undef UNSIGNED_ABS_FUNCTOR
 #undef UNSIGNED_ABS_FUNC
 
+#define REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                              \
+    template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
+    inline auto NAME(E&& e, X&& axes, ES es = ES()) noexcept                                                      \
+    {                                                                                                             \
+        using result_type = RESULT_TYPE;                                                                          \
+        using functor_type = FUNCTOR<result_type>;                                                                \
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e),                                  \
+                      std::forward<X>(axes), es);                                                                 \
+    }                                                                                                             \
+                                                                                                                  \
+    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,                                                      \
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>               \
+    inline auto NAME(E&& e, ES es = ES()) noexcept                                                                \
+    {                                                                                                             \
+        using result_type = RESULT_TYPE;                                                                          \
+        using functor_type = FUNCTOR<result_type>;                                                                \
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), es);                             \
+    }                                                                                                             \
+
+#define OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                             \
+    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                             \
+        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES()) noexcept                             \
+        {                                                                                                         \
+            using result_type = RESULT_TYPE;                                                                      \
+            using functor_type = FUNCTOR<result_type>;                                                            \
+            return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);                       \
+        }                                                                                                         \
+
+#define MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                          \
+    template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
+    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES()) noexcept                                            \
+    {                                                                                                             \
+        using result_type = RESULT_TYPE;                                                                          \
+        using functor_type = FUNCTOR<result_type>;                                                                \
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                       \
+    }                                                                                                             \
+
+
     /*******************
      * basic functions *
      *******************/
@@ -624,38 +664,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param axes the axes along which the maximum is found (optional)
      * @return an \ref xreducer
      */
-    template <class E, class X>
-    inline auto amax(E&& e, X&& axes) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
-    }
-
-    template <class E>
-    inline auto amax(E&& e) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
-    }
-
+    REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type);
 #ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto amax(E&& e, std::initializer_list<I> axes) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type);
 #else
-    template <class E, class I, std::size_t N>
-    inline auto amax(E&& e, const I (&axes)[N]) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::maximum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type);
 #endif
 
     /**
@@ -668,38 +681,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param axes the axes along which the minimum is found (optional)
      * @return an \ref xreducer
      */
-    template <class E, class X>
-    inline auto amin(E&& e, X&& axes) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
-    }
-
-    template <class E>
-    inline auto amin(E&& e) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
-    }
-
+    REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type);
 #ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto amin(E&& e, std::initializer_list<I> axes) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type);
 #else
-    template <class E, class I, std::size_t N>
-    inline auto amin(E&& e, const I (&axes)[N]) noexcept
-    {
-        using result_type = typename std::decay_t<E>::value_type;
-        using functor_type = math::minimum<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type);
 #endif
 
     /**
@@ -1482,7 +1468,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
                     return a == b;
                 }
                 auto d = math::abs((internal_type) a - (internal_type) b);
-                return d <= m_atol || d <= m_rtol * std::max(math::abs(a), math::abs(b));
+                return d <= m_atol || d <= m_rtol * (double) std::max(math::abs(a), math::abs(b));
             }
 
             template <class U>
@@ -1543,6 +1529,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * Reducing functions *
      **********************/
 
+
     /**
      * @defgroup  red_functions reducing functions
      */
@@ -1557,38 +1544,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param axes the axes along which the sum is performed (optional)
      * @return an \ref xreducer
      */
-    template <class E, class X>
-    inline auto sum(E&& e, X&& axes) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
-    }
-
-    template <class E>
-    inline auto sum(E&& e) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
-    }
-
+    REDUCER_FUNCTION(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto sum(E&& e, std::initializer_list<I> axes) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    OLD_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #else
-    template <class E, class I, std::size_t N>
-    inline auto sum(E&& e, const I (&axes)[N]) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::plus<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    MODERN_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #endif
 
     /**
@@ -1601,38 +1561,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param axes the axes along which the product is computed (optional)
      * @return an \ref xreducer
      */
-    template <class E, class X>
-    inline auto prod(E&& e, X&& axes) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), std::forward<X>(axes));
-    }
-
-    template <class E>
-    inline auto prod(E&& e) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e));
-    }
-
+    REDUCER_FUNCTION(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto prod(E&& e, std::initializer_list<I> axes) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    OLD_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #else
-    template <class E, class I, std::size_t N>
-    inline auto prod(E&& e, const I (&axes)[N]) noexcept
-    {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        using functor_type = std::multiplies<result_type>;
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);
-    }
+    MODERN_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #endif
 
     /**
@@ -1677,6 +1610,58 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         return std::move(s) / static_cast<double>(size / s.size());
     }
 #endif
+
+    /**
+     * @defgroup acc_functions accumulating functions
+     */
+
+    /**
+     * @ingroup acc_functions
+     * @brief Cumulative sum.
+     *
+     * Returns the accumulated sum for the elements over given
+     * \em axes (or flattened).
+     * @param e an \ref xexpression
+     * @param axes the axes along which the cumulative sum is computed (optional)
+     * @return an \ref xarray<T>
+     */
+    template <class E>
+    inline auto cumsum(E&& e, std::size_t axis) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::plus<result_type>(), std::forward<E>(e), axis);
+    }
+
+    template <class E>
+    inline auto cumsum(E&& e) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::plus<result_type>(), std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup acc_functions
+     * @brief Cumulative product.
+     *
+     * Returns the accumulated product for the elements over given
+     * \em axes (or flattened).
+     * @param e an \ref xexpression
+     * @param axes the axes along which the cumulative product is computed (optional)
+     * @return an \ref xarray<T>
+     */
+    template <class E>
+    inline auto cumprod(E&& e, std::size_t axis) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::multiplies<result_type>(), std::forward<E>(e), axis);
+    }
+
+    template <class E>
+    inline auto cumprod(E&& e) noexcept
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(std::multiplies<result_type>(), std::forward<E>(e));
+    }
 }
 
 #endif
