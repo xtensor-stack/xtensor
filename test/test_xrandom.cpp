@@ -47,4 +47,16 @@ namespace xt
         ASSERT_NE(p1, p2);
         ASSERT_NE(p1, p3);
     }
+
+    TEST(xrandom, choice)
+    {
+        xarray<double> a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        xt::random::seed(42);
+        auto ac1 = xt::random::choice(a, 5);
+        auto ac2 = xt::random::choice(a, 5);
+        xt::random::seed(42);
+        auto ac3 = xt::random::choice(a, 5);
+        EXPECT_EQ(ac1, ac3);
+        EXPECT_NE(ac1, ac2);
+    }
 }

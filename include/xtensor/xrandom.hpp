@@ -17,6 +17,7 @@
 #include <random>
 #include <utility>
 
+#include "xtensor.hpp"
 #include "xgenerator.hpp"
 
 namespace xt
@@ -71,6 +72,10 @@ namespace xt
         auto randn(const I (&shape)[L], T mean = 0, T std_dev = 1,
                    E& engine = random::get_default_random_engine());
 #endif
+
+        template <class T, class E = random::default_engine_type>
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n,
+                                                  E& engine = random::get_default_random_engine());
     }
 
     namespace detail
@@ -123,11 +128,11 @@ namespace xt
         }
 
         /**
-         * xexpression with specified @p shape containing uniformly distributed random numbers 
+         * xexpression with specified @p shape containing uniformly distributed random numbers
          * in the interval from @p lower to @p upper, excluding upper.
-         * 
+         *
          * Numbers are drawn from @c std::uniform_real_distribution.
-         * 
+         *
          * @param shape shape of resulting xexpression
          * @param lower lower bound
          * @param upper upper bound
@@ -142,11 +147,11 @@ namespace xt
         }
 
         /**
-         * xexpression with specified @p shape containing uniformly distributed 
+         * xexpression with specified @p shape containing uniformly distributed
          * random integers in the interval from @p lower to @p upper, excluding upper.
-         * 
+         *
          * Numbers are drawn from @c std::uniform_int_distribution.
-         * 
+         *
          * @param shape shape of resulting xexpression
          * @param lower lower bound
          * @param upper upper bound
@@ -161,12 +166,12 @@ namespace xt
         }
 
         /**
-         * xexpression with specified @p shape containing numbers sampled from 
-         * the Normal (Gaussian) random number distribution with mean @p mean and 
+         * xexpression with specified @p shape containing numbers sampled from
+         * the Normal (Gaussian) random number distribution with mean @p mean and
          * standard deviation @p std_dev.
-         * 
+         *
          * Numbers are drawn from @c std::normal_distribution.
-         * 
+         *
          * @param shape shape of resulting xexpression
          * @param mean mean of normal distribution
          * @param std_dev standard deviation of normal distribution
@@ -223,6 +228,36 @@ namespace xt
             return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
         }
 #endif
+
+        /**
+         * Randomly select n unique elements from xexpression e.
+         * Note: this function makes a copy of your data, and only 1D data is accepted.
+         *
+         * @param e expression to sample from
+         * @param n number of elements to sample
+         * @param engine random number engine
+         *
+         * @return xtensor containing 1D container of sampled elements
+         */
+        template <class T, class E>
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, E& engine)
+        {
+            const auto& de = e.derived_cast();
+            XTENSOR_ASSERT(de.dimension() == 1);
+            XTENSOR_ASSERT(de.size() >= n);
+            xtensor<typename T::value_type, 1> result;
+            result.reshape({n});
+
+            xtensor<typename T::value_type, 1> shuffled = de;
+            shuffle(shuffled.data().begin(), shuffled.data().end(), engine);
+
+            std::copy(shuffled.data().begin(), shuffled.data().begin() + n, result.begin());
+
+            return result;
+
+            // Doesn't exist yet but would be much nicer as it probably prevent copies
+            // std::experimental::sample(de.begin(), de.end(), result.begin(), std::ref(engine));
+        }
     }
 }
 
