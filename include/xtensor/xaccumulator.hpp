@@ -97,6 +97,7 @@ namespace xt
                 {
                     result.data()[i + 1] = f(result.data()[i], e.data()[i + 1]);
                 }
+                return result;
             }
             else
             {

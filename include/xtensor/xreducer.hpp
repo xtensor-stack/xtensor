@@ -128,15 +128,15 @@ namespace xt
         }
 
         // TODO remove all entries where iter_shape == 0
-        iter_shape.erase(iter_shape.begin() + last_ax, iter_shape.end());
-        iter_strides.erase(iter_strides.begin() + last_ax, iter_strides.end());
+        iter_shape.erase(iter_shape.begin() + (ptrdiff_t) last_ax, iter_shape.end());
+        iter_strides.erase(iter_strides.begin() + (ptrdiff_t) last_ax, iter_strides.end());
 
         for (std::size_t i = 0; i < iter_shape.size(); ++i)
         {
             if (iter_shape[i] == 0)
             {
-                iter_shape.erase(iter_shape.begin() + i);
-                iter_strides.erase(iter_strides.begin() + i);
+                iter_shape.erase(iter_shape.begin() + (ptrdiff_t) i);
+                iter_strides.erase(iter_strides.begin() + (ptrdiff_t) i);
                 ++i;
             }
         }
@@ -144,20 +144,20 @@ namespace xt
         xindex temp_idx(iter_shape.size());
         auto next_idx = [&iter_shape, &iter_strides, &temp_idx]()
         {
-            int i = iter_shape.size() - 1;
-            for (; i >= 0; --i)
+            std::size_t i = iter_shape.size();
+            for (; i > 0; --i)
             {
-                if (ptrdiff_t(temp_idx[(std::size_t) i]) >= ptrdiff_t(iter_shape[(std::size_t) i]) - 1)
+                if (ptrdiff_t(temp_idx[i - 1]) >= ptrdiff_t(iter_shape[i - 1]) - 1)
                 {
-                    temp_idx[(std::size_t) i] = 0;
+                    temp_idx[i - 1] = 0;
                 }
                 else
                 {
-                    temp_idx[(std::size_t) i]++;
+                    temp_idx[i - 1]++;
                     break;
                 }
             }
-            return std::make_pair(i == -1,
+            return std::make_pair(i == 0,
                                   std::inner_product(temp_idx.begin(), temp_idx.end(),
                                                      iter_strides.begin(), ptrdiff_t(0)));
         };
@@ -175,6 +175,9 @@ namespace xt
 
         auto merge_border = out;
         bool merge = false;
+
+        // TODO there could be some performance gain by removing merge checking
+        //      when axes.size() == 1
         // Decide if going about it row-wise or col-wise
         if (inner_stride == 1)
         {
@@ -186,14 +189,8 @@ namespace xt
                 tmp = init_fct(*begin);
                 tmp = std::accumulate(begin + 1, begin + outer_loop_size, tmp, acc_fct);
 
-                if (merge)
-                {
-                    *out = merge_fct(*out, tmp);
-                }
-                else
-                {
-                    *out = tmp;
-                }
+                // use merge function if necessary
+                *out = merge ? merge_fct(*out, tmp) : tmp;
 
                 begin += outer_loop_size;
 
@@ -217,27 +214,17 @@ namespace xt
         {
             while(idx_res.first != true)
             {
-                if (!merge)
-                {
-                    for (std::size_t i = 0; i < inner_loop_size; ++i)
-                    {
-                        *(out + i) = init_fct(*(begin + i));
-                    }
-                }
-                else
-                {
-                    for (std::size_t i = 0; i < inner_loop_size; ++i)
-                    {
-                        *(out + i) = merge_fct(*(out + i), *(begin + i));
-                    }
-                }
+                std::transform(out, out + inner_loop_size, begin, out,
+                               [merge, &init_fct, &merge_fct](auto&& v1, auto&& v2)
+                               {
+                                    return merge ? merge_fct(v1, v2) : init_fct(v2);
+                               }
+                );
+
                 begin += inner_stride;
                 for (std::size_t i = 1; i < outer_loop_size; ++i)
                 {
-                    for (std::size_t j = 0; j < inner_loop_size; ++j)
-                    {
-                        *(out + j) = acc_fct(*(out + j), *(begin + j));
-                    }
+                    std::transform(out, out + inner_loop_size, begin, out, acc_fct);
                     begin += inner_stride;
                 }
 
@@ -258,7 +245,6 @@ namespace xt
 
             };
         }
-
         return result;
     }
 
