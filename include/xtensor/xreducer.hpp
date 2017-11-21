@@ -61,114 +61,178 @@ namespace xt
         using shape_type = std::vector<std::size_t>;
         using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
         using result_type = typename accumulate_functor::result_type;
+
+        // retrieve functors from triple struct
         auto acc_fct = std::get<0>(f);
         auto init_fct = std::get<1>(f);
+        auto merge_fct = std::get<2>(f);
 
-        if (axes.size() == e.dimension())
-        {
-            // reducing over all axes
-            auto result = xarray<result_type>::from_shape({});
-            auto it = e.begin();
-            auto init = init_fct(*(it++));
-            result(0) = std::accumulate(it, e.end(), init);
-            return result;
-        }
+        shape_type result_shape(e.dimension() - axes.size());
+        std::vector<std::size_t> iter_shape = e.shape();
+        std::vector<std::size_t> iter_strides(e.dimension());
 
-        shape_type shape(e.dimension() - axes.size());
-        shape_type strides(axes.size());
-        // shape_type sizes(axes.size());
-        std::size_t inner_loop_size = 1;
-        std::size_t out_increment = 0;
-        shape_type offsets(e.dimension() - axes.size() ? e.dimension() - axes.size() : 1);
+        xt::xarray<result_type> result;
 
         if (!std::is_sorted(axes.cbegin(), axes.cend()))
         {
-            // TODO make this untrue
             throw std::runtime_error("Reducing axes should be sorted");
         }
 
-        std::size_t shape_idx = 0;
-        std::size_t stride_idx = 0;
-        std::size_t sizes_idx = 0;
+        if (e.dimension() == axes.size())
+        {
+            auto begin = e.data().begin();
+            result_type tmp = init_fct(*begin);
+            ++begin;
+            result(0) = std::accumulate(begin, e.data().end(), tmp, acc_fct);
+            return result;
+        }
 
+        std::size_t idx = 0;
         for (std::size_t i = 0; i < e.dimension(); ++i)
         {
-            if (std::find(axes.begin(), axes.end(), i) != axes.end())
+            if (std::find(axes.begin(), axes.end(), i) == axes.end())
             {
-                strides[stride_idx++] = e.strides()[i];
-                // std::size_t curr_size = sizes_idx != 0 ? sizes[sizes_idx - 1] : 1;
-                // inner_loop_size *= e.shape()[i];
-            }
-            else
-            {
-                offsets[shape_idx] = e.strides()[i];
-                shape[shape_idx++] = e.shape()[i];
-                if (i > axes.back())
-                {
-                    inner_loop_size *= e.shape()[i];
-                }
+                // i not in axes!
+                result_shape[idx] = e.shape()[i];
+                ++idx;
             }
         }
-        // allocate result array
-        // TODO layout?
-        auto result = xarray<result_type>::from_shape(shape);
 
-        // auto& de = e.derived_cast();
-        auto begin = e.raw_data();
-        auto out = result.raw_data();
-        auto inner_stride = strides.back();
+        result.reshape(result_shape);
 
-        std::size_t next_stride = 0;
+        std::size_t inner_loop_size = e.strides()[axes[axes.size() - 1]];
+        std::size_t inner_stride    = e.strides()[axes[axes.size() - 1]];
+        std::size_t outer_loop_size = e.shape()[axes[axes.size() - 1]];
 
-        xindex temp_idx(shape.size());
-
-        auto next_idx = [&shape, &e, &temp_idx]()
+        auto it = axes.rbegin();
+        auto last_ax = *it;
+        ++it;
+        for (; it != axes.rend(); ++it)
         {
-            for (int i = int(shape.size() - 2); i >= 0; --i)
+            if (*it == last_ax - 1)
             {
-                if (temp_idx[(std::size_t) i] >= shape[(std::size_t) i] - 1)
+                last_ax = *it;
+                outer_loop_size *= e.shape()[last_ax];
+            }
+        }
+
+        idx = 0;
+        for (std::size_t i = 0; i < e.dimension(); ++i)
+        {
+            if (std::find(axes.begin(), axes.end(), i) == axes.end())
+            {
+                // i not in axes!
+                iter_strides[i] = result.strides()[idx];
+                ++idx;
+            }
+        }
+
+        // TODO remove all entries where iter_shape == 0
+        iter_shape.erase(iter_shape.begin() + last_ax, iter_shape.end());
+        iter_strides.erase(iter_strides.begin() + last_ax, iter_strides.end());
+
+        for (std::size_t i = 0; i < iter_shape.size(); ++i)
+        {
+            if (iter_shape[i] == 0)
+            {
+                iter_shape.erase(iter_shape.begin() + i);
+                iter_strides.erase(iter_strides.begin() + i);
+                ++i;
+            }
+        }
+
+        xindex temp_idx(iter_shape.size());
+        auto next_idx = [&iter_shape, &iter_strides, &temp_idx]()
+        {
+            int i = iter_shape.size() - 1;
+            for (; i >= 0; --i)
+            {
+                if (ptrdiff_t(temp_idx[(std::size_t) i]) >= ptrdiff_t(iter_shape[(std::size_t) i]) - 1)
                 {
                     temp_idx[(std::size_t) i] = 0;
                 }
                 else
                 {
                     temp_idx[(std::size_t) i]++;
-                    return e.strides()[(std::size_t) i];
+                    break;
                 }
             }
-            // return empty index, happens at last iteration step, but remains unused
-            return std::size_t(0);
+            return std::make_pair(i == -1,
+                                  std::inner_product(temp_idx.begin(), temp_idx.end(),
+                                                     iter_strides.begin(), ptrdiff_t(0)));
         };
-        // sizes.back() = 3;
-        std::cout << "SIZE: " << inner_loop_size << std::endl;
-        std::cout << "INNER STRIDE: " << inner_stride << std::endl
-                  << "OUTER STRIDE: " << next_stride << std::endl;
 
-        do
+        auto begin = e.raw_data();
+        auto out = result.raw_data();
+        auto out_begin = result.raw_data();
+
+        ptrdiff_t next_stride = 0;
+
+        std::pair<bool, ptrdiff_t> idx_res(false, 0);
+
+        // Remark: eventually some modifications here to make conditions faster where merge + accumulate is the
+        // same function (e.g. check std::is_same<decltype(merge_fct), decltype(acc_fct)>::value) ...
+
+        auto merge_border = out;
+        bool merge = false;
+        // Decide if going about it row-wise or col-wise
+        if (inner_stride == 1)
         {
-            // Decide if going about it row-wise or col-wise
-            if (inner_stride == 1)
+            while(idx_res.first != true)
             {
-                for (std::size_t i = 0; i < shape.back(); ++i)
+                // for unknown reasons it's much faster to use a temporary variable and
+                // std::accumulate here -- probably some cache behavior
+                result_type tmp;
+                tmp = init_fct(*begin);
+                tmp = std::accumulate(begin + 1, begin + outer_loop_size, tmp, acc_fct);
+
+                if (merge)
                 {
-                    *(out + i)  = init_fct(*begin);
-                    for (std::size_t j = 1; j < inner_loop_size; ++j)
-                    {
-                        *(out + i) = acc_fct(*(out + i), *(begin + j));
-                    }
-                    begin += offsets.back();
+                    *out = merge_fct(*out, tmp);
                 }
-            }
-            else
-            {
-                std::cout << "OFFSET: " << offsets.back() << std::endl;
-                for (std::size_t i = 0; i < inner_loop_size; ++i)
+                else
                 {
-                    *(out + i) = init_fct(*(begin + i));
+                    *out = tmp;
+                }
+
+                begin += outer_loop_size;
+
+                idx_res = next_idx();
+                next_stride = idx_res.second;
+                out = out_begin + next_stride;
+
+                if (out > merge_border)
+                {
+                    // looped over once
+                    merge = false;
+                    merge_border = out;
+                }
+                else
+                {
+                    merge = true;
+                }
+            };
+        }
+        else
+        {
+            while(idx_res.first != true)
+            {
+                if (!merge)
+                {
+                    for (std::size_t i = 0; i < inner_loop_size; ++i)
+                    {
+                        *(out + i) = init_fct(*(begin + i));
+                    }
+                }
+                else
+                {
+                    for (std::size_t i = 0; i < inner_loop_size; ++i)
+                    {
+                        *(out + i) = merge_fct(*(out + i), *(begin + i));
+                    }
                 }
                 begin += inner_stride;
-
-                for (std::size_t i = 1; i < shape.back(); ++i)
+                for (std::size_t i = 1; i < outer_loop_size; ++i)
                 {
                     for (std::size_t j = 0; j < inner_loop_size; ++j)
                     {
@@ -176,11 +240,24 @@ namespace xt
                     }
                     begin += inner_stride;
                 }
-            }
-            next_stride = next_idx();
-            std::cout << next_stride << std::endl;
-            out += 0;
-        } while (next_stride);
+
+                idx_res = next_idx();
+                next_stride = idx_res.second;
+                out = out_begin + next_stride;
+
+                if (out > merge_border)
+                {
+                    // looped over once
+                    merge = false;
+                    merge_border = out;
+                }
+                else
+                {
+                    merge = true;
+                }
+
+            };
+        }
 
         return result;
     }

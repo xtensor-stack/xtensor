@@ -242,7 +242,7 @@ namespace xt
         std::vector<std::size_t> iter_strides = ev.strides();
         iter_strides.erase(iter_strides.begin() + axis);
 
-        xindex temp_idx(iter_shape.size(), 0);
+        xindex temp_idx(iter_shape.size());
         auto next_idx = [&iter_shape, &iter_strides, &temp_idx]()
         {
             ptrdiff_t offset = 0;
