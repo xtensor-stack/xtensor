@@ -1641,12 +1641,12 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 
     /**
      * @ingroup acc_functions
-     * @brief Cumulative sum.
+     * @brief Cumulative product.
      *
-     * Returns the accumulated sum for the elements over given
+     * Returns the accumulated product for the elements over given
      * \em axes (or flattened).
      * @param e an \ref xexpression
-     * @param axes the axes along which the cumulative sum is computed (optional)
+     * @param axes the axes along which the cumulative product is computed (optional)
      * @return an \ref xarray<T>
      */
     template <class E>

@@ -81,50 +81,50 @@ set(XTENSOR_TESTS
     main.cpp
     test_common.hpp
     test_xaccumulator.cpp
-    test_xadapt.cpp
-    test_xadaptor_semantic.cpp
-    test_xarray.cpp
-    test_xarray_adaptor.cpp
-    test_xaxis_iterator.cpp
-    test_xbroadcast.cpp
-    test_xbuffer_adaptor.cpp
-    test_xbuilder.cpp
-    test_xconcepts.cpp
-    test_xcontainer_semantic.cpp
-    test_xcomplex.cpp
-    test_xcsv.cpp
-    test_xdynamicview.cpp
-    test_xeval.cpp
-    test_xexception.cpp
-    test_xfunction.cpp
-    test_xindexview.cpp
-    test_xinfo.cpp
-    test_xiterator.cpp
-    test_xio.cpp
-    test_xlayout.cpp
-    test_xmath.cpp
-    test_xnoalias.cpp
-    test_xnorm.cpp
-    test_xnpy.cpp
-    test_xoperation.cpp
-    test_xoptional.cpp
-    test_xoptional_assembly.cpp
-    test_xoptional_assembly_adaptor.cpp
-    test_xrandom.cpp
-    test_xreducer.cpp
-    test_xscalar.cpp
-    test_xscalar_semantic.cpp
-    test_xsemantic.hpp
-    test_xstorage.cpp
-    test_xstridedview.cpp
-    test_xsort.cpp
-    test_xtensor.cpp
-    test_xtensor_adaptor.cpp
-    test_xtensor_semantic.cpp
-    test_xvectorize.cpp
-    test_xview.cpp
-    test_xview_semantic.cpp
-    test_xutils.cpp
+    # test_xadapt.cpp
+    # test_xadaptor_semantic.cpp
+    # test_xarray.cpp
+    # test_xarray_adaptor.cpp
+    # test_xaxis_iterator.cpp
+    # test_xbroadcast.cpp
+    # test_xbuffer_adaptor.cpp
+    # test_xbuilder.cpp
+    # test_xconcepts.cpp
+    # test_xcontainer_semantic.cpp
+    # test_xcomplex.cpp
+    # test_xcsv.cpp
+    # test_xdynamicview.cpp
+    # test_xeval.cpp
+    # test_xexception.cpp
+    # test_xfunction.cpp
+    # test_xindexview.cpp
+    # test_xinfo.cpp
+    # test_xiterator.cpp
+    # test_xio.cpp
+    # test_xlayout.cpp
+    # test_xmath.cpp
+    # test_xnoalias.cpp
+    # test_xnorm.cpp
+    # test_xnpy.cpp
+    # test_xoperation.cpp
+    # test_xoptional.cpp
+    # test_xoptional_assembly.cpp
+    # test_xoptional_assembly_adaptor.cpp
+    # test_xrandom.cpp
+    # test_xreducer.cpp
+    # test_xscalar.cpp
+    # test_xscalar_semantic.cpp
+    # test_xsemantic.hpp
+    # test_xstorage.cpp
+    # test_xstridedview.cpp
+    # test_xsort.cpp
+    # test_xtensor.cpp
+    # test_xtensor_adaptor.cpp
+    # test_xtensor_semantic.cpp
+    # test_xvectorize.cpp
+    # test_xview.cpp
+    # test_xview_semantic.cpp
+    # test_xutils.cpp
 )
 
 # remove xinfo tests for compilers < GCC 5

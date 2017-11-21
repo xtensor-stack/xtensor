@@ -32,7 +32,7 @@
 #endif
 
 #ifndef DEFAULT_LAYOUT
-#define DEFAULT_LAYOUT layout_type::row_major
+#define DEFAULT_LAYOUT layout_type::column_major
 #endif
 
 #endif
