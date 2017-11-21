@@ -117,6 +117,7 @@ set(XTENSOR_TESTS
     test_xsemantic.hpp
     test_xstorage.cpp
     test_xstridedview.cpp
+    test_xsort.cpp
     test_xtensor.cpp
     test_xtensor_adaptor.cpp
     test_xtensor_semantic.cpp

@@ -13,6 +13,8 @@
 #include <algorithm>
 
 #include "xarray.hpp"
+#include "xeval.hpp"
+#include "xtensor.hpp"
 #include "xslice.hpp"  // for xnone
 
 namespace xt
@@ -62,12 +64,12 @@ namespace xt
 
             self_type& operator+=(const ptrdiff_t& inc)
             {
-                m_ptr += inc * m_stride;
+                m_ptr += inc * (ptrdiff_t) m_stride;
                 return *this;
             }
             self_type& operator-=(const ptrdiff_t& inc)
             {
-                m_ptr -= inc * m_stride;
+                m_ptr -= inc * (ptrdiff_t) m_stride;
                 return *this;
             }
 
@@ -84,10 +86,10 @@ namespace xt
                 return retval;
             }
 
-            friend int operator-(const self_type& lhs, const self_type& rhs)
+            friend ptrdiff_t operator-(const self_type& lhs, const self_type& rhs)
             {
                 // TODO benchmark against having std::size_t m_pos member that keeps track of position
-                return (lhs.m_ptr - rhs.m_ptr) / lhs.m_stride;
+                return (lhs.m_ptr - rhs.m_ptr) / (ptrdiff_t) lhs.m_stride;
             }
 
             bool operator==(self_type other) const {
@@ -122,8 +124,8 @@ namespace xt
             }
 
         private:
-            std::size_t m_stride;
             T* m_ptr;
+            std::size_t m_stride;
         };
 
         template <class T>
@@ -169,10 +171,10 @@ namespace xt
             }
 
         private:
-            std::size_t m_size;
-            std::size_t m_stride;
             T* m_ptr;
             T* m_orig_ptr;
+            std::size_t m_stride;
+            std::size_t m_size;
         };
     }
 
@@ -202,6 +204,7 @@ namespace xt
     {
         using value_type = typename E::value_type;
 
+        ptrdiff_t offset;
 
         // fast track for constant secondary stride
         if (E::static_layout == layout_type::row_major && (axis == 0 || ev.dimension() - 1 == axis))
@@ -223,12 +226,14 @@ namespace xt
             }
             else
             {
-                secondary_stride = ev.strides()[axis - 1];
+                secondary_stride = (ptrdiff_t) ev.strides()[axis - 1];
             }
 
             detail::stride_iterator_maker<value_type> smk = detail::stride_iterator_maker<value_type>(ev, axis);
 
-            for (std::size_t i = 0, offset = secondary_stride; i < n_iters; ++i, offset += secondary_stride)
+            offset = secondary_stride;
+
+            for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
                 fct(smk.begin(), smk.end());
                 smk.set_ptr_offset(offset);
@@ -237,10 +242,10 @@ namespace xt
         }
 
         auto iter_shape = ev.shape();
-        iter_shape.erase(iter_shape.begin() + axis);
+        iter_shape.erase(iter_shape.begin() + (ptrdiff_t) axis);
 
         std::vector<std::size_t> iter_strides = ev.strides();
-        iter_strides.erase(iter_strides.begin() + axis);
+        iter_strides.erase(iter_strides.begin() + (ptrdiff_t) axis);
 
         xindex temp_idx(iter_shape.size());
         auto next_idx = [&iter_shape, &iter_strides, &temp_idx]()
@@ -265,7 +270,7 @@ namespace xt
         detail::stride_iterator_maker<value_type> smk = detail::stride_iterator_maker<value_type>(ev, axis);
 
         fct(smk.begin(), smk.end());
-        ptrdiff_t offset = next_idx();
+        offset = next_idx();
         while (offset != 0)
         {
             smk.set_ptr_offset(offset);
@@ -329,7 +334,7 @@ namespace xt
             using value_type = typename A::value_type;
 
             std::vector<std::size_t> new_shape = a.shape();
-            new_shape.erase(new_shape.begin() + axis);
+            new_shape.erase(new_shape.begin() + (ptrdiff_t) axis);
 
             xt::xarray<std::size_t> result = xt::xarray<std::size_t>::from_shape(new_shape);
 
