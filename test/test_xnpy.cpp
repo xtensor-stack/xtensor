@@ -83,14 +83,28 @@ namespace xt
 
         xtensor<uint64_t, 1> ularr = {12ul, 14ul, 16ul, 18ul, 1234321ul};
         dump_npy(filename, barr);
-        EXPECT_TRUE(compare_binary_files(filename, "files/xnpy_files/bool.npy"));
+
+        std::string compare_name = "files/xnpy_files/bool.npy";
+        if (barr.layout() == layout_type::column_major)
+        {
+            compare_name = "files/xnpy_files/bool_fortran.npy";
+        }
+
+        EXPECT_TRUE(compare_binary_files(filename, compare_name));
         std::remove(filename.c_str());
 
         filename = get_filename();
         dump_npy(filename, ularr);
         auto ularrcpy = load_npy<uint64_t>(filename);
         EXPECT_TRUE(all(equal(ularr, ularrcpy)));
-        EXPECT_TRUE(compare_binary_files(filename, "files/xnpy_files/unsignedlong.npy"));
+
+        compare_name = "files/xnpy_files/unsignedlong.npy";
+        if (barr.layout() == layout_type::column_major)
+        {
+            compare_name = "files/xnpy_files/unsignedlong_fortran.npy";
+        }
+
+        EXPECT_TRUE(compare_binary_files(filename, compare_name));
         std::remove(filename.c_str());
     }
 }
