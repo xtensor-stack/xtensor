@@ -135,9 +135,11 @@ set(XTENSOR_TARGET test_xtensor)
 # Add files for npy tests
 set(XNPY_FILES
     bool.npy
+    bool_fortran.npy
     double.npy
     double_fortran.npy
     unsignedlong.npy
+    unsignedlong_fortran.npy
 )
 foreach(filename IN LISTS XNPY_FILES)
     configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files/xnpy_files/${filename}
