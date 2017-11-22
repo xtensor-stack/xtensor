@@ -96,6 +96,7 @@ namespace xt
                     }
                     res(j) = temp;
                 }
+                benchmark::DoNotOptimize(res.data());
             }
         }
 

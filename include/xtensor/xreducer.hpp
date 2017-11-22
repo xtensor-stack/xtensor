@@ -195,7 +195,8 @@ namespace xt
         bool merge = false;
 
         // TODO there could be some performance gain by removing merge checking
-        //      when axes.size() == 1
+        //      when axes.size() == 1 and even next_idx could be removed for something simpler (next_stride always the same)
+        //      best way to do this would be to create a function that takes (begin, out, outer_loop_size, inner_loop_size, next_idx_lambda)
         // Decide if going about it row-wise or col-wise
         if (inner_stride == 1)
         {
