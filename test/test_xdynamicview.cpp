@@ -106,7 +106,7 @@ namespace xt
 
         auto view1 = dynamic_view(a, slice_vector(a, range(0, 2), 1, range(1, 4)));
         auto iter = view1.template begin<layout_type::row_major>();
-        auto iter_end = view1.end<layout_type::row_major>();
+        auto iter_end = view1.template end<layout_type::row_major>();
 
         EXPECT_EQ(6, *iter);
         ++iter;
@@ -124,7 +124,7 @@ namespace xt
 
         auto view2 = dynamic_view(view1, slice_vector(view1, range(0, 2), range(1, 3)));
         auto iter2 = view2.template begin<layout_type::row_major>();
-        auto iter_end2 = view2.end<layout_type::row_major>();
+        auto iter_end2 = view2.template end<layout_type::row_major>();
 
         EXPECT_EQ(7, *iter2);
         ++iter2;
@@ -151,7 +151,7 @@ namespace xt
 
         auto func = dynamic_view(a, slice_vector(a, 1, range(1, 4))) + b;
         auto iter = func.template begin<layout_type::row_major>();
-        auto iter_end = func.end<layout_type::row_major>();
+        auto iter_end = func.template end<layout_type::row_major>();
 
         EXPECT_EQ(7, *iter);
         ++iter;
@@ -257,7 +257,7 @@ namespace xt
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), all(), newaxis()));
         auto iter1 = view1.template begin<layout_type::row_major>();
-        auto iter1_end = view1.end<layout_type::row_major>();
+        auto iter1_end = view1.template end<layout_type::row_major>();
 
         EXPECT_EQ(a(0, 0), *iter1);
         ++iter1;
@@ -287,7 +287,7 @@ namespace xt
 
         auto view2 = dynamic_view(a, slice_vector(a, all(), newaxis(), all()));
         auto iter2 = view2.template begin<layout_type::row_major>();
-        auto iter2_end = view2.end<layout_type::row_major>();
+        auto iter2_end = view2.template end<layout_type::row_major>();
 
         EXPECT_EQ(a(0, 0), *iter2);
         ++iter2;
