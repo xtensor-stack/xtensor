@@ -27,7 +27,7 @@ namespace xt
         {
             SCOPED_TRACE("row_major constructor");
             row_major_result<> rm;
-            opt_ass_type ra(rm.m_shape);
+            dyn_opt_ass_type ra(rm.m_shape, layout_type::row_major);
             compare_shape(ra, rm);
         }
 
@@ -63,7 +63,7 @@ namespace xt
             SCOPED_TRACE("row_major valued constructor");
             row_major_result<> rm;
             int value = 2;
-            dyn_opt_ass_type ra(rm.m_shape, value);
+            dyn_opt_ass_type ra(rm.m_shape, value, layout_type::row_major);
             compare_shape(ra, rm);
             dyn_opt_ass_type::value_expression::container_type vec(ra.size(), value);
             EXPECT_EQ(ra.value().data(), vec);

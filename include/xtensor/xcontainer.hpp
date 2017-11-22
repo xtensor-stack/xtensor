@@ -1210,7 +1210,7 @@ namespace xt
         {
             if (m_layout == layout_type::dynamic || m_layout == layout_type::any)
             {
-                m_layout = layout_type::row_major;  // fall back to row major
+                m_layout = DEFAULT_LAYOUT;  // fall back to default layout
             }
             m_shape = xtl::forward_sequence<shape_type>(shape);
             resize_container(m_strides, m_shape.size());

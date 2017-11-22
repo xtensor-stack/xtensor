@@ -178,7 +178,7 @@ namespace xt
         xtensor_adaptor(const container_type& data);
 
         template <class D>
-        xtensor_adaptor(D&& data, const shape_type& shape, layout_type l = layout_type::row_major);
+        xtensor_adaptor(D&& data, const shape_type& shape, layout_type l = L);
 
         template <class D>
         xtensor_adaptor(D&& data, const shape_type& shape, const strides_type& strides);

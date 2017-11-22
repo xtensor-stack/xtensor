@@ -9,6 +9,8 @@
 #ifndef XTENSOR_LAYOUT_HPP
 #define XTENSOR_LAYOUT_HPP
 
+#include "xtensor_config.hpp"
+
 namespace xt
 {
     /*! layout_type enum for xcontainer based xexpressions */
@@ -37,7 +39,7 @@ namespace xt
        d = dynamic, a = any, r = row_major, c = column_major.
        @endverbatim
      * Using bitmasks to avoid nested if-else statements.
-     * 
+     *
      * @param args the input layouts.
      * @return the output layout, computed with the previous logical table.
      */
@@ -84,7 +86,7 @@ namespace xt
     constexpr layout_type default_assignable_layout(layout_type l) noexcept
     {
         return (l == layout_type::row_major || l == layout_type::column_major) ?
-            l : layout_type::row_major;
+            l : DEFAULT_LAYOUT;
     }
 }
 

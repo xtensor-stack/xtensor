@@ -33,7 +33,14 @@ namespace xt
         EXPECT_FALSE(cm.data() == rm.data());
         EXPECT_EQ(cm_data, cm.data());
         EXPECT_EQ(rm_data, rm.data());
-        EXPECT_EQ(rm_data, dm.data());
+        if (DEFAULT_LAYOUT == layout_type::row_major)
+        {
+            EXPECT_EQ(rm_data, dm.data());
+        }
+        else
+        {
+            EXPECT_EQ(cm_data, dm.data());
+        }
         EXPECT_TRUE(cm.data()[1] == 4);
         EXPECT_TRUE(rm.data()[1] == 2);
 
@@ -57,7 +64,14 @@ namespace xt
         EXPECT_FALSE(cm.data() == rm.data());
         EXPECT_EQ(cm_data, cm.data());
         EXPECT_EQ(rm_data, rm.data());
-        EXPECT_EQ(rm_data, dm.data());
+        if (DEFAULT_LAYOUT == layout_type::row_major)
+        {
+            EXPECT_EQ(rm_data, dm.data());
+        }
+        else
+        {
+            EXPECT_EQ(cm_data, dm.data());
+        }
         EXPECT_TRUE(cm.data()[1] == 4);
         EXPECT_TRUE(rm.data()[1] == 2);
 

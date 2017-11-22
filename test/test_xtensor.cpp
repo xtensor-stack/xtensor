@@ -17,13 +17,13 @@ namespace xt
 
     TEST(xtensor, initializer_constructor)
     {
-        xtensor_dynamic t 
-          {{{0, 1, 2}, 
-            {3, 4, 5}, 
-            {6, 7, 8}}, 
-           {{9, 10, 11}, 
-            {12, 13, 14}, 
-            {15, 16, 17}}}; 
+        xtensor_dynamic t
+          {{{0, 1, 2},
+            {3, 4, 5},
+            {6, 7, 8}},
+           {{9, 10, 11},
+            {12, 13, 14},
+            {15, 16, 17}}};
         EXPECT_EQ(t.dimension(), size_t(3));
         EXPECT_EQ(t(0, 0, 1), 1);
         EXPECT_EQ(t.shape()[0], size_t(2));
@@ -34,7 +34,7 @@ namespace xt
         {
             SCOPED_TRACE("row_major constructor");
             row_major_result<container_type> rm;
-            xtensor_dynamic ra(rm.m_shape);
+            xtensor_dynamic ra(rm.m_shape, layout_type::row_major);
             compare_shape(ra, rm);
         }
 
@@ -70,7 +70,7 @@ namespace xt
             SCOPED_TRACE("row_major valued constructor");
             row_major_result<container_type> rm;
             int value = 2;
-            xtensor_dynamic ra(rm.m_shape, value);
+            xtensor_dynamic ra(rm.m_shape, value, layout_type::row_major);
             compare_shape(ra, rm);
             xtensor_dynamic::container_type vec(ra.size(), value);
             EXPECT_EQ(ra.data(), vec);
