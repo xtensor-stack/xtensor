@@ -9,6 +9,8 @@
 #ifndef XTENSOR_LAYOUT_HPP
 #define XTENSOR_LAYOUT_HPP
 
+#include "xtensor_config.hpp"
+
 namespace xt
 {
     /*! layout_type enum for xcontainer based xexpressions */

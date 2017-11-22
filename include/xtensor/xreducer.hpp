@@ -298,7 +298,8 @@ namespace xt
         using substepper_type = typename xexpression_type::const_stepper;
         using shape_type = typename xreducer_type::shape_type;
 
-        xreducer_stepper(const xreducer_type& red, size_type offset, bool end = false, layout_type l = DEFAULT_LAYOUT);
+        xreducer_stepper(const xreducer_type& red, size_type offset, bool end = false,
+                         layout_type l = default_assignable_layout(xexpression_type::static_layout));
 
         reference operator*() const;
 

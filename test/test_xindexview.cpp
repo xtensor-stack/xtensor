@@ -22,16 +22,16 @@ namespace xt
     {
         xarray<double> e = xt::random::rand<double>({3, 3});
         xarray<double> e_copy = e;
-        auto v = index_view(e, {{1, 1}, {1, 2}, {2, 2}});
+        auto v = index_view(e, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
         EXPECT_EQ(v.layout(), layout_type::dynamic);
 
         using shape_type = typename decltype(v)::shape_type;
         EXPECT_EQ(shape_type{3}, v.shape());
 
         EXPECT_EQ(e(1, 1), v(0));
-        EXPECT_EQ(e(1, 2), v[{1}]);
+        EXPECT_EQ(e(1, 2), v[{1ul}]);
 
-        std::vector<size_t> idx = {2};
+        std::vector<size_t> idx = {2ul};
         EXPECT_EQ(e(2, 2), v.element(idx.begin(), idx.end()));
 
         v += 3;
@@ -77,9 +77,9 @@ namespace xt
     {
         xarray<double> e = xt::random::rand<double>({3, 3});
         auto fn = e * 3 - 120;
-        auto v = index_view(fn, {{1, 1}, {1, 2}, {2, 2}});
+        auto v = index_view(fn, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
         EXPECT_EQ(fn(1, 1), v(0));
-        EXPECT_EQ(fn(1, 2), v[{1}]);
+        EXPECT_EQ(fn(1, 2), v[{1ul}]);
 
         std::vector<size_t> idx = {2};
         EXPECT_EQ(fn(2, 2), v.element(idx.begin(), idx.end()));
