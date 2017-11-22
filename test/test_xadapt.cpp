@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xadapt.hpp"
+#include "xtensor/xstrides.hpp"
 
 namespace xt
 {
@@ -21,7 +22,7 @@ namespace xt
 
         auto a1 = xadapt(v, s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, v[1]);
+        EXPECT_EQ(1, v[a1.strides()[1]]);
 
         shape_type str({2, 1});
         auto a2 = xadapt(v, s, str);
@@ -38,7 +39,7 @@ namespace xt
 
         auto a1 = xadapt(data, size, no_ownership(), s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, data[1]);
+        EXPECT_EQ(1, data[a1.strides()[1]]);
 
         shape_type str({2, 1});
         auto a2 = xadapt(data, size, no_ownership(), s, str);
@@ -58,7 +59,7 @@ namespace xt
 
         auto a1 = xadapt(data, size, acquire_ownership(), s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, data[1]);
+        EXPECT_EQ(1, data[a1.strides()[1]]);
 
         shape_type str({2, 1});
         auto a2 = xadapt(data2, size, acquire_ownership(), s, str);
@@ -74,7 +75,7 @@ namespace xt
 
         auto a1 = xadapt(v, s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, v[1]);
+        EXPECT_EQ(1, v[a1.strides()[1]]);
 
         shape_type str = {2, 1};
         auto a2 = xadapt(v, s, str);
@@ -91,7 +92,7 @@ namespace xt
 
         auto a1 = xadapt(data, size, no_ownership(), s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, data[1]);
+        EXPECT_EQ(1, data[a1.strides()[1]]);
 
         shape_type str = {2, 1};
         auto a2 = xadapt(data, size, no_ownership(), s, str);
@@ -111,7 +112,7 @@ namespace xt
 
         auto a1 = xadapt(data, size, acquire_ownership(), s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, data[1]);
+        EXPECT_EQ(1, data[a1.strides()[1]]);
 
         shape_type str = {2, 1};
         auto a2 = xadapt(data2, size, acquire_ownership(), s, str);
@@ -129,7 +130,7 @@ namespace xt
 
         auto a1 = xadapt(std::move(data), size, acquire_ownership(), s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, data[1]);
+        EXPECT_EQ(1, data[a1.strides()[1]]);
 
         shape_type str = {2, 1};
         auto a2 = xadapt(std::move(data2), size, acquire_ownership(), s, str);
