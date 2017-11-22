@@ -83,8 +83,6 @@ matrix:
           packages:
             - g++-6
       env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
-  allow_failures:
-      - env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
 env:
   global:
     - MINCONDA_VERSION="latest"

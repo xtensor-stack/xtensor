@@ -20,7 +20,7 @@ namespace xt
         {
             SCOPED_TRACE("row_major constructor");
             row_major_result<> rm;
-            xarray_dynamic ra(rm.m_shape);
+            xarray_dynamic ra(rm.m_shape, layout_type::row_major);
             compare_shape(ra, rm);
         }
 
@@ -56,7 +56,7 @@ namespace xt
             SCOPED_TRACE("row_major valued constructor");
             row_major_result<> rm;
             int value = 2;
-            xarray_dynamic ra(rm.m_shape, value);
+            xarray_dynamic ra(rm.m_shape, value, layout_type::row_major);
             compare_shape(ra, rm);
             xarray_dynamic::container_type vec(ra.size(), value);
             EXPECT_EQ(ra.data(), vec);
