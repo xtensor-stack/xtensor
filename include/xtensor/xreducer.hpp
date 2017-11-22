@@ -71,13 +71,14 @@ namespace xt
         std::vector<std::size_t> iter_shape = e.shape();
         std::vector<std::size_t> iter_strides(e.dimension());
 
-        xt::xarray<result_type> result;
+        xt::xarray<result_type, std::decay_t<E>::static_layout> result;
 
         if (!std::is_sorted(axes.cbegin(), axes.cend()))
         {
             throw std::runtime_error("Reducing axes should be sorted");
         }
 
+        // Fast track for complete reduction
         if (e.dimension() == axes.size())
         {
             auto begin = e.data().begin();
@@ -87,8 +88,8 @@ namespace xt
             return result;
         }
 
-        std::size_t idx = 0;
-        for (std::size_t i = 0; i < e.dimension(); ++i)
+        // axis wise reductions:
+        for (std::size_t i = 0, idx = 0; i < e.dimension(); ++i)
         {
             if (std::find(axes.begin(), axes.end(), i) == axes.end())
             {
@@ -98,26 +99,32 @@ namespace xt
             }
         }
 
-        result.reshape(result_shape);
+        result.reshape(result_shape, e.layout());
 
-        std::size_t inner_loop_size = e.strides()[axes[axes.size() - 1]];
-        std::size_t inner_stride    = e.strides()[axes[axes.size() - 1]];
-        std::size_t outer_loop_size = e.shape()[axes[axes.size() - 1]];
+        std::size_t ax_idx = (e.layout() == layout_type::row_major) ? axes.size() - 1 : 0;
+        std::size_t inner_loop_size = e.strides()[axes[ax_idx]];
+        std::size_t inner_stride    = e.strides()[axes[ax_idx]];
+        std::size_t outer_loop_size = e.shape()[axes[ax_idx]];
 
-        auto it = axes.rbegin();
-        auto last_ax = *it;
-        ++it;
-        for (; it != axes.rend(); ++it)
+        // The following code merges reduction axes "at the end" (or the beginning for col_major)
+        // together by increasing the size of the outer loop where appropriate
+        auto merge_loops = [&outer_loop_size, &e](auto it, auto end)
         {
-            if (*it == last_ax - 1)
+            auto last_ax = *it;
+            ++it;
+            for (; it != end; ++it)
             {
-                last_ax = *it;
-                outer_loop_size *= e.shape()[last_ax];
+                // note that we check is_sorted, so this condition is valid
+                if (std::abs(ptrdiff_t(*it) - ptrdiff_t(last_ax)) ==  1)
+                {
+                    last_ax = *it;
+                    outer_loop_size *= e.shape()[last_ax];
+                }
             }
-        }
+            return last_ax;
+        };
 
-        idx = 0;
-        for (std::size_t i = 0; i < e.dimension(); ++i)
+        for (std::size_t i = 0, idx = 0; i < e.dimension(); ++i)
         {
             if (std::find(axes.begin(), axes.end(), i) == axes.end())
             {
@@ -127,18 +134,29 @@ namespace xt
             }
         }
 
-        // TODO remove all entries where iter_shape == 0
-        iter_shape.erase(iter_shape.begin() + (ptrdiff_t) last_ax, iter_shape.end());
-        iter_strides.erase(iter_strides.begin() + (ptrdiff_t) last_ax, iter_strides.end());
-
-        for (std::size_t i = 0; i < iter_shape.size(); ++i)
+        if (e.layout() == layout_type::row_major)
         {
-            if (iter_shape[i] == 0)
-            {
-                iter_shape.erase(iter_shape.begin() + (ptrdiff_t) i);
-                iter_strides.erase(iter_strides.begin() + (ptrdiff_t) i);
-                ++i;
-            }
+            std::size_t last_ax = merge_loops(axes.rbegin(), axes.rend());
+
+            iter_shape.erase(iter_shape.begin() + (ptrdiff_t) last_ax, iter_shape.end());
+            iter_strides.erase(iter_strides.begin() + (ptrdiff_t) last_ax, iter_strides.end());
+        }
+        else if (e.layout() == layout_type::column_major)
+        {
+            // we got column_major here
+            std::size_t last_ax = merge_loops(axes.begin(), axes.end());
+
+            // erasing the front vs the back
+            iter_shape.erase(iter_shape.begin(), iter_shape.begin() + (ptrdiff_t) last_ax + 1);
+            iter_strides.erase(iter_strides.begin(), iter_strides.begin() + (ptrdiff_t) last_ax + 1);
+
+            // and reversing, to make it work with the same next_idx function
+            std::reverse(iter_shape.begin(), iter_shape.end());
+            std::reverse(iter_strides.begin(), iter_strides.end());
+        }
+        else
+        {
+            throw std::runtime_error("Layout not supported in immediate reduction.");
         }
 
         xindex temp_idx(iter_shape.size());
