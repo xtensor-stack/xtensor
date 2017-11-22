@@ -636,7 +636,7 @@ namespace xt
             const E& ex = e.derived_cast();
             auto&& eval_ex = eval(ex);
             bool fortran_order = false;
-            if (eval_ex.layout() == layout_type::column_major)
+            if (eval_ex.layout() == layout_type::column_major && eval_ex.dimension() > 1)
             {
                 fortran_order = true;
             }
