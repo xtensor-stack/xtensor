@@ -206,6 +206,9 @@ namespace xt
         template <class E>
         disable_xexpression<E, self_type&> operator/=(const E&);
 
+        template <class E>
+        disable_xexpression<E, self_type&> operator%=(const E&);
+        
     private:
 
         template <class F>
@@ -558,6 +561,18 @@ namespace xt
     inline auto xfiltration<ECT, CCT>::operator/=(const E& e) -> disable_xexpression<E, self_type&>
     {
         return apply([this, &e](const_reference v, bool cond) { return cond ? v / e : v; });
+    }
+
+    /**
+     * Computes the remainder of \c *this after division by the scalar \c e.
+     * @param e the scalar involved in the operation.
+     * @return a reference to \c *this.
+     */
+    template <class ECT, class CCT>
+    template <class E>
+    inline auto xfiltration<ECT, CCT>::operator%=(const E& e) -> disable_xexpression<E, self_type&>
+    {
+        return apply([this, &e](const_reference v, bool cond) { return cond ? v % e : v; });
     }
 
     template <class ECT, class CCT>

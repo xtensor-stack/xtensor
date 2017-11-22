@@ -137,6 +137,23 @@ namespace xt
         EXPECT_EQ((sa / b)(0, 0), sa / b(0, 0));
     }
 
+    TYPED_TEST(operation, modulus)
+    {
+        using int_container = rebind_container_t<TypeParam, int>;
+        using shape_type = typename int_container::shape_type;
+
+        shape_type shape = {3, 2};
+        int_container a(shape, 11);
+        int_container b(shape, 3);
+        EXPECT_EQ((a % b)(0, 0), a(0, 0) % b(0, 0));
+        
+        int sb = 3;
+        EXPECT_EQ((a % sb)(0, 0), a(0, 0) % sb);
+        
+        int sa = 11;
+        EXPECT_EQ((sa % b)(0, 0), sa % b(0, 0));
+    }
+    
     template <class T>
     struct int_rebind;
 

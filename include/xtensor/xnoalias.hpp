@@ -37,6 +37,9 @@ namespace xt
         template <class E>
         A& operator/=(const xexpression<E>& e);
 
+        template <class E>
+        A& operator%=(const xexpression<E>& e);
+        
     private:
 
         A& m_array;
@@ -90,6 +93,13 @@ namespace xt
         return m_array.divides_assign(e);
     }
 
+    template <class A>
+    template <class E>
+    inline A& noalias_proxy<A>::operator%=(const xexpression<E>& e)
+    {
+        return m_array.modulus_assign(e);
+    }
+    
     template <class A>
     inline noalias_proxy<A> noalias(A& a) noexcept
     {
