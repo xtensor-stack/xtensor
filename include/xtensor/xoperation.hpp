@@ -119,6 +119,7 @@ namespace xt
         BINARY_OPERATOR_FUNCTOR(minus, -);
         BINARY_OPERATOR_FUNCTOR(multiplies, *);
         BINARY_OPERATOR_FUNCTOR(divides, /);
+        BINARY_OPERATOR_FUNCTOR(modulus, %);
         BINARY_BOOL_OPERATOR_FUNCTOR(logical_or, ||);
         BINARY_BOOL_OPERATOR_FUNCTOR(logical_and, &&);
         UNARY_BOOL_OPERATOR_FUNCTOR(logical_not, !);
@@ -363,6 +364,23 @@ namespace xt
         return detail::make_xfunction<detail::divides>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
+    /**
+     * @ingroup arithmetic_operators
+     * @brief Modulus
+     *
+     * Returns an \ref xfunction for the element-wise modulus
+     * of \a e1 by \a e2.
+     * @param e1 an \ref xexpression or a scalar
+     * @param e2 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto operator%(E1&& e1, E2&& e2) noexcept
+    -> detail::xfunction_type_t<detail::modulus, E1, E2>
+    {
+        return detail::make_xfunction<detail::modulus>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+    
     /**
      * @defgroup logical_operators Logical operators
      */

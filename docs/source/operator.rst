@@ -18,6 +18,7 @@ Arithmetic operators
 - ``operator-``
 - ``operator*``
 - ``operator/``
+- ``operator%``
 
 All these operators are element-wise operators and apply the lazy broadcasting rules explained in
 a previous section.
