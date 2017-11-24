@@ -21,10 +21,10 @@
 #include "xmath.hpp"
 #include "xview.hpp"
 
-#if _WIN32
-using precision_type = typename std::streamsize;
+#ifdef _WIN32
+    using precision_type = typename std::streamsize;
 #else
-using precision_type = int;
+    using precision_type = int;
 #endif
 
 namespace xt

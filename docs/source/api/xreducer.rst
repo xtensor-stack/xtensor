@@ -13,5 +13,5 @@ Defined in ``xtensor/xreducer.hpp``
    :project: xtensor
    :members:
 
-.. doxygenfunction:: xt::reduce(F&&, E&&, X&&)
+.. doxygenfunction:: xt::reduce(F&&, E&&, X&&, ES)
    :project: xtensor

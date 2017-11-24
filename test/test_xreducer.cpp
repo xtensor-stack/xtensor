@@ -40,6 +40,7 @@ namespace xt
             }
         }
     }
+
     TEST(xreducer, functor_type)
     {
         auto sum = [](auto const& left, auto const& right) { return left + right; };
@@ -177,5 +178,66 @@ namespace xt
 
         xarray<uint8_t> c = {1, 2};
         EXPECT_EQ(mean(c)(), 1.5);
+    }
+
+    TEST(xreducer, immediate)
+    {
+        xarray<double> a = xt::arange(27);
+        a.reshape({3, 3, 3});
+
+        xarray<double> a_lz = sum(a);
+        auto a_gd = sum(a, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1});
+        a_gd = sum(a, {1}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 2});
+        a_gd = sum(a, {0, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 2});
+        a_gd = sum(a, {1, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a = xt::arange(4 * 3 * 6 * 2 * 7);
+        a.reshape({4, 3, 6, 2, 7});
+
+        a_lz = sum(a);
+        a_gd = sum(a, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1});
+        a_gd = sum(a, {1}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 2});
+        a_gd = sum(a, {0, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 2});
+        a_gd = sum(a, {1, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 3, 4});
+        a_gd = sum(a, {1, 3, 4}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 1, 4});
+        a_gd = sum(a, {0, 1, 4}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 1, 3});
+        a_gd = sum(a, {0, 1, 3}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 2, 3});
+        a_gd = sum(a, {0, 2, 3}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 2, 3});
+        a_gd = sum(a, {1, 2, 3}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
     }
 }

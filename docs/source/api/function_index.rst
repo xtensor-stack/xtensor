@@ -11,6 +11,7 @@ Functions and generators
 
    xfunction
    xreducer
+   xaccumulator
    xgenerator
    xbuilder
    xrandom

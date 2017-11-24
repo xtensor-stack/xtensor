@@ -23,7 +23,7 @@ include(CheckCXXCompilerFlag)
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -ffast-math -Wunused-parameter -Wextra -Wreorder")
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
 
     if (HAS_CPP14_FLAG)
@@ -114,3 +114,10 @@ add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK}
 target_link_libraries(${XTENSOR_BENCHMARK_TARGET} ${GBENCHMARK_LIBRARIES})
 
 add_custom_target(xbenchmark COMMAND benchmark_xtensor DEPENDS ${XTENSOR_BENCHMARK_TARGET})
+
+add_custom_target(xpowerbench
+    COMMAND echo "sudo needed to set cpu power governor to performance"
+    COMMAND sudo cpupower frequency-set --governor performance
+    COMMAND benchmark_xtensor
+    COMMAND sudo cpupower frequency-set --governor powersave
+    DEPENDS ${XTENSOR_BENCHMARK_TARGET})
