@@ -18,7 +18,7 @@
 #include "xtensor/xtensor.hpp"
 
 // For how many sizes should math functions be tested?
-#define MATH_RANGE 10, 10 << 3
+#define MATH_RANGE 64, 64
 
 namespace xt
 {

@@ -113,7 +113,9 @@ set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_BENCHMARK_TARGET} ${GBENCHMARK_LIBRARIES})
 
-add_custom_target(xbenchmark COMMAND benchmark_xtensor DEPENDS ${XTENSOR_BENCHMARK_TARGET})
+add_custom_target(xbenchmark
+    COMMAND benchmark_xtensor
+    DEPENDS ${XTENSOR_BENCHMARK_TARGET})
 
 add_custom_target(xpowerbench
     COMMAND echo "sudo needed to set cpu power governor to performance"
