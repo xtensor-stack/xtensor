@@ -31,6 +31,16 @@
     std::vector<typename DEFAULT_DATA_CONTAINER(T, EA)::size_type, SA>
 #endif
 
+#ifndef DEFAULT_ALLOCATOR
+#ifdef XTENSOR_USE_XSIMD
+#define DEFAULT_ALLOCATOR \
+    xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
+#else
+#define DEFAULT_ALLOCATOR \
+    std::allocator<T>
+#endif
+#endif
+
 #ifndef DEFAULT_LAYOUT
 #define DEFAULT_LAYOUT layout_type::row_major
 #endif
