@@ -53,19 +53,11 @@ namespace xt
      * @tparam A The allocator of the container holding the elements.
      * @tparam SA The allocator of the containers holding the shape and the strides.
      */
-#ifdef XTENSOR_USE_XSIMD
     template <class T,
               layout_type L = DEFAULT_LAYOUT,
-              class A = xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>,
+              class A = DEFAULT_ALLOCATOR(T),
               class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
-#else
-    template <class T,
-              layout_type L = DEFAULT_LAYOUT,
-              class A = std::allocator<T>,
-              class SA = std::allocator<typename std::vector<T, A>::size_type>>
-    using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
-#endif
 
     template <class EC,
               layout_type L = DEFAULT_LAYOUT,
@@ -83,21 +75,12 @@ namespace xt
      * @tparam BA The allocator of the container holding the missing flags.
      * @tparam SA The allocator of the containers holding the shape and the strides.
      */
-#ifdef XTENSOR_USE_XSIMD
     template <class T,
               layout_type L = DEFAULT_LAYOUT,
-              class A = xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>,
+              class A = DEFAULT_ALLOCATOR(T),
               class BC = xtl::xdynamic_bitset<std::size_t>,
               class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xarray_optional = xarray_container<xtl::xoptional_vector<T, A, BC>, L, DEFAULT_SHAPE_CONTAINER(T, A, SA), xoptional_expression_tag>;
-#else
-    template <class T,
-              layout_type L = DEFAULT_LAYOUT,
-              class A = std::allocator<T>,
-              class BC = xtl::xdynamic_bitset<std::size_t>,
-              class SA = std::allocator<typename std::vector<T, A>::size_type>>
-    using xarray_optional = xarray_container<xtl::xoptional_vector<T, A, BC>, L, DEFAULT_SHAPE_CONTAINER(T, A, SA), xoptional_expression_tag>;
-#endif
 
     template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_container;
@@ -122,13 +105,11 @@ namespace xt
      * @tparam L The layout_type of the tensor (default: row_major).
      * @tparam A The allocator of the containers holding the elements.
      */
-#ifdef XTENSOR_USE_XSIMD
-    template <class T, std::size_t N, layout_type L = DEFAULT_LAYOUT, class A = xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>>
+    template <class T,
+              std::size_t N,
+              layout_type L = DEFAULT_LAYOUT,
+              class A = DEFAULT_ALLOCATOR(T)>
     using xtensor = xtensor_container<DEFAULT_DATA_CONTAINER(T, A), N, L>;
-#else
-    template <class T, std::size_t N, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<T>>
-    using xtensor = xtensor_container<DEFAULT_DATA_CONTAINER(T, A), N, L>;
-#endif
 
     template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_adaptor;
@@ -143,21 +124,12 @@ namespace xt
      * @tparam A The allocator of the containers holding the elements.
      * @tparam BA The allocator of the container holding the missing flags.
      */
-#ifdef XTENSOR_USE_XSIMD
     template <class T,
               std::size_t N,
               layout_type L = DEFAULT_LAYOUT,
-              class A = xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>,
+              class A = DEFAULT_ALLOCATOR(T),
               class BC = xtl::xdynamic_bitset<std::size_t>>
     using xtensor_optional = xtensor_container<xtl::xoptional_vector<T, A, BC>, N, L, xoptional_expression_tag>;
-#else
-    template <class T,
-              std::size_t N,
-              layout_type L = DEFAULT_LAYOUT,
-              class A = std::allocator<T>,
-              class BC = xtl::xdynamic_bitset<std::size_t>>
-    using xtensor_optional = xtensor_container<xtl::xoptional_vector<T, A, BC>, N, L, xoptional_expression_tag>;
-#endif
 
     template <class CT, class... S>
     class xview;

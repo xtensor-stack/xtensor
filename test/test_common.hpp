@@ -14,14 +14,14 @@
 
 namespace xt
 {
-    template <class T, class A>
-    bool operator==(const uvector<T, A>& lhs, const std::vector<T, A>& rhs)
+    template <class T, class A, class AV>
+    bool operator==(const uvector<T, A>& lhs, const std::vector<T, AV>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template <class T, class A>
-    bool operator==(const std::vector<T, A>& lhs, const uvector<T, A>& rhs)
+    template <class T, class A, class AV>
+    bool operator==(const std::vector<T, AV>& lhs, const uvector<T, A>& rhs)
     {
         return rhs == lhs;
     }
@@ -29,7 +29,7 @@ namespace xt
     template <class C = std::vector<std::size_t>>
     struct layout_result
     {
-        using vector_type = uvector<int>;
+        using vector_type = uvector<int, DEFAULT_ALLOCATOR(int)>;
         using size_type = typename C::value_type;
         using shape_type = C;
         using strides_type = C;
