@@ -33,10 +33,11 @@
 
 #ifndef DEFAULT_ALLOCATOR
 #ifdef XTENSOR_USE_XSIMD
-#define DEFAULT_ALLOCATOR \
+#include "xsimd/xsimd.hpp"
+#define DEFAULT_ALLOCATOR(T) \
     xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
 #else
-#define DEFAULT_ALLOCATOR \
+#define DEFAULT_ALLOCATOR(T) \
     std::allocator<T>
 #endif
 #endif
