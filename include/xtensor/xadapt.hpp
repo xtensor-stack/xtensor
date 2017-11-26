@@ -78,6 +78,16 @@ namespace xt
      ***************************/
 
     /**
+     * Constructs a 1D xtensor_adaptor of the given stl-like container,
+     * with the specified layout_type.
+     * @param container the container to adapt
+     * @param l the layout_type of the xtensor_adaptor
+     */
+    template <class C, layout_type L = DEFAULT_LAYOUT>
+    xtensor_adaptor<C, 1, L>
+    xadapt(C&& container, layout_type l = L);
+    
+    /**
      * Constructs an xtensor_adaptor of the given stl-like container,
      * with the specified shape and layout_type.
      * @param container the container to adapt
@@ -100,6 +110,20 @@ namespace xt
     xadapt(C&& container, const std::array<typename std::decay_t<C>::size_type, N>& shape, const std::array<typename std::decay_t<C>::size_type, N>& strides);
 
     /**
+     * Constructs a 1D xtensor_adaptor of the given dynamically allocated C array,
+     * with the specified layout.
+     * @param pointer the pointer to the beginning of the dynamic array
+     * @param size the size of the dynamic array
+     * @param ownership indicates whether the adaptor takes ownership of the array.
+     *        Possible values are ``no_ownerhsip()`` or ``acquire_ownership()``
+     * @param l the layout_type of the xtensor_adaptor
+     * @param alloc the allocator used for allocating / deallocating the dynamic array
+     */
+    template <class P, class O, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_pointer_t<std::remove_reference_t<P>>>>
+    xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, 1, L>
+    xadapt(P&& pointer, typename A::size_type size, O ownership, layout_type l = L, const A& alloc = A());
+
+    /**
      * Constructs an xtensor_adaptor of the given dynamically allocated C array,
      * with the specified shape and layout.
      * @param pointer the pointer to the beginning of the dynamic array
@@ -117,7 +141,7 @@ namespace xt
 
     /**
      * Constructs an xtensor_adaptor of the given dynamically allocated C array,
-     * with the specified shape and layout.
+     * with the specified shape and strides.
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -167,6 +191,14 @@ namespace xt
      * xtensor_adaptor builder implementation *
      ******************************************/
 
+    template <class C, layout_type L>
+    inline xtensor_adaptor<C, 1, L>
+    xadapt(C&& container, layout_type l)
+    {
+        const std::array<typename std::decay_t<C>::size_type, 1> shape{container.size()};
+        return xtensor_adaptor<xtl::closure_type_t<C>, 1, L>(std::forward<C>(container), shape, l);
+    }
+    
     template <class C, std::size_t N, layout_type L>
     inline xtensor_adaptor<C, N, L>
     xadapt(C&& container, const std::array<typename std::decay_t<C>::size_type, N>& shape, layout_type l)
@@ -179,6 +211,16 @@ namespace xt
     xadapt(C&& container, const std::array<typename std::decay_t<C>::size_type, N>& shape, const std::array<typename std::decay_t<C>::size_type, N>& strides)
     {
         return xtensor_adaptor<xtl::closure_type_t<C>, N, layout_type::dynamic>(std::forward<C>(container), shape, strides);
+    }
+
+    template <class P, class O, layout_type L, class A>
+    inline xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, 1, L>
+    xadapt(P&& pointer, typename A::size_type size, O, layout_type l, const A& alloc)
+    {
+        using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
+        buffer_type buf(std::forward<P>(pointer), size, alloc);
+        const std::array<typename A::size_type, 1> shape{size};
+        return xtensor_adaptor<buffer_type, 1, L>(std::move(buf), shape, l);
     }
 
     template <class P, std::size_t N, class O, layout_type L, class A>
