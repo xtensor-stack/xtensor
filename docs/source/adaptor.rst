@@ -25,7 +25,7 @@ The following example shows how to bring an ``std::vector`` into the expression 
 
     std::vector<double> v = {1., 2., 3., 4., 5., 6. };
     std::vector<std::size_t> shape = { 2, 3 };
-    auto a1 = xt::adapt(v, shape);
+    auto a1 = xt::xadapt(v, shape);
 
     xt::xarray<double> a2 = {{ 1., 2., 3.},
                              { 4., 5., 6.}};
@@ -56,7 +56,7 @@ ownership of the array:
     double compute(double* data, std::size_t size)
     {
         std::vector<std::size_t> shape = { 2, 3 };
-        auto a = xt::adapt(data, size, xt::no_ownership(), shape);
+        auto a = xt::xadapt(data, size, xt::no_ownership(), shape);
         return some_computation(data, size)
     }
 
@@ -78,7 +78,7 @@ the ownership of the array, meaning it will be deleted when the adaptor is destr
     double compute(double* data, std::size_t size)
     {
         std::vector<std::size_t> shape = { 2, 3 };
-        auto a = xt::adapt(data, size, xt::acquire_ownership(), shape);
+        auto a = xt::xadapt(data, size, xt::acquire_ownership(), shape);
         return some_computation(data, size)
     }
 
