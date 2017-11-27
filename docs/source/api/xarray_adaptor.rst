@@ -13,19 +13,19 @@ Defined in ``xtensor/xarray.hpp``
    :project: xtensor
    :members:
 
-xadapt (xarray_adaptor)
+adapt (xarray_adaptor)
 =======================
 
 Defined in ``xtensor/xadapt.hpp``
 
-.. doxygenfunction:: xt::xadapt(C&&, const SC&, layout_type)
+.. doxygenfunction:: xt::adapt(C&&, const SC&, layout_type)
    :project: xtensor
 
-.. doxygenfunction:: xt::xadapt(C&&, const SC&, const SC&)
+.. doxygenfunction:: xt::adapt(C&&, const SC&, const SC&)
    :project: xtensor
 
-.. doxygenfunction:: xt::xadapt(P&&, typename A::size_type, O, const SC&, layout_type, const A&)
+.. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, const SC&, layout_type, const A&)
    :project: xtensor
 
-.. doxygenfunction:: xt::xadapt(P&&, typename A::size_type, O, const SC&, const SC&, const A&)
+.. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, const SC&, const SC&, const A&)
    :project: xtensor
