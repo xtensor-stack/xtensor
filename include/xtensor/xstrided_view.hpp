@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XTENSOR_STRIDEDVIEW_HPP
-#define XTENSOR_STRIDEDVIEW_HPP
+#ifndef XTENSOR_STRIDED_VIEW_HPP
+#define XTENSOR_STRIDED_VIEW_HPP
 
 #include <algorithm>
 #include <cstddef>
@@ -246,6 +246,7 @@ namespace xt
      * @param shape the shape of the view
      * @param strides the strides of the view
      * @param offset the offset of the first element in the underlying container
+     * @param layout the layout of the view
      */
     template <class CT, class S, class CD>
     inline xstrided_view<CT, S, CD>::xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept

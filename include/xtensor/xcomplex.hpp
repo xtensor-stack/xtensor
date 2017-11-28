@@ -14,7 +14,7 @@
 
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xexpression.hpp"
-#include "xtensor/xoffsetview.hpp"
+#include "xtensor/xoffset_view.hpp"
 
 #include "xtl/xcomplex.hpp"
 
@@ -44,14 +44,14 @@ namespace xt
             static inline auto real(E&& e) noexcept
             {
                 using real_type = typename std::decay_t<E>::value_type::value_type;
-                return xoffsetview<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
+                return xoffset_view<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
             }
 
             template <class E>
             static inline auto imag(E&& e) noexcept
             {
                 using real_type = typename std::decay_t<E>::value_type::value_type;
-                return xoffsetview<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
+                return xoffset_view<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
             }
         };
 

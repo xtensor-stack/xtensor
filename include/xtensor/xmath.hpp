@@ -662,6 +662,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the maximum is found (optional)
+     * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
     REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type);
@@ -679,6 +680,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the minimum is found (optional)
+     * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
     REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type);
@@ -1542,6 +1544,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the sum is performed (optional)
+     * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
     REDUCER_FUNCTION(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
@@ -1559,6 +1562,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the product is computed (optional)
+     * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
     REDUCER_FUNCTION(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
@@ -1620,9 +1624,9 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @brief Cumulative sum.
      *
      * Returns the accumulated sum for the elements over given
-     * \em axes (or flattened).
+     * \em axis (or flattened).
      * @param e an \ref xexpression
-     * @param axes the axes along which the cumulative sum is computed (optional)
+     * @param axis the axes along which the cumulative sum is computed (optional)
      * @return an \ref xarray<T>
      */
     template <class E>
@@ -1644,9 +1648,9 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @brief Cumulative product.
      *
      * Returns the accumulated product for the elements over given
-     * \em axes (or flattened).
+     * \em axis (or flattened).
      * @param e an \ref xexpression
-     * @param axes the axes along which the cumulative product is computed (optional)
+     * @param axis the axes along which the cumulative product is computed (optional)
      * @return an \ref xarray<T>
      */
     template <class E>

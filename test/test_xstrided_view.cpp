@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
-#include "xtensor/xstridedview.hpp"
+#include "xtensor/xstrided_view.hpp"
 
 #include "xtensor/xio.hpp"
 
@@ -18,7 +18,7 @@ namespace xt
     using std::size_t;
     using shape_t = std::vector<std::size_t>;
 
-    TEST(xstridedview, transpose_assignment)
+    TEST(xstrided_view, transpose_assignment)
     {
         xarray<double> e = xt::arange<double>(24);
         e.reshape({2, 2, 6});
@@ -32,7 +32,7 @@ namespace xt
         EXPECT_ANY_THROW(vt.at(0, 0, 0, 0));
     }
 
-    TEST(xstridedview, expression_adapter)
+    TEST(xstrided_view, expression_adapter)
     {
         auto e = xt::arange<double>(24);
         auto sv = slice_vector(e, range(2, 10, 3));
@@ -46,7 +46,7 @@ namespace xt
         EXPECT_EQ(assigned(1), 5);
     }
 
-    TEST(xstridedview, transpose_layout_swap)
+    TEST(xstrided_view, transpose_layout_swap)
     {
         xarray<double, layout_type::row_major> a = xt::ones<double>({5, 5});
 

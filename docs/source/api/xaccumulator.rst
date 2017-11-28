@@ -4,19 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xfunctorview
+xaccumulator
 ============
 
-Defined in ``xtensor/xfunctorview.hpp``
+Defined in ``xtensor/xaccumulator.hpp``
 
-.. doxygenclass:: xt::xfunctorview
-   :project: xtensor
-   :members:
-
-Defined in ``xtensor/xcomplex.hpp``
-
-.. doxygenfunction:: xt::real(E&&)
+.. doxygenfunction:: xt::accumulate(F&&, E&&, ES)
    :project: xtensor
 
-.. doxygenfunction:: xt::imag(E&&)
+.. doxygenfunction:: xt::accumulate(F&&, E&&, std::size_t, ES)
    :project: xtensor

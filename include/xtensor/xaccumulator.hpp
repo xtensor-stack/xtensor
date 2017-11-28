@@ -117,8 +117,9 @@ namespace xt
      * Accumulate and flatten array
      * **NOTE** This function is not lazy!
      *
-     * @param f Functor to use for accumulation
+     * @param f functor to use for accumulation
      * @param e xexpression to be accumulated
+     * @param evaluation_strategy evaluation strategy of the accumulation
      *
      * @return returns xarray<T> filled with accumulated values
      */
@@ -138,6 +139,7 @@ namespace xt
      * @param f Functor to use for accumulation
      * @param e xexpression to accumulate
      * @param axis Axis to perform accumulation over
+     * @param evaluation_strategy evaluation strategy of the accumulation
      *
      * @return returns xarray<T> filled with accumulated values
      */

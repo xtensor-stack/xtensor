@@ -4,10 +4,10 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xstridedview
-============
+xstrided_view
+=============
 
-Defined in ``xtensor/xstridedview.hpp``
+Defined in ``xtensor/xstrided_view.hpp``
 
 .. doxygenclass:: xt::xstrided_view
    :project: xtensor
