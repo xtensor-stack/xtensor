@@ -13,19 +13,19 @@ Defined in ``xtensor/xtensor.hpp``
    :project: xtensor
    :members:
 
-xadapt (xtensor_adaptor)
+adapt (xtensor_adaptor)
 ========================
 
 Defined in ``xtensor/xadapt.hpp``
 
-.. doxygenfunction:: xt::xadapt(C&&, const std::array<typename std::decay_t<C>::size_type, N>&, layout_type)
+.. doxygenfunction:: xt::adapt(C&&, const std::array<typename std::decay_t<C>::size_type, N>&, layout_type)
    :project: xtensor
 
-.. doxygenfunction:: xt::xadapt(C&&, const std::array<typename std::decay_t<C>::size_type, N>&, const std::array<typename std::decay_t<C>::size_type, N>&)
+.. doxygenfunction:: xt::adapt(C&&, const std::array<typename std::decay_t<C>::size_type, N>&, const std::array<typename std::decay_t<C>::size_type, N>&)
    :project: xtensor
 
-.. doxygenfunction:: xt::xadapt(P&&, typename A::size_type, O, const std::array<typename A::size_type, N>&, layout_type, const A&)
+.. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, const std::array<typename A::size_type, N>&, layout_type, const A&)
    :project: xtensor
 
-.. doxygenfunction:: xt::xadapt(P&&, typename A::size_type, O, const std::array<typename A::size_type, N>&, const std::array<typename A::size_type, N>&, const A&)
+.. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, const std::array<typename A::size_type, N>&, const std::array<typename A::size_type, N>&, const A&)
    :project: xtensor
