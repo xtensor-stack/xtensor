@@ -166,7 +166,7 @@ namespace xt
         data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, strides_type>
         strides() const;
 
         template <class T = xexpression_type>
@@ -609,9 +609,8 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::strides() const ->
-        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, strides_type>
     {
-        using strides_type = typename T::strides_type;
         strides_type strides = xtl::make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
