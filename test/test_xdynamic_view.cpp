@@ -17,7 +17,7 @@ namespace xt
     using std::size_t;
     using view_shape_type = std::vector<size_t>;
 
-    TEST(xdynview, simple)
+    TEST(xdynamic_view, simple)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
@@ -61,7 +61,7 @@ namespace xt
         EXPECT_EQ(a(2, 2), view7(2));
     }
 
-    TEST(xdynview, three_dimensional)
+    TEST(xdynamic_view, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
         std::vector<double> data = {
@@ -96,7 +96,7 @@ namespace xt
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
 
-    TEST(xdynview, iterator)
+    TEST(xdynamic_view, iterator)
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double> a(shape);
@@ -137,7 +137,7 @@ namespace xt
         EXPECT_EQ(iter2, iter_end2);
     }
 
-    TEST(xdynview, xdynview_on_xfunction)
+    TEST(xdynamic_view, xdynamic_view_on_xfunction)
     {
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
@@ -162,7 +162,7 @@ namespace xt
         EXPECT_EQ(iter, iter_end);
     }
 
-    TEST(xdynview, xdynview_on_xtensor)
+    TEST(xdynamic_view, xdynamic_view_on_xtensor)
     {
         xtensor<int, 2> a({3, 4});
         std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
@@ -189,7 +189,7 @@ namespace xt
         EXPECT_EQ(10, res(2));
     }
 
-    TEST(xdynview, const_view)
+    TEST(xdynamic_view, const_view)
     {
         const xtensor<double, 3> arr{{1, 2, 3}, 2.5};
         xtensor<double, 2> arr2{{2, 3}, 0.0};
@@ -198,7 +198,7 @@ namespace xt
         EXPECT_EQ(ref, arr2);
     }
 
-    TEST(xdynview, newaxis)
+    TEST(xdynamic_view, newaxis)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
@@ -248,7 +248,7 @@ namespace xt
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
     }
 
-    TEST(xdynview, newaxis_iterating)
+    TEST(xdynamic_view, newaxis_iterating)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
@@ -316,7 +316,7 @@ namespace xt
         EXPECT_EQ(iter2_end, iter2);
     }
 
-    TEST(xdynview, newaxis_function)
+    TEST(xdynamic_view, newaxis_function)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
@@ -338,7 +338,7 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
-    TEST(xdynview, range_adaptor)
+    TEST(xdynamic_view, range_adaptor)
     {
         using namespace xt::placeholders;
         using t = xarray<int>;
@@ -379,7 +379,7 @@ namespace xt
         EXPECT_TRUE(v8e == v8);
     }
 
-    TEST(xdynview, assign)
+    TEST(xdynamic_view, assign)
     {
         using t = xarray<int>;
         t a = {1, 2, 3, 4, 5};

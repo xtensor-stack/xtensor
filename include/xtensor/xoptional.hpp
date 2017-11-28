@@ -325,7 +325,7 @@ namespace xt
      /**
       * Constructs an xoptional_function applying the specified function to the given
       * arguments.
-      * @param f the function to apply
+      * @param func the function to apply
       * @param e the \ref xexpression arguments
       */
     template <class F, class R, class... CT>
