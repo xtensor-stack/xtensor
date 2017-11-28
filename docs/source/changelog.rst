@@ -7,6 +7,46 @@
 Changelog
 =========
 
+0.14.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- ``xadapt`` renamed into ``adapt``
+  `#563 <https://github.com/QuantStack/xtensor/pull/563>`_.
+- Naming consistency
+  `#565 <https://github.com/QuantStack/xtensor/pull/565>`_.
+
+New features
+~~~~~~~~~~~~
+
+- add ``random::choice``
+  `#547 <https://github.com/QuantStack/xtensor/pull/547>`_.
+- evaluation strategy and accumulators.
+  `#550 <https://github.com/QuantStack/xtensor/pull/550>`_.
+- modulus operator
+  `#556 <https://github.com/QuantStack/xtensor/pull/556>`_.
+- ``adapt``: default overload for 1D arrays
+  `#560 <https://github.com/QuantStack/xtensor/pull/560>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- optional fixes to avoid ambiguous calls
+  `#541 <https://github.com/QuantStack/xtensor/pull/541>`_.
+- narrative documentation about ``xt::adapt``
+  `#544 <https://github.com/QuantStack/xtensor/pull/544>`_.
+- ``xfunction`` refactoring
+  `#545 <https://github.com/QuantStack/xtensor/pull/545>`_.
+- SIMD acceleration for AVX fixed
+  `#557 <https://github.com/QuantStack/xtensor/pull/557>`_.
+- allocator fixes
+  `#558 <https://github.com/QuantStack/xtensor/pull/558>`_.
+  `#559 <https://github.com/QuantStack/xtensor/pull/559>`_.
+
+
+
 0.13.2
 ------
 
