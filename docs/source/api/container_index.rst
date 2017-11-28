@@ -19,7 +19,7 @@ Containers and views
    xoptional_assembly
    xoptional_assembly_adaptor
    xview
-   xstridedview
+   xstrided_view
    xbroadcast
-   xindexview
-   xfunctorview
+   xindex_view
+   xfunctor_view

@@ -6,12 +6,12 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XTENSOR_OFFSETVIEW_HPP
-#define XTENSOR_OFFSETVIEW_HPP
+#ifndef XTENSOR_OFFSET_VIEW_HPP
+#define XTENSOR_OFFSET_VIEW_HPP
 
 #include "xtl/xcomplex.hpp"
 
-#include "xtensor/xfunctorview.hpp"
+#include "xtensor/xfunctor_view.hpp"
 
 namespace xt
 {

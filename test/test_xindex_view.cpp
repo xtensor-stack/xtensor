@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xrandom.hpp"
-#include "xtensor/xindexview.hpp"
+#include "xtensor/xindex_view.hpp"
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xview.hpp"
 #include "test_common.hpp"

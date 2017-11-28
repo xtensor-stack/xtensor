@@ -14,7 +14,7 @@
 
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xexpression.hpp"
-#include "xtensor/xoffsetview.hpp"
+#include "xtensor/xoffset_view.hpp"
 
 #include "xtl/xcomplex.hpp"
 

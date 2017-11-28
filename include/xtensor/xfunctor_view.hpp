@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XTENSOR_FUNCTORVIEW_HPP
-#define XTENSOR_FUNCTORVIEW_HPP
+#ifndef XTENSOR_FUNCTOR_VIEW_HPP
+#define XTENSOR_FUNCTOR_VIEW_HPP
 
 #include <algorithm>
 #include <array>

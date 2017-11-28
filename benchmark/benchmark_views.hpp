@@ -17,7 +17,7 @@
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xstrides.hpp"
-#include "xtensor/xstridedview.hpp"
+#include "xtensor/xstrided_view.hpp"
 
 namespace xt
 {

@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
-#include "xtensor/xstridedview.hpp"
+#include "xtensor/xstrided_view.hpp"
 
 #include "xtensor/xio.hpp"
 

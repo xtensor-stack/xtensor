@@ -93,11 +93,11 @@ set(XTENSOR_TESTS
     test_xcontainer_semantic.cpp
     test_xcomplex.cpp
     test_xcsv.cpp
-    test_xdynamicview.cpp
+    test_xdynamic_view.cpp
     test_xeval.cpp
     test_xexception.cpp
     test_xfunction.cpp
-    test_xindexview.cpp
+    test_xindex_view.cpp
     test_xinfo.cpp
     test_xiterator.cpp
     test_xio.cpp
@@ -116,7 +116,7 @@ set(XTENSOR_TESTS
     test_xscalar_semantic.cpp
     test_xsemantic.hpp
     test_xstorage.cpp
-    test_xstridedview.cpp
+    test_xstrided_view.cpp
     test_xtensor.cpp
     test_xtensor_adaptor.cpp
     test_xtensor_semantic.cpp

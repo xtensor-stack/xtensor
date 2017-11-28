@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xstridedview.hpp"
+#include "xtensor/xstrided_view.hpp"
 #include <algorithm>
 
 namespace xt

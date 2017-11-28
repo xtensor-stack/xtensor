@@ -51,9 +51,9 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctorview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctor_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xindexview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xindex_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xinfo.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterable.hpp
@@ -63,7 +63,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnpy.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoffsetview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xoffset_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly.hpp
@@ -74,7 +74,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstorage.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xstridedview.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xstrided_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstrides.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp

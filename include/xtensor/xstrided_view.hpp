@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XTENSOR_STRIDEDVIEW_HPP
-#define XTENSOR_STRIDEDVIEW_HPP
+#ifndef XTENSOR_STRIDED_VIEW_HPP
+#define XTENSOR_STRIDED_VIEW_HPP
 
 #include <algorithm>
 #include <cstddef>

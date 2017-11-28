@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XTENSOR_INDEXVIEW_HPP
-#define XTENSOR_INDEXVIEW_HPP
+#ifndef XTENSOR_INDEX_VIEW_HPP
+#define XTENSOR_INDEX_VIEW_HPP
 
 #include <algorithm>
 #include <cstddef>
