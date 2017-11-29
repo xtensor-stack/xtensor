@@ -29,6 +29,8 @@ New features
   `#556 <https://github.com/QuantStack/xtensor/pull/556>`_.
 - ``adapt``: default overload for 1D arrays
   `#560 <https://github.com/QuantStack/xtensor/pull/560>`_.
+- Move semantic on ``adapt``
+  `#564 <https://github.com/QuantStack/xtensor/pull/564>`_.
 
 Other changes
 ~~~~~~~~~~~~~
@@ -44,7 +46,8 @@ Other changes
 - allocator fixes
   `#558 <https://github.com/QuantStack/xtensor/pull/558>`_.
   `#559 <https://github.com/QuantStack/xtensor/pull/559>`_.
-
+- return type of ``view::strides()`` fixed
+  `#568 <https://github.com/QuantStack/xtensor/pull/568>`_.
 
 
 0.13.2
