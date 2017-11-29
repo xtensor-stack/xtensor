@@ -3,7 +3,7 @@
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://beta.mybinder.org/v2/gh/QuantStack/xtensor/0.13.2-binder?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://beta.mybinder.org/v2/gh/QuantStack/xtensor/0.14.0-binder2?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
@@ -48,7 +48,8 @@ make install
 
 | `xtensor` | `xtl`  |`xsimd` (optional) |
 |-----------|--------|-------------------|
-|  master   | ^0.3.4 |       ^3.1.0      |
+|  master   | ^0.3.6 |       ^3.1.0      |
+|  0.14.0   | ^0.3.6 |       ^3.1.0      |
 |  0.13.2   | ^0.3.4 |       ^3.1.0      |
 |  0.13.1   | ^0.3.3 |       ^3.1.0      |
 |  0.13.0   | ^0.3.3 |       ^3.1.0      |
