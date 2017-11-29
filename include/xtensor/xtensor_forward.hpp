@@ -15,6 +15,7 @@
 #include "xexpression.hpp"
 #include "xlayout.hpp"
 #include "xstorage.hpp"
+#include "xshape.hpp"
 #include "xtensor_config.hpp"
 #include "xtensor_simd.hpp"
 
@@ -61,7 +62,9 @@ namespace xt
 
     template <class EC,
               layout_type L = DEFAULT_LAYOUT,
-              class SC = std::vector<typename EC::size_type>,
+              class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
+                                                 std::allocator<typename EC::size_type>,
+                                                 std::allocator<typename EC::size_type>),
               class Tag = xtensor_expression_tag>
     class xarray_adaptor;
 

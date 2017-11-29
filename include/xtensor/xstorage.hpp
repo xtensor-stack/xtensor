@@ -16,8 +16,6 @@
 #include <memory>
 #include <type_traits>
 
-#include "xutils.hpp"
-
 namespace xt
 {
 
@@ -27,6 +25,18 @@ namespace xt
         using require_input_iter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<It>::iterator_category,
                                                                                std::input_iterator_tag>::value>::type;
     }
+
+    /********************************************
+     * xtrivial_default_construct implemenation *
+     ********************************************/
+
+    #if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(_GLIBCXX_USE_CXX11_ABI)
+        template <class T>
+        using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
+    #else
+        template <class T>
+        using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
+    #endif
 
     template <class T, class Allocator = std::allocator<T>>
     class uvector
@@ -498,32 +508,25 @@ namespace xt
     inline bool operator<(const uvector<T, A>& lhs, const uvector<T, A>& rhs)
     {
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::less<T>());
+                                            rhs.begin(), rhs.end());
     }
 
     template <class T, class A>
     inline bool operator<=(const uvector<T, A>& lhs, const uvector<T, A>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::less_equal<T>());
+        return !(lhs > rhs);
     }
 
     template <class T, class A>
     inline bool operator>(const uvector<T, A>& lhs, const uvector<T, A>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::greater<T>());
+        return rhs < lhs;
     }
 
     template <class T, class A>
     inline bool operator>=(const uvector<T, A>& lhs, const uvector<T, A>& rhs)
     {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::greater_equal<T>());
+        return !(lhs < rhs);
     }
 
     template <class T, class A>

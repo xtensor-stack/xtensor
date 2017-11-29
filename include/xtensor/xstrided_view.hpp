@@ -780,7 +780,7 @@ namespace xt
     template <class E, class I, class Tag = check_policy::none>
     inline auto transpose(E&& e, std::initializer_list<I> permutation, Tag check_policy = Tag())
     {
-        std::vector<I> perm(permutation);
+        dynamic_shape<I> perm(permutation);
         return detail::transpose_impl(std::forward<E>(e), std::move(perm), check_policy);
     }
 #else
@@ -905,7 +905,7 @@ namespace xt
          * @param shape the shape
          */
         template <class... Args>
-        inline slice_vector(const std::vector<std::size_t>& shape, Args... args)
+        inline slice_vector(const dynamic_shape<std::size_t>& shape, Args... args)
         {
             m_shape = shape;
             append(args...);
@@ -982,7 +982,7 @@ namespace xt
 
     private:
 
-        std::vector<std::size_t> m_shape;
+        dynamic_shape<std::size_t> m_shape;
         std::size_t newaxis_count = 0;
     };
 
@@ -1021,7 +1021,7 @@ namespace xt
         template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_strides(E&& e)
         {
-            std::vector<std::size_t> strides;
+            dynamic_shape<std::size_t> strides;
             strides.resize(e.shape().size());
             compute_strides(e.shape(), DEFAULT_LAYOUT, strides);
             return strides;
@@ -1067,7 +1067,7 @@ namespace xt
 
         // Compute strided view
         std::size_t offset = detail::get_offset(e);
-        using shape_type = typename std::vector<std::size_t>;
+        using shape_type = dynamic_shape<std::size_t>;
 
         shape_type new_shape(dimension);
         shape_type new_strides(dimension);

@@ -1322,7 +1322,7 @@ namespace xt
         m_shape = xtl::forward_sequence<shape_type>(shape);
         resize_container(m_strides, m_shape.size());
         resize_container(m_backstrides, m_shape.size());
-        size_type data_size = compute_strides(m_shape, m_layout, m_strides, m_backstrides);
+        compute_strides(m_shape, m_layout, m_strides, m_backstrides);
     }
 }
 

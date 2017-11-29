@@ -421,8 +421,8 @@ namespace xt
     {
         using container_1d = redim_container_t<TypeParam, 1>;
         using container_2d = redim_container_t<TypeParam, 2>;
-        container_2d a = {{1, 2, 3, 4},
-                          {5, 6, 7, 8},
+        container_2d a = {{1,  2,  3,  4},
+                          {5,  6,  7,  8},
                           {9, 10, 11, 12}};
         container_2d b = a;
         auto viewa = view(a, all(), range(1, 4));

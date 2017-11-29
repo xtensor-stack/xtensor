@@ -311,7 +311,7 @@ namespace xt
             inline value_type operator()(Args... args) const
             {
                 // TODO: avoid memory allocation
-                return access_impl(xindex({{static_cast<size_type>(args)...}}));
+                return access_impl(xindex({static_cast<size_type>(args)...}));
             }
 
             template <class It>
@@ -370,7 +370,7 @@ namespace xt
             inline value_type operator()(Args... args) const
             {
                 // TODO: avoid memory allocation
-                return access_impl(xindex({{static_cast<size_type>(args)...}}));
+                return access_impl(xindex({static_cast<size_type>(args)...}));
             }
 
             template <class It>

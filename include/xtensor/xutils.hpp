@@ -23,6 +23,7 @@
 #include "xtl/xfunctional.hpp"
 #include "xtl/xtype_traits.hpp"
 
+#include "xshape.hpp"
 #include "xtensor_config.hpp"
 
 namespace xt
@@ -441,7 +442,7 @@ namespace xt
         template <class... S>
         struct promote_index_impl<false, S...>
         {
-            using type = std::vector<typename std::common_type<typename S::value_type...>::type>;
+            using type = dynamic_shape<typename std::common_type<typename S::value_type...>::type>;
         };
 
         template <class... S>
@@ -599,22 +600,6 @@ namespace xt
     {
         using type = void;
     };
-
-    /********************************************
-     * xtrivial_default_construct implemenation *
-     ********************************************/
-
-    #if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(_GLIBCXX_USE_CXX11_ABI)
-
-    template <class T>
-    using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
-
-    #else
-
-    template <class T>
-    using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
-
-    #endif
 
     /*************************
      * conditional type cast *

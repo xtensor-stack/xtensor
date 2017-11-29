@@ -16,12 +16,13 @@
 #include "xtl/xclosure.hpp"
 #include "xtl/xtype_traits.hpp"
 
+#include "xshape.hpp"
 #include "xutils.hpp"
 
 namespace xt
 {
 
-    using xindex = std::vector<std::size_t>;
+    using xindex = dynamic_shape<std::size_t>;
 
     /***************************
      * xexpression declaration *

@@ -26,7 +26,7 @@ namespace xt
         return rhs == lhs;
     }
 
-    template <class C = std::vector<std::size_t>>
+    template <class C = dynamic_shape<std::size_t>>
     struct layout_result
     {
         using vector_type = uvector<int, DEFAULT_ALLOCATOR(int)>;
@@ -68,7 +68,7 @@ namespace xt
         inline const vector_type& data() const { return m_data; }
     };
 
-    template <class C = std::vector<std::size_t>>
+    template <class C = dynamic_shape<std::size_t>>
     struct row_major_result : layout_result<C>
     {
         inline row_major_result()
@@ -82,7 +82,7 @@ namespace xt
         }
     };
 
-    template <class C = std::vector<std::size_t>>
+    template <class C = dynamic_shape<std::size_t>>
     struct column_major_result : layout_result<C>
     {
         inline column_major_result()
@@ -97,7 +97,7 @@ namespace xt
         }
     };
 
-    template <class C = std::vector<std::size_t>>
+    template <class C = dynamic_shape<std::size_t>>
     struct central_major_result : layout_result<C>
     {
         inline central_major_result()
@@ -111,7 +111,7 @@ namespace xt
         }
     };
 
-    template <class C = std::vector<std::size_t>>
+    template <class C = dynamic_shape<std::size_t>>
     struct unit_shape_result
     {
         using vector_type = std::vector<int>;
@@ -167,7 +167,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_resize(V& vec)
     {
         {
@@ -316,7 +316,7 @@ namespace xt
         {
             SCOPED_TRACE("transpose permutation throws");
             row_major_result<C> rm;
-            vec.resize(rm.shape(), layout_type::row_major);
+            vec.reshape(rm.shape(), layout_type::row_major);
 
             EXPECT_THROW(transpose(vec, {1, 1, 0}, check_policy::full()), transpose_error);
             EXPECT_THROW(transpose(vec, {1, 0, 2, 3}, check_policy::full()), transpose_error);
@@ -371,7 +371,7 @@ namespace xt
         EXPECT_ANY_THROW(vec.at(0, 0, 0, 0, 0, 0));
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_access(V& vec)
     {
         {
@@ -419,7 +419,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_at(V& vec)
     {
         {
@@ -459,7 +459,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_element(V& vec)
     {
         {
@@ -542,7 +542,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_indexed_access(V& vec)
     {
         xindex index1 = {1, 1};
@@ -648,7 +648,7 @@ namespace xt
         }
     }
 
-    template <class VRM, class VCM, class C = std::vector<std::size_t>>
+    template <class VRM, class VCM, class C = dynamic_shape<std::size_t>>
     void test_iterator(VRM& vecrm, VCM& veccm)
     {
         {
@@ -670,7 +670,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_xiterator(V& vec)
     {
         row_major_result<C> rm;
@@ -750,7 +750,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_reverse_xiterator(V& vec)
     {
         row_major_result<C> rm;

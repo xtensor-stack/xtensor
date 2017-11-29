@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include "xtensor/xtensor_config.hpp"
 #include "xtensor/xstorage.hpp"
 #include <numeric>
 

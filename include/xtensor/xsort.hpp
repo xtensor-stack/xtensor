@@ -195,7 +195,7 @@ namespace xt
                 return arg_func_impl(e, std::forward<F>(cmp));
             }
 
-            std::vector<std::size_t> new_shape = e.shape();
+            xt::dynamic_shape<std::size_t> new_shape = e.shape();
             new_shape.erase(new_shape.begin() + ptrdiff_t(axis));
 
             result_type result(new_shape);
