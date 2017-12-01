@@ -1,0 +1,23 @@
+############################################################################
+# Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    #
+#                                                                          #
+# Distributed under the terms of the BSD 3-Clause License.                 #
+#                                                                          #
+# The full license is in the file LICENSE, distributed with this software. #
+############################################################################
+
+cmake_minimum_required(VERSION 2.8.2)
+
+project(googlebenchmark-download NONE)
+
+include(ExternalProject)
+ExternalProject_Add(googlebenchmark
+    GIT_REPOSITORY    https://github.com/google/benchmark.git
+    GIT_TAG           v1.2.0
+    SOURCE_DIR        "${CMAKE_CURRENT_BINARY_DIR}/googlebenchmark-src"
+    BINARY_DIR        "${CMAKE_CURRENT_BINARY_DIR}/googlebenchmark-build"
+    CONFIGURE_COMMAND ""
+    BUILD_COMMAND     ""
+    INSTALL_COMMAND   ""
+    TEST_COMMAND      ""
+)
