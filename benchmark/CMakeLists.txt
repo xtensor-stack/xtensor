@@ -99,6 +99,11 @@ else()
     find_package(benchmark REQUIRED)
 endif()
 
+include_directories(${xtl_INCLUDE_DIRS})
+if (XTENSOR_USE_XSIMD)
+    include_directories(${xsimd_INCLUDE_DIRS})
+endif()
+
 include_directories(${XTENSOR_INCLUDE_DIR} ${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
