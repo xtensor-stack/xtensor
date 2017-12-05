@@ -176,6 +176,46 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 #undef INT_SPECIALIZATION
 #undef INT_SPECIALIZATION_IMPL
 
+    namespace detail
+    {
+        template <class T>
+        struct isclose
+        {
+            using result_type = bool;
+            isclose(double rtol, double atol, bool equal_nan)
+            : m_rtol(rtol), m_atol(atol), m_equal_nan(equal_nan)
+            {
+            }
+
+            bool operator()(const T& a, const T& b) const
+            {
+                using internal_type = promote_type_t<T, double>;
+                if(math::isnan(a) && math::isnan(b))
+                {
+                    return m_equal_nan;
+                }
+                if(math::isinf(a) && math::isinf(b))
+                {
+                    // check for both infinity signs equal
+                    return a == b;
+                }
+                auto d = math::abs((internal_type) a - (internal_type) b);
+                return d <= m_atol || d <= m_rtol * (double) std::max(math::abs(a), math::abs(b));
+            }
+
+            template <class U>
+            struct rebind
+            {
+                using type = isclose<U>;
+            };
+
+        private:
+            double m_rtol;
+            double m_atol;
+            bool m_equal_nan;
+        };
+    }
+
     // /*************
      // * isclose() *
      // *************/

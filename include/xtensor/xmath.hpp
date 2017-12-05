@@ -20,56 +20,15 @@
 #include "xoperation.hpp"
 #include "xreducer.hpp"
 #include "xaccumulator.hpp"
+#include "xmathutil.hpp"
 
 #include "xtl/xcomplex.hpp"
 
 namespace xt
 {
-    template <class T = double>
-    struct numeric_constants
-    {
-        static constexpr T PI = 3.141592653589793238463;
-        static constexpr T PI_2 = 1.57079632679489661923;
-        static constexpr T PI_4 = 0.785398163397448309616;
-        static constexpr T D_1_PI = 0.318309886183790671538;
-        static constexpr T D_2_PI = 0.636619772367581343076;
-        static constexpr T D_2_SQRTPI = 1.12837916709551257390;
-        static constexpr T SQRT2 = 1.41421356237309504880;
-        static constexpr T SQRT1_2 = 0.707106781186547524401;
-        static constexpr T E = 2.71828182845904523536;
-        static constexpr T LOG2E = 1.44269504088896340736;
-        static constexpr T LOG10E = 0.434294481903251827651;
-        static constexpr T LN2 = 0.693147180559945309417;
-    };
-
     /***********
      * Helpers *
      ***********/
-
-#define UNSIGNED_ABS_FUNC(T)                                                     \
-constexpr inline T abs(const T& x)                                               \
-{                                                                                \
-    return x;                                                                    \
-}                                                                                \
-
-#define INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, T)                        \
-constexpr inline bool FUNC_NAME(const T& /*x*/) noexcept                         \
-{                                                                                \
-    return RETURN_VAL;                                                           \
-}                                                                                \
-
-#define INT_SPECIALIZATION(FUNC_NAME, RETURN_VAL)                                \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, char);                            \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, short);                           \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, int);                             \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long);                            \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long long);                       \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned char);                   \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned short);                  \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned int);                    \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long);                   \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);              \
-
 
 #define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                         \
     template <class T>                                                           \
@@ -213,105 +172,6 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 
     namespace math
     {
-        using std::abs;
-        using std::fabs;
-
-        using std::cos;
-        using std::sin;
-        using std::tan;
-        using std::acos;
-        using std::asin;
-        using std::atan;
-
-        using std::cosh;
-        using std::sinh;
-        using std::tanh;
-        using std::acosh;
-        using std::asinh;
-        using std::atanh;
-
-        using std::sqrt;
-        using std::cbrt;
-
-        using std::exp;
-        using std::exp2;
-        using std::expm1;
-        using std::log;
-        using std::log2;
-        using std::log10;
-        using std::log1p;
-        using std::logb;
-        using std::ilogb;
-
-        using std::floor;
-        using std::ceil;
-        using std::trunc;
-        using std::round;
-        using std::lround;
-        using std::llround;
-        using std::rint;
-        using std::nearbyint;
-        using std::remainder;
-
-        using std::erf;
-        using std::erfc;
-        using std::erfc;
-        using std::tgamma;
-        using std::lgamma;
-
-        using std::conj;
-        using std::real;
-        using std::imag;
-        using std::arg;
-
-        using std::atan2;
-        using std::copysign;
-        using std::fdim;
-        using std::fmax;
-        using std::fmin;
-        using std::fmod;
-        using std::hypot;
-        using std::pow;
-
-        using std::fma;
-
-        using std::isnan;
-        using std::isinf;
-        using std::isfinite;
-        using std::fpclassify;
-
-        // Overload isinf, isnan and isfinite for complex datatypes,
-        // following the Python specification:
-        template <class T>
-        inline bool isinf(const std::complex<T>& c)
-        {
-            return std::isinf(std::real(c)) || std::isinf(std::imag(c));
-        }
-
-        template <class T>
-        inline bool isnan(const std::complex<T>& c)
-        {
-            return std::isnan(std::real(c)) || std::isnan(std::imag(c));
-        }
-
-        template <class T>
-        inline bool isfinite(const std::complex<T>& c)
-        {
-            return !isinf(c) && !isnan(c);
-        }
-
-        // The following specializations are needed to avoid 'ambiguous overload' errors,
-        // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
-        UNSIGNED_ABS_FUNC(unsigned int);
-        UNSIGNED_ABS_FUNC(unsigned long);
-        UNSIGNED_ABS_FUNC(unsigned long long);
-
-#ifdef _WIN32
-        INT_SPECIALIZATION(isinf, false);
-        INT_SPECIALIZATION(isnan, false);
-        INT_SPECIALIZATION(isfinite, true);
-#endif
-
         UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
 
         UNARY_MATH_FUNCTOR(fabs);
@@ -370,8 +230,6 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 #undef TERNARY_BOOL_FUNCTOR
 #undef TERNARY_MATH_FUNCTOR_IMPL
 #undef UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
-#undef UNSIGNED_ABS_FUNCTOR
-#undef UNSIGNED_ABS_FUNC
 
 #define REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                              \
     template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
@@ -1447,43 +1305,6 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             );
             return type(std::move(functor), std::forward<E>(e)...);
         }
-
-        template <class T>
-        struct isclose
-        {
-            using result_type = bool;
-            isclose(double rtol, double atol, bool equal_nan)
-                : m_rtol(rtol), m_atol(atol), m_equal_nan(equal_nan)
-            {
-            }
-
-            bool operator()(const T& a, const T& b) const
-            {
-                using internal_type = promote_type_t<T, double>;
-                if(math::isnan(a) && math::isnan(b))
-                {
-                    return m_equal_nan;
-                }
-                if(math::isinf(a) && math::isinf(b))
-                {
-                    // check for both infinity signs equal
-                    return a == b;
-                }
-                auto d = math::abs((internal_type) a - (internal_type) b);
-                return d <= m_atol || d <= m_rtol * (double) std::max(math::abs(a), math::abs(b));
-            }
-
-            template <class U>
-            struct rebind
-            {
-                using type = isclose<U>;
-            };
-
-        private:
-            double m_rtol;
-            double m_atol;
-            bool m_equal_nan;
-        };
     }
 
     /**

@@ -134,17 +134,12 @@ namespace xt
             EXPECT_EQ(bv5[k], *rbv5);
         }
 
-        // FV fv(iv3);
-        // EXPECT_TRUE(equalIter(iv3.begin(), iv3.end(), fv.begin(), SIZE));
-        // EXPECT_TRUE(equalVector(iv3, fv));
-
-        // fv = fv3;
-        // EXPECT_TRUE(equalIter(fv3.begin(), fv3.end(), fv.begin(), SIZE));
-        // EXPECT_TRUE(equalVector(fv3, fv));
-
-        // fv = bv3;
-        // EXPECT_TRUE(equalIter(bv3.begin(), bv3.end(), fv.begin(), SIZE));
-        // EXPECT_TRUE(equalVector(bv3, fv));
+        FV fv(iv3);
+        EXPECT_EQ(fv, iv3);
+        fv = fv3;
+        EXPECT_EQ(fv, fv3);
+        fv = bv3;
+        EXPECT_EQ(fv, bv3);
 
         EXPECT_EQ(iv3, (iv3.template subarray<0, SIZE>()));
         EXPECT_EQ(2, (iv3.template subarray<0, 2>().size()));
@@ -240,7 +235,7 @@ namespace xt
         EXPECT_TRUE(all_greater_equal(bv3, bv1));
         EXPECT_TRUE(!all_greater_equal(bv1, bv3));
 
-        // EXPECT_TRUE(isclose(fv3, fv3));
+        EXPECT_TRUE(isclose(fv3, fv3));
 
         EXPECT_TRUE(!any(bv0) && !all(bv0) && any(bv1) && all(bv1));
         EXPECT_TRUE(!any(iv0) && !all(iv0) && any(iv1) && all(iv1));
@@ -319,11 +314,11 @@ namespace xt
         EXPECT_TRUE(!any(e));
         EXPECT_TRUE(e == 0);
 
-        // EXPECT_EQ(prod(a), 6);
-        // EXPECT_EQ(prod(A()), 0);
+        EXPECT_EQ(prod(a), 6);
+        EXPECT_EQ(prod(A()), 0);
 
-        // EXPECT_EQ(cross(a, a), e);
-        // EXPECT_EQ(dot(a, a), 14);
+        EXPECT_EQ(dot(a, a), 14);
+        EXPECT_EQ(cross(a, a), e);
         // EXPECT_EQ(squared_norm(a), 14u);
 
         EXPECT_EQ(a.erase(1), (A{ 1,3 }));
@@ -353,7 +348,7 @@ namespace xt
         EXPECT_EQ(transpose(A::range(1, 4)), (A{ 3,2,1 }));
         EXPECT_EQ(transpose(A::range(1, 4), A{ 1,2,0 }), (A{ 2,3,1 }));
 
-        // EXPECT_THROW(A(3) / A(2), std::runtime_error);
+        EXPECT_THROW(A(3, 0) / A(2, 0), std::runtime_error);
 
         using TA = tiny_array<int, 3>;
         TA s(A{ 1,2,3 });
@@ -444,9 +439,6 @@ namespace xt
         EXPECT_EQ(cumsum(bv3), (IV{1, 3, 7}));
         EXPECT_EQ(cumprod(bv3), (IV{1, 2, 8}));
 
-        // float minRef[] = { 1.0f, 2.0f, 3.6f, 4.8f, 8.0f, 9.7f };
-        // float minRefScalar[] = { 1.2f, 2.4f, 3.6f, 4.0f, 4.0f, 4.0f };
-        // auto minRes = min(iv3, fv3);
         EXPECT_EQ(min(iv3, fv3), (FV{1.0, 2.0, 3.6}));
         EXPECT_EQ(min(3.0, fv3), (FV{1.2, 2.4, 3.0}));
         EXPECT_EQ(min(fv3, 3.0), (FV{1.2, 2.4, 3.0}));
@@ -458,17 +450,28 @@ namespace xt
         EXPECT_EQ(max(iv3), 4);
         EXPECT_EQ(max(fv3), 3.6f);
 
-        // EXPECT_EQ(clip_lower(iv3), iv3);
-        // EXPECT_EQ(clip_lower(iv3, 11), IV{ 11 });
-        // EXPECT_EQ(clip_upper(iv3, 0), IV{ 0 });
-        // EXPECT_EQ(clip_upper(iv3, 11), iv3);
-        // EXPECT_EQ(clip(iv3, 0, 11), iv3);
-        // EXPECT_EQ(clip(iv3, 11, 12), IV{ 11 });
-        // EXPECT_EQ(clip(iv3, -1, 0), IV{ 0 });
-        // EXPECT_EQ(clip(iv3, IV{0 }, IV{11}), iv3);
-        // EXPECT_EQ(clip(iv3, IV{11}, IV{12}), IV{11});
-        // EXPECT_EQ(clip(iv3, IV{-1}, IV{0 }), IV{0 });
+        EXPECT_EQ(clip_lower(iv3, 0), iv3);
+        EXPECT_EQ(clip_lower(iv3, 11), IV{ 11 });
+        EXPECT_EQ(clip_upper(iv3, 0), IV{ 0 });
+        EXPECT_EQ(clip_upper(iv3, 11), iv3);
+        EXPECT_EQ(clip(iv3, 0, 11), iv3);
+        EXPECT_EQ(clip(iv3, 11, 12), IV{ 11 });
+        EXPECT_EQ(clip(iv3, -1, 0), IV{ 0 });
+        EXPECT_EQ(clip(iv3, IV{0 }, IV{11}), iv3);
+        EXPECT_EQ(clip(iv3, IV{11}, IV{12}), IV{11});
+        EXPECT_EQ(clip(iv3, IV{-1}, IV{0 }), IV{0 });
 
+        EXPECT_EQ(dot(iv3, iv3), 21);
+        EXPECT_EQ(dot(fv1, fv3), sum(fv3));
+
+        EXPECT_EQ(cross(bv3, bv3), IV{0});
+        EXPECT_EQ(cross(iv3, bv3), IV{0});
+        EXPECT_TRUE(isclose(cross(fv3, fv3), FV{ 0.0f }, 1e-6f));
+        EXPECT_TRUE(isclose(cross(fv1, fv3), (FV{ 1.2f, -2.4f, 1.2f }), 1e-6f));
+    }
+
+    TEST(xtiny, norm)
+    {
         // EXPECT_TRUE(squared_norm(bv1) == SIZE);
         // EXPECT_TRUE(squared_norm(iv1) == SIZE);
         // EXPECT_TRUE(squared_norm(fv1) == (float)SIZE);
@@ -498,36 +501,9 @@ namespace xt
         // EXPECT_EQ(static_cast<uint64_t>(dot(bv, bv)), expectedSM2);
         // EXPECT_EQ(squared_norm(bv), expectedSM2);
 
-
-
-        // float maxRef[] = { 1.2f, 2.4f, 4.0f, 5.0f, 8.1f, 10.0f };
-        // EXPECT_TRUE(equalIter(maxRef, maxRef + SIZE, max(iv3, fv3).begin(), SIZE));
-        // float maxRefScalar[] = { 4.0f, 4.0f, 4.0f, 4.8f, 8.1f, 9.7f };
-        // EXPECT_TRUE(equalIter(maxRefScalar, maxRefScalar + SIZE, max(4.0f, fv3).begin(), SIZE));
-        // EXPECT_TRUE(equalIter(maxRefScalar, maxRefScalar + SIZE, max(fv3, 4.0f).begin(), SIZE));
-        // IV ivmax = floor(fv3);
-        // ivmax[1] = 3;
-        // int maxRef2[] = { 1, 3, 4, 5, 8, 10 };
-        // EXPECT_TRUE(equalIter(maxRef2, maxRef2 + SIZE, max(iv3, ivmax).begin(), SIZE));
-
-        // EXPECT_EQ(sqrt(iv3 * iv3), iv3);
-        // EXPECT_EQ(sqrt(pow(iv3, 2)), iv3);
-
-
-
         // int oddRef[] = { 1, 0, 0, 1, 0, 0 };
         // EXPECT_TRUE(equalIter(oddRef, oddRef + SIZE, odd(iv3).begin(), SIZE));
         // EXPECT_TRUE(equalIter(oddRef, oddRef + SIZE, (iv3 & 1).begin(), SIZE));
     }
-
-    // TEST(xtiny, cross_product)
-    // {
-        // EXPECT_EQ(cross(bv3, bv3), IV{0});
-        // EXPECT_EQ(cross(iv3, bv3), IV{0});
-        // EXPECT_TRUE(isclose(cross(fv3, fv3), FV{ 0.0f }, 1e-6f));
-
-        // FV cr = cross(fv1, fv3), crr{ 1.2f, -2.4f, 1.2f };
-        // EXPECT_TRUE(isclose(cr, crr, 1e-6f));
-    // }
 
 } // namespace xt

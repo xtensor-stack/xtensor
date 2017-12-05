@@ -1352,19 +1352,22 @@ namespace xt
         return reversed(v);
     }
 
-    // template <class V1, tags::memory_policy MP1, class V2, tags::memory_policy MP2, int ... N>
-    // inline bool
-    // isclose(tiny_array<V1, MP1, N...> const & l,
-            // tiny_array<V2, MP2, N...> const & r,
-            // promote_type_t<V1, V2> epsilon = 2.0*std::numeric_limits<promote_type_t<V1, V2> >::epsilon())
-    // {
-        // XTENSOR_ASSERT_RUNTIME_SIZE(N..., l.size() == r.size(),
-            // "tiny_array_base::isclose(): size mismatch.");
-        // for(index_t k=0; k < l.size(); ++k)
-            // if(!isclose(l[k], r[k], epsilon, epsilon))
-                // return false;
-        // return true;
-    // }
+    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
+    inline bool
+    isclose(tiny_array<V1, N1, R1> const & l,
+            tiny_array<V2, N2, R2> const & r,
+            double rtol = 2.0*std::numeric_limits<double>::epsilon(),
+            double atol = 2.0*std::numeric_limits<double>::epsilon(),
+            bool equal_nan = false)
+    {
+        if(l.size() != r.size())
+            return false;
+        detail::isclose<promote_type_t<V1, V2>> isclose_fct{rtol, atol, equal_nan};
+        for(index_t k=0; k < l.size(); ++k)
+            if(!isclose_fct(l[k], r[k]))
+                return false;
+        return true;
+    }
 
     /*************************/
     /* tiny_array-Arithmetic */
@@ -1405,69 +1408,70 @@ namespace xt
         };
     }
 
-    #define XTENSOR_TINYARRAY_OPERATORS(OP) \
-    template <class V1, index_t N1, class R1, class V2, \
-              XTENSOR_REQUIRE<!tiny_array_concept<V2>::value && \
-                              std::is_convertible<V2, V1>::value> > \
-    inline tiny_array<V1, N1, R1> & \
-    operator OP##=(tiny_array<V1, N1, R1> & l, \
-                   V2 r) \
-    { \
-        for(index_t i=0; i<l.size(); ++i) \
-            l[i] OP##= r; \
-        return l; \
-    } \
-     \
-    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2> \
-    inline tiny_array<V1, N1, R1> &  \
-    operator OP##=(tiny_array<V1, N1, R1> & l, \
-                   tiny_array<V2, N2, R2> const & r) \
-    { \
-        XTENSOR_ASSERT_MSG(l.size() == r.size(), \
-            "tiny_array::operator" #OP "=(): size mismatch."); \
-        for(index_t i=0; i<l.size(); ++i) \
-            l[i] OP##= r[i]; \
-        return l; \
-    } \
-    \
-    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2> \
-    inline \
-    tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), tiny_detail::size_promote<N1, N2>::value> \
-    operator OP(tiny_array<V1, N1, R1> const & l, \
-                tiny_array<V2, N2, R2> const & r) \
-    { \
-        static_assert(tiny_detail::size_promote<N1, N2>::valid, \
-            "tiny_array::operator" #OP "(): size mismatch."); \
-        XTENSOR_ASSERT_MSG(l.size() == r.size(), \
-            "tiny_array::operator" #OP "(): size mismatch."); \
-        tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), tiny_detail::size_promote<N1, N2>::value> res(l); \
-        res OP##= r; \
-        return res; \
-    } \
-     \
-    template <class V1, index_t N1, class R1, class V2, \
-              XTENSOR_REQUIRE<!tiny_array_concept<V2>::value> >\
-    inline \
-    tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N1> \
-    operator OP(tiny_array<V1, N1, R1> const & l, \
-                V2 r) \
-    { \
-        tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N1> res(l); \
-        res OP##= r; \
-        return res; \
-    } \
-     \
-    template <class V1, class V2, index_t N2, class R2, \
-              XTENSOR_REQUIRE<!tiny_array_concept<V1>::value && \
-                              !std::is_base_of<std::ios_base, V1>::value> >\
-    inline \
-    tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N2> \
-    operator OP(V1 l, \
-                tiny_array<V2, N2, R2> const & r) \
-    { \
-        tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N2> res(r.size(), l); \
-        res OP##= r; \
-        return res; \
+    #define XTENSOR_TINYARRAY_OPERATORS(OP)                                                  \
+    template <class V1, index_t N1, class R1, class V2,                                      \
+              XTENSOR_REQUIRE<!tiny_array_concept<V2>::value &&                              \
+                              std::is_convertible<V2, V1>::value> >                          \
+    inline tiny_array<V1, N1, R1> &                                                          \
+    operator OP##=(tiny_array<V1, N1, R1> & l,                                               \
+                   V2 r)                                                                     \
+    {                                                                                        \
+        for(index_t i=0; i<l.size(); ++i)                                                    \
+            l[i] OP##= r;                                                                    \
+        return l;                                                                            \
+    }                                                                                        \
+                                                                                             \
+    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>                \
+    inline tiny_array<V1, N1, R1> &                                                          \
+    operator OP##=(tiny_array<V1, N1, R1> & l,                                               \
+                   tiny_array<V2, N2, R2> const & r)                                         \
+    {                                                                                        \
+        XTENSOR_ASSERT_MSG(l.size() == r.size(),                                             \
+            "tiny_array::operator" #OP "=(): size mismatch.");                               \
+        for(index_t i=0; i<l.size(); ++i)                                                    \
+            l[i] OP##= r[i];                                                                 \
+        return l;                                                                            \
+    }                                                                                        \
+                                                                                             \
+    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>                \
+    inline                                                                                   \
+    tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), tiny_detail::size_promote<N1, N2>::value>   \
+    operator OP(tiny_array<V1, N1, R1> const & l,                                            \
+                tiny_array<V2, N2, R2> const & r)                                            \
+    {                                                                                        \
+        static_assert(tiny_detail::size_promote<N1, N2>::valid,                              \
+            "tiny_array::operator" #OP "(): size mismatch.");                                \
+        XTENSOR_ASSERT_MSG(l.size() == r.size(),                                             \
+            "tiny_array::operator" #OP "(): size mismatch.");                                \
+        tiny_array<decltype((*(V1*)0) OP (*(V2*)0)),                                         \
+                   tiny_detail::size_promote<N1, N2>::value> res(l);                         \
+        res OP##= r;                                                                         \
+        return res;                                                                          \
+    }                                                                                        \
+                                                                                             \
+    template <class V1, index_t N1, class R1, class V2,                                      \
+              XTENSOR_REQUIRE<!tiny_array_concept<V2>::value> >                              \
+    inline                                                                                   \
+    tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N1>                                         \
+    operator OP(tiny_array<V1, N1, R1> const & l,                                            \
+                V2 r)                                                                        \
+    {                                                                                        \
+        tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N1> res(l);                             \
+        res OP##= r;                                                                         \
+        return res;                                                                          \
+    }                                                                                        \
+                                                                                             \
+    template <class V1, class V2, index_t N2, class R2,                                      \
+              XTENSOR_REQUIRE<!tiny_array_concept<V1>::value &&                              \
+                              !std::is_base_of<std::ios_base, V1>::value> >                  \
+    inline                                                                                   \
+    tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N2>                                         \
+    operator OP(V1 l,                                                                        \
+                tiny_array<V2, N2, R2> const & r)                                            \
+    {                                                                                        \
+        tiny_array<decltype((*(V1*)0) OP (*(V2*)0)), N2> res(r.size(), l);                   \
+        res OP##= r;                                                                         \
+        return res;                                                                          \
     }
 
     XTENSOR_TINYARRAY_OPERATORS(+)
@@ -1534,7 +1538,7 @@ namespace xt
     FCT(tiny_array<V, N, R> const & v)                                      \
     {                                                                       \
         using namespace math;                                               \
-        tiny_array<decltype(FCT(*(V*)0)), N> res(v.size(), dont_init);      \
+        tiny_array<decltype(FCT(v[0])), N> res(v.size(), dont_init);        \
         for(index_t k=0; k < v.size(); ++k)                                 \
             res[k] = FCT(v[k]);                                             \
         return res;                                                         \
@@ -1609,7 +1613,7 @@ namespace xt
             #FCT "(tiny_array, tiny_array): size mismatch.");                                   \
         XTENSOR_ASSERT_MSG(l.size() == r.size(),                                                \
             #FCT "(tiny_array, tiny_array): size mismatch.");                                   \
-        tiny_array<decltype(FCT(*(V1*)0, *(V2*)0)),                                             \
+        tiny_array<decltype(FCT(l[0], r[0])),                                                   \
                    tiny_detail::size_promote<N1, N2>::value> res(l.size(), dont_init);          \
         for(index_t k=0; k < l.size(); ++k)                                                     \
             res[k] = FCT(l[k], r[k]);                                                           \
@@ -1840,38 +1844,115 @@ namespace xt
         return m;
     }
 
-#if 0
-        /// cross product
-    template <class V1, tags::memory_policy MP1, class V2, tags::memory_policy MP2, int N,
-              XTENSOR_REQUIRE<N == 3 || N == runtime_size> >
-    inline
-    tiny_array<promote_type_t<V1, V2>, N>
-    cross(tiny_array<V1, MP1, N> const & r1,
-          tiny_array<V2, MP2, N> const & r2)
+        /** \brief Clip values below a threshold.
+
+            All elements smaller than \a val are set to \a val.
+        */
+    template <class V, index_t N, class R>
+    inline auto
+    clip_lower(tiny_array<V, N, R> const & t, const V val)
     {
-        XTENSOR_ASSERT_RUNTIME_SIZE(N, r1.size() == 3 && r2.size() == 3,
-            "cross(): cross product requires size() == 3.");
-        typedef tiny_array<promote_type_t<V1, V2>, N> Res;
-        return  Res{r1[1]*r2[2] - r1[2]*r2[1],
-                    r1[2]*r2[0] - r1[0]*r2[2],
-                    r1[0]*r2[1] - r1[1]*r2[0]};
+        tiny_array<V, N> res(t.size(), dont_init);
+        for(index_t k=0; k < t.size(); ++k)
+        {
+            res[k] = t[k] < val ? val :  t[k];
+        }
+        return res;
+    }
+
+        /** \brief Clip values above a threshold.
+
+            All elements bigger than \a val are set to \a val.
+        */
+    template <class V, index_t N, class R>
+    inline auto
+    clip_upper(tiny_array<V, N, R> const & t, const V val)
+    {
+        tiny_array<V, N> res(t.size(), dont_init);
+        for(index_t k=0; k < t.size(); ++k)
+        {
+            res[k] = t[k] > val ? val :  t[k];
+        }
+        return res;
+    }
+
+        /** \brief Clip values to an interval.
+
+            All elements less than \a valLower are set to \a valLower, all elements
+            bigger than \a valUpper are set to \a valUpper.
+        */
+    template <class V, index_t N, class R>
+    inline auto
+    clip(tiny_array<V, N, R> const & t,
+         const V valLower, const V valUpper)
+    {
+        tiny_array<V, N> res(t.size(), dont_init);
+        for(index_t k=0; k < t.size(); ++k)
+        {
+            res[k] =  (t[k] < valLower)
+                           ? valLower
+                           : (t[k] > valUpper)
+                                 ? valUpper
+                                 : t[k];
+        }
+        return res;
+    }
+
+        /** \brief Clip values to a vector of intervals.
+
+            All elements less than \a valLower are set to \a valLower, all elements
+            bigger than \a valUpper are set to \a valUpper.
+        */
+    template <class V, index_t N1, class R1, index_t N2, class R2, index_t N3, class R3>
+    inline auto
+    clip(tiny_array<V, N1, R1> const & t,
+         tiny_array<V, N2, R2> const & valLower,
+         tiny_array<V, N3, R3> const & valUpper)
+    {
+        XTENSOR_ASSERT_MSG(t.size() == valLower.size() && t.size() == valUpper.size(),
+            "clip(): size mismatch.");
+        tiny_array<V, N1> res(t.size(), dont_init);
+        for(index_t k=0; k < t.size(); ++k)
+        {
+            res[k] =  (t[k] < valLower[k])
+                           ? valLower[k]
+                           : (t[k] > valUpper[k])
+                                 ? valUpper[k]
+                                 : t[k];
+        }
+        return res;
     }
 
         /// dot product of two vectors
-    template <class V1, tags::memory_policy MP1, class V2, tags::memory_policy MP2, int N, int M>
-    inline
-    promote_type_t<V1, V2>
-    dot(tiny_array<V1, MP1, N> const & l,
-        tiny_array<V2, MP2, M> const & r)
+    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
+    inline auto
+    dot(tiny_array<V1, N1, R1> const & l,
+        tiny_array<V2, N2, R2> const & r)
     {
-        XTENSOR_ASSERT_MSG(l.size() == r.size(), "dot(): size mismatch.");
-        promote_type_t<V1, V2> res = promote_type_t<V1, V2>();
+        XTENSOR_ASSERT_MSG(l.size() == r.size(),
+            "dot(tiny_array, tiny_array): size mismatch.");
+        using result_type = decltype(l[0] * r[0]);
+        result_type res = result_type();
         for(index_t k=0; k < l.size(); ++k)
             res += l[k] * r[k];
         return res;
     }
 
+        /// cross product
+    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
+    inline auto
+    cross(tiny_array<V1, N1, R1> const & r1,
+          tiny_array<V2, N2, R2> const & r2)
+    {
+        XTENSOR_ASSERT_MSG(r1.size() == 3 && r2.size() == 3,
+            "cross(tiny_array, tiny_array): cross product requires size() == 3.");
+        using result_type = tiny_array<decltype(r1[0] * r2[0]), 3>;
+        return  result_type{r1[1]*r2[2] - r1[2]*r2[1],
+                            r1[2]*r2[0] - r1[0]*r2[2],
+                            r1[0]*r2[1] - r1[1]*r2[0]};
+    }
 
+#if 0
     /// squared norm
     template <class V, tags::memory_policy MP, int ... N>
     inline squared_norm_type_t<tiny_array<V, MP, N...> >
@@ -1890,101 +1971,6 @@ namespace xt
     mean_square(tiny_array<V, MP, N...> const & t)
     {
         return norm_type_t<V>(squared_norm(t)) / t.size();
-    }
-
-        /** \brief Clip negative values.
-
-            All elements smaller than 0 are set to zero.
-        */
-    template <class V, tags::memory_policy MP, int ... N>
-    inline
-    tiny_array<V, tags::owns_memory, N...>
-    clip_lower(tiny_array<V, MP, N...> const & t)
-    {
-        return clip_lower(t, V());
-    }
-
-        /** \brief Clip values below a threshold.
-
-            All elements smaller than \a val are set to \a val.
-        */
-    template <class V, tags::memory_policy MP, int ... N>
-    inline
-    tiny_array<V, tags::owns_memory, N...>
-    clip_lower(tiny_array<V, MP, N...> const & t, const V val)
-    {
-        tiny_array<V, tags::owns_memory, N...> res(t.size(), dont_init);
-        for(index_t k=0; k < t.size(); ++k)
-        {
-            res[k] = t[k] < val ? val :  t[k];
-        }
-        return res;
-    }
-
-        /** \brief Clip values above a threshold.
-
-            All elements bigger than \a val are set to \a val.
-        */
-    template <class V, tags::memory_policy MP, int ... N>
-    inline
-    tiny_array<V, tags::owns_memory, N...>
-    clip_upper(tiny_array<V, MP, N...> const & t, const V val)
-    {
-        tiny_array<V, tags::owns_memory, N...> res(t.size(), dont_init);
-        for(index_t k=0; k < t.size(); ++k)
-        {
-            res[k] = t[k] > val ? val :  t[k];
-        }
-        return res;
-    }
-
-        /** \brief Clip values to an interval.
-
-            All elements less than \a valLower are set to \a valLower, all elements
-            bigger than \a valUpper are set to \a valUpper.
-        */
-    template <class V, tags::memory_policy MP, int ... N>
-    inline
-    tiny_array<V, tags::owns_memory, N...>
-    clip(tiny_array<V, MP, N...> const & t,
-         const V valLower, const V valUpper)
-    {
-        tiny_array<V, tags::owns_memory, N...> res(t.size(), dont_init);
-        for(index_t k=0; k < t.size(); ++k)
-        {
-            res[k] =  (t[k] < valLower)
-                           ? valLower
-                           : (t[k] > valUpper)
-                                 ? valUpper
-                                 : t[k];
-        }
-        return res;
-    }
-
-        /** \brief Clip values to a vector of intervals.
-
-            All elements less than \a valLower are set to \a valLower, all elements
-            bigger than \a valUpper are set to \a valUpper.
-        */
-    template <class V, tags::memory_policy MP1, tags::memory_policy MP2, tags::memory_policy MP3, int ... N>
-    inline
-    tiny_array<V, tags::owns_memory, N...>
-    clip(tiny_array<V, MP1, N...> const & t,
-         tiny_array<V, MP2, N...> const & valLower,
-         tiny_array<V, MP3, N...> const & valUpper)
-    {
-        XTENSOR_ASSERT_RUNTIME_SIZE(N..., t.size() == valLower.size() && t.size() == valUpper.size(),
-            "clip(): size mismatch.");
-        tiny_array<V, tags::owns_memory, N...> res(t.size(), dont_init);
-        for(index_t k=0; k < t.size(); ++k)
-        {
-            res[k] =  (t[k] < valLower[k])
-                           ? valLower[k]
-                           : (t[k] > valUpper[k])
-                                 ? valUpper[k]
-                                 : t[k];
-        }
-        return res;
     }
 
     template <class T1, tags::memory_policy MP1, class T2, tags::memory_policy MP2, int ... N>
