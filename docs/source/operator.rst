@@ -148,14 +148,14 @@ Reducers
 
 `xtensor` provides reducers, that is, means for accumulating values of tensor expressions over prescribed axes.
 The return value of a reducer is an ``xexpression`` with the same shape as the input expression, with the specified
-axes removed. 
+axes removed.
 
 .. code::
 
     #include "xtensor/xarray.hpp"
     #include "xtensor/xmath.hpp"
 
-    xt::xarray<double> a = ones<double>({3, 2, 4, 6, 5 });
+    xt::xarray<double> a = xt::ones<double>({3, 2, 4, 6, 5});
     xt::xarray<double> res = xt::sum(a, {1, 3});
     // => res.shape() = { 3, 4, 5 };
     // => res(0, 0, 0) = 12
@@ -167,10 +167,70 @@ You can also call the ``reduce`` generator with your own reducing function:
     #include "xtensor/xarray.hpp"
     #include "xtensor/xreducer.hpp"
 
-    xt::xarray<double> a = some_init_function({3, 2, 4, 6, 5});
-    xt::xarray<double> res = reduce([](double a, double b) { return a*a + b*b; },
-                                    a,
-                                    {1, 3});
+    xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
+    xt::xarray<double> res = xt::reduce([](double a, double b) { return a*a + b*b; },
+                                        arr,
+                                        {1, 3});
+
+Accumulators
+------------
+
+Similar to reducers, `xtensor` provides accumulators which are used to implement cumulative functions such
+as ``cumsum`` or ``cumprod``. Accumulators can currently only work on a single axis. Additionally, the 
+accumulators are not lazy and do not return an xexpression, but rather an evaluated ``xarray`` or ``xtensor``.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xmath.hpp"
+
+    xt::xarray<double> a = xt::ones<double>({5, 8, 3});
+    xt::xarray<double> res = xt::cumsum(a, 1);
+    // => res.shape() = {5, 8, 3};
+    // => res(0, 0, 0) = 1
+    // => res(0, 7, 0) = 8
+
+You can also call the ``accumumulate`` generator with your own accumulating function.
+For example, the implementation of cumsum is as follows:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xaccumulator.hpp"
+
+    xt::xarray<double> arr = some_init_function({5, 5, 5});
+    xt::xarray<double> res = xt::accumulate([](double a, double b) { return a + b; },
+                                            arr,
+                                            1);
+
+Evaluation strategy
+-------------------
+
+Generally, `xtensor` implements a :ref:`lazy execution model <lazy-evaluation>`, but under certain circumstances,
+a *greedy* execution model with immediate execution can be favorable. For example, reusing (and recomputing)
+the same values of a reducer over and over again if you use them in a loop can cost a lot of CPU cycles.
+Additionally, *greedy* execution can benefit from SIMD acceleration over reduction axes and is faster when the
+entire result needs to be computed.
+
+Therefore, xtensor allows to select an ``evaluation_strategy``. Currently, two evaluation strategies are implemented:
+``evaluation_strategy::immediate`` and ``evaluation_strategy::lazy``. When ``immediate`` evaluation is selected,
+the return value is not an xexpression, but an in-memory datastructure such as a xarray or xtensor (depending on the
+input values).
+
+Choosing an evaluation_strategy is straightforward. For reducers:
+
+... code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xreducer.hpp"
+
+    xt::xarray<double> a = xt::ones<double>({3, 2, 4, 6, 5});
+    auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::immediate());
+    // or select the default:
+    // auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::lazy());
+
+Note: for accumulators, only the ``immediate`` evaluation strategy is currently implemented.
+
 
 Universal functions and vectorization
 -------------------------------------

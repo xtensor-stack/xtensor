@@ -72,7 +72,8 @@ namespace xt
 
             std::size_t inner_stride = result.strides()[axis];
             std::size_t outer_stride = 1; // this is either going row- or column-wise (strides.back / strides.front)
-            std::size_t outer_loop_size, inner_loop_size;
+            std::size_t outer_loop_size = 0;
+            std::size_t inner_loop_size = 0;
 
             auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax)
             {
