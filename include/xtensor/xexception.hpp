@@ -210,8 +210,19 @@ namespace xt
 #define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)
 #endif
 
+    // Use 'if(PREDICATE) {} else {throw ...}' to avoid unexpected behavior in code
+    // which doesn't enclose the 'if' body in braces, e.g.
+    //    if(some_condition)
+    //        XTENSOR_PRECONDITION(predicate, "message");
+    //    else
+    //        ...
+    // If the assertion was implemented as just 'if(!(PREDICATE)) { throw ... }',
+    // the 'else' in the code above would belong to the assertion's implicit 'if',
+    // not to the explicit 'if' of the visible code, as most people would expect.
 #define XTENSOR_PRECONDITION(PREDICATE, MESSAGE)                                              \
-    if (!(PREDICATE))                                                                         \
+    if (PREDICATE)                                                                            \
+    {}                                                                                        \
+    else                                                                                      \
     {                                                                                         \
         throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE +         \
                                  "\n  " + __FILE__ + '(' + std::to_string(__LINE__) + ")\n"); \
