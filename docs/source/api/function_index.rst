@@ -14,4 +14,5 @@ Functions and generators
    xaccumulator
    xgenerator
    xbuilder
+   xsort
    xrandom
