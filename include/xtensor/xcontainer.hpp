@@ -58,6 +58,7 @@ namespace xt
 
         using inner_types = xcontainer_inner_types<D>;
         using container_type = typename inner_types::container_type;
+        using allocator_type = typename container_type::allocator_type;
         using value_type = typename container_type::value_type;
         using reference = typename container_type::reference;
         using const_reference = typename container_type::const_reference;
@@ -81,7 +82,7 @@ namespace xt
 
         static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
-        using data_alignment = xsimd::container_alignment<container_type>;
+        using data_alignment = xsimd::container_alignment_t<container_type>;
         using simd_type = xsimd::simd_type<value_type>;
 
         size_type size() const noexcept;
