@@ -21,7 +21,8 @@
 #include "xconcepts.hpp"
 #include "xexception.hpp"
 #include "xutils.hpp"
-#include "xmathutil.hpp"
+#include "xmath.hpp"
+#include "xnorm.hpp"
 
 namespace xt
 {
@@ -1319,6 +1320,27 @@ namespace xt
 
     #undef XTENSOR_TINY_COMPARISON
 
+    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
+    inline bool
+    isclose(tiny_array<V1, N1, R1> const & l,
+            tiny_array<V2, N2, R2> const & r,
+            double rtol = 2.0*std::numeric_limits<double>::epsilon(),
+            double atol = 2.0*std::numeric_limits<double>::epsilon(),
+            bool equal_nan = false)
+    {
+        if(l.size() != r.size())
+            return false;
+        detail::isclose<promote_type_t<V1, V2>> isclose_fct{rtol, atol, equal_nan};
+        for(index_t k=0; k < l.size(); ++k)
+            if(!isclose_fct(l[k], r[k]))
+                return false;
+        return true;
+    }
+
+    /***************************/
+    /* tiny_array manipulation */
+    /***************************/
+
         /// reversed copy
     template <class V, index_t N, class R>
     inline
@@ -1352,30 +1374,9 @@ namespace xt
         return reversed(v);
     }
 
-    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
-    inline bool
-    isclose(tiny_array<V1, N1, R1> const & l,
-            tiny_array<V2, N2, R2> const & r,
-            double rtol = 2.0*std::numeric_limits<double>::epsilon(),
-            double atol = 2.0*std::numeric_limits<double>::epsilon(),
-            bool equal_nan = false)
-    {
-        if(l.size() != r.size())
-            return false;
-        detail::isclose<promote_type_t<V1, V2>> isclose_fct{rtol, atol, equal_nan};
-        for(index_t k=0; k < l.size(); ++k)
-            if(!isclose_fct(l[k], r[k]))
-                return false;
-        return true;
-    }
-
     /*************************/
-    /* tiny_array-Arithmetic */
+    /* tiny_array arithmetic */
     /*************************/
-
-    /** \addtogroup TinyArrayOperators
-     */
-    //@{
 
     namespace tiny_detail
     {
@@ -1923,7 +1924,7 @@ namespace xt
         return res;
     }
 
-        /// dot product of two vectors
+        /// dot product of two tiny_arrays
     template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
     inline auto
     dot(tiny_array<V1, N1, R1> const & l,
@@ -1938,7 +1939,7 @@ namespace xt
         return res;
     }
 
-        /// cross product
+        /// cross product of two tiny_arrays
     template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
     inline auto
     cross(tiny_array<V1, N1, R1> const & r1,
@@ -1952,36 +1953,35 @@ namespace xt
                             r1[0]*r2[1] - r1[1]*r2[0]};
     }
 
-#if 0
-    /// squared norm
-    template <class V, tags::memory_policy MP, int ... N>
-    inline squared_norm_type_t<tiny_array<V, MP, N...> >
-    squared_norm(tiny_array<V, MP, N...> const & t)
-    {
-        using Type = squared_norm_type_t<tiny_array<V, MP, N...> >;
-        Type result = Type();
-        for(index_t i=0; i<t.size(); ++i)
-            result += squared_norm(t[i]);
-        return result;
-    }
-
-    template <class V, tags::memory_policy MP, int ... N>
-    inline
-    norm_type_t<V>
-    mean_square(tiny_array<V, MP, N...> const & t)
-    {
-        return norm_type_t<V>(squared_norm(t)) / t.size();
-    }
-
-    template <class T1, tags::memory_policy MP1, class T2, tags::memory_policy MP2, int ... N>
+    template <class V, index_t N, class R>
     inline void
-    swap(tiny_array<T1, MP1, N...> & l,
-         tiny_array<T2, MP2, N...> & r)
+    swap(tiny_array<V, N, R> & l,
+         tiny_array<V, N, R> & r)
     {
         l.swap(r);
     }
 
-#endif // if 0
+    /// squared norm
+    template <class V, index_t N, class R>
+    inline auto
+    norm_sq(tiny_array<V, N, R> const & t)
+    {
+        using result_type = squared_norm_type_t<tiny_array<V, N, R>>;
+        result_type result = result_type();
+        for(index_t i=0; i<t.size(); ++i)
+            result += norm_sq(t[i]);
+        return result;
+    }
+
+    // template <class V, tags::memory_policy MP, int ... N>
+    // inline
+    // norm_type_t<V>
+    // mean_square(tiny_array<V, MP, N...> const & t)
+    // {
+        // return norm_type_t<V>(squared_norm(t)) / t.size();
+    // }
+
+//@}
 
 } // namespace xt
 

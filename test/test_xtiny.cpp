@@ -194,6 +194,11 @@ namespace xt
         EXPECT_EQ(fv3, fv10.insert(SIZE - 1, fv3[SIZE - 1]));
         FV1 fv11(fv3.begin() + 1);
         EXPECT_EQ(fv11, fv3.erase(0));
+
+        BV bv2(bv1), bv4(bv3);
+        swap(bv2, bv4);
+        EXPECT_EQ(bv3, bv2);
+        EXPECT_EQ(bv1, bv4);
     }
 
     TEST(xtiny, comparison)
@@ -319,7 +324,7 @@ namespace xt
 
         EXPECT_EQ(dot(a, a), 14);
         EXPECT_EQ(cross(a, a), e);
-        // EXPECT_EQ(squared_norm(a), 14u);
+        // EXPECT_EQ(norm_sq(a), 14u);
 
         EXPECT_EQ(a.erase(1), (A{ 1,3 }));
         EXPECT_EQ(a.insert(3, 4), (A{ 1,2,3,4 }));
@@ -468,42 +473,37 @@ namespace xt
         EXPECT_EQ(cross(iv3, bv3), IV{0});
         EXPECT_TRUE(isclose(cross(fv3, fv3), FV{ 0.0f }, 1e-6f));
         EXPECT_TRUE(isclose(cross(fv1, fv3), (FV{ 1.2f, -2.4f, 1.2f }), 1e-6f));
-    }
-
-    TEST(xtiny, norm)
-    {
-        // EXPECT_TRUE(squared_norm(bv1) == SIZE);
-        // EXPECT_TRUE(squared_norm(iv1) == SIZE);
-        // EXPECT_TRUE(squared_norm(fv1) == (float)SIZE);
-
-        // float expectedSM = 1.2f*1.2f + 2.4f*2.4f + 3.6f*3.6f;
-        // EXPECT_NEAR(squared_norm(fv3), expectedSM, 1e-6);
-
-        // EXPECT_EQ(static_cast<uint64_t>(dot(bv3, bv3)), squared_norm(bv3));
-        // EXPECT_EQ(static_cast<uint64_t>(dot(iv3, bv3)), squared_norm(iv3));
-        // EXPECT_NEAR(dot(fv3, fv3), squared_norm(fv3), 1e-6);
-
-        // tiny_array<IV, 3> ivv{ iv3, iv3, iv3 };
-        // EXPECT_EQ(squared_norm(ivv), 3 * squared_norm(iv3));
-        // EXPECT_EQ(norm(ivv), sqrt(3.0*static_cast<double>(squared_norm(iv3))));
-        // EXPECT_EQ(elementwise_norm(iv3), iv3);
-        // EXPECT_EQ(elementwise_squared_norm(iv3), (IV{ 1, 4, 16 }));
-
-        // EXPECT_TRUE(isclose(sqrt(dot(bv3, bv3)), norm(bv3), 0.0));
-        // EXPECT_TRUE(isclose(sqrt(dot(iv3, bv3)), norm(iv3), 0.0));
-        // EXPECT_TRUE(isclose(sqrt(dot(fv3, fv3)), norm(fv3), 0.0));
-        // EXPECT_NEAR(sqrt(dot(bv3, bv3)), norm(bv3), 1e-6);
-        // EXPECT_NEAR(sqrt(dot(iv3, bv3)), norm(iv3), 1e-6);
-        // EXPECT_NEAR(sqrt(dot(fv3, fv3)), norm(fv3), 1e-6);
-
-
-        // uint64_t expectedSM2 = 40005;
-        // EXPECT_EQ(static_cast<uint64_t>(dot(bv, bv)), expectedSM2);
-        // EXPECT_EQ(squared_norm(bv), expectedSM2);
 
         // int oddRef[] = { 1, 0, 0, 1, 0, 0 };
         // EXPECT_TRUE(equalIter(oddRef, oddRef + SIZE, odd(iv3).begin(), SIZE));
         // EXPECT_TRUE(equalIter(oddRef, oddRef + SIZE, (iv3 & 1).begin(), SIZE));
+    }
+
+    TEST(xtiny, norm)
+    {
+        using math::sqrt;
+
+        EXPECT_TRUE(norm_sq(bv1) == SIZE);
+        EXPECT_TRUE(norm_sq(iv1) == SIZE);
+        EXPECT_TRUE(norm_sq(fv1) == (float)SIZE);
+
+        EXPECT_EQ(norm_sq(bv3), dot(bv3, bv3));
+        EXPECT_EQ(norm_sq(iv3), dot(iv3, iv3));
+        EXPECT_NEAR(norm_sq(fv3), sum(fv3*fv3), 1e-6);
+        EXPECT_NEAR(norm_sq(fv3), dot(fv3, fv3), 1e-6);
+
+        tiny_array<IV, 3> ivv{ iv3, iv3, iv3 };
+        EXPECT_EQ(norm_sq(ivv), 3 * norm_sq(iv3));
+        EXPECT_EQ(norm_l2(ivv), sqrt(3.0*norm_sq(iv3)));
+        // EXPECT_EQ(elementwise_norm(iv3), iv3);
+        // EXPECT_EQ(elementwise_squared_norm(iv3), (IV{ 1, 4, 16 }));
+
+        EXPECT_NEAR(norm_l2(bv3), sqrt(dot(bv3, bv3)), 1e-6);
+        EXPECT_NEAR(norm_l2(iv3), sqrt(dot(iv3, iv3)), 1e-6);
+        EXPECT_NEAR(norm_l2(fv3), sqrt(dot(fv3, fv3)), 1e-6);
+
+        BV bv { 1, 2, 200};
+        EXPECT_EQ(norm_sq(bv), 40005);
     }
 
 } // namespace xt
