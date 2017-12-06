@@ -68,6 +68,7 @@ namespace xt
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using container_type = typename base_type::container_type;
+        using allocator_type = typename base_type::allocator_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
