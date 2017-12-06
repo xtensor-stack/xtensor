@@ -53,7 +53,18 @@ namespace xt
         xarray<double> expected = {  0.,  1.,  3.,  6., 10., 15., 21., 28., 36., 45., 55., 66., 78., 91.,
                                    105.,120.,136.,153.,171.,190.,210.,231.,253.,276.,300.,325.,351.,378.,
                                    406.,435.,465.,496.,528.,561.,595.,630.};
-        EXPECT_TRUE(allclose(expected, res));
+
+        xarray<double> expected_col = {   0.,   18.,   24.,   48.,   60.,   90.,   93.,  114.,  123.,  150.,  165.,  198.,
+                                        199.,  218.,  225.,  250.,  263.,  294.,  298.,  320.,  330.,  358.,  374.,  408.,
+                                        410.,  430.,  438.,  464.,  478.,  510.,  515.,  538.,  549.,  578.,  595.,  630.};
+        if (arg_0.layout() == layout_type::row_major)
+        {
+            EXPECT_TRUE(allclose(expected, res));
+        }
+        else
+        {
+            EXPECT_TRUE(allclose(expected_col, res));
+        }
 
         auto res_0 = cumsum(arg_0, 0);
         xarray<double> expected_0 = {{{{ 0., 1., 2.},
@@ -142,6 +153,17 @@ namespace xt
         EXPECT_TRUE(allclose(expected_3, res_3));
     }
 
+    TEST(xaccumulator, xtensor)
+    {
+        xtensor<double, 2> arr = {{1, 2, 3}, {4, 5, 6}};
+        auto res = xt::cumsum(arr, 0);
+        bool type_eq = std::is_same<xtensor<double, 2>, decltype(res)>::value;
+        EXPECT_TRUE(type_eq);
+        xtensor<double, 2> expected = {{1, 2, 3}, {5, 7, 9}};
+        EXPECT_EQ(expected, res);
+    }
+
+
     TEST(xaccumulator, cumprod)
     {
         xarray<long> arg_0 = {{ 0, 1, 2},
@@ -166,8 +188,5 @@ namespace xt
                                    {  6, 42, 336},
                                    {  9, 90, 990}};
         EXPECT_TRUE(allclose(expected_1, res_1));
-
-
-
     }
 }

@@ -42,33 +42,62 @@ namespace xt
             static_assert(!std::is_same<evaluation_strategy::lazy, ES>::value, "Lazy accumulators not yet implemented.");
         }
 
+        template <class T, class R>
+        struct xaccumulator_return_type
+        {
+            using type = xarray<R>;
+        };
+
+        template <class T, std::size_t N, class R>
+        struct xaccumulator_return_type<xtensor<T, N>, R>
+        {
+            using type = xtensor<R, N>;
+        };
+
+        template <class T, class R>
+        using xaccumulator_return_type_t = typename xaccumulator_return_type<T, R>::type;
+
         template <class F, class E>
         inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate)
         {
-            using T = typename F::result_type;
+            using function_return_type = typename F::result_type;
+            using result_type = xaccumulator_return_type_t<std::decay_t<E>, function_return_type>;
 
             if (axis >= e.dimension())
             {
                 throw std::runtime_error("Axis larger than expression dimension in accumulator.");
             }
 
-            // Investigate if doing a trick with transpose is better here: by transposing the
-            // xarray such that the accumulation axis is last, it should be cache friendly
-            xarray<T, layout_type::row_major> result = e;  // assign + make a copy, we need it anyways
+            result_type result = e;  // assign + make a copy, we need it anyways
 
-            std::size_t outer_stride = result.strides().back();
             std::size_t inner_stride = result.strides()[axis];
+            std::size_t outer_stride = 1; // this is either going row- or column-wise (strides.back / strides.front)
+            std::size_t outer_loop_size = 0;
+            std::size_t inner_loop_size = 0;
 
-            std::size_t outer_loop_size = std::accumulate(result.shape().cbegin(),
-                                                          result.shape().cbegin() + std::ptrdiff_t(axis),
-                                                          std::size_t(1), std::multiplies<std::size_t>());
-            std::size_t inner_loop_size = std::accumulate(result.shape().cbegin() + std::ptrdiff_t(axis),
-                                                          result.shape().cend(),
-                                                          std::size_t(1), std::multiplies<std::size_t>());
-            inner_loop_size -= inner_stride;
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax)
+            {
+                outer_loop_size = std::accumulate(first,
+                                                  first + ax,
+                                                  std::size_t(1), std::multiplies<std::size_t>());
+
+                inner_loop_size = std::accumulate(first + ax,
+                                                  last,
+                                                  std::size_t(1), std::multiplies<std::size_t>());
+            };
+
+            if (result_type::static_layout == layout_type::row_major)
+            {
+                set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<ptrdiff_t>(axis));
+            }
+            else
+            {
+                set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<ptrdiff_t>(axis + 1));
+                std::swap(inner_loop_size, outer_loop_size);
+            }
+            inner_loop_size = inner_loop_size - inner_stride;
 
             std::size_t pos = 0;
-
             for (std::size_t i = 0; i < outer_loop_size; ++i)
             {
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
@@ -86,30 +115,21 @@ namespace xt
         inline auto accumulator_impl(F&& f, E&& e, evaluation_strategy::immediate)
         {
             using T = typename F::result_type;
+            using result_type = xtensor<T, 1>;
             std::size_t sz = e.size();
+            auto result = result_type::from_shape({sz});
 
-            // if layout == row_major, avoid a copy
-            if (e.layout() == layout_type::row_major)
-            {
-                xarray<T, layout_type::row_major> result = xarray<T, layout_type::row_major>::from_shape({sz});
-                result.data()[0] = e.data()[0];
-                for (std::size_t i = 0; i < sz - 1; ++i)
-                {
-                    result.data()[i + 1] = f(result.data()[i], e.data()[i + 1]);
-                }
-                return result;
-            }
-            else
-            {
-                xarray<T, layout_type::row_major> result = e;
-                result.reshape({sz});
+            auto it = e.template begin<DEFAULT_LAYOUT>();
 
-                for (std::size_t i = 0; i < sz - 1; ++i)
-                {
-                    result.data()[i + 1] = f(result.data()[i], result.data()[i + 1]);
-                }
-                return result;
+            result.data()[0] = *it;
+            ++it;
+
+            for (std::size_t idx = 0; it != e.template end<DEFAULT_LAYOUT>(); ++it)
+            {
+                result.data()[idx + 1] = f(result.data()[idx], *it);
+                ++idx;
             }
+            return result;
         }
     }
 
