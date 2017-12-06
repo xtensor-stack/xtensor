@@ -380,7 +380,7 @@ namespace xt
     {
         return detail::make_xfunction<detail::modulus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
-    
+
     /**
      * @defgroup logical_operators Logical operators
      */
@@ -746,7 +746,8 @@ namespace xt
     * @param e an \ref xexpression
     * @return a boolean
     */
-    template <class E>
+    template <class E,
+              XTENSOR_REQUIRE<is_xexpression<E>::value>>
     inline bool any(E&& e)
     {
         using xtype = std::decay_t<E>;
@@ -771,7 +772,8 @@ namespace xt
     * @param e an \ref xexpression
     * @return a boolean
     */
-    template <class E>
+    template <class E,
+              XTENSOR_REQUIRE<is_xexpression<E>::value>>
     inline bool all(E&& e)
     {
         using xtype = std::decay_t<E>;
