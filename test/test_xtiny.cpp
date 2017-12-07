@@ -240,7 +240,7 @@ namespace xt
         EXPECT_TRUE(all_greater_equal(bv3, bv1));
         EXPECT_TRUE(!all_greater_equal(bv1, bv3));
 
-        EXPECT_TRUE(isclose(fv3, fv3));
+        EXPECT_TRUE(all_close(fv3, fv3));
 
         EXPECT_TRUE(!any(bv0) && !all(bv0) && any(bv1) && all(bv1));
         EXPECT_TRUE(!any(iv0) && !all(iv0) && any(iv1) && all(iv1));
@@ -471,8 +471,8 @@ namespace xt
 
         EXPECT_EQ(cross(bv3, bv3), IV{0});
         EXPECT_EQ(cross(iv3, bv3), IV{0});
-        EXPECT_TRUE(isclose(cross(fv3, fv3), FV{ 0.0f }, 1e-6f));
-        EXPECT_TRUE(isclose(cross(fv1, fv3), (FV{ 1.2f, -2.4f, 1.2f }), 1e-6f));
+        EXPECT_TRUE(all_close(cross(fv3, fv3), FV{ 0.0f }, 1e-6f));
+        EXPECT_TRUE(all_close(cross(fv1, fv3), (FV{ 1.2f, -2.4f, 1.2f }), 1e-6f));
 
         // int oddRef[] = { 1, 0, 0, 1, 0, 0 };
         // EXPECT_TRUE(equalIter(oddRef, oddRef + SIZE, odd(iv3).begin(), SIZE));

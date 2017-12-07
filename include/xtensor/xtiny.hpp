@@ -1322,11 +1322,11 @@ namespace xt
 
     template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
     inline bool
-    isclose(tiny_array<V1, N1, R1> const & l,
-            tiny_array<V2, N2, R2> const & r,
-            double rtol = 2.0*std::numeric_limits<double>::epsilon(),
-            double atol = 2.0*std::numeric_limits<double>::epsilon(),
-            bool equal_nan = false)
+    all_close(tiny_array<V1, N1, R1> const & l,
+              tiny_array<V2, N2, R2> const & r,
+              double rtol = 2.0*std::numeric_limits<double>::epsilon(),
+              double atol = 2.0*std::numeric_limits<double>::epsilon(),
+              bool equal_nan = false)
     {
         if(l.size() != r.size())
             return false;
