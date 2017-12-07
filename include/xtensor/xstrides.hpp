@@ -233,6 +233,12 @@ namespace xt
     inline bool broadcast_shape(const S1& input, S2& output)
     {
         bool trivial_broadcast = (input.size() == output.size());
+#ifndef XTENSOR_ENABLE_ASSERT
+        if (trivial_broadcast)
+        {
+            return true;
+        }
+#endif
         auto input_iter = input.crbegin();
         auto output_iter = output.rbegin();
         for (; input_iter != input.crend(); ++input_iter, ++output_iter)
