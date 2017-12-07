@@ -1503,8 +1503,9 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param equal_nan if true, isclose returns true if both elements of e1 and e2 are NaN
      * @return an \ref xfunction
      */
-    template <class E1, class E2,
-              XTENSOR_REQUIRE<is_xexpression<E1>::value || is_xexpression<E2>::value>>
+    // template <class E1, class E2,
+              // class = std::enable_if_t<is_xexpression<E1>::value || is_xexpression<E2>::value>>
+    template <class E1, class E2>
     inline auto isclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false) noexcept
     {
         return detail::make_xfunction<detail::isclose>(std::make_tuple(rtol, atol, equal_nan),
@@ -1586,7 +1587,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xexpression
      */
     template <class E, class X,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto mean(E&& e, X&& axes) noexcept
     {
         auto size = e.size();
@@ -1595,7 +1596,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     }
 
     template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto mean(E&& e) noexcept
     {
         auto size = e.size();
@@ -1635,7 +1636,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xarray<T>
      */
     template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumsum(E&& e, std::size_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
@@ -1643,7 +1644,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     }
 
     template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumsum(E&& e) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
@@ -1661,7 +1662,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xarray<T>
      */
     template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumprod(E&& e, std::size_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
@@ -1669,7 +1670,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     }
 
     template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumprod(E&& e) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;

@@ -747,7 +747,7 @@ namespace xt
     * @return a boolean
     */
     template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline bool any(E&& e)
     {
         using xtype = std::decay_t<E>;
@@ -773,7 +773,7 @@ namespace xt
     * @return a boolean
     */
     template <class E,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline bool all(E&& e)
     {
         using xtype = std::decay_t<E>;
