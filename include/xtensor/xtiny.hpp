@@ -472,7 +472,7 @@ namespace xt
     /***********************************************/
 
     template <class VALUETYPE, index_t BUFFER_SIZE>
-    class tiny_array_base<VALUETYPE, runtime_size, std::integral_constant<index_t, BUFFER_SIZE>>
+    class tiny_array_base<VALUETYPE, runtime_size, VALUETYPE[BUFFER_SIZE]>
     : public tags::tiny_array_tag
     {
       public:
@@ -744,9 +744,9 @@ namespace xt
 
     template <class VALUETYPE>
     class tiny_array_base<VALUETYPE, runtime_size, void>
-    : public tiny_array_base<VALUETYPE, runtime_size, std::integral_constant<index_t, 4>>
+    : public tiny_array_base<VALUETYPE, runtime_size, VALUETYPE[4]>
     {
-        using base_type = tiny_array_base<VALUETYPE, runtime_size, std::integral_constant<index_t, 4>>;
+        using base_type = tiny_array_base<VALUETYPE, runtime_size, VALUETYPE[4]>;
       public:
         using base_type::base_type;
     };
