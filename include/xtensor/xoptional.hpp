@@ -38,7 +38,9 @@ namespace xt
         struct split_optional_expression_impl
         {
             using value_expression = T;
-            using flag_expression = decltype(ones<bool>(std::declval<T>().shape()));
+            using flag_expression = std::conditional_t<is_xscalar<std::decay_t<T>>::value,
+                                                       xscalar<bool>,
+                                                       decltype(ones<bool>(std::declval<T>().shape()))>;
 
             template <class U>
             static inline U&& value(U&& arg)
@@ -47,9 +49,15 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            static inline std::enable_if_t<!is_xscalar<std::decay_t<U>>::value, flag_expression> has_value(U&& arg)
             {
                 return ones<bool>(arg.shape());
+            }
+
+            template <class U>
+            static inline std::enable_if_t<is_xscalar<std::decay_t<U>>::value,flag_expression> has_value(U&& /*arg*/)
+            {
+                return xscalar<bool>(true);
             }
         };
 
@@ -352,7 +360,7 @@ namespace xt
     inline auto xoptional_function<F, R, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
     {
         return value_expression(value_functor(),
-            detail::split_optional_expression<CT>::value(std::forward<CT>(std::get<I>(this->arguments())))...);
+            detail::split_optional_expression<CT>::value(std::get<I>(this->arguments()))...);
     }
 
     template <class F, class R, class... CT>
@@ -360,7 +368,7 @@ namespace xt
     inline auto xoptional_function<F, R, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
     {
         return flag_expression(flag_functor(),
-            detail::split_optional_expression<CT>::has_value(std::forward<CT>(std::get<I>(this->arguments())))...);
+            detail::split_optional_expression<CT>::has_value(std::get<I>(this->arguments()))...);
     }
 
     /********************************
@@ -417,26 +425,10 @@ namespace xt
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
 
-        bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
-        if (trivial_broadcast)
-        {
-            using base_value_type1 = typename std::decay_t<decltype(xt::value(de1))>::value_type;
-            using base_value_type2 = typename std::decay_t<decltype(xt::value(de2))>::value_type;
-            constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
-            constexpr bool same_type = std::is_same<base_value_type1, base_value_type2>::value;
-            constexpr bool simd_size = xsimd::simd_traits<base_value_type1>::size > 1;
-            constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
-            constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
-            decltype(auto) bde1 = xt::value(de1);
-            decltype(auto) hde1 = xt::has_value(de1);
-            trivial_assigner<simd_assign>::run(bde1, xt::value(de2));
-            trivial_assigner<false>::run(hde1, xt::has_value(de2));
-        }
-        else
-        {
-            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(de1, de2);
-            assigner.run();
-        }
+        decltype(auto) bde1 = xt::value(de1);
+        decltype(auto) hde1 = xt::has_value(de1);
+        xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, xt::value(de2), trivial);
+        xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::has_value(de2), trivial);
     }
 }
 

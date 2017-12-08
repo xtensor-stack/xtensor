@@ -479,4 +479,20 @@ namespace xt
         EXPECT_EQ(res(1, 2), opt(14.));
         EXPECT_EQ(res(1, 3), opt(16., false));
     }
+
+    TEST(xoptional_assembly, mixed_expression)
+    {
+        using opt = xtl::xoptional<int>;
+        dyn_opt_ass_type a = { { opt(1), opt(2, false), opt(3, false), opt(4) },
+                               { opt(5, false), opt(6), opt(7), opt(8, false) } };
+        xarray<int> b = { { 1, 2, 3, 4}, { 5, 6, 7, 8} };
+
+        dyn_opt_ass_type c = a + b;
+        dyn_opt_ass_type res = { { opt(2), opt(4, false), opt(6, false), opt(8) },
+                                 { opt(10, false), opt(12), opt(14), opt(16, false) } };
+        EXPECT_EQ(res, c);
+
+        dyn_opt_ass_type d = 2 * a;
+        EXPECT_EQ(res, d);
+    }
 }
