@@ -400,10 +400,21 @@ namespace xt
         , data_(const_cast<representation_type>(rhs.data_))
         {}
 
+        tiny_array_base(representation_type begin, size_type size)
+        : size_(size)
+        , data_(begin)
+        {}
+
         tiny_array_base(representation_type begin, representation_type end)
         : size_(std::distance(begin, end))
         , data_(begin)
         {}
+
+        void reset(representation_type begin, size_type size)
+        {
+            size_ = size;
+            data_ = begin;
+        }
 
         void reset(representation_type begin, representation_type end)
         {
@@ -460,8 +471,8 @@ namespace xt
     /* tiny_array_base: dynamic shape, owns memory */
     /***********************************************/
 
-    template <class VALUETYPE>
-    class tiny_array_base<VALUETYPE, runtime_size, void>
+    template <class VALUETYPE, index_t BUFFER_SIZE>
+    class tiny_array_base<VALUETYPE, runtime_size, std::integral_constant<index_t, BUFFER_SIZE>>
     : public tags::tiny_array_tag
     {
       public:
@@ -483,6 +494,7 @@ namespace xt
         static const bool    owns_memory = true;
         static const bool    is_static   = false;
         static const index_t static_size = runtime_size;
+        static const index_t buffer_size = BUFFER_SIZE;
 
         template <class NEW_VALUETYPE>
         using rebind = tiny_array<NEW_VALUETYPE, runtime_size>;
@@ -723,12 +735,20 @@ namespace xt
 
         static const bool may_use_uninitialized_memory = std::is_scalar<value_type>::value ||
                                                          std::is_pod<value_type>::value;
-        static const index_t buffer_size = 4;
 
         std::allocator<value_type> alloc_;
         index_t      size_;
         representation_type data_;
         value_type   buffer_[buffer_size < 1 ? 1 : buffer_size];
+    };
+
+    template <class VALUETYPE>
+    class tiny_array_base<VALUETYPE, runtime_size, void>
+    : public tiny_array_base<VALUETYPE, runtime_size, std::integral_constant<index_t, 4>>
+    {
+        using base_type = tiny_array_base<VALUETYPE, runtime_size, std::integral_constant<index_t, 4>>;
+      public:
+        using base_type::base_type;
     };
 
     /**************/
