@@ -1,7 +1,7 @@
 name: xtensor
 channels:
-  - nodefaults
   - QuantStack
+  - conda-forge
 dependencies:
   - xtensor
   - xtensor-blas
