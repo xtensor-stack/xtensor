@@ -480,6 +480,9 @@ namespace xt
         EXPECT_EQ(res(1, 3), opt(16., false));
     }
 
+    template <class T>
+    struct DEBUG;
+
     TEST(xoptional_assembly, mixed_expression)
     {
         using opt = xtl::xoptional<int>;
@@ -494,5 +497,12 @@ namespace xt
 
         dyn_opt_ass_type d = 2 * a;
         EXPECT_EQ(res, d);
+
+        opt e = opt(2, true);
+        dyn_opt_ass_type f = e * a;
+        EXPECT_EQ(res, f);
+
+        dyn_opt_ass_type g = opt(2, true) * a;
+        EXPECT_EQ(res, f);
     }
 }

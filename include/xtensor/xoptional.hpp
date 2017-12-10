@@ -38,9 +38,7 @@ namespace xt
         struct split_optional_expression_impl
         {
             using value_expression = T;
-            using flag_expression = std::conditional_t<is_xscalar<std::decay_t<T>>::value,
-                                                       xscalar<bool>,
-                                                       decltype(ones<bool>(std::declval<T>().shape()))>;
+            using flag_expression = decltype(ones<bool>(std::declval<T>().shape()));
 
             template <class U>
             static inline U&& value(U&& arg)
@@ -49,16 +47,87 @@ namespace xt
             }
 
             template <class U>
-            static inline std::enable_if_t<!is_xscalar<std::decay_t<U>>::value, flag_expression> has_value(U&& arg)
+            static inline flag_expression has_value(U&& arg)
             {
                 return ones<bool>(arg.shape());
             }
+        };
+
+        template <class T, class Tag>
+        struct split_optional_expression_impl<xscalar<T>, Tag>
+        {
+            using value_expression = xscalar<T>;
+            using flag_expression = xscalar<bool>;
 
             template <class U>
-            static inline std::enable_if_t<is_xscalar<std::decay_t<U>>::value,flag_expression> has_value(U&& /*arg*/)
+            static inline U&& value(U&& arg)
+            {
+                return std::forward<U>(arg);
+            }
+
+            template <class U>
+            static inline flag_expression has_value(U&&)
             {
                 return xscalar<bool>(true);
             }
+        };
+
+        template <class T, bool is_const, bool is_ref>
+        struct split_optional_scalar
+        {
+            using raw_value_closure = typename T::value_closure;
+            using raw_flag_closure = typename T::flag_closure;
+            using cst_value_closure = std::conditional_t<is_const,
+                                                         std::add_const_t<raw_value_closure>,
+                                                         raw_value_closure>;
+            using cst_flag_closure = std::conditional_t<is_const,
+                                                        std::add_const_t<raw_flag_closure>,
+                                                        raw_flag_closure>;
+            using value_closure = std::conditional_t<is_ref,
+                                                     std::add_lvalue_reference_t<cst_value_closure>,
+                                                     cst_value_closure>;
+            using flag_closure = std::conditional_t<is_ref,
+                                                    std::add_lvalue_reference_t<cst_flag_closure>,
+                                                    cst_flag_closure>;
+            using value_expression = xscalar<value_closure>;
+            using flag_expression = xscalar<flag_closure>;
+
+            template <class U>
+            static inline value_expression value(U&& arg)
+            {
+                return arg().value();
+            }
+
+            template <class U>
+            static inline flag_expression has_value(U&& arg)
+            {
+                return arg().has_value();
+            }
+
+        };
+
+        template <class T, class B, class Tag>
+        struct split_optional_expression_impl<xscalar<xtl::xoptional<T, B>>, Tag>
+            : split_optional_scalar<xtl::xoptional<T, B>, false, false>
+        {
+        };
+
+        template <class T, class B, class Tag>
+        struct split_optional_expression_impl<xscalar<xtl::xoptional<T, B>&>, Tag>
+            : split_optional_scalar<xtl::xoptional<T, B>, false, true>
+        {
+        };
+
+        template <class T, class B, class Tag>
+        struct split_optional_expression_impl<xscalar<const xtl::xoptional<T, B>&>, Tag>
+            : split_optional_scalar<xtl::xoptional<T, B>, true, true>
+        {
+        };
+
+        template <class T, class B, class Tag>
+        struct split_optional_expression_impl<xscalar<const xtl::xoptional<T, B>>, Tag>
+            : split_optional_scalar<xtl::xoptional<T, B>, true, false>
+        {
         };
 
         template <class T>
