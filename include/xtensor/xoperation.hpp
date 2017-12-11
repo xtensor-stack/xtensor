@@ -15,8 +15,8 @@
 
 #include "xtl/xsequence.hpp"
 
+#include "xconcepts.hpp"
 #include "xfunction.hpp"
-//#include "xoptional.hpp"
 #include "xscalar.hpp"
 #include "xstrides.hpp"
 
@@ -590,7 +590,8 @@ namespace xt
      * @return a boolean
      */
     template <class E1, class E2>
-    inline bool operator==(const xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline std::enable_if_t<xoptional_comparable<E1, E2>::value, bool>
+    operator==(const xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
