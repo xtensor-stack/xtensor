@@ -295,6 +295,28 @@ namespace xt
 
     template <class... T>
     using xexpression_tag_t = typename xexpression_tag<T...>::type;
+
+    template <class E>
+    struct is_xtensor_expression : std::is_same<xexpression_tag_t<E>, xtensor_expression_tag>
+    {
+    };
+
+    template <class E>
+    struct is_xoptional_expression : std::is_same<xexpression_tag_t<E>, xoptional_expression_tag>
+    {
+    };
+
+    /********************************
+     * xoptional_comparable concept *
+     ********************************/
+
+    template <class... E>
+    struct xoptional_comparable : xtl::conjunction<xtl::disjunction<is_xtensor_expression<E>,
+                                                                    is_xoptional_expression<E>
+                                                                   >...
+                                                  >
+    {
+    };
 }
 
 #endif
