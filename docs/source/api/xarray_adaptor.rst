@@ -21,11 +21,11 @@ Defined in ``xtensor/xadapt.hpp``
 .. doxygenfunction:: xt::adapt(C&&, const SC&, layout_type)
    :project: xtensor
 
-.. doxygenfunction:: xt::adapt(C&&, const SC&, const SC&)
+.. doxygenfunction:: xt::adapt(C&&, SC&&, SS&&)
    :project: xtensor
 
 .. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, const SC&, layout_type, const A&)
    :project: xtensor
 
-.. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, const SC&, const SC&, const A&)
+.. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, SC&&, SS&&, const A&)
    :project: xtensor
