@@ -7,6 +7,35 @@
 Changelog
 =========
 
+0.14.1
+------
+
+New features
+~~~~~~~~~~~~
+
+- sort, argmin and argmax
+  `#549 <https://github.com/QuantStack/xtensor/pull/549>`_.
+- ``xscalar_expression_tag``
+  `#582 <https://github.com/QuantStack/xtensor/pull/582>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- accumulator improvements
+  `#570 <https://github.com/QuantStack/xtensor/pull/570>`_.
+- benchmark cmake fixed
+  `#571 <https://github.com/QuantStack/xtensor/pull/571>`_.
+- allocator_type added to container interface
+  `#573 <https://github.com/QuantStack/xtensor/pull/573>`_.
+- allow conda-forge as fallback channel
+  `#575 <https://github.com/QuantStack/xtensor/pull/575>`_.
+- arithmetic mixing optional assemblies and scalars fixed
+  `#578 <https://github.com/QuantStack/xtensor/pull/578>`_.
+- arithmetic mixing optional assemblies and optionals fixed
+  `#579 <https://github.com/QuantStack/xtensor/pull/579>`_.
+- ``operator==`` restricted to xtensor and xoptional expressions
+  `#580 <https://github.com/QuantStack/xtensor/pull/580>`_.
+
 0.14.0
 ------
 
