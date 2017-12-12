@@ -225,6 +225,10 @@ namespace xt
      * expression tag system *
      *************************/
 
+    struct xscalar_expression_tag
+    {
+    };
+
     struct xtensor_expression_tag
     {
     };
@@ -263,6 +267,24 @@ namespace xt
         struct expression_tag_and<T, T>
         {
             using type = T;
+        };
+
+        template <>
+        struct expression_tag_and<xscalar_expression_tag, xscalar_expression_tag>
+        {
+            using type = xscalar_expression_tag;
+        };
+
+        template <class T>
+        struct expression_tag_and<xscalar_expression_tag, T>
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct expression_tag_and<T, xscalar_expression_tag>
+            : expression_tag_and<xscalar_expression_tag, T>
+        {
         };
 
         template <>
