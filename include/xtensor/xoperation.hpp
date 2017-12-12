@@ -189,6 +189,12 @@ namespace xt
         struct select_xfunction_expression;
 
         template <class F, class... E>
+        struct select_xfunction_expression<xscalar_expression_tag, F, E...>
+        {
+            using type = typename select_xfunction_expression<xtensor_expression_tag, F, E...>::type;
+        };
+
+        template <class F, class... E>
         struct select_xfunction_expression<xtensor_expression_tag, F, E...>
         {
             using type = xfunction<F, typename F::result_type, E...>;
@@ -205,6 +211,12 @@ namespace xt
 
         template <class Tag, template <class...> class F, class... E>
         struct build_functor_type;
+
+        template <template <class...> class F, class... E>
+        struct build_functor_type<xscalar_expression_tag, F, E...>
+        {
+            using type = typename build_functor_type<xtensor_expression_tag, F, E...>::type;
+        };
 
         template <template <class...> class F, class... E>
         struct build_functor_type<xtensor_expression_tag, F, E...>
