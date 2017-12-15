@@ -290,6 +290,8 @@ argument.
 +--------------------------------------------+-----------------------------------------------+
 | ``np.imag(a)``                             | ``xt::imag(a)``                               |
 +--------------------------------------------+-----------------------------------------------+
+| ``np.conj(a)``                             | ``xt::conj(a)``                               |
++--------------------------------------------+-----------------------------------------------+
 
 - The constness and value category (rvalue / lvalue) of ``real(a)`` is the same as that of ``a``.
   Hence, if ``a`` is a non-const lvalue, ``real(a)`` is an non-const lvalue reference, to which
