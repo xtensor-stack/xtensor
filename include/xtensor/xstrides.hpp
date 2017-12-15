@@ -53,6 +53,16 @@ namespace xt
     void adapt_strides(const shape_type& shape, strides_type& strides,
                        backstrides_type& backstrides) noexcept;
 
+    /*****************
+     * unravel_index *
+     *****************/
+
+    template <class S>
+    S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l);
+
+    template <class S>
+    S unravel_index(typename S::value_type index, const S& shape, layout_type l);
+
     /***********************
      * broadcast functions *
      ***********************/
@@ -227,6 +237,42 @@ namespace xt
         {
             detail::adapt_strides(shape, strides, &backstrides, i);
         }
+    }
+
+    template <class S>
+    inline S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l)
+    {
+        using size_type = typename S::size_type;
+        using value_type = typename S::value_type;
+        S result = xtl::make_sequence<S>(strides.size(), 0);
+        auto lambda = [&index](const value_type& str)
+        {
+            value_type quot = str != 0 ? index / str : 0;
+            index = str != 0 ? index % str : index;
+            return quot;
+        };
+
+        if (l == layout_type::row_major)
+        {
+            std::transform(strides.cbegin(), strides.cend(), result.begin(), lambda);
+        }
+        else if(l == layout_type::column_major)
+        {
+            std::transform(strides.crbegin(), strides.crend(), result.rbegin(), lambda);
+        }
+        else
+        {
+            throw std::runtime_error("unravel_index: dynamic layout not supported yet");
+        }
+        return result;
+    }
+
+    template <class S>
+    inline S unravel_index(typename S::value_type index, const S& shape, layout_type l)
+    {
+        S strides = xtl::make_sequence<S>(shape.size(), 0);
+        compute_strides(shape, l, strides);
+        return unravel_from_strides(index, strides, l);
     }
 
     template <class S1, class S2>

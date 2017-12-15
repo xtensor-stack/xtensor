@@ -480,9 +480,6 @@ namespace xt
         EXPECT_EQ(res(1, 3), opt(16., false));
     }
 
-    template <class T>
-    struct DEBUG;
-
     TEST(xoptional_assembly, mixed_expression)
     {
         using opt = xtl::xoptional<int>;
