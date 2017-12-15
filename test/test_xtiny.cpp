@@ -20,196 +20,158 @@
 namespace xt
 {
     static const int SIZE = 3;
-    using BV = xtiny<unsigned char, SIZE>;
-    using IV = xtiny<int, SIZE>;
-    using FV = xtiny<float, SIZE>;
 
-    static float di[] = { 1, 2, 4};
-    static float df[] = { 1.2f, 2.4f, 3.6f};
-    BV bv0, bv1{1}, bv3(di);
-    IV iv0, iv1{1}, iv3(di);
-    FV fv0, fv1{1.0f}, fv3(df);
-
-    TEST(xtiny, construction)
+    template <class T>
+    struct xtiny_test_data
     {
-        EXPECT_EQ(bv0.size(), SIZE);
-        EXPECT_EQ(iv0.size(), SIZE);
-        EXPECT_EQ(fv0.size(), SIZE);
-        EXPECT_FALSE(bv0.empty());
-        EXPECT_FALSE(iv0.empty());
-        EXPECT_FALSE(fv0.empty());
-        EXPECT_EQ(bv0.shape(), (std::array<size_t, 1>{SIZE}));
-        EXPECT_EQ(iv0.shape(), (std::array<size_t, 1>{SIZE}));
-        EXPECT_EQ(fv0.shape(), (std::array<size_t, 1>{SIZE}));
+        static T data[SIZE];
+    };
 
-        auto iv3iter = iv3.begin();
-        auto iv3citer = iv3.cbegin();
-        auto iv3riter = iv3.rbegin();
-        auto iv3criter = iv3.crbegin();
-        for(int k=0; k<SIZE; ++k, ++iv3iter, ++iv3citer, ++iv3riter, ++iv3criter)
+    template <class T>
+    T xtiny_test_data<T>::data[SIZE] = {1, 2, 4};
+
+    template <>
+    float xtiny_test_data<float>::data[SIZE] = { 1.2f, 2.4f, 4.6f};
+
+    template <class T>
+    class xtiny_test : public testing::Test
+    {
+    };
+
+    typedef testing::Types<xtiny<uint8_t, SIZE>,
+                           xtiny<int, SIZE>,
+                           xtiny<float, SIZE>,
+                           xtiny<int, runtime_size>,         // buffer_size > SIZE
+                           xtiny<int, runtime_size, int[1]>  // buffer_size < SIZE
+                          > xtiny_types;
+
+    TYPED_TEST_CASE(xtiny_test, xtiny_types);
+
+    TYPED_TEST(xtiny_test, construction)
+    {
+        using V = TypeParam;
+        using T = typename V::value_type;
+        using size_type = typename V::size_type;
+        const bool fixed = V::has_fixed_size;
+
+        T * data = xtiny_test_data<T>::data;
+
+        V v0,
+          v1(SIZE, 1),
+          v3(data, data+SIZE);
+
+        EXPECT_EQ(v0.size(), fixed ? SIZE : 0);
+        EXPECT_EQ(v1.size(), SIZE);
+        EXPECT_EQ(v3.size(), SIZE);
+        EXPECT_EQ(v0.empty(), !fixed);
+        EXPECT_FALSE(v1.empty());
+        EXPECT_FALSE(v3.empty());
+        EXPECT_EQ(v0.shape(), (std::array<size_t, 1>{fixed ? SIZE : 0}));
+        EXPECT_EQ(v1.shape(), (std::array<size_t, 1>{SIZE}));
+        EXPECT_EQ(v3.shape(), (std::array<size_t, 1>{SIZE}));
+
+        EXPECT_EQ(v3.front(), data[0]);
+        EXPECT_EQ(v3.back(), data[SIZE-1]);
+        V const & cv3 = v3;
+        EXPECT_EQ(cv3.front(), data[0]);
+        EXPECT_EQ(cv3.back(), data[SIZE-1]);
+
+        auto v3iter   = v3.begin();
+        auto v3citer  = v3.cbegin();
+        auto v3riter  = v3.rbegin();
+        auto v3criter = v3.crbegin();
+        for(size_type k=0; k<v3.size(); ++k, ++v3iter, ++v3citer, ++v3riter, ++v3criter)
         {
-            EXPECT_EQ(bv0[k], 0);
-            EXPECT_EQ(iv0[k], 0);
-            EXPECT_EQ(fv0[k], 0);
-            EXPECT_EQ(bv1[k], 1);
-            EXPECT_EQ(iv1[k], 1);
-            EXPECT_EQ(fv1[k], 1);
-            EXPECT_EQ(bv3[k], di[k]);
-            EXPECT_EQ(iv3[k], di[k]);
-            EXPECT_EQ(iv3.at(k), di[k]);
-            EXPECT_EQ(fv3[k], df[k]);
-            EXPECT_EQ(*iv3iter, di[k]);
-            EXPECT_EQ(*iv3citer, di[k]);
-            EXPECT_EQ(*iv3riter, di[SIZE-1-k]);
-            EXPECT_EQ(*iv3criter, di[SIZE-1-k]);
+            if(fixed)
+            {
+                EXPECT_EQ(v0[k], 0);
+            }
+            EXPECT_EQ(v1[k], 1);
+            EXPECT_EQ(v3[k], data[k]);
+            EXPECT_EQ(v3.at(k), data[k]);
+            EXPECT_EQ(*v3iter, data[k]);
+            EXPECT_EQ(*v3citer, data[k]);
+            EXPECT_EQ(*v3riter, data[SIZE-1-k]);
+            EXPECT_EQ(*v3criter, data[SIZE-1-k]);
         }
-        EXPECT_EQ(iv3iter, iv3.end());
-        EXPECT_EQ(iv3citer, iv3.cend());
-        EXPECT_EQ(iv3riter, iv3.rend());
-        EXPECT_EQ(iv3criter, iv3.crend());
-        EXPECT_THROW(iv3.at(SIZE), std::out_of_range);
+        EXPECT_EQ(v3iter, v3.end());
+        EXPECT_EQ(v3citer, v3.cend());
+        EXPECT_EQ(v3riter, v3.rend());
+        EXPECT_EQ(v3criter, v3.crend());
+        EXPECT_THROW(v3.at(SIZE), std::out_of_range);
 
-        EXPECT_EQ(iv3.front(), 1);
-        EXPECT_EQ(iv3.back(), 4);
+        EXPECT_EQ(v3, V(v3));
+        EXPECT_EQ(v3, V(v3.begin(), v3.end()));
+        if(fixed)
+        {
+            EXPECT_THROW(V(v3.begin(), v3.begin()+SIZE-1), std::runtime_error);
+            EXPECT_THROW((V{1,2}), std::runtime_error);
+        }
 
-        EXPECT_EQ(iv3, IV(iv3));
-        EXPECT_EQ(iv3, IV(bv3));
-        EXPECT_EQ(iv3, IV(bv3.begin()));
-        EXPECT_EQ(iv3, IV(bv3.begin(), bv3.end()));
-        EXPECT_THROW(IV(bv3.begin(), bv3.begin()+2), std::runtime_error);
-        EXPECT_EQ(iv1, IV(fv1));
-        EXPECT_EQ(iv3, (IV{ 1, 2, 4 }));
-        EXPECT_EQ(iv3, (IV{ 1.1, 2.2, 4.4 }));
-        EXPECT_EQ(iv1, (IV{ 1 }));
-        EXPECT_EQ(iv1, (IV{ 1.1 }));
-        EXPECT_EQ(iv1, IV(SIZE, 1));
-        EXPECT_EQ(iv3, IV(std::array<int, SIZE>{1, 2, 4}));
-        EXPECT_EQ(iv1, IV(std::vector<int>(SIZE, 1)));
+        if(std::is_integral<T>::value)
+        {
+            EXPECT_EQ(v3, (V{1, 2, 4}));
+        }
+        else
+        {
+            EXPECT_EQ(v3, (V{1.2f, 2.4f, 4.6f}));
+        }
+        if(fixed)
+        {
+            EXPECT_EQ(v1, (V{1}));
+         }
+        else
+        {
+            EXPECT_EQ((xtiny<T, 1>(1,1)), (V{1}));
+        }
 
-        IV iv;
-        iv.assign(SIZE, 0);
-        EXPECT_EQ(iv0, iv);
-        iv.assign(SIZE, 1);
-        EXPECT_EQ(iv1, iv);
-        iv.assign({1,2,4});
-        EXPECT_EQ(iv3, iv);
+        V v;
+        v.assign(SIZE, 1);
+        EXPECT_EQ(v1, v);
+        v.assign({1.2f, 2.4f, 4.6f});
+        EXPECT_EQ(v3, v);
 
-        FV fv(iv3);
-        EXPECT_EQ(fv, iv3);
-        fv = fv3;
-        EXPECT_EQ(fv, fv3);
-        fv = bv3;
-        EXPECT_EQ(fv, bv3);
+        v = 1;
+        EXPECT_EQ(v, v1);
+        v = v3;
+        EXPECT_EQ(v, v3);
 
-        EXPECT_EQ(iv3, (iv3.template subarray<0, SIZE>()));
-        EXPECT_EQ(2, (iv3.template subarray<0, 2>().size()));
-        EXPECT_EQ(iv3[0], (iv3.template subarray<0, 2>()[0]));
-        EXPECT_EQ(iv3[1], (iv3.template subarray<0, 2>()[1]));
-        EXPECT_EQ(2, (iv3.template subarray<1, 3>().size()));
-        EXPECT_EQ(iv3[1], (iv3.template subarray<1, 3>()[0]));
-        EXPECT_EQ(iv3[2], (iv3.template subarray<1, 3>()[1]));
-        EXPECT_EQ(1, (iv3.template subarray<1, 2>().size()));
-        EXPECT_EQ(iv3[1], (iv3.template subarray<1, 2>()[0]));
-        EXPECT_EQ(1, (iv3.subarray(1, 2).size()));
-        EXPECT_EQ(iv3[1], (iv3.subarray(1, 2)[0]));
-        IV const & civ3 = iv3;
-        EXPECT_EQ(1, (civ3.template subarray<1, 2>().size()));
-        EXPECT_EQ(iv3[1], (civ3.template subarray<1, 2>()[0]));
-        EXPECT_EQ(1, (civ3.subarray(1, 2).size()));
-        EXPECT_EQ(iv3[1], (civ3.subarray(1, 2)[0]));
-
-        using FV1 = FV::rebind_size<SIZE - 1>;
-        FV1 fv10(fv3.begin());
-        EXPECT_EQ(fv10, fv3.erase(SIZE - 1));
-        EXPECT_EQ(fv3, fv10.insert(SIZE - 1, fv3[SIZE - 1]));
-        EXPECT_EQ(fv10, fv3.pop_back());
-        EXPECT_EQ(fv3, fv10.push_back(fv3[SIZE - 1]));
-        FV1 fv11(fv3.begin() + 1);
-        EXPECT_EQ(fv11, fv3.erase(0));
-        EXPECT_EQ(fv3, fv11.insert(0, fv3[0]));
-        EXPECT_EQ(fv11, fv3.pop_front());
-        EXPECT_EQ(fv3, fv11.push_front(fv3[0]));
-
-        BV bv2(bv1), bv4(bv3);
-        swap(bv2, bv4);
-        EXPECT_EQ(bv3, bv2);
-        EXPECT_EQ(bv1, bv4);
-    }
-
-    TEST(xtiny, comparison)
-    {
-        EXPECT_TRUE(bv0 == bv0);
-        EXPECT_TRUE(bv0 == 0);
-        EXPECT_TRUE(0 == bv0);
-        EXPECT_TRUE(iv0 == iv0);
-        EXPECT_TRUE(fv0 == fv0);
-        EXPECT_TRUE(fv0 == 0);
-        EXPECT_TRUE(0 == fv0);
-        EXPECT_TRUE(iv0 == bv0);
-        EXPECT_TRUE(iv0 == fv0);
-        EXPECT_TRUE(fv0 == bv0);
-
-        EXPECT_TRUE(bv3 == bv3);
-        EXPECT_TRUE(iv3 == iv3);
-        EXPECT_TRUE(fv3 == fv3);
-        EXPECT_TRUE(iv3 == bv3);
-        EXPECT_TRUE(iv3 != fv3);
-        EXPECT_TRUE(iv3 != 0);
-        EXPECT_TRUE(0 != iv3);
-        EXPECT_TRUE(fv3 != bv3);
-        EXPECT_TRUE(fv3 != 0);
-        EXPECT_TRUE(0 != fv3);
-    }
-
-    TEST(xtiny, ostream)
-    {
-        std::ostringstream out;
-        out << iv3;
-        std::string expected("{1, 2, 4}");
-        EXPECT_EQ(expected, out.str());
-        out << "Testing.." << fv3 << 42;
-        out << bv3 << std::endl;
-    }
-
-    TEST(xtiny, runtime_size)
-    {
-        using A = xtiny<int>;
-        using V1 = xtiny<int, 1>;
-
-        EXPECT_TRUE(typeid(A) == typeid(xtiny<int, runtime_size>));
-
-        A a{ 1,2,3 }, b{ 1,2,3 }, c = a, e(3, 0);
-        EXPECT_EQ(a.size(), 3);
-        EXPECT_EQ(b.size(), 3);
-        EXPECT_EQ(c.size(), 3);
-        EXPECT_EQ(e.size(), 3);
-        EXPECT_EQ(a, b);
-        EXPECT_EQ(a, c);
-        EXPECT_TRUE(a != e);
-        EXPECT_EQ(e, (A{ 0,0,0 }));
-
-        EXPECT_EQ(iv3, (A{ 1, 2, 4 }));
-        EXPECT_EQ(iv3, (A{ 1.1, 2.2, 4.4 }));
-        EXPECT_EQ(iv3, (A({ 1, 2, 4 })));
-        EXPECT_EQ(iv3, (A({ 1.1, 2.2, 4.4 })));
-        EXPECT_EQ(V1{1}, (A{ 1 }));
-        EXPECT_EQ(V1{1}, (A{ 1.1 }));
-        EXPECT_EQ(V1{1}, (A({ 1 })));
-        EXPECT_EQ(V1{1}, (A({ 1.1 })));
-        EXPECT_EQ(iv0, A(SIZE, 0));
-        EXPECT_EQ(iv1, A(SIZE, 1));
-
-        c.assign({ 1,2,3 });
-        EXPECT_EQ(a, c);
-
-        EXPECT_EQ(a.erase(1), (A{ 1,3 }));
-        EXPECT_EQ(a.insert(3, 4), (A{ 1,2,3,4 }));
+        V v2(v1), v4(v3);
+        swap(v2, v4);
+        EXPECT_EQ(v3, v2);
+        EXPECT_EQ(v1, v4);
 
         // testing move constructor and assignment
-        EXPECT_EQ(std::move(A{ 1,2,3 }), (A{ 1,2,3 }));
-        EXPECT_EQ(A(a.insert(3, 4)), (A{ 1,2,3,4 }));
-        a = a.insert(3, 4);
-        EXPECT_EQ(a, (A{ 1,2,3,4 }));
+        v4 = v3.push_back(0).pop_back();
+        EXPECT_EQ(v4, v3);
+        EXPECT_EQ(V(v3.push_back(0).pop_back()), v3);
+    }
+
+    TYPED_TEST(xtiny_test, subarray)
+    {
+        using V = TypeParam;
+        using A = typename V::rebind_size<runtime_size>;
+        using T = typename V::value_type;
+
+        T * data = xtiny_test_data<T>::data;
+        V v3(data, data+SIZE);
+        V const & cv3 = v3;
+
+        EXPECT_EQ(v3, (v3.template subarray<0, SIZE>()));
+        EXPECT_EQ(2, (v3.template subarray<0, 2>().size()));
+        EXPECT_EQ(v3[0], (v3.template subarray<0, 2>()[0]));
+        EXPECT_EQ(v3[1], (v3.template subarray<0, 2>()[1]));
+        EXPECT_EQ(2, (v3.template subarray<1, 3>().size()));
+        EXPECT_EQ(v3[1], (v3.template subarray<1, 3>()[0]));
+        EXPECT_EQ(v3[2], (v3.template subarray<1, 3>()[1]));
+        EXPECT_EQ(1, (v3.template subarray<1, 2>().size()));
+        EXPECT_EQ(v3[1], (v3.template subarray<1, 2>()[0]));
+        EXPECT_EQ(1, (v3.subarray(1, 2).size()));
+        EXPECT_EQ(v3[1], (v3.subarray(1, 2)[0]));
+        EXPECT_EQ(1, (cv3.template subarray<1, 2>().size()));
+        EXPECT_EQ(v3[1], (cv3.template subarray<1, 2>()[0]));
+        EXPECT_EQ(1, (cv3.subarray(1, 2).size()));
+        EXPECT_EQ(v3[1], (cv3.subarray(1, 2)[0]));
 
         A r{ 2,3,4,5 };
         EXPECT_EQ(r, (A{ 2,3,4,5 }));
@@ -217,6 +179,88 @@ namespace xt
         EXPECT_EQ(r.subarray(1, 3), (A{ 3,4 }));
         EXPECT_EQ((r.template subarray<1, 3>().size()), 2);
         EXPECT_EQ((r.template subarray<1, 3>()), (A{ 3,4 }));
+    }
+
+    TYPED_TEST(xtiny_test, erase_insert)
+    {
+        using V = TypeParam;
+        using V1 = V::rebind_size<SIZE - 1>;
+        using T = typename V::value_type;
+
+        T * data = xtiny_test_data<T>::data;
+        V v3(data, data+SIZE);
+        V1 v10(v3.begin(), v3.begin()+SIZE-1);
+
+        EXPECT_EQ(v10, v3.erase(SIZE - 1));
+        EXPECT_EQ(v3, v10.insert(SIZE - 1, v3[SIZE - 1]));
+        EXPECT_EQ(v10, v3.pop_back());
+        EXPECT_EQ(v3, v10.push_back(v3[SIZE - 1]));
+        V1 v11(v3.begin() + 1, v3.begin() + SIZE);
+        EXPECT_EQ(v11, v3.erase(0));
+        EXPECT_EQ(v3, v11.insert(0, v3[0]));
+        EXPECT_EQ(v11, v3.pop_front());
+        EXPECT_EQ(v3, v11.push_front(v3[0]));
+    }
+
+    TYPED_TEST(xtiny_test, comparison)
+    {
+        using V = TypeParam;
+        using T = typename V::value_type;
+
+        T * data = xtiny_test_data<T>::data;
+
+        V v1{1},
+          v2(SIZE, 1),
+          v3(data, data+SIZE);
+
+        EXPECT_TRUE(v3 == v3);
+        EXPECT_EQ(v1 == v2, V::has_fixed_size);
+        EXPECT_TRUE(v1 == v1);
+        EXPECT_TRUE(v1 == 1);
+        EXPECT_TRUE(1 == v1);
+        EXPECT_TRUE(v1 != v3);
+        EXPECT_TRUE(v2 != v3);
+        EXPECT_TRUE(v1 != 0);
+        EXPECT_TRUE(0 != v1);
+        EXPECT_TRUE(v2 != 0);
+        EXPECT_TRUE(0 != v2);
+    }
+
+    TYPED_TEST(xtiny_test, ostream)
+    {
+        using V = TypeParam;
+        using T = typename V::value_type;
+
+        T * data = xtiny_test_data<T>::data;
+        V v3(data, data+SIZE);
+
+        std::ostringstream out;
+        out << v3;
+        if(std::is_integral<T>::value)
+        {
+            std::string expected("{1, 2, 4}");
+            EXPECT_EQ(expected, out.str());
+        }
+    }
+
+    TEST(xtiny, conversion)
+    {
+        using IV = xtiny<int, SIZE>;
+        using FV = xtiny<float, SIZE>;
+        IV iv{1,2,3},
+           iv1(SIZE, 1);
+        FV fv{1.1f,2.2f,3.3f},
+           fv1{1.0};
+
+        EXPECT_TRUE(iv1 == fv1);
+        EXPECT_TRUE(fv1 == iv1);
+        EXPECT_TRUE(iv != fv);
+        EXPECT_TRUE(fv != iv);
+        EXPECT_TRUE(iv == IV(fv));
+        EXPECT_TRUE(iv == (IV{1.1f,2.2f,3.3f}));
+        EXPECT_TRUE(iv1 == IV{1.2});
+        iv1 = fv;
+        EXPECT_TRUE(iv1 == iv);
     }
 
     TEST(xtiny, interoperability)
