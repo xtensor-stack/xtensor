@@ -223,6 +223,9 @@ namespace xt
         template <class NEW_VALUETYPE>
         using rebind = xtiny<NEW_VALUETYPE, runtime_size, NEW_VALUETYPE[BUFFER_SIZE]>;
 
+        template <index_t NEW_SIZE>
+        using rebind_size = xtiny<value_type, NEW_SIZE < runtime_size ? runtime_size : NEW_SIZE>;
+
         xtiny_impl();
         ~xtiny_impl();
 
@@ -335,10 +338,10 @@ namespace xt
         static const index_t static_size = N;
 
         template <class NEW_VALUETYPE, index_t NEW_SIZE=N>
-        using rebind = xtiny<NEW_VALUETYPE, NEW_SIZE, std::array<VALUETYPE, (size_t)NEW_SIZE>>;
+        using rebind = xtiny<NEW_VALUETYPE, NEW_SIZE < runtime_size ? runtime_size : NEW_SIZE>;
 
         template <index_t NEW_SIZE>
-        using rebind_size = xtiny<value_type, NEW_SIZE, std::array<VALUETYPE, (size_t)NEW_SIZE>>;
+        using rebind_size = xtiny<value_type, NEW_SIZE < runtime_size ? runtime_size : NEW_SIZE>;
 
         xtiny_impl();
 
@@ -678,6 +681,13 @@ namespace xt
         using base_type::swap;
         void swap(xtiny_impl &);
     };
+
+    template <class V, index_t N, class R>
+    inline void
+    swap(xtiny<V, N, R> & l, xtiny<V, N, R> & r)
+    {
+        l.swap(r);
+    }
 
     /****************/
     /* xtiny output */
@@ -1284,7 +1294,7 @@ namespace xt
     inline auto
     xtiny_impl<V, runtime_size, V[B]>::capacity() const -> size_type
     {
-        return std::max(m_size, buffer_size);
+        return std::max<std::size_t>(m_size, buffer_size);
     }
 
     template <class V, index_t B>
@@ -1298,7 +1308,7 @@ namespace xt
     inline auto
     xtiny_impl<V, runtime_size, V[B]>::max_size() const -> size_type
     {
-        return std::max_size(m_allocator);
+        return m_allocator.max_size();
     }
 
     template <class V, index_t B>
@@ -1909,14 +1919,14 @@ namespace xt
     inline auto
     xtiny_impl<V, runtime_size, R>::rbegin() -> reverse_iterator
     {
-        return reverse_iterator(m_data+N);
+        return reverse_iterator(m_data+m_size);
     }
 
     template <class V, class R>
     constexpr inline auto
     xtiny_impl<V, runtime_size, R>::rbegin() const -> const_reverse_iterator
     {
-        return const_reverse_iterator(m_data+N);
+        return const_reverse_iterator(m_data+m_size);
     }
 
     template <class V, class R>
