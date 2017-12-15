@@ -19,7 +19,7 @@
 
 namespace xt
 {
-    static const int SIZE = 3;
+    static const unsigned SIZE = 3;
 
     template <class T>
     struct xtiny_test_data
@@ -150,7 +150,7 @@ namespace xt
     TYPED_TEST(xtiny_test, subarray)
     {
         using V = TypeParam;
-        using A = typename V::rebind_size<runtime_size>;
+        using A = typename V::template rebind_size<runtime_size>;
         using T = typename V::value_type;
 
         T * data = xtiny_test_data<T>::data;
@@ -158,33 +158,33 @@ namespace xt
         V const & cv3 = v3;
 
         EXPECT_EQ(v3, (v3.template subarray<0, SIZE>()));
-        EXPECT_EQ(2, (v3.template subarray<0, 2>().size()));
+        EXPECT_EQ(2u, (v3.template subarray<0, 2>().size()));
         EXPECT_EQ(v3[0], (v3.template subarray<0, 2>()[0]));
         EXPECT_EQ(v3[1], (v3.template subarray<0, 2>()[1]));
-        EXPECT_EQ(2, (v3.template subarray<1, 3>().size()));
+        EXPECT_EQ(2u, (v3.template subarray<1, 3>().size()));
         EXPECT_EQ(v3[1], (v3.template subarray<1, 3>()[0]));
         EXPECT_EQ(v3[2], (v3.template subarray<1, 3>()[1]));
-        EXPECT_EQ(1, (v3.template subarray<1, 2>().size()));
+        EXPECT_EQ(1u, (v3.template subarray<1, 2>().size()));
         EXPECT_EQ(v3[1], (v3.template subarray<1, 2>()[0]));
-        EXPECT_EQ(1, (v3.subarray(1, 2).size()));
+        EXPECT_EQ(1u, (v3.subarray(1, 2).size()));
         EXPECT_EQ(v3[1], (v3.subarray(1, 2)[0]));
-        EXPECT_EQ(1, (cv3.template subarray<1, 2>().size()));
+        EXPECT_EQ(1u, (cv3.template subarray<1, 2>().size()));
         EXPECT_EQ(v3[1], (cv3.template subarray<1, 2>()[0]));
-        EXPECT_EQ(1, (cv3.subarray(1, 2).size()));
+        EXPECT_EQ(1u, (cv3.subarray(1, 2).size()));
         EXPECT_EQ(v3[1], (cv3.subarray(1, 2)[0]));
 
         A r{ 2,3,4,5 };
         EXPECT_EQ(r, (A{ 2,3,4,5 }));
-        EXPECT_EQ(r.subarray(1, 3).size(), 2);
+        EXPECT_EQ(r.subarray(1, 3).size(), 2u);
         EXPECT_EQ(r.subarray(1, 3), (A{ 3,4 }));
-        EXPECT_EQ((r.template subarray<1, 3>().size()), 2);
+        EXPECT_EQ((r.template subarray<1, 3>().size()), 2u);
         EXPECT_EQ((r.template subarray<1, 3>()), (A{ 3,4 }));
     }
 
     TYPED_TEST(xtiny_test, erase_insert)
     {
         using V = TypeParam;
-        using V1 = V::rebind_size<SIZE - 1>;
+        using V1 = typename V::template rebind_size<SIZE - 1>;
         using T = typename V::value_type;
 
         T * data = xtiny_test_data<T>::data;
@@ -206,6 +206,7 @@ namespace xt
     {
         using V = TypeParam;
         using T = typename V::value_type;
+        const bool fixed = V::has_fixed_size;
 
         T * data = xtiny_test_data<T>::data;
 
@@ -214,7 +215,7 @@ namespace xt
           v3(data, data+SIZE);
 
         EXPECT_TRUE(v3 == v3);
-        EXPECT_EQ(v1 == v2, V::has_fixed_size);
+        EXPECT_EQ(v1 == v2, fixed);
         EXPECT_TRUE(v1 == v1);
         EXPECT_TRUE(v1 == 1);
         EXPECT_TRUE(1 == v1);

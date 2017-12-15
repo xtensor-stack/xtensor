@@ -101,13 +101,13 @@ namespace xt
         xtiny(xtiny && rhs);
 
         template <class T, index_t M, class R>
-        xtiny(xtiny<T, M, R> const & rhs);
+        explicit xtiny(xtiny<T, M, R> const & rhs);
 
         template <class T, class A>
-        xtiny(std::vector<T, A> const & v);
+        explicit xtiny(std::vector<T, A> const & v);
 
         template <class T, std::size_t M>
-        xtiny(std::array<T, M> const & v);
+        explicit xtiny(std::array<T, M> const & v);
 
         xtiny & operator=(xtiny const & rhs);
         xtiny & operator=(xtiny && rhs);
@@ -238,7 +238,7 @@ namespace xt
         xtiny_impl(IT begin, IT end);
 
         template <class T>
-        xtiny_impl(std::initializer_list<T> const & v);
+        explicit xtiny_impl(std::initializer_list<T> const & v);
 
         xtiny_impl(xtiny_impl const & v);
         xtiny_impl(xtiny_impl && v);
@@ -351,14 +351,14 @@ namespace xt
 
         template <class IT,
                   class = detail::require_input_iter<IT>>
-        xtiny_impl(IT begin);
+        explicit xtiny_impl(IT begin);
 
         template <class IT,
                   class = detail::require_input_iter<IT>>
         xtiny_impl(IT begin, IT end);
 
         template <class T>
-        xtiny_impl(std::initializer_list<T> const & v);
+        explicit xtiny_impl(std::initializer_list<T> const & v);
 
         xtiny_impl(xtiny_impl const & v);
         xtiny_impl(xtiny_impl && v);
@@ -699,7 +699,7 @@ namespace xt
         o << "{";
         if(v.size() > 0)
             o << promote_type_t<T>(v[0]);
-        for(index_t i=1; i < (index_t)v.size(); ++i)
+        for(decltype(v.size()) i=1; i < v.size(); ++i)
             o << ", " << promote_type_t<T>(v[i]);
         o << "}";
         return o;
@@ -716,7 +716,7 @@ namespace xt
     {
         if(l.size() != r.size())
             return false;
-        for(index_t k=0; k < (index_t)l.size(); ++k)
+        for(decltype(l.size()) k=0; k < l.size(); ++k)
             if(l[k] != r[k])
                 return false;
         return true;
@@ -729,7 +729,7 @@ namespace xt
     operator==(xtiny<V1, N1, R1> const & l,
                V2 const & r)
     {
-        for(index_t k=0; k < (index_t)l.size(); ++k)
+        for(decltype(l.size()) k=0; k < l.size(); ++k)
             if(l[k] != r)
                 return false;
         return true;
@@ -742,7 +742,7 @@ namespace xt
     operator==(V1 const & l,
                xtiny<V2, N2, R2> const & r)
     {
-        for(index_t k=0; k < (index_t)r.size(); ++k)
+        for(decltype(r.size()) k=0; k < r.size(); ++k)
             if(l != r[k])
                 return false;
         return true;
@@ -755,7 +755,7 @@ namespace xt
     {
         if(l.size() != r.size())
             return true;
-        for(index_t k=0; k < (index_t)l.size(); ++k)
+        for(decltype(l.size()) k=0; k < l.size(); ++k)
             if(l[k] != r[k])
                 return true;
         return false;
@@ -768,7 +768,7 @@ namespace xt
     operator!=(xtiny<V1, N1, R1> const & l,
                V2 const & r)
     {
-        for(index_t k=0; k < (index_t)l.size(); ++k)
+        for(decltype(l.size()) k=0; k < l.size(); ++k)
             if(l[k] != r)
                 return true;
         return false;
@@ -781,7 +781,7 @@ namespace xt
     operator!=(V1 const & l,
                xtiny<V2, N2, R2> const & r)
     {
-        for(index_t k=0; k < (index_t)r.size(); ++k)
+        for(decltype(r.size()) k=0; k < r.size(); ++k)
             if(l != r[k])
                 return true;
         return false;
@@ -1057,21 +1057,21 @@ namespace xt
     inline auto
     xtiny<V, N, R>::end() -> iterator
     {
-        return begin() + size();
+        return begin() + static_cast<std::ptrdiff_t>(size());
     }
 
     template <class V, index_t N, class R>
     constexpr inline auto
     xtiny<V, N, R>::end() const -> const_iterator
     {
-        return begin() + size();
+        return begin() + static_cast<std::ptrdiff_t>(size());
     }
 
     template <class V, index_t N, class R>
     constexpr inline auto
     xtiny<V, N, R>::cend() const -> const_iterator
     {
-        return cbegin() + size();
+        return cbegin() + static_cast<std::ptrdiff_t>(size());
     }
 
     template <class V, index_t N, class R>
@@ -1085,21 +1085,21 @@ namespace xt
     inline auto
     xtiny<V, N, R>::rend() -> reverse_iterator
     {
-        return rbegin() + size();
+        return rbegin() + static_cast<std::ptrdiff_t>(size());
     }
 
     template <class V, index_t N, class R>
     constexpr inline auto
     xtiny<V, N, R>::rend() const -> const_reverse_iterator
     {
-        return rbegin() + size();
+        return rbegin() + static_cast<std::ptrdiff_t>(size());
     }
 
     template <class V, index_t N, class R>
     constexpr inline auto
     xtiny<V, N, R>::crend() const -> const_reverse_iterator
     {
-        return crbegin() + size();
+        return crbegin() + static_cast<std::ptrdiff_t>(size());
     }
 
     template <class V, index_t N, class R>
@@ -1234,7 +1234,7 @@ namespace xt
     inline void
     xtiny_impl<V, runtime_size, V[B]>::assign(IT begin, IT end)
     {
-        size_type n = std::distance(begin, end);
+        size_type n = static_cast<size_type>(std::distance(begin, end));
         if(m_size == n)
         {
             for (size_type k = 0; k < m_size; ++k, ++begin)
@@ -1602,7 +1602,8 @@ namespace xt
     xtiny_impl<V, N, std::array<V, (size_t)N>>::assign(IT begin, IT end)
     {
         std::ignore = end;
-        XTENSOR_ASSERT_MSG(std::distance(begin, end) == size(), "xtiny_impl::assign(begin, end): size mismatch.");
+        XTENSOR_ASSERT_MSG(std::distance(begin, end) == static_cast<std::ptrdiff_t>(size()),
+            "xtiny_impl::assign(begin, end): size mismatch.");
         for(size_type k=0; k<N; ++k, ++begin)
         {
             (*this)[k] = static_cast<value_type>(*begin);
@@ -1647,7 +1648,8 @@ namespace xt
     : m_data(begin)
     {
         std::ignore = end;
-        XTENSOR_ASSERT_MSG(std::distance(begin, end) == size(), "xtiny_impl(begin, end): size mismatch");
+        XTENSOR_ASSERT_MSG(std::distance(begin, end) == static_cast<std::ptrdiff_t>(size()),
+            "xtiny_impl(begin, end): size mismatch");
     }
 
     template <class V, index_t N, class R>
@@ -1657,7 +1659,8 @@ namespace xt
     : m_data(const_cast<representation_type>(&*begin))
     {
         std::ignore = end;
-        XTENSOR_ASSERT_MSG(std::distance(begin, end) == size(), "xtiny_impl::assign(begin, end): size mismatch.");
+        XTENSOR_ASSERT_MSG(std::distance(begin, end) == static_cast<std::ptrdiff_t>(size()),
+            "xtiny_impl::assign(begin, end): size mismatch.");
     }
 
     template <class V, index_t N, class R>
@@ -1685,7 +1688,8 @@ namespace xt
     xtiny_impl<V, N, R>::assign(IT begin, IT end)
     {
         std::ignore = end;
-        XTENSOR_ASSERT_MSG(std::distance(begin, end) == size(), "xtiny_impl::assign(begin, end): size mismatch.");
+        XTENSOR_ASSERT_MSG(std::distance(begin, end) == static_cast<std::ptrdiff_t>(size()),
+            "xtiny_impl::assign(begin, end): size mismatch.");
         for(size_type k=0; k<N; ++k, ++begin)
         {
             (*this)[k] = static_cast<value_type>(*begin);
@@ -1799,7 +1803,7 @@ namespace xt
     template <class V, class R>
     inline
     xtiny_impl<V, runtime_size, R>::xtiny_impl(representation_type const & begin, representation_type const & end)
-    : m_size(std::distance(begin, end))
+    : m_size(static_cast<size_type>(std::distance(begin, end)))
     , m_data(begin)
     {
     }
@@ -1808,7 +1812,7 @@ namespace xt
     template <class IT, class>
     inline
     xtiny_impl<V, runtime_size, R>::xtiny_impl(IT begin, IT end)
-    : m_size(std::distance(begin, end))
+    : m_size(static_cast<size_type>(std::distance(begin, end)))
     , m_data(const_cast<representation_type>(&*begin))
     {
     }
@@ -1817,7 +1821,7 @@ namespace xt
     inline void
     xtiny_impl<V, runtime_size, R>::reset(representation_type const & begin, representation_type const & end)
     {
-        m_size = std::distance(begin, end);
+        m_size = static_cast<size_type>(std::distance(begin, end));
         m_data = begin;
     }
 
@@ -1838,7 +1842,8 @@ namespace xt
     xtiny_impl<V, runtime_size, R>::assign(IT begin, IT end)
     {
         std::ignore = end;
-        XTENSOR_ASSERT_MSG(std::distance(begin, end) == size(), "xtiny_impl::assign(begin, end): size mismatch.");
+        XTENSOR_ASSERT_MSG(std::distance(begin, end) == static_cast<std::ptrdiff_t>(size()),
+            "xtiny_impl::assign(begin, end): size mismatch.");
         for(size_type k=0; k<size(); ++k, ++begin)
         {
             (*this)[k] = static_cast<value_type>(*begin);
@@ -1960,7 +1965,8 @@ namespace xt
     xtiny_impl<V, runtime_size, xbuffer_adaptor<CP, O, A>>::assign(IT begin, IT end)
     {
         std::ignore = end;
-        XTENSOR_ASSERT_MSG(std::distance(begin, end) == size(), "xtiny_impl::assign(begin, end): size mismatch.");
+        XTENSOR_ASSERT_MSG(std::distance(begin, end) == static_cast<std::ptrdiff_t>(size()),
+            "xtiny_impl::assign(begin, end): size mismatch.");
         for(size_type k=0; k<size(); ++k, ++begin)
         {
             (*this)[k] = static_cast<value_type>(*begin);
