@@ -375,7 +375,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 
 #define REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                              \
     template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
-              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value &&     \
+                                       is_xexpression<E>::value, int>>                                            \
     inline auto NAME(E&& e, X&& axes, ES es = ES()) noexcept                                                      \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
@@ -385,7 +386,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     }                                                                                                             \
                                                                                                                   \
     template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,                                                      \
-              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>               \
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value &&                   \
+                                       is_xexpression<E>::value, int>>                                            \
     inline auto NAME(E&& e, ES es = ES()) noexcept                                                                \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
@@ -1501,6 +1503,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param equal_nan if true, isclose returns true if both elements of e1 and e2 are NaN
      * @return an \ref xfunction
      */
+    // template <class E1, class E2,
+              // class = std::enable_if_t<is_xexpression<E1>::value || is_xexpression<E2>::value>>
     template <class E1, class E2>
     inline auto isclose(E1&& e1, E2&& e2, double rtol = 1e-05, double atol = 1e-08, bool equal_nan = false) noexcept
     {
@@ -1582,7 +1586,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param axes the axes along which the mean is computed (optional)
      * @return an \ref xexpression
      */
-    template <class E, class X>
+    template <class E, class X,
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto mean(E&& e, X&& axes) noexcept
     {
         auto size = e.size();
@@ -1590,7 +1595,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         return std::move(s) / static_cast<double>(size / s.size());
     }
 
-    template <class E>
+    template <class E,
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto mean(E&& e) noexcept
     {
         auto size = e.size();
@@ -1629,14 +1635,16 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param axis the axes along which the cumulative sum is computed (optional)
      * @return an \ref xarray<T>
      */
-    template <class E>
+    template <class E,
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumsum(E&& e, std::size_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(std::plus<result_type>(), std::forward<E>(e), axis);
     }
 
-    template <class E>
+    template <class E,
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumsum(E&& e) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
@@ -1653,14 +1661,16 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param axis the axes along which the cumulative product is computed (optional)
      * @return an \ref xarray<T>
      */
-    template <class E>
+    template <class E,
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumprod(E&& e, std::size_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(std::multiplies<result_type>(), std::forward<E>(e), axis);
     }
 
-    template <class E>
+    template <class E,
+              class = std::enable_if_t<is_xexpression<E>::value>>
     inline auto cumprod(E&& e) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
