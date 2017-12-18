@@ -32,7 +32,7 @@ namespace xt
 
     using index_t = std::ptrdiff_t;
 
-    static const index_t runtime_size  = -1;
+    constexpr static index_t runtime_size  = -1;
 
     namespace tags
     {
@@ -88,7 +88,6 @@ namespace xt
         using const_reverse_iterator = typename base_type::const_reverse_iterator;
         using size_type = typename base_type::size_type;
         using difference_type = typename base_type::difference_type;
-        using index_type = typename base_type::index_type;
 
         using base_type::owns_memory;
         using base_type::has_fixed_size;
@@ -125,8 +124,7 @@ namespace xt
 
         using base_type::assign;
 
-        template <class T>
-        void assign(std::initializer_list<T> v);
+        void assign(std::initializer_list<value_type> v);
 
         using base_type::data;
 
@@ -168,7 +166,6 @@ namespace xt
 
         using base_type::size;
         using base_type::max_size;
-        using base_type::shape;
         constexpr bool empty() const;
 
         using base_type::swap;
@@ -213,12 +210,11 @@ namespace xt
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
-        using index_type = std::array<size_type, 1>;
 
-        static const bool owns_memory = true;
-        static const bool has_fixed_size = false;
-        static const index_t static_size = runtime_size;
-        static const index_t buffer_size = BUFFER_SIZE;
+        constexpr static bool owns_memory = true;
+        constexpr static bool has_fixed_size = false;
+        constexpr static index_t static_size = runtime_size;
+        constexpr static index_t buffer_size = BUFFER_SIZE;
 
         template <class NEW_VALUETYPE>
         using rebind = xtiny<NEW_VALUETYPE, runtime_size, NEW_VALUETYPE[BUFFER_SIZE]>;
@@ -237,8 +233,7 @@ namespace xt
                   class = detail::require_input_iter<IT>>
         xtiny_impl(IT begin, IT end);
 
-        template <class T>
-        explicit xtiny_impl(std::initializer_list<T> const & v);
+        explicit xtiny_impl(std::initializer_list<value_type> const & v);
 
         xtiny_impl(xtiny_impl const & v);
         xtiny_impl(xtiny_impl && v);
@@ -263,7 +258,6 @@ namespace xt
         size_type capacity() const;
         size_type size() const;
         size_type max_size() const;
-        index_type shape() const;
         bool on_stack() const;
 
         iterator begin();
@@ -275,7 +269,7 @@ namespace xt
         void swap(xtiny_impl & other);
 
       protected:
-        static const bool may_use_uninitialized_memory = xtrivially_default_constructible<value_type>::value;
+        constexpr static bool may_use_uninitialized_memory = xtrivially_default_constructible<value_type>::value;
 
         /* allocate() assumes that m_size is already set,
            but no memory has been allocated yet */
@@ -331,11 +325,10 @@ namespace xt
         using const_reverse_iterator = typename base_type::const_reverse_iterator;
         using size_type = std::size_t;
         using difference_type = std::ptrdiff_t;
-        using index_type = std::array<size_type, 1>;
 
-        static const bool owns_memory = true;
-        static const bool has_fixed_size = true;
-        static const index_t static_size = N;
+        constexpr static bool owns_memory = true;
+        constexpr static bool has_fixed_size = true;
+        constexpr static index_t static_size = N;
 
         template <class NEW_VALUETYPE, index_t NEW_SIZE=N>
         using rebind = xtiny<NEW_VALUETYPE, NEW_SIZE < runtime_size ? runtime_size : NEW_SIZE>;
@@ -357,8 +350,7 @@ namespace xt
                   class = detail::require_input_iter<IT>>
         xtiny_impl(IT begin, IT end);
 
-        template <class T>
-        explicit xtiny_impl(std::initializer_list<T> const & v);
+        explicit xtiny_impl(std::initializer_list<value_type> const & v);
 
         xtiny_impl(xtiny_impl const & v);
         xtiny_impl(xtiny_impl && v);
@@ -378,7 +370,6 @@ namespace xt
         using base_type::size;
         using base_type::max_size;
         constexpr size_type capacity() const;
-        constexpr index_type shape() const;
 
         using base_type::begin;
         using base_type::cbegin;
@@ -407,7 +398,7 @@ namespace xt
             template <class U>
             static typename U::value_type test(U *, typename U::value_type * = 0);
 
-            static const bool value = !std::is_same<decltype(test((T*)0)), void>::value;
+            constexpr static bool value = !std::is_same<decltype(test((T*)0)), void>::value;
         };
 
         template <class T,
@@ -485,11 +476,10 @@ namespace xt
         using const_reverse_iterator = typename traits::const_reverse_iterator;
         using size_type              = std::size_t;
         using difference_type        = std::ptrdiff_t;
-        using index_type             = std::array<index_t, 1>;
 
-        static const bool owns_memory = false;
-        static const bool has_fixed_size = true;
-        static const index_t static_size = N;
+        constexpr static bool owns_memory = false;
+        constexpr static bool has_fixed_size = true;
+        constexpr static index_t static_size = N;
 
         xtiny_impl();
 
@@ -523,7 +513,6 @@ namespace xt
         constexpr size_type size() const;
         constexpr size_type max_size() const;
         constexpr size_type capacity() const;
-        constexpr index_type shape() const;
 
         iterator begin();
         constexpr const_iterator begin() const;
@@ -567,11 +556,10 @@ namespace xt
         using const_reverse_iterator = typename traits::const_reverse_iterator;
         using size_type              = std::size_t;
         using difference_type        = std::ptrdiff_t;
-        using index_type             = std::array<index_t, 1>;
 
-        static const bool owns_memory = false;
-        static const bool has_fixed_size = false;
-        static const index_t static_size = runtime_size;
+        constexpr static bool owns_memory = false;
+        constexpr static bool has_fixed_size = false;
+        constexpr static index_t static_size = runtime_size;
 
         xtiny_impl();
 
@@ -604,7 +592,6 @@ namespace xt
         constexpr size_type size() const;
         constexpr size_type max_size() const;
         constexpr size_type capacity() const;
-        constexpr index_type shape() const;
 
         iterator begin();
         constexpr const_iterator begin() const;
@@ -647,11 +634,10 @@ namespace xt
         using const_reverse_iterator = typename base_type::const_reverse_iterator;
         using size_type              = std::size_t;
         using difference_type        = std::ptrdiff_t;
-        using index_type             = std::array<index_t, 1>;
 
-        static const bool owns_memory = false;
-        static const bool has_fixed_size = false;
-        static const index_t static_size = runtime_size;
+        constexpr static bool owns_memory = false;
+        constexpr static bool has_fixed_size = false;
+        constexpr static index_t static_size = runtime_size;
 
         using base_type::base_type;
 
@@ -667,7 +653,6 @@ namespace xt
 
         constexpr size_type max_size() const;
         constexpr size_type capacity() const;
-        constexpr index_type shape() const;
 
         using base_type::begin;
         using base_type::cbegin;
@@ -714,12 +699,7 @@ namespace xt
     operator==(xtiny<V1, N1, R1> const & l,
                xtiny<V2, N2, R2> const & r)
     {
-        if(l.size() != r.size())
-            return false;
-        for(decltype(l.size()) k=0; k < l.size(); ++k)
-            if(l[k] != r[k])
-                return false;
-        return true;
+        return l.size() == r.size() && std::equal(l.cbegin(), l.cend(), r.cbegin());
     }
 
     template <class V1, index_t N1, class R1, class V2,
@@ -729,9 +709,14 @@ namespace xt
     operator==(xtiny<V1, N1, R1> const & l,
                V2 const & r)
     {
-        for(decltype(l.size()) k=0; k < l.size(); ++k)
-            if(l[k] != r)
+        auto i = l.cbegin();
+        for(decltype(l.size()) k=0; k < l.size(); ++k, ++i)
+        {
+            if(*i != r)
+            {
                 return false;
+            }
+        }
         return true;
     }
 
@@ -742,36 +727,15 @@ namespace xt
     operator==(V1 const & l,
                xtiny<V2, N2, R2> const & r)
     {
-        for(decltype(r.size()) k=0; k < r.size(); ++k)
-            if(l != r[k])
-                return false;
-        return true;
+        return r == l;
     }
 
-    template <class V1, index_t N1, class R1, class V2, index_t N2, class R2>
-    inline bool
-    operator!=(xtiny<V1, N1, R1> const & l,
-               xtiny<V2, N2, R2> const & r)
-    {
-        if(l.size() != r.size())
-            return true;
-        for(decltype(l.size()) k=0; k < l.size(); ++k)
-            if(l[k] != r[k])
-                return true;
-        return false;
-    }
-
-    template <class V1, index_t N1, class R1, class V2,
-              XTENSOR_REQUIRE<!xtiny_concept<V2>::value &&
-                              std::is_convertible<V2, V1>::value> >
+    template <class V1, index_t N1, class R1, class V2>
     inline bool
     operator!=(xtiny<V1, N1, R1> const & l,
                V2 const & r)
     {
-        for(decltype(l.size()) k=0; k < l.size(); ++k)
-            if(l[k] != r)
-                return true;
-        return false;
+        return !(l == r);
     }
 
     template <class V1, class V2, index_t N2, class R2,
@@ -781,10 +745,7 @@ namespace xt
     operator!=(V1 const & l,
                xtiny<V2, N2, R2> const & r)
     {
-        for(decltype(r.size()) k=0; k < r.size(); ++k)
-            if(l != r[k])
-                return true;
-        return false;
+        return !(r == l);
     }
 
     /************************/
@@ -816,7 +777,7 @@ namespace xt
     template <class T, index_t M, class Q>
     inline
     xtiny<V, N, R>::xtiny(xtiny<T, M, Q> const & v)
-    : base_type(v.begin(), v.end())
+    : base_type(v.cbegin(), v.cend())
     {
     }
 
@@ -824,7 +785,7 @@ namespace xt
     template <class T, class A>
     inline
     xtiny<V, N, R>::xtiny(std::vector<T, A> const & v)
-    : base_type(v.begin(), v.end())
+    : base_type(v.cbegin(), v.cend())
     {
     }
 
@@ -832,7 +793,7 @@ namespace xt
     template <class T, std::size_t M>
     inline
     xtiny<V, N, R>::xtiny(std::array<T, M> const & v)
-    : base_type(v.begin(), v.end())
+    : base_type(v.cbegin(), v.cend())
     {
     }
 
@@ -865,7 +826,7 @@ namespace xt
     inline auto
     xtiny<V, N, R>::operator=(std::vector<T, A> const & v) -> xtiny &
     {
-        base_type::assign(v.begin(), v.end());
+        base_type::assign(v.cbegin(), v.cend());
         return *this;
     }
 
@@ -874,7 +835,7 @@ namespace xt
     inline auto
     xtiny<V, N, R>::operator=(std::array<T, M> const & v) -> xtiny &
     {
-        base_type::assign(v.begin(), v.end());
+        base_type::assign(v.cbegin(), v.cend());
         return *this;
     }
 
@@ -883,14 +844,13 @@ namespace xt
     inline auto
     xtiny<V, N, R>::operator=(xtiny<U, M, Q> const & v) -> xtiny &
     {
-        base_type::assign(v.begin(), v.end());
+        base_type::assign(v.cbegin(), v.cend());
         return *this;
     }
 
     template <class V, index_t N, class R>
-    template <class T>
     inline void
-    xtiny<V, N, R>::assign(std::initializer_list<T> v)
+    xtiny<V, N, R>::assign(std::initializer_list<value_type> v)
     {
         base_type::assign(v.begin(), v.end());
     }
@@ -900,7 +860,9 @@ namespace xt
     xtiny<V, N, R>::at(size_type i) -> reference
     {
         if(i < 0 || i >= size())
+        {
             throw std::out_of_range("xtiny::at()");
+        }
         return (*this)[i];
     }
 
@@ -909,7 +871,9 @@ namespace xt
     xtiny<V, N, R>::at(size_type i) const -> const_reference
     {
         if(i < 0 || i >= size())
+        {
             throw std::out_of_range("xtiny::at()");
+        }
         return (*this)[i];
     }
 
@@ -989,14 +953,12 @@ namespace xt
     {
         XTENSOR_PRECONDITION(m >= 0 && m < size(), "xtiny::erase(): "
             "Index "+std::to_string(m)+" out of bounds [0, "+std::to_string(size())+").");
-        static const index_t res_size = has_fixed_size
+        constexpr static index_t res_size = has_fixed_size
                                             ? static_size-1
                                             : runtime_size;
         xtiny<value_type, res_size> res(size()-1, dont_init);
-        for(size_type k=0; k<m; ++k)
-            res[k] = (*this)[k];
-        for(size_type k=m+1; k<size(); ++k)
-            res[k-1] = (*this)[k];
+        std::copy(cbegin(), cbegin()+m, res.begin());
+        std::copy(cbegin()+m+1, cend(), res.begin()+m);
         return res;
     }
 
@@ -1020,15 +982,13 @@ namespace xt
     {
         XTENSOR_PRECONDITION(m >= 0 && m <= size(), "xtiny::insert(): "
             "Index "+std::to_string(m)+" out of bounds [0, "+std::to_string(size())+"].");
-        static const index_t res_size = has_fixed_size
+        constexpr static index_t res_size = has_fixed_size
                                             ? static_size+1
                                             : runtime_size;
         xtiny<value_type, res_size> res(size()+1, dont_init);
-        for(size_type k=0; k<m; ++k)
-            res[k] = (*this)[k];
+        std::copy(cbegin(), cbegin()+m, res.begin());
         res[m] = v;
-        for(size_type k=m; k<size(); ++k)
-            res[k+1] = (*this)[k];
+        std::copy(cbegin()+m, cend(), res.begin()+m+1);
         return res;
     }
 
@@ -1166,9 +1126,8 @@ namespace xt
     }
 
     template <class V, index_t B>
-    template <class T>
     inline
-    xtiny_impl<V, runtime_size, V[B]>::xtiny_impl(std::initializer_list<T> const & v)
+    xtiny_impl<V, runtime_size, V[B]>::xtiny_impl(std::initializer_list<value_type> const & v)
     : m_size(0)
     , m_data(m_buffer)
     {
@@ -1312,13 +1271,6 @@ namespace xt
     }
 
     template <class V, index_t B>
-    inline auto
-    xtiny_impl<V, runtime_size, V[B]>::shape() const -> index_type
-    {
-        return {m_size};
-    }
-
-    template <class V, index_t B>
     inline bool
     xtiny_impl<V, runtime_size, V[B]>::on_stack() const
     {
@@ -1445,7 +1397,9 @@ namespace xt
         {
             m_data = m_allocator.allocate(m_size);
             if(!may_use_uninitialized_memory)
+            {
                 std::uninitialized_fill(m_data, m_data+m_size, value_type());
+            }
         }
     }
 
@@ -1458,12 +1412,16 @@ namespace xt
         {
             m_data = m_allocator.allocate(m_size);
             for(size_type k=0; k<m_size; ++k, ++begin)
+            {
                 m_allocator.construct(m_data+k, static_cast<value_type>(*begin));
+            }
         }
         else
         {
             for(size_type k=0; k<m_size; ++k, ++begin)
+            {
                 m_data[k] = static_cast<value_type>(*begin);
+            }
         }
     }
 
@@ -1476,7 +1434,9 @@ namespace xt
             if(!may_use_uninitialized_memory)
             {
                 for(size_type k=0; k<m_size; ++k)
+                {
                     m_allocator.destroy(m_data+k);
+                }
             }
             m_allocator.deallocate(m_data, m_size);
             m_data = m_buffer;
@@ -1538,9 +1498,8 @@ namespace xt
     }
 
     template <class V, index_t N>
-    template <class T>
     inline
-    xtiny_impl<V, N, std::array<V, (size_t)N>>::xtiny_impl(std::initializer_list<T> const & v)
+    xtiny_impl<V, N, std::array<V, (size_t)N>>::xtiny_impl(std::initializer_list<value_type> const & v)
     {
         const size_t n = v.size();
         if(n == 1)
@@ -1553,7 +1512,7 @@ namespace xt
         }
         else
         {
-            XTENSOR_ASSERT_MSG(false, "xtiny_impl::xtiny_impl(std::initializer_list<T>): size mismatch.");
+            XTENSOR_ASSERT_MSG(false, "xtiny_impl::xtiny_impl(std::initializer_list): size mismatch.");
         }
     }
 
@@ -1615,13 +1574,6 @@ namespace xt
     xtiny_impl<V, N, std::array<V, (size_t)N>>::capacity() const -> size_type
     {
         return N;
-    }
-
-    template <class V, index_t N>
-    constexpr inline auto
-    xtiny_impl<V, N, std::array<V, (size_t)N>>::shape() const -> index_type
-    {
-        return {N};
     }
 
     /**********************************************/
@@ -1746,13 +1698,6 @@ namespace xt
     }
 
     template <class V, index_t N, class R>
-    constexpr inline auto
-    xtiny_impl<V, N, R>::shape() const -> index_type
-    {
-        return {N};
-    }
-
-    template <class V, index_t N, class R>
     inline auto
     xtiny_impl<V, N, R>::begin() -> iterator
     {
@@ -1829,11 +1774,9 @@ namespace xt
     inline void
     xtiny_impl<V, runtime_size, R>::assign(size_type n, const value_type& v)
     {
+        std::ignore = n;
         XTENSOR_ASSERT_MSG(n == size(), "xtiny_impl::assign(n, v): size mismatch.");
-        for(size_type k=0; k<size(); ++k)
-        {
-            (*this)[k] = v;
-        }
+        std::fill(begin(), begin()+size(), v);
     }
 
     template <class V, class R>
@@ -1900,13 +1843,6 @@ namespace xt
     }
 
     template <class V, class R>
-    constexpr inline auto
-    xtiny_impl<V, runtime_size, R>::shape() const -> index_type
-    {
-        return {m_size};
-    }
-
-    template <class V, class R>
     inline auto
     xtiny_impl<V, runtime_size, R>::begin() -> iterator
     {
@@ -1952,11 +1888,9 @@ namespace xt
     inline void
     xtiny_impl<V, runtime_size, xbuffer_adaptor<CP, O, A>>::assign(size_type n, const value_type& v)
     {
+        std::ignore = n;
         XTENSOR_ASSERT_MSG(n == size(), "xtiny_impl::assign(n, v): size mismatch.");
-        for(size_type k=0; k<n; ++k)
-        {
-            (*this)[k] = v;
-        }
+        std::fill(begin(), begin()+size(), v);
     }
 
     template <class V, class CP, class O, class A>
@@ -1986,14 +1920,6 @@ namespace xt
     {
         return size();
     }
-
-    template <class V, class CP, class O, class A>
-    constexpr inline auto
-    xtiny_impl<V, runtime_size, xbuffer_adaptor<CP, O, A>>::shape() const -> index_type
-    {
-        return {size()};
-    }
-
 } // namespace xt
 
 #endif // XTENSOR_XTINY_HPP

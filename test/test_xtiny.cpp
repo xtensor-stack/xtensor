@@ -55,9 +55,11 @@ namespace xt
         const bool fixed = V::has_fixed_size;
 
         T * data = xtiny_test_data<T>::data;
+        int * idata = xtiny_test_data<int>::data;
 
         V v0,
           v1(SIZE, 1),
+          v2(idata, idata+SIZE),
           v3(data, data+SIZE);
 
         EXPECT_EQ(v0.size(), fixed ? SIZE : 0);
@@ -66,9 +68,6 @@ namespace xt
         EXPECT_EQ(v0.empty(), !fixed);
         EXPECT_FALSE(v1.empty());
         EXPECT_FALSE(v3.empty());
-        EXPECT_EQ(v0.shape(), (std::array<size_t, 1>{fixed ? SIZE : 0}));
-        EXPECT_EQ(v1.shape(), (std::array<size_t, 1>{SIZE}));
-        EXPECT_EQ(v3.shape(), (std::array<size_t, 1>{SIZE}));
 
         EXPECT_EQ(v3.front(), data[0]);
         EXPECT_EQ(v3.back(), data[SIZE-1]);
@@ -112,10 +111,6 @@ namespace xt
         {
             EXPECT_EQ(v3, (V{1, 2, 4}));
         }
-        else
-        {
-            EXPECT_EQ(v3, (V{1.2f, 2.4f, 4.6f}));
-        }
         if(fixed)
         {
             EXPECT_EQ(v1, (V{1}));
@@ -128,22 +123,22 @@ namespace xt
         V v;
         v.assign(SIZE, 1);
         EXPECT_EQ(v1, v);
-        v.assign({1.2f, 2.4f, 4.6f});
-        EXPECT_EQ(v3, v);
+        v.assign({1, 2, 4});
+        EXPECT_EQ(v2, v);
 
         v = 1;
         EXPECT_EQ(v, v1);
         v = v3;
         EXPECT_EQ(v, v3);
 
-        V v2(v1), v4(v3);
-        swap(v2, v4);
-        EXPECT_EQ(v3, v2);
-        EXPECT_EQ(v1, v4);
+        V v4(v1), v5(v3);
+        swap(v4, v5);
+        EXPECT_EQ(v3, v4);
+        EXPECT_EQ(v1, v5);
 
         // testing move constructor and assignment
-        v4 = v3.push_back(0).pop_back();
-        EXPECT_EQ(v4, v3);
+        v5 = v3.push_back(0).pop_back();
+        EXPECT_EQ(v5, v3);
         EXPECT_EQ(V(v3.push_back(0).pop_back()), v3);
     }
 
@@ -258,8 +253,6 @@ namespace xt
         EXPECT_TRUE(iv != fv);
         EXPECT_TRUE(fv != iv);
         EXPECT_TRUE(iv == IV(fv));
-        EXPECT_TRUE(iv == (IV{1.1f,2.2f,3.3f}));
-        EXPECT_TRUE(iv1 == IV{1.2});
         iv1 = fv;
         EXPECT_TRUE(iv1 == iv);
     }
