@@ -79,7 +79,7 @@ namespace xt
     private:
 
         template <class E1, class E2>
-        static bool reshape(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static bool resize(xexpression<E1>& e1, const xexpression<E2>& e2);
     };
 
     /*****************
@@ -226,7 +226,7 @@ namespace xt
     template <class E1, class E2>
     inline void xexpression_assigner<Tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        bool trivial_broadcast = reshape(e1, e2);
+        bool trivial_broadcast = resize(e1, e2);
         base_type::assign_data(e1, e2, trivial_broadcast);
     }
 
@@ -284,7 +284,7 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline bool xexpression_assigner<Tag>::reshape(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
@@ -292,7 +292,7 @@ namespace xt
         size_type size = de2.dimension();
         shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
         bool trivial_broadcast = de2.broadcast_shape(shape);
-        e1.derived_cast().reshape(std::move(shape));
+        e1.derived_cast().resize(std::move(shape));
         return trivial_broadcast;
     }
 

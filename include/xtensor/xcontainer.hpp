@@ -362,11 +362,14 @@ namespace xt
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
 
         template <class S = shape_type>
-        void reshape(S&& shape, bool force = false);
+        void resize(S&& shape, bool force = false);
         template <class S = shape_type>
-        void reshape(S&& shape, layout_type l);
+        void resize(S&& shape, layout_type l);
         template <class S = shape_type>
-        void reshape(S&& shape, const strides_type& strides);
+        void resize(S&& shape, const strides_type& strides);
+
+        template <class S = shape_type>
+        void reshape(S&& shape);
 
         layout_type layout() const noexcept;
 
@@ -1199,13 +1202,13 @@ namespace xt
     }
 
     /**
-     * Reshapes the container.
+     * resizes the container.
      * @param shape the new shape
      * @param force force reshaping, even if the shape stays the same (default: false)
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(S&& shape, bool force)
+    inline void xstrided_container<D>::resize(S&& shape, bool force)
     {
         if (m_shape.size() != shape.size() || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
@@ -1222,34 +1225,34 @@ namespace xt
     }
 
     /**
-     * Reshapes the container.
+     * resizes the container.
      * @param shape the new shape
      * @param l the new layout_type
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(S&& shape, layout_type l)
+    inline void xstrided_container<D>::resize(S&& shape, layout_type l)
     {
         if (base_type::static_layout != layout_type::dynamic && l != base_type::static_layout)
         {
             throw std::runtime_error("Cannot change layout_type if template parameter not layout_type::dynamic.");
         }
         m_layout = l;
-        reshape(std::forward<S>(shape), true);
+        resize(std::forward<S>(shape), true);
     }
 
     /**
-     * Reshapes the container.
+     * Resizes the container.
      * @param shape the new shape
      * @param strides the new strides
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(S&& shape, const strides_type& strides)
+    inline void xstrided_container<D>::resize(S&& shape, const strides_type& strides)
     {
         if (base_type::static_layout != layout_type::dynamic)
         {
-            throw std::runtime_error("Cannot reshape with custom strides when layout() is != layout_type::dynamic.");
+            throw std::runtime_error("Cannot resize with custom strides when layout() is != layout_type::dynamic.");
         }
         m_shape = xtl::forward_sequence<shape_type>(shape);
         m_strides = strides;
@@ -1257,6 +1260,28 @@ namespace xt
         adapt_strides(m_shape, m_strides, m_backstrides);
         m_layout = layout_type::dynamic;
         detail::resize_data_container(this->data(), compute_size(m_shape));
+    }
+
+    /**
+     * Reshapes the container and keeps old elements
+     * @param shape the new shape (has to have same number of elements as the original container)
+     */
+    template <class D>
+    template <class S>
+    inline void xstrided_container<D>::reshape(S&& shape)
+    {
+        if (compute_size(shape) != this->size())
+        {
+            throw std::runtime_error("Cannot reshape with incorrect number of elements.");
+        }
+        if (m_layout == layout_type::dynamic || m_layout == layout_type::any)
+        {
+            m_layout = DEFAULT_LAYOUT;  // fall back to default layout
+        }
+        m_shape = xtl::forward_sequence<shape_type>(shape);
+        resize_container(m_strides, m_shape.size());
+        resize_container(m_backstrides, m_shape.size());
+        size_type data_size = compute_strides(m_shape, m_layout, m_strides, m_backstrides);
     }
 }
 

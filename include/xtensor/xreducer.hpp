@@ -99,7 +99,7 @@ namespace xt
             }
         }
 
-        result.reshape(result_shape, e.layout());
+        result.resize(result_shape, e.layout());
 
         std::size_t ax_idx = (e.layout() == layout_type::row_major) ? axes.size() - 1 : 0;
         std::size_t inner_loop_size = e.strides()[axes[ax_idx]];

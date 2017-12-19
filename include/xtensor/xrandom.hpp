@@ -246,7 +246,7 @@ namespace xt
             XTENSOR_ASSERT(de.dimension() == 1);
             XTENSOR_ASSERT(de.size() >= n);
             xtensor<typename T::value_type, 1> result;
-            result.reshape({n});
+            result.resize({n});
 
             xtensor<typename T::value_type, 1> shuffled = de;
             shuffle(shuffled.data().begin(), shuffled.data().end(), engine);

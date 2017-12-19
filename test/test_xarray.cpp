@@ -140,6 +140,12 @@ namespace xt
         }
     }
 
+    TEST(xarray, resize)
+    {
+        xarray_dynamic a;
+        test_resize(a);
+    }
+
     TEST(xarray, reshape)
     {
         xarray_dynamic a;

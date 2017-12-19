@@ -97,6 +97,13 @@ namespace xt
         }
     }
 
+    TEST(xtensor_adaptor, resize)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_resize<adaptor_type, container_type>(a);
+    }
+
     TEST(xtensor_adaptor, reshape)
     {
         vec_type v;

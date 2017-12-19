@@ -45,27 +45,27 @@ namespace xt
     {
         F f;
         row_major_result<shape_type> rmr;
-        a.reshape(rmr.shape(), rmr.strides());
+        a.resize(rmr.shape(), rmr.strides());
         assign_array(a, rmr.m_assigner);
-        ra.reshape(rmr.shape(), rmr.strides());
+        ra.resize(rmr.shape(), rmr.strides());
         assign_array(ra, rmr.m_assigner);
 
         column_major_result<shape_type> cmr;
-        ca.reshape(cmr.shape(), cmr.strides());
+        ca.resize(cmr.shape(), cmr.strides());
         assign_array(ca, cmr.m_assigner);
 
         central_major_result<shape_type> ctmr;
-        cta.reshape(ctmr.shape(), ctmr.strides());
+        cta.resize(ctmr.shape(), ctmr.strides());
         assign_array(cta, ctmr.m_assigner);
 
         unit_shape_result<shape_type> usr;
-        ua.reshape(usr.shape(), usr.strides());
+        ua.resize(usr.shape(), usr.strides());
         assign_array(ua, usr.m_assigner);
 
-        res_rr.reshape(rmr.shape(), rmr.strides());
-        res_rc.reshape(rmr.shape(), rmr.strides());
-        res_rct.reshape(rmr.shape(), rmr.strides());
-        res_ru.reshape(rmr.shape(), rmr.strides());
+        res_rr.resize(rmr.shape(), rmr.strides());
+        res_rc.resize(rmr.shape(), rmr.strides());
+        res_rct.resize(rmr.shape(), rmr.strides());
+        res_ru.resize(rmr.shape(), rmr.strides());
 
         for (size_t i = 0; i < rmr.shape()[0]; ++i)
         {
@@ -108,25 +108,25 @@ namespace xt
         F f;
         b = 2;
         row_major_result<shape_type> rmr;
-        ra.reshape(rmr.shape(), rmr.strides());
+        ra.resize(rmr.shape(), rmr.strides());
         assign_array(ra, rmr.m_assigner);
 
         column_major_result<shape_type> cmr;
-        ca.reshape(cmr.shape(), cmr.strides());
+        ca.resize(cmr.shape(), cmr.strides());
         assign_array(ca, cmr.m_assigner);
 
         central_major_result<shape_type> ctmr;
-        cta.reshape(ctmr.shape(), ctmr.strides());
+        cta.resize(ctmr.shape(), ctmr.strides());
         assign_array(cta, ctmr.m_assigner);
 
         unit_shape_result<shape_type> usr;
-        ua.reshape(usr.shape(), usr.strides());
+        ua.resize(usr.shape(), usr.strides());
         assign_array(ua, usr.m_assigner);
 
-        res_r.reshape(rmr.shape(), rmr.strides());
-        res_c.reshape(cmr.shape(), cmr.strides());
-        res_ct.reshape(ctmr.shape(), ctmr.strides());
-        res_u.reshape(usr.shape(), usr.strides());
+        res_r.resize(rmr.shape(), rmr.strides());
+        res_c.resize(cmr.shape(), cmr.strides());
+        res_ct.resize(ctmr.shape(), ctmr.strides());
+        res_u.resize(usr.shape(), usr.strides());
 
         for (size_t i = 0; i < rmr.shape()[0]; ++i)
         {

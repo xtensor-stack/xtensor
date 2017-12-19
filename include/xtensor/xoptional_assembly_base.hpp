@@ -119,11 +119,14 @@ namespace xt
         const inner_backstrides_type& backstrides() const noexcept;
 
         template <class S = shape_type>
-        void reshape(const S& shape, bool force = false);
+        void resize(const S& shape, bool force = false);
         template <class S = shape_type>
-        void reshape(const S& shape, layout_type l);
+        void resize(const S& shape, layout_type l);
         template <class S = shape_type>
-        void reshape(const S& shape, const strides_type& strides);
+        void resize(const S& shape, const strides_type& strides);
+
+        template <class S = shape_type>
+        void reshape(const S& shape);
 
         layout_type layout() const noexcept;
 
@@ -408,29 +411,42 @@ namespace xt
     //@}
 
     /**
-     * Reshapes the optional assembly.
+     * Resizes the optional assembly.
      * @param shape the new shape
      * @param force force reshaping, even if the shape stays the same (default: false)
      */
     template <class D>
     template <class S>
-    inline void xoptional_assembly_base<D>::reshape(const S& shape, bool force)
+    inline void xoptional_assembly_base<D>::resize(const S& shape, bool force)
     {
-        value().reshape(shape, force);
-        has_value().reshape(shape, force);
+        value().resize(shape, force);
+        has_value().resize(shape, force);
     }
 
     /**
-     * Reshapes the optional assembly.
+     * Resizes the optional assembly.
      * @param shape the new shape
      * @param l the new layout_type
      */
     template <class D>
     template <class S>
-    inline void xoptional_assembly_base<D>::reshape(const S& shape, layout_type l)
+    inline void xoptional_assembly_base<D>::resize(const S& shape, layout_type l)
     {
-        value().reshape(shape, l);
-        has_value().reshape(shape, l);
+        value().resize(shape, l);
+        has_value().resize(shape, l);
+    }
+
+    /**
+     * Resizes the optional assembly.
+     * @param shape the new shape
+     * @param strides the new strides
+     */
+    template <class D>
+    template <class S>
+    inline void xoptional_assembly_base<D>::resize(const S& shape, const strides_type& strides)
+    {
+        value().resize(shape, strides);
+        has_value().resize(shape, strides);
     }
 
     /**
@@ -440,10 +456,10 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline void xoptional_assembly_base<D>::reshape(const S& shape, const strides_type& strides)
+    inline void xoptional_assembly_base<D>::reshape(const S& shape)
     {
-        value().reshape(shape, strides);
-        has_value().reshape(shape, strides);
+        value().reshape(shape);
+        has_value().reshape(shape);
     }
 
     /**

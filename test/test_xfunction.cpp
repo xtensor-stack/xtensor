@@ -26,16 +26,16 @@ namespace xt
     xfunction_features::xfunction_features()
     {
         row_major_result<> rm;
-        m_a.reshape(rm.shape(), rm.strides());
+        m_a.resize(rm.shape(), rm.strides());
         std::copy(rm.data().cbegin(), rm.data().cend(), m_a.begin());
 
         unit_shape_result<> us;
-        m_b.reshape(us.shape(), us.strides());
+        m_b.resize(us.shape(), us.strides());
         std::copy(us.data().cbegin(), us.data().cend(), m_b.begin());
 
         using shape_type = layout_result<>::shape_type;
         shape_type sh = {4, 3, 2, 4};
-        m_c.reshape(sh);
+        m_c.resize(sh);
 
         for (size_t i = 0; i < sh[0]; ++i)
         {

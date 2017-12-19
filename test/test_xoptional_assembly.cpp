@@ -190,6 +190,12 @@ namespace xt
         }
     }
 
+    TEST(xoptional_assembly, resize)
+    {
+        dyn_opt_ass_type a;
+        test_resize(a);
+    }
+
     TEST(xoptional_assembly, reshape)
     {
         dyn_opt_ass_type a;
@@ -275,7 +281,7 @@ namespace xt
 
         {
             shape_type s2 = {3, 1, 4, 2};
-            vec.reshape(s2);
+            vec.resize(s2);
             SCOPED_TRACE("different dimensions");
             shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
@@ -317,7 +323,7 @@ namespace xt
     {
         row_major_result<> rm;
         dyn_opt_ass_type vec;
-        vec.reshape(rm.m_shape, layout_type::row_major);
+        vec.resize(rm.m_shape, layout_type::row_major);
         vec(1, 1, 0) = rm.m_assigner[1][1][0];
         vec.value()[0] = 4;
         size_t nb_iter = vec.size() / 2;
@@ -398,7 +404,7 @@ namespace xt
     {
         row_major_result<> rm;
         dyn_opt_ass_type vec;
-        vec.reshape(rm.m_shape, layout_type::row_major);
+        vec.resize(rm.m_shape, layout_type::row_major);
         vec(1, 0, 3) = rm.m_assigner[1][0][3];
         vec(2, 1, 3) = 2;
         size_t nb_iter = vec.size() / 2;

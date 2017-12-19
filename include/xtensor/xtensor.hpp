@@ -230,7 +230,7 @@ namespace xt
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(nested_initializer_list_t<value_type, N> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), true);
+        base_type::resize(xt::shape<shape_type>(t), true);
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -244,7 +244,7 @@ namespace xt
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(const shape_type& shape, layout_type l)
         : base_type()
     {
-        base_type::reshape(shape, l);
+        base_type::resize(shape, l);
     }
 
     /**
@@ -258,7 +258,7 @@ namespace xt
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(const shape_type& shape, const_reference value, layout_type l)
         : base_type()
     {
-        base_type::reshape(shape, l);
+        base_type::resize(shape, l);
         std::fill(m_data.begin(), m_data.end(), value);
     }
 
@@ -271,7 +271,7 @@ namespace xt
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(const shape_type& shape, const strides_type& strides)
         : base_type()
     {
-        base_type::reshape(shape, strides);
+        base_type::resize(shape, strides);
     }
 
     /**
@@ -285,7 +285,7 @@ namespace xt
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(const shape_type& shape, const strides_type& strides, const_reference value)
         : base_type()
     {
-        base_type::reshape(shape, strides);
+        base_type::resize(shape, strides);
         std::fill(m_data.begin(), m_data.end(), value);
     }
 
@@ -328,7 +328,7 @@ namespace xt
         : base_type()
     {
         // Avoids unintialized data because of (m_shape == shape) condition
-        // in reshape (called by assign), which is always true when size() == 1.
+        // in resize (called by assign), which is always true when size() == 1.
         // The condition dimension() == 0 as in xarray is not sufficient because
         // the shape is always initialized since it has a static number of dimensions.
         if (e.derived_cast().size() == 1)
@@ -401,7 +401,7 @@ namespace xt
     inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(D&& data, const shape_type& shape, layout_type l)
         : base_type(), m_data(std::forward<D>(data))
     {
-        base_type::reshape(shape, l);
+        base_type::resize(shape, l);
     }
 
     /**
@@ -416,7 +416,7 @@ namespace xt
     inline xtensor_adaptor<EC, N, L, Tag>::xtensor_adaptor(D&& data, const shape_type& shape, const strides_type& strides)
         : base_type(), m_data(std::forward<D>(data))
     {
-        base_type::reshape(shape, strides);
+        base_type::resize(shape, strides);
     }
     //@}
 

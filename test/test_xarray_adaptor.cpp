@@ -96,6 +96,13 @@ namespace xt
         }
     }
 
+    TEST(xarray_adaptor, resize)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_resize(a);
+    }
+
     TEST(xarray_adaptor, reshape)
     {
         vec_type v;

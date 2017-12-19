@@ -86,6 +86,15 @@ namespace xt
         }
     }
 
+    TEST(xoptional_assembly_adaptor, resize)
+    {
+        array_type v = {{1, 2, 3}, {4, 5, 6}};
+        flag_array_type hv = {{true, false, true}, {false, true, false}};
+        adaptor_type a(v, hv);
+        test_resize(a);
+        compare_shape(a.value(), a.has_value());
+    }
+
     TEST(xoptional_assembly_adaptor, reshape)
     {
         array_type v = {{1, 2, 3}, {4, 5, 6}};
@@ -196,7 +205,7 @@ namespace xt
 
         {
             shape_type s2 = {3, 1, 4, 2};
-            a.reshape(s2);
+            a.resize(s2);
             SCOPED_TRACE("different dimensions");
             shape_type s3 = {5, 3, 1, 4, 2};
             shape_type s3r = s3;
@@ -216,7 +225,7 @@ namespace xt
             xarray<int, layout_type::row_major> v;
             xarray<bool, layout_type::row_major> hv;
             xoptional_assembly_adaptor<decltype(v)&, decltype(hv)&> rma(v, hv);
-            rma.reshape({2, 2});
+            rma.resize({2, 2});
             std::copy(vec.cbegin(), vec.cend(), rma.begin<layout_type::row_major>());
             EXPECT_EQ(vec[0], rma(0, 0));
             EXPECT_EQ(vec[1], rma(0, 1));
@@ -230,7 +239,7 @@ namespace xt
             xarray<int, layout_type::row_major> v;
             xarray<bool, layout_type::row_major> hv;
             xoptional_assembly_adaptor<decltype(v)&, decltype(hv)&> cma(v, hv);
-            cma.reshape({2, 2});
+            cma.resize({2, 2});
             std::copy(vec.cbegin(), vec.cend(), cma.begin<layout_type::column_major>());
             EXPECT_EQ(vec[0], cma(0, 0));
             EXPECT_EQ(vec[1], cma(1, 0));
@@ -244,7 +253,7 @@ namespace xt
     {
         row_major_result<> rm;
         array_type a;
-        a.reshape(rm.m_shape, layout_type::row_major);
+        a.resize(rm.m_shape, layout_type::row_major);
         a(1, 1, 0) = rm.m_assigner[1][1][0];
         a[0] = 4;
         flag_array_type fa(rm.m_shape, true);
@@ -327,7 +336,7 @@ namespace xt
     {
         row_major_result<> rm;
         array_type a;
-        a.reshape(rm.m_shape, layout_type::row_major);
+        a.resize(rm.m_shape, layout_type::row_major);
         a(1, 0, 3) = rm.m_assigner[1][0][3];
         a(2, 1, 3) = 2;
         flag_array_type fa(rm.m_shape, true);

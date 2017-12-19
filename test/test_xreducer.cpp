@@ -183,7 +183,7 @@ namespace xt
     TEST(xreducer, immediate)
     {
         xarray<double> a = xt::arange(27);
-        a.reshape({3, 3, 3});
+        a.resize({3, 3, 3});
 
         xarray<double> a_lz = sum(a);
         auto a_gd = sum(a, evaluation_strategy::immediate());
@@ -202,7 +202,7 @@ namespace xt
         EXPECT_EQ(a_lz, a_gd);
 
         a = xt::arange(4 * 3 * 6 * 2 * 7);
-        a.reshape({4, 3, 6, 2, 7});
+        a.resize({4, 3, 6, 2, 7});
 
         a_lz = sum(a);
         a_gd = sum(a, evaluation_strategy::immediate());

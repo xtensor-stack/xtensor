@@ -21,7 +21,7 @@ namespace xt
     TEST(xstrided_view, transpose_assignment)
     {
         xarray<double> e = xt::arange<double>(24);
-        e.reshape({2, 2, 6});
+        e.resize({2, 2, 6});
         auto vt = transpose(e);
 
         vt(0, 0, 1) = 123;

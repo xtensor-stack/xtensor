@@ -355,7 +355,7 @@ namespace xt
     inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 1> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
@@ -369,7 +369,7 @@ namespace xt
     inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 2> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
@@ -383,7 +383,7 @@ namespace xt
     inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 3> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
@@ -397,7 +397,7 @@ namespace xt
     inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 4> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
@@ -411,7 +411,7 @@ namespace xt
     inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 5> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         bool condition = VE::static_layout == layout_type::row_major && FE::static_layout == layout_type::row_major;
         condition ? detail::nested_optional_copy(this->storage_begin(), t)
                   : nested_copy(this->template begin<layout_type::row_major>(), t);
