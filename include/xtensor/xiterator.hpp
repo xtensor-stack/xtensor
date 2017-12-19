@@ -13,6 +13,7 @@
 #include <array>
 #include <cstddef>
 #include <iterator>
+#include <numeric>
 #include <vector>
 
 #include "xtl/xiterator_base.hpp"
@@ -255,7 +256,12 @@ namespace xt
     }
 
     template <class It, class S, layout_type L>
-    class xiterator : detail::shape_storage<S>
+    class xiterator : public xtl::xrandom_access_iterator_base<xiterator<It, S, L>,
+                                                               typename It::value_type,
+                                                               typename It::difference_type,
+                                                               typename It::pointer,
+                                                               typename It::reference>,
+                      private detail::shape_storage<S>
     {
     public:
 
@@ -267,7 +273,7 @@ namespace xt
         using pointer = typename subiterator_type::pointer;
         using difference_type = typename subiterator_type::difference_type;
         using size_type = typename subiterator_type::size_type;
-        using iterator_category = std::bidirectional_iterator_tag;
+        using iterator_category = std::random_access_iterator_tag;
 
         using private_base = detail::shape_storage<S>;
         using shape_type = typename private_base::shape_type;
@@ -275,46 +281,39 @@ namespace xt
         using index_type = xindex_type_t<shape_type>;
 
         xiterator() = default;
-        xiterator(It it, shape_param_type shape, bool reverse);
+        // end_index means either reverse_iterator && !end or !reverse_iterator && end
+        xiterator(It it, shape_param_type shape, bool end_index);
 
         self_type& operator++();
-        self_type operator++(int);
-
         self_type& operator--();
-        self_type operator--(int);
 
         self_type& operator+=(difference_type n);
         self_type& operator-=(difference_type n);
+
+        difference_type operator-(const self_type& rhs) const;
 
         reference operator*() const;
         pointer operator->() const;
 
         bool equal(const xiterator& rhs) const;
+        bool less_than(const xiterator& rhs) const;
 
     private:
 
         subiterator_type m_it;
         index_type m_index;
+        difference_type m_linear_index;
 
         using checking_type = typename detail::LAYOUT_FORBIDEN_FOR_XITERATOR<L>::type;
     };
-
-    template <class It, class S, layout_type L>
-    xiterator<It, S, L> operator+(const xiterator<It, S, L>& lhs, typename xiterator<It, S, L>::difference_type rhs);
-
-    template <class It, class S, layout_type L>
-    xiterator<It, S, L> operator+(typename xiterator<It, S, L>::difference_type lhs, const xiterator<It, S, L>& rhs);
-
-    template <class It, class S, layout_type L>
-    xiterator<It, S, L> operator-(const xiterator<It, S, L>& lhs, typename xiterator<It, S, L>::difference_type rhs);
 
     template <class It, class S, layout_type L>
     bool operator==(const xiterator<It, S, L>& lhs,
                     const xiterator<It, S, L>& rhs);
 
     template <class It, class S, layout_type L>
-    bool operator!=(const xiterator<It, S, L>& lhs,
-                    const xiterator<It, S, L>& rhs);
+    bool operator<(const xiterator<It, S, L>& lhs,
+                   const xiterator<It, S, L>& rhs);
 
     /*******************************
     * trivial_begin / trivial_end *
@@ -877,16 +876,24 @@ namespace xt
     }
 
     template <class It, class S, layout_type L>
-    inline xiterator<It, S, L>::xiterator(It it, shape_param_type shape, bool reverse)
+    inline xiterator<It, S, L>::xiterator(It it, shape_param_type shape, bool end_index)
         : private_base(shape), m_it(it),
-          m_index(reverse ? xtl::forward_sequence<index_type, const shape_type&>(this->shape())
-                          : xtl::make_sequence<index_type>(this->shape().size(), size_type(0)))
+          m_index(end_index ? xtl::forward_sequence<index_type, const shape_type&>(this->shape())
+                            : xtl::make_sequence<index_type>(this->shape().size(), size_type(0))),
+          m_linear_index(0)
     {
-        if (reverse)
+        // end_index means either reverse_iterator && !end or !reverse_iterator && end
+        if (end_index)
         {
-            auto iter_begin = (L == layout_type::row_major) ? m_index.begin() : m_index.begin() + 1;
-            auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
-            std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
+            if (m_index.size() != size_type(0))
+            {
+                auto iter_begin = (L == layout_type::row_major) ? m_index.begin() : m_index.begin() + 1;
+                auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
+                std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
+
+            }
+            m_linear_index = difference_type(std::accumulate(this->shape().cbegin(), this->shape().cend(),
+                                             size_type(1), std::multiplies<size_type>()));
         }
     }
 
@@ -894,30 +901,16 @@ namespace xt
     inline auto xiterator<It, S, L>::operator++() -> self_type&
     {
         stepper_tools<L>::increment_stepper(m_it, m_index, this->shape());
+        ++m_linear_index;
         return *this;
-    }
-
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator++(int) -> self_type
-    {
-        self_type tmp(*this);
-        ++(*this);
-        return tmp;
     }
 
     template <class It, class S, layout_type L>
     inline auto xiterator<It, S, L>::operator--() -> self_type&
     {
         stepper_tools<L>::decrement_stepper(m_it, m_index, this->shape());
+        --m_linear_index;
         return *this;
-    }
-
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator--(int) -> self_type
-    {
-        self_type tmp(*this);
-        --(*this);
-        return tmp;
     }
 
     template <class It, class S, layout_type L>
@@ -931,6 +924,7 @@ namespace xt
         {
             stepper_tools<L>::decrement_stepper(m_it, m_index, this->shape(), static_cast<size_type>(-n));
         }
+        m_linear_index += n;
         return *this;
     }
 
@@ -945,7 +939,14 @@ namespace xt
         {
             stepper_tools<L>::increment_stepper(m_it, m_index, this->shape(), static_cast<size_type>(-n));
         }
+        m_linear_index -= n;
         return *this;
+    }
+
+    template <class It, class S, layout_type L>
+    inline auto xiterator<It, S, L>::operator-(const self_type& rhs) const -> difference_type
+    {
+        return m_linear_index - rhs.m_linear_index;
     }
 
     template <class It, class S, layout_type L>
@@ -967,25 +968,9 @@ namespace xt
     }
 
     template <class It, class S, layout_type L>
-    inline xiterator<It, S, L> operator+(const xiterator<It, S, L>& lhs, typename xiterator<It, S, L>::difference_type rhs)
+    inline bool xiterator<It, S, L>::less_than(const xiterator& rhs) const
     {
-        xiterator<It, S, L> tmp(lhs);
-        tmp += rhs;
-        return tmp;
-    }
-
-    template <class It, class S, layout_type L>
-    inline xiterator<It, S, L> operator+(typename xiterator<It, S, L>::difference_type lhs, const xiterator<It, S, L>& rhs)
-    {
-        return rhs + lhs;
-    }
-
-    template <class It, class S, layout_type L>
-    inline xiterator<It, S, L> operator-(const xiterator<It, S, L>& lhs, typename xiterator<It, S, L>::difference_type rhs)
-    {
-        xiterator<It, S, L> tmp(lhs);
-        tmp -= rhs;
-        return tmp;
+        return m_index < rhs.m_index && this->shape() == rhs.shape();
     }
 
     template <class It, class S, layout_type L>
@@ -996,10 +981,10 @@ namespace xt
     }
 
     template <class It, class S, layout_type L>
-    inline bool operator!=(const xiterator<It, S, L>& lhs,
-                           const xiterator<It, S, L>& rhs)
+    bool operator<(const xiterator<It, S, L>& lhs,
+                   const xiterator<It, S, L>& rhs)
     {
-        return !(lhs.equal(rhs));
+        return lhs.less_than(rhs);
     }
 }
 

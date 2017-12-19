@@ -31,6 +31,7 @@ namespace xt
     {
         using vector_type = uvector<int, DEFAULT_ALLOCATOR(int)>;
         using size_type = typename C::value_type;
+        using difference_type = typename C::difference_type;
         using shape_type = C;
         using strides_type = C;
 
@@ -115,6 +116,7 @@ namespace xt
     {
         using vector_type = std::vector<int>;
         using size_type = typename C::value_type;
+        using difference_type = typename C::difference_type;
         using shape_type = C;
         using strides_type = C;
 

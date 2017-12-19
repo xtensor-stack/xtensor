@@ -85,13 +85,14 @@ namespace xt
     void test_random_increment(const R& result, const S& shape)
     {
         using size_type = typename R::size_type;
+        using difference_type = typename R::difference_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.data();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
-        size_type nb_inc = L == layout_type::row_major ?
+        difference_type nb_inc = difference_type(L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
-            shape.front() * shape[1] + 1;
+            shape.front() * shape[1] + 1);
         int expected = a(1, 0, 1);
 
         auto iter = a.template begin<L>();
@@ -102,6 +103,7 @@ namespace xt
 
         EXPECT_EQ(*iter, expected) << "preincrement operator doesn't give expected result";
         EXPECT_EQ(*iter3, expected) << "postincrement operator doesn't give expected result";
+        EXPECT_EQ(iter2[nb_inc], expected) << "postincrement operator doesn't give expected result";
     }
 
     TYPED_TEST(xiterator_test, random_increment)
@@ -242,13 +244,14 @@ namespace xt
     void test_random_decrement(const R& result, const S& shape)
     {
         using size_type = typename R::size_type;
+        using difference_type = typename R::difference_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.data();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
-        size_type nb_inc = L == layout_type::row_major ?
+        difference_type nb_inc = difference_type(L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
-            shape.front() * shape[1] + 1;
+            shape.front() * shape[1] + 1);
         int expected = a(1, 1, 2);
 
         auto iter = a.template rbegin<L>();
@@ -341,6 +344,75 @@ namespace xt
         }
     }
 
+    template <layout_type L, class R, class S>
+    void test_minus(const R& result, const S& shape)
+    {
+        using size_type = typename R::size_type;
+        using difference_type = typename R::difference_type;
+        using shape_type = typename R::shape_type;
+        using vector_type = typename R::vector_type;
+        vector_type data = result.data();
+        xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
+        
+        size_type size = shape.size();
+        difference_type nb_inc = difference_type(L == layout_type::row_major ?
+            shape.back() * shape[size - 2] + shape.back() + 2 :
+            shape[size - 3] * shape[size - 2] * 2 + shape[size - 3] + 1);
+        difference_type nb_inc2 = difference_type(L == layout_type::row_major ?
+            shape.back() * shape[size - 2] * 2  + 3 :
+            shape[size - 3] * shape[size - 2] * 3 + 2);
+
+        ptrdiff_t expected = ptrdiff_t(nb_inc2 - nb_inc);
+
+        auto iter = a.template begin<L>() + nb_inc;
+        auto iter2 = a.template begin<L>() + nb_inc2;
+        EXPECT_EQ(iter2 - iter, expected) << "operator- doesn't give expected result";
+
+        auto riter = a.template rbegin<L>() + nb_inc;
+        auto riter2 = a.template rbegin<L>() + nb_inc2;
+        EXPECT_EQ(riter2 - riter, expected) << "operator- doesn't give expected result";
+
+        auto diff = a.template end<L>() - a.template begin<L>();
+        EXPECT_EQ(size_type(diff), a.size());
+
+        auto rdiff = a.template rend<L>() - a.template rbegin<L>();
+        EXPECT_EQ(size_type(rdiff), a.size());
+    }
+
+    TEST(xiterator, row_major_minus)
+    {
+        row_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape - row_major iterator");
+            test_minus<layout_type::row_major>(rm, rm.shape());
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape - row_major iterator");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_minus<layout_type::row_major>(rm, rm.shape());
+        }
+    }
+
+    TEST(xiterator, column_major_minus)
+    {
+        column_major_result<> rm;
+        {
+            SCOPED_TRACE("same shape - column_major iterator");
+            test_minus<layout_type::column_major>(rm, rm.shape());
+        }
+
+        {
+            SCOPED_TRACE("broadcasting shape - column_major iterator");
+            layout_result<>::shape_type sh = rm.shape();
+            sh.insert(sh.begin(), 2);
+            sh.insert(sh.begin(), 4);
+            test_minus<layout_type::column_major>(rm, rm.shape());
+        }
+    }
+
     TEST(xiterator, broadcast)
     {
         EXPECT_TRUE(broadcastable(std::vector<size_t>({3, 2, 1}), std::vector<size_t>({1, 2, 1})));
@@ -367,5 +439,73 @@ namespace xt
         // of a container is consistent for any layout.
         bool res = (a == b);
         EXPECT_TRUE(res);
+    }
+
+    TEST(xiterator, comparisons)
+    {
+        row_major_result<> rm;
+        xarray<int> arr(rm.shape());
+
+        auto rm_iter = arr.template cbegin<layout_type::row_major>();
+        auto rm_iter2 = rm_iter + 2;
+
+        EXPECT_TRUE(rm_iter != rm_iter2);
+        EXPECT_FALSE(rm_iter == rm_iter2);
+        EXPECT_TRUE(rm_iter < rm_iter2);
+        EXPECT_TRUE(rm_iter <= rm_iter2);
+        EXPECT_FALSE(rm_iter > rm_iter2);
+        EXPECT_FALSE(rm_iter >= rm_iter2);
+
+        auto cm_iter = arr.template cbegin<layout_type::column_major>();
+        auto cm_iter2 = cm_iter + 2;
+
+        EXPECT_TRUE(cm_iter != cm_iter2);
+        EXPECT_FALSE(cm_iter == cm_iter2);
+        EXPECT_TRUE(cm_iter < cm_iter2);
+        EXPECT_TRUE(cm_iter <= cm_iter2);
+        EXPECT_FALSE(cm_iter > cm_iter2);
+        EXPECT_FALSE(cm_iter >= cm_iter2);
+    }
+
+    TEST(xiterator, assign)
+    {
+        row_major_result<> rm;
+        using vector_type = row_major_result<>::vector_type;
+        xarray_adaptor<vector_type, layout_type::dynamic> a(rm.data(), rm.shape(), rm.strides());
+        
+        {
+            SCOPED_TRACE("row_major iterator");
+            xarray<vector_type::value_type> dst(a.shape(), 1);
+            std::copy(a.cbegin<layout_type::row_major>(), a.cend<layout_type::row_major>(), dst.begin<layout_type::row_major>());
+            EXPECT_EQ(a, dst);
+        }
+
+        {
+            SCOPED_TRACE("column_major iterator");
+            xarray<vector_type::value_type> dst(a.shape(), 1);
+            std::copy(a.cbegin<layout_type::column_major>(), a.cend<layout_type::column_major>(), dst.begin<layout_type::column_major>());
+            EXPECT_EQ(a, dst);
+        }
+    }
+
+    TEST(xiterator, revert_assign)
+    {
+        row_major_result<> rm;
+        using vector_type = row_major_result<>::vector_type;
+        xarray_adaptor<vector_type, layout_type::dynamic> a(rm.data(), rm.shape(), rm.strides());
+
+        {
+            SCOPED_TRACE("row_major iterator");
+            xarray<vector_type::value_type> dst(a.shape(), 1);
+            std::copy(a.crbegin<layout_type::row_major>(), a.crend<layout_type::row_major>(), dst.rbegin<layout_type::row_major>());
+            EXPECT_EQ(a, dst);
+        }
+
+        {
+            SCOPED_TRACE("column_major iterator");
+            xarray<vector_type::value_type> dst(a.shape(), 1);
+            std::copy(a.crbegin<layout_type::column_major>(), a.crend<layout_type::column_major>(), dst.rbegin<layout_type::column_major>());
+            EXPECT_EQ(a, dst);
+        }
     }
 }
