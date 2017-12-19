@@ -177,7 +177,10 @@ namespace xt
         template <class E1, class E2>
         inline bool is_trivial_broadcast(const E1& e1, const E2& e2)
         {
-            return e2.is_trivial_broadcast(e1.strides());
+            using S1 = typename E1::shape_type;
+            using S2 = typename E2::shape_type;
+            constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) && detail::equal_dimensions<S1, S2>::value;
+            return trivial_layout || e2.is_trivial_broadcast(e1.strides());
         }
 
         template <class D, class E2, class... SL>

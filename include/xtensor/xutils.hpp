@@ -600,6 +600,25 @@ namespace xt
         using type = void;
     };
 
+    /********************
+     * equal_dimensions *
+     ********************/
+
+    namespace detail
+    {
+        template <class... Args>
+        struct equal_dimensions
+        {
+            constexpr static bool value = false;
+        };
+
+        template <class... T, std::size_t N>
+        struct equal_dimensions<std::array<T, N>...>
+        {
+            constexpr static bool value = true;
+        };
+    }
+
     /********************************************
      * xtrivial_default_construct implemenation *
      ********************************************/

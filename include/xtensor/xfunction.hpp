@@ -165,6 +165,9 @@ namespace xt
 
         static constexpr layout_type static_layout = compute_layout(std::decay_t<CT>::static_layout...);
         static constexpr bool contiguous_layout = detail::conjunction_c<std::decay_t<CT>::contiguous_layout...>::value;
+        static constexpr bool no_broadcast = detail::only_array<typename std::decay_t<CT>::shape_type...>::value &&
+                                             detail::equal_dimensions<typename std::decay_t<CT>::shape_type...>::value;
+
 
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
@@ -196,7 +199,12 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
+
+        template <bool NB = no_broadcast, typename std::enable_if_t<NB, int> = 0>
         const shape_type& shape() const;
+        template <bool NB = no_broadcast, typename std::enable_if_t<!NB, int> = 0>
+        const shape_type& shape() const;
+
         layout_type layout() const noexcept;
 
         template <class... Args>
@@ -516,7 +524,7 @@ namespace xt
     template <class Func, class U>
     inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CT... e) noexcept
         : m_e(e...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(1))),
-          m_shape_computed(false)
+          m_shape_computed(no_broadcast)
     {
     }
     //@}
@@ -531,7 +539,14 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        // static if required because xvectorize test with empty m_e
+        return xtl::mpl::static_if<no_broadcast>([&](auto self)
+        {
+            return std::get<0>(self(*this).m_e).size();
+        }, /*else*/ [&](auto self)
+        {
+            return compute_size(self(*this).shape());
+        });
     }
 
     /**
@@ -540,14 +555,27 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::dimension() const noexcept -> size_type
     {
-        size_type dimension = m_shape_computed ? m_shape.size() : compute_dimension();
-        return dimension;
+        return xtl::mpl::static_if<no_broadcast>([&](auto self)
+        {
+            return std::get<0>(self(*this).m_e).dimension();
+        }, /*else*/ [&](auto self)
+        {
+            return self(*this).m_shape_computed ? self(*this).m_shape.size() : self(*this).compute_dimension();
+        });
+    }
+
+    template <class F, class R, class... CT>
+    template <bool NB, typename std::enable_if_t<NB, int>>
+    inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
+    {
+        return std::get<0>(m_e).shape();
     }
 
     /**
      * Returns the shape of the xfunction.
      */
     template <class F, class R, class... CT>
+    template <bool NB, typename std::enable_if_t<!NB, int>>
     inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
     {
         if (!m_shape_computed)
