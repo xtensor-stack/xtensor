@@ -215,14 +215,14 @@ namespace xt
     void test_reshape(V& vec)
     {
         {
-            SCOPED_TRACE("row_major resize");
+            SCOPED_TRACE("row_major reshape");
             row_major_result<C> rm;
             auto shape = rm.m_shape;
             std::size_t sz = compute_size(shape);
             std::fill(shape.begin(), shape.end(), 1);
             shape[0] = sz;
             vec.resize(shape);
-            vec.reshape(rm.m_shape);
+            vec.reshape(rm.m_shape, layout_type::row_major);
             compare_shape(vec, rm);
             shape = rm.m_shape;
             shape.front() += 123;
