@@ -47,7 +47,7 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            static inline flag_expression flag(U&& arg)
             {
                 return ones<bool>(arg.shape());
             }
@@ -66,7 +66,7 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&&)
+            static inline flag_expression flag(U&&)
             {
                 return xscalar<bool>(true);
             }
@@ -99,9 +99,9 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            static inline flag_expression flag(U&& arg)
             {
-                return arg().has_value();
+                return arg().flag();
             }
 
         };
@@ -134,7 +134,7 @@ namespace xt
         struct split_optional_expression_impl<T, xoptional_expression_tag>
         {
             using value_expression = decltype(std::declval<T>().value());
-            using flag_expression = decltype(std::declval<T>().has_value());
+            using flag_expression = decltype(std::declval<T>().flag());
 
             template <class U>
             static inline value_expression value(U&& arg)
@@ -143,9 +143,9 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            static inline flag_expression flag(U&& arg)
             {
-                return arg.has_value();
+                return arg.flag();
             }
         };
 
@@ -180,9 +180,9 @@ namespace xt
                 return value_expression(std::move(arg.data().value()), arg.shape());
             }
 
-            static inline flag_expression has_value(OA arg)
+            static inline flag_expression flag(OA arg)
             {
-                return flag_expression(std::move(arg.data().has_value()), arg.shape());
+                return flag_expression(std::move(arg.data().flag()), arg.shape());
             }
         };
 
@@ -200,9 +200,9 @@ namespace xt
                 return value_expression(arg.data().value(), arg.shape());
             }
 
-            static inline flag_expression has_value(OA& arg)
+            static inline flag_expression flag(OA& arg)
             {
-                return flag_expression(arg.data().has_value(), arg.shape());
+                return flag_expression(arg.data().flag(), arg.shape());
             }
         };
 
@@ -238,9 +238,9 @@ namespace xt
                 return value_expression(std::move(arg.data().value()), arg.shape());
             }
 
-            static inline flag_expression has_value(OT arg)
+            static inline flag_expression flag(OT arg)
             {
-                return flag_expression(std::move(arg.data().has_value()), arg.shape());
+                return flag_expression(std::move(arg.data().flag()), arg.shape());
             }
         };
 
@@ -258,9 +258,9 @@ namespace xt
                 return value_expression(arg.data().value(), arg.shape());
             }
 
-            static inline flag_expression has_value(OT& arg)
+            static inline flag_expression flag(OT& arg)
             {
-                return flag_expression(arg.data().has_value(), arg.shape());
+                return flag_expression(arg.data().flag(), arg.shape());
             }
         };
 
@@ -321,7 +321,7 @@ namespace xt
     detail::value_expression_t<E> value(E&&);
 
     template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    detail::flag_expression_t<E> has_value(E&&);
+    detail::flag_expression_t<E> flag(E&&);
 
     template <>
     class xexpression_assigner_base<xoptional_expression_tag>
@@ -383,8 +383,9 @@ namespace xt
 
         value_expression value() const;
         flag_expression has_value() const;
+        flag_expression flag() const;
 
-    private:
+      private:
 
         template <std::size_t... I>
         value_expression value_impl(std::index_sequence<I...>) const;
@@ -425,6 +426,12 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
+    inline auto xoptional_function<F, R, CT...>::flag() const -> flag_expression
+    {
+        return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
+    }
+
+    template <class F, class R, class... CT>
     template <std::size_t... I>
     inline auto xoptional_function<F, R, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
     {
@@ -437,7 +444,7 @@ namespace xt
     inline auto xoptional_function<F, R, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
     {
         return flag_expression(flag_functor(),
-            detail::split_optional_expression<CT>::has_value(std::get<I>(this->arguments()))...);
+            detail::split_optional_expression<CT>::flag(std::get<I>(this->arguments()))...);
     }
 
     /********************************
@@ -483,9 +490,9 @@ namespace xt
     }
 
     template <class E, class>
-    inline auto has_value(E&& e) -> detail::flag_expression_t<E>
+    inline auto flag(E&& e) -> detail::flag_expression_t<E>
     {
-        return detail::split_optional_expression<E>::has_value(std::forward<E>(e));
+        return detail::split_optional_expression<E>::flag(std::forward<E>(e));
     }
 
     template <class E1, class E2>
@@ -495,9 +502,9 @@ namespace xt
         const E2& de2 = e2.derived_cast();
 
         decltype(auto) bde1 = xt::value(de1);
-        decltype(auto) hde1 = xt::has_value(de1);
+        decltype(auto) hde1 = xt::flag(de1);
         xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, xt::value(de2), trivial);
-        xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::has_value(de2), trivial);
+        xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::flag(de2), trivial);
     }
 }
 

@@ -114,8 +114,8 @@ namespace xt
         value_expression& value_impl() noexcept;
         const value_expression& value_impl() const noexcept;
 
-        flag_expression& has_value_impl() noexcept;
-        const flag_expression& has_value_impl() const noexcept;
+        flag_expression& flag_impl() noexcept;
+        const flag_expression& flag_impl() const noexcept;
 
         value_expression m_value;
         flag_expression m_has_value;
@@ -199,8 +199,8 @@ namespace xt
         value_expression& value_impl() noexcept;
         const value_expression& value_impl() const noexcept;
 
-        flag_expression& has_value_impl() noexcept;
-        const flag_expression& has_value_impl() const noexcept;
+        flag_expression& flag_impl() noexcept;
+        const flag_expression& flag_impl() const noexcept;
 
         VEC m_value;
         FEC m_has_value;
@@ -218,7 +218,7 @@ namespace xt
         inline void nested_optional_copy(T&& iter, const S& s)
         {
             iter->value() = s.value();
-            iter->has_value() = s.has_value();
+            iter->flag() = s.flag();
             ++iter;
         }
 
@@ -266,7 +266,7 @@ namespace xt
      */
     template <class VE, class FE>
     inline xoptional_assembly<VE, FE>::xoptional_assembly(const shape_type& shape, const value_type& value, layout_type l)
-        : m_value(shape, value.value(), l), m_has_value(shape, value.has_value(), l)
+        : m_value(shape, value.value(), l), m_has_value(shape, value.flag(), l)
     {
     }
 
@@ -290,7 +290,7 @@ namespace xt
      */
     template <class VE, class FE>
     inline xoptional_assembly<VE, FE>::xoptional_assembly(const shape_type& shape, const strides_type& strides, const value_type& value)
-        : m_value(shape, strides, value.value()), m_has_value(shape, strides, value.has_value())
+        : m_value(shape, strides, value.value()), m_has_value(shape, strides, value.flag())
     {
     }
 
@@ -301,7 +301,7 @@ namespace xt
      */
     template <class VE, class FE>
     inline xoptional_assembly<VE, FE>::xoptional_assembly(const value_type& value)
-        : m_value(value.value()), m_has_value(value.has_value())
+        : m_value(value.value()), m_has_value(value.flag())
     {
     }
 
@@ -469,13 +469,13 @@ namespace xt
     }
 
     template <class VE, class FE>
-    inline auto xoptional_assembly<VE, FE>::has_value_impl() noexcept -> flag_expression&
+    inline auto xoptional_assembly<VE, FE>::flag_impl() noexcept -> flag_expression&
     {
         return m_has_value;
     }
 
     template <class VE, class FE>
-    inline auto xoptional_assembly<VE, FE>::has_value_impl() const noexcept -> const flag_expression&
+    inline auto xoptional_assembly<VE, FE>::flag_impl() const noexcept -> const flag_expression&
     {
         return m_has_value;
     }
@@ -524,7 +524,7 @@ namespace xt
     inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(temporary_type&& tmp) -> self_type&
     {
         m_value = std::move(tmp.value());
-        m_has_value = std::move(tmp.has_value());
+        m_has_value = std::move(tmp.flag());
         return *this;
     }
 
@@ -556,13 +556,13 @@ namespace xt
     }
 
     template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::has_value_impl() noexcept -> flag_expression&
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::flag_impl() noexcept -> flag_expression&
     {
         return m_has_value;
     }
 
     template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::has_value_impl() const noexcept -> const flag_expression&
+    inline auto xoptional_assembly_adaptor<VEC, FEC>::flag_impl() const noexcept -> const flag_expression&
     {
         return m_has_value;
     }

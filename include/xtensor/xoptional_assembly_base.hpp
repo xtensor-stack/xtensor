@@ -215,8 +215,8 @@ namespace xt
         value_expression& value() noexcept;
         const value_expression& value() const noexcept;
 
-        flag_expression& has_value() noexcept;
-        const flag_expression& has_value() const noexcept;
+        flag_expression& flag() noexcept;
+        const flag_expression& flag() const noexcept;
 
     protected:
 
@@ -417,7 +417,7 @@ namespace xt
     inline void xoptional_assembly_base<D>::reshape(const S& shape, bool force)
     {
         value().reshape(shape, force);
-        has_value().reshape(shape, force);
+        flag().reshape(shape, force);
     }
 
     /**
@@ -430,7 +430,7 @@ namespace xt
     inline void xoptional_assembly_base<D>::reshape(const S& shape, layout_type l)
     {
         value().reshape(shape, l);
-        has_value().reshape(shape, l);
+        flag().reshape(shape, l);
     }
 
     /**
@@ -443,7 +443,7 @@ namespace xt
     inline void xoptional_assembly_base<D>::reshape(const S& shape, const strides_type& strides)
     {
         value().reshape(shape, strides);
-        has_value().reshape(shape, strides);
+        flag().reshape(shape, strides);
     }
 
     /**
@@ -470,7 +470,7 @@ namespace xt
     template <class... Args>
     inline auto xoptional_assembly_base<D>::operator()(Args... args) -> reference
     {
-        return reference(value()(args...), has_value()(args...));
+        return reference(value()(args...), flag()(args...));
     }
 
     /**
@@ -483,7 +483,7 @@ namespace xt
     template <class... Args>
     inline auto xoptional_assembly_base<D>::operator()(Args... args) const -> const_reference
     {
-        return const_reference(value()(args...), has_value()(args...));
+        return const_reference(value()(args...), flag()(args...));
     }
 
     /**
@@ -499,7 +499,7 @@ namespace xt
     template <class... Args>
     inline auto xoptional_assembly_base<D>::at(Args... args) -> reference
     {
-        return reference(value().at(args...), has_value().at(args...));
+        return reference(value().at(args...), flag().at(args...));
     }
 
     /**
@@ -515,7 +515,7 @@ namespace xt
     template <class... Args>
     inline auto xoptional_assembly_base<D>::at(Args... args) const -> const_reference
     {
-        return const_reference(value().at(args...), has_value().at(args...));
+        return const_reference(value().at(args...), flag().at(args...));
     }
 
     /**
@@ -529,7 +529,7 @@ namespace xt
     inline auto xoptional_assembly_base<D>::operator[](const S& index)
         -> disable_integral_t<S, reference>
     {
-        return reference(value()[index], has_value()[index]);
+        return reference(value()[index], flag()[index]);
     }
 
     template <class D>
@@ -537,13 +537,13 @@ namespace xt
     inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index)
         -> reference
     {
-        return reference(value()[index], has_value()[index]);
+        return reference(value()[index], flag()[index]);
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::operator[](size_type i) -> reference
     {
-        return reference(value()[i], has_value()[i]);
+        return reference(value()[i], flag()[i]);
     }
 
     /**
@@ -557,7 +557,7 @@ namespace xt
     inline auto xoptional_assembly_base<D>::operator[](const S& index) const
         -> disable_integral_t<S, const_reference>
     {
-        return const_reference(value()[index], has_value()[index]);
+        return const_reference(value()[index], flag()[index]);
     }
 
     template <class D>
@@ -565,13 +565,13 @@ namespace xt
     inline auto xoptional_assembly_base<D>::operator[](std::initializer_list<I> index) const
         -> const_reference
     {
-        return const_reference(value()[index], has_value()[index]);
+        return const_reference(value()[index], flag()[index]);
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::operator[](size_type i) const -> const_reference
     {
-        return const_reference(value()[i], has_value()[i]);
+        return const_reference(value()[i], flag()[i]);
     }
 
     /**
@@ -585,7 +585,7 @@ namespace xt
     template <class It>
     inline auto xoptional_assembly_base<D>::element(It first, It last) -> reference
     {
-        return reference(value().element(first, last), has_value().element(first, last));
+        return reference(value().element(first, last), flag().element(first, last));
     }
 
     /**
@@ -599,7 +599,7 @@ namespace xt
     template <class It>
     inline auto xoptional_assembly_base<D>::element(It first, It last) const -> const_reference
     {
-        return const_reference(value().element(first, last), has_value().element(first, last));
+        return const_reference(value().element(first, last), flag().element(first, last));
     }
     //@}
 
@@ -617,7 +617,7 @@ namespace xt
     inline bool xoptional_assembly_base<D>::broadcast_shape(S& shape) const
     {
         bool res = value().broadcast_shape(shape);
-        return res && has_value().broadcast_shape(shape);
+        return res && flag().broadcast_shape(shape);
     }
 
     /**
@@ -629,7 +629,7 @@ namespace xt
     template <class S>
     inline bool xoptional_assembly_base<D>::is_trivial_broadcast(const S& strides) const noexcept
     {
-        return value().is_trivial_broadcast(strides) && has_value().is_trivial_broadcast(strides);
+        return value().is_trivial_broadcast(strides) && flag().is_trivial_broadcast(strides);
     }
     //@}
 
@@ -638,7 +638,7 @@ namespace xt
     inline auto xoptional_assembly_base<D>::storage_begin() noexcept -> storage_iterator
     {
         return storage_iterator(value().template storage_begin<L>(),
-                                has_value().template storage_begin<L>());
+                                flag().template storage_begin<L>());
     }
 
     template <class D>
@@ -646,7 +646,7 @@ namespace xt
     inline auto xoptional_assembly_base<D>::storage_end() noexcept -> storage_iterator
     {
         return storage_iterator(value().template storage_end<L>(),
-                                has_value().template storage_end<L>());
+                                flag().template storage_end<L>());
     }
 
     template <class D>
@@ -668,7 +668,7 @@ namespace xt
     inline auto xoptional_assembly_base<D>::storage_cbegin() const noexcept -> const_storage_iterator
     {
         return const_storage_iterator(value().template storage_cbegin<L>(),
-                                      has_value().template storage_begin<L>());
+                                      flag().template storage_begin<L>());
     }
 
     template <class D>
@@ -676,7 +676,7 @@ namespace xt
     inline auto xoptional_assembly_base<D>::storage_cend() const noexcept -> const_storage_iterator
     {
         return const_storage_iterator(value().template storage_cend<L>(),
-                                      has_value().template storage_end<L>());
+                                      flag().template storage_end<L>());
     }
 
     template <class D>
@@ -725,40 +725,40 @@ namespace xt
     template <class S>
     inline auto xoptional_assembly_base<D>::stepper_begin(const S& shape) noexcept -> stepper
     {
-        return stepper(value().stepper_begin(shape), has_value().stepper_begin(shape));
+        return stepper(value().stepper_begin(shape), flag().stepper_begin(shape));
     }
 
     template <class D>
     template <class S>
     inline auto xoptional_assembly_base<D>::stepper_end(const S& shape, layout_type l) noexcept -> stepper
     {
-        return stepper(value().stepper_end(shape, l), has_value().stepper_end(shape, l));
+        return stepper(value().stepper_end(shape, l), flag().stepper_end(shape, l));
     }
 
     template <class D>
     template <class S>
     inline auto xoptional_assembly_base<D>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
-        return const_stepper(value().stepper_begin(shape), has_value().stepper_begin(shape));
+        return const_stepper(value().stepper_begin(shape), flag().stepper_begin(shape));
     }
 
     template <class D>
     template <class S>
     inline auto xoptional_assembly_base<D>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
-        return const_stepper(value().stepper_end(shape, l), has_value().stepper_end(shape, l));
+        return const_stepper(value().stepper_end(shape, l), flag().stepper_end(shape, l));
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::data_element(size_type i) -> reference
     {
-        return reference(value().data_element(i), has_value().data_element(i));
+        return reference(value().data_element(i), flag().data_element(i));
     }
 
     template <class D>
     inline auto xoptional_assembly_base<D>::data_element(size_type i) const -> const_reference
     {
-        return const_reference(value().data_element(i), has_value().data_element(i));
+        return const_reference(value().data_element(i), flag().data_element(i));
     }
 
     /**
@@ -783,18 +783,18 @@ namespace xt
      * Return an expression for the missing mask of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::has_value() noexcept -> flag_expression&
+    inline auto xoptional_assembly_base<D>::flag() noexcept -> flag_expression&
     {
-        return derived_cast().has_value_impl();
+        return derived_cast().flag_impl();
     }
 
     /**
      * Return a constant expression for the missing mask of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::has_value() const noexcept -> const flag_expression&
+    inline auto xoptional_assembly_base<D>::flag() const noexcept -> const flag_expression&
     {
-        return derived_cast().has_value_impl();
+        return derived_cast().flag_impl();
     }
 
     template <class D>
