@@ -126,7 +126,7 @@ namespace xt
         void resize(const S& shape, const strides_type& strides);
 
         template <class S = shape_type>
-        void reshape(const S& shape);
+        void reshape(const S& shape, layout_type layout = static_layout);
 
         layout_type layout() const noexcept;
 
@@ -452,14 +452,14 @@ namespace xt
     /**
      * Reshapes the optional assembly.
      * @param shape the new shape
-     * @param strides the new strides
+     * @param layout the new layout
      */
     template <class D>
     template <class S>
-    inline void xoptional_assembly_base<D>::reshape(const S& shape)
+    inline void xoptional_assembly_base<D>::reshape(const S& shape, layout_type layout)
     {
-        value().reshape(shape);
-        has_value().reshape(shape);
+        value().reshape(shape, layout);
+        has_value().reshape(shape, layout);
     }
 
     /**
