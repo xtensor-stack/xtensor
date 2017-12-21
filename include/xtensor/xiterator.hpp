@@ -133,28 +133,17 @@ namespace xt
     template <layout_type L>
     struct stepper_tools
     {
-
-        template <class S, class IT, class ST>
-        static void increment_stepper(S& stepper,
-                                      IT& index,
-                                      const ST& shape);
-
-        template <class S, class IT, class ST>
-        static void decrement_stepper(S& stepper,
-                                      IT& index,
-                                      const ST& shape);
-
         template <class S, class IT, class ST>
         static void increment_stepper(S& stepper,
                                       IT& index,
                                       const ST& shape,
-                                      typename S::size_type n);
+                                      typename S::size_type n = 1);
 
         template <class S, class IT, class ST>
         static void decrement_stepper(S& stepper,
                                       IT& index,
                                       const ST& shape,
-                                      typename S::size_type n);
+                                      typename S::size_type n = 1);
     };
 
     /********************
@@ -434,38 +423,6 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::row_major>::increment_stepper(S& stepper,
                                                                   IT& index,
-                                                                  const ST& shape)
-    {
-        using size_type = typename S::size_type;
-        size_type i = index.size();
-        while (i != 0)
-        {
-            --i;
-            if (index[i] != shape[i] - 1)
-            {
-                ++index[i];
-                stepper.step(i);
-                return;
-            }
-            else
-            {
-                index[i] = 0;
-                if (i != 0)
-                {
-                    stepper.reset(i);
-                }
-            }
-        }
-        if (i == 0)
-        {
-            stepper.to_end(layout_type::row_major);
-        }
-    }
-
-    template <>
-    template <class S, class IT, class ST>
-    void stepper_tools<layout_type::row_major>::increment_stepper(S& stepper,
-                                                                  IT& index,
                                                                   const ST& shape,
                                                                   typename S::size_type n)
     {
@@ -481,7 +438,7 @@ namespace xt
                 index[i] += inc;
                 stepper.step(i, inc);
                 n -= inc;
-                if (i != leading_i)
+                if (i != leading_i || index.size() == 1)
                 {
                     i = index.size();
                 }
@@ -511,38 +468,6 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::row_major>::decrement_stepper(S& stepper,
                                                                   IT& index,
-                                                                  const ST& shape)
-    {
-        using size_type = typename S::size_type;
-        size_type i = index.size();
-        while (i != 0)
-        {
-            --i;
-            if (index[i] != 0)
-            {
-                --index[i];
-                stepper.step_back(i);
-                return;
-            }
-            else
-            {
-                index[i] = shape[i] - 1;
-                if (i != 0)
-                {
-                    stepper.reset_back(i);
-                }
-            }
-        }
-        if (i == 0)
-        {
-            stepper.to_begin();
-        }
-    }
-
-    template <>
-    template <class S, class IT, class ST>
-    void stepper_tools<layout_type::row_major>::decrement_stepper(S& stepper,
-                                                                  IT& index,
                                                                   const ST& shape,
                                                                   typename S::size_type n)
     {
@@ -558,7 +483,7 @@ namespace xt
                 index[i] -= inc;
                 stepper.step_back(i, inc);
                 n -= inc;
-                if (i != leading_i)
+                if (i != leading_i || index.size() == 1)
                 {
                     i = index.size();
                 }
@@ -588,39 +513,6 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::column_major>::increment_stepper(S& stepper,
                                                                      IT& index,
-                                                                     const ST& shape)
-    {
-        using size_type = typename S::size_type;
-        size_type size = index.size();
-        size_type i = 0;
-        while (i != size)
-        {
-            if (index[i] != shape[i] - 1)
-            {
-                ++index[i];
-                stepper.step(i);
-                return;
-            }
-            else
-            {
-                index[i] = 0;
-                if (i != size - 1)
-                {
-                    stepper.reset(i);
-                }
-            }
-            ++i;
-        }
-        if (i == size)
-        {
-            stepper.to_end(layout_type::column_major);
-        }
-    }
-
-    template <>
-    template <class S, class IT, class ST>
-    void stepper_tools<layout_type::column_major>::increment_stepper(S& stepper,
-                                                                     IT& index,
                                                                      const ST& shape,
                                                                      typename S::size_type n)
     {
@@ -636,7 +528,7 @@ namespace xt
                 index[i] += inc;
                 stepper.step(i, inc);
                 n -= inc;
-                if (i != leading_i)
+                if (i != leading_i || index.size() == 1)
                 {
                     i = 0;
                     continue;
@@ -668,39 +560,6 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::column_major>::decrement_stepper(S& stepper,
                                                                      IT& index,
-                                                                     const ST& shape)
-    {
-        using size_type = typename S::size_type;
-        size_type size = index.size();
-        size_type i = 0;
-        while (i != size)
-        {
-            if (index[i] != 0)
-            {
-                --index[i];
-                stepper.step_back(i);
-                return;
-            }
-            else
-            {
-                index[i] = shape[i] - 1;
-                if (i != size - 1)
-                {
-                    stepper.reset_back(i);
-                }
-            }
-            ++i;
-        }
-        if (i == size)
-        {
-            stepper.to_begin();
-        }
-    }
-
-    template <>
-    template <class S, class IT, class ST>
-    void stepper_tools<layout_type::column_major>::decrement_stepper(S& stepper,
-                                                                     IT& index,
                                                                      const ST& shape,
                                                                      typename S::size_type n)
     {
@@ -716,7 +575,7 @@ namespace xt
                 index[i] -= inc;
                 stepper.step_back(i, inc);
                 n -= inc;
-                if (i != leading_i)
+                if (i != leading_i || index.size() == 1)
                 {
                     i = 0;
                     continue;
