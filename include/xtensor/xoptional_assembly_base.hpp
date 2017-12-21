@@ -10,6 +10,7 @@
 #define XOPTIONAL_ASSEMBLY_BASE_HPP
 
 #include "xiterable.hpp"
+#include "xoperation.hpp"
 #include "xtensor_forward.hpp"
 
 namespace xt
@@ -57,9 +58,11 @@ namespace xt
         using flag_reference = typename flag_expression::reference;
         using flag_const_reference = typename flag_expression::const_reference;
 
-        using value_type = xtl::xoptional<base_value_type, flag_type>;
-        using reference = xtl::xoptional<base_reference, flag_reference>;
-        using const_reference = xtl::xoptional<base_const_reference, flag_const_reference>;
+        constexpr static bool has_value_truthy = inner_types::has_value_truthy;
+
+        using value_type = xtl::xoptional<base_value_type, flag_type, has_value_truthy>;
+        using reference = xtl::xoptional<base_reference, flag_reference, has_value_truthy>;
+        using const_reference = xtl::xoptional<base_const_reference, flag_const_reference, has_value_truthy>;
         using pointer = xtl::xclosure_pointer<reference>;
         using const_pointer = xtl::xclosure_pointer<const_reference>;
         using size_type = typename value_expression::size_type;
@@ -218,7 +221,9 @@ namespace xt
         flag_expression& flag() noexcept;
         const flag_expression& flag() const noexcept;
 
-    protected:
+        const auto has_value() const noexcept;
+
+      protected:
 
         xoptional_assembly_base() = default;
         ~xoptional_assembly_base() = default;
@@ -795,6 +800,15 @@ namespace xt
     inline auto xoptional_assembly_base<D>::flag() const noexcept -> const flag_expression&
     {
         return derived_cast().flag_impl();
+    }
+
+    /**
+     * Return an expression for the has_value result of the optional assembly.
+     */
+    template <class D>
+    inline const auto xoptional_assembly_base<D>::has_value() const noexcept
+    {
+        return equal(derived_cast().flag_impl(), inner_types::has_value_truthy);
     }
 
     template <class D>
