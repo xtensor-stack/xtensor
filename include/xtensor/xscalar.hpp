@@ -358,8 +358,26 @@ namespace xt
      * xdummy_iterator *
      *******************/
 
+    namespace detail
+    {
+        template <bool is_const, class CT>
+        using dummy_reference_t = std::conditional_t<is_const,
+                                                     typename xscalar<CT>::const_reference,
+                                                     typename xscalar<CT>::reference>;
+
+        template <bool is_const, class CT>
+        using dummy_pointer_t = std::conditional_t<is_const,
+                                                   typename xscalar<CT>::const_pointer,
+                                                   typename xscalar<CT>::pointer>;
+    }
+
     template <bool is_const, class CT>
     class xdummy_iterator
+        : public xtl::xrandom_access_iterator_base<xdummy_iterator<is_const, CT>,
+                                                   typename xscalar<CT>::value_type,
+                                                   typename xscalar<CT>::difference_type,
+                                                   detail::dummy_pointer_t<is_const, CT>,
+                                                   detail::dummy_reference_t<is_const, CT>>
     {
     public:
 
@@ -369,23 +387,25 @@ namespace xt
                                                   xscalar<CT>>;
 
         using value_type = typename container_type::value_type;
-        using reference = std::conditional_t<is_const,
-                                             typename container_type::const_reference,
-                                             typename container_type::reference>;
-        using pointer = std::conditional_t<is_const,
-                                           typename container_type::const_pointer,
-                                           typename container_type::pointer>;
+        using reference = detail::dummy_reference_t<is_const, CT>;
+        using pointer = detail::dummy_pointer_t<is_const, CT>;
         using difference_type = typename container_type::difference_type;
-        using iterator_category = std::forward_iterator_tag;
+        using iterator_category = std::random_access_iterator_tag;
 
         explicit xdummy_iterator(container_type* c) noexcept;
 
         self_type& operator++() noexcept;
-        self_type operator++(int) noexcept;
+        self_type& operator--() noexcept;
+
+        self_type& operator+=(difference_type n) noexcept;
+        self_type& operator-=(difference_type n) noexcept;
+
+        difference_type operator-(const self_type& rhs) const noexcept;
 
         reference operator*() const noexcept;
 
         bool equal(const self_type& rhs) const noexcept;
+        bool less_than(const self_type& rhs) const noexcept;
 
     private:
 
@@ -397,8 +417,8 @@ namespace xt
                     const xdummy_iterator<is_const, CT>& rhs) noexcept;
 
     template <bool is_const, class CT>
-    bool operator!=(const xdummy_iterator<is_const, CT>& lhs,
-                    const xdummy_iterator<is_const, CT>& rhs) noexcept;
+    bool operator<(const xdummy_iterator<is_const, CT>& lhs,
+                   const xdummy_iterator<is_const, CT>& rhs) noexcept;
 
     /*******************************
      * trivial_begin / trivial_end *
@@ -999,11 +1019,27 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline auto xdummy_iterator<is_const, CT>::operator++(int)noexcept -> self_type
+    inline auto xdummy_iterator<is_const, CT>::operator--() noexcept -> self_type&
     {
-        self_type tmp(*this);
-        ++(*this);
-        return tmp;
+        return *this;
+    }
+
+    template <bool is_const, class CT>
+    inline auto xdummy_iterator<is_const, CT>::operator+=(difference_type) noexcept -> self_type&
+    {
+        return *this;
+    }
+
+    template <bool is_const, class CT>
+    inline auto xdummy_iterator<is_const, CT>::operator-=(difference_type) noexcept -> self_type&
+    {
+        return *this;
+    }
+
+    template <bool is_const, class CT>
+    inline auto xdummy_iterator<is_const, CT>::operator-(const self_type&) const noexcept -> difference_type
+    {
+        return 0;
     }
 
     template <bool is_const, class CT>
@@ -1019,6 +1055,12 @@ namespace xt
     }
 
     template <bool is_const, class CT>
+    inline bool xdummy_iterator<is_const, CT>::less_than(const self_type& rhs) const noexcept
+    {
+        return p_c < rhs.p_c;
+    }
+
+    template <bool is_const, class CT>
     inline bool operator==(const xdummy_iterator<is_const, CT>& lhs,
                            const xdummy_iterator<is_const, CT>& rhs) noexcept
     {
@@ -1026,10 +1068,10 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline bool operator!=(const xdummy_iterator<is_const, CT>& lhs,
-                           const xdummy_iterator<is_const, CT>& rhs) noexcept
+    inline bool operator<(const xdummy_iterator<is_const, CT>& lhs,
+                          const xdummy_iterator<is_const, CT>& rhs) noexcept
     {
-        return !(lhs.equal(rhs));
+        return lhs.less_than(rhs);
     }
 }
 

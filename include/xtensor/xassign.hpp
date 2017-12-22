@@ -96,12 +96,13 @@ namespace xt
         using shape_type = typename E1::shape_type;
         using index_type = xindex_type_t<shape_type>;
         using size_type = typename lhs_iterator::size_type;
+        using difference_type = typename lhs_iterator::difference_type;
 
         data_assigner(E1& e1, const E2& e2);
 
         void run();
 
-        void step(size_type i);
+        void step(size_type i, size_type n);
         void reset(size_type i);
 
         void to_end(layout_type);
@@ -323,10 +324,10 @@ namespace xt
     }
 
     template <class E1, class E2, layout_type L>
-    inline void data_assigner<E1, E2, L>::step(size_type i)
+    inline void data_assigner<E1, E2, L>::step(size_type i, size_type n)
     {
-        m_lhs.step(i);
-        m_rhs.step(i);
+        m_lhs.step(i, n);
+        m_rhs.step(i, n);
     }
 
     template <class E1, class E2, layout_type L>

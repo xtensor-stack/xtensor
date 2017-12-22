@@ -250,23 +250,17 @@ namespace xt
 
         {
             SCOPED_TRACE("same shape");
-            std::cout << "before same shape" << std::endl;
             test_xfunction_iterator(f.m_a, f.m_a);
-            std::cout << "after same shape" << std::endl;
         }
 
         {
             SCOPED_TRACE("different shape");
-            std::cout << "before different shape" << std::endl;
             test_xfunction_iterator(f.m_a, f.m_b);
-            std::cout << "after different shape" << std::endl;
         }
 
         {
             SCOPED_TRACE("different dimensions");
-            std::cout << "before different dimensions" << std::endl;
             test_xfunction_iterator(f.m_c, f.m_a);
-            std::cout << "after different dimensions" << std::endl;
         }
     }
 

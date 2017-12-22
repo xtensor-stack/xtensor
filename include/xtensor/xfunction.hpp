@@ -350,7 +350,11 @@ namespace xt
     using get_iterator = typename detail::get_iterator_impl<C>::type;
 
     template <class F, class R, class... CT>
-    class xfunction_iterator
+    class xfunction_iterator : public xtl::xrandom_access_iterator_base<xfunction_iterator<F, R, CT...>,
+                                                                        typename xfunction_base<F, R, CT...>::value_type,
+                                                                        typename xfunction_base<F, R, CT...>::difference_type,
+                                                                        typename xfunction_base<F, R, CT...>::pointer,
+                                                                        typename xfunction_base<F, R, CT...>::reference>
     {
     public:
 
@@ -362,28 +366,38 @@ namespace xt
         using reference = typename xfunction_type::value_type;
         using pointer = typename xfunction_type::const_pointer;
         using difference_type = typename xfunction_type::difference_type;
-        using iterator_category = std::bidirectional_iterator_tag;
+        using iterator_category = std::random_access_iterator_tag;
 
         template <class... It>
         xfunction_iterator(const xfunction_type* func, It&&... it) noexcept;
 
         self_type& operator++();
-        self_type operator++(int);
-
         self_type& operator--();
-        self_type operator--(int);
+
+        self_type& operator+=(difference_type n);
+        self_type& operator-=(difference_type n);
+
+        difference_type operator-(const self_type& rhs) const;
 
         reference operator*() const;
 
         bool equal(const self_type& rhs) const;
+        bool less_than(const self_type& rhs) const;
 
     private:
+
+        using data_type = std::tuple<get_iterator<const std::decay_t<CT>>...>;
 
         template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
 
+        template <std::size_t... I>
+        difference_type tuple_max_diff(std::index_sequence<I...>,
+                                       const data_type& lhs,
+                                       const data_type& rhs) const;
+
         const xfunction_type* p_f;
-        std::tuple<get_iterator<const std::decay_t<CT>>...> m_it;
+        data_type m_it;
     };
 
     template <class F, class R, class... CT>
@@ -391,8 +405,8 @@ namespace xt
                     const xfunction_iterator<F, R, CT...>& it2);
 
     template <class F, class R, class... CT>
-    bool operator!=(const xfunction_iterator<F, R, CT...>& it1,
-                    const xfunction_iterator<F, R, CT...>& it2);
+    bool operator<(const xfunction_iterator<F, R, CT...>& it1,
+                   const xfunction_iterator<F, R, CT...>& it2);
 
     /*********************
      * xfunction_stepper *
@@ -834,14 +848,6 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_iterator<F, R, CT...>::operator++(int) -> self_type
-    {
-        self_type tmp(*this);
-        ++(*this);
-        return tmp;
-    }
-
-    template <class F, class R, class... CT>
     inline auto xfunction_iterator<F, R, CT...>::operator--() -> self_type&
     {
         auto f = [](auto& it) { return --it; };
@@ -850,11 +856,25 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_iterator<F, R, CT...>::operator--(int) -> self_type
+    inline auto xfunction_iterator<F, R, CT...>::operator+=(difference_type n) -> self_type&
     {
-        self_type tmp(*this);
-        --(*this);
-        return tmp;
+        auto f = [n](auto& it) { it += n; };
+        for_each(f, m_it);
+        return *this;
+    }
+
+    template <class F, class R, class... CT>
+    inline auto xfunction_iterator<F, R, CT...>::operator-=(difference_type n) -> self_type&
+    {
+        auto f = [n](auto& it) { it -= n; };
+        for_each(f, m_it);
+        return *this;
+    }
+
+    template <class F, class R, class... CT>
+    inline auto xfunction_iterator<F, R, CT...>::operator-(const self_type& rhs) const -> difference_type
+    {
+        return tuple_max_diff(std::make_index_sequence<sizeof...(CT)>(), m_it, rhs.m_it);
     }
 
     template <class F, class R, class... CT>
@@ -870,10 +890,27 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
+    inline bool xfunction_iterator<F, R, CT...>::less_than(const self_type& rhs) const
+    {
+        return p_f == rhs.p_f && m_it < rhs.m_it;
+    }
+
+    template <class F, class R, class... CT>
     template <std::size_t... I>
     inline auto xfunction_iterator<F, R, CT...>::deref_impl(std::index_sequence<I...>) const -> reference
     {
         return (p_f->m_f)(*std::get<I>(m_it)...);
+    }
+
+    template <class F, class R, class... CT>
+    template <std::size_t... I>
+    inline auto xfunction_iterator<F, R, CT...>::tuple_max_diff(std::index_sequence<I...>,
+                                                                const data_type& lhs,
+                                                                const data_type& rhs) const -> difference_type
+    {
+        auto diff = std::make_tuple((std::get<I>(lhs) - std::get<I>(rhs))...);
+        auto func = [](difference_type n, auto&& v) { return std::max(n, v); };
+        return accumulate(func, difference_type(0), diff);
     }
 
     template <class F, class R, class... CT>
@@ -884,10 +921,10 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline bool operator!=(const xfunction_iterator<F, R, CT...>& it1,
-                           const xfunction_iterator<F, R, CT...>& it2)
+    inline bool operator<(const xfunction_iterator<F, R, CT...>& it1,
+                          const xfunction_iterator<F, R, CT...>& it2)
     {
-        return !(it1.equal(it2));
+        return it1.less_than(it2);
     }
 
     /************************************
