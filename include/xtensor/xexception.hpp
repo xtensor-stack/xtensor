@@ -177,8 +177,8 @@ namespace xt
     }
 
 #ifdef XTENSOR_ENABLE_ASSERT
-#define XTENSOR_ASSERT(expr) XTENSOR_ASSERT_IMPL(expr, __FILE__, __LINE__)
-#define XTENSOR_ASSERT_IMPL(expr, file, line)                                                                                    \
+#define XTENSOR_TRY(expr) XTENSOR_TRY_IMPL(expr, __FILE__, __LINE__)
+#define XTENSOR_TRY_IMPL(expr, file, line)                                                                                       \
     try                                                                                                                          \
     {                                                                                                                            \
         expr;                                                                                                                    \
@@ -188,33 +188,42 @@ namespace xt
         throw std::runtime_error(std::string(file) + ':' + std::to_string(line) + ": check failed\n\t" + std::string(e.what())); \
     }
 #else
+#define XTENSOR_TRY(expr)
+#endif
+
+#ifdef XTENSOR_ENABLE_ASSERT
+#define XTENSOR_ASSERT(expr) XTENSOR_ASSERT_IMPL(expr, __FILE__, __LINE__)
+#define XTENSOR_ASSERT_IMPL(expr, file, line)                                                                                    \
+    if (!(expr))                                                                                                                 \
+    {                                                                                                                            \
+        throw std::runtime_error(std::string(file) + ':' + std::to_string(line) + ": assertion failed (" #expr ") \n\t");        \
+    }
+#else
 #define XTENSOR_ASSERT(expr)
 #endif
-}
 
 #ifdef XTENSOR_ENABLE_CHECK_DIMENSION
-#define XTENSOR_CHECK_DIMENSION(S, ARGS) XTENSOR_ASSERT(check_dimension(S, ARGS))
+#define XTENSOR_CHECK_DIMENSION(S, ARGS) XTENSOR_TRY(check_dimension(S, ARGS))
 #else
 #define XTENSOR_CHECK_DIMENSION(S, ARGS)
 #endif
 
 #ifdef XTENSOR_ENABLE_ASSERT
-#define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)                                                \
-    if (!(PREDICATE))                                                                         \
+#define XTENSOR_ASSERT_MSG(expr, msg)                                                         \
+    if (!(expr))                                                                              \
     {                                                                                         \
-        throw std::runtime_error(std::string("Assertion error!\n") + MESSAGE +                \
+        throw std::runtime_error(std::string("Assertion error!\n") + msg +                    \
                                  "\n  " + __FILE__ + '(' + std::to_string(__LINE__) + ")\n"); \
     }
-
 #else
-#define XTENSOR_ASSERT_MSG(PREDICATE, MESSAGE)
+#define XTENSOR_ASSERT_MSG(expr, msg)
 #endif
 
-#define XTENSOR_PRECONDITION(PREDICATE, MESSAGE)                                              \
-    if (!(PREDICATE))                                                                         \
+#define XTENSOR_PRECONDITION(expr, msg)                                                       \
+    if (!(expr))                                                                              \
     {                                                                                         \
-        throw std::runtime_error(std::string("Precondition violation!\n") + MESSAGE +         \
+        throw std::runtime_error(std::string("Precondition violation!\n") + msg +             \
                                  "\n  " + __FILE__ + '(' + std::to_string(__LINE__) + ")\n"); \
     }
-
+}
 #endif  // XEXCEPTION_HPP

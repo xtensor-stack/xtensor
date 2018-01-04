@@ -85,6 +85,8 @@ namespace xt
         using data_alignment = xsimd::container_alignment_t<container_type>;
         using simd_type = xsimd::simd_type<value_type>;
 
+        static_assert(static_layout != layout_type::any, "Container layout can never be layout_type::any!");
+
         size_type size() const noexcept;
 
         constexpr size_type dimension() const noexcept;
@@ -505,7 +507,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
-        XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return data()[index];
@@ -521,7 +523,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
-        XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return data()[index];
@@ -626,7 +628,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) -> reference
     {
-        XTENSOR_ASSERT(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return data()[element_offset<size_type>(strides(), first, last)];
     }
 
@@ -641,7 +643,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) const -> const_reference
     {
-        XTENSOR_ASSERT(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return data()[element_offset<size_type>(strides(), first, last)];
     }
 

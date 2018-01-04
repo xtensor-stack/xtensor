@@ -393,7 +393,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view<CT, S, CD>::operator()(Args... args) -> reference
     {
-        XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_TRY(check_index(shape(), args...));
         size_type index = m_offset + data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return m_data[index];
     }
@@ -409,7 +409,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view<CT, S, CD>::operator()(Args... args) const -> const_reference
     {
-        XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_TRY(check_index(shape(), args...));
         size_type index = m_offset + data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return m_data[index];
     }

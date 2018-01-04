@@ -192,7 +192,7 @@ namespace xt
     template <class... Args>
     inline auto xgenerator<F, R, S>::operator()(Args... args) const -> const_reference
     {
-        XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_TRY(check_index(shape(), args...));
         return m_f(args...);
     }
 
@@ -246,7 +246,7 @@ namespace xt
     template <class It>
     inline auto xgenerator<F, R, S>::element(It first, It last) const -> const_reference
     {
-        XTENSOR_ASSERT(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_f.element(first, last);
     }
     //@}
