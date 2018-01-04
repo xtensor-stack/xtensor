@@ -62,7 +62,7 @@ namespace xt
      */
     template <class C, class SC, class SS, typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0>
     xarray_adaptor<xtl::closure_type_t<C>, layout_type::dynamic, std::decay_t<SC>>
-    adapt(C&& container, SC&& shape, SS& strides);
+    adapt(C&& container, SC&& shape, SS&& strides);
 
     /**
      * Constructs an xarray_adaptor of the given dynamically allocated C array,
@@ -190,7 +190,7 @@ namespace xt
     // shape and strides - container version
     template <class C, class SC, class SS, typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int>>
     inline xarray_adaptor<xtl::closure_type_t<C>, layout_type::dynamic, std::decay_t<SC>>
-    adapt(C&& container, SC&& shape, SS& strides)
+    adapt(C&& container, SC&& shape, SS&& strides)
     {
         using return_type = xarray_adaptor<xtl::closure_type_t<C>, layout_type::dynamic, std::decay_t<SC>>;
         return return_type(std::forward<C>(container),
