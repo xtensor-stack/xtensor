@@ -96,7 +96,7 @@ namespace xt
     xtensor_container<std::vector<T, A>, 2> load_csv(std::istream& stream)
     {
         using container_type = typename std::vector<T, A>;
-        using tensor_type = xtensor_container<container_type, 2>;
+        using tensor_type = xtensor_container<container_type, 2, layout_type::row_major>;
         using size_type = typename tensor_type::size_type;
         using inner_shape_type = typename tensor_type::inner_shape_type;
         using inner_strides_type = typename tensor_type::inner_strides_type;
@@ -127,7 +127,7 @@ namespace xt
 
     /**
      * @brief Dump tensor to CSV.
-     * 
+     *
      * @param stream the output stream to write the CSV encoded values
      * @param e the tensor expression to serialize
      */
