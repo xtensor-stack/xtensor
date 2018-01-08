@@ -99,7 +99,7 @@ namespace xt
             return N;
         }
 
-        T m_data[N ? N : 1];
+        const T m_data[N ? N : 1];
     };
 
     template <std::size_t... X>
@@ -247,11 +247,12 @@ namespace xt
         };
 
         template <layout_type L, std::size_t... X, std::size_t... I>
-        constexpr xt::const_array<std::size_t, sizeof...(X)> get_strides_impl(const xt::fixed_shape<X...>& shape, std::index_sequence<I...>)
+        constexpr xt::const_array<std::size_t, sizeof...(X)>
+        get_strides_impl(const xt::fixed_shape<X...>& /*shape*/, std::index_sequence<I...>)
         {
-            static_assert(((L == layout_type::row_major) || (L == layout_type::column_major)), 
-                          "Layout not supported for fixed objects");
-            return xt::const_array<std::size_t, sizeof...(X)>{calculate_stride<L, I, X...>::value...};
+            static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
+                          "Layout not supported for fixed array");
+            return { calculate_stride<L, I, X...>::value... };
         }
 
         template <class T, std::size_t... I>
@@ -275,29 +276,27 @@ namespace xt
             constexpr static std::size_t value = X;
         };
 
+        template <class T>
+        struct compute_size;
+
         template <std::size_t... X>
-        constexpr std::size_t compute_size(const fixed_shape<X...>& /*s*/)
+        struct compute_size<xt::fixed_shape<X...>>
         {
-            return compute_size_impl<X...>::value;
-        }
+            constexpr static std::size_t value = compute_size_impl<X...>::value;
+        };
     }
 
-    // returns strides & backstrides in a tuple
     template <layout_type L, std::size_t... X>
     constexpr const_array<std::size_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape)
     {
-        // constexpr std::size_t sz = std::tuple_size<T>::value;
-        // constexpr std::size_t sz = fixed_shape<X...>::size();
-        // auto index_sequence = ;
         return detail::get_strides_impl<L>(shape, std::make_index_sequence<sizeof...(X)>{});
     }
 
     template <class T>
     constexpr T get_backstrides(const T& shape, const T& strides)
     {
-        // constexpr std::size_t sz = std::tuple_size<T>::value;
-        // auto index_sequence = ;
-        return detail::get_backstrides_impl(shape, strides, std::make_index_sequence<shape.size()>{});
+        return detail::get_backstrides_impl(shape, strides,
+                                            std::make_index_sequence<std::tuple_size<T>::value>{});
     }
 
     template <class EC, class S, layout_type L, class Tag>
@@ -310,7 +309,7 @@ namespace xt
         using shape_type = std::array<typename inner_shape_type::value_type,
                                       std::tuple_size<inner_shape_type>::value>;
         using strides_type = shape_type;
-        using container_type = std::array<EC, detail::compute_size(S())>;
+        using container_type = std::array<EC, detail::compute_size<S>::value>;
         using temporary_type = xfixed_container<EC, S, L, Tag>;
         static constexpr layout_type layout = L;
     };
