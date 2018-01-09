@@ -103,7 +103,7 @@ with the ``index_view`` helper function.
 .. code::
 
     #include "xtensor/xarray.hpp"
-    #include "xtensor/xindexview.hpp"
+    #include "xtensor/xindex_view.hpp"
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     auto b = xt::index_view(a, {{0,0}, {1, 0}, {0, 1}});
@@ -120,7 +120,7 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
 .. code::
 
     #include "xtensor/xarray.hpp"
-    #include "xtensor/xindexview.hpp"
+    #include "xtensor/xindex_view.hpp"
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     auto v = xt::filter(a, a >= 5);
@@ -139,7 +139,7 @@ computed scalar assignments.
 .. code::
 
     #include "xtensor/xarray.hpp"
-    #include "xtensor/xindexview.hpp"
+    #include "xtensor/xindex_view.hpp"
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     filtration(a, a >= 5) += 100;
