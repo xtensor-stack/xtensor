@@ -382,7 +382,7 @@ namespace xt
         template <class E1, class E2>
         inline void trivial_assigner_run_impl(E1& e1, const E2& e2, std::true_type)
         {
-            std::copy(e2.storage_cbegin(), e2.storage_cend(), e1.storage_begin());
+            std::transform(e2.storage_cbegin(), e2.storage_cend(), e1.storage_begin(), [&](typename E2::value_type x) { return static_cast<typename E1::value_type>(x); });
         }
 
         template <class E1, class E2>

@@ -333,13 +333,25 @@ namespace xt
 
         bool equal(const xfunctor_iterator& rhs) const;
 
+        xfunctor_iterator operator+(difference_type offset)
+        {
+            return xfunctor_iterator(m_it + offset, p_functor);
+        }
+
+        difference_type operator-(xfunctor_iterator it2)
+        {
+            return m_it - it2.m_it;
+        }
+
+        bool operator<(xfunctor_iterator it2)
+        {
+            return (*this - it2) < 0;
+        }
+
     private:
 
         IT m_it;
         const functor_type* p_functor;
-
-        template <class F_, class IT_>
-        friend xfunctor_iterator<F_, IT_> operator+(xfunctor_iterator<F_, IT_>, xfunctor_iterator<F_, IT_>);
 
         template <class F_, class IT_>
         friend typename xfunctor_iterator<F_, IT_>::difference_type operator-(xfunctor_iterator<F_, IT_>, xfunctor_iterator<F_, IT_>);
@@ -352,18 +364,6 @@ namespace xt
     template <class F, class IT>
     bool operator!=(const xfunctor_iterator<F, IT>& lhs,
                     const xfunctor_iterator<F, IT>& rhs);
-
-    template <class F, class IT>
-    xfunctor_iterator<F, IT> operator+(xfunctor_iterator<F, IT> it1, xfunctor_iterator<F, IT> it2)
-    {
-        return xfunctor_iterator<F, IT>(it1.m_it + it2.m_it);
-    }
-
-    template <class F, class IT>
-    typename xfunctor_iterator<F, IT>::difference_type operator-(xfunctor_iterator<F, IT> it1, xfunctor_iterator<F, IT> it2)
-    {
-        return it1.m_it - it2.m_it;
-    }
 
     /********************************
      * xfunctor_stepper declaration *
