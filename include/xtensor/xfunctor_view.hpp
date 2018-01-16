@@ -308,7 +308,11 @@ namespace xt
      *********************************/
 
     template <class F, class IT>
-    class xfunctor_iterator
+    class xfunctor_iterator : public xtl::xrandom_access_iterator_base<xfunctor_iterator<F, IT>,
+                                                                       typename F::value_type,
+                                                                       typename std::iterator_traits<IT>::difference_type,
+                                                                       typename xtl::xproxy_wrapper<decltype(std::declval<F>()(*(IT())))>::pointer,
+                                                                       xtl::xproxy_wrapper<decltype(std::declval<F>()(*(IT())))>>
     {
     public:
 
@@ -326,23 +330,23 @@ namespace xt
         xfunctor_iterator(const IT&, const functor_type*);
 
         self_type& operator++();
-        self_type operator++(int);
+        self_type& operator--();
+
+        self_type& operator+=(difference_type n);
+        self_type& operator-=(difference_type n);
+
+        difference_type operator-(xfunctor_iterator rhs) const;
 
         reference operator*() const;
         pointer operator->() const;
 
         bool equal(const xfunctor_iterator& rhs) const;
-        xfunctor_iterator operator+(difference_type offset) const;
-        difference_type operator-(xfunctor_iterator it2) const;
-        bool operator<(xfunctor_iterator it2) const;
+        bool less_than(const xfunctor_iterator& rhs) const;
 
     private:
 
         IT m_it;
         const functor_type* p_functor;
-
-        template <class F_, class IT_>
-        friend typename xfunctor_iterator<F_, IT_>::difference_type operator-(xfunctor_iterator<F_, IT_>, xfunctor_iterator<F_, IT_>);
     };
 
     template <class F, class IT>
@@ -350,26 +354,8 @@ namespace xt
         const xfunctor_iterator<F, IT>& rhs);
 
     template <class F, class IT>
-    bool operator!=(const xfunctor_iterator<F, IT>& lhs,
-        const xfunctor_iterator<F, IT>& rhs);
-
-    template <class F, class IT>
-    xfunctor_iterator<F, IT> xfunctor_iterator<F, IT>::operator+(typename xfunctor_iterator<F, IT>::difference_type offset) const
-    {
-        return xfunctor_iterator(m_it + offset, p_functor);
-    }
-
-    template <class F, class IT>
-    typename xfunctor_iterator<F, IT>::difference_type xfunctor_iterator<F, IT>::operator-(typename xfunctor_iterator<F, IT>::xfunctor_iterator it2) const
-    {
-        return m_it - it2.m_it;
-    }
-
-    template <class F, class IT>
-    bool xfunctor_iterator<F, IT>::operator<(xfunctor_iterator<F, IT> it2) const
-    {
-        return (*this - it2) < 0;
-    }
+    bool operator<(const xfunctor_iterator<F, IT>& lhs,
+                   const xfunctor_iterator<F, IT>& rhs);
 
     /********************************
      * xfunctor_stepper declaration *
@@ -1168,18 +1154,37 @@ namespace xt
     }
 
     template <class F, class IT>
-    auto xfunctor_iterator<F, IT>::operator++() -> self_type&
+    inline auto xfunctor_iterator<F, IT>::operator++() -> self_type&
     {
         ++m_it;
         return *this;
     }
 
     template <class F, class IT>
-    auto xfunctor_iterator<F, IT>::operator++(int) -> self_type
+    inline auto xfunctor_iterator<F, IT>::operator--() -> self_type&
     {
-        self_type tmp(*this);
-        ++m_it;
-        return tmp;
+        --m_it;
+        return *this;
+    }
+
+    template <class F, class IT>
+    inline auto xfunctor_iterator<F, IT>::operator+=(difference_type n) -> self_type&
+    {
+        m_it += n;
+        return *this;
+    }
+
+    template <class F, class IT>
+    inline auto xfunctor_iterator<F, IT>::operator-=(difference_type n) -> self_type&
+    {
+        m_it -= n;
+        return *this;
+    }
+
+    template <class F, class IT>
+    inline auto xfunctor_iterator<F, IT>::operator-(xfunctor_iterator rhs) const -> difference_type
+    {
+        return m_it - rhs.m_it;
     }
 
     template <class F, class IT>
@@ -1201,6 +1206,12 @@ namespace xt
     }
 
     template <class F, class IT>
+    auto xfunctor_iterator<F, IT>::less_than(const xfunctor_iterator& rhs) const -> bool
+    {
+        return m_it < rhs.m_it;
+    }
+
+    template <class F, class IT>
     bool operator==(const xfunctor_iterator<F, IT>& lhs,
                     const xfunctor_iterator<F, IT>& rhs)
     {
@@ -1208,10 +1219,10 @@ namespace xt
     }
 
     template <class F, class IT>
-    bool operator!=(const xfunctor_iterator<F, IT>& lhs,
-                    const xfunctor_iterator<F, IT>& rhs)
+    bool operator<(const xfunctor_iterator<F, IT>& lhs,
+                   const xfunctor_iterator<F, IT>& rhs)
     {
-        return !lhs.equal(rhs);
+        return !lhs.less_than(rhs);
     }
 
     /***********************************
