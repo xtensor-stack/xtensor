@@ -47,7 +47,7 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            static inline flag_expression flag(U&& arg)
             {
                 return ones<bool>(arg.shape());
             }
@@ -66,7 +66,7 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&&)
+            static inline flag_expression flag(U&&)
             {
                 return xscalar<bool>(true);
             }
@@ -99,9 +99,9 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            static inline flag_expression flag(U&& arg)
             {
-                return arg().has_value();
+                return arg().flag();
             }
 
         };
@@ -134,7 +134,7 @@ namespace xt
         struct split_optional_expression_impl<T, xoptional_expression_tag>
         {
             using value_expression = decltype(std::declval<T>().value());
-            using flag_expression = decltype(std::declval<T>().has_value());
+            using flag_expression = decltype(std::declval<T>().flag());
 
             template <class U>
             static inline value_expression value(U&& arg)
@@ -143,9 +143,9 @@ namespace xt
             }
 
             template <class U>
-            static inline flag_expression has_value(U&& arg)
+            static inline flag_expression flag(U&& arg)
             {
-                return arg.has_value();
+                return arg.flag();
             }
         };
 
@@ -180,9 +180,9 @@ namespace xt
                 return value_expression(std::move(arg.data().value()), arg.shape());
             }
 
-            static inline flag_expression has_value(OA arg)
+            static inline flag_expression flag(OA arg)
             {
-                return flag_expression(std::move(arg.data().has_value()), arg.shape());
+                return flag_expression(std::move(arg.data().flag()), arg.shape());
             }
         };
 
@@ -200,9 +200,9 @@ namespace xt
                 return value_expression(arg.data().value(), arg.shape());
             }
 
-            static inline flag_expression has_value(OA& arg)
+            static inline flag_expression flag(OA& arg)
             {
-                return flag_expression(arg.data().has_value(), arg.shape());
+                return flag_expression(arg.data().flag(), arg.shape());
             }
         };
 
@@ -238,9 +238,9 @@ namespace xt
                 return value_expression(std::move(arg.data().value()), arg.shape());
             }
 
-            static inline flag_expression has_value(OT arg)
+            static inline flag_expression flag(OT arg)
             {
-                return flag_expression(std::move(arg.data().has_value()), arg.shape());
+                return flag_expression(std::move(arg.data().flag()), arg.shape());
             }
         };
 
@@ -258,9 +258,9 @@ namespace xt
                 return value_expression(arg.data().value(), arg.shape());
             }
 
-            static inline flag_expression has_value(OT& arg)
+            static inline flag_expression flag(OT& arg)
             {
-                return flag_expression(arg.data().has_value(), arg.shape());
+                return flag_expression(arg.data().flag(), arg.shape());
             }
         };
 
@@ -298,38 +298,75 @@ namespace xt
             using simd_value_type = bool;
             using simd_result_type = bool;
             template <class T1, class T2>
-            constexpr result_type operator()(const T1& arg1, const T2& arg2) const
+            constexpr result_type operator()(const T1 &arg1, const T2 &arg2) const
             {
                 return (arg1 & arg2);
             }
-            constexpr simd_result_type simd_apply(const simd_value_type& arg1,
-                                                  const simd_value_type& arg2) const
+            constexpr simd_result_type simd_apply(const simd_value_type &arg1,
+                                                  const simd_value_type &arg2) const
             {
                 return (arg1 & arg2);
             }
         };
+
+        template <class T = bool, bool... EXISTS>
+        class combine_has_value
+        {
+        public:
+            using return_type = T;
+            using first_argument_type = T;
+            using second_argument_type = T;
+            using result_type = T;
+            using simd_value_type = bool;
+            using simd_result_type = bool;
+            constexpr static std::array<bool, sizeof...(EXISTS)> exists = {EXISTS...};
+
+            template <class T1, class T2>
+            constexpr result_type operator()(const T1& arg1, const T2& arg2) const
+            {
+                return ((arg1 == exists[0]) & (arg2 == exists[1]));
+            }
+        };
+
+        template <class T, bool... EXISTS>
+        constexpr std::array<bool, sizeof...(EXISTS)> combine_has_value<T, EXISTS...>::exists;
+
+        template <class... Args>
+        constexpr bool all_same(Args... args)
+        {
+            bool arr[sizeof...(Args)] = {args...};
+            bool first = arr[0];
+            for (std::size_t i = 1; i < sizeof...(Args); ++i)
+            {
+                if (first != arr[i])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
-    /**********************
+        /**********************
      * optional functions *
      **********************/
 
-    template <class T, class B>
-    auto sign(const xtl::xoptional<T, B>& e);
+        template <class T, class B>
+        auto sign(const xtl::xoptional<T, B> &e);
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    detail::value_expression_t<E> value(E&&);
+        template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+        detail::value_expression_t<E> value(E &&);
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    detail::flag_expression_t<E> has_value(E&&);
+        template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+        detail::flag_expression_t<E> flag(E &&);
 
-    template <>
-    class xexpression_assigner_base<xoptional_expression_tag>
-    {
-    public:
+        template <>
+        class xexpression_assigner_base<xoptional_expression_tag>
+        {
+          public:
 
-        template <class E1, class E2>
-        static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
+            template <class E1, class E2>
+            static void assign_data(xexpression<E1> &e1, const xexpression<E2> &e2, bool trivial);
     };
 
     /**********************
@@ -337,6 +374,24 @@ namespace xt
      **********************/
 
 #define DL DEFAULT_LAYOUT
+
+    namespace detail
+    {
+        template <class T, class... U>
+        struct fp_impl
+        {
+            using type = T;
+        };
+
+        template <class... T>
+        struct front_pack
+        {
+            using type = typename fp_impl<T...>::type;
+        };
+
+        template <class... T>
+        using front_pack_t = typename front_pack<T...>::type;
+    }
 
     /**
      * @class xoptional_function
@@ -361,6 +416,10 @@ namespace xt
         using expression_tag = xoptional_expression_tag;
         using value_functor = typename F::template rebind<typename R::value_type>::type;
         using flag_functor = detail::optional_bitwise<bool>;
+        using has_value_functor = detail::combine_has_value<bool, std::decay_t<CT>::has_value_truthy...>;
+
+        constexpr static bool exists_equal = detail::all_same(std::decay_t<CT>::has_value_truthy...);
+        constexpr static bool has_value_truthy = exists_equal ? detail::front_pack_t<std::decay_t<CT>...>::has_value_truthy : true;
 
         template <class Func, class U = std::enable_if<!std::is_base_of<Func, self_type>::value>>
         xoptional_function(Func&& func, CT... e) noexcept;
@@ -381,16 +440,33 @@ namespace xt
                                           bool,
                                           detail::flag_expression_t<CT>...>;
 
-        value_expression value() const;
-        flag_expression has_value() const;
+        using has_value_expression = xfunction<has_value_functor,
+                                               bool,
+                                               detail::flag_expression_t<CT>...>;
 
-    private:
+        value_expression value() const;
+
+        template <class T = self_type>
+        std::enable_if_t<T::exists_equal, flag_expression>
+        has_value() const;
+
+        template <class T = self_type>
+        std::enable_if_t<!T::exists_equal, has_value_expression>
+        has_value() const;
+
+        std::conditional_t<exists_equal, flag_expression, has_value_expression>
+        flag() const;
+
+      private:
 
         template <std::size_t... I>
         value_expression value_impl(std::index_sequence<I...>) const;
 
         template <std::size_t... I>
-        flag_expression has_value_impl(std::index_sequence<I...>) const;
+        has_value_expression has_value_impl(std::index_sequence<I...>) const;
+
+        template <std::size_t... I>
+        flag_expression flag_impl(std::index_sequence<I...>) const;
     };
 
 #undef DL
@@ -419,9 +495,26 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xoptional_function<F, R, CT...>::has_value() const -> flag_expression
+    template <class T>
+    inline auto xoptional_function<F, R, CT...>::has_value() const
+        -> std::enable_if_t<T::exists_equal, flag_expression>
+    {
+        return flag_impl(std::make_index_sequence<sizeof...(CT)>());
+    }
+
+    template <class F, class R, class... CT>
+    template <class T>
+    inline auto xoptional_function<F, R, CT...>::has_value() const
+        -> std::enable_if_t<!T::exists_equal, has_value_expression>
     {
         return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
+    }
+
+    template <class F, class R, class... CT>
+    inline auto xoptional_function<F, R, CT...>::flag() const
+        -> std::conditional_t<exists_equal, flag_expression, has_value_expression>
+    {
+        return has_value();
     }
 
     template <class F, class R, class... CT>
@@ -434,10 +527,19 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <std::size_t... I>
-    inline auto xoptional_function<F, R, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
+    inline auto xoptional_function<F, R, CT...>::flag_impl(std::index_sequence<I...>) const -> flag_expression
     {
         return flag_expression(flag_functor(),
-            detail::split_optional_expression<CT>::has_value(std::get<I>(this->arguments()))...);
+            detail::split_optional_expression<CT>::flag(std::get<I>(this->arguments()))...);
+    }
+
+    template <class F, class R, class... CT>
+    template <std::size_t... I>
+    inline auto xoptional_function<F, R, CT...>::has_value_impl(std::index_sequence<I...>) const
+        -> has_value_expression
+    {
+        return has_value_expression(has_value_functor(),
+            detail::split_optional_expression<CT>::flag(std::get<I>(this->arguments()))...);
     }
 
     /********************************
@@ -483,9 +585,9 @@ namespace xt
     }
 
     template <class E, class>
-    inline auto has_value(E&& e) -> detail::flag_expression_t<E>
+    inline auto flag(E&& e) -> detail::flag_expression_t<E>
     {
-        return detail::split_optional_expression<E>::has_value(std::forward<E>(e));
+        return detail::split_optional_expression<E>::flag(std::forward<E>(e));
     }
 
     template <class E1, class E2>
@@ -495,9 +597,9 @@ namespace xt
         const E2& de2 = e2.derived_cast();
 
         decltype(auto) bde1 = xt::value(de1);
-        decltype(auto) hde1 = xt::has_value(de1);
+        decltype(auto) hde1 = xt::flag(de1);
         xexpression_assigner_base<xtensor_expression_tag>::assign_data(bde1, xt::value(de2), trivial);
-        xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::has_value(de2), trivial);
+        xexpression_assigner_base<xtensor_expression_tag>::assign_data(hde1, xt::flag(de2), trivial);
     }
 }
 

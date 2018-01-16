@@ -145,7 +145,7 @@ namespace xt
             dyn_opt_ass_type b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.flag().data(), b.flag().data());
         }
 
         {
@@ -153,11 +153,11 @@ namespace xt
             row_major_result<> r;
             dyn_opt_ass_type c(r.m_shape, dyn_opt_ass_type::value_type(0, false));
             EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.flag().data(), c.flag().data());
             c = a;
             compare_shape(a, c);
             EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.flag().data(), c.flag().data());
         }
     }
 
@@ -173,7 +173,7 @@ namespace xt
             dyn_opt_ass_type b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.flag().data(), b.flag().data());
         }
 
         {
@@ -181,12 +181,12 @@ namespace xt
             row_major_result<> r;
             dyn_opt_ass_type c(r.m_shape, dyn_opt_ass_type::value_type(0, false));
             EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.flag().data(), c.flag().data());
             dyn_opt_ass_type tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
             EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.flag().data(), c.flag().data());
         }
     }
 

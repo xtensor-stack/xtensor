@@ -82,7 +82,7 @@ namespace xt
             {{ 0.0 ,       2.0         },
              { 3.0 , xtl::missing<double>() }};
 
-        auto flag_view = xt::has_value(m);
+        auto flag_view = xt::flag(m);
 
         xtensor<bool, 2> res = flag_view;
 
@@ -106,7 +106,7 @@ namespace xt
             {{ 0.0 , 2.0 },
              { 3.0 , 1.0 }};
 
-        auto flag_view = has_value(m);
+        auto flag_view = xt::flag(m);
 
         xtensor<bool, 2> res = flag_view;
         ASSERT_TRUE(res(0, 0));

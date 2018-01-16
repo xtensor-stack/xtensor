@@ -21,21 +21,26 @@ namespace xt
      * xoptional_assembly declaration *
      **********************************/
 
-    template <class VE, class FE>
+    template <class VE, class FE, bool EXISTS = true>
     class xoptional_assembly;
 
-    template <class VE, class FE>
-    struct xcontainer_inner_types<xoptional_assembly<VE, FE>>
+    template <class VE, class FE, bool EXISTS>
+    struct xcontainer_inner_types<xoptional_assembly<VE, FE, EXISTS>>
     {
         using value_expression = VE;
         using flag_expression = FE;
-        using temporary_type = xoptional_assembly<VE, FE>;
+        using temporary_type = xoptional_assembly<VE, FE, EXISTS>;
+
+        constexpr static bool has_value_truthy = EXISTS;
     };
 
-    template <class VE, class FE>
-    struct xiterable_inner_types<xoptional_assembly<VE, FE>>
+    template <class VE, class FE, bool EXISTS>
+    constexpr bool xcontainer_inner_types<xoptional_assembly<VE, FE, EXISTS>>::has_value_truthy;
+
+    template <class VE, class FE, bool EXISTS>
+    struct xiterable_inner_types<xoptional_assembly<VE, FE, EXISTS>>
     {
-        using assembly_type = xoptional_assembly<VE, FE>;
+        using assembly_type = xoptional_assembly<VE, FE, EXISTS>;
         using inner_shape_type = typename VE::inner_shape_type;
         using stepper = xoptional_assembly_stepper<assembly_type, false>;
         using const_stepper = xoptional_assembly_stepper<assembly_type, true>;
@@ -54,13 +59,13 @@ namespace xt
      * @tparam VE The type of expression holding the values.
      * @tparam FE The type of expression holding the missing mask.
      */
-    template <class VE, class FE>
-    class xoptional_assembly : public xoptional_assembly_base<xoptional_assembly<VE, FE>>,
-                               public xcontainer_semantic<xoptional_assembly<VE, FE>>
+    template <class VE, class FE, bool EXISTS>
+    class xoptional_assembly : public xoptional_assembly_base<xoptional_assembly<VE, FE, EXISTS>>,
+                               public xcontainer_semantic<xoptional_assembly<VE, FE, EXISTS>>
     {
     public:
 
-        using self_type = xoptional_assembly<VE, FE>;
+        using self_type = xoptional_assembly<VE, FE, EXISTS>;
         using base_type = xoptional_assembly_base<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using value_expression = typename base_type::value_expression;
@@ -114,34 +119,39 @@ namespace xt
         value_expression& value_impl() noexcept;
         const value_expression& value_impl() const noexcept;
 
-        flag_expression& has_value_impl() noexcept;
-        const flag_expression& has_value_impl() const noexcept;
+        flag_expression& flag_impl() noexcept;
+        const flag_expression& flag_impl() const noexcept;
 
         value_expression m_value;
-        flag_expression m_has_value;
+        flag_expression m_flag;
 
-        friend class xoptional_assembly_base<xoptional_assembly<VE, FE>>;
+        friend class xoptional_assembly_base<xoptional_assembly<VE, FE, EXISTS>>;
     };
 
     /******************************************
      * xoptional_assembly_adaptor declaration *
      ******************************************/
 
-    template <class VEC, class FEC>
+    template <class VEC, class FEC, bool EXISTS = true>
     class xoptional_assembly_adaptor;
 
-    template <class VEC, class FEC>
-    struct xcontainer_inner_types<xoptional_assembly_adaptor<VEC, FEC>>
+    template <class VEC, class FEC, bool EXISTS>
+    struct xcontainer_inner_types<xoptional_assembly_adaptor<VEC, FEC, EXISTS>>
     {
         using value_expression = std::remove_reference_t<VEC>;
         using flag_expression = std::remove_reference_t<FEC>;
         using temporary_type = xoptional_assembly<value_expression, flag_expression>;
+
+        constexpr static bool has_value_truthy = EXISTS;
     };
 
-    template <class VEC, class FEC>
-    struct xiterable_inner_types<xoptional_assembly_adaptor<VEC, FEC>>
+    template <class VEC, class FEC, bool EXISTS>
+    constexpr bool xcontainer_inner_types<xoptional_assembly_adaptor<VEC, FEC, EXISTS>>::has_value_truthy;
+
+    template <class VEC, class FEC, bool EXISTS>
+    struct xiterable_inner_types<xoptional_assembly_adaptor<VEC, FEC, EXISTS>>
     {
-        using assembly_type = xoptional_assembly_adaptor<VEC, FEC>;
+        using assembly_type = xoptional_assembly_adaptor<VEC, FEC, EXISTS>;
         using inner_shape_type = typename std::decay_t<VEC>::inner_shape_type;
         using stepper = xoptional_assembly_stepper<assembly_type, false>;
         using const_stepper = xoptional_assembly_stepper<assembly_type, true>;
@@ -159,13 +169,13 @@ namespace xt
      * @tparam VEC The closure for the type of expression holding the values.
      * @tparam FE The closure for the type of expression holding the missing mask.
      */
-    template <class VEC, class FEC>
-    class xoptional_assembly_adaptor : public xoptional_assembly_base<xoptional_assembly_adaptor<VEC, FEC>>,
-                                       public xcontainer_semantic<xoptional_assembly_adaptor<VEC, FEC>>
+    template <class VEC, class FEC, bool EXISTS>
+    class xoptional_assembly_adaptor : public xoptional_assembly_base<xoptional_assembly_adaptor<VEC, FEC, EXISTS>>,
+                                       public xcontainer_semantic<xoptional_assembly_adaptor<VEC, FEC, EXISTS>>
     {
     public:
 
-        using self_type = xoptional_assembly_adaptor<VEC, FEC>;
+        using self_type = xoptional_assembly_adaptor<VEC, FEC, EXISTS>;
         using base_type = xoptional_assembly_base<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
         using value_expression = typename base_type::value_expression;
@@ -178,6 +188,8 @@ namespace xt
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
         using temporary_type = typename semantic_base::temporary_type;
+
+        constexpr static bool has_value_truthy = EXISTS;
 
         template <class OVE, class OFE>
         xoptional_assembly_adaptor(OVE&& ve, OFE&& fe);
@@ -199,13 +211,13 @@ namespace xt
         value_expression& value_impl() noexcept;
         const value_expression& value_impl() const noexcept;
 
-        flag_expression& has_value_impl() noexcept;
-        const flag_expression& has_value_impl() const noexcept;
+        flag_expression& flag_impl() noexcept;
+        const flag_expression& flag_impl() const noexcept;
 
         VEC m_value;
-        FEC m_has_value;
+        FEC m_flag;
 
-        friend class xoptional_assembly_base<xoptional_assembly_adaptor<VEC, FEC>>;
+        friend class xoptional_assembly_base<xoptional_assembly_adaptor<VEC, FEC, EXISTS>>;
     };
 
     /*************************************
@@ -218,7 +230,7 @@ namespace xt
         inline void nested_optional_copy(T&& iter, const S& s)
         {
             iter->value() = s.value();
-            iter->has_value() = s.has_value();
+            iter->flag() = s.flag();
             ++iter;
         }
 
@@ -239,9 +251,9 @@ namespace xt
     /**
      * Allocates an uninitialized xoptional_assembly that holds 0 element.
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly()
-        : m_value(), m_has_value()
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly()
+        : m_value(), m_flag()
     {
     }
 
@@ -251,9 +263,9 @@ namespace xt
      * @param shape the shape of the xoptional_assembly
      * @param l the layout_type of the xoptional_assembly
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(const shape_type& shape, layout_type l)
-        : m_value(shape, l), m_has_value(shape, l)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(const shape_type& shape, layout_type l)
+        : m_value(shape, l), m_flag(shape, l)
     {
     }
 
@@ -264,9 +276,9 @@ namespace xt
      * @param value the value of the elements
      * @param l the layout_type of the xoptional_assembly
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(const shape_type& shape, const value_type& value, layout_type l)
-        : m_value(shape, value.value(), l), m_has_value(shape, value.has_value(), l)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(const shape_type& shape, const value_type& value, layout_type l)
+        : m_value(shape, value.value(), l), m_flag(shape, value.flag(), l)
     {
     }
 
@@ -275,9 +287,9 @@ namespace xt
      * @param shape the shape of the xoptional_assembly
      * @param strides the strides of the xoptional_assembly
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(const shape_type& shape, const strides_type& strides)
-        : m_value(shape, strides), m_has_value(shape, strides)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(const shape_type& shape, const strides_type& strides)
+        : m_value(shape, strides), m_flag(shape, strides)
     {
     }
 
@@ -288,9 +300,9 @@ namespace xt
      * @param strides the strides of the xoptional_assembly
      * @param value the value of the elements
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(const shape_type& shape, const strides_type& strides, const value_type& value)
-        : m_value(shape, strides, value.value()), m_has_value(shape, strides, value.has_value())
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(const shape_type& shape, const strides_type& strides, const value_type& value)
+        : m_value(shape, strides, value.value()), m_flag(shape, strides, value.flag())
     {
     }
 
@@ -299,20 +311,20 @@ namespace xt
      * specified value.
      * @param value the value of the element
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(const value_type& value)
-        : m_value(value.value()), m_has_value(value.has_value())
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(const value_type& value)
+        : m_value(value.value()), m_flag(value.flag())
     {
     }
 
-    /** 
+    /**
      * Allocates an xoptional_assembly from the specified value expression. The flag
      * expression is initialized as if no value is missing.
      * @param ve the expression holding the values
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(const VE& ve)
-        : m_value(ve), m_has_value(ve.shape(), true, ve.layout())
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(const VE& ve)
+        : m_value(ve), m_flag(ve.shape(), EXISTS, ve.layout())
     {
     }
 
@@ -323,9 +335,9 @@ namespace xt
      * the xoptional_assembly has been constructed.
      * @param ve the expression holding the values
      */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(VE&& ve)
-        : m_value(std::move(ve)), m_has_value(ve.shape(), true, ve.layout())
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(VE&& ve)
+        : m_value(std::move(ve)), m_flag(ve.shape(), EXISTS, ve.layout())
     {
     }
 
@@ -335,10 +347,10 @@ namespace xt
      * @param ove the expression holding the values
      * @param ofe the expression holding the missing mask
      */
-    template <class VE, class FE>
+    template <class VE, class FE, bool EXISTS>
     template <class OVE, class OFE, typename>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(OVE&& ove, OFE&& ofe)
-        : m_value(std::forward<OVE>(ove)), m_has_value(std::forward<OFE>(ofe))
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(OVE&& ove, OFE&& ofe)
+        : m_value(std::forward<OVE>(ove)), m_flag(std::forward<OFE>(ofe))
     {
     }
     //@}
@@ -351,8 +363,8 @@ namespace xt
     * Allocates a one-dimensional xoptional_assembly.
     * @param t the elements of the xoptional_assembly
     */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 1> t)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(nested_initializer_list_t<value_type, 1> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -365,8 +377,8 @@ namespace xt
     * Allocates a two-dimensional xoptional_assembly.
     * @param t the elements of the xoptional_assembly
     */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 2> t)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(nested_initializer_list_t<value_type, 2> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -379,8 +391,8 @@ namespace xt
     * Allocates a three-dimensional xoptional_assembly.
     * @param t the elements of the xoptional_assembly
     */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 3> t)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(nested_initializer_list_t<value_type, 3> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -393,8 +405,8 @@ namespace xt
     * Allocates a four-dimensional xoptional_assembly.
     * @param t the elements of the xoptional_assembly
     */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 4> t)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(nested_initializer_list_t<value_type, 4> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -407,8 +419,8 @@ namespace xt
     * Allocates a five-dimensional xoptional_assembly.
     * @param t the elements of the xoptional_assembly
     */
-    template <class VE, class FE>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(nested_initializer_list_t<value_type, 5> t)
+    template <class VE, class FE, bool EXISTS>
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(nested_initializer_list_t<value_type, 5> t)
         : base_type()
     {
         base_type::reshape(xt::shape<shape_type>(t));
@@ -422,9 +434,9 @@ namespace xt
      * Allocates and returns an xoptional_assembly with the specified shape.
      * @param s the shape of the xoptional_assembly
      */
-    template <class VE, class FE>
+    template <class VE, class FE, bool EXISTS>
     template <class S>
-    inline xoptional_assembly<VE, FE> xoptional_assembly<VE, FE>::from_shape(S&& s)
+    inline xoptional_assembly<VE, FE, EXISTS> xoptional_assembly<VE, FE, EXISTS>::from_shape(S&& s)
     {
         shape_type shape = xtl::forward_sequence<shape_type>(s);
         return self_type(shape);
@@ -437,9 +449,9 @@ namespace xt
     /**
      * The extended copy constructor.
      */
-    template <class VE, class FE>
+    template <class VE, class FE, bool EXISTS>
     template <class E>
-    inline xoptional_assembly<VE, FE>::xoptional_assembly(const xexpression<E>& e)
+    inline xoptional_assembly<VE, FE, EXISTS>::xoptional_assembly(const xexpression<E>& e)
         : base_type()
     {
         semantic_base::assign(e);
@@ -448,36 +460,36 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class VE, class FE>
+    template <class VE, class FE, bool EXISTS>
     template <class E>
-    inline auto xoptional_assembly<VE, FE>::operator=(const xexpression<E>& e) -> self_type&
+    inline auto xoptional_assembly<VE, FE, EXISTS>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
     //@}
 
-    template <class VE, class FE>
-    inline auto xoptional_assembly<VE, FE>::value_impl() noexcept -> value_expression&
+    template <class VE, class FE, bool EXISTS>
+    inline auto xoptional_assembly<VE, FE, EXISTS>::value_impl() noexcept -> value_expression&
     {
         return m_value;
     }
 
-    template <class VE, class FE>
-    inline auto xoptional_assembly<VE, FE>::value_impl() const noexcept -> const value_expression&
+    template <class VE, class FE, bool EXISTS>
+    inline auto xoptional_assembly<VE, FE, EXISTS>::value_impl() const noexcept -> const value_expression&
     {
         return m_value;
     }
 
-    template <class VE, class FE>
-    inline auto xoptional_assembly<VE, FE>::has_value_impl() noexcept -> flag_expression&
+    template <class VE, class FE, bool EXISTS>
+    inline auto xoptional_assembly<VE, FE, EXISTS>::flag_impl() noexcept -> flag_expression&
     {
-        return m_has_value;
+        return m_flag;
     }
 
-    template <class VE, class FE>
-    inline auto xoptional_assembly<VE, FE>::has_value_impl() const noexcept -> const flag_expression&
+    template <class VE, class FE, bool EXISTS>
+    inline auto xoptional_assembly<VE, FE, EXISTS>::flag_impl() const noexcept -> const flag_expression&
     {
-        return m_has_value;
+        return m_flag;
     }
 
     /*********************************************
@@ -494,37 +506,37 @@ namespace xt
      * @param ve the expression holding the values
      * @param fe the expression holding the missing mask
      */
-    template <class VEC, class FEC>
+    template <class VEC, class FEC, bool EXISTS>
     template <class OVE, class OFE>
-    inline xoptional_assembly_adaptor<VEC, FEC>::xoptional_assembly_adaptor(OVE&& ve, OFE&& fe)
-        : m_value(std::forward<OVE>(ve)), m_has_value(std::forward<OFE>(fe))
+    inline xoptional_assembly_adaptor<VEC, FEC, EXISTS>::xoptional_assembly_adaptor(OVE&& ve, OFE&& fe)
+        : m_value(std::forward<OVE>(ve)), m_flag(std::forward<OFE>(fe))
     {
     }
     //@}
 
-    template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(const self_type& rhs) -> self_type&
+    template <class VEC, class FEC, bool EXISTS>
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::operator=(const self_type& rhs) -> self_type&
     {
         base_type::operator=(rhs);
         m_value = rhs.m_value;
-        m_has_value = rhs.m_has_value;
+        m_flag = rhs.m_flag;
         return *this;
     }
 
-    template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(self_type&& rhs) -> self_type&
+    template <class VEC, class FEC, bool EXISTS>
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::operator=(self_type&& rhs) -> self_type&
     {
         base_type::operator=(std::move(rhs));
         m_value = rhs.m_value;
-        m_has_value = rhs.m_has_value;
+        m_flag = rhs.m_flag;
         return *this;
     }
 
-    template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(temporary_type&& tmp) -> self_type&
+    template <class VEC, class FEC, bool EXISTS>
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::operator=(temporary_type&& tmp) -> self_type&
     {
         m_value = std::move(tmp.value());
-        m_has_value = std::move(tmp.has_value());
+        m_flag = std::move(tmp.flag());
         return *this;
     }
 
@@ -535,36 +547,36 @@ namespace xt
     /**
      * The extended assignment operator.
      */
-    template <class VEC, class FEC>
+    template <class VEC, class FEC, bool EXISTS>
     template <class E>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::operator=(const xexpression<E>& e) -> self_type&
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::operator=(const xexpression<E>& e) -> self_type&
     {
         return semantic_base::operator=(e);
     }
     //@}
 
-    template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::value_impl() noexcept -> value_expression&
+    template <class VEC, class FEC, bool EXISTS>
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::value_impl() noexcept -> value_expression&
     {
         return m_value;
     }
 
-    template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::value_impl() const noexcept -> const value_expression&
+    template <class VEC, class FEC, bool EXISTS>
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::value_impl() const noexcept -> const value_expression&
     {
         return m_value;
     }
 
-    template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::has_value_impl() noexcept -> flag_expression&
+    template <class VEC, class FEC, bool EXISTS>
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::flag_impl() noexcept -> flag_expression&
     {
-        return m_has_value;
+        return m_flag;
     }
 
-    template <class VEC, class FEC>
-    inline auto xoptional_assembly_adaptor<VEC, FEC>::has_value_impl() const noexcept -> const flag_expression&
+    template <class VEC, class FEC, bool EXISTS>
+    inline auto xoptional_assembly_adaptor<VEC, FEC, EXISTS>::flag_impl() const noexcept -> const flag_expression&
     {
-        return m_has_value;
+        return m_flag;
     }
 }
 

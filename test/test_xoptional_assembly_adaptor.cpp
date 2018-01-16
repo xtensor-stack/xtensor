@@ -39,7 +39,7 @@ namespace xt
             adaptor_type b(a);
             compare_shape(a, b);
             EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.flag().data(), b.flag().data());
         }
 
         {
@@ -48,11 +48,11 @@ namespace xt
             flag_array_type hv2 = {{false, true, true}, {false, true, false}};
             adaptor_type c(v2, hv2);
             EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.flag().data(), c.flag().data());
             c = a;
             compare_shape(a, c);
             EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.flag().data(), c.flag().data());
         }
     }
 
@@ -68,7 +68,7 @@ namespace xt
             adaptor_type b(std::move(tmp));
             compare_shape(a, b);
             EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.flag().data(), b.flag().data());
         }
 
         {
@@ -77,12 +77,12 @@ namespace xt
             flag_array_type hv2 = {{false, true, true}, {false, true, false}};
             adaptor_type c(v2, hv2);
             EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.flag().data(), c.flag().data());
             adaptor_type tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
             EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.flag().data(), c.flag().data());
         }
     }
 
@@ -92,7 +92,7 @@ namespace xt
         flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
         test_reshape(a);
-        compare_shape(a.value(), a.has_value());
+        compare_shape(a.value(), a.flag());
     }
 
     TEST(xoptional_assembly_adaptor, access)
