@@ -237,7 +237,7 @@ namespace xt
                                !std::is_integral<STEP>::value, xrange<int>>
         get(std::size_t /*size*/) const
         {
-            return xrange<int>(m_min, m_max);
+            return xrange<int>(static_cast<int>(m_min), static_cast<int>(m_max));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
