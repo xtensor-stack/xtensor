@@ -113,10 +113,10 @@ namespace xt
         inline auto benchmark_stridedview(benchmark::State& state, std::vector<std::size_t> shape)
         {
             xarray<double, L1> x = xt::arange<double>(compute_size(shape));
-            x.reshape(shape);
+            x.resize(shape);
 
             xarray<double, L2> res;
-            res.reshape(std::vector<std::size_t>(shape.rbegin(), shape.rend()));
+            res.resize(std::vector<std::size_t>(shape.rbegin(), shape.rend()));
 
             while (state.KeepRunning())
             {

@@ -42,9 +42,9 @@ namespace xt
         inline void init_xtensor_benchmark(V& lhs, V& rhs, V& res,
                                            std::size_t size0, size_t size1)
         {
-            lhs.reshape({ size0, size1 });
-            rhs.reshape({ size0, size1 });
-            res.reshape({ size0, size1 });
+            lhs.resize({ size0, size1 });
+            rhs.resize({ size0, size1 });
+            res.resize({ size0, size1 });
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
@@ -54,9 +54,9 @@ namespace xt
         {
             using strides_type = typename V::strides_type;
             strides_type str = { size1, 1 };
-            lhs.reshape({ size0, size1 }, str);
-            rhs.reshape({ size0, size1 }, str);
-            res.reshape({ size0, size1 }, str);
+            lhs.resize({ size0, size1 }, str);
+            rhs.resize({ size0, size1 }, str);
+            res.resize({ size0, size1 }, str);
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 

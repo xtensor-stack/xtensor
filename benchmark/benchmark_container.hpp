@@ -26,9 +26,9 @@ namespace xt
         template <class E>
         inline void init_benchmark(E& x, E& y, E& res, typename E::size_type size)
         {
-            x.reshape({ size });
-            y.reshape({ size });
-            res.reshape({ size });
+            x.resize({ size });
+            y.resize({ size });
+            res.resize({ size });
 
             using value_type = typename E::value_type;
             using size_type = typename E::size_type;
@@ -123,10 +123,10 @@ namespace xt
 
             shape_type shape = { 4, 3, 5 };
 
-            x.reshape(shape);
-            y.reshape(shape);
-            z.reshape(shape);
-            res.reshape(shape);
+            x.resize(shape);
+            y.resize(shape);
+            z.resize(shape);
+            res.resize(shape);
 
             for (size_type i = 0; i < shape[0]; ++i)
             {
@@ -171,9 +171,9 @@ namespace xt
 
             shape_type shape = { 100, 100 };
 
-            x.reshape(shape);
-            y.reshape(shape);
-            res.reshape(shape);
+            x.resize(shape);
+            y.resize(shape);
+            res.resize(shape);
 
             for (size_type i = 0; i < shape[0]; ++i)
             {

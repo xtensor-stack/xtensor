@@ -154,6 +154,12 @@ namespace xt
         }
     }
 
+    TEST(xtensor, resize)
+    {
+        xtensor_dynamic a;
+        test_resize<xtensor_dynamic, container_type>(a);
+    }
+
     TEST(xtensor, reshape)
     {
         xtensor_dynamic a;

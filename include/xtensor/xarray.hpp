@@ -239,7 +239,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, layout_type l)
         : base_type()
     {
-        base_type::reshape(shape, l);
+        base_type::resize(shape, l);
     }
 
     /**
@@ -253,7 +253,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const_reference value, layout_type l)
         : base_type()
     {
-        base_type::reshape(shape, l);
+        base_type::resize(shape, l);
         std::fill(m_data.begin(), m_data.end(), value);
     }
 
@@ -266,7 +266,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const strides_type& strides)
         : base_type()
     {
-        base_type::reshape(shape, strides);
+        base_type::resize(shape, strides);
     }
 
     /**
@@ -280,7 +280,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(const shape_type& shape, const strides_type& strides, const_reference value)
         : base_type()
     {
-        base_type::reshape(shape, strides);
+        base_type::resize(shape, strides);
         std::fill(m_data.begin(), m_data.end(), value);
     }
 
@@ -293,7 +293,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(const value_type& t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t), true);
+        base_type::resize(xt::shape<shape_type>(t), true);
         nested_copy(m_data.begin(), t);
     }
 
@@ -323,7 +323,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 1> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -335,7 +335,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 2> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -347,7 +347,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 3> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -359,7 +359,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 4> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
 
@@ -371,7 +371,7 @@ namespace xt
     inline xarray_container<EC, L, SC, Tag>::xarray_container(nested_initializer_list_t<value_type, 5> t)
         : base_type()
     {
-        base_type::reshape(xt::shape<shape_type>(t));
+        base_type::resize(xt::shape<shape_type>(t));
         L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
     //@}
@@ -401,7 +401,7 @@ namespace xt
         : base_type()
     {
         // Avoids unintialized data because of (m_shape == shape) condition
-        // in reshape (called by assign), which is always true when dimension == 0.
+        // in resize (called by assign), which is always true when dimension == 0.
         if (e.derived_cast().dimension() == 0)
         {
             m_data.resize(1);
@@ -472,7 +472,7 @@ namespace xt
     inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(D&& data, const shape_type& shape, layout_type l)
         : base_type(), m_data(std::forward<D>(data))
     {
-        base_type::reshape(shape, l);
+        base_type::resize(shape, l);
     }
 
     /**
@@ -487,7 +487,7 @@ namespace xt
     inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(D&& data, const shape_type& shape, const strides_type& strides)
         : base_type(), m_data(std::forward<D>(data))
     {
-        base_type::reshape(shape, strides);
+        base_type::resize(shape, strides);
     }
     //@}
 

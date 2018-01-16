@@ -7,6 +7,11 @@
 Changelog
 =========
 
+0.15.0 (unreleased)
+-------------------
+
+- change reshape to resize, and add throwing reshape
+
 0.14.1
 ------
 
