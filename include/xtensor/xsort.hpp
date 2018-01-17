@@ -50,7 +50,7 @@ namespace xt
             else
             {
                 n_iters = std::accumulate(ev.shape().begin() + 1, ev.shape().end(),
-                                          (std::size_t) 1, std::multiplies<>());
+                                          std::size_t(1), std::multiplies<>());
                 secondary_stride = static_cast<ptrdiff_t>(ev.strides()[1]);
             }
 
@@ -106,7 +106,7 @@ namespace xt
         {
             auto axis_numbers = arange<std::size_t>(de.shape().size());
             std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
-            permutation.erase(permutation.begin() + (ptrdiff_t) axis);
+            permutation.erase(permutation.begin() + ptrdiff_t(axis));
             if (de.layout() == layout_type::row_major)
             {
                 permutation.push_back(axis);
@@ -121,7 +121,7 @@ namespace xt
             for (auto el : axis_numbers)
             {
                 auto it = std::find(permutation.begin(), permutation.end(), el);
-                reverse_permutation.push_back((std::size_t) std::distance(permutation.begin(), it));
+                reverse_permutation.push_back(std::size_t(std::distance(permutation.begin(), it)));
             }
 
             ev = transpose(de, permutation);
@@ -196,7 +196,7 @@ namespace xt
             }
 
             std::vector<std::size_t> new_shape = e.shape();
-            new_shape.erase(new_shape.begin() + (ptrdiff_t) axis);
+            new_shape.erase(new_shape.begin() + ptrdiff_t(axis));
 
             result_type result(new_shape);
             auto result_iter = result.begin();
@@ -222,7 +222,7 @@ namespace xt
                 E input;
                 auto axis_numbers = arange<std::size_t>(e.shape().size());
                 std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
-                permutation.erase(permutation.begin() + (ptrdiff_t) axis);
+                permutation.erase(permutation.begin() + ptrdiff_t(axis));
                 if (input.layout() == layout_type::row_major)
                 {
                     permutation.push_back(axis);

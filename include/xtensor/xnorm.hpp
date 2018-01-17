@@ -223,7 +223,7 @@ namespace xt
     XTENSOR_NORM_FUNCTION(norm_l0, unsigned long long, XTENSOR_EMPTY, +, std::plus)
     XTENSOR_NORM_FUNCTION(norm_l1, big_promote_type_t<value_type>, XTENSOR_EMPTY, +, std::plus)
     XTENSOR_NORM_FUNCTION(norm_sq, big_promote_type_t<value_type>, XTENSOR_EMPTY, +, std::plus)
-    XTENSOR_NORM_FUNCTION(norm_linf, decltype(norm_linf(*(value_type*)0)), std::max<result_type>, XTENSOR_COMMA, math::maximum)
+    XTENSOR_NORM_FUNCTION(norm_linf, decltype(norm_linf(std::declval<value_type>())), std::max<result_type>, XTENSOR_COMMA, math::maximum)
 
 #undef XTENSOR_EMPTY
 #undef XTENSOR_COMMA

@@ -674,13 +674,13 @@ namespace xt
     template <class T0, class T1>
     struct promote_type<T0, T1>
     {
-        using type = decltype(*(std::decay_t<T0>*)0 + *(std::decay_t<T1>*)0);
+        using type = decltype(std::declval<std::decay_t<T0>>() + std::declval<std::decay_t<T1>>());
     };
 
     template <class T0, class... REST>
     struct promote_type<T0, REST...>
     {
-        using type = decltype(*(std::decay_t<T0>*)0 + *(typename promote_type<REST...>::type*)0);
+        using type = decltype(std::declval<std::decay_t<T0>>() + std::declval<typename promote_type<REST...>::type>());
     };
 
     template <>
@@ -752,7 +752,7 @@ namespace xt
         using std::sqrt;
 
         template <class T>
-        using real_promote_type_t = decltype(sqrt(*(std::decay_t<T>*)0));
+        using real_promote_type_t = decltype(sqrt(std::declval<std::decay_t<T>>()));
     }
 
     /**
@@ -873,7 +873,7 @@ namespace xt
             template <class U>
             static typename U::value_type test(U*, typename U::value_type* = 0);
 
-            using T = decltype(test((ARRAY*)0));
+            using T = decltype(test(std::declval<ARRAY*>()));
 
             static const bool value = !std::is_same<T, void*>::value;
 

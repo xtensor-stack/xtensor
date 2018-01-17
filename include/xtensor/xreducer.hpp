@@ -138,8 +138,8 @@ namespace xt
         {
             std::size_t last_ax = merge_loops(axes.rbegin(), axes.rend());
 
-            iter_shape.erase(iter_shape.begin() + (ptrdiff_t) last_ax, iter_shape.end());
-            iter_strides.erase(iter_strides.begin() + (ptrdiff_t) last_ax, iter_strides.end());
+            iter_shape.erase(iter_shape.begin() + ptrdiff_t(last_ax), iter_shape.end());
+            iter_strides.erase(iter_strides.begin() + ptrdiff_t(last_ax), iter_strides.end());
         }
         else if (e.layout() == layout_type::column_major)
         {
@@ -147,8 +147,8 @@ namespace xt
             std::size_t last_ax = merge_loops(axes.begin(), axes.end());
 
             // erasing the front vs the back
-            iter_shape.erase(iter_shape.begin(), iter_shape.begin() + (ptrdiff_t) last_ax + 1);
-            iter_strides.erase(iter_strides.begin(), iter_strides.begin() + (ptrdiff_t) last_ax + 1);
+            iter_shape.erase(iter_shape.begin(), iter_shape.begin() + ptrdiff_t(last_ax + 1));
+            iter_strides.erase(iter_strides.begin(), iter_strides.begin() + ptrdiff_t(last_ax + 1));
 
             // and reversing, to make it work with the same next_idx function
             std::reverse(iter_shape.begin(), iter_shape.end());
@@ -378,7 +378,7 @@ namespace xt
 
         using substepper_type = typename xexpression_type::const_stepper;
         using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
-            std::declval<init_functor_type>()(**(substepper_type*)0), **(substepper_type*)0))>;
+            std::declval<init_functor_type>()(*std::declval<substepper_type>()), *std::declval<substepper_type>()))>;
         using reference = value_type;
         using const_reference = value_type;
         using pointer = value_type*;
@@ -769,7 +769,7 @@ namespace xt
         size_type dim = 0;
         while (first != last)
         {
-            stepper.step(dim++, (std::size_t) *first++);
+            stepper.step(dim++, std::size_t(*first++));
         }
         return *stepper;
     }
