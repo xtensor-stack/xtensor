@@ -99,12 +99,7 @@ else()
     find_package(benchmark REQUIRED)
 endif()
 
-include_directories(${xtl_INCLUDE_DIRS})
-if (XTENSOR_USE_XSIMD)
-    include_directories(${xsimd_INCLUDE_DIRS})
-endif()
-
-include_directories(${XTENSOR_INCLUDE_DIR} ${GBENCHMARK_INCLUDE_DIRS})
+include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
     benchmark_assign.hpp
@@ -116,7 +111,7 @@ set(XTENSOR_BENCHMARK
 
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
-target_link_libraries(${XTENSOR_BENCHMARK_TARGET} ${GBENCHMARK_LIBRARIES})
+target_link_libraries(${XTENSOR_BENCHMARK_TARGET} xtensor ${GBENCHMARK_LIBRARIES})
 
 add_custom_target(xbenchmark
     COMMAND benchmark_xtensor
