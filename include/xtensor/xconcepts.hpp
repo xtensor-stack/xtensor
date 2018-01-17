@@ -81,7 +81,7 @@ namespace xt
         static const bool value =
             std::is_array<T>::value ||
             std::is_pointer<T>::value ||
-            std::is_same<decltype(test((V*)0)), int>::value;
+            std::is_same<decltype(test(std::declval<V*>())), int>::value;
     };
 
         /** @brief Check if a conversion may loose information.

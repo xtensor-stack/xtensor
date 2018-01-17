@@ -63,8 +63,8 @@ namespace xt
                                 unsigned char v_minor = 0)
         {
             ostream.write(magic_string, magic_string_length);
-            ostream.put((char)v_major);
-            ostream.put((char)v_minor);
+            ostream.put(char(v_major));
+            ostream.put(char(v_minor));
         }
 
         inline void read_magic(std::istream& istream,
@@ -87,8 +87,8 @@ namespace xt
                 }
             }
 
-            *v_major = (unsigned char)buf[magic_string_length];
-            *v_minor = (unsigned char)buf[magic_string_length + 1];
+            *v_major = static_cast<unsigned char>(buf[magic_string_length]);
+            *v_minor = static_cast<unsigned char>(buf[magic_string_length + 1]);
             delete[] buf;
         }
 
@@ -403,21 +403,21 @@ namespace xt
             if (version[0] == 1 && version[1] == 0)
             {
                 char header_len_le16[2];
-                uint16_t header_len = (uint16_t)header.length();
+                uint16_t header_len = uint16_t(header.length());
 
-                header_len_le16[0] = (char)((header_len >> 0) & 0xff);
-                header_len_le16[1] = (char)((header_len >> 8) & 0xff);
+                header_len_le16[0] = char((header_len >> 0) & 0xff);
+                header_len_le16[1] = char((header_len >> 8) & 0xff);
                 out.write(reinterpret_cast<char*>(header_len_le16), 2);
             }
             else
             {
                 char header_len_le32[4];
-                uint32_t header_len = (uint32_t)header.length();
+                uint32_t header_len = uint32_t(header.length());
 
-                header_len_le32[0] = (char)((header_len >> 0) & 0xff);
-                header_len_le32[1] = (char)((header_len >> 8) & 0xff);
-                header_len_le32[2] = (char)((header_len >> 16) & 0xff);
-                header_len_le32[3] = (char)((header_len >> 24) & 0xff);
+                header_len_le32[0] = char((header_len >> 0) & 0xff);
+                header_len_le32[1] = char((header_len >> 8) & 0xff);
+                header_len_le32[2] = char((header_len >> 16) & 0xff);
+                header_len_le32[3] = char((header_len >> 24) & 0xff);
                 out.write(reinterpret_cast<char*>(header_len_le32), 4);
             }
 
@@ -430,7 +430,7 @@ namespace xt
             char header_len_le16[2];
             istream.read(header_len_le16, 2);
 
-            uint16_t header_length = (uint16_t)(header_len_le16[0] << 0) | (uint16_t)(header_len_le16[1] << 8);
+            uint16_t header_length = uint16_t(header_len_le16[0] << 0) | uint16_t(header_len_le16[1] << 8);
 
             if ((magic_string_length + 2 + 2 + header_length) % 16 != 0)
             {
@@ -451,8 +451,8 @@ namespace xt
             char header_len_le32[4];
             istream.read(header_len_le32, 4);
 
-            uint32_t header_length = (uint32_t)(header_len_le32[0] << 0) | (uint32_t)(header_len_le32[1] << 8) |
-                (uint32_t)(header_len_le32[2] << 16) | (uint32_t)(header_len_le32[3] << 24);
+            uint32_t header_length = uint32_t(header_len_le32[0] << 0) | uint32_t(header_len_le32[1] << 8) |
+                uint32_t(header_len_le32[2] << 16) | uint32_t(header_len_le32[3] << 24);
 
             if ((magic_string_length + 2 + 4 + header_length) % 16 != 0)
             {
@@ -476,7 +476,7 @@ namespace xt
                 : m_shape(shape), m_fortran_order(fortran_order), m_typestring(typestring)
             {
                 // Allocate memory
-                m_word_size = (std::size_t)atoi(&typestring[2]);
+                m_word_size = std::size_t(atoi(&typestring[2]));
                 m_n_bytes = compute_size(shape) * m_word_size;
                 m_buffer = new char[m_n_bytes];
             }
@@ -625,7 +625,7 @@ namespace xt
 
             npy_file result(shape, fortran_order, typestr);
             // read the data
-            stream.read(result.ptr(), (std::streamsize)(result.n_bytes()));
+            stream.read(result.ptr(), std::streamsize((result.n_bytes())));
             return result;
         }
 
@@ -648,7 +648,7 @@ namespace xt
 
             std::size_t size = compute_size(shape);
             stream.write(reinterpret_cast<const char*>(eval_ex.raw_data()),
-                         (std::streamsize)(sizeof(value_type) * size));
+                         std::streamsize((sizeof(value_type) * size)));
         }
     }  // namespace detail
 

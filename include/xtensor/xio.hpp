@@ -260,7 +260,7 @@ namespace xt
                     precision_type decimals = 1;  // print a leading 0
                     if (std::floor(m_max) != 0)
                     {
-                        decimals += (precision_type)std::log10(std::floor(m_max));
+                        decimals += precision_type(std::log10(std::floor(m_max)));
                     }
                     // 2 => sign and dot
                     m_width = 2 + decimals + m_precision;
@@ -320,7 +320,7 @@ namespace xt
                 {
                     if (!m_scientific || !m_large_exponent)
                     {
-                        int exponent = 1 + (int)std::log10(math::abs(val));
+                        int exponent = 1 + int(std::log10(math::abs(val)));
                         if (exponent <= -5 || exponent > 7)
                         {
                             m_scientific = true;
@@ -378,7 +378,7 @@ namespace xt
             void init()
             {
                 m_it = m_cache.cbegin();
-                m_width = 1 + (precision_type)std::log10(m_max) + m_sign;
+                m_width = 1 + precision_type(std::log10(m_max)) + m_sign;
             }
 
             std::ostream& print_next(std::ostream& out)
@@ -644,7 +644,7 @@ namespace xt
             return out;
         }
 
-        precision_type temp_precision = (precision_type)out.precision();
+        precision_type temp_precision = precision_type(out.precision());
         precision_type precision = temp_precision;
         if (print_options::print_options().precision != -1)
         {

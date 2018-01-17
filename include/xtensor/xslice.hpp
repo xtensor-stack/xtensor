@@ -257,7 +257,7 @@ namespace xt
                                 !std::is_integral<STEP>::value, xrange<std::size_t>>
         get(std::size_t size) const
         {
-            return xrange<std::size_t>((std::size_t)m_min, size);
+            return xrange<std::size_t>(std::size_t(m_min), size);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -266,7 +266,7 @@ namespace xt
                                 !std::is_integral<STEP>::value, xrange<std::size_t>>
         get(std::size_t /*size*/) const
         {
-            return xrange<std::size_t>(0, (std::size_t)m_max);
+            return xrange<std::size_t>(0, std::size_t(m_max));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -460,7 +460,7 @@ namespace xt
 
     template <class T>
     inline xstepped_range<T>::xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept
-        : m_min(min_val), m_size((size_type)std::ceil(double(max_val - min_val) / double(step))), m_step(step)
+        : m_min(min_val), m_size(size_type(std::ceil(double(max_val - min_val) / double(step)))), m_step(step)
     {
     }
 

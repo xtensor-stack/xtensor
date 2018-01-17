@@ -41,7 +41,7 @@ namespace xt
     {
         xarray<double> a = {{5, 3, 1}, {4, 4, 4}};
         xarray<double> b = {1,3,4,-100};
-        xarray<double, (layout_type) ((int) DEFAULT_LAYOUT & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
+        xarray<double, layout_type(int(DEFAULT_LAYOUT) & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
 
         xarray<std::size_t> ex;
 

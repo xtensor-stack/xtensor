@@ -636,11 +636,11 @@ namespace xt
     {
         EXPECT_EQ(math::abs(1ul), 1ul);
         EXPECT_EQ(math::abs(1u), 1u);
-        EXPECT_EQ(math::abs((unsigned char) 1), (unsigned char) 1);
-        EXPECT_EQ(math::abs((char) 1), 1);
-        EXPECT_EQ(math::abs((int) 1), 1);
-        EXPECT_EQ(math::abs((int) -1), 1);
-        EXPECT_EQ(math::abs((long) -1), (long) 1);
+        EXPECT_EQ(math::abs(static_cast<unsigned char>(1)), static_cast<unsigned char>(1));
+        EXPECT_EQ(math::abs(char(1)), 1);
+        EXPECT_EQ(math::abs(int(1)), 1);
+        EXPECT_EQ(math::abs(int(-1)), 1);
+        EXPECT_EQ(math::abs(long(-1)), long(1));
         EXPECT_EQ(math::abs(-1.5), 1.5);
     }
 
