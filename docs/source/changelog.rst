@@ -10,7 +10,38 @@ Changelog
 0.15.0 (unreleased)
 -------------------
 
-- change reshape to resize, and add throwing reshape
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- change ``reshape`` to ``resize``, and add throwing ``reshape``
+  `#598 <https://github.com/QuantStack/xtensor/pull/598>`_.
+- moved to modern cmake
+  `#611 <https://github.com/QuantStack/xtensor/pull/611>`_.
+
+New features
+~~~~~~~~~~~~
+
+- unravel function
+  `#589 <https://github.com/QuantStack/xtensor/pull/589>`_.
+- random access iterators
+  `#596 <https://github.com/QuantStack/xtensor/pull/596>`_.
+
+
+Other changes
+~~~~~~~~~~~~~
+
+- upgraded to google/benchmark version 1.3.0
+  `#583 <https://github.com/QuantStack/xtensor/pull/583>`_.
+- ``XTENSOR_ASSERT`` renamed into ``XTENSOR_TRY``, new ``XTENSOR_ASSERT``
+  `#603 <https://github.com/QuantStack/xtensor/pull/603>`_.
+- ``adapt`` fixed
+  `#604 <https://github.com/QuantStack/xtensor/pull/604>`_.
+- VC14 warnings removed
+  `#608 <https://github.com/QuantStack/xtensor/pull/608>`_.
+- ``xfunctor_iterator`` is now a random access iterator
+  `#609 <https://github.com/QuantStack/xtensor/pull/609>`_.
+- removed ``old-style-cast`` warnings
+  `#610 <https://github.com/QuantStack/xtensor/pull/610>`_.
 
 0.14.1
 ------
