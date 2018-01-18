@@ -460,7 +460,7 @@ namespace xt
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
 
         std::array<std::size_t, 3> idx3 = {1, 2};
-        EXPECT_EQ(a(1, 2), view3.element(idx2.begin(), idx2.end()));
+        EXPECT_EQ(a(1, 2), view3.element(idx3.begin(), idx3.end()));
     }
 
     TEST(xview, newaxis_iterating)
