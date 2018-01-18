@@ -501,9 +501,6 @@ namespace xt
     inline auto reduce(F&& f, E&& e, const I (&axes)[N], ES evaluation_strategy) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
-        // using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
-        // return reducer_type(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
-        auto ar = arange(e.dimension());
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
 
     }
