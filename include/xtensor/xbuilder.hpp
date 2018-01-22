@@ -96,8 +96,8 @@ namespace xt
     {
 
 
-        template<class T, std::size_t INDEX>
-        class index_impl{
+        template<class T, std::size_t DIM, std::size_t INDEX>
+        class index_object_impl{
         public:
 
             using value_type = T;
@@ -297,7 +297,7 @@ namespace xt
     inline auto index_object() noexcept
     {
         const std::size_t shape = 1;
-        return detail::make_xgenerator(detail::index_impl<T,INDEX>(), {shape});
+        return detail::make_xgenerator(detail::index_object_impl<T,1,INDEX>(), {shape});
     }
 
 
