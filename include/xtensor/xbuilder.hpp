@@ -94,7 +94,9 @@ namespace xt
     namespace detail
     {
 
-
+        // to implement blitz index placeholders
+        // see 3.6: Index placeholders
+        // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
         template<class T, std::size_t DIM, std::size_t INDEX>
         class index_expr_impl{
         public:
@@ -106,14 +108,12 @@ namespace xt
             template <class... Args>
             inline T operator()(Args... args) const
             {
-                //std::cout<<"operator() len(args) "<<sizeof...(Args)<<"\n";
                 return access_impl<0>(args...);
             }
 
             template <class It>
             inline T element(It first, It last) const
             {
-                //std::cout<<"element() len(iter) "<<std::distance(first,last)<<"\n";
                 return element_impl<0>(first);
             }
 
@@ -129,7 +129,6 @@ namespace xt
             template <std::size_t I, class T1, class... Args>
             inline T access_impl(T1 t, Args...args) const
             {
-                //std::cout<<"index "<<I<<" "<<t<<"\n";
                 return (I == INDEX ?  T(t) : access_impl<I+1>(args ...));
             }
 
@@ -290,9 +289,9 @@ namespace xt
 
 
 
-    /**
-     * TODO
-     */
+    // to implement blitz index placeholders
+    // see 3.6: Index placeholders
+    // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
     template <class T, std::size_t DIM, std::size_t INDEX>
     inline auto index_expr() noexcept
     {
