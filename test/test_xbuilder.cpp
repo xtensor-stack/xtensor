@@ -14,7 +14,6 @@
 #include <sstream>
 
 
-#include <iostream> // remove me
 
 namespace xt
 {
@@ -50,18 +49,6 @@ namespace xt
         ASSERT_EQ(int(2), res(1));
         ASSERT_EQ(int(4), res(2));
 
-
-
-
-        // ASSERT_EQ(size_t(2), m.dimension());
-        // ASSERT_EQ(1.0, m(0, 1));
-        // xarray<double> m_assigned = m;
-        // ASSERT_EQ(1.0, m_assigned(0, 1));
-
-        // // assignment with narrowing type cast
-        // // (check that the compiler doesn't issue a warning)
-        // xarray<uint8_t> c = cast<uint8_t>(m);
-        // ASSERT_EQ(1, c(0, 1));
     }
 
     TEST(xbuilder, index_expr_2D_a)
@@ -96,6 +83,7 @@ namespace xt
         // second index
         auto i1 = index_expr<int,2, 1>();
 
+        // nontrivial expression
         auto res_a  = a + b*(i0+1) + (c  * i1)+2;
         auto res_b  = a + (1+i0)*b + (i1 * c )+2;
 

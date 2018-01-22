@@ -31,7 +31,6 @@
 #include "xgenerator.hpp"
 #include "xoperation.hpp"
 
-#include <iostream> // remove me
 
 namespace xt
 {
