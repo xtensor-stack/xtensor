@@ -98,7 +98,7 @@ namespace xt
         // see 3.6: Index placeholders
         // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
         template<class T, std::size_t DIM, std::size_t INDEX>
-        class index_expr_impl{
+        class index_placeholder_impl{
         public:
 
             using value_type = T;
@@ -293,13 +293,13 @@ namespace xt
     // see 3.6: Index placeholders
     // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
     template <class T, std::size_t DIM, std::size_t INDEX>
-    inline auto index_expr() noexcept
+    inline auto index_placeholder() noexcept
     {
         // todo make efficient
         std::array<std::size_t, DIM> shape;
         std::fill(shape.begin(), shape.end(), 1);
         
-        return detail::make_xgenerator(detail::index_expr_impl<T,DIM,INDEX>(), shape);
+        return detail::make_xgenerator(detail::index_placeholder_impl<T,DIM,INDEX>(), shape);
     }
 
 
