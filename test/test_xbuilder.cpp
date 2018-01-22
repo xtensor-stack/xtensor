@@ -64,7 +64,7 @@ namespace xt
         // ASSERT_EQ(1, c(0, 1));
     }
 
-    TEST(xbuilder, index_expr_2D)
+    TEST(xbuilder, index_expr_2D_a)
     {
         auto m  = ones<int>({2,3});
         auto i0 = index_expr<int,2, 0>();
@@ -81,17 +81,40 @@ namespace xt
         ASSERT_EQ(int(1+1+2*0), res(1,0));
         ASSERT_EQ(int(1+1+2*1), res(1,1));
         ASSERT_EQ(int(1+1+2*2), res(1,2));
+    }
+
+    TEST(xbuilder, index_expr_2D_b)
+    {
+        auto a  = 2*ones<int>({2,3});
+        auto b  = 3*ones<int>({2,3});
+        auto c  = 4*ones<int>({1,1});
+
+        auto i0 = index_expr<int,2, 0>();
+        auto i1 = index_expr<int,2, 1>();
+
+        auto res_a  = a + b*(i0+1) + (c  * i1)+2;
+        auto res_b  = a + (1+i0)*b + (i1 * c )+2;
+
+        ASSERT_EQ(size_t(2), res_a.shape()[0]);
+        ASSERT_EQ(size_t(3), res_a.shape()[1]);
+
+        ASSERT_EQ(size_t(2), res_b.shape()[0]);
+        ASSERT_EQ(size_t(3), res_b.shape()[1]);
 
 
-        // ASSERT_EQ(size_t(2), m.dimension());
-        // ASSERT_EQ(1.0, m(0, 1));
-        // xarray<double> m_assigned = m;
-        // ASSERT_EQ(1.0, m_assigned(0, 1));
+        ASSERT_EQ(int(2 + 3*(0+1) + 4*0+2), res_a(0,0));
+        ASSERT_EQ(int(2 + 3*(0+1) + 4*1+2), res_a(0,1));
+        ASSERT_EQ(int(2 + 3*(0+1) + 4*2+2), res_a(0,2));
+        ASSERT_EQ(int(2 + 3*(1+1) + 4*0+2), res_a(1,0));
+        ASSERT_EQ(int(2 + 3*(1+1) + 4*1+2), res_a(1,1));
+        ASSERT_EQ(int(2 + 3*(1+1) + 4*2+2), res_a(1,2));
 
-        // // assignment with narrowing type cast
-        // // (check that the compiler doesn't issue a warning)
-        // xarray<uint8_t> c = cast<uint8_t>(m);
-        // ASSERT_EQ(1, c(0, 1));
+        ASSERT_EQ(res_a(0,0), res_b(0,0));
+        ASSERT_EQ(res_a(0,1), res_b(0,1));
+        ASSERT_EQ(res_a(0,2), res_b(0,2));
+        ASSERT_EQ(res_a(1,0), res_b(1,0));
+        ASSERT_EQ(res_a(1,1), res_b(1,1));
+        ASSERT_EQ(res_a(1,2), res_b(1,2));
     }
 
     TEST(xbuilder, arange_simple)
