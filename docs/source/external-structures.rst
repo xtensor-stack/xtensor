@@ -39,7 +39,7 @@ that is:
 - usual typedefs for STL sequences
 - random access methods (``operator[]``, ``front``, ``back`` and ``data``)
 - iterator methods (``begin``, ``end``, ``cbegin``, ``cend``)
-- ``size`` and ``resize`` methods
+- ``size`` and ``reshape``, ``resize`` methods
 
 ``xtensor`` does not require that the container has a contiguous memory layout, only that it
 provides the aforementioned interface. In fact, the container could even be backed by a
@@ -118,9 +118,6 @@ Thanks to the previous structures definition, inheriting from ``xcontainer`` bri
 API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the
 support for mathematical operations.
 
-NOTE: if we were to design a class that takes a reference on ``raw_tensor`` instead of embedding an instance,
-we would inherit from ``xadaptor_semantic`` instead of ``xcontainer_semantic``.
-
 Define semantic
 ~~~~~~~~~~~~~~~
 
@@ -172,11 +169,11 @@ The last two methods are extended copy constructor and assign operator. They all
     // .... init a, b and c
     tnesor_type d = a + b - c;
 
-Implement the reshape methods
+Implement the resize methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The next methods to define are the overloads of ``reshape``. ``xtensor`` provides utilities functions to
-compute strides based on the shape and the layout, so the implementation of the ``reshape`` overloads
+The next methods to define are the overloads of ``resize``. ``xtensor`` provides utilities functions to
+compute strides based on the shape and the layout, so the implementation of the ``resize`` overloads
 is straightforward:
 
 .. code::
@@ -184,14 +181,14 @@ is straightforward:
     #include "xtensor/xstrides.hpp" // for utitilities functions
 
     template <class T>
-    void reshape(const shape_type& shape)
+    void resize(const shape_type& shape)
     {
         if(m_shape != shape)
-            reshape(shape, layout::row_major);
+            resize(shape, layout::row_major);
     }
 
     template <class T>
-    void reshape(const shape_type& shape, layout l)
+    void resize(const shape_type& shape, layout l)
     {
         m_raw.m_shape = shape;
         m_raw.m_strides.resize(shape.size());
@@ -201,7 +198,7 @@ is straightforward:
     }
 
     template <class T>
-    void reshape(const shape_type& shape, const strides_type& strides)
+    void resize(const shape_type& shape, const strides_type& strides)
     {
         m_raw.m_shape = shape;
         m_raw.m_strides = strides;
@@ -445,7 +442,7 @@ This part is relatively straightforward:
         return false;
     }
 
-Implement reshape overloads
+Implement resize overloads
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 This is very similar to what must be done for one-dimensional containers,

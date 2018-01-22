@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    using vector_type = uvector<double>;
+    using vector_type = uvector<double, DEFAULT_ALLOCATOR(double)>;
 
     TEST(uvector, constructor)
     {
@@ -73,4 +73,3 @@ namespace xt
         }
     }
 }
-

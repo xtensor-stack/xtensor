@@ -6,12 +6,13 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XVECTORIZE_HPP
-#define XVECTORIZE_HPP
+#ifndef XTENSOR_VECTORIZE_HPP
+#define XTENSOR_VECTORIZE_HPP
 
 #include <type_traits>
 #include <utility>
 
+#include "xfunction.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -53,7 +54,7 @@ namespace xt
     xvectorizer<F, R> vectorize(F&& f, R (*)(Args...));
 
     template <class F>
-    auto vectorize(F&& f) -> decltype(vectorize(std::forward<F>(f), (detail::get_function_type<F>*)nullptr));
+    auto vectorize(F&& f) -> decltype(vectorize(std::forward<F>(f), std::declval<detail::get_function_type<F>*>()));
 
     /******************************
      * xvectorizer implementation *
@@ -86,9 +87,9 @@ namespace xt
     }
 
     template <class F>
-    inline auto vectorize(F&& f) -> decltype(vectorize(std::forward<F>(f), (detail::get_function_type<F>*)nullptr))
+    inline auto vectorize(F&& f) -> decltype(vectorize(std::forward<F>(f), std::declval<detail::get_function_type<F>*>()))
     {
-        return vectorize(std::forward<F>(f), (detail::get_function_type<F>*)nullptr);
+        return vectorize(std::forward<F>(f), static_cast<detail::get_function_type<F>*>(nullptr));
     }
 }
 

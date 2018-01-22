@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XITERABLE_HPP
-#define XITERABLE_HPP
+#ifndef XTENSOR_ITERABLE_HPP
+#define XTENSOR_ITERABLE_HPP
 
 #include "xiterator.hpp"
 
@@ -135,14 +135,14 @@ namespace xt
     private:
 
         template <layout_type L>
-        const_layout_iterator<L> get_cbegin(bool reverse) const noexcept;
+        const_layout_iterator<L> get_cbegin(bool end_index) const noexcept;
         template <layout_type L>
-        const_layout_iterator<L> get_cend(bool reverse) const noexcept;
+        const_layout_iterator<L> get_cend(bool end_index) const noexcept;
 
         template <class S, layout_type L>
-        const_broadcast_iterator<S, L> get_cbegin(const S& shape, bool reverse) const noexcept;
+        const_broadcast_iterator<S, L> get_cbegin(const S& shape, bool end_index) const noexcept;
         template <class S, layout_type L>
-        const_broadcast_iterator<S, L> get_cend(const S& shape, bool reverse) const noexcept;
+        const_broadcast_iterator<S, L> get_cend(const S& shape, bool end_index) const noexcept;
 
         template <class S>
         const_stepper get_stepper_begin(const S& shape) const noexcept;
@@ -242,14 +242,14 @@ namespace xt
     private:
 
         template <layout_type L>
-        layout_iterator<L> get_begin(bool reverse) noexcept;
+        layout_iterator<L> get_begin(bool end_index) noexcept;
         template <layout_type L>
-        layout_iterator<L> get_end(bool reverse) noexcept;
+        layout_iterator<L> get_end(bool end_index) noexcept;
 
         template <class S, layout_type L>
-        broadcast_iterator<S, L> get_begin(const S& shape, bool reverse) noexcept;
+        broadcast_iterator<S, L> get_begin(const S& shape, bool end_index) noexcept;
         template <class S, layout_type L>
-        broadcast_iterator<S, L> get_end(const S& shape, bool reverse) noexcept;
+        broadcast_iterator<S, L> get_end(const S& shape, bool end_index) noexcept;
 
         template <class S>
         stepper get_stepper_begin(const S& shape) noexcept;
@@ -317,7 +317,7 @@ namespace xt
     template <layout_type L>
     inline auto xconst_iterable<D>::cend() const noexcept -> const_layout_iterator<L>
     {
-        return get_cend<L>(false);
+        return get_cend<L>(true);
     }
     //@}
 
@@ -368,7 +368,7 @@ namespace xt
     template <layout_type L>
     inline auto xconst_iterable<D>::crend() const noexcept -> const_reverse_layout_iterator<L>
     {
-        return const_reverse_layout_iterator<L>(get_cbegin<L>(true));
+        return const_reverse_layout_iterator<L>(get_cbegin<L>(false));
     }
     //@}
 
@@ -429,7 +429,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xconst_iterable<D>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return get_cend<S, L>(shape, false);
+        return get_cend<S, L>(shape, true);
     }
     //@}
 
@@ -490,7 +490,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xconst_iterable<D>::crend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
-        return const_reverse_broadcast_iterator<S, L>(get_cbegin<S, L>(shape, true));
+        return const_reverse_broadcast_iterator<S, L>(get_cbegin<S, L>(shape, false));
     }
     //@}
 
@@ -552,30 +552,30 @@ namespace xt
 
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::get_cbegin(bool reverse) const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::get_cbegin(bool end_index) const noexcept -> const_layout_iterator<L>
     {
-        return const_layout_iterator<L>(get_stepper_begin(get_shape()), &get_shape(), reverse);
+        return const_layout_iterator<L>(get_stepper_begin(get_shape()), &get_shape(), end_index);
     }
 
     template <class D>
     template <layout_type L>
-    inline auto xconst_iterable<D>::get_cend(bool reverse) const noexcept -> const_layout_iterator<L>
+    inline auto xconst_iterable<D>::get_cend(bool end_index) const noexcept -> const_layout_iterator<L>
     {
-        return const_layout_iterator<L>(get_stepper_end(get_shape(), L), &get_shape(), reverse);
+        return const_layout_iterator<L>(get_stepper_end(get_shape(), L), &get_shape(), end_index);
     }
 
     template <class D>
     template <class S, layout_type L>
-    inline auto xconst_iterable<D>::get_cbegin(const S& shape, bool reverse) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::get_cbegin(const S& shape, bool end_index) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return const_broadcast_iterator<S, L>(get_stepper_begin(shape), shape, reverse);
+        return const_broadcast_iterator<S, L>(get_stepper_begin(shape), shape, end_index);
     }
 
     template <class D>
     template <class S, layout_type L>
-    inline auto xconst_iterable<D>::get_cend(const S& shape, bool reverse) const noexcept -> const_broadcast_iterator<S, L>
+    inline auto xconst_iterable<D>::get_cend(const S& shape, bool end_index) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return const_broadcast_iterator<S, L>(get_stepper_end(shape, L), shape, reverse);
+        return const_broadcast_iterator<S, L>(get_stepper_end(shape, L), shape, end_index);
     }
 
     template <class D>
@@ -611,7 +611,7 @@ namespace xt
     /**
      * @name Iterators
      */
-     //@{
+    //@{
     /**
      * Returns an iterator to the first element of the expression.
      * @tparam L layout used for the traversal. Default value is \c DEFAULT_LAYOUT.
@@ -632,7 +632,7 @@ namespace xt
     template <layout_type L>
     inline auto xiterable<D>::end() noexcept -> layout_iterator<L>
     {
-        return get_end<L>(false);
+        return get_end<L>(true);
     }
     //@}
 
@@ -660,7 +660,7 @@ namespace xt
     template <layout_type L>
     inline auto xiterable<D>::rend() noexcept -> reverse_layout_iterator<L>
     {
-        return reverse_layout_iterator<L>(get_begin<L>(true));
+        return reverse_layout_iterator<L>(get_begin<L>(false));
     }
     //@}
 
@@ -693,7 +693,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xiterable<D>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
     {
-        return get_end<S, L>(shape, false);
+        return get_end<S, L>(shape, true);
     }
     //@}
 
@@ -726,7 +726,7 @@ namespace xt
     template <class S, layout_type L>
     inline auto xiterable<D>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
     {
-        return reverse_broadcast_iterator<S, L>(get_begin<S, L>(shape, true));
+        return reverse_broadcast_iterator<S, L>(get_begin<S, L>(shape, false));
     }
     //@}
 
@@ -760,30 +760,30 @@ namespace xt
 
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::get_begin(bool reverse) noexcept -> layout_iterator<L>
+    inline auto xiterable<D>::get_begin(bool end_index) noexcept -> layout_iterator<L>
     {
-        return layout_iterator<L>(get_stepper_begin(this->get_shape()), &(this->get_shape()), reverse);
+        return layout_iterator<L>(get_stepper_begin(this->get_shape()), &(this->get_shape()), end_index);
     }
 
     template <class D>
     template <layout_type L>
-    inline auto xiterable<D>::get_end(bool reverse) noexcept -> layout_iterator<L>
+    inline auto xiterable<D>::get_end(bool end_index) noexcept -> layout_iterator<L>
     {
-        return layout_iterator<L>(get_stepper_end(this->get_shape(), L), &(this->get_shape()), reverse);
+        return layout_iterator<L>(get_stepper_end(this->get_shape(), L), &(this->get_shape()), end_index);
     }
 
     template <class D>
     template <class S, layout_type L>
-    inline auto xiterable<D>::get_begin(const S& shape, bool reverse) noexcept -> broadcast_iterator<S, L>
+    inline auto xiterable<D>::get_begin(const S& shape, bool end_index) noexcept -> broadcast_iterator<S, L>
     {
-        return broadcast_iterator<S, L>(get_stepper_begin(shape), shape, reverse);
+        return broadcast_iterator<S, L>(get_stepper_begin(shape), shape, end_index);
     }
 
     template <class D>
     template <class S, layout_type L>
-    inline auto xiterable<D>::get_end(const S& shape, bool reverse) noexcept -> broadcast_iterator<S, L>
+    inline auto xiterable<D>::get_end(const S& shape, bool end_index) noexcept -> broadcast_iterator<S, L>
     {
-        return broadcast_iterator<S, L>(get_stepper_end(shape, L), shape, reverse);
+        return broadcast_iterator<S, L>(get_stepper_end(shape, L), shape, end_index);
     }
 
     template <class D>

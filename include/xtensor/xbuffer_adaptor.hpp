@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XBUFFER_ADAPTOR_HPP
-#define XBUFFER_ADAPTOR_HPP
+#ifndef XTENSOR_BUFFER_ADAPTOR_HPP
+#define XTENSOR_BUFFER_ADAPTOR_HPP
 
 #include <algorithm>
 #include <functional>
@@ -15,10 +15,16 @@
 #include <memory>
 #include <stdexcept>
 
+#include "xtl/xclosure.hpp"
+
 #include "xstorage.hpp"
 
 namespace xt
 {
+    /******************************
+     * xbuffer_adator declaration *
+     ******************************/
+
     struct no_ownership
     {
     };
@@ -27,15 +33,21 @@ namespace xt
     {
     };
 
+    template <class CP, class O = no_ownership, class A = std::allocator<std::remove_pointer_t<std::remove_reference_t<CP>>>>
+    class xbuffer_adaptor;
+
+    /*********************************
+     * xbuffer_adator implementation *
+     *********************************/
+
     namespace detail
     {
-
-        template <class T, class A>
+        template <class CP, class A>
         class xbuffer_storage
         {
         public:
 
-            using self_type = xbuffer_storage<T, A>;
+            using self_type = xbuffer_storage<CP, A>;
             using allocator_type = A;
             using value_type = typename allocator_type::value_type;
             using reference = typename allocator_type::reference;
@@ -46,7 +58,9 @@ namespace xt
             using difference_type = typename allocator_type::difference_type;
 
             xbuffer_storage();
-            xbuffer_storage(T*& data, size_type size, const allocator_type& alloc = allocator_type());
+
+            template <class P>
+            xbuffer_storage(P&& data, size_type size, const allocator_type& alloc = allocator_type());
 
             size_type size() const noexcept;
             void resize(size_type size);
@@ -62,12 +76,12 @@ namespace xt
             size_type m_size;
         };
 
-        template <class T, class A>
+        template <class CP, class A>
         class xbuffer_owner_storage
         {
         public:
 
-            using self_type = xbuffer_owner_storage<T, A>;
+            using self_type = xbuffer_owner_storage<CP, A>;
             using allocator_type = A;
             using value_type = typename allocator_type::value_type;
             using reference = typename allocator_type::reference;
@@ -77,8 +91,11 @@ namespace xt
             using size_type = typename allocator_type::size_type;
             using difference_type = typename allocator_type::difference_type;
 
-            xbuffer_owner_storage();
-            xbuffer_owner_storage(T*& data, size_type size, const allocator_type& alloc = allocator_type());
+            xbuffer_owner_storage() = default;
+
+            template <class P>
+            xbuffer_owner_storage(P&& data, size_type size, const allocator_type& alloc = allocator_type());
+
             ~xbuffer_owner_storage();
 
             xbuffer_owner_storage(const self_type&) = delete;
@@ -99,33 +116,34 @@ namespace xt
 
         private:
 
-            pointer* p_data;
+            xtl::xclosure_wrapper<CP> m_data;
             size_type m_size;
+            bool m_moved_from;
             allocator_type m_allocator;
         };
 
-        template <class T, class A, class O>
+        template <class CP, class A, class O>
         struct get_buffer_storage
         {
-            using type = xbuffer_storage<T, A>;
+            using type = xbuffer_storage<CP, A>;
         };
 
-        template <class T, class A>
-        struct get_buffer_storage<T, A, acquire_ownership>
+        template <class CP, class A>
+        struct get_buffer_storage<CP, A, acquire_ownership>
         {
-            using type = xbuffer_owner_storage<T, A>;
+            using type = xbuffer_owner_storage<CP, A>;
         };
 
-        template <class T, class A, class O>
-        using buffer_storage_t = typename get_buffer_storage<T, A, O>::type;
+        template <class CP, class A, class O>
+        using buffer_storage_t = typename get_buffer_storage<CP, A, O>::type;
     }
 
-    template <class T, class O = no_ownership, class A = std::allocator<T>>
-    class xbuffer_adaptor : private detail::buffer_storage_t<T, A, O>
+    template <class CP, class O, class A>
+    class xbuffer_adaptor : private detail::buffer_storage_t<CP, A, O>
     {
     public:
 
-        using base_type = detail::buffer_storage_t<T, A, O>;
+        using base_type = detail::buffer_storage_t<CP, A, O>;
         using allocator_type = typename base_type::allocator_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
@@ -143,11 +161,8 @@ namespace xt
 
         xbuffer_adaptor() = default;
 
-        template <class OW = O, class = std::enable_if_t<std::is_same<OW, acquire_ownership>::value>>
-        xbuffer_adaptor(T*& data, size_type size, const allocator_type& alloc = allocator_type());
-
-        template <class OW = O, class = std::enable_if_t<std::is_same<OW, no_ownership>::value>>
-        xbuffer_adaptor(T* data, size_type size, const allocator_type& alloc = allocator_type());
+        template <class P>
+        xbuffer_adaptor(P&& data, size_type size, const allocator_type& alloc = allocator_type());
 
         bool empty() const noexcept;
         using base_type::size;
@@ -182,55 +197,33 @@ namespace xt
         using base_type::swap;
     };
 
-    template <class T, class O, class A>
-    bool operator==(const xbuffer_adaptor<T, O, A>& lhs,
-                    const xbuffer_adaptor<T, O, A>& rhs);
+    template <class CP, class O, class A>
+    bool operator==(const xbuffer_adaptor<CP, O, A>& lhs,
+                    const xbuffer_adaptor<CP, O, A>& rhs);
 
-    template <class T, class O, class A>
-    bool operator!=(const xbuffer_adaptor<T, O, A>& lhs,
-                    const xbuffer_adaptor<T, O, A>& rhs);
+    template <class CP, class O, class A>
+    bool operator!=(const xbuffer_adaptor<CP, O, A>& lhs,
+                    const xbuffer_adaptor<CP, O, A>& rhs);
 
-    template <class T, class O, class A>
-    bool operator<(const xbuffer_adaptor<T, O, A>& lhs,
-                   const xbuffer_adaptor<T, O, A>& rhs);
+    template <class CP, class O, class A>
+    bool operator<(const xbuffer_adaptor<CP, O, A>& lhs,
+                   const xbuffer_adaptor<CP, O, A>& rhs);
 
-    template <class T, class O, class A>
-    bool operator<=(const xbuffer_adaptor<T, O, A>& lhs,
-                    const xbuffer_adaptor<T, O, A>& rhs);
+    template <class CP, class O, class A>
+    bool operator<=(const xbuffer_adaptor<CP, O, A>& lhs,
+                    const xbuffer_adaptor<CP, O, A>& rhs);
 
-    template <class T, class O, class A>
-    bool operator>(const xbuffer_adaptor<T, O, A>& lhs,
-                   const xbuffer_adaptor<T, O, A>& rhs);
+    template <class CP, class O, class A>
+    bool operator>(const xbuffer_adaptor<CP, O, A>& lhs,
+                   const xbuffer_adaptor<CP, O, A>& rhs);
 
-    template <class T, class O, class A>
-    bool operator>=(const xbuffer_adaptor<T, O, A>& lhs,
-                    const xbuffer_adaptor<T, O, A>& rhs);
+    template <class CP, class O, class A>
+    bool operator>=(const xbuffer_adaptor<CP, O, A>& lhs,
+                    const xbuffer_adaptor<CP, O, A>& rhs);
 
-    template <class T, class O, class A>
-    void swap(xbuffer_adaptor<T, O, A>& lhs,
-              xbuffer_adaptor<T, O, A>& rhs) noexcept;
-
-    /*******************
-     * adaptor_closure *
-     *******************/
-
-    namespace detail
-    {
-        template <class C>
-        struct adaptor_closure_impl
-        {
-            using type = C&;
-        };
-
-        template <class T, class O, class A>
-        struct adaptor_closure_impl<xbuffer_adaptor<T, O, A>>
-        {
-            using type = xbuffer_adaptor<T, O, A>;
-        };
-    }
-
-    template <class C>
-    using adaptor_closure_t = typename detail::adaptor_closure_impl<C>::type;
+    template <class CP, class O, class A>
+    void swap(xbuffer_adaptor<CP, O, A>& lhs,
+              xbuffer_adaptor<CP, O, A>& rhs) noexcept;
 
     /**********************************
      * xbuffer_storage implementation *
@@ -238,26 +231,27 @@ namespace xt
 
     namespace detail
     {
-        template <class T, class A>
-        inline xbuffer_storage<T, A>::xbuffer_storage()
+        template <class CP, class A>
+        inline xbuffer_storage<CP, A>::xbuffer_storage()
             : p_data(nullptr), m_size(0)
         {
         }
 
-        template <class T, class A>
-        inline xbuffer_storage<T, A>::xbuffer_storage(T*& data, size_type size, const allocator_type&)
-            : p_data(data), m_size(size)
+        template <class CP, class A>
+        template <class P>
+        inline xbuffer_storage<CP, A>::xbuffer_storage(P&& data, size_type size, const allocator_type&)
+            : p_data(std::forward<P>(data)), m_size(size)
         {
         }
 
-        template <class T, class A>
-        inline auto xbuffer_storage<T, A>::size() const noexcept -> size_type
+        template <class CP, class A>
+        inline auto xbuffer_storage<CP, A>::size() const noexcept -> size_type
         {
             return m_size;
         }
 
-        template <class T, class A>
-        inline void xbuffer_storage<T, A>::resize(size_type size)
+        template <class CP, class A>
+        inline void xbuffer_storage<CP, A>::resize(size_type size)
         {
             if (size != m_size)
             {
@@ -265,20 +259,20 @@ namespace xt
             }
         }
 
-        template <class T, class A>
-        inline auto xbuffer_storage<T, A>::data() noexcept -> pointer
+        template <class CP, class A>
+        inline auto xbuffer_storage<CP, A>::data() noexcept -> pointer
         {
             return p_data;
         }
 
-        template <class T, class A>
-        inline auto xbuffer_storage<T, A>::data() const noexcept -> const_pointer
+        template <class CP, class A>
+        inline auto xbuffer_storage<CP, A>::data() const noexcept -> const_pointer
         {
             return p_data;
         }
 
-        template <class T, class A>
-        inline void xbuffer_storage<T, A>::swap(self_type& rhs) noexcept
+        template <class CP, class A>
+        inline void xbuffer_storage<CP, A>::swap(self_type& rhs) noexcept
         {
             using std::swap;
             swap(p_data, rhs.p_data);
@@ -292,31 +286,25 @@ namespace xt
 
     namespace detail
     {
-        template <class T, class A>
-        inline xbuffer_owner_storage<T, A>::xbuffer_owner_storage()
-            : p_data(nullptr), m_size(0), m_allocator()
+        template <class CP, class A>
+        template <class P>
+        inline xbuffer_owner_storage<CP, A>::xbuffer_owner_storage(P&& data, size_type size, const allocator_type& alloc)
+            : m_data(std::forward<P>(data)), m_size(size), m_moved_from(false), m_allocator(alloc)
         {
         }
 
-        template <class T, class A>
-        inline xbuffer_owner_storage<T, A>::xbuffer_owner_storage(T*& data, size_type size, const allocator_type& alloc)
-            : p_data(&data), m_size(size), m_allocator(alloc)
+        template <class CP, class A>
+        inline xbuffer_owner_storage<CP, A>::~xbuffer_owner_storage()
         {
-        }
-
-        template <class T, class A>
-        inline xbuffer_owner_storage<T, A>::~xbuffer_owner_storage()
-        {
-            if (p_data != nullptr)
+            if (!m_moved_from)
             {
-                safe_destroy_deallocate(m_allocator, *p_data, m_size);
-                p_data = nullptr;
+                safe_destroy_deallocate(m_allocator, m_data.get(), m_size);
                 m_size = 0;
             }
         }
 
-        template <class T, class A>
-        inline auto xbuffer_owner_storage<T, A>::operator=(const self_type& rhs) -> self_type&
+        template <class CP, class A>
+        inline auto xbuffer_owner_storage<CP, A>::operator=(const self_type& rhs) -> self_type&
         {
             using std::swap;
             if (this != &rhs)
@@ -325,13 +313,13 @@ namespace xt
                 pointer tmp = safe_init_allocate(al, rhs.m_size);
                 if (xtrivially_default_constructible<value_type>::value)
                 {
-                    std::uninitialized_copy(*(rhs.p_data), *(rhs.p_data) + rhs.m_size, tmp);
+                    std::uninitialized_copy(rhs.m_data.get(), rhs.m_data.get() + rhs.m_size, tmp);
                 }
                 else
                 {
-                    std::copy(*(rhs.p_data), *(rhs.p_data) + rhs.m_size, tmp);
+                    std::copy(rhs.m_data.get(), rhs.m_data.get() + rhs.m_size, tmp);
                 }
-                swap(*p_data, tmp);
+                swap(m_data.get(), tmp);
                 m_size = rhs.m_size;
                 swap(m_allocator, al);
                 safe_destroy_deallocate(al, tmp, m_size);
@@ -339,63 +327,64 @@ namespace xt
             return *this;
         }
 
-        template <class T, class A>
-        inline xbuffer_owner_storage<T, A>::xbuffer_owner_storage(self_type&& rhs)
-            : p_data(rhs.p_data), m_size(rhs.m_size), m_allocator(std::move(rhs.m_allocator))
+        template <class CP, class A>
+        inline xbuffer_owner_storage<CP, A>::xbuffer_owner_storage(self_type&& rhs)
+            : m_data(std::move(rhs.m_data)), m_size(std::move(rhs.m_size)), m_moved_from(std::move(rhs.m_moved_from)), m_allocator(std::move(rhs.m_allocator))
         {
-            rhs.p_data = nullptr;
+            rhs.m_moved_from = true;
             rhs.m_size = 0;
         }
 
-        template <class T, class A>
-        inline auto xbuffer_owner_storage<T, A>::operator=(self_type&& rhs) -> self_type&
+        template <class CP, class A>
+        inline auto xbuffer_owner_storage<CP, A>::operator=(self_type&& rhs) -> self_type&
         {
             swap(rhs);
+            rhs.m_moved_from = true;
             return *this;
         }
 
-        template <class T, class A>
-        inline auto xbuffer_owner_storage<T, A>::size() const noexcept -> size_type
+        template <class CP, class A>
+        inline auto xbuffer_owner_storage<CP, A>::size() const noexcept -> size_type
         {
             return m_size;
         }
 
-        template <class T, class A>
-        void xbuffer_owner_storage<T, A>::resize(size_type size)
+        template <class CP, class A>
+        void xbuffer_owner_storage<CP, A>::resize(size_type size)
         {
             using std::swap;
             if (size != m_size)
             {
                 pointer tmp = safe_init_allocate(m_allocator, size);
-                swap(*p_data, tmp);
+                swap(m_data.get(), tmp);
                 swap(m_size, size);
                 safe_destroy_deallocate(m_allocator, tmp, size);
             }
         }
 
-        template <class T, class A>
-        inline auto xbuffer_owner_storage<T, A>::data() noexcept -> pointer
+        template <class CP, class A>
+        inline auto xbuffer_owner_storage<CP, A>::data() noexcept -> pointer
         {
-            return *p_data;
+            return m_data.get();
         }
 
-        template <class T, class A>
-        inline auto xbuffer_owner_storage<T, A>::data() const noexcept -> const_pointer
+        template <class CP, class A>
+        inline auto xbuffer_owner_storage<CP, A>::data() const noexcept -> const_pointer
         {
-            return *p_data;
+            return m_data.get();
         }
 
-        template <class T, class A>
-        inline auto xbuffer_owner_storage<T, A>::get_allocator() const noexcept -> allocator_type
+        template <class CP, class A>
+        inline auto xbuffer_owner_storage<CP, A>::get_allocator() const noexcept -> allocator_type
         {
             return allocator_type(m_allocator);
         }
 
-        template <class T, class A>
-        inline void xbuffer_owner_storage<T, A>::swap(self_type& rhs) noexcept
+        template <class CP, class A>
+        inline void xbuffer_owner_storage<CP, A>::swap(self_type& rhs) noexcept
         {
             using std::swap;
-            swap(p_data, rhs.p_data);
+            swap(m_data, rhs.m_data);
             swap(m_size, rhs.m_size);
             swap(m_allocator, rhs.m_allocator);
         }
@@ -405,187 +394,180 @@ namespace xt
      * xbuffer_adaptor implementation *
      **********************************/
 
-    template <class T, class O, class A>
-    template <class OW, class>
-    inline xbuffer_adaptor<T, O, A>::xbuffer_adaptor(T*& data, size_type size, const allocator_type& alloc)
-        : base_type(data, size, alloc)
+    template <class CP, class O, class A>
+    template <class P>
+    inline xbuffer_adaptor<CP, O, A>::xbuffer_adaptor(P&& data, size_type size, const allocator_type& alloc)
+        : base_type(std::forward<P>(data), size, alloc)
     {
     }
 
-    template <class T, class O, class A>
-    template <class OW, class>
-    inline xbuffer_adaptor<T, O, A>::xbuffer_adaptor(T* data, size_type size, const allocator_type& alloc)
-        : base_type(data, size, alloc)
-    {
-    }
-
-    template <class T, class O, class A>
-    bool xbuffer_adaptor<T, O, A>::empty() const noexcept
+    template <class CP, class O, class A>
+    bool xbuffer_adaptor<CP, O, A>::empty() const noexcept
     {
         return size() == 0;
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::operator[](size_type i) -> reference
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::operator[](size_type i) -> reference
     {
         return data()[i];
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::operator[](size_type i) const -> const_reference
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::operator[](size_type i) const -> const_reference
     {
         return data()[i];
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::front() -> reference
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::front() -> reference
     {
         return data()[0];
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::front() const -> const_reference
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::front() const -> const_reference
     {
         return data()[0];
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::back() -> reference
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::back() -> reference
     {
         return data()[size() - 1];
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::back() const -> const_reference
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::back() const -> const_reference
     {
         return data()[size() - 1];
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::begin() -> iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::begin() -> iterator
     {
         return data();
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::end() -> iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::end() -> iterator
     {
         return data() + size();
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::begin() const -> const_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::begin() const -> const_iterator
     {
         return data();
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::end() const -> const_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::end() const -> const_iterator
     {
         return data() + size();
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::cbegin() const -> const_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::cbegin() const -> const_iterator
     {
         return begin();
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::cend() const -> const_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::cend() const -> const_iterator
     {
         return end();
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::rbegin() -> reverse_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::rbegin() -> reverse_iterator
     {
         return reverse_iterator(end());
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::rend() -> reverse_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::rend() -> reverse_iterator
     {
         return reverse_iterator(begin());
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::rbegin() const -> const_reverse_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::rbegin() const -> const_reverse_iterator
     {
         return const_reverse_iterator(end());
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::rend() const -> const_reverse_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::rend() const -> const_reverse_iterator
     {
         return const_reverse_iterator(begin());
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::crbegin() const -> const_reverse_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::crbegin() const -> const_reverse_iterator
     {
         return rbegin();
     }
 
-    template <class T, class O, class A>
-    inline auto xbuffer_adaptor<T, O, A>::crend() const -> const_reverse_iterator
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::crend() const -> const_reverse_iterator
     {
         return rend();
     }
 
-    template <class T, class O, class A>
-    inline bool operator==(const xbuffer_adaptor<T, O, A>& lhs,
-                           const xbuffer_adaptor<T, O, A>& rhs)
+    template <class CP, class O, class A>
+    inline bool operator==(const xbuffer_adaptor<CP, O, A>& lhs,
+                           const xbuffer_adaptor<CP, O, A>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template <class T, class O, class A>
-    inline bool operator!=(const xbuffer_adaptor<T, O, A>& lhs,
-                           const xbuffer_adaptor<T, O, A>& rhs)
+    template <class CP, class O, class A>
+    inline bool operator!=(const xbuffer_adaptor<CP, O, A>& lhs,
+                           const xbuffer_adaptor<CP, O, A>& rhs)
     {
         return !(lhs == rhs);
     }
 
-    template <class T, class O, class A>
-    inline bool operator<(const xbuffer_adaptor<T, O, A>& lhs,
-                          const xbuffer_adaptor<T, O, A>& rhs)
+    template <class CP, class O, class A>
+    inline bool operator<(const xbuffer_adaptor<CP, O, A>& lhs,
+                          const xbuffer_adaptor<CP, O, A>& rhs)
     {
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                             rhs.begin(), rhs.end(),
-                                            std::less<T>());
+                                            std::less<typename A::value_type>());
     }
 
-    template <class T, class O, class A>
-    inline bool operator<=(const xbuffer_adaptor<T, O, A>& lhs,
-                           const xbuffer_adaptor<T, O, A>& rhs)
+    template <class CP, class O, class A>
+    inline bool operator<=(const xbuffer_adaptor<CP, O, A>& lhs,
+                           const xbuffer_adaptor<CP, O, A>& rhs)
     {
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                             rhs.begin(), rhs.end(),
-                                            std::less_equal<T>());
+                                            std::less_equal<typename A::value_type>());
     }
 
-    template <class T, class O, class A>
-    inline bool operator>(const xbuffer_adaptor<T, O, A>& lhs,
-                          const xbuffer_adaptor<T, O, A>& rhs)
+    template <class CP, class O, class A>
+    inline bool operator>(const xbuffer_adaptor<CP, O, A>& lhs,
+                          const xbuffer_adaptor<CP, O, A>& rhs)
     {
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                             rhs.begin(), rhs.end(),
-                                            std::greater<T>());
+                                            std::greater<typename A::value_type>());
     }
 
-    template <class T, class O, class A>
-    inline bool operator>=(const xbuffer_adaptor<T, O, A>& lhs,
-                           const xbuffer_adaptor<T, O, A>& rhs)
+    template <class CP, class O, class A>
+    inline bool operator>=(const xbuffer_adaptor<CP, O, A>& lhs,
+                           const xbuffer_adaptor<CP, O, A>& rhs)
     {
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                             rhs.begin(), rhs.end(),
-                                            std::greater_equal<T>());
+                                            std::greater_equal<typename A::value_type>());
     }
 
-    template <class T, class O, class A>
-    inline void swap(xbuffer_adaptor<T, O, A>& lhs,
-                     xbuffer_adaptor<T, O, A>& rhs) noexcept
+    template <class CP, class O, class A>
+    inline void swap(xbuffer_adaptor<CP, O, A>& lhs,
+                     xbuffer_adaptor<CP, O, A>& rhs) noexcept
     {
         lhs.swap(rhs);
     }

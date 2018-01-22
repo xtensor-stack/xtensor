@@ -26,11 +26,11 @@ two ways:
 
 - at compile time, as a template argument. The value ``layout_type::dynamic`` allows to specify any strided index scheme at runtime (including
   row-major and column-major schemes), whereas ``layout_type::row_major`` and ``layout_type::column_major`` fixes the strided index scheme and
-  disable ``reshape`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template
+  disable ``resize`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template
   parameter is ``DEFAULT_LAYOUT``.
-- at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``reshape`` and constructor overloads allow
+- at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``resize`` and constructor overloads allow
   to aspecify a set of strides or a layout value to avoid strides computation. If neither strides nor layout is specified when instantiating
-  or reshaping a multi-dimensional array, strides corresponding to ``DEFAULT_LAYOUT`` are used.
+  or resizing a multi-dimensional array, strides corresponding to ``DEFAULT_LAYOUT`` are used.
 
 The following example shows how to initialize a multi-dimensional array of dynamic layout with specified strides:
 
@@ -75,11 +75,22 @@ Two container classes implementing multi-dimensional arrays are provided: ``xarr
 - ``xtensor`` has a dimension set at compilation time, which enables many optimizations. For example, shapes and strides
   of ``xtensor`` instances are allocated on the stack instead of the heap.
 
+Let's use ``xtensor`` instead of ``xarray`` in the previous example:
+
+.. code::
+
+    #include <array>
+    #include "xtensor/xtensor.hpp"
+
+    std::array<size_t, 3> shape = { 3, 2, 4 };
+    xt::xtensor<double, 3, layout_type::row_major> a(shape);
+
 ``xarray`` and ``xtensor`` containers are both ``xexpression`` s and can be involved and mixed in mathematical expressions, assigned to each
 other etc... They provide an augmented interface compared to other ``xexpression`` types:
 
 - Each method exposed in ``xexpression`` interface has its non-const counterpart exposed by both ``xarray`` and ``xtensor``.
-- ``reshape()`` reshapes the container in place, that is, if the global size of the container doesn't change, no memory allocation occurs.
+- ``reshape()`` reshapes the container in place, and the global size of the container has to stay the same.
+- ``resize()`` resizes the container in place, that is, if the global size of the container doesn't change, no memory allocation occurs.
 - ``transpose()`` transposes the container in place, that is, no memory allocation occurs.
 - ``strides()`` returns the strides of the container, used to compute the position of an element in the underlying buffer.
 
@@ -99,7 +110,7 @@ Aliasing and temporaries
 ------------------------
 
 In some cases, an expression should not be directly assigned to a container. Instead, it has to be assigned to a temporary variable before being copied
-into the destination container. This occurs when the destination container is involved in the expression and has to be reshaped. This phenomenon is
+into the destination container. This occurs when the destination container is involved in the expression and has to be resized. This phenomenon is
 known as *aliasing*.
 
 To prevent this, `xtensor` assigns the expression to a temporary variable before copying it. In the case of ``xarray``, this results in an extra dynamic memory
@@ -115,7 +126,7 @@ automatically and applies the "temporary variable rule" by default. A mechanism 
 
     // a, b, and c are xt::xarrays previously initialized
     xt::noalias(b) = a + c;
-    // Even if b has to be reshaped, a+c will be assigned directly to it
+    // Even if b has to be resized, a+c will be assigned directly to it
     // No temporary variable will be involved
 
 Example of aliasing
@@ -137,9 +148,9 @@ The aliasing phenomenon is illustrated in the following example:
     b = a + b;
     // b appears on both left-hand and right-hand sides of the statement
 
-In the above example, the shape of ``a + b`` is ``{ 3, 2, 4 }``. Therefore, ``b`` must first be reshaped, which impacts how the right-hand side is computed.
+In the above example, the shape of ``a + b`` is ``{ 3, 2, 4 }``. Therefore, ``b`` must first be resized, which impacts how the right-hand side is computed.
 
 If the values of ``b`` were copied into the new buffer directly without an intermediary variable, then we would have 
-``new_b(0, i, j) == old_b(i, j) for (i,j) in [0,1] x [0, 3]``. After the reshape of ``bb``, ``a(0, i, j) + b(0, i, j)`` is assigned to ``b(0, i, j)``, then,
+``new_b(0, i, j) == old_b(i, j) for (i,j) in [0,1] x [0, 3]``. After the resize of ``bb``, ``a(0, i, j) + b(0, i, j)`` is assigned to ``b(0, i, j)``, then,
 due to broadcasting rules, ``a(1, i, j) + b(0, i, j)`` is assigned to ``b(1, i, j)``. The issue is ``b(0, i, j)`` has been changed by the previous assignment.
 

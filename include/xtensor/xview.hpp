@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XVIEW_HPP
-#define XVIEW_HPP
+#ifndef XTENSOR_VIEW_HPP
+#define XTENSOR_VIEW_HPP
 
 #include <algorithm>
 #include <array>
@@ -15,6 +15,9 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#include "xtl/xclosure.hpp"
+#include "xtl/xsequence.hpp"
 
 #include "xbroadcast.hpp"
 #include "xcontainer.hpp"
@@ -120,14 +123,24 @@ namespace xt
 
         template <class... Args>
         reference operator()(Args... args);
-        reference operator[](const xindex& index);
+        template <class... Args>
+        reference at(Args... args);
+        template <class OS>
+        disable_integral_t<OS, reference> operator[](const OS& index);
+        template <class I>
+        reference operator[](std::initializer_list<I> index);
         reference operator[](size_type i);
         template <class It>
         reference element(It first, It last);
 
         template <class... Args>
         const_reference operator()(Args... args) const;
-        const_reference operator[](const xindex& index) const;
+        template <class... Args>
+        const_reference at(Args... args) const;
+        template <class OS>
+        disable_integral_t<OS, const_reference> operator[](const OS& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
         template <class It>
         const_reference element(It first, It last) const;
@@ -153,7 +166,7 @@ namespace xt
         data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, strides_type>
         strides() const;
 
         template <class T = xexpression_type>
@@ -169,6 +182,10 @@ namespace xt
         raw_data_offset() const noexcept;
 
         size_type underlying_size(size_type dim) const;
+
+        xtl::xclosure_pointer<self_type&> operator&() &;
+        xtl::xclosure_pointer<const self_type&> operator&() const &;
+        xtl::xclosure_pointer<self_type> operator&() &&;
 
     private:
 
@@ -335,7 +352,7 @@ namespace xt
     template <class CTA, class FSL, class... SL>
     inline xview<CT, S...>::xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
         : m_e(std::forward<CTA>(e)), m_slices(std::forward<FSL>(first_slice), std::forward<SL>(slices)...),
-          m_shape(make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
+          m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
     {
         auto func = [](const auto& s) noexcept { return get_size(s); };
         for (size_type i = 0; i != dimension(); ++i)
@@ -366,7 +383,7 @@ namespace xt
     inline auto xview<CT, S...>::operator=(const xexpression<E>& e) -> self_type&
     {
         bool cond = (e.derived_cast().shape().size() == dimension()) &&
-                    std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
+            std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
         if (!cond)
         {
             semantic_base::operator=(broadcast(e.derived_cast(), shape()));
@@ -459,10 +476,37 @@ namespace xt
                            static_cast<size_type>(args)...);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the expression,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the expression.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
     template <class CT, class... S>
-    inline auto xview<CT, S...>::operator[](const xindex& index) -> reference
+    template <class... Args>
+    inline auto xview<CT, S...>::at(Args... args) -> reference
+    {
+        check_access(shape(), static_cast<size_type>(args)...);
+        return this->operator()(args...);
+    }
+
+    template <class CT, class... S>
+    template <class OS>
+    inline auto xview<CT, S...>::operator[](const OS& index)
+        -> disable_integral_t<OS, reference>
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class CT, class... S>
+    template <class I>
+    inline auto xview<CT, S...>::operator[](std::initializer_list<I> index)
+        -> reference
+    {
+        return element(index.begin(), index.end());
     }
 
     template <class CT, class... S>
@@ -498,10 +542,37 @@ namespace xt
                            static_cast<size_type>(args)...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the expression,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the expression.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
     template <class CT, class... S>
-    inline auto xview<CT, S...>::operator[](const xindex& index) const -> const_reference
+    template <class... Args>
+    inline auto xview<CT, S...>::at(Args... args) const -> const_reference
+    {
+        check_access(shape(), static_cast<size_type>(args)...);
+        return this->operator()(args...);
+    }
+
+    template <class CT, class... S>
+    template <class OS>
+    inline auto xview<CT, S...>::operator[](const OS& index) const
+        -> disable_integral_t<OS, const_reference>
     {
         return element(index.cbegin(), index.cend());
+    }
+
+    template <class CT, class... S>
+    template <class I>
+    inline auto xview<CT, S...>::operator[](std::initializer_list<I> index) const
+        -> const_reference
+    {
+        return element(index.begin(), index.end());
     }
 
     template <class CT, class... S>
@@ -538,10 +609,9 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::strides() const ->
-        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, strides_type>
     {
-        using strides_type = typename T::strides_type;
-        strides_type strides = make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
+        strides_type strides = xtl::make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
         size_type i = 0, idx;
@@ -606,6 +676,24 @@ namespace xt
     inline auto xview<CT, S...>::underlying_size(size_type dim) const -> size_type
     {
         return m_e.shape()[dim];
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator&() & -> xtl::xclosure_pointer<self_type&>
+    {
+        return xtl::closure_pointer(*this);
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator&() const & -> xtl::xclosure_pointer<const self_type&>
+    {
+        return xtl::closure_pointer(*this);
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::operator&() && -> xtl::xclosure_pointer<self_type>
+    {
+        return xtl::closure_pointer(std::move(*this));
     }
 
     /**
@@ -678,7 +766,7 @@ namespace xt
     inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice, Arg arg, Args... args) const -> size_type
     {
         using ST = typename T::size_type;
-        return slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...));
+        return static_cast<size_type>(slice.derived_cast()(argument<I>(static_cast<ST>(arg), static_cast<ST>(args)...)));
     }
 
     template <class CT, class... S>
@@ -692,13 +780,11 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::make_index(It first, It last) const -> base_index_type
     {
-        auto index = make_sequence<typename xexpression_type::shape_type>(m_e.dimension(), 0);
-        auto func1 = [&first](const auto& s)
-        {
+        auto index = xtl::make_sequence<typename xexpression_type::shape_type>(m_e.dimension(), 0);
+        auto func1 = [&first](const auto& s) {
             return get_slice_value(s, first);
         };
-        auto func2 = [](const auto& s)
-        {
+        auto func2 = [](const auto& s) {
             return xt::value(s, 0);
         };
         for (size_type i = 0; i != m_e.dimension(); ++i)
@@ -736,7 +822,7 @@ namespace xt
         template <class E, std::size_t... I, class... S>
         inline auto make_view_impl(E&& e, std::index_sequence<I...>, S&&... slices)
         {
-            using view_type = xview<closure_t<E>, get_slice_type<std::decay_t<E>, S>...>;
+            using view_type = xview<xtl::closure_type_t<E>, get_slice_type<std::decay_t<E>, S>...>;
             return view_type(std::forward<E>(e),
                 get_slice_implementation(e, std::forward<S>(slices), get_underlying_shape_index<std::decay_t<E>, S...>(I))...
             );

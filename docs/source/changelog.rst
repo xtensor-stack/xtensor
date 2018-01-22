@@ -7,6 +7,261 @@
 Changelog
 =========
 
+0.15.0 (unreleased)
+-------------------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- change ``reshape`` to ``resize``, and add throwing ``reshape``
+  `#598 <https://github.com/QuantStack/xtensor/pull/598>`_.
+- moved to modern cmake
+  `#611 <https://github.com/QuantStack/xtensor/pull/611>`_.
+
+New features
+~~~~~~~~~~~~
+
+- unravel function
+  `#589 <https://github.com/QuantStack/xtensor/pull/589>`_.
+- random access iterators
+  `#596 <https://github.com/QuantStack/xtensor/pull/596>`_.
+
+
+Other changes
+~~~~~~~~~~~~~
+
+- upgraded to google/benchmark version 1.3.0
+  `#583 <https://github.com/QuantStack/xtensor/pull/583>`_.
+- ``XTENSOR_ASSERT`` renamed into ``XTENSOR_TRY``, new ``XTENSOR_ASSERT``
+  `#603 <https://github.com/QuantStack/xtensor/pull/603>`_.
+- ``adapt`` fixed
+  `#604 <https://github.com/QuantStack/xtensor/pull/604>`_.
+- VC14 warnings removed
+  `#608 <https://github.com/QuantStack/xtensor/pull/608>`_.
+- ``xfunctor_iterator`` is now a random access iterator
+  `#609 <https://github.com/QuantStack/xtensor/pull/609>`_.
+- removed ``old-style-cast`` warnings
+  `#610 <https://github.com/QuantStack/xtensor/pull/610>`_.
+
+0.14.1
+------
+
+New features
+~~~~~~~~~~~~
+
+- sort, argmin and argmax
+  `#549 <https://github.com/QuantStack/xtensor/pull/549>`_.
+- ``xscalar_expression_tag``
+  `#582 <https://github.com/QuantStack/xtensor/pull/582>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- accumulator improvements
+  `#570 <https://github.com/QuantStack/xtensor/pull/570>`_.
+- benchmark cmake fixed
+  `#571 <https://github.com/QuantStack/xtensor/pull/571>`_.
+- allocator_type added to container interface
+  `#573 <https://github.com/QuantStack/xtensor/pull/573>`_.
+- allow conda-forge as fallback channel
+  `#575 <https://github.com/QuantStack/xtensor/pull/575>`_.
+- arithmetic mixing optional assemblies and scalars fixed
+  `#578 <https://github.com/QuantStack/xtensor/pull/578>`_.
+- arithmetic mixing optional assemblies and optionals fixed
+  `#579 <https://github.com/QuantStack/xtensor/pull/579>`_.
+- ``operator==`` restricted to xtensor and xoptional expressions
+  `#580 <https://github.com/QuantStack/xtensor/pull/580>`_.
+
+0.14.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- ``xadapt`` renamed into ``adapt``
+  `#563 <https://github.com/QuantStack/xtensor/pull/563>`_.
+- Naming consistency
+  `#565 <https://github.com/QuantStack/xtensor/pull/565>`_.
+
+New features
+~~~~~~~~~~~~
+
+- add ``random::choice``
+  `#547 <https://github.com/QuantStack/xtensor/pull/547>`_.
+- evaluation strategy and accumulators.
+  `#550 <https://github.com/QuantStack/xtensor/pull/550>`_.
+- modulus operator
+  `#556 <https://github.com/QuantStack/xtensor/pull/556>`_.
+- ``adapt``: default overload for 1D arrays
+  `#560 <https://github.com/QuantStack/xtensor/pull/560>`_.
+- Move semantic on ``adapt``
+  `#564 <https://github.com/QuantStack/xtensor/pull/564>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- optional fixes to avoid ambiguous calls
+  `#541 <https://github.com/QuantStack/xtensor/pull/541>`_.
+- narrative documentation about ``xt::adapt``
+  `#544 <https://github.com/QuantStack/xtensor/pull/544>`_.
+- ``xfunction`` refactoring
+  `#545 <https://github.com/QuantStack/xtensor/pull/545>`_.
+- SIMD acceleration for AVX fixed
+  `#557 <https://github.com/QuantStack/xtensor/pull/557>`_.
+- allocator fixes
+  `#558 <https://github.com/QuantStack/xtensor/pull/558>`_.
+  `#559 <https://github.com/QuantStack/xtensor/pull/559>`_.
+- return type of ``view::strides()`` fixed
+  `#568 <https://github.com/QuantStack/xtensor/pull/568>`_.
+
+
+0.13.2
+------
+
+- Support for complex version of ``isclose``
+  `#512 <https://github.com/QuantStack/xtensor/pull/512>`_.
+- Fixup static layout in ``xstrided_view``
+  `#536 <https://github.com/QuantStack/xtensor/pull/536>`_.
+- ``xexpression::operator[]`` now take support any type of sequence
+  `#537 <https://github.com/QuantStack/xtensor/pull/537`_.
+- Fixing ``xinfo`` issues for Visual Studio.
+  `#529 <https://github.com/QuantStack/xtensor/pull/529>`_.
+- Fix const-correctness in ``xstrided_view``.
+  `#526 <https://github.com/QuantStack/xtensor/pull/526>`_.
+
+
+0.13.1
+------
+
+- More general floating point type
+  `#518 <https://github.com/QuantStack/xtensor/pull/518>`_.
+- Do not require functor to be passed via rvalue reference
+  `#519 <https://github.com/QuantStack/xtensor/pull/519>`_.
+- Documentation improved
+  `#520 <https://github.com/QuantStack/xtensor/pull/520>`_.
+- Fix in xreducer
+  `#521 <https://github.com/QuantStack/xtensor/pull/521>`_.
+
+0.13.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- The API for ``xbuffer_adaptor`` has changed. The template parameter is the type of the buffer, not just the value type
+  `#482 <https://github.com/QuantStack/xtensor/pull/482>`_.
+- Change ``edge_items`` print option to ``edgeitems`` for better numpy consistency
+  `#489 <https://github.com/QuantStack/xtensor/pull/489>`_.
+- xtensor now depends on ``xtl`` version `~0.3.3`
+  `#508 <https://github.com/QuantStack/xtensor/pull/508>`_.
+
+New features
+~~~~~~~~~~~~
+
+- Support for parsing the ``npy`` file format
+  `#465 <https://github.com/QuantStack/xtensor/pull/465>`_.
+- Creation of optional expressions from value and boolean expressions (optional assembly)
+  `#496 <https://github.com/QuantStack/xtensor/pull/496>`_.
+- Support for the explicit cast of expressions with different value types
+  `#491 <https://github.com/QuantStack/xtensor/pull/491>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- Addition of broadcasting bitwise operators
+  `#459 <https://github.com/QuantStack/xtensor/pull/459>`_.
+- More efficient optional expression system
+  `#467 <https://github.com/QuantStack/xtensor/pull/467>`_.
+- Migration of benchmarks to the Google benchmark framework
+  `#473 <https://github.com/QuantStack/xtensor/pull/473>`_.
+- Container semantic and adaptor semantic merged
+  `#475 <https://github.com/QuantStack/xtensor/pull/475>`_.
+- Various fixes and improvements of the strided views
+  `#480 <https://github.com/QuantStack/xtensor/pull/480>`_.
+  `#481 <https://github.com/QuantStack/xtensor/pull/481>`_.
+- Assignment now performs basic type conversion
+  `#486 <https://github.com/QuantStack/xtensor/pull/486>`_.
+- Workaround for a compiler bug in Visual Studio 2017
+  `#490 <https://github.com/QuantStack/xtensor/pull/490>`_.
+- MSVC 2017 workaround
+  `#492 <https://github.com/QuantStack/xtensor/pull/492>`_.
+- The ``size()`` method for containers now returns the total number of elements instead of the buffer size, which may differ when the smallest stride is greater than ``1``
+  `#502 <https://github.com/QuantStack/xtensor/pull/502>`_.
+- The behavior of ``linspace`` with integral types has been made consistent with numpy
+  `#510 <https://github.com/QuantStack/xtensor/pull/510>`_.
+
+0.12.1
+------
+
+- Fix issue with slicing when using heterogeneous integral types
+  `#451 <https://github.com/QuantStack/xtensor/pull/451>`_.
+
+0.12.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- ``xtensor`` now depends on ``xtl`` version `0.2.x`
+  `#421 <https://github.com/QuantStack/xtensor/pull/421>`_.
+
+New features
+~~~~~~~~~~~~
+
+- ``xtensor`` has an optional dependency on ``xsimd`` for enabling simd acceleration
+  `#426 <https://github.com/QuantStack/xtensor/pull/426>`_.
+
+- All expressions have an additional safe access function (``at``)
+  `#420 <https://github.com/QuantStack/xtensor/pull/420>`_.
+
+- norm functions
+  `#440 <https://github.com/QuantStack/xtensor/pull/440>`_.
+
+- ``closure_pointer`` used in iterators returning temporaries so their ``operator->`` can be
+  correctly defined
+  `#446 <https://github.com/QuantStack/xtensor/pull/446>`_.
+
+- expressions tags added so ``xtensor`` expression system can be extended
+  `#447 <https://github.com/QuantStack/xtensor/pull/447>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- Preconditions and exceptions
+  `#409 <https://github.com/QuantStack/xtensor/pull/409>`_.
+
+- ``isclose`` is now symmetric
+  `#411 <https://github.com/QuantStack/xtensor/pull/411>`_.
+
+- concepts added
+  `#414 <https://github.com/QuantStack/xtensor/pull/414>`_.
+
+- narrowing cast for mixed arithmetic
+  `#432 <https://github.com/QuantStack/xtensor/pull/432>`_.
+
+- ``is_xexpression`` concept fixed
+  `#439 <https://github.com/QuantStack/xtensor/pull/439>`_.
+
+- ``void_t`` implementation fixed for compilers affected by C++14 defect CWG 1558
+  `#448 <https://github.com/QuantStack/xtensor/pull/448>`_.
+
+0.11.3
+------
+
+- Fixed bug in length-1 statically dimensioned tensor construction
+  `#431 <https://github.com/QuantStack/xtensor/pull/431>`_.
+
+0.11.2
+------
+
+- Fixup compilation issue with latest clang compiler. (missing `constexpr` keyword)
+  `#407 <https://github.com/QuantStack/xtensor/pull/407>`_.
+
+0.11.1
+------
+
+- Fixes some warnings in julia and python bindings
+
 0.11.0
 ------
 

@@ -46,5 +46,29 @@ namespace xt
         array_type res = t1 + t2;
         EXPECT_EQ(res(0, 0), t1(0, 0) + t2(0, 0));
     }
-}
 
+    TEST(xtensor_semantic, tensor_cast)
+    {
+        using int8_tensor = xtensor<int8_t, 2>;
+        using int32_tensor = xtensor<int32_t, 2>;
+        using double_tensor = xtensor<double, 2>;
+
+        int8_tensor i8t = {{int8_t(0), int8_t(1) },
+                           { int8_t(2) , int8_t(3) },
+                           { int8_t(4) , int8_t(5) }};
+
+        int32_tensor i32t = {{ int32_t(0), int32_t(1) },
+                             { int8_t(2) , int8_t(3) },
+                             { int8_t(4) , int8_t(5) }};
+
+        double_tensor dt = {{0., 1.},
+                            {2., 3.},
+                            {4., 5.}};
+
+        int32_tensor i32res = i8t;
+        EXPECT_EQ(i32res, i32t);
+
+        double_tensor dres = i32t;
+        EXPECT_EQ(dres, dt);
+    }
+}

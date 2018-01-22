@@ -4,6 +4,9 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
+.. _lazy-evaluation:
+
+
 Expressions and lazy evaluation
 ===============================
 
@@ -142,7 +145,8 @@ Shape
 Element access
 ~~~~~~~~~~~~~~
 
-- ``operator()`` is an access operator which can take multiple integral arguments of none.
+- ``operator()`` is an access operator which can take multiple integral arguments or none.
+- ``at()`` is similar to ``operator()`` but checks that its number of arguments does not exceed the number of dimensions, and performs bounds check. This should not be used where you expect ``operator()`` to perform broadcasting.
 - ``operator[]`` has two overloads: one that takes a single integral argument and is equivalent to the call of ``operator()`` with one argument, and one with a single multi-index argument, which can be of size determined at runtime. This operator also supports braced initializer arguments.
 - ``element()`` is an access operator which takes a pair of iterators on a container of indices.
 

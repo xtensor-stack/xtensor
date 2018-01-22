@@ -4,12 +4,12 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xfunctorview
-============
+xfunctor_view
+=============
 
-Defined in ``xtensor/xfunctorview.hpp``
+Defined in ``xtensor/xfunctor_view.hpp``
 
-.. doxygenclass:: xt::xfunctorview
+.. doxygenclass:: xt::xfunctor_view
    :project: xtensor
    :members:
 

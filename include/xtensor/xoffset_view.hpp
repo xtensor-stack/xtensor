@@ -6,10 +6,12 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XOFFSETVIEW_HPP
-#define XOFFSETVIEW_HPP
+#ifndef XTENSOR_OFFSET_VIEW_HPP
+#define XTENSOR_OFFSET_VIEW_HPP
 
-#include "xtensor/xfunctorview.hpp"
+#include "xtl/xcomplex.hpp"
+
+#include "xtensor/xfunctor_view.hpp"
 
 namespace xt
 {
@@ -27,13 +29,13 @@ namespace xt
             template <class T>
             decltype(auto) operator()(T&& t) const
             {
-                return forward_offset<M, I>(t);
+                return xtl::forward_offset<M, I>(t);
             }
         };
     }
 
     template <class CT, class M, std::size_t I>
-    using xoffsetview = xfunctorview<detail::offset_forwarder<M, I>, CT>;
+    using xoffset_view = xfunctor_view<detail::offset_forwarder<M, I>, CT>;
 }
 
 #endif

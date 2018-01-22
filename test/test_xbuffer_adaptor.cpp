@@ -11,8 +11,8 @@
 
 namespace xt
 {
-    using buffer_adaptor = xbuffer_adaptor<double>;
-    using owner_adaptor = xbuffer_adaptor<double, acquire_ownership>;
+    using buffer_adaptor = xbuffer_adaptor<double*>;
+    using owner_adaptor = xbuffer_adaptor<double*&, acquire_ownership>;
 
     TEST(xbuffer_adaptor, owner_destructor)
     {
@@ -177,4 +177,3 @@ namespace xt
         delete[] data;
     }
 }
-

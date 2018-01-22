@@ -52,6 +52,8 @@ namespace xt
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(size_t(1), view1.dimension());
         EXPECT_EQ(layout_type::dynamic, view1.layout());
+        EXPECT_ANY_THROW(view1.at(10));
+        EXPECT_ANY_THROW(view1.at(0, 0));
 
         auto view0 = view(a, 0, range(0, 3));
         EXPECT_EQ(a(0, 0), view0(0));
@@ -169,6 +171,8 @@ namespace xt
         EXPECT_EQ(a(1, 0, 1), view1(0, 1));
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
         EXPECT_EQ(a(1, 1, 1), view1(1, 1));
+        EXPECT_ANY_THROW(view1.at(10, 10));
+        EXPECT_ANY_THROW(view1.at(0, 0, 0));
 
         std::array<std::size_t, 2> idx = {1, 1};
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
@@ -375,7 +379,7 @@ namespace xt
         using shape_type = tensor_type::shape_type;
         tensor_type arr1{shape_type{2}};
         std::fill(arr1.begin(), arr1.end(), 6);
-        const tensor_type arr2=arr1;
+        const tensor_type arr2 = arr1;
         auto view = xt::view(arr2, 0);
         auto iter = view.begin();
         auto iter_end = view.end();
@@ -456,7 +460,7 @@ namespace xt
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
 
         std::array<std::size_t, 3> idx3 = {1, 2};
-        EXPECT_EQ(a(1, 2), view3.element(idx2.begin(), idx2.end()));
+        EXPECT_EQ(a(1, 2), view3.element(idx3.begin(), idx3.end()));
     }
 
     TEST(xview, newaxis_iterating)
@@ -637,5 +641,19 @@ namespace xt
             EXPECT_EQ(v2[idx2], v2.raw_data()[v2.raw_data_offset() + linear_idx]);
             next_idx(idx2, shape2);
         }
+    }
+
+    TEST(xview, strides_type)
+    {
+        xt::xtensor<float, 2> a{
+            { 1, 2 },
+            { 3, 4 },
+            { 5, 6 }
+        };
+        auto row = xt::view(a, 1, xt::all());
+        bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::size_t, 1>>::value;
+        bool cond2 = std::is_same<decltype(row.strides()), std::array<std::size_t, 1>>::value;
+        EXPECT_TRUE(cond1);
+        EXPECT_TRUE(cond2);
     }
 }

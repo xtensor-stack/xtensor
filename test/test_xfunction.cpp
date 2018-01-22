@@ -26,16 +26,16 @@ namespace xt
     xfunction_features::xfunction_features()
     {
         row_major_result<> rm;
-        m_a.reshape(rm.shape(), rm.strides());
+        m_a.resize(rm.shape(), rm.strides());
         std::copy(rm.data().cbegin(), rm.data().cend(), m_a.begin());
 
         unit_shape_result<> us;
-        m_b.reshape(us.shape(), us.strides());
+        m_b.resize(us.shape(), us.strides());
         std::copy(us.data().cbegin(), us.data().cend(), m_b.begin());
 
         using shape_type = layout_result<>::shape_type;
         shape_type sh = {4, 3, 2, 4};
-        m_c.reshape(sh);
+        m_c.resize(sh);
 
         for (size_t i = 0; i < sh[0]; ++i)
         {
@@ -155,6 +155,41 @@ namespace xt
         }
     }
 
+    TEST(xfunction, at)
+    {
+        xfunction_features f;
+        size_t i = f.m_a.shape()[0] - 1;
+        size_t j = f.m_a.shape()[1] - 1;
+        size_t k = f.m_a.shape()[2] - 1;
+
+        {
+            SCOPED_TRACE("same shape");
+            int a = (f.m_a + f.m_a).at(i, j, k);
+            int b = f.m_a.at(i, j, k) + f.m_a.at(i, j, k);
+            EXPECT_EQ(a, b);
+            EXPECT_ANY_THROW((f.m_a + f.m_a).at(0, 0, 0, 0));
+            EXPECT_ANY_THROW((f.m_a + f.m_a).at(10, 10, 10));
+        }
+
+        {
+            SCOPED_TRACE("different shape");
+            int a = (f.m_a + f.m_b).at(i, j, k);
+            int b = f.m_a.at(i, j, k) + f.m_b.at(i, 0, k);
+            EXPECT_EQ(a, b);
+            EXPECT_ANY_THROW((f.m_a + f.m_a).at(0, 0, 0, 0));
+            EXPECT_ANY_THROW((f.m_a + f.m_a).at(10, 10, 10));
+        }
+
+        {
+            SCOPED_TRACE("different dimensions");
+            int a = (f.m_a + f.m_c).at(1, i, j, k);
+            int b = f.m_a.at(i, j, k) + f.m_c.at(1, i, j, k);
+            EXPECT_EQ(a, b);
+            EXPECT_ANY_THROW((f.m_a + f.m_a).at(0, 0, 0, 0, 0));
+            EXPECT_ANY_THROW((f.m_a + f.m_a).at(10, 10, 10, 10));
+        }
+    }
+
     TEST(xfunction, indexed_access)
     {
         xfunction_features f;
@@ -168,6 +203,7 @@ namespace xt
             int a = (f.m_a + f.m_a)[index];
             int b = f.m_a[index] + f.m_a[index];
             EXPECT_EQ(a, b);
+            EXPECT_EQ(((f.m_a + f.m_a)[{0, 0, 0}]), (f.m_a[{0, 0, 0}] + f.m_a[{0, 0, 0}]));
         }
 
         {
@@ -177,6 +213,7 @@ namespace xt
             index2[1] = 0;
             int b = f.m_a[index] + f.m_b[index2];
             EXPECT_EQ(a, b);
+            EXPECT_EQ(((f.m_a + f.m_b)[{0, 0, 0}]), (f.m_a[{0, 0, 0}] + f.m_b[{0, 0, 0}]));
         }
 
         {
@@ -189,6 +226,7 @@ namespace xt
             int a = (f.m_a + f.m_c)[index2];
             int b = f.m_a[index] + f.m_c[index2];
             EXPECT_EQ(a, b);
+            EXPECT_EQ(((f.m_a + f.m_c)[{0, 0, 0, 0}]), (f.m_a[{0, 0, 0, 0}] + f.m_c[{0, 0, 0, 0}]));
         }
     }
 
@@ -212,23 +250,17 @@ namespace xt
 
         {
             SCOPED_TRACE("same shape");
-            std::cout << "before same shape" << std::endl;
             test_xfunction_iterator(f.m_a, f.m_a);
-            std::cout << "after same shape" << std::endl;
         }
 
         {
             SCOPED_TRACE("different shape");
-            std::cout << "before different shape" << std::endl;
             test_xfunction_iterator(f.m_a, f.m_b);
-            std::cout << "after different shape" << std::endl;
         }
 
         {
             SCOPED_TRACE("different dimensions");
-            std::cout << "before different dimensions" << std::endl;
             test_xfunction_iterator(f.m_c, f.m_a);
-            std::cout << "after different dimensions" << std::endl;
         }
     }
 

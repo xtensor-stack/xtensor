@@ -15,3 +15,6 @@ Defined in ``xtensor/xarray.hpp``
 
 .. doxygentypedef:: xt::xarray
    :project: xtensor
+
+.. doxygentypedef:: xt::xarray_optional
+   :project: xtensor

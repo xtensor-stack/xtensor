@@ -15,7 +15,11 @@ Containers and views
    xarray_adaptor
    xtensor
    xtensor_adaptor
+   xoptional_assembly_base
+   xoptional_assembly
+   xoptional_assembly_adaptor
    xview
+   xstrided_view
    xbroadcast
-   xindexview
-   xfunctorview
+   xindex_view
+   xfunctor_view

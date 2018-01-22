@@ -17,11 +17,14 @@
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
 
+// For how many sizes should math functions be tested?
+#define MATH_RANGE 64, 64
+
 namespace xt
 {
     namespace math
     {
-        using duration_type = std::chrono::duration<double, std::milli>;
+        // TODO use a fixture here to avoid initializing arrays everytime anew ...
 
         /****************************
          * Benchmark initialization *
@@ -44,9 +47,9 @@ namespace xt
         template <class V>
         inline void init_xtensor_benchmark(V& lhs, V& rhs, V& res, std::size_t size0, size_t size1)
         {
-            lhs.reshape({ size0, size1 });
-            rhs.reshape({ size0, size1 });
-            res.reshape({ size0, size1 });
+            lhs.resize({ size0, size1 });
+            rhs.resize({ size0, size1 });
+            res.resize({ size0, size1 });
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
@@ -64,109 +67,65 @@ namespace xt
          ***********************/
 
         template <class F, class V>
-        inline duration_type benchmark_xtensor_ref(F f, const V& lhs, V& res, std::size_t number)
-        {
-            size_t size = lhs.shape()[0] * lhs.shape()[1];
-            duration_type t_res = duration_type::max();
-            for (std::size_t count = 0; count < number; ++count)
-            {
-                auto start = std::chrono::steady_clock::now();
-                for (std::size_t i = 0; i < size; ++i)
-                {
-                    res.data()[i] = f(lhs.data()[i]);
-                }
-                auto end = std::chrono::steady_clock::now();
-                auto tmp = end - start;
-                t_res = tmp < t_res ? tmp : t_res;
-            }
-            return t_res;
-        }
-
-        template <class F, class V>
-        inline duration_type benchmark_xtensor_ref(F f, const V& lhs, const V& rhs, V& res, std::size_t number)
-        {
-            size_t size = lhs.shape()[0] * lhs.shape()[1];
-            duration_type t_res = duration_type::max();
-            for (std::size_t count = 0; count < number; ++count)
-            {
-                auto start = std::chrono::steady_clock::now();
-                for (std::size_t i = 0; i < size; ++i)
-                {
-                    res.data()[i] = f(lhs.data()[i], rhs.data()[i]);
-                }
-                auto end = std::chrono::steady_clock::now();
-                auto tmp = end - start;
-                t_res = tmp < t_res ? tmp : t_res;
-            }
-            return t_res;
-        }
-
-        template <class F, class V>
-        inline duration_type benchmark_xtensor(F f, const V& lhs, V& res, std::size_t number)
-        {
-            duration_type t_res = duration_type::max();
-            for (std::size_t count = 0; count < number; ++count)
-            {
-                auto start = std::chrono::steady_clock::now();
-                xt::noalias(res) = f(lhs);
-                auto end = std::chrono::steady_clock::now();
-                auto tmp = end - start;
-                t_res = tmp < t_res ? tmp : t_res;
-            }
-            return t_res;
-        }
-
-        template <class F, class V>
-        inline duration_type benchmark_xtensor(F f, const V& lhs, const V& rhs, V& res, std::size_t number)
-        {
-            size_t s0 = lhs.shape()[0];
-            size_t s1 = lhs.shape()[1];
-            duration_type t_res = duration_type::max();
-            for (std::size_t count = 0; count < number; ++count)
-            {
-                auto start = std::chrono::steady_clock::now();
-                xt::noalias(res) = f(lhs, rhs);
-                auto end = std::chrono::steady_clock::now();
-                auto tmp = end - start;
-                t_res = tmp < t_res ? tmp : t_res;
-            }
-            return t_res;
-        }
-
-        /*********************
-         * Benchmark runners *
-         *********************/
-
-        template <class F, class OS>
-        void run_benchmark_1op(F f, OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
+        inline void math_xtensor_2(benchmark::State& state)
         {
             xtensor<double, 2> lhs, rhs, res;
-            init_xtensor_benchmark(lhs, rhs, res, size0, size1);
+            init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
 
-            duration_type ref_time = benchmark_xtensor_ref(f, lhs, res, iter);
-            duration_type xt_time = benchmark_xtensor(f, lhs, res, iter);
+            auto f = F();
 
-            out << "=====================" << std::endl;
-            out << F::name() << std::endl;
-            out << "reference: " << ref_time.count() << "ms" << std::endl;
-            out << "xtensor  : " << xt_time.count() << "ms" << std::endl;
-            out << "=====================" << std::endl;
+            while(state.KeepRunning())
+            {
+                benchmark::DoNotOptimize(xt::noalias(res) = f(lhs, rhs));
+            }
         }
 
-        template <class F, class OS>
-        void run_benchmark_2op(F f, OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
+        template <class F, class V>
+        inline void math_xtensor_1(benchmark::State& state)
         {
             xtensor<double, 2> lhs, rhs, res;
-            init_xtensor_benchmark(lhs, rhs, res, size0, size1);
+            init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
 
-            duration_type ref_time = benchmark_xtensor_ref(f, lhs, rhs, res, iter);
-            duration_type xt_time = benchmark_xtensor(f, lhs, rhs, res, iter);
+            auto f = F();
 
-            out << "=====================" << std::endl;
-            out << F::name() << std::endl;
-            out << "reference: " << ref_time.count() << "ms" << std::endl;
-            out << "xtensor  : " << xt_time.count() << "ms" << std::endl;
-            out << "=====================" << std::endl;
+            while(state.KeepRunning())
+            {
+                benchmark::DoNotOptimize(xt::noalias(res) = f(lhs));
+            }
+        }
+
+        template <class F>
+        inline auto math_ref_2(benchmark::State& state)
+        {
+            auto f = F();
+            xtensor<double, 2> lhs, rhs, res;
+            init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
+            size_t size = lhs.shape()[0] * lhs.shape()[1];
+
+            while (state.KeepRunning())
+            {
+                for (std::size_t i = 0; i < size; ++i)
+                {
+                    benchmark::DoNotOptimize(res.data()[i] = f(lhs.data()[i], res.data()[i]));
+                }
+            }
+        }
+
+        template <class F>
+        inline void math_ref_1(benchmark::State& state)
+        {
+            auto f = F();
+            xtensor<double, 2> lhs, rhs, res;
+            init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
+            size_t size = lhs.shape()[0] * lhs.shape()[1];
+
+            while (state.KeepRunning())
+            {
+                for (std::size_t i = 0; i < size; ++i)
+                {
+                    benchmark::DoNotOptimize(res.data()[i] = f(lhs.data()[i]));
+                }
+            }
         }
 
         /**********************
@@ -237,117 +196,81 @@ namespace xt
          * benchmark groups *
          ********************/
 
-        template <class OS>
-        void benchmark_arithmetic(OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
-        {
-            run_benchmark_2op(add_fn(), out, size0, size1, iter);
-            run_benchmark_2op(sub_fn(), out, size0, size1, iter);
-            run_benchmark_2op(mul_fn(), out, size0, size1, iter);
-            run_benchmark_2op(div_fn(), out, size0, size1, iter);
-        }
+        BENCHMARK_TEMPLATE(math_ref_2, add_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_2, add_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        void benchmark_exp_log(OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
-        {
-            run_benchmark_1op(exp_fn(), out, size0, size1, iter);
-            run_benchmark_1op(exp2_fn(), out, size0, size1, iter);
-            run_benchmark_1op(expm1_fn(), out, size0, size1, iter);
-            run_benchmark_1op(log_fn(), out, size0, size1, iter);
-            run_benchmark_1op(log2_fn(), out, size0, size1, iter);
-            run_benchmark_1op(log10_fn(), out, size0, size1, iter);
-            run_benchmark_1op(log1p_fn(), out, size0, size1, iter);
-        }
+        BENCHMARK_TEMPLATE(math_ref_2, sub_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_2, sub_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        void benchmark_trigo(OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
-        {
-            run_benchmark_1op(sin_fn(), out, size0, size1, iter);
-            run_benchmark_1op(cos_fn(), out, size0, size1, iter);
-            run_benchmark_1op(tan_fn(), out, size0, size1, iter);
-            run_benchmark_1op(asin_fn(), out, size0, size1, iter);
-            run_benchmark_1op(acos_fn(), out, size0, size1, iter);
-            run_benchmark_1op(atan_fn(), out, size0, size1, iter);
-        }
+        BENCHMARK_TEMPLATE(math_ref_2, mul_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_2, mul_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        void benchmark_hyperbolic(OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
-        {
-            run_benchmark_1op(sinh_fn(), out, size0, size1, iter);
-            run_benchmark_1op(cosh_fn(), out, size0, size1, iter);
-            run_benchmark_1op(tanh_fn(), out, size0, size1, iter);
-            run_benchmark_1op(asinh_fn(), out, size0, size1, iter);
-            run_benchmark_1op(acosh_fn(), out, size0, size1, iter);
-            run_benchmark_1op(atanh_fn(), out, size0, size1, iter);
-        }
+        BENCHMARK_TEMPLATE(math_ref_2, div_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_2, div_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        void benchmark_power(OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
-        {
-            run_benchmark_2op(pow_fn(), out, size0, size1, iter);
-            run_benchmark_1op(sqrt_fn(), out, size0, size1, iter);
-            run_benchmark_1op(cbrt_fn(), out, size0, size1, iter);
-            run_benchmark_2op(hypot_fn(), out, size0, size1, iter);
-        }
+        BENCHMARK_TEMPLATE(math_ref_1, exp_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, exp_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, exp2_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, exp2_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, expm1_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, expm1_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, log_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, log_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, log2_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, log2_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, log10_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, log10_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, log1p_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, log1p_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        void benchmark_rounding(OS& out, std::size_t size0, std::size_t size1, std::size_t iter)
-        {
-            run_benchmark_1op(ceil_fn(), out, size0, size1, iter);
-            run_benchmark_1op(floor_fn(), out, size0, size1, iter);
-            run_benchmark_1op(trunc_fn(), out, size0, size1, iter);
-            run_benchmark_1op(round_fn(), out, size0, size1, iter);
-            run_benchmark_1op(nearbyint_fn(), out, size0, size1, iter);
-            run_benchmark_1op(rint_fn(), out, size0, size1, iter);
-        }
+        BENCHMARK_TEMPLATE(math_ref_1, sin_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, sin_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, cos_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, cos_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, tan_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, tan_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, asin_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, asin_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, acos_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, acos_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, atan_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, atan_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        using benchmark_function = void(*)(OS&, std::size_t, std::size_t, std::size_t);
+        BENCHMARK_TEMPLATE(math_ref_1, sinh_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, sinh_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, cosh_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, cosh_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, tanh_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, tanh_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, asinh_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, asinh_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, acosh_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, acosh_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, atanh_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, atanh_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        using benchmark_map = std::map < std::string, benchmark_function<OS>>;
+        BENCHMARK_TEMPLATE(math_ref_2, pow_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_2, pow_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, sqrt_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, sqrt_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, cbrt_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, cbrt_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_2, hypot_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_2, hypot_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
-        template <class OS>
-        const benchmark_map<OS>& get_benchmark_map()
-        {
-            static benchmark_map<OS> bm;
-            if (bm.empty())
-            {
-                bm["op"] = &benchmark_arithmetic<OS>;
-                bm["exp"] = &benchmark_exp_log<OS>;
-                bm["trigo"] = &benchmark_trigo<OS>;
-                bm["hyperbolic"] = &benchmark_hyperbolic<OS>;
-                bm["power"] = &benchmark_power<OS>;
-                bm["rounding"] = &benchmark_rounding<OS>;
-            }
-            return bm;
-        }
-
-        template <class OS>
-        void benchmark_math(OS& out, const std::string& meth = "")
-        {
-            std::size_t size0 = 20;
-            std::size_t size1 = 500;
-            std::size_t nb_iter = 1000;
-
-            const auto& bm = get_benchmark_map<OS>();
-            if (meth != "")
-            {
-                auto iter = bm.find(meth);
-                if (iter != bm.end())
-                {
-                    (iter->second)(out, size0, size1, nb_iter);
-                }
-            }
-            else
-            {
-                for (auto v : bm)
-                {
-                    (v.second)(out, size0, size1, nb_iter);
-                }
-            }
-        }
+        BENCHMARK_TEMPLATE(math_ref_1, ceil_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, ceil_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, floor_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, floor_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, trunc_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, trunc_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, round_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, round_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, nearbyint_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, nearbyint_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_ref_1, rint_fn)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_1, rint_fn, xtensor<double, 2>)->Range(MATH_RANGE);
     }
-
 }
 
 #endif

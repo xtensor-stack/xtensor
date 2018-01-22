@@ -65,18 +65,6 @@ namespace xt
         EXPECT_EQ(8, accumulate(func, 0, t));
     }
 
-    TEST(utils, or)
-    {
-        using true_t = std::true_type;
-        using false_t = std::false_type;
-
-        using t1 = or_<false_t, false_t, false_t>;
-        using t2 = or_<false_t, true_t, false_t>;
-
-        ASSERT_TRUE(!t1::value);
-        ASSERT_TRUE(t2::value);
-    }
-
     template <class... T>
     auto foo(const std::tuple<T...>& t)
     {
@@ -134,20 +122,10 @@ namespace xt
         EXPECT_EQ(e2, s2);
     }
 
-    TEST(utils, forward_offset)
+    TEST(utils, conditional_cast)
     {
-        // Test that lvalues can be modified
-        std::complex<double> clv;
-        forward_real(clv) = 3.0;
-        EXPECT_EQ(std::real(clv), 3.0);
-
-        forward_imag(clv) = 1.0;
-        EXPECT_EQ(std::imag(clv), 1.0);
-
-        double rlv = 2.0;
-        forward_real(rlv) = 1.0;
-        EXPECT_EQ(forward_imag(rlv), 0.0);
-        EXPECT_EQ(forward_real(rlv), 1.0);
+        EXPECT_TRUE((std::is_same<decltype(conditional_cast<false, double>(1)), int>::value));
+        EXPECT_TRUE((std::is_same<decltype(conditional_cast<true, double>(1)), double>::value));
     }
 
     TEST(utils, promote_traits)
@@ -156,6 +134,13 @@ namespace xt
         EXPECT_TRUE((std::is_same<promote_type_t<int>, int>::value));
         EXPECT_TRUE((std::is_same<promote_type_t<float>, float>::value));
         EXPECT_TRUE((std::is_same<promote_type_t<double>, double>::value));
+        EXPECT_TRUE((std::is_same<promote_type_t<bool>, bool>::value));
+
+        EXPECT_TRUE((std::is_same<big_promote_type_t<uint8_t>, unsigned long long>::value));
+        EXPECT_TRUE((std::is_same<big_promote_type_t<short>, long long>::value));
+        EXPECT_TRUE((std::is_same<big_promote_type_t<int>, long long>::value));
+        EXPECT_TRUE((std::is_same<big_promote_type_t<float>, double>::value));
+        EXPECT_TRUE((std::is_same<big_promote_type_t<double>, double>::value));
 
         EXPECT_TRUE((std::is_same<real_promote_type_t<uint8_t>, double>::value));
         EXPECT_TRUE((std::is_same<real_promote_type_t<int>, double>::value));
@@ -168,7 +153,7 @@ namespace xt
 
     TEST(utils, norm_traits)
     {
-        EXPECT_TRUE((std::is_same<norm_type_t<uint8_t>, uint8_t>::value));
+        EXPECT_TRUE((std::is_same<norm_type_t<uint8_t>, int>::value));
         EXPECT_TRUE((std::is_same<norm_type_t<int>, int>::value));
         EXPECT_TRUE((std::is_same<norm_type_t<double>, double>::value));
         EXPECT_TRUE((std::is_same<norm_type_t<std::vector<uint8_t>>, double>::value));

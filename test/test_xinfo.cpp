@@ -7,28 +7,28 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xstridedview.hpp"
 
-#include "xtensor/xio.hpp"
-#include <iostream>
+#include <sstream>
+#include <string>
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xinfo.hpp"
 
 namespace xt
 {
-    using std::size_t;
-    using shape_t = std::vector<std::size_t>;
-
-    TEST(xstridedview, transpose_assignment)
+    TEST(xinfo, compiles)
     {
-        xarray<double> e = xt::arange<double>(24);
-        e.reshape({2, 2, 6});
-        auto vt = transpose(e);
+    	xarray<double> test = {{1,2,3}, {4,5,6}};
+    	std::stringstream ss;
 
-        vt(0, 0, 1) = 123;
-        EXPECT_EQ(123, e(1, 0, 0));
-        auto val = vt[{1, 0, 1}];
-        EXPECT_EQ(e(1, 0, 1), val);
+    	ss << info(test) << std::endl;
+    }
+
+    TEST(xinfo, typename)
+    {
+    	xarray<double> test = {{1,2,3}, {4,5,6}};
+    	auto t_s = type_to_string<typename decltype(test)::value_type>();
+    	std::string expected = "double";
+    	EXPECT_EQ(expected, t_s);
     }
 }
-

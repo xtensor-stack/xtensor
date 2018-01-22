@@ -6,9 +6,10 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XAXIS_ITERATOR_HPP
-#define XAXIS_ITERATOR_HPP
+#ifndef XTENSOR_AXIS_ITERATOR_HPP
+#define XTENSOR_AXIS_ITERATOR_HPP
 
+#include "xtl/xclosure.hpp"
 #include "xview.hpp"
 
 namespace xt
@@ -30,7 +31,7 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
         using value_type = xview<CT, size_type>;
         using reference = std::remove_reference_t<apply_cv_t<CT, value_type>>;
-        using pointer = std::nullptr_t;
+        using pointer = xtl::xclosure_pointer<std::remove_reference_t<apply_cv_t<CT, value_type>>>;
 
         using iterator_category = std::forward_iterator_tag;
 
@@ -48,7 +49,7 @@ namespace xt
 
     private:
 
-        using storing_type = ptr_closure_t<CT>;
+        using storing_type = xtl::ptr_closure_type_t<CT>;
         mutable storing_type p_expression;
         size_type m_index;
 
@@ -154,7 +155,7 @@ namespace xt
     template <class CT>
     inline auto xaxis_iterator<CT>::operator->() const -> pointer
     {
-        return nullptr;
+        return xtl::closure_pointer(operator*());
     }
 
     template <class CT>
@@ -178,7 +179,7 @@ namespace xt
     template <class E>
     inline auto axis_begin(E&& e)
     {
-        using return_type = xaxis_iterator<closure_t<E>>;
+        using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
         using size_type = typename std::decay_t<E>::size_type;
         return return_type(std::forward<E>(e), size_type(0));
     }
@@ -186,7 +187,7 @@ namespace xt
     template <class E>
     inline auto axis_end(E&& e)
     {
-        using return_type = xaxis_iterator<closure_t<E>>;
+        using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
         using size_type = typename std::decay_t<E>::size_type;
         return return_type(std::forward<E>(e), size_type(e.shape()[0]));
     }

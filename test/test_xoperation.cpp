@@ -137,6 +137,98 @@ namespace xt
         EXPECT_EQ((sa / b)(0, 0), sa / b(0, 0));
     }
 
+    TYPED_TEST(operation, modulus)
+    {
+        using int_container = rebind_container_t<TypeParam, int>;
+        using shape_type = typename int_container::shape_type;
+
+        shape_type shape = {3, 2};
+        int_container a(shape, 11);
+        int_container b(shape, 3);
+        EXPECT_EQ((a % b)(0, 0), a(0, 0) % b(0, 0));
+        
+        int sb = 3;
+        EXPECT_EQ((a % sb)(0, 0), a(0, 0) % sb);
+        
+        int sa = 11;
+        EXPECT_EQ((sa % b)(0, 0), sa % b(0, 0));
+    }
+    
+    template <class T>
+    struct int_rebind;
+
+    template <>
+    struct int_rebind<xarray<double>>
+    {
+        using type = xarray<int>;
+    };
+
+    template <>
+    struct int_rebind<xtensor<double, 2>>
+    {
+        using type = xtensor<int, 2>;
+    };
+
+    template <class T>
+    using int_rebind_t = typename int_rebind<T>::type;
+
+    TYPED_TEST(operation, bitwise_and)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = {3, 2};
+        int_tensor a(shape, 14);
+        int_tensor b(shape, 15);
+        EXPECT_EQ((a & b)(0, 0), a(0, 0) & b(0, 0));
+
+        int sb = 48;
+        EXPECT_EQ((a & sb)(0, 0), a(0, 0) & sb);
+
+        int sa = 24;
+        EXPECT_EQ((sa & b)(0, 0), sa & b(0, 0));
+    }
+
+    TYPED_TEST(operation, bitwise_or)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = {3, 2};
+        int_tensor a(shape, 14);
+        int_tensor b(shape, 15);
+        EXPECT_EQ((a | b)(0, 0), a(0, 0) | b(0, 0));
+
+        int sb = 48;
+        EXPECT_EQ((a | sb)(0, 0), a(0, 0) | sb);
+
+        int sa = 24;
+        EXPECT_EQ((sa | b)(0, 0), sa | b(0, 0));
+    }
+
+    TYPED_TEST(operation, bitwise_xor)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = {3, 2};
+        int_tensor a(shape, 14);
+        int_tensor b(shape, 15);
+        EXPECT_EQ((a ^ b)(0, 0), a(0, 0) ^ b(0, 0));
+
+        int sb = 48;
+        EXPECT_EQ((a ^ sb)(0, 0), a(0, 0) ^ sb);
+
+        int sa = 24;
+        EXPECT_EQ((sa ^ b)(0, 0), sa ^ b(0, 0));
+    }
+
+    TYPED_TEST(operation, bitwise_not)
+    {
+        using int_tensor = int_rebind_t<TypeParam>;
+        using shape_type = typename int_tensor::shape_type;
+        shape_type shape = {3, 2};
+        int_tensor a(shape, 15);
+        EXPECT_EQ((~a)(0, 0), ~(a(0, 0)));
+    }
+
     TYPED_TEST(operation, less)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
@@ -360,5 +452,16 @@ namespace xt
         int_container_2d a = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
         std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected = {{0, 0}, {1, 1}, {2, 2}};
         EXPECT_EQ(expected, where(a));
+    }
+
+    TYPED_TEST(operation, cast)
+    {
+        using int_container_t = rebind_container_t<TypeParam, int>;
+        using shape_type = typename int_container_t::shape_type;
+        shape_type shape = {3, 2};
+        int_container_t a(shape, 5);
+        auto ref = static_cast<double>(a(0, 0)) / 2;
+        auto actual = (cast<double>(a) / 2)(0, 0);
+        EXPECT_EQ(ref, actual);
     }
 }

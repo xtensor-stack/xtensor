@@ -6,12 +6,14 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XSLICE_HPP
-#define XSLICE_HPP
+#ifndef XTENSOR_SLICE_HPP
+#define XTENSOR_SLICE_HPP
 
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+
+#include "xtl/xtype_traits.hpp"
 
 #include "xutils.hpp"
 
@@ -66,7 +68,7 @@ namespace xt
     using disable_xslice = typename std::enable_if<!is_xslice<E>::value, R>::type;
 
     template <class... E>
-    using has_xslice = or_<is_xslice<E>...>;
+    using has_xslice = xtl::disjunction<is_xslice<E>...>;
 
     /**********************
      * xrange declaration *
@@ -93,20 +95,6 @@ namespace xt
         size_type m_size;
     };
 
-    /**
-     * Returns a slice representing an interval, to
-     * be used as an argument of view function.
-     * @param min_val the first index of the interval
-     * @param max_val the last index of the interval
-     * @sa view
-     */
-    template <class T, class E = std::enable_if_t<!std::is_same<T, placeholders::xtuph>::value>>
-    inline auto range(T min_val, T max_val) noexcept
-    {
-        using UT = std::make_unsigned_t<T>;
-        return xrange<UT>(static_cast<UT>(min_val), static_cast<UT>(max_val));
-    }
-
     /******************************
      * xstepped_range declaration *
      ******************************/
@@ -132,22 +120,6 @@ namespace xt
         size_type m_size;
         size_type m_step;
     };
-
-    /**
-     * Returns a slice representing an interval, to
-     * be used as an argument of view function.
-     * @param min_val the first index of the interval
-     * @param max_val the last index of the interval
-     * @param step the space between two indices
-     * @sa view
-     */
-    template <class T, class E = std::enable_if_t<!std::is_same<T, placeholders::xtuph>::value>>
-    inline auto range(T min_val, T max_val, T step) noexcept
-    {
-        //using UT = std::make_unsigned_t<T>;
-        //return xstepped_range<UT>(static_cast<UT>(min_val), static_cast<UT>(max_val), static_cast<UT>(step));
-        return xstepped_range<T>(min_val, max_val, step);
-    }
 
     /********************
      * xall declaration *
@@ -233,21 +205,45 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value && std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        inline std::enable_if_t<std::is_integral<MI>::value &&
+                                std::is_integral<MA>::value &&
+                                std::is_integral<STEP>::value, xstepped_range<int>>
+        get(std::size_t /*size*/) const
+        {
+            return xstepped_range<int>(m_min, m_max, m_step);
+        }
+
+        template <class MI = A, class MA = B, class STEP = C>
+        inline std::enable_if_t<!std::is_integral<MI>::value && 
+                                std::is_integral<MA>::value &&
+                                std::is_integral<STEP>::value, xstepped_range<int>>
         get(std::size_t size) const
         {
             return xstepped_range<int>(m_step > 0 ? 0 : int(size) - 1, m_max, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<std::is_integral<MI>::value && !std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        inline std::enable_if_t<std::is_integral<MI>::value &&
+                                !std::is_integral<MA>::value &&
+                                std::is_integral<STEP>::value, xstepped_range<int>>
         get(std::size_t size) const
         {
             return xstepped_range<int>(m_min, m_step > 0 ? int(size) : -1, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value && !std::is_integral<MA>::value && std::is_integral<STEP>::value, xstepped_range<int>>
+        inline std::enable_if_t<std::is_integral<MI>::value &&
+                                std::is_integral<MA>::value &&
+                               !std::is_integral<STEP>::value, xrange<int>>
+        get(std::size_t /*size*/) const
+        {
+            return xrange<int>(static_cast<int>(m_min), static_cast<int>(m_max));
+        }
+
+        template <class MI = A, class MA = B, class STEP = C>
+        inline std::enable_if_t<!std::is_integral<MI>::value &&
+                                !std::is_integral<MA>::value &&
+                                std::is_integral<STEP>::value, xstepped_range<int>>
         get(std::size_t size) const
         {
             int min_val_arg = m_step > 0 ? 0 : int(size) - 1;
@@ -256,21 +252,27 @@ namespace xt
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<std::is_integral<MI>::value && !std::is_integral<MA>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
+        inline std::enable_if_t<std::is_integral<MI>::value &&
+                                !std::is_integral<MA>::value &&
+                                !std::is_integral<STEP>::value, xrange<std::size_t>>
         get(std::size_t size) const
         {
-            return xrange<std::size_t>((std::size_t)m_min, size);
+            return xrange<std::size_t>(std::size_t(m_min), size);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value && std::is_integral<MA>::value && !std::is_integral<STEP>::value, xrange<std::size_t>>
+        inline std::enable_if_t<!std::is_integral<MI>::value &&
+                                std::is_integral<MA>::value &&
+                                !std::is_integral<STEP>::value, xrange<std::size_t>>
         get(std::size_t /*size*/) const
         {
-            return xrange<std::size_t>(0, (std::size_t)m_max);
+            return xrange<std::size_t>(0, std::size_t(m_max));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value && !std::is_integral<MA>::value && !std::is_integral<STEP>::value, xall<std::size_t>>
+        inline std::enable_if_t<!std::is_integral<MI>::value &&
+                                !std::is_integral<MA>::value &&
+                                !std::is_integral<STEP>::value, xall<std::size_t>>
         get(std::size_t size) const
         {
             return xall<std::size_t>(size);
@@ -458,7 +460,7 @@ namespace xt
 
     template <class T>
     inline xstepped_range<T>::xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept
-        : m_min(min_val), m_size((size_type)std::ceil(double(max_val - min_val) / double(step))), m_step(step)
+        : m_min(min_val), m_size(size_type(std::ceil(double(max_val - min_val) / double(step)))), m_step(step)
     {
     }
 

@@ -15,3 +15,6 @@ Defined in ``xtensor/xtensor.hpp``
 
 .. doxygentypedef:: xt::xtensor
    :project: xtensor
+
+.. doxygentypedef:: xt::xtensor_optional
+   :project: xtensor

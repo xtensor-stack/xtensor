@@ -6,15 +6,17 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XCOMPLEX_HPP
-#define XCOMPLEX_HPP
+#ifndef XTENSOR_COMPLEX_HPP
+#define XTENSOR_COMPLEX_HPP
 
 #include <type_traits>
 #include <utility>
 
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xexpression.hpp"
-#include "xtensor/xoffsetview.hpp"
+#include "xtensor/xoffset_view.hpp"
+
+#include "xtl/xcomplex.hpp"
 
 namespace xt
 {
@@ -42,14 +44,14 @@ namespace xt
             static inline auto real(E&& e) noexcept
             {
                 using real_type = typename std::decay_t<E>::value_type::value_type;
-                return xoffsetview<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
+                return xoffset_view<xclosure_t<E>, real_type, 0>(std::forward<E>(e));
             }
 
             template <class E>
             static inline auto imag(E&& e) noexcept
             {
                 using real_type = typename std::decay_t<E>::value_type::value_type;
-                return xoffsetview<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
+                return xoffset_view<xclosure_t<E>, real_type, sizeof(real_type)>(std::forward<E>(e));
             }
         };
 
@@ -75,13 +77,13 @@ namespace xt
             template <class E>
             static inline auto real(E&& e) noexcept
             {
-                return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
+                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
             }
 
             template <class E>
             static inline auto imag(E&& e) noexcept
             {
-                return detail::complex_helper<is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
+                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
             }
         };
 
@@ -91,13 +93,13 @@ namespace xt
             template <class E>
             static inline decltype(auto) real(E&& e) noexcept
             {
-                return forward_real(std::forward<E>(e));
+                return xtl::forward_real(std::forward<E>(e));
             }
 
             template <class E>
             static inline decltype(auto) imag(E&& e) noexcept
             {
-                return forward_imag(std::forward<E>(e));
+                return xtl::forward_imag(std::forward<E>(e));
             }
         };
     }
@@ -170,7 +172,12 @@ namespace xt
         {
             using argument_type = T;
             using result_type = decltype(detail::conj(std::declval<T>()));
+            using simd_value_type = xsimd::simd_type<T>;
             constexpr result_type operator()(const T& t) const
+            {
+                return detail::conj(t);
+            }
+            constexpr simd_value_type simd_apply(const simd_value_type& t) const
             {
                 return detail::conj(t);
             }
@@ -217,7 +224,7 @@ namespace xt
     template <class E>
     inline auto angle(E&& e, bool deg = false) noexcept
     {
-        using value_type = complex_value_type_t<typename std::decay_t<E>::value_type>;
+        using value_type = xtl::complex_value_type_t<typename std::decay_t<E>::value_type>;
         value_type multiplier = 1.0;
         if (deg)
         {

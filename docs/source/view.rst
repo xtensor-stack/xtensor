@@ -67,6 +67,32 @@ you are actually also altering the underlying expression.
     v1(0, 0) = 1;
     // => a(1, 0, 1) = 1
 
+
+Dynamic views
+-------------
+
+While the ``xt::view`` is a compile-time static expression, xtensor also contains a dynamic view in ``xstridedview.hpp``. The dynamic view and the slice vector allow to dynamically push_back slices, so when the dimension is unknown at compile time, the slice vector can be built dynamically at runtime. All the same slices as in xview can be used.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xstridedview.hpp"
+
+    auto a = xt::xarray<int>::from_shape({3, 2, 3, 4, 5});
+
+    // note that `a` has to be passed into the slice_vector constructor
+    xt::slice_vector sv(a, xt::range(0, 1), xt::newaxis());
+    sv.push_back(1);
+    sv.push_back(xt::all());
+    // there is also a shorthand syntax: sv.append(1, xt::all());
+
+    auto v1 = xt::dynamic_view(a, sv);
+    // v1 has the same behavior as the static view
+
+The dynamic_view is implemented on top of the strided_view, which is very efficient on contigous memory (e.g. xtensor or xarray) 
+but less efficient on xexpressions.
+
+
 Index views
 -----------
 
@@ -77,7 +103,7 @@ with the ``index_view`` helper function.
 .. code::
 
     #include "xtensor/xarray.hpp"
-    #include "xtensor/xindexview.hpp"
+    #include "xtensor/xindex_view.hpp"
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     auto b = xt::index_view(a, {{0,0}, {1, 0}, {0, 1}});
@@ -94,7 +120,7 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
 .. code::
 
     #include "xtensor/xarray.hpp"
-    #include "xtensor/xindexview.hpp"
+    #include "xtensor/xindex_view.hpp"
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     auto v = xt::filter(a, a >= 5);
@@ -113,7 +139,7 @@ computed scalar assignments.
 .. code::
 
     #include "xtensor/xarray.hpp"
-    #include "xtensor/xindexview.hpp"
+    #include "xtensor/xindex_view.hpp"
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     filtration(a, a >= 5) += 100;

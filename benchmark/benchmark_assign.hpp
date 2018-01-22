@@ -9,16 +9,16 @@
 #ifndef BENCHMARK_ASSIGN_HPP
 #define BENCHMARK_ASSIGN_HPP
 
-#include <chrono>
-#include <cstddef>
+#include <benchmark/benchmark.h>
+
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xarray.hpp"
 
 namespace xt
 {
     namespace assign
     {
-        using duration_type = std::chrono::duration<double, std::milli>;
 
         /****************************
          * Benchmark initialization *
@@ -42,9 +42,9 @@ namespace xt
         inline void init_xtensor_benchmark(V& lhs, V& rhs, V& res,
                                            std::size_t size0, size_t size1)
         {
-            lhs.reshape({ size0, size1 });
-            rhs.reshape({ size0, size1 });
-            res.reshape({ size0, size1 });
+            lhs.resize({ size0, size1 });
+            rhs.resize({ size0, size1 });
+            res.resize({ size0, size1 });
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
@@ -54,71 +54,46 @@ namespace xt
         {
             using strides_type = typename V::strides_type;
             strides_type str = { size1, 1 };
-            lhs.reshape({ size0, size1 }, str);
-            rhs.reshape({ size0, size1 }, str);
-            res.reshape({ size0, size1 }, str);
+            lhs.resize({ size0, size1 }, str);
+            rhs.resize({ size0, size1 }, str);
+            res.resize({ size0, size1 }, str);
             init_benchmark_data(lhs, rhs, size0, size1);
         }
 
         template <class E>
-        inline auto benchmark_c_loop(const E& x, const E& y, E& res, std::size_t count)
+        inline auto benchmark_c_assign(benchmark::State& state)
         {
-            duration_type t_res = duration_type::max();
             using size_type = typename E::size_type;
-            for (std::size_t i = 0; i < count; ++i)
+
+            E x, y, res;
+            init_xtensor_benchmark(x, y, res, state.range(0), state.range(0));
+
+            while (state.KeepRunning())
             {
-                auto start = std::chrono::steady_clock::now();
                 size_type csize = x.size();
                 for (size_type i = 0; i < csize; ++i)
                 {
                     res.data()[i] = 3 * x.data()[i] - 2 * y.data()[i];
                 }
-                auto end = std::chrono::steady_clock::now();
-                auto tmp = end - start;
-                t_res = tmp < t_res ? tmp : t_res;
             }
-            return t_res;
         }
 
         template <class E>
-        inline auto benchmark_xtensor(const E& x, const E& y, E& res, std::size_t count)
+        inline auto benchmark_assign(benchmark::State& state)
         {
-            duration_type t_res = duration_type::max();
-            for (std::size_t i = 0; i < count; ++i)
+            E x, y, res;
+            init_xtensor_benchmark(x, y, res, state.range(0), state.range(0));
+            while (state.KeepRunning())
             {
-                auto start = std::chrono::steady_clock::now();
                 xt::noalias(res) = 3 * x - 2 * y;
-                auto end = std::chrono::steady_clock::now();
-                auto tmp = end - start;
-                t_res = tmp < t_res ? tmp : t_res;
             }
-            return t_res;
         }
 
-        template <class OS>
-        inline void benchmark(OS& out)
-        {
-            std::size_t count = 10;
-            std::size_t size0 = 20, size1 = 500;
-            xtensor<double, 2> lhs_r, rhs_r, res_r;
-            init_xtensor_benchmark(lhs_r, rhs_r, res_r, size0, size1);
-
-            xtensor<double, 2, layout_type::dynamic> lhs_d, rhs_d, res_d;
-            init_dl_xtensor_benchmark(lhs_d, rhs_d, res_d, size0, size1);
-
-            duration_type c_loop_assign = benchmark_c_loop(lhs_d, rhs_d, res_d, count);
-            duration_type iterator_assign = benchmark_xtensor(lhs_d, rhs_d, res_d, count);
-            duration_type index_assign = benchmark_xtensor(lhs_r, rhs_r, res_r, count);
-
-            out << "********************" << std::endl;
-            out << "* ASSIGN BENCHMARK *" << std::endl;
-            out << "********************" << std::endl;
-
-            out << "c loop assign  : " << c_loop_assign.count() << "ms" << std::endl;
-            out << "iterator assign: " << iterator_assign.count() << "ms" << std::endl;
-            out << "index assign   : " << index_assign.count() << "ms" << std::endl;
-            out << std::endl;
-        }
+        BENCHMARK_TEMPLATE(benchmark_c_assign, xt::xtensor<double, 2>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(benchmark_assign, xt::xarray<double>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(benchmark_assign, xt::xtensor<double, 2>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(benchmark_assign, xt::xarray<double, layout_type::dynamic>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(benchmark_assign, xt::xtensor<double, 2, layout_type::dynamic>)->Range(32, 32<<3);
     }
 }
 

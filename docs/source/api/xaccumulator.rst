@@ -4,11 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xadaptor_semantic
-=================
+xaccumulator
+============
 
-Defined in ``xtensor/xsemantic.hpp``
+Defined in ``xtensor/xaccumulator.hpp``
 
-.. doxygenclass:: xt::xadaptor_semantic
+.. doxygenfunction:: xt::accumulate(F&&, E&&, ES)
    :project: xtensor
-   :members:
+
+.. doxygenfunction:: xt::accumulate(F&&, E&&, std::size_t, ES)
+   :project: xtensor

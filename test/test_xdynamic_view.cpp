@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xstridedview.hpp"
+#include "xtensor/xstrided_view.hpp"
 #include <algorithm>
 
 namespace xt
@@ -17,12 +17,12 @@ namespace xt
     using std::size_t;
     using view_shape_type = std::vector<size_t>;
 
-    TEST(xdynview, simple)
+    TEST(xdynamic_view, simple)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
         EXPECT_EQ(a(1, 1), view1(0));
@@ -61,7 +61,7 @@ namespace xt
         EXPECT_EQ(a(2, 2), view7(2));
     }
 
-    TEST(xdynview, three_dimensional)
+    TEST(xdynamic_view, three_dimensional)
     {
         view_shape_type shape = {3, 4, 2};
         std::vector<double> data = {
@@ -81,7 +81,7 @@ namespace xt
             211, 212
         };
         xarray<double> a(shape);
-        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1));
         EXPECT_EQ(size_t(2), view1.dimension());
@@ -96,7 +96,7 @@ namespace xt
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
 
-    TEST(xdynview, iterator)
+    TEST(xdynamic_view, iterator)
     {
         view_shape_type shape = {2, 3, 4};
         xarray<double> a(shape);
@@ -105,8 +105,8 @@ namespace xt
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, range(0, 2), 1, range(1, 4)));
-        auto iter = view1.begin();
-        auto iter_end = view1.end();
+        auto iter = view1.template begin<layout_type::row_major>();
+        auto iter_end = view1.template end<layout_type::row_major>();
 
         EXPECT_EQ(6, *iter);
         ++iter;
@@ -123,8 +123,8 @@ namespace xt
         EXPECT_EQ(iter, iter_end);
 
         auto view2 = dynamic_view(view1, slice_vector(view1, range(0, 2), range(1, 3)));
-        auto iter2 = view2.begin();
-        auto iter_end2 = view2.end();
+        auto iter2 = view2.template begin<layout_type::row_major>();
+        auto iter_end2 = view2.template end<layout_type::row_major>();
 
         EXPECT_EQ(7, *iter2);
         ++iter2;
@@ -137,7 +137,7 @@ namespace xt
         EXPECT_EQ(iter2, iter_end2);
     }
 
-    TEST(xdynview, xdynview_on_xfunction)
+    TEST(xdynamic_view, xdynamic_view_on_xfunction)
     {
         view_shape_type shape = {3, 4};
         xarray<int> a(shape);
@@ -150,8 +150,8 @@ namespace xt
         std::copy(data2.cbegin(), data2.cend(), b.template begin<layout_type::row_major>());
 
         auto func = dynamic_view(a, slice_vector(a, 1, range(1, 4))) + b;
-        auto iter = func.begin();
-        auto iter_end = func.end();
+        auto iter = func.template begin<layout_type::row_major>();
+        auto iter_end = func.template end<layout_type::row_major>();
 
         EXPECT_EQ(7, *iter);
         ++iter;
@@ -162,11 +162,11 @@ namespace xt
         EXPECT_EQ(iter, iter_end);
     }
 
-    TEST(xdynview, xdynview_on_xtensor)
+    TEST(xdynamic_view, xdynamic_view_on_xtensor)
     {
         xtensor<int, 2> a({3, 4});
         std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.begin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, 1, range(1, 4)));
         EXPECT_EQ(a(1, 1), view1(0));
@@ -189,7 +189,7 @@ namespace xt
         EXPECT_EQ(10, res(2));
     }
 
-    TEST(xdynview, const_view)
+    TEST(xdynamic_view, const_view)
     {
         const xtensor<double, 3> arr{{1, 2, 3}, 2.5};
         xtensor<double, 2> arr2{{2, 3}, 0.0};
@@ -198,12 +198,12 @@ namespace xt
         EXPECT_EQ(ref, arr2);
     }
 
-    TEST(xdynview, newaxis)
+    TEST(xdynamic_view, newaxis)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
         std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+        std::copy(data.cbegin(), data.cend(), a.begin());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), newaxis(), all()));
         EXPECT_EQ(a(1, 1), view1(1, 0, 1));
@@ -248,7 +248,7 @@ namespace xt
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
     }
 
-    TEST(xdynview, newaxis_iterating)
+    TEST(xdynamic_view, newaxis_iterating)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
@@ -256,8 +256,8 @@ namespace xt
         std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
 
         auto view1 = dynamic_view(a, slice_vector(a, all(), all(), newaxis()));
-        auto iter1 = view1.begin();
-        auto iter1_end = view1.end();
+        auto iter1 = view1.template begin<layout_type::row_major>();
+        auto iter1_end = view1.template end<layout_type::row_major>();
 
         EXPECT_EQ(a(0, 0), *iter1);
         ++iter1;
@@ -286,8 +286,8 @@ namespace xt
         EXPECT_EQ(iter1_end, iter1);
 
         auto view2 = dynamic_view(a, slice_vector(a, all(), newaxis(), all()));
-        auto iter2 = view2.begin();
-        auto iter2_end = view2.end();
+        auto iter2 = view2.template begin<layout_type::row_major>();
+        auto iter2_end = view2.template end<layout_type::row_major>();
 
         EXPECT_EQ(a(0, 0), *iter2);
         ++iter2;
@@ -316,7 +316,7 @@ namespace xt
         EXPECT_EQ(iter2_end, iter2);
     }
 
-    TEST(xdynview, newaxis_function)
+    TEST(xdynamic_view, newaxis_function)
     {
         view_shape_type shape = {3, 4};
         xarray<double> a(shape);
@@ -338,7 +338,7 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
-    TEST(xdynview, range_adaptor)
+    TEST(xdynamic_view, range_adaptor)
     {
         using namespace xt::placeholders;
         using t = xarray<int>;
@@ -377,5 +377,23 @@ namespace xt
         auto v8 = dynamic_view(a, slice_vector(a, range(2, n, 2)));
         t v8e = {3, 5};
         EXPECT_TRUE(v8e == v8);
+    }
+
+    TEST(xdynamic_view, assign)
+    {
+        using t = xarray<int>;
+        t a = {1, 2, 3, 4, 5};
+
+        auto v = dynamic_view(a, slice_vector(a, range(0, 2)));
+        v = 1000;
+        EXPECT_EQ(v(0), 1000);
+        EXPECT_EQ(a(0), 1000);
+        EXPECT_EQ(a(1), 1000);
+
+        auto v2 = dynamic_view(a, slice_vector(a, range(3, 5)));
+        t b = {-100, -100};
+        v2 = b;
+        EXPECT_EQ(v2(1), -100);
+        EXPECT_EQ(a(4), -100);
     }
 }

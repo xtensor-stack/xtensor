@@ -29,6 +29,22 @@ namespace xt
         EXPECT_EQ(4, x());
     }
 
+    TEST(xscalar, indexed_access)
+    {
+        // Calling operator() with no argument returns the wrapped value.
+        xscalar<int> x(2);
+        EXPECT_EQ((x[{0}]), 2);
+
+        x[{0}] = 4;
+        EXPECT_EQ(4, (x[{0}]));
+    }
+
+    TEST(xscalar, at)
+    {
+        xscalar<int> x(2);
+        EXPECT_ANY_THROW(x.at(0));
+    }
+
     TEST(xscalar, dimension)
     {
         // The dimension of a xscalar is 0

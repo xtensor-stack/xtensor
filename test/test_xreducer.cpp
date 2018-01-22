@@ -22,7 +22,7 @@ namespace xt
         xarray<double> m_a;
         using shape_type = xarray<double>::shape_type;
 
-        using func = std::plus<double>;
+        using func = xreducer_functors<std::plus<double>>;
         xreducer<func, const xarray<double>&, axes_type> m_red;
 
         xreducer_features();
@@ -41,6 +41,18 @@ namespace xt
         }
     }
 
+    TEST(xreducer, functor_type)
+    {
+        auto sum = [](auto const& left, auto const& right) { return left + right; };
+        auto sum_functor = xt::make_xreducer_functor(sum);
+        xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
+        xt::xarray<int> a_sums = xt::reduce(std::move(sum_functor), a, {1});
+        xt::xarray<int> a_sums2 = xt::reduce(sum_functor, a, {1});
+        xt::xarray<int> expect = {6, 15};
+        EXPECT_EQ(a_sums, expect);
+        EXPECT_EQ(a_sums2, expect);
+    }
+
     TEST(xreducer, shape)
     {
         xreducer_features features;
@@ -54,6 +66,22 @@ namespace xt
         xreducer_features features;
         EXPECT_EQ(12, features.m_red(0, 0, 0));
         EXPECT_EQ(24, features.m_red(1, 1, 1));
+    }
+
+    TEST(xreducer, indexed_access)
+    {
+        xreducer_features features;
+        EXPECT_EQ(12, (features.m_red[{0, 0, 0}]));
+        EXPECT_EQ(24, (features.m_red[{1, 1, 1}]));
+    }
+
+    TEST(xreducer, at)
+    {
+        xreducer_features features;
+        EXPECT_EQ(12, features.m_red.at(0, 0, 0));
+        EXPECT_EQ(24, features.m_red.at(1, 1, 1));
+        EXPECT_ANY_THROW(features.m_red.at(10, 10, 10));
+        EXPECT_ANY_THROW(features.m_red.at(0, 0, 0, 0));
     }
 
     TEST(xreducer, iterator)
@@ -86,6 +114,15 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
+    TEST(xreducer, sum_tensor)
+    {
+        xtensor<double, 2> m = {{1, 2}, {3, 4}};
+        xarray<double> res = xt::sum(m, {0});
+        EXPECT_EQ(res.dimension(), 1);
+        EXPECT_EQ(res(0), 4.0);
+        EXPECT_EQ(res(1), 6.0);
+    }
+
     TEST(xreducer, sum2)
     {
         xarray<double> u = ones<double>({2, 4});
@@ -102,6 +139,10 @@ namespace xt
         xarray<double> expectedv1 = 2 * ones<double>({4});
         xarray<double> resv1 = sum(v, {1});
         EXPECT_EQ(expectedv1, resv1);
+
+        // check that there is no overflow
+        xarray<uint8_t> c = ones<uint8_t>({1000});
+        EXPECT_EQ(1000u, sum(c)());
     }
 
     TEST(xreducer, sum_all)
@@ -110,6 +151,13 @@ namespace xt
         auto res = sum(features.m_a);
         double expected = 732;
         EXPECT_EQ(res(), expected);
+    }
+
+    TEST(xreducer, prod)
+    {
+        // check that there is no overflow
+        xarray<uint8_t> c = 2 * ones<uint8_t>({34});
+        EXPECT_EQ(1ULL << 34, prod(c)());
     }
 
     TEST(xreducer, mean)
@@ -127,5 +175,69 @@ namespace xt
         EXPECT_EQ(mean_all(), expect_all());
         EXPECT_TRUE(all(equal(mean0, expect0)));
         EXPECT_TRUE(all(equal(mean1, expect1)));
+
+        xarray<uint8_t> c = {1, 2};
+        EXPECT_EQ(mean(c)(), 1.5);
+    }
+
+    TEST(xreducer, immediate)
+    {
+        xarray<double> a = xt::arange(27);
+        a.resize({3, 3, 3});
+
+        xarray<double> a_lz = sum(a);
+        auto a_gd = sum(a, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1});
+        a_gd = sum(a, {1}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 2});
+        a_gd = sum(a, {0, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 2});
+        a_gd = sum(a, {1, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a = xt::arange(4 * 3 * 6 * 2 * 7);
+        a.resize({4, 3, 6, 2, 7});
+
+        a_lz = sum(a);
+        a_gd = sum(a, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1});
+        a_gd = sum(a, {1}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 2});
+        a_gd = sum(a, {0, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 2});
+        a_gd = sum(a, {1, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 3, 4});
+        a_gd = sum(a, {1, 3, 4}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 1, 4});
+        a_gd = sum(a, {0, 1, 4}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 1, 3});
+        a_gd = sum(a, {0, 1, 3}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {0, 2, 3});
+        a_gd = sum(a, {0, 2, 3}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+
+        a_lz = sum(a, {1, 2, 3});
+        a_gd = sum(a, {1, 2, 3}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
     }
 }

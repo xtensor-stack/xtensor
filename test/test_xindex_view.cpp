@@ -9,7 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xrandom.hpp"
-#include "xtensor/xindexview.hpp"
+#include "xtensor/xindex_view.hpp"
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xview.hpp"
 #include "test_common.hpp"
@@ -18,20 +18,20 @@ namespace xt
 {
     using std::size_t;
 
-    TEST(xindexview, indices)
+    TEST(xindex_view, indices)
     {
         xarray<double> e = xt::random::rand<double>({3, 3});
         xarray<double> e_copy = e;
-        auto v = index_view(e, {{1, 1}, {1, 2}, {2, 2}});
+        auto v = index_view(e, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
         EXPECT_EQ(v.layout(), layout_type::dynamic);
 
         using shape_type = typename decltype(v)::shape_type;
         EXPECT_EQ(shape_type{3}, v.shape());
 
         EXPECT_EQ(e(1, 1), v(0));
-        EXPECT_EQ(e(1, 2), v[xindex({1})]);
+        EXPECT_EQ(e(1, 2), v[{1ul}]);
 
-        std::vector<size_t> idx = {2};
+        std::vector<size_t> idx = {2ul};
         EXPECT_EQ(e(2, 2), v.element(idx.begin(), idx.end()));
 
         v += 3;
@@ -53,7 +53,7 @@ namespace xt
         EXPECT_EQ(3, e(2, 2));
     }
 
-    TEST(xindexview, boolean)
+    TEST(xindex_view, boolean)
     {
         xarray<double> e = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
         auto v = filter(e, e > 0);
@@ -73,13 +73,13 @@ namespace xt
         EXPECT_TRUE(!any(e2 > 0.5));
     }
 
-    TEST(xindexview, indices_on_function)
+    TEST(xindex_view, indices_on_function)
     {
         xarray<double> e = xt::random::rand<double>({3, 3});
         auto fn = e * 3 - 120;
-        auto v = index_view(fn, {{1, 1}, {1, 2}, {2, 2}});
+        auto v = index_view(fn, {{1ul, 1ul}, {1ul, 2ul}, {2ul, 2ul}});
         EXPECT_EQ(fn(1, 1), v(0));
-        EXPECT_EQ(fn(1, 2), v[xindex({1})]);
+        EXPECT_EQ(fn(1, 2), v[{1ul}]);
 
         std::vector<size_t> idx = {2};
         EXPECT_EQ(fn(2, 2), v.element(idx.begin(), idx.end()));
@@ -92,7 +92,7 @@ namespace xt
         EXPECT_EQ(++it, v.end());
     }
 
-    TEST(xindexview, view_on_view)
+    TEST(xindex_view, view_on_view)
     {
         xarray<double> e = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
         auto v = filter(e, e > 0);
@@ -101,7 +101,7 @@ namespace xt
         EXPECT_EQ(10, e(1, 1));
     }
 
-    TEST(xindexview, assign_scalar)
+    TEST(xindex_view, assign_scalar)
     {
         xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
         auto v = filter(a, a >= 5);
@@ -111,7 +111,7 @@ namespace xt
         EXPECT_EQ(100, v(2));
     }
 
-    TEST(xindexview, filtration)
+    TEST(xindex_view, filtration)
     {
         xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
         filtration(a, a >= 5) += 2;
@@ -119,4 +119,3 @@ namespace xt
         EXPECT_EQ(expected, a);
     }
 }
-

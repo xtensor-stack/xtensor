@@ -21,7 +21,7 @@ namespace xt
             SCOPED_TRACE("row_major constructor");
             row_major_result<> rm;
             vec_type v;
-            adaptor_type a(v, rm.shape());
+            adaptor_type a(v, rm.shape(), layout_type::row_major);
             compare_shape(a, rm);
         }
 
@@ -96,6 +96,13 @@ namespace xt
         }
     }
 
+    TEST(xarray_adaptor, resize)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_resize(a);
+    }
+
     TEST(xarray_adaptor, reshape)
     {
         vec_type v;
@@ -108,6 +115,13 @@ namespace xt
         vec_type v;
         adaptor_type a(v);
         test_access(a);
+    }
+
+    TEST(xarray_adaptor, at)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_at(a);
     }
 
     TEST(xarray_adaptor, indexed_access)

@@ -2,8 +2,8 @@
 
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
-[![Documentation Status](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://beta.mybinder.org/v2/gh/QuantStack/xtensor/0.11.1?filepath=notebooks/xtensor.ipynb)
+[![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
+[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://beta.mybinder.org/v2/gh/QuantStack/xtensor/0.14.1-binder?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
@@ -38,9 +38,25 @@ conda install -c conda-forge xtensor
 Or you can directly install it from the sources:
 
 ```bash
-cmake -D CMAKE_INSTALL_PREFIX=your_install_prefix
+cmake -DCMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
+
+## Dependencies
+
+`xtensor` depends on the [xtl](https://github.com/QuantStack/xtl) library and has an optional dependency on the [xsimd](https://github.com/QuantStack/xsimd) library:
+
+| `xtensor` | `xtl`  |`xsimd` (optional) |
+|-----------|--------|-------------------|
+|  master   | ^0.3.7 |       ^3.1.0      |
+|  0.14.1   | ^0.3.7 |       ^3.1.0      |
+|  0.14.0   | ^0.3.6 |       ^3.1.0      |
+|  0.13.2   | ^0.3.4 |       ^3.1.0      |
+|  0.13.1   | ^0.3.3 |       ^3.1.0      |
+|  0.13.0   | ^0.3.3 |       ^3.1.0      |
+
+The dependency on `xsimd` is required if you want to enable simd acceleration in `xtensor`. This can be done
+by defining the macro `XTENSOR_USE_XSIMD` *before* including any header of `xtensor`.
 
 ## Usage
 
@@ -210,17 +226,6 @@ cmake -DBUILD_TESTS=ON -DDOWNLOAD_GTEST=ON ../
 make xtest
 ```
 
-In the context of continuous integration with Travis CI, tests are run in a `conda` environment, which can be activated with
-
-```bash
-cd test
-conda env create -f ./test-environment.yml
-source activate test-xtensor
-cd ..
-cmake -DBUILD_TESTS=ON .
-make xtest
-```
-
 ## Building the HTML documentation
 
 xtensor's documentation is built with three tools
@@ -232,8 +237,8 @@ xtensor's documentation is built with three tools
 While doxygen must be installed separately, you can install breathe by typing
 
 ```bash
-pip install breathe
-``` 
+pip install breathe sphinx_rtd_theme
+```
 
 Breathe can also be installed with `conda`
 
@@ -241,13 +246,11 @@ Breathe can also be installed with `conda`
 conda install -c conda-forge breathe
 ```
 
-Finally, build the documentation with
+Finally, go to `docs` subdirectory and build the documentation with the following command:
 
 ```bash
 make html
 ```
-
-from the `docs` subdirectory.
 
 ## License
 

@@ -6,12 +6,15 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XEXPRESSION_HPP
-#define XEXPRESSION_HPP
+#ifndef XTENSOR_EXPRESSION_HPP
+#define XTENSOR_EXPRESSION_HPP
 
 #include <cstddef>
 #include <type_traits>
 #include <vector>
+
+#include "xtl/xclosure.hpp"
+#include "xtl/xtype_traits.hpp"
 
 #include "xutils.hpp"
 
@@ -98,7 +101,7 @@ namespace xt
     namespace detail
     {
         template <class E>
-        struct is_xexpression_impl : std::is_base_of<xexpression<E>, E>
+        struct is_xexpression_impl : std::is_base_of<xexpression<std::decay_t<E>>, std::decay_t<E>>
         {
         };
 
@@ -115,7 +118,7 @@ namespace xt
     using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
 
     template <class... E>
-    using has_xexpression = or_<is_xexpression<E>...>;
+    using has_xexpression = xtl::disjunction<is_xexpression<E>...>;
 
     /************
      * xclosure *
@@ -127,13 +130,13 @@ namespace xt
     template <class E, class EN = void>
     struct xclosure
     {
-        using type = closure_t<E>;
+        using type = xtl::closure_type_t<E>;
     };
 
     template <class E>
     struct xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<closure_t<E>>;
+        using type = xscalar<xtl::closure_type_t<E>>;
     };
 
     template <class E>
@@ -142,13 +145,13 @@ namespace xt
     template <class E, class EN = void>
     struct const_xclosure
     {
-        using type = const_closure_t<E>;
+        using type = xtl::const_closure_type_t<E>;
     };
 
     template <class E>
     struct const_xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
-        using type = xscalar<const_closure_t<E>>;
+        using type = xscalar<xtl::const_closure_type_t<E>>;
     };
 
     template <class E>
@@ -217,6 +220,125 @@ namespace xt
             return e(i, args...);
         }
     }
+
+    /*************************
+     * expression tag system *
+     *************************/
+
+    struct xscalar_expression_tag
+    {
+    };
+
+    struct xtensor_expression_tag
+    {
+    };
+
+    struct xoptional_expression_tag
+    {
+    };
+
+    namespace detail
+    {
+        template <class E, class = void_t<int>>
+        struct get_expression_tag
+        {
+            using type = xtensor_expression_tag;
+        };
+
+        template <class E>
+        struct get_expression_tag<E, void_t<typename std::decay_t<E>::expression_tag>>
+        {
+            using type = typename std::decay_t<E>::expression_tag;
+        };
+
+        template <class E>
+        using get_expression_tag_t = typename get_expression_tag<E>::type;
+
+        template <class... T>
+        struct expression_tag_and;
+
+        template <class T>
+        struct expression_tag_and<T>
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct expression_tag_and<T, T>
+        {
+            using type = T;
+        };
+
+        template <>
+        struct expression_tag_and<xscalar_expression_tag, xscalar_expression_tag>
+        {
+            using type = xscalar_expression_tag;
+        };
+
+        template <class T>
+        struct expression_tag_and<xscalar_expression_tag, T>
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct expression_tag_and<T, xscalar_expression_tag>
+            : expression_tag_and<xscalar_expression_tag, T>
+        {
+        };
+
+        template <>
+        struct expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+        {
+            using type = xoptional_expression_tag;
+        };
+
+        template <>
+        struct expression_tag_and<xoptional_expression_tag, xtensor_expression_tag>
+            : expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+        {
+        };
+
+        template <class T1, class... T>
+        struct expression_tag_and<T1, T...>
+            : expression_tag_and<T1, typename expression_tag_and<T...>::type>
+        {
+        };
+
+        template <class... T>
+        using expression_tag_and_t = typename expression_tag_and<T...>::type;
+    }
+
+    template <class... T>
+    struct xexpression_tag
+    {
+        using type = detail::expression_tag_and_t<detail::get_expression_tag_t<T>...>;
+    };
+
+    template <class... T>
+    using xexpression_tag_t = typename xexpression_tag<T...>::type;
+
+    template <class E>
+    struct is_xtensor_expression : std::is_same<xexpression_tag_t<E>, xtensor_expression_tag>
+    {
+    };
+
+    template <class E>
+    struct is_xoptional_expression : std::is_same<xexpression_tag_t<E>, xoptional_expression_tag>
+    {
+    };
+
+    /********************************
+     * xoptional_comparable concept *
+     ********************************/
+
+    template <class... E>
+    struct xoptional_comparable : xtl::conjunction<xtl::disjunction<is_xtensor_expression<E>,
+                                                                    is_xoptional_expression<E>
+                                                                   >...
+                                                  >
+    {
+    };
 }
 
 #endif

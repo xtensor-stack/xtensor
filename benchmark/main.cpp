@@ -6,88 +6,44 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "benchmark_assign.hpp"
-#include "benchmark_container.hpp"
-#include "benchmark_math.hpp"
-#include "benchmark_views.hpp"
 #include <iostream>
 
-template <class OS>
-void benchmark_container(OS& out)
-{
-    xt::axpy_1d::benchmark<std::vector<double>>(out);
-    xt::axpy_1d::benchmark<xt::uvector<double>>(out);
-    xt::func::benchmark<std::vector<double>>(out);
-    xt::func::benchmark<xt::uvector<double>>(out);
-    xt::sum_assign::benchmark<std::vector<double>>(out);
-    xt::sum_assign::benchmark<xt::uvector<double>>(out);
-}
+#include <benchmark/benchmark.h>
 
-template <class OS>
-void benchmark_views(OS& out)
-{
-    xt::reducer::benchmark(out);
-    xt::stridedview::benchmark(out);
-}
+#include "benchmark_assign.hpp"
+#include "benchmark_math.hpp"
+#include "benchmark_views.hpp"
+#include "benchmark_container.hpp"
 
-template <class OS>
-void benchmark_assign(OS& out)
+#ifdef XTENSOR_USE_XSIMD
+#ifdef __GNUC__
+template <class T>
+void print_type(T&& /*t*/)
 {
-    
+    std::cout << __PRETTY_FUNCTION__ << std::endl;
 }
-int main(int argc, char* argv[])
+#endif
+void print_stats()
 {
-    std::cout << "Using steady_clock" << std::endl;
-    std::cout << "period num: " << std::chrono::steady_clock::period::num << std::endl;
-    std::cout << "period den: " << std::chrono::steady_clock::period::den << std::endl;
-    std::cout << "steady = " << std::boolalpha << std::chrono::steady_clock::is_steady << std::endl;
-    std::cout << std::endl;
+    std::cout << "USING XSIMD\nSIMD SIZE: " << xsimd::simd_traits<double>::size << "\n\n";
+#ifdef __GNUC__
+    print_type(xt::xarray<double>());
+    print_type(xt::xtensor<double, 2>());
+#endif
+}
+#else
+void print_stats()
+{
+    std::cout << "NOT USING XSIMD\n\n";
+};
+#endif
 
-    if (argc != 1)
-    {
-        if (std::string(argv[1]) == "--help" || std::string(argv[1]) == "-h")
-        {
-            std::cout << "Avalaible options:" << std::endl;
-            std::cout << "assign    : run benchmark on tensor assign" << std::endl;
-            std::cout << "container : run benchmark on container basic operations" << std::endl;
-            std::cout << "view      : run benchmark on view basic operations" << std::endl;
-            std::cout << "op        : run benchmark on arithmetic operations" << std::endl;
-            std::cout << "exp       : run benchmark on exponential and logarithm functions" << std::endl;
-            std::cout << "trigo     : run benchmark on trigonomeric functions" << std::endl;
-            std::cout << "hyperbolic: run benchmark on hyperbolic functions" << std::endl;
-            std::cout << "power     : run benchmark on power functions" << std::endl;
-            std::cout << "rounding  : run benchmark on rounding functions" << std::endl;
-        }
-        else
-        {
-            for (int i = 1; i < argc; ++i)
-            {
-                std::string sarg = std::string(argv[i]);
-                if (sarg == "assign")
-                {
-                    xt::assign::benchmark(std::cout);
-                }
-                else if (sarg == "container")
-                {
-                    benchmark_container(std::cout);
-                }
-                else if (sarg == "view")
-                {
-                    benchmark_views(std::cout);
-                }
-                else
-                {
-                    xt::math::benchmark_math(std::cout, sarg);
-                }
-            }
-        }
-    }
-    else
-    {
-        xt::assign::benchmark(std::cout);
-        benchmark_container(std::cout);
-        benchmark_views(std::cout);
-        xt::math::benchmark_math(std::cout);
-    }
-    return 0;
+
+// Custom main function to print SIMD config
+int main(int argc, char** argv)
+{
+    print_stats();
+    benchmark::Initialize(&argc, argv);
+    if (benchmark::ReportUnrecognizedArguments(argc, argv)) return 1;
+    benchmark::RunSpecifiedBenchmarks();
 }

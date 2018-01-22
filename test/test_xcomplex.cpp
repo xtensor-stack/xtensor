@@ -10,8 +10,9 @@
 
 #include <complex>
 #include "xtensor/xarray.hpp"
-#include "xtensor/xbuilder.hpp" 
+#include "xtensor/xbuilder.hpp"
 #include "xtensor/xcomplex.hpp"
+#include "xtensor/xio.hpp"
 
 namespace xt
 {
@@ -53,7 +54,7 @@ namespace xt
 
         // Test assigning an expression to the complex view
         real(e) = zeros<double>({2, 2});
-        xarray<std::complex<double>> expect1 = 
+        xarray<std::complex<double>> expect1 =
             {{0.0       , 0.0 + 1.0i},
              {0.0 - 1.0i, 0.0       }};
         EXPECT_TRUE(all(equal(e, expect1)));
@@ -70,7 +71,7 @@ namespace xt
 
         // Test assigning an expression to the complex view
         real(e) = 0.0;
-        xarray<std::complex<double>> expect1 = 
+        xarray<std::complex<double>> expect1 =
             {{0.0       , 0.0 + 1.0i},
              {0.0 - 1.0i, 0.0       }};
         EXPECT_TRUE(all(equal(e, expect1)));
@@ -126,8 +127,7 @@ namespace xt
         xarray<std::complex<double>> cmplexpected_conj = {{0.40101756 - 0.71233018i, 0.62731701 - 0.42786349i, 0.32415089 - 0.2977805i},
                                                           {0.24475928 - 0.49208478i, 0.69475518 - 0.74029639i, 0.59390240 - 0.35772892i},
                                                           {0.63179202 - 0.41720995i, 0.44025718 - 0.65472131i, 0.08372648 - 0.37380143i}};
-        EXPECT_TRUE(allclose(imag(cmplexpected_conj), imag(cmplres_conj)));
-        EXPECT_TRUE(allclose(real(cmplexpected_conj), real(cmplres_conj)));
+        EXPECT_TRUE(allclose(cmplexpected_conj, cmplres_conj));
 
         auto cmplres_norm = xt::norm(cmplarg_0);
         xarray<double> fieldnorm = {{0.66822937, 0.5765938, 0.19374703},
@@ -145,5 +145,56 @@ namespace xt
         xarray<double> B = xt::conj(A);
         EXPECT_EQ(A, B);
     }
-}
 
+    TEST(xcomplex, isnan)
+    {
+        using c_t = std::complex<double>;
+        double nan = std::numeric_limits<double>::quiet_NaN();
+
+        xarray<std::complex<double>> e = {c_t(0, 1), c_t(0, nan), c_t(-nan, 2), c_t(nan, -nan)};
+        xarray<bool> expected = {false, true, true, true};
+        // Full qualification required by Windows
+        EXPECT_TRUE(all(equal(expected, xt::isnan(e))));
+    }
+
+    TEST(xcomplex, isinf)
+    {
+        using c_t = std::complex<double>;
+        double inf = std::numeric_limits<double>::infinity();
+
+        xarray<std::complex<double>> e = {c_t(0, 1), c_t(0, inf), c_t(-inf, 2), c_t(inf, -inf), c_t(0, -inf)};
+        xarray<bool> expected = {false, true, true, true, true};
+
+        EXPECT_TRUE(all(equal(expected, xt::isinf(e))));
+    }
+
+    TEST(xcomplex, isclose)
+    {
+        xarray<std::complex<double>> arg = {{0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
+                                            {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
+                                            {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
+
+        xarray<std::complex<double>> compare = {{0.401 + 0.712i, 0.627 + 0.427i, 0.324 + 0.297i},
+                                                {0.244 + 0.492i, 0.694 + 0.740i, 0.593 + 0.357i},
+                                                {0.631 + 0.417i, 0.440 + 0.654i, 0.083 + 0.373i}};
+
+        auto veryclose = isclose(arg, compare, 1e-5);
+        auto looselyclose = isclose(arg, compare, 1e-1);
+
+        EXPECT_TRUE(all(equal(false, veryclose)));
+        EXPECT_TRUE(all(equal(true, looselyclose)));
+
+        double inf = std::numeric_limits<double>::infinity();
+        double nan = std::numeric_limits<double>::quiet_NaN();
+        using c_t = std::complex<double>;
+
+        EXPECT_TRUE(isclose(c_t(0, nan), c_t(0, nan))() == false);
+        EXPECT_TRUE(isclose(c_t(0, nan), c_t(0, nan), 1e-5, 1e-3, true)() == true);
+        EXPECT_TRUE(isclose(c_t(0, inf), c_t(0, inf))() == true);
+        EXPECT_TRUE(isclose(c_t(0, -inf), c_t(0, inf))() == false);
+
+        EXPECT_TRUE(isclose(c_t(inf, -inf), c_t(0, inf))() == false);
+        EXPECT_TRUE(isclose(c_t(5, 5), c_t(5, -5))() == false);
+
+    }
+}

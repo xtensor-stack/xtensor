@@ -39,6 +39,15 @@ Defined in ``xtensor/xbuilder.hpp``
 .. doxygenfunction:: xt::logspace
    :project: xtensor
 
+.. doxygenfunction:: xt::concatenate
+   :project: xtensor
+
+.. doxygenfunction:: xt::stack
+   :project: xtensor
+
+.. doxygenfunction:: xt::meshgrid
+   :project: xtensor
+
 .. doxygenfunction:: xt::diag
    :project: xtensor
 

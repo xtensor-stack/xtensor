@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XGENERATOR_HPP
-#define XGENERATOR_HPP
+#ifndef XTENSOR_GENERATOR_HPP
+#define XTENSOR_GENERATOR_HPP
 
 #include <algorithm>
 #include <cstddef>
@@ -15,6 +15,8 @@
 #include <tuple>
 #include <type_traits>
 #include <utility>
+
+#include "xtl/xsequence.hpp"
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
@@ -88,7 +90,12 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args... args) const;
-        const_reference operator[](const xindex& index) const;
+        template <class... Args>
+        const_reference at(Args... args) const;
+        template <class OS>
+        disable_integral_t<OS, const_reference> operator[](const OS& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
         template <class It>
@@ -185,12 +192,39 @@ namespace xt
     template <class... Args>
     inline auto xgenerator<F, R, S>::operator()(Args... args) const -> const_reference
     {
-        XTENSOR_ASSERT(check_index(shape(), args...));
+        XTENSOR_TRY(check_index(shape(), args...));
         return m_f(args...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the expression,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the expression.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
     template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::operator[](const xindex& index) const -> const_reference
+    template <class... Args>
+    inline auto xgenerator<F, R, S>::at(Args... args) const -> const_reference
+    {
+        check_access(shape(), args...);
+        return this->operator()(args...);
+    }
+
+    template <class F, class R, class S>
+    template <class OS>
+    inline auto xgenerator<F, R, S>::operator[](const OS& index) const
+        -> disable_integral_t<OS, const_reference>
+    {
+        return element(index.cbegin(), index.cend());
+    }
+
+    template <class F, class R, class S>
+    template <class I>
+    inline auto xgenerator<F, R, S>::operator[](std::initializer_list<I> index) const
+        -> const_reference
     {
         return element(index.begin(), index.end());
     }
@@ -212,7 +246,7 @@ namespace xt
     template <class It>
     inline auto xgenerator<F, R, S>::element(It first, It last) const -> const_reference
     {
-        XTENSOR_ASSERT(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_f.element(first, last);
     }
     //@}
@@ -270,7 +304,7 @@ namespace xt
         {
             using shape_type = std::vector<std::size_t>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
-            return type(std::forward<Functor>(f), forward_sequence<shape_type>(shape));
+            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type>(shape));
         }
 #else
         template <class Functor, class I, std::size_t L>
@@ -278,7 +312,7 @@ namespace xt
         {
             using shape_type = std::array<std::size_t, L>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
-            return type(std::forward<Functor>(f), forward_sequence<shape_type>(shape));
+            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type>(shape));
         }
 #endif
 

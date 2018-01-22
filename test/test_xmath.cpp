@@ -18,6 +18,140 @@ namespace xt
     using std::size_t;
     using shape_type = std::vector<size_t>;
 
+    /*******************
+     * type conversion *
+     *******************/
+
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                  \
+    {                                                                                \
+        using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
+        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+    }
+
+    TEST(xmath, result_type)
+    {
+        shape_type shape = {3, 2};
+        xarray<unsigned char> auchar(shape);
+        xarray<short> ashort(shape);
+        xarray<int> aint(shape);
+        xarray<unsigned int> auint(shape);
+        xarray<unsigned long long> aulong(shape);
+        xarray<float> afloat(shape);
+        xarray<double> adouble(shape);
+        xarray<std::complex<float>> afcomplex(shape);
+        xarray<std::complex<double>> adcomplex(shape);
+
+        /*****************
+         * unsigned char *
+         *****************/
+        CHECK_RESULT_TYPE(auchar + auchar, int);
+        CHECK_RESULT_TYPE(2 * auchar, int);
+        CHECK_RESULT_TYPE(2.0 * auchar, double);
+        CHECK_RESULT_TYPE(sqrt(auchar), double);
+        CHECK_RESULT_TYPE(abs(auchar), int);
+        CHECK_RESULT_TYPE(sum(auchar), unsigned long long);
+        CHECK_RESULT_TYPE(mean(auchar), double);
+
+        /*********
+         * short *
+         *********/
+        CHECK_RESULT_TYPE(ashort + ashort, int);
+        CHECK_RESULT_TYPE(2 * ashort, int);
+        CHECK_RESULT_TYPE(2.0 * ashort, double);
+        CHECK_RESULT_TYPE(sqrt(ashort), double);
+        CHECK_RESULT_TYPE(abs(ashort), int);
+        CHECK_RESULT_TYPE(sum(ashort), long long);
+        CHECK_RESULT_TYPE(mean(ashort), double);
+
+        /*******
+         * int *
+         *******/
+        CHECK_RESULT_TYPE(aint + aint, int);
+        CHECK_RESULT_TYPE(2 * aint, int);
+        CHECK_RESULT_TYPE(2.0 * aint, double);
+        CHECK_RESULT_TYPE(sqrt(aint), double);
+        CHECK_RESULT_TYPE(abs(aint), int);
+        CHECK_RESULT_TYPE(sum(aint), long long);
+        CHECK_RESULT_TYPE(mean(aint), double);
+
+        /****************
+         * unsigned int *
+         ****************/
+        CHECK_RESULT_TYPE(auint + auint, unsigned int);
+        CHECK_RESULT_TYPE(2 * auint, unsigned int);
+        CHECK_RESULT_TYPE(2.0 * auint, double);
+        CHECK_RESULT_TYPE(sqrt(auint), double);
+        CHECK_RESULT_TYPE(abs(auint), unsigned int);
+        CHECK_RESULT_TYPE(sum(auint), unsigned long long);
+        CHECK_RESULT_TYPE(mean(auint), double);
+
+        /**********************
+         * unsigned long long *
+         **********************/
+        CHECK_RESULT_TYPE(aulong + aulong, unsigned long long);
+        CHECK_RESULT_TYPE(2 * aulong, unsigned long long);
+        CHECK_RESULT_TYPE(2.0 * aulong, double);
+        CHECK_RESULT_TYPE(sqrt(aulong), double);
+        CHECK_RESULT_TYPE(abs(aulong), unsigned long long);
+        CHECK_RESULT_TYPE(sum(aulong), unsigned long long);
+        CHECK_RESULT_TYPE(mean(aulong), double);
+
+        /*********
+         * float *
+         *********/
+        CHECK_RESULT_TYPE(afloat + afloat, float);
+        CHECK_RESULT_TYPE(2.0f * afloat, float);
+        CHECK_RESULT_TYPE(2.0 * afloat, double);
+        CHECK_RESULT_TYPE(sqrt(afloat), float);
+        CHECK_RESULT_TYPE(abs(afloat), float);
+        CHECK_RESULT_TYPE(sum(afloat), double);
+        CHECK_RESULT_TYPE(mean(afloat), double);
+
+        /**********
+         * double *
+         **********/
+        CHECK_RESULT_TYPE(adouble + adouble, double);
+        CHECK_RESULT_TYPE(2.0 * adouble, double);
+        CHECK_RESULT_TYPE(sqrt(adouble), double);
+        CHECK_RESULT_TYPE(abs(adouble), double);
+        CHECK_RESULT_TYPE(sum(adouble), double);
+        CHECK_RESULT_TYPE(mean(adouble), double);
+
+        /***********************
+         * std::complex<float> *
+         ***********************/
+        CHECK_RESULT_TYPE(afcomplex + afcomplex, std::complex<float>);
+        CHECK_RESULT_TYPE(std::complex<float>(2.0) * afcomplex, std::complex<float>);
+        CHECK_RESULT_TYPE(2.0f * afcomplex, std::complex<float>);
+        CHECK_RESULT_TYPE(sqrt(afcomplex), std::complex<float>);
+        CHECK_RESULT_TYPE(abs(afcomplex), float);
+        CHECK_RESULT_TYPE(sum(afcomplex), std::complex<double>);
+        CHECK_RESULT_TYPE(mean(afcomplex), std::complex<double>);
+
+        /************************
+         * std::complex<double> *
+         ************************/
+        CHECK_RESULT_TYPE(adcomplex + adcomplex, std::complex<double>);
+        CHECK_RESULT_TYPE(std::complex<double>(2.0) * adcomplex, std::complex<double>);
+        CHECK_RESULT_TYPE(2.0 * adcomplex, std::complex<double>);
+        CHECK_RESULT_TYPE(sqrt(adcomplex), std::complex<double>);
+        CHECK_RESULT_TYPE(abs(adcomplex), double);
+        CHECK_RESULT_TYPE(sum(adcomplex), std::complex<double>);
+        CHECK_RESULT_TYPE(mean(adcomplex), std::complex<double>);
+
+        /***************
+         * mixed types *
+         ***************/
+        CHECK_RESULT_TYPE(auchar + aint, int);
+        CHECK_RESULT_TYPE(ashort + aint, int);
+        CHECK_RESULT_TYPE(aulong + aint, unsigned long long);
+        CHECK_RESULT_TYPE(afloat + aint, float);
+        CHECK_RESULT_TYPE(adouble + aint, double);
+        CHECK_RESULT_TYPE(adouble + adcomplex, std::complex<double>);
+        CHECK_RESULT_TYPE(aulong + adouble, double);
+    }
+
+
     /********************
      * Basic operations *
      ********************/
@@ -486,6 +620,38 @@ namespace xt
         a(0, 0) = nan("n");
         EXPECT_FALSE(isclose(a, b)(0, 0));
         EXPECT_TRUE(isclose(a, b, 1, 1, true)(0, 0));
+    }
+
+    TEST(xmath, isclose_int)
+    {
+        EXPECT_FALSE(isclose(1, 2)());
+        EXPECT_TRUE(isclose(1, 2, 1)());
+        EXPECT_TRUE(isclose(1u, 2u, 1u)());
+        EXPECT_TRUE(isclose(1ul, 2ul, 1ul)());
+        EXPECT_TRUE(isclose(1ul, 10ul, 1ul)());
+        EXPECT_TRUE(isclose(1ul, 10ul, 1ul, 100ul)());
+    }
+
+    TEST(xmath, integer_abs)
+    {
+        EXPECT_EQ(math::abs(1ul), 1ul);
+        EXPECT_EQ(math::abs(1u), 1u);
+        EXPECT_EQ(math::abs(static_cast<unsigned char>(1)), static_cast<unsigned char>(1));
+        EXPECT_EQ(math::abs(char(1)), 1);
+        EXPECT_EQ(math::abs(int(1)), 1);
+        EXPECT_EQ(math::abs(int(-1)), 1);
+        EXPECT_EQ(math::abs(long(-1)), long(1));
+        EXPECT_EQ(math::abs(-1.5), 1.5);
+    }
+
+    TEST(xmath, isinf_nan_int)
+    {
+        EXPECT_FALSE(math::isinf(132));
+        EXPECT_FALSE(math::isinf(-123123));
+        EXPECT_FALSE(math::isnan(132));
+        EXPECT_FALSE(math::isnan(-123123));
+        EXPECT_FALSE(math::isinf(132ul));
+        EXPECT_FALSE(math::isnan(123123ul));
     }
 
     TEST(xmath, scalar_cast)

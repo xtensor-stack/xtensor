@@ -4,12 +4,12 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xindexview
-==========
+xindex_view
+===========
 
-Defined in ``xtensor/xindexview.hpp``
+Defined in ``xtensor/xindex_view.hpp``
 
-.. doxygenclass:: xt::xindexview
+.. doxygenclass:: xt::xindex_view
    :project: xtensor
    :members:
 

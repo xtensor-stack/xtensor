@@ -22,7 +22,7 @@ namespace xt
             SCOPED_TRACE("row_major constructor");
             row_major_result<container_type> rm;
             vec_type v;
-            adaptor_type a(v, rm.shape());
+            adaptor_type a(v, rm.shape(), layout_type::row_major);
             compare_shape(a, rm);
         }
 
@@ -97,6 +97,13 @@ namespace xt
         }
     }
 
+    TEST(xtensor_adaptor, resize)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_resize<adaptor_type, container_type>(a);
+    }
+
     TEST(xtensor_adaptor, reshape)
     {
         vec_type v;
@@ -109,6 +116,13 @@ namespace xt
         vec_type v;
         adaptor_type a(v);
         test_access<adaptor_type, container_type>(a);
+    }
+
+    TEST(xtensor_adaptor, at)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_at<adaptor_type, container_type>(a);
     }
 
     TEST(xtensor_adaptor, indexed_access)

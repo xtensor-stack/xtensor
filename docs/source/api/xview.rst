@@ -18,10 +18,10 @@ Defined in ``xtensor/xview.hpp``
 
 Defined in ``xtensor/xslice.hpp``
 
-.. doxygenfunction:: xt::range(T, T)
+.. doxygenfunction:: xt::range(A, B)
    :project: xtensor
 
-.. doxygenfunction:: xt::range(T, T, T)
+.. doxygenfunction:: xt::range(A, B, C)
    :project: xtensor
 
 .. doxygenfunction:: xt::all
