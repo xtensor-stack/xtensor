@@ -130,6 +130,7 @@ namespace xt
             template <std::size_t I, class T1, class... Args>
             inline T access_impl(T1 t, Args...args) const
             {
+                std::cout<<"index "<<I<<" "<<t<<"\n";
                 return (I == INDEX ?  T(t) : access_impl<I+1>(args ...));
             }
 
@@ -293,11 +294,14 @@ namespace xt
     /**
      * TODO
      */
-    template <class T, std::size_t INDEX>
+    template <class T, std::size_t DIM, std::size_t INDEX>
     inline auto index_expr() noexcept
     {
-        const std::size_t shape = 1;
-        return detail::make_xgenerator(detail::index_expr_impl<T,1,INDEX>(), {shape});
+        // todo make efficient
+        std::array<std::size_t, DIM> shape;
+        std::fill(shape.begin(), shape.end(), 1);
+        
+        return detail::make_xgenerator(detail::index_expr_impl<T,DIM,INDEX>(), shape);
     }
 
 
