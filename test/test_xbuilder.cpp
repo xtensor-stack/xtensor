@@ -109,6 +109,61 @@ namespace xt
         ASSERT_EQ(res_a(1,2), res_b(1,2));
     }
 
+    TEST(xbuilder, index_placeholder_2D_fancy_non_matching_dim)
+    {
+        // broadcasted shape   2,3,2
+        auto a  = 2*ones<int>({1,3,2});
+        auto b  = 3*ones<int>({2,1,1});
+        auto c  = 4*ones<int>({1,1,1});
+
+        // 0 and 1 index, both 2d 
+        // => 1 and 2 index in 3d
+        // after broadcasting
+        auto i0 = index_placeholder<int,2, 0>();
+        auto i1 = index_placeholder<int,2, 1>();
+
+        // the above index placeholders
+        // are the same as these: (after broadcasting)
+        auto j1 = index_placeholder<int,3, 1>();
+        auto j2 = index_placeholder<int,3, 2>();
+
+        {
+            auto res_a = a + 3*i0 + 2*i1;
+            auto res_b = a + 3*j1 + 2*j2;
+
+
+
+            ASSERT_EQ(2+3*0+2*0, res_a(0,0,0));
+            ASSERT_EQ(2+3*0+2*1, res_a(0,0,1));
+            ASSERT_EQ(2+3*1+2*0, res_a(0,1,0));
+            ASSERT_EQ(2+3*1+2*1, res_a(0,1,1));
+            ASSERT_EQ(2+3*2+2*0, res_a(0,2,0));
+            ASSERT_EQ(2+3*2+2*1, res_a(0,2,1));
+            ASSERT_EQ(2+3*0+2*0, res_a(1,0,0));
+            ASSERT_EQ(2+3*0+2*1, res_a(1,0,1));
+            ASSERT_EQ(2+3*1+2*0, res_a(1,1,0));
+            ASSERT_EQ(2+3*1+2*1, res_a(1,1,1));
+            ASSERT_EQ(2+3*2+2*0, res_a(1,2,0));
+            ASSERT_EQ(2+3*2+2*1, res_a(1,2,1));
+        
+
+
+            ASSERT_EQ(res_b(0,0,0), res_a(0,0,0));
+            ASSERT_EQ(res_b(0,0,1), res_a(0,0,1));
+            ASSERT_EQ(res_b(0,1,0), res_a(0,1,0));
+            ASSERT_EQ(res_b(0,1,1), res_a(0,1,1));
+            ASSERT_EQ(res_b(0,2,0), res_a(0,2,0));
+            ASSERT_EQ(res_b(0,2,1), res_a(0,2,1));
+            ASSERT_EQ(res_b(1,0,0), res_a(1,0,0));
+            ASSERT_EQ(res_b(1,0,1), res_a(1,0,1));
+            ASSERT_EQ(res_b(1,1,0), res_a(1,1,0));
+            ASSERT_EQ(res_b(1,1,1), res_a(1,1,1));
+            ASSERT_EQ(res_b(1,2,0), res_a(1,2,0));
+            ASSERT_EQ(res_b(1,2,1), res_a(1,2,1));
+
+        }
+    }
+
     TEST(xbuilder, arange_simple)
     {
         auto ls = arange<double>(50);
