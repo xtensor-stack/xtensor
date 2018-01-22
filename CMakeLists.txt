@@ -127,7 +127,6 @@ if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
 
-
 include_directories(${xtl_INCLUDE_DIRS})
 
 # Installation
