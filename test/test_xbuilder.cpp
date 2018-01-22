@@ -35,10 +35,10 @@ namespace xt
         ASSERT_EQ(1, c(0, 1));
     }
 
-    TEST(xbuilder, index_object)
+    TEST(xbuilder, index_expr)
     {
         auto m = arange<int>({3});
-        auto i0 = index_object<int,0>();
+        auto i0 = index_expr<int,0>();
 
 
         ASSERT_EQ(size_t(1), i0.dimension());
@@ -64,11 +64,11 @@ namespace xt
         // ASSERT_EQ(1, c(0, 1));
     }
 
-    TEST(xbuilder, index_object_2D)
+    TEST(xbuilder, index_expr_2D)
     {
         auto m  = ones<int>({2,3});
-        auto i0 = index_object<int,0>();
-        auto i1 = index_object<int,1>();
+        auto i0 = index_expr<int,0>();
+        auto i1 = index_expr<int,1>();
 
 
         std::cout<<"2D test\n";
