@@ -162,7 +162,48 @@ namespace xt
 
         }
     }
+    TEST(xbuilder, index_placeholder_blitz_example){
 
+            // Fill a two-dimensional array with a radially
+            // symmetric, decaying sinusoid
+            const static std::size_t DIM = 2;
+
+            // Create the array
+            int N = 64;           
+            auto array = ones<double>({N,N});
+
+            // Some parameters
+            double midpoint = (N-1)/2.;
+            int cycles = 3;
+            double omega = 2.0 * M_PI * cycles / double(N);
+            double tau = - 10.0 / N;
+
+            // Index placeholders
+            auto i = index_placeholder<double, DIM, 0>(); // first index
+            auto j = index_placeholder<double, DIM, 1>(); // second index
+    
+            // Fill the array
+            auto data = cos(omega * sqrt(pow(i-midpoint, 2) + pow(j-midpoint, 2)))
+                * exp(tau * sqrt(pow(i-midpoint, 2) + pow(j-midpoint, 2)));
+
+
+
+            // TESTING
+            for(auto x1=0; x1<N; ++x1)
+            for(auto x0=0; x0<N; ++x0){
+
+                auto ii = double(x0);
+                auto jj = double(x1);
+
+                auto should_val = std::cos(omega * std::sqrt(std::pow(ii-midpoint, 2) + std::pow(jj-midpoint, 2)))
+                    * std::exp(tau * std::sqrt(std::pow(ii-midpoint, 2) + std::pow(jj-midpoint, 2)));
+                
+                auto is_val = data(x0, x1);
+
+                ASSERT_NEAR(is_val, should_val, 0.000001);
+            }
+
+    }
     TEST(xbuilder, arange_simple)
     {
         auto ls = arange<double>(50);
