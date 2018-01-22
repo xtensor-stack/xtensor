@@ -117,8 +117,7 @@ namespace xt
         auto c  = 4*ones<int>({1,1,1});
 
         // 0 and 1 index, both 2d 
-        // => 1 and 2 index in 3d
-        // after broadcasting
+        // => will become index 1 and 2 index in 3d after broadcasting
         auto i0 = index_placeholder<int,2, 0>();
         auto i1 = index_placeholder<int,2, 1>();
 
