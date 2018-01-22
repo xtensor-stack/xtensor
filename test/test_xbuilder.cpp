@@ -85,11 +85,15 @@ namespace xt
 
     TEST(xbuilder, index_expr_2D_b)
     {
-        auto a  = 2*ones<int>({2,3});
-        auto b  = 3*ones<int>({2,3});
+        // broadcasted shape   2,3
+        auto a  = 2*ones<int>({1,3});
+        auto b  = 3*ones<int>({2,1});
         auto c  = 4*ones<int>({1,1});
 
+        // first index
         auto i0 = index_expr<int,2, 0>();
+
+        // second index
         auto i1 = index_expr<int,2, 1>();
 
         auto res_a  = a + b*(i0+1) + (c  * i1)+2;
