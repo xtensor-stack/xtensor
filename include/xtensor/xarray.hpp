@@ -140,6 +140,7 @@ namespace xt
         using inner_backstrides_type = backstrides_type;
         using temporary_type = xarray_container<temporary_container_t<container_type>, L, SC, Tag>;
         static constexpr layout_type layout = L;
+        static constexpr bool is_const = std::is_const<container_type>::value;
     };
 
     template <class EC, layout_type L, class SC, class Tag>

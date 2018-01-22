@@ -42,6 +42,22 @@ namespace xt
     auto broadcast(E&& e, const I (&s)[L]) noexcept;
 #endif
 
+    /**
+     * Broadcast Into Operator
+     * Broadcasts the right hand side expression to the size of the left hand.
+     *
+     * @param lhs The left hand side, which defines the broadcast size
+     * @param rhs The right hand side that will be broadcasted to the shape of lhs
+     */
+    template <class E1, class E2>
+    void operator<<=(xexpression<E1>& lhs, const xexpression<E2>& rhs)
+    {
+        auto& lhs_d = lhs.derived_cast();
+        auto& rhs_d = rhs.derived_cast();
+        auto shape = lhs_d.shape();
+        lhs_d = xt::broadcast(rhs_d, std::move(shape));
+    }
+
     /**************
      * xbroadcast *
      **************/

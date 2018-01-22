@@ -187,6 +187,11 @@ namespace xt
 
     namespace detail
     {
+        template <class T>
+        struct is_generator : std::false_type
+        {
+        };
+
         template <class E>
         inline typename E::reference get_element(E& e)
         {
@@ -196,10 +201,21 @@ namespace xt
         template <class E, class S, class... Args>
         inline typename E::reference get_element(E& e, S i, Args... args)
         {
-            if (sizeof...(Args) >= e.dimension())
+            if (sizeof...(Args) >= e.dimension() && !is_generator<std::decay_t<E>>::value)
             {
                 return get_element(e, args...);
             }
+            if (is_generator<E>::value)
+            {
+                std::array<std::size_t, sizeof...(Args)> gs = {args...};
+                std::cout << "is gen " << i << ", ";
+                for (auto& el : gs)
+                {
+                    std::cout << el << ", ";
+                }
+                std::cout << std::endl;
+            }
+
             return e(i, args...);
         }
 
@@ -209,12 +225,30 @@ namespace xt
             return e();
         }
 
+        template <class T>
+        void print_type(T&&)
+        {
+            std::cout << __PRETTY_FUNCTION__ << std::endl;
+        }
+
         template <class E, class S, class... Args>
         inline typename E::const_reference get_element(const E& e, S i, Args... args)
         {
-            if (sizeof...(Args) >= e.dimension())
+            // print_type(e);
+
+            if (sizeof...(Args) >= e.dimension() && !is_generator<std::decay_t<E>>::value)
             {
                 return get_element(e, args...);
+            }
+            if (is_generator<E>::value)
+            {
+                std::array<std::size_t, sizeof...(Args)> gs = {args...};
+                std::cout << "is gen " << i << ", ";
+                for (auto& el : gs)
+                {
+                    std::cout << el << ", ";
+                }
+                std::cout << std::endl;
             }
             return e(i, args...);
         }

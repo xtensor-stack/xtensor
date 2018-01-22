@@ -132,6 +132,33 @@ namespace xt
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
 
+    /****************************
+     * enumerate implementation *
+     ****************************/
+
+    namespace detail
+    {
+        template <std::size_t I, class F, class... T>
+        inline typename std::enable_if<I == sizeof...(T), void>::type
+        enumerate_impl(F&& /*f*/, const std::tuple<T...>& /*t*/) noexcept(noexcept(std::declval<F>()))
+        {
+        }
+
+        template <std::size_t I, class F, class... T>
+        inline typename std::enable_if<I < sizeof...(T), void>::type
+        enumerate_impl(F&& f, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+        {
+            f(I, std::get<I>(t));
+            enumerate_impl<I + 1, F, T...>(std::forward<F>(f), t);
+        }
+    }
+
+    template <class F, class... T>
+    inline void enumerate(F&& f, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+    {
+        detail::enumerate_impl<0, F, T...>(std::forward<F>(f), t);
+    }
+
     /*****************************
      * accumulate implementation *
      *****************************/
@@ -534,6 +561,55 @@ namespace xt
     using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
 
     #endif
+
+    /***************************
+     * is_valid implementation *
+     ***************************/
+
+    // taken from boost::hana
+    // under the BSL 1.0
+    // https://github.com/boostorg/hana/blob/5b1c2ada83ba531ccb644e65fb03e7bd3e12b8cf/include/boost/hana/type.hpp#L123
+    namespace type_detail
+    {
+        template <class F, class ...Args, class = decltype(std::declval<F&&>()(std::declval<Args&&>()...))>
+        constexpr bool is_valid_impl(int)
+        {
+            return true;
+        }
+
+        template <class F, class ...Args>
+        constexpr bool is_valid_impl(...)
+        {
+            return false;
+        }
+
+        template <class F>
+        struct is_valid_fun
+        {
+            template <class ...Args>
+            constexpr auto operator()(Args&& ...) const
+            {
+                return is_valid_impl<F, Args&&...>(int{});
+            }
+        };
+    }
+
+    struct is_valid_t
+    {
+        template <class F>
+        constexpr auto operator()(F&&) const
+        {
+            return type_detail::is_valid_fun<F&&>{};
+        }
+
+        template <class F, class ...Args>
+        constexpr auto operator()(F&&, Args&&...) const
+        {
+            return type_detail::is_valid_impl<F&&, Args&&...>(int{});
+        }
+    };
+
+    constexpr is_valid_t is_valid{};
 
     /*************************
      * conditional type cast *

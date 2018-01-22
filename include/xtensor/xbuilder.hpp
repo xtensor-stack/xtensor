@@ -17,6 +17,7 @@
 #include <cmath>
 #include <cstddef>
 #include <functional>
+#include <limits>
 #include <utility>
 #include <vector>
 #ifdef X_OLD_CLANG
@@ -30,6 +31,7 @@
 #include "xfunction.hpp"
 #include "xgenerator.hpp"
 #include "xoperation.hpp"
+
 
 namespace xt
 {
@@ -92,15 +94,119 @@ namespace xt
 
     namespace detail
     {
-        template <class T>
-        class arange_impl
+
+        template <class S>
+        class generator_functor_base 
+        {
+        public:
+            using shape_type = S;
+
+            template <class IS>
+            generator_functor_base(IS&& s)
+                : m_shape(std::forward<IS>(s))
+            {
+            }
+
+            inline const S& shape() const
+            {
+                return m_shape;
+            }
+
+            inline std::size_t dimension() const
+            {
+                return m_shape.size();
+            }
+
+            template <class OS>
+            inline bool broadcast_shape(OS& shape) const
+            {
+                return xt::broadcast_shape(m_shape, shape);
+            }
+
+        private:
+            S m_shape;
+        };
+
+        // to implement blitz index placeholders
+        // see 3.6: Index placeholders
+        // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
+        template<class T, std::size_t Idx>
+        class index_expr_impl
         {
         public:
 
             using value_type = T;
+            using shape_type = std::vector<std::size_t>;
+            using size_type = std::size_t;
+
+            template <class... Args>
+            inline T operator()(Args... args) const
+            {
+                return std::array<std::size_t, sizeof...(Args)>({args...})[Idx];
+            }
+
+            template <class It>
+            inline T element(It first, It last) const
+            {
+                std::advance(first, Idx);
+                return *first;
+            }
+
+            template <class S>
+            inline bool broadcast_shape(S& shape) const
+            {
+                m_dim = shape.size();
+                m_shape_computed = false;
+                return true;
+            }
+
+            inline std::vector<std::size_t>& shape() const
+            {
+                if (m_dim == 0)
+                {
+                    throw std::runtime_error("No dimension set on index expr. Forgot to call broadcast or use <<=?");
+                }
+                if (m_shape_computed)
+                {
+                    return m_shape;
+                }
+                m_shape = std::vector<std::size_t>(m_dim, 1);
+                m_shape_computed = true;
+                return m_shape;
+            }
+
+            inline std::size_t dimension() const
+            {
+                return m_dim;
+            }
+
+        private:
+
+            mutable std::size_t m_dim = 0;
+            mutable bool m_shape_computed = false;
+            mutable std::vector<std::size_t> m_shape;
+        };
+
+        template <class T>
+        class arange_impl
+            : public generator_functor_base<std::array<std::size_t, 1>>
+        {
+        public:
+
+            using value_type = T;
+            using shape_type = std::array<std::size_t, 1>;
+            using base = generator_functor_base<shape_type>;
 
             arange_impl(T start, T stop, T step)
-                : m_start(start), m_stop(stop), m_step(step)
+                : base(std::array<std::size_t, 1>{static_cast<std::size_t>(std::ceil((stop - start) / step))}),
+                  m_start(start), m_stop(stop), m_step(step)
+                  
+            {
+            }
+
+            arange_impl(T start, T stop, T step, std::size_t N)
+                : base(std::array<std::size_t, 1>{N}),
+                  m_start(start), m_stop(stop), m_step(step)
             {
             }
 
@@ -134,16 +240,19 @@ namespace xt
             }
         };
 
-        template <class F>
+        template <class F, class S>
         class fn_impl
+            : public generator_functor_base<S>
         {
         public:
 
             using value_type = typename F::value_type;
             using size_type = std::size_t;
+            using base = generator_functor_base<S>;
 
-            fn_impl(F&& f)
-                : m_ft(f)
+            template <class OS>
+            fn_impl(F&& f, OS&& s)
+                : base(std::forward<OS>(s)), m_ft(f)
             {
             }
 
@@ -213,7 +322,7 @@ namespace xt
     template <class T = bool>
     inline auto eye(const std::vector<std::size_t>& shape, int k = 0)
     {
-        return detail::make_xgenerator(detail::fn_impl<detail::eye_fn<T>>(detail::eye_fn<T>(k)), shape);
+        return detail::make_xgenerator(detail::fn_impl<detail::eye_fn<T>, const std::vector<std::size_t>>(detail::eye_fn<T>(k), shape));
     }
 
     /**
@@ -231,6 +340,19 @@ namespace xt
         return eye<T>({n, n}, k);
     }
 
+
+
+    // to implement blitz index placeholders
+    // see 3.6: Index placeholders
+    // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
+    template <class T, std::size_t INDEX>
+    inline auto index_expr() noexcept
+    {
+        return detail::make_xgenerator(detail::index_expr_impl<T, INDEX>());
+    }
+
+
+
     /**
      * Generates numbers evenly spaced within given half-open interval [start, stop).
      * @param start start of the interval
@@ -242,8 +364,7 @@ namespace xt
     template <class T>
     inline auto arange(T start, T stop, T step = 1) noexcept
     {
-        std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
-        return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step), {shape});
+        return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step));
     }
 
     /**
@@ -273,7 +394,7 @@ namespace xt
     {
         using fp_type = std::common_type_t<T, double>;
         fp_type step = fp_type(stop - start) / fp_type(num_samples - (endpoint ? 1 : 0));
-        return cast<T>(detail::make_xgenerator(detail::arange_impl<fp_type>(fp_type(start), fp_type(stop), step), {num_samples}));
+        return cast<T>(detail::make_xgenerator(detail::arange_impl<fp_type>(fp_type(start), fp_type(stop), step, num_samples)));
     }
 
     /**
@@ -294,16 +415,19 @@ namespace xt
 
     namespace detail
     {
-        template <class... CT>
+        template <class S, class... CT>
         class concatenate_impl
+            : public generator_functor_base<S>
         {
         public:
 
             using size_type = std::size_t;
             using value_type = promote_type_t<typename std::decay_t<CT>::value_type...>;
+            using base = generator_functor_base<S>;
 
-            inline concatenate_impl(std::tuple<CT...>&& t, size_type axis)
-                : m_t(t), m_axis(axis)
+            template <class OS>
+            inline concatenate_impl(std::tuple<CT...>&& t, size_type axis, OS&& shape)
+                : base(std::forward<OS>(shape)), m_t(t), m_axis(axis)
             {
             }
 
@@ -353,16 +477,19 @@ namespace xt
             size_type m_axis;
         };
 
-        template <class... CT>
+        template <class S, class... CT>
         class stack_impl
+            : public generator_functor_base<S>
         {
         public:
 
             using size_type = std::size_t;
             using value_type = promote_type_t<typename std::decay_t<CT>::value_type...>;
+            using base = generator_functor_base<S>;
 
-            inline stack_impl(std::tuple<CT...>&& t, size_type axis)
-                : m_t(t), m_axis(axis)
+            template <class OS>
+            inline stack_impl(std::tuple<CT...>&& t, size_type axis, OS&& shape)
+                : base(std::forward<OS>(shape)), m_t(t), m_axis(axis)
             {
             }
 
@@ -396,18 +523,20 @@ namespace xt
             const size_type m_axis;
         };
 
-        template <class CT>
+        template <class CT, class S>
         class repeat_impl
+            : public generator_functor_base<S>
         {
         public:
 
             using xexpression_type = std::decay_t<CT>;
             using size_type = typename xexpression_type::size_type;
             using value_type = typename xexpression_type::value_type;
+            using base = generator_functor_base<S>;
 
-            template <class CTA>
-            repeat_impl(CTA&& source, size_type axis)
-                : m_source(std::forward<CTA>(source)), m_axis(axis)
+            template <class CTA, class OS>
+            repeat_impl(CTA&& source, size_type axis, OS&& shape)
+                : base(std::forward<OS>(shape)), m_source(std::forward<CTA>(source)), m_axis(axis)
             {
             }
 
@@ -465,7 +594,7 @@ namespace xt
             return prev + arr.shape()[axis];
         };
         new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
-        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
+        return detail::make_xgenerator(detail::concatenate_impl<shape_type, CT...>(std::forward<std::tuple<CT...>>(t), axis, std::move(new_shape)));
     }
 
     namespace detail
@@ -512,7 +641,7 @@ namespace xt
     {
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         auto new_shape = detail::add_axis(xtl::forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(CT));
-        return detail::make_xgenerator(detail::stack_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
+        return detail::make_xgenerator(detail::stack_impl<decltype(new_shape), CT...>(std::forward<std::tuple<CT...>>(t), axis, std::move(new_shape)));
     }
 
     namespace detail
@@ -525,15 +654,14 @@ namespace xt
             const std::array<std::size_t, sizeof...(E)> shape = {e.shape()[0]...};
             return std::make_tuple(
                 detail::make_xgenerator(
-                    detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
-                    shape
+                    detail::repeat_impl<xclosure_t<E>, decltype(shape)>(std::forward<E>(e), I, shape)
                 )...
             );
 #else
+            using shape_type = std::array<std::size_t, sizeof...(E)>;
             return std::make_tuple(
                 detail::make_xgenerator(
-                    detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
-                    {e.shape()[0]...}
+                    detail::repeat_impl<xclosure_t<E>, shape_type>(std::forward<E>(e), I, shape_type{e.shape()[0]...})
                 )...
             );
 #endif
@@ -640,18 +768,21 @@ namespace xt
             const int m_k;
         };
 
-        template <class CT>
+        template <class CT, class S>
         class flip_impl
+            : public generator_functor_base<S>
         {
         public:
 
             using xexpression_type = std::decay_t<CT>;
             using value_type = typename xexpression_type::value_type;
             using size_type = typename xexpression_type::size_type;
+            using base = generator_functor_base<S>;
 
-            template <class CTA>
-            flip_impl(CTA&& source, std::size_t axis)
-                : m_source(std::forward<CTA>(source)), m_axis(axis), m_shape_at_axis(m_source.shape()[m_axis] - 1)
+            template <class CTA, class ST>
+            flip_impl(CTA&& source, std::size_t axis, ST&& shape)
+                : base(std::forward<ST>(shape)), m_source(std::forward<CTA>(source)), m_axis(axis),
+                  m_shape_at_axis(m_source.shape()[m_axis] - 1)
             {
             }
 
@@ -786,8 +917,8 @@ namespace xt
 
         ret_shape.back() = diag_size;
 
-        return detail::make_xgenerator(detail::fn_impl<detail::diagonal_fn<CT>>(detail::diagonal_fn<CT>(std::forward<E>(arr), offset, axis_1, axis_2)),
-                                       ret_shape);
+        return detail::make_xgenerator(detail::fn_impl<detail::diagonal_fn<CT>, decltype(ret_shape)>(
+            detail::diagonal_fn<CT>(std::forward<E>(arr), offset, axis_1, axis_2), std::move(ret_shape)));
     }
 
     /**
@@ -810,8 +941,7 @@ namespace xt
         using CT = xclosure_t<E>;
         std::size_t sk = std::size_t(std::abs(k));
         std::size_t s = arr.shape()[0] + sk;
-        return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr), k)),
-                                       {s, s});
+        return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>, std::array<std::size_t, 2>>(detail::diag_fn<CT>(std::forward<E>(arr), k), std::array<std::size_t, 2>{s, s}));
     }
 
     /**
@@ -829,8 +959,7 @@ namespace xt
     {
         using CT = xclosure_t<E>;
         auto shape = arr.shape();
-        return detail::make_xgenerator(detail::flip_impl<CT>(std::forward<E>(arr), axis),
-                                       shape);
+        return detail::make_xgenerator(detail::flip_impl<CT, decltype(shape)>(std::forward<E>(arr), axis, std::move(shape)));
     }
 
     /**
@@ -847,9 +976,8 @@ namespace xt
     {
         using CT = xclosure_t<E>;
         auto shape = arr.shape();
-        return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::greater_equal<long int>>>(
-                                           detail::trilu_fn<CT, std::greater_equal<long int>>(std::forward<E>(arr), k, std::greater_equal<long int>())),
-                                       shape);
+        return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::greater_equal<long int>>, decltype(shape)>(
+                                           detail::trilu_fn<CT, std::greater_equal<long int>>(std::forward<E>(arr), k, std::greater_equal<long int>()), std::move(shape)));
     }
 
     /**
@@ -866,9 +994,8 @@ namespace xt
     {
         using CT = xclosure_t<E>;
         auto shape = arr.shape();
-        return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::less_equal<long int>>>(
-                                           detail::trilu_fn<CT, std::less_equal<long int>>(std::forward<E>(arr), k, std::less_equal<long int>())),
-                                       shape);
+        return detail::make_xgenerator(detail::fn_impl<detail::trilu_fn<CT, std::less_equal<long int>>, decltype(shape)>(
+                                           detail::trilu_fn<CT, std::less_equal<long int>>(std::forward<E>(arr), k, std::less_equal<long int>()), std::move(shape)));
     }
 }
 #endif
