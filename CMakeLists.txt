@@ -129,13 +129,8 @@ if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
 
-<<<<<<< HEAD
-if(BUILD_NEW_BENCHMARK)
-    add_subdirectory(new_benchmark)
-endif()
-=======
+
 include_directories(${xtl_INCLUDE_DIRS})
->>>>>>> 45454b9ee1270a85043290b507582670d513cbd3
 
 # Installation
 # ============

@@ -31,6 +31,8 @@
 #include "xgenerator.hpp"
 #include "xoperation.hpp"
 
+#include <iostream> // remove me
+
 namespace xt
 {
 
@@ -92,6 +94,61 @@ namespace xt
 
     namespace detail
     {
+
+
+        template<class T, std::size_t INDEX>
+        class index_impl{
+        public:
+
+            using value_type = T;
+
+            
+
+            template <class... Args>
+            inline T operator()(Args... args) const
+            {
+                std::cout<<"operator() len(args) "<<sizeof...(Args)<<"\n";
+                return access_impl<0>(args...);
+            }
+
+            template <class It>
+            inline T element(It first, It last) const
+            {
+                std::cout<<"element() len(iter) "<<std::distance(first,last)<<"\n";
+                return element_impl<0>(first);
+            }
+
+        private:
+
+
+            template <std::size_t I, class It>
+            inline T element_impl(It it) const
+            {
+                return (I == INDEX ?  T(*it) :  element_impl<I+1>(it++));
+            }
+
+            template <std::size_t I, class T1, class... Args>
+            inline T access_impl(T1 t, Args...args) const
+            {
+                return (I == INDEX ?  T(t) : access_impl<I+1>(args ...));
+            }
+
+            template<std::size_t I>
+            inline T access_impl() const
+            {
+                return T(0);
+            }
+
+            template<std::size_t I>
+            inline T element_impl() const
+            {
+                return T(0);
+            }
+        };
+
+
+
+
         template <class T>
         class arange_impl
         {
@@ -230,6 +287,20 @@ namespace xt
     {
         return eye<T>({n, n}, k);
     }
+
+
+
+    /**
+     * TODO
+     */
+    template <class T, std::size_t INDEX>
+    inline auto index_object() noexcept
+    {
+        const std::size_t shape = 1;
+        return detail::make_xgenerator(detail::index_impl<T,INDEX>(), {shape});
+    }
+
+
 
     /**
      * Generates numbers evenly spaced within given half-open interval [start, stop).
