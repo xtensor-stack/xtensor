@@ -70,22 +70,17 @@ namespace xt
         auto i0 = index_expr<int,2, 0>();
         auto i1 = index_expr<int,2, 1>();
 
-
-        std::cout<<"2D test\n";
-
-        auto res  = m + i0 + i1;
+        auto res  = m + i0 + 2*i1;
 
         ASSERT_EQ(size_t(2), res.shape()[0]);
         ASSERT_EQ(size_t(3), res.shape()[1]);
 
-
-        ASSERT_EQ(int(1+0+0), res(0,0));
-        ASSERT_EQ(int(1+0+1), res(0,1));
-        ASSERT_EQ(int(1+0+2), res(0,2));
-
-        ASSERT_EQ(int(1+1+0), res(1,0));
-        ASSERT_EQ(int(1+1+1), res(1,1));
-        ASSERT_EQ(int(1+1+2), res(1,2));
+        ASSERT_EQ(int(1+0+2*0), res(0,0));
+        ASSERT_EQ(int(1+0+2*1), res(0,1));
+        ASSERT_EQ(int(1+0+2*2), res(0,2));
+        ASSERT_EQ(int(1+1+2*0), res(1,0));
+        ASSERT_EQ(int(1+1+2*1), res(1,1));
+        ASSERT_EQ(int(1+1+2*2), res(1,2));
 
 
         // ASSERT_EQ(size_t(2), m.dimension());
