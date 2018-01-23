@@ -34,7 +34,7 @@ namespace xt
         ASSERT_EQ(1, c(0, 1));
     }
 
-    TEST(xbuilder, index_placeholder_1D)
+    TEST(xbuilder, index_placeholder_1D_ct)
     {
         auto m = arange<int>({3});
         auto i0 = index_placeholder<int,1,0>();
@@ -48,7 +48,21 @@ namespace xt
         ASSERT_EQ(int(0), res(0));
         ASSERT_EQ(int(2), res(1));
         ASSERT_EQ(int(4), res(2));
+    }
+    TEST(xbuilder, index_placeholder_1D_rt)
+    {
+        auto m = arange<int>({3});
+        auto i0 = index_placeholder<int>(1,0);
 
+
+        ASSERT_EQ(size_t(1), i0.dimension());
+        ASSERT_EQ(size_t(1), i0.shape()[0]);
+
+        auto res  = m + i0;
+
+        ASSERT_EQ(int(0), res(0));
+        ASSERT_EQ(int(2), res(1));
+        ASSERT_EQ(int(4), res(2));
     }
 
     TEST(xbuilder, index_placeholder_2D_simple_matching_dim)
@@ -77,11 +91,11 @@ namespace xt
         auto b  = 3*ones<int>({2,1});
         auto c  = 4*ones<int>({1,1});
 
-        // first index
+        // first index (compile time specified dim and index)
         auto i0 = index_placeholder<int,2, 0>();
 
-        // second index
-        auto i1 = index_placeholder<int,2, 1>();
+        // second index (runtime specified dim and index)
+        auto i1 = index_placeholder<int>(2,1);
 
         // nontrivial expression
         auto res_a  = a + b*(i0+1) + (c  * i1)+2;

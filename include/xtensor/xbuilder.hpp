@@ -154,10 +154,10 @@ namespace xt
 
 
             index_placeholder_impl_rt(
-                const std::size_t dim,
+                const std::size_t ,
                 const std::size_t index  
             )
-            :   dim_(dim),
+            :   //dim_(dim),
                 index_(index){
             }
 
@@ -355,7 +355,7 @@ namespace xt
     template <class T, std::size_t DIM, std::size_t INDEX>
     inline auto index_placeholder() noexcept
     {
-        // todo make efficient
+        // todo make efficient 
         std::array<std::size_t, DIM> shape;
         std::fill(shape.begin(), shape.end(), 1);
         
@@ -369,7 +369,7 @@ namespace xt
     ) noexcept
     {
         // todo make efficient (use xt::ones or something)
-        std::vecor<std::size_t> shape(dim, 1);
+        std::vector<std::size_t> shape(dim, 1);
         return detail::make_xgenerator(detail::index_placeholder_impl_rt<T>(dim, index), shape);
     }
 
