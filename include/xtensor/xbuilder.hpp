@@ -98,7 +98,7 @@ namespace xt
         // see 3.6: Index placeholders
         // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
         template<class T, std::size_t DIM, std::size_t INDEX>
-        class index_placeholder_impl{
+        class index_placeholder_impl_ct{
         public:
 
             using value_type = T;
@@ -143,6 +143,66 @@ namespace xt
             {
                 return T(0);
             }
+        };
+
+
+        template<class T>
+        class index_placeholder_impl_rt{
+        public:
+
+            using value_type = T;
+
+
+            index_placeholder_impl_rt(
+                const std::size_t dim,
+                const std::size_t index  
+            )
+            :   dim_(dim),
+                index_(index){
+            }
+
+            template <class... Args>
+            inline T operator()(Args... args) const
+            {
+                return access_impl<0>(args...);
+            }
+
+            template <class It>
+            inline T element(It first, It last) const
+            {
+                return element_impl<0>(first);
+            }
+
+        private:
+
+
+            template <std::size_t I, class It>
+            inline T element_impl(It it) const
+            {
+                return (I == index_ ?  T(*it) :  element_impl<I+1>(it++));
+            }
+
+            template <std::size_t I, class T1, class... Args>
+            inline T access_impl(T1 t, Args...args) const
+            {
+                return (I == index_ ?  T(t) : access_impl<I+1>(args ...));
+            }
+
+            template<std::size_t I>
+            inline T access_impl() const
+            {
+                return T(0);
+            }
+
+            template<std::size_t I>
+            inline T element_impl() const
+            {
+                return T(0);
+            }
+            
+            // the dim seems to be not needed
+            //std::size_t dim_;
+            std::size_t index_;
         };
 
 
@@ -299,7 +359,18 @@ namespace xt
         std::array<std::size_t, DIM> shape;
         std::fill(shape.begin(), shape.end(), 1);
         
-        return detail::make_xgenerator(detail::index_placeholder_impl<T,DIM,INDEX>(), shape);
+        return detail::make_xgenerator(detail::index_placeholder_impl_ct<T,DIM,INDEX>(), shape);
+    }
+
+    template <class T>
+    inline auto index_placeholder(
+        const std::size_t dim,
+        const std::size_t index
+    ) noexcept
+    {
+        // todo make efficient (use xt::ones or something)
+        std::vecor<std::size_t> shape(dim, 1);
+        return detail::make_xgenerator(detail::index_placeholder_impl_rt<T>(dim, index), shape);
     }
 
 
