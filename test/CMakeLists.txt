@@ -75,8 +75,6 @@ endif()
 
 find_package(Threads)
 
-include_directories(${XTENSOR_INCLUDE_DIR})
-include_directories(${xtl_INCLUDE_DIRS})
 include_directories(${GTEST_INCLUDE_DIRS})
 
 set(XTENSOR_TESTS
@@ -155,7 +153,7 @@ add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(${XTENSOR_TARGET} gtest_main)
 endif()
-target_link_libraries(${XTENSOR_TARGET} ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(${XTENSOR_TARGET} xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})
 

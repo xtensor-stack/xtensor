@@ -28,7 +28,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-find_package(xtl REQUIRED)
+find_package(xtl 0.4 REQUIRED)
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
 # Build
@@ -87,6 +87,11 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
 )
 
+add_library(xtensor INTERFACE)
+target_include_directories(xtensor INTERFACE $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
+                                             $<INSTALL_INTERFACE:include>)
+target_link_libraries(xtensor INTERFACE xtl)
+
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(XTENSOR_CHECK_DIMENSION "xtensor dimension check" OFF)
 OPTION(XTENSOR_USE_XSIMD "simd acceleration for xtensor" OFF)
@@ -110,10 +115,12 @@ endif()
 
 if(XTENSOR_USE_XSIMD)
     add_definitions(-DXTENSOR_USE_XSIMD)
-    find_package(xsimd REQUIRED)
-    include_directories(${xsimd_INCLUDE_DIRS})
+    find_package(xsimd 4 REQUIRED)
     message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
+    target_link_libraries(xtensor INTERFACE xsimd)
 endif()
+
+message(STATUS "${XTENSOR_DEPENDENCIES}")
 
 if(DEFAULT_COLUMN_MAJOR)
     add_definitions(-DDEFAULT_LAYOUT=layout_type::column_major)
@@ -127,13 +134,18 @@ if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
 
-include_directories(${xtl_INCLUDE_DIRS})
-
 # Installation
 # ============
 
 include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
+
+install(TARGETS xtensor
+        EXPORT ${PROJECT_NAME}-targets)
+
+# Makes the project importable from the build directory
+export(EXPORT ${PROJECT_NAME}-targets
+       FILE "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake")
 
 install(FILES ${XTENSOR_HEADERS}
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/xtensor)
@@ -156,6 +168,9 @@ write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Conf
 set(CMAKE_SIZEOF_VOID_P ${_XTENSOR_CMAKE_SIZEOF_VOID_P})
 install(FILES ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
               ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+        DESTINATION ${XTENSOR_CMAKECONFIG_INSTALL_DIR})
+install(EXPORT ${PROJECT_NAME}-targets
+        FILE ${PROJECT_NAME}Targets.cmake
         DESTINATION ${XTENSOR_CMAKECONFIG_INSTALL_DIR})
 
 configure_file(${PROJECT_NAME}.pc.in
