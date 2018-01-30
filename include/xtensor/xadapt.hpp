@@ -17,7 +17,6 @@
 #include "xtl/xsequence.hpp"
 
 #include "xarray.hpp"
-#include "xbuffer_adaptor.hpp"
 #include "xtensor.hpp"
 
 namespace xt

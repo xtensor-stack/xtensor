@@ -144,12 +144,14 @@ namespace xt
     public:
 
         using base_type = detail::buffer_storage_t<CP, A, O>;
+        using self_type = xbuffer_adaptor<CP, O, A>;
         using allocator_type = typename base_type::allocator_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
+        using temporary_type = typename uvector<value_type, allocator_type>;
 
         using size_type = typename base_type::size_type;
         using difference_type = typename base_type::difference_type;
@@ -163,6 +165,16 @@ namespace xt
 
         template <class P>
         xbuffer_adaptor(P&& data, size_type size, const allocator_type& alloc = allocator_type());
+
+        ~xbuffer_adaptor() = default;
+
+        xbuffer_adaptor(const self_type&) = default;
+        self_type& operator=(const self_type&) = default;
+
+        xbuffer_adaptor(self_type&&) = default;
+        xbuffer_adaptor& operator=(self_type&&) = default;
+
+        self_type& operator=(temporary_type&&);
 
         bool empty() const noexcept;
         using base_type::size;
@@ -224,6 +236,25 @@ namespace xt
     template <class CP, class O, class A>
     void swap(xbuffer_adaptor<CP, O, A>& lhs,
               xbuffer_adaptor<CP, O, A>& rhs) noexcept;
+
+    /************************************
+     * temporary_container metafunction *
+     ************************************/
+
+    template <class C>
+    struct temporary_container
+    {
+        using type = C;
+    };
+
+    template <class CP, class O, class A>
+    struct temporary_container<xbuffer_adaptor<CP, O, A>>
+    {
+        using type = typename xbuffer_adaptor<CP, O, A>::temporary_type;
+    };
+
+    template <class C>
+    using temporary_container_t = typename temporary_container<C>::type;
 
     /**********************************
      * xbuffer_storage implementation *
@@ -399,6 +430,14 @@ namespace xt
     inline xbuffer_adaptor<CP, O, A>::xbuffer_adaptor(P&& data, size_type size, const allocator_type& alloc)
         : base_type(std::forward<P>(data), size, alloc)
     {
+    }
+
+    template <class CP, class O, class A>
+    inline auto xbuffer_adaptor<CP, O, A>::operator=(temporary_type&& tmp) -> self_type&
+    {
+        base_type::resize(tmp.size());
+        std::copy(tmp.cbegin(), tmp.cend(), begin());
+        return *this;
     }
 
     template <class CP, class O, class A>
