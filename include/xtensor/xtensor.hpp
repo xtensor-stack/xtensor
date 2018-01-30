@@ -15,6 +15,7 @@
 #include <utility>
 #include <vector>
 
+#include "xbuffer_adaptor.hpp"
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
 
@@ -132,7 +133,7 @@ namespace xt
         using inner_shape_type = shape_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
-        using temporary_type = xtensor_container<container_type, N, L, Tag>;
+        using temporary_type = xtensor_container<temporary_container_t<container_type>, N, L, Tag>;
         static constexpr layout_type layout = L;
     };
 
