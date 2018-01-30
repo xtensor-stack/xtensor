@@ -52,13 +52,15 @@ ownership of the array:
     #include <cstddef>
     #include "xtensor/xadapt.hpp"
 
-    void compute(double* data, std::size_t size) {
+    void compute(double* data, std::size_t size)
+    {
         std::vector<std::size_t> shape = { size };
         auto a = xt::adapt(data, size, xt::no_ownership(), shape);
         a = a + a; // does not modify the size
     }
 
-    int main() {
+    int main()
+    {
         std::size_t size = 2;
         double* data = new double[size];
         for (int i = 0; i < size; i++)
@@ -83,7 +85,8 @@ the ownership of the array, meaning it will be deleted when the adaptor is destr
     #include "xtensor/xarray.hpp"
     #include "xtensor/xadapt.hpp"
 
-    void compute(double*& data, std::size_t size) {
+    void compute(double*& data, std::size_t size)
+    {
         // data pointer can be changed, hence double*&
         std::vector<std::size_t> shape = { size };
         auto a = xt::adapt(data, size, xt::acquire_ownership(), shape);
@@ -92,7 +95,8 @@ the ownership of the array, meaning it will be deleted when the adaptor is destr
         a = a * b; // size has changed, shape is now { 2, 2 }
     }
 
-    int main() {
+    int main()
+    {
         std::size_t size = 2;
         double* data = new double[size];
         for (int i = 0; i < size; i++)
@@ -119,13 +123,15 @@ adapter before calling ``compute`` and pass it to the function:
     #include "xtensor/xadapt.hpp"
     
     template <class A>
-    void compute(A& a) {
+    void compute(A& a)
+    {
         xt::xarray<double> b {1., 2.};
         b.reshape({2, 1});
         a = a * b; // size has changed, shape is now { 2, 2 }
     }
     
-    int main() {
+    int main()
+    {
         std::size_t size = 2;
         double* data = new double[size];
         for (int i = 0; i < size; i++)
