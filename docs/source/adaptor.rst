@@ -57,7 +57,7 @@ ownership of the array:
     {
         std::vector<std::size_t> shape = { 2, 3 };
         auto a = xt::adapt(data, size, xt::no_ownership(), shape);
-        return some_computation(data, size)
+        return some_computation(a);
     }
 
     std::size_t size = get_data_size();
@@ -79,7 +79,7 @@ the ownership of the array, meaning it will be deleted when the adaptor is destr
     {
         std::vector<std::size_t> shape = { 2, 3 };
         auto a = xt::adapt(data, size, xt::acquire_ownership(), shape);
-        return some_computation(data, size)
+        return some_computation(a);
     }
 
     std::size_t size = get_data_size();
