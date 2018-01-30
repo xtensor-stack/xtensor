@@ -242,7 +242,6 @@ namespace xt
     template <class S>
     inline S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l)
     {
-        using size_type = typename S::size_type;
         using value_type = typename S::value_type;
         S result = xtl::make_sequence<S>(strides.size(), 0);
         auto lambda = [&index](const value_type& str)
