@@ -155,4 +155,20 @@ namespace xt
         a2(1, 0) = 1;
         EXPECT_EQ(1, data2[2]);
     }
+
+    TEST(xarray_adaptor, inplace_assignment)
+    {
+        size_t size = 1;
+        int data1 = 0;
+        int data2 = 1;
+        int data3;
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s({1});
+
+        auto a1 = adapt(&data1, size, xt::no_ownership(), s);
+        auto a2 = adapt(&data2, size, xt::no_ownership(), s);
+        auto a3 = adapt(&data3, size, xt::no_ownership(), s);
+        a3 = a1 + a2;
+        EXPECT_EQ(1, data3);
+    }
 }
