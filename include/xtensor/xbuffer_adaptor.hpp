@@ -151,7 +151,7 @@ namespace xt
         using const_reference = typename base_type::const_reference;
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
-        using temporary_type = typename uvector<value_type, allocator_type>;
+        using temporary_type = uvector<value_type, allocator_type>;
 
         using size_type = typename base_type::size_type;
         using difference_type = typename base_type::difference_type;

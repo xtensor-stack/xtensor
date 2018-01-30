@@ -67,6 +67,40 @@ namespace xt
         EXPECT_EQ(1, data2[2]);
     }
 
+    TEST(xarray_adaptor, no_ownership_assign)
+    {
+        size_t size = 1;
+        int data1 = 0;
+        int data2 = 1;
+        int data3;
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s({ 1 });
+
+        auto a1 = adapt(&data1, size, xt::no_ownership(), s);
+        auto a2 = adapt(&data2, size, xt::no_ownership(), s);
+        auto a3 = adapt(&data3, size, xt::no_ownership(), s);
+        a3 = a1 + a2;
+        EXPECT_EQ(1, data3);
+    }
+
+    TEST(xarray_adaptor, acquire_ownership_assign)
+    {
+        size_t size = 1;
+        int* data1 = new int[1];
+        data1[0] = 0;
+        int* data2 = new int[1];
+        data2[0] = 1;
+        int* data3 = nullptr;
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s({ 1 });
+
+        auto a1 = adapt(data1, size, xt::acquire_ownership(), s);
+        auto a2 = adapt(data2, size, xt::acquire_ownership(), s);
+        auto a3 = adapt(data3, size_t(0), xt::acquire_ownership(), s);
+        a3 = a1 + a2;
+        EXPECT_EQ(1, *data3);
+    }
+
     TEST(xtensor_adaptor, adapt)
     {
         vec_type v0(4, 0);
@@ -154,21 +188,5 @@ namespace xt
         auto a2 = adapt(std::move(data2), size, acquire_ownership(), s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, data2[2]);
-    }
-
-    TEST(xarray_adaptor, inplace_assignment)
-    {
-        size_t size = 1;
-        int data1 = 0;
-        int data2 = 1;
-        int data3;
-        using shape_type = std::vector<vec_type::size_type>;
-        shape_type s({1});
-
-        auto a1 = adapt(&data1, size, xt::no_ownership(), s);
-        auto a2 = adapt(&data2, size, xt::no_ownership(), s);
-        auto a3 = adapt(&data3, size, xt::no_ownership(), s);
-        a3 = a1 + a2;
-        EXPECT_EQ(1, data3);
     }
 }
