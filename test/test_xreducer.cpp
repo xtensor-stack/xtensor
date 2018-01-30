@@ -240,4 +240,15 @@ namespace xt
         a_gd = sum(a, {1, 2, 3}, evaluation_strategy::immediate());
         EXPECT_EQ(a_lz, a_gd);
     }
+
+    TEST(xreducer, chaining_reducers)
+    {
+        xt::xarray<double> a = {{ 1., 2. },
+                                { 3., 4. }};
+
+        auto b = a - xt::sum(a, { 0 });
+        auto c = xt::sum(b, { 0 });
+        EXPECT_EQ(c(0), -4.);
+        EXPECT_EQ(c(1), -6.);
+    }
 }
