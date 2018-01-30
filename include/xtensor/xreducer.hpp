@@ -844,7 +844,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_stepper.step(get_dim(dim), n);
+            m_stepper.step(get_dim(dim - m_offset), n);
         }
     }
 
@@ -853,7 +853,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_stepper.step_back(get_dim(dim), n);
+            m_stepper.step_back(get_dim(dim - m_offset), n);
         }
     }
 
@@ -862,7 +862,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_stepper.reset(get_dim(dim));
+            m_stepper.reset(get_dim(dim - m_offset));
         }
     }
 
@@ -871,7 +871,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_stepper.reset_back(get_dim(dim));
+            m_stepper.reset_back(get_dim(dim - m_offset));
         }
     }
 
