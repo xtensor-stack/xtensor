@@ -7,6 +7,22 @@
 Changelog
 =========
 
+0.15.1
+------
+
+- ``xarray_adaptor`` fixed
+  `#618 <https://github.com/QuantStack/xtensor/pull/618>`_.
+- ``xtensor_adaptor`` fixed
+  `#620 <https://github.com/QuantStack/xtensor/pull/620>`_.
+- fix in ``xreducer`` steppers
+  `#622 <https://github.com/QuantStack/xtensor/pull/622>`_.
+- documentation improved
+  `#621 <https://github.com/QuantStack/xtensor/pull/621>`_.
+  `#623 <https://github.com/QuantStack/xtensor/pull/623>`_.
+  `#625 <https://github.com/QuantStack/xtensor/pull/625>`_.
+- warnings removed
+  `#624 <https://github.com/QuantStack/xtensor/pull/624>`_.
+
 0.15.0
 ------
 

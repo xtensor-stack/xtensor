@@ -49,12 +49,10 @@ make install
 | `xtensor` | `xtl`  |`xsimd` (optional) |
 |-----------|--------|-------------------|
 |  master   | ^0.4.0 |       ^4.0.0      |
+|  0.15.1   | ^0.4.0 |       ^4.0.0      |
 |  0.15.0   | ^0.4.0 |       ^4.0.0      |
 |  0.14.1   | ^0.3.7 |       ^3.1.0      |
 |  0.14.0   | ^0.3.6 |       ^3.1.0      |
-|  0.13.2   | ^0.3.4 |       ^3.1.0      |
-|  0.13.1   | ^0.3.3 |       ^3.1.0      |
-|  0.13.0   | ^0.3.3 |       ^3.1.0      |
 
 The dependency on `xsimd` is required if you want to enable simd acceleration in `xtensor`. This can be done
 by defining the macro `XTENSOR_USE_XSIMD` *before* including any header of `xtensor`.
