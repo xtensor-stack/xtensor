@@ -4,6 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
+.. _concepts-label:
+
 Concepts
 ========
 
@@ -45,14 +47,16 @@ const lvalue or rvalue):
     const derived_type& derived_cast() & noexcept;
     derived_type derived_cast() && noexcept;
 
+.. _xiterable-concept-label:
+
 xiterable
 ~~~~~~~~~
 
 The iterable concept is modeled by two classes, ``xconst_iterable`` and ``xiterable``, defined
 in ``xtensor/xiterable.hpp``. ``xconst_iterable`` provides types and methods for iterating on
-constant expressions, similar to the ones provided by the STL containers. Unlike STL, methods
-of ``xconst_iterable`` and ``xiterable`` are templated by a layout parameter that allows you to
-iterate over a N-dimensional expression in row-major or column-major.
+constant expressions, similar to the ones provided by the STL containers. Unlike the STL, the
+methods of ``xconst_iterable`` and ``xiterable`` are templated by a layout parameter that allows
+you to iterate over a N-dimensional expression in row-major or column-major.
 
 .. code::
 
@@ -111,6 +115,8 @@ given shape:
 
 Iterators returned by methods defined in ``xconst_iterable`` and ``xiterable`` are random access
 iterators.
+
+.. _xsemantic-concept-label:
 
 xsemantic
 ~~~~~~~~~
@@ -198,6 +204,8 @@ assignment.
 xsemantic classes hierarchy:
 
 .. image:: xsemantic_classes.png
+
+.. _xcontainer-concept-label:
 
 xcontainer
 ~~~~~~~~~~
