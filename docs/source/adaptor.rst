@@ -114,7 +114,7 @@ the ownership of the array, meaning it will be deleted when the adaptor is destr
 
 To safely get the computed data out of the function, you could pass an additional output parameter
 to ``compute`` in which you copy the result before exiting the function. Or you can create the
-adapter before calling ``compute`` and pass it to the function:
+adaptor before calling ``compute`` and pass it to the function:
 
 .. code::
 
