@@ -47,6 +47,7 @@ Building the test suite of ``xtensor`` where the sources of ``gtest`` are locate
     cmake -DGTEST_SRC_DIR=/usr/share/gtest ../
     make xtest
 
+.. _configuration-label:
 
 Configuration
 -------------
