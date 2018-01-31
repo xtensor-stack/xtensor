@@ -15,3 +15,4 @@ before going any further.
 .. toctree::
 
    concepts
+   implementation_classes
