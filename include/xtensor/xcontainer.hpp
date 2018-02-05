@@ -311,6 +311,12 @@ namespace xt
         container_iterator data_xend(layout_type l) noexcept;
         const_container_iterator data_xend(layout_type l) const noexcept;
 
+    protected:
+
+        derived_type& derived_cast() & noexcept;
+        const derived_type& derived_cast() const & noexcept;
+        derived_type derived_cast() && noexcept;
+
     private:
 
         friend class xiterable<D>;
@@ -325,9 +331,6 @@ namespace xt
         inner_shape_type& mutable_shape();
         inner_strides_type& mutable_strides();
         inner_backstrides_type& mutable_backstrides();
-
-        derived_type& derived_cast();
-        const derived_type& derived_cast() const;
     };
 
 #undef DL
@@ -432,18 +435,6 @@ namespace xt
     inline auto xcontainer<D>::mutable_backstrides() -> inner_backstrides_type&
     {
         return derived_cast().backstrides_impl();
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::derived_cast() -> derived_type&
-    {
-        return *static_cast<derived_type*>(this);
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::derived_cast() const -> const derived_type&
-    {
-        return *static_cast<const derived_type*>(this);
     }
 
     /**
@@ -1094,6 +1085,24 @@ namespace xt
     inline auto xcontainer<D>::data_xend(layout_type l) const noexcept -> const_container_iterator
     {
         return data_xend_impl(data().end(), l);
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::derived_cast() & noexcept -> derived_type&
+    {
+        return *static_cast<derived_type*>(this);
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::derived_cast() const & noexcept -> const derived_type&
+    {
+        return *static_cast<const derived_type*>(this);
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::derived_cast() && noexcept -> derived_type
+    {
+        return *static_cast<derived_type*>(this);
     }
 
     template <class D>
