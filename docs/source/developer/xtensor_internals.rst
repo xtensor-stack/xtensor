@@ -16,3 +16,4 @@ before going any further.
 
    concepts
    implementation_classes
+   expression_tree.rst
