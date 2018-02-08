@@ -197,5 +197,5 @@ The las thing required is to specialize the ``select_xfunction_expression`` meta
 
 In this example, ``xoptional_function`` inherits from ``xfunction_base`` and define some additional methods, so it provides a
 richer API the ``xfunction``. However it is possible to define a function class with a different API, thus not inheriting from
-``xfunction_base``. In that case, the assignment mechanics need to be customized too, this is detailed in :ref:`expression-assignment-label`.
+``xfunction_base``. In that case, the assignment mechanics need to be customized too, this is detailed in :ref:`xtensor-assign-label`.
 

@@ -219,6 +219,8 @@ The semantic classes only expect the following type: ``temporary_type``.
     inner_backstrides_type;
     layout_type;
 
+.. _xiterable-inner-label:
+
 **xiterable**
 
 Since many expressions are not containers, the definition of types required by the iterable concept is

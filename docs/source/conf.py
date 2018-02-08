@@ -21,8 +21,8 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 project = 'xtensor'
-copyright = '2016, Johan Mabille and Sylvain Corlay'
-author = 'Johan Mabille and Sylvain Corlay'
+copyright = '2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht'
+author = 'Johan Mabille, Sylvain Corlay and Wolf Vollprecht'
 
 html_logo = 'quantstack-white.svg'
 

@@ -139,7 +139,7 @@ Other changes
 - Fixup static layout in ``xstrided_view``
   `#536 <https://github.com/QuantStack/xtensor/pull/536>`_.
 - ``xexpression::operator[]`` now take support any type of sequence
-  `#537 <https://github.com/QuantStack/xtensor/pull/537`_.
+  `#537 <https://github.com/QuantStack/xtensor/pull/537>`_.
 - Fixing ``xinfo`` issues for Visual Studio.
   `#529 <https://github.com/QuantStack/xtensor/pull/529>`_.
 - Fix const-correctness in ``xstrided_view``.
