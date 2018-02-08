@@ -60,7 +60,9 @@ namespace xt
         using container_type = typename inner_types::container_type;
         using allocator_type = typename container_type::allocator_type;
         using value_type = typename container_type::value_type;
-        using reference = typename container_type::reference;
+        using reference = std::conditional_t<std::is_const<container_type>::value,  
+                                             typename container_type::const_reference,
+                                             typename container_type::reference>;
         using const_reference = typename container_type::const_reference;
         using pointer = typename container_type::pointer;
         using const_pointer = typename container_type::const_pointer;
