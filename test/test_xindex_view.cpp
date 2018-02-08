@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xadapt.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xindex_view.hpp"
 #include "xtensor/xbroadcast.hpp"
@@ -121,10 +122,20 @@ namespace xt
 
     TEST(xindex_view, filter)
     {
-        xarray<double> a = { { 1, 5, 3 },{ 4, 5, 6 } };
-        const xarray<double> b = { { 1, 5, 3 },{ 4, 5, 6 } };
+        xarray<double> a = {{ 1, 5, 3 },{ 4, 5, 6 }};
+        const xarray<double> b = {{ 1, 5, 3 },{ 4, 5, 6 }};
         filter(a, a > 3) += filter(b, b > 3);
-        xarray<double> expected = { { 1, 10, 3}, {8, 10, 12} };
+        xarray<double> expected = {{ 1, 10, 3}, {8, 10, 12}};
         EXPECT_EQ(expected, a);
+    }
+
+    TEST(xindex_view, const_adapt_filter)
+    {
+        const std::vector<double> av({1,2,3,4,5,6});
+        auto a = xt::adapt(av, std::array<std::size_t, 2>({3, 2}));
+        xt::xarray<double> b = {{1, 2, 3}, {4, 5, 6}};
+        xt::filter(b, b > 3) += xt::filter(a, a < 4);
+        xarray<double> expected = {{1, 2, 3}, {5, 7, 9}};
+        EXPECT_EQ(expected, b);
     }
 }
