@@ -403,6 +403,13 @@ namespace xt
         }
 
         template <class ST>
+        void resize(ST&& s)
+        {
+            (void)(s); // remove unused parameter warning if XTENSOR_ASSERT undefined
+            XTENSOR_ASSERT(std::equal(s.begin(), s.end(), m_shape.begin()) && s.size() == m_shape.size());
+        }
+
+        template <class ST>
         bool broadcast_shape(ST& s) const
         {
             return xt::broadcast_shape(m_shape, s);
@@ -419,9 +426,9 @@ namespace xt
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
-        CONSTEXPR_ENHANCED inner_shape_type& shape_impl() const noexcept;
-        CONSTEXPR_ENHANCED inner_strides_type& strides_impl() const noexcept;
-        CONSTEXPR_ENHANCED inner_backstrides_type& backstrides_impl() const noexcept;
+        CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
+        CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
+        CONSTEXPR_RETURN const inner_backstrides_type& backstrides_impl() const noexcept;
 
         friend class xcontainer<xfixed_container<EC, S, L, Tag>>;
     };
@@ -530,9 +537,9 @@ namespace xt
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
-        CONSTEXPR_ENHANCED inner_shape_type& shape_impl() const noexcept;
-        CONSTEXPR_ENHANCED inner_strides_type& strides_impl() const noexcept;
-        CONSTEXPR_ENHANCED inner_backstrides_type&  backstrides_impl() const noexcept;
+        CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
+        CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
+        CONSTEXPR_RETURN const inner_backstrides_type&  backstrides_impl() const noexcept;
 
         friend class xcontainer<xfixed_adaptor<EC, S, L, Tag>>;
     };
