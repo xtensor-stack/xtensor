@@ -9,8 +9,8 @@ xtensor internals
 
 This section provides information about `xtensor`'s internals and its architecture. It is intended for developers
 who want to contribute to `xtensor` or simply understand how it works under the hood. `xtensor` makes heavy use
-of CRTP, template programming, universal references and perfect forwarding. One should be familiar with these notions
-before going any further.
+of the CRTP pattern, template meta-programming, universal references and perfect forwarding. One should be familiar
+with these notions before going any further.
 
 .. toctree::
 
@@ -18,3 +18,4 @@ before going any further.
    implementation_classes
    expression_tree.rst
    iterating_expression.rst
+   assignment.rst

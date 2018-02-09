@@ -97,6 +97,8 @@ If the expression class inherits from ``xiterable`` instead of ``xconst_iterable
 of the previous methods must also be defined. Every method implemented in one of the base class eventually calls
 one of these stepper methods, whose mechanics is explained hereafter.
 
+.. _stepper-label:
+
 Steppers
 ~~~~~~~~
 
@@ -119,24 +121,25 @@ The ``reset`` and ``reset_back`` methods are shortcut to ``step_back`` and ``ste
 The steppers are initialized with a "position" (that may be an index, a pointer to the underlying buffer of an container-based
 expression, etc...) in the expression, and can then be used to browse the expression in any direction:
 
-.. image:: stepper_basic.png
+.. image:: stepper_basic.svg
 
-In this diagram, the data are stored in row-major order, and we step in the second dimension (dimension index starts at 0).
+In this diagram, the data is stored in row-major order, and we step in the second dimension (dimension index starts at 0).
 The positions of the stepper are represented by the red dots.
 
 The ``to_end`` method takes a layout parameter, because the ending positions of a stepper depend on the layout used to iterate.
 Indeed, if we call ``step_back`` after a call to ``to_end``, we want the stepper to point to the last element. To ensure this
-for both row-major and column-major iterations, the ending positions must be set as shown below:
+for both row-major order and column-major order iterations, the ending positions must be set as shown below:
 
-.. image:: stepper_to_end.png
+.. image:: stepper_to_end.svg
 
 The red dots are the position of a stepper iterating in column-major while the green ones are the positions of a stepper iterating
-in row-major. Thus, if we assume that ``p`` is a pointer to the last element (the square containing 11), the ending positions
-of the stepper are ``p + 1`` in row-major, and ``p + 3`` in column-major.
+in row-major order. Thus, if we assume that ``p`` is a pointer to the last element (the square containing 11), the ending positions
+of the stepper are ``p + 1`` in row-major, and ``p + 3`` in column-major order.
 
-A stepper is specific to an expression type, thus implementing a new kind of expression usually requires to implement a new
+A stepper is specific to an expression type, therefore implementing a new kind of expression usually requires to implement a new
 kind of stepper. However `xtensor` provides a generic ``xindexed_stepper`` class, that can be used with any kind of expressions.
-Though not optimal, this solution allows to defer the implementation of a specific stepper.
+Even though it is generally not optimal, authors of new expression types can make use of the generic index stepper in a
+first implementation.
 
 Broadcasting
 ~~~~~~~~~~~~
@@ -189,7 +192,7 @@ order; here dimension 1 of ``a`` correpsonds to dimension 0 of ``b``.
 This implementation ensures that a step in dimension 0 of the function updates the stepper of ``a`` while the stepper of ``b``
 remains unchanged; on the other hand, stepping in dimension 1 will update both steppers, as illustrated below:
 
-.. image:: stepper_broadcasting.png
+.. image:: stepper_broadcasting.svg
 
 The red dots are initial stepper positions, the green dots and blue dots are the positions of the steppers after calling ``step``
 with different dimension arguments.
@@ -202,7 +205,7 @@ upon the steppers. Whereas the steppers are tied to the expression they refer to
 kind of stepper.
 
 An iterator holds a stepper an multi-dimensional index. A call to ``operator++`` increases the index and calls the ``step`` method
-of the stepper accordingly. The way the index is increased depends on the layout used for iterating. For a row-major iteration
+of the stepper accordingly. The way the index is increased depends on the layout used for iterating. For a row-major order iteration
 over a container with shape ``{3, 4}``, the index iterating sequence is:
 
 .. code::
@@ -223,10 +226,11 @@ over a container with shape ``{3, 4}``, the index iterating sequence is:
 When a member of an index reaches its maximum value, it is reset to 0 and the member in the next dimension is increased. This translates
 in the calls of two methods of the stepper, first ``reset`` and then ``step``. This is illustrated by the following picture:
 
-.. image:: stepper_iterating.png
+.. image:: stepper_iterating.svg
 
 The green arrows represent the iteration from ``{0, 0}`` to ``{0, 3}``. The blue arrows illustrate what happens when the index is increased
-from ``{0, 3}`` to ``{1, 0}``: first the stepper is reset to ``{0, 0}``, then ``step(0, 1)`` is called, setting it to the position ``{1, 0}``.
+from ``{0, 3}`` to ``{1, 0}``: first the stepper is reset to ``{0, 0}``, then ``step(0, 1)`` is called, setting the stepper to the position
+``{1, 0}``.
 
 ``xiterator`` implements a random access iterator, providing ``operator--`` and ``operator[]`` methods. The implementation of these methods
 is similar to the one of ``operator++``.
