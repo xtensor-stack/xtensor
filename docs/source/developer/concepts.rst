@@ -11,13 +11,13 @@ Concepts
 
 `xtensor`'s core is built upon key concepts captured in interfaces that are put together in
 derived classes through CRTP and multiple inheritance. Interfaces and classes that model
-expressions implement value semantic. CRTP and value semantic achieve static polymorphism and
-avoids performance overhead of virtual method and dynamic dispatching.
+expressions implement *value semantic*. CRTP and value semantic achieve static polymorphism and
+avoids performance overhead of virtual methods and dynamic dispatching.
 
 xexpression
 ~~~~~~~~~~~
 
-``xexpression`` is the base class for all expression classes. It is a CRTP whose template
+``xexpression`` is the base class for all expression classes. It is a CRTP base whose template
 parameter must be the most derived class in the hierarchy. For instance, if ``A`` inherits
 from ``B`` which in turn inherits from ``xexpression``, then ``B`` should be a template
 class whose template parameter is ``A`` and should forward this parameter to ``xexpression``:
@@ -56,7 +56,9 @@ The iterable concept is modeled by two classes, ``xconst_iterable`` and ``xitera
 in ``xtensor/xiterable.hpp``. ``xconst_iterable`` provides types and methods for iterating on
 constant expressions, similar to the ones provided by the STL containers. Unlike the STL, the
 methods of ``xconst_iterable`` and ``xiterable`` are templated by a layout parameter that allows
-you to iterate over a N-dimensional expression in row-major or column-major.
+you to iterate over a N-dimensional expression in row-major order or column-major order.
+Row-major layout means that elements that only differ by their last index are contiguous in memory.
+Column-major layout means that elements that only differ by their first index are contiguous in memory.
 
 .. code::
 
@@ -78,7 +80,7 @@ you to iterate over a N-dimensional expression in row-major or column-major.
     template <class L>
     const_reverse_iterator crend() const noexcept;
 
-.. image:: iteration.png
+.. image:: iteration.svg
 
 This template parameter is defaulted to ``DEFAULT_LAYOUT`` (see :ref:`configuration-label`), so
 that `xtensor` expressions can be used in generic code such as:
@@ -152,9 +154,9 @@ The first overload is meant for computed assignment involving a scalar; it allow
 We rely on SFINAE to remove this overload from the overload resolution set when the parameter that we want
 to assign is not a scalar, avoiding ambiguity.
 
-All operator-based methods taking an ``xexpression`` parameter do not perform a direct assignment, instead
-they compute a temporary before calling the ``assign`` method. Thus, if ``a`` and ``b`` are expressions,
-the following
+Operator-based method taking a general ``xexpression`` parameter don't perform a direct assignment. Instead,
+the result is assigned to a temporary variable first, in order to prevent issues with aliasing. Thus, if ``a``
+and ``b`` are expressions, the following
 
 .. code::
 
@@ -203,7 +205,7 @@ assignment.
 
 xsemantic classes hierarchy:
 
-.. image:: xsemantic_classes.png
+.. image:: xsemantic_classes.svg
 
 .. _xcontainer-concept-label:
 
@@ -263,12 +265,10 @@ They are covered in the :ref:`xtensor-assign-label` section.
 
 If you read the entire code of ``xcontainer``, you'll notice that two types are defined for shape,
 strides and backstrides: ``shape_type`` and ``inner_shape_type``, ``strides_type`` and
-``inner_strides_type``, and ``backstrides_type`` and ``inner_backstrides_type``.
-
-The inner types are used for storing data, while the other ones are used for reshape and resize
-APIs. This way, it is possible to write in C++ a wrapper of a python structure that holds the shape,
-strides and backstrides allocated on the python side, and provide methods for resizing and reshaping
-that accept structures allocated on the C++ side.
+``inner_strides_type``, and ``backstrides_type`` and ``inner_backstrides_type``. The distinction
+between ``inner_shape_type`` and ``shape_type`` was motivated by the xtensor-python wrapper around
+numpy data structures, where the inner shape type is a proxy on the shape section of the numpy
+arrayobject. It cannot have a value semantics on its own as it is bound to the entire numpy array.
 
 ``xstrided_container`` inherits from ``xcontainer``; it represents a container that holds its shape
 and strides. It provides methods for reshaping the container:
@@ -291,17 +291,17 @@ Both ``xstrided_container`` and ``xcontainer`` are CRTP classes whose template p
 the most derived type in the hierarchy. Besides, ``xcontainer`` inherits from ``xiterable``,
 thus providing iteration methods.
 
-.. image:: xcontainer_classes.png
+.. image:: xcontainer_classes.svg
 
 xfunction_base
 ~~~~~~~~~~~~~~
 
 The ``xfunction_base`` is used to model mathematical operations and functions. It provides similar
 methods to the ones defined in ``xcontainer``, and embeds the functor describing the operation and
-the operands.
+its operands.
 
 Like other interfaces, it is a CRTP class whose template parameter must be the most derived type of
 the hierarchy. It inherits from ``xconst_iterable``, thus providing iteration methods.
 
-The fact that ``xfunction_base`` is not a final class and needs to be inherited allows to define function
-classes that provide a richer API and have them working with already existing code.
+The fact that ``xfunction_base`` is not a final class and needs to be inherited from allows to define
+function classes that provide a richer API and have them working with already existing code.

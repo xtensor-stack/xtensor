@@ -106,7 +106,7 @@ totally:
 These methods are usually provided by inheriting from ``xconst_iterable`` or ``xiterable``.
 See :ref:`iterating-expression-label` for more details.
 
-If the expression is mutable, it must also define the non-const counterpart of the data access
+If the expression is mutable, it must also define the non-const counterparts of the data access
 methods, and inherits from a semantic class to provide assignment operators.
 
 xarray and xtensor
@@ -115,11 +115,11 @@ xarray and xtensor
 Although they represent different concepts, ``xarray`` and ``xtensor`` have really similar
 implementations so only ``xarray`` will be covered.
 
-``xarray`` is a strided-array expression that can be assigned to. Everything ``xarray`` needs
+``xarray`` is a strided array expression that can be assigned to. Everything ``xarray`` needs
 is already defined in classes modeling :ref:`concepts-label`, so ``xarray`` only has to inherit
 from these classes and define constructors and assignment operators:
 
-.. image:: xarray_uml.png
+.. image:: xarray_uml.svg
 
 Besides implementing the methods that define value semantic, ``xarray`` and ``xtensor`` hold
 the data container. Since the ``xcontainer`` base class implements all the logic for accessing

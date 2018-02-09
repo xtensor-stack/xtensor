@@ -14,8 +14,9 @@ the expression tree.
 xfunction_base / xfunction
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A node in the expression tree is represented by an instance of ``xfunction_base``. This is a template class whose
-parameters are:
+A node in the expression tree may be represented by different classes in `xtensor`; here we focus on basic arithmetic
+operations and mathematical functions, which are represented by an instance of ``xfunction_base``. This is a template
+class whose parameters are:
 
 - a functor describing the operation of the mathematical function
 - the return type, computing from the types of the child expressions involved in the operation
@@ -39,7 +40,7 @@ Consider the following code:
 Here the type of ``f`` is ``xfunction<plus, double, const xarray<double>&, const xarray<double>&>``, and f stores constant
 references on the arrays involved in the operation. This can be illustrated by the figure below:
 
-.. image:: xfunction_tree.png
+.. image:: xfunction_tree.svg
 
 The implementation of ``xfunction_base`` methods is quite easy: they forward the call to the nodes and apply the operation
 when this makes sense. For instance, assuming that the operands are stored as ``m_first`` and ``m_second``, and the functor
