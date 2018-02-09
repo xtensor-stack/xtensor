@@ -37,6 +37,7 @@ endif()
 
 if(MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+    add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
 endif()
@@ -97,6 +98,7 @@ set(XTENSOR_TESTS
     test_xeval.cpp
     test_xexception.cpp
     test_xfunction.cpp
+    test_xfixed.cpp
     test_xindex_view.cpp
     test_xinfo.cpp
     test_xiterator.cpp
