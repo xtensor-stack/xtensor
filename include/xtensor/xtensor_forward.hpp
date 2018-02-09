@@ -114,6 +114,14 @@ namespace xt
     template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_adaptor;
 
+    template <class EC, class FS, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
+    class xfixed_container;
+
+    template <class T,
+              class FS,
+              layout_type L = DEFAULT_LAYOUT>
+    using xfixed = xfixed_container<T, FS, L>;
+
     /**
      * @typedef xtensor_optional
      * Alias template on xtensor_container for handling missing values

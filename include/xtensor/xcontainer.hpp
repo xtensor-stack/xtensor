@@ -38,6 +38,25 @@ namespace xt
 
 #define DL DEFAULT_LAYOUT
 
+    namespace detail
+    {
+        template <class T>
+        struct allocator_type_impl
+        {
+            using type = typename T::allocator_type;
+        };
+
+        template <class T, std::size_t N>
+        struct allocator_type_impl<std::array<T, N>>
+        {
+            using type = std::allocator<T>;  // fake allocator for testing
+        };
+    }
+
+    template <class T>
+    using allocator_type_t = typename detail::allocator_type_impl<T>::type;
+
+
     /**
      * @class xcontainer
      * @brief Base class for dense multidimensional containers.
@@ -58,7 +77,7 @@ namespace xt
 
         using inner_types = xcontainer_inner_types<D>;
         using container_type = typename inner_types::container_type;
-        using allocator_type = typename container_type::allocator_type;
+        using allocator_type = allocator_type_t<std::decay_t<container_type>>;
         using value_type = typename container_type::value_type;
         using reference = std::conditional_t<std::is_const<container_type>::value,  
                                              typename container_type::const_reference,
@@ -93,9 +112,9 @@ namespace xt
 
         constexpr size_type dimension() const noexcept;
 
-        const inner_shape_type& shape() const noexcept;
-        const inner_strides_type& strides() const noexcept;
-        const inner_backstrides_type& backstrides() const noexcept;
+        constexpr const inner_shape_type& shape() const noexcept;
+        constexpr const inner_strides_type& strides() const noexcept;
+        constexpr const inner_backstrides_type& backstrides() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
@@ -465,7 +484,7 @@ namespace xt
      * Returns the shape of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::shape() const noexcept -> const inner_shape_type&
+    constexpr inline auto xcontainer<D>::shape() const noexcept -> const inner_shape_type&
     {
         return derived_cast().shape_impl();
     }
@@ -474,7 +493,7 @@ namespace xt
      * Returns the strides of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::strides() const noexcept -> const inner_strides_type&
+    constexpr inline auto xcontainer<D>::strides() const noexcept -> const inner_strides_type&
     {
         return derived_cast().strides_impl();
     }
@@ -483,7 +502,7 @@ namespace xt
      * Returns the backstrides of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::backstrides() const noexcept -> const inner_backstrides_type&
+    constexpr inline auto xcontainer<D>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return derived_cast().backstrides_impl();
     }
@@ -1205,7 +1224,7 @@ namespace xt
         template <class C, class S>
         inline void resize_data_container(C& c, S size)
         {
-            c.resize(size);
+            xt::resize_container(c, size);
         }
 
         template <class C, class S>
