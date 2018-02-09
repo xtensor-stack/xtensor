@@ -18,6 +18,17 @@
 #include "xcontainer.hpp"
 #include "xsemantic.hpp"
 
+#ifdef _MSC_VER
+    #define CONSTEXPR_ENHANCED const
+    #define CONSTEXPR_ENHANCED_STATIC const
+    #define CONSTEXPR_RETURN
+#else
+    #define CONSTEXPR_ENHANCED constexpr
+    #define CONSTEXPR_RETURN constexpr
+    #define CONSTEXPR_ENHANCED_STATIC constexpr static
+    #define HAS_CONSTEXPR_ENHANCED
+#endif
+
 namespace xt
 {
 
@@ -165,37 +176,43 @@ namespace xt
 
     namespace detail
     {
-        // template <class T>
-        // constexpr std::size_t calculate_stride(T& shape, std::size_t idx, layout_type L)
-        // {
-        //     if (shape[idx] == 1)
-        //     {
-        //         return std::size_t(0);
-        //     }
+        /**************************************************************************************
+           The following is something we can currently only dream about -- for when we drop 
+           support for a lot of the old compilers (e.g. GCC 4.9, MSVC 2017 ;)
 
-        //     std::size_t data_size = 1;
-        //     std::size_t stride = 1;
-        //     if (L == layout_type::row_major)
-        //     {
-        //         // because we have a integer sequence that counts
-        //         // from 0 to sz - 1, we need to "invert" idx here
-        //         idx = shape.size() - idx;
-        //         for (std::size_t i = idx; i != 0; --i)
-        //         {
-        //             stride = data_size;
-        //             data_size = stride * shape[i - 1];
-        //         }
-        //     }
-        //     else
-        //     {
-        //         for (std::size_t i = 0; i < idx + 1; ++i)
-        //         {
-        //             stride = data_size;
-        //             data_size = stride * shape[i];
-        //         }
-        //     }
-        //     return stride;
-        // }
+        template <class T>
+        constexpr std::size_t calculate_stride(T& shape, std::size_t idx, layout_type L)
+        {
+            if (shape[idx] == 1)
+            {
+                return std::size_t(0);
+            }
+
+            std::size_t data_size = 1;
+            std::size_t stride = 1;
+            if (L == layout_type::row_major)
+            {
+                // because we have a integer sequence that counts
+                // from 0 to sz - 1, we need to "invert" idx here
+                idx = shape.size() - idx;
+                for (std::size_t i = idx; i != 0; --i)
+                {
+                    stride = data_size;
+                    data_size = stride * shape[i - 1];
+                }
+            }
+            else
+            {
+                for (std::size_t i = 0; i < idx + 1; ++i)
+                {
+                    stride = data_size;
+                    data_size = stride * shape[i];
+                }
+            }
+            return stride;
+        }
+
+        *****************************************************************************************/
 
         template <layout_type L, std::size_t I, std::size_t... X>
         struct calculate_stride;
@@ -395,20 +412,21 @@ namespace xt
 
         container_type m_data;
 
-        constexpr static inner_shape_type m_shape = S();
-        constexpr static inner_strides_type m_strides = get_strides<L>(S());
-        constexpr static inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
+        CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
+        CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
+        CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
-        constexpr const inner_shape_type& shape_impl() const noexcept;
-        constexpr const inner_strides_type& strides_impl() const noexcept;
-        constexpr const inner_backstrides_type& backstrides_impl() const noexcept;
+        CONSTEXPR_ENHANCED inner_shape_type& shape_impl() const noexcept;
+        CONSTEXPR_ENHANCED inner_strides_type& strides_impl() const noexcept;
+        CONSTEXPR_ENHANCED inner_backstrides_type& backstrides_impl() const noexcept;
 
         friend class xcontainer<xfixed_container<EC, S, L, Tag>>;
     };
 
+#ifdef HAS_CONSTEXPR_ENHANCED
     // Out of line definitions to prevent linker errors prior to C++17
     template <class EC, class S, layout_type L, class Tag>
     constexpr typename xfixed_container<EC, S, L, Tag>::inner_shape_type xfixed_container<EC, S, L, Tag>::m_shape;
@@ -418,6 +436,7 @@ namespace xt
 
     template <class EC, class S, layout_type L, class Tag>
     constexpr typename xfixed_container<EC, S, L, Tag>::inner_backstrides_type xfixed_container<EC, S, L, Tag>::m_backstrides;
+#endif
 
     /****************************************
      * xfixed_container_adaptor declaration *
@@ -504,20 +523,21 @@ namespace xt
 
         container_closure_type m_data;
 
-        constexpr static inner_shape_type m_shape = S();
-        constexpr static inner_strides_type m_strides = get_strides<L>(m_shape);
-        constexpr static inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
+        CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
+        CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(m_shape);
+        CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
         container_type& data_impl() noexcept;
         const container_type& data_impl() const noexcept;
 
-        constexpr const inner_shape_type& shape_impl() const noexcept;
-        constexpr const inner_strides_type& strides_impl() const noexcept;
-        constexpr const inner_backstrides_type&  backstrides_impl() const noexcept;
+        CONSTEXPR_ENHANCED inner_shape_type& shape_impl() const noexcept;
+        CONSTEXPR_ENHANCED inner_strides_type& strides_impl() const noexcept;
+        CONSTEXPR_ENHANCED inner_backstrides_type&  backstrides_impl() const noexcept;
 
         friend class xcontainer<xfixed_adaptor<EC, S, L, Tag>>;
     };
 
+#ifdef HAS_CONSTEXPR_ENHANCED
     // Out of line definitions to prevent linker errors prior to C++17
     template <class EC, class S, layout_type L, class Tag>
     constexpr typename xfixed_adaptor<EC, S, L, Tag>::inner_shape_type xfixed_adaptor<EC, S, L, Tag>::m_shape;
@@ -527,6 +547,7 @@ namespace xt
 
     template <class EC, class S, layout_type L, class Tag>
     constexpr typename xfixed_adaptor<EC, S, L, Tag>::inner_backstrides_type xfixed_adaptor<EC, S, L, Tag>::m_backstrides;
+#endif
 
     /************************************
      * xfixed_container implementation *
@@ -592,19 +613,19 @@ namespace xt
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    constexpr auto xfixed_container<EC, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
+    CONSTEXPR_RETURN auto xfixed_container<EC, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    constexpr auto xfixed_container<EC, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
+    CONSTEXPR_RETURN auto xfixed_container<EC, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
     {
         return m_strides;
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    constexpr auto xfixed_container<EC, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
+    CONSTEXPR_RETURN auto xfixed_container<EC, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
     }
@@ -704,19 +725,19 @@ namespace xt
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    constexpr auto xfixed_adaptor<EC, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
+    CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    constexpr auto xfixed_adaptor<EC, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
+    CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
     {
         return m_strides;
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    constexpr auto xfixed_adaptor<EC, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
+    CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
     }
