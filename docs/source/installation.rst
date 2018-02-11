@@ -47,8 +47,19 @@ A package for xtensor is available on Debian.
 
     sudo apt-get install xtensor-dev
 
-.. image:: cmake.svg
+.. image:: spack.svg
 
+Using the Spack package
+-----------------------
+
+A package for xtensor is available on the Spack package manager.
+
+.. code::
+
+    spack install xtensor
+    spack load xtensor
+
+.. image:: cmake.svg
 
 From source with cmake
 ----------------------
