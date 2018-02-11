@@ -67,9 +67,11 @@ This software is licensed under the BSD-3-Clause license. See the LICENSE file f
 
 .. toctree::
    :caption: DEVELOPER ZONE
+   :maxdepth: 2
 
    compilers
    build-options
+   developer/xtensor_internals
    external-structures
    releasing
 
