@@ -14,7 +14,6 @@
 #include "benchmark_math.hpp"
 #include "benchmark_views.hpp"
 #include "benchmark_container.hpp"
-#include "benchmark_adapter.hpp"
 
 #ifdef XTENSOR_USE_XSIMD
 #ifdef __GNUC__
