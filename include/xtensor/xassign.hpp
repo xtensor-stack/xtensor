@@ -288,7 +288,7 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline bool xexpression_assigner<Tag>::reshape(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
@@ -299,7 +299,7 @@ namespace xt
         constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) && detail::equal_dimensions<S1, S2>::value;
         if (trivial_layout)
         {
-            e1.derived_cast().reshape(de2.shape(), true); // force reshape to skip shape equality check!
+            e1.derived_cast().resize(de2.shape(), true); // force resize to skip shape equality check!
             return true;
         }
         else
@@ -307,7 +307,9 @@ namespace xt
             size_type size = de2.dimension();
             shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
             bool trivial_broadcast = de2.broadcast_shape(shape);
-            e1.derived_cast().resize(std::move(shape), true);
+            // Note adding force resize here breaks scalar assignment. 
+            // Maybe add computed layout here.
+            e1.derived_cast().resize(std::move(shape));
             return trivial_broadcast;
         }
     }

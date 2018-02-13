@@ -606,14 +606,32 @@ namespace xt
 
     namespace detail
     {
+        template <std::size_t I, std::size_t... J>
+        struct all_equal_int
+        {
+            constexpr static bool value = sizeof...(J) == 0 || xtl::conjunction<std::integral_constant<bool, (I == J)>...>::value;
+        };
+
+        template <class V>
+        struct container_static_size
+        {
+            constexpr static std::size_t value = 0;
+        };
+
+        template <class T, std::size_t N>
+        struct container_static_size<std::array<T, N>>
+        {
+            constexpr static std::size_t value = N;
+        };
+
         template <class... Args>
         struct equal_dimensions
         {
-            constexpr static bool value = false;
+            constexpr static bool value = all_equal_int<container_static_size<Args>::value...>::value;
         };
 
-        template <class... T, std::size_t N>
-        struct equal_dimensions<std::array<T, N>...>
+        template<>
+        struct equal_dimensions<>
         {
             constexpr static bool value = true;
         };

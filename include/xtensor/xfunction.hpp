@@ -165,7 +165,8 @@ namespace xt
 
         static constexpr layout_type static_layout = compute_layout(std::decay_t<CT>::static_layout...);
         static constexpr bool contiguous_layout = detail::conjunction_c<std::decay_t<CT>::contiguous_layout...>::value;
-        static constexpr bool no_broadcast = detail::only_array<typename std::decay_t<CT>::shape_type...>::value &&
+        static constexpr bool no_broadcast = sizeof...(CT) != 0 &&
+                                             detail::only_array<typename std::decay_t<CT>::shape_type...>::value &&
                                              detail::equal_dimensions<typename std::decay_t<CT>::shape_type...>::value;
 
 
