@@ -627,7 +627,7 @@ namespace xt
         template <class... Args>
         struct equal_dimensions
         {
-            constexpr static bool value = all_equal_int<container_static_size<Args>::value...>::value;
+            constexpr static bool value = all_equal_int<container_static_size<Args>::value...>::value && xtl::conjunction<is_array<Args>...>::value;
         };
 
         template<>
