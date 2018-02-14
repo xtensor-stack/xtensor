@@ -312,7 +312,7 @@ namespace xt
     template <class... T>
     struct xexpression_tag
     {
-        using type = detail::expression_tag_and_t<detail::get_expression_tag_t<T>...>;
+        using type = detail::expression_tag_and_t<detail::get_expression_tag_t<std::decay_t<const_xclosure_t<T>>>...>;
     };
 
     template <class... T>
