@@ -234,23 +234,23 @@ namespace xt
         using build_functor_type_t = typename build_functor_type<Tag, F, E...>::type;
 
         template <template <class...> class F, class... E>
-        inline auto make_xfunction(E&&... e) noexcept
-        {
-            using expression_tag = xexpression_tag_t<E...>;
-            using functor_type = build_functor_type_t<expression_tag, F, E...>;
-            using type = select_xfunction_expression_t<expression_tag, functor_type, const_xclosure_t<E>...>;
-            return type(functor_type(), std::forward<E>(e)...);
-        }
-
-        template <template <class...> class F, class... E>
         struct xfunction_type
         {
-            using expression_tag = xexpression_tag_t<E...>;
+            using expression_tag = xexpression_tag_t<std::decay_t<const_xclosure_t<E>>...>;
             using functor_type = build_functor_type_t<expression_tag, F, E...>;
             using type = select_xfunction_expression_t<expression_tag,
-                                                       functor_type,
-                                                       const_xclosure_t<E>...>;
+                functor_type,
+                const_xclosure_t<E>...>;
         };
+
+        template <template <class...> class F, class... E>
+        inline auto make_xfunction(E&&... e) noexcept
+        {
+            using function_type = xfunction_type<F, E... >;
+            using functor_type = typename function_type::functor_type;
+            using type = typename function_type::type;
+            return type(functor_type(), std::forward<E>(e)...);
+        }
 
         // On MSVC, the second argument of enable_if_t is always evaluated, even if the condition is false.
         // Wrapping the xfunction type in the xfunction_type metafunction avoids this evaluation when
