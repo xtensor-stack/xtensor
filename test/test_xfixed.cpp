@@ -62,8 +62,8 @@ namespace xt
 
         EXPECT_EQ(5.0, ad(1, 1));
         auto expr = ad + b;
-        EXPECT_EQ(8, expr(1, 0));
+        EXPECT_EQ(10., expr(1, 1));
         ad = b * 2;
-        EXPECT_EQ(ad(0, 1), 2 * 2);
+        EXPECT_EQ(ad(1, 1), 5 * 2);
     }
 }

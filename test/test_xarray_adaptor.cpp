@@ -165,10 +165,10 @@ namespace xt
 
     TEST(xarray_adaptor, adapt_std_array)
     {
-        std::array<double, 9> a = {1,2,3,4,5,6,7,8,9};
+        std::array<double, 9> a = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         xt::xarray_adaptor<decltype(a)> ad(a, {3, 3});
-        EXPECT_EQ(ad(2, 1), 8.);
+        EXPECT_EQ(ad(1, 1), 5.);
         ad = ad * 2;
-        EXPECT_EQ(ad(0, 1), 4.);
+        EXPECT_EQ(ad(1, 1), 10.);
     }
 }
