@@ -570,7 +570,7 @@ namespace xt
     template <bool NB, typename std::enable_if_t<NB, int>>
     inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
     {
-        XTENSOR_THROW(shape<false>());
+        XTENSOR_TRY(shape<false>());
         return std::get<0>(m_e).shape();
     }
 
