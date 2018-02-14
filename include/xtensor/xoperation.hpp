@@ -236,7 +236,7 @@ namespace xt
         template <template <class...> class F, class... E>
         struct xfunction_type
         {
-            using expression_tag = xexpression_tag_t<std::decay_t<const_xclosure_t<E>>...>;
+            using expression_tag = xexpression_tag_t<E...>;
             using functor_type = build_functor_type_t<expression_tag, F, E...>;
             using type = select_xfunction_expression_t<expression_tag,
                 functor_type,
