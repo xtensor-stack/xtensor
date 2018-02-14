@@ -335,7 +335,7 @@ namespace xt
         // the shape is always initialized since it has a static number of dimensions.
         if (e.derived_cast().size() == 1)
         {
-            m_data.resize(1);
+            detail::resize_data_container(m_data, std::size_t(1));
         }
         semantic_base::assign(e);
     }
@@ -444,7 +444,7 @@ namespace xt
         base_type::shape_impl() = std::move(const_cast<shape_type&>(rhs.shape()));
         base_type::strides_impl() = std::move(const_cast<strides_type&>(rhs.strides()));
         base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(rhs.backstrides()));
-        m_data = std::move(rhs.data());
+        m_data = xtl::forward_sequence<container_type>(std::move(rhs.data()));
         return *this;
     }
 

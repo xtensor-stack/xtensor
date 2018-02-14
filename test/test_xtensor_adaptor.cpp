@@ -162,4 +162,13 @@ namespace xt
         adaptor_type a(v);
         test_reverse_xiterator<adaptor_type, container_type>(a);
     }
+
+    TEST(xtensor_adaptor, adapt_std_array)
+    {
+        std::array<double, 9> a = {1,2,3,4,5,6,7,8,9};
+        xtensor_adaptor<decltype(a), 2> ad(a, {3, 3});
+        EXPECT_EQ(ad(2, 1), 8.);
+        ad = ad * 2;
+        EXPECT_EQ(ad(0, 1), 4.);
+    }
 }

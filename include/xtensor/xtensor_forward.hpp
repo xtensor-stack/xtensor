@@ -114,13 +114,22 @@ namespace xt
     template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_adaptor;
 
+    template <std::size_t... N>
+    class fixed_shape;
+
+    template <std::size_t... N>
+    using xshape = fixed_shape<N...>;
+
     template <class EC, class FS, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xfixed_container;
+
+    template <class EC, class FS, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
+    class xfixed_adaptor;
 
     template <class T,
               class FS,
               layout_type L = DEFAULT_LAYOUT>
-    using xfixed = xfixed_container<T, FS, L>;
+    using xtensorf = xfixed_container<T, FS, L>;
 
     /**
      * @typedef xtensor_optional
