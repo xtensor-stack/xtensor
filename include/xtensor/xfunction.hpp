@@ -524,7 +524,7 @@ namespace xt
     template <class Func, class U>
     inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CT... e) noexcept
         : m_e(e...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(1))),
-          m_shape_computed(no_broadcast)
+          m_shape_computed(false)
     {
     }
     //@}
@@ -542,6 +542,7 @@ namespace xt
         // static if required because xvectorize test with empty m_e
         return xtl::mpl::static_if<no_broadcast>([&](auto self)
         {
+            XTENSOR_ASSERT(std::get<0>(self(*this).m_e).size() == compute_size(self(*this).shape()));
             return std::get<0>(self(*this).m_e).size();
         }, /*else*/ [&](auto self)
         {
@@ -557,6 +558,7 @@ namespace xt
     {
         return xtl::mpl::static_if<no_broadcast>([&](auto self)
         {
+            XTENSOR_ASSERT(std::get<0>(self(*this).m_e).dimension() == self(*this).compute_dimension());
             return std::get<0>(self(*this).m_e).dimension();
         }, /*else*/ [&](auto self)
         {
@@ -568,6 +570,7 @@ namespace xt
     template <bool NB, typename std::enable_if_t<NB, int>>
     inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
     {
+        XTENSOR_THROW(shape<false>());
         return std::get<0>(m_e).shape();
     }
 

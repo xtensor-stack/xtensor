@@ -19,6 +19,12 @@
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
 
+#ifdef XTENSOR_ENABLE_ASSERT
+#define DISABLE_STATIC_BROADCAST_CHECK true
+#else
+#define DISABLE_STATIC_BROADCAST_CHECK false
+#endif
+
 namespace xt
 {
 
@@ -179,7 +185,8 @@ namespace xt
         {
             using S1 = typename E1::shape_type;
             using S2 = typename E2::shape_type;
-            constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) && detail::equal_dimensions<S1, S2>::value;
+            constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) &&
+                                            detail::equal_dimensions<S1, S2>::value && !DISABLE_STATIC_BROADCAST_CHECK;
             return trivial_layout || e2.is_trivial_broadcast(e1.strides());
         }
 
@@ -296,7 +303,8 @@ namespace xt
         using S2 = typename E2::shape_type;
 
         const E2& de2 = e2.derived_cast();
-        constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) && detail::equal_dimensions<S1, S2>::value;
+        constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) &&
+                                        detail::equal_dimensions<S1, S2>::value && !DISABLE_STATIC_BROADCAST_CHECK;
         if (trivial_layout)
         {
             e1.derived_cast().resize(de2.shape(), true); // force resize to skip shape equality check!
@@ -423,5 +431,7 @@ namespace xt
         assigner_detail::trivial_assigner_run_impl(e1, e2, is_convertible());
     }
 }
+
+#undef DISABLE_STATIC_BROADCAST_CHECK
 
 #endif
