@@ -19,6 +19,12 @@
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
 
+#ifdef XTENSOR_ENABLE_ASSERT
+#define DISABLE_STATIC_BROADCAST_CHECK true
+#else
+#define DISABLE_STATIC_BROADCAST_CHECK false
+#endif
+
 namespace xt
 {
 
@@ -177,7 +183,11 @@ namespace xt
         template <class E1, class E2>
         inline bool is_trivial_broadcast(const E1& e1, const E2& e2)
         {
-            return e2.is_trivial_broadcast(e1.strides());
+            using S1 = typename E1::shape_type;
+            using S2 = typename E2::shape_type;
+            constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) &&
+                                            detail::equal_dimensions<S1, S2>::value && !DISABLE_STATIC_BROADCAST_CHECK;
+            return trivial_layout || e2.is_trivial_broadcast(e1.strides());
         }
 
         template <class D, class E2, class... SL>
@@ -289,12 +299,27 @@ namespace xt
     {
         using shape_type = typename E1::shape_type;
         using size_type = typename E1::size_type;
+        using S1 = typename E1::shape_type;
+        using S2 = typename E2::shape_type;
+
         const E2& de2 = e2.derived_cast();
-        size_type size = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
-        bool trivial_broadcast = de2.broadcast_shape(shape);
-        e1.derived_cast().resize(std::move(shape));
-        return trivial_broadcast;
+        constexpr bool trivial_layout = E1::contiguous_layout && (E1::static_layout == E2::static_layout) &&
+                                        detail::equal_dimensions<S1, S2>::value && !DISABLE_STATIC_BROADCAST_CHECK;
+        if (trivial_layout)
+        {
+            e1.derived_cast().resize(de2.shape(), true); // force resize to skip shape equality check!
+            return true;
+        }
+        else
+        {
+            size_type size = de2.dimension();
+            shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
+            bool trivial_broadcast = de2.broadcast_shape(shape);
+            // Note adding force resize here breaks scalar assignment. 
+            // Maybe add computed layout here.
+            e1.derived_cast().resize(std::move(shape));
+            return trivial_broadcast;
+        }
     }
 
     /********************************
@@ -406,5 +431,7 @@ namespace xt
         assigner_detail::trivial_assigner_run_impl(e1, e2, is_convertible());
     }
 }
+
+#undef DISABLE_STATIC_BROADCAST_CHECK
 
 #endif

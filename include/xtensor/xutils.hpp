@@ -600,6 +600,43 @@ namespace xt
         using type = void;
     };
 
+    /********************
+     * equal_dimensions *
+     ********************/
+
+    namespace detail
+    {
+        template <std::size_t I, std::size_t... J>
+        struct all_equal_int
+        {
+            constexpr static bool value = sizeof...(J) == 0 || xtl::conjunction<std::integral_constant<bool, (I == J)>...>::value;
+        };
+
+        template <class V>
+        struct container_static_size
+        {
+            constexpr static std::size_t value = 0;
+        };
+
+        template <class T, std::size_t N>
+        struct container_static_size<std::array<T, N>>
+        {
+            constexpr static std::size_t value = N;
+        };
+
+        template <class... Args>
+        struct equal_dimensions
+        {
+            constexpr static bool value = all_equal_int<container_static_size<Args>::value...>::value && xtl::conjunction<is_array<Args>...>::value;
+        };
+
+        template<>
+        struct equal_dimensions<>
+        {
+            constexpr static bool value = true;
+        };
+    }
+
     /********************************************
      * xtrivial_default_construct implemenation *
      ********************************************/

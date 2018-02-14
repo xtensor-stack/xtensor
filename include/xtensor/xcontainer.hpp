@@ -38,6 +38,24 @@ namespace xt
 
 #define DL DEFAULT_LAYOUT
 
+    namespace detail
+    {
+        template <class T>
+        struct allocator_type_impl
+        {
+            using type = typename T::allocator_type;
+        };
+
+        template <class T, std::size_t N>
+        struct allocator_type_impl<std::array<T, N>>
+        {
+            using type = std::allocator<T>;  // fake allocator for testing
+        };
+    }
+
+    template <class T>
+    using allocator_type_t = typename detail::allocator_type_impl<T>::type;
+
     /**
      * @class xcontainer
      * @brief Base class for dense multidimensional containers.
@@ -58,7 +76,7 @@ namespace xt
 
         using inner_types = xcontainer_inner_types<D>;
         using container_type = typename inner_types::container_type;
-        using allocator_type = typename container_type::allocator_type;
+        using allocator_type = allocator_type_t<std::decay_t<container_type>>;
         using value_type = typename container_type::value_type;
         using reference = std::conditional_t<std::is_const<container_type>::value,  
                                              typename container_type::const_reference,
@@ -449,7 +467,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        return contiguous_layout ? data().size() : compute_size(shape());
     }
 
     /**
@@ -1205,7 +1223,7 @@ namespace xt
         template <class C, class S>
         inline void resize_data_container(C& c, S size)
         {
-            c.resize(size);
+            xt::resize_container(c, size);
         }
 
         template <class C, class S>
@@ -1301,7 +1319,7 @@ namespace xt
         m_shape = xtl::forward_sequence<shape_type>(shape);
         resize_container(m_strides, m_shape.size());
         resize_container(m_backstrides, m_shape.size());
-        size_type data_size = compute_strides(m_shape, m_layout, m_strides, m_backstrides);
+        compute_strides(m_shape, m_layout, m_strides, m_backstrides);
     }
 }
 
