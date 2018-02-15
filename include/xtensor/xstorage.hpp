@@ -17,6 +17,7 @@
 #include <type_traits>
 
 #include "xexception.hpp"
+#include "xutils.hpp"
 
 #ifndef XSHAPE_ALIGNMENT
     #ifdef XTENSOR_USE_XSIMD
@@ -36,18 +37,6 @@ namespace xt
         using require_input_iter = typename std::enable_if<std::is_convertible<typename std::iterator_traits<It>::iterator_category,
                                                                                std::input_iterator_tag>::value>::type;
     }
-
-    /********************************************
-     * xtrivial_default_construct implemenation *
-     ********************************************/
-
-    #if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(_GLIBCXX_USE_CXX11_ABI)
-        template <class T>
-        using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
-    #else
-        template <class T>
-        using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
-    #endif
 
     template <class T, class Allocator = std::allocator<T>>
     class uvector
