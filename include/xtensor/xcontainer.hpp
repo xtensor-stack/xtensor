@@ -1163,6 +1163,7 @@ namespace xt
         : base_type()
     {
         m_shape = xtl::make_sequence<inner_shape_type>(base_type::dimension(), 1);
+        m_strides = xtl::make_sequence<inner_strides_type>(base_type::dimension(), 0);
     }
 
     template <class D>
