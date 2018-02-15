@@ -15,7 +15,7 @@
 namespace xt
 {
     using std::size_t;
-    using view_shape_type = std::vector<size_t>;
+    using view_shape_type = dynamic_shape<size_t>;
 
     TEST(xview, temporary_type)
     {

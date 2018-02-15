@@ -58,7 +58,7 @@ namespace xt
     template <class F, class E, class X>
     auto reduce_immediate(F&& f, E&& e, X&& axes)
     {
-        using shape_type = std::vector<std::size_t>;
+        using shape_type = dynamic_shape<std::size_t>;
         using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
         using result_type = typename accumulate_functor::result_type;
 
@@ -68,8 +68,8 @@ namespace xt
         auto merge_fct = std::get<2>(f);
 
         shape_type result_shape(e.dimension() - axes.size());
-        std::vector<std::size_t> iter_shape = e.shape();
-        std::vector<std::size_t> iter_strides(e.dimension());
+        shape_type iter_shape = e.shape();
+        shape_type iter_strides(e.dimension());
 
         xt::xarray<result_type, std::decay_t<E>::static_layout> result;
 

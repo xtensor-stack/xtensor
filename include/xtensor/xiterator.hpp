@@ -21,6 +21,7 @@
 
 #include "xexception.hpp"
 #include "xlayout.hpp"
+#include "xshape.hpp"
 #include "xutils.hpp"
 
 namespace xt
@@ -68,7 +69,7 @@ namespace xt
         template <class ST>
         struct index_type_impl
         {
-            using type = std::vector<typename ST::value_type>;
+            using type = dynamic_shape<typename ST::value_type>;
         };
 
         template <class V, std::size_t L>
@@ -668,7 +669,7 @@ namespace xt
     template <class C, bool is_const>
     inline void xindexed_stepper<C, is_const>::to_end(layout_type)
     {
-        m_index = p_e->shape();
+        std::copy(p_e->shape().begin(), p_e->shape().end(), m_index.begin());
     }
 
     template <class C, bool is_const>

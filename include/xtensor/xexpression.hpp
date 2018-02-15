@@ -17,11 +17,10 @@
 #include "xtl/xtype_traits.hpp"
 
 #include "xutils.hpp"
+#include "xshape.hpp"
 
 namespace xt
 {
-
-    using xindex = std::vector<std::size_t>;
 
     /***************************
      * xexpression declaration *

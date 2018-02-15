@@ -18,7 +18,7 @@ namespace xt
         {
             SCOPED_TRACE("row_major strides");
             row_major_result<> rm;
-            using index_type = std::vector<std::size_t>;
+            using index_type = xt::dynamic_shape<std::size_t>;
             index_type index = { 2, 1, 1 };
             auto offset = element_offset<std::size_t>(rm.strides(), index.cbegin(), index.cend());
             index_type unrav_index = unravel_from_strides(offset, rm.strides(), layout_type::row_major);
@@ -28,7 +28,7 @@ namespace xt
         {
             SCOPED_TRACE("column_major strides");
             column_major_result<> cm;
-            using index_type = std::vector<std::size_t>;
+            using index_type = xt::dynamic_shape<std::size_t>;
             index_type index = { 2, 1, 1 };
             auto offset = element_offset<std::size_t>(cm.strides(), index.cbegin(), index.cend());
             index_type unrav_index = unravel_from_strides(offset, cm.strides(), layout_type::column_major);
@@ -38,7 +38,7 @@ namespace xt
         {
             SCOPED_TRACE("unit_major strides");
             unit_shape_result<> um;
-            using index_type = std::vector<std::size_t>;
+            using index_type = xt::dynamic_shape<std::size_t>;
             index_type index = { 2, 0, 1 };
             auto offset = element_offset<std::size_t>(um.strides(), index.cbegin(), index.cend());
             index_type unrav_index = unravel_from_strides(offset, um.strides(), layout_type::row_major);
@@ -51,7 +51,7 @@ namespace xt
         {
             SCOPED_TRACE("row_major strides");
             row_major_result<> rm;
-            using index_type = std::vector<std::size_t>;
+            using index_type = xt::dynamic_shape<std::size_t>;
             index_type index = { 2, 1, 1 };
             auto offset = element_offset<std::size_t>(rm.strides(), index.cbegin(), index.cend());
             index_type unrav_index = unravel_index(offset, rm.shape(), layout_type::row_major);
@@ -61,7 +61,7 @@ namespace xt
         {
             SCOPED_TRACE("column_major strides");
             column_major_result<> cm;
-            using index_type = std::vector<std::size_t>;
+            using index_type = xt::dynamic_shape<std::size_t>;
             index_type index = { 2, 1, 1 };
             auto offset = element_offset<std::size_t>(cm.strides(), index.cbegin(), index.cend());
             index_type unrav_index = unravel_index(offset, cm.shape(), layout_type::column_major);
@@ -71,7 +71,7 @@ namespace xt
         {
             SCOPED_TRACE("unit_major strides");
             unit_shape_result<> um;
-            using index_type = std::vector<std::size_t>;
+            using index_type = xt::dynamic_shape<std::size_t>;
             index_type index = { 2, 0, 1 };
             auto offset = element_offset<std::size_t>(um.strides(), index.cbegin(), index.cend());
             index_type unrav_index = unravel_index(offset, um.shape(), layout_type::row_major);
