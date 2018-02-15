@@ -56,6 +56,33 @@ Outputs:
      {4, 5, 6},
      {7, 8, 9}}
 
+**Index Access**
+
+.. code::
+
+    #include <iostream>
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xio.hpp"
+
+    xt::xarray<double> arr1
+      {{1.0, 2.0, 3.0},
+       {2.0, 5.0, 7.0},
+       {2.0, 5.0, 7.0}};
+    
+    std::cout << arr1(0, 0) << std::endl;
+
+    xt::xarray<int> arr2
+      {1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    std::cout << arr2(0);
+
+Outputs:
+
+.. code::
+
+    1.0
+    1
+     
 **Broadcasting the** ``xt::pow`` **universal functions.**
 
 .. code::
