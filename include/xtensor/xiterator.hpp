@@ -304,6 +304,59 @@ namespace xt
     bool operator<(const xiterator<It, S, L>& lhs,
                    const xiterator<It, S, L>& rhs);
 
+    /*********************
+     * xbounded_iterator *
+     *********************/
+
+    template <class It, class BIt>
+    class xbounded_iterator : public xtl::xrandom_access_iterator_base<xbounded_iterator<It, BIt>,
+                                                                       typename std::iterator_traits<It>::value_type,
+                                                                       typename std::iterator_traits<It>::difference_type,
+                                                                       typename std::iterator_traits<It>::pointer,
+                                                                       typename std::iterator_traits<It>::reference>
+    {
+    public:
+
+        using self_type = xbounded_iterator<It, BIt>;
+
+        using subiterator_type = It;
+        using bound_iterator_type = BIt;
+        using value_type = typename std::iterator_traits<It>::value_type;
+        using reference = typename std::iterator_traits<It>::reference;
+        using pointer = typename std::iterator_traits<It>::pointer;
+        using difference_type = typename std::iterator_traits<It>::difference_type;
+        using iterator_category = std::random_access_iterator_tag;
+
+        xbounded_iterator() = default;
+        xbounded_iterator(It it, BIt bound_it);
+
+        self_type& operator++();
+        self_type& operator--();
+
+        self_type& operator+=(difference_type n);
+        self_type& operator-=(difference_type n);
+
+        difference_type operator-(const self_type& rhs) const;
+
+        value_type operator*() const;
+
+        bool equal(const self_type& rhs) const;
+        bool less_than(const self_type& rhs) const;
+
+    private:
+
+        subiterator_type m_it;
+        bound_iterator_type m_bound_it;
+    };
+
+    template <class It, class BIt>
+    bool operator==(const xbounded_iterator<It, BIt>& lhs,
+                    const xbounded_iterator<It, BIt>& rhs);
+
+    template <class It, class BIt>
+    bool operator<(const xbounded_iterator<It, BIt>& lhs,
+                   const xbounded_iterator<It, BIt>& rhs);
+
     /*******************************
     * trivial_begin / trivial_end *
     *******************************/
@@ -842,6 +895,86 @@ namespace xt
     template <class It, class S, layout_type L>
     bool operator<(const xiterator<It, S, L>& lhs,
                    const xiterator<It, S, L>& rhs)
+    {
+        return lhs.less_than(rhs);
+    }
+
+    /************************************
+     * xbounded_iterator implementation *
+     ************************************/
+
+    template <class It, class BIt>
+    xbounded_iterator<It, BIt>::xbounded_iterator(It it, BIt bound_it)
+        : m_it(it), m_bound_it(bound_it)
+    {
+    }
+
+    template <class It, class BIt>
+    inline auto xbounded_iterator<It, BIt>::operator++() -> self_type&
+    {
+        ++m_it;
+        ++m_bound_it;
+        return *this;
+    }
+
+    template <class It, class BIt>
+    inline auto xbounded_iterator<It, BIt>::operator--() -> self_type&
+    {
+        --m_it;
+        --m_bound_it;
+        return *this;
+    }
+
+    template <class It, class BIt>
+    inline auto xbounded_iterator<It, BIt>::operator+=(difference_type n) -> self_type&
+    {
+        m_it += n;
+        m_bound_it += n;
+        return *this;
+    }
+
+    template <class It, class BIt>
+    inline auto xbounded_iterator<It, BIt>::operator-=(difference_type n) -> self_type&
+    {
+        m_it -= n;
+        m_bound_it -= n;
+        return *this;
+    }
+
+    template <class It, class BIt>
+    inline auto xbounded_iterator<It, BIt>::operator-(const self_type& rhs) const -> difference_type
+    {
+        return m_it - rhs.m_it;
+    }
+
+    template <class It, class BIt>
+    inline auto xbounded_iterator<It, BIt>::operator*() const -> value_type
+    {
+        return (*m_it < *m_bound_it) ? *m_it : static_cast<value_type>((*m_bound_it) - 1);
+    }
+
+    template <class It, class BIt>
+    inline bool xbounded_iterator<It, BIt>::equal(const self_type& rhs) const
+    {
+        return m_it == rhs.m_it && m_bound_it == rhs.m_bound_it;
+    }
+
+    template <class It, class BIt>
+    inline bool xbounded_iterator<It, BIt>::less_than(const self_type& rhs) const
+    {
+        return m_it < rhs.m_it;
+    }
+
+    template <class It, class BIt>
+    inline bool operator==(const xbounded_iterator<It, BIt>& lhs,
+                           const xbounded_iterator<It, BIt>& rhs)
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class It, class BIt>
+    inline bool operator<(const xbounded_iterator<It, BIt>& lhs,
+                          const xbounded_iterator<It, BIt>& rhs)
     {
         return lhs.less_than(rhs);
     }

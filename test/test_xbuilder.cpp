@@ -435,4 +435,12 @@ namespace xt
         xarray<double> expected_range = {{1, 0}, {1, 0}};
         ASSERT_TRUE(all(equal(flipped_range, expected_range)));
     }
+
+    TEST(xbuilder, arange_broadcast)
+    {
+        auto a = arange<int>(1);
+        xarray<int> b = { 1, 2, 3 };
+        xarray<int> res = a + b;
+        EXPECT_EQ(res, b);
+    }
 }

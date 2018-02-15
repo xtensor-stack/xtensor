@@ -114,6 +114,12 @@ namespace xt
 
     private:
 
+        template <std::size_t dim>
+        void adapt_index() const;
+
+        template <std::size_t dim, class I, class... Args>
+        void adapt_index(I& arg, Args&... args) const;
+
         functor_type m_f;
         inner_shape_type m_shape;
     };
@@ -193,6 +199,7 @@ namespace xt
     inline auto xgenerator<F, R, S>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
+        adapt_index<0>(args...);
         return m_f(args...);
     }
 
@@ -246,8 +253,9 @@ namespace xt
     template <class It>
     inline auto xgenerator<F, R, S>::element(It first, It last) const -> const_reference
     {
+        using bounded_iterator = xbounded_iterator<It, typename shape_type::const_iterator>;
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        return m_f.element(first, last);
+        return m_f.element(bounded_iterator(first, shape().cbegin()), bounded_iterator(last, shape().cend()));
     }
     //@}
 
@@ -294,6 +302,30 @@ namespace xt
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset, true);
+    }
+
+    template <class F, class R, class S>
+    template <std::size_t dim>
+    inline void xgenerator<F, R, S>::adapt_index() const
+    {
+    }
+
+    template <class F, class R, class S>
+    template <std::size_t dim, class I, class... Args>
+    inline void xgenerator<F, R, S>::adapt_index(I& arg, Args&... args) const
+    {
+        if (sizeof...(Args)+1 > m_shape.size())
+        {
+            adapt_index<dim>(args...);
+        }
+        else
+        {
+            if (arg >= m_shape[dim] && m_shape[dim] == 1)
+            {
+                arg = 0;
+            }
+            adapt_index<dim + 1>(args...);
+        }
     }
 
     namespace detail
