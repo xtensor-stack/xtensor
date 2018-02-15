@@ -539,7 +539,7 @@ namespace xt
      * svector implementation *
      **************************/
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, std::size_t N, class A = std::allocator<T>, bool Init = true>
     class svector
     {
     public:

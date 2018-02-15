@@ -21,6 +21,7 @@
 
 #include "xexception.hpp"
 #include "xlayout.hpp"
+#include "xshape.hpp"
 #include "xutils.hpp"
 
 namespace xt
