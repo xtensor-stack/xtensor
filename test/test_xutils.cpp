@@ -12,6 +12,7 @@
 #include <tuple>
 #include <complex>
 #include "xtensor/xutils.hpp"
+#include "xtensor/xstorage.hpp" // has to be imported for promote_shape tests
 
 namespace xt
 {

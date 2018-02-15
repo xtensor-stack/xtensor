@@ -16,7 +16,6 @@
 #include "xtl/xclosure.hpp"
 #include "xtl/xtype_traits.hpp"
 
-#include "xshape.hpp"
 #include "xutils.hpp"
 
 namespace xt
