@@ -201,21 +201,10 @@ namespace xt
         template <class E, class S, class... Args>
         inline typename E::reference get_element(E& e, S i, Args... args)
         {
-            if (sizeof...(Args) >= e.dimension() && !is_generator<std::decay_t<E>>::value)
+            if (sizeof...(Args) >= e.dimension())
             {
                 return get_element(e, args...);
             }
-            if (is_generator<E>::value)
-            {
-                std::array<std::size_t, sizeof...(Args)> gs = {args...};
-                std::cout << "is gen " << i << ", ";
-                for (auto& el : gs)
-                {
-                    std::cout << el << ", ";
-                }
-                std::cout << std::endl;
-            }
-
             return e(i, args...);
         }
 
@@ -234,21 +223,9 @@ namespace xt
         template <class E, class S, class... Args>
         inline typename E::const_reference get_element(const E& e, S i, Args... args)
         {
-            // print_type(e);
-
-            if (sizeof...(Args) >= e.dimension() && !is_generator<std::decay_t<E>>::value)
+            if (sizeof...(Args) >= e.dimension())
             {
                 return get_element(e, args...);
-            }
-            if (is_generator<E>::value)
-            {
-                std::array<std::size_t, sizeof...(Args)> gs = {args...};
-                std::cout << "is gen " << i << ", ";
-                for (auto& el : gs)
-                {
-                    std::cout << el << ", ";
-                }
-                std::cout << std::endl;
             }
             return e(i, args...);
         }

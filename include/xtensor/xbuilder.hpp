@@ -130,7 +130,7 @@ namespace xt
         // to implement blitz index placeholders
         // see 3.6: Index placeholders
         // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
-        template<class T, std::size_t Idx>
+        template<std::size_t Idx, class T>
         class index_expr_impl
         {
         public:
@@ -142,14 +142,14 @@ namespace xt
             template <class... Args>
             inline T operator()(Args... args) const
             {
-                return std::array<std::size_t, sizeof...(Args)>({args...})[Idx];
+                return T(std::array<std::size_t, sizeof...(Args)>({static_cast<std::size_t>(args)...})[Idx]);
             }
 
             template <class It>
-            inline T element(It first, It last) const
+            inline T element(It first, It /*last*/) const
             {
                 std::advance(first, Idx);
-                return *first;
+                return T(*first);
             }
 
             template <class S>
@@ -345,10 +345,10 @@ namespace xt
     // to implement blitz index placeholders
     // see 3.6: Index placeholders
     // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
-    template <class T, std::size_t INDEX>
+    template <std::size_t Idx, class T = int>
     inline auto index_expr() noexcept
     {
-        return detail::make_xgenerator(detail::index_expr_impl<T, INDEX>());
+        return detail::make_xgenerator(detail::index_expr_impl<Idx, T>());
     }
 
 

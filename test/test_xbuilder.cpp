@@ -6,13 +6,14 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xarray.hpp"
-
-#include "xtensor/xio.hpp"
 #include <sstream>
 
+#include "gtest/gtest.h"
+
+#include "xtensor/xarray.hpp"
+#include "xtensor/xbuilder.hpp"
+#include "xtensor/xbroadcast.hpp"
+#include "xtensor/xio.hpp"
 
 
 namespace xt
@@ -37,13 +38,9 @@ namespace xt
     TEST(xbuilder, index_expr)
     {
         auto m = arange<int>({3});
-        auto i0 = index_expr<int, 0>();
-
-        // ASSERT_EQ(size_t(1), i0.dimension());
-        // ASSERT_EQ(size_t(1), i0.shape()[0]);
-
-
-        auto res  = m + i0;
+        auto i0 = index_expr<0>();
+        auto res = xarray<int>::from_shape(m.shape());
+        res <<= m + i0;
 
         ASSERT_EQ(int(0), res(0));
         ASSERT_EQ(int(2), res(1));
@@ -54,13 +51,10 @@ namespace xt
     TEST(xbuilder, index_expr_2D_a)
     {
         auto m  = ones<int>({2, 3});
-        auto i0 = index_expr<int, 0>();
-        auto i1 = index_expr<int, 1>();
-
-        xarray<int> res = m + i0 + (2 * i1);
-
-        // std::cout << res << std::endl;
-        // std::cout << res(0, 1) << std::endl;
+        auto i0 = index_expr<0>();
+        auto i1 = index_expr<1>();
+        auto res = xarray<int>::from_shape({2, 3});
+        res <<= m + i0 + (2 * i1);
 
         ASSERT_EQ(1 + 0 + 2 * 0, res(0, 0));
         ASSERT_EQ(1 + 0 + 2 * 1, res(0, 1));
@@ -77,8 +71,8 @@ namespace xt
         auto b  = 3 * ones<int>({2, 1});
         auto c  = 4 * ones<int>({1, 1});
 
-        auto i0 = index_expr<int, 0>();
-        auto i1 = index_expr<int, 1>();
+        auto i0 = index_expr<0, int>();
+        auto i1 = index_expr<1, int>();
 
         // nontrivial expression
         auto res_a  = a + b * (i0 + 1) + (c * i1) + 2;
