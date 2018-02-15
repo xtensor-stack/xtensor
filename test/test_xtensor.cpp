@@ -234,5 +234,6 @@ namespace xt
         xtensor<int, 1> a = {1};
         xtensor<int, 1> res = 2 * a;
         EXPECT_EQ(2, res(0));
+        EXPECT_EQ(2, res(1));
     }
 }
