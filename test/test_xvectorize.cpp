@@ -57,7 +57,7 @@ namespace xt
         xarray<double> a(shape, 1.5);
         xarray<double> b(shape, 2.3);
         xarray<double> c = vecfunc(a, b);
-        EXPECT_EQ(a(1, 0) + b(1, 0), c(1, 0));
+        EXPECT_EQ(a(0, 0) + b(0, 0), c(0, 0));
     }
 
     TEST(xvectorize, noargument)
