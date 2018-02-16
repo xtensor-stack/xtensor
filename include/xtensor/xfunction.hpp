@@ -120,6 +120,16 @@ namespace xt
         using stepper = const_stepper;
     };
 
+    template <class... CTI>
+    struct xfunction_layout_traits
+    {
+        static constexpr layout_type static_layout = sizeof...(CTI) != 0 ? compute_layout(std::decay_t<CTI>::static_layout...) : layout_type::any;
+        static constexpr bool contiguous_layout = sizeof...(CTI) != 0 && detail::conjunction_c<std::decay_t<CTI>::contiguous_layout...>::value;
+        static constexpr bool no_broadcast = sizeof...(CTI) != 0 &&
+                                             contiguous_layout &&
+                                             detail::equal_dimensions<typename std::decay_t<CTI>::shape_type...>::value;
+    };
+
     /******************
      * xfunction_base *
      ******************/
@@ -163,11 +173,10 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
-        static constexpr layout_type static_layout = sizeof...(CT) != 0 ? compute_layout(std::decay_t<CT>::static_layout...) : layout_type::any;
-        static constexpr bool contiguous_layout = sizeof...(CT) != 0 && detail::conjunction_c<std::decay_t<CT>::contiguous_layout...>::value;
-        static constexpr bool no_broadcast = sizeof...(CT) != 0 &&
-                                             contiguous_layout &&
-                                             detail::equal_dimensions<typename std::decay_t<CT>::shape_type...>::value;
+        using layout_traits = xfunction_layout_traits<CT...>;
+        static constexpr layout_type static_layout = layout_traits::static_layout;
+        static constexpr bool contiguous_layout = layout_traits::contiguous_layout;
+        static constexpr bool no_broadcast = layout_traits::no_broadcast;
 
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
