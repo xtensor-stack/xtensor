@@ -1107,7 +1107,7 @@ namespace xt
             // If this wasn't grown from the inline copy, grow the allocated space.
             new_alloc = reinterpret_cast<pointer>(realloc(this->m_begin, new_capacity * sizeof(T)));
         }
-        assert(new_alloc && "Out of memory");
+        XTENSOR_ASSERT(new_alloc);
 
         m_end = new_alloc + current_size;
         m_begin = new_alloc;
