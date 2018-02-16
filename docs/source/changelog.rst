@@ -7,10 +7,16 @@
 Changelog
 =========
 
+0.15.4
+------
+
+- fix gcc-7 error w.r.t. the use of ``assert``
+  `#648 <https://github.com/QuantStack/xtensor/pull/648>`_.
+
 0.15.3
 ------
 
-- add missing headers to installation and tests
+- add missing headers to cmake installation and tests
   `#647 <https://github.com/QuantStack/xtensor/pull/647>`_.
 
 
