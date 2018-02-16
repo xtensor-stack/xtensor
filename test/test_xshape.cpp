@@ -10,6 +10,7 @@
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xstrides.hpp"
+#include "xtensor/xfixed.hpp"
 
 namespace xt
 {
@@ -53,10 +54,10 @@ namespace xt
         std::vector<std::size_t> v(s.begin(), s.end());
         std::vector<std::size_t> v2 = {1,2,3,4};
 
-        s.insert(s.begin(), (std::size_t) 55);
-        s.insert(s.begin() + 2, (std::size_t) 123);
-        v.insert(v.begin(), (std::size_t) 55);
-        v.insert(v.begin() + 2, (std::size_t) 123);
+        s.insert(s.begin(), std::size_t(55));
+        s.insert(s.begin() + 2, std::size_t(123));
+        v.insert(v.begin(), std::size_t(55));
+        v.insert(v.begin() + 2, std::size_t(123));
         std::size_t nr = 12321;
         s.insert(s.end(), nr);
         v.insert(v.end(), nr);
@@ -125,21 +126,12 @@ namespace xt
 
     TEST(xshape, fixed)
     {
-        const_array<3, 4, 5> a;
+        fixed_shape<3, 4, 5> af;
+        const_array<std::size_t, 3> a = af;
         EXPECT_EQ(a[0], 3);
         EXPECT_EQ(a[2], 5);
         EXPECT_EQ(a.back(), 5);
         EXPECT_EQ(a.front(), 3);
         EXPECT_EQ(a.size(), 3);
-
-        auto b = std::vector<std::size_t>({3, 4, 5});
-
-        EXPECT_TRUE(is_const_array<decltype(a)>::value);
-
-        auto sa = compute_size(a);
-        auto sb = compute_size(b);
-        EXPECT_EQ(sa, sb);
-
-        static_assert(compute_size(a) == (3 * 4 * 5), "");
     }
 }
