@@ -120,6 +120,16 @@ namespace xt
         using stepper = const_stepper;
     };
 
+    template <class... CTI>
+    struct xfunction_layout_traits
+    {
+        static constexpr layout_type static_layout = sizeof...(CTI) != 0 ? compute_layout(std::decay_t<CTI>::static_layout...) : layout_type::any;
+        static constexpr bool contiguous_layout = sizeof...(CTI) != 0 && detail::conjunction_c<std::decay_t<CTI>::contiguous_layout...>::value;
+        static constexpr bool no_broadcast = sizeof...(CTI) != 0 &&
+                                             contiguous_layout &&
+                                             detail::equal_dimensions<typename std::decay_t<CTI>::shape_type...>::value;
+    };
+
     /******************
      * xfunction_base *
      ******************/
@@ -163,8 +173,10 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
-        static constexpr layout_type static_layout = compute_layout(std::decay_t<CT>::static_layout...);
-        static constexpr bool contiguous_layout = detail::conjunction_c<std::decay_t<CT>::contiguous_layout...>::value;
+        using layout_traits = xfunction_layout_traits<CT...>;
+        static constexpr layout_type static_layout = layout_traits::static_layout;
+        static constexpr bool contiguous_layout = layout_traits::contiguous_layout;
+        static constexpr bool no_broadcast = layout_traits::no_broadcast;
 
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
@@ -196,6 +208,10 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
+
+        template <bool NB = no_broadcast, std::enable_if_t<NB, int> = 0>
+        const shape_type& shape() const;
+        template <bool NB = no_broadcast, std::enable_if_t<!NB, int> = 0>
         const shape_type& shape() const;
         layout_type layout() const noexcept;
 
@@ -531,7 +547,16 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        return xtl::mpl::static_if<no_broadcast>([&](auto self)
+        {
+            XTENSOR_ASSERT(std::get<0>(self(*this).m_e).size() == compute_size(self(*this).shape()));
+            return std::get<0>(self(*this).m_e).size();
+        },
+        /*else*/
+        [&](auto self)
+        {
+            return compute_size(self(*this).shape());
+        });
     }
 
     /**
@@ -540,14 +565,54 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::dimension() const noexcept -> size_type
     {
-        size_type dimension = m_shape_computed ? m_shape.size() : compute_dimension();
-        return dimension;
+        return xtl::mpl::static_if<no_broadcast>([&](auto self)
+        {
+            XTENSOR_ASSERT(std::get<0>(self(*this).m_e).dimension() == self(*this).compute_dimension());
+            return std::get<0>(self(*this).m_e).dimension();
+        },
+        /*else*/
+        [&](auto self)
+        {
+            return self(*this).m_shape_computed ? self(*this).m_shape.size() : self(*this).compute_dimension();
+        });
     }
 
     /**
      * Returns the shape of the xfunction.
      */
     template <class F, class R, class... CT>
+    template <bool NB, std::enable_if_t<NB, int>>
+    inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
+    {
+        if (!m_shape_computed)
+        {
+            std::copy(std::get<0>(m_e).shape().begin(), std::get<0>(m_e).shape().end(), m_shape.begin());
+            XTENSOR_TRY(broadcast_shape(m_shape));  // make sure broadcast works in debug mode
+            m_shape_computed = true;
+        }
+        return m_shape;
+
+        // The code below claims to return a reference to a temporary
+        // **********************************************************
+        // using first_shape = typename std::decay_t<detail::pack_first_t<CT...>>::inner_shape_type;
+        // return xtl::mpl::static_if<std::is_same<shape_type, first_shape>::value>(
+        //     [&](auto self)
+        //     {
+        //         return std::get<0>(self(*this).m_e).shape();
+        //     },
+        //     [&](auto self)
+        //     {
+        //         if (!self(*this).m_shape_computed)
+        //         {
+        //             std::copy(std::get<0>(self(*this).m_e).shape().begin(), std::get<0>(self(*this).m_e).shape().end(), self(*this).m_shape.begin());
+        //         }
+        //         return self(*this).m_shape;
+        //     }
+        // );
+    }
+
+    template <class F, class R, class... CT>
+    template <bool NB, std::enable_if_t<!NB, int>>
     inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
     {
         if (!m_shape_computed)
@@ -667,6 +732,11 @@ namespace xt
     template <class S>
     inline bool xfunction_base<F, R, CT...>::is_trivial_broadcast(const S& strides) const noexcept
     {
+        constexpr bool trivial = contiguous_layout && no_broadcast;
+        if (trivial)
+        {
+            return trivial;
+        }
         auto func = [&strides](bool b, auto&& e) { return b && e.is_trivial_broadcast(strides); };
         return accumulate(func, true, m_e);
     }
