@@ -50,6 +50,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xeval.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xfixed.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctor_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
@@ -72,6 +73,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xshape.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsort.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstorage.hpp
