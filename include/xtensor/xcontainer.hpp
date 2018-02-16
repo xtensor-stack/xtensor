@@ -468,7 +468,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        return contiguous_layout ? data().size() : compute_size(shape());
     }
 
     /**
