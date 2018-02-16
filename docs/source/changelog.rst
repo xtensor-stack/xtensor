@@ -7,6 +7,23 @@
 Changelog
 =========
 
+0.15.2
+------
+
+- ``xshape`` implementation
+  `#572 <https://github.com/QuantStack/xtensor/pull/572>`_.
+- xfixed container
+  `#586 <https://github.com/QuantStack/xtensor/pull/586>`_.
+- protected ``xcontainer::derived_cast``
+  `#627 <https://github.com/QuantStack/xtensor/pull/627>`_.
+- const reference fix
+  `#632 <https://github.com/QuantStack/xtensor/pull/632>`_.
+- ``xgenerator`` access operators fixed
+  `#643 <https://github.com/QuantStack/xtensor/pull/643>`_.
+- contiguous layout optiimzation
+  `#645 <https://github.com/QuantStack/xtensor/pull/645>`_.
+
+
 0.15.1
 ------
 
