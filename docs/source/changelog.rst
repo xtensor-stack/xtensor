@@ -7,6 +7,13 @@
 Changelog
 =========
 
+0.15.3
+------
+
+- add missing headers to installation and tests
+  `#647 <https://github.com/QuantStack/xtensor/pull/647>`_.
+
+
 0.15.2
 ------
 
