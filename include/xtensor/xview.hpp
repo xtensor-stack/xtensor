@@ -146,7 +146,7 @@ namespace xt
         const_reference element(It first, It last) const;
 
         template <class ST>
-        bool broadcast_shape(ST& shape) const;
+        bool broadcast_shape(ST& shape, bool reuse_cache = false) const;
 
         template <class ST>
         bool is_trivial_broadcast(const ST& strides) const;
@@ -707,7 +707,7 @@ namespace xt
      */
     template <class CT, class... S>
     template <class ST>
-    inline bool xview<CT, S...>::broadcast_shape(ST& shape) const
+    inline bool xview<CT, S...>::broadcast_shape(ST& shape, bool) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }

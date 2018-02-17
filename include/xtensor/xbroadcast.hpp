@@ -123,7 +123,7 @@ namespace xt
         const_reference element(It, It last) const;
 
         template <class S>
-        bool broadcast_shape(S& shape) const;
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
@@ -329,7 +329,7 @@ namespace xt
      */
     template <class CT, class X>
     template <class S>
-    inline bool xbroadcast<CT, X>::broadcast_shape(S& shape) const
+    inline bool xbroadcast<CT, X>::broadcast_shape(S& shape, bool) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }

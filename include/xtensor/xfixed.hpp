@@ -402,7 +402,7 @@ namespace xt
         void reshape(ST&& shape, layout_type layout = L) const;
 
         template <class ST>
-        bool broadcast_shape(ST& s) const;
+        bool broadcast_shape(ST& s, bool reuse_cache = false) const;
 
     private:
 
@@ -617,7 +617,7 @@ namespace xt
 
     template <class ET, class S, layout_type L, class Tag>
     template <class ST>
-    inline bool xfixed_container<ET, S, L, Tag>::broadcast_shape(ST& shape) const
+    inline bool xfixed_container<ET, S, L, Tag>::broadcast_shape(ST& shape, bool) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }

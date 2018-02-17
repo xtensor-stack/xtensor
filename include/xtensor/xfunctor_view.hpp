@@ -193,7 +193,7 @@ namespace xt
         const_reference element(IT first, IT last) const;
 
         template <class S>
-        bool broadcast_shape(S& shape) const;
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const;
@@ -670,13 +670,14 @@ namespace xt
     /**
      * Broadcast the shape of the function to the specified parameter.
      * @param shape the result shape
+     * @param reuse_cache boolean for reusing a previously computed shape
      * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class F, class CT>
     template <class S>
-    inline bool xfunctor_view<F, CT>::broadcast_shape(S& shape) const
+    inline bool xfunctor_view<F, CT>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        return m_e.broadcast_shape(shape);
+        return m_e.broadcast_shape(shape, reuse_cache);
     }
 
     /**
