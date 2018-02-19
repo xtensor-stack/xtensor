@@ -77,7 +77,7 @@ namespace xt
         EXPECT_EQ(size_t(10), c.size());
         EXPECT_EQ(2, c[2]);
 
-        std::vector<double> src(10, 1);
+        std::vector<std::size_t> src(10, std::size_t(1));
         vector_type d(src.cbegin(), src.cend());
         EXPECT_EQ(size_t(10), d.size());
         EXPECT_EQ(1, d[2]);
@@ -117,10 +117,10 @@ namespace xt
     TEST(svector, iterator)
     {
         vector_type a(10);
-        std::iota(a.begin(), a.end(), 0.);
+        std::iota(a.begin(), a.end(), std::size_t(0));
         for (size_t i = 0; i < a.size(); ++i)
         {
-            EXPECT_EQ(double(i), a[i]);
+            EXPECT_EQ(i, a[i]);
         }
     }
 

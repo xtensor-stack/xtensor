@@ -160,7 +160,7 @@ namespace xt
         const_reference element(It first, It last) const;
 
         template <class S>
-        bool broadcast_shape(S& shape) const;
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
@@ -649,10 +649,10 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline bool xoptional_assembly_base<D>::broadcast_shape(S& shape) const
+    inline bool xoptional_assembly_base<D>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        bool res = value().broadcast_shape(shape);
-        return res && has_value().broadcast_shape(shape);
+        bool res = value().broadcast_shape(shape, reuse_cache);
+        return res && has_value().broadcast_shape(shape, reuse_cache);
     }
 
     /**

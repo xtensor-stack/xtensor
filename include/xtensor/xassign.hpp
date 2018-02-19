@@ -177,7 +177,8 @@ namespace xt
         template <class E1, class E2>
         inline bool is_trivial_broadcast(const E1& e1, const E2& e2)
         {
-            return e2.is_trivial_broadcast(e1.strides());
+            return (E1::contiguous_layout && E2::contiguous_layout && (E1::static_layout == E2::static_layout))
+                    || e2.is_trivial_broadcast(e1.strides());
         }
 
         template <class D, class E2, class... SL>
@@ -243,7 +244,7 @@ namespace xt
 
         size_type dim = de2.dimension();
         shape_type shape = xtl::make_sequence<shape_type>(dim, size_type(1));
-        bool trivial_broadcast = de2.broadcast_shape(shape);
+        bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
         if (dim > de1.dimension() || shape > de1.shape())
         {
@@ -276,7 +277,7 @@ namespace xt
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
         shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
-        de2.broadcast_shape(shape);
+        de2.broadcast_shape(shape, true);
         if (shape.size() > de1.shape().size() || shape > de1.shape())
         {
             throw broadcast_error(shape, de1.shape());
@@ -292,7 +293,7 @@ namespace xt
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
         shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
-        bool trivial_broadcast = de2.broadcast_shape(shape);
+        bool trivial_broadcast = de2.broadcast_shape(shape, true);
         e1.derived_cast().resize(std::move(shape));
         return trivial_broadcast;
     }

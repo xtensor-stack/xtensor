@@ -138,7 +138,7 @@ namespace xt
         const_reference element(It, It) const noexcept;
 
         template <class S>
-        bool broadcast_shape(S& shape) const noexcept;
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const noexcept;
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
@@ -576,7 +576,7 @@ namespace xt
 
     template <class CT>
     template <class S>
-    inline bool xscalar<CT>::broadcast_shape(S&) const noexcept
+    inline bool xscalar<CT>::broadcast_shape(S&, bool) const noexcept
     {
         return true;
     }

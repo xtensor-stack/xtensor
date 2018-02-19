@@ -215,7 +215,7 @@ namespace xt
         const_reference element(It first, It last) const;
 
         template <class S>
-        bool broadcast_shape(S& shape) const;
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
@@ -303,6 +303,7 @@ namespace xt
         std::tuple<CT...> m_e;
         functor_type m_f;
         mutable shape_type m_shape;
+        mutable bool m_shape_trivial;
         mutable bool m_shape_computed;
 
         friend class xfunction_iterator<F, R, CT...>;
@@ -553,7 +554,7 @@ namespace xt
         if (!m_shape_computed)
         {
             m_shape = xtl::make_sequence<shape_type>(compute_dimension(), size_type(1));
-            broadcast_shape(m_shape);
+            m_shape_trivial = broadcast_shape(m_shape, false);
             m_shape_computed = true;
         }
         return m_shape;
@@ -647,15 +648,24 @@ namespace xt
     /**
      * Broadcast the shape of the function to the specified parameter.
      * @param shape the result shape
+     * @param reuse_cache boolean for reusing a previously computed shape
      * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class F, class R, class... CT>
     template <class S>
-    inline bool xfunction_base<F, R, CT...>::broadcast_shape(S& shape) const
+    inline bool xfunction_base<F, R, CT...>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        // e.broadcast_shape must be evaluated even if b is false
-        auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
-        return accumulate(func, true, m_e);
+        if (reuse_cache && m_shape_computed)
+        {
+            std::copy(m_shape.cbegin(), m_shape.cend(), shape.begin());
+            return m_shape_trivial;
+        }
+        else
+        {
+            // e.broadcast_shape must be evaluated even if b is false
+            auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
+            return accumulate(func, true, m_e);
+        }
     }
 
     /**

@@ -153,7 +153,7 @@ namespace xt
         const size_type raw_data_offset() const noexcept;
 
         template <class S>
-        bool broadcast_shape(S& shape) const;
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
@@ -717,7 +717,7 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline bool xcontainer<D>::broadcast_shape(S& shape) const
+    inline bool xcontainer<D>::broadcast_shape(S& shape, bool) const
     {
         return xt::broadcast_shape(this->shape(), shape);
     }
