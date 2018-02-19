@@ -652,7 +652,7 @@ namespace xt
         };
         auto row = xt::view(a, 1, xt::all());
         bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::size_t, 1>>::value;
-        bool cond2 = std::is_same<decltype(row.strides()), std::array<std::size_t, 1>>::value;
+        bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::size_t, 1>&>::value;
         EXPECT_TRUE(cond1);
         EXPECT_TRUE(cond2);
     }
