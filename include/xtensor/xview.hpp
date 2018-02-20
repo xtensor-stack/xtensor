@@ -166,7 +166,7 @@ namespace xt
         data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, const strides_type&>
         strides() const;
 
         template <class T = xexpression_type>
@@ -199,6 +199,10 @@ namespace xt
         CT m_e;
         slice_type m_slices;
         inner_shape_type m_shape;
+        mutable strides_type m_strides;
+        mutable bool m_strides_computed;
+
+        strides_type compute_strides() const;
 
         template <typename std::decay_t<CT>::size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args);
@@ -352,7 +356,8 @@ namespace xt
     template <class CTA, class FSL, class... SL>
     inline xview<CT, S...>::xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
         : m_e(std::forward<CTA>(e)), m_slices(std::forward<FSL>(first_slice), std::forward<SL>(slices)...),
-          m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0))
+          m_shape(xtl::make_sequence<shape_type>(m_e.dimension() - integral_count<S...>() + newaxis_count<S...>(), 0)),
+          m_strides_computed(false)
     {
         auto func = [](const auto& s) noexcept { return get_size(s); };
         for (size_type i = 0; i != dimension(); ++i)
@@ -609,28 +614,14 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::strides() const ->
-        std::enable_if_t<has_raw_data_interface<T>::value, strides_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, const strides_type&>
     {
-        strides_type strides = xtl::make_sequence<strides_type>(m_e.dimension() - integral_count<S...>(), 0);
-
-        auto func = [](const auto& s) { return xt::step_size(s); };
-        size_type i = 0, idx;
-
-        for (; i < sizeof...(S); ++i)
+        if (!m_strides_computed)
         {
-            idx = integral_skip<S...>(i);
-            if (idx >= sizeof...(S))
-            {
-                break;
-            }
-            strides[i] = m_e.strides()[idx] * apply<size_type>(idx, func, m_slices);
+            m_strides = compute_strides();
+            m_strides_computed = true;
         }
-        for (; i < strides.size(); ++i)
-        {
-            strides[i] = m_e.strides()[idx++];
-        }
-
-        return strides;
+        return m_strides;
     }
 
     /**
@@ -724,6 +715,30 @@ namespace xt
         return false;
     }
     //@}
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::compute_strides() const -> strides_type
+    {
+        strides_type strides = xtl::make_sequence<strides_type>(dimension(), 0);
+
+        auto func = [](const auto& s) { return xt::step_size(s); };
+        size_type i = 0, idx;
+
+        for (; i < sizeof...(S); i = newaxis_skip<S...>(++i))
+        {
+            idx = integral_skip<S...>(i);
+            if (idx >= sizeof...(S))
+            {
+                break;
+            }
+            strides[i] = m_e.strides()[idx - newaxis_count_before<S...>(i)] * apply<size_type>(idx, func, m_slices);
+        }
+        for (; i < strides.size(); ++i)
+        {
+            strides[i] = m_e.strides()[idx++];
+        }
+        return strides;
+    }
 
     template <class CT, class... S>
     template <typename std::decay_t<CT>::size_type... I, class... Args>
