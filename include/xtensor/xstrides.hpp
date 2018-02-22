@@ -278,19 +278,20 @@ namespace xt
     inline bool broadcast_shape(const S1& input, S2& output)
     {
         bool trivial_broadcast = (input.size() == output.size());
-        auto input_iter = input.crbegin();
-        auto output_iter = output.rbegin();
-        for (; input_iter != input.crend(); ++input_iter, ++output_iter)
+        // Indices are faster than reverse iterators
+        std::size_t output_index = output.size();
+        std::size_t input_index = input.size();
+        for(; input_index != 0; --input_index, --output_index)
         {
-            if (*output_iter == 1)
+            if(output[output_index - 1] == 1)
             {
-                *output_iter = *input_iter;
+                output[output_index - 1] = input[input_index - 1];
             }
-            else if ((*input_iter != 1) && (*output_iter != *input_iter))
+            else if((input[input_index - 1] != 1) && (input[input_index - 1] != output[output_index - 1]))
             {
                 throw_broadcast_error(output, input);
             }
-            trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
+            trivial_broadcast = trivial_broadcast && (output[output_index - 1] == input[input_index - 1]);
         }
         return trivial_broadcast;
     }

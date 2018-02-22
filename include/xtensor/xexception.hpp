@@ -38,7 +38,14 @@ namespace xt
      * broadcast_error implementation *
      **********************************/
 
+#ifdef NDEBUG
     // Do not inline this function
+    template <class S1, class S2>
+    [[noreturn]] void throw_broadcast_error(const S1&, const S2&)
+    {
+        throw broadcast_error("Incompatible dimneison of arrays, compile in DEBUG for more info");
+    }
+#else
     template <class S1, class S2>
     [[noreturn]] void throw_broadcast_error(const S1& lhs, const S2& rhs)
     {
@@ -57,6 +64,7 @@ namespace xt
 
         throw broadcast_error(buf.str().c_str());
     }
+#endif
 
     /*******************
      * transpose_error *
