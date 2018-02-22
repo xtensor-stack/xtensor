@@ -288,7 +288,7 @@ namespace xt
             }
             else if ((*input_iter != 1) && (*output_iter != *input_iter))
             {
-                throw broadcast_error(output, input);
+                throw_broadcast_error(output, input);
             }
             trivial_broadcast = trivial_broadcast && (*output_iter == *input_iter);
         }

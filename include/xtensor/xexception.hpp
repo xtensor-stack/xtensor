@@ -9,7 +9,7 @@
 #ifndef XTENSOR_EXCEPTION_HPP
 #define XTENSOR_EXCEPTION_HPP
 
-#include <exception>
+#include <stdexcept>
 #include <iterator>
 #include <sstream>
 #include <string>
@@ -21,26 +21,26 @@ namespace xt
      * broadcast_error *
      *******************/
 
-    class broadcast_error : public std::exception
+    class broadcast_error : public std::runtime_error
     {
     public:
 
-        template <class S1, class S2>
-        broadcast_error(const S1& lhs, const S2& rhs);
-
-        virtual const char* what() const noexcept;
-
-    private:
-
-        std::string m_message;
+        explicit broadcast_error(const char* msg)
+            : std::runtime_error(msg)
+        {
+        }
     };
+
+    template <class S1, class S2>
+    [[noreturn]] void throw_broadcast_error(const S1& lhs, const S2& rhs);
 
     /**********************************
      * broadcast_error implementation *
      **********************************/
 
+    // Do not inline this function
     template <class S1, class S2>
-    inline broadcast_error::broadcast_error(const S1& lhs, const S2& rhs)
+    [[noreturn]] void throw_broadcast_error(const S1& lhs, const S2& rhs)
     {
         std::ostringstream buf("Incompatible dimension of arrays:", std::ios_base::ate);
 
@@ -55,42 +55,22 @@ namespace xt
         std::copy(rhs.cbegin(), rhs.cend(), iter2);
         buf << ")";
 
-        m_message = buf.str();
-    }
-
-    inline const char* broadcast_error::what() const noexcept
-    {
-        return m_message.c_str();
+        throw broadcast_error(buf.str().c_str());
     }
 
     /*******************
      * transpose_error *
      *******************/
 
-    class transpose_error : public std::exception
+    class transpose_error : public std::runtime_error
     {
     public:
 
-        explicit transpose_error(const std::string& msg);
-
-        virtual const char* what() const noexcept;
-
-    private:
-
-        std::string m_message;
+        explicit transpose_error(const char* msg)
+            : std::runtime_error(msg)
+        {
+        }
     };
-
-    /**********************************
-     * transpose_error implementation *
-     **********************************/
-
-    inline transpose_error::transpose_error(const std::string& msg)
-        : m_message(msg) {}
-
-    inline const char* transpose_error::what() const noexcept
-    {
-        return m_message.c_str();
-    }
 
     /***************
      * check_index *
