@@ -280,7 +280,7 @@ namespace xt
         de2.broadcast_shape(shape, true);
         if (shape.size() > de1.shape().size() || shape > de1.shape())
         {
-            throw broadcast_error(shape, de1.shape());
+            throw_broadcast_error(shape, de1.shape());
         }
     }
 
