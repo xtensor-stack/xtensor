@@ -16,6 +16,7 @@
 #include <utility>
 
 #include "xtl/xsequence.hpp"
+#include "xtl/xvariant.hpp"
 
 #include "xarray.hpp"
 #include "xexpression.hpp"
@@ -652,7 +653,7 @@ namespace xt
     inline auto strided_view(E&& e, I&& shape, I&& strides, std::size_t offset = 0, layout_type layout = layout_type::dynamic) noexcept
     {
         using view_type = xstrided_view<xclosure_t<E>, I, decltype(e.data())>;
-        return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides), offset);
+        return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides), offset, layout);
     }
 
     /****************************
@@ -842,149 +843,50 @@ namespace xt
             mutable index_type m_index;
             size_type m_size;
         };
+
+        template <class E>
+        struct slice_getter_impl {
+            E& m_expr;
+            mutable std::size_t idx;
+
+            slice_getter_impl(E& expr)
+                : m_expr(expr), idx(0)
+            {
+            }
+
+            template <class T>
+            std::array<int, 3> operator()(const T& t) const {
+                auto sl = get_slice_implementation(m_expr, t, idx);
+                return std::array<int, 3>({int(sl(0)), int(sl.size()), int(sl.step_size())});
+            }
+
+            std::array<int, 3> operator()(const int& /*t*/) const {
+                return std::array<int, 3>({0, 0, 0});
+            }
+        };
     }
 
-    /**
-     * The slice_vector is used as part of the dynamic_view interface.
-     * It offers an interface to dynamically push_back or append slices
-     * to dynamically create a view into a xexpression.
-     *
-     * This data structure is necessary as the slices of xview are
-     * compile-time static. If you do not know how many dimensions
-     * your expression has at compile-time, using dynamic_view can be
-     * useful.
-     *
-     * Internally, the dynamic_view is implemented using the strided_view
-     * adapter, which is very fast for data structures in contigous
-     * memory (such as xarrays and xtensors).
-     *
-     * Usage example:
-     *
-     * \code{.cpp}
-     * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
-     * xt::slice_vector sv(a, xt::range(0, 1));
-     * sv.push_back(xt::all());
-     * \endcode
-     */
-    class slice_vector : private std::vector<std::array<long int, 3>>
-    {
-    public:
 
-        using index_type = long int;
-        using base_type = std::vector<std::array<index_type, 3>>;
+    template <class T>
+    using slice_variant = xtl::variant<
+        T,
 
-        // propagating interface
-        using base_type::begin;
-        using base_type::cbegin;
-        using base_type::end;
-        using base_type::cend;
-        using base_type::size;
-        using base_type::operator[];
-        using base_type::push_back;
-        using base_type::pop_back;
+        xt::xrange_adaptor<xt::placeholders::xtuph, T, T>,
+        xt::xrange_adaptor<T, xt::placeholders::xtuph, T>,
+        xt::xrange_adaptor<T, T, xt::placeholders::xtuph>,
 
-        inline slice_vector() = default;
+        xt::xrange_adaptor<T, xt::placeholders::xtuph, xt::placeholders::xtuph>,
+        xt::xrange_adaptor<xt::placeholders::xtuph, T, xt::placeholders::xtuph>,
+        xt::xrange_adaptor<xt::placeholders::xtuph, xt::placeholders::xtuph, T>,
 
-        /**
-         * Constructor for slice vector
-         *
-         * @param e xexpression
-         * @param args xslices, integer, all or newaxis
-         */
-        template <class E, class... Args>
-        inline slice_vector(const xexpression<E>& e, Args... args)
-        {
-            const auto& de = e.derived_cast();
-            m_shape.resize(de.shape().size());
-            std::copy(de.shape().cbegin(), de.shape().cend(), m_shape.begin());
-            append(args...);
-        }
+        xt::xrange_adaptor<T, T, T>,
+        xt::xrange_adaptor<xt::placeholders::xtuph, xt::placeholders::xtuph, xt::placeholders::xtuph>,
 
-        /**
-         * @brief Alternative constructor taking a shape
-         * @param shape the shape
-         */
-        template <class... Args>
-        inline slice_vector(const dynamic_shape<std::size_t>& shape, Args... args)
-        {
-            m_shape = shape;
-            append(args...);
-        }
+        xt::xall_tag,
+        xt::xnewaxis_tag
+    >;
 
-        /**
-         * Convenience function to append one or multiple
-         * slices to the slice_vector
-         *
-         * \code{.cpp}
-         * xt::slice_vector sv(a, xt::range(0, 1));
-         * sv.append(xt::all(), xt::newaxis(), 0, 12));
-         * \endcode
-         */
-        template <class T, class... Args>
-        inline void append(const T& s, Args... args)
-        {
-            push_back(s);
-            append(args...);
-        }
-
-        ///@cond DOXYGEN_INCLUDE_SFINAE
-        inline void append()
-        {
-        }
-        /// @endcond
-
-        /**
-         * Push back a single slice, integer, all or newaxis.
-         *
-         * @param s slice
-         */
-        template <class T>
-        inline void push_back(const xslice<T>& s)
-        {
-            auto ds = s.derived_cast();
-            base_type::push_back({index_type(ds(0)), index_type(ds.size()), index_type(ds.step_size())});
-        }
-
-        ///@cond DOXYGEN_INCLUDE_SFINAE
-        template <class A, class B, class C>
-        inline void push_back(const xrange_adaptor<A, B, C>& s)
-        {
-            auto idx = size() - newaxis_count;
-            if (idx >= m_shape.size())
-            {
-                throw std::runtime_error("Too many slices in slice vector for shape");
-            }
-            auto ds = s.get(m_shape[idx]);
-            base_type::push_back({index_type(ds(0)), index_type(ds.size()), index_type(ds.step_size())});
-        }
-
-        inline void push_back(xall_tag /*s*/)
-        {
-            auto idx = size() - newaxis_count;
-            if (idx >= m_shape.size())
-            {
-                throw std::runtime_error("Too many slices in slice vector for shape");
-            }
-            base_type::push_back({0, index_type(m_shape[idx]), 1});
-        }
-
-        inline void push_back(xnewaxis_tag /*s*/)
-        {
-            ++newaxis_count;
-            base_type::push_back({-1, 0, 0});
-        }
-
-        inline void push_back(index_type i)
-        {
-            base_type::push_back({i, 0, 0});
-        }
-        /// @endcond
-
-    private:
-
-        dynamic_shape<std::size_t> m_shape;
-        std::size_t newaxis_count = 0;
-    };
+    using slice_vector = std::vector<slice_variant<int>>;
 
     namespace detail
     {
@@ -1045,23 +947,21 @@ namespace xt
      * // ==> {{1, 3}}
      * \endcode
      */
-    template <class E, class S>
-    inline auto dynamic_view(E&& e, S&& slices)
+    template <class E>
+    inline auto dynamic_view(E&& e, const slice_vector& slices)
     {
         // Compute dimension
         std::size_t dimension = e.dimension();
 
         for (const auto& el : slices)
         {
-            if (el[0] >= 0 && el[1] == 0)
+            if (xtl::get_if<xt::xnewaxis_tag>(&el) != nullptr)
             {
-                // treat this like a single integral and remove from shape
-                --dimension;
+                dimension++;
             }
-            else if (el[0] == -1 && el[1] == 0)
+            else if(xtl::get_if<int>(&el) != nullptr)
             {
-                // treat this like a new axis
-                ++dimension;
+                dimension--;
             }
         }
 
@@ -1075,39 +975,46 @@ namespace xt
         auto old_shape = e.shape();
         auto&& old_strides = detail::get_strides(e);
 
-        std::size_t i = 0;
-        std::size_t idx = 0;
-        std::size_t newaxis_skip = 0;
+        std::size_t i = 0, idx = 0, newaxis_skip = 0;
+
+        auto slice_getter = detail::slice_getter_impl<E>(e);
 
         for (; i < slices.size(); ++i)
         {
-            if (slices[i][0] >= 0)
+            auto ptr = xtl::get_if<int>(&slices[i]);
+            if (ptr != nullptr)
             {
-                std::size_t slice0 = static_cast<std::size_t>(slices[i][0]);
-                offset += slice0 * old_strides[i];
+                std::size_t slice0 = static_cast<std::size_t>(*ptr);
+                offset += slice0 * old_strides[i - newaxis_skip];
             }
-
-            if (slices[i][1] != 0 && slices[i][2] != 0)
-            {
-                std::size_t slice1 = static_cast<std::size_t>(slices[i][1]);
-                std::size_t slice2 = static_cast<std::size_t>(slices[i][2]);
-                new_shape[idx] = slice1;
-                new_strides[idx] = slice2 * old_strides[i - newaxis_skip];
-                ++idx;
-            }
-            else if (slices[i][0] == -1)  // newaxis
+            else if (xtl::get_if<xt::xnewaxis_tag>(&slices[i]) != nullptr)
             {
                 new_shape[idx] = 1;
                 new_strides[idx] = 0;
                 ++newaxis_skip;
                 ++idx;
             }
+            else if (xtl::get_if<xt::xall_tag>(&slices[i]) != nullptr)
+            {
+                new_shape[idx] = old_shape[i - newaxis_skip];
+                new_strides[idx] = old_strides[i - newaxis_skip];
+                ++idx;
+            }
+            else
+            {
+                slice_getter.idx = i - newaxis_skip;
+                std::array<int, 3> info = xtl::visit(slice_getter, slices[i]);
+                offset += std::size_t(info[0]) * old_strides[i - newaxis_skip];
+                new_shape[idx] = std::size_t(info[1]);
+                new_strides[idx] = std::size_t(info[2]) * old_strides[i - newaxis_skip];
+                idx++;
+            }
         }
 
-        for (; i < old_shape.size(); ++i)
+        for (; (i - newaxis_skip) < old_shape.size(); ++i)
         {
-            new_shape[idx] = old_shape[i];
-            new_strides[idx] = old_strides[i];
+            new_shape[idx] = old_shape[i - newaxis_skip];
+            new_strides[idx] = old_strides[i - newaxis_skip];
             ++idx;
         }
 

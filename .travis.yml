@@ -115,7 +115,7 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda install gtest cmake -c conda-forge 
-    - conda install xtl==0.4.0 -c QuantStack
+    - conda install xtl==0.4.1 -c QuantStack
     # Testing
     - mkdir build
     - cd build

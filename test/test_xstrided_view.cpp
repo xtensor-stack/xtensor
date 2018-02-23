@@ -35,7 +35,7 @@ namespace xt
     TEST(xstrided_view, expression_adapter)
     {
         auto e = xt::arange<double>(24);
-        auto sv = slice_vector(e, range(2, 10, 3));
+        auto sv = slice_vector({range(2, 10, 3)});
         auto vt = dynamic_view(e, sv);
 
         EXPECT_EQ(vt(0), 2);
