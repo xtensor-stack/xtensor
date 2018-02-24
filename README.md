@@ -38,7 +38,7 @@ conda install -c conda-forge xtensor
 Or you can directly install it from the sources:
 
 ```bash
-cmake -DCMAKE_INSTALL_PREFIX=your_install_prefix
+set cmake -DCMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
 
