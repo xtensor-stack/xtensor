@@ -15,8 +15,8 @@
 
 namespace xt
 {
-    using std::size_t;
-    using shape_t = std::vector<std::size_t>;
+    using xt::index_t;
+    using shape_t = std::vector<xt::index_t>;
 
     TEST(xbuilder, ones)
     {
@@ -256,14 +256,14 @@ namespace xt
         ASSERT_TRUE(all(equal(std::get<1>(mesh), expect1)));
     }
 
-    TEST(xbuilder, meshgrid_arange)
-    {
-        auto xrange = xt::arange(0, 2);
-        auto yrange = xt::arange(0, 2);
-        auto grid = xt::meshgrid(xrange, yrange);
-        std::ostringstream stream;
-        stream << std::get<0>(grid) << std::endl;
-    }
+    // TEST(xbuilder, meshgrid_arange)
+    // {
+    //     auto xrange = xt::arange(0, 2);
+    //     auto yrange = xt::arange(0, 2);
+    //     auto grid = xt::meshgrid(xrange, yrange);
+    //     std::ostringstream stream;
+    //     stream << std::get<0>(grid) << std::endl;
+    // }
 
     TEST(xbuilder, triu)
     {

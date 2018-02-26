@@ -17,7 +17,7 @@ namespace xt
 {
     namespace detail
     {
-        template <class M, std::size_t I>
+        template <class M, xt::index_t I>
         struct offset_forwarder
         {
             using value_type = M;
@@ -34,7 +34,7 @@ namespace xt
         };
     }
 
-    template <class CT, class M, std::size_t I>
+    template <class CT, class M, xt::index_t I>
     using xoffset_view = xfunctor_view<detail::offset_forwarder<M, I>, CT>;
 }
 

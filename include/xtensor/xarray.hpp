@@ -406,7 +406,7 @@ namespace xt
         // in resize (called by assign), which is always true when dimension == 0.
         if (e.derived_cast().dimension() == 0)
         {
-            detail::resize_data_container(m_data, std::size_t(1));
+            detail::resize_data_container(m_data, xt::index_t(1));
         }
         semantic_base::assign(e);
     }

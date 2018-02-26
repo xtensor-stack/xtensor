@@ -14,8 +14,8 @@
 
 namespace xt
 {
-    using std::size_t;
-    using view_shape_type = dynamic_shape<size_t>;
+    using xt::index_t;
+    using view_shape_type = dynamic_shape<xt::index_t>;
 
     TEST(xdynamic_view, simple)
     {
@@ -92,7 +92,7 @@ namespace xt
         EXPECT_EQ(a(1, 1, 0), view1(1, 0));
         EXPECT_EQ(a(1, 1, 1), view1(1, 1));
 
-        std::array<std::size_t, 2> idx = {1, 1};
+        std::array<xt::index_t, 2> idx = {1, 1};
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
 
@@ -241,10 +241,10 @@ namespace xt
         EXPECT_EQ(a(1, 2), view6(2, 0));
         EXPECT_EQ(size_t(2), view6.dimension());
 
-        std::array<std::size_t, 3> idx1 = {1, 0, 2};
+        std::array<xt::index_t, 3> idx1 = {1, 0, 2};
         EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
 
-        std::array<std::size_t, 3> idx2 = {1, 2, 0};
+        std::array<xt::index_t, 3> idx2 = {1, 2, 0};
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
     }
 

@@ -17,7 +17,7 @@
 
 namespace xt
 {
-    using std::size_t;
+    using xt::index_t;
 
     TEST(xindex_view, indices)
     {
@@ -132,7 +132,7 @@ namespace xt
     TEST(xindex_view, const_adapt_filter)
     {
         const std::vector<double> av({1,2,3,4,5,6});
-        auto a = xt::adapt(av, std::array<std::size_t, 2>({3, 2}));
+        auto a = xt::adapt(av, std::array<xt::index_t, 2>({3, 2}));
         xt::xarray<double> b = {{1, 2, 3}, {4, 5, 6}};
         xt::filter(b, b > 3) += xt::filter(a, a < 4);
         xarray<double> expected = {{1, 2, 3}, {5, 7, 9}};

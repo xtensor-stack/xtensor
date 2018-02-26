@@ -275,7 +275,7 @@ namespace xt
     adapt(P&& pointer, typename A::size_type size, O, const SC& shape, layout_type l, const A& alloc)
     {
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
-        constexpr std::size_t N = detail::array_size<SC>::value;
+        constexpr xt::index_t N = detail::array_size<SC>::value;
         using return_type = xtensor_adaptor<buffer_type, N, L>;
         buffer_type buf(std::forward<P>(pointer), size, alloc);
         return return_type(std::move(buf), shape, l);
@@ -287,7 +287,7 @@ namespace xt
     adapt(P&& pointer, typename A::size_type size, O, SC&& shape, SS&& strides, const A& alloc)
     {
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
-        constexpr std::size_t N = detail::array_size<SC>::value;
+        constexpr xt::index_t N = detail::array_size<SC>::value;
         using return_type = xtensor_adaptor<buffer_type, N, layout_type::dynamic>;
         buffer_type buf(std::forward<P>(pointer), size, alloc);
         return return_type(std::move(buf),

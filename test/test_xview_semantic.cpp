@@ -55,19 +55,19 @@ namespace xt
         }
     }
 
-    template <class C, std::size_t>
+    template <class C, xt::index_t>
     struct redim_container
     {
         using type = C;
     };
 
-    template <class T, std::size_t N, layout_type L, std::size_t NN>
+    template <class T, xt::index_t N, layout_type L, xt::index_t NN>
     struct redim_container<xtensor<T, N, L>, NN>
     {
         using type = xtensor<T, NN, L>;
     };
 
-    template <class C, std::size_t N>
+    template <class C, xt::index_t N>
     using redim_container_t = typename redim_container<C, N>::type;
 
     template <class C>

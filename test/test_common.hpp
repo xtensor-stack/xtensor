@@ -26,7 +26,7 @@ namespace xt
         return rhs == lhs;
     }
 
-    template <class C = dynamic_shape<std::size_t>>
+    template <class C = dynamic_shape<xt::index_t>>
     struct layout_result
     {
         using vector_type = uvector<int, DEFAULT_ALLOCATOR(int)>;
@@ -68,7 +68,7 @@ namespace xt
         inline const vector_type& data() const { return m_data; }
     };
 
-    template <class C = dynamic_shape<std::size_t>>
+    template <class C = dynamic_shape<xt::index_t>>
     struct row_major_result : layout_result<C>
     {
         inline row_major_result()
@@ -82,7 +82,7 @@ namespace xt
         }
     };
 
-    template <class C = dynamic_shape<std::size_t>>
+    template <class C = dynamic_shape<xt::index_t>>
     struct column_major_result : layout_result<C>
     {
         inline column_major_result()
@@ -97,7 +97,7 @@ namespace xt
         }
     };
 
-    template <class C = dynamic_shape<std::size_t>>
+    template <class C = dynamic_shape<xt::index_t>>
     struct central_major_result : layout_result<C>
     {
         inline central_major_result()
@@ -111,7 +111,7 @@ namespace xt
         }
     };
 
-    template <class C = dynamic_shape<std::size_t>>
+    template <class C = dynamic_shape<xt::index_t>>
     struct unit_shape_result
     {
         using vector_type = std::vector<int>;
@@ -130,7 +130,7 @@ namespace xt
             m_data = {-1, 1, 2, 3, 8, 9, 10, 11, 16, 17, 18, 19};
             m_layout = layout_type::dynamic;
             m_assigner.resize(m_shape[0]);
-            for (std::size_t i = 0; i < m_shape[0]; ++i)
+            for (xt::index_t i = 0; i < m_shape[0]; ++i)
             {
                 m_assigner[i].resize(m_shape[1]);
             }
@@ -167,7 +167,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = dynamic_shape<std::size_t>>
+    template <class V, class C = dynamic_shape<xt::index_t>>
     void test_resize(V& vec)
     {
         {
@@ -182,8 +182,8 @@ namespace xt
             row_major_result<C> rm;
             auto v_copy_a = vec;
             auto v_copy_b = vec;
-            std::array<std::size_t, 3> ar = {3, 2, 4};
-            std::vector<std::size_t> vr = {3, 2, 4};
+            std::array<xt::index_t, 3> ar = {3, 2, 4};
+            std::vector<xt::index_t> vr = {3, 2, 4};
             v_copy_a.resize(ar, true);
             compare_shape(v_copy_a, rm);
             v_copy_b.resize(vr, true);
@@ -213,14 +213,14 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = std::vector<xt::index_t>>
     void test_reshape(V& vec)
     {
         {
             SCOPED_TRACE("row_major reshape");
             row_major_result<C> rm;
             auto shape = rm.m_shape;
-            std::size_t sz = compute_size(shape);
+            xt::index_t sz = compute_size(shape);
             std::fill(shape.begin(), shape.end(), 1);
             shape[0] = sz;
             vec.resize(shape);
@@ -232,7 +232,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = std::vector<std::size_t>>
+    template <class V, class C = std::vector<xt::index_t>>
     void test_transpose(V& vec)
     {
         using shape_type = typename V::shape_type;
@@ -309,7 +309,7 @@ namespace xt
             EXPECT_EQ(vec_copy(1, 1, 2), vt(1, 1, 2));
 
             // Compilation check only
-            std::vector<std::size_t> perm = {1, 0, 2};
+            std::vector<xt::index_t> perm = {1, 0, 2};
             transpose(vec, perm);
         }
 
@@ -328,11 +328,11 @@ namespace xt
     template <class V1, class V2>
     void assign_array(V1& dst, const V2& src)
     {
-        for (std::size_t i = 0; i < dst.shape()[0]; ++i)
+        for (xt::index_t i = 0; i < dst.shape()[0]; ++i)
         {
-            for (std::size_t j = 0; j < dst.shape()[1]; ++j)
+            for (xt::index_t j = 0; j < dst.shape()[1]; ++j)
             {
-                for (std::size_t k = 0; k < dst.shape()[2]; ++k)
+                for (xt::index_t k = 0; k < dst.shape()[2]; ++k)
                 {
                     dst(i, j, k) = src[i][j][k];
                 }
@@ -343,11 +343,11 @@ namespace xt
     template <class V1, class V2>
     void safe_assign_array(V1& dst, const V2& src)
     {
-        for (std::size_t i = 0; i < dst.shape()[0]; ++i)
+        for (xt::index_t i = 0; i < dst.shape()[0]; ++i)
         {
-            for (std::size_t j = 0; j < dst.shape()[1]; ++j)
+            for (xt::index_t j = 0; j < dst.shape()[1]; ++j)
             {
-                for (std::size_t k = 0; k < dst.shape()[2]; ++k)
+                for (xt::index_t k = 0; k < dst.shape()[2]; ++k)
                 {
                     dst.at(i, j, k) = src[i][j][k];
                 }
@@ -371,7 +371,7 @@ namespace xt
         EXPECT_ANY_THROW(vec.at(0, 0, 0, 0, 0, 0));
     }
 
-    template <class V, class C = dynamic_shape<std::size_t>>
+    template <class V, class C = dynamic_shape<xt::index_t>>
     void test_access(V& vec)
     {
         {
@@ -419,7 +419,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = dynamic_shape<std::size_t>>
+    template <class V, class C = dynamic_shape<xt::index_t>>
     void test_at(V& vec)
     {
         {
@@ -459,7 +459,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = dynamic_shape<std::size_t>>
+    template <class V, class C = dynamic_shape<xt::index_t>>
     void test_element(V& vec)
     {
         {
@@ -468,10 +468,10 @@ namespace xt
             vec.resize(rm.m_shape, layout_type::row_major);
             assign_array(vec, rm.m_assigner);
             EXPECT_EQ(vec.data(), rm.m_data);
-            std::vector<std::size_t> index1 = {0, 1, 1};
-            std::vector<std::size_t> index2 = {1, 1};
-            std::vector<std::size_t> index3 = {2, 1, 3};
-            std::vector<std::size_t> index4 = {2, 2, 2, 1, 3};
+            std::vector<xt::index_t> index1 = {0, 1, 1};
+            std::vector<xt::index_t> index2 = {1, 1};
+            std::vector<xt::index_t> index3 = {2, 1, 3};
+            std::vector<xt::index_t> index4 = {2, 2, 2, 1, 3};
             EXPECT_EQ(vec.element(index1.begin(), index1.end()), vec.element(index2.begin(), index2.end()));
             EXPECT_EQ(vec.element(index3.begin(), index3.end()), vec.element(index4.begin(), index4.end()));
             test_bound_check(vec);
@@ -483,10 +483,10 @@ namespace xt
             vec.resize(cm.m_shape, layout_type::column_major);
             assign_array(vec, cm.m_assigner);
             EXPECT_EQ(vec.data(), cm.m_data);
-            std::vector<std::size_t> index1 = {0, 1, 1};
-            std::vector<std::size_t> index2 = {1, 1};
-            std::vector<std::size_t> index3 = {2, 1, 3};
-            std::vector<std::size_t> index4 = {2, 2, 2, 1, 3};
+            std::vector<xt::index_t> index1 = {0, 1, 1};
+            std::vector<xt::index_t> index2 = {1, 1};
+            std::vector<xt::index_t> index3 = {2, 1, 3};
+            std::vector<xt::index_t> index4 = {2, 2, 2, 1, 3};
             EXPECT_EQ(vec.element(index1.begin(), index1.end()), vec.element(index2.begin(), index2.end()));
             EXPECT_EQ(vec.element(index3.begin(), index3.end()), vec.element(index4.begin(), index4.end()));
             test_bound_check(vec);
@@ -498,10 +498,10 @@ namespace xt
             vec.resize(cem.m_shape, cem.m_strides);
             assign_array(vec, cem.m_assigner);
             EXPECT_EQ(vec.data(), cem.m_data);
-            std::vector<std::size_t> index1 = {0, 1, 1};
-            std::vector<std::size_t> index2 = {1, 1};
-            std::vector<std::size_t> index3 = {2, 1, 3};
-            std::vector<std::size_t> index4 = {2, 2, 2, 1, 3};
+            std::vector<xt::index_t> index1 = {0, 1, 1};
+            std::vector<xt::index_t> index2 = {1, 1};
+            std::vector<xt::index_t> index3 = {2, 1, 3};
+            std::vector<xt::index_t> index4 = {2, 2, 2, 1, 3};
             EXPECT_EQ(vec.element(index1.begin(), index1.end()), vec.element(index2.begin(), index2.end()));
             EXPECT_EQ(vec.element(index3.begin(), index3.end()), vec.element(index4.begin(), index4.end()));
             test_bound_check(vec);
@@ -513,10 +513,10 @@ namespace xt
             vec.resize(usr.m_shape, layout_type::row_major);
             assign_array(vec, usr.m_assigner);
             EXPECT_EQ(vec.data(), usr.m_data);
-            std::vector<std::size_t> index1 = {0, 1, 0};
-            std::vector<std::size_t> index2 = {1, 0};
-            std::vector<std::size_t> index3 = {2, 0, 3};
-            std::vector<std::size_t> index4 = {2, 2, 2, 0, 3};
+            std::vector<xt::index_t> index1 = {0, 1, 0};
+            std::vector<xt::index_t> index2 = {1, 0};
+            std::vector<xt::index_t> index3 = {2, 0, 3};
+            std::vector<xt::index_t> index4 = {2, 2, 2, 0, 3};
             EXPECT_EQ(vec.element(index1.begin(), index1.end()), vec.element(index2.begin(), index2.end()));
             EXPECT_EQ(vec.element(index3.begin(), index3.end()), vec.element(index4.begin(), index4.end()));
             test_bound_check(vec);
@@ -527,13 +527,13 @@ namespace xt
     void indexed_assign_array(V1& dst, const V2& src)
     {
         xindex index(dst.dimension());
-        for (std::size_t i = 0; i < dst.shape()[0]; ++i)
+        for (xt::index_t i = 0; i < dst.shape()[0]; ++i)
         {
             index[0] = i;
-            for (std::size_t j = 0; j < dst.shape()[1]; ++j)
+            for (xt::index_t j = 0; j < dst.shape()[1]; ++j)
             {
                 index[1] = j;
-                for (std::size_t k = 0; k < dst.shape()[2]; ++k)
+                for (xt::index_t k = 0; k < dst.shape()[2]; ++k)
                 {
                     index[2] = k;
                     dst[index] = src[i][j][k];
@@ -542,7 +542,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = dynamic_shape<std::size_t>>
+    template <class V, class C = dynamic_shape<xt::index_t>>
     void test_indexed_access(V& vec)
     {
         xindex index1 = {1, 1};
@@ -648,7 +648,7 @@ namespace xt
         }
     }
 
-    template <class VRM, class VCM, class C = dynamic_shape<std::size_t>>
+    template <class VRM, class VCM, class C = dynamic_shape<xt::index_t>>
     void test_iterator(VRM& vecrm, VCM& veccm)
     {
         {
@@ -670,25 +670,25 @@ namespace xt
         }
     }
 
-    template <class V, class C = dynamic_shape<std::size_t>>
+    template <class V, class C = dynamic_shape<xt::index_t>>
     void test_xiterator(V& vec)
     {
         row_major_result<C> rm;
         vec.resize(rm.m_shape, layout_type::row_major);
         indexed_assign_array(vec, rm.m_assigner);
-        size_t nb_iter = vec.size() / 2;
-        using shape_type = std::vector<size_t>;
+        xt::index_t nb_iter = vec.size() / 2;
+        using shape_type = std::vector<xt::index_t>;
 
         // broadcast_iterator
         {
             auto iter = vec.template begin<layout_type::row_major>();
             auto iter_end = vec.template end<layout_type::row_major>();
-            for (size_t i = 0; i < nb_iter; ++i)
+            for (xt::index_t i = 0; i < nb_iter; ++i)
             {
                 ++iter;
             }
             EXPECT_EQ(vec.data()[nb_iter], *iter);
-            for (size_t i = 0; i < nb_iter; ++i)
+            for (xt::index_t i = 0; i < nb_iter; ++i)
             {
                 ++iter;
             }
@@ -750,7 +750,7 @@ namespace xt
         }
     }
 
-    template <class V, class C = dynamic_shape<std::size_t>>
+    template <class V, class C = dynamic_shape<xt::index_t>>
     void test_reverse_xiterator(V& vec)
     {
         row_major_result<C> rm;

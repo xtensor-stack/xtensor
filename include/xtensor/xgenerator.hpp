@@ -66,7 +66,7 @@ namespace xt
         using const_reference = value_type;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = std::size_t;
+        using size_type = xt::index_t;
         using difference_type = std::ptrdiff_t;
 
         using iterable_base = xconst_iterable<self_type>;
@@ -114,10 +114,10 @@ namespace xt
 
     private:
 
-        template <std::size_t dim>
+        template <xt::index_t dim>
         void adapt_index() const;
 
-        template <std::size_t dim, class I, class... Args>
+        template <xt::index_t dim, class I, class... Args>
         void adapt_index(I& arg, Args&... args) const;
 
         functor_type m_f;
@@ -165,7 +165,7 @@ namespace xt
     template <class F, class R, class S>
     inline auto xgenerator<F, R, S>::dimension() const noexcept -> size_type
     {
-        return m_shape.size();
+        return static_cast<size_type>(m_shape.size());
     }
 
     /**
@@ -305,13 +305,13 @@ namespace xt
     }
 
     template <class F, class R, class S>
-    template <std::size_t dim>
+    template <xt::index_t dim>
     inline void xgenerator<F, R, S>::adapt_index() const
     {
     }
 
     template <class F, class R, class S>
-    template <std::size_t dim, class I, class... Args>
+    template <xt::index_t dim, class I, class... Args>
     inline void xgenerator<F, R, S>::adapt_index(I& arg, Args&... args) const
     {
         if (sizeof...(Args)+1 > m_shape.size())
@@ -334,15 +334,15 @@ namespace xt
         template <class Functor, class I>
         inline auto make_xgenerator(Functor&& f, std::initializer_list<I> shape) noexcept
         {
-            using shape_type = std::vector<std::size_t>;
+            using shape_type = std::vector<xt::index_t>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
             return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type>(shape));
         }
 #else
-        template <class Functor, class I, std::size_t L>
+        template <class Functor, class I, xt::index_t L>
         inline auto make_xgenerator(Functor&& f, const I (&shape)[L]) noexcept
         {
-            using shape_type = std::array<std::size_t, L>;
+            using shape_type = std::array<xt::index_t, L>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
             return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type>(shape));
         }

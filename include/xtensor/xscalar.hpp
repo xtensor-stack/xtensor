@@ -42,7 +42,7 @@ namespace xt
     struct xiterable_inner_types<xscalar<CT>>
     {
         using value_type = std::decay_t<CT>;
-        using inner_shape_type = std::array<std::size_t, 0>;
+        using inner_shape_type = std::array<xt::index_t, 0>;
         using const_stepper = xscalar_stepper<true, CT>;
         using stepper = xscalar_stepper<false, CT>;
     };
@@ -61,7 +61,7 @@ namespace xt
         using const_reference = const value_type&;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = std::size_t;
+        using size_type = xt::index_t;
         using difference_type = std::ptrdiff_t;
         using simd_value_type = xsimd::simd_type<value_type>;
 

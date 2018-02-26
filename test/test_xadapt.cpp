@@ -17,7 +17,7 @@ namespace xt
     TEST(xarray_adaptor, adapt)
     {
         vec_type v(4, 0);
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = std::vector<xt::index_t>;
         shape_type s({2, 2});
 
         auto a1 = adapt(v, s);
@@ -34,7 +34,7 @@ namespace xt
     {
         size_t size = 4;
         int* data = new int[size];
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = std::vector<xt::index_t>;
         shape_type s({2, 2});
 
         auto a1 = adapt(data, size, no_ownership(), s);
@@ -54,7 +54,7 @@ namespace xt
         size_t size = 4;
         int* data = new int[size];
         int* data2 = new int[size];
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = std::vector<xt::index_t>;
         shape_type s({2, 2});
 
         auto a1 = adapt(data, size, acquire_ownership(), s);
@@ -73,7 +73,7 @@ namespace xt
         int data1 = 0;
         int data2 = 1;
         int data3;
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = std::vector<xt::index_t>;
         shape_type s({ 1 });
 
         auto a1 = adapt(&data1, size, xt::no_ownership(), s);
@@ -91,7 +91,7 @@ namespace xt
         int* data2 = new int[1];
         data2[0] = 1;
         int* data3 = nullptr;
-        using shape_type = std::vector<vec_type::size_type>;
+        using shape_type = std::vector<xt::index_t>;
         shape_type s({ 1 });
 
         auto a1 = adapt(data1, size, xt::acquire_ownership(), s);
@@ -111,7 +111,7 @@ namespace xt
         EXPECT_EQ(3, v0[3]);
         
         vec_type v(4, 0);
-        using shape_type = std::array<vec_type::size_type, 2>;
+        using shape_type = std::array<xt::index_t, 2>;
         shape_type s = {2, 2};
 
         auto a1 = adapt(v, s);
@@ -133,7 +133,7 @@ namespace xt
         a0(3) = 3;
         EXPECT_EQ(3, data[3]);
 
-        using shape_type = std::array<vec_type::size_type, 2>;
+        using shape_type = std::array<xt::index_t, 2>;
         shape_type s = {2, 2};
 
         auto a1 = adapt(data, size, no_ownership(), s);
@@ -159,7 +159,7 @@ namespace xt
         a0(3) = 3;
         EXPECT_EQ(3, data0[3]);
 
-        using shape_type = std::array<vec_type::size_type, 2>;
+        using shape_type = std::array<xt::index_t, 2>;
         shape_type s = {2, 2};
 
         auto a1 = adapt(data1, size, acquire_ownership(), s);
@@ -177,7 +177,7 @@ namespace xt
         size_t size = 4;
         int* data = new int[size];
         int* data2 = new int[size];
-        using shape_type = std::array<vec_type::size_type, 2>;
+        using shape_type = std::array<xt::index_t, 2>;
         shape_type s = {2, 2};
 
         auto a1 = adapt(std::move(data), size, acquire_ownership(), s);
@@ -196,7 +196,7 @@ namespace xt
         int data1 = 0;
         int data2 = 1;
         int data3;
-        using shape_type = std::array<vec_type::size_type, 1>;
+        using shape_type = std::array<xt::index_t, 1>;
         shape_type s = { 1 };
 
         auto a1 = adapt(&data1, size, xt::no_ownership(), s);
@@ -214,7 +214,7 @@ namespace xt
         int* data2 = new int[1];
         data2[0] = 1;
         int* data3 = nullptr;
-        using shape_type = std::array<vec_type::size_type, 1>;
+        using shape_type = std::array<xt::index_t, 1>;
         shape_type s = { 1 };
 
         auto a1 = adapt(data1, size, xt::acquire_ownership(), s);

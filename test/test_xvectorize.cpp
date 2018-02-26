@@ -18,7 +18,7 @@ namespace xt
         return d1 + d2;
     }
 
-    using shape_type = dynamic_shape<size_t>;
+    using shape_type = dynamic_shape<xt::index_t>;
 
     TEST(xvectorize, function)
     {

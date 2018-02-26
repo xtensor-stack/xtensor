@@ -26,9 +26,18 @@
 #define DEFAULT_DATA_CONTAINER(T, A) uvector<T, A>
 #endif
 
+#ifndef DEFAULT_INDEX_TYPE
+#define INDEX_T ptrdiff_t
+#endif
+
+namespace xt
+{
+	using index_t = INDEX_T;
+}
+
 #ifndef DEFAULT_SHAPE_CONTAINER
 #define DEFAULT_SHAPE_CONTAINER(T, EA, SA) \
-    xt::svector<typename DEFAULT_DATA_CONTAINER(T, EA)::size_type, 4, SA>
+    xt::svector<xt::index_t, 4, SA>
 #endif
 
 #ifndef DEFAULT_ALLOCATOR

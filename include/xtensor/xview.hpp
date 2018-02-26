@@ -178,7 +178,7 @@ namespace xt
         raw_data();
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, const std::size_t>
+        std::enable_if_t<has_raw_data_interface<T>::value, const xt::index_t>
         raw_data_offset() const noexcept;
 
         size_type underlying_size(size_type dim) const;
@@ -190,7 +190,7 @@ namespace xt
     private:
 
         // VS 2015 workaround (yes, really)
-        template <std::size_t I>
+        template <xt::index_t I>
         struct lesser_condition
         {
             static constexpr bool value = (I + newaxis_count_before<S...>(I + 1) < sizeof...(S));
@@ -204,16 +204,16 @@ namespace xt
 
         strides_type compute_strides() const;
 
-        template <typename std::decay_t<CT>::size_type... I, class... Args>
+        template <std::size_t... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args);
 
-        template <typename std::decay_t<CT>::size_type... I, class... Args>
+        template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
 
-        template <typename std::decay_t<CT>::size_type I, class... Args>
+        template <std::size_t I, class... Args>
         std::enable_if_t<lesser_condition<I>::value, size_type> index(Args... args) const;
 
-        template <typename std::decay_t<CT>::size_type I, class... Args>
+        template <std::size_t I, class... Args>
         std::enable_if_t<!lesser_condition<I>::value, size_type> index(Args... args) const;
 
         template <typename std::decay_t<CT>::size_type, class T>
@@ -364,7 +364,7 @@ namespace xt
         {
             size_type index = integral_skip<S...>(i);
             m_shape[i] = index < sizeof...(S) ?
-                apply<std::size_t>(index, func, m_slices) : m_e.shape()[index - newaxis_count_before<S...>(index)];
+                apply<xt::index_t>(index, func, m_slices) : m_e.shape()[index - newaxis_count_before<S...>(index)];
         }
     }
     //@}
@@ -649,7 +649,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::raw_data_offset() const noexcept ->
-        std::enable_if_t<has_raw_data_interface<T>::value, const std::size_t>
+        std::enable_if_t<has_raw_data_interface<T>::value, const xt::index_t>
     {
         auto func = [](const auto& s) { return xt::value(s, 0); };
         typename T::size_type offset = m_e.raw_data_offset();
@@ -741,21 +741,21 @@ namespace xt
     }
 
     template <class CT, class... S>
-    template <typename std::decay_t<CT>::size_type... I, class... Args>
+    template <std::size_t... I, class... Args>
     inline auto xview<CT, S...>::access_impl(std::index_sequence<I...>, Args... args) -> reference
     {
         return m_e(index<I>(args...)...);
     }
 
     template <class CT, class... S>
-    template <typename std::decay_t<CT>::size_type... I, class... Args>
+    template <std::size_t... I, class... Args>
     inline auto xview<CT, S...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
     {
         return m_e(index<I>(args...)...);
     }
 
     template <class CT, class... S>
-    template <typename std::decay_t<CT>::size_type I, class... Args>
+    template <std::size_t I, class... Args>
     inline auto xview<CT, S...>::index(Args... args) const -> std::enable_if_t<lesser_condition<I>::value, size_type>
     {
         return sliced_access<I - integral_count_before<S...>(I) + newaxis_count_before<S...>(I + 1)>
@@ -763,7 +763,7 @@ namespace xt
     }
 
     template <class CT, class... S>
-    template <typename std::decay_t<CT>::size_type I, class... Args>
+    template <std::size_t I, class... Args>
     inline auto xview<CT, S...>::index(Args... args) const -> std::enable_if_t<!lesser_condition<I>::value, size_type>
     {
         return argument<I - integral_count<S...>() + newaxis_count<S...>()>(args...);
@@ -829,7 +829,7 @@ namespace xt
     namespace detail
     {
         template <class E, class... S>
-        inline std::size_t get_underlying_shape_index(std::size_t I)
+        inline xt::index_t get_underlying_shape_index(xt::index_t I)
         {
             return I - newaxis_count_before<get_slice_type<E, S>...>(I);
         }

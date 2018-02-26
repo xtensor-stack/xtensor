@@ -46,19 +46,19 @@ namespace xt
     // see http://stackoverflow.com/a/20170989
     struct static_string
     {
-        template <std::size_t N>
+        template <xt::index_t N>
         explicit CONSTEXPR11_TN static_string(const char (&a)[N]) NOEXCEPT_TN
             : data(a), size(N - 1)
         {
         }
 
-        CONSTEXPR11_TN static_string(const char* a, const std::size_t sz) NOEXCEPT_TN
+        CONSTEXPR11_TN static_string(const char* a, const xt::index_t sz) NOEXCEPT_TN
             : data(a), size(sz)
         {
         }
 
         const char* const data;
-        const std::size_t size;
+        const xt::index_t size;
     };
 
     template <class T>

@@ -224,7 +224,7 @@ namespace xt
         {
         };
 
-        template <class OT, std::size_t N, layout_type L>
+        template <class OT, xt::index_t N, layout_type L>
         struct split_optional_tensor
         {
             using optional_tensor = OT;
@@ -244,7 +244,7 @@ namespace xt
             }
         };
 
-        template <class OT, std::size_t N, layout_type L>
+        template <class OT, xt::index_t N, layout_type L>
         struct split_optional_tensor_ref
         {
             using optional_tensor = OT;
@@ -264,19 +264,19 @@ namespace xt
             }
         };
 
-        template <class T, std::size_t N, layout_type L, class A, class BC>
+        template <class T, xt::index_t N, layout_type L, class A, class BC>
         struct split_optional_expression<xtensor_optional<T, N, L, A, BC>>
             : split_optional_tensor<xtensor_optional<T, N, L, A, BC>, N, L>
         {
         };
 
-        template <class T, std::size_t N, layout_type L, class A, class BC>
+        template <class T, xt::index_t N, layout_type L, class A, class BC>
         struct split_optional_expression<xtensor_optional<T, N, L, A, BC>&>
             : split_optional_tensor_ref<xtensor_optional<T, N, L, A, BC>, N, L>
         {
         };
 
-        template <class T, std::size_t N, layout_type L, class A, class BC>
+        template <class T, xt::index_t N, layout_type L, class A, class BC>
         struct split_optional_expression<const xtensor_optional<T, N, L, A, BC>&>
             : split_optional_tensor_ref<const xtensor_optional<T, N, L, A, BC>, N, L>
         {

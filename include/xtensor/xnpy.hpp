@@ -49,7 +49,7 @@ namespace xt
 #endif
 
         const char magic_string[] = "\x93NUMPY";
-        const std::size_t magic_string_length = 6;
+        const xt::index_t magic_string_length = 6;
 
         const char little_endian_char = '<';
         const char big_endian_char = '>';
@@ -79,7 +79,7 @@ namespace xt
                 throw std::runtime_error("io error: failed reading file");
             }
 
-            for (std::size_t i = 0; i < magic_string_length; i++)
+            for (xt::index_t i = 0; i < magic_string_length; i++)
             {
                 if (buf[i] != magic_string[i])
                 {
@@ -162,7 +162,7 @@ namespace xt
 
         inline std::string get_value_from_map(std::string mapstr)
         {
-            std::size_t sep_pos = mapstr.find_first_of(":");
+            xt::index_t sep_pos = mapstr.find_first_of(":");
             if (sep_pos == std::string::npos)
             {
                 return "";
@@ -181,7 +181,7 @@ namespace xt
 
         inline void parse_header(std::string header, std::string& descr,
                                  bool* fortran_order,
-                                 std::vector<std::size_t>& shape)
+                                 std::vector<xt::index_t>& shape)
         {
             // The first 6 bytes are a magic string: exactly "x93NUMPY".
             //
@@ -229,9 +229,9 @@ namespace xt
             header = unwrap_s(header, '{', '}');
 
             // find the positions of the 3 dictionary keys
-            std::size_t keypos_descr = header.find("'descr'");
-            std::size_t keypos_fortran = header.find("'fortran_order'");
-            std::size_t keypos_shape = header.find("'shape'");
+            xt::index_t keypos_descr = header.find("'descr'");
+            xt::index_t keypos_fortran = header.find("'fortran_order'");
+            xt::index_t keypos_shape = header.find("'shape'");
 
             // make sure all the keys are present
             if (keypos_descr == std::string::npos)
@@ -298,10 +298,10 @@ namespace xt
             shape_s = unwrap_s(shape_s, '(', ')');
 
             // a tokenizer would be nice...
-            std::size_t pos = 0;
+            xt::index_t pos = 0;
             for (;;)
             {
-                std::size_t pos_next = shape_s.find_first_of(',', pos);
+                xt::index_t pos_next = shape_s.find_first_of(',', pos);
                 std::string dim_s;
 
                 if (pos_next != std::string::npos)
@@ -326,7 +326,7 @@ namespace xt
                 {
                     std::stringstream ss;
                     ss << dim_s;
-                    std::size_t tmp;
+                    xt::index_t tmp;
                     ss >> tmp;
                     shape.push_back(tmp);
                 }
@@ -379,8 +379,8 @@ namespace xt
                       << "', 'fortran_order': " << s_fortran_order
                       << ", 'shape': " << s_shape << ", }";
 
-            std::size_t header_len_pre = ss_header.str().length() + 1;
-            std::size_t metadata_len = magic_string_length + 2 + 2 + header_len_pre;
+            xt::index_t header_len_pre = ss_header.str().length() + 1;
+            xt::index_t metadata_len = magic_string_length + 2 + 2 + header_len_pre;
 
             unsigned char version[2] = {1, 0};
             if (metadata_len >= 255 * 255)
@@ -389,7 +389,7 @@ namespace xt
                 version[0] = 2;
                 version[1] = 0;
             }
-            std::size_t padding_len = 16 - metadata_len % 16;
+            xt::index_t padding_len = 16 - metadata_len % 16;
             std::string padding(padding_len, ' ');
             ss_header << padding;
             ss_header << std::endl;
@@ -471,12 +471,12 @@ namespace xt
         {
             npy_file() = default;
 
-            npy_file(std::vector<std::size_t>& shape, bool fortran_order,
+            npy_file(std::vector<xt::index_t>& shape, bool fortran_order,
                      std::string typestring)
                 : m_shape(shape), m_fortran_order(fortran_order), m_typestring(typestring)
             {
                 // Allocate memory
-                m_word_size = std::size_t(atoi(&typestring[2]));
+                m_word_size = xt::index_t(atoi(&typestring[2]));
                 m_n_bytes = compute_size(shape) * m_word_size;
                 m_buffer = new char[m_n_bytes];
             }
@@ -528,8 +528,8 @@ namespace xt
                     throw std::runtime_error("This npy_file has already been cast.");
                 }
                 T* ptr = reinterpret_cast<T*>(&m_buffer[0]);
-                std::vector<std::size_t> strides(m_shape.size());
-                std::size_t sz = compute_size(m_shape);
+                std::vector<xt::index_t> strides(m_shape.size());
+                xt::index_t sz = compute_size(m_shape);
 
                 // check if the typestring matches the given one
                 if (check_type && m_typestring != detail::build_typestring<T>())
@@ -547,7 +547,7 @@ namespace xt
                 compute_strides(m_shape,
                                 m_fortran_order ? layout_type::column_major : layout_type::row_major,
                                 strides);
-                std::vector<std::size_t> shape(m_shape);
+                std::vector<xt::index_t> shape(m_shape);
 
                 return std::make_tuple(ptr, sz, std::move(shape), std::move(strides));
             }
@@ -582,12 +582,12 @@ namespace xt
                 return m_buffer;
             }
 
-            std::size_t n_bytes()
+            xt::index_t n_bytes()
             {
                 return m_n_bytes;
             }
 
-            std::vector<std::size_t> m_shape;
+            std::vector<xt::index_t> m_shape;
             bool m_fortran_order;
             size_t m_word_size;
             size_t m_n_bytes;
@@ -620,7 +620,7 @@ namespace xt
             bool fortran_order;
             std::string typestr;
 
-            std::vector<std::size_t> shape;
+            std::vector<xt::index_t> shape;
             detail::parse_header(header, typestr, &fortran_order, shape);
 
             npy_file result(shape, fortran_order, typestr);
@@ -646,7 +646,7 @@ namespace xt
             auto shape = eval_ex.shape();
             detail::write_header(stream, typestring, fortran_order, shape);
 
-            std::size_t size = compute_size(shape);
+            xt::index_t size = compute_size(shape);
             stream.write(reinterpret_cast<const char*>(eval_ex.raw_data()),
                          std::streamsize((sizeof(value_type) * size)));
         }

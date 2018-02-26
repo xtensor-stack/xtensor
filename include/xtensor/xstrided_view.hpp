@@ -120,8 +120,8 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
 
-        xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept;
-        xstrided_view(CT e, CD data, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept;
+        xstrided_view(CT e, S&& shape, S&& strides, xt::index_t offset, layout_type layout) noexcept;
+        xstrided_view(CT e, CD data, S&& shape, S&& strides, xt::index_t offset, layout_type layout) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -225,7 +225,7 @@ namespace xt
         shape_type m_shape;
         strides_type m_strides;
         backstrides_type m_backstrides;
-        std::size_t m_offset;
+        xt::index_t m_offset;
         layout_type m_layout;
 
         friend class xview_semantic<xstrided_view<CT, S, CD>>;
@@ -249,7 +249,7 @@ namespace xt
      * @param layout the layout of the view
      */
     template <class CT, class S, class CD>
-    inline xstrided_view<CT, S, CD>::xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept
+    inline xstrided_view<CT, S, CD>::xstrided_view(CT e, S&& shape, S&& strides, xt::index_t offset, layout_type layout) noexcept
         : m_e(e), m_data(m_e.data()), m_shape(std::forward<S>(shape)), m_strides(std::forward<S>(strides)), m_offset(offset), m_layout(layout)
     {
         m_backstrides = xtl::make_sequence<backstrides_type>(m_shape.size(), 0);
@@ -257,7 +257,7 @@ namespace xt
     }
 
     template <class CT, class S, class CD>
-    inline xstrided_view<CT, S, CD>::xstrided_view(CT e, CD data, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept
+    inline xstrided_view<CT, S, CD>::xstrided_view(CT e, CD data, S&& shape, S&& strides, xt::index_t offset, layout_type layout) noexcept
         : m_e(e), m_data(data), m_shape(std::forward<S>(shape)), m_strides(std::forward<S>(strides)), m_offset(offset), m_layout(layout)
     {
         m_backstrides = xtl::make_sequence<backstrides_type>(m_shape.size(), 0);
@@ -649,7 +649,7 @@ namespace xt
      * @return the view
      */
     template <class E, class I>
-    inline auto strided_view(E&& e, I&& shape, I&& strides, std::size_t offset = 0, layout_type layout = layout_type::dynamic) noexcept
+    inline auto strided_view(E&& e, I&& shape, I&& strides, xt::index_t offset = 0, layout_type layout = layout_type::dynamic) noexcept
     {
         using view_type = xstrided_view<xclosure_t<E>, I, decltype(e.data())>;
         return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides), offset);
@@ -679,9 +679,9 @@ namespace xt
             resize_container(temp_shape, e.shape().size());
 
             using size_type = typename std::decay_t<E>::size_type;
-            for (std::size_t i = 0; i < e.shape().size(); ++i)
+            for (xt::index_t i = 0; i < e.shape().size(); ++i)
             {
-                if (std::size_t(permutation[i]) >= e.dimension())
+                if (xt::index_t(permutation[i]) >= e.dimension())
                 {
                     throw transpose_error("Permutation contains wrong axis");
                 }
@@ -717,9 +717,9 @@ namespace xt
         inline auto transpose_impl(E&& e, S&& permutation, check_policy::full)
         {
             // check if axis appears twice in permutation
-            for (std::size_t i = 0; i < sequence_size(permutation); ++i)
+            for (xt::index_t i = 0; i < sequence_size(permutation); ++i)
             {
-                for (std::size_t j = i + 1; j < sequence_size(permutation); ++j)
+                for (xt::index_t j = i + 1; j < sequence_size(permutation); ++j)
                 {
                     if (permutation[i] == permutation[j])
                     {
@@ -784,7 +784,7 @@ namespace xt
         return detail::transpose_impl(std::forward<E>(e), std::move(perm), check_policy);
     }
 #else
-    template <class E, class I, std::size_t N, class Tag = check_policy::none>
+    template <class E, class I, xt::index_t N, class Tag = check_policy::none>
     inline auto transpose(E&& e, const I (&permutation)[N], Tag check_policy = Tag())
     {
         return detail::transpose_impl(std::forward<E>(e), permutation, check_policy);
@@ -818,9 +818,9 @@ namespace xt
                 compute_strides(m_e.shape(), DEFAULT_LAYOUT, m_strides);
             }
 
-            const reference operator[](std::size_t idx) const
+            const reference operator[](xt::index_t idx) const
             {
-                std::size_t quot;
+                xt::index_t quot;
                 for (size_type i = 0; i < m_strides.size(); ++i)
                 {
                     quot = idx / m_strides[i];
@@ -905,7 +905,7 @@ namespace xt
          * @param shape the shape
          */
         template <class... Args>
-        inline slice_vector(const dynamic_shape<std::size_t>& shape, Args... args)
+        inline slice_vector(const dynamic_shape<xt::index_t>& shape, Args... args)
         {
             m_shape = shape;
             append(args...);
@@ -982,8 +982,8 @@ namespace xt
 
     private:
 
-        dynamic_shape<std::size_t> m_shape;
-        std::size_t newaxis_count = 0;
+        dynamic_shape<xt::index_t> m_shape;
+        xt::index_t newaxis_count = 0;
     };
 
     namespace detail
@@ -995,7 +995,7 @@ namespace xt
         }
 
         template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline std::size_t get_offset(E&& e)
+        inline xt::index_t get_offset(E&& e)
         {
             return e.raw_data_offset();
         }
@@ -1013,15 +1013,15 @@ namespace xt
         }
 
         template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline std::size_t get_offset(E&& /*e*/)
+        inline xt::index_t get_offset(E&& /*e*/)
         {
-            return std::size_t(0);
+            return xt::index_t(0);
         }
 
         template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_strides(E&& e)
         {
-            dynamic_shape<std::size_t> strides;
+            dynamic_shape<xt::index_t> strides;
             strides.resize(e.shape().size());
             compute_strides(e.shape(), DEFAULT_LAYOUT, strides);
             return strides;
@@ -1049,7 +1049,7 @@ namespace xt
     inline auto dynamic_view(E&& e, S&& slices)
     {
         // Compute dimension
-        std::size_t dimension = e.dimension();
+        xt::index_t dimension = e.dimension();
 
         for (const auto& el : slices)
         {
@@ -1066,8 +1066,8 @@ namespace xt
         }
 
         // Compute strided view
-        std::size_t offset = detail::get_offset(e);
-        using shape_type = dynamic_shape<std::size_t>;
+        xt::index_t offset = detail::get_offset(e);
+        using shape_type = dynamic_shape<xt::index_t>;
 
         shape_type new_shape(dimension);
         shape_type new_strides(dimension);
@@ -1075,22 +1075,22 @@ namespace xt
         auto old_shape = e.shape();
         auto&& old_strides = detail::get_strides(e);
 
-        std::size_t i = 0;
-        std::size_t idx = 0;
-        std::size_t newaxis_skip = 0;
+        xt::index_t i = 0;
+        xt::index_t idx = 0;
+        xt::index_t newaxis_skip = 0;
 
         for (; i < slices.size(); ++i)
         {
             if (slices[i][0] >= 0)
             {
-                std::size_t slice0 = static_cast<std::size_t>(slices[i][0]);
+                xt::index_t slice0 = static_cast<xt::index_t>(slices[i][0]);
                 offset += slice0 * old_strides[i];
             }
 
             if (slices[i][1] != 0 && slices[i][2] != 0)
             {
-                std::size_t slice1 = static_cast<std::size_t>(slices[i][1]);
-                std::size_t slice2 = static_cast<std::size_t>(slices[i][2]);
+                xt::index_t slice1 = static_cast<xt::index_t>(slices[i][1]);
+                xt::index_t slice2 = static_cast<xt::index_t>(slices[i][2]);
                 new_shape[idx] = slice1;
                 new_strides[idx] = slice2 * old_strides[i - newaxis_skip];
                 ++idx;

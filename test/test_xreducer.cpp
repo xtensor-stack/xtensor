@@ -13,11 +13,11 @@
 #include "xtensor/xmath.hpp"
 #include "xtensor/xreducer.hpp"
 
-namespace xt
+namespace xt 
 {
     struct xreducer_features
     {
-        using axes_type = std::array<std::size_t, 2>;
+        using axes_type = std::array<xt::index_t, 2>;
         axes_type m_axes;
         xarray<double> m_a;
         using shape_type = xarray<double>::shape_type;
@@ -32,9 +32,9 @@ namespace xt
         : m_axes({1, 3}), m_a(ones<double>({3, 2, 4, 6, 5})),
           m_red(func(), m_a, m_axes)
     {
-        for (std::size_t i = 0; i < 2; ++i)
+        for (xt::index_t i = 0; i < 2; ++i)
         {
-            for (std::size_t j = 0; j < 6; ++j)
+            for (xt::index_t j = 0; j < 6; ++j)
             {
                 m_a(1, i, 1, j, 1) = 2;
             }
@@ -90,8 +90,8 @@ namespace xt
         auto iter = features.m_red.cbegin();
         auto iter_end = features.m_red.cend();
         const xreducer_features::shape_type& s = features.m_red.shape();
-        std::size_t nb_iter = 1;
-        nb_iter = std::accumulate(s.cbegin(), s.cend(), nb_iter, std::multiplies<std::size_t>());
+        xt::index_t nb_iter = 1;
+        nb_iter = std::accumulate(s.cbegin(), s.cend(), nb_iter, std::multiplies<xt::index_t>());
         std::advance(iter, nb_iter);
         EXPECT_EQ(iter_end, iter);
     }

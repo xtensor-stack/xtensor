@@ -58,7 +58,7 @@ namespace xt
     template <class F, class E, class X>
     auto reduce_immediate(F&& f, E&& e, X&& axes)
     {
-        using shape_type = dynamic_shape<std::size_t>;
+        using shape_type = dynamic_shape<xt::index_t>;
         using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
         using result_type = typename accumulate_functor::result_type;
 
@@ -89,7 +89,7 @@ namespace xt
         }
 
         // axis wise reductions:
-        for (std::size_t i = 0, idx = 0; i < e.dimension(); ++i)
+        for (xt::index_t i = 0, idx = 0; i < e.dimension(); ++i)
         {
             if (std::find(axes.begin(), axes.end(), i) == axes.end())
             {
@@ -101,10 +101,10 @@ namespace xt
 
         result.resize(result_shape, e.layout());
 
-        std::size_t ax_idx = (e.layout() == layout_type::row_major) ? axes.size() - 1 : 0;
-        std::size_t inner_loop_size = e.strides()[axes[ax_idx]];
-        std::size_t inner_stride    = e.strides()[axes[ax_idx]];
-        std::size_t outer_loop_size = e.shape()[axes[ax_idx]];
+        xt::index_t ax_idx = (e.layout() == layout_type::row_major) ? axes.size() - 1 : 0;
+        xt::index_t inner_loop_size = e.strides()[axes[ax_idx]];
+        xt::index_t inner_stride    = e.strides()[axes[ax_idx]];
+        xt::index_t outer_loop_size = e.shape()[axes[ax_idx]];
 
         // The following code merges reduction axes "at the end" (or the beginning for col_major)
         // together by increasing the size of the outer loop where appropriate
@@ -124,7 +124,7 @@ namespace xt
             return last_ax;
         };
 
-        for (std::size_t i = 0, idx = 0; i < e.dimension(); ++i)
+        for (xt::index_t i = 0, idx = 0; i < e.dimension(); ++i)
         {
             if (std::find(axes.begin(), axes.end(), i) == axes.end())
             {
@@ -136,7 +136,7 @@ namespace xt
 
         if (e.layout() == layout_type::row_major)
         {
-            std::size_t last_ax = merge_loops(axes.rbegin(), axes.rend());
+            xt::index_t last_ax = merge_loops(axes.rbegin(), axes.rend());
 
             iter_shape.erase(iter_shape.begin() + ptrdiff_t(last_ax), iter_shape.end());
             iter_strides.erase(iter_strides.begin() + ptrdiff_t(last_ax), iter_strides.end());
@@ -144,7 +144,7 @@ namespace xt
         else if (e.layout() == layout_type::column_major)
         {
             // we got column_major here
-            std::size_t last_ax = merge_loops(axes.begin(), axes.end());
+            xt::index_t last_ax = merge_loops(axes.begin(), axes.end());
 
             // erasing the front vs the back
             iter_shape.erase(iter_shape.begin(), iter_shape.begin() + ptrdiff_t(last_ax + 1));
@@ -162,7 +162,7 @@ namespace xt
         xindex temp_idx(iter_shape.size());
         auto next_idx = [&iter_shape, &iter_strides, &temp_idx]()
         {
-            std::size_t i = iter_shape.size();
+            xt::index_t i = iter_shape.size();
             for (; i > 0; --i)
             {
                 if (ptrdiff_t(temp_idx[i - 1]) >= ptrdiff_t(iter_shape[i - 1]) - 1)
@@ -241,7 +241,7 @@ namespace xt
                 );
 
                 begin += inner_stride;
-                for (std::size_t i = 1; i < outer_loop_size; ++i)
+                for (xt::index_t i = 1; i < outer_loop_size; ++i)
                 {
                     std::transform(out, out + inner_loop_size, begin, out, acc_fct);
                     begin += inner_stride;
@@ -703,7 +703,7 @@ namespace xt
     template <class... Args>
     inline auto xreducer<F, CT, X>::operator()(Args... args) const -> const_reference
     {
-        std::array<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
+        std::array<xt::index_t, sizeof...(Args)> arg_array = {{static_cast<xt::index_t>(args)...}};
         return element(arg_array.cbegin(), arg_array.cend());
     }
 
@@ -766,7 +766,7 @@ namespace xt
         size_type dim = 0;
         while (first != last)
         {
-            stepper.step(dim++, std::size_t(*first++));
+            stepper.step(dim++, xt::index_t(*first++));
         }
         return *stepper;
     }

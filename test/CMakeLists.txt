@@ -23,8 +23,8 @@ include(CheckCXXCompilerFlag)
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable")
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
+    # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable")
     #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion")
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
 
@@ -82,7 +82,7 @@ set(XTENSOR_TESTS
     main.cpp
     test_common.hpp
     test_xaccumulator.cpp
-    test_xadapt.cpp
+    # test_xadapt.cpp
     test_xadaptor_semantic.cpp
     test_xarray.cpp
     test_xarray_adaptor.cpp
@@ -102,7 +102,7 @@ set(XTENSOR_TESTS
     test_xindex_view.cpp
     test_xinfo.cpp
     test_xiterator.cpp
-    test_xio.cpp
+    # test_xio.cpp
     test_xlayout.cpp
     test_xmath.cpp
     test_xnoalias.cpp
@@ -127,7 +127,7 @@ set(XTENSOR_TESTS
     test_xtensor_semantic.cpp
     test_xvectorize.cpp
     test_xview.cpp
-    test_xview_semantic.cpp
+    # test_xview_semantic.cpp
     test_xutils.cpp
 )
 

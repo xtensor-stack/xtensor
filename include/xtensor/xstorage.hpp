@@ -539,7 +539,7 @@ namespace xt
      * svector implementation *
      **************************/
 
-    template <class T, std::size_t N, class A = std::allocator<T>, bool Init = true>
+    template <class T, xt::index_t N, class A = std::allocator<T>, bool Init = true>
     class svector
     {
     public:
@@ -630,7 +630,7 @@ namespace xt
 
         iterator insert(const_iterator it, const T& elt);
 
-        template <std::size_t ON, class OA, bool InitA>
+        template <xt::index_t ON, class OA, bool InitA>
         void swap(svector<T, ON, OA, InitA>& rhs);
 
         allocator_type get_allocator() const noexcept;
@@ -650,28 +650,28 @@ namespace xt
         void destroy_range(T* begin, T* end);
     };
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::~svector()
     {
         if (!on_stack())
         {
-            detail::safe_destroy_deallocate(m_allocator, m_begin, static_cast<std::size_t>(m_capacity - m_begin));
+            detail::safe_destroy_deallocate(m_allocator, m_begin, static_cast<xt::index_t>(m_capacity - m_begin));
         }
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector() noexcept
         : svector(allocator_type())
     {
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(const allocator_type& alloc) noexcept
         : m_allocator(alloc)
     {
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(size_type n, const allocator_type& alloc)
         : m_allocator(alloc)
     {
@@ -685,7 +685,7 @@ namespace xt
         }
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     template <class IT, class>
     inline svector<T, N, A, Init>::svector(IT begin, IT end, const allocator_type& alloc)
         : m_allocator(alloc)
@@ -693,41 +693,41 @@ namespace xt
         assign(begin, end);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(const std::vector<T>& vec)
     {
         assign(vec.begin(), vec.end());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(size_type n, const value_type& v, const allocator_type& alloc)
         : m_allocator(alloc)
     {
         assign(n, v);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(std::initializer_list<T> il, const allocator_type& alloc)
         : m_allocator(alloc)
     {
         assign(il.begin(), il.end());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const svector& rhs)
     {
         assign(rhs.begin(), rhs.end());
         return *this;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(svector&& rhs)
     {
         assign(rhs.begin(), rhs.end());
         return *this;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(std::vector<T>& rhs)
     {
         if (this != &rhs)
@@ -738,20 +738,20 @@ namespace xt
         return *this;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(const svector& rhs)
         : m_allocator(std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator()))
     {
         assign(rhs.begin(), rhs.end());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(svector&& rhs)
     {
         this->swap(rhs);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::assign(size_type n, const value_type& v)
     {
         if (n > N)
@@ -762,18 +762,18 @@ namespace xt
         std::fill(begin(), end(), v);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     template <class V>
     inline void svector<T, N, A, Init>::assign(std::initializer_list<V> il)
     {
         assign(il.begin(), il.end());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     template <class IT>
     inline void svector<T, N, A, Init>::assign(IT other_begin, IT other_end)
     {
-        std::size_t size = static_cast<std::size_t>(other_end - other_begin);
+        xt::index_t size = static_cast<xt::index_t>(other_end - other_begin);
         if (size > N)
         {
             grow(size);
@@ -782,31 +782,31 @@ namespace xt
         m_end = m_begin + size;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::operator[](size_type idx) -> reference
     {
         return m_begin[idx];
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::operator[](size_type idx) const -> const_reference
     {
         return m_begin[idx];
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::data() -> pointer
     {
         return m_begin;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::data() const -> const_pointer
     {
         return m_begin;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     void svector<T, N, A, Init>::resize(size_type n)
     {
         if (n > N)
@@ -820,13 +820,13 @@ namespace xt
         }
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::capacity() const -> size_type
     {
-        return static_cast<std::size_t>(m_capacity - m_begin);
+        return static_cast<xt::index_t>(m_capacity - m_begin);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     void svector<T, N, A, Init>::push_back(const T& elt)
     {
         if (m_end >= m_capacity)
@@ -836,137 +836,137 @@ namespace xt
         *(m_end++) = elt;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     void svector<T, N, A, Init>::pop_back()
     {
         --m_end;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::begin() -> iterator
     {
         return m_begin;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::begin() const -> const_iterator
     {
         return m_begin;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::cbegin() const -> const_iterator
     {
         return m_begin;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::end() -> iterator
     {
         return m_end;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::end() const -> const_iterator
     {
         return m_end;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::cend() const -> const_iterator
     {
         return m_end;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::rbegin() -> reverse_iterator
     {
         return reverse_iterator(m_end);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::rbegin() const -> const_reverse_iterator
     {
         return const_reverse_iterator(m_end);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::crbegin() const -> const_reverse_iterator
     {
         return const_reverse_iterator(m_end);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::rend() -> reverse_iterator
     {
         return reverse_iterator(m_begin);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::rend() const -> const_reverse_iterator
     {
         return const_reverse_iterator(m_begin);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::crend() const -> const_reverse_iterator
     {
         return const_reverse_iterator(m_begin);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::size() const -> size_type
     {
         return static_cast<size_type>(m_end - m_begin);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::empty() const -> bool
     {
         return m_begin == m_end;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::front() -> reference
     {
         XTENSOR_ASSERT(!empty());
         return m_begin[0];
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::front() const -> const_reference
     {
         XTENSOR_ASSERT(!empty());
         return m_begin[0];
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::back() -> reference
     {
         XTENSOR_ASSERT(!empty());
         return m_end[-1];
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::back() const -> const_reference
     {
         XTENSOR_ASSERT(!empty());
         return m_end[-1];
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::on_stack() -> bool
     {
         return m_begin == &m_data[0];
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::get_allocator() const noexcept -> allocator_type
     {
         return m_allocator;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::erase(const_iterator cit) -> iterator
     {
         auto it = const_cast<pointer>(cit);
@@ -976,7 +976,7 @@ namespace xt
         return ret_val;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::erase(const_iterator cfirst, const_iterator clast) -> iterator
     {
         auto first = const_cast<pointer>(cfirst);
@@ -992,7 +992,7 @@ namespace xt
         return first;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::insert(const_iterator cit, const T& elt) -> iterator
     {
         auto it = const_cast<pointer>(cit);
@@ -1023,7 +1023,7 @@ namespace xt
         return it;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::destroy_range(T* begin, T* end)
     {
         if (!xtrivially_default_constructible<T>::value)
@@ -1036,8 +1036,8 @@ namespace xt
         }
     }
 
-    template <class T, std::size_t N, class A, bool Init>
-    template <std::size_t ON, class OA, bool InitA>
+    template <class T, xt::index_t N, class A, bool Init>
+    template <xt::index_t ON, class OA, bool InitA>
     inline void svector<T, N, A, Init>::swap(svector<T, ON, OA, InitA>& rhs)
     {
         if (this == &rhs)
@@ -1085,7 +1085,7 @@ namespace xt
         }
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::grow(size_type min_capacity)
     {
         size_type current_size = size();
@@ -1114,56 +1114,56 @@ namespace xt
         m_capacity = new_alloc + new_capacity;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator==(const std::vector<T>& lhs, const svector<T, N, A, Init>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator==(const svector<T, N, A, Init>& lhs, const std::vector<T>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator==(const svector<T, N, A, Init>& lhs, const svector<T, N, A, Init>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator!=(const svector<T, N, A, Init>& lhs, const svector<T, N, A, Init>& rhs)
     {
         return !(lhs == rhs);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator<(const svector<T, N, A, Init>& lhs, const svector<T, N, A, Init>& rhs)
     {
         return std::lexicographical_compare(lhs.begin(), lhs.end(),
                                             rhs.begin(), rhs.end());
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator<=(const svector<T, N, A, Init>& lhs, const svector<T, N, A, Init>& rhs)
     {
         return !(lhs > rhs);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator>(const svector<T, N, A, Init>& lhs, const svector<T, N, A, Init>& rhs)
     {
         return rhs < lhs;
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline bool operator>=(const svector<T, N, A, Init>& lhs, const svector<T, N, A, Init>& rhs)
     {
         return !(lhs < rhs);
     }
 
-    template <class T, std::size_t N, class A, bool Init>
+    template <class T, xt::index_t N, class A, bool Init>
     inline void swap(svector<T, N, A, Init>& lhs, svector<T, N, A, Init>& rhs) noexcept
     {
         lhs.swap(rhs);

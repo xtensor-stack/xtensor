@@ -60,21 +60,21 @@ namespace xt
         auto randn(std::initializer_list<I>, T mean = 0, T std_dev = 1,
                    E& engine = random::get_default_random_engine());
 #else
-        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        template <class T, class I, xt::index_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
                   E& engine = random::get_default_random_engine());
 
-        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        template <class T, class I, xt::index_t L, class E = random::default_engine_type>
         auto randint(const I (&shape)[L], T lower = 0, T upper = std::numeric_limits<T>::max(),
                      E& engine = random::get_default_random_engine());
 
-        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        template <class T, class I, xt::index_t L, class E = random::default_engine_type>
         auto randn(const I (&shape)[L], T mean = 0, T std_dev = 1,
                    E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
-        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n,
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, xt::index_t n,
                                                   E& engine = random::get_default_random_engine());
     }
 
@@ -207,21 +207,21 @@ namespace xt
             return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
         }
 #else
-        template <class T, class I, std::size_t L, class E>
+        template <class T, class I, xt::index_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
         {
             std::uniform_real_distribution<T> dist(lower, upper);
             return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
         }
 
-        template <class T, class I, std::size_t L, class E>
+        template <class T, class I, xt::index_t L, class E>
         inline auto randint(const I (&shape)[L], T lower, T upper, E& engine)
         {
             std::uniform_int_distribution<T> dist(lower, upper - 1);
             return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
         }
 
-        template <class T, class I, std::size_t L, class E>
+        template <class T, class I, xt::index_t L, class E>
         inline auto randn(const I (&shape)[L], T mean, T std_dev, E& engine)
         {
             std::normal_distribution<T> dist(mean, std_dev);
@@ -240,7 +240,7 @@ namespace xt
          * @return xtensor containing 1D container of sampled elements
          */
         template <class T, class E>
-        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, E& engine)
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, xt::index_t n, E& engine)
         {
             const auto& de = e.derived_cast();
             XTENSOR_ASSERT(de.dimension() == 1);

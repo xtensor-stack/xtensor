@@ -40,11 +40,11 @@ namespace xt
 
         {
             SCOPED_TRACE("from shape");
-            std::array<std::size_t, 3> shp = {5, 4, 2};
-            std::vector<std::size_t> shp_as_vec = {5, 4, 2};
+            std::array<xt::index_t, 3> shp = {5, 4, 2};
+            std::vector<xt::index_t> shp_as_vec = {5, 4, 2};
             auto ca = cm_opt_ass_type::from_shape({3, 2, 1});
             auto cb = cm_opt_ass_type::from_shape(shp);
-            std::vector<std::size_t> expected_shape = {3, 2, 1};
+            std::vector<xt::index_t> expected_shape = {3, 2, 1};
             EXPECT_EQ(expected_shape, ca.shape());
             EXPECT_EQ(shp_as_vec, cb.shape());
         }
@@ -227,7 +227,7 @@ namespace xt
     {
         using opt = xtl::xoptional<int>;
         opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
-        std::vector<std::size_t> v0({0, 0}), v1({0, 1}), v2({1, 0}), v3({1, 1});
+        std::vector<xt::index_t> v0({0, 0}), v1({0, 1}), v2({1, 0}), v3({1, 1});
         EXPECT_EQ(a.element(v0.begin(), v0.end()), opt(1, true));
         EXPECT_EQ(a.element(v1.begin(), v1.end()), opt(2, false));
         EXPECT_EQ(a.element(v2.begin(), v2.end()), opt(3, false));
@@ -304,7 +304,7 @@ namespace xt
             EXPECT_EQ(vec[1], rma(0, 1));
             EXPECT_EQ(vec[2], rma(1, 0));
             EXPECT_EQ(vec[3], rma(1, 1));
-            EXPECT_EQ(vec.size(), std::size_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>())));
+            EXPECT_EQ(vec.size(), xt::index_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>())));
         }
 
         {
@@ -315,7 +315,7 @@ namespace xt
             EXPECT_EQ(vec[1], cma(1, 0));
             EXPECT_EQ(vec[2], cma(0, 1));
             EXPECT_EQ(vec[3], cma(1, 1));
-            EXPECT_EQ(vec.size(), std::size_t(std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>())));
+            EXPECT_EQ(vec.size(), xt::index_t(std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>())));
         }
     }
 
