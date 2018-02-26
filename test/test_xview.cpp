@@ -10,6 +10,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
+#include "xtensor/xstrided_view.hpp"
 #include <algorithm>
 
 namespace xt
@@ -655,5 +656,20 @@ namespace xt
         bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::size_t, 1>&>::value;
         EXPECT_TRUE(cond1);
         EXPECT_TRUE(cond2);
+    }
+
+    TEST(xview, transpose)
+    {
+        xt::xarray<int> vector = xt::linspace(1, 10, 10);
+        auto matrix = xt::view(vector, xt::all(), xt::newaxis());
+        auto mt = xt::transpose(matrix);
+        EXPECT_EQ(mt.shape(), std::vector<std::size_t>({1, 10}));
+        EXPECT_EQ(mt.strides(), std::vector<std::size_t>({0, 1}));
+        int sum = 0;
+        for (std::size_t i = 0; i < vector.size(); ++i)
+        {
+            sum += mt(0, i);
+        }
+        EXPECT_EQ(55, sum);
     }
 }
