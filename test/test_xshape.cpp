@@ -127,7 +127,7 @@ namespace xt
     TEST(xshape, fixed)
     {
         fixed_shape<3, 4, 5> af;
-        const_array<std::size_t, 3> a = af;
+        detail::array<std::size_t, 3> a = af;
         EXPECT_EQ(a[0], 3);
         EXPECT_EQ(a[2], 5);
         EXPECT_EQ(a.back(), 5);

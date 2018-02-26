@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "xcontainer.hpp"
+#include "xstorage.hpp"
 #include "xsemantic.hpp"
 
 #ifdef _MSC_VER
@@ -31,94 +32,12 @@
 
 namespace xt
 {
-
-    // Fixed shape
-    template <class T, std::size_t N>
-    struct const_array
-    {
-        using size_type = std::size_t;
-        using value_type = T;
-        using pointer = value_type*;
-        using const_pointer = const value_type*;
-        using reference = value_type&;
-        using const_reference = const value_type&;
-
-        using iterator = pointer;
-        using const_iterator = const_pointer;
-
-        using reverse_iterator = std::reverse_iterator<const_iterator>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
-
-        constexpr const_reference operator[](std::size_t idx) const
-        {
-            return m_data[idx];
-        }
-
-        constexpr const_iterator begin() const
-        {
-            return cbegin();
-        }
-
-        constexpr const_iterator end() const
-        {
-            return cend();
-        }
-
-        constexpr const_iterator cbegin() const
-        {
-            return m_data;
-        }
-
-        constexpr const_iterator cend() const
-        {
-            return m_data + N;
-        }
-
-        // TODO make constexpr once C++17 arrives
-        reverse_iterator rbegin() const
-        {
-            return crbegin();
-        }
-
-        reverse_iterator rend() const
-        {
-            return crend();
-        }
-
-        const_reverse_iterator crbegin() const
-        {
-            return const_reverse_iterator(end());
-        }
-
-        const_reverse_iterator crend() const
-        {
-            return const_reverse_iterator(begin());
-        }
-
-        constexpr const_reference front() const
-        {
-            return m_data[0];
-        }
-
-        constexpr const_reference back() const
-        {
-            return m_data[size() - 1];
-        }
-
-        constexpr size_type size() const
-        {
-            return N;
-        }
-
-        const T m_data[N ? N : 1];
-    };
-
     template <std::size_t... X>
     class fixed_shape
     {
     public:
 
-        using cast_type = const_array<std::size_t, sizeof...(X)>;
+        using cast_type = detail::array<std::size_t, sizeof...(X)>;
 
         constexpr static std::size_t size()
         {
@@ -139,7 +58,7 @@ namespace xt
 namespace std
 {
     template <class T, size_t N>
-    class tuple_size<xt::const_array<T, N>> :
+    class tuple_size<xt::detail::array<T, N>> :
         public integral_constant<size_t, N>
     {
     };
@@ -150,9 +69,9 @@ namespace xtl
     namespace detail
     {
         template <class T, std::size_t N>
-        struct sequence_builder<xt::const_array<T, N>>
+        struct sequence_builder<xt::detail::array<T, N>>
         {
-            using sequence_type = xt::const_array<T, N>;
+            using sequence_type = xt::detail::array<T, N>;
             using value_type = typename sequence_type::value_type;
             using size_type = typename sequence_type::size_type;
 
@@ -264,7 +183,7 @@ namespace xt
         };
 
         template <layout_type L, std::size_t... X, std::size_t... I>
-        constexpr xt::const_array<std::size_t, sizeof...(X)>
+        constexpr xt::detail::array<std::size_t, sizeof...(X)>
         get_strides_impl(const xt::fixed_shape<X...>& /*shape*/, std::index_sequence<I...>)
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
@@ -304,7 +223,7 @@ namespace xt
     }
 
     template <layout_type L, std::size_t... X>
-    constexpr const_array<std::size_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape)
+    constexpr detail::array<std::size_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape)
     {
         return detail::get_strides_impl<L>(shape, std::make_index_sequence<sizeof...(X)>{});
     }
@@ -326,7 +245,7 @@ namespace xt
         using shape_type = std::array<typename inner_shape_type::value_type,
                                       std::tuple_size<inner_shape_type>::value>;
         using strides_type = shape_type;
-        using container_type = std::array<ET, detail::compute_size<S>::value>;
+        using container_type = detail::array<ET, detail::compute_size<S>::value>;
         using temporary_type = xfixed_container<ET, S, L, Tag>;
         static constexpr layout_type layout = L;
     };
