@@ -27,12 +27,12 @@
 #endif
 
 #ifndef DEFAULT_INDEX_TYPE
-#define INDEX_T ptrdiff_t
+#define DEFAULT_INDEX_TYPE ptrdiff_t
 #endif
 
 namespace xt
 {
-	using index_t = INDEX_T;
+	using index_t = DEFAULT_INDEX_TYPE;
 }
 
 #ifndef DEFAULT_SHAPE_CONTAINER

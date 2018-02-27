@@ -25,7 +25,7 @@ namespace xt
         using value_type = typename E::value_type;
         const auto de = e.derived_cast();
         E ev;
-        ev.resize({ de.size() });
+        ev.resize({ static_cast<xt::index_t>(de.size()) });
 
         std::copy(de.begin(), de.end(), ev.begin());
         std::sort(ev.begin(), ev.end());

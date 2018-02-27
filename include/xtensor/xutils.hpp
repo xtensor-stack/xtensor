@@ -64,7 +64,7 @@ namespace xt
     template <class C>
     bool resize_container(C& c, typename C::size_type size);
 
-    template <class T, xt::index_t N>
+    template <class T, std::size_t N>
     bool resize_container(std::array<T, N>& a, typename std::array<T, N>::size_type size);
 
     // gcc 4.9 is affected by C++14 defect CGW 1558

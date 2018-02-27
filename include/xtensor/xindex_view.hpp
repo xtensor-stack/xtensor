@@ -236,7 +236,7 @@ namespace xt
     template <class CT, class I>
     template <class I2>
     inline xindex_view<CT, I>::xindex_view(CT e, I2&& indices) noexcept
-        : m_e(e), m_indices(std::forward<I2>(indices)), m_shape({m_indices.size()})
+        : m_e(e), m_indices(std::forward<I2>(indices)), m_shape({static_cast<xt::index_t>(m_indices.size())})
     {
     }
     //@}
