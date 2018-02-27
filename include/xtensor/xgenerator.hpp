@@ -25,6 +25,44 @@
 
 namespace xt
 {
+    namespace detail
+    {
+        /**
+         * Generator Functor Base implementation
+         * Stores a shape and the required functions
+         */
+        template <class S>
+        class generator_functor_base 
+        {
+        public:
+            using shape_type = S;
+
+            template <class IS>
+            generator_functor_base(IS&& s)
+                : m_shape(std::forward<IS>(s))
+            {
+            }
+
+            inline const S& shape() const
+            {
+                return m_shape;
+            }
+
+            inline std::size_t dimension() const
+            {
+                return m_shape.size();
+            }
+
+            template <class OS>
+            inline bool broadcast_shape(OS& shape) const
+            {
+                return xt::broadcast_shape(m_shape, shape);
+            }
+
+        private:
+            S m_shape;
+        };
+    }
 
     /**************
      * xgenerator *

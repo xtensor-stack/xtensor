@@ -80,13 +80,16 @@ namespace xt
 
     namespace detail
     {
-        template <class T>
+        template <class T, class S>
         struct random_impl
+            : public detail::generator_functor_base<S>
         {
             using value_type = T;
+            using base_type = detail::generator_functor_base<S>;
 
-            random_impl(std::function<value_type()>&& generator)
-                : m_generator(std::move(generator))
+            template <class ST>
+            random_impl(std::function<value_type()>&& generator, ST&& shape)
+                : m_generator(std::move(generator)), base_type(std::forward<ST>(shape))
             {
             }
 
@@ -143,7 +146,7 @@ namespace xt
         inline auto rand(const S& shape, T lower, T upper, E& engine)
         {
             std::uniform_real_distribution<T> dist(lower, upper);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            return detail::make_xgenerator(detail::random_impl<T, S>(std::bind(dist, std::ref(engine)), shape));
         }
 
         /**
@@ -162,7 +165,7 @@ namespace xt
         inline auto randint(const S& shape, T lower, T upper, E& engine)
         {
             std::uniform_int_distribution<T> dist(lower, upper - 1);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            return detail::make_xgenerator(detail::random_impl<T, S>(std::bind(dist, std::ref(engine)), shape));
         }
 
         /**
@@ -182,7 +185,7 @@ namespace xt
         inline auto randn(const S& shape, T mean, T std_dev, E& engine)
         {
             std::normal_distribution<T> dist(mean, std_dev);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            return detail::make_xgenerator(detail::random_impl<T, S>(std::bind(dist, std::ref(engine)), shape));
         }
 
 #ifdef X_OLD_CLANG
@@ -190,42 +193,45 @@ namespace xt
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
         {
             std::uniform_real_distribution<T> dist(lower, upper);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            return detail::make_xgenerator(detail::random_impl<T, dynamic_shape<std::size_t>>(std::bind(dist, std::ref(engine)), shape));
         }
 
         template <class T, class I, class E>
         inline auto randint(std::initializer_list<I> shape, T lower, T upper, E& engine)
         {
             std::uniform_int_distribution<T> dist(lower, upper - 1);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            return detail::make_xgenerator(detail::random_impl<T, dynamic_shape<std::size_t>>(std::bind(dist, std::ref(engine)), shape));
         }
 
         template <class T, class I, class E>
         inline auto randn(std::initializer_list<I> shape, T mean, T std_dev, E& engine)
         {
             std::normal_distribution<T> dist(mean, std_dev);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            return detail::make_xgenerator(detail::random_impl<T, dynamic_shape<std::size_t>>(std::bind(dist, std::ref(engine)), shape));
         }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
         {
             std::uniform_real_distribution<T> dist(lower, upper);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            using shape_type = std::array<std::size_t, L>;
+            return detail::make_xgenerator(detail::random_impl<T, shape_type>(std::bind(dist, std::ref(engine)), shape));
         }
 
         template <class T, class I, std::size_t L, class E>
         inline auto randint(const I (&shape)[L], T lower, T upper, E& engine)
         {
             std::uniform_int_distribution<T> dist(lower, upper - 1);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            using shape_type = std::array<std::size_t, L>;
+            return detail::make_xgenerator(detail::random_impl<T, shape_type>(std::bind(dist, std::ref(engine)), shape));
         }
 
         template <class T, class I, std::size_t L, class E>
         inline auto randn(const I (&shape)[L], T mean, T std_dev, E& engine)
         {
             std::normal_distribution<T> dist(mean, std_dev);
-            return detail::make_xgenerator(detail::random_impl<T>(std::bind(dist, std::ref(engine))), shape);
+            using shape_type = std::array<std::size_t, L>;
+            return detail::make_xgenerator(detail::random_impl<T, shape_type>(std::bind(dist, std::ref(engine)), shape));
         }
 #endif
 

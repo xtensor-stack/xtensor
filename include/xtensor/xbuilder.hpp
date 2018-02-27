@@ -94,39 +94,6 @@ namespace xt
 
     namespace detail
     {
-
-        template <class S>
-        class generator_functor_base 
-        {
-        public:
-            using shape_type = S;
-
-            template <class IS>
-            generator_functor_base(IS&& s)
-                : m_shape(std::forward<IS>(s))
-            {
-            }
-
-            inline const S& shape() const
-            {
-                return m_shape;
-            }
-
-            inline std::size_t dimension() const
-            {
-                return m_shape.size();
-            }
-
-            template <class OS>
-            inline bool broadcast_shape(OS& shape) const
-            {
-                return xt::broadcast_shape(m_shape, shape);
-            }
-
-        private:
-            S m_shape;
-        };
-
         // to implement blitz index placeholders
         // see 3.6: Index placeholders
         // http://dsec.pku.edu.cn/~mendl/blitz/manual/blitz03.html
