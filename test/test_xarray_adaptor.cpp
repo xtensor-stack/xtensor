@@ -166,7 +166,7 @@ namespace xt
     TEST(xarray_adaptor, adapt_std_array)
     {
         std::array<double, 9> a = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        xt::xarray_adaptor<decltype(a)> ad(a, xt::dynamic_shape<std::size_t>{3, 3});
+        xt::xarray_adaptor<decltype(a)> ad(a, xt::dynamic_shape<xt::index_t>{3, 3});
         EXPECT_EQ(ad(1, 1), 5.);
         ad = ad * 2;
         EXPECT_EQ(ad(1, 1), 10.);

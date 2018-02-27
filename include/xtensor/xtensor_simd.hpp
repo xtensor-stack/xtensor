@@ -108,7 +108,7 @@ namespace xsimd
     }
 
     template <class T>
-    inline std::size_t get_alignment_offset(const T* /*p*/, std::size_t size, std::size_t /*block_size*/)
+    inline xt::index_t get_alignment_offset(const T* /*p*/, xt::index_t size, xt::index_t /*block_size*/)
     {
         return size;
     }

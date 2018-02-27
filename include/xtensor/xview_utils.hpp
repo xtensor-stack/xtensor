@@ -22,33 +22,33 @@ namespace xt
 
     // number of integral types in the specified sequence of types
     template <class... S>
-    constexpr std::size_t integral_count();
+    constexpr xt::index_t integral_count();
 
     // number of integral types in the specified sequence of types before specified index
     template <class... S>
-    constexpr std::size_t integral_count_before(std::size_t i);
+    constexpr xt::index_t integral_count_before(xt::index_t i);
 
     // index in the specified sequence of types of the ith non-integral type
     template <class... S>
-    constexpr std::size_t integral_skip(std::size_t i);
+    constexpr xt::index_t integral_skip(xt::index_t i);
 
     // number of newaxis types in the specified sequence of types
     template <class... S>
-    constexpr std::size_t newaxis_count();
+    constexpr xt::index_t newaxis_count();
 
     // number of newaxis types in the specified sequence of types before specified index
     template <class... S>
-    constexpr std::size_t newaxis_count_before(std::size_t i);
+    constexpr xt::index_t newaxis_count_before(xt::index_t i);
 
     // index in the specified sequence of types of the ith non-newaxis type
     template <class... S>
-    constexpr std::size_t newaxis_skip(std::size_t i);
+    constexpr xt::index_t newaxis_skip(xt::index_t i);
 
     // return slice evaluation and increment iterator
     template <class S, class It>
-    inline disable_xslice<S, std::size_t> get_slice_value(const S& s, It&) noexcept
+    inline disable_xslice<S, xt::index_t> get_slice_value(const S& s, It&) noexcept
     {
-        return static_cast<std::size_t>(s);
+        return static_cast<xt::index_t>(s);
     }
 
     template <class S, class It>
@@ -99,7 +99,7 @@ namespace xt
         template <class T, class... S>
         struct integral_count_impl
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr xt::index_t count(xt::index_t i) noexcept
             {
                 return i ? (integral_count_impl<S...>::count(i - 1) + (std::is_integral<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
             }
@@ -108,7 +108,7 @@ namespace xt
         template <>
         struct integral_count_impl<void>
         {
-            static constexpr std::size_t count(std::size_t /*i*/) noexcept
+            static constexpr xt::index_t count(xt::index_t /*i*/) noexcept
             {
                 return 0;
             }
@@ -116,13 +116,13 @@ namespace xt
     }
 
     template <class... S>
-    constexpr std::size_t integral_count()
+    constexpr xt::index_t integral_count()
     {
         return detail::integral_count_impl<S..., void>::count(sizeof...(S));
     }
 
     template <class... S>
-    constexpr std::size_t integral_count_before(std::size_t i)
+    constexpr xt::index_t integral_count_before(xt::index_t i)
     {
         return detail::integral_count_impl<S..., void>::count(i);
     }
@@ -146,7 +146,7 @@ namespace xt
         template <class T, class... S>
         struct newaxis_count_impl
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr xt::index_t count(xt::index_t i) noexcept
             {
                 return i ? (newaxis_count_impl<S...>::count(i - 1) + (is_newaxis<std::remove_reference_t<T>>::value ? 1 : 0)) : 0;
             }
@@ -155,7 +155,7 @@ namespace xt
         template <>
         struct newaxis_count_impl<void>
         {
-            static constexpr std::size_t count(std::size_t /*i*/) noexcept
+            static constexpr xt::index_t count(xt::index_t /*i*/) noexcept
             {
                 return 0;
             }
@@ -163,13 +163,13 @@ namespace xt
     }
 
     template <class... S>
-    constexpr std::size_t newaxis_count()
+    constexpr xt::index_t newaxis_count()
     {
         return detail::newaxis_count_impl<S..., void>::count(sizeof...(S));
     }
 
     template <class... S>
-    constexpr std::size_t newaxis_count_before(std::size_t i)
+    constexpr xt::index_t newaxis_count_before(xt::index_t i)
     {
         return detail::newaxis_count_impl<S..., void>::count(i);
     }
@@ -184,14 +184,14 @@ namespace xt
         template <class T, class... S>
         struct integral_skip_impl
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr xt::index_t count(xt::index_t i) noexcept
             {
                 return i == 0 ? count_impl() : count_impl(i);
             }
 
         private:
 
-            static constexpr std::size_t count_impl(std::size_t i) noexcept
+            static constexpr xt::index_t count_impl(xt::index_t i) noexcept
             {
                 return 1 + (
                     std::is_integral<std::remove_reference_t<T>>::value ?
@@ -200,7 +200,7 @@ namespace xt
                     );
             }
 
-            static constexpr std::size_t count_impl() noexcept
+            static constexpr xt::index_t count_impl() noexcept
             {
                 return std::is_integral<std::remove_reference_t<T>>::value ? 1 + integral_skip_impl<S...>::count(0) : 0;
             }
@@ -209,7 +209,7 @@ namespace xt
         template <>
         struct integral_skip_impl<void>
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr xt::index_t count(xt::index_t i) noexcept
             {
                 return i;
             }
@@ -217,7 +217,7 @@ namespace xt
     }
 
     template <class... S>
-    constexpr std::size_t integral_skip(std::size_t i)
+    constexpr xt::index_t integral_skip(xt::index_t i)
     {
         return detail::integral_skip_impl<S..., void>::count(i);
     }
@@ -232,14 +232,14 @@ namespace xt
         template <class T, class... S>
         struct newaxis_skip_impl
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr xt::index_t count(xt::index_t i) noexcept
             {
                 return i == 0 ? count_impl() : count_impl(i);
             }
 
         private:
 
-            static constexpr std::size_t count_impl(std::size_t i) noexcept
+            static constexpr xt::index_t count_impl(xt::index_t i) noexcept
             {
                 return 1 + (
                     is_newaxis<std::remove_reference_t<T>>::value ?
@@ -248,7 +248,7 @@ namespace xt
                     );
             }
 
-            static constexpr std::size_t count_impl() noexcept
+            static constexpr xt::index_t count_impl() noexcept
             {
                 return is_newaxis<std::remove_reference_t<T>>::value ? 1 + newaxis_skip_impl<S...>::count(0) : 0;
             }
@@ -257,7 +257,7 @@ namespace xt
         template <>
         struct newaxis_skip_impl<void>
         {
-            static constexpr std::size_t count(std::size_t i) noexcept
+            static constexpr xt::index_t count(xt::index_t i) noexcept
             {
                 return i;
             }
@@ -265,7 +265,7 @@ namespace xt
     }
 
     template <class... S>
-    constexpr std::size_t newaxis_skip(std::size_t i)
+    constexpr xt::index_t newaxis_skip(xt::index_t i)
     {
         return detail::newaxis_skip_impl<S..., void>::count(i);
     }

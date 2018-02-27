@@ -25,7 +25,7 @@ namespace xt
         using value_type = typename E::value_type;
         const auto de = e.derived_cast();
         E ev;
-        ev.resize({ de.size() });
+        ev.resize({ static_cast<xt::index_t>(de.size()) });
 
         std::copy(de.begin(), de.end(), ev.begin());
         std::sort(ev.begin(), ev.end());
@@ -39,31 +39,31 @@ namespace xt
         void call_over_leading_axis(E& ev, F&& fct)
         {
             using value_type = typename E::value_type;
-            std::size_t n_iters = 1;
+            xt::index_t n_iters = 1;
             ptrdiff_t secondary_stride;
             if (ev.layout() == layout_type::row_major)
             {
                 n_iters = std::accumulate(ev.shape().begin(), ev.shape().end() - 1,
-                                          std::size_t(1), std::multiplies<>());
+                                          xt::index_t(1), std::multiplies<>());
                 secondary_stride = static_cast<ptrdiff_t>(ev.strides()[ev.dimension() - 2]);
             }
             else
             {
                 n_iters = std::accumulate(ev.shape().begin() + 1, ev.shape().end(),
-                                          std::size_t(1), std::multiplies<>());
+                                          xt::index_t(1), std::multiplies<>());
                 secondary_stride = static_cast<ptrdiff_t>(ev.strides()[1]);
             }
 
             ptrdiff_t offset = 0;
 
-            for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
+            for (xt::index_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
                 fct(ev.raw_data() + offset, ev.raw_data() + offset + secondary_stride);
             }
         }
 
         template <class E>
-        inline std::size_t leading_axis(const E& e)
+        inline xt::index_t leading_axis(const E& e)
         {
             if (e.layout() == layout_type::row_major)
             {
@@ -88,7 +88,7 @@ namespace xt
      * @return sorted array (copy)
      */
     template <class E>
-    auto sort(const xexpression<E>& e, std::size_t axis)
+    auto sort(const xexpression<E>& e, xt::index_t axis)
     {
         using eval_type = typename E::temporary_type;
         using value_type = typename E::value_type;
@@ -104,8 +104,8 @@ namespace xt
 
         if (axis != detail::leading_axis(ev))
         {
-            auto axis_numbers = arange<std::size_t>(de.shape().size());
-            std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
+            auto axis_numbers = arange<xt::index_t>(de.shape().size());
+            std::vector<xt::index_t> permutation(axis_numbers.begin(), axis_numbers.end());
             permutation.erase(permutation.begin() + ptrdiff_t(axis));
             if (de.layout() == layout_type::row_major)
             {
@@ -117,11 +117,11 @@ namespace xt
             }
 
             // TODO find a more clever way to get reverse permutation?
-            std::vector<std::size_t> reverse_permutation;
+            std::vector<xt::index_t> reverse_permutation;
             for (auto el : axis_numbers)
             {
                 auto it = std::find(permutation.begin(), permutation.end(), el);
-                reverse_permutation.push_back(std::size_t(std::distance(permutation.begin(), it)));
+                reverse_permutation.push_back(xt::index_t(std::distance(permutation.begin(), it)));
             }
 
             ev = transpose(de, permutation);
@@ -149,22 +149,22 @@ namespace xt
         template <class T>
         struct argfunc_result_type
         {
-            using type = xarray<std::size_t>;
+            using type = xarray<xt::index_t>;
         };
 
-        template <class T, std::size_t N>
+        template <class T, xt::index_t N>
         struct argfunc_result_type<xtensor<T, N>>
         {
-            using type = xtensor<std::size_t, N - 1>;
+            using type = xtensor<xt::index_t, N - 1>;
         };
 
         template <class IT, class F>
-        inline std::size_t cmp_idx(IT iter, IT end, ptrdiff_t inc, F&& cmp)
+        inline xt::index_t cmp_idx(IT iter, IT end, ptrdiff_t inc, F&& cmp)
         {
-            std::size_t idx = 0;
+            xt::index_t idx = 0;
             double min = *iter;
             iter += inc;
-            for (std::size_t i = 1; iter < end; iter += inc, ++i)
+            for (xt::index_t i = 1; iter < end; iter += inc, ++i)
             {
                 if (cmp(*iter, min))
                 {
@@ -176,7 +176,7 @@ namespace xt
         }
 
         template <class E, class F>
-        xtensor<std::size_t, 0> arg_func_impl(const E& e, F&& f)
+        xtensor<xt::index_t, 0> arg_func_impl(const E& e, F&& f)
         {
             return cmp_idx(e.template begin<DEFAULT_LAYOUT>(),
                            e.template end<DEFAULT_LAYOUT>(), 1,
@@ -185,7 +185,7 @@ namespace xt
 
         template <class E, class F>
         typename argfunc_result_type<E>::type
-        arg_func_impl(const E& e, std::size_t axis, F&& cmp)
+        arg_func_impl(const E& e, xt::index_t axis, F&& cmp)
         {
             using value_type = typename E::value_type;
             using result_type = typename argfunc_result_type<E>::type;
@@ -195,17 +195,17 @@ namespace xt
                 return arg_func_impl(e, std::forward<F>(cmp));
             }
 
-            xt::dynamic_shape<std::size_t> new_shape = e.shape();
+            xt::dynamic_shape<xt::index_t> new_shape = e.shape();
             new_shape.erase(new_shape.begin() + ptrdiff_t(axis));
 
             result_type result(new_shape);
             auto result_iter = result.begin();
 
             auto arg_func_lambda = [&result_iter, &cmp](auto begin, auto end) {
-                std::size_t idx = 0;
+                xt::index_t idx = 0;
                 value_type val = *begin;
                 ++begin;
-                for (std::size_t i = 1; begin != end; ++begin, ++i)
+                for (xt::index_t i = 1; begin != end; ++begin, ++i)
                 {
                     if (cmp(*begin, val))
                     {
@@ -220,8 +220,8 @@ namespace xt
             if (axis != detail::leading_axis(e))
             {
                 E input;
-                auto axis_numbers = arange<std::size_t>(e.shape().size());
-                std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
+                auto axis_numbers = arange<xt::index_t>(e.shape().size());
+                std::vector<xt::index_t> permutation(axis_numbers.begin(), axis_numbers.end());
                 permutation.erase(permutation.begin() + ptrdiff_t(axis));
                 if (input.layout() == layout_type::row_major)
                 {
@@ -263,7 +263,7 @@ namespace xt
      * @return returns xarray with positions of minimal value
      */
     template <class E>
-    auto argmin(const xexpression<E>& e, std::size_t axis)
+    auto argmin(const xexpression<E>& e, xt::index_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
@@ -287,7 +287,7 @@ namespace xt
      * @return returns xarray with positions of minimal value
      */
     template <class E>
-    auto argmax(const xexpression<E>& e, std::size_t axis)
+    auto argmax(const xexpression<E>& e, xt::index_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());

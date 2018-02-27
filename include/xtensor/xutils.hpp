@@ -44,7 +44,7 @@ namespace xt
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template <class R, class F, class... S>
-    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()));
+    R apply(xt::index_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()));
 
     template <class T, class S>
     void nested_copy(T&& iter, const S& s);
@@ -207,7 +207,7 @@ namespace xt
         }
 
         template <class R, class F, std::size_t... I, class... S>
-        R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
+        R apply(xt::index_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
         {
             using FT = std::add_pointer_t<R(F&&, const std::tuple<S...>&)>;
             static const std::array<FT, sizeof...(I)> ar = {{&apply_one<R, F, I, S...>...}};
@@ -216,7 +216,7 @@ namespace xt
     }
 
     template <class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
+    inline R apply(xt::index_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }
@@ -225,7 +225,7 @@ namespace xt
      * nested_initializer_list *
      ***************************/
 
-    template <class T, std::size_t I>
+    template <class T, xt::index_t I>
     struct nested_initializer_list
     {
         using type = std::initializer_list<typename nested_initializer_list<T, I - 1>::type>;
@@ -237,7 +237,7 @@ namespace xt
         using type = T;
     };
 
-    template <class T, std::size_t I>
+    template <class T, xt::index_t I>
     using nested_initializer_list_t = typename nested_initializer_list<T, I>::type;
 
     /******************************
@@ -268,20 +268,20 @@ namespace xt
         template <class U>
         struct initializer_depth_impl
         {
-            static constexpr std::size_t value = 0;
+            static constexpr xt::index_t value = 0;
         };
 
         template <class T>
         struct initializer_depth_impl<std::initializer_list<T>>
         {
-            static constexpr std::size_t value = 1 + initializer_depth_impl<T>::value;
+            static constexpr xt::index_t value = 1 + initializer_depth_impl<T>::value;
         };
     }
 
     template <class U>
     struct initializer_dimension
     {
-        static constexpr std::size_t value = detail::initializer_depth_impl<U>::value;
+        static constexpr xt::index_t value = detail::initializer_depth_impl<U>::value;
     };
 
     /************************************
@@ -290,11 +290,11 @@ namespace xt
 
     namespace detail
     {
-        template <std::size_t I>
+        template <xt::index_t I>
         struct initializer_shape_impl
         {
             template <class T>
-            static constexpr std::size_t value(T t)
+            static constexpr xt::index_t value(T t)
             {
                 return t.size() == 0 ? 0 : initializer_shape_impl<I - 1>::value(*t.begin());
             }
@@ -304,7 +304,7 @@ namespace xt
         struct initializer_shape_impl<0>
         {
             template <class T>
-            static constexpr std::size_t value(T t)
+            static constexpr xt::index_t value(T t)
             {
                 return t.size();
             }
@@ -506,7 +506,7 @@ namespace xt
 
     public:
 
-        constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
+        constexpr static bool value = decltype(test<T>(xt::index_t(0)))::value == true;
     };
 
     /******************

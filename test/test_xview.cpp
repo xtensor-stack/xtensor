@@ -14,8 +14,8 @@
 
 namespace xt
 {
-    using std::size_t;
-    using view_shape_type = dynamic_shape<size_t>;
+    using xt::index_t; 
+    using view_shape_type = dynamic_shape<xt::index_t>;
 
     TEST(xview, temporary_type)
     {
@@ -174,7 +174,7 @@ namespace xt
         EXPECT_ANY_THROW(view1.at(10, 10));
         EXPECT_ANY_THROW(view1.at(0, 0, 0));
 
-        std::array<std::size_t, 2> idx = {1, 1};
+        std::array<xt::index_t, 2> idx = {1, 1};
         EXPECT_EQ(a(1, 1, 1), view1.element(idx.cbegin(), idx.cend()));
     }
 
@@ -453,13 +453,13 @@ namespace xt
         EXPECT_EQ(a(1, 2), view6(2, 0));
         EXPECT_EQ(size_t(2), view6.dimension());
 
-        std::array<std::size_t, 3> idx1 = {1, 0, 2};
+        std::array<xt::index_t, 3> idx1 = {1, 0, 2};
         EXPECT_EQ(a(1, 2), view1.element(idx1.begin(), idx1.end()));
 
-        std::array<std::size_t, 3> idx2 = {1, 2, 0};
+        std::array<xt::index_t, 3> idx2 = {1, 2, 0};
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
 
-        std::array<std::size_t, 3> idx3 = {1, 2};
+        std::array<xt::index_t, 3> idx3 = {1, 2};
         EXPECT_EQ(a(1, 2), view3.element(idx3.begin(), idx3.end()));
     }
 
@@ -624,9 +624,9 @@ namespace xt
         auto shape1 = v1.shape();
         auto idx1 = index_type(shape1.size(), 0);
         auto strides1 = v1.strides();
-        for (std::size_t i = 0; i < v1.size(); ++i)
+        for (xt::index_t i = 0; i < v1.size(); ++i)
         {
-            auto linear_idx = std::inner_product(idx1.begin(), idx1.end(), strides1.begin(), std::size_t(0));
+            auto linear_idx = std::inner_product(idx1.begin(), idx1.end(), strides1.begin(), xt::index_t(0));
             EXPECT_EQ(v1[idx1], v1.raw_data()[v1.raw_data_offset() + linear_idx]);
             next_idx(idx1, shape1);
         }
@@ -635,9 +635,9 @@ namespace xt
         auto shape2 = v2.shape();
         auto idx2 = index_type(shape2.size(), 0);
         auto strides2 = v2.strides();
-        for (std::size_t i = 0; i < v2.size(); ++i)
+        for (xt::index_t i = 0; i < v2.size(); ++i)
         {
-            auto linear_idx = std::inner_product(idx2.begin(), idx2.end(), strides2.begin(), std::size_t(0));
+            auto linear_idx = std::inner_product(idx2.begin(), idx2.end(), strides2.begin(), xt::index_t(0));
             EXPECT_EQ(v2[idx2], v2.raw_data()[v2.raw_data_offset() + linear_idx]);
             next_idx(idx2, shape2);
         }
@@ -651,8 +651,8 @@ namespace xt
             { 5, 6 }
         };
         auto row = xt::view(a, 1, xt::all());
-        bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::size_t, 1>>::value;
-        bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::size_t, 1>&>::value;
+        bool cond1 = std::is_same<decltype(row)::strides_type, std::array<xt::index_t, 1>>::value;
+        bool cond2 = std::is_same<decltype(row.strides()), const std::array<xt::index_t, 1>&>::value;
         EXPECT_TRUE(cond1);
         EXPECT_TRUE(cond2);
     }

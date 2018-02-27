@@ -14,7 +14,7 @@ namespace xt
 {
     using vec_type = std::vector<int>;
     using adaptor_type = xtensor_adaptor<vec_type, 3, layout_type::dynamic>;
-    using container_type = std::array<std::size_t, 3>;
+    using container_type = std::array<xt::index_t, 3>;
 
     TEST(xtensor_adaptor, shaped_constructor)
     {

@@ -138,7 +138,7 @@ namespace xt
         array_type v = {{1, 2, 3}, {4, 5, 6}};
         flag_array_type hv = {{true, false, true}, {false, true, false}};
         adaptor_type a(v, hv);
-        std::vector<std::size_t> v00({0, 0}), v01({0, 1}), v02({0, 2}),
+        std::vector<xt::index_t> v00({0, 0}), v01({0, 1}), v02({0, 2}),
             v10({1, 0}), v11({1, 1}), v12({1, 2});
 
         EXPECT_EQ(a.element(v00.begin(), v00.end()), opt(1, true));
@@ -231,7 +231,7 @@ namespace xt
             EXPECT_EQ(vec[1], rma(0, 1));
             EXPECT_EQ(vec[2], rma(1, 0));
             EXPECT_EQ(vec[3], rma(1, 1));
-            EXPECT_EQ(vec.size(), std::size_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>())));
+            EXPECT_EQ(vec.size(), xt::index_t(std::distance(rma.begin<layout_type::row_major>(), rma.end<layout_type::row_major>())));
         }
 
         {
@@ -245,7 +245,7 @@ namespace xt
             EXPECT_EQ(vec[1], cma(1, 0));
             EXPECT_EQ(vec[2], cma(0, 1));
             EXPECT_EQ(vec[3], cma(1, 1));
-            EXPECT_EQ(vec.size(), std::size_t(std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>())));
+            EXPECT_EQ(vec.size(), xt::index_t(std::distance(cma.begin<layout_type::column_major>(), cma.end<layout_type::column_major>())));
         }
     }
 

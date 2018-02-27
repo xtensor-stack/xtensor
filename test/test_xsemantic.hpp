@@ -16,7 +16,7 @@
 
 namespace xt
 {
-    using std::size_t;
+    using xt::index_t;
     using xarray_dynamic = xarray<int, layout_type::dynamic>;
     using xtensor_dynamic = xtensor<int, 3, layout_type::dynamic>;
 

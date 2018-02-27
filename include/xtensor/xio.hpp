@@ -217,7 +217,7 @@ namespace xt
         struct recurser<0>
         {
             template <class F, class E>
-            static void run(F& fn, const E& e, std::size_t)
+            static void run(F& fn, const E& e, xt::index_t)
             {
                 if (e.dimension() == 0)
                 {
@@ -506,7 +506,7 @@ namespace xt
                     s.erase(0, 1);  // erase space for +/-
                 }
                 // insert j at end of number
-                std::size_t idx = s.find_last_not_of(" ");
+                xt::index_t idx = s.find_last_not_of(" ");
                 s.insert(idx + 1, "i");
                 out << s;
                 ++m_it;
@@ -607,7 +607,7 @@ namespace xt
         template <class S>
         struct recursion_depth
         {
-            static constexpr std::size_t value = 5;
+            static constexpr xt::index_t value = 5;
         };
 
 // Note: std::min is not constexpr on old versions of gcc (4.x) and clang.
@@ -633,7 +633,7 @@ namespace xt
         const E& d = e.derived_cast();
 
         size_t lim = 0;
-        std::size_t sz = compute_size(d.shape());
+        xt::index_t sz = compute_size(d.shape());
         if (sz > print_options::print_options().threshold)
         {
             lim = print_options::print_options().edgeitems;

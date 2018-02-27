@@ -30,7 +30,7 @@ namespace xt
               layout_type L = DEFAULT_LAYOUT,
               class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
                                                  typename EC::allocator_type,
-                                                 std::allocator<typename EC::size_type>),
+                                                 std::allocator<xt::index_t>),
               class Tag = xtensor_expression_tag>
     class xarray_container;
 
@@ -46,7 +46,7 @@ namespace xt
      * instead of the heavier syntax
      *
      * \code{.cpp}
-     * xt::xarray_container<std::vector<double>, std::vector<std::size_t>> a = ...
+     * xt::xarray_container<std::vector<double>, std::vector<xt::index_t>> a = ...
      * \endcode
      *
      * @tparam T The value type of the elements.
@@ -57,14 +57,14 @@ namespace xt
     template <class T,
               layout_type L = DEFAULT_LAYOUT,
               class A = DEFAULT_ALLOCATOR(T),
-              class SA = std::allocator<typename std::vector<T, A>::size_type>>
+              class SA = std::allocator<xt::index_t>>
     using xarray = xarray_container<DEFAULT_DATA_CONTAINER(T, A), L, DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
     template <class EC,
               layout_type L = DEFAULT_LAYOUT,
               class SC = DEFAULT_SHAPE_CONTAINER(typename EC::value_type,
-                                                 std::allocator<typename EC::size_type>,
-                                                 std::allocator<typename EC::size_type>),
+                                                 std::allocator<xt::index_t>,
+                                                 std::allocator<xt::index_t>),
               class Tag = xtensor_expression_tag>
     class xarray_adaptor;
 
@@ -81,11 +81,11 @@ namespace xt
     template <class T,
               layout_type L = DEFAULT_LAYOUT,
               class A = DEFAULT_ALLOCATOR(T),
-              class BC = xtl::xdynamic_bitset<std::size_t>,
-              class SA = std::allocator<typename std::vector<T, A>::size_type>>
+              class BC = xtl::xdynamic_bitset<xt::index_t>,
+              class SA = std::allocator<xt::index_t>>
     using xarray_optional = xarray_container<xtl::xoptional_vector<T, A, BC>, L, DEFAULT_SHAPE_CONTAINER(T, A, SA), xoptional_expression_tag>;
 
-    template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
+    template <class EC, xt::index_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_container;
 
     /**
@@ -109,18 +109,18 @@ namespace xt
      * @tparam A The allocator of the containers holding the elements.
      */
     template <class T,
-              std::size_t N,
+              xt::index_t N,
               layout_type L = DEFAULT_LAYOUT,
               class A = DEFAULT_ALLOCATOR(T)>
     using xtensor = xtensor_container<DEFAULT_DATA_CONTAINER(T, A), N, L>;
 
-    template <class EC, std::size_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
+    template <class EC, xt::index_t N, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_adaptor;
 
-    template <std::size_t... N>
+    template <xt::index_t... N>
     class fixed_shape;
 
-    template <std::size_t... N>
+    template <xt::index_t... N>
     using xshape = fixed_shape<N...>;
 
     template <class EC, class FS, layout_type L = DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
@@ -145,10 +145,10 @@ namespace xt
      * @tparam BA The allocator of the container holding the missing flags.
      */
     template <class T,
-              std::size_t N,
+              xt::index_t N,
               layout_type L = DEFAULT_LAYOUT,
               class A = DEFAULT_ALLOCATOR(T),
-              class BC = xtl::xdynamic_bitset<std::size_t>>
+              class BC = xtl::xdynamic_bitset<xt::index_t>>
     using xtensor_optional = xtensor_container<xtl::xoptional_vector<T, A, BC>, N, L, xoptional_expression_tag>;
 
     template <class CT, class... S>

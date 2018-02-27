@@ -1607,7 +1607,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         return std::move(s) / static_cast<double>(size / s.size());
     }
 #else
-    template <class E, class I, std::size_t N>
+    template <class E, class I, xt::index_t N>
     inline auto mean(E&& e, const I (&axes)[N]) noexcept
     {
         auto size = e.size();
@@ -1631,7 +1631,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xarray<T>
      */
     template <class E>
-    inline auto cumsum(E&& e, std::size_t axis) noexcept
+    inline auto cumsum(E&& e, xt::index_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(std::plus<result_type>(), std::forward<E>(e), axis);
@@ -1655,7 +1655,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xarray<T>
      */
     template <class E>
-    inline auto cumprod(E&& e, std::size_t axis) noexcept
+    inline auto cumprod(E&& e, xt::index_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(std::multiplies<result_type>(), std::forward<E>(e), axis);

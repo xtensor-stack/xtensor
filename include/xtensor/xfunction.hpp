@@ -47,7 +47,7 @@ namespace xt
         template <>
         struct common_size_type<>
         {
-            using type = std::size_t;
+            using type = xt::index_t;
         };
 
         template <class... Args>
@@ -834,7 +834,10 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::compute_dimension() const noexcept -> size_type
     {
-        auto func = [](size_type d, auto&& e) noexcept { return std::max(d, e.dimension()); };
+        // todo either replace std::max with custom function 
+        // or make sure that cast types are always correct?
+        auto func = [](size_type d, auto&& e) noexcept { return std::max(static_cast<size_type>(d),
+                                                                         static_cast<size_type>(e.dimension())); };
         return accumulate(func, size_type(0), m_e);
     }
 

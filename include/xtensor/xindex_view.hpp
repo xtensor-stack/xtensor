@@ -36,7 +36,7 @@ namespace xt
     template <class CT, class I>
     struct xiterable_inner_types<xindex_view<CT, I>>
     {
-        using inner_shape_type = std::array<std::size_t, 1>;
+        using inner_shape_type = std::array<xt::index_t, 1>;
         using const_stepper = xindexed_stepper<xindex_view<CT, I>>;
         using stepper = xindexed_stepper<xindex_view<CT, I>, false>;
     };
@@ -236,7 +236,7 @@ namespace xt
     template <class CT, class I>
     template <class I2>
     inline xindex_view<CT, I>::xindex_view(CT e, I2&& indices) noexcept
-        : m_e(e), m_indices(std::forward<I2>(indices)), m_shape({m_indices.size()})
+        : m_e(e), m_indices(std::forward<I2>(indices)), m_shape({static_cast<xt::index_t>(m_indices.size())})
     {
     }
     //@}
@@ -618,7 +618,7 @@ namespace xt
         return view_type(std::forward<E>(e), std::move(idx));
     }
 #else
-    template <class E, std::size_t L>
+    template <class E, xt::index_t L>
     inline auto index_view(E&& e, const xindex (&indices)[L]) noexcept
     {
         using view_type = xindex_view<xclosure_t<E>, std::array<xindex, L>>;

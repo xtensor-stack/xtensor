@@ -55,7 +55,7 @@ namespace xt
         return broadcast(T(1), shape);
     }
 #else
-    template <class T, class I, std::size_t L>
+    template <class T, class I, xt::index_t L>
     inline auto ones(const I (&shape)[L]) noexcept
     {
         return broadcast(T(1), shape);
@@ -83,7 +83,7 @@ namespace xt
         return broadcast(T(0), shape);
     }
 #else
-    template <class T, class I, std::size_t L>
+    template <class T, class I, xt::index_t L>
     inline auto zeros(const I (&shape)[L]) noexcept
     {
         return broadcast(T(0), shape);
@@ -140,7 +140,7 @@ namespace xt
         public:
 
             using value_type = typename F::value_type;
-            using size_type = std::size_t;
+            using size_type = xt::index_t;
 
             fn_impl(F&& f)
                 : m_ft(f)
@@ -211,7 +211,7 @@ namespace xt
      * @return xgenerator that generates the values on access
      */
     template <class T = bool>
-    inline auto eye(const std::vector<std::size_t>& shape, int k = 0)
+    inline auto eye(const std::vector<xt::index_t>& shape, int k = 0)
     {
         return detail::make_xgenerator(detail::fn_impl<detail::eye_fn<T>>(detail::eye_fn<T>(k)), shape);
     }
@@ -226,7 +226,7 @@ namespace xt
      * @return xgenerator that generates the values on access
      */
     template <class T = bool>
-    inline auto eye(std::size_t n, int k = 0)
+    inline auto eye(xt::index_t n, int k = 0)
     {
         return eye<T>({n, n}, k);
     }
@@ -242,7 +242,7 @@ namespace xt
     template <class T>
     inline auto arange(T start, T stop, T step = 1) noexcept
     {
-        std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
+        xt::index_t shape = static_cast<xt::index_t>(std::ceil((stop - start) / step));
         return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step), {shape});
     }
 
@@ -269,7 +269,7 @@ namespace xt
      * @return xgenerator that generates the values on access
      */
     template <class T>
-    inline auto linspace(T start, T stop, std::size_t num_samples = 50, bool endpoint = true) noexcept
+    inline auto linspace(T start, T stop, xt::index_t num_samples = 50, bool endpoint = true) noexcept
     {
         using fp_type = std::common_type_t<T, double>;
         fp_type step = fp_type(stop - start) / fp_type(num_samples - (endpoint ? 1 : 0));
@@ -287,7 +287,7 @@ namespace xt
      * @return xgenerator that generates the values on access
      */
     template <class T>
-    inline auto logspace(T start, T stop, std::size_t num_samples, T base = 10, bool endpoint = true) noexcept
+    inline auto logspace(T start, T stop, xt::index_t num_samples, T base = 10, bool endpoint = true) noexcept
     {
         return cast<T>(pow(std::move(base), linspace(start, stop, num_samples, endpoint)));
     }
@@ -299,7 +299,7 @@ namespace xt
         {
         public:
 
-            using size_type = std::size_t;
+            using size_type = xt::index_t;
             using value_type = promote_type_t<typename std::decay_t<CT>::value_type...>;
 
             inline concatenate_impl(std::tuple<CT...>&& t, size_type axis)
@@ -358,7 +358,7 @@ namespace xt
         {
         public:
 
-            using size_type = std::size_t;
+            using size_type = xt::index_t;
             using value_type = promote_type_t<typename std::decay_t<CT>::value_type...>;
 
             inline stack_impl(std::tuple<CT...>&& t, size_type axis)
@@ -457,21 +457,21 @@ namespace xt
      * \endcode
      */
     template <class... CT>
-    inline auto concatenate(std::tuple<CT...>&& t, std::size_t axis = 0)
+    inline auto concatenate(std::tuple<CT...>&& t, xt::index_t axis = 0)
     {
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         shape_type new_shape = xtl::forward_sequence<shape_type>(std::get<0>(t).shape());
-        auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
+        auto shape_at_axis = [&axis](xt::index_t prev, auto& arr) -> xt::index_t {
             return prev + arr.shape()[axis];
         };
-        new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
+        new_shape[axis] += accumulate(shape_at_axis, xt::index_t(0), t) - new_shape[axis];
         return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 
     namespace detail
     {
         template <class T, std::size_t N>
-        inline std::array<T, N + 1> add_axis(std::array<T, N> arr, std::size_t axis, std::size_t value)
+        inline std::array<T, N + 1> add_axis(std::array<T, N> arr, xt::index_t axis, xt::index_t value)
         {
             std::array<T, N + 1> temp;
             std::copy(arr.begin(), arr.begin() + axis, temp.begin());
@@ -481,7 +481,7 @@ namespace xt
         }
 
         template <class T>
-        inline T add_axis(T arr, std::size_t axis, std::size_t value)
+        inline T add_axis(T arr, xt::index_t axis, xt::index_t value)
         {
             T temp(arr);
             temp.insert(temp.begin() + std::ptrdiff_t(axis), value);
@@ -522,7 +522,7 @@ namespace xt
         inline auto meshgrid_impl(std::index_sequence<I...>, E&&... e) noexcept
         {
 #if defined X_OLD_CLANG || defined _MSC_VER
-            const std::array<std::size_t, sizeof...(E)> shape = {e.shape()[0]...};
+            const std::array<xt::index_t, sizeof...(E)> shape = {e.shape()[0]...};
             return std::make_tuple(
                 detail::make_xgenerator(
                     detail::repeat_impl<xclosure_t<E>>(std::forward<E>(e), I),
@@ -565,7 +565,7 @@ namespace xt
             using value_type = typename xexpression_type::value_type;
 
             template <class CTA>
-            diagonal_fn(CTA&& source, int offset, std::size_t axis_1, std::size_t axis_2)
+            diagonal_fn(CTA&& source, int offset, xt::index_t axis_1, xt::index_t axis_2)
                 : m_source(std::forward<CTA>(source)), m_offset(offset), m_axis_1(axis_1), m_axis_2(axis_2)
             {
             }
@@ -575,7 +575,7 @@ namespace xt
             {
                 xindex idx(m_source.shape().size());
 
-                for (std::size_t i = 0; i < idx.size(); i++)
+                for (xt::index_t i = 0; i < idx.size(); i++)
                 {
                     if (i != m_axis_1 && i != m_axis_2)
                     {
@@ -601,8 +601,8 @@ namespace xt
 
             CT m_source;
             const int m_offset;
-            const std::size_t m_axis_1;
-            const std::size_t m_axis_2;
+            const xt::index_t m_axis_1;
+            const xt::index_t m_axis_2;
         };
 
         template <class CT>
@@ -650,7 +650,7 @@ namespace xt
             using size_type = typename xexpression_type::size_type;
 
             template <class CTA>
-            flip_impl(CTA&& source, std::size_t axis)
+            flip_impl(CTA&& source, xt::index_t axis)
                 : m_source(std::forward<CTA>(source)), m_axis(axis), m_shape_at_axis(m_source.shape()[m_axis] - 1)
             {
             }
@@ -725,7 +725,7 @@ namespace xt
             using type = ST;
         };
 
-        template <class I, std::size_t L>
+        template <class I, xt::index_t L>
         struct diagonal_shape_type<std::array<I, L>>
         {
             using type = std::array<I, L - 1>;
@@ -757,7 +757,7 @@ namespace xt
      * \endcode
      */
     template <class E>
-    inline auto diagonal(E&& arr, int offset = 0, std::size_t axis_1 = 0, std::size_t axis_2 = 1)
+    inline auto diagonal(E&& arr, int offset = 0, xt::index_t axis_1 = 0, xt::index_t axis_2 = 1)
     {
         using CT = xclosure_t<E>;
         using shape_type = typename detail::diagonal_shape_type<typename std::decay_t<E>::shape_type>::type;
@@ -773,10 +773,10 @@ namespace xt
 
         offset >= 0 ? dim_2 -= offset : dim_1 += offset;
 
-        auto diag_size = std::size_t(dim_2 < dim_1 ? dim_2 : dim_1);
+        auto diag_size = xt::index_t(dim_2 < dim_1 ? dim_2 : dim_1);
 
-        std::size_t i = 0;
-        for (std::size_t idim = 0; idim < dimension; ++idim)
+        xt::index_t i = 0;
+        for (xt::index_t idim = 0; idim < dimension; ++idim)
         {
             if (idim != axis_1 && idim != axis_2)
             {
@@ -808,8 +808,8 @@ namespace xt
     inline auto diag(E&& arr, int k = 0)
     {
         using CT = xclosure_t<E>;
-        std::size_t sk = std::size_t(std::abs(k));
-        std::size_t s = arr.shape()[0] + sk;
+        xt::index_t sk = xt::index_t(std::abs(k));
+        xt::index_t s = arr.shape()[0] + sk;
         return detail::make_xgenerator(detail::fn_impl<detail::diag_fn<CT>>(detail::diag_fn<CT>(std::forward<E>(arr), k)),
                                        {s, s});
     }
@@ -825,7 +825,7 @@ namespace xt
      * @return xexpression evaluating to reversed array
      */
     template <class E>
-    inline auto flip(E&& arr, std::size_t axis)
+    inline auto flip(E&& arr, xt::index_t axis)
     {
         using CT = xclosure_t<E>;
         auto shape = arr.shape();

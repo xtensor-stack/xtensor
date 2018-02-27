@@ -23,7 +23,7 @@ namespace xt
         central_major_result<>, unit_shape_result<>>;
     TYPED_TEST_CASE(xiterator_test, testing_types);
 
-    using std::size_t;
+    using xt::index_t;
 
     template <layout_type L, class R, class S>
     void test_increment(const R& result, const S& shape)

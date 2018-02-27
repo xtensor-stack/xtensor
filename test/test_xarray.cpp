@@ -33,11 +33,11 @@ namespace xt
 
         {
             SCOPED_TRACE("from shape");
-            std::array<std::size_t, 3> shp = {5, 4, 2};
-            std::vector<std::size_t> shp_as_vec = {5, 4, 2};
+            std::array<xt::index_t, 3> shp = {5, 4, 2};
+            std::vector<xt::index_t> shp_as_vec = {5, 4, 2};
             auto ca = xarray<int, layout_type::column_major>::from_shape({3, 2, 1});
             auto cb = xarray<int, layout_type::column_major>::from_shape(shp);
-            std::vector<std::size_t> expected_shape = {3, 2, 1};
+            std::vector<xt::index_t> expected_shape = {3, 2, 1};
             EXPECT_EQ(expected_shape, ca.shape());
             EXPECT_EQ(shp_as_vec, cb.shape());
         }

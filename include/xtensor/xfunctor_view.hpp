@@ -53,7 +53,7 @@ namespace xt
             using type = xarray<typename F::value_type, L>;
         };
 
-        template <class F, class T, std::size_t N, layout_type L>
+        template <class F, class T, xt::index_t N, layout_type L>
         struct functorview_temporary_type_impl<F, std::array<T, N>, L>
         {
             using type = xtensor<typename F::value_type, N, L>;

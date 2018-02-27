@@ -26,13 +26,13 @@ namespace xt
     template <class T>
     using dynamic_shape = svector<T, 4>;
 
-    template <class T, std::size_t N>
+    template <class T, xt::index_t N>
     using static_shape = std::array<T, N>;
 
-    template <std::size_t... X>
+    template <xt::index_t... X>
     class fixed_shape;
 
-    using xindex = dynamic_shape<std::size_t>;
+    using xindex = dynamic_shape<xt::index_t>;
 
     /*************************************
      * promote_shape and promote_strides *
@@ -99,7 +99,7 @@ namespace xt
         template <>
         struct promote_index_impl<true>
         {
-            using type = std::array<std::size_t, 0>;
+            using type = std::array<xt::index_t, 0>;
         };
 
         template <class... S>

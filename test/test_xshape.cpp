@@ -14,14 +14,14 @@
 
 namespace xt
 {
-    using vector_type = svector<std::size_t, 4>;
+    using vector_type = svector<xt::index_t, 4>;
 
     TEST(svector, behavior)
     {
         vector_type s = {1,2,3,4};
         vector_type s2 = s;
-        std::vector<std::size_t> v(s.begin(), s.end());
-        std::vector<std::size_t> v2 = {1,2,3,4};
+        std::vector<xt::index_t> v(s.begin(), s.end());
+        std::vector<xt::index_t> v2 = {1,2,3,4};
 
         EXPECT_TRUE(std::equal(s.begin(), s.end(), v.begin()));
         EXPECT_TRUE(std::equal(s2.begin(), s2.end(), v2.begin()));
@@ -51,14 +51,14 @@ namespace xt
     {
         vector_type s = {1,2,3,4};
         vector_type s2 = s;
-        std::vector<std::size_t> v(s.begin(), s.end());
-        std::vector<std::size_t> v2 = {1,2,3,4};
+        std::vector<xt::index_t> v(s.begin(), s.end());
+        std::vector<xt::index_t> v2 = {1,2,3,4};
 
-        s.insert(s.begin(), std::size_t(55));
-        s.insert(s.begin() + 2, std::size_t(123));
-        v.insert(v.begin(), std::size_t(55));
-        v.insert(v.begin() + 2, std::size_t(123));
-        std::size_t nr = 12321;
+        s.insert(s.begin(), xt::index_t(55));
+        s.insert(s.begin() + 2, xt::index_t(123));
+        v.insert(v.begin(), xt::index_t(55));
+        v.insert(v.begin() + 2, xt::index_t(123));
+        xt::index_t nr = 12321;
         s.insert(s.end(), nr);
         v.insert(v.end(), nr);
 
@@ -77,7 +77,7 @@ namespace xt
         EXPECT_EQ(size_t(10), c.size());
         EXPECT_EQ(2, c[2]);
 
-        std::vector<std::size_t> src(10, std::size_t(1));
+        std::vector<xt::index_t> src(10, xt::index_t(1));
         vector_type d(src.cbegin(), src.cend());
         EXPECT_EQ(size_t(10), d.size());
         EXPECT_EQ(1, d[2]);
@@ -117,7 +117,7 @@ namespace xt
     TEST(svector, iterator)
     {
         vector_type a(10);
-        std::iota(a.begin(), a.end(), std::size_t(0));
+        std::iota(a.begin(), a.end(), xt::index_t(0));
         for (size_t i = 0; i < a.size(); ++i)
         {
             EXPECT_EQ(i, a[i]);
@@ -127,7 +127,7 @@ namespace xt
     TEST(xshape, fixed)
     {
         fixed_shape<3, 4, 5> af;
-        const_array<std::size_t, 3> a = af;
+        const_array<xt::index_t, 3> a = af;
         EXPECT_EQ(a[0], 3);
         EXPECT_EQ(a[2], 5);
         EXPECT_EQ(a.back(), 5);

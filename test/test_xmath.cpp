@@ -15,8 +15,8 @@
 
 namespace xt
 {
-    using std::size_t;
-    using shape_type = dynamic_shape<size_t>;
+    using xt::index_t;
+    using shape_type = dynamic_shape<xt::index_t>;
 
     /*******************
      * type conversion *

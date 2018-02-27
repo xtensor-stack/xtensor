@@ -183,7 +183,7 @@ namespace xt
 
 #else
 #define XTENSOR_NORM_FUNCTION_AXES(NAME)                                         \
-    template <class E, class I, std::size_t N>                                   \
+    template <class E, class I, xt::index_t N>                                   \
     inline auto NAME(E&& e, const I(&axes)[N]) noexcept                          \
     {                                                                            \
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;    \
@@ -358,7 +358,7 @@ namespace xt
         return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes));
     }
 #else
-    template <class E, class I, std::size_t N>
+    template <class E, class I, xt::index_t N>
     inline auto norm_lp_to_p(E&& e, double p, const I (&axes)[N]) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
@@ -400,7 +400,7 @@ namespace xt
         return norm_lp(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes));
     }
 #else
-    template <class E, class I, std::size_t N>
+    template <class E, class I, xt::index_t N>
     inline auto norm_lp(E&& e, double p, const I (&axes)[N]) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;

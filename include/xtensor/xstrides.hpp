@@ -40,10 +40,10 @@ namespace xt
      *******************/
 
     template <class shape_type, class strides_type>
-    std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides);
+    xt::index_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides);
 
     template <class shape_type, class strides_type, class backstrides_type>
-    std::size_t compute_strides(const shape_type& shape, layout_type l,
+    xt::index_t compute_strides(const shape_type& shape, layout_type l,
                                 strides_type& strides, backstrides_type& backstrides);
 
     template <class shape_type, class strides_type>
@@ -107,13 +107,13 @@ namespace xt
 
     namespace detail
     {
-        template <class size_type, class S, std::size_t dim>
+        template <class size_type, class S, xt::index_t dim>
         inline size_type raw_data_offset(const S&) noexcept
         {
             return 0;
         }
 
-        template <class size_type, class S, std::size_t dim, class Arg, class... Args>
+        template <class size_type, class S, xt::index_t dim, class Arg, class... Args>
         inline size_type raw_data_offset(const S& strides, Arg arg, Args... args) noexcept
         {
             return arg * strides[dim] + raw_data_offset<size_type, S, dim + 1>(strides, args...);
@@ -180,13 +180,13 @@ namespace xt
         }
 
         template <class shape_type, class strides_type, class bs_ptr>
-        inline std::size_t compute_strides(const shape_type& shape, layout_type l,
+        inline xt::index_t compute_strides(const shape_type& shape, layout_type l,
                                            strides_type& strides, bs_ptr bs)
         {
-            std::size_t data_size = 1;
+            xt::index_t data_size = 1;
             if (l == layout_type::row_major)
             {
-                for (std::size_t i = strides.size(); i != 0; --i)
+                for (xt::index_t i = strides.size(); i != 0; --i)
                 {
                     strides[i - 1] = data_size;
                     data_size = strides[i - 1] * shape[i - 1];
@@ -195,7 +195,7 @@ namespace xt
             }
             else
             {
-                for (std::size_t i = 0; i < strides.size(); ++i)
+                for (xt::index_t i = 0; i < strides.size(); ++i)
                 {
                     strides[i] = data_size;
                     data_size = strides[i] * shape[i];
@@ -207,13 +207,13 @@ namespace xt
     }
 
     template <class shape_type, class strides_type>
-    inline std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides)
+    inline xt::index_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides)
     {
         return detail::compute_strides(shape, l, strides, nullptr);
     }
 
     template <class shape_type, class strides_type, class backstrides_type>
-    inline std::size_t compute_strides(const shape_type& shape, layout_type l,
+    inline xt::index_t compute_strides(const shape_type& shape, layout_type l,
                                        strides_type& strides,
                                        backstrides_type& backstrides)
     {
@@ -279,8 +279,8 @@ namespace xt
     {
         bool trivial_broadcast = (input.size() == output.size());
         // Indices are faster than reverse iterators
-        std::size_t output_index = output.size();
-        std::size_t input_index = input.size();
+        xt::index_t output_index = output.size();
+        xt::index_t input_index = input.size();
         for(; input_index != 0; --input_index, --output_index)
         {
             if(output[output_index - 1] == 1)

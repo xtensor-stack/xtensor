@@ -230,7 +230,7 @@ namespace xt
     inline xtensor_adaptor<C, 1, L>
     adapt(C&& container, layout_type l)
     {
-        const std::array<typename std::decay_t<C>::size_type, 1> shape{container.size()};
+        const std::array<xt::index_t, 1> shape{static_cast<xt::index_t>(container.size())};
         using return_type = xtensor_adaptor<xtl::closure_type_t<C>, 1, L>;
         return return_type(std::forward<C>(container), shape, l);
     }
@@ -265,7 +265,7 @@ namespace xt
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
         using return_type = xtensor_adaptor<buffer_type, 1, L>;
         buffer_type buf(std::forward<P>(pointer), size, alloc);
-        const std::array<typename A::size_type, 1> shape{size};
+        const std::array<xt::index_t, 1> shape{static_cast<xt::index_t>(size)};
         return return_type(std::move(buf), shape, l);
     }
 
@@ -275,7 +275,7 @@ namespace xt
     adapt(P&& pointer, typename A::size_type size, O, const SC& shape, layout_type l, const A& alloc)
     {
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
-        constexpr std::size_t N = detail::array_size<SC>::value;
+        constexpr xt::index_t N = detail::array_size<SC>::value;
         using return_type = xtensor_adaptor<buffer_type, N, L>;
         buffer_type buf(std::forward<P>(pointer), size, alloc);
         return return_type(std::move(buf), shape, l);
@@ -287,7 +287,7 @@ namespace xt
     adapt(P&& pointer, typename A::size_type size, O, SC&& shape, SS&& strides, const A& alloc)
     {
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
-        constexpr std::size_t N = detail::array_size<SC>::value;
+        constexpr xt::index_t N = detail::array_size<SC>::value;
         using return_type = xtensor_adaptor<buffer_type, N, layout_type::dynamic>;
         buffer_type buf(std::forward<P>(pointer), size, alloc);
         return return_type(std::move(buf),

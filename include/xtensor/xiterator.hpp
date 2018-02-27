@@ -72,7 +72,7 @@ namespace xt
             using type = dynamic_shape<typename ST::value_type>;
         };
 
-        template <class V, std::size_t L>
+        template <class V, xt::index_t L>
         struct index_type_impl<std::array<V, L>>
         {
             using type = std::array<V, L>;

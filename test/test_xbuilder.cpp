@@ -15,8 +15,8 @@
 
 namespace xt
 {
-    using std::size_t;
-    using shape_t = std::vector<std::size_t>;
+    using xt::index_t;
+    using shape_t = std::vector<xt::index_t>;
 
     TEST(xbuilder, ones)
     {

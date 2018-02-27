@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    using std::size_t;
+    using xt::index_t;
 
     xarray<int> get_test_array()
     {

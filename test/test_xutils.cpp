@@ -16,7 +16,7 @@
 
 namespace xt
 {
-    using std::size_t;
+    using xt::index_t;
 
     struct for_each_fn
     {

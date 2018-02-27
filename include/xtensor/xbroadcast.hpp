@@ -38,7 +38,7 @@ namespace xt
     template <class E, class I>
     auto broadcast(E&& e, std::initializer_list<I> s) noexcept;
 #else
-    template <class E, class I, std::size_t L>
+    template <class E, class I, xt::index_t L>
     auto broadcast(E&& e, const I (&s)[L]) noexcept;
 #endif
 
@@ -165,15 +165,15 @@ namespace xt
     template <class E, class I>
     inline auto broadcast(E&& e, std::initializer_list<I> s) noexcept
     {
-        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<std::size_t>>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::vector<xt::index_t>>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type>(s));
     }
 #else
-    template <class E, class I, std::size_t L>
+    template <class E, class I, xt::index_t L>
     inline auto broadcast(E&& e, const I (&s)[L]) noexcept
     {
-        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<std::size_t, L>>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, std::array<xt::index_t, L>>;
         using shape_type = typename broadcast_type::shape_type;
         return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type>(s));
     }

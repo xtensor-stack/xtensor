@@ -43,7 +43,7 @@ namespace xt
         xarray<double> b = {1,3,4,-100};
         xarray<double, layout_type(int(DEFAULT_LAYOUT) & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
 
-        xarray<std::size_t> ex;
+        xarray<xt::index_t> ex;
 
         ex = (DEFAULT_LAYOUT == layout_type::row_major) ? 2ul : 4ul;
         EXPECT_EQ(ex, argmin(a));
@@ -51,10 +51,10 @@ namespace xt
         EXPECT_EQ(3, argmin(b)());
         EXPECT_EQ(3, argmin(b, 0)());
 
-        xarray<std::size_t> ex_2 = {1, 0, 0};
+        xarray<xt::index_t> ex_2 = {1, 0, 0};
         EXPECT_EQ(ex_2, argmin(a, 0));
 
-        xarray<std::size_t> ex_3 = {2, 0};
+        xarray<xt::index_t> ex_3 = {2, 0};
         EXPECT_EQ(ex_3, argmin(a, 1));
     }
 
@@ -64,16 +64,16 @@ namespace xt
 
         EXPECT_EQ(0ul, argmax(a)());
 
-        xarray<std::size_t> ex_2 = {0, 1, 1};
+        xarray<xt::index_t> ex_2 = {0, 1, 1};
         EXPECT_EQ(ex_2, argmax(a, 0));
 
-        xarray<std::size_t> ex_3 = {0, 0};
+        xarray<xt::index_t> ex_3 = {0, 0};
         EXPECT_EQ(ex_3, argmax(a, 1));
     }
 
     TEST(xsort, sort_large_prob)
     {
-        for (std::size_t i = 0; i < 20; ++i)
+        for (xt::index_t i = 0; i < 20; ++i)
         {
             xarray<double> a = xt::random::rand<double>({5, 5, 100, 10});
 
@@ -97,7 +97,7 @@ namespace xt
 
     TEST(xsort, argmax_prob)
     {
-        for (std::size_t i = 0; i < 20; ++i)
+        for (xt::index_t i = 0; i < 20; ++i)
         {
             xarray<double> a = xt::random::rand<double>({5, 5, 5, 5});
 

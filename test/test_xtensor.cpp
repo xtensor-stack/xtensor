@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    using container_type = std::array<std::size_t, 3>;
+    using container_type = std::array<xt::index_t, 3>;
     using xtensor_dynamic = xtensor<int, 3, layout_type::dynamic>;
 
     TEST(xtensor, initializer_constructor)
@@ -47,11 +47,11 @@ namespace xt
 
         {
             SCOPED_TRACE("from shape");
-            std::array<std::size_t, 3> shp = {5, 4, 2};
-            std::vector<std::size_t> shp_as_vec = {5, 4, 2};
+            std::array<xt::index_t, 3> shp = {5, 4, 2};
+            std::vector<xt::index_t> shp_as_vec = {5, 4, 2};
             auto ca = xtensor<int, 3>::from_shape({3, 2, 1});
             auto cb = xtensor<int, 3>::from_shape(shp_as_vec);
-            std::vector<std::size_t> expected_shape = {3, 2, 1};
+            std::vector<xt::index_t> expected_shape = {3, 2, 1};
             EXPECT_TRUE(std::equal(expected_shape.begin(), expected_shape.end(), ca.shape().begin()));
             EXPECT_TRUE(std::equal(shp.begin(), shp.end(), cb.shape().begin()));
         }
