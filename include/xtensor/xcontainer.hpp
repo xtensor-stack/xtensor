@@ -1230,7 +1230,8 @@ namespace xt
         template <class C, class S>
         inline void resize_data_container(const C& c, S size)
         {
-            (void)(c, size);  // remove unused parameter warning
+            static_cast<void>(c);
+            static_cast<void>(size);  // remove unused parameter warning
             XTENSOR_ASSERT_MSG(c.size() == size, "Trying to resize const data container with wrong size.");
         }
     }
