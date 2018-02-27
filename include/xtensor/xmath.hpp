@@ -404,7 +404,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         }                                                                                                         \
 
 #define MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                          \
-    template <class E, class I, xt::index_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
+    template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
     inline auto NAME(E&& e, const I (&axes)[N], ES es = ES()) noexcept                                            \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \

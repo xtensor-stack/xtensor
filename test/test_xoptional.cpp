@@ -64,17 +64,17 @@ namespace xt
         ASSERT_FALSE(res(1, 1).has_value());
     }
 
-    // TEST(xoptional, xio)
-    // {
-    //     std::ostringstream oss;
-    //     xtensor_optional<double, 2> m
-    //         {{ 0.0 ,       2.0         },
-    //          { 3.0 , xtl::missing<double>() }};
+    TEST(xoptional, xio)
+    {
+        std::ostringstream oss;
+        xtensor_optional<double, 2> m
+            {{ 0.0 ,       2.0         },
+             { 3.0 , xtl::missing<double>() }};
 
-    //     oss << m;
-    //     std::string expect = "{{  0,   2},\n {  3, N/A}}";
-    //     ASSERT_EQ(oss.str(), expect);
-    // }
+        oss << m;
+        std::string expect = "{{  0,   2},\n {  3, N/A}}";
+        ASSERT_EQ(oss.str(), expect);
+    }
 
     TEST(xoptional, ufunc)
     {

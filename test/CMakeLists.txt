@@ -82,7 +82,7 @@ set(XTENSOR_TESTS
     main.cpp
     test_common.hpp
     test_xaccumulator.cpp
-    # test_xadapt.cpp
+    test_xadapt.cpp
     test_xadaptor_semantic.cpp
     test_xarray.cpp
     test_xarray_adaptor.cpp
@@ -102,7 +102,7 @@ set(XTENSOR_TESTS
     test_xindex_view.cpp
     test_xinfo.cpp
     test_xiterator.cpp
-    # test_xio.cpp
+    test_xio.cpp
     test_xlayout.cpp
     test_xmath.cpp
     test_xnoalias.cpp
@@ -127,7 +127,7 @@ set(XTENSOR_TESTS
     test_xtensor_semantic.cpp
     test_xvectorize.cpp
     test_xview.cpp
-    # test_xview_semantic.cpp
+    test_xview_semantic.cpp
     test_xutils.cpp
 )
 

@@ -69,7 +69,7 @@ namespace xt
             using type = xarray<T, L>;
         };
 
-        template <class T, class I, xt::index_t N, layout_type L, class... SL>
+        template <class T, class I, std::size_t N, layout_type L, class... SL>
         struct view_temporary_type_impl<T, std::array<I, N>, L, SL...>
         {
             using type = xtensor<T, N + newaxis_count<SL...>() - integral_count<SL...>(), L>;

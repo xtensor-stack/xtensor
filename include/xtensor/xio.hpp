@@ -37,9 +37,9 @@ namespace xt
     {
         struct print_options_impl
         {
-            xt::index_t edgeitems = 3;
-            xt::index_t line_width = 75;
-            xt::index_t threshold = 1000;
+            std::size_t edgeitems = 3;
+            std::size_t line_width = 75;
+            std::size_t threshold = 1000;
             precision_type precision = -1;  // default precision
         };
 
@@ -55,7 +55,7 @@ namespace xt
          *
          * @param line_width The line width
          */
-        inline void set_line_width(xt::index_t line_width)
+        inline void set_line_width(std::size_t line_width)
         {
             print_options().line_width = line_width;
         }
@@ -66,7 +66,7 @@ namespace xt
          * @param threshold The number of elements in the xexpression that triggers
          *                  summarization in the output
          */
-        inline void set_threshold(xt::index_t threshold)
+        inline void set_threshold(std::size_t threshold)
         {
             print_options().threshold = threshold;
         }
@@ -78,7 +78,7 @@ namespace xt
          *
          * @param edgeitems The number of edge items
          */
-        inline void set_edgeitems(xt::index_t edgeitems)
+        inline void set_edgeitems(std::size_t edgeitems)
         {
             print_options().edgeitems = edgeitems;
         }
@@ -100,12 +100,12 @@ namespace xt
 
     namespace detail
     {
-        template <xt::index_t I>
+        template <std::size_t I>
         struct xout
         {
             template <class E, class F>
-            static std::ostream& output(std::ostream& out, const E& e, F& printer, xt::index_t blanks,
-                                        precision_type element_width, xt::index_t edgeitems, xt::index_t line_width)
+            static std::ostream& output(std::ostream& out, const E& e, F& printer, std::size_t blanks,
+                                        precision_type element_width, std::size_t edgeitems, std::size_t line_width)
             {
                 using size_type = typename E::size_type;
 
@@ -173,7 +173,7 @@ namespace xt
         {
             template <class E, class F>
             static std::ostream& output(std::ostream& out, const E& e, F& printer,
-                                        xt::index_t, precision_type, xt::index_t, xt::index_t)
+                                        std::size_t, precision_type, std::size_t, std::size_t)
             {
                 if (e.dimension() == 0)
                 {
@@ -186,11 +186,11 @@ namespace xt
             }
         };
 
-        template <xt::index_t I>
+        template <std::size_t I>
         struct recurser
         {
             template <class F, class E>
-            static void run(F& fn, const E& e, xt::index_t lim = 0)
+            static void run(F& fn, const E& e, std::size_t lim = 0)
             {
                 using size_type = typename E::size_type;
                 if (e.dimension() == 0)
@@ -612,10 +612,10 @@ namespace xt
 
 // Note: std::min is not constexpr on old versions of gcc (4.x) and clang.
 #define XTENSOR_MIN(x, y) (x > y ? y : x)
-        template <class T, xt::index_t N>
+        template <class T, std::size_t N>
         struct recursion_depth<std::array<T, N>>
         {
-            static constexpr xt::index_t value = XTENSOR_MIN(5, N);
+            static constexpr std::size_t value = XTENSOR_MIN(5, N);
         };
 #undef XTENSOR_MIN
     }
@@ -654,7 +654,7 @@ namespace xt
 
         detail::printer<E> p(precision);
 
-        constexpr xt::index_t depth = detail::recursion_depth<typename E::shape_type>::value;
+        constexpr std::size_t depth = detail::recursion_depth<typename E::shape_type>::value;
         detail::recurser<depth>::run(p, d, lim);
         p.init();
         detail::xout<depth>::output(out, d, p, 1, p.width(), lim, print_options::print_options().line_width);

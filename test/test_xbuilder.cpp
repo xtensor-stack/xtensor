@@ -256,14 +256,14 @@ namespace xt
         ASSERT_TRUE(all(equal(std::get<1>(mesh), expect1)));
     }
 
-    // TEST(xbuilder, meshgrid_arange)
-    // {
-    //     auto xrange = xt::arange(0, 2);
-    //     auto yrange = xt::arange(0, 2);
-    //     auto grid = xt::meshgrid(xrange, yrange);
-    //     std::ostringstream stream;
-    //     stream << std::get<0>(grid) << std::endl;
-    // }
+    TEST(xbuilder, meshgrid_arange)
+    {
+        auto xrange = xt::arange(0, 2);
+        auto yrange = xt::arange(0, 2);
+        auto grid = xt::meshgrid(xrange, yrange);
+        std::ostringstream stream;
+        stream << std::get<0>(grid) << std::endl;
+    }
 
     TEST(xbuilder, triu)
     {
