@@ -305,7 +305,7 @@ namespace xt
     template <class CT, class S, class CD>
     inline auto xstrided_view<CT, S, CD>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        return xt::compute_size(shape());
     }
 
     /**
@@ -347,13 +347,13 @@ namespace xt
     template <class CT, class S, class CD>
     inline auto xstrided_view<CT, S, CD>::data() noexcept -> underlying_container_type&
     {
-        return m_e.data();
+        return m_data;
     }
 
     template <class CT, class S, class CD>
     inline auto xstrided_view<CT, S, CD>::data() const noexcept -> const underlying_container_type&
     {
-        return m_e.data();
+        return m_data;
     }
 
     template <class CT, class S, class CD>
@@ -815,7 +815,7 @@ namespace xt
             {
                 resize_container(m_index, m_e.dimension());
                 resize_container(m_strides, m_e.dimension());
-                m_size = compute_size(m_e.shape());
+                m_size = xt::compute_size(m_e.shape());
                 compute_strides(m_e.shape(), DEFAULT_LAYOUT, m_strides);
             }
 
@@ -1015,7 +1015,7 @@ namespace xt
                 offset += std::size_t(info[0]) * old_strides[i - newaxis_skip];
                 new_shape[idx] = std::size_t(info[1]);
                 new_strides[idx] = std::size_t(info[2]) * old_strides[i - newaxis_skip];
-                idx++;
+                ++idx;
             }
         }
 
