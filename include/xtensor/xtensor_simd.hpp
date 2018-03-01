@@ -21,6 +21,9 @@
 
 namespace xsimd
 {
+    template <class T, std::size_t A>
+    class aligned_allocator;
+
     struct aligned_mode
     {
     };

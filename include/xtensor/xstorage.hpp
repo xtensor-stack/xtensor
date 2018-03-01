@@ -18,13 +18,14 @@
 
 #include "xexception.hpp"
 #include "xutils.hpp"
+#include "xtensor_simd.hpp"
 
-#ifndef XSHAPE_ALIGNMENT
+#ifndef XALIGNMENT
     #ifdef XTENSOR_USE_XSIMD
         #include "xsimd/xsimd.hpp"
-        #define XSHAPE_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
+        #define XALIGNMENT XSIMD_DEFAULT_ALIGNMENT
     #else
-        #define XSHAPE_ALIGNMENT T
+        #define XALIGNMENT 0
     #endif
 #endif
 
@@ -539,6 +540,21 @@ namespace xt
      * svector implementation *
      **************************/
 
+    namespace detail
+    {
+        template <class T>
+        struct allocator_alignment
+        {
+            constexpr static std::size_t value = 0;
+        };
+
+        template <class T, std::size_t A>
+        struct allocator_alignment<xsimd::aligned_allocator<T, A>>
+        {
+            constexpr static std::size_t value = A;
+        };
+    }
+
     template <class T, std::size_t N, class A = std::allocator<T>, bool Init = true>
     class svector
     {
@@ -558,6 +574,13 @@ namespace xt
         using const_iterator = const_pointer;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+    #if defined(_MSC_VER) && _MSC_VER < 1910
+        constexpr static std::size_t alignment = detail::allocator_alignment<A>::value;
+    #else
+        constexpr static std::size_t alignment = detail::allocator_alignment<A>::value != 0 ?
+                                                    detail::allocator_alignment<A>::value : alignof(T);
+    #endif
 
         svector() noexcept;
         ~svector();
@@ -644,7 +667,7 @@ namespace xt
         T* m_capacity = std::end(m_data);
 
         // stack allocated memory
-        alignas(XSHAPE_ALIGNMENT) T m_data[N > 0 ? N : 1];
+        alignas(alignment) T m_data[N > 0 ? N : 1];
 
         void grow(size_type min_capacity = 0);
         void destroy_range(T* begin, T* end);
@@ -1169,6 +1192,125 @@ namespace xt
         lhs.swap(rhs);
     }
 
+#if defined(_MSC_VER) && _MSC_VER < 1910
+    #define SELECT_ALIGN XALIGNMENT
+#else
+    #define SELECT_ALIGN (XALIGNMENT != 0 ? XALIGNMENT : alignof(T))
+#endif
+
+    /**
+     * This array class is modeled after ``std::array`` but adds optional alignment through a template parameter.
+     *
+     * To be moved to xtl, along with the rest of xstorage.hpp
+     */
+    template <class T, std::size_t N, std::size_t Align = SELECT_ALIGN>
+    class alignas(Align) aligned_array : public std::array<T, N>
+    {
+    public:
+        // Note: this is for alignment detection. The allocator serves no other purpose than
+        //       that of a trait here.
+        using allocator_type = std::conditional_t<Align != 0,
+                                                  xsimd::aligned_allocator<T, Align>,
+                                                  std::allocator<T>>;
+    };
+
+#if defined(_MSC_VER)
+    #define CONST
+#else
+    #define CONST const
+#endif
+
+    /**
+     * A std::array like class with all member function (except reverse iterators)
+     * as constexpr. The data is immutable once set.
+     */
+    template <class T, std::size_t N>
+    struct const_array
+    {
+        using size_type = std::size_t;
+        using value_type = T;
+        using pointer = value_type*;
+        using const_pointer = const value_type*;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+        using difference_type = std::ptrdiff_t;
+        using iterator = pointer;
+        using const_iterator = const_pointer;
+
+        using reverse_iterator = std::reverse_iterator<const_iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+        constexpr const_reference operator[](std::size_t idx) const
+        {
+            return m_data[idx];
+        }
+
+        constexpr const_iterator begin() const noexcept
+        {
+            return cbegin();
+        }
+
+        constexpr const_iterator end() const noexcept
+        {
+            return cend();
+        }
+
+        constexpr const_iterator cbegin() const noexcept
+        {
+            return m_data;
+        }
+
+        constexpr const_iterator cend() const noexcept
+        {
+            return m_data + N;
+        }
+
+        // TODO make constexpr once C++17 arrives
+        reverse_iterator rbegin() const noexcept
+        {
+            return crbegin();
+        }
+
+        reverse_iterator rend() const noexcept
+        {
+            return crend();
+        }
+
+        const_reverse_iterator crbegin() const noexcept
+        {
+            return const_reverse_iterator(end());
+        }
+
+        const_reverse_iterator crend() const noexcept
+        {
+            return const_reverse_iterator(begin());
+        }
+
+        constexpr const_pointer data() const noexcept
+        {
+            return m_data;
+        }
+
+        constexpr const_reference front() const noexcept
+        {
+            return m_data[0];
+        }
+
+        constexpr const_reference back() const noexcept
+        {
+            return m_data[size() - 1];
+        }
+
+        constexpr size_type size() const noexcept
+        {
+            return N;
+        }
+
+        CONST T m_data[N > 0 ? N : 1];
+    };
 }
+
+#undef XALIGNMENT
+#undef SELECT_ALIGN
 
 #endif
