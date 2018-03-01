@@ -162,6 +162,10 @@ namespace xt
         const_stepper stepper_end(const ST& shape, layout_type l) const;
 
         template <class T = xexpression_type>
+        std::enable_if_t<has_raw_data_interface<T>::value, typename T::container_type&>
+        data();
+
+        template <class T = xexpression_type>
         std::enable_if_t<has_raw_data_interface<T>::value, const typename T::container_type&>
         data() const;
 
@@ -600,6 +604,14 @@ namespace xt
      * container). ``xt::eval`` will make sure that the underlying xexpression is
      * on a realized container.
      */
+    template <class CT, class... S>
+    template <class T>
+    inline auto xview<CT, S...>::data() ->
+        std::enable_if_t<has_raw_data_interface<T>::value, typename T::container_type&>
+    {
+        return m_e.data();
+    }
+
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::data() const ->
