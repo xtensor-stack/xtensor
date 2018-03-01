@@ -1214,6 +1214,12 @@ namespace xt
                                                   std::allocator<T>>;
     };
 
+#if defined(_MSC_VER)
+    #define CONST
+#else
+    #define CONST const
+#endif
+
     /**
      * A std::array like class with all member function (except reverse iterators)
      * as constexpr. The data is immutable once set.
@@ -1285,22 +1291,22 @@ namespace xt
             return m_data;
         }
 
-        constexpr const_reference front() const
+        constexpr const_reference front() const noexcept
         {
             return m_data[0];
         }
 
-        constexpr const_reference back() const
+        constexpr const_reference back() const noexcept
         {
             return m_data[size() - 1];
         }
 
-        constexpr size_type size() const
+        constexpr size_type size() const noexcept
         {
             return N;
         }
 
-        const T m_data[N > 0 ? N : 1];
+        CONST T m_data[N > 0 ? N : 1];
     };
 }
 
