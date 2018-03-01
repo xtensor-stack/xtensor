@@ -1198,6 +1198,11 @@ namespace xt
     #define SELECT_ALIGN (XALIGNMENT != 0 ? XALIGNMENT : alignof(T))
 #endif
 
+    /**
+     * This array class is modeled after ``std::array`` but adds optional alignment through a template parameter.
+     *
+     * To be moved to xtl, along with the rest of xstorage.hpp
+     */
     template <class T, std::size_t N, std::size_t Align = SELECT_ALIGN>
     class alignas(Align) aligned_array : public std::array<T, N>
     {
@@ -1210,10 +1215,8 @@ namespace xt
     };
 
     /**
-     * This array class is modeled after ``std::array`` but adds optional alignment through a template
-     * parameter and all accessors/iterators (except reverse) are constexpr qualified.
-     *
-     * To be moved to xtl, along with the rest of xstorage.hpp
+     * A std::array like class with all member function (except reverse iterators)
+     * as constexpr. The data is immutable once set.
      */
     template <class T, std::size_t N>
     struct const_array
@@ -1297,7 +1300,7 @@ namespace xt
             return N;
         }
 
-        T m_data[N > 0 ? N : 1];
+        const T m_data[N > 0 ? N : 1];
     };
 }
 
