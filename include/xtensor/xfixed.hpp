@@ -37,7 +37,7 @@ namespace xt
     {
     public:
 
-        using cast_type = detail::array<std::size_t, sizeof...(X)>;
+        using cast_type = const_array<std::size_t, sizeof...(X)>;
 
         constexpr static std::size_t size()
         {
@@ -58,7 +58,7 @@ namespace xt
 namespace std
 {
     template <class T, size_t N>
-    class tuple_size<xt::detail::array<T, N>> :
+    class tuple_size<xt::const_array<T, N>> :
         public integral_constant<size_t, N>
     {
     };
@@ -69,9 +69,9 @@ namespace xtl
     namespace detail
     {
         template <class T, std::size_t N>
-        struct sequence_builder<xt::detail::array<T, N>>
+        struct sequence_builder<xt::const_array<T, N>>
         {
-            using sequence_type = xt::detail::array<T, N>;
+            using sequence_type = xt::const_array<T, N>;
             using value_type = typename sequence_type::value_type;
             using size_type = typename sequence_type::size_type;
 
@@ -183,7 +183,7 @@ namespace xt
         };
 
         template <layout_type L, std::size_t... X, std::size_t... I>
-        constexpr xt::detail::array<std::size_t, sizeof...(X)>
+        constexpr const_array<std::size_t, sizeof...(X)>
         get_strides_impl(const xt::fixed_shape<X...>& /*shape*/, std::index_sequence<I...>)
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
@@ -223,7 +223,7 @@ namespace xt
     }
 
     template <layout_type L, std::size_t... X>
-    constexpr detail::array<std::size_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape)
+    constexpr const_array<std::size_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape)
     {
         return detail::get_strides_impl<L>(shape, std::make_index_sequence<sizeof...(X)>{});
     }
@@ -245,7 +245,7 @@ namespace xt
         using shape_type = std::array<typename inner_shape_type::value_type,
                                       std::tuple_size<inner_shape_type>::value>;
         using strides_type = shape_type;
-        using container_type = detail::array<ET, detail::compute_size<S>::value>;
+        using container_type = aligned_array<ET, detail::compute_size<S>::value>;
         using temporary_type = xfixed_container<ET, S, L, Tag>;
         static constexpr layout_type layout = L;
     };
@@ -682,5 +682,10 @@ namespace xt
         return m_backstrides;
     }
 }
+
+#undef CONSTEXPR_ENHANCED
+#undef CONSTEXPR_RETURN
+#undef CONSTEXPR_ENHANCED_STATIC
+#undef HAS_CONSTEXPR_ENHANCED
 
 #endif
