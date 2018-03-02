@@ -15,6 +15,7 @@ Containers and views
    xarray_adaptor
    xtensor
    xtensor_adaptor
+   xfixed
    xoptional_assembly_base
    xoptional_assembly
    xoptional_assembly_adaptor

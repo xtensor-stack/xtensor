@@ -63,17 +63,21 @@ If the layout of the array can be fixed at compile time, we can even do simpler:
 
     std::vector<size_t> shape = { 3, 2, 4 };
     xt::xarray<double, layout_type::row_major> a(shape);
+    // this shortcut is equivalent:
+    // xt::xarray<double> a(shape);
 
 However, in that latter case, the layout of the array is forced to ``row_major`` at compile time, and therefore cannot be changed at runtime.
 
 Runtime vs Compile-time dimensionality
 --------------------------------------
 
-Two container classes implementing multi-dimensional arrays are provided: ``xarray`` and ``xtensor``.
+Three container classes implementing multi-dimensional arrays are provided: ``xarray`` and ``xtensor`` and ``xtensorf``.
 
 - ``xarray`` can be reshaped dynamically to any number of dimensions. It is the container that is the most similar to numpy arrays.
 - ``xtensor`` has a dimension set at compilation time, which enables many optimizations. For example, shapes and strides
   of ``xtensor`` instances are allocated on the stack instead of the heap.
+- ``xtensorf`` has a shape fixed at compile time. This allows even more optimizations, such as allocating the storage for the container
+  on the stack, as well as computing strides and backstrides at compile time, making the allocation of this container extremely cheap.
 
 Let's use ``xtensor`` instead of ``xarray`` in the previous example:
 
@@ -83,15 +87,26 @@ Let's use ``xtensor`` instead of ``xarray`` in the previous example:
     #include "xtensor/xtensor.hpp"
 
     std::array<size_t, 3> shape = { 3, 2, 4 };
-    xt::xtensor<double, 3, layout_type::row_major> a(shape);
+    xt::xtensor<double, 3> a(shape);
+    // whis is equivalent to
+    // xt::xtensor<double, 3, layout_type::row_major> a(shape);
 
-``xarray`` and ``xtensor`` containers are both ``xexpression`` s and can be involved and mixed in mathematical expressions, assigned to each
+
+Or when using ``xtensorf``:
+
+.. code::
+
+    #include "xtensor/xfixed.hpp"
+
+    xt::xtensorf<double, xt::xshape<3, 2, 4>> a();
+    // or xt::xtensorf<double, xt::xshape<3, 2, 4>, xt::layout_type::row_major>()
+
+``xarray``, ``xtensor`` and ``xtensorf`` containers are all ``xexpression`` s and can be involved and mixed in mathematical expressions, assigned to each
 other etc... They provide an augmented interface compared to other ``xexpression`` types:
 
-- Each method exposed in ``xexpression`` interface has its non-const counterpart exposed by both ``xarray`` and ``xtensor``.
+- Each method exposed in ``xexpression`` interface has its non-const counterpart exposed by ``xarray``, ``xtensor`` and ``xtensorf``.
 - ``reshape()`` reshapes the container in place, and the global size of the container has to stay the same.
 - ``resize()`` resizes the container in place, that is, if the global size of the container doesn't change, no memory allocation occurs.
-- ``transpose()`` transposes the container in place, that is, no memory allocation occurs.
 - ``strides()`` returns the strides of the container, used to compute the position of an element in the underlying buffer.
 
 Performance

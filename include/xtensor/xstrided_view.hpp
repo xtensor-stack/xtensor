@@ -941,9 +941,17 @@ namespace xt
      *
      * \code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
-     * xt::slice_vector sv(a, xt::range(0, 1));
+     * xt::slice_vector sv({xt::range(0, 1)});
      * sv.push_back(xt::range(0, 3, 2));
      * auto v = xt::dynamic_view(a, sv);
+     * // ==> {{1, 3}}
+     * \endcode
+     * 
+     * You can also achieve the same with the following short-hand syntax:
+     * 
+     * \code{.cpp}
+     * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
+     * auto v = xt::dynamic_view(a, {xt::range(0, 1), xt::range(0, 3, 2)});
      * // ==> {{1, 3}}
      * \endcode
      */
