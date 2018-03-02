@@ -214,7 +214,7 @@ namespace xt
     }
 
     template <std::size_t... X>
-    constexpr std::size_t compute_size(const xt::fixed_shape<X...>& shape)
+    constexpr std::size_t compute_size(const fixed_shape<X...>& shape)
     {
         return detail::compute_size_impl<X...>::value;
     }

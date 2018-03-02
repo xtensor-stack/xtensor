@@ -20,7 +20,7 @@ namespace xt
 {
 
     template <class shape_type>
-    auto compute_size(const shape_type& shape) noexcept;
+    std::size_t compute_size(const shape_type& shape) noexcept;
 
     /***************
      * data offset *
@@ -99,10 +99,10 @@ namespace xt
      ******************/
 
     template <class shape_type>
-    inline auto compute_size(const shape_type& shape) noexcept
+    inline std::size_t compute_size(const shape_type& shape) noexcept
     {
         using size_type = std::decay_t<typename shape_type::value_type>;
-        return std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>());
+        return static_cast<std::size_t>(std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>()));
     }
 
     namespace detail
