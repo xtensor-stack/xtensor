@@ -305,7 +305,7 @@ namespace xt
     template <class CT, class S, class CD>
     inline auto xstrided_view<CT, S, CD>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        return xt::compute_size(shape());
     }
 
     /**
@@ -815,7 +815,7 @@ namespace xt
             {
                 resize_container(m_index, m_e.dimension());
                 resize_container(m_strides, m_e.dimension());
-                m_size = compute_size(m_e.shape());
+                m_size = xt::compute_size(m_e.shape());
                 compute_strides(m_e.shape(), DEFAULT_LAYOUT, m_strides);
             }
 
