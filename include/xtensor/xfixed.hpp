@@ -32,6 +32,11 @@
 
 namespace xt
 {
+    /**
+     * @class fixed_shape
+     * Fixed shape implementation for compile time defined arrays.
+     * @sa xshape
+     */
     template <std::size_t... X>
     class fixed_shape
     {
@@ -265,10 +270,10 @@ namespace xt
      * with tensor semantic and fixed dimension
      *
      * @tparam ET The type of the elements.
-     * @tparam S The shape of the container.
+     * @tparam S The xshape template paramter of the container. 
      * @tparam L The layout_type of the tensor.
      * @tparam Tag The expression tag.
-     * @sa xtensor
+     * @sa xtensorf
      */
     template <class ET, class S, layout_type L, class Tag>
     class xfixed_container : public xcontainer<xfixed_container<ET, S, L, Tag>>,
@@ -392,7 +397,7 @@ namespace xt
      * tensor semantic to stl-like containers.
      *
      * @tparam EC The closure for the container type to adapt.
-     * @tparam N The dimension of the adaptor.
+     * @tparam S The xshape template parameter for the fixed shape of the adaptor
      * @tparam L The layout_type of the adaptor.
      * @tparam Tag The expression tag.
      */
@@ -474,7 +479,7 @@ namespace xt
      */
     //@{
     /**
-     * Allocates an uninitialized xfixed_container that holds 0 element.
+     * Allocates an uninitialized xfixed_container according to the shape template parameter.
      */
     template <class ET, class S, layout_type L, class Tag>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container()
@@ -482,7 +487,7 @@ namespace xt
     }
 
     /**
-     * Allocates an xfixed_container with nested initializer lists.
+     * Allocates an xfixed_container with shape S with values from nested initializer lists.
      */
     template <class ET, class S, layout_type L, class Tag>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
@@ -516,6 +521,10 @@ namespace xt
     }
     //@}
 
+    /**
+     * Note that the xfixed_container **cannot** be resized. Attempting to resize with a different
+     * size throws an assert in debug mode.
+     */
     template <class ET, class S, layout_type L, class Tag>
     template <class ST>
     inline void xfixed_container<ET, S, L, Tag>::resize(ST&& shape, bool) const
@@ -524,6 +533,9 @@ namespace xt
         XTENSOR_ASSERT(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size());
     }
 
+    /**
+     * Note that the xfixed_container **cannot** be reshaped to a shape different from ``S``.
+     */
     template <class ET, class S, layout_type L, class Tag>
     template <class ST>
     inline void xfixed_container<ET, S, L, Tag>::reshape(ST&& shape, layout_type layout) const
