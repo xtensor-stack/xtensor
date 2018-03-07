@@ -20,7 +20,6 @@
 #include "xexpression.hpp"
 #include "xstrided_view.hpp"
 #include "xmath.hpp"
-#include "xview.hpp"
 
 #ifdef _WIN32
     using precision_type = typename std::streamsize;
