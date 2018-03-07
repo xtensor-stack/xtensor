@@ -78,9 +78,12 @@ find_package(Threads)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set(XTENSOR_TESTS
+set(COMMON_BASE
     main.cpp
     test_common.hpp
+)
+
+set(XTENSOR_TESTS
     test_xaccumulator.cpp
     test_xadapt.cpp
     test_xadaptor_semantic.cpp
@@ -136,7 +139,7 @@ if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION V
     list(REMOVE_ITEM XTENSOR_TESTS test_xinfo.cpp)
 endif()
 
-set(XTENSOR_TARGET test_xtensor)
+set(XTENSOR_TARGET test_xtensor_lib)
 
 # Add files for npy tests
 set(XNPY_FILES
@@ -152,11 +155,21 @@ foreach(filename IN LISTS XNPY_FILES)
         ${CMAKE_CURRENT_BINARY_DIR}/files/xnpy_files/${filename} COPYONLY)
 endforeach()
 
-add_executable(${XTENSOR_TARGET} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+foreach(filename IN LISTS XTENSOR_TESTS)
+    string(REPLACE ".cpp" "" targetname ${filename})
+    add_executable(${targetname} ${COMMON_BASE} ${filename} ${XTENSOR_HEADERS})
+    target_link_libraries(${targetname} xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+    if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
+        add_dependencies(${targetname} gtest_main)
+    endif()
+    add_custom_target(x${targetname} COMMAND ${targetname} DEPENDS ${targetname})
+endforeach()
+
+add_executable(${XTENSOR_TARGET} ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(${XTENSOR_TARGET} gtest_main)
 endif()
 target_link_libraries(${XTENSOR_TARGET} xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor DEPENDS ${XTENSOR_TARGET})
+add_custom_target(xtest COMMAND ${XTENSOR_TARGET} DEPENDS ${XTENSOR_TARGET})
 

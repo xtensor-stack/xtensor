@@ -32,8 +32,8 @@ install:
   - conda install gtest cmake -c conda-forge
   - conda install xtl==0.4.1 -c QuantStack
   - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON .
-  - nmake test_xtensor
+  - nmake test_xtensor_lib
   - cd test
 
 build_script:
-  - .\test_xtensor
+  - .\test_xtensor_lib

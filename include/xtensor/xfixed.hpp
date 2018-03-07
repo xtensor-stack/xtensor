@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "xcontainer.hpp"
+#include "xstrides.hpp"
 #include "xstorage.hpp"
 #include "xsemantic.hpp"
 
@@ -217,24 +218,25 @@ namespace xt
             constexpr static std::size_t value = X;
         };
 
+        // TODO unify with constexpr compute_size when dropping MSVC 2015
         template <class T>
-        struct compute_size;
-
+        struct fixed_compute_size;
+        
         template <std::size_t... X>
-        struct compute_size<xt::fixed_shape<X...>>
+        struct fixed_compute_size<xt::fixed_shape<X...>>
         {
             constexpr static std::size_t value = compute_size_impl<X...>::value;
         };
     }
 
     template <layout_type L, std::size_t... X>
-    constexpr const_array<std::size_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape)
+    constexpr const_array<std::size_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape) noexcept
     {
         return detail::get_strides_impl<L>(shape, std::make_index_sequence<sizeof...(X)>{});
     }
 
     template <class T>
-    constexpr T get_backstrides(const T& shape, const T& strides)
+    constexpr T get_backstrides(const T& shape, const T& strides) noexcept
     {
         return detail::get_backstrides_impl(shape, strides,
                                             std::make_index_sequence<std::tuple_size<T>::value>{});
@@ -250,7 +252,7 @@ namespace xt
         using shape_type = std::array<typename inner_shape_type::value_type,
                                       std::tuple_size<inner_shape_type>::value>;
         using strides_type = shape_type;
-        using container_type = aligned_array<ET, detail::compute_size<S>::value>;
+        using container_type = aligned_array<ET, detail::fixed_compute_size<S>::value>;
         using temporary_type = xfixed_container<ET, S, L, Tag>;
         static constexpr layout_type layout = L;
     };

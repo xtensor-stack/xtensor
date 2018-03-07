@@ -126,7 +126,7 @@ install:
       else
         cmake -DBUILD_TESTS=ON ..;
       fi
-    - make -j2 test_xtensor
+    - make -j2 test_xtensor_lib
     - cd test
 script:
-    - ./test_xtensor
+    - ./test_xtensor_lib
