@@ -84,7 +84,7 @@ namespace xt
             auto begin = e.data().begin();
             result_type tmp = init_fct(*begin);
             ++begin;
-            result(0) = std::accumulate(begin, e.data().end(), tmp, acc_fct);
+            result = std::accumulate(begin, e.data().end(), tmp, acc_fct);
             return result;
         }
 
