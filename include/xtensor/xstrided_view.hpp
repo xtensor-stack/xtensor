@@ -822,11 +822,23 @@ namespace xt
             const reference operator[](std::size_t idx) const
             {
                 std::size_t quot;
-                for (size_type i = 0; i < m_strides.size(); ++i)
+                if (DEFAULT_LAYOUT == xt::layout_type::row_major)
                 {
-                    quot = idx / m_strides[i];
-                    idx = idx % m_strides[i];
-                    m_index[i] = quot;
+                    for (size_type i = 0; i < m_strides.size(); ++i)
+                    {
+                        quot = idx / m_strides[i];
+                        idx = idx % m_strides[i];
+                        m_index[i] = quot;
+                    }
+                }
+                else
+                {
+                    for (size_type i = m_strides.size(); i != 0; --i)
+                    {
+                        quot = idx / m_strides[i - 1];
+                        idx = idx % m_strides[i - 1];
+                        m_index[i - 1] = quot;
+                    }
                 }
                 return m_e.element(m_index.cbegin(), m_index.cend());
             }
