@@ -71,8 +71,10 @@ you are actually also altering the underlying expression.
 Dynamic views
 -------------
 
-While the ``xt::view`` is a compile-time static expression, xtensor also contains a dynamic view in ``xstrided_view.hpp``. The dynamic view and the slice vector allow to dynamically push_back slices, so when the dimension is unknown at compile time, the slice vector can be built dynamically at runtime. Note that the slice vector is actually a type-alias for a ``std::vector`` of a ``variant`` for all the slice types.
-All the same slices as in xview can be used.
+While the ``xt::view`` is a compile-time static expression, xtensor also contains a dynamic view in ``xstrided_view.hpp``. The dynamic
+view and the slice vector allow to dynamically push_back slices, so when the dimension is unknown at compile time, the slice vector can
+be built dynamically at runtime. Note that the slice vector is actually a type-alias for a ``std::vector`` of a ``variant`` for all the
+slice types. All the same slices as in xview can be used.
 
 .. code::
 
@@ -88,9 +90,29 @@ All the same slices as in xview can be used.
     auto v1 = xt::dynamic_view(a, sv);
     // v1 has the same behavior as the static view
 
-The dynamic_view is implemented on top of the strided_view, which is very efficient on contigous memory (e.g. xtensor or xarray) 
-but less efficient on xexpressions.
+The ``dynamic_view`` is implemented on top of the ``xstrided_view``, which is very efficient on contigous memory (e.g. ``xtensor`` or
+``xarray``) but less efficient on xexpressions.
 
+Transposed views
+----------------
+
+``xtensor`` provides a lazy transposed view on any expression, whose layout is either row major order or column major order. Trying to build
+a transposed view on a expression with a dynamic layout throws an exception.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xstrided_view.hpp"
+    
+    xt::xarray<int> a = { {0, 1, 2}, {3, 4, 5} };
+    auto tr = xt::transpose(a);
+    // tr == { {0, 3}, {1, 4}, {2, 5} }
+
+    xt::xarray<int, layout_type::dynamic> b = { {0, 1, 2}, {3, 4, 5} };
+    auto tr2 = xt::transpose(b);
+    // => throw transpose_error
+
+Like the dynamic view, the transposed view is built upon the ``xstrided_view``.
 
 Index views
 -----------

@@ -141,7 +141,7 @@ namespace xt
                         elems_on_line = 0;
                     }
 
-                    slices.push_back(i);
+                    slices.push_back(static_cast<int>(i));
                     xoutput(out, e, slices, printer, blanks + 1, element_width, edgeitems, line_width) << ',';
                     slices.pop_back();
                     elems_on_line++;
@@ -161,7 +161,7 @@ namespace xt
                     out << std::endl
                         << indents;
                 }
-                slices.push_back(i);
+                slices.push_back(static_cast<int>(i));
                 xoutput(out, e, slices, printer, blanks + 1, element_width, edgeitems, line_width) << '}';
                 slices.pop_back();
             }
@@ -186,11 +186,11 @@ namespace xt
                     {
                         i = view.shape()[0] - lim;
                     }
-                    slices.push_back(i);
+                    slices.push_back(static_cast<int>(i));
                     recurser_run(fn, e, slices, lim);
                     slices.pop_back();
                 }
-                slices.push_back(i);
+                slices.push_back(static_cast<int>(i));
                 recurser_run(fn, e, slices, lim);
                 slices.pop_back();
             }

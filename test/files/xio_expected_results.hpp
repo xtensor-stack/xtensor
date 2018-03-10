@@ -515,11 +515,16 @@ static std::string print_options_result = R"xio({{ 4.2591064316, -1.4305814994, 
 static std::string long_strings = R"xio({{some, random very long and very very, boring},
  {strings, in, xtensor xarray}})xio";
 
-
-static std::string bool_fn = R"xio({{ true, false,  true,  true, false},
+static std::string bool_fn_rm = R"xio({{ true, false,  true,  true, false},
  { true, false,  true, false, false},
  { true, false, false,  true,  true},
  { true, false, false,  true, false},
+ {false, false,  true, false, false}})xio";
+
+static std::string bool_fn_cm = R"xio({{ true,  true,  true,  true, false},
+ {false, false, false, false, false},
+ { true,  true, false, false,  true},
+ { true, false,  true,  true, false},
  {false, false,  true, false, false}})xio";
 
 

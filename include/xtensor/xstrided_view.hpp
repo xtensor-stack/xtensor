@@ -656,143 +656,6 @@ namespace xt
         return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides), offset, layout);
     }
 
-    /****************************
-     * transpose implementation *
-     ****************************/
-
-    namespace detail
-    {
-        template <class E, class S>
-        inline auto transpose_impl(E&& e, S&& permutation, check_policy::none)
-        {
-            if (sequence_size(permutation) != e.dimension())
-            {
-                throw transpose_error("Permutation does not have the same size as shape");
-            }
-
-            // permute stride and shape
-            using strides_type = typename std::decay_t<E>::strides_type;
-            strides_type temp_strides;
-            resize_container(temp_strides, e.strides().size());
-
-            using shape_type = typename std::decay_t<E>::shape_type;
-            shape_type temp_shape;
-            resize_container(temp_shape, e.shape().size());
-
-            using size_type = typename std::decay_t<E>::size_type;
-            for (std::size_t i = 0; i < e.shape().size(); ++i)
-            {
-                if (std::size_t(permutation[i]) >= e.dimension())
-                {
-                    throw transpose_error("Permutation contains wrong axis");
-                }
-                size_type perm = static_cast<size_type>(permutation[i]);
-                temp_shape[i] = e.shape()[perm];
-                temp_strides[i] = e.strides()[perm];
-            }
-
-            layout_type new_layout = layout_type::dynamic;
-            if (std::is_sorted(std::begin(permutation), std::end(permutation)))
-            {
-                // keep old layout
-                new_layout = e.layout();
-            }
-            else if (std::is_sorted(std::begin(permutation), std::end(permutation), std::greater<>()))
-            {
-                // this swaps the layout
-                if (e.layout() == layout_type::row_major)
-                {
-                    new_layout = layout_type::column_major;
-                }
-                else if (e.layout() == layout_type::column_major)
-                {
-                    new_layout = layout_type::row_major;
-                }
-            }
-
-            using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
-            return view_type(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), 0, new_layout);
-        }
-
-        template <class E, class S>
-        inline auto transpose_impl(E&& e, S&& permutation, check_policy::full)
-        {
-            // check if axis appears twice in permutation
-            for (std::size_t i = 0; i < sequence_size(permutation); ++i)
-            {
-                for (std::size_t j = i + 1; j < sequence_size(permutation); ++j)
-                {
-                    if (permutation[i] == permutation[j])
-                    {
-                        throw transpose_error("Permutation contains axis more than once");
-                    }
-                }
-            }
-            return transpose_impl(std::forward<E>(e), std::forward<S>(permutation), check_policy::none());
-        }
-    }
-
-    /**
-     * Returns a transpose view by reversing the dimensions of xexpression e
-     * @param e the input expression
-     */
-    template <class E>
-    inline auto transpose(E&& e) noexcept
-    {
-        using shape_type = typename std::decay_t<E>::shape_type;
-
-        shape_type shape;
-        resize_container(shape, e.shape().size());
-        std::copy(e.shape().rbegin(), e.shape().rend(), shape.begin());
-
-        shape_type strides;
-        resize_container(strides, e.strides().size());
-        std::copy(e.strides().rbegin(), e.strides().rend(), strides.begin());
-
-        layout_type new_layout = layout_type::dynamic;
-        if (e.layout() == layout_type::row_major)
-        {
-            new_layout = layout_type::column_major;
-        }
-        else if (e.layout() == layout_type::column_major)
-        {
-            new_layout = layout_type::row_major;
-        }
-
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
-        return view_type(std::forward<E>(e), std::move(shape), std::move(strides), 0, new_layout);
-    }
-
-    /**
-     * Returns a transpose view by permuting the xexpression e with @p permutation.
-     * @param e the input expression
-     * @param permutation the sequence containing permutation
-     * @param check_policy the check level (check_policy::full() or check_policy::none())
-     * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
-     */
-    template <class E, class S, class Tag = check_policy::none>
-    inline auto transpose(E&& e, S&& permutation, Tag check_policy = Tag())
-    {
-        return detail::transpose_impl(std::forward<E>(e), std::forward<S>(permutation), check_policy);
-    }
-
-    /// @cond DOXYGEN_INCLUDE_SFINAE
-#ifdef X_OLD_CLANG
-    template <class E, class I, class Tag = check_policy::none>
-    inline auto transpose(E&& e, std::initializer_list<I> permutation, Tag check_policy = Tag())
-    {
-        dynamic_shape<I> perm(permutation);
-        return detail::transpose_impl(std::forward<E>(e), std::move(perm), check_policy);
-    }
-#else
-    template <class E, class I, std::size_t N, class Tag = check_policy::none>
-    inline auto transpose(E&& e, const I (&permutation)[N], Tag check_policy = Tag())
-    {
-        return detail::transpose_impl(std::forward<E>(e), permutation, check_policy);
-    }
-#endif
-    /// @endcond
-
     namespace detail
     {
         template <class CT>
@@ -816,13 +679,14 @@ namespace xt
                 resize_container(m_index, m_e.dimension());
                 resize_container(m_strides, m_e.dimension());
                 m_size = compute_size(m_e.shape());
-                compute_strides(m_e.shape(), DEFAULT_LAYOUT, m_strides);
+                m_layout = m_e.layout();
+                compute_strides(m_e.shape(), m_layout, m_strides);
             }
 
             const reference operator[](std::size_t idx) const
             {
                 std::size_t quot;
-                if (DEFAULT_LAYOUT == xt::layout_type::row_major)
+                if (m_layout == xt::layout_type::row_major)
                 {
                     for (size_type i = 0; i < m_strides.size(); ++i)
                     {
@@ -854,6 +718,7 @@ namespace xt
             shape_type m_strides;
             mutable index_type m_index;
             size_type m_size;
+            layout_type m_layout;
         };
 
         template <class E>
@@ -898,6 +763,10 @@ namespace xt
         xt::xnewaxis_tag
     >;
 
+    /**
+     * @typedef slice_vector
+     * @brief vector of slices used to build a `xstrided_view`
+     */
     using slice_vector = std::vector<slice_variant<int>>;
 
     namespace detail
@@ -1044,6 +913,170 @@ namespace xt
         // TODO change layout type?
         return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), offset, layout_type::dynamic);
     }
+
+    /****************************
+     * transpose implementation *
+     ****************************/
+
+    namespace detail
+    {
+        template <class E, class S>
+        inline auto transpose_impl(E&& e, S&& permutation, check_policy::none)
+        {
+            if (sequence_size(permutation) != e.dimension())
+            {
+                throw transpose_error("Permutation does not have the same size as shape");
+            }
+
+            // permute stride and shape
+            using strides_type = typename std::decay_t<E>::strides_type;
+            strides_type temp_strides;
+            resize_container(temp_strides, e.strides().size());
+
+            using shape_type = typename std::decay_t<E>::shape_type;
+            shape_type temp_shape;
+            resize_container(temp_shape, e.shape().size());
+
+            using size_type = typename std::decay_t<E>::size_type;
+            for (std::size_t i = 0; i < e.shape().size(); ++i)
+            {
+                if (std::size_t(permutation[i]) >= e.dimension())
+                {
+                    throw transpose_error("Permutation contains wrong axis");
+                }
+                size_type perm = static_cast<size_type>(permutation[i]);
+                temp_shape[i] = e.shape()[perm];
+                temp_strides[i] = e.strides()[perm];
+            }
+
+            layout_type new_layout = layout_type::dynamic;
+            if (std::is_sorted(std::begin(permutation), std::end(permutation)))
+            {
+                // keep old layout
+                new_layout = e.layout();
+            }
+            else if (std::is_sorted(std::begin(permutation), std::end(permutation), std::greater<>()))
+            {
+                // this swaps the layout
+                if (e.layout() == layout_type::row_major)
+                {
+                    new_layout = layout_type::column_major;
+                }
+                else if (e.layout() == layout_type::column_major)
+                {
+                    new_layout = layout_type::row_major;
+                }
+            }
+
+            using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
+            return view_type(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), 0, new_layout);
+        }
+
+        template <class E, class S>
+        inline auto transpose_impl(E&& e, S&& permutation, check_policy::full)
+        {
+            // check if axis appears twice in permutation
+            for (std::size_t i = 0; i < sequence_size(permutation); ++i)
+            {
+                for (std::size_t j = i + 1; j < sequence_size(permutation); ++j)
+                {
+                    if (permutation[i] == permutation[j])
+                    {
+                        throw transpose_error("Permutation contains axis more than once");
+                    }
+                }
+            }
+            return transpose_impl(std::forward<E>(e), std::forward<S>(permutation), check_policy::none());
+        }
+
+        template <class E, class S, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline void compute_transposed_strides(E&& e, const S& shape, S& strides)
+        {
+            std::copy(e.strides().rbegin(), e.strides().rend(), strides.begin());
+        }
+
+        template <class E, class S, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        inline void compute_transposed_strides(E&&, const S& shape, S& strides)
+        {
+            layout_type l = std::decay_t<E>::static_layout;
+            if (l == layout_type::row_major)
+            {
+                l = layout_type::column_major;
+            }
+            else if(l == layout_type::column_major)
+            {
+                l = layout_type::row_major;
+            }
+            else
+            {
+                throw transpose_error("cannot compute transposed strides for dynamic layout");
+            }
+            compute_strides(shape, l, strides);
+        }
+    }
+
+    /**
+     * Returns a transpose view by reversing the dimensions of xexpression e
+     * @param e the input expression
+     */
+    template <class E>
+    inline auto transpose(E&& e) noexcept
+    {
+        using shape_type = typename std::decay_t<E>::shape_type;
+
+        shape_type shape;
+        resize_container(shape, e.shape().size());
+        std::copy(e.shape().rbegin(), e.shape().rend(), shape.begin());
+
+        shape_type strides;
+        resize_container(strides, e.shape().size());
+        detail::compute_transposed_strides(e, shape, strides);
+        //std::copy(e.strides().rbegin(), e.strides().rend(), strides.begin());
+
+        layout_type new_layout = layout_type::dynamic;
+        if (e.layout() == layout_type::row_major)
+        {
+            new_layout = layout_type::column_major;
+        }
+        else if (e.layout() == layout_type::column_major)
+        {
+            new_layout = layout_type::row_major;
+        }
+
+        decltype(auto) data = detail::get_data(e);
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
+        return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(shape), std::move(strides), 0, new_layout);
+    }
+
+    /**
+     * Returns a transpose view by permuting the xexpression e with @p permutation.
+     * @param e the input expression
+     * @param permutation the sequence containing permutation
+     * @param check_policy the check level (check_policy::full() or check_policy::none())
+     * @tparam Tag selects the level of error checking on permutation vector defaults to check_policy::none.
+     */
+    template <class E, class S, class Tag = check_policy::none>
+    inline auto transpose(E&& e, S&& permutation, Tag check_policy = Tag())
+    {
+        return detail::transpose_impl(std::forward<E>(e), std::forward<S>(permutation), check_policy);
+    }
+
+    /// @cond DOXYGEN_INCLUDE_SFINAE
+#ifdef X_OLD_CLANG
+    template <class E, class I, class Tag = check_policy::none>
+    inline auto transpose(E&& e, std::initializer_list<I> permutation, Tag check_policy = Tag())
+    {
+        dynamic_shape<I> perm(permutation);
+        return detail::transpose_impl(std::forward<E>(e), std::move(perm), check_policy);
+    }
+#else
+    template <class E, class I, std::size_t N, class Tag = check_policy::none>
+    inline auto transpose(E&& e, const I(&permutation)[N], Tag check_policy = Tag())
+    {
+        return detail::transpose_impl(std::forward<E>(e), permutation, check_policy);
+    }
+#endif
+    /// @endcond
 }
 
 #endif
