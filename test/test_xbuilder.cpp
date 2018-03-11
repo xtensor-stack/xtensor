@@ -13,6 +13,8 @@
 #include "xtensor/xio.hpp"
 #include <sstream>
 
+
+
 namespace xt
 {
     using std::size_t;
@@ -32,6 +34,190 @@ namespace xt
         ASSERT_EQ(1, c(0, 1));
     }
 
+    TEST(xbuilder, index_placeholder_1D_ct)
+    {
+        auto m = arange<int>({3});
+        auto i0 = index_placeholder<int,1,0>();
+
+
+        ASSERT_EQ(size_t(1), i0.dimension());
+        ASSERT_EQ(size_t(1), i0.shape()[0]);
+
+        auto res  = m + i0;
+
+        ASSERT_EQ(int(0), res(0));
+        ASSERT_EQ(int(2), res(1));
+        ASSERT_EQ(int(4), res(2));
+    }
+    TEST(xbuilder, index_placeholder_1D_rt)
+    {
+        auto m = arange<int>({3});
+        auto i0 = index_placeholder<int>(1,0);
+
+
+        ASSERT_EQ(size_t(1), i0.dimension());
+        ASSERT_EQ(size_t(1), i0.shape()[0]);
+
+        auto res  = m + i0;
+
+        ASSERT_EQ(int(0), res(0));
+        ASSERT_EQ(int(2), res(1));
+        ASSERT_EQ(int(4), res(2));
+    }
+
+    TEST(xbuilder, index_placeholder_2D_simple_matching_dim)
+    {   
+        auto m  = ones<int>({2,3});
+        auto i0 = index_placeholder<int,2, 0>();
+        auto i1 = index_placeholder<int,2, 1>();
+
+        auto res  = m + i0 + 2*i1;
+
+        ASSERT_EQ(size_t(2), res.shape()[0]);
+        ASSERT_EQ(size_t(3), res.shape()[1]);
+
+        ASSERT_EQ(int(1+0+2*0), res(0,0));
+        ASSERT_EQ(int(1+0+2*1), res(0,1));
+        ASSERT_EQ(int(1+0+2*2), res(0,2));
+        ASSERT_EQ(int(1+1+2*0), res(1,0));
+        ASSERT_EQ(int(1+1+2*1), res(1,1));
+        ASSERT_EQ(int(1+1+2*2), res(1,2));
+    }
+
+    TEST(xbuilder, index_placeholder_2D_advanced_matching_dim)
+    {
+        // broadcasted shape   2,3
+        auto a  = 2*ones<int>({1,3});
+        auto b  = 3*ones<int>({2,1});
+        auto c  = 4*ones<int>({1,1});
+
+        // first index (compile time specified dim and index)
+        auto i0 = index_placeholder<int,2, 0>();
+
+        // second index (runtime specified dim and index)
+        auto i1 = index_placeholder<int>(2,1);
+
+        // nontrivial expression
+        auto res_a  = a + b*(i0+1) + (c  * i1)+2;
+        auto res_b  = a + (1+i0)*b + (i1 * c )+2;
+
+        ASSERT_EQ(size_t(2), res_a.shape()[0]);
+        ASSERT_EQ(size_t(3), res_a.shape()[1]);
+
+        ASSERT_EQ(size_t(2), res_b.shape()[0]);
+        ASSERT_EQ(size_t(3), res_b.shape()[1]);
+
+
+        ASSERT_EQ(int(2 + 3*(0+1) + 4*0+2), res_a(0,0));
+        ASSERT_EQ(int(2 + 3*(0+1) + 4*1+2), res_a(0,1));
+        ASSERT_EQ(int(2 + 3*(0+1) + 4*2+2), res_a(0,2));
+        ASSERT_EQ(int(2 + 3*(1+1) + 4*0+2), res_a(1,0));
+        ASSERT_EQ(int(2 + 3*(1+1) + 4*1+2), res_a(1,1));
+        ASSERT_EQ(int(2 + 3*(1+1) + 4*2+2), res_a(1,2));
+
+        ASSERT_EQ(res_a(0,0), res_b(0,0));
+        ASSERT_EQ(res_a(0,1), res_b(0,1));
+        ASSERT_EQ(res_a(0,2), res_b(0,2));
+        ASSERT_EQ(res_a(1,0), res_b(1,0));
+        ASSERT_EQ(res_a(1,1), res_b(1,1));
+        ASSERT_EQ(res_a(1,2), res_b(1,2));
+    }
+
+    TEST(xbuilder, index_placeholder_2D_fancy_non_matching_dim)
+    {
+        // broadcasted shape   2,3,2
+        auto a  = 2*ones<int>({1,3,2});
+        auto b  = 3*ones<int>({2,1,1});
+        auto c  = 4*ones<int>({1,1,1});
+
+        // 0 and 1 index, both 2d 
+        // => will become index 1 and 2 index in 3d after broadcasting
+        auto i0 = index_placeholder<int,2, 0>();
+        auto i1 = index_placeholder<int,2, 1>();
+
+        // the above index placeholders
+        // are the same as these: (after broadcasting)
+        auto j1 = index_placeholder<int,3, 1>();
+        auto j2 = index_placeholder<int,3, 2>();
+
+        {
+            auto res_a = a + 3*i0 + 2*i1;
+            auto res_b = a + 3*j1 + 2*j2;
+
+
+
+            ASSERT_EQ(2+3*0+2*0, res_a(0,0,0));
+            ASSERT_EQ(2+3*0+2*1, res_a(0,0,1));
+            ASSERT_EQ(2+3*1+2*0, res_a(0,1,0));
+            ASSERT_EQ(2+3*1+2*1, res_a(0,1,1));
+            ASSERT_EQ(2+3*2+2*0, res_a(0,2,0));
+            ASSERT_EQ(2+3*2+2*1, res_a(0,2,1));
+            ASSERT_EQ(2+3*0+2*0, res_a(1,0,0));
+            ASSERT_EQ(2+3*0+2*1, res_a(1,0,1));
+            ASSERT_EQ(2+3*1+2*0, res_a(1,1,0));
+            ASSERT_EQ(2+3*1+2*1, res_a(1,1,1));
+            ASSERT_EQ(2+3*2+2*0, res_a(1,2,0));
+            ASSERT_EQ(2+3*2+2*1, res_a(1,2,1));
+        
+
+
+            ASSERT_EQ(res_b(0,0,0), res_a(0,0,0));
+            ASSERT_EQ(res_b(0,0,1), res_a(0,0,1));
+            ASSERT_EQ(res_b(0,1,0), res_a(0,1,0));
+            ASSERT_EQ(res_b(0,1,1), res_a(0,1,1));
+            ASSERT_EQ(res_b(0,2,0), res_a(0,2,0));
+            ASSERT_EQ(res_b(0,2,1), res_a(0,2,1));
+            ASSERT_EQ(res_b(1,0,0), res_a(1,0,0));
+            ASSERT_EQ(res_b(1,0,1), res_a(1,0,1));
+            ASSERT_EQ(res_b(1,1,0), res_a(1,1,0));
+            ASSERT_EQ(res_b(1,1,1), res_a(1,1,1));
+            ASSERT_EQ(res_b(1,2,0), res_a(1,2,0));
+            ASSERT_EQ(res_b(1,2,1), res_a(1,2,1));
+
+        }
+    }
+    TEST(xbuilder, index_placeholder_blitz_example){
+
+            // Fill a two-dimensional array with a radially
+            // symmetric, decaying sinusoid
+            const static std::size_t DIM = 2;
+
+            // Create the array
+            int N = 64;           
+            auto array = ones<double>({N,N});
+
+            // Some parameters
+            double midpoint = (N-1)/2.;
+            int cycles = 3;
+            double omega = 2.0 * M_PI * cycles / double(N);
+            double tau = - 10.0 / N;
+
+            // Index placeholders
+            auto i = index_placeholder<double, DIM, 0>(); // first index
+            auto j = index_placeholder<double, DIM, 1>(); // second index
+    
+            // Fill the array
+            auto data = cos(omega * sqrt(pow(i-midpoint, 2) + pow(j-midpoint, 2)))
+                * exp(tau * sqrt(pow(i-midpoint, 2) + pow(j-midpoint, 2)));
+
+
+
+            // TESTING
+            for(auto x1=0; x1<N; ++x1)
+            for(auto x0=0; x0<N; ++x0){
+
+                auto ii = double(x0);
+                auto jj = double(x1);
+
+                auto should_val = std::cos(omega * std::sqrt(std::pow(ii-midpoint, 2) + std::pow(jj-midpoint, 2)))
+                    * std::exp(tau * std::sqrt(std::pow(ii-midpoint, 2) + std::pow(jj-midpoint, 2)));
+                
+                auto is_val = data(x0, x1);
+
+                ASSERT_NEAR(is_val, should_val, 0.000001);
+            }
+
+    }
     TEST(xbuilder, arange_simple)
     {
         auto ls = arange<double>(50);
