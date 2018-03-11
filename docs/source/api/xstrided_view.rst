@@ -22,9 +22,8 @@ Defined in ``xtensor/xstrided_view.hpp``
 .. doxygenfunction:: xt::transpose(E&&, S&&, Tag)
    :project: xtensor
 
-.. doxygenclass:: xt::slice_vector
+.. doxygentypedef:: xt::slice_vector
    :project: xtensor
-   :members:
 
 .. doxygenfunction:: xt::dynamic_view
    :project: xtensor

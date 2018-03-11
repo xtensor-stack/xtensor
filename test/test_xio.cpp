@@ -126,7 +126,8 @@ namespace xt
 
         std::stringstream out;
         out << (rn > 0);
-        EXPECT_EQ(bool_fn, out.str());
+        std::string res = (DEFAULT_LAYOUT == layout_type::row_major) ? bool_fn_rm : bool_fn_cm;
+        EXPECT_EQ(res, out.str());
     }
 
     TEST(xio, cutoff)
