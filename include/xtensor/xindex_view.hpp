@@ -61,7 +61,7 @@ namespace xt
      */
     template <class CT, class I>
     class xindex_view : public xview_semantic<xindex_view<CT, I>>,
-                       public xiterable<xindex_view<CT, I>>
+                        public xiterable<xindex_view<CT, I>>
     {
     public:
 

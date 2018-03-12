@@ -314,7 +314,7 @@ namespace xt
     template <std::size_t dim, class I, class... Args>
     inline void xgenerator<F, R, S>::adapt_index(I& arg, Args&... args) const
     {
-        if (sizeof...(Args)+1 > m_shape.size())
+        if (sizeof...(Args) + 1 > m_shape.size())
         {
             adapt_index<dim>(args...);
         }

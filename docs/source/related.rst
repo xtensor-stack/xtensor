@@ -21,11 +21,10 @@ xtensor-python
 .. image:: xtensor-python.svg
    :alt: xtensor-python
 
-The xtensor-python_ project provides the implementation of container types compatible with ``xtensor``'s expression
-system, ``pyarray`` and ``pytensor`` which effectively wrap numpy arrays, allowing operating on numpy arrays inplace.
+The xtensor-python_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``pyarray`` and ``pytensor`` which effectively wrap numpy arrays, allowing operating on numpy arrays in-place.
 
-Example 1: Use an algorithm of the C++ library on a numpy array inplace
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 1: Use an algorithm of the C++ library on a numpy array in-place
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **C++ code**
 
@@ -151,7 +150,7 @@ xtensor-julia
 .. image:: xtensor-julia.svg
    :alt: xtensor-julia
 
-The xtensor-julia_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``jlarray`` and ``jltensor`` which effectively wrap Julia arrays, allowing operating on Julia arrays inplace.
+The xtensor-julia_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``jlarray`` and ``jltensor`` which effectively wrap Julia arrays, allowing operating on Julia arrays in-place.
 
 Example 1: Use an algorithm of the C++ library with a Julia array
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,10 +260,10 @@ xtensor-r
 .. image:: xtensor-r.svg
    :alt: xtensor-r
 
-The xtensor-r_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``rarray`` and ``rtensor`` which effectively wrap R arrays, allowing operating on R arrays inplace.
+The xtensor-r_ project provides the implementation of container types compatible with ``xtensor``'s expression system, ``rarray`` and ``rtensor`` which effectively wrap R arrays, allowing operating on R arrays in-place.
 
-Example 1: Use an algorithm of the C++ library on a R array inplace
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Example 1: Use an algorithm of the C++ library on a R array in-place
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 **C++ code**
 

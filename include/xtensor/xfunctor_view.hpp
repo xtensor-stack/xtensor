@@ -351,7 +351,7 @@ namespace xt
 
     template <class F, class IT>
     bool operator==(const xfunctor_iterator<F, IT>& lhs,
-        const xfunctor_iterator<F, IT>& rhs);
+                    const xfunctor_iterator<F, IT>& rhs);
 
     template <class F, class IT>
     bool operator<(const xfunctor_iterator<F, IT>& lhs,

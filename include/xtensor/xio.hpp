@@ -18,8 +18,8 @@
 #include <string>
 
 #include "xexpression.hpp"
-#include "xstrided_view.hpp"
 #include "xmath.hpp"
+#include "xstrided_view.hpp"
 
 #ifdef _WIN32
     using precision_type = typename std::streamsize;
@@ -102,7 +102,7 @@ namespace xt
     {
         template <class E, class F>
         std::ostream& xoutput(std::ostream& out, const E& e, slice_vector& slices, F& printer, std::size_t blanks,
-                             precision_type element_width, std::size_t edgeitems, std::size_t line_width)
+                              precision_type element_width, std::size_t edgeitems, std::size_t line_width)
         {
             using size_type = typename E::size_type;
 

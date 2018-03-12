@@ -255,7 +255,7 @@ namespace xt
         {
             std::transform(strides.cbegin(), strides.cend(), result.begin(), lambda);
         }
-        else if(l == layout_type::column_major)
+        else if (l == layout_type::column_major)
         {
             std::transform(strides.crbegin(), strides.crend(), result.rbegin(), lambda);
         }
@@ -281,13 +281,13 @@ namespace xt
         // Indices are faster than reverse iterators
         std::size_t output_index = output.size();
         std::size_t input_index = input.size();
-        for(; input_index != 0; --input_index, --output_index)
+        for (; input_index != 0; --input_index, --output_index)
         {
-            if(output[output_index - 1] == 1)
+            if (output[output_index - 1] == 1)
             {
                 output[output_index - 1] = input[input_index - 1];
             }
-            else if((input[input_index - 1] != 1) && (input[input_index - 1] != output[output_index - 1]))
+            else if ((input[input_index - 1] != 1) && (input[input_index - 1] != output[output_index - 1]))
             {
                 throw_broadcast_error(output, input);
             }

@@ -99,7 +99,7 @@ namespace xt
     {
         return m_array.modulus_assign(e);
     }
-    
+
     template <class A>
     inline noalias_proxy<A> noalias(A& a) noexcept
     {

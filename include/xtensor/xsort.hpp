@@ -13,8 +13,8 @@
 
 #include "xarray.hpp"
 #include "xeval.hpp"
-#include "xstrided_view.hpp"
 #include "xslice.hpp"  // for xnone
+#include "xstrided_view.hpp"
 #include "xtensor.hpp"
 
 namespace xt
@@ -25,7 +25,7 @@ namespace xt
         using value_type = typename E::value_type;
         const auto de = e.derived_cast();
         E ev;
-        ev.resize({ de.size() });
+        ev.resize({de.size()});
 
         std::copy(de.begin(), de.end(), ev.begin());
         std::sort(ev.begin(), ev.end());

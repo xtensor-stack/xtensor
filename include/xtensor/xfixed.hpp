@@ -145,7 +145,7 @@ namespace xt
         template <std::size_t I, std::size_t Y, std::size_t... X>
         struct calculate_stride<layout_type::column_major, I, Y, X...>
         {
-            constexpr static std::size_t value = Y * 
+            constexpr static std::size_t value = Y *
                 (calculate_stride<layout_type::column_major, I - 1, X...>::value == 0 ? 1 : calculate_stride<layout_type::column_major, I - 1, X...>::value);
         };
 
@@ -194,7 +194,7 @@ namespace xt
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
                           "Layout not supported for fixed array");
-            return { calculate_stride<L, I, X...>::value... };
+            return {calculate_stride<L, I, X...>::value...};
         }
 
         template <class T, std::size_t... I>
@@ -221,7 +221,7 @@ namespace xt
         // TODO unify with constexpr compute_size when dropping MSVC 2015
         template <class T>
         struct fixed_compute_size;
-        
+
         template <std::size_t... X>
         struct fixed_compute_size<xt::fixed_shape<X...>>
         {
@@ -455,7 +455,7 @@ namespace xt
 
         CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
         CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
-        CONSTEXPR_RETURN const inner_backstrides_type&  backstrides_impl() const noexcept;
+        CONSTEXPR_RETURN const inner_backstrides_type& backstrides_impl() const noexcept;
 
         friend class xcontainer<xfixed_adaptor<EC, S, L, Tag>>;
     };
@@ -531,7 +531,7 @@ namespace xt
     template <class ST>
     inline void xfixed_container<ET, S, L, Tag>::resize(ST&& shape, bool) const
     {
-        (void)(shape); // remove unused parameter warning if XTENSOR_ASSERT undefined
+        (void)(shape);  // remove unused parameter warning if XTENSOR_ASSERT undefined
         XTENSOR_ASSERT(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size());
     }
 

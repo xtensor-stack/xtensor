@@ -106,7 +106,7 @@ namespace xt
     template <class C, layout_type L = DEFAULT_LAYOUT>
     xtensor_adaptor<C, 1, L>
     adapt(C&& container, layout_type l = L);
-    
+
     /**
      * Constructs an xtensor_adaptor of the given stl-like container,
      * with the specified shape and layout_type.

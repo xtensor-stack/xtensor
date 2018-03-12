@@ -17,8 +17,8 @@
 #include <type_traits>
 
 #include "xexception.hpp"
-#include "xutils.hpp"
 #include "xtensor_simd.hpp"
+#include "xutils.hpp"
 
 #ifndef XALIGNMENT
     #ifdef XTENSOR_USE_XSIMD
@@ -1069,7 +1069,8 @@ namespace xt
         }
 
         // We can only avoid copying elements if neither vector is small.
-        if (!this->on_stack() && !rhs.on_stack()) {
+        if (!this->on_stack() && !rhs.on_stack())
+        {
             std::swap(this->m_begin, rhs.m_begin);
             std::swap(this->m_end, rhs.m_end);
             std::swap(this->m_capacity, rhs.m_capacity);
@@ -1112,7 +1113,7 @@ namespace xt
     inline void svector<T, N, A, Init>::grow(size_type min_capacity)
     {
         size_type current_size = size();
-        size_type new_capacity = 2 * current_size + 1; // Always grow.
+        size_type new_capacity = 2 * current_size + 1;  // Always grow.
         if (new_capacity < min_capacity)
         {
             new_capacity = min_capacity;

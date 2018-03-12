@@ -34,8 +34,7 @@ of optional values, it holds an array of ``double`` and a boolean container wher
 bytes.
 
 The ``xtensor_optional::reference`` typedef, which is the return type of ``operator()`` is a reference proxy which can be used as an
-lvalue for assigning new values in the array. It happens to be an instance of ``xoptional<T, B>`` where ``T`` and ``B`` are actually
-the reference types of the underlying storage for values and boolean flags.
+lvalue for assigning new values in the array. It happens to be an instance of ``xoptional<T, B>`` where ``T`` and ``B`` are actually the reference types of the underlying storage for values and boolean flags.
 
 This technique enables performance improvements in mathematical operations over boolean arrays including SIMD optimizations, and
 reduces the memory footprint of optional arrays. It should be transparent to the user.

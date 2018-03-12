@@ -732,12 +732,14 @@ namespace xt
             }
 
             template <class T>
-            std::array<int, 3> operator()(const T& t) const {
+            std::array<int, 3> operator()(const T& t) const
+            {
                 auto sl = get_slice_implementation(m_expr, t, idx);
                 return std::array<int, 3>({int(sl(0)), int(sl.size()), int(sl.step_size())});
             }
 
-            std::array<int, 3> operator()(const int& /*t*/) const {
+            std::array<int, 3> operator()(const int& /*t*/) const
+            {
                 return std::array<int, 3>({0, 0, 0});
             }
         };
@@ -848,7 +850,7 @@ namespace xt
             {
                 dimension++;
             }
-            else if(xtl::get_if<int>(&el) != nullptr)
+            else if (xtl::get_if<int>(&el) != nullptr)
             {
                 dimension--;
             }
@@ -1003,7 +1005,7 @@ namespace xt
             {
                 l = layout_type::column_major;
             }
-            else if(l == layout_type::column_major)
+            else if (l == layout_type::column_major)
             {
                 l = layout_type::row_major;
             }
