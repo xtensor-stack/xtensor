@@ -206,6 +206,28 @@ namespace xt
         EXPECT_EQ(1, data3);
     }
 
+    TEST(xtensor_adaptor, const_no_ownership_assign)
+    {
+        size_t size = 1;
+        int data1 = 0;
+        int data2 = 1;
+        int data3;
+        const int* const p_data1 = &data1;
+        const int* const p_data2 = &data2;
+        int* p_data3 = &data3;
+
+        using shape_type = std::array<vec_type::size_type, 1>;
+        shape_type s = { 1 };
+
+        auto a1 = adapt(p_data1, size, xt::no_ownership(), s);
+        auto a2 = adapt(p_data2, size, xt::no_ownership(), s);
+        auto a3 = adapt(p_data3, size, xt::no_ownership(), s);
+
+        a3 = a1 + a2;
+
+        EXPECT_EQ(1, data3);
+    }
+
     TEST(xtensor_adaptor, acquire_ownership_assign)
     {
         size_t size = 1;

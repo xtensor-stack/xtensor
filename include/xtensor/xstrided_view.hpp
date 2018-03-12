@@ -992,7 +992,7 @@ namespace xt
         }
 
         template <class E, class S, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline void compute_transposed_strides(E&& e, const S& shape, S& strides)
+        inline void compute_transposed_strides(E&& e, const S&, S& strides)
         {
             std::copy(e.strides().rbegin(), e.strides().rend(), strides.begin());
         }
