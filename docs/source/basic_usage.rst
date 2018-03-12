@@ -33,7 +33,7 @@ Outputs:
 
    {7, 11, 14}
 
-**Initialize a 1-D array and reshape it inplace.**
+**Initialize a 1-D array and reshape it in-place.**
 
 .. code::
 

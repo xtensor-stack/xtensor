@@ -1027,12 +1027,12 @@ namespace xt
      * xfunction implementation *
      ****************************/
 
-     /**
-      * Constructs an xfunction applying the specified function to the given
-      * arguments.
-      * @param f the function to apply
-      * @param e the \ref xexpression arguments
-      */
+    /**
+     * Constructs an xfunction applying the specified function to the given
+     * arguments.
+     * @param f the function to apply
+     * @param e the \ref xexpression arguments
+     */
     template <class F, class R, class... CT>
     template <class Func, class U>
     xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept

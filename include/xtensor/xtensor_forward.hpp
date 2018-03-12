@@ -14,8 +14,8 @@
 
 #include "xexpression.hpp"
 #include "xlayout.hpp"
-#include "xstorage.hpp"
 #include "xshape.hpp"
+#include "xstorage.hpp"
 #include "xtensor_config.hpp"
 #include "xtensor_simd.hpp"
 

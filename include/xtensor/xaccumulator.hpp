@@ -10,14 +10,13 @@
 #define XTENSOR_ACCUMULATOR_HPP
 
 #include <algorithm>
+#include <cstddef>
 #include <numeric>
 #include <type_traits>
-#include <cstddef>
 
-#include "xtensor_forward.hpp"
-#include "xstrides.hpp"
 #include "xexpression.hpp"
-#include <iostream>
+#include "xstrides.hpp"
+#include "xtensor_forward.hpp"
 
 namespace xt
 {
@@ -71,12 +70,11 @@ namespace xt
             result_type result = e;  // assign + make a copy, we need it anyways
 
             std::size_t inner_stride = result.strides()[axis];
-            std::size_t outer_stride = 1; // this is either going row- or column-wise (strides.back / strides.front)
+            std::size_t outer_stride = 1;  // this is either going row- or column-wise (strides.back / strides.front)
             std::size_t outer_loop_size = 0;
             std::size_t inner_loop_size = 0;
 
-            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax)
-            {
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax) {
                 outer_loop_size = std::accumulate(first,
                                                   first + ax,
                                                   std::size_t(1), std::multiplies<std::size_t>());
@@ -168,7 +166,6 @@ namespace xt
     {
         return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), axis, evaluation_strategy);
     }
-
 }
 
 #endif

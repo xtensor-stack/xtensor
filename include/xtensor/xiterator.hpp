@@ -483,7 +483,7 @@ namespace xt
         using size_type = typename S::size_type;
         size_type i = index.size();
         size_type leading_i = index.size() - 1;
-        while (i != 0 && n!= 0)
+        while (i != 0 && n != 0)
         {
             --i;
             size_type inc = (i == leading_i) ? n : 1;
@@ -803,7 +803,6 @@ namespace xt
                 auto iter_begin = (L == layout_type::row_major) ? m_index.begin() : m_index.begin() + 1;
                 auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
                 std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
-
             }
             m_linear_index = difference_type(std::accumulate(this->shape().cbegin(), this->shape().cend(),
                                              size_type(1), std::multiplies<size_type>()));

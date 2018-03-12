@@ -246,7 +246,7 @@ namespace xt
         template <template <class...> class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
-            using function_type = xfunction_type<F, E... >;
+            using function_type = xfunction_type<F, E...>;
             using functor_type = typename function_type::functor_type;
             using type = typename function_type::type;
             return type(functor_type(), std::forward<E>(e)...);
@@ -388,11 +388,11 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto operator%(E1&& e1, E2&& e2) noexcept
-    -> detail::xfunction_type_t<detail::modulus, E1, E2>
+        -> detail::xfunction_type_t<detail::modulus, E1, E2>
     {
         return detail::make_xfunction<detail::modulus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
-    
+
     /**
      * @defgroup logical_operators Logical operators
      */

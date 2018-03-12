@@ -17,8 +17,8 @@
 #include <random>
 #include <utility>
 
-#include "xtensor.hpp"
 #include "xgenerator.hpp"
+#include "xtensor.hpp"
 
 namespace xt
 {

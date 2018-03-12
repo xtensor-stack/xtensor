@@ -9,21 +9,20 @@
 Closure semantics
 =================
 
-The ``xtensor`` library is a tensor expression library implementing numpy-style broadcasting and universal functions, but in a lazy fashion.
+The ``xtensor`` library is a tensor expression library implementing numpy-style broadcasting and universal functions but in a lazy fashion.
 
 If ``x`` and ``y`` are two tensor expressions with compatible shapes, the result of ``x + y`` is not a tensor but an expression that does
 not hold any value. Values of ``x + y`` are computed upon access or when the result is assigned to a container such as ``xt::xtensor`` or
 ``xt::xarray``. The same holds for most functions in xtensor, views, broadcasting views, etc.
 
 In order to be able to perform the differed computation of ``x + y``, the returned expression must hold references, const references or
-copies of the members ``x`` and ``y``, depending on how arguments were passed to ``operator+``. The actual types of held by the expressions
+copies of the members ``x`` and ``y``, depending on how arguments were passed to ``operator+``. The actual types held by the expressions
 are the **closure types**.
 
-The concept of closure type is key in the implementation of ``xtensor`` and appears in all the expressions defined in xtensor, and the
-utility functions and meta functions complements the tools of the standard libary for the move semantics. 
+The concept of closure type is key in the implementation of ``xtensor`` and appears in all the expressions defined in xtensor, and the utility functions and metafunctions complement the tools of the standard library for the move semantics. 
 
-Basic rules for determinning closure types
-------------------------------------------
+Basic rules for determining closure types
+-----------------------------------------
 
 The two main requirements are the following:
 
@@ -85,7 +84,7 @@ scalar value.
 
 For the xscalar to be a proper proxy on the scalar value, if actually holds a closure type on the scalar value.
 
-The logics for this is encoded into xtensor's ``xclosure`` type trait.
+The logic for this is encoded into xtensor's ``xclosure`` type trait.
 
 .. code:: cpp
 
@@ -137,13 +136,13 @@ Returning evaluated or unevaluated expressions
 A key feature of xtensor is that a function returning e.g. ``x + y / z`` where ``x``, ``y`` and ``z`` are xtensor expressions does not actually perform any
 computation. It is only evaluated upon access or assignment. The returned expression holds values or references for ``x``, ``y`` and ``z`` depending on the
 lvalue-ness of the variables passed to the expression, using the *closure semantics* described earlier. This may result in dangling references when using
-local variables of a function in an unevaluated expression, unless one properly forwards / move the variables.
+local variables of a function in an unevaluated expression unless one properly forwards / move the variables.
 
 .. note::
 
    The following rule of thumbs prevents dangling references in the xtensor closure semantics:
 
-   - If the laziness is not important for your usecase, returning ``xt::eval(x + y / z)`` will return an evaluated container and avoid these complications.
+   - If the laziness is not important for your use case, returning ``xt::eval(x + y / z)`` will return an evaluated container and avoid these complications.
    - Otherwise, the key is to *move* lvalues that become invalid when leaving the current scope.
 
 **Example: moving local variables and forwarding universal references**
@@ -170,10 +169,10 @@ Let us first consider the following implementation of the ``mean`` function in x
     }
 
 The first thing to take into account is that the result of the final division is an expression, which performs the actual computation
-upon access or assignent.
+upon access or assignment.
 
 - In order to perform the division, the expression must hold the values or references on the numerator and denominator.
-- Since ``s`` is a local variable, it will be destroyed upon leaving the scope of the function, and more importantly it is an *lvalue*.
+- Since ``s`` is a local variable, it will be destroyed upon leaving the scope of the function, and more importantly, it is an *lvalue*.
 - A consequence of ``s`` being an lvalue and a local variable, is that the ``s / value_type(size)`` would end up holding a dangling const reference on ``s``.
 - Hence we must call return ``std::move(s) / value_type(size)``.
 

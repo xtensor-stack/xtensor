@@ -9,9 +9,9 @@
 #ifndef XTENSOR_EXCEPTION_HPP
 #define XTENSOR_EXCEPTION_HPP
 
-#include <stdexcept>
 #include <iterator>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 namespace xt

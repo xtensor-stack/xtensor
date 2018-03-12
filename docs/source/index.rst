@@ -20,7 +20,7 @@ Introduction
 - an API following the idioms of the **C++ standard library**.
 - tools to manipulate array expressions and build upon `xtensor`.
 
-Containers of `xtensor` are inspired by `NumPy`_, the Python array programming library. **Adaptors** for existing data structures to be plugged into our expression system can easily be written. In fact, `xtensor` can be used to **process numpy data structures inplace** using Python's `buffer protocol`_. For more details on the numpy bindings, check out the xtensor-python_ project.
+Containers of `xtensor` are inspired by `NumPy`_, the Python array programming library. **Adaptors** for existing data structures to be plugged into our expression system can easily be written. In fact, `xtensor` can be used to **process numpy data structures in-place** using Python's `buffer protocol`_. For more details on the numpy bindings, check out the xtensor-python_ project.
 
 `xtensor` requires a modern C++ compiler supporting C++14. The following C++ compilers are supported:
 

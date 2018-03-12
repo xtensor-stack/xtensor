@@ -14,23 +14,15 @@ A multi-dimensional array of `xtensor` consists of a contiguous one-dimensional 
 unsigned integers to the location of an element in the buffer. The range in which the indices can vary is specified by the
 `shape` of the array.
 
-The scheme used to map indices into a location in the buffer is a strided index scheme. In such a scheme, the index ``(i0, ..., in)``
-corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where ``(s0, ..., sn)`` are the `strides`
-of the array. Some particular cases of strided schemes implement well known memory layouts: 
+The scheme used to map indices into a location in the buffer is a strided indexing scheme. In such a scheme, the index ``(i0, ..., in)`` corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where ``(s0, ..., sn)`` are the `strides` of the array. Some particular cases of strided schemes implement well known memory layouts: 
 
 - the row-major layout (or C layout) is a strided index scheme where the strides grow from right to left
 - the column-major layout (or Fortran layout) is a strided index scheme where the strides grow from left to right
 
-``xtensor`` provides a ``layout_type`` enum that helps to specify the layout used by multi-dimensional arrays. This enum can be used in
-two ways:
+``xtensor`` provides a ``layout_type`` enum that helps to specify the layout used by multi-dimensional arrays. This enum can be used in two ways:
 
-- at compile time, as a template argument. The value ``layout_type::dynamic`` allows to specify any strided index scheme at runtime (including
-  row-major and column-major schemes), whereas ``layout_type::row_major`` and ``layout_type::column_major`` fixes the strided index scheme and
-  disable ``resize`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template
-  parameter is ``DEFAULT_LAYOUT``.
-- at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``resize`` and constructor overloads allow
-  to aspecify a set of strides or a layout value to avoid strides computation. If neither strides nor layout is specified when instantiating
-  or resizing a multi-dimensional array, strides corresponding to ``DEFAULT_LAYOUT`` are used.
+- at compile time, as a template argument. The value ``layout_type::dynamic`` allows specifying any strided index scheme at runtime (including row-major and column-major schemes), while ``layout_type::row_major`` and ``layout_type::column_major`` fixes the strided index scheme and disable ``resize`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template parameter is ``DEFAULT_LAYOUT``.
+- at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``resize`` and constructor overloads allow specifying a set of strides or a layout value to avoid strides computation. If neither strides nor layout is specified when instantiating or resizing a multi-dimensional array, strides corresponding to ``DEFAULT_LAYOUT`` are used.
 
 The following example shows how to initialize a multi-dimensional array of dynamic layout with specified strides:
 
@@ -43,8 +35,7 @@ The following example shows how to initialize a multi-dimensional array of dynam
     std::vector<size_t> strides = { 8, 4, 1 };
     xt::xarray<double, layout_type::dynamic> a(shape, strides);
 
-However, this requires to carefully compute the strides to avoid buffer overflow when accessing elements of the array. We can use the layout
-shortcut to specify the strides instead of computing them:
+However, this requires to carefully compute the strides to avoid buffer overflow when accessing elements of the array. We can use the following shortcut to specify the strides instead of computing them:
 
 .. code::
 
@@ -54,7 +45,7 @@ shortcut to specify the strides instead of computing them:
     std::vector<size_t> shape = { 3, 2, 4 };
     xt::xarray<double, layout_type::dynamic> a(shape, xt::layout::row_major);
 
-If the layout of the array can be fixed at compile time, we can even do simpler:
+If the layout of the array can be fixed at compile time, we can make it even simpler:
 
 .. code::
 
@@ -66,7 +57,7 @@ If the layout of the array can be fixed at compile time, we can even do simpler:
     // this shortcut is equivalent:
     // xt::xarray<double> a(shape);
 
-However, in that latter case, the layout of the array is forced to ``row_major`` at compile time, and therefore cannot be changed at runtime.
+However, in the latter case, the layout of the array is forced to ``row_major`` at compile time, and therefore cannot be changed at runtime.
 
 Runtime vs Compile-time dimensionality
 --------------------------------------
@@ -76,8 +67,7 @@ Three container classes implementing multi-dimensional arrays are provided: ``xa
 - ``xarray`` can be reshaped dynamically to any number of dimensions. It is the container that is the most similar to numpy arrays.
 - ``xtensor`` has a dimension set at compilation time, which enables many optimizations. For example, shapes and strides
   of ``xtensor`` instances are allocated on the stack instead of the heap.
-- ``xtensorf`` has a shape fixed at compile time. This allows even more optimizations, such as allocating the storage for the container
-  on the stack, as well as computing strides and backstrides at compile time, making the allocation of this container extremely cheap.
+- ``xtensorf`` has a shape fixed at compile time. This allows even more optimizations, such as allocating the storage for the container on the stack, as well as computing strides and backstrides at compile time, making the allocation of this container extremely cheap.
 
 Let's use ``xtensor`` instead of ``xarray`` in the previous example:
 
@@ -90,7 +80,6 @@ Let's use ``xtensor`` instead of ``xarray`` in the previous example:
     xt::xtensor<double, 3> a(shape);
     // whis is equivalent to
     // xt::xtensor<double, 3, layout_type::row_major> a(shape);
-
 
 Or when using ``xtensorf``:
 
@@ -112,14 +101,9 @@ other etc... They provide an augmented interface compared to other ``xexpression
 Performance
 -----------
 
-The dynamic dimensionality of ``xarray`` comes at a cost. Since the dimension is unknown at build time, the sequences holding shape and strides of
-``xarray`` instances are heap-allocated, which makes it significantly more expansive than ``xtensor``. Shape and strides of ``xtensor`` are
-stack-allocated which makes them more efficient.
+The dynamic dimensionality of ``xarray`` comes at a cost. Since the dimension is unknown at build time, the sequences holding shape and strides of ``xarray`` instances are heap-allocated, which makes it significantly more expansive than ``xtensor``. Shape and strides of ``xtensor`` are stack-allocated which makes them more efficient.
 
-More generally, the library implements a ``promote_shape`` mechanism at build time to determine the optimal sequence type to hold the shape of an
-expression. The shape type of a broadcasting expression whose members have a dimensionality determined at compile time will have a stack-allocated
-shape. If a single member of a broadcasting expression has a dynamic dimension (for example an ``xarray``), it bubbles up to entire broadcasting
-expression which will have a heap allocated shape. The same hold for views, broadcast expressions, etc...
+More generally, the library implements a ``promote_shape`` mechanism at build time to determine the optimal sequence type to hold the shape of an expression. The shape type of a broadcasting expression whose members have a dimensionality determined at compile time will have a stack-allocated shape. If a single member of a broadcasting expression has a dynamic dimension (for example an ``xarray``), it bubbles up to the entire broadcasting expression which will have a heap-allocated shape. The same hold for views, broadcast expressions, etc...
 
 Aliasing and temporaries
 ------------------------

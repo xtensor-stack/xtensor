@@ -8,7 +8,7 @@ Expression builders
 ===================
 
 `xtensor` provides functions to ease the build of common N-dimensional expressions. The expressions
-returned by these functions implement the lazyness of `xtensor`, that is, they don't hold any value.
+returned by these functions implement the laziness of `xtensor`, that is, they don't hold any value.
 Values are computed upon request.
 
 Ones and zeros
@@ -17,7 +17,7 @@ Ones and zeros
 - ``zeros(shape)``: generates an expression containing zeros of the specified shape.
 - ``ones(shape)``: generates an expression containing ones of the specified shape.
 - ``eye(shape, k=0)``: generates an expression of the specified shape, with ones on the k-th diagonal.
-- ``eye(n, k = 0)``: generates a n x n expression with ones on the k-th diagonal.
+- ``eye(n, k = 0)``: generates an expression with ones on the k-th diagonal.
 
 Numerical ranges
 ----------------
