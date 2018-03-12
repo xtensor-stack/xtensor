@@ -92,4 +92,28 @@ namespace xt
         EXPECT_EQ(fun2(1, 1), tr2(1, 1));
         EXPECT_EQ(fun2(1, 2), tr2(2, 1));
     }
+
+    TEST(xstrided_view, ravel)
+    {
+        xarray<int, layout_type::row_major> a = { { 0, 1, 2 },{ 3, 4, 5 } };
+
+        auto flat = ravel<layout_type::row_major>(a);
+        EXPECT_EQ(flat(0), a(0, 0));
+        EXPECT_EQ(flat(1), a(0, 1));
+        EXPECT_EQ(flat(2), a(0, 2));
+        EXPECT_EQ(flat(3), a(1, 0));
+        EXPECT_EQ(flat(4), a(1, 1));
+        EXPECT_EQ(flat(5), a(1, 2));
+
+        auto flat_c = ravel<layout_type::column_major>(a);
+        EXPECT_EQ(flat_c(0), a(0, 0));
+        EXPECT_EQ(flat_c(1), a(1, 0));
+        EXPECT_EQ(flat_c(2), a(0, 1));
+        EXPECT_EQ(flat_c(3), a(1, 1));
+        EXPECT_EQ(flat_c(4), a(0, 2));
+        EXPECT_EQ(flat_c(5), a(1, 2));
+
+        auto flat2 = flatten(a);
+        EXPECT_EQ(flat, flat2);
+    }
 }

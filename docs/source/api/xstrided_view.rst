@@ -27,3 +27,9 @@ Defined in ``xtensor/xstrided_view.hpp``
 
 .. doxygenfunction:: xt::dynamic_view
    :project: xtensor
+
+.. doxygenfunction:: xt::ravel
+   :project: xtensor
+
+.. doxygenfunction:: xt::flatten
+   :project: xtensor

@@ -669,6 +669,7 @@ namespace xt
             using size_type = typename xexpression_type::size_type;
             using value_type = typename xexpression_type::value_type;
             using reference = typename xexpression_type::reference;
+            using const_reference = typename xexpression_type::const_reference;
 
             using iterator = typename xexpression_type::iterator;
             using const_iterator = typename xexpression_type::const_iterator;
@@ -683,7 +684,20 @@ namespace xt
                 compute_strides(m_e.shape(), m_layout, m_strides);
             }
 
-            const reference operator[](std::size_t idx) const
+            expression_adaptor(CT&& e, shape_type&& strides, layout_type layout)
+                : m_e(e), m_strides(std::move(strides)), m_layout(layout)
+            {
+                resize_container(m_index, m_e.dimension());
+                m_size = e.size();
+            }
+
+            reference operator[](std::size_t idx)
+            {
+                m_index = detail::unravel_noexcept(idx, m_strides, m_layout);
+                return m_e.element(m_index.cbegin(), m_index.cend());
+            }
+
+            const_reference operator[](std::size_t idx) const
             {
                 m_index = detail::unravel_noexcept(idx, m_strides, m_layout);
                 return m_e.element(m_index.cbegin(), m_index.cend());
@@ -989,7 +1003,7 @@ namespace xt
         }
 
         template <class E, class S, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline void compute_transposed_strides(E&& e, const S& shape, S& strides)
+        inline void compute_transposed_strides(E&& e, const S&, S& strides)
         {
             std::copy(e.strides().rbegin(), e.strides().rend(), strides.begin());
         }
@@ -1010,7 +1024,6 @@ namespace xt
     inline auto transpose(E&& e) noexcept
     {
         using shape_type = typename std::decay_t<E>::shape_type;
-
         shape_type shape;
         resize_container(shape, e.shape().size());
         std::copy(e.shape().rbegin(), e.shape().rend(), shape.begin());
@@ -1055,6 +1068,79 @@ namespace xt
     }
 #endif
     /// @endcond
+
+    /***************************
+     * ravel and flatten views *
+     ***************************/
+
+    namespace detail
+    {
+        template <class E, class D>
+        inline auto build_ravel_view(E&& e, D&& data)
+        {
+            using shape_type = static_shape<std::size_t, 1>;
+            using view_type = xstrided_view<xclosure_t<E>, shape_type, D>;
+
+            shape_type new_shape, new_strides;
+            new_shape[0] = e.size();
+            new_strides[0] = std::size_t(1);
+            std::size_t offset = detail::get_offset(e);
+
+            return view_type(std::forward<E>(e), std::forward<D>(data),
+                std::move(new_shape), std::move(new_strides),
+                offset, layout_type::dynamic);
+        }
+
+        template <bool same_layout>
+        struct ravel_impl
+        {
+            template <class E>
+            inline static auto run(E&& e)
+            {
+                return build_ravel_view(std::forward<E>(e), detail::get_data(e));
+            }
+        };
+
+        template <>
+        struct ravel_impl<false>
+        {
+            template <class E>
+            inline static auto run(E&& e)
+            {
+                using proxy_type = expression_adaptor<xclosure_t<E>>;
+                using shape_type = typename std::decay_t<E>::shape_type;
+                shape_type strides;
+                resize_container(strides, e.shape().size());
+                layout_type l = detail::transpose_layout(e.layout());
+                compute_strides(e.shape(), l, strides);
+                return build_ravel_view(e, proxy_type(e, std::move(strides), l));
+            }
+        };
+    }
+
+    /**
+     * Returns a flatten view of the given expression. No copy is made.
+     * @param e the input expression
+     * @tparam L the layout used to read the elements of e
+     * @tparam E the type of the expression
+     */
+    template <layout_type L, class E>
+    inline auto ravel(E&& e)
+    {
+        return detail::ravel_impl<std::decay_t<E>::static_layout == L>::run(std::forward<E>(e));
+    }
+
+    /**
+     * Returns a flatten view of the given expression. No copy is made.
+     * The layout used to read the elements is the one of e.
+     * @param e the input expression
+     * @tparam E the type of the expression
+     */
+    template <class E>
+    inline auto flatten(E&& e)
+    {
+        return ravel<std::decay_t<E>::static_layout>(std::forward<E>(e));
+    }
 }
 
 #endif
