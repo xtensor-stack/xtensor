@@ -685,25 +685,7 @@ namespace xt
 
             const reference operator[](std::size_t idx) const
             {
-                std::size_t quot;
-                if (m_layout == xt::layout_type::row_major)
-                {
-                    for (size_type i = 0; i < m_strides.size(); ++i)
-                    {
-                        quot = idx / m_strides[i];
-                        idx = idx % m_strides[i];
-                        m_index[i] = quot;
-                    }
-                }
-                else
-                {
-                    for (size_type i = m_strides.size(); i != 0; --i)
-                    {
-                        quot = idx / m_strides[i - 1];
-                        idx = idx % m_strides[i - 1];
-                        m_index[i - 1] = quot;
-                    }
-                }
+                m_index = detail::unravel_noexcept(idx, m_strides, m_layout);
                 return m_e.element(m_index.cbegin(), m_index.cend());
             }
 
@@ -922,6 +904,29 @@ namespace xt
 
     namespace detail
     {
+        inline layout_type transpose_layout_noexcept(layout_type l) noexcept
+        {
+            layout_type result = l;
+            if (l == layout_type::row_major)
+            {
+                result = layout_type::column_major;
+            }
+            else if (l == layout_type::column_major)
+            {
+                result = layout_type::row_major;
+            }
+            return result;
+        }
+
+        inline layout_type transpose_layout(layout_type l)
+        {
+            if (l != layout_type::row_major && l != layout_type::column_major)
+            {
+                throw transpose_error("cannot compute transposed layout of dynamic layout");
+            }
+            return transpose_layout_noexcept(l);
+        }
+
         template <class E, class S>
         inline auto transpose_impl(E&& e, S&& permutation, check_policy::none)
         {
@@ -959,15 +964,7 @@ namespace xt
             }
             else if (std::is_sorted(std::begin(permutation), std::end(permutation), std::greater<>()))
             {
-                // this swaps the layout
-                if (e.layout() == layout_type::row_major)
-                {
-                    new_layout = layout_type::column_major;
-                }
-                else if (e.layout() == layout_type::column_major)
-                {
-                    new_layout = layout_type::row_major;
-                }
+                new_layout = transpose_layout_noexcept(e.layout());
             }
 
             using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(e.data())>;
@@ -1000,19 +997,7 @@ namespace xt
         template <class E, class S, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline void compute_transposed_strides(E&&, const S& shape, S& strides)
         {
-            layout_type l = std::decay_t<E>::static_layout;
-            if (l == layout_type::row_major)
-            {
-                l = layout_type::column_major;
-            }
-            else if (l == layout_type::column_major)
-            {
-                l = layout_type::row_major;
-            }
-            else
-            {
-                throw transpose_error("cannot compute transposed strides for dynamic layout");
-            }
+            layout_type l = transpose_layout(std::decay_t<E>::static_layout);
             compute_strides(shape, l, strides);
         }
     }
@@ -1033,17 +1018,8 @@ namespace xt
         shape_type strides;
         resize_container(strides, e.shape().size());
         detail::compute_transposed_strides(e, shape, strides);
-        //std::copy(e.strides().rbegin(), e.strides().rend(), strides.begin());
 
-        layout_type new_layout = layout_type::dynamic;
-        if (e.layout() == layout_type::row_major)
-        {
-            new_layout = layout_type::column_major;
-        }
-        else if (e.layout() == layout_type::column_major)
-        {
-            new_layout = layout_type::row_major;
-        }
+        layout_type new_layout = detail::transpose_layout_noexcept(e.layout());
 
         decltype(auto) data = detail::get_data(e);
         using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
