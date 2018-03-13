@@ -40,7 +40,7 @@ namespace xt
         EXPECT_EQ(expected, e(1, 1));
 
         auto t = v + 3;
-        EXPECT_EQ((e_copy(1, 1) + 6), t(0));
+		EXPECT_DOUBLE_EQ((e_copy(1, 1) + 6), t(0));
         EXPECT_EQ((e(1, 1) + 3), t(0));
 
         v = broadcast(123, v.shape());

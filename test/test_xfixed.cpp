@@ -12,6 +12,8 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 
+#if _MSC_VER < 1910 || (_MSC_VER >= 1910 && !defined(DISABLE_VS2017))
+
 namespace xt
 {
     using xtensorf3x3 = xtensorf<double, xt::xshape<3, 3>>; 
@@ -67,3 +69,5 @@ namespace xt
         EXPECT_EQ(ad(1, 1), 5 * 2);
     }
 }
+
+#endif

@@ -102,6 +102,7 @@ OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
 OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" ON)
 OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
+OPTION(DISABLE_VS2017 "disables the compilation of some test with Visual Studio 2017" OFF)
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     set(BUILD_TESTS ON)
@@ -126,6 +127,10 @@ message(STATUS "${XTENSOR_DEPENDENCIES}")
 
 if(DEFAULT_COLUMN_MAJOR)
     add_definitions(-DDEFAULT_LAYOUT=layout_type::column_major)
+endif()
+
+if(DISABLE_VS2017)
+    add_definitions(-DDISABLE_VS2017)
 endif()
 
 if(BUILD_TESTS)
