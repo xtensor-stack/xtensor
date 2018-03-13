@@ -114,6 +114,29 @@ a transposed view on a expression with a dynamic layout throws an exception.
 
 Like the dynamic view, the transposed view is built upon the ``xstrided_view``.
 
+Flatten views
+-------------
+
+It is sometimes usefull to have a one-dimensional view of all the elements of an expression. ``xtensor`` provides two functions
+for that, ``ravel`` and ``flatten``. The former one let you specify the order used to read the elements while the latter one
+uses the layout of the expression.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xstrided_view.hpp"
+    
+    xt::xarray<int> a = { {0, 1, 2}, {3, 4, 5} };
+    auto flc = xt::ravel<layout_type::column_major>(a);
+    std::cout << flc << std::endl;
+    // => prints { 0, 3, 1, 4, 2, 5 }
+
+    auto fl = xt::flatten(a);
+    std::cout << fl << std::endl;
+    // => prints { 0, 1, 2, 3, 4, 5 }
+
+Like the dynamic view and the transposed view, the flatten view is built upon the ``xstrided_view``.
+
 Index views
 -----------
 

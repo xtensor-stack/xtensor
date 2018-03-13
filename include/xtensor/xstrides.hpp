@@ -239,31 +239,46 @@ namespace xt
         }
     }
 
+    namespace detail
+    {
+        template <class S>
+        inline S unravel_noexcept(typename S::value_type idx, const S& strides, layout_type l) noexcept
+        {
+            using value_type = typename S::value_type;
+            using size_type = typename S::size_type;
+            S result = xtl::make_sequence<S>(strides.size(), 0);
+            if (l == layout_type::row_major)
+            {
+                for (size_type i = 0; i < strides.size(); ++i)
+                {
+                    value_type str = strides[i];
+                    value_type quot = str != 0 ? idx / str : 0;
+                    idx = str != 0 ? idx % str : idx;
+                    result[i] = quot;
+                }
+            }
+            else
+            {
+                for (size_type i = strides.size(); i != 0; --i)
+                {
+                    value_type str = strides[i - 1];
+                    value_type quot = str != 0 ? idx / str : 0;
+                    idx = str != 0 ? idx % str : idx;
+                    result[i - 1] = quot;
+                }
+            }
+            return result;
+        }
+    }
+
     template <class S>
     inline S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l)
     {
-        using value_type = typename S::value_type;
-        S result = xtl::make_sequence<S>(strides.size(), 0);
-        auto lambda = [&index](const value_type& str)
+        if(l != layout_type::row_major && l != layout_type::column_major)
         {
-            value_type quot = str != 0 ? index / str : 0;
-            index = str != 0 ? index % str : index;
-            return quot;
-        };
-
-        if (l == layout_type::row_major)
-        {
-            std::transform(strides.cbegin(), strides.cend(), result.begin(), lambda);
+            throw std::runtime_error("unravel_index: dynamic layout not supported");
         }
-        else if (l == layout_type::column_major)
-        {
-            std::transform(strides.crbegin(), strides.crend(), result.rbegin(), lambda);
-        }
-        else
-        {
-            throw std::runtime_error("unravel_index: dynamic layout not supported yet");
-        }
-        return result;
+        return detail::unravel_noexcept(index, strides, l);;
     }
 
     template <class S>

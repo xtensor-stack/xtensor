@@ -597,7 +597,8 @@ namespace xt
 
         svector& operator=(const svector& rhs);
         svector& operator=(svector&& rhs);
-        svector& operator=(std::vector<T>& rhs);
+        svector& operator=(const std::vector<T>& rhs);
+        svector& operator=(std::initializer_list<T> il);
 
         svector(const svector& other);
         svector(svector&& other);
@@ -751,14 +752,17 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(std::vector<T>& rhs)
+    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const std::vector<T>& rhs)
     {
-        if (this != &rhs)
-        {
-            m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
-            assign(rhs.begin(), rhs.end());
-        }
+        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+        assign(rhs.begin(), rhs.end());
         return *this;
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(std::initializer_list<T> il)
+    {
+        return operator=(self_type(il));
     }
 
     template <class T, std::size_t N, class A, bool Init>
