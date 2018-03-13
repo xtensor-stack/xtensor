@@ -555,7 +555,7 @@ namespace xt
         };
     }
 
-    template <class T, std::size_t N, class A = std::allocator<T>, bool Init = true>
+    template <class T, std::size_t N = 4, class A = std::allocator<T>, bool Init = true>
     class svector
     {
     public:
@@ -590,15 +590,21 @@ namespace xt
         svector(size_type n, const value_type& v, const allocator_type& alloc = allocator_type());
         svector(std::initializer_list<T> il, const allocator_type& alloc = allocator_type());
 
-        explicit svector(const std::vector<T>& vec);
+        svector(const std::vector<T>& vec);
 
         template <class IT, class = detail::require_input_iter<IT>>
         svector(IT begin, IT end, const allocator_type& alloc = allocator_type());
+
+        template <std::size_t N2, bool I2, class = std::enable_if_t<N != N2, void>>
+        explicit svector(const svector<T, N2, A, I2>& rhs);
 
         svector& operator=(const svector& rhs);
         svector& operator=(svector&& rhs);
         svector& operator=(const std::vector<T>& rhs);
         svector& operator=(std::initializer_list<T> il);
+
+        template <std::size_t N2, bool I2, class = std::enable_if_t<N != N2, void>>
+        svector& operator=(const svector<T, N2, A, I2>& rhs);
 
         svector(const svector& other);
         svector(svector&& other);
@@ -718,6 +724,14 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
+    template <std::size_t N2, bool I2, class>
+    inline svector<T, N, A, Init>::svector(const svector<T, N2, A, I2>& rhs)
+        : m_allocator(rhs.get_allocator())
+    {
+        assign(rhs.begin(), rhs.end());
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(const std::vector<T>& vec)
     {
         assign(vec.begin(), vec.end());
@@ -763,6 +777,15 @@ namespace xt
     inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(std::initializer_list<T> il)
     {
         return operator=(self_type(il));
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    template <std::size_t N2, bool I2, class>
+    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const svector<T, N2, A, I2>& rhs)
+    {
+        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+        assign(rhs.begin(), rhs.end());
+        return *this;
     }
 
     template <class T, std::size_t N, class A, bool Init>
