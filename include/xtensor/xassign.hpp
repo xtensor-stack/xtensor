@@ -11,7 +11,7 @@
 
 #include <algorithm>
 
-#include "xtl/xsequence.hpp"
+#include <xtl/xsequence.hpp>
 
 #include "xconcepts.hpp"
 #include "xexpression.hpp"

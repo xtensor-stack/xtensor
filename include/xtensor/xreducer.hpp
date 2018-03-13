@@ -21,8 +21,8 @@
 #include <vector>
 #endif
 
-#include "xtl/xfunctional.hpp"
-#include "xtl/xsequence.hpp"
+#include <xtl/xfunctional.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xbuilder.hpp"
 #include "xexpression.hpp"

@@ -22,7 +22,7 @@
 
 #ifndef XALIGNMENT
     #ifdef XTENSOR_USE_XSIMD
-        #include "xsimd/xsimd.hpp"
+        #include <xsimd/xsimd.hpp>
         #define XALIGNMENT XSIMD_DEFAULT_ALIGNMENT
     #else
         #define XALIGNMENT 0

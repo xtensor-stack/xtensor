@@ -17,11 +17,11 @@
 #include <complex>
 #include <type_traits>
 
+#include <xtl/xcomplex.hpp>
+
 #include "xaccumulator.hpp"
 #include "xoperation.hpp"
 #include "xreducer.hpp"
-
-#include "xtl/xcomplex.hpp"
 
 namespace xt
 {

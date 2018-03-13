@@ -13,7 +13,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "xtl/xtype_traits.hpp"
+#include <xtl/xtype_traits.hpp>
 
 #include "xutils.hpp"
 

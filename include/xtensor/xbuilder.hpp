@@ -23,8 +23,8 @@
     #include <initializer_list>
 #endif
 
-#include "xtl/xclosure.hpp"
-#include "xtl/xsequence.hpp"
+#include <xtl/xclosure.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xbroadcast.hpp"
 #include "xfunction.hpp"
