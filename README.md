@@ -189,7 +189,7 @@ In `xtensor`, arithmetic operations (`+`, `-`, `*`, `/`) and all special functio
 All `xexpression`s offer two sets of functions to retrieve iterator pairs (and their `const` counterpart).
 
  - `begin()` and `end()` provide instances of `xiterator`s which can be used to iterate over all the elements of the expression. The order in which elements are listed is `row-major` in that the index of last dimension is incremented first.
- - `xbegin(shape)` and `xend(shape)` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in a row-major way, but certain dimensions are repeated to match the provided shape as per the rules described above. For an expression `e`, `e.xbegin(e.shape())` and `e.begin()` are equivalent.
+ - `begin(shape)` and `end(shape)` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in a row-major way, but certain dimensions are repeated to match the provided shape as per the rules described above. For an expression `e`, `e.begin(e.shape())` and `e.begin()` are equivalent.
 
 ### Runtime vs compile-time dimensionality
 
