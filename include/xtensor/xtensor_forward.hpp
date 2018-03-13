@@ -12,14 +12,14 @@
 #include <memory>
 #include <vector>
 
+#include <xtl/xoptional_sequence.hpp>
+
 #include "xexpression.hpp"
 #include "xlayout.hpp"
 #include "xshape.hpp"
 #include "xstorage.hpp"
 #include "xtensor_config.hpp"
 #include "xtensor_simd.hpp"
-
-#include "xtl/xoptional_sequence.hpp"
 
 namespace xt
 {

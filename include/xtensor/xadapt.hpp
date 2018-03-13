@@ -14,7 +14,7 @@
 #include <memory>
 #include <type_traits>
 
-#include "xtl/xsequence.hpp"
+#include <xtl/xsequence.hpp>
 
 #include "xarray.hpp"
 #include "xtensor.hpp"

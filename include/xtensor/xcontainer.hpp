@@ -15,8 +15,8 @@
 #include <numeric>
 #include <stdexcept>
 
-#include "xtl/xmeta_utils.hpp"
-#include "xtl/xsequence.hpp"
+#include <xtl/xmeta_utils.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xiterable.hpp"
 #include "xiterator.hpp"

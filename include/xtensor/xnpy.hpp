@@ -10,12 +10,7 @@
 // Derived from https://github.com/llohse/libnpy by Leon Merten Lohse,
 // relicensed from MIT License with permission
 
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xeval.hpp"
-#include "xtensor/xstrides.hpp"
-
-#include "xtl/xsequence.hpp"
+#include <xtl/xsequence.hpp>
 
 #include <algorithm>
 #include <complex>
@@ -28,6 +23,11 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+#include "xtensor/xadapt.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xeval.hpp"
+#include "xtensor/xstrides.hpp"
 
 namespace xt
 {

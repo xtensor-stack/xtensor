@@ -15,7 +15,7 @@
 
 #ifdef XTENSOR_USE_XSIMD
 
-#include "xsimd/xsimd.hpp"
+#include <xsimd/xsimd.hpp>
 
 #else  // XTENSOR_USE_XSIMD
 

@@ -13,7 +13,7 @@
 #include <functional>
 #include <type_traits>
 
-#include "xtl/xsequence.hpp"
+#include <xtl/xsequence.hpp>
 
 #include "xconcepts.hpp"
 #include "xfunction.hpp"
