@@ -825,9 +825,9 @@ namespace xt
      * auto v = xt::dynamic_view(a, sv);
      * // ==> {{1, 3}}
      * \endcode
-     * 
+     *
      * You can also achieve the same with the following short-hand syntax:
-     * 
+     *
      * \code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
      * auto v = xt::dynamic_view(a, {xt::range(0, 1), xt::range(0, 3, 2)});
@@ -1162,6 +1162,67 @@ namespace xt
 
         using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>, decltype(data)>;
         return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), 0, e.layout());
+    }
+
+    namespace detail
+    {
+        template <class E, class S>
+        inline auto squeeze_impl(E&& e, S&& axis, check_policy::none)
+        {
+            xt::dynamic_shape<std::size_t> new_shape = e.shape(), new_strides = detail::get_strides(e);
+            for (auto ix : axis)
+            {
+                new_shape.erase(new_shape.begin() + ix);
+                new_strides.erase(new_strides.begin() + ix);
+            }
+
+            decltype(auto) data = detail::get_data(e);
+
+            using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>, decltype(data)>;
+            return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), 0, e.layout());
+        }
+
+        template <class E, class S>
+        inline auto squeeze_impl(E&& e, S&& axis, check_policy::full)
+        {
+            for (auto ix : axis)
+            {
+                if (e.shape()[ix] != 1)
+                {
+                    throw std::runtime_error("Trying to squeeze axis != 1");
+                }
+            }
+            return squeeze_impl(std::forward<E>(e), std::forward<S>(axis), check_policy::none());
+        }
+    }
+
+    template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!std::is_integral<S>::value, int> = 0>
+    inline auto squeeze(E&& e, S&& axis, Tag check_policy = Tag())
+    {
+        return detail::squeeze_impl(std::forward<E>(e), std::forward<S>(axis), check_policy);
+    }
+
+    /// @cond DOXYGEN_INCLUDE_SFINAE
+#ifdef X_OLD_CLANG
+    template <class E, class I, class Tag = check_policy::none>
+    inline auto squeeze(E&& e, std::initializer_list<I> axis, Tag check_policy = Tag())
+    {
+        dynamic_shape<I> ax(axis);
+        return detail::squeeze_impl(std::forward<E>(e), std::move(ax), check_policy);
+    }
+#else
+    template <class E, class I, std::size_t N, class Tag = check_policy::none>
+    inline auto squeeze(E&& e, const I(&axis)[N], Tag check_policy = Tag())
+    {
+        return detail::squeeze_impl(std::forward<E>(e), axis, check_policy);
+    }
+#endif
+    /// @endcond
+
+    template <class E, class Tag = check_policy::none>
+    inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())
+    {
+        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>({ axis }), check_policy);
     }
 }
 
