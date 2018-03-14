@@ -1141,6 +1141,28 @@ namespace xt
     {
         return ravel<std::decay_t<E>::static_layout>(std::forward<E>(e));
     }
+
+    /**
+     * Returns a squeeze view of the given expression. No copy is made.
+     * Squeezing an expression removes dimensions of extent 1.
+     *
+     * @param e the input expression
+     * @tparam E the type of the expression
+     */
+    template <class E>
+    inline auto squeeze(E&& e)
+    {
+        xt::dynamic_shape<std::size_t> new_shape, new_strides;
+        std::copy_if(e.shape().begin(), e.shape().end(), std::back_inserter(new_shape),
+                               [](std::size_t i){ return i != 1; });
+        auto&& old_strides = detail::get_strides(e);
+        std::copy_if(old_strides.begin(), old_strides.end(), std::back_inserter(new_strides),
+                               [](std::size_t i){ return i != 0; });
+        decltype(auto) data = detail::get_data(e);
+
+        using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>, decltype(data)>;
+        return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), 0, e.layout());
+    }
 }
 
 #endif
