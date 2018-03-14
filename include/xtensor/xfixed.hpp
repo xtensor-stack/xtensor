@@ -305,6 +305,9 @@ namespace xt
         constexpr static std::size_t N = std::tuple_size<shape_type>::value;
 
         xfixed_container();
+        explicit xfixed_container(value_type v);
+        explicit xfixed_container(const inner_shape_type& shape, layout_type l = L);
+        explicit xfixed_container(const inner_shape_type& shape, value_type v, layout_type l = L);
         xfixed_container(nested_initializer_list_t<value_type, N> t);
 
         ~xfixed_container() = default;
@@ -481,10 +484,49 @@ namespace xt
      */
     //@{
     /**
-     * Allocates an uninitialized xfixed_container according to the shape template parameter.
+     * Create an uninitialized xfixed_container according to the shape template parameter.
      */
     template <class ET, class S, layout_type L, class Tag>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container()
+    {
+    }
+
+    /**
+     * Create an xfixed_container, and initialize with the value of v.
+     *
+     * @param v the fill value
+     */
+    template <class ET, class S, layout_type L, class Tag>
+    inline xfixed_container<ET, S, L, Tag>::xfixed_container(value_type v)
+    {
+        std::fill(this->begin(), this->end(), v);
+    }
+
+    /**
+     * Create an uninitialized xfixed_container.
+     * Note this function is only provided for homogenity, and the shape & layout argument is
+     * disregarded (the template shape is always used).
+     *
+     * @param shape the shape of the xfixed_container (unused!)
+     * @param l the layout_type of the xfixed_container (unused!)
+     */
+    template <class ET, class S, layout_type L, class Tag>
+    inline xfixed_container<ET, S, L, Tag>::xfixed_container(const inner_shape_type& /*shape*/, layout_type /*l*/)
+    {
+    }
+
+    /**
+     * Create an xfixed_container, and initialize with the value of v.
+     * Note, the shape argument to this function is only provided for homogenity,
+     * and the shape argument is disregarded (the template shape is always used).
+     *
+     * @param shape the shape of the xfixed_container (unused!)
+     * @param v the fill value
+     * @param l the layout_type of the xfixed_container (unused!)
+     */
+    template <class ET, class S, layout_type L, class Tag>
+    inline xfixed_container<ET, S, L, Tag>::xfixed_container(const inner_shape_type& /*shape*/, value_type v, layout_type /*l*/)
+        : xfixed_container(v)
     {
     }
 
