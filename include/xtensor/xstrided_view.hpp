@@ -1228,9 +1228,35 @@ namespace xt
     template <class E>
     auto expand_dims(E&& e, std::size_t axis)
     {
-        xt::slice_vector sv(e.dimension() + 1, xt::all());
+        slice_vector sv(e.dimension() + 1, xt::all());
         sv[axis] = xt::newaxis();
         return dynamic_view(std::forward<E>(e), std::move(sv));
+    }
+
+    template <class E>
+    auto split(E& e, std::size_t n, std::size_t axis = 0)
+    {
+        if (axis >= e.dimension())
+        {
+            throw std::runtime_error("Split along axis > dimension!");
+        }
+        std::size_t ax_sz = e.shape()[axis];
+        slice_vector sv(e.dimension(), xt::all());
+        std::size_t step = ax_sz / n;
+        std::size_t rest = ax_sz % n;
+
+        if (rest)
+        {
+            throw std::runtime_error("Split does not result in equal division!");
+        }
+
+        std::vector<decltype(dynamic_view(e, sv))> result;
+        for (std::size_t i = 0; i < n; ++i)
+        {
+            sv[axis] = range(static_cast<int>(i * step), static_cast<int>((i + 1) * step));
+            result.emplace_back(dynamic_view(e, sv));
+        }
+        return result;
     }
 }
 
