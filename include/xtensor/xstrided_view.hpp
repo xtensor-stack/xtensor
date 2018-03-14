@@ -906,7 +906,6 @@ namespace xt
         }
 
         decltype(auto) data = detail::get_data(e);
-
         using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
         // TODO change layout type?
         return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), offset, layout_type::dynamic);
@@ -1233,12 +1232,34 @@ namespace xt
         return dynamic_view(std::forward<E>(e), std::move(sv));
     }
 
+    template <std::size_t N, class E>
+    auto atleast_Nd(E&& e)
+    {
+        slice_vector sv(std::max(e.dimension(), N), xt::all());
+        std::cout << sv.size() << std::endl;
+        if (e.dimension() < N)
+        {
+            std::size_t i = 0;
+            for (; i < std::ceil(double(e.dimension() / double(N))); ++i)
+            {
+                sv[i] = xt::newaxis();
+            }
+            i += e.dimension();
+            for (; i <= N; ++i)
+            {
+                sv[i] = xt::newaxis();
+            }
+        }
+        // return dynamic_view(std::forward<E>(e), std::move(sv));
+        return e;
+    }
+
     template <class E>
     auto split(E& e, std::size_t n, std::size_t axis = 0)
     {
         if (axis >= e.dimension())
         {
-            throw std::runtime_error("Split along axis > dimension!");
+            throw std::runtime_error("Split along axis > dimension.");
         }
         std::size_t ax_sz = e.shape()[axis];
         slice_vector sv(e.dimension(), xt::all());
@@ -1247,7 +1268,7 @@ namespace xt
 
         if (rest)
         {
-            throw std::runtime_error("Split does not result in equal division!");
+            throw std::runtime_error("Split does not result in equal division.");
         }
 
         std::vector<decltype(dynamic_view(e, sv))> result;
