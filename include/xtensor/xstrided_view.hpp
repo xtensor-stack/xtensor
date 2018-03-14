@@ -1224,6 +1224,14 @@ namespace xt
     {
         return squeeze(std::forward<E>(e), std::array<std::size_t, 1>({ axis }), check_policy);
     }
+
+    template <class E>
+    auto expand_dims(E&& e, std::size_t axis)
+    {
+        xt::slice_vector sv(e.dimension() + 1, xt::all());
+        sv[axis] = xt::newaxis();
+        return dynamic_view(std::forward<E>(e), std::move(sv));
+    }
 }
 
 #endif
