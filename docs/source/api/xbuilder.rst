@@ -21,16 +21,16 @@ Defined in ``xtensor/xbuilder.hpp``
 .. doxygenfunction:: xt::zeros(const I (&)[L])
    :project: xtensor
 
-.. doxygenfunction:: xt::full_like(const I (&)[L])
+.. doxygenfunction:: xt::full_like(const xexpression<E>&)
    :project: xtensor
 
-.. doxygenfunction:: xt::empty_like(const I (&)[L])
+.. doxygenfunction:: xt::empty_like(const xexpression<E>&)
    :project: xtensor
 
-.. doxygenfunction:: xt::zeros_like(const I (&)[L])
+.. doxygenfunction:: xt::zeros_like(const xexpression<E>&)
    :project: xtensor
 
-.. doxygenfunction:: xt::ones_like(const I (&)[L])
+.. doxygenfunction:: xt::ones_like(const xexpression<E>&)
    :project: xtensor
 
 .. doxygenfunction:: xt::eye(const std::vector<std::size_t>&, int)
