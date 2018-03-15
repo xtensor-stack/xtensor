@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xfixed.hpp"
 
 #include "xtensor/xio.hpp"
 #include <sstream>
@@ -30,6 +31,41 @@ namespace xt
         // (check that the compiler doesn't issue a warning)
         xarray<uint8_t> c = cast<uint8_t>(m);
         ASSERT_EQ(1, c(0, 1));
+    }
+
+    TEST(xbuilder, like)
+    {
+        bool type_equal = false;
+        auto arr = xarray<int>::from_shape({3,2,5});
+        auto xfx = xtensorf<int, xt::xshape<3, 3, 3>>();
+
+        auto onas = ones_like(arr);
+        EXPECT_EQ(onas.shape(), arr.shape());
+        type_equal = std::is_same<typename decltype(onas)::value_type, int>::value;
+        EXPECT_TRUE(type_equal);
+        type_equal = std::is_same<typename decltype(onas)::shape_type, xt::dynamic_shape<std::size_t>>::value;
+        EXPECT_TRUE(type_equal);
+        EXPECT_EQ(onas(1, 1), 1);
+
+        auto zeras = zeros_like(arr);
+        EXPECT_EQ(zeras.shape(), arr.shape());
+        type_equal = std::is_same<typename decltype(zeras)::value_type, int>::value;
+        EXPECT_TRUE(type_equal);
+        EXPECT_EQ(zeras(1, 1), 0);
+
+        auto empty = empty_like(arr);
+        EXPECT_EQ(empty.shape(), arr.shape());
+        type_equal = std::is_same<typename decltype(empty)::value_type, int>::value;
+        EXPECT_TRUE(type_equal);
+
+        auto full = full_like(arr, 123);
+        EXPECT_EQ(full.shape(), arr.shape());
+        type_equal = std::is_same<typename decltype(full)::value_type, int>::value;
+        EXPECT_TRUE(type_equal);
+        EXPECT_EQ(full(1, 1), 123);
+
+        auto f_xfx = full_like(xfx, 2332);
+        EXPECT_EQ(f_xfx(0, 2), 2332);
     }
 
     TEST(xbuilder, arange_simple)
