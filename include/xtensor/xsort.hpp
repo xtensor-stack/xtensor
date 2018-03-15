@@ -293,6 +293,24 @@ namespace xt
         auto&& ed = eval(e.derived_cast());
         return detail::arg_func_impl(ed, axis, std::greater<value_type>());
     }
+
+    /**
+     * Find unique elements of a xexpression. This returns a flattened xtensor with
+     * sorted, unique elements from the original expression.
+     *
+     * @param a input xexpression (will be flattened)
+     */
+    template <class E>
+    auto unique(const xexpression<E>& e)
+    {
+        auto sorted = sort(e, xnone());
+        auto end = std::unique(sorted.begin(), sorted.end());
+        std::size_t sz = static_cast<std::size_t>(std::distance(sorted.begin(), end));
+        // TODO check if we can shrink the vector without reallocation
+        auto result = xtensor<typename E::value_type, 1>::from_shape({ sz });
+        std::copy(sorted.begin(), end, result.begin());
+        return result;
+    }
 }
 
 #endif

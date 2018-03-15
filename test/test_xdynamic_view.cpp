@@ -59,6 +59,12 @@ namespace xt
         EXPECT_EQ(a(0, 2), view7(0));
         EXPECT_EQ(a(1, 2), view7(1));
         EXPECT_EQ(a(2, 2), view7(2));
+
+        EXPECT_THROW(dynamic_view(a, {all(), all(), 1}), std::runtime_error);
+        EXPECT_THROW(dynamic_view(a, {all(), all(), all()}), std::runtime_error);
+        EXPECT_NO_THROW(dynamic_view(a, {all(), newaxis(), all()}));
+        EXPECT_NO_THROW(dynamic_view(a, {3, newaxis(), 1}));
+        EXPECT_NO_THROW(dynamic_view(a, {3, 1, newaxis()}));
     }
 
     TEST(xdynamic_view, three_dimensional)
@@ -396,5 +402,33 @@ namespace xt
         v2 = b;
         EXPECT_EQ(v2(1), -100);
         EXPECT_EQ(a(4), -100);
+    }
+
+    TEST(xdynamic_view, ellipsis)
+    {
+        using t = xarray<int>;
+        auto a = t::from_shape({5, 5, 1, 1, 1, 4});
+        std::iota(a.begin(), a.end(), 0);
+
+        auto v1 = dynamic_view(a, {1, 1, xt::ellipsis()});
+        dynamic_shape<std::size_t> v1_s{1, 1, 1, 4};
+        EXPECT_EQ(v1.shape(), v1_s);
+
+        EXPECT_EQ(dynamic_view(a, {2, 2, xt::ellipsis()}), dynamic_view(a, {2, 2, xt::all(), xt::all(), xt::all(), xt::all()}));
+        EXPECT_EQ(dynamic_view(a, {2, xt::ellipsis(), 0, 2}), dynamic_view(a, {2, xt::all(), xt::all(), xt::all(), 0, 2}));
+
+        EXPECT_THROW(dynamic_view(a, {xt::ellipsis(), 0, xt::ellipsis()}), std::runtime_error);
+
+        t b = xt::ones<int>({5, 5, 5});
+        auto v2 = dynamic_view(b, {xt::ellipsis(), 1, 1, 1});
+        EXPECT_EQ(v2(), 1);
+        EXPECT_EQ(v2.shape().size(), 0);
+
+        auto v3 = dynamic_view(b, {xt::ellipsis(), 1, xt::all(), 1});
+        dynamic_shape<std::size_t> v3_s{5};
+        EXPECT_EQ(v3.shape(), v3_s);
+
+
+        EXPECT_THROW(dynamic_view(b, {xt::ellipsis(), 1, 1, 1, 1}), std::runtime_error);
     }
 }

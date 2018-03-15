@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xstrided_view.hpp"
 
@@ -210,5 +211,41 @@ namespace xt
         EXPECT_EQ(d4d1.shape(), ds({1, 3, 1, 1}));
         auto d2d1 = atleast_2d(d1);
         EXPECT_EQ(d2d1.shape(), ds({1, 3}));
+    }
+
+    TEST(xstrided_view, trim_zeros)
+    {
+        using arr_t = xarray<int>;
+        arr_t a = {0, 0, 0, 1, 3, 0};
+        arr_t b = {0, 0, 0, 0};
+        arr_t c = {0, 0, 0, 1};
+        arr_t d = {1, 0, 0, 1};
+
+        arr_t ea = {1, 3};
+        arr_t ec = {1};
+        arr_t ed = {1, 0, 0, 1};
+
+        arr_t eaf = {1, 3, 0};
+        arr_t ecf = {1};
+        arr_t edf = {1, 0, 0, 1};
+
+        arr_t eab = {0, 0, 0, 1, 3};
+        arr_t ecb = {0, 0, 0, 1};
+        arr_t edb = {1, 0, 0, 1};
+
+        EXPECT_EQ(trim_zeros(a), ea);
+        EXPECT_EQ(trim_zeros(b).size(), 0);
+        EXPECT_EQ(trim_zeros(c), ec);
+        EXPECT_EQ(trim_zeros(d), ed);
+
+        EXPECT_EQ(trim_zeros(a, "f"), eaf);
+        EXPECT_EQ(trim_zeros(b, "f").size(), 0);
+        EXPECT_EQ(trim_zeros(c, "f"), ecf);
+        EXPECT_EQ(trim_zeros(d, "f"), edf);
+
+        EXPECT_EQ(trim_zeros(a, "b"), eab);
+        EXPECT_EQ(trim_zeros(b, "b").size(), 0);
+        EXPECT_EQ(trim_zeros(c, "b"), ecb);
+        EXPECT_EQ(trim_zeros(d, "b"), edb);
     }
 }

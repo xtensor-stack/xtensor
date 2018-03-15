@@ -34,6 +34,9 @@ Defined in ``xtensor/xstrided_view.hpp``
 .. doxygenfunction:: xt::flatten
    :project: xtensor
 
+.. doxygenfunction:: xt::trim_zeros
+   :project: xtensor
+
 .. doxygenfunction:: xt::squeeze(E&&)
    :project: xtensor
 

@@ -152,16 +152,57 @@ namespace xt
     /**
      * Returns a slice representing a full dimension,
      * to be used as an argument of view function.
-     * @sa view
+     * @sa view, dynamic_view
      */
     inline auto all() noexcept
     {
         return xall_tag();
     }
 
+    template <class T>
+    class xellipsis : public xslice<xellipsis<T>>
+    {
+    public:
+
+        using size_type = T;
+
+        xellipsis() = default;
+
+        size_type operator()(size_type i) const noexcept;
+
+        size_type size() const noexcept;
+        size_type step_size() const noexcept;
+
+    };
+
+    struct xellipsis_tag
+    {
+    };
+
+    /**
+     * Returns a slice representing all remaining dimensions,
+     * and selecting all in these dimensions. Ellipsis will expand
+     * to a series of `all()` slices, until the number of slices is
+     * equal to the number of dimensions of the source array.
+     *
+     * Note: ellipsis can only be used in dynamic_view!
+     *
+     * \code{.cpp}
+     * xarray<double> a = xarray<double>::from_shape({5, 5, 1, 1, 5});
+     * auto v = xt::dynamic_view(a, {2, xt::ellipsis(), 2});
+     * // equivalent to using {2, xt::all(), xt::all(), xt::all(), 2};
+     * \endcode
+     *
+     * @sa dynamic_view
+     */
+    inline auto ellipsis() noexcept
+    {
+        return xellipsis_tag();
+    }
+
     /************************
-    * xnewaxis declaration *
-    ************************/
+     * xnewaxis declaration *
+     ************************/
 
     template <class T>
     class xnewaxis : public xslice<xnewaxis<T>>
@@ -183,10 +224,10 @@ namespace xt
     };
 
     /**
-    * Returns a slice representing a new axis of length one,
-    * to be used as an argument of view function.
-    * @sa view
-    */
+     * Returns a slice representing a new axis of length one,
+     * to be used as an argument of view function.
+     * @sa view, dynamic_view
+     */
     inline auto newaxis() noexcept
     {
         return xnewaxis_tag();
@@ -285,12 +326,37 @@ namespace xt
         C m_step;
     };
 
+    /**
+     * Select a range from min_val to max_val.
+     * You can use the shorthand `_` syntax to select from the start or until the end.
+     *
+     * \code{.cpp}
+     * using namespace xt::placeholders;  // to enable _ syntax
+     *
+     * range(3, _)  // select from index 3 to the end
+     * range(_, 5)  // select from index o to 5
+     * range(_, _)  // equivalent to `all()`
+     * \endcode
+     *
+     * @sa view, dynamic_view
+     */
     template <class A, class B>
     inline auto range(A min_val, B max_val)
     {
         return xrange_adaptor<A, B, placeholders::xtuph>(min_val, max_val, placeholders::xtuph());
     }
 
+    /**
+     * Select a range from min_val to max_val with step
+     * You can use the shorthand `_` syntax to select from the start or until the end.
+     *
+     * \code{.cpp}
+     * using namespace xt::placeholders;  // to enable _ syntax
+     * range(3, _, 5)  // select from index 3 to the end with stepsize 5
+     * \endcode
+     *
+     * @sa view, dynamic_view
+     */
     template <class A, class B, class C>
     inline auto range(A min_val, B max_val, C step)
     {
@@ -364,6 +430,12 @@ namespace xt
     }
 
     template <class E>
+    inline auto get_slice_implementation(E& /*e*/, xellipsis_tag, std::size_t /*index*/)
+    {
+        return xellipsis<typename E::size_type>();
+    }
+
+    template <class E>
     inline auto get_slice_implementation(E& /*e*/, xnewaxis_tag, std::size_t /*index*/)
     {
         return xnewaxis<typename E::size_type>();
@@ -374,7 +446,6 @@ namespace xt
     {
         return adaptor.get(e.shape()[index]);
     }
-
 
     /******************************
      * homogeneous get_slice_type *
@@ -392,6 +463,12 @@ namespace xt
         struct get_slice_type_impl<E, xall_tag>
         {
             using type = xall<typename E::size_type>;
+        };
+
+        template <class E>
+        struct get_slice_type_impl<E, xellipsis_tag>
+        {
+            using type = xellipsis<typename E::size_type>;
         };
 
         template <class E>
@@ -510,9 +587,31 @@ namespace xt
         return 1;
     }
 
+    /****************************
+     * xellipsis implementation *
+     ****************************/
+
+    template <class T>
+    inline auto xellipsis<T>::operator()(size_type /*i*/) const noexcept -> size_type
+    {
+        return 0;
+    }
+
+    template <class T>
+    inline auto xellipsis<T>::size() const noexcept -> size_type
+    {
+        return 0;
+    }
+
+    template <class T>
+    inline auto xellipsis<T>::step_size() const noexcept -> size_type
+    {
+        return 1;
+    }
+
     /***************************
-    * xnewaxis implementation *
-    ***************************/
+     * xnewaxis implementation *
+     ***************************/
 
     template <class T>
     inline auto xnewaxis<T>::operator()(size_type) const noexcept -> size_type

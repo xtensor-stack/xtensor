@@ -746,19 +746,20 @@ namespace xt
     using slice_variant = xtl::variant<
         T,
 
-        xt::xrange_adaptor<xt::placeholders::xtuph, T, T>,
-        xt::xrange_adaptor<T, xt::placeholders::xtuph, T>,
-        xt::xrange_adaptor<T, T, xt::placeholders::xtuph>,
+        xrange_adaptor<placeholders::xtuph, T, T>,
+        xrange_adaptor<T, placeholders::xtuph, T>,
+        xrange_adaptor<T, T, placeholders::xtuph>,
 
-        xt::xrange_adaptor<T, xt::placeholders::xtuph, xt::placeholders::xtuph>,
-        xt::xrange_adaptor<xt::placeholders::xtuph, T, xt::placeholders::xtuph>,
-        xt::xrange_adaptor<xt::placeholders::xtuph, xt::placeholders::xtuph, T>,
+        xrange_adaptor<T, placeholders::xtuph, placeholders::xtuph>,
+        xrange_adaptor<placeholders::xtuph, T, placeholders::xtuph>,
+        xrange_adaptor<placeholders::xtuph, placeholders::xtuph, T>,
 
-        xt::xrange_adaptor<T, T, T>,
-        xt::xrange_adaptor<xt::placeholders::xtuph, xt::placeholders::xtuph, xt::placeholders::xtuph>,
+        xrange_adaptor<T, T, T>,
+        xrange_adaptor<placeholders::xtuph, placeholders::xtuph, placeholders::xtuph>,
 
-        xt::xall_tag,
-        xt::xnewaxis_tag
+        xall_tag,
+        xellipsis_tag,
+        xnewaxis_tag
     >;
 
     /**
@@ -838,18 +839,45 @@ namespace xt
     inline auto dynamic_view(E&& e, const slice_vector& slices)
     {
         // Compute dimension
-        std::size_t dimension = e.dimension();
-
+        std::size_t dimension = e.dimension(), n_newaxis = 0, n_add_all;
+        ptrdiff_t dimension_check = static_cast<ptrdiff_t>(e.dimension());
+        bool has_ellipsis = false;
         for (const auto& el : slices)
         {
             if (xtl::get_if<xt::xnewaxis_tag>(&el) != nullptr)
             {
                 dimension++;
+                n_newaxis++;
             }
             else if (xtl::get_if<int>(&el) != nullptr)
             {
                 dimension--;
+                dimension_check--;
             }
+            else if (xtl::get_if<xt::xellipsis_tag>(&el) != nullptr)
+            {
+                if (has_ellipsis == true)
+                {
+                    throw std::runtime_error("Ellipsis can only appear once.");
+                }
+                has_ellipsis = true;
+            }
+            else
+            {
+                dimension_check--;
+            }
+        }
+
+        if (dimension_check < 0)
+        {
+            throw std::runtime_error("Too many slices for view.");
+        }
+
+        if (has_ellipsis)
+        {
+            // replace ellipsis with N * xt::all
+            // remove -1 because of the ellipsis slize itself
+            n_add_all = e.dimension() - (slices.size() - 1 - n_newaxis);
         }
 
         // Compute strided view
@@ -862,53 +890,71 @@ namespace xt
         auto old_shape = e.shape();
         auto&& old_strides = detail::get_strides(e);
 
-        std::size_t i = 0, idx = 0, newaxis_skip = 0;
+#define MS(v) static_cast<ptrdiff_t>(v)
+#define MU(v) static_cast<std::size_t>(v)
+
+        ptrdiff_t i = 0, axis_skip = 0;
+        std::size_t idx = 0;
 
         auto slice_getter = detail::slice_getter_impl<E>(e);
 
-        for (; i < slices.size(); ++i)
+        for (; i < MS(slices.size()); ++i)
         {
-            auto ptr = xtl::get_if<int>(&slices[i]);
+            auto ptr = xtl::get_if<int>(&slices[MU(i)]);
             if (ptr != nullptr)
             {
                 std::size_t slice0 = static_cast<std::size_t>(*ptr);
-                offset += slice0 * old_strides[i - newaxis_skip];
+                offset += slice0 * old_strides[MU(i - axis_skip)];
             }
-            else if (xtl::get_if<xt::xnewaxis_tag>(&slices[i]) != nullptr)
+            else if (xtl::get_if<xt::xnewaxis_tag>(&slices[MU(i)]) != nullptr)
             {
                 new_shape[idx] = 1;
                 new_strides[idx] = 0;
-                ++newaxis_skip;
+                ++axis_skip;
                 ++idx;
             }
-            else if (xtl::get_if<xt::xall_tag>(&slices[i]) != nullptr)
+            else if (xtl::get_if<xt::xellipsis_tag>(&slices[MU(i)]) != nullptr)
             {
-                new_shape[idx] = old_shape[i - newaxis_skip];
-                new_strides[idx] = old_strides[i - newaxis_skip];
+                for (std::size_t j = 0; j < n_add_all; ++j)
+                {
+                    new_shape[idx] = old_shape[MU(i - axis_skip)];
+                    new_strides[idx] = old_strides[MU(i - axis_skip)];
+                    ++idx, --axis_skip;
+                }
+                ++axis_skip;  // because i++
+            }
+            else if (xtl::get_if<xt::xall_tag>(&slices[MU(i)]) != nullptr)
+            {
+                new_shape[idx] = old_shape[MU(i - axis_skip)];
+                new_strides[idx] = old_strides[MU(i - axis_skip)];
                 ++idx;
             }
             else
             {
-                slice_getter.idx = i - newaxis_skip;
-                std::array<int, 3> info = xtl::visit(slice_getter, slices[i]);
-                offset += std::size_t(info[0]) * old_strides[i - newaxis_skip];
+                slice_getter.idx = MU(i - axis_skip);
+                std::array<int, 3> info = xtl::visit(slice_getter, slices[MU(i)]);
+                offset += std::size_t(info[0]) * old_strides[MU(i - axis_skip)];
                 new_shape[idx] = std::size_t(info[1]);
-                new_strides[idx] = std::size_t(info[2]) * old_strides[i - newaxis_skip];
+                new_strides[idx] = std::size_t(info[2]) * old_strides[MU(i - axis_skip)];
                 ++idx;
             }
         }
 
-        for (; (i - newaxis_skip) < old_shape.size(); ++i)
+        for (; MU(i - axis_skip) < old_shape.size(); ++i)
         {
-            new_shape[idx] = old_shape[i - newaxis_skip];
-            new_strides[idx] = old_strides[i - newaxis_skip];
+            new_shape[idx] = old_shape[MU(i - axis_skip)];
+            new_strides[idx] = old_strides[MU(i - axis_skip)];
             ++idx;
         }
 
         decltype(auto) data = detail::get_data(e);
+
         using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
         // TODO change layout type?
         return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), offset, layout_type::dynamic);
+
+#undef MU
+#undef MS
     }
 
     /****************************
@@ -1139,6 +1185,37 @@ namespace xt
     inline auto flatten(E&& e)
     {
         return ravel<std::decay_t<E>::static_layout>(std::forward<E>(e));
+    }
+
+    /**
+     * Trim zeros at beginning, end or both of 1D sequence.
+     *
+     * @param direction string of either 'f' for trim from beginning, 'b' for trim from end
+     *                  or 'fb' (default) for both.
+     * @return returns a view without zeros at the beginning and end
+     */
+    template <class E>
+    inline auto trim_zeros(E&& e, const std::string& direction = "fb")
+    {
+        XTENSOR_ASSERT_MSG(e.dimension() == 1, "Dimension for trim_zeros has to be 1.");
+
+        ptrdiff_t begin = 0, end = static_cast<ptrdiff_t>(e.size());
+
+        auto find_fun = [](const auto& i) {
+            return i != 0;
+        };
+
+        if (direction.find("f") != std::string::npos)
+        {
+            begin = std::find_if(e.begin(), e.end(), find_fun) - e.begin();
+        }
+
+        if (direction.find("b") != std::string::npos && begin != end)
+        {
+            end -= std::find_if(e.rbegin(), e.rend(), find_fun) - e.rbegin();
+        }
+
+        return dynamic_view(std::forward<E>(e), { range(static_cast<int>(begin), static_cast<int>(end)) });
     }
 
     /**
