@@ -1236,7 +1236,6 @@ namespace xt
     auto atleast_Nd(E&& e)
     {
         slice_vector sv(std::max(e.dimension(), N), xt::all());
-        std::cout << sv.size() << std::endl;
         if (e.dimension() < N)
         {
             std::size_t i = 0;
@@ -1245,13 +1244,29 @@ namespace xt
                 sv[i] = xt::newaxis();
             }
             i += e.dimension();
-            for (; i <= N; ++i)
+            for (; i < N; ++i)
             {
                 sv[i] = xt::newaxis();
             }
         }
-        // return dynamic_view(std::forward<E>(e), std::move(sv));
-        return e;
+        return dynamic_view(std::forward<E>(e), std::move(sv));
+    }
+
+    template <class E>
+    auto atleast_1d(E&& e)
+    {
+        return atleast_Nd<1>(std::forward<E>(e));
+    }
+    template <class E>
+    auto atleast_2d(E&& e)
+    {
+        return atleast_Nd<2>(std::forward<E>(e));
+    }
+
+    template <class E>
+    auto atleast_3d(E&& e)
+    {
+        return atleast_Nd<3>(std::forward<E>(e));
     }
 
     template <class E>
