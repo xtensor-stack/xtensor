@@ -97,6 +97,30 @@ Defined in ``xtensor/xmath.hpp`` and ``xtensor/xoperation.hpp``
 .. doxygenfunction:: not_equal(E1&&, E2&&)
    :project: xtensor
 
+.. _bitwise-and-op-ref:
+.. doxygenfunction:: operator&(E1&&, E2&&)
+   :project: xtensor
+
+.. _bitwise-or-op-ref:
+.. doxygenfunction:: operator|(E1&&, E2&&)
+   :project: xtensor
+
+.. _bitwise-xor-op-ref:
+.. doxygenfunction:: operator^(E1&&, E2&&)
+   :project: xtensor
+
+.. _bitwise-not-op-ref:
+.. doxygenfunction:: operator~(E1&&, E2&&)
+   :project: xtensor
+
+.. _left-shift-op-ref:
+.. doxygenfunction:: left_shift(E1&&, E2&&)
+   :project: xtensor
+
+.. _right-shift-op-ref:
+.. doxygenfunction:: right_shift(E1&&, E2&&)
+   :project: xtensor
+
 .. _cast-ref:
 .. doxygenfunction:: cast(E&&)
    :project: xtensor

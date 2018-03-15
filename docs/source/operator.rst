@@ -108,6 +108,17 @@ Element-wise equality comparison can be achieved through the ``xt::equal`` funct
     xt::xarray<bool> re = xt::equal(a1, a2);
     // => re = { false, false, true, true }
 
+Bitwise operators
+-----------------
+
+`xtensor` also contains the following bitwise operators:
+
+- Bitwise and: ``operator&``
+- Bitwise or: ``operator|``
+- Bitwise xor: ``operator^``
+- Bitwise not: ``operator~``
+- Bitwise left/right shift: ``shift_left``, ``shift_right``
+
 Mathematical functions
 ----------------------
 
@@ -219,7 +230,7 @@ input values).
 
 Choosing an evaluation_strategy is straightforward. For reducers:
 
-... code::
+.. code::
 
     #include "xtensor/xarray.hpp"
     #include "xtensor/xreducer.hpp"
