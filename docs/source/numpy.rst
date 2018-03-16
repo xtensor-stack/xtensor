@@ -161,10 +161,10 @@ The random module provides simple ways to create random tensor expressions, lazi
 | ``np.random.choice(arr, 5)``                  | ``xt::random::choice(arr, 5)``                |
 +-----------------------------------------------+-----------------------------------------------+
 
-Concatenation
--------------
+Concatenation, splitting, squeezing
+-----------------------------------
 
-Concatenating expressions does not allocate memory, it returns a tensor expression holding
+Concatenating expressions does not allocate memory, it returns a tensor or view expression holding
 closures on the specified arguments.
 
 +-----------------------------------------------+-----------------------------------------------+
@@ -173,6 +173,14 @@ closures on the specified arguments.
 | ``np.stack([a, b, c], axis=1)``               | ``xt::stack(xtuple(a, b, c), 1)``             |
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.concatenate([a, b, c], axis=1)``         | ``xt::concatenate(xtuple(a, b, c), 1)``       |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.squeeze(a)``                             | ``xt::squeeze(a)``                            |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.expand_dims(a, 1)``                      | ``xt::expand_dims(a ,1)``                     |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.atleast_3d(a)``                          | ``xt::expand_dims(1)``                        |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.split(a, 4, axis=0)``                    | ``xt::split(a, 4, 0)``                        |
 +-----------------------------------------------+-----------------------------------------------+
 
 Diagonal, triangular and flip

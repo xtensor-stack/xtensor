@@ -1168,14 +1168,20 @@ namespace xt
         template <class E, class S>
         inline auto squeeze_impl(E&& e, S&& axis, check_policy::none)
         {
-            xt::dynamic_shape<std::size_t> new_shape = e.shape(), new_strides = detail::get_strides(e);
-            for (auto ix : axis)
-            {
-                new_shape.erase(new_shape.begin() + ix);
-                new_strides.erase(new_strides.begin() + ix);
-            }
+            std::size_t new_dim = e.dimension() - axis.size();
+            xt::dynamic_shape<std::size_t> new_shape(new_dim), new_strides(new_dim);
 
+            decltype(auto) old_strides = detail::get_strides(e);
             decltype(auto) data = detail::get_data(e);
+
+            for (std::size_t i = 0, ix = 0; i < e.dimension(); ++i)
+            {
+                if (axis.end() == std::find(axis.begin(), axis.end(), i))
+                {
+                    new_shape[ix] = e.shape()[i];
+                    new_strides[ix++] = old_strides[i];
+                }
+            }
 
             using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>, decltype(data)>;
             return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), 0, e.layout());
@@ -1186,7 +1192,11 @@ namespace xt
         {
             for (auto ix : axis)
             {
-                if (e.shape()[ix] != 1)
+                if (static_cast<std::size_t>(ix) > e.dimension())
+                {
+                    throw std::runtime_error("Axis argument to squeeze > dimension of expression");
+                }
+                if (e.shape()[static_cast<std::size_t>(ix)] != 1)
                 {
                     throw std::runtime_error("Trying to squeeze axis != 1");
                 }
@@ -1195,6 +1205,15 @@ namespace xt
         }
     }
 
+    /**
+     * @brief Remove single-dimensional entries from the shape of an xexpression
+     *
+     * @param e input xexpression
+     * @param axis integer or container of integers, select a subset of single-dimensional
+     *        entries of the shape.
+     * @param check_policy select check_policy. With check_policy::full(), selecting an axis
+     *        which is greater than one will throw a runtime_error.
+     */
     template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!std::is_integral<S>::value, int> = 0>
     inline auto squeeze(E&& e, S&& axis, Tag check_policy = Tag())
     {
@@ -1213,17 +1232,28 @@ namespace xt
     template <class E, class I, std::size_t N, class Tag = check_policy::none>
     inline auto squeeze(E&& e, const I(&axis)[N], Tag check_policy = Tag())
     {
-        return detail::squeeze_impl(std::forward<E>(e), axis, check_policy);
+        using arr_t = std::array<I, N>;
+        return detail::squeeze_impl(std::forward<E>(e), xtl::forward_sequence<arr_t>(axis), check_policy);
     }
 #endif
-    /// @endcond
 
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())
     {
         return squeeze(std::forward<E>(e), std::array<std::size_t, 1>({ axis }), check_policy);
     }
+    /// @endcond
 
+    /**
+     * @brief Expand the shape of an xexpression.
+     *
+     * Insert a new axis that will appear at the axis position in the expanded array shape.
+     * This will return a ``dynamic_view`` with a ``xt::newaxis()`` at the indicated axis.
+     *
+     * @param e input xexpression
+     * @param axis axis to expand
+     * @return returns a ``dynamic_view`` with expanded dimension
+     */
     template <class E>
     auto expand_dims(E&& e, std::size_t axis)
     {
@@ -1232,6 +1262,18 @@ namespace xt
         return dynamic_view(std::forward<E>(e), std::move(sv));
     }
 
+    /**
+     * Expand dimensions of xexpression to at least `N`
+     *
+     * This adds ``newaxis()`` slices to a ``dynamic_view`` until
+     * the dimension of the view reaches at least `N`.
+     * Note: dimensions are added equally at the beginning and the end.
+     * For example, a 1-D array of shape (N,) becomes a view of shape (1, N, 1).
+     *
+     * @param e input xexpression
+     * @tparam N the number of requested dimensions
+     * @return ``dynamic_view`` with expanded dimensions
+     */
     template <std::size_t N, class E>
     auto atleast_Nd(E&& e)
     {
@@ -1239,7 +1281,7 @@ namespace xt
         if (e.dimension() < N)
         {
             std::size_t i = 0;
-            for (; i < std::ceil(double(e.dimension() / double(N))); ++i)
+            for (; i < std::round(double((N - e.dimension()) / double(N))); ++i)
             {
                 sv[i] = xt::newaxis();
             }
@@ -1252,23 +1294,48 @@ namespace xt
         return dynamic_view(std::forward<E>(e), std::move(sv));
     }
 
+    /**
+     * Expand to at least 1D
+     * @sa atleast_Nd
+     */
     template <class E>
     auto atleast_1d(E&& e)
     {
         return atleast_Nd<1>(std::forward<E>(e));
     }
+
+    /**
+     * Expand to at least 2D
+     * @sa atleast_Nd
+     */
     template <class E>
     auto atleast_2d(E&& e)
     {
         return atleast_Nd<2>(std::forward<E>(e));
     }
 
+    /**
+     * Expand to at least 3D
+     * @sa atleast_Nd
+     */
     template <class E>
     auto atleast_3d(E&& e)
     {
         return atleast_Nd<3>(std::forward<E>(e));
     }
 
+    /**
+     * @brief Split xexpression along axis into subexpressions
+     *
+     * This splits an xexpression along the axis in `n` equal parts and
+     * returns a vector of ``dynamic_view``.
+     * Calling split with axis > dimension of e or a `n` that does not result in
+     * an equal division of the xexpression will throw a runtime_error.
+     *
+     * @param e input xexpression
+     * @param n number of elements to return
+     * @param axis axis along which to split the expression
+     */
     template <class E>
     auto split(E& e, std::size_t n, std::size_t axis = 0)
     {
@@ -1276,6 +1343,7 @@ namespace xt
         {
             throw std::runtime_error("Split along axis > dimension.");
         }
+
         std::size_t ax_sz = e.shape()[axis];
         slice_vector sv(e.dimension(), xt::all());
         std::size_t step = ax_sz / n;
