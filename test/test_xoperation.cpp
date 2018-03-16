@@ -146,14 +146,14 @@ namespace xt
         int_container a(shape, 11);
         int_container b(shape, 3);
         EXPECT_EQ((a % b)(0, 0), a(0, 0) % b(0, 0));
-        
+
         int sb = 3;
         EXPECT_EQ((a % sb)(0, 0), a(0, 0) % sb);
-        
+
         int sa = 11;
         EXPECT_EQ((sa % b)(0, 0), sa % b(0, 0));
     }
-    
+
     template <class T>
     struct int_rebind;
 
@@ -463,5 +463,31 @@ namespace xt
         auto ref = static_cast<double>(a(0, 0)) / 2;
         auto actual = (cast<double>(a) / 2)(0, 0);
         EXPECT_EQ(ref, actual);
+    }
+
+    TEST(operation, left_shift)
+    {
+        xarray<int> arr({5,1, 1000});
+        xarray<int> res1 = left_shift(arr, 4);
+        xarray<int> res2 = left_shift(arr, arr);
+        EXPECT_EQ(left_shift(arr, 4)(1), 16);
+        xarray<int> expected1 = {80, 16, 16000};
+        xarray<int> expected2 = {160, 2, 256000};
+
+        EXPECT_EQ(expected1, res1);
+        EXPECT_EQ(expected2, res2);
+    }
+
+    TEST(operation, right_shift)
+    {
+        xarray<int> arr({5,1, 1000});
+        xarray<int> res1 = right_shift(arr, 4);
+        xarray<int> res2 = right_shift(arr, arr);
+        EXPECT_EQ(right_shift(arr, 4)(1), 0);
+        xarray<int> expected1 = {0, 0, 62};
+        xarray<int> expected2 = {0, 0, 3};
+
+        EXPECT_EQ(expected1, res1);
+        EXPECT_EQ(expected2, res2);
     }
 }
