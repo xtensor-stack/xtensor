@@ -161,10 +161,10 @@ The random module provides simple ways to create random tensor expressions, lazi
 | ``np.random.choice(arr, 5)``                  | ``xt::random::choice(arr, 5)``                |
 +-----------------------------------------------+-----------------------------------------------+
 
-Concatenation
--------------
+Concatenation, splitting, squeezing
+-----------------------------------
 
-Concatenating expressions does not allocate memory, it returns a tensor expression holding
+Concatenating expressions does not allocate memory, it returns a tensor or view expression holding
 closures on the specified arguments.
 
 +-----------------------------------------------+-----------------------------------------------+
@@ -174,11 +174,19 @@ closures on the specified arguments.
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.concatenate([a, b, c], axis=1)``         | ``xt::concatenate(xtuple(a, b, c), 1)``       |
 +-----------------------------------------------+-----------------------------------------------+
+| ``np.squeeze(a)``                             | ``xt::squeeze(a)``                            |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.expand_dims(a, 1)``                      | ``xt::expand_dims(a ,1)``                     |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.atleast_3d(a)``                          | ``xt::atleast_3d(a)``                         |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.split(a, 4, axis=0)``                    | ``xt::split(a, 4, 0)``                        |
++-----------------------------------------------+-----------------------------------------------+
 
 Diagonal, triangular and flip
 -----------------------------
 
-In the same spirit as concatenation, the following operations do not allocate any memory and do 
+In the same spirit as concatenation, the following operations do not allocate any memory and do
 not modify the underlying xexpression.
 
 +-----------------------------------------------+-----------------------------------------------+
@@ -206,7 +214,7 @@ xtensor follows the idioms of the C++ STL providing iterator pairs to iterate on
 different fashions.
 
 +----------------------------------------------------------------+----------------------------------------------------------------+
-|            Python 3 - numpy                                    |                C++ 14 - xtensor                                | 
+|            Python 3 - numpy                                    |                C++ 14 - xtensor                                |
 +================================================================+================================================================+
 | | ``for x in np.nditer(a):``                                   | | ``for(auto it=a.begin(); it!=a.end(); ++it)``                |
 +----------------------------------------------------------------+----------------------------------------------------------------+

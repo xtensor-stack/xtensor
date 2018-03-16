@@ -116,4 +116,99 @@ namespace xt
         auto flat2 = flatten(a);
         EXPECT_EQ(flat, flat2);
     }
+
+    TEST(xstrided_view, split)
+    {
+        auto b = xt::xarray<double>::from_shape({3, 3, 3});
+        using ds = xt::dynamic_shape<std::size_t>;
+        std::iota(b.begin(), b.end(), 0);
+        auto s1 = split(b, 3);
+        EXPECT_EQ(s1.size(), 3);
+        EXPECT_EQ(s1[0].shape(), ds({1, 3, 3}));
+        EXPECT_EQ(s1[0](0, 0), b(0, 0, 0));
+        EXPECT_EQ(s1[1](0, 0), b(1, 0, 0));
+        EXPECT_EQ(s1[2](0, 0), b(2, 0, 0));
+
+        EXPECT_THROW(split(b, 4), std::runtime_error);
+        EXPECT_THROW(split(b, 2), std::runtime_error);
+
+        auto s2 = split(b, 1);
+        EXPECT_EQ(s2.size(), 1);
+        EXPECT_EQ(s2[0].shape(), ds({3, 3, 3}));
+
+        auto s3 = split(b, 3, 1);
+        EXPECT_EQ(s3.size(), 3);
+        EXPECT_EQ(s3[0].shape(), ds({3, 1, 3}));
+
+        EXPECT_EQ(s3[0](0, 1), b(0, 0, 1));
+        EXPECT_EQ(s3[1](0, 1), b(0, 1, 1));
+        EXPECT_EQ(s3[2](0, 1), b(0, 2, 1));
+    }
+
+    TEST(xstrided_view, squeeze)
+    {
+        auto b = xt::xarray<double>::from_shape({3, 3, 1, 1, 2, 1, 3});
+        std::iota(b.begin(), b.end(), 0);
+        using ds = xt::dynamic_shape<std::size_t>;
+        auto sq = squeeze(b);
+
+        EXPECT_EQ(sq.shape(), ds({3, 3, 2, 3}));
+        EXPECT_EQ(sq(1, 1, 1, 1), b(1, 1, 0, 0, 1, 0, 1));
+        EXPECT_THROW(squeeze(b, 1, check_policy::full()), std::runtime_error);
+        EXPECT_THROW(squeeze(b, 10, check_policy::full()), std::runtime_error);
+
+        auto sq2 = squeeze(b, {2, 3}, check_policy::full());
+        EXPECT_EQ(sq2.shape(), ds({3, 3, 2, 1, 3}));
+        EXPECT_EQ(sq2(1, 1, 1, 0, 1), b(1, 1, 0, 0, 1, 0, 1));
+
+        auto sq3 = squeeze(b, 2);
+        EXPECT_EQ(sq3.shape(), ds({3, 3, 1, 2, 1, 3}));
+        EXPECT_EQ(sq3(2, 2, 0, 1, 0, 2), b(2, 2, 0, 0, 1, 0, 2));
+    }
+
+    TEST(xstrided_view, expand_dims)
+    {
+        auto b = xt::xarray<double>::from_shape({3, 3});
+        std::iota(b.begin(), b.end(), 0);
+        using ds = xt::dynamic_shape<std::size_t>;
+        auto ex = expand_dims(b, 0);
+        EXPECT_EQ(ex.shape(), ds({1, 3, 3}));
+        auto ex1 = expand_dims(b, 1);
+        EXPECT_EQ(ex1.shape(), ds({3, 1, 3}));
+        auto ex2 = expand_dims(b, 2);
+        EXPECT_EQ(ex2.shape(), ds({3, 3, 1}));
+
+        EXPECT_EQ(ex1(0, 0, 1), b(0, 1));
+        EXPECT_EQ(ex1(2, 0, 1), b(2, 1));
+    }
+
+    TEST(xstrided_view, atleast_nd)
+    {
+        xt::xarray<char> d0 = 123;
+        auto d1 = xt::xarray<char>::from_shape({3});
+        auto d2 = xt::xarray<char>::from_shape({3, 3});
+        auto d3 = xt::xarray<char>::from_shape({3, 3, 3});
+        auto d5 = xt::xarray<char>::from_shape({3, 3, 3, 3, 3});
+        std::iota(d1.begin(), d1.end(), 0);
+        std::iota(d2.begin(), d2.end(), 0);
+        std::iota(d3.begin(), d3.end(), 0);
+        std::iota(d5.begin(), d5.end(), 0);
+        using ds = xt::dynamic_shape<std::size_t>;
+
+        auto d3d1 = atleast_3d(d1);
+        EXPECT_EQ(d3d1.shape(), ds({1, 3, 1}));
+        auto d3d2 = atleast_3d(d2);
+        EXPECT_EQ(d3d2.shape(), ds({3, 3, 1}));
+        auto d3d3 = atleast_3d(d3);
+        EXPECT_EQ(d3d3.shape(), ds({3, 3, 3}));
+        auto d3d5 = atleast_3d(d5);
+        EXPECT_EQ(d3d5.shape(), ds({3, 3, 3, 3, 3}));
+        auto d3d0 = atleast_3d(d0);
+        EXPECT_EQ(d3d0.shape(), ds({1, 1, 1}));
+        EXPECT_EQ(d3d0(0, 0, 0), 123);
+        auto d4d1 = atleast_Nd<4>(d1);
+        EXPECT_EQ(d4d1.shape(), ds({1, 3, 1, 1}));
+        auto d2d1 = atleast_2d(d1);
+        EXPECT_EQ(d2d1.shape(), ds({1, 3}));
+    }
 }
