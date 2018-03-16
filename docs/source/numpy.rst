@@ -186,7 +186,7 @@ closures on the specified arguments.
 Diagonal, triangular and flip
 -----------------------------
 
-In the same spirit as concatenation, the following operations do not allocate any memory and do 
+In the same spirit as concatenation, the following operations do not allocate any memory and do
 not modify the underlying xexpression.
 
 +-----------------------------------------------+-----------------------------------------------+

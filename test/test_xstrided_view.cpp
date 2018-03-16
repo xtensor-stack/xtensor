@@ -125,9 +125,9 @@ namespace xt
         auto s1 = split(b, 3);
         EXPECT_EQ(s1.size(), 3);
         EXPECT_EQ(s1[0].shape(), ds({1, 3, 3}));
-        EXPECT_EQ(s1[0](0, 0), 0);
-        EXPECT_EQ(s1[1](0, 0), 9);
-        EXPECT_EQ(s1[2](0, 0), 18);
+        EXPECT_EQ(s1[0](0, 0), b(0, 0, 0));
+        EXPECT_EQ(s1[1](0, 0), b(1, 0, 0));
+        EXPECT_EQ(s1[2](0, 0), b(2, 0, 0));
 
         EXPECT_THROW(split(b, 4), std::runtime_error);
         EXPECT_THROW(split(b, 2), std::runtime_error);

@@ -237,4 +237,4 @@ The returned value is an expression holding a closure on the passed argument.
 
     real(e) = zeros<double>({2, 2});
     // => e = {{0.0, 0.0 + 1.0i}, {0.0 - 1.0i, 0.0}};
-  
+
