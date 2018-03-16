@@ -433,8 +433,10 @@ namespace xt
         template <class... It>
         xfunction_stepper(const xfunction_type* func, It&&... it) noexcept;
 
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
+        void step(size_type dim);
+        void step_back(size_type dim);
+        void step(size_type dim, size_type n);
+        void step_back(size_type dim, size_type n);
         void reset(size_type dim);
         void reset_back(size_type dim);
 
@@ -946,6 +948,20 @@ namespace xt
     inline xfunction_stepper<F, R, CT...>::xfunction_stepper(const xfunction_type* func, It&&... it) noexcept
         : p_f(func), m_it(std::forward<It>(it)...)
     {
+    }
+
+    template <class F, class R, class... CT>
+    inline void xfunction_stepper<F, R, CT...>::step(size_type dim)
+    {
+        auto f = [dim](auto& it) { it.step(dim); };
+        for_each(f, m_it);
+    }
+
+    template <class F, class R, class... CT>
+    inline void xfunction_stepper<F, R, CT...>::step_back(size_type dim)
+    {
+        auto f = [dim](auto& it) { it.step_back(dim); };
+        for_each(f, m_it);
     }
 
     template <class F, class R, class... CT>

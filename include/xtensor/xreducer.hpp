@@ -527,8 +527,10 @@ namespace xt
 
         reference operator*() const;
 
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
+        void step(size_type dim);
+        void step_back(size_type dim);
+        void step(size_type dim, size_type n);
+        void step_back(size_type dim, size_type n);
         void reset(size_type dim);
         void reset_back(size_type dim);
 
@@ -831,6 +833,24 @@ namespace xt
     {
         reference r = aggregate(0);
         return r;
+    }
+
+    template <class F, class CT, class X>
+    inline void xreducer_stepper<F, CT, X>::step(size_type dim)
+    {
+        if (dim >= m_offset)
+        {
+            m_stepper.step(get_dim(dim - m_offset));
+        }
+    }
+
+    template <class F, class CT, class X>
+    inline void xreducer_stepper<F, CT, X>::step_back(size_type dim)
+    {
+        if (dim >= m_offset)
+        {
+            m_stepper.step_back(get_dim(dim - m_offset));
+        }
     }
 
     template <class F, class CT, class X>
