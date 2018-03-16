@@ -23,6 +23,8 @@
 
 namespace xt
 {
+    // Thanks to Ullrich Koethe for these benchmarks
+    // https://github.com/QuantStack/xtensor/issues/695
     namespace view_benchmarks
     {
         constexpr int SIZE = 1000;
