@@ -349,8 +349,11 @@ namespace xt
 
         xoptional_assembly_stepper(value_stepper vs, flag_stepper fs) noexcept;
 
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
+
+        void step(size_type dim);
+        void step_back(size_type dim);
+        void step(size_type dim, size_type n);
+        void step_back(size_type dim, size_type n);
         void reset(size_type dim);
         void reset_back(size_type dim);
 
@@ -938,6 +941,20 @@ namespace xt
     inline xoptional_assembly_stepper<D, C>::xoptional_assembly_stepper(value_stepper vs, flag_stepper fs) noexcept
         : m_vs(vs), m_fs(fs)
     {
+    }
+
+    template <class D, bool C>
+    inline void xoptional_assembly_stepper<D, C>::step(size_type dim)
+    {
+        m_vs.step(dim);
+        m_fs.step(dim);
+    }
+
+    template <class D, bool C>
+    inline void xoptional_assembly_stepper<D, C>::step_back(size_type dim)
+    {
+        m_vs.step_back(dim);
+        m_fs.step_back(dim);
     }
 
     template <class D, bool C>

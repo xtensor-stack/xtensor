@@ -291,8 +291,10 @@ namespace xt
 
         reference operator*() const;
 
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
+        void step(size_type dim);
+        void step_back(size_type dim);
+        void step(size_type dim, size_type n);
+        void step_back(size_type dim, size_type n);
         void reset(size_type dim);
         void reset_back(size_type dim);
 
@@ -305,6 +307,9 @@ namespace xt
 
         bool is_newaxis_slice(size_type index) const noexcept;
         void to_end_impl();
+
+        template <class F>
+        void common_step(size_type dim, F f);
 
         template <class F>
         void common_step(size_type dim, size_type n, F f);
@@ -941,6 +946,20 @@ namespace xt
     }
 
     template <bool is_const, class CT, class... S>
+    inline void xview_stepper<is_const, CT, S...>::step(size_type dim)
+    {
+        auto func = [this](size_type index, size_type offset) { m_it.step(index, offset); };
+        common_step(dim, func);
+    }
+
+    template <bool is_const, class CT, class... S>
+    inline void xview_stepper<is_const, CT, S...>::step_back(size_type dim)
+    {
+        auto func = [this](size_type index, size_type offset) { m_it.step_back(index, offset); };
+        common_step(dim, func);
+    }
+
+    template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::step(size_type dim, size_type n)
     {
         auto func = [this](size_type index, size_type offset) { m_it.step(index, offset); };
@@ -1006,6 +1025,24 @@ namespace xt
                 size_type index = i - newaxis_count_before<S...>(i);
                 s = p_view->underlying_size(index) - 1 - s;
                 m_it.step_back(index, s);
+            }
+        }
+    }
+
+    template <bool is_const, class CT, class... S>
+    template <class F>
+    void xview_stepper<is_const, CT, S...>::common_step(size_type dim, F f)
+    {
+        if (dim >= m_offset)
+        {
+            auto func = [](const auto& s) noexcept { return step_size(s); };
+            size_type index = integral_skip<S...>(dim);
+            if (!is_newaxis_slice(index))
+            {
+                size_type step_size = index < sizeof...(S) ?
+                    apply<size_type>(index, func, p_view->slices()) : 1;
+                index -= newaxis_count_before<S...>(index);
+                f(index, step_size);
             }
         }
     }

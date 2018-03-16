@@ -102,6 +102,7 @@ namespace xt
 
         void run();
 
+        void step(size_type i);
         void step(size_type i, size_type n);
         void reset(size_type i);
 
@@ -322,6 +323,13 @@ namespace xt
             *m_lhs = conditional_cast<is_narrowing, result_type>(*m_rhs);
             stepper_tools<L>::increment_stepper(*this, m_index, m_e1.shape());
         }
+    }
+
+    template <class E1, class E2, layout_type L>
+    inline void data_assigner<E1, E2, L>::step(size_type i)
+    {
+        m_lhs.step(i);
+        m_rhs.step(i);
     }
 
     template <class E1, class E2, layout_type L>
