@@ -16,6 +16,8 @@
 #include <string>
 
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrides.hpp"
 #include "xtensor/xstrided_view.hpp"
 
@@ -133,7 +135,6 @@ namespace xt
         BENCHMARK_CAPTURE(benchmark_stridedview_cm_cm, 10x20x500, {10, 20, 500});
         BENCHMARK_CAPTURE(benchmark_stridedview_rm_cm, 10x20x500, {10, 20, 500});
         BENCHMARK_CAPTURE(benchmark_stridedview_cm_rm, 10x20x500, {10, 20, 500});
-
     }
 }
 

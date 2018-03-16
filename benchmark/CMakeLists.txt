@@ -112,6 +112,7 @@ set(XTENSOR_BENCHMARK
     benchmark_container.hpp
     benchmark_math.hpp
     benchmark_views.hpp
+    benchmark_view_iteration.hpp
     main.cpp
 )
 
