@@ -135,10 +135,12 @@ Shape
     #include <vector>
     #include "xtensor/xarray.hpp"
 
-    std::vector<size_t> shape = {3, 2, 4};
-    xt::xarray<double> a(shape);
+    using array_type = xt::xarray<double>;
+    using shape_type = array_type::shape_type;
+    shape_type shape = {3, 2, 4};
+    array_type a(shape);
     size_t d = a.dimension();
-    const std::vector<size_t>& s = a.shape();
+    const shape_type& s = a.shape();
     bool res = (d == shape.size()) && (s == shape);
     // => res = true
 

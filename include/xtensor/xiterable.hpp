@@ -434,7 +434,7 @@ namespace xt
     //@}
 
     /**
-     * Constant reverse broadcast iterators
+     * @name Constant reverse broadcast iterators
      */
     //@{
     /**
