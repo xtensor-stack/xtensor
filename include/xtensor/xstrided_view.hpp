@@ -1190,6 +1190,7 @@ namespace xt
     /**
      * Trim zeros at beginning, end or both of 1D sequence.
      *
+     * @param e input xexpression
      * @param direction string of either 'f' for trim from beginning, 'b' for trim from end
      *                  or 'fb' (default) for both.
      * @return returns a view without zeros at the beginning and end

@@ -92,7 +92,7 @@ namespace xt
 
     /**
      * Create a xcontainer (xarray, xtensor or xtensorf) with uninitialized values of
-     * the same shape, value type and layout as @emph e.
+     * the same shape, value type and layout as the input xexpression *e*.
      *
      * @param e the xexpression from which to extract shape, value type and layout.
      */
@@ -104,10 +104,11 @@ namespace xt
     }
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf), filled with @emph fill_value and of
-     * the same shape, value type and layout as @emph e.
+     * Create a xcontainer (xarray, xtensor or xtensorf), filled with *fill_value* and of
+     * the same shape, value type and layout as the input xexpression *e*.
      *
      * @param e the xexpression from which to extract shape, value type and layout.
+     * @param fill_value the value used to set each element of the returned xcontainer.
      */
     template <class E>
     inline typename E::temporary_type full_like(const xexpression<E>& e, typename E::value_type fill_value)
@@ -117,9 +118,11 @@ namespace xt
     }
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf), filled with @emph zeros and of
-     * the same shape, value type and layout as @emph e. Note: contrary to zeros(shape), this function
-     * returns a non-lazy, evaluated container! Use ``xt::zeros<double>(e.shape());` for a lazy version.
+     * Create a xcontainer (xarray, xtensor or xtensorf), filled with zeros and of
+     * the same shape, value type and layout as the input xexpression *e*.
+     *
+     * Note: contrary to zeros(shape), this function returns a non-lazy, allocated container! 
+     * Use ``xt::zeros<double>(e.shape());` for a lazy version.
      *
      * @param e the xexpression from which to extract shape, value type and layout.
      */
@@ -130,9 +133,11 @@ namespace xt
     }
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf), filled with @emph ones and of
-     * the same shape, value type and layout as @emph e. Note: contrary to ones(shape), this function
-     * returns a non-lazy, evaluated container! Use ``xt::ones<double>(e.shape());` for a lazy version.
+     * Create a xcontainer (xarray, xtensor or xtensorf), filled with ones and of
+     * the same shape, value type and layout as the input xexpression *e*.
+     *
+     * Note: contrary to ones(shape), this function returns a non-lazy, evaluated container!
+     * Use ``xt::ones<double>(e.shape());`` for a lazy version.
      *
      * @param e the xexpression from which to extract shape, value type and layout.
      */

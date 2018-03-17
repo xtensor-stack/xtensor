@@ -257,7 +257,7 @@ namespace xt
     /**
      * Find position of minimal value in xexpression
      *
-     * @param a xexpression to compute argmin on
+     * @param e input xexpression
      * @param axis select axis (or none)
      *
      * @return returns xarray with positions of minimal value
@@ -281,7 +281,7 @@ namespace xt
     /**
      * Find position of maximal value in xexpression
      *
-     * @param a xexpression to compute argmin on
+     * @param e input xexpression
      * @param axis select axis (or none)
      *
      * @return returns xarray with positions of minimal value
@@ -298,7 +298,7 @@ namespace xt
      * Find unique elements of a xexpression. This returns a flattened xtensor with
      * sorted, unique elements from the original expression.
      *
-     * @param a input xexpression (will be flattened)
+     * @param e input xexpression (will be flattened)
      */
     template <class E>
     auto unique(const xexpression<E>& e)
