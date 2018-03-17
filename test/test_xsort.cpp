@@ -130,4 +130,19 @@ namespace xt
             EXPECT_EQ(c3_idx, m3_idx);
         }
     }
+
+    TEST(xsort, unique)
+    {
+        xarray<double> a = {1,2,3, 5,3,2,1,2,2,2,2,2,2, 45};
+        xarray<double> ax = {1, 2, 3, 5, 45};
+        EXPECT_EQ(unique(a), ax);
+
+        xarray<double> b = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<double> bx = {1,2,3,4,5,6,7,8,9};
+        EXPECT_EQ(unique(b), bx);
+
+        xarray<double> bb = {{1,2,3}, {7,8,9}, {4,5,6}, {7,8,9}};
+        xarray<double> bbx = {1,2,3,4,5,6,7,8,9};
+        EXPECT_EQ(unique(bb), bbx);
+    }
 }

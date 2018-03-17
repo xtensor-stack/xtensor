@@ -29,3 +29,6 @@ Defined in ``xtensor/xsort.hpp``
 
 .. doxygenfunction:: xt::argmax(const xexpression<E>&, std::size_t)
    :project: xtensor
+
+.. doxygenfunction:: xt::unique(const xexpression<E>&)
+   :project: xtensor

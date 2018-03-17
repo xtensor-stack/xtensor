@@ -29,3 +29,6 @@ Defined in ``xtensor/xslice.hpp``
 
 .. doxygenfunction:: xt::newaxis
    :project: xtensor
+
+.. doxygenfunction:: xt::ellipsis
+   :project: xtensor
