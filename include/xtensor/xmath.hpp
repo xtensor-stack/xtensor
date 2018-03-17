@@ -9,7 +9,7 @@
 /**
  * @brief standard mathematical functions for xexpressions
  */
-\
+
 #ifndef XTENSOR_MATH_HPP
 #define XTENSOR_MATH_HPP
 
@@ -17,11 +17,11 @@
 #include <complex>
 #include <type_traits>
 
+#include <xtl/xcomplex.hpp>
+
+#include "xaccumulator.hpp"
 #include "xoperation.hpp"
 #include "xreducer.hpp"
-#include "xaccumulator.hpp"
-
-#include "xtl/xcomplex.hpp"
 
 namespace xt
 {
@@ -1461,11 +1461,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             bool operator()(const T& a, const T& b) const
             {
                 using internal_type = promote_type_t<T, double>;
-                if(math::isnan(a) && math::isnan(b))
+                if (math::isnan(a) && math::isnan(b))
                 {
                     return m_equal_nan;
                 }
-                if(math::isinf(a) && math::isinf(b))
+                if (math::isinf(a) && math::isinf(b))
                 {
                     // check for both infinity signs equal
                     return a == b;

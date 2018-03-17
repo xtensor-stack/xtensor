@@ -71,7 +71,7 @@ and the size of the data, it might be convenient to store the result of the expr
 Forcing evaluation
 ------------------
 
-If you have to force the evaluation of an xexpression for some reason (for example, you want to have all results in memory to perform a sort, or use external BLAS functions) then you can use ``xt::eval`` on an xexpression. 
+If you have to force the evaluation of an xexpression for some reason (for example, you want to have all results in memory to perform a sort or use external BLAS functions) then you can use ``xt::eval`` on an xexpression.
 Evaluating will either return an rvalue to a newly allocated container in the case of a xexpression, or a reference to a container in case you are evaluating a ``xarray`` or ``xtensor``. Note that, in order to avoid copies, you should use an universal reference on the lefthand side (``auto&&``). For example:
 
 .. code::
@@ -87,7 +87,7 @@ Broadcasting
 ------------
 
 The number of dimensions of an ``xexpression`` and the sizes of these dimensions are provided by the ``shape()`` method, which returns a sequence of unsigned integers
-specifying the size of each dimension. We can operate on expressions of different shapes of dimensions in a elementwise fashion. Broadcasting rules of `xtensor` are
+specifying the size of each dimension. We can operate on expressions of different shapes of dimensions in an elementwise fashion. Broadcasting rules of `xtensor` are
 similar to those of Numpy_ and libdynd_.
 
 In an operation involving two arrays of different dimensions, the array with the lesser dimensions is broadcast across the leading dimensions of the other.
@@ -146,8 +146,8 @@ Element access
 ~~~~~~~~~~~~~~
 
 - ``operator()`` is an access operator which can take multiple integral arguments or none.
-- ``at()`` is similar to ``operator()`` but checks that its number of arguments does not exceed the number of dimensions, and performs bounds check. This should not be used where you expect ``operator()`` to perform broadcasting.
-- ``operator[]`` has two overloads: one that takes a single integral argument and is equivalent to the call of ``operator()`` with one argument, and one with a single multi-index argument, which can be of size determined at runtime. This operator also supports braced initializer arguments.
+- ``at()`` is similar to ``operator()`` but checks that its number of arguments does not exceed the number of dimensions, and performs bounds checking. This should not be used where you expect ``operator()`` to perform broadcasting.
+- ``operator[]`` has two overloads: one that takes a single integral argument and is equivalent to the call of ``operator()`` with one argument, and one with a single multi-index argument, which can be of a size determined at runtime. This operator also supports braced initializer arguments.
 - ``element()`` is an access operator which takes a pair of iterators on a container of indices.
 
 .. code::
@@ -168,10 +168,8 @@ Iterators
 - ``begin()`` and ``end()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the expression. The layout of the iteration can be specified
   through the ``layout_type`` template parameter, accepted values are ``layout_type::row_major`` and ``layout_type::column_major``. If not specified, ``DEFAULT_LAYOUT`` is used.
   This iterator pair permits to use algorithms of the STL with ``xexpression`` as if they were simple containers.
-- ``begin(shape)`` and ``end(shape)`` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in ``DEFAULT_LAYOUT`` if no ``layout_type`` template
-  parameter is specified. Certain dimensions are repeated to match the provided shape as per the rules described above.
-- ``rbegin()`` and ``rend()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the reversed expression. As ``begin()`` and ``end()``, the
-  layout of the iteration can be specified through the ``layout_type`` parameter.
+- ``begin(shape)`` and ``end(shape)`` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in ``DEFAULT_LAYOUT`` if no ``layout_type`` template parameter is specified. Certain dimensions are repeated to match the provided shape as per the rules described above.
+- ``rbegin()`` and ``rend()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the reversed expression. As ``begin()`` and ``end()``, the layout of the iteration can be specified through the ``layout_type`` parameter.
 - ``rbegin(shape)`` and ``rend(shape)`` are the reversed counterpart of ``begin(shape)`` and ``end(shape)``.
 
 .. _NumPy: http://www.numpy.org

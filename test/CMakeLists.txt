@@ -81,6 +81,7 @@ include_directories(${GTEST_INCLUDE_DIRS})
 set(COMMON_BASE
     main.cpp
     test_common.hpp
+    test_xsemantic.hpp
 )
 
 set(XTENSOR_TESTS
@@ -119,7 +120,6 @@ set(XTENSOR_TESTS
     test_xreducer.cpp
     test_xscalar.cpp
     test_xscalar_semantic.cpp
-    test_xsemantic.hpp
     test_xshape.cpp
     test_xsort.cpp
     test_xstorage.cpp

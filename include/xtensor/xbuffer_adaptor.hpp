@@ -15,7 +15,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include "xtl/xclosure.hpp"
+#include <xtl/xclosure.hpp>
 
 #include "xstorage.hpp"
 
@@ -50,9 +50,13 @@ namespace xt
             using self_type = xbuffer_storage<CP, A>;
             using allocator_type = A;
             using value_type = typename allocator_type::value_type;
-            using reference = typename allocator_type::reference;
+            using reference = std::conditional_t<std::is_const<std::remove_reference_t<CP>>::value,
+                                  typename allocator_type::const_reference,
+                                  typename allocator_type::reference>;
             using const_reference = typename allocator_type::const_reference;
-            using pointer = typename allocator_type::pointer;
+            using pointer = std::conditional_t<std::is_const<std::remove_reference_t<CP>>::value,
+                                  typename allocator_type::const_pointer,
+                                  typename allocator_type::pointer>;
             using const_pointer = typename allocator_type::const_pointer;
             using size_type = typename allocator_type::size_type;
             using difference_type = typename allocator_type::difference_type;
@@ -84,9 +88,13 @@ namespace xt
             using self_type = xbuffer_owner_storage<CP, A>;
             using allocator_type = A;
             using value_type = typename allocator_type::value_type;
-            using reference = typename allocator_type::reference;
+            using reference = std::conditional_t<std::is_const<std::remove_reference_t<CP>>::value,
+                                  typename allocator_type::const_reference,
+                                  typename allocator_type::reference>;
             using const_reference = typename allocator_type::const_reference;
-            using pointer = typename allocator_type::pointer;
+            using pointer = std::conditional_t<std::is_const<std::remove_reference_t<CP>>::value,
+                                  typename allocator_type::const_pointer,
+                                  typename allocator_type::pointer>;
             using const_pointer = typename allocator_type::const_pointer;
             using size_type = typename allocator_type::size_type;
             using difference_type = typename allocator_type::difference_type;

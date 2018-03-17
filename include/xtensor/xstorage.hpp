@@ -17,12 +17,12 @@
 #include <type_traits>
 
 #include "xexception.hpp"
-#include "xutils.hpp"
 #include "xtensor_simd.hpp"
+#include "xutils.hpp"
 
 #ifndef XALIGNMENT
     #ifdef XTENSOR_USE_XSIMD
-        #include "xsimd/xsimd.hpp"
+        #include <xsimd/xsimd.hpp>
         #define XALIGNMENT XSIMD_DEFAULT_ALIGNMENT
     #else
         #define XALIGNMENT 0
@@ -555,7 +555,7 @@ namespace xt
         };
     }
 
-    template <class T, std::size_t N, class A = std::allocator<T>, bool Init = true>
+    template <class T, std::size_t N = 4, class A = std::allocator<T>, bool Init = true>
     class svector
     {
     public:
@@ -590,14 +590,21 @@ namespace xt
         svector(size_type n, const value_type& v, const allocator_type& alloc = allocator_type());
         svector(std::initializer_list<T> il, const allocator_type& alloc = allocator_type());
 
-        explicit svector(const std::vector<T>& vec);
+        svector(const std::vector<T>& vec);
 
         template <class IT, class = detail::require_input_iter<IT>>
         svector(IT begin, IT end, const allocator_type& alloc = allocator_type());
 
+        template <std::size_t N2, bool I2, class = std::enable_if_t<N != N2, void>>
+        explicit svector(const svector<T, N2, A, I2>& rhs);
+
         svector& operator=(const svector& rhs);
         svector& operator=(svector&& rhs);
-        svector& operator=(std::vector<T>& rhs);
+        svector& operator=(const std::vector<T>& rhs);
+        svector& operator=(std::initializer_list<T> il);
+
+        template <std::size_t N2, bool I2, class = std::enable_if_t<N != N2, void>>
+        svector& operator=(const svector<T, N2, A, I2>& rhs);
 
         svector(const svector& other);
         svector(svector&& other);
@@ -717,6 +724,14 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
+    template <std::size_t N2, bool I2, class>
+    inline svector<T, N, A, Init>::svector(const svector<T, N2, A, I2>& rhs)
+        : m_allocator(rhs.get_allocator())
+    {
+        assign(rhs.begin(), rhs.end());
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
     inline svector<T, N, A, Init>::svector(const std::vector<T>& vec)
     {
         assign(vec.begin(), vec.end());
@@ -751,13 +766,25 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
-    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(std::vector<T>& rhs)
+    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const std::vector<T>& rhs)
     {
-        if (this != &rhs)
-        {
-            m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
-            assign(rhs.begin(), rhs.end());
-        }
+        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+        assign(rhs.begin(), rhs.end());
+        return *this;
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(std::initializer_list<T> il)
+    {
+        return operator=(self_type(il));
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    template <std::size_t N2, bool I2, class>
+    inline svector<T, N, A, Init>& svector<T, N, A, Init>::operator=(const svector<T, N2, A, I2>& rhs)
+    {
+        m_allocator = std::allocator_traits<allocator_type>::select_on_container_copy_construction(rhs.get_allocator());
+        assign(rhs.begin(), rhs.end());
         return *this;
     }
 
@@ -1069,7 +1096,8 @@ namespace xt
         }
 
         // We can only avoid copying elements if neither vector is small.
-        if (!this->on_stack() && !rhs.on_stack()) {
+        if (!this->on_stack() && !rhs.on_stack())
+        {
             std::swap(this->m_begin, rhs.m_begin);
             std::swap(this->m_end, rhs.m_end);
             std::swap(this->m_capacity, rhs.m_capacity);
@@ -1112,7 +1140,7 @@ namespace xt
     inline void svector<T, N, A, Init>::grow(size_type min_capacity)
     {
         size_type current_size = size();
-        size_type new_capacity = 2 * current_size + 1; // Always grow.
+        size_type new_capacity = 2 * current_size + 1;  // Always grow.
         if (new_capacity < min_capacity)
         {
             new_capacity = min_capacity;

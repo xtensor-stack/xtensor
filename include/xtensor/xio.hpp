@@ -19,7 +19,7 @@
 
 #include "xexpression.hpp"
 #include "xmath.hpp"
-#include "xview.hpp"
+#include "xstrided_view.hpp"
 
 #ifdef _WIN32
     using precision_type = typename std::streamsize;
@@ -100,131 +100,101 @@ namespace xt
 
     namespace detail
     {
-        template <std::size_t I>
-        struct xout
+        template <class E, class F>
+        std::ostream& xoutput(std::ostream& out, const E& e, slice_vector& slices, F& printer, std::size_t blanks,
+                              precision_type element_width, std::size_t edgeitems, std::size_t line_width)
         {
-            template <class E, class F>
-            static std::ostream& output(std::ostream& out, const E& e, F& printer, std::size_t blanks,
-                                        precision_type element_width, std::size_t edgeitems, std::size_t line_width)
+            using size_type = typename E::size_type;
+
+            const auto view = xt::dynamic_view(e, slices);
+            if (view.dimension() == 0)
             {
-                using size_type = typename E::size_type;
+                printer.print_next(out);
+            }
+            else
+            {
+                std::string indents(blanks, ' ');
 
-                if (e.dimension() == 0)
+                size_type i = 0;
+                size_type elems_on_line = 0;
+                size_type ewp2 = static_cast<size_type>(element_width) + size_type(2);
+                size_type line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
+
+                out << '{';
+                for (; i != view.shape()[0] - 1; ++i)
                 {
-                    printer.print_next(out);
-                }
-                else
-                {
-                    std::string indents(blanks, ' ');
-
-                    size_type i = 0;
-                    size_type elems_on_line = 0;
-                    size_type ewp2 = static_cast<size_type>(element_width) + size_type(2);
-                    size_type line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
-
-                    out << '{';
-                    for (; i != e.shape()[0] - 1; ++i)
+                    if (edgeitems && view.shape()[0] > (edgeitems * 2) && i == edgeitems)
                     {
-                        if (edgeitems && e.shape()[0] > (edgeitems * 2) && i == edgeitems)
+                        out << "..., ";
+                        if (view.dimension() > 1)
                         {
-                            out << "..., ";
-                            if (e.dimension() > 1)
-                            {
-                                elems_on_line = 0;
-                                out << std::endl
-                                    << indents;
-                            }
-                            i = e.shape()[0] - edgeitems;
-                        }
-                        if (e.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
-                        {
-                            out << std::endl
-                                << indents;
                             elems_on_line = 0;
-                        }
-
-                        xout<I - 1>::output(out, view(e, i), printer, blanks + 1, element_width, edgeitems, line_width) << ',';
-
-                        elems_on_line++;
-
-                        if (I == 1 || e.dimension() == 1)
-                        {
-                            out << ' ';
-                        }
-                        else
-                        {
                             out << std::endl
                                 << indents;
                         }
+                        i = view.shape()[0] - edgeitems;
                     }
-                    if (e.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
+                    if (view.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
+                    {
+                        out << std::endl
+                            << indents;
+                        elems_on_line = 0;
+                    }
+
+                    slices.push_back(static_cast<int>(i));
+                    xoutput(out, e, slices, printer, blanks + 1, element_width, edgeitems, line_width) << ',';
+                    slices.pop_back();
+                    elems_on_line++;
+
+                    if (view.dimension() == 1)
+                    {
+                        out << ' ';
+                    }
+                    else
                     {
                         out << std::endl
                             << indents;
                     }
-                    xout<I - 1>::output(out, view(e, i), printer, blanks + 1, element_width, edgeitems, line_width) << '}';
                 }
-                return out;
+                if (view.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
+                {
+                    out << std::endl
+                        << indents;
+                }
+                slices.push_back(static_cast<int>(i));
+                xoutput(out, e, slices, printer, blanks + 1, element_width, edgeitems, line_width) << '}';
+                slices.pop_back();
             }
-        };
+            return out;
+        }
 
-        template <>
-        struct xout<0>
+        template <class F, class E>
+        static void recurser_run(F& fn, const E& e, slice_vector& slices, std::size_t lim = 0)
         {
-            template <class E, class F>
-            static std::ostream& output(std::ostream& out, const E& e, F& printer,
-                                        std::size_t, precision_type, std::size_t, std::size_t)
+            using size_type = typename E::size_type;
+            const auto view = dynamic_view(e, slices);
+            if (view.dimension() == 0)
             {
-                if (e.dimension() == 0)
-                {
-                    return printer.print_next(out);
-                }
-                else
-                {
-                    return out << "{...}";
-                }
+                fn.update(view());
             }
-        };
-
-        template <std::size_t I>
-        struct recurser
-        {
-            template <class F, class E>
-            static void run(F& fn, const E& e, std::size_t lim = 0)
+            else
             {
-                using size_type = typename E::size_type;
-                if (e.dimension() == 0)
+                size_type i = 0;
+                for (; i != view.shape()[0] - 1; ++i)
                 {
-                    fn.update(e());
-                }
-                else
-                {
-                    size_type i = 0;
-                    for (; i != e.shape()[0] - 1; ++i)
+                    if (lim && view.shape()[0] > (lim * 2) && i == lim)
                     {
-                        if (lim && e.shape()[0] > (lim * 2) && i == lim)
-                        {
-                            i = e.shape()[0] - lim;
-                        }
-                        recurser<I - 1>::run(fn, view(e, i), lim);
+                        i = view.shape()[0] - lim;
                     }
-                    recurser<I - 1>::run(fn, view(e, i), lim);
+                    slices.push_back(static_cast<int>(i));
+                    recurser_run(fn, e, slices, lim);
+                    slices.pop_back();
                 }
+                slices.push_back(static_cast<int>(i));
+                recurser_run(fn, e, slices, lim);
+                slices.pop_back();
             }
-        };
-
-        template <>
-        struct recurser<0>
-        {
-            template <class F, class E>
-            static void run(F& fn, const E& e, std::size_t)
-            {
-                if (e.dimension() == 0)
-                {
-                    fn.update(e());
-                }
-            }
-        };
+        }
 
         template <class T, class E = void>
         struct printer;
@@ -603,21 +573,6 @@ namespace xt
 
             std::function<std::string(const value_type&)> m_func;
         };
-
-        template <class S>
-        struct recursion_depth
-        {
-            static constexpr std::size_t value = 5;
-        };
-
-// Note: std::min is not constexpr on old versions of gcc (4.x) and clang.
-#define XTENSOR_MIN(x, y) (x > y ? y : x)
-        template <class T, std::size_t N>
-        struct recursion_depth<std::array<T, N>>
-        {
-            static constexpr std::size_t value = XTENSOR_MIN(5, N);
-        };
-#undef XTENSOR_MIN
     }
 
     template <class E, class F>
@@ -654,10 +609,11 @@ namespace xt
 
         detail::printer<E> p(precision);
 
-        constexpr std::size_t depth = detail::recursion_depth<typename E::shape_type>::value;
-        detail::recurser<depth>::run(p, d, lim);
+        slice_vector sv;
+        detail::recurser_run(p, d, sv, lim);
         p.init();
-        detail::xout<depth>::output(out, d, p, 1, p.width(), lim, print_options::print_options().line_width);
+        sv.clear();
+        xoutput(out, d, sv, p, 1, p.width(), lim, print_options::print_options().line_width);
 
         out << std::setprecision(temp_precision);  // restore precision
 

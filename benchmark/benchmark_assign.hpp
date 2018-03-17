@@ -73,8 +73,9 @@ namespace xt
                 size_type csize = x.size();
                 for (size_type i = 0; i < csize; ++i)
                 {
-                    res.data()[i] = 3 * x.data()[i] - 2 * y.data()[i];
+                    res.data()[i] = 3.0 * x.data()[i] - 2.0 * y.data()[i];
                 }
+                benchmark::DoNotOptimize(res.data().data());
             }
         }
 
@@ -85,8 +86,9 @@ namespace xt
             init_xtensor_benchmark(x, y, res, state.range(0), state.range(0));
             while (state.KeepRunning())
             {
-                xt::noalias(res) = 3 * x - 2 * y;
+                xt::noalias(res) = 3.0 * x - 2.0 * y;
             }
+            benchmark::DoNotOptimize(res.data().data());
         }
 
         BENCHMARK_TEMPLATE(benchmark_c_assign, xt::xtensor<double, 2>)->Range(32, 32<<3);

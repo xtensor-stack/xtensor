@@ -13,7 +13,7 @@
 #include <functional>
 #include <type_traits>
 
-#include "xtl/xsequence.hpp"
+#include <xtl/xsequence.hpp>
 
 #include "xconcepts.hpp"
 #include "xfunction.hpp"
@@ -127,6 +127,8 @@ namespace xt
         BINARY_OPERATOR_FUNCTOR(bitwise_and, &);
         BINARY_OPERATOR_FUNCTOR(bitwise_xor, ^);
         UNARY_OPERATOR_FUNCTOR(bitwise_not, ~);
+        BINARY_OPERATOR_FUNCTOR(left_shift, <<);
+        BINARY_OPERATOR_FUNCTOR(right_shift, >>);
         BINARY_BOOL_OPERATOR_FUNCTOR(less, <);
         BINARY_BOOL_OPERATOR_FUNCTOR(less_equal, <=);
         BINARY_BOOL_OPERATOR_FUNCTOR(greater, >);
@@ -246,7 +248,7 @@ namespace xt
         template <template <class...> class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
-            using function_type = xfunction_type<F, E... >;
+            using function_type = xfunction_type<F, E...>;
             using functor_type = typename function_type::functor_type;
             using type = typename function_type::type;
             return type(functor_type(), std::forward<E>(e)...);
@@ -388,11 +390,11 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto operator%(E1&& e1, E2&& e2) noexcept
-    -> detail::xfunction_type_t<detail::modulus, E1, E2>
+        -> detail::xfunction_type_t<detail::modulus, E1, E2>
     {
         return detail::make_xfunction<detail::modulus>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
-    
+
     /**
      * @defgroup logical_operators Logical operators
      */
@@ -516,6 +518,40 @@ namespace xt
         -> detail::xfunction_type_t<detail::bitwise_not, E>
     {
         return detail::make_xfunction<detail::bitwise_not>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise left shift
+     *
+     * Returns an \ref xfunction for the element-wise bitwise left shift of e1
+     * by e2.
+     * @param e1 an \ref xexpression
+     * @param e2 an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto left_shift(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<detail::left_shift, E1, E2>
+    {
+        return detail::make_xfunction<detail::left_shift>(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise left shift
+     *
+     * Returns an \ref xfunction for the element-wise bitwise left shift of e1
+     * by e2.
+     * @param e1 an \ref xexpression
+     * @param e2 an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E1, class E2>
+    inline auto right_shift(E1&& e1, E2&& e2) noexcept
+        -> detail::xfunction_type_t<detail::right_shift, E1, E2>
+    {
+        return detail::make_xfunction<detail::right_shift>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**

@@ -12,8 +12,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "xtl/xoptional.hpp"
-#include "xtl/xoptional_sequence.hpp"
+#include <xtl/xoptional.hpp>
+#include <xtl/xoptional_sequence.hpp>
 
 #include "xarray.hpp"
 #include "xtensor.hpp"
@@ -103,7 +103,6 @@ namespace xt
             {
                 return arg().has_value();
             }
-
         };
 
         template <class T, class B, class Tag>
@@ -399,12 +398,12 @@ namespace xt
      * xoptional_function implementation *
      *************************************/
 
-     /**
-      * Constructs an xoptional_function applying the specified function to the given
-      * arguments.
-      * @param func the function to apply
-      * @param e the \ref xexpression arguments
-      */
+    /**
+     * Constructs an xoptional_function applying the specified function to the given
+     * arguments.
+     * @param func the function to apply
+     * @param e the \ref xexpression arguments
+     */
     template <class F, class R, class... CT>
     template <class Func, class U>
     inline xoptional_function<F, R, CT...>::xoptional_function(Func&& func, CT... e) noexcept

@@ -15,8 +15,8 @@
 #include <numeric>
 #include <stdexcept>
 
-#include "xtl/xmeta_utils.hpp"
-#include "xtl/xsequence.hpp"
+#include <xtl/xmeta_utils.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xiterable.hpp"
 #include "xiterator.hpp"
@@ -79,7 +79,7 @@ namespace xt
         using container_type = typename inner_types::container_type;
         using allocator_type = allocator_type_t<std::decay_t<container_type>>;
         using value_type = typename container_type::value_type;
-        using reference = std::conditional_t<std::is_const<container_type>::value,  
+        using reference = std::conditional_t<std::is_const<container_type>::value,
                                              typename container_type::const_reference,
                                              typename container_type::reference>;
         using const_reference = typename container_type::const_reference;

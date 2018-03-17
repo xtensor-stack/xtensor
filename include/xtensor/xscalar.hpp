@@ -13,7 +13,7 @@
 #include <cstddef>
 #include <utility>
 
-#include "xtl/xtype_traits.hpp"
+#include <xtl/xtype_traits.hpp>
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"

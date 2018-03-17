@@ -10,12 +10,7 @@
 // Derived from https://github.com/llohse/libnpy by Leon Merten Lohse,
 // relicensed from MIT License with permission
 
-#include "xtensor/xadapt.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xeval.hpp"
-#include "xtensor/xstrides.hpp"
-
-#include "xtl/xsequence.hpp"
+#include <xtl/xsequence.hpp>
 
 #include <algorithm>
 #include <complex>
@@ -28,6 +23,11 @@
 #include <string>
 #include <typeinfo>
 #include <vector>
+
+#include "xtensor/xadapt.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xeval.hpp"
+#include "xtensor/xstrides.hpp"
 
 namespace xt
 {
@@ -558,7 +558,7 @@ namespace xt
                 auto cast_elems = cast_impl<T, L>(check_type);
                 m_buffer = nullptr;
                 return adapt(std::move(std::get<0>(cast_elems)), std::get<1>(cast_elems),
-                              acquire_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
+                             acquire_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
             }
 
             template <class T, layout_type L = layout_type::dynamic>
@@ -566,7 +566,7 @@ namespace xt
             {
                 auto cast_elems = cast_impl<T, L>(check_type);
                 return adapt(std::get<0>(cast_elems), std::get<1>(cast_elems),
-                              no_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
+                             no_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
             }
 
             template <class T, layout_type L = layout_type::dynamic>
@@ -574,7 +574,7 @@ namespace xt
             {
                 auto cast_elems = cast_impl<T, L>(check_type);
                 return adapt(std::get<0>(cast_elems), std::get<1>(cast_elems),
-                              no_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
+                             no_ownership(), std::get<2>(cast_elems), std::get<3>(cast_elems));
             }
 
             char* ptr()

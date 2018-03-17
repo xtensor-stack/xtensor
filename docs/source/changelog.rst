@@ -7,6 +7,48 @@
 Changelog
 =========
 
+0.15.5
+------
+
+- assign functions optimized 
+  `#650 <https://github.com/QuantStack/xtensor/pull/650>`_.
+- transposed view fixed
+  `#652 <https://github.com/QuantStack/xtensor/pull/652>`_.
+- exceptions refactoring
+  `#654 <https://github.com/QuantStack/xtensor/pull/654>`_.
+- performances improved
+  `#655 <https://github.com/QuantStack/xtensor/pull/655>`_.
+- view data accessor fixed
+  `#660 <https://github.com/QuantStack/xtensor/pull/660>`_.
+- new dynamic view using variant
+  `#656 <https://github.com/QuantStack/xtensor/pull/656>`_.
+- alignment added to fixed xtensor
+  `#659 <https://github.com/QuantStack/xtensor/pull/659>`_.
+- code cleanup
+  `#664 <https://github.com/QuantStack/xtensor/pull/664>`_.
+- xtensorf and new dynamic view documentation
+  `#667 <https://github.com/QuantStack/xtensor/pull/667>`_.
+- qualify namespace for compute_size
+  `#665 <https://github.com/QuantStack/xtensor/pull/665>`_.
+- make xio use ``dynamic_view`` instead of ``view``
+  `#662 <https://github.com/QuantStack/xtensor/pull/662>`_.
+- transposed view on any expression
+  `#671 <https://github.com/QuantStack/xtensor/pull/671>`_.
+- docs typos and grammar plus formatting
+  `#676 <https://github.com/QuantStack/xtensor/pull/676>`_.
+- index view test assertion fixed
+  `#680 <https://github.com/QuantStack/xtensor/pull/680>`_.
+- flatten view
+  `#678 <https://github.com/QuantStack/xtensor/pull/678>`_.
+- handle the case of pointers to const element in ``xadapt``
+  `#679 <https://github.com/QuantStack/xtensor/pull/679>`_.
+- use quotes in #include statements for xtl
+  `#681 <https://github.com/QuantStack/xtensor/pull/681>`_.
+- additional constructors for ``svector``
+  `#682 <https://github.com/QuantStack/xtensor/pull/682>`_.
+- removed ``test_xsemantics.hpp`` from test CMakeLists
+  `#684 <https://github.com/QuantStack/xtensor/pull/684>`_.
+
 0.15.4
 ------
 

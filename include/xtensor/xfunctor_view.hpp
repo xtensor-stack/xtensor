@@ -15,7 +15,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "xtl/xproxy_wrapper.hpp"
+#include <xtl/xproxy_wrapper.hpp>
 
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xiterator.hpp"
@@ -351,7 +351,7 @@ namespace xt
 
     template <class F, class IT>
     bool operator==(const xfunctor_iterator<F, IT>& lhs,
-        const xfunctor_iterator<F, IT>& rhs);
+                    const xfunctor_iterator<F, IT>& rhs);
 
     template <class F, class IT>
     bool operator<(const xfunctor_iterator<F, IT>& lhs,
@@ -379,8 +379,10 @@ namespace xt
 
         reference operator*() const;
 
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
+        void step(size_type dim);
+        void step_back(size_type dim);
+        void step(size_type dim, size_type n);
+        void step_back(size_type dim, size_type n);
         void reset(size_type dim);
         void reset_back(size_type dim);
 
@@ -1240,6 +1242,18 @@ namespace xt
     auto xfunctor_stepper<F, ST>::operator*() const -> reference
     {
         return (*p_functor)(*m_stepper);
+    }
+
+    template <class F, class ST>
+    void xfunctor_stepper<F, ST>::step(size_type dim)
+    {
+        m_stepper.step(dim);
+    }
+
+    template <class F, class ST>
+    void xfunctor_stepper<F, ST>::step_back(size_type dim)
+    {
+        m_stepper.step_back(dim);
     }
 
     template <class F, class ST>

@@ -17,8 +17,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "xtl/xsequence.hpp"
-#include "xtl/xtype_traits.hpp"
+#include <xtl/xsequence.hpp>
+#include <xtl/xtype_traits.hpp>
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
@@ -433,8 +433,10 @@ namespace xt
         template <class... It>
         xfunction_stepper(const xfunction_type* func, It&&... it) noexcept;
 
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
+        void step(size_type dim);
+        void step_back(size_type dim);
+        void step(size_type dim, size_type n);
+        void step_back(size_type dim, size_type n);
         void reset(size_type dim);
         void reset_back(size_type dim);
 
@@ -949,6 +951,20 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
+    inline void xfunction_stepper<F, R, CT...>::step(size_type dim)
+    {
+        auto f = [dim](auto& it) { it.step(dim); };
+        for_each(f, m_it);
+    }
+
+    template <class F, class R, class... CT>
+    inline void xfunction_stepper<F, R, CT...>::step_back(size_type dim)
+    {
+        auto f = [dim](auto& it) { it.step_back(dim); };
+        for_each(f, m_it);
+    }
+
+    template <class F, class R, class... CT>
     inline void xfunction_stepper<F, R, CT...>::step(size_type dim, size_type n)
     {
         auto f = [dim, n](auto& it) { it.step(dim, n); };
@@ -1027,12 +1043,12 @@ namespace xt
      * xfunction implementation *
      ****************************/
 
-     /**
-      * Constructs an xfunction applying the specified function to the given
-      * arguments.
-      * @param f the function to apply
-      * @param e the \ref xexpression arguments
-      */
+    /**
+     * Constructs an xfunction applying the specified function to the given
+     * arguments.
+     * @param f the function to apply
+     * @param e the \ref xexpression arguments
+     */
     template <class F, class R, class... CT>
     template <class Func, class U>
     xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept

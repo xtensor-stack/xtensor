@@ -52,7 +52,7 @@ namespace xt
 
         template <class E>
         disable_xexpression<E, derived_type&> operator%=(const E&);
-        
+
         template <class E>
         disable_xexpression<E, derived_type&> operator&=(const E&);
 
@@ -100,10 +100,10 @@ namespace xt
 
         template <class E>
         derived_type& divides_assign(const xexpression<E>&);
-        
+
         template <class E>
         derived_type& modulus_assign(const xexpression<E>&);
-        
+
     protected:
 
         xsemantic_base() = default;
@@ -277,7 +277,7 @@ namespace xt
     {
         return this->derived_cast().scalar_computed_assign(e, std::modulus<>());
     }
-    
+
     /**
      * Computes the bitwise and of \c *this and the scalar \c e and assigns it to \c *this.
      * @param e the scalar involved in the operation.
@@ -373,7 +373,7 @@ namespace xt
     {
         return operator=(this->derived_cast() % e.derived_cast());
     }
-    
+
     /**
      * Computes the bitwise and of \c *this and the xexpression \c e and assigns it to \c *this.
      * @param e the xexpression involved in the operation.
@@ -491,7 +491,7 @@ namespace xt
     {
         return this->derived_cast().computed_assign(this->derived_cast() % e.derived_cast());
     }
-    
+
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator=(const xexpression<E>& e) -> derived_type&

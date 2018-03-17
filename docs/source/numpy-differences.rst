@@ -15,7 +15,7 @@ xtensor and numpy are very different libraries in their internal semantics. Whil
 is a lazy expression system, Numpy manipulates in-memory containers, however, similarities in
 APIs are obvious. See e.g. the numpy to xtensor cheat sheet.
 
-And this page tracks the subtle differences of behavior of numpy and xtensor.
+And this page tracks the subtle differences of behavior between numpy and xtensor.
 
 Zero-dimensional arrays
 -----------------------

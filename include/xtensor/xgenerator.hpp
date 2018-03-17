@@ -16,7 +16,7 @@
 #include <type_traits>
 #include <utility>
 
-#include "xtl/xsequence.hpp"
+#include <xtl/xsequence.hpp>
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
@@ -314,13 +314,14 @@ namespace xt
     template <std::size_t dim, class I, class... Args>
     inline void xgenerator<F, R, S>::adapt_index(I& arg, Args&... args) const
     {
-        if (sizeof...(Args)+1 > m_shape.size())
+        using value_type = typename decltype(m_shape)::value_type;
+        if (sizeof...(Args) + 1 > m_shape.size())
         {
             adapt_index<dim>(args...);
         }
         else
         {
-            if (arg >= m_shape[dim] && m_shape[dim] == 1)
+            if (static_cast<value_type>(arg) >= m_shape[dim] && m_shape[dim] == 1)
             {
                 arg = 0;
             }

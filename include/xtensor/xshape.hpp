@@ -18,8 +18,8 @@
 #include <iterator>
 #include <memory>
 
-#include "xstorage.hpp"
 #include "xexception.hpp"
+#include "xstorage.hpp"
 
 namespace xt
 {
@@ -114,7 +114,6 @@ namespace xt
 
     template <class... S>
     using promote_strides_t = typename detail::promote_index<S...>::type;
-
 }
 
 #endif

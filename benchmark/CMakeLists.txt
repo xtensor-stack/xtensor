@@ -99,6 +99,12 @@ else()
     find_package(benchmark REQUIRED)
 endif()
 
+find_package(xsimd)
+if (xsimd_FOUND)
+    include_directories(${xsimd_INCLUDE_DIRS})
+    add_definitions("-DXTENSOR_USE_XSIMD=1")
+endif()
+
 include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
@@ -106,6 +112,7 @@ set(XTENSOR_BENCHMARK
     benchmark_container.hpp
     benchmark_math.hpp
     benchmark_views.hpp
+    benchmark_view_iteration.hpp
     main.cpp
 )
 

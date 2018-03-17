@@ -21,8 +21,8 @@
 #include <vector>
 #endif
 
-#include "xtl/xfunctional.hpp"
-#include "xtl/xsequence.hpp"
+#include <xtl/xfunctional.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xbuilder.hpp"
 #include "xexpression.hpp"
@@ -84,7 +84,7 @@ namespace xt
             auto begin = e.data().begin();
             result_type tmp = init_fct(*begin);
             ++begin;
-            result(0) = std::accumulate(begin, e.data().end(), tmp, acc_fct);
+            result = std::accumulate(begin, e.data().end(), tmp, acc_fct);
             return result;
         }
 
@@ -103,19 +103,18 @@ namespace xt
 
         std::size_t ax_idx = (e.layout() == layout_type::row_major) ? axes.size() - 1 : 0;
         std::size_t inner_loop_size = e.strides()[axes[ax_idx]];
-        std::size_t inner_stride    = e.strides()[axes[ax_idx]];
+        std::size_t inner_stride = e.strides()[axes[ax_idx]];
         std::size_t outer_loop_size = e.shape()[axes[ax_idx]];
 
         // The following code merges reduction axes "at the end" (or the beginning for col_major)
         // together by increasing the size of the outer loop where appropriate
-        auto merge_loops = [&outer_loop_size, &e](auto it, auto end)
-        {
+        auto merge_loops = [&outer_loop_size, &e](auto it, auto end) {
             auto last_ax = *it;
             ++it;
             for (; it != end; ++it)
             {
                 // note that we check is_sorted, so this condition is valid
-                if (std::abs(ptrdiff_t(*it) - ptrdiff_t(last_ax)) ==  1)
+                if (std::abs(ptrdiff_t(*it) - ptrdiff_t(last_ax)) == 1)
                 {
                     last_ax = *it;
                     outer_loop_size *= e.shape()[last_ax];
@@ -160,8 +159,7 @@ namespace xt
         }
 
         xindex temp_idx(iter_shape.size());
-        auto next_idx = [&iter_shape, &iter_strides, &temp_idx]()
-        {
+        auto next_idx = [&iter_shape, &iter_strides, &temp_idx]() {
             std::size_t i = iter_shape.size();
             for (; i > 0; --i)
             {
@@ -200,7 +198,7 @@ namespace xt
         // Decide if going about it row-wise or col-wise
         if (inner_stride == 1)
         {
-            while(idx_res.first != true)
+            while (idx_res.first != true)
             {
                 // for unknown reasons it's much faster to use a temporary variable and
                 // std::accumulate here -- probably some cache behavior
@@ -231,14 +229,12 @@ namespace xt
         }
         else
         {
-            while(idx_res.first != true)
+            while (idx_res.first != true)
             {
                 std::transform(out, out + inner_loop_size, begin, out,
-                               [merge, &init_fct, &merge_fct](auto&& v1, auto&& v2)
-                               {
-                                    return merge ? merge_fct(v1, v2) : init_fct(v2);
-                               }
-                );
+                               [merge, &init_fct, &merge_fct](auto&& v1, auto&& v2) {
+                                   return merge ? merge_fct(v1, v2) : init_fct(v2);
+                               });
 
                 begin += inner_stride;
                 for (std::size_t i = 1; i < outer_loop_size; ++i)
@@ -261,7 +257,6 @@ namespace xt
                 {
                     merge = true;
                 }
-
             };
         }
         return result;
@@ -502,7 +497,6 @@ namespace xt
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
-
     }
 #endif
 
@@ -533,8 +527,10 @@ namespace xt
 
         reference operator*() const;
 
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
+        void step(size_type dim);
+        void step_back(size_type dim);
+        void step(size_type dim, size_type n);
+        void step_back(size_type dim, size_type n);
         void reset(size_type dim);
         void reset_back(size_type dim);
 
@@ -837,6 +833,24 @@ namespace xt
     {
         reference r = aggregate(0);
         return r;
+    }
+
+    template <class F, class CT, class X>
+    inline void xreducer_stepper<F, CT, X>::step(size_type dim)
+    {
+        if (dim >= m_offset)
+        {
+            m_stepper.step(get_dim(dim - m_offset));
+        }
+    }
+
+    template <class F, class CT, class X>
+    inline void xreducer_stepper<F, CT, X>::step_back(size_type dim)
+    {
+        if (dim >= m_offset)
+        {
+            m_stepper.step_back(get_dim(dim - m_offset));
+        }
     }
 
     template <class F, class CT, class X>

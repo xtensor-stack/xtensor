@@ -34,7 +34,7 @@ A consequence is that we need to use stack-allocated shape types in these cases.
 GCC < 5.1 and ``std::is_trivially_default_constructible``
 ---------------------------------------------------------
 
-The version of the STL shipped with versions of GCC older than 5.1 are missing a number of type traits, such as ``std::is_trivially_default_constructible``. However, for some of them, equivalent type traits with different names are provided, such as ``std::has_trivial_default_constructor``.
+The versions of the STL shipped with versions of GCC older than 5.1 are missing a number of type traits, such as ``std::is_trivially_default_constructible``. However, for some of them, equivalent type traits with different names are provided, such as ``std::has_trivial_default_constructor``.
 
 In this case, we polyfill the proper standard names using the deprecated ``std::has_trivial_default_constructor``. This must also be done when the compiler is clang when it makes use of the GCC implementation of the STL, which is the default behavior on linux. Properly detecting the version of the GCC STL used by clang cannot be done with the ``__GNUC__``  macro, which are overridden by clang. Instead, we check for the definition of the macro ``_GLIBCXX_USE_CXX11_ABI`` which is only defined with GCC versions greater than 5.
 

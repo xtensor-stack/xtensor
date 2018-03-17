@@ -16,8 +16,8 @@
 #include <numeric>
 #include <vector>
 
-#include "xtl/xiterator_base.hpp"
-#include "xtl/xsequence.hpp"
+#include <xtl/xiterator_base.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xexception.hpp"
 #include "xlayout.hpp"
@@ -134,17 +134,31 @@ namespace xt
     template <layout_type L>
     struct stepper_tools
     {
+        // For performance reasons, increment_stepper and decrement_stepper are
+        // specialized for the case where n=1, which underlies operator++ and
+        // operator-- on xiterators.
+
+        template <class S, class IT, class ST>
+        static void increment_stepper(S& stepper,
+                                      IT& index,
+                                      const ST& shape);
+
+        template <class S, class IT, class ST>
+        static void decrement_stepper(S& stepper,
+                                      IT& index,
+                                      const ST& shape);
+
         template <class S, class IT, class ST>
         static void increment_stepper(S& stepper,
                                       IT& index,
                                       const ST& shape,
-                                      typename S::size_type n = 1);
+                                      typename S::size_type n);
 
         template <class S, class IT, class ST>
         static void decrement_stepper(S& stepper,
                                       IT& index,
                                       const ST& shape,
-                                      typename S::size_type n = 1);
+                                      typename S::size_type n);
     };
 
     /********************
@@ -477,13 +491,45 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::row_major>::increment_stepper(S& stepper,
                                                                   IT& index,
+                                                                  const ST& shape)
+    {
+        using size_type = typename S::size_type;
+        size_type i = index.size();
+        while (i != 0)
+        {
+            --i;
+            if (index[i] != shape[i] - 1)
+            {
+                ++index[i];
+                stepper.step(i);
+                return;
+            }
+            else
+            {
+                index[i] = 0;
+                if (i != 0)
+                {
+                    stepper.reset(i);
+                }
+            }
+        }
+        if (i == 0)
+        {
+            stepper.to_end(layout_type::row_major);
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::row_major>::increment_stepper(S& stepper,
+                                                                  IT& index,
                                                                   const ST& shape,
                                                                   typename S::size_type n)
     {
         using size_type = typename S::size_type;
         size_type i = index.size();
         size_type leading_i = index.size() - 1;
-        while (i != 0 && n!= 0)
+        while (i != 0 && n != 0)
         {
             --i;
             size_type inc = (i == leading_i) ? n : 1;
@@ -515,6 +561,38 @@ namespace xt
         if (i == 0)
         {
             stepper.to_end(layout_type::row_major);
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::row_major>::decrement_stepper(S& stepper,
+                                                                  IT& index,
+                                                                  const ST& shape)
+    {
+        using size_type = typename S::size_type;
+        size_type i = index.size();
+        while (i != 0)
+        {
+            --i;
+            if (index[i] != 0)
+            {
+                --index[i];
+                stepper.step_back(i);
+                return;
+            }
+            else
+            {
+                index[i] = shape[i] - 1;
+                if (i != 0)
+                {
+                    stepper.reset_back(i);
+                }
+            }
+        }
+        if (i == 0)
+        {
+            stepper.to_begin();
         }
     }
 
@@ -566,6 +644,39 @@ namespace xt
     template <>
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::column_major>::increment_stepper(S& stepper,
+                                                                     IT& index,	
+                                                                     const ST& shape)
+    {
+        using size_type = typename S::size_type;
+        size_type size = index.size();
+        size_type i = 0;
+        while (i != size)
+        {
+            if (index[i] != shape[i] - 1)
+            {
+                ++index[i];
+                stepper.step(i);
+                return;
+            }
+            else
+            {
+                index[i] = 0;
+                if (i != size - 1)
+                {
+                    stepper.reset(i);
+                }
+            }
+            ++i;
+        }
+        if (i == size)
+        {
+            stepper.to_end(layout_type::column_major);
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::column_major>::increment_stepper(S& stepper,
                                                                      IT& index,
                                                                      const ST& shape,
                                                                      typename S::size_type n)
@@ -607,6 +718,39 @@ namespace xt
         if (i == size)
         {
             stepper.to_end(layout_type::column_major);
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::column_major>::decrement_stepper(S& stepper,
+                                                                     IT& index,	
+                                                                     const ST& shape)
+    {
+        using size_type = typename S::size_type;
+        size_type size = index.size();
+        size_type i = 0;
+        while (i != size)
+        {
+            if (index[i] != 0)
+            {
+                --index[i];
+                stepper.step_back(i);
+                return;
+            }
+            else
+            {
+                index[i] = shape[i] - 1;
+                if (i != size - 1)
+                {
+                    stepper.reset_back(i);
+                }
+            }
+            ++i;
+        }
+        if (i == size)
+        {
+            stepper.to_begin();
         }
     }
 
@@ -803,7 +947,6 @@ namespace xt
                 auto iter_begin = (L == layout_type::row_major) ? m_index.begin() : m_index.begin() + 1;
                 auto iter_end = (L == layout_type::row_major) ? m_index.end() - 1 : m_index.end();
                 std::transform(iter_begin, iter_end, iter_begin, [](const auto& v) { return v - 1; });
-
             }
             m_linear_index = difference_type(std::accumulate(this->shape().cbegin(), this->shape().cend(),
                                              size_type(1), std::multiplies<size_type>()));

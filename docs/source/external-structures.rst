@@ -15,8 +15,7 @@ Adapting one-dimensional containers
 
 You may want to use your own one-dimensional container as a backend for tensor data containers
 and even for the shape or the strides. This is the simplest structure to plug into ``xtensor``.
-In the following example, we define new container and adaptor types for user-specified storage and
-shape types.
+In the following example, we define new container and adaptor types for user-specified storage and shape types.
 
 .. code::
 
@@ -33,8 +32,7 @@ These new types will have all the features of the core ``xt::xtensor`` and ``xt:
 ``xt::xarray_adaptor`` and ``xt::xtensor_adaptor`` hold a reference on an already initialized
 container.
 
-A requirement for the user-specified containers is to provide a minimal ``std::vector``-like interface,
-that is:
+A requirement for the user-specified containers is to provide a minimal ``std::vector``-like interface, that is:
 
 - usual typedefs for STL sequences
 - random access methods (``operator[]``, ``front``, ``back`` and ``data``)
@@ -86,7 +84,7 @@ The following tells ``xtensor`` which types must be used for getting shape, stri
         static constexpr layout_type layout = raw_tensor<T>::layout;
     };
 
-The ``inner_XXX_type`` are the types used to store and read the shape, strides an backstrides, while the
+The ``inner_XXX_type`` are the types used to store and read the shape, strides and backstrides, while the
 other ones are used for reshaping. Most of the time, they will be the same; differences come when inner
 types cannot be instantiated out of the box (because they are linked to python buffer for instance).
 
@@ -114,9 +112,7 @@ Next step is to inherit from the ``xcontainer`` and the ``xcontainer_semantic`` 
         ...
     };
 
-Thanks to the previous structures definition, inheriting from ``xcontainer`` brings almost all the container
-API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the
-support for mathematical operations.
+Thanks to definition of the previous structures, inheriting from ``xcontainer`` brings almost all the container API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the support for mathematical operations.
 
 Define semantic
 ~~~~~~~~~~~~~~~
@@ -160,7 +156,7 @@ they are declared as ``protected`` in the base class.
         }
     };
     
-The last two methods are extended copy constructor and assign operator. They allow to write things like
+The last two methods are extended copy constructor and assign operator. They allow writing things like
 
 .. code::
 
@@ -172,13 +168,11 @@ The last two methods are extended copy constructor and assign operator. They all
 Implement the resize methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The next methods to define are the overloads of ``resize``. ``xtensor`` provides utilities functions to
-compute strides based on the shape and the layout, so the implementation of the ``resize`` overloads
-is straightforward:
+The next methods to define are the overloads of ``resize``. ``xtensor`` provides utility functions to compute strides based on the shape and the layout, so the implementation of the ``resize`` overloads is straightforward:
 
 .. code::
 
-    #include "xtensor/xstrides.hpp" // for utitilities functions
+    #include "xtensor/xstrides.hpp" // for utility functions
 
     template <class T>
     void resize(const shape_type& shape)
@@ -230,9 +224,7 @@ be declared as a friend class so that it can access them.
 Embedding a full tensor structure
 ---------------------------------
 
-You may need to plug structures that already provide n-dimensional access methods, instead
-of a one-dimensional container with a strided index scheme. This section illustrates how
-to adapt such structures with the following (minimal) API:
+You may need to plug structures that already provide n-dimensional access methods, instead of a one-dimensional container with a strided index scheme. This section illustrates how to adapt such structures with the following (minimal) API:
 
 .. code::
 
@@ -319,14 +311,14 @@ The iterator and stepper used here may not be the most optimal for ``table``, ho
 are guaranteed to work as long as ``table`` provides an access operator based on indices.
 
 NOTE: we inherit from ``xcontainer_semantic`` because we assume the ``table_adaptor`` class
-embeds an instance of ``table``. If it tooks a reference on it, we would inherit from
+embeds an instance of ``table``. If it took a reference on it, we would inherit from
 ``xadaptor_semantic`` instead.
 
 Define semantic
 ~~~~~~~~~~~~~~~
 
 As for one-dimensional containers adaptors, you must define constructors and at least declare
-default copy and move constuctor and assign operator. You also must define extended copy
+default copy and move constructors and assignment operators. You also must define the extended copy
 constructor and assign operator.
 
 .. code::

@@ -9,9 +9,9 @@
 #ifndef XTENSOR_EXCEPTION_HPP
 #define XTENSOR_EXCEPTION_HPP
 
-#include <stdexcept>
 #include <iterator>
 #include <sstream>
+#include <stdexcept>
 #include <string>
 
 namespace xt
@@ -119,7 +119,8 @@ namespace xt
     template <class S, class... Args>
     inline void check_index(const S& shape, Args... args)
     {
-        detail::check_index_impl<S, 0>(shape, args...);
+        using value_type = typename S::value_type;
+        detail::check_index_impl<S, 0>(shape, static_cast<value_type>(args)...);
     }
 
     template <class S, class It>

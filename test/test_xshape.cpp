@@ -81,6 +81,43 @@ namespace xt
         vector_type d(src.cbegin(), src.cend());
         EXPECT_EQ(size_t(10), d.size());
         EXPECT_EQ(1, d[2]);
+
+        vector_type e(src);
+        EXPECT_EQ(size_t(10), d.size());
+        EXPECT_EQ(1, d[2]);
+        
+        vector_type f = { 1, 2, 3, 4 };
+        EXPECT_EQ(size_t(4), f.size());
+        EXPECT_EQ(3, f[2]);
+
+        svector<std::size_t, 8> ov = { 1, 2, 3, 4, 5, 6, 7, 8 };
+        vector_type g(ov);
+        EXPECT_EQ(size_t(8), g.size());
+        EXPECT_EQ(3, g[2]);
+    }
+
+    TEST(svector, assign)
+    {
+        vector_type a = { 1, 2, 3, 4 };
+        
+        vector_type src1(10, 2);
+        a = src1;
+        EXPECT_EQ(size_t(10), a.size());
+        EXPECT_EQ(2, a[2]);
+
+        std::vector<size_t> src2(5, 1);
+        a = src2;
+        EXPECT_EQ(size_t(5), a.size());
+        EXPECT_EQ(1, a[2]);
+
+        a = { 1, 2, 3, 4 };
+        EXPECT_EQ(size_t(4), a.size());
+        EXPECT_EQ(3, a[2]);
+
+        svector<std::size_t, 4> src3(10, 1);
+        a = src3;
+        EXPECT_EQ(size_t(10), a.size());
+        EXPECT_EQ(1, a[2]);
     }
 
     TEST(svector, resize)

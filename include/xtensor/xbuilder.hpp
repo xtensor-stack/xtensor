@@ -23,8 +23,8 @@
     #include <initializer_list>
 #endif
 
-#include "xtl/xclosure.hpp"
-#include "xtl/xsequence.hpp"
+#include <xtl/xclosure.hpp>
+#include <xtl/xsequence.hpp>
 
 #include "xbroadcast.hpp"
 #include "xfunction.hpp"
@@ -89,6 +89,58 @@ namespace xt
         return broadcast(T(0), shape);
     }
 #endif
+
+    /**
+     * Create a xcontainer (xarray, xtensor or xtensorf) with uninitialized values of
+     * the same shape, value type and layout as @emph e.
+     *
+     * @param e the xexpression from which to extract shape, value type and layout.
+     */
+    template <class E>
+    inline typename E::temporary_type empty_like(const xexpression<E>& e)
+    {
+        typename E::temporary_type res(e.derived_cast().shape());
+        return res;
+    }
+
+    /**
+     * Create a xcontainer (xarray, xtensor or xtensorf), filled with @emph fill_value and of
+     * the same shape, value type and layout as @emph e.
+     *
+     * @param e the xexpression from which to extract shape, value type and layout.
+     */
+    template <class E>
+    inline typename E::temporary_type full_like(const xexpression<E>& e, typename E::value_type fill_value)
+    {
+        typename E::temporary_type res(e.derived_cast().shape(), fill_value);
+        return res;
+    }
+
+    /**
+     * Create a xcontainer (xarray, xtensor or xtensorf), filled with @emph zeros and of
+     * the same shape, value type and layout as @emph e. Note: contrary to zeros(shape), this function
+     * returns a non-lazy, evaluated container! Use ``xt::zeros<double>(e.shape());` for a lazy version.
+     *
+     * @param e the xexpression from which to extract shape, value type and layout.
+     */
+    template <class E>
+    inline typename E::temporary_type zeros_like(const xexpression<E>& e)
+    {
+        return full_like(e, typename E::value_type(0));
+    }
+
+    /**
+     * Create a xcontainer (xarray, xtensor or xtensorf), filled with @emph ones and of
+     * the same shape, value type and layout as @emph e. Note: contrary to ones(shape), this function
+     * returns a non-lazy, evaluated container! Use ``xt::ones<double>(e.shape());` for a lazy version.
+     *
+     * @param e the xexpression from which to extract shape, value type and layout.
+     */
+    template <class E>
+    inline typename E::temporary_type ones_like(const xexpression<E>& e)
+    {
+        return full_like(e, typename E::value_type(1));
+    }
 
     namespace detail
     {

@@ -13,11 +13,11 @@
 #include <type_traits>
 #include <vector>
 
-#include "xtl/xclosure.hpp"
-#include "xtl/xtype_traits.hpp"
+#include <xtl/xclosure.hpp>
+#include <xtl/xtype_traits.hpp>
 
-#include "xutils.hpp"
 #include "xshape.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
