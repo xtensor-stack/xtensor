@@ -180,6 +180,15 @@ namespace xt
         EXPECT_EQ(mean(c)(), 1.5);
     }
 
+    TEST(xreducer, minmax)
+    {
+        using A = std::array<double, 2>;
+
+        xtensor<double, 2> input
+            {{-1.0, 0.0}, {1.0, 0.0}};
+        EXPECT_EQ(minmax(input)(), (A{-1.0, 1.0}));
+    }
+
     TEST(xreducer, immediate)
     {
         xarray<double> a = xt::arange(27);
