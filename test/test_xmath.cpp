@@ -27,6 +27,8 @@ namespace xt
         using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
         EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
     }
+#define ARRAY_TYPE(VALUE_TYPE)  \
+    std::array<VALUE_TYPE, 2>
 
     TEST(xmath, result_type)
     {
@@ -51,6 +53,7 @@ namespace xt
         CHECK_RESULT_TYPE(abs(auchar), int);
         CHECK_RESULT_TYPE(sum(auchar), unsigned long long);
         CHECK_RESULT_TYPE(mean(auchar), double);
+        CHECK_RESULT_TYPE(minmax(auchar), ARRAY_TYPE(unsigned char));
 
         /*********
          * short *
@@ -62,6 +65,7 @@ namespace xt
         CHECK_RESULT_TYPE(abs(ashort), int);
         CHECK_RESULT_TYPE(sum(ashort), long long);
         CHECK_RESULT_TYPE(mean(ashort), double);
+        CHECK_RESULT_TYPE(minmax(ashort), ARRAY_TYPE(short));
 
         /*******
          * int *
@@ -73,6 +77,7 @@ namespace xt
         CHECK_RESULT_TYPE(abs(aint), int);
         CHECK_RESULT_TYPE(sum(aint), long long);
         CHECK_RESULT_TYPE(mean(aint), double);
+        CHECK_RESULT_TYPE(minmax(aint), ARRAY_TYPE(int));
 
         /****************
          * unsigned int *
@@ -84,6 +89,7 @@ namespace xt
         CHECK_RESULT_TYPE(abs(auint), unsigned int);
         CHECK_RESULT_TYPE(sum(auint), unsigned long long);
         CHECK_RESULT_TYPE(mean(auint), double);
+        CHECK_RESULT_TYPE(minmax(auint), ARRAY_TYPE(unsigned int));
 
         /**********************
          * unsigned long long *
@@ -95,6 +101,7 @@ namespace xt
         CHECK_RESULT_TYPE(abs(aulong), unsigned long long);
         CHECK_RESULT_TYPE(sum(aulong), unsigned long long);
         CHECK_RESULT_TYPE(mean(aulong), double);
+        CHECK_RESULT_TYPE(minmax(aulong), ARRAY_TYPE(unsigned long long));
 
         /*********
          * float *
@@ -106,6 +113,7 @@ namespace xt
         CHECK_RESULT_TYPE(abs(afloat), float);
         CHECK_RESULT_TYPE(sum(afloat), double);
         CHECK_RESULT_TYPE(mean(afloat), double);
+        CHECK_RESULT_TYPE(minmax(afloat), ARRAY_TYPE(float));
 
         /**********
          * double *
@@ -116,6 +124,7 @@ namespace xt
         CHECK_RESULT_TYPE(abs(adouble), double);
         CHECK_RESULT_TYPE(sum(adouble), double);
         CHECK_RESULT_TYPE(mean(adouble), double);
+        CHECK_RESULT_TYPE(minmax(adouble), ARRAY_TYPE(double));
 
         /***********************
          * std::complex<float> *
@@ -661,5 +670,8 @@ namespace xt
         EXPECT_EQ(res, std::atan(arg));
         bool close = ::xt::isclose(1.0, 1.0);
         EXPECT_EQ(close, true);
+
+        auto p = ::xt::numeric_constants<>::PI;
+        EXPECT_EQ(p, 3.141592653589793238463);
     }
 }

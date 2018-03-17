@@ -1616,6 +1616,43 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     }
 #endif
 
+     /**
+     * @ingroup red_functions
+     * @brief Minimum and maximum among the elements of an array or expression.
+     *
+     * Returns an \ref xreducer for the minimum and maximum of an expression's elements.
+     * @param e an \ref xexpression
+     * @return an \ref xexpression of type ``std::array<value_type, 2>``, whose first
+     *         and second element represent the minimum and maximum respectively
+     */
+    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, ES>::value>>
+    inline auto minmax(E&& e, ES es = ES()) noexcept
+    {
+        using std::min;
+        using std::max;
+        using value_type = typename std::decay_t<E>::value_type;
+        using result_type = std::array<value_type, 2>;
+
+        auto reduce_func = [](result_type r, value_type const& v) {
+            r[0] = min(r[0], v);
+            r[1] = max(r[1], v);
+            return r;
+        };
+        auto init_func = [](value_type const& v) {
+            return result_type{v, v};
+        };
+        auto merge_func = [](result_type r, result_type const& s) {
+            r[0] = min(r[0], s[0]);
+            r[1] = max(r[1], s[1]);
+            return r;
+        };
+        return reduce(make_xreducer_functor(std::move(reduce_func),
+                                            std::move(init_func),
+                                            std::move(merge_func)),
+                      std::forward<E>(e), arange(e.dimension()), es);
+    }
+
     /**
      * @defgroup acc_functions accumulating functions
      */
