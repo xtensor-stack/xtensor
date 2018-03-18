@@ -94,9 +94,9 @@ namespace xt
         };
 
         template <class F, class R>
-        struct simd_return_type<F, R, void_t<decltype(&F::simd_apply)>>
+        struct simd_return_type<F, R, void_t<typename std::decay_t<F>::simd_result_type>>
         {
-            using type = R;
+            using type = typename std::decay_t<F>::simd_result_type;
         };
 
         template <class F, class R>
@@ -290,7 +290,7 @@ namespace xt
         const_reference data_element_impl(std::index_sequence<I...>, size_type i) const;
 
         template <class align, class simd, std::size_t... I>
-        simd load_simd_impl(std::index_sequence<I...>, size_type i) const;
+        detail::simd_return_type_t<functor_type, simd> load_simd_impl(std::index_sequence<I...>, size_type i) const;
 
         template <class Func, std::size_t... I>
         const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const noexcept;
@@ -814,7 +814,7 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <class align, class simd, std::size_t... I>
-    inline auto xfunction_base<F, R, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const -> simd
+    inline auto xfunction_base<F, R, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const -> detail::simd_return_type_t<functor_type, simd>
     {
         return m_f.simd_apply((std::get<I>(m_e).template load_simd<align, simd>(i))...);
     }
