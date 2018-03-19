@@ -101,6 +101,27 @@ namespace xt
 
         template <class F, class R>
         using simd_return_type_t = typename simd_return_type<F, R>::type;
+
+        template <class T, class R>
+        struct functor_return_type
+        {
+            using type = R;
+            using simd_type = xsimd::simd_type<R>;
+        };
+
+        template <class T>
+        struct functor_return_type<T, bool>
+        {
+            using type = bool;
+            using simd_type = xsimd::simd_bool_type<T>;
+        };
+
+        template <>
+        struct functor_return_type<void, bool>
+        {
+            using type = bool;
+            using simd_type = bool;
+        };
     }
 
     template <class F, class R, class... CT>
@@ -147,6 +168,7 @@ namespace xt
         using self_type = xfunction_base<F, R, CT...>;
         using only_scalar = all_xscalar<CT...>;
         using functor_type = typename std::remove_reference<F>::type;
+        using tuple_type = std::tuple<CT...>;
 
         using value_type = R;
         using reference = value_type;
@@ -155,7 +177,7 @@ namespace xt
         using const_pointer = const value_type*;
         using size_type = detail::common_size_type_t<std::decay_t<CT>...>;
         using difference_type = detail::common_difference_type_t<std::decay_t<CT>...>;
-        using simd_value_type = xsimd::simd_type<value_type>;
+        using simd_value_type = typename detail::functor_return_type<detail::common_value_type_t<std::decay_t<CT>...>, R>::simd_type;
         using iterable_base = xconst_iterable<xfunction_base<F, R, CT...>>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
@@ -260,7 +282,7 @@ namespace xt
         template <class align, class simd = simd_value_type>
         detail::simd_return_type_t<functor_type, simd> load_simd(size_type i) const;
 
-        const std::tuple<CT...>& arguments() const noexcept;
+        const tuple_type& arguments() const noexcept;
 
     protected:
 
@@ -300,7 +322,7 @@ namespace xt
 
         size_type compute_dimension() const noexcept;
 
-        std::tuple<CT...> m_e;
+        tuple_type m_e;
         functor_type m_f;
         mutable shape_type m_shape;
         mutable bool m_shape_trivial;
@@ -779,7 +801,7 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_base<F, R, CT...>::arguments() const noexcept -> const std::tuple<CT...>&
+    inline auto xfunction_base<F, R, CT...>::arguments() const noexcept -> const tuple_type&
     {
         return m_e;
     }
@@ -812,11 +834,46 @@ namespace xt
         return m_f((std::get<I>(m_e).data_element(i))...);
     }
 
+    namespace detail
+    {
+// TODO: add traits for batch_bool in xsimd and remove this ugly hack
+
+        template <class V>
+        struct is_batch_bool
+        {
+            static constexpr bool value = false;
+        };
+
+#ifdef XTENSOR_USE_XSIMD
+        template <class T, std::size_t N>
+        struct is_batch_bool<xsimd::batch_bool<T, N>>
+        {
+            static constexpr bool value = true;
+        };
+#endif
+
+        // This metafunction avoids loading boolean values as batches of floating points and
+        // reciprocally. However, we cannot always load data as batches of their scalar type
+        // since this prevents mixed arithmetic.
+        template <class T, class simd>
+        struct get_simd_type
+        {
+            using simd_value_type = typename std::decay_t<T>::simd_value_type;
+            static constexpr bool is_arg_bool = is_batch_bool<simd_value_type>::value;
+            static constexpr bool is_res_bool = is_batch_bool<simd>::value;
+            using type = std::conditional_t<is_arg_bool || is_res_bool, simd_value_type, simd>;
+        };
+
+        template <class T, class simd>
+        using get_simd_type_t = typename get_simd_type<T, simd>::type;
+    }
+
     template <class F, class R, class... CT>
     template <class align, class simd, std::size_t... I>
     inline auto xfunction_base<F, R, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const -> simd
     {
-        return m_f.simd_apply((std::get<I>(m_e).template load_simd<align, simd>(i))...);
+        return m_f.simd_apply((std::get<I>(m_e)
+            .template load_simd<align, detail::get_simd_type_t<std::tuple_element_t<I, tuple_type>, simd>>(i))...);
     }
 
     template <class F, class R, class... CT>

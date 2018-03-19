@@ -30,23 +30,6 @@ namespace xt
      * helpers *
      ***********/
 
-    namespace detail
-    {
-        template <class T, class R>
-        struct functor_return_type
-        {
-            using type = R;
-            using simd_type = xsimd::simd_type<R>;
-        };
-
-        template <class T>
-        struct functor_return_type<T, bool>
-        {
-            using type = bool;
-            using simd_type = xsimd::simd_bool_type<T>;
-        };
-    }
-
 #define UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
     template <class T>                                                          \
     struct NAME                                                                 \
@@ -142,14 +125,15 @@ namespace xt
             using result_type = T;
             using simd_value_type = xsimd::simd_type<T>;
             using simd_bool_type = xsimd::simd_bool_type<T>;
+            using simd_result_type = simd_value_type;
 
             constexpr result_type operator()(bool t1, const T& t2, const T& t3) const noexcept
             {
                 return t1 ? t2 : t3;
             }
-            constexpr simd_value_type simd_apply(const simd_bool_type& t1,
-                                                 const simd_value_type& t2,
-                                                 const simd_value_type& t3) const noexcept
+            constexpr simd_result_type simd_apply(const simd_bool_type& t1,
+                                                  const simd_value_type& t2,
+                                                  const simd_value_type& t3) const noexcept
             {
                 return xsimd::select(t1, t2, t3);
             }
