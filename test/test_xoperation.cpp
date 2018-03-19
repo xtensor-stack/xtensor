@@ -454,6 +454,18 @@ namespace xt
         EXPECT_EQ(expected, where(a));
     }
 
+    template <class T>
+    struct PRINT;
+
+    TYPED_TEST(operation, where)
+    {
+        TypeParam a = { { 1, 2, 3 },{ 0, 1, 0 },{ 0, 4, 1 } };
+        double b = 1.0;
+        TypeParam res = where(a > b, b, a);
+        TypeParam expected = { { 1, 1, 1 },{ 0, 1, 0 },{ 0, 1, 1 } };
+        EXPECT_EQ(expected, res);
+    }
+
     TYPED_TEST(operation, cast)
     {
         using int_container_t = rebind_container_t<TypeParam, int>;

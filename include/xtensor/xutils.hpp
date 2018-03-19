@@ -583,6 +583,12 @@ namespace xt
     template <class... T>
     struct promote_type;
 
+    template <>
+    struct promote_type<>
+    {
+        using type = void;
+    };
+
     template <class T>
     struct promote_type<T>
     {
