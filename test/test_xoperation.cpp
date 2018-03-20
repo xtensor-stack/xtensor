@@ -454,9 +454,6 @@ namespace xt
         EXPECT_EQ(expected, where(a));
     }
 
-    template <class T>
-    struct PRINT;
-
     TYPED_TEST(operation, where)
     {
         TypeParam a = { { 1, 2, 3 },{ 0, 1, 0 },{ 0, 4, 1 } };
@@ -464,6 +461,15 @@ namespace xt
         TypeParam res = where(a > b, b, a);
         TypeParam expected = { { 1, 1, 1 },{ 0, 1, 0 },{ 0, 1, 1 } };
         EXPECT_EQ(expected, res);
+    }
+
+    TEST(operation, where_cast)
+    {
+        xarray<int> a = {{0, 1, 0}, {3, 0, 5}};
+        double res1 = 1.2;
+        xarray<double> b = where(equal(a, 0.0), res1, 0.0);
+        xarray<double> expected = { {1.2, 0., 1.2}, {0., 1.2, 0.} };
+        EXPECT_EQ(b, expected);
     }
 
     TYPED_TEST(operation, cast)

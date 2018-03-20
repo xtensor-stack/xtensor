@@ -855,25 +855,30 @@ namespace xt
         // This metafunction avoids loading boolean values as batches of floating points and
         // reciprocally. However, we cannot always load data as batches of their scalar type
         // since this prevents mixed arithmetic.
-        template <class T, class simd>
+        template <class T, class simd, class common_simd>
         struct get_simd_type
         {
             using simd_value_type = typename std::decay_t<T>::simd_value_type;
             static constexpr bool is_arg_bool = is_batch_bool<simd_value_type>::value;
             static constexpr bool is_res_bool = is_batch_bool<simd>::value;
-            using type = std::conditional_t<is_arg_bool || is_res_bool, simd_value_type, simd>;
+            using type = std::conditional_t<is_res_bool,
+                                            common_simd,
+                                            std::conditional_t<is_arg_bool,
+                                                               simd_value_type,
+                                                               simd>>;
         };
 
-        template <class T, class simd>
-        using get_simd_type_t = typename get_simd_type<T, simd>::type;
+        template <class T, class simd, class common_simd>
+        using get_simd_type_t = typename get_simd_type<T, simd, common_simd>::type;
     }
 
     template <class F, class R, class... CT>
     template <class align, class simd, std::size_t... I>
     inline auto xfunction_base<F, R, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const -> simd
     {
+        using common_simd = xsimd::simd_type<detail::common_value_type_t<std::decay_t<CT>...>>;
         return m_f.simd_apply((std::get<I>(m_e)
-            .template load_simd<align, detail::get_simd_type_t<std::tuple_element_t<I, tuple_type>, simd>>(i))...);
+            .template load_simd<align, detail::get_simd_type_t<std::tuple_element_t<I, tuple_type>, simd, common_simd>>(i))...);
     }
 
     template <class F, class R, class... CT>
