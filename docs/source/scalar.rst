@@ -44,7 +44,7 @@ Assuming that the scalar assignment does not resize the array, we have the follo
     std::cout << a << std::endl;
     // prints {{1.2, 1.2, 1.2}, {1.2, 1.2, 1.2}}
 
-This is not consistent with the behavior the copy constructor from a scalar:
+This is not consistent with the behavior of the copy constructor from a scalar:
 
 .. code::
 
@@ -55,7 +55,7 @@ This is not consistent with the behavior the copy constructor from a scalar:
     // prints 1.2 (a is a 0-D array)
 
 A way to fix this is to disable copy construction from scalar, and provide a constructor taking a shape and
-a scalar so now the following are equivalent:
+a scalar: 
 
 .. code::
 
@@ -126,5 +126,5 @@ After that, ``b`` has become a 2-dimensional array! Indeed, since assigning a sc
 This simple example shows that without consistency between scalars and 0-D expressions, refactoring the code to cache the result
 of some 0-D computation actually *silently* changes the shape of the expressions that this result is assigned to.
 
-The only way to avoid that behavior and the bugs it lead to is to handle scalars as if they were 0-dimensional expressions.
+The only way to avoid that behavior and the bugs it leads to is to handle scalars as if they were 0-dimensional expressions.
 
