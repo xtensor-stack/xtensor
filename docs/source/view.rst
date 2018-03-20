@@ -8,7 +8,7 @@ Views
 =====
 
 Views are used to adapt the shape of an ``xexpression`` without changing it, nor copying it. `xtensor`
-provides two kinds of views.
+provides many kinds of views.
 
 Sliced views
 ------------
@@ -237,4 +237,21 @@ The returned value is an expression holding a closure on the passed argument.
 
     real(e) = zeros<double>({2, 2});
     // => e = {{0.0, 0.0 + 1.0i}, {0.0 - 1.0i, 0.0}};
+
+Assigning to a view
+-------------------
+
+When assigning an expression ``rhs`` to a container such as ``xarray``, this last one is resized so its shape is the same as the one
+of ``RHS``. However, since views *cannot be resized*, when assigning an expression to a view, broadcasting rules are applied:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xview.hpp"
+
+    xarray<double> a = {{0., 1., 2.}, {3., 4., 5.}};
+    double b = 1.2
+    auto tr = view(a, 0, all());
+    tr = b;
+    // => a = {{1.2, 1.2, 1.2}, {3., 4., 5.}}
 
