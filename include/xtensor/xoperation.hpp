@@ -34,7 +34,9 @@ namespace xt
     template <class T>                                                          \
     struct NAME                                                                 \
     {                                                                           \
-        using return_type = xt::detail::functor_return_type<T, R>;              \
+        template <class U, class RT>                                            \
+        using frt = xt::detail::functor_return_type<U, RT>;                     \
+        using return_type = frt<T, R>;                                          \
         using argument_type = T;                                                \
         using result_type = typename return_type::type;                         \
         using simd_value_type = xsimd::simd_type<T>;                            \
@@ -43,7 +45,9 @@ namespace xt
         {                                                                       \
             return OP arg;                                                      \
         }                                                                       \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg) const \
+        template <class B>                                                      \
+        constexpr typename frt<typename B::value_type, R>::simd_type            \
+        simd_apply(const B& arg) const                                          \
         {                                                                       \
             return OP arg;                                                      \
         }                                                                       \
@@ -67,7 +71,9 @@ namespace xt
     template <class T>                                                           \
     struct NAME                                                                  \
     {                                                                            \
-        using return_type = xt::detail::functor_return_type<T, R>;               \
+        template <class U, class RT>                                             \
+        using frt = xt::detail::functor_return_type<U, RT>;                      \
+        using return_type = frt<T, R>;                                           \
         using first_argument_type = T;                                           \
         using second_argument_type = T;                                          \
         using result_type = typename return_type::type;                          \
@@ -78,8 +84,9 @@ namespace xt
         {                                                                        \
             return (arg1 OP arg2);                                               \
         }                                                                        \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg1,       \
-                                              const simd_value_type& arg2) const \
+        template <class B>                                                       \
+        constexpr typename frt<typename B::value_type, R>::simd_type             \
+        simd_apply(const B& arg1, const B& arg2) const                           \
         {                                                                        \
             return (arg1 OP arg2);                                               \
         }                                                                        \
@@ -131,9 +138,10 @@ namespace xt
             {
                 return t1 ? t2 : t3;
             }
-            constexpr simd_result_type simd_apply(const simd_bool_type& t1,
-                                                  const simd_value_type& t2,
-                                                  const simd_value_type& t3) const noexcept
+            template <class B>
+            constexpr B simd_apply(const typename xsimd::simd_traits<B>::batch_bool& t1,
+                                   const simd_value_type& t2,
+                                   const simd_value_type& t3) const noexcept
             {
                 return xsimd::select(t1, t2, t3);
             }
