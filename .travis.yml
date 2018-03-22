@@ -41,10 +41,18 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
+      env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.6
           packages:
             - clang-3.6
-      env: COMPILER=clang CLANG=3.6
+      env: COMPILER=clang CLANG=3.6 DISABLE_XSIMD=1
     - os: linux
       addons:
         apt:
@@ -75,14 +83,6 @@ matrix:
     - os: osx
       osx_image: xcode8
       compiler: clang
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-      env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -116,6 +116,7 @@ install:
     - conda update -q conda
     - conda install gtest cmake -c conda-forge 
     - conda install xtl==0.4.1 -c QuantStack
+    - conda install xsimd -c QuantStack
     # Testing
     - mkdir build
     - cd build
@@ -123,8 +124,10 @@ install:
         cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON ..;
       elif [[ "$COLUMN_MAJOR_LAYOUT" == 1 ]]; then
         cmake -DBUILD_TESTS=ON -DDEFAULT_COLUMN_MAJOR=ON ..;
-      else
+      elif [[ "$DISABLE_XSIMD" == 1 ]]; then
         cmake -DBUILD_TESTS=ON ..;
+      else
+        cmake -DXTENSOR_USE_XSIMD=ON -DBUILD_TESTS=ON ..;
       fi
     - make -j2 test_xtensor_lib
     - cd test
