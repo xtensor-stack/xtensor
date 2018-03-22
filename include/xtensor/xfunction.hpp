@@ -106,7 +106,7 @@ namespace xt
         struct functor_return_type
         {
             using type = R;
-            using simd_type = xsimd::simd_type<R>;
+            using simd_type = xsimd::simd_type<T>;
         };
 
         template <class T>

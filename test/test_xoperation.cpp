@@ -463,12 +463,13 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
-    TEST(operation, where_cast)
+    TYPED_TEST(operation, where_cast)
     {
-        xarray<int> a = {{0, 1, 0}, {3, 0, 5}};
+        using int_container_2d = rebind_container_t<TypeParam, int>;
+        int_container_2d a = {{0, 1, 0}, {3, 0, 5}};
         double res1 = 1.2;
-        xarray<double> b = where(equal(a, 0.0), res1, 0.0);
-        xarray<double> expected = { {1.2, 0., 1.2}, {0., 1.2, 0.} };
+        TypeParam b = where(equal(a, 0.0), res1, 0.0);
+        TypeParam expected = { {1.2, 0., 1.2}, {0., 1.2, 0.} };
         EXPECT_EQ(b, expected);
     }
 
@@ -481,6 +482,17 @@ namespace xt
         auto ref = static_cast<double>(a(0, 0)) / 2;
         auto actual = (cast<double>(a) / 2)(0, 0);
         EXPECT_EQ(ref, actual);
+    }
+
+    TYPED_TEST(operation, mixed_arithmetic)
+    {
+        using int_container_t = rebind_container_t<TypeParam, int>;
+        TypeParam a = {{0., 1., 2.}, {3., 4., 5.}};
+        int_container_t b = {{0, 1, 2}, {3, 4, 5}};
+        int_container_t c = b;
+        TypeParam res = a + (b + c);
+        TypeParam expected = {{0., 3., 6.}, {9., 12., 15.}};
+        EXPECT_EQ(res, expected);
     }
 
     TEST(operation, left_shift)
