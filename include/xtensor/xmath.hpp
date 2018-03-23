@@ -1671,14 +1671,14 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     inline auto cumsum(E&& e, std::size_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(std::plus<result_type>(), std::forward<E>(e), axis);
+        return accumulate(make_xaccumulator_functor(std::plus<result_type>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto cumsum(E&& e) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(std::plus<result_type>(), std::forward<E>(e));
+        return accumulate(make_xaccumulator_functor(std::plus<result_type>()), std::forward<E>(e));
     }
 
     /**
@@ -1695,30 +1695,174 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     inline auto cumprod(E&& e, std::size_t axis) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(std::multiplies<result_type>(), std::forward<E>(e), axis);
+        return accumulate(make_xaccumulator_functor(std::multiplies<result_type>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto cumprod(E&& e) noexcept
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(std::multiplies<result_type>(), std::forward<E>(e));
+        return accumulate(make_xaccumulator_functor(std::multiplies<result_type>()), std::forward<E>(e));
+    }
+
+    /*****************
+     * nan functions *
+     *****************/
+
+    namespace detail
+    {
+        template <class T>
+        struct nan_to_num_functor
+        {
+            using value_type = T;
+            using result_type = value_type;
+
+            inline result_type operator()(const value_type a, const value_type v) const
+            {
+                switch (std::fpclassify(a))
+                {
+                    case FP_NAN: return v;
+                    case FP_INFINITE: {
+                        if (a < 0)
+                        {
+                            return std::numeric_limits<result_type>::lowest();
+                        }
+                        else
+                        {
+                            return std::numeric_limits<result_type>::max();
+                        }
+                    }
+                    default: return a;
+                }
+            }
+        };
+
+        template <class T>
+        struct nan_plus
+        {
+            using value_type = T;
+            using result_type = value_type;
+
+            constexpr inline result_type operator()(const value_type& lhs, const value_type& rhs) const
+            {
+                if (!std::isnan(rhs))
+                {
+                    return lhs + rhs;
+                }
+                return lhs;
+            }
+        };
+
+        template <class T>
+        struct nan_multiplies
+        {
+            using value_type = T;
+            using result_type = value_type;
+
+            constexpr inline result_type operator()(const value_type& lhs, const value_type& rhs) const
+            {
+                if (!std::isnan(rhs))
+                {
+                    return lhs * rhs;
+                }
+                return lhs;
+            }
+        };
     }
 
     /**
      * @ingroup nan_functions
      */
     template <class E>
-    inline auto nan_to_num(const xexpression<E>& e, typename std::decay_t<E>::value_type num)
+    inline auto nan_to_num(E&& e, typename std::decay_t<E>::value_type num)
     {
-        return where(isnan(e.derived_cast()), num, e.derived_cast());
+        return detail::make_xfunction<detail::nan_to_num_functor>(std::forward<E>(e), num);
+    }
+
+#define NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                     \
+    template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
+    inline auto NAME(E&& e, X&& axes, ES es = ES()) noexcept                                                      \
+    {                                                                                                             \
+        using result_type = RESULT_TYPE;                                                                          \
+        using functor_type = FUNCTOR<result_type>;                                                                \
+        return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN),                 \
+                      std::forward<X>(axes), es);                                                                 \
+    }                                                                                                             \
+                                                                                                                  \
+    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,                                                      \
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>               \
+    inline auto NAME(E&& e, ES es = ES()) noexcept                                                                \
+    {                                                                                                             \
+        using result_type = RESULT_TYPE;                                                                          \
+        using functor_type = FUNCTOR<result_type>;                                                                \
+        return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN), es);            \
+    }                                                                                                             \
+
+#define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                    \
+    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                             \
+        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES()) noexcept                             \
+        {                                                                                                         \
+            using result_type = RESULT_TYPE;                                                                      \
+            using functor_type = FUNCTOR<result_type>;                                                            \
+            return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN), axes);      \
+        }                                                                                                         \
+
+#define MODERN_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                 \
+    template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
+    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES()) noexcept                                            \
+    {                                                                                                             \
+        using result_type = RESULT_TYPE;                                                                          \
+        using functor_type = FUNCTOR<result_type>;                                                                \
+        return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN), axes, es);      \
+    }                                                                                                             \
+
+    NAN_REDUCER_FUNCTION(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
+#ifdef X_OLD_CLANG
+    OLD_CLANG_NAN_REDUCER(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
+#else
+    MODERN_CLANG_NAN_REDUCER(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
+#endif
+
+    NAN_REDUCER_FUNCTION(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
+#ifdef X_OLD_CLANG
+    OLD_CLANG_NAN_REDUCER(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
+#else
+    MODERN_CLANG_NAN_REDUCER(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
+#endif
+
+#undef NAN_REDUCER_FUNCTION
+#undef OLD_CLANG_NAN_REDUCER
+#undef MODERN_CLANG_NAN_REDUCER
+
+    template <class E>
+    inline auto nancumsum(E&& e, std::size_t axis)
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), [](auto val) { return std::isnan(val) ? 0 : val; }), std::forward<E>(e), axis);
     }
 
     template <class E>
-    inline auto nansum(E&& e)
+    inline auto nancumsum(E&& e)
     {
-        return sum(nan_to_num(e, 0));
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), [](auto val) { return std::isnan(val) ? 0 : val; }), std::forward<E>(e));
     }
+
+    template <class E>
+    inline auto nancumprod(E&& e, std::size_t axis)
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), [](auto val) { return std::isnan(val) ? 1 : val; }), std::forward<E>(e), axis);
+    }
+
+    template <class E>
+    inline auto nancumprod(E&& e)
+    {
+        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), [](auto val) { return std::isnan(val) ? 1 : val; }), std::forward<E>(e));
+    }
+
 }
 
 #endif

@@ -230,18 +230,6 @@ namespace xt
         }
     }
 
-    TEST(xfunction, arg_reference)
-    {
-        xt::xarray<double> a = {{1,2,3}, {22, 44, 66}};
-        auto fn = detail::make_xfunction<detail::plus>(a, detail::arg<0>());
-        auto fn2 = detail::make_xfunction<detail::plus>(detail::arg<1>(), a);
-
-        EXPECT_EQ(fn(0, 0), 2);
-        EXPECT_EQ(fn(1, 2), 66 * 2);
-        EXPECT_EQ(fn2(0, 0), 2);
-        EXPECT_EQ(fn2(1, 2), 66 * 2);
-    }
-
     void test_xfunction_iterator(const xarray<int>& a, const xarray<int>& b)
     {
         auto func = (a + b);
