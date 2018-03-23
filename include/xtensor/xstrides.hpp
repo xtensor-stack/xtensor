@@ -298,15 +298,32 @@ namespace xt
         std::size_t input_index = input.size();
         for (; input_index != 0; --input_index, --output_index)
         {
-            if (output[output_index - 1] == 1)
+            // First case: output = (0, 0, ...., 0)
+            // output is a new shape that has not been through
+            // the broadcast process yet; broadcast is trivial
+            if (output[output_index - 1] == 0)
             {
                 output[output_index - 1] = input[input_index - 1];
             }
-            else if ((input[input_index - 1] != 1) && (input[input_index - 1] != output[output_index - 1]))
+            // Second case: output has been initialized to 1. Broacast is trivial
+            // only if input is 1 to.
+            else if (output[output_index - 1] == 1)
+            {
+                output[output_index - 1] = input[input_index - 1];
+                trivial_broadcast = trivial_broadcast && (input[input_index - 1] == 1);
+            }
+            // Third case: output has been initialized to something different from 1.
+            // if input is 1, then the broadcast is not trivial
+            else if (input[input_index - 1] == 1)
+            {
+                trivial_broadcast = false;
+            }
+            // Last case: input and output must have the same value, else
+            // shape are not compatible and an exception is thrown
+            else if (input[input_index - 1] != output[output_index - 1])
             {
                 throw_broadcast_error(output, input);
             }
-            trivial_broadcast = trivial_broadcast && (output[output_index - 1] == input[input_index - 1]);
         }
         return trivial_broadcast;
     }

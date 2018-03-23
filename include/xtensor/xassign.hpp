@@ -244,7 +244,7 @@ namespace xt
         const E2& de2 = e2.derived_cast();
 
         size_type dim = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(dim, size_type(1));
+        shape_type shape = xtl::make_sequence<shape_type>(dim, size_type(0));
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
 
         if (dim > de1.dimension() || shape > de1.shape())
@@ -277,7 +277,7 @@ namespace xt
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
+        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(0));
         de2.broadcast_shape(shape, true);
         if (shape.size() > de1.shape().size() || shape > de1.shape())
         {
@@ -293,7 +293,7 @@ namespace xt
         using size_type = typename E1::size_type;
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(1));
+        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(0));
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
         e1.derived_cast().resize(std::move(shape));
         return trivial_broadcast;
