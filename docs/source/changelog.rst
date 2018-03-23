@@ -7,6 +7,32 @@
 Changelog
 =========
 
+0.15.6
+------
+
+- zeros, ones, full and empty_like functions
+  `#686 <https://github.com/QuantStack/xtensor/pull/686>`_.
+- squeeze view
+  `#687 <https://github.com/QuantStack/xtensor/pull/687>`_.
+- bitwise shift left and shift right
+  `#688 <https://github.com/QuantStack/xtensor/pull/688>`_.
+- ellipsis, unique and trim functions
+  `#689 <https://github.com/QuantStack/xtensor/pull/689>`_.
+- xview iterator benchmark
+  `#696 <https://github.com/QuantStack/xtensor/pull/696>`_.
+- optimize stepper increment
+  `#697 <https://github.com/QuantStack/xtensor/pull/697>`_.
+- minmax reducers
+  `#698 <https://github.com/QuantStack/xtensor/pull/698>`_.
+- where fix with SIMD
+  `#704 <https://github.com/QuantStack/xtensor/pull/704>`_.
+- additional doc for scalars and views
+  `#705 <https://github.com/QuantStack/xtensor/pull/705>`_.
+- mixed arithmetic with SIMD
+  `#713 <https://github.com/QuantStack/xtensor/pull/713>`_.
+- broadcast fixed
+  `#717 <https://github.com/QuantStack/xtensor/pull/717>`_.
+
 0.15.5
 ------
 
