@@ -540,7 +540,7 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func, class U>
     inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CT... e) noexcept
-        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(1))),
+        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(0))),
           m_shape_computed(false)
     {
     }
@@ -577,7 +577,7 @@ namespace xt
     {
         if (!m_shape_computed)
         {
-            m_shape = xtl::make_sequence<shape_type>(compute_dimension(), size_type(1));
+            m_shape = xtl::make_sequence<shape_type>(compute_dimension(), size_type(0));
             m_shape_trivial = broadcast_shape(m_shape, false);
             m_shape_computed = true;
         }

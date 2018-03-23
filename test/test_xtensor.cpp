@@ -235,5 +235,9 @@ namespace xt
         xtensor<int, 1> res = 2 * a;
         EXPECT_EQ(2, res(0));
         EXPECT_EQ(2, res(1));
+
+        xtensor<int, 1> b = { 1, 2 };
+        xt::xarray<double> ca = a * b;
     }
+
 }
