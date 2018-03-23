@@ -167,10 +167,12 @@ namespace xt
                 {
                     return static_cast<R>(arg);
                 }
-                constexpr simd_result_type simd_apply(const simd_value_type& arg) const
+                // SIMD conversion disabled for now since it does not make sense
+                // in most of the cases
+                /*constexpr simd_result_type simd_apply(const simd_value_type& arg) const
                 {
                     return static_cast<R>(arg);
-                }
+                }*/
                 template <class U>
                 struct rebind
                 {

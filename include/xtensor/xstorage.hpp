@@ -1220,11 +1220,7 @@ namespace xt
         lhs.swap(rhs);
     }
 
-#if defined(_MSC_VER) && _MSC_VER < 1910
-    #define SELECT_ALIGN XALIGNMENT
-#else
-    #define SELECT_ALIGN (XALIGNMENT != 0 ? XALIGNMENT : alignof(T))
-#endif
+#define SELECT_ALIGN (XALIGNMENT != 0 ? XALIGNMENT : alignof(T))
 
     /**
      * This array class is modeled after ``std::array`` but adds optional alignment through a template parameter.
