@@ -839,7 +839,7 @@ namespace xt
     inline auto dynamic_view(E&& e, const slice_vector& slices)
     {
         // Compute dimension
-        std::size_t dimension = e.dimension(), n_newaxis = 0, n_add_all;
+        std::size_t dimension = e.dimension(), n_newaxis = 0, n_add_all = 0;
         ptrdiff_t dimension_check = static_cast<ptrdiff_t>(e.dimension());
         bool has_ellipsis = false;
         for (const auto& el : slices)
