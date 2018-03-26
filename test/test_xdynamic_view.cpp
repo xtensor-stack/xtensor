@@ -203,6 +203,11 @@ namespace xt
         xtensor<double, 2> ref{{2, 3}, 2.5};
         arr2 = dynamic_view(arr, {0});
         EXPECT_EQ(ref, arr2);
+        // check that the following compiles
+        auto v = dynamic_view(arr, {0});
+        double acc = v(0);
+        EXPECT_EQ(acc, 2.5);
+        auto iter = v.begin();
     }
 
     TEST(xdynamic_view, newaxis)

@@ -196,7 +196,9 @@ namespace xt
         std::enable_if_t<detail::is_indexed_stepper<STEP>::value, STEP>
         stepper_end(const ST& shape, layout_type l) const;
 
-        using container_iterator = typename std::decay_t<CD>::iterator;
+        using container_iterator = std::conditional_t<is_const,
+                                                      typename std::decay_t<CD>::const_iterator,
+                                                      typename std::decay_t<CD>::iterator>;
         using const_container_iterator = typename std::decay_t<CD>::const_iterator;
 
         underlying_container_type& data() noexcept;
