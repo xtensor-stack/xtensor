@@ -202,7 +202,7 @@ namespace xt
         template <class T>
         struct printer<T, std::enable_if_t<std::is_floating_point<typename T::value_type>::value>>
         {
-            using value_type = typename T::value_type;
+            using value_type = std::decay_t<typename T::value_type>;
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
@@ -337,7 +337,7 @@ namespace xt
         template <class T>
         struct printer<T, std::enable_if_t<std::is_integral<typename T::value_type>::value && !std::is_same<typename T::value_type, bool>::value>>
         {
-            using value_type = typename T::value_type;
+            using value_type = std::decay_t<typename T::value_type>;
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
@@ -441,7 +441,7 @@ namespace xt
         template <class T>
         struct printer<T, std::enable_if_t<xtl::is_complex<typename T::value_type>::value>>
         {
-            using value_type = typename T::value_type;
+            using value_type = std::decay_t<typename T::value_type>;
             using cache_type = std::vector<bool>;
             using cache_iterator = typename cache_type::const_iterator;
 
@@ -505,7 +505,7 @@ namespace xt
         template <class T>
         struct printer<T, std::enable_if_t<!std::is_fundamental<typename T::value_type>::value && !xtl::is_complex<typename T::value_type>::value>>
         {
-            using value_type = typename T::value_type;
+            using value_type = std::decay_t<typename T::value_type>;
             using cache_type = std::vector<std::string>;
             using cache_iterator = typename cache_type::const_iterator;
 
@@ -556,7 +556,7 @@ namespace xt
         template <class E>
         struct custom_formatter
         {
-            using value_type = typename E::value_type;
+            using value_type = std::decay_t<typename E::value_type>;
 
             template <class F>
             custom_formatter(F&& func)

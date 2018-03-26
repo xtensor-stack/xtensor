@@ -79,7 +79,7 @@ namespace xt
     template <class E, class... SL>
     struct view_temporary_type
     {
-        using type = typename detail::view_temporary_type_impl<typename E::value_type,
+        using type = typename detail::view_temporary_type_impl<std::decay_t<typename E::value_type>,
                                                                typename E::shape_type,
                                                                E::static_layout,
                                                                SL...>::type;
