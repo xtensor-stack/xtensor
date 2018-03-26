@@ -1744,13 +1744,9 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             using value_type = T;
             using result_type = value_type;
 
-            constexpr inline result_type operator()(const value_type lhs, const value_type rhs) const
+            constexpr result_type operator()(const value_type lhs, const value_type rhs) const
             {
-                if (!math::isnan(rhs))
-                {
-                    return lhs + rhs;
-                }
-                return lhs;
+                return !math::isnan(rhs) ? lhs + rhs : lhs;
             }
         };
 
@@ -1760,13 +1756,9 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             using value_type = T;
             using result_type = value_type;
 
-            constexpr inline result_type operator()(const value_type lhs, const value_type rhs) const
+            constexpr result_type operator()(const value_type lhs, const value_type rhs) const
             {
-                if (!math::isnan(rhs))
-                {
-                    return lhs * rhs;
-                }
-                return lhs;
+                return !math::isnan(rhs) ? lhs * rhs : lhs;
             }
         };
 
@@ -1775,7 +1767,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         {
             using value_type = T;
             using result_type = T;
-            constexpr inline result_type operator()(const value_type lhs) const
+            constexpr result_type operator()(const value_type lhs) const
             {
                 return math::isnan(lhs) ? result_type(V) : lhs;
             }
