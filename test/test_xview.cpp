@@ -367,6 +367,8 @@ namespace xt
         auto a2 = xt::view(a1, 1, xt::range(1, 2));
         int v2 = a2(0);
         EXPECT_EQ(v2, 3);
+
+        auto it = a2.begin();
     }
 
     TEST(xview, trivial_iterating)
