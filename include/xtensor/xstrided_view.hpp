@@ -34,7 +34,7 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, CD>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using temporary_type = xarray<typename xexpression_type::value_type>;
+        using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
     };
 
     namespace detail
