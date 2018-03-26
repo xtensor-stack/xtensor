@@ -282,3 +282,19 @@ Mathematical functions
 +---------------------------------------------+-------------------------------------------------+
 | :ref:`cumprod <cumprod-function-reference>` | cumulative product of elements over given axes  |
 +---------------------------------------------+-------------------------------------------------+
+
+.. toctree::
+
+   nan_functions
+
++---------------------------------------------------+------------------------------------------------------------+
+| :ref:`nan_to_num <nan-to-num-function-reference>` | convert NaN and +/- inf to finite numbers                  |
++---------------------------------------------------+------------------------------------------------------------+
+| :ref:`nansum <nansum-function-reference>`         | sum of elements over a given axis, replacing NaN with 0    |
++---------------------------------------------------+------------------------------------------------------------+
+| :ref:`nanprod <nanprod-function-reference>`       | product of elements over given axes, replacing NaN with 1  |
++---------------------------------------------------+------------------------------------------------------------+
+| :ref:`nancumsum <nancumsum-function-reference>`   | cumsum of elements over a given axis, replacing NaN with 0 |
++---------------------------------------------------+------------------------------------------------------------+
+| :ref:`nancumprod <nancumprod-function-reference>` | cumprod of elements over given axes, replacing NaN with 1  |
++---------------------------------------------------+------------------------------------------------------------+

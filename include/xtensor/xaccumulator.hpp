@@ -138,9 +138,14 @@ namespace xt
             inner_loop_size = inner_loop_size - inner_stride;
 
             std::size_t pos = 0;
-            for (std::size_t i = 0; i < outer_loop_size; ++i)
+            for (std::size_t j = 0; j < inner_loop_size; ++j)
             {
                 result.data()[pos] = std::get<1>(f)(result.data()[pos]);
+                pos += outer_stride;
+            }
+            pos = 0;
+            for (std::size_t i = 0; i < outer_loop_size; ++i)
+            {
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
                     result.data()[pos + inner_stride] = std::get<0>(f)(result.data()[pos],

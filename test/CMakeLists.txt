@@ -109,6 +109,7 @@ set(XTENSOR_TESTS
     test_xio.cpp
     test_xlayout.cpp
     test_xmath.cpp
+    test_xnan_functions.cpp
     test_xnoalias.cpp
     test_xnorm.cpp
     test_xnpy.cpp

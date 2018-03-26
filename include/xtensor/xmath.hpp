@@ -1717,23 +1717,24 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             using value_type = T;
             using result_type = value_type;
 
-            inline result_type operator()(const value_type a, const value_type v) const
+            inline result_type operator()(const value_type a) const
             {
-                switch (std::fpclassify(a))
+                if (math::isnan(a))
                 {
-                    case FP_NAN: return v;
-                    case FP_INFINITE: {
-                        if (a < 0)
-                        {
-                            return std::numeric_limits<result_type>::lowest();
-                        }
-                        else
-                        {
-                            return std::numeric_limits<result_type>::max();
-                        }
-                    }
-                    default: return a;
+                    return 0;
                 }
+                if (math::isinf(a))
+                {
+                    if (a < 0)
+                    {
+                        return std::numeric_limits<result_type>::lowest();
+                    }
+                    else
+                    {
+                        return std::numeric_limits<result_type>::max();
+                    }
+                }
+                return a;
             }
         };
 
@@ -1743,9 +1744,9 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             using value_type = T;
             using result_type = value_type;
 
-            constexpr inline result_type operator()(const value_type& lhs, const value_type& rhs) const
+            constexpr inline result_type operator()(const value_type lhs, const value_type rhs) const
             {
-                if (!std::isnan(rhs))
+                if (!math::isnan(rhs))
                 {
                     return lhs + rhs;
                 }
@@ -1759,24 +1760,46 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             using value_type = T;
             using result_type = value_type;
 
-            constexpr inline result_type operator()(const value_type& lhs, const value_type& rhs) const
+            constexpr inline result_type operator()(const value_type lhs, const value_type rhs) const
             {
-                if (!std::isnan(rhs))
+                if (!math::isnan(rhs))
                 {
                     return lhs * rhs;
                 }
                 return lhs;
             }
         };
+
+        template <class T, int V>
+        struct nan_init
+        {
+            using value_type = T;
+            using result_type = T;
+            constexpr inline result_type operator()(const value_type lhs) const
+            {
+                return math::isnan(lhs) ? result_type(V) : lhs;
+            }
+        };
     }
 
     /**
+     * @defgroup  nan_functions nan functions
+     */
+
+    /**
      * @ingroup nan_functions
+     * @brief Convert nan or +/- inf to numbers
+     *
+     * This functions converts nan to 0, and +inf to the highest, -inf to the lowest
+     * floating point value of the same type.
+     *
+     * @param e input \ref xexpression
+     * @return an \ref xexpression
      */
     template <class E>
-    inline auto nan_to_num(E&& e, typename std::decay_t<E>::value_type num)
+    inline auto nan_to_num(E&& e)
     {
-        return detail::make_xfunction<detail::nan_to_num_functor>(std::forward<E>(e), num);
+        return detail::make_xfunction<detail::nan_to_num_functor>(std::forward<E>(e));
     }
 
 #define NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                     \
@@ -1786,7 +1809,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN),                 \
+        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
+        return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e),             \
                       std::forward<X>(axes), es);                                                                 \
     }                                                                                                             \
                                                                                                                   \
@@ -1796,7 +1820,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN), es);            \
+        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
+        return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);        \
     }                                                                                                             \
 
 #define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                    \
@@ -1805,7 +1830,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         {                                                                                                         \
             using result_type = RESULT_TYPE;                                                                      \
             using functor_type = FUNCTOR<result_type>;                                                            \
-            return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN), axes);      \
+            using init_functor_type = detail::nan_init<result_type, NAN>;                                         \
+            return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes);  \
         }                                                                                                         \
 
 #define MODERN_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                 \
@@ -1814,9 +1840,21 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return reduce(make_xreducer_functor(functor_type()), nan_to_num(std::forward<E>(e), NAN), axes, es);      \
+        using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
+        return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es);  \
     }                                                                                                             \
 
+    /**
+     * @ingroup nan_functions
+     * @brief Sum of elements over given axes, replacing nan with 0.
+     *
+     * Returns an \ref xreducer for the sum of elements over given
+     * \em axes, replacing nan with 0.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the sum is performed (optional)
+     * @param es evaluation strategy of the reducer (optional)
+     * @return an \ref xreducer
+     */
     NAN_REDUCER_FUNCTION(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
 #ifdef X_OLD_CLANG
     OLD_CLANG_NAN_REDUCER(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
@@ -1824,6 +1862,17 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     MODERN_CLANG_NAN_REDUCER(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
 #endif
 
+    /**
+     * @ingroup nan_functions
+     * @brief Product of elements over given axes, replacing nan with 1.
+     *
+     * Returns an \ref xreducer for the sum of elements over given
+     * \em axes, replacing nan with 1.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the sum is performed (optional)
+     * @param es evaluation strategy of the reducer (optional)
+     * @return an \ref xreducer
+     */
     NAN_REDUCER_FUNCTION(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
 #ifdef X_OLD_CLANG
     OLD_CLANG_NAN_REDUCER(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
@@ -1835,32 +1884,52 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 #undef OLD_CLANG_NAN_REDUCER
 #undef MODERN_CLANG_NAN_REDUCER
 
+    /**
+     * @ingroup nan_functions
+     * @brief Cumulative sum, replacing nan with 0.
+     *
+     * Returns an xaccumulator for the sum of elements over given
+     * \em axis, replacing nan with 0.
+     * @param e an \ref xexpression
+     * @param axis the axis along which the elements are accumulated (optional)
+     * @return an xaccumulator
+     */
     template <class E>
     inline auto nancumsum(E&& e, std::size_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), [](auto val) { return std::isnan(val) ? 0 : val; }), std::forward<E>(e), axis);
+        return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), detail::nan_init<result_type, 0>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto nancumsum(E&& e)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), [](auto val) { return std::isnan(val) ? 0 : val; }), std::forward<E>(e));
+        return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), detail::nan_init<result_type, 0>()), std::forward<E>(e));
     }
 
+    /**
+     * @ingroup nan_functions
+     * @brief Cumulative product, replacing nan with 1.
+     *
+     * Returns an xaccumulator for the product of elements over given
+     * \em axis, replacing nan with 1.
+     * @param e an \ref xexpression
+     * @param axis the axis along which the elements are accumulated (optional)
+     * @return an xaccumulator
+     */
     template <class E>
     inline auto nancumprod(E&& e, std::size_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), [](auto val) { return std::isnan(val) ? 1 : val; }), std::forward<E>(e), axis);
+        return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), detail::nan_init<result_type, 1>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto nancumprod(E&& e)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
-        return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), [](auto val) { return std::isnan(val) ? 1 : val; }), std::forward<E>(e));
+        return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), detail::nan_init<result_type, 1>()), std::forward<E>(e));
     }
 
 }
