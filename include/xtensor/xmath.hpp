@@ -1704,6 +1704,21 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(std::multiplies<result_type>(), std::forward<E>(e));
     }
+
+    /**
+     * @ingroup nan_functions
+     */
+    template <class E>
+    inline auto nan_to_num(const xexpression<E>& e, typename std::decay_t<E>::value_type num)
+    {
+        return where(isnan(e.derived_cast()), num, e.derived_cast());
+    }
+
+    template <class E>
+    inline auto nansum(E&& e)
+    {
+        return sum(nan_to_num(e, 0));
+    }
 }
 
 #endif

@@ -122,6 +122,51 @@ namespace xt
             using type = bool;
             using simd_type = bool;
         };
+
+        template <std::size_t I>
+        struct arg
+        {
+            operator int()
+            {
+                return 1;
+            }
+        };
+
+        template <class T>
+        struct get_arg
+        {
+            constexpr static std::size_t value = -1;
+        };
+
+        template <std::size_t I>
+        struct get_arg<arg<I>>
+        {
+            constexpr static std::size_t value = I;
+        };
+
+        template <std::size_t I>
+        struct get_arg<xscalar<const arg<I>>>
+        {
+            constexpr static std::size_t value = I;
+        };
+
+        template <class T>
+        struct is_arg
+        {
+            constexpr static bool value = false;
+        };
+
+        template <std::size_t I>
+        struct is_arg<xscalar<const arg<I>>>
+        {
+            constexpr static bool value = true;
+        };
+
+        template <class T, std::size_t IDX>
+        struct get_idx
+        {
+            constexpr static std::size_t value = is_arg<T>::value ? get_arg<T>::value : IDX;
+        };
     }
 
     template <class F, class R, class... CT>
@@ -817,21 +862,21 @@ namespace xt
     template <std::size_t... I, class... Args>
     inline auto xfunction_base<F, R, CT...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
     {
-        return m_f(detail::get_element(std::get<I>(m_e), args...)...);
+        return m_f(detail::get_element(std::get<detail::get_idx<CT, I>::value>(m_e), args...)...);
     }
 
     template <class F, class R, class... CT>
     template <std::size_t... I, class It>
     inline auto xfunction_base<F, R, CT...>::element_access_impl(std::index_sequence<I...>, It first, It last) const -> const_reference
     {
-        return m_f((std::get<I>(m_e).element(first, last))...);
+        return m_f((std::get<detail::get_idx<CT, I>::value>(m_e).element(first, last))...);
     }
 
     template <class F, class R, class... CT>
     template <std::size_t... I>
     inline auto xfunction_base<F, R, CT...>::data_element_impl(std::index_sequence<I...>, size_type i) const -> const_reference
     {
-        return m_f((std::get<I>(m_e).data_element(i))...);
+        return m_f((std::get<detail::get_idx<CT, I>::value>(m_e).data_element(i))...);
     }
 
     namespace detail
