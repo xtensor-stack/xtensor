@@ -27,6 +27,47 @@ namespace xt
      * accumulate *
      **************/
 
+    template <class ACCUMULATE_FUNC, class INIT_FUNC = xtl::identity>
+    struct xaccumulator_functor
+        : public std::tuple<ACCUMULATE_FUNC, INIT_FUNC>
+    {
+        using self_type = xaccumulator_functor<ACCUMULATE_FUNC, INIT_FUNC>;
+        using base_type = std::tuple<ACCUMULATE_FUNC, INIT_FUNC>;
+        using accumulate_functor_type = ACCUMULATE_FUNC;
+        using init_functor_type = INIT_FUNC;
+
+        xaccumulator_functor()
+            : base_type()
+        {
+        }
+
+        template <class RF>
+        xaccumulator_functor(RF&& accumulate_func)
+            : base_type(std::forward<RF>(accumulate_func), INIT_FUNC())
+        {
+        }
+
+        template <class RF, class IF>
+        xaccumulator_functor(RF&& accumulate_func, IF&& init_func)
+            : base_type(std::forward<RF>(accumulate_func), std::forward<IF>(init_func))
+        {
+        }
+    };
+
+    template <class RF>
+    auto make_xaccumulator_functor(RF&& accumulate_func)
+    {
+        using accumulator_type = xaccumulator_functor<std::remove_reference_t<RF>>;
+        return accumulator_type(std::forward<RF>(accumulate_func));
+    }
+
+    template <class RF, class IF>
+    auto make_xaccumulator_functor(RF&& accumulate_func, IF&& init_func)
+    {
+        using accumulator_type = xaccumulator_functor<std::remove_reference_t<RF>, std::remove_reference_t<IF>>;
+        return accumulator_type(std::forward<RF>(accumulate_func), std::forward<IF>(init_func));
+    }
+
     namespace detail
     {
         template <class F, class E, class ES>
@@ -57,9 +98,53 @@ namespace xt
         using xaccumulator_return_type_t = typename xaccumulator_return_type<T, R>::type;
 
         template <class F, class E>
+        inline auto accumulator_init_with_f(F&& f, E& e, std::size_t axis)
+        {
+            // this function is the equivalent (but hopefully faster) to (if axis == 1)
+            // e[:, 0, :, :, ...] = f(e[:, 0, :, :, ...])
+            // so that all "first" values are initialized in a first pass
+
+            std::size_t outer_loop_size, inner_loop_size, outer_stride, inner_stride, pos = 0;
+
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax) {
+                outer_loop_size = std::accumulate(first, first + ax,
+                                                  std::size_t(1), std::multiplies<std::size_t>());
+                inner_loop_size = std::accumulate(first + ax + 1, last,
+                                                  std::size_t(1), std::multiplies<std::size_t>());
+            };
+
+            auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, ptrdiff_t ax) {
+                outer_stride = ax == 0 ? 1 : *std::min_element(first, first + ax);
+                inner_stride = (ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last);
+            };
+
+            set_loop_sizes(e.shape().begin(), e.shape().end(), static_cast<ptrdiff_t>(axis));
+            set_loop_strides(e.strides().begin(), e.strides().end(), static_cast<ptrdiff_t>(axis));
+
+            if (e.layout() == layout_type::column_major)
+            {
+                // swap for better memory locality (smaller stride in the inner loop)
+                std::swap(outer_loop_size, inner_loop_size);
+                std::swap(outer_stride, inner_stride);
+            }
+
+            for (std::size_t i = 0; i < outer_loop_size; ++i)
+            {
+                pos = i * outer_stride;
+                for (std::size_t j = 0; j < inner_loop_size; ++j)
+                {
+                    e.data()[pos] = f(e.data()[pos]);
+                    pos += inner_stride;
+                }
+            }
+
+        }
+
+        template <class F, class E>
         inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate)
         {
-            using function_return_type = typename F::result_type;
+            using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
+            using function_return_type = typename accumulate_functor::result_type;
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, function_return_type>;
 
             if (axis >= e.dimension())
@@ -93,15 +178,24 @@ namespace xt
                 set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<ptrdiff_t>(axis + 1));
                 std::swap(inner_loop_size, outer_loop_size);
             }
-            inner_loop_size = inner_loop_size - inner_stride;
 
             std::size_t pos = 0;
+
+            inner_loop_size = inner_loop_size - inner_stride;
+
+            // activate the init loop if we have an init function other than identity
+            if (!std::is_same<decltype(std::get<1>(f)), xtl::identity>::value)
+            {
+                accumulator_init_with_f(std::get<1>(f), result, axis);
+            }
+
+            pos = 0;
             for (std::size_t i = 0; i < outer_loop_size; ++i)
             {
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
-                    result.data()[pos + inner_stride] = f(result.data()[pos],
-                                                          result.data()[pos + inner_stride]);
+                    result.data()[pos + inner_stride] = std::get<0>(f)(result.data()[pos],
+                                                                       result.data()[pos + inner_stride]);
                     pos += outer_stride;
                 }
                 pos += inner_stride;
@@ -112,19 +206,21 @@ namespace xt
         template <class F, class E>
         inline auto accumulator_impl(F&& f, E&& e, evaluation_strategy::immediate)
         {
-            using T = typename F::result_type;
+            using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
+            using T = typename accumulate_functor::result_type;
+
             using result_type = xtensor<T, 1>;
             std::size_t sz = e.size();
             auto result = result_type::from_shape({sz});
 
             auto it = e.template begin<DEFAULT_LAYOUT>();
 
-            result.data()[0] = *it;
+            result.data()[0] = std::get<1>(f)(*it);
             ++it;
 
             for (std::size_t idx = 0; it != e.template end<DEFAULT_LAYOUT>(); ++it)
             {
-                result.data()[idx + 1] = f(result.data()[idx], *it);
+                result.data()[idx + 1] = std::get<0>(f)(result.data()[idx], *it);
                 ++idx;
             }
             return result;
