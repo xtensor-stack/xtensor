@@ -771,7 +771,7 @@ namespace xt
     namespace detail
     {
         template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline auto&& get_data(E&& e)
+        inline decltype(auto) get_data(E&& e)
         {
             return e.data();
         }
@@ -783,7 +783,7 @@ namespace xt
         }
 
         template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline auto&& get_strides(E&& e)
+        inline decltype(auto) get_strides(E&& e)
         {
             return e.strides();
         }
@@ -791,7 +791,7 @@ namespace xt
         template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_data(E&& e) -> expression_adaptor<xclosure_t<E>>
         {
-            return std::move(expression_adaptor<xclosure_t<E>>(e));
+            return expression_adaptor<xclosure_t<E>>(e);
         }
 
         template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
