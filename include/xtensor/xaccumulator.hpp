@@ -98,6 +98,49 @@ namespace xt
         using xaccumulator_return_type_t = typename xaccumulator_return_type<T, R>::type;
 
         template <class F, class E>
+        inline auto accumulator_init_with_f(F&& f, E& e, std::size_t axis)
+        {
+            // this function is the equivalent (but hopefully faster) to (if axis == 1)
+            // e[:, 0, :, :, ...] = f(e[:, 0, :, :, ...])
+            // so that all "first" values are initialized in a first pass
+
+            std::size_t outer_loop_size, inner_loop_size, outer_stride, inner_stride, pos = 0;
+
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax) {
+                outer_loop_size = std::accumulate(first, first + ax,
+                                                  std::size_t(1), std::multiplies<std::size_t>());
+                inner_loop_size = std::accumulate(first + ax + 1, last,
+                                                  std::size_t(1), std::multiplies<std::size_t>());
+            };
+
+            auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, ptrdiff_t ax) {
+                outer_stride = ax == 0 ? 1 : *std::min_element(first, first + ax);
+                inner_stride = (ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last);
+            };
+
+            set_loop_sizes(e.shape().begin(), e.shape().end(), static_cast<ptrdiff_t>(axis));
+            set_loop_strides(e.strides().begin(), e.strides().end(), static_cast<ptrdiff_t>(axis));
+
+            if (e.layout() == layout_type::column_major)
+            {
+                // swap for better memory locality (smaller stride in the inner loop)
+                std::swap(outer_loop_size, inner_loop_size);
+                std::swap(outer_stride, inner_stride);
+            }
+
+            for (std::size_t i = 0; i < outer_loop_size; ++i)
+            {
+                pos = i * outer_stride;
+                for (std::size_t j = 0; j < inner_loop_size; ++j)
+                {
+                    e.data()[pos] = f(e.data()[pos]);
+                    pos += inner_stride;
+                }
+            }
+
+        }
+
+        template <class F, class E>
         inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate)
         {
             using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
@@ -135,14 +178,17 @@ namespace xt
                 set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<ptrdiff_t>(axis + 1));
                 std::swap(inner_loop_size, outer_loop_size);
             }
-            inner_loop_size = inner_loop_size - inner_stride;
 
             std::size_t pos = 0;
-            for (std::size_t j = 0; j < inner_loop_size; ++j)
+
+            inner_loop_size = inner_loop_size - inner_stride;
+
+            // activate the init loop if we have an init function other than identity
+            if (!std::is_same<decltype(std::get<1>(f)), xtl::identity>::value)
             {
-                result.data()[pos] = std::get<1>(f)(result.data()[pos]);
-                pos += outer_stride;
+                accumulator_init_with_f(std::get<1>(f), result, axis);
             }
+
             pos = 0;
             for (std::size_t i = 0; i < outer_loop_size; ++i)
             {
