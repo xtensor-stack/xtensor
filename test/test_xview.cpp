@@ -361,6 +361,14 @@ namespace xt
         EXPECT_EQ(10, res(2));
     }
 
+    TEST(xview, on_const_array)
+    {
+        const xt::xarray<int> a1{{0, 1}, {2, 3}};
+        auto a2 = xt::view(a1, 1, xt::range(1, 2));
+        int v2 = a2(0);
+        EXPECT_EQ(v2, 3);
+    }
+
     TEST(xview, trivial_iterating)
     {
         using tensor_type = xtensor<double, 1>;

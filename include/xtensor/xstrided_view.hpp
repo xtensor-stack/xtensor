@@ -95,10 +95,16 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
 
+        static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
+
         using value_type = typename xexpression_type::value_type;
-        using reference = typename xexpression_type::reference;
+        using reference = std::conditional_t<is_const,
+                                             typename xexpression_type::const_reference,
+                                             typename xexpression_type::reference>;
         using const_reference = typename xexpression_type::const_reference;
-        using pointer = typename xexpression_type::pointer;
+        using pointer = std::conditional_t<is_const,
+                                           typename xexpression_type::const_pointer,
+                                           typename xexpression_type::pointer>;
         using const_pointer = typename xexpression_type::const_pointer;
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
