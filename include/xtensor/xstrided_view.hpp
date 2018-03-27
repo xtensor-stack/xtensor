@@ -715,6 +715,26 @@ namespace xt
             {
                 return m_size;
             }
+            
+            iterator begin()
+            {
+                return m_e.begin();
+            }
+
+            iterator end()
+            {
+                return m_e.end();
+            }
+
+            const_iterator begin() const
+            {
+                return m_e.begin();
+            }
+            
+            const_iterator end() const
+            {
+                return m_e.end();
+            }
 
         private:
 
@@ -959,6 +979,7 @@ namespace xt
 
         using view_type = xstrided_view<xclosure_t<E>, shape_type, decltype(data)>;
         // TODO change layout type?
+        // TODO: fix forwarding when e is an rvalue (stored as ref in data then moved in e => data has a dangling ref)
         return view_type(std::forward<E>(e), std::forward<decltype(data)>(data), std::move(new_shape), std::move(new_strides), offset, layout_type::dynamic);
 
 #undef MU
