@@ -146,27 +146,27 @@ namespace xt
 
     TEST(xdynamic_view, xdynamic_view_on_xfunction)
     {
-        view_shape_type shape = {3, 4};
-        xarray<int> a(shape);
-        std::vector<int> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+        xarray<int> a = { {1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12} };
+        xarray<int> b = { 1, 2, 3, 4 };
 
-        view_shape_type shape2 = {3};
-        xarray<int> b(shape2);
-        std::vector<int> data2 = {1, 2, 3};
-        std::copy(data2.cbegin(), data2.cend(), b.template begin<layout_type::row_major>());
-
-        auto func = dynamic_view(a, slice_vector({1, range(1, 4)})) + b;
+        auto sum = a + b;
+        auto func = dynamic_view(sum, slice_vector({1, range(1, 4)}));
         auto iter = func.template begin<layout_type::row_major>();
         auto iter_end = func.template end<layout_type::row_major>();
 
-        EXPECT_EQ(7, *iter);
+        EXPECT_EQ(8, *iter);
         ++iter;
-        EXPECT_EQ(9, *iter);
+        EXPECT_EQ(10, *iter);
         ++iter;
-        EXPECT_EQ(11, *iter);
+        EXPECT_EQ(12, *iter);
         ++iter;
         EXPECT_EQ(iter, iter_end);
+    }
+
+    TEST(dynamic_view, view_on_generator)
+    {
+        auto vgen = dynamic_view(eye(4), slice_vector({1, range(1, 4)}));
+        auto iter = vgen.cbegin();
     }
 
     TEST(xdynamic_view, xdynamic_view_on_xtensor)
