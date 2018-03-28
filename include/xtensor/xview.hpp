@@ -844,9 +844,27 @@ namespace xt
             return I - newaxis_count_before<get_slice_type<E, S>...>(I);
         }
 
+        template <class... S>
+        struct check_slice;
+
+        template <>
+        struct check_slice<>
+        {
+            using type = void_t<>;
+        };
+
+        template <class S, class... SL>
+        struct check_slice<S, SL...>
+        {
+            static_assert(!std::is_same<S, xellipsis_tag>::value, "ellipsis not supported vith xview");
+            using type = typename check_slice<SL...>::type;
+        };
+
         template <class E, std::size_t... I, class... S>
         inline auto make_view_impl(E&& e, std::index_sequence<I...>, S&&... slices)
         {
+            // Checks that no ellipsis slice is used
+            using type = typename check_slice<S...>::type;
             using view_type = xview<xtl::closure_type_t<E>, get_slice_type<std::decay_t<E>, S>...>;
             return view_type(std::forward<E>(e),
                 get_slice_implementation(e, std::forward<S>(slices), get_underlying_shape_index<std::decay_t<E>, S...>(I))...
