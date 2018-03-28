@@ -401,17 +401,7 @@ namespace xt
     template <class E>
     inline auto xview<CT, S...>::operator=(const xexpression<E>& e) -> self_type&
     {
-        bool cond = (e.derived_cast().shape().size() == dimension()) &&
-            std::equal(shape().begin(), shape().end(), e.derived_cast().shape().begin());
-        if (!cond)
-        {
-            semantic_base::operator=(broadcast(e.derived_cast(), shape()));
-        }
-        else
-        {
-            semantic_base::operator=(e);
-        }
-        return *this;
+        return semantic_base::operator=(e);
     }
     //@}
 

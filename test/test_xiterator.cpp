@@ -415,10 +415,10 @@ namespace xt
 
     TEST(xiterator, broadcast)
     {
-        EXPECT_TRUE(broadcastable(std::vector<size_t>({3, 2, 1}), std::vector<size_t>({1, 2, 1})));
-        EXPECT_TRUE(broadcastable(std::vector<size_t>({3, 2, 1}), std::vector<size_t>({1, 1})));
+        EXPECT_TRUE(broadcastable(std::vector<size_t>({1, 2, 1}), std::vector<size_t>({ 3, 2, 1 })));
+        EXPECT_TRUE(broadcastable(std::vector<size_t>({1, 1}), std::vector<size_t>({ 3, 2, 1 })));
         EXPECT_TRUE(broadcastable(std::vector<size_t>({1, 1}), std::vector<size_t>({2, 2, 1})));
-        EXPECT_FALSE(broadcastable(std::vector<size_t>({3, 2, 1}), std::vector<size_t>({2, 2, 1})));
+        EXPECT_FALSE(broadcastable(std::vector<size_t>({2, 2, 1}), std::vector<size_t>({ 3, 2, 1 })));
     }
 
     TEST(xiterator, pointer)

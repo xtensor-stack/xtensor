@@ -8,8 +8,9 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
+#include "xtensor/xtensor.hpp"
 #include <algorithm>
 
 namespace xt
@@ -435,5 +436,21 @@ namespace xt
 
 
         EXPECT_THROW(dynamic_view(b, {xt::ellipsis(), 1, 1, 1, 1}), std::runtime_error);
+    }
+
+    TEST(xdynamic_view, incompatible_shape)
+    {
+        xarray<int> a = xarray<int>::from_shape({ 4, 3, 2 });
+        xarray<int> b = xarray<int>::from_shape({ 2, 3, 4 });
+        slice_vector sv;
+        sv.push_back(all());
+        auto v = dynamic_view(a, sv);
+
+        EXPECT_FALSE(broadcastable(v.shape(), b.shape()));
+        EXPECT_FALSE(broadcastable(b.shape(), v.shape()));
+        EXPECT_THROW(assert_compatible_shape(b, v), broadcast_error);
+        EXPECT_THROW(assert_compatible_shape(v, b), broadcast_error);
+        EXPECT_THROW(v = b, broadcast_error);
+        EXPECT_THROW(noalias(v) = b, broadcast_error);
     }
 }

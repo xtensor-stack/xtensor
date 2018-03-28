@@ -272,16 +272,11 @@ namespace xt
     template <class E1, class E2>
     inline void xexpression_assigner<Tag>::assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        using shape_type = typename E1::shape_type;
-        using size_type = typename E1::size_type;
         const E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
-        size_type size = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(0));
-        de2.broadcast_shape(shape, true);
-        if (shape.size() > de1.shape().size() || shape > de1.shape())
+        if (!broadcastable(de2.shape(), de1.shape()))
         {
-            throw_broadcast_error(shape, de1.shape());
+            throw_broadcast_error(de2.shape(), de1.shape());
         }
     }
 

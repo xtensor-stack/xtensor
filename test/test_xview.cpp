@@ -8,9 +8,10 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xnoalias.hpp"
+#include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
-#include "xtensor/xstrided_view.hpp"
 #include <algorithm>
 
 namespace xt
@@ -681,5 +682,19 @@ namespace xt
             sum += mt(0, i);
         }
         EXPECT_EQ(55, sum);
+    }
+
+    TEST(xview, incompatible_shape)
+    {
+        xarray<int> a = xarray<int>::from_shape({4, 3, 2});
+        xarray<int> b = xarray<int>::from_shape({2, 3, 4});
+        auto v = view(a, all());
+
+        EXPECT_FALSE(broadcastable(v.shape(), b.shape()));
+        EXPECT_FALSE(broadcastable(b.shape(), v.shape()));
+        EXPECT_THROW(assert_compatible_shape(b, v), broadcast_error);
+        EXPECT_THROW(assert_compatible_shape(v, b), broadcast_error);
+        EXPECT_THROW(v = b, broadcast_error);
+        EXPECT_THROW(noalias(v) = b, broadcast_error);
     }
 }
