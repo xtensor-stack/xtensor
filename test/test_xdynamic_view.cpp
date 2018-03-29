@@ -129,6 +129,7 @@ namespace xt
         EXPECT_EQ(20, *iter);
         ++iter;
         EXPECT_EQ(iter, iter_end);
+        EXPECT_FALSE(iter < iter_end);
 
         auto view2 = dynamic_view(view1, slice_vector({range(0, 2), range(1, 3)}));
         auto iter2 = view2.template begin<layout_type::row_major>();
@@ -143,6 +144,7 @@ namespace xt
         EXPECT_EQ(20, *iter2);
         ++iter2;
         EXPECT_EQ(iter2, iter_end2);
+        EXPECT_FALSE(iter2 < iter_end2);
     }
 
     TEST(xdynamic_view, xdynamic_view_on_xfunction)

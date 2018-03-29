@@ -154,6 +154,7 @@ namespace xt
         }
 
         EXPECT_EQ(iter, last) << "iterator doesn't reach the end";
+        EXPECT_FALSE(iter < last);
     }
 
     TYPED_TEST(xiterator_test, end)
