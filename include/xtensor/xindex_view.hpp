@@ -37,7 +37,7 @@ namespace xt
     struct xiterable_inner_types<xindex_view<CT, I>>
     {
         using inner_shape_type = std::array<std::size_t, 1>;
-        using const_stepper = xindexed_stepper<xindex_view<CT, I>>;
+        using const_stepper = xindexed_stepper<xindex_view<CT, I>, true>;
         using stepper = xindexed_stepper<xindex_view<CT, I>, false>;
     };
 

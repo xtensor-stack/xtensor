@@ -114,7 +114,7 @@ namespace xt
             for (; it != end; ++it)
             {
                 // note that we check is_sorted, so this condition is valid
-                if (std::abs(ptrdiff_t(*it) - ptrdiff_t(last_ax)) == 1)
+                if (std::abs(std::ptrdiff_t(*it) - std::ptrdiff_t(last_ax)) == 1)
                 {
                     last_ax = *it;
                     outer_loop_size *= e.shape()[last_ax];
@@ -137,8 +137,8 @@ namespace xt
         {
             std::size_t last_ax = merge_loops(axes.rbegin(), axes.rend());
 
-            iter_shape.erase(iter_shape.begin() + ptrdiff_t(last_ax), iter_shape.end());
-            iter_strides.erase(iter_strides.begin() + ptrdiff_t(last_ax), iter_strides.end());
+            iter_shape.erase(iter_shape.begin() + std::ptrdiff_t(last_ax), iter_shape.end());
+            iter_strides.erase(iter_strides.begin() + std::ptrdiff_t(last_ax), iter_strides.end());
         }
         else if (e.layout() == layout_type::column_major)
         {
@@ -146,8 +146,8 @@ namespace xt
             std::size_t last_ax = merge_loops(axes.begin(), axes.end());
 
             // erasing the front vs the back
-            iter_shape.erase(iter_shape.begin(), iter_shape.begin() + ptrdiff_t(last_ax + 1));
-            iter_strides.erase(iter_strides.begin(), iter_strides.begin() + ptrdiff_t(last_ax + 1));
+            iter_shape.erase(iter_shape.begin(), iter_shape.begin() + std::ptrdiff_t(last_ax + 1));
+            iter_strides.erase(iter_strides.begin(), iter_strides.begin() + std::ptrdiff_t(last_ax + 1));
 
             // and reversing, to make it work with the same next_idx function
             std::reverse(iter_shape.begin(), iter_shape.end());
@@ -163,7 +163,7 @@ namespace xt
             std::size_t i = iter_shape.size();
             for (; i > 0; --i)
             {
-                if (ptrdiff_t(temp_idx[i - 1]) >= ptrdiff_t(iter_shape[i - 1]) - 1)
+                if (std::ptrdiff_t(temp_idx[i - 1]) >= std::ptrdiff_t(iter_shape[i - 1]) - 1)
                 {
                     temp_idx[i - 1] = 0;
                 }
@@ -175,16 +175,16 @@ namespace xt
             }
             return std::make_pair(i == 0,
                                   std::inner_product(temp_idx.begin(), temp_idx.end(),
-                                                     iter_strides.begin(), ptrdiff_t(0)));
+                                                     iter_strides.begin(), std::ptrdiff_t(0)));
         };
 
         auto begin = e.raw_data();
         auto out = result.raw_data();
         auto out_begin = result.raw_data();
 
-        ptrdiff_t next_stride = 0;
+        std::ptrdiff_t next_stride = 0;
 
-        std::pair<bool, ptrdiff_t> idx_res(false, 0);
+        std::pair<bool, std::ptrdiff_t> idx_res(false, 0);
 
         // Remark: eventually some modifications here to make conditions faster where merge + accumulate is the
         // same function (e.g. check std::is_same<decltype(merge_fct), decltype(acc_fct)>::value) ...

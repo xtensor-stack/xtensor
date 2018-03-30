@@ -106,20 +106,20 @@ namespace xt
 
             std::size_t outer_loop_size, inner_loop_size, outer_stride, inner_stride, pos = 0;
 
-            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax) {
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, std::ptrdiff_t ax) {
                 outer_loop_size = std::accumulate(first, first + ax,
                                                   std::size_t(1), std::multiplies<std::size_t>());
                 inner_loop_size = std::accumulate(first + ax + 1, last,
                                                   std::size_t(1), std::multiplies<std::size_t>());
             };
 
-            auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, ptrdiff_t ax) {
+            auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, std::ptrdiff_t ax) {
                 outer_stride = ax == 0 ? 1 : *std::min_element(first, first + ax);
                 inner_stride = (ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last);
             };
 
-            set_loop_sizes(e.shape().begin(), e.shape().end(), static_cast<ptrdiff_t>(axis));
-            set_loop_strides(e.strides().begin(), e.strides().end(), static_cast<ptrdiff_t>(axis));
+            set_loop_sizes(e.shape().begin(), e.shape().end(), static_cast<std::ptrdiff_t>(axis));
+            set_loop_strides(e.strides().begin(), e.strides().end(), static_cast<std::ptrdiff_t>(axis));
 
             if (e.layout() == layout_type::column_major)
             {
@@ -159,7 +159,7 @@ namespace xt
             std::size_t outer_loop_size = 0;
             std::size_t inner_loop_size = 0;
 
-            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, ptrdiff_t ax) {
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, std::ptrdiff_t ax) {
                 outer_loop_size = std::accumulate(first,
                                                   first + ax,
                                                   std::size_t(1), std::multiplies<std::size_t>());
@@ -171,11 +171,11 @@ namespace xt
 
             if (result_type::static_layout == layout_type::row_major)
             {
-                set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<ptrdiff_t>(axis));
+                set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<std::ptrdiff_t>(axis));
             }
             else
             {
-                set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<ptrdiff_t>(axis + 1));
+                set_loop_sizes(result.shape().cbegin(), result.shape().cend(), static_cast<std::ptrdiff_t>(axis + 1));
                 std::swap(inner_loop_size, outer_loop_size);
             }
 

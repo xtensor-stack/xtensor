@@ -347,7 +347,6 @@ namespace xt
         EXPECT_EQ(size_t(1), view1.dimension());
 
         auto iter = view1.template begin<layout_type::row_major>();
-        auto iter_end = view1.template end<layout_type::row_major>();
 
         EXPECT_EQ(6, *iter);
         ++iter;

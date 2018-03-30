@@ -37,7 +37,7 @@ namespace xt
     struct xiterable_inner_types<xgenerator<C, R, S>>
     {
         using inner_shape_type = S;
-        using const_stepper = xindexed_stepper<xgenerator<C, R, S>>;
+        using const_stepper = xindexed_stepper<xgenerator<C, R, S>, true>;
         using stepper = const_stepper;
     };
 
