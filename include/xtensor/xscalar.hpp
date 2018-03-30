@@ -973,7 +973,7 @@ namespace xt
     template <bool is_const, class CT>
     inline void xscalar_stepper<is_const, CT>::to_begin() noexcept
     {
-        p_c = p_c->stepper_begin(p_c->shap()).pc;
+        p_c = p_c->stepper_begin(p_c->shape()).p_c;
     }
 
     template <bool is_const, class CT>
