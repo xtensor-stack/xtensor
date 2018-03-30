@@ -3,7 +3,7 @@
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.5?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.6?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
@@ -41,6 +41,13 @@ Or you can directly install it from the sources:
 cmake -DCMAKE_INSTALL_PREFIX=your_install_prefix
 make install
 ```
+
+## Trying it online
+
+To try out xtensor interactively in your web browser, just click on the binder
+link:
+
+[![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.6?filepath=notebooks/xtensor.ipynb)
 
 ## Dependencies
 
@@ -131,7 +138,7 @@ std::cout << arr1(0, 0) << std::endl;
 
 xt::xarray<int> arr2
   {1, 2, 3, 4, 5, 6, 7, 8, 9};
-  
+
 std::cout << arr2(0);
 ```
 
@@ -142,7 +149,6 @@ Outputs:
 1
 ```
 
-       
 ## The numpy to xtensor cheat sheet
 
 If you are familiar with numpy APIs, and you are interested in xtensor, you can check out the [numpy to xtensor cheat sheet](https://xtensor.readthedocs.io/en/latest/numpy.html) provided in the documentation.
@@ -225,10 +231,25 @@ shape. If a single member of a broadcasting expression has a dynamic dimension (
 
 Therefore, when building an application with xtensor, we recommend using statically dimensioned containers whenever possible to improve the overall performance of the application.
 
-## Python bindings
+## Language bindings
 
-The [xtensor-python](https://github.com/QuantStack/xtensor-python) project provides the implementation of two `xtensor` containers, `pyarray` and `pytensor` which
-effectively wrap numpy arrays, allowing inplace modification, including reshapes.
+### [![xtensor-python](xtensor-python-small.svg)](https://github.com/QuantStack/xtensor-python)
+
+The [xtensor-python](https://github.com/QuantStack/xtensor-python) project provides the implementation of two `xtensor` containers, `pyarray` and `pytensor` which effectively wrap numpy arrays, allowing inplace modification, including reshapes.
+
+Utilities to automatically generate numpy-style universal functions, exposed to Python from scalar function are also provided.
+
+### [![xtensor-julia](xtensor-julia-small.svg)](https://github.com/QuantStack/xtensor-julia)
+
+The [xtensor-julia](https://github.com/QuantStack/xtensor-julia) project provides the implementation of two `xtensor` containers, `jlarray` and `jltensor` which effectively wrap julia arrays, allowing inplace modification, including reshapes.
+
+Like in the Python case, utilities to generate numpy-style universal functions are provided.
+
+### [![xtensor-r](xtensor-r-small.svg)](https://github.com/QuantStack/xtensor-r)
+
+The [xtensor-r](https://github.com/QuantStack/xtensor-r) project provides the implementation of two `xtensor` containers, `rarray` and `rtensor` which effectively wrap R arrays, allowing inplace modification, including reshapes.
+
+Like for the Python and Julia bindings, utilities to generate numpy-style universal functions are provided.
 
 ## Building and running the tests
 
