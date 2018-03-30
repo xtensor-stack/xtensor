@@ -10,6 +10,7 @@
 #define XTENSOR_STORAGE_HPP
 
 #include <algorithm>
+#include <cstddef>
 #include <functional>
 #include <initializer_list>
 #include <iterator>
@@ -1054,7 +1055,7 @@ namespace xt
 
         if (m_end >= m_capacity)
         {
-            ptrdiff_t elt_no = it - m_begin;
+            std::ptrdiff_t elt_no = it - m_begin;
             grow();
             it = m_begin + elt_no;
         }

@@ -165,7 +165,7 @@ namespace xt
      * xindexed_stepper *
      ********************/
 
-    template <class E, bool is_const = true>
+    template <class E, bool is_const>
     class xindexed_stepper
     {
     public:

@@ -27,7 +27,7 @@ namespace xt
         E ev;
         ev.resize({de.size()});
 
-        std::copy(de.begin(), de.end(), ev.begin());
+        std::copy(de.cbegin(), de.cend(), ev.begin());
         std::sort(ev.begin(), ev.end());
 
         return ev;
@@ -40,21 +40,21 @@ namespace xt
         {
             using value_type = typename E::value_type;
             std::size_t n_iters = 1;
-            ptrdiff_t secondary_stride;
+            std::ptrdiff_t secondary_stride;
             if (ev.layout() == layout_type::row_major)
             {
                 n_iters = std::accumulate(ev.shape().begin(), ev.shape().end() - 1,
                                           std::size_t(1), std::multiplies<>());
-                secondary_stride = static_cast<ptrdiff_t>(ev.strides()[ev.dimension() - 2]);
+                secondary_stride = static_cast<std::ptrdiff_t>(ev.strides()[ev.dimension() - 2]);
             }
             else
             {
                 n_iters = std::accumulate(ev.shape().begin() + 1, ev.shape().end(),
                                           std::size_t(1), std::multiplies<>());
-                secondary_stride = static_cast<ptrdiff_t>(ev.strides()[1]);
+                secondary_stride = static_cast<std::ptrdiff_t>(ev.strides()[1]);
             }
 
-            ptrdiff_t offset = 0;
+            std::ptrdiff_t offset = 0;
 
             for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
@@ -106,7 +106,7 @@ namespace xt
         {
             auto axis_numbers = arange<std::size_t>(de.shape().size());
             std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
-            permutation.erase(permutation.begin() + ptrdiff_t(axis));
+            permutation.erase(permutation.begin() + std::ptrdiff_t(axis));
             if (de.layout() == layout_type::row_major)
             {
                 permutation.push_back(axis);
@@ -159,7 +159,7 @@ namespace xt
         };
 
         template <class IT, class F>
-        inline std::size_t cmp_idx(IT iter, IT end, ptrdiff_t inc, F&& cmp)
+        inline std::size_t cmp_idx(IT iter, IT end, std::ptrdiff_t inc, F&& cmp)
         {
             std::size_t idx = 0;
             double min = *iter;
@@ -196,7 +196,7 @@ namespace xt
             }
 
             xt::dynamic_shape<std::size_t> new_shape = e.shape();
-            new_shape.erase(new_shape.begin() + ptrdiff_t(axis));
+            new_shape.erase(new_shape.begin() + std::ptrdiff_t(axis));
 
             result_type result(new_shape);
             auto result_iter = result.begin();
@@ -221,8 +221,8 @@ namespace xt
             {
                 E input;
                 auto axis_numbers = arange<std::size_t>(e.shape().size());
-                std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
-                permutation.erase(permutation.begin() + ptrdiff_t(axis));
+                std::vector<std::size_t> permutation(axis_numbers.cbegin(), axis_numbers.cend());
+                permutation.erase(permutation.begin() + std::ptrdiff_t(axis));
                 if (input.layout() == layout_type::row_major)
                 {
                     permutation.push_back(axis);

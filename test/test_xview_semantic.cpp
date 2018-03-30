@@ -252,7 +252,6 @@ namespace xt
     TYPED_TEST(view_semantic, a_plus_equal_b)
     {
         view_op_tester<std::plus<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major += row_major");
@@ -294,7 +293,6 @@ namespace xt
     TYPED_TEST(view_semantic, a_minus_equal_b)
     {
         view_op_tester<std::minus<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major -= row_major");
@@ -336,7 +334,6 @@ namespace xt
     TYPED_TEST(view_semantic, a_times_equal_b)
     {
         view_op_tester<std::multiplies<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major *= row_major");
@@ -378,7 +375,6 @@ namespace xt
     TYPED_TEST(view_semantic, a_divide_by_equal_b)
     {
         view_op_tester<std::divides<>, TypeParam> t;
-        auto viewa = view(t.a, t.x_slice, t.y_slice, t.z_slice);
 
         {
             SCOPED_TRACE("row_major /= row_major");
