@@ -286,8 +286,8 @@ namespace xt
 
     protected:
 
-        template <class Func, class U = std::enable_if<!std::is_base_of<Func, self_type>::value>>
-        xfunction_base(Func&& f, CT... e) noexcept;
+        template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<Func, self_type>::value>>
+        xfunction_base(Func&& f, CTA&&... e) noexcept;
 
         ~xfunction_base() = default;
 
@@ -511,8 +511,8 @@ namespace xt
         using self_type = xfunction<F, R, CT...>;
         using base_type = xfunction_base<F, R, CT...>;
 
-        template <class Func, class U = std::enable_if<!std::is_base_of<Func, self_type>::value>>
-        xfunction(Func&& f, CT... e) noexcept;
+        template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<Func, self_type>::value>>
+        xfunction(Func&& f, CTA&&... e) noexcept;
 
         ~xfunction() = default;
 
@@ -538,9 +538,9 @@ namespace xt
      * @param e the \ref xexpression arguments
      */
     template <class F, class R, class... CT>
-    template <class Func, class U>
-    inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CT... e) noexcept
-        : m_e(e...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(0))),
+    template <class Func, class... CTA, class U>
+    inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CTA&&... e) noexcept
+        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(0))),
           m_shape_computed(false)
     {
     }
@@ -1112,9 +1112,9 @@ namespace xt
      * @param e the \ref xexpression arguments
      */
     template <class F, class R, class... CT>
-    template <class Func, class U>
-    xfunction<F, R, CT...>::xfunction(Func&& f, CT... e) noexcept
-        : base_type(std::forward<Func>(f), e...)
+    template <class Func, class... CTA, class U>
+    xfunction<F, R, CT...>::xfunction(Func&& f, CTA&&... e) noexcept
+        : base_type(std::forward<Func>(f), std::forward<CTA>(e)...)
     {
     }
 }

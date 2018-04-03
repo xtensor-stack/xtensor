@@ -93,8 +93,8 @@ namespace xt
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
-        template <class I2>
-        xindex_view(CT e, I2&& indices) noexcept;
+        template <class CTA, class I2>
+        xindex_view(CTA&& e, I2&& indices) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -189,7 +189,8 @@ namespace xt
         using xexpression_type = std::decay_t<ECT>;
         using const_reference = typename xexpression_type::const_reference;
 
-        xfiltration(ECT e, CCT condition);
+        template <class ECTA, class CCTA>
+        xfiltration(ECTA&& e, CCTA&& condition);
 
         template <class E>
         disable_xexpression<E, self_type&> operator=(const E&);
@@ -234,9 +235,9 @@ namespace xt
      * @param indices the indices to select
      */
     template <class CT, class I>
-    template <class I2>
-    inline xindex_view<CT, I>::xindex_view(CT e, I2&& indices) noexcept
-        : m_e(e), m_indices(std::forward<I2>(indices)), m_shape({m_indices.size()})
+    template <class CTA, class I2>
+    inline xindex_view<CT, I>::xindex_view(CTA&& e, I2&& indices) noexcept
+        : m_e(std::forward<CTA>(e)), m_indices(std::forward<I2>(indices)), m_shape({ m_indices.size() })
     {
     }
     //@}
@@ -488,8 +489,9 @@ namespace xt
      * @param condition the filtering \ref xexpression to apply.
      */
     template <class ECT, class CCT>
-    inline xfiltration<ECT, CCT>::xfiltration(ECT e, CCT condition)
-        : m_e(e), m_condition(condition)
+    template <class ECTA, class CCTA>
+    inline xfiltration<ECT, CCT>::xfiltration(ECTA&& e, CCTA&& condition)
+        : m_e(std::forward<ECTA>(e)), m_condition(std::forward<CCTA>(condition))
     {
     }
     //@}
