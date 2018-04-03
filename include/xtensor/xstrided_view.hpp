@@ -201,10 +201,11 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
 
-        xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept;
+        template <class CTA>
+        xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept;
 
-        template <class FST>
-        xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset, layout_type layout, FST&& flatten_strides, layout_type flatten_layout) noexcept;
+        template <class CTA, class FST>
+        xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout, FST&& flatten_strides, layout_type flatten_layout) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -334,8 +335,9 @@ namespace xt
      * @param layout the layout of the view
      */
     template <class CT, class S, class FS>
-    inline xstrided_view<CT, S, FS>::xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept
-        : m_e(e),
+    template <class CTA>
+    inline xstrided_view<CT, S, FS>::xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept
+        : m_e(std::forward<CTA>(e)),
           m_data(detail::get_flat_storage<CT>(m_e)),
           m_shape(std::move(shape)),
           m_strides(std::move(strides)),
@@ -347,9 +349,9 @@ namespace xt
     }
 
     template <class CT, class S, class FS>
-    template <class FST>
-    inline xstrided_view<CT, S, FS>::xstrided_view(CT e, S&& shape, S&& strides, std::size_t offset, layout_type layout, FST&& flatten_strides, layout_type flatten_layout) noexcept
-        : m_e(e),
+    template <class CTA, class FST>
+    inline xstrided_view<CT, S, FS>::xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout, FST&& flatten_strides, layout_type flatten_layout) noexcept
+        : m_e(std::forward<CTA>(e)),
           m_data(detail::get_flat_storage<CT>(m_e, std::forward<FST>(flatten_strides), flatten_layout)),
           m_shape(std::move(shape)),
           m_strides(std::move(strides)),
