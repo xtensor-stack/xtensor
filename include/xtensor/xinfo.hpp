@@ -91,7 +91,6 @@ namespace xt
     std::string info(const T& t)
     {
         std::string s;
-        using shape_type = typename T::shape_type;
         s += "\nValue type: " + type_to_string<typename T::value_type>();
         s += "\nLayout: ";
         if (t.layout() == layout_type::row_major)

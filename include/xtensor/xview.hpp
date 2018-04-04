@@ -736,13 +736,13 @@ namespace xt
         auto func = [](const auto& s) { return xt::step_size(s); };
         size_type i = 0;
 
-        for (; i < sizeof...(S); i++)
+        for (; i < sizeof...(S); ++i)
         {
-            strides[i - integral_count_before<S...>(i)] =
+            strides[i - integral_count_before<S...>(i)] +=
                 m_e.strides()[i - newaxis_count_before<S...>(i)] *
                 apply<size_type>(i, func, m_slices);
         }
-        for (; i < strides.size(); ++i)
+        for (; i < strides.size() + integral_count<S...>(); ++i)
         {
             strides[i - integral_count<S...>()] =
                 m_e.strides()[i - newaxis_count<S...>()];
