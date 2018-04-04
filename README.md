@@ -251,6 +251,16 @@ The [xtensor-r](https://github.com/QuantStack/xtensor-r) project provides the im
 
 Like for the Python and Julia bindings, utilities to generate numpy-style universal functions are provided.
 
+## Library bindings
+
+### [![xtensor-blas](xtensor-blas-small.svg)](https://github.com/QuantStack/xtensor-blas)
+
+The [xtensor-blas](https://github.com/QuantStack/xtensor-blas) project provides bindings to BLAS libraries, enabling linear-algebra operations on xtensor expressions.
+
+### [![xtensor-io](xtensor-io-small.svg)](https://github.com/QuantStack/xtensor-io)
+
+The [xtensor-io](https://github.com/QuantStack/xtensor-io) project enables the loading of a variety of file formats into xtensor expressions, such as image files, sound files, as well as  NumPy npy and npz files.
+
 ## Building and running the tests
 
 Building the tests requires the [GTest](https://github.com/google/googletest) testing framework and [cmake](https://cmake.org).
