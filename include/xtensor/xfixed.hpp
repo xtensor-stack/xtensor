@@ -171,7 +171,7 @@ namespace xt
         template <std::size_t I, std::size_t... X>
         struct calculate_stride_row_major
         {
-            constexpr static std::size_t value = (at<sizeof...(X) - I - 1, X...>::value == 1 ? 0 : at<sizeof...(X) - I - 1, X...>::value) * 
+            constexpr static std::size_t value = (at<sizeof...(X) - I, X...>::value == 1 ? 0 : at<sizeof...(X) - I, X...>::value) *
                 (calculate_stride_row_major<I - 1, X...>::value == 0 ? 
                     1 : calculate_stride_row_major<I - 1, X...>::value);
         };
