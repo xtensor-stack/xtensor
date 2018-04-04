@@ -10,12 +10,15 @@
 #define XTENSOR_ASSIGN_HPP
 
 #include <algorithm>
+#include <type_traits>
+#include <utility>
 
 #include <xtl/xsequence.hpp>
 
 #include "xconcepts.hpp"
 #include "xexpression.hpp"
 #include "xiterator.hpp"
+#include "xstrides.hpp"
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
 
