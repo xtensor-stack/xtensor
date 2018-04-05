@@ -86,12 +86,18 @@ namespace xt
 
         EXPECT_TRUE(std::equal(arm.strides().begin(), arm.strides().end(), brm.strides().begin()));
         EXPECT_EQ(arm.strides().size(), brm.strides().size());
+        EXPECT_TRUE(std::equal(arm.backstrides().begin(), arm.backstrides().end(), brm.backstrides().begin()));
+        EXPECT_EQ(arm.backstrides().size(), brm.backstrides().size());
+        EXPECT_EQ(arm.size(), 3 * 7 * 2 * 5 * 3);
 
         xtensorf<double, xshape<3, 7, 2, 5, 3>, layout_type::column_major> acm;
         xtensor<double, 5, layout_type::column_major> bcm = xtensor<double, 5, layout_type::column_major>::from_shape({3, 7, 2, 5, 3});
 
         EXPECT_TRUE(std::equal(acm.strides().begin(), acm.strides().end(), bcm.strides().begin()));
         EXPECT_EQ(acm.strides().size(), bcm.strides().size());
+        EXPECT_TRUE(std::equal(acm.backstrides().begin(), acm.backstrides().end(), bcm.backstrides().begin()));
+        EXPECT_EQ(acm.backstrides().size(), bcm.backstrides().size());
+        EXPECT_EQ(acm.size(), 3 * 7 * 2 * 5 * 3);
 
         auto s = get_strides<layout_type::row_major>(xshape<3, 4, 5>());
         EXPECT_EQ(s[0], 20);
