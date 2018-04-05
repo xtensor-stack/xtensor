@@ -734,19 +734,15 @@ namespace xt
         strides_type strides = xtl::make_sequence<strides_type>(dimension(), 0);
 
         auto func = [](const auto& s) { return xt::step_size(s); };
-        size_type i = 0;
 
-        for (; i < sizeof...(S); ++i)
+        for (size_type i = 0; i != dimension(); ++i)
         {
-            strides[i - integral_count_before<S...>(i)] +=
-                m_e.strides()[i - newaxis_count_before<S...>(i)] *
-                apply<size_type>(i, func, m_slices);
+            size_type index = integral_skip<S...>(i);
+            strides[i] = index < sizeof...(S) ?
+                apply<size_type>(index, func, m_slices) * m_e.strides()[index - newaxis_count_before<S...>(index)] :
+                m_e.strides()[index - newaxis_count_before<S...>(index)];
         }
-        for (; i < strides.size() + integral_count<S...>(); ++i)
-        {
-            strides[i - integral_count<S...>()] =
-                m_e.strides()[i - newaxis_count<S...>()];
-        }
+
         return strides;
     }
 
