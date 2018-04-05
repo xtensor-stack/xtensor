@@ -498,15 +498,17 @@ namespace xt
     template <class T>
     class has_raw_data_interface
     {
+        // the test function has one argument -- the return type of the function we're searching if it exists
         template <class C>
-        static std::true_type test(decltype(std::declval<C>().raw_data_offset()));
+        static std::true_type test(decltype(std::declval<C>().raw_data()));
 
         template <class C>
         static std::false_type test(...);
 
     public:
 
-        constexpr static bool value = decltype(test<T>(std::size_t(0)))::value == true;
+        // we try to call the test function with the return type and report the result
+        constexpr static bool value = decltype(test<T>(std::declval<const std::add_pointer_t<typename T::value_type>>()))::value == true;
     };
 
     /******************
