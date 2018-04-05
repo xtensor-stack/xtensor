@@ -248,75 +248,75 @@ namespace xt
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
                                 std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<int>>
+                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
         get(std::size_t /*size*/) const
         {
-            return xstepped_range<int>(m_min, m_max, m_step);
+            return xstepped_range<std::ptrdiff_t>(m_min, m_max, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value && 
                                 std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<int>>
+                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            return xstepped_range<int>(m_step > 0 ? 0 : int(size) - 1, m_max, m_step);
+            return xstepped_range<std::ptrdiff_t>(m_step > 0 ? 0 : int(size) - 1, m_max, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
                                 !std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<int>>
+                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            return xstepped_range<int>(m_min, m_step > 0 ? int(size) : -1, m_step);
+            return xstepped_range<std::ptrdiff_t>(m_min, m_step > 0 ? int(size) : -1, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
                                 std::is_integral<MA>::value &&
-                               !std::is_integral<STEP>::value, xrange<int>>
+                               !std::is_integral<STEP>::value, xrange<std::ptrdiff_t>>
         get(std::size_t /*size*/) const
         {
-            return xrange<int>(static_cast<int>(m_min), static_cast<int>(m_max));
+            return xrange<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(m_min), static_cast<std::ptrdiff_t>(m_max));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value &&
                                 !std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<int>>
+                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
             int min_val_arg = m_step > 0 ? 0 : int(size) - 1;
             int max_val_arg = m_step > 0 ? int(size) : -1;
-            return xstepped_range<int>(min_val_arg, max_val_arg, m_step);
+            return xstepped_range<std::ptrdiff_t>(min_val_arg, max_val_arg, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
                                 !std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value, xrange<std::size_t>>
+                                !std::is_integral<STEP>::value, xrange<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            return xrange<std::size_t>(std::size_t(m_min), size);
+            return xrange<std::ptrdiff_t>(std::size_t(m_min), size);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value &&
                                 std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value, xrange<std::size_t>>
+                                !std::is_integral<STEP>::value, xrange<std::ptrdiff_t>>
         get(std::size_t /*size*/) const
         {
-            return xrange<std::size_t>(0, std::size_t(m_max));
+            return xrange<std::ptrdiff_t>(0, std::size_t(m_max));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value &&
                                 !std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value, xall<std::size_t>>
+                                !std::is_integral<STEP>::value, xall<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            return xall<std::size_t>(size);
+            return xall<std::ptrdiff_t>(size);
         }
 
     private:
@@ -325,6 +325,34 @@ namespace xt
         B m_max;
         C m_step;
     };
+
+    namespace detail
+    {
+        template <class T, class E = void>
+        struct cast_if_integer
+        {
+            using type = T;
+
+            type operator()(T& t)
+            {
+                return t;
+            }
+        };
+
+        template <class T>
+        struct cast_if_integer<T, std::enable_if_t<std::is_integral<T>::value>>
+        {
+            using type = std::ptrdiff_t;
+
+            type operator()(T& t)
+            {
+                return static_cast<type>(t);
+            }
+        };
+
+        template <class T>
+        using cast_if_integer_t = typename cast_if_integer<T>::type;
+    }
 
     /**
      * Select a range from min_val to max_val.
@@ -343,7 +371,8 @@ namespace xt
     template <class A, class B>
     inline auto range(A min_val, B max_val)
     {
-        return xrange_adaptor<A, B, placeholders::xtuph>(min_val, max_val, placeholders::xtuph());
+        return xrange_adaptor<detail::cast_if_integer_t<A>, detail::cast_if_integer_t<B>, placeholders::xtuph>(
+            detail::cast_if_integer<A>{}(min_val), detail::cast_if_integer<B>{}(max_val), placeholders::xtuph());
     }
 
     /**
@@ -360,7 +389,8 @@ namespace xt
     template <class A, class B, class C>
     inline auto range(A min_val, B max_val, C step)
     {
-        return xrange_adaptor<A, B, C>(min_val, max_val, step);
+        return xrange_adaptor<detail::cast_if_integer_t<A>, detail::cast_if_integer_t<B>, detail::cast_if_integer_t<C>>(
+            detail::cast_if_integer<A>{}(min_val), detail::cast_if_integer<B>{}(max_val), detail::cast_if_integer<C>{}(step));
     }
 
 
@@ -540,6 +570,7 @@ namespace xt
         : m_min(min_val), m_size(size_type(std::ceil(double(max_val - min_val) / double(step)))), m_step(step)
     {
     }
+
 
     template <class T>
     inline auto xstepped_range<T>::operator()(size_type i) const noexcept -> size_type

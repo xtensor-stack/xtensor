@@ -857,19 +857,18 @@ namespace xt
             }
 
             template <class T>
-            std::array<int, 3> operator()(const T& t) const
+            std::array<std::ptrdiff_t, 3> operator()(const T& t) const
             {
                 auto sl = get_slice_implementation(m_expr, t, idx);
-                return std::array<int, 3>({int(sl(0)), int(sl.size()), int(sl.step_size())});
+                return std::array<std::ptrdiff_t, 3>({std::ptrdiff_t(sl(0)), std::ptrdiff_t(sl.size()), std::ptrdiff_t(sl.step_size())});
             }
 
-            std::array<int, 3> operator()(const int& /*t*/) const
+            std::array<std::ptrdiff_t, 3> operator()(const std::ptrdiff_t& /*t*/) const
             {
-                return std::array<int, 3>({0, 0, 0});
+                return std::array<std::ptrdiff_t, 3>({0, 0, 0});
             }
         };
     }
-
 
     template <class T>
     using slice_variant = xtl::variant<
@@ -895,7 +894,7 @@ namespace xt
      * @typedef slice_vector
      * @brief vector of slices used to build a `xstrided_view`
      */
-    using slice_vector = std::vector<slice_variant<int>>;
+    using slice_vector = std::vector<slice_variant<std::ptrdiff_t>>;
 
     /**
      * Function to create a dynamic view from
@@ -937,7 +936,7 @@ namespace xt
                 ++dimension;
                 ++n_newaxis;
             }
-            else if (xtl::get_if<int>(&el) != nullptr)
+            else if (xtl::get_if<std::ptrdiff_t>(&el) != nullptr)
             {
                 --dimension;
                 --dimension_check;
@@ -988,7 +987,7 @@ namespace xt
 
         for (; i < MS(slices.size()); ++i)
         {
-            auto ptr = xtl::get_if<int>(&slices[MU(i)]);
+            auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[MU(i)]);
             if (ptr != nullptr)
             {
                 std::size_t slice0 = static_cast<std::size_t>(*ptr);
@@ -1020,7 +1019,7 @@ namespace xt
             else
             {
                 slice_getter.idx = MU(i - axis_skip);
-                std::array<int, 3> info = xtl::visit(slice_getter, slices[MU(i)]);
+                std::array<std::ptrdiff_t, 3> info = xtl::visit(slice_getter, slices[MU(i)]);
                 offset += std::size_t(info[0]) * old_strides[MU(i - axis_skip)];
                 new_shape[idx] = std::size_t(info[1]);
                 new_strides[idx] = std::size_t(info[2]) * old_strides[MU(i - axis_skip)];
