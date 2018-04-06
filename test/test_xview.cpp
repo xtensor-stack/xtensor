@@ -696,4 +696,38 @@ namespace xt
         EXPECT_THROW(v = b, broadcast_error);
         EXPECT_THROW(noalias(v) = b, broadcast_error);
     }
+
+    TEST(xview, strides)
+    {
+        // Strides: 72/24/6/1
+        xarray<int, layout_type::row_major> a = xarray<int, layout_type::row_major>::from_shape({5, 3, 4, 6});
+
+        auto s1 = view(a, 1, 1, xt::all(), xt::all()).strides();
+        std::vector<std::size_t> s1e = {6, 1};
+        EXPECT_EQ(s1, s1e);
+
+        auto s2 = view(a, 1, xt::all(), xt::all(), 1).strides();
+        std::vector<std::size_t> s2e = {24, 6};
+        EXPECT_EQ(s2, s2e);
+
+        auto s3 = view(a, 1, xt::all(), 1, xt::newaxis(), xt::newaxis(), xt::all()).strides();
+        std::vector<std::size_t> s3e = {24, 0, 0, 1};
+        EXPECT_EQ(s3, s3e);
+
+        auto s4 = view(a, xt::range(0, 1, 2), 1, 0, xt::all(), xt::newaxis()).strides();
+        std::vector<std::size_t> s4e = {72 * 2, 1, 0};
+        EXPECT_EQ(s4, s4e);
+
+        auto s5 = view(a, xt::all(), 1).strides();
+        std::vector<std::size_t> s5e = {72, 6, 1};
+        EXPECT_EQ(s5, s5e);
+
+        auto s6 = view(a, xt::all(), 1, 1, xt::newaxis(), xt::all()).strides();
+        std::vector<std::size_t> s6e = {72, 0, 1};
+        EXPECT_EQ(s6, s6e);
+
+        auto s7 = view(a, xt::all(), 1, xt::newaxis(), xt::all()).strides();
+        std::vector<std::size_t> s7e = {72, 0, 6, 1};
+        EXPECT_EQ(s7, s7e);
+    }
 }
