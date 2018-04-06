@@ -11,8 +11,13 @@
 #include <type_traits>
 #include <tuple>
 #include <complex>
-#include "xtensor/xutils.hpp"
+
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xstrided_view.hpp"
 #include "xtensor/xshape.hpp"
+#include "xtensor/xutils.hpp"
 
 namespace xt
 {
@@ -169,5 +174,30 @@ namespace xt
         EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<int>>, uint64_t>::value));
         EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<double>>, double>::value));
         EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<long double>>, long double>::value));
+    }
+
+    TEST(utils, has_raw_data_interface)
+    {
+        bool b = has_raw_data_interface<xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_raw_data_interface<const xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_raw_data_interface<const xtensor<double, 2>>::value;
+        EXPECT_TRUE(b);
+        b = has_raw_data_interface<const xtensorf<double, xshape<3, 4>>>::value;
+        EXPECT_TRUE(b);
+
+        xarray<int> a = xarray<int>::from_shape({3, 4, 5});
+        auto f = a + a - 23;
+        auto v2 = dynamic_view(a, {all(), 1, all()});
+        auto vv2 = dynamic_view(v2, {all(), 2});
+        auto v3 = dynamic_view(f, {all(), 2});
+
+        b = has_raw_data_interface<decltype(v2)>::value;
+        EXPECT_TRUE(b);
+        b = has_raw_data_interface<decltype(vv2)>::value;
+        EXPECT_TRUE(b);
+        b = has_raw_data_interface<decltype(v3)>::value;
+        EXPECT_FALSE(b);
     }
 }

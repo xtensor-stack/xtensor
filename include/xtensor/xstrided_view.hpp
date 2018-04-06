@@ -285,8 +285,12 @@ namespace xt
         auto& expression() noexcept;
         const auto& expression() const noexcept;
 
-        value_type* raw_data() noexcept;
-        const value_type* raw_data() const noexcept;
+        template <class E = std::decay_t<CT>>
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, value_type*>
+        raw_data() noexcept;
+        template <class E = std::decay_t<CT>>
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, const value_type*>
+        raw_data() const noexcept;
 
         size_type raw_data_offset() const noexcept;
 
@@ -458,13 +462,17 @@ namespace xt
     }
 
     template <class CT, class S, class FS>
-    inline auto xstrided_view<CT, S, FS>::raw_data() noexcept -> value_type*
+    template <class E>
+    inline auto xstrided_view<CT, S, FS>::raw_data() noexcept ->
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, value_type*>
     {
         return m_e.raw_data();
     }
 
     template <class CT, class S, class FS>
-    inline auto xstrided_view<CT, S, FS>::raw_data() const noexcept -> const value_type*
+    template <class E>
+    inline auto xstrided_view<CT, S, FS>::raw_data() const noexcept ->
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, const value_type*>
     {
         return m_e.raw_data();
     }
@@ -909,19 +917,18 @@ namespace xt
             }
 
             template <class T>
-            std::array<int, 3> operator()(const T& t) const
+            std::array<std::ptrdiff_t, 3> operator()(const T& t) const
             {
-                auto sl = get_slice_from_shape(m_shape, t, idx);
-                return std::array<int, 3>({{int(sl(0)), int(sl.size()), int(sl.step_size())}});
+                auto sl = get_slice_implementation(m_expr, t, idx);
+                return std::array<std::ptrdiff_t, 3>({std::ptrdiff_t(sl(0)), std::ptrdiff_t(sl.size()), std::ptrdiff_t(sl.step_size())});
             }
 
-            std::array<int, 3> operator()(const int& /*t*/) const
+            std::array<std::ptrdiff_t, 3> operator()(const std::ptrdiff_t& /*t*/) const
             {
-                return std::array<int, 3>({{0, 0, 0}});
+                return std::array<std::ptrdiff_t, 3>({0, 0, 0});
             }
         };
     }
-
 
     template <class T>
     using slice_variant = xtl::variant<
@@ -947,7 +954,7 @@ namespace xt
      * @typedef slice_vector
      * @brief vector of slices used to build a `xstrided_view`
      */
-    using slice_vector = std::vector<slice_variant<int>>;
+    using slice_vector = std::vector<slice_variant<std::ptrdiff_t>>;
 
     namespace detail
     {
@@ -966,7 +973,7 @@ namespace xt
                     ++dimension;
                     ++n_newaxis;
                 }
-                else if (xtl::get_if<int>(&el) != nullptr)
+                else if (xtl::get_if<std::ptrdiff_t>(&el) != nullptr)
                 {
                     --dimension;
                     --dimension_check;
@@ -1017,7 +1024,7 @@ namespace xt
 
             for (; i < MS(slices.size()); ++i)
             {
-                auto ptr = xtl::get_if<int>(&slices[MU(i)]);
+                auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[MU(i)]);
                 if (ptr != nullptr)
                 {
                     std::size_t slice0 = static_cast<std::size_t>(*ptr);
@@ -1049,7 +1056,7 @@ namespace xt
                 else
                 {
                     slice_getter.idx = MU(i - axis_skip);
-                    std::array<int, 3> info = xtl::visit(slice_getter, slices[MU(i)]);
+                    std::array<std::ptrdiff_t, 3> info = xtl::visit(slice_getter, slices[MU(i)]);
                     offset += std::size_t(info[0]) * old_strides[MU(i - axis_skip)];
                     new_shape[idx] = std::size_t(info[1]);
                     new_strides[idx] = std::size_t(info[2]) * old_strides[MU(i - axis_skip)];
@@ -1404,7 +1411,7 @@ namespace xt
             end -= std::find_if(e.crbegin(), e.crend(), find_fun) - e.crbegin();
         }
 
-        return dynamic_view(std::forward<E>(e), { range(static_cast<int>(begin), static_cast<int>(end)) });
+        return dynamic_view(std::forward<E>(e), { range(begin, end) });
     }
 
     /**
@@ -1621,7 +1628,7 @@ namespace xt
         std::vector<decltype(dynamic_view(e, sv))> result;
         for (std::size_t i = 0; i < n; ++i)
         {
-            sv[axis] = range(static_cast<int>(i * step), static_cast<int>((i + 1) * step));
+            sv[axis] = range(i * step, (i + 1) * step);
             result.emplace_back(dynamic_view(e, sv));
         }
         return result;

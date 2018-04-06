@@ -484,4 +484,12 @@ namespace xt
         EXPECT_EQ(v2(0, 2), 5);
         EXPECT_TRUE(xt::all(equal(vv2, 5)));
     }
+ 
+    TEST(xdynamic_view, range_integer_casting)
+    {
+        // just check compilation
+        auto arr = xarray<int>::from_shape({3, 4, 5});
+        auto a = dynamic_view(arr, {range(0, std::ptrdiff_t(2)), 323});
+        auto b = dynamic_view(arr, {range(std::size_t(0), 2), 323});
+    }
 }
