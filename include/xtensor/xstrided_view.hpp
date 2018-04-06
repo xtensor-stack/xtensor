@@ -281,8 +281,12 @@ namespace xt
         container_type& data() noexcept;
         const container_type& data() const noexcept;
 
-        value_type* raw_data() noexcept;
-        const value_type* raw_data() const noexcept;
+        template <class E = std::decay_t<CT>>
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, value_type*>
+        raw_data() noexcept;
+        template <class E = std::decay_t<CT>>
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, const value_type*>
+        raw_data() const noexcept;
 
         size_type raw_data_offset() const noexcept;
 
@@ -454,13 +458,17 @@ namespace xt
     }
 
     template <class CT, class S, class FS>
-    inline auto xstrided_view<CT, S, FS>::raw_data() noexcept -> value_type*
+    template <class E>
+    inline auto xstrided_view<CT, S, FS>::raw_data() noexcept ->
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, value_type*>
     {
         return m_e.raw_data();
     }
 
     template <class CT, class S, class FS>
-    inline auto xstrided_view<CT, S, FS>::raw_data() const noexcept -> const value_type*
+    template <class E>
+    inline auto xstrided_view<CT, S, FS>::raw_data() const noexcept ->
+        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, const value_type*>
     {
         return m_e.raw_data();
     }
