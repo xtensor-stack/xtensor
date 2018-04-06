@@ -919,13 +919,13 @@ namespace xt
             template <class T>
             std::array<std::ptrdiff_t, 3> operator()(const T& t) const
             {
-                auto sl = get_slice_implementation(m_expr, t, idx);
-                return std::array<std::ptrdiff_t, 3>({std::ptrdiff_t(sl(0)), std::ptrdiff_t(sl.size()), std::ptrdiff_t(sl.step_size())});
+                auto sl = get_slice_from_shape(m_shape, t, idx);
+                return {std::ptrdiff_t(sl(0)), std::ptrdiff_t(sl.size()), std::ptrdiff_t(sl.step_size())};
             }
 
             std::array<std::ptrdiff_t, 3> operator()(const std::ptrdiff_t& /*t*/) const
             {
-                return std::array<std::ptrdiff_t, 3>({0, 0, 0});
+                return {0, 0, 0};
             }
         };
     }
@@ -1056,7 +1056,7 @@ namespace xt
                 else
                 {
                     slice_getter.idx = MU(i - axis_skip);
-                    std::array<std::ptrdiff_t, 3> info = xtl::visit(slice_getter, slices[MU(i)]);
+                    auto info = xtl::visit(slice_getter, slices[MU(i)]);
                     offset += std::size_t(info[0]) * old_strides[MU(i - axis_skip)];
                     new_shape[idx] = std::size_t(info[1]);
                     new_strides[idx] = std::size_t(info[2]) * old_strides[MU(i - axis_skip)];
