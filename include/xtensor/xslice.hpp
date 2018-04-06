@@ -333,7 +333,7 @@ namespace xt
         {
             using type = T;
 
-            type operator()(T& t)
+            type operator()(T t)
             {
                 return t;
             }
@@ -344,7 +344,7 @@ namespace xt
         {
             using type = std::ptrdiff_t;
 
-            type operator()(T& t)
+            type operator()(T t)
             {
                 return static_cast<type>(t);
             }
