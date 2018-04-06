@@ -88,6 +88,10 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
+        size_type step_size(size_type i, size_type n = 1) const noexcept;
+        size_type revert_index(size_type i) const noexcept;
+
+        bool contains(size_type i) const noexcept;
 
     private:
 
@@ -113,6 +117,10 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
+        size_type step_size(size_type i, size_type n = 1) const noexcept;
+        size_type revert_index(size_type i) const noexcept;
+
+        bool contains(size_type i) const noexcept;
 
     private:
 
@@ -139,6 +147,10 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
+        size_type step_size(size_type i, size_type n = 1) const noexcept;
+        size_type revert_index(size_type i) const noexcept;
+
+        bool contains(size_type i) const noexcept;
 
     private:
 
@@ -172,7 +184,6 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
-
     };
 
     struct xellipsis_tag
@@ -217,6 +228,10 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
+        size_type step_size(size_type i, size_type n = 1) const noexcept;
+        size_type revert_index(size_type i) const noexcept;
+
+        bool contains(size_type i) const noexcept;
     };
 
     struct xnewaxis_tag
@@ -561,6 +576,24 @@ namespace xt
         return 1;
     }
 
+    template <class T>
+    inline auto xrange<T>::step_size(size_type /*i*/, size_type n) const noexcept -> size_type
+    {
+        return n;
+    }
+
+    template <class T>
+    inline auto xrange<T>::revert_index(size_type i) const noexcept -> size_type
+    {
+        return i - m_min;
+    }
+
+    template <class T>
+    inline bool xrange<T>::contains(size_type i) const noexcept
+    {
+        return i >= m_min && i < m_min + m_size;
+    }
+
     /********************************
      * xtepped_range implementation *
      ********************************/
@@ -590,6 +623,24 @@ namespace xt
         return m_step;
     }
 
+    template <class T>
+    inline auto xstepped_range<T>::step_size(size_type /*i*/, size_type n) const noexcept -> size_type
+    {
+        return m_step * n;
+    }
+
+    template <class T>
+    inline auto xstepped_range<T>::revert_index(size_type i) const noexcept -> size_type
+    {
+        return (i - m_min) / m_step;
+    }
+
+    template <class T>
+    inline bool xstepped_range<T>::contains(size_type i) const noexcept
+    {
+        return i >= m_min && i < m_min + m_size * m_step && ((i - m_min) % m_step == 0);
+    }
+
     /***********************
      * xall implementation *
      ***********************/
@@ -616,6 +667,24 @@ namespace xt
     inline auto xall<T>::step_size() const noexcept -> size_type
     {
         return 1;
+    }
+
+    template <class T>
+    inline auto xall<T>::step_size(size_type /*i*/, size_type n) const noexcept -> size_type
+    {
+        return n;
+    }
+
+    template <class T>
+    inline auto xall<T>::revert_index(size_type i) const noexcept -> size_type
+    {
+        return i;
+    }
+
+    template <class T>
+    inline bool xall<T>::contains(size_type i) const noexcept
+    {
+        return i < m_size;
     }
 
     /****************************
@@ -660,6 +729,24 @@ namespace xt
     inline auto xnewaxis<T>::step_size() const noexcept -> size_type
     {
         return 0;
+    }
+
+    template <class T>
+    inline auto xnewaxis<T>::step_size(size_type /*i*/, size_type /*n*/) const noexcept -> size_type
+    {
+        return 0;
+    }
+
+    template <class T>
+    inline auto xnewaxis<T>::revert_index(size_type i) const noexcept -> size_type
+    {
+        return i;
+    }
+
+    template <class T>
+    inline bool xnewaxis<T>::contains(size_type i) const noexcept
+    {
+        return i == 0;
     }
 }
 
