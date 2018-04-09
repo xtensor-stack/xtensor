@@ -274,17 +274,19 @@ namespace xt
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
-                                std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
-        get(std::size_t /*size*/) const
+                                    std::is_integral<MA>::value &&
+                                    std::is_integral<STEP>::value,
+                                xstepped_range<std::ptrdiff_t>>
+            get(std::size_t /*size*/) const
         {
             return xstepped_range<std::ptrdiff_t>(m_min, m_max, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
-        inline std::enable_if_t<!std::is_integral<MI>::value && 
-                                std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
+        inline std::enable_if_t<!std::is_integral<MI>::value &&
+                                    std::is_integral<MA>::value &&
+                                    std::is_integral<STEP>::value,
+                                xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
             return xstepped_range<std::ptrdiff_t>(m_step > 0 ? 0 : int(size) - 1, m_max, m_step);
@@ -292,8 +294,9 @@ namespace xt
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
+                                    !std::is_integral<MA>::value &&
+                                    std::is_integral<STEP>::value,
+                                xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
             return xstepped_range<std::ptrdiff_t>(m_min, m_step > 0 ? int(size) : -1, m_step);
@@ -301,17 +304,19 @@ namespace xt
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
-                                std::is_integral<MA>::value &&
-                               !std::is_integral<STEP>::value, xrange<std::ptrdiff_t>>
-        get(std::size_t /*size*/) const
+                                    std::is_integral<MA>::value &&
+                                    !std::is_integral<STEP>::value,
+                                xrange<std::ptrdiff_t>>
+            get(std::size_t /*size*/) const
         {
             return xrange<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(m_min), static_cast<std::ptrdiff_t>(m_max));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                std::is_integral<STEP>::value, xstepped_range<std::ptrdiff_t>>
+                                    !std::is_integral<MA>::value &&
+                                    std::is_integral<STEP>::value,
+                                xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
             int min_val_arg = m_step > 0 ? 0 : int(size) - 1;
@@ -321,8 +326,9 @@ namespace xt
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value, xrange<std::ptrdiff_t>>
+                                    !std::is_integral<MA>::value &&
+                                    !std::is_integral<STEP>::value,
+                                xrange<std::ptrdiff_t>>
         get(std::size_t size) const
         {
             return xrange<std::ptrdiff_t>(std::size_t(m_min), size);
@@ -330,17 +336,19 @@ namespace xt
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value &&
-                                std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value, xrange<std::ptrdiff_t>>
-        get(std::size_t /*size*/) const
+                                    std::is_integral<MA>::value &&
+                                    !std::is_integral<STEP>::value,
+                                xrange<std::ptrdiff_t>>
+            get(std::size_t /*size*/) const
         {
             return xrange<std::ptrdiff_t>(0, std::size_t(m_max));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
         inline std::enable_if_t<!std::is_integral<MI>::value &&
-                                !std::is_integral<MA>::value &&
-                                !std::is_integral<STEP>::value, xall<std::ptrdiff_t>>
+                                    !std::is_integral<MA>::value &&
+                                    !std::is_integral<STEP>::value,
+                                xall<std::ptrdiff_t>>
         get(std::size_t size) const
         {
             return xall<std::ptrdiff_t>(size);

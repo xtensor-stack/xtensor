@@ -10,6 +10,7 @@
 #define XTENSOR_AXIS_ITERATOR_HPP
 
 #include <xtl/xclosure.hpp>
+
 #include "xview.hpp"
 
 namespace xt
