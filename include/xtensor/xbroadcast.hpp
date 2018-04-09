@@ -133,6 +133,14 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
+        template <class E>
+        std::enable_if_t<xt::is_xscalar<CT>::value, void> assign(xexpression<E>& e) const
+        {
+            auto& ed = e.derived_cast();
+            ed.resize(m_shape);
+            std::fill(ed.begin(), ed.end(), m_e());
+        }
+
     private:
 
         CT m_e;

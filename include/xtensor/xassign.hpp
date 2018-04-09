@@ -144,11 +144,23 @@ namespace xt
         xexpression_assigner<tag>::assign_data(e1, e2, trivial);
     }
 
-    template <class E1, class E2>
+    template<class, class, class = void>
+    struct has_assign_function : std::false_type {};
+
+    template<class E1, class E2>
+    struct has_assign_function<E1, E2, void_t<decltype(std::declval<const E2&>().assign(std::declval<E1&>()))>> : std::true_type {};
+
+    template <class E1, class E2> 
     inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        using tag = xexpression_tag_t<E1, E2>;
-        xexpression_assigner<tag>::assign_xexpression(e1, e2);
+        return xtl::mpl::static_if<has_assign_function<E1, E2>::value>([&](auto self)
+        {
+            e2.derived_cast().assign(e1);
+        }, /*else*/ [&](auto self)
+        {
+            using tag = xexpression_tag_t<E1, E2>;
+            xexpression_assigner<tag>::assign_xexpression(e1, e2);
+        });
     }
 
     template <class E1, class E2>
