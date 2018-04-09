@@ -43,7 +43,7 @@
 #endif
 
 #ifndef XTENSOR_DEFAULT_LAYOUT
-#define XTENSOR_DEFAULT_LAYOUT layout_type::row_major
+#define XTENSOR_DEFAULT_LAYOUT ::xt::layout_type::row_major
 #endif
 
 #endif
