@@ -137,7 +137,6 @@ namespace xt
                     pos += inner_stride;
                 }
             }
-
         }
 
         template <class F, class E>

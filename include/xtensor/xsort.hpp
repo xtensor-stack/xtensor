@@ -307,7 +307,7 @@ namespace xt
         auto end = std::unique(sorted.begin(), sorted.end());
         std::size_t sz = static_cast<std::size_t>(std::distance(sorted.begin(), end));
         // TODO check if we can shrink the vector without reallocation
-        auto result = xtensor<typename E::value_type, 1>::from_shape({ sz });
+        auto result = xtensor<typename E::value_type, 1>::from_shape({sz});
         std::copy(sorted.begin(), end, result.begin());
         return result;
     }

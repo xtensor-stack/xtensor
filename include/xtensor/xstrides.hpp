@@ -274,11 +274,11 @@ namespace xt
     template <class S>
     inline S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l)
     {
-        if(l != layout_type::row_major && l != layout_type::column_major)
+        if (l != layout_type::row_major && l != layout_type::column_major)
         {
             throw std::runtime_error("unravel_index: dynamic layout not supported");
         }
-        return detail::unravel_noexcept(index, strides, l);;
+        return detail::unravel_noexcept(index, strides, l);
     }
 
     template <class S>

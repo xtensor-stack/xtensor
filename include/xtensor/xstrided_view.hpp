@@ -130,16 +130,14 @@ namespace xt
         using inner_backstrides_type_type = inner_shape_type;
 
         using const_stepper = std::conditional_t<
-                detail::is_indexed_stepper<typename std::decay_t<CT>::stepper>::value,
-                xindexed_stepper<const xstrided_view<CT, S, FS>, true>,
-                xstepper<const xstrided_view<CT, S, FS>>
-            >;
+            detail::is_indexed_stepper<typename std::decay_t<CT>::stepper>::value,
+            xindexed_stepper<const xstrided_view<CT, S, FS>, true>,
+            xstepper<const xstrided_view<CT, S, FS>>>;
 
         using stepper = std::conditional_t<
-                detail::is_indexed_stepper<typename std::decay_t<CT>::stepper>::value,
-                xindexed_stepper<xstrided_view<CT, S, FS>, false>,
-                xstepper<xstrided_view<CT, S, FS>>
-            >;
+            detail::is_indexed_stepper<typename std::decay_t<CT>::stepper>::value,
+            xindexed_stepper<xstrided_view<CT, S, FS>, false>,
+            xstepper<xstrided_view<CT, S, FS>>>;
     };
 
     /*****************
@@ -1334,7 +1332,7 @@ namespace xt
             end -= std::find_if(e.crbegin(), e.crend(), find_fun) - e.crbegin();
         }
 
-        return dynamic_view(std::forward<E>(e), { range(static_cast<int>(begin), static_cast<int>(end)) });
+        return dynamic_view(std::forward<E>(e), {range(static_cast<int>(begin), static_cast<int>(end))});
     }
 
     /**
@@ -1349,10 +1347,10 @@ namespace xt
     {
         xt::dynamic_shape<std::size_t> new_shape, new_strides;
         std::copy_if(e.shape().cbegin(), e.shape().cend(), std::back_inserter(new_shape),
-                               [](std::size_t i){ return i != 1; });
+                     [](std::size_t i) { return i != 1; });
         auto&& old_strides = detail::get_strides(e);
         std::copy_if(old_strides.cbegin(), old_strides.cend(), std::back_inserter(new_strides),
-                               [](std::size_t i){ return i != 0; });
+                     [](std::size_t i) { return i != 0; });
 
         using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>>;
         return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
@@ -1434,7 +1432,7 @@ namespace xt
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())
     {
-        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>({ axis }), check_policy);
+        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>({axis}), check_policy);
     }
     /// @endcond
 
