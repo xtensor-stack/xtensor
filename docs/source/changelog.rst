@@ -7,6 +7,52 @@
 Changelog
 =========
 
+0.15.7
+------
+
+- nan related functions
+  `#718 <https://github.com/QuantStack/xtensor/pull/718>`_.
+- return types fixed in dynamic view helper
+  `#722 <https://github.com/QuantStack/xtensor/pull/722>`_.
+- xview on constant expressions
+  `#723 <https://github.com/QuantStack/xtensor/pull/723>`_.
+- added decays to make const ``value_type`` compile
+  `#727 <https://github.com/QuantStack/xtensor/pull/727>`_.
+- iterator for constant ``strided_view`` fixed
+  `#729 <https://github.com/QuantStack/xtensor/pull/729>`_.
+- ``strided_view`` on ``xfunction`` fixed
+  `#732 <https://github.com/QuantStack/xtensor/pull/732>`_.
+- Fixes in ``xstrided_view``
+  `#736 <https://github.com/QuantStack/xtensor/pull/736>`_.
+- View semantic (broadcast on assign) fixed
+  `#742 <https://github.com/QuantStack/xtensor/pull/742>`_.
+- Compilation prevented when using ellipsis with ``xview``
+  `#743 <https://github.com/QuantStack/xtensor/pull/743>`_.
+- Index of ``xiterator`` set to shape when reaching the end
+  `#744 <https://github.com/QuantStack/xtensor/pull/744>`_.
+- ``xscalar`` fixed
+  `#748 <https://github.com/QuantStack/xtensor/pull/748>`_.
+- Updated README and related projects
+  `#749 <https://github.com/QuantStack/xtensor/pull/749>`_.
+- Perfect forwarding in ``xfunction``  and views
+  `#750 <https://github.com/QuantStack/xtensor/pull/750>`_.
+- Missing include in ``xassign.hpp``
+  `#752 <https://github.com/QuantStack/xtensor/pull/752>`_.
+- More related projects in the README
+  `#754 <https://github.com/QuantStack/xtensor/pull/754>`_.
+- Fixed stride computation for ``xtensorf``
+  `#755 <https://github.com/QuantStack/xtensor/pull/755>`_.
+- Added tests for backstrides
+  `#758 <https://github.com/QuantStack/xtensor/pull/758>`_.
+- Clean up ``has_raw_data`` ins strided view
+  `#759 <https://github.com/QuantStack/xtensor/pull/759>`_.
+- Switch to ``ptrdiff_t`` for slices
+  `#760 <https://github.com/QuantStack/xtensor/pull/760>`_.
+- Fixed ``xview`` strides computation
+  `#762 <https://github.com/QuantStack/xtensor/pull/762>`_.
+- Additional methods in slices, required for ``xframe``
+  `#764 <https://github.com/QuantStack/xtensor/pull/764>`_.
+
 0.15.6
 ------
 
