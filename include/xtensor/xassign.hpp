@@ -25,20 +25,6 @@
 namespace xt
 {
 
-    template <class E1, class E2>
-    class has_assign_to
-    {
-        template <class C>
-        static decltype(std::declval<const C&>().assign_to(std::declval<E1&>())) test(int);
-
-        template <class C>
-        static std::false_type test(...);
-
-    public:
-
-        constexpr static bool value = std::is_same<void, decltype(test<E2>(std::declval<int>()))>::value;
-    };
-
     /********************
      * Assign functions *
      ********************/
@@ -47,12 +33,7 @@ namespace xt
     void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
 
     template <class E1, class E2>
-    std::enable_if_t<!has_assign_to<E1, E2>::value, void>
-    assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
-
-    template <class E1, class E2>
-    std::enable_if_t<has_assign_to<E1, E2>::value, void>
-    assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+    void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
 
     template <class E1, class E2>
     void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
@@ -163,19 +144,28 @@ namespace xt
         xexpression_assigner<tag>::assign_data(e1, e2, trivial);
     }
 
-    template <class E1, class E2>
-    inline auto assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
-        -> std::enable_if_t<has_assign_to<E1, E2>::value, void>
+    template <class E1, class E2, class = void>
+    struct has_assign_to : std::false_type
     {
-        e2.derived_cast().assign_to(e1);
-    }
+    };
 
     template <class E1, class E2>
-    inline auto assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
-        -> std::enable_if_t<!has_assign_to<E1, E2>::value, void>
+    struct has_assign_to<E1, E2, void_t<decltype(std::declval<const E2&>().assign_to(std::declval<E1&>()))>>
+        : std::true_type
     {
-        using tag = xexpression_tag_t<E1, E2>;
-        xexpression_assigner<tag>::assign_xexpression(e1, e2);
+    };
+
+    template <class E1, class E2>
+    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    {
+        xtl::mpl::static_if<has_assign_to<E1, E2>::value>([&](auto self)
+        {
+            self(e2).derived_cast().assign_to(e1);
+        }, /*else*/ [&](auto self)
+        {
+            using tag = xexpression_tag_t<E1, E2>;
+            xexpression_assigner<tag>::assign_xexpression(e1, e2);
+        });
     }
 
     template <class E1, class E2>
