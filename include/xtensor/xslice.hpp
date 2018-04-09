@@ -80,6 +80,7 @@ namespace xt
     public:
 
         using size_type = T;
+        using self_type = xrange<T>;
 
         xrange() = default;
         xrange(size_type min_val, size_type max_val) noexcept;
@@ -92,6 +93,9 @@ namespace xt
         size_type revert_index(size_type i) const noexcept;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
 
     private:
 
@@ -109,6 +113,7 @@ namespace xt
     public:
 
         using size_type = T;
+        using self_type = xstepped_range<T>;
 
         xstepped_range() = default;
         xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept;
@@ -121,6 +126,9 @@ namespace xt
         size_type revert_index(size_type i) const noexcept;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
 
     private:
 
@@ -139,6 +147,7 @@ namespace xt
     public:
 
         using size_type = T;
+        using self_type = xall<T>;
 
         xall() = default;
         explicit xall(size_type size) noexcept;
@@ -151,6 +160,9 @@ namespace xt
         size_type revert_index(size_type i) const noexcept;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
 
     private:
 
@@ -594,6 +606,18 @@ namespace xt
         return i >= m_min && i < m_min + m_size;
     }
 
+    template <class T>
+    inline bool xrange<T>::operator==(const self_type& rhs) const noexcept
+    {
+        return (m_min == rhs.m_min) && (m_size == rhs.m_size);
+    }
+
+    template <class T>
+    inline bool xrange<T>::operator!=(const self_type& rhs) const noexcept
+    {
+        return !(*this == rhs);
+    }
+
     /********************************
      * xtepped_range implementation *
      ********************************/
@@ -641,6 +665,18 @@ namespace xt
         return i >= m_min && i < m_min + m_size * m_step && ((i - m_min) % m_step == 0);
     }
 
+    template <class T>
+    inline bool xstepped_range<T>::operator==(const self_type& rhs) const noexcept
+    {
+        return (m_min == rhs.m_min) && (m_size == rhs.m_size) && (m_step == rhs.m_step);
+    }
+
+    template <class T>
+    inline bool xstepped_range<T>::operator!=(const self_type& rhs) const noexcept
+    {
+        return !(*this == rhs);
+    }
+
     /***********************
      * xall implementation *
      ***********************/
@@ -685,6 +721,18 @@ namespace xt
     inline bool xall<T>::contains(size_type i) const noexcept
     {
         return i < m_size;
+    }
+
+    template <class T>
+    inline bool xall<T>::operator==(const self_type& rhs) const noexcept
+    {
+        return m_size == rhs.m_size;
+    }
+
+    template <class T>
+    inline bool xall<T>::operator!=(const self_type& rhs) const noexcept
+    {
+        return !(*this == rhs);
     }
 
     /****************************
