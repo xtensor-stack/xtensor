@@ -140,7 +140,6 @@ namespace xt
                             << indents;
                         elems_on_line = 0;
                     }
-
                     slices.push_back(static_cast<int>(i));
                     xoutput(out, e, slices, printer, blanks + 1, element_width, edgeitems, line_width) << ',';
                     slices.pop_back();
