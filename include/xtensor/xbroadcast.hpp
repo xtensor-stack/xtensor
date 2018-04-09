@@ -21,6 +21,7 @@
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
+#include "xscalar.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
 
@@ -134,7 +135,7 @@ namespace xt
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
         template <class E>
-        std::enable_if_t<xt::is_xscalar<CT>::value, void> assign(xexpression<E>& e) const
+        std::enable_if_t<xt::is_xscalar<CT>::value, void> assign_to(xexpression<E>& e) const
         {
             auto& ed = e.derived_cast();
             ed.resize(m_shape);
