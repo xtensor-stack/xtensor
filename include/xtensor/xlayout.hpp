@@ -86,7 +86,7 @@ namespace xt
     constexpr layout_type default_assignable_layout(layout_type l) noexcept
     {
         return (l == layout_type::row_major || l == layout_type::column_major) ?
-            l : DEFAULT_LAYOUT;
+            l : XTENSOR_DEFAULT_LAYOUT;
     }
 }
 

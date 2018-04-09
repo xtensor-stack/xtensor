@@ -47,7 +47,7 @@ namespace xt
         using stepper = xscalar_stepper<false, CT>;
     };
 
-#define DL DEFAULT_LAYOUT
+#define DL XTENSOR_DEFAULT_LAYOUT
     template <class CT>
     class xscalar : public xexpression<xscalar<CT>>,
                     private xiterable<xscalar<CT>>

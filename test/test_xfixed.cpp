@@ -75,7 +75,7 @@ namespace xt
         // reshaping fixed container
         EXPECT_THROW(a.reshape({1, 9}), std::runtime_error);
         EXPECT_NO_THROW(a.reshape({3, 4}));
-        EXPECT_NO_THROW(a.reshape({3, 4}, DEFAULT_LAYOUT));
+        EXPECT_NO_THROW(a.reshape({3, 4}, XTENSOR_DEFAULT_LAYOUT));
         EXPECT_THROW(a.reshape({3, 4}, layout_type::any), std::runtime_error);
     }
 
@@ -118,7 +118,7 @@ namespace xt
         xfixed_adaptor<std::vector<double>&, xt::xshape<3, 4>> ad(a);
         auto bd = adapt(b, std::array<std::size_t, 2>{3, 4});
 
-        EXPECT_EQ(ad.layout(), DEFAULT_LAYOUT);
+        EXPECT_EQ(ad.layout(), XTENSOR_DEFAULT_LAYOUT);
 
         EXPECT_EQ(ad(1, 1), bd(1, 1));
         auto expr = ad + bd;

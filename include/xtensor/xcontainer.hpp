@@ -36,7 +36,7 @@ namespace xt
         using const_stepper = xstepper<const D>;
     };
 
-#define DL DEFAULT_LAYOUT
+#define DL XTENSOR_DEFAULT_LAYOUT
 
     namespace detail
     {
@@ -1250,7 +1250,7 @@ namespace xt
         {
             if (m_layout == layout_type::dynamic || m_layout == layout_type::any)
             {
-                m_layout = DEFAULT_LAYOUT;  // fall back to default layout
+                m_layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
             }
             m_shape = xtl::forward_sequence<shape_type>(shape);
             resize_container(m_strides, m_shape.size());
@@ -1302,7 +1302,7 @@ namespace xt
      * Reshapes the container and keeps old elements
      * @param shape the new shape (has to have same number of elements as the original container)
      * @param layout the layout to compute the strides (defaults to static layout of the container,
-     *               or for a container with dynamic layout to DEFAULT_LAYOUT)
+     *               or for a container with dynamic layout to XTENSOR_DEFAULT_LAYOUT)
      */
     template <class D>
     template <class S>
@@ -1314,7 +1314,7 @@ namespace xt
         }
         if (layout == layout_type::dynamic || layout == layout_type::any)
         {
-            layout = DEFAULT_LAYOUT;  // fall back to default layout
+            layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
         }
         if (layout != base_type::static_layout && base_type::static_layout != layout_type::dynamic)
         {

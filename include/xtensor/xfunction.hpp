@@ -145,7 +145,7 @@ namespace xt
      * xfunction_base *
      ******************/
 
-#define DL DEFAULT_LAYOUT
+#define DL XTENSOR_DEFAULT_LAYOUT
 
     /**
      * @class xfunction_base

@@ -13,7 +13,7 @@
 
 namespace xt
 {
-    using vector_type = uvector<double, DEFAULT_ALLOCATOR(double)>;
+    using vector_type = uvector<double, XTENSOR_DEFAULT_ALLOCATOR(double)>;
 
     TEST(uvector, constructor)
     {

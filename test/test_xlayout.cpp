@@ -33,7 +33,7 @@ namespace xt
         EXPECT_FALSE(cm.data() == rm.data());
         EXPECT_EQ(cm_data, cm.data());
         EXPECT_EQ(rm_data, rm.data());
-        if (DEFAULT_LAYOUT == layout_type::row_major)
+        if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
         {
             EXPECT_EQ(rm_data, dm.data());
         }
@@ -64,7 +64,7 @@ namespace xt
         EXPECT_FALSE(cm.data() == rm.data());
         EXPECT_EQ(cm_data, cm.data());
         EXPECT_EQ(rm_data, rm.data());
-        if (DEFAULT_LAYOUT == layout_type::row_major)
+        if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
         {
             EXPECT_EQ(rm_data, dm.data());
         }

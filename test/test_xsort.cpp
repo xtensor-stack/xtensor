@@ -41,11 +41,11 @@ namespace xt
     {
         xarray<double> a = {{5, 3, 1}, {4, 4, 4}};
         xarray<double> b = {1,3,4,-100};
-        xarray<double, layout_type(int(DEFAULT_LAYOUT) & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
+        xarray<double, layout_type(int(XTENSOR_DEFAULT_LAYOUT) & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
 
         xarray<std::size_t> ex;
 
-        ex = (DEFAULT_LAYOUT == layout_type::row_major) ? 2ul : 4ul;
+        ex = (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major) ? 2ul : 4ul;
         EXPECT_EQ(ex, argmin(a));
 
         EXPECT_EQ(3, argmin(b)());

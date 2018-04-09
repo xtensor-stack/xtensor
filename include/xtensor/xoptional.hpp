@@ -335,7 +335,7 @@ namespace xt
      * xoptional_function *
      **********************/
 
-#define DL DEFAULT_LAYOUT
+#define DL XTENSOR_DEFAULT_LAYOUT
 
     /**
      * @class xoptional_function

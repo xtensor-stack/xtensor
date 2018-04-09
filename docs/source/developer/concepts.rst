@@ -82,7 +82,7 @@ Column-major layout means that elements that only differ by their first index ar
 
 .. image:: iteration.svg
 
-This template parameter is defaulted to ``DEFAULT_LAYOUT`` (see :ref:`configuration-label`), so
+This template parameter is defaulted to ``XTENSOR_DEFAULT_LAYOUT`` (see :ref:`configuration-label`), so
 that `xtensor` expressions can be used in generic code such as:
 
 .. code::

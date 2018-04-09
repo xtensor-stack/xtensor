@@ -48,7 +48,7 @@ namespace xt
      * @param shape the shape of the xarray_adaptor
      * @param l the layout_type of the xarray_adaptor
      */
-    template <class C, class SC, layout_type L = DEFAULT_LAYOUT, typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0>
+    template <class C, class SC, layout_type L = XTENSOR_DEFAULT_LAYOUT, typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0>
     xarray_adaptor<xtl::closure_type_t<C>, L, std::decay_t<SC>>
     adapt(C&& container, const SC& shape, layout_type l = L);
 
@@ -74,7 +74,7 @@ namespace xt
      * @param l the layout_type of the xarray_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
      */
-    template <class P, class O, class SC, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<P>>>>, typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0>
+    template <class P, class O, class SC, layout_type L = XTENSOR_DEFAULT_LAYOUT, class A = std::allocator<std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<P>>>>, typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0>
     xarray_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, L, SC>
     adapt(P&& pointer, typename A::size_type size, O ownership, const SC& shape, layout_type l = L, const A& alloc = A());
 
@@ -103,7 +103,7 @@ namespace xt
      * @param container the container to adapt
      * @param l the layout_type of the xtensor_adaptor
      */
-    template <class C, layout_type L = DEFAULT_LAYOUT>
+    template <class C, layout_type L = XTENSOR_DEFAULT_LAYOUT>
     xtensor_adaptor<C, 1, L>
     adapt(C&& container, layout_type l = L);
 
@@ -114,7 +114,7 @@ namespace xt
      * @param shape the shape of the xtensor_adaptor
      * @param l the layout_type of the xtensor_adaptor
      */
-    template <class C, class SC, layout_type L = DEFAULT_LAYOUT, typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int> = 0>
+    template <class C, class SC, layout_type L = XTENSOR_DEFAULT_LAYOUT, typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int> = 0>
     xtensor_adaptor<C, detail::array_size<SC>::value, L>
     adapt(C&& container, const SC& shape, layout_type l = L);
 
@@ -139,7 +139,7 @@ namespace xt
      * @param l the layout_type of the xtensor_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
      */
-    template <class P, class O, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<P>>>>>
+    template <class P, class O, layout_type L = XTENSOR_DEFAULT_LAYOUT, class A = std::allocator<std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<P>>>>>
     xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, 1, L>
     adapt(P&& pointer, typename A::size_type size, O ownership, layout_type l = L, const A& alloc = A());
 
@@ -154,7 +154,7 @@ namespace xt
      * @param l the layout_type of the xtensor_adaptor
      * @param alloc the allocator used for allocating / deallocating the dynamic array
      */
-    template <class P, class O, class SC, layout_type L = DEFAULT_LAYOUT, class A = std::allocator<std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<P>>>>, typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int> = 0>
+    template <class P, class O, class SC, layout_type L = XTENSOR_DEFAULT_LAYOUT, class A = std::allocator<std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<P>>>>, typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int> = 0>
     xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, detail::array_size<SC>::value, L>
     adapt(P&& pointer, typename A::size_type size, O ownership, const SC& shape, layout_type l = L, const A& alloc = A());
 
