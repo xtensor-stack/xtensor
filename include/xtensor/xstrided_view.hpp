@@ -875,36 +875,6 @@ namespace xt
             layout_type m_layout;
         };
 
-        template <class S, class SL>
-        inline auto get_slice_from_shape(S& /*e*/, SL&& slice, std::size_t /*index*/)
-        {
-            return std::forward<SL>(slice);
-        }
-
-        template <class S>
-        inline auto get_slice_from_shape(S& s, xall_tag, std::size_t index)
-        {
-            return xall<typename S::size_type>(s[index]);
-        }
-
-        template <class S>
-        inline auto get_slice_from_shape(S& /*e*/, xellipsis_tag, std::size_t /*index*/)
-        {
-            return xellipsis<typename S::size_type>();
-        }
-
-        template <class S>
-        inline auto get_slice_from_shape(S& /*e*/, xnewaxis_tag, std::size_t /*index*/)
-        {
-            return xnewaxis<typename S::size_type>();
-        }
-
-        template <class S, class A, class B, class C>
-        inline auto get_slice_from_shape(S& s, xrange_adaptor<A, B, C> adaptor, std::size_t index)
-        {
-            return adaptor.get(s[index]);
-        }
-
         template <class S>
         struct slice_getter_impl
         {
@@ -917,15 +887,16 @@ namespace xt
             }
 
             template <class T>
-            std::array<std::ptrdiff_t, 3> operator()(const T& t) const
-            {
-                auto sl = get_slice_from_shape(m_shape, t, idx);
-                return {std::ptrdiff_t(sl(0)), std::ptrdiff_t(sl.size()), std::ptrdiff_t(sl.step_size())};
-            }
-
-            std::array<std::ptrdiff_t, 3> operator()(const std::ptrdiff_t& /*t*/) const
+            std::array<std::ptrdiff_t, 3> operator()(const T& /*t*/) const
             {
                 return {0, 0, 0};
+            }
+
+            template <class A, class B, class C>
+            std::array<std::ptrdiff_t, 3> operator()(const xrange_adaptor<A, B, C>& range) const
+            {
+                auto sl = range.get(m_shape[idx]);
+                return {sl(0), sl.size(), sl.step_size()};
             }
         };
     }
