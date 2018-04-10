@@ -6,12 +6,14 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include <algorithm>
+
 #include "gtest/gtest.h"
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
-#include <algorithm>
 
 namespace xt
 {
@@ -456,6 +458,33 @@ namespace xt
         EXPECT_THROW(noalias(v) = b, broadcast_error);
     }
 
+    TEST(xdynamic_view, view_on_view)
+    {
+        xarray<int> a = xt::ones<int>({3, 4, 5});
+        auto v1 = dynamic_view(a, {1, all(), all()});
+        auto vv1 = dynamic_view(v1, {1, all()});
+        vv1 = vv1 * 5;
+        EXPECT_EQ(a(0, 0, 0), 1);
+        EXPECT_EQ(a(1, 1, 0), 5);
+        EXPECT_EQ(a(1, 1, 4), 5);
+        EXPECT_EQ(a(1, 2, 4), 1);
+        EXPECT_EQ(v1(1, 4), 5);
+
+        bool st = std::is_same<decltype(v1), decltype(vv1)>::value;
+        EXPECT_TRUE(st);
+
+        a = xt::ones<int>({3, 4, 5});
+        auto v2 = dynamic_view(a, {all(), 1, all()});
+        auto vv2 = dynamic_view(v2, {all(), 2});
+        vv2 = vv2 * 5;
+        EXPECT_EQ(a(0, 0, 0), 1);
+        EXPECT_EQ(a(1, 1, 2), 5);
+        EXPECT_EQ(a(2, 1, 2), 5);
+        EXPECT_EQ(a(0, 1, 2), 5);
+        EXPECT_EQ(v2(0, 2), 5);
+        EXPECT_TRUE(xt::all(equal(vv2, 5)));
+    }
+ 
     TEST(xdynamic_view, range_integer_casting)
     {
         // just check compilation
