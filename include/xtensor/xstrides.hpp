@@ -221,6 +221,40 @@ namespace xt
     }
 
     template <class shape_type, class strides_type>
+    inline bool do_strides_match(const shape_type& shape, const strides_type& strides, layout_type l)
+    {
+        std::size_t data_size = 1;
+        if (l == layout_type::row_major)
+        {
+            for (std::size_t i = strides.size(); i != 0; --i)
+            {
+                if ((shape[i - 1] == 1 && strides[i - 1] != 0) || (shape[i - 1] != 1 && strides[i - 1] != data_size))
+                {
+                    return false;
+                }
+                data_size *= shape[i - 1];
+            }
+            return true;
+        }
+        else if (l == layout_type::column_major)
+        {
+            for (std::size_t i = 0; i < strides.size(); ++i)
+            {
+                if ((shape[i] != 1 && strides[i] != data_size) || (shape[i] == 1 && strides[i] != 0))
+                {
+                    return false;
+                }
+                data_size *= shape[i];
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    template <class shape_type, class strides_type>
     inline void adapt_strides(const shape_type& shape, strides_type& strides) noexcept
     {
         for (typename shape_type::size_type i = 0; i < shape.size(); ++i)

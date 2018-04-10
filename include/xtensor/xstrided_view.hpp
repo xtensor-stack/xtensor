@@ -930,7 +930,7 @@ namespace xt
     namespace detail
     {
         template <class S, class ST>
-        inline auto make_dynamic_view(const S& shape, ST&& strides, std::size_t base_offset, const slice_vector& slices)
+        inline auto make_dynamic_view(const S& shape, ST&& strides, std::size_t base_offset, layout_type layout, const slice_vector& slices)
         {
             // Compute dimension
             std::size_t dimension = shape.size(), n_newaxis = 0, n_add_all = 0;
@@ -1004,9 +1004,7 @@ namespace xt
                 else if (xtl::get_if<xt::xnewaxis_tag>(&slices[MU(i)]) != nullptr)
                 {
                     new_shape[idx] = 1;
-                    new_strides[idx] = 0;
-                    ++axis_skip;
-                    ++idx;
+                    ++axis_skip, ++idx;
                 }
                 else if (xtl::get_if<xt::xellipsis_tag>(&slices[MU(i)]) != nullptr)
                 {
@@ -1014,7 +1012,7 @@ namespace xt
                     {
                         new_shape[idx] = old_shape[MU(i - axis_skip)];
                         new_strides[idx] = old_strides[MU(i - axis_skip)];
-                        ++idx, --axis_skip;
+                        --axis_skip, ++idx;
                     }
                     ++axis_skip;  // because i++
                 }
@@ -1042,11 +1040,9 @@ namespace xt
                 ++idx;
             }
 
-            // TODO change layout type?
-            return std::make_tuple(std::move(new_shape), std::move(new_strides), offset, layout_type::dynamic);
+            layout_type new_layout = do_strides_match(new_shape, new_strides, layout) ? layout : layout_type::dynamic;
 
-            // using view_type = xstrided_view<xclosure_t<E>, shape_type>;
-            // return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), offset, layout_type::dynamic);
+            return std::make_tuple(std::move(new_shape), std::move(new_strides), offset, new_layout);
 
     #undef MU
     #undef MS
@@ -1081,7 +1077,7 @@ namespace xt
     template <class E>
     inline auto dynamic_view(E&& e, const slice_vector& slices)
     {
-        auto args = detail::make_dynamic_view(e.shape(), detail::get_strides(e), detail::get_offset(e), slices);
+        auto args = detail::make_dynamic_view(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<E>, std::decay_t<decltype(std::get<0>(args))>>;
         return view_type(std::forward<E>(e), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
     }
@@ -1089,7 +1085,7 @@ namespace xt
     template <class CT, class S, class FS>
     auto dynamic_view(const xstrided_view<CT, S, FS>& e, const slice_vector& slices)
     {
-        auto args = detail::make_dynamic_view(e.shape(), detail::get_strides(e), detail::get_offset(e), slices);
+        auto args = detail::make_dynamic_view(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
         return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
     }
@@ -1097,7 +1093,7 @@ namespace xt
     template <class CT, class S, class FS>
     auto dynamic_view(xstrided_view<CT, S, FS>& e, const slice_vector& slices)
     {
-        auto args = detail::make_dynamic_view(e.shape(), detail::get_strides(e), detail::get_offset(e), slices);
+        auto args = detail::make_dynamic_view(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
         return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
     }

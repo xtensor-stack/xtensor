@@ -492,4 +492,71 @@ namespace xt
         auto a = dynamic_view(arr, {range(0, std::ptrdiff_t(2)), 323});
         auto b = dynamic_view(arr, {range(std::size_t(0), 2), 323});
     }
+
+    TEST(xdynamic_view, strides)
+    {
+        // Strides: 72/24/6/1
+        xarray<int, layout_type::row_major> a = xarray<int, layout_type::row_major>::from_shape({5, 3, 4, 6});
+
+        auto s1 = dynamic_view(a, {1, 1, xt::all(), xt::all()}).strides();
+        std::vector<std::size_t> s1e = {6, 1};
+        EXPECT_EQ(s1, s1e);
+
+        auto s2 = dynamic_view(a, {1, xt::all(), xt::all(), 1}).strides();
+        std::vector<std::size_t> s2e = {24, 6};
+        EXPECT_EQ(s2, s2e);
+
+        auto s3 = dynamic_view(a, {1, xt::all(), 1, xt::newaxis(), xt::newaxis(), xt::all()}).strides();
+        std::vector<std::size_t> s3e = {24, 0, 0, 1};
+        EXPECT_EQ(s3, s3e);
+
+        auto s4 = dynamic_view(a, {xt::range(0, 1, 2), 1, 0, xt::all(), xt::newaxis()}).strides();
+        std::vector<std::size_t> s4e = {0, 1, 0};
+        EXPECT_EQ(s4, s4e);
+
+        auto s4x = dynamic_view(a, {xt::range(0, 5, 2), 1, 0, xt::all(), xt::newaxis()}).strides();
+        std::vector<std::size_t> s4xe = {72 * 2, 1, 0};
+        EXPECT_EQ(s4x, s4xe);
+
+        auto s5 = dynamic_view(a, {xt::all(), 1}).strides();
+        std::vector<std::size_t> s5e = {72, 6, 1};
+        EXPECT_EQ(s5, s5e);
+
+        auto s6 = dynamic_view(a, {xt::all(), 1, 1, xt::newaxis(), xt::all()}).strides();
+        std::vector<std::size_t> s6e = {72, 0, 1};
+        EXPECT_EQ(s6, s6e);
+
+        auto s7 = dynamic_view(a, {xt::all(), 1, xt::newaxis(), xt::all()}).strides();
+        std::vector<std::size_t> s7e = {72, 0, 6, 1};
+        EXPECT_EQ(s7, s7e);
+    }
+
+    TEST(xdynamic_view, layout)
+    {
+        xarray<int, layout_type::row_major> a = xarray<int, layout_type::row_major>::from_shape({5, 3, 4, 6});
+
+        auto s1 = dynamic_view(a, {xt::all(), 1, xt::newaxis(), xt::all()}).layout();
+        EXPECT_EQ(s1, layout_type::dynamic);
+
+        auto s1x = dynamic_view(a, {1, xt::all(), xt::newaxis(), xt::all()}).layout();
+        EXPECT_EQ(s1x, layout_type::row_major);
+
+        auto s2 = dynamic_view(a, {1, 2, range(0, 3), xt::all()}).layout();
+        EXPECT_EQ(s2, layout_type::row_major);
+
+        auto s3 = dynamic_view(a, {1}).layout();
+        EXPECT_EQ(s3, layout_type::row_major);
+
+        xarray<int, layout_type::column_major> b = xarray<int, layout_type::column_major>::from_shape({5, 3, 4, 6});
+
+        auto s4 = dynamic_view(b, {1}).layout();
+        EXPECT_EQ(s4, layout_type::dynamic);
+
+        auto s5 = dynamic_view(b, {xt::all(), 1, 1, 1}).layout();
+        EXPECT_EQ(s5, layout_type::column_major);
+
+        auto s6 = dynamic_view(b, {xt::all(), 1, 1, xt::range(0, 6)}).layout();
+        EXPECT_EQ(s6, layout_type::dynamic);
+    }
+
 }

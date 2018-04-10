@@ -715,8 +715,12 @@ namespace xt
         EXPECT_EQ(s3, s3e);
 
         auto s4 = view(a, xt::range(0, 1, 2), 1, 0, xt::all(), xt::newaxis()).strides();
-        std::vector<std::size_t> s4e = {72 * 2, 1, 0};
+        std::vector<std::size_t> s4e = {0, 1, 0};
         EXPECT_EQ(s4, s4e);
+
+        auto s4x = view(a, xt::range(0, 5, 2), 1, 0, xt::all(), xt::newaxis()).strides();
+        std::vector<std::size_t> s4xe = {72 * 2, 1, 0};
+        EXPECT_EQ(s4x, s4xe);
 
         auto s5 = view(a, xt::all(), 1).strides();
         std::vector<std::size_t> s5e = {72, 6, 1};
