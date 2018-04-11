@@ -333,6 +333,8 @@ namespace xt
         template <class ST>
         bool broadcast_shape(ST& s, bool reuse_cache = false) const;
 
+        constexpr layout_type layout() const noexcept;
+
     private:
 
         container_type m_data;
@@ -444,6 +446,8 @@ namespace xt
 
         template <class E>
         xfixed_adaptor& operator=(const xexpression<E>& e);
+
+        constexpr layout_type layout() const noexcept;
 
     private:
 
@@ -598,6 +602,12 @@ namespace xt
     }
 
     template <class ET, class S, layout_type L, class Tag>
+    constexpr layout_type xfixed_container<ET, S, L, Tag>::layout() const noexcept
+    {
+        return base_type::static_layout;
+    }
+
+    template <class ET, class S, layout_type L, class Tag>
     inline auto xfixed_container<ET, S, L, Tag>::data_impl() noexcept -> container_type&
     {
         return m_data;
@@ -718,6 +728,12 @@ namespace xt
     inline auto xfixed_adaptor<EC, S, L, Tag>::data_impl() const noexcept -> const container_type&
     {
         return m_data;
+    }
+
+    template <class EC, class S, layout_type L, class Tag>
+    constexpr layout_type xfixed_adaptor<EC, S, L, Tag>::layout() const noexcept
+    {
+        return base_type::static_layout;
     }
 
     template <class EC, class S, layout_type L, class Tag>
