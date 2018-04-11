@@ -53,7 +53,7 @@ namespace xt
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(size_t(1), view1.dimension());
-        EXPECT_EQ(layout_type::dynamic, view1.layout());
+        EXPECT_EQ(a.layout(), view1.layout());
         EXPECT_ANY_THROW(view1.at(10));
         EXPECT_ANY_THROW(view1.at(0, 0));
 
@@ -68,25 +68,31 @@ namespace xt
         EXPECT_EQ(a(1, 2), view2(1));
         EXPECT_EQ(size_t(1), view2.dimension());
         EXPECT_EQ(size_t(2), view2.shape()[0]);
+        EXPECT_EQ(layout_type::dynamic, view2.layout());
 
         auto view4 = view(a, 1);
         EXPECT_EQ(size_t(1), view4.dimension());
         EXPECT_EQ(size_t(4), view4.shape()[0]);
+        EXPECT_EQ(a.layout(), view4.layout());
 
         auto view5 = view(view4, 1);
         EXPECT_EQ(size_t(0), view5.dimension());
         EXPECT_EQ(size_t(0), view5.shape().size());
+        EXPECT_EQ(a.layout(), view5.layout());
 
         auto view6 = view(a, 1, all());
         EXPECT_EQ(a(1, 0), view6(0));
         EXPECT_EQ(a(1, 1), view6(1));
         EXPECT_EQ(a(1, 2), view6(2));
         EXPECT_EQ(a(1, 3), view6(3));
+        EXPECT_EQ(a.layout(), view6.layout());
 
         auto view7 = view(a, all(), 2);
         EXPECT_EQ(a(0, 2), view7(0));
         EXPECT_EQ(a(1, 2), view7(1));
         EXPECT_EQ(a(2, 2), view7(2));
+        EXPECT_EQ(layout_type::dynamic, view7.layout());
+
     }
 
     TEST(xview, copy_semantic)
@@ -103,7 +109,7 @@ namespace xt
             EXPECT_EQ(a(1, 1), view2(0));
             EXPECT_EQ(a(1, 2), view2(1));
             EXPECT_EQ(size_t(1), view2.dimension());
-            EXPECT_EQ(layout_type::dynamic, view2.layout());
+            EXPECT_EQ(a.layout(), view2.layout());
         }
 
         {
@@ -131,7 +137,7 @@ namespace xt
             EXPECT_EQ(a(1, 1), view2(0));
             EXPECT_EQ(a(1, 2), view2(1));
             EXPECT_EQ(size_t(1), view2.dimension());
-            EXPECT_EQ(layout_type::dynamic, view2.layout());
+            EXPECT_EQ(a.layout(), view2.layout());
         }
 
         {
