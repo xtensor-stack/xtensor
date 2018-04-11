@@ -7,6 +7,24 @@
 Changelog
 =========
 
+0.15.9
+------
+
+- missing layout method in xfixed
+  `#777 <https://github.com/QuantStack/xtensor/pull/777>`_.
+- fixed uninitialized backstrides
+  `#774 <https://github.com/QuantStack/xtensor/pull/774>`_.
+- update xtensor-blas in binder
+  `#773 <https://github.com/QuantStack/xtensor/pull/773>`_.
+
+0.15.8
+------
+
+- comparison operators for slices
+  `#770 <https://github.com/QuantStack/xtensor/pull/770>`_.
+- use default-assignable layout for strided views.
+  `#769 <https://github.com/QuantStack/xtensor/pull/769>`_.
+
 0.15.7
 ------
 
