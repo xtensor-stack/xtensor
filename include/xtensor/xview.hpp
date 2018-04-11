@@ -459,7 +459,7 @@ namespace xt
     template <class CT, class... S>
     inline layout_type xview<CT, S...>::layout() const noexcept
     {
-        return static_layout;
+        return do_strides_match(shape(), strides(), m_e.layout()) ? m_e.layout() : layout_type::dynamic;
     }
     //@}
 
