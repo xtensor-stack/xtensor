@@ -118,12 +118,22 @@ namespace xt
         xfixed_adaptor<std::vector<double>&, xt::xshape<3, 4>> ad(a);
         auto bd = adapt(b, std::array<std::size_t, 2>{3, 4});
 
+        EXPECT_EQ(ad.layout(), DEFAULT_LAYOUT);
+
         EXPECT_EQ(ad(1, 1), bd(1, 1));
         auto expr = ad + bd;
         EXPECT_EQ(expr(1, 1), bd(1, 1) * 2);
         ad = bd * 2;
         EXPECT_EQ(bd(1, 1) * 2, ad(1, 1));
         EXPECT_EQ(a[0], 2);
+    }
+
+    TEST(xtensorf, layout)
+    {
+        xtensorf<double, xshape<2, 2>, layout_type::row_major> a;
+        EXPECT_EQ(a.layout(), layout_type::row_major);
+        xtensorf<double, xshape<2, 2>, layout_type::column_major> b;
+        EXPECT_EQ(b.layout(), layout_type::column_major);
     }
 }
 
