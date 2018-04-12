@@ -368,6 +368,15 @@ Calculate the derivative of a (discretized) field in Fourier space, e.g. a sine 
     std::cout << "cos:            " << xt::cos(x) << std::endl;
     std::cout << "sin_derivative: " << sin_derivative << std::endl;
 
+**Outputs**
+
+.. code::
+
+    x:              { 0.      ,  0.031416,  0.062832,  0.094248, ...,  6.251769}
+    sin:            { 0.000000e+00,  3.141076e-02,  6.279052e-02,  9.410831e-02, ..., -3.141076e-02}
+    cos:            { 1.000000e+00,  9.995066e-01,  9.980267e-01,  9.955620e-01, ...,  9.995066e-01}
+    sin_derivative: { 1.000000e+00,  9.995066e-01,  9.980267e-01,  9.955620e-01, ...,  9.995066e-01}
+
 xtensor-io
 ----------
 
