@@ -21,9 +21,12 @@
 Installation
 ============
 
-Although ``xtensor`` is a header-only library, we provide standardized means to install it, with package managers or with cmake.
+Although ``xtensor`` is a header-only library, we provide standardized means to
+install it, with package managers or with cmake.
 
-Besides the xtensor headers, all these methods place the ``cmake`` project configuration file in the right location so that third-party projects can use cmake's ``find_package`` to locate xtensor headers.
+Besides the xtensor headers, all these methods place the ``cmake`` project
+configuration file in the right location so that third-party projects can use
+cmake's ``find_package`` to locate xtensor headers.
 
 .. image:: conda.svg
 
@@ -64,8 +67,9 @@ A package for xtensor is available on the Spack package manager.
 From source with cmake
 ----------------------
 
-You can also install ``xtensor`` from source with cmake. This requires that you have the xtl_ library installed on your system.
-On Unix platforms, from the source directory:
+You can also install ``xtensor`` from source with cmake. This requires that you
+have the xtl_ library installed on your system. On Unix platforms, from the
+source directory:
 
 .. code::
 
@@ -84,6 +88,7 @@ On Windows platforms, from the source directory:
     nmake
     nmake install
 
-See the section of the documentation on :doc:`build-options`, for more details on how to cmake options.
+See the section of the documentation on :doc:`build-options`, for more details
+on how to cmake options.
 
 .. _xtl: https://github.com/QuantStack/xtl

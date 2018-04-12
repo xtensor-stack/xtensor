@@ -21,8 +21,8 @@ Build
 - ``XTENSOR_USE_XSIMD``: enables simd acceleration in ``xtensor``. This requires that you have xsimd_ installed
   on your system.
 
-All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or setting ``GTEST_SRC_DIR``
-enables ``BUILD_TESTS``.
+All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or
+setting ``GTEST_SRC_DIR`` enables ``BUILD_TESTS``.
 
 If the ``BUILD_TESTS`` option is enabled, the following targets are available:
 
@@ -38,7 +38,8 @@ For instance, building the test suite of ``xtensor`` with assertions enabled:
     cmake -DBUILD_TESTS=ON -DXTENSOR_ENABLE_ASSERT=ON ../
     make xtest
 
-Building the test suite of ``xtensor`` where the sources of ``gtest`` are located in e.g. ``/usr/share/gtest``:
+Building the test suite of ``xtensor`` where the sources of ``gtest`` are
+located in e.g. ``/usr/share/gtest``:
 
 .. code::
 
@@ -52,8 +53,8 @@ Building the test suite of ``xtensor`` where the sources of ``gtest`` are locate
 Configuration
 -------------
 
-``xtensor`` can be configured via macros, which must be defined *before* including any of its header. Here is a list of
-available macros:
+``xtensor`` can be configured via macros, which must be defined *before*
+including any of its header. Here is a list of available macros:
 
 - ``XTENSOR_ENABLE_ASSERT``: enables assertions in xtensor, such as bound check.
 - ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
