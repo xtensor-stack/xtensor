@@ -348,8 +348,8 @@ Calculate the derivative of a (discretized) field in Fourier space, e.g. a sine 
     #include <xtensor/xio.hpp>
 
     // generate a sinusoid field
-    double dx = M_PI/100;
-    xt::xarray<double> x = xt::arange(0., 2*M_PI, dx);
+    double dx = M_PI / 100;
+    xt::xarray<double> x = xt::arange(0., 2 * M_PI, dx);
     xt::xarray<double> sin = xt::sin(x);
 
     // transform to Fourier space
@@ -358,7 +358,7 @@ Calculate the derivative of a (discretized) field in Fourier space, e.g. a sine 
     // multiply by i*k
     std::complex<double> i {0, 1};
     auto k = xt::fftw::rfftscale<double>(sin.shape()[0], dx);
-    xt::xarray< std::complex<double> > sin_derivative_fs = xt::eval(i * k * sin_fs);
+    xt::xarray<std::complex<double>> sin_derivative_fs = xt::eval(i * k * sin_fs);
 
     // transform back to normal space
     auto sin_derivative = xt::fftw::irfft(sin_derivative_fs);
