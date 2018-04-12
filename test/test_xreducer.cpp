@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xreducer.hpp"
@@ -54,6 +55,15 @@ namespace xt
         xt::xarray<int> expect = {6, 15};
         EXPECT_EQ(a_sums, expect);
         EXPECT_EQ(a_sums2, expect);
+    }
+
+    TEST(xreducer, errors)
+    {
+        xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
+        EXPECT_THROW(xt::sum(a, {1, 0}), std::runtime_error);
+        EXPECT_THROW(xt::sum(a, {0, 2}), std::runtime_error);
+        EXPECT_THROW(xt::sum(a, {1, 0}, evaluation_strategy::immediate()), std::runtime_error);
+        EXPECT_THROW(xt::sum(a, {0, 2}, evaluation_strategy::immediate()), std::runtime_error);
     }
 
     TEST(xreducer, shape)
@@ -262,6 +272,90 @@ namespace xt
         auto c = xt::sum(b, { 0 });
         EXPECT_EQ(c(0), -4.);
         EXPECT_EQ(c(1), -6.);
+    }
+
+    TEST(xreducer, immediate_shape)
+    {
+        xtensor<double, 2> c = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+        auto xa = xt::sum(c, {0}, evaluation_strategy::immediate());
+        auto is_arr = [](const auto& c)
+        {
+            bool istrue = detail::is_array<std::decay_t<decltype(c)>>::value;
+            return istrue;
+        };
+
+    #ifndef X_OLD_CLANG
+        EXPECT_TRUE(is_arr(xa.shape()));
+    #endif
+
+        xtensor<double, 3> a;
+        a.resize({3, 3, 3});
+        std::iota(a.storage().begin(), a.storage().end(), 0);
+
+        xarray<double> a_lz = sum(a);
+        auto a_gd = sum(a, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+        EXPECT_TRUE(is_arr(a_gd.shape()));
+
+        a_lz = sum(a, {1});
+        auto a_gd_1 = sum(a, {1}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd_1);
+
+        a_lz = sum(a, {0, 2});
+        auto a_gd_2 = sum(a, {0, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd_2);
+
+    #ifndef X_OLD_CLANG
+        EXPECT_TRUE(is_arr(a_gd_1.shape()));
+        EXPECT_TRUE(is_arr(a_gd_2.shape()));
+    #endif
+
+        a_lz = sum(a, {1, 2});
+        a_gd_2 = sum(a, {1, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd_2);
+    }
+
+    TEST(xreducer, xfixed_reduction)
+    {
+        xtensorf<double, xshape<3, 3, 3>> a;
+        std::iota(a.storage().begin(), a.storage().end(), 0);
+
+        xtensor<double, 3> b;
+        b.resize({3, 3, 3});
+        std::iota(b.storage().begin(), b.storage().end(), 0);
+
+        auto is_arr = [](const auto& c)
+        {
+            bool istrue = detail::is_array<std::decay_t<decltype(c)>>::value;
+            return istrue;
+        };
+
+        xarray<double> a_lz = sum(a);
+        auto a_gd = sum(a, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd);
+        EXPECT_TRUE(is_arr(a_gd.shape()));
+
+        a_lz = sum(a, {1});
+        auto a_gd_1 = sum(a, {1}, evaluation_strategy::immediate());
+        auto b_gd_1 = sum(b, {1}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd_1);
+        EXPECT_EQ(a_lz, b_gd_1);
+
+        a_lz = sum(a, {0, 2});
+        auto a_gd_2 = sum(a, {0, 2}, evaluation_strategy::immediate());
+        auto b_gd_2 = sum(b, {0, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd_2);
+        EXPECT_EQ(b_gd_2, a_gd_2);
+        EXPECT_EQ(a_gd_2.dimension(), 1);
+
+    #ifndef X_OLD_CLANG
+        EXPECT_TRUE(is_arr(a_gd_1.shape()));
+        EXPECT_TRUE(is_arr(a_gd_2.shape()));
+    #endif
+
+        a_lz = sum(a, {1, 2});
+        a_gd_2 = sum(a, {1, 2}, evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz, a_gd_2);
     }
 
     TEST(xreducer, view_steppers)
