@@ -284,7 +284,7 @@ namespace xt
      * @param e input xexpression
      * @param axis select axis (or none)
      *
-     * @return returns xarray with positions of minimal value
+     * @return returns xarray with positions of maximal value
      */
     template <class E>
     auto argmax(const xexpression<E>& e, std::size_t axis)
