@@ -52,6 +52,20 @@ namespace xt
         }
     }
 
+    template<typename E>
+    auto normalize(E&& expr)
+    {
+        return E{ expr } / xt::view(xt::sum(E{ expr }, { 1 }), xt::all(), xt::newaxis());
+    }
+
+    TEST(xfunction, copy_constructor)
+    {
+        xt::xarray<double> freqs({ 10, 5 }, 1);
+        xt::xarray<double> other_freqs({ 10, 5 }, 2);
+        // Compilation test
+        xarray<double> probs = normalize(freqs + other_freqs);
+    }
+
     TEST(xfunction, broadcast_shape)
     {
         using shape_type = layout_result<>::shape_type;
