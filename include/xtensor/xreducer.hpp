@@ -548,7 +548,7 @@ namespace xt
         size_type shape(size_type i) const noexcept;
         size_type axis(size_type i) const noexcept;
 
-        const xreducer_type& m_reducer;
+        const xreducer_type* m_reducer;
         size_type m_offset;
         mutable substepper_type m_stepper;
     };
@@ -819,7 +819,7 @@ namespace xt
 
     template <class F, class CT, class X>
     inline xreducer_stepper<F, CT, X>::xreducer_stepper(const xreducer_type& red, size_type offset, bool end, layout_type l)
-        : m_reducer(red), m_offset(offset),
+        : m_reducer(&red), m_offset(offset),
           m_stepper(get_substepper_begin())
     {
         if (end)
@@ -904,7 +904,7 @@ namespace xt
     template <class F, class CT, class X>
     inline bool xreducer_stepper<F, CT, X>::equal(const self_type& rhs) const
     {
-        return &m_reducer == &(rhs.m_reducer) && m_stepper.equal(rhs.m_stepper);
+        return m_reducer == rhs.m_reducer && m_stepper.equal(rhs.m_stepper);
     }
 
     template <class F, class CT, class X>
@@ -913,22 +913,22 @@ namespace xt
         size_type index = axis(dim);
         size_type size = shape(index);
         reference res;
-        if (dim != m_reducer.m_axes.size() - 1)
+        if (dim != m_reducer->m_axes.size() - 1)
         {
             res = aggregate(dim + 1);
             for (size_type i = 1; i != size; ++i)
             {
                 m_stepper.step(index);
-                res = m_reducer.m_merge(res, aggregate(dim + 1));
+                res = m_reducer->m_merge(res, aggregate(dim + 1));
             }
         }
         else
         {
-            res = m_reducer.m_init(*m_stepper);
+            res = m_reducer->m_init(*m_stepper);
             for (size_type i = 1; i != size; ++i)
             {
                 m_stepper.step(index);
-                res = m_reducer.m_reduce(res, *m_stepper);
+                res = m_reducer->m_reduce(res, *m_stepper);
             }
         }
         m_stepper.reset(index);
@@ -938,25 +938,25 @@ namespace xt
     template <class F, class CT, class X>
     inline auto xreducer_stepper<F, CT, X>::get_substepper_begin() const -> substepper_type
     {
-        return m_reducer.m_e.stepper_begin(m_reducer.m_e.shape());
+        return m_reducer->m_e.stepper_begin(m_reducer->m_e.shape());
     }
 
     template <class F, class CT, class X>
     inline auto xreducer_stepper<F, CT, X>::get_dim(size_type dim) const noexcept -> size_type
     {
-        return m_reducer.m_dim_mapping[dim];
+        return m_reducer->m_dim_mapping[dim];
     }
 
     template <class F, class CT, class X>
     inline auto xreducer_stepper<F, CT, X>::shape(size_type i) const noexcept -> size_type
     {
-        return m_reducer.m_e.shape()[i];
+        return m_reducer->m_e.shape()[i];
     }
 
     template <class F, class CT, class X>
     inline auto xreducer_stepper<F, CT, X>::axis(size_type i) const noexcept -> size_type
     {
-        return m_reducer.m_axes[i];
+        return m_reducer->m_axes[i];
     }
 
     template <class F, class CT, class X>

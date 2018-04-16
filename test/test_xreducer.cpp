@@ -12,6 +12,9 @@
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xreducer.hpp"
+#include "xtensor/xview.hpp" 
+#include "xtensor/xstrided_view.hpp" 
+#include "xtensor/xrandom.hpp" 
 
 namespace xt
 {
@@ -259,5 +262,18 @@ namespace xt
         auto c = xt::sum(b, { 0 });
         EXPECT_EQ(c(0), -4.);
         EXPECT_EQ(c(1), -6.);
+    }
+
+    TEST(xreducer, view_steppers)
+    {
+        xt::xtensor<double, 2> X({10, 20});
+        xt::xtensor<double, 2> Y(X.shape());
+
+        X = xt::random::randn<double>(X.shape());
+
+        xt::xtensor<double, 2> vx0 = xt::view(xt::sum(X, {1}), xt::all(), xt::newaxis());
+        xt::xtensor<double, 2> vx1 = xt::expand_dims(xt::sum(X, {1}), 1);
+
+        EXPECT_EQ(vx0, vx1);
     }
 }
