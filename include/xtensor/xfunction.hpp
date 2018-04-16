@@ -286,7 +286,7 @@ namespace xt
 
     protected:
 
-        template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<Func, self_type>::value>>
+        template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
         xfunction_base(Func&& f, CTA&&... e) noexcept;
 
         ~xfunction_base() = default;
@@ -511,7 +511,7 @@ namespace xt
         using self_type = xfunction<F, R, CT...>;
         using base_type = xfunction_base<F, R, CT...>;
 
-        template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<Func, self_type>::value>>
+        template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
         xfunction(Func&& f, CTA&&... e) noexcept;
 
         ~xfunction() = default;
