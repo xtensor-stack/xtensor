@@ -14,15 +14,15 @@ A multi-dimensional array of `xtensor` consists of a contiguous one-dimensional 
 unsigned integers to the location of an element in the buffer. The range in which the indices can vary is specified by the
 `shape` of the array.
 
-The scheme used to map indices into a location in the buffer is a strided indexing scheme. In such a scheme, the index ``(i0, ..., in)`` corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where ``(s0, ..., sn)`` are the `strides` of the array. Some particular cases of strided schemes implement well known memory layouts: 
+The scheme used to map indices into a location in the buffer is a strided indexing scheme. In such a scheme, the index ``(i0, ..., in)`` corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where ``(s0, ..., sn)`` are the `strides` of the array. Some particular cases of strided schemes implement well known memory layouts:
 
 - the row-major layout (or C layout) is a strided index scheme where the strides grow from right to left
 - the column-major layout (or Fortran layout) is a strided index scheme where the strides grow from left to right
 
 ``xtensor`` provides a ``layout_type`` enum that helps to specify the layout used by multi-dimensional arrays. This enum can be used in two ways:
 
-- at compile time, as a template argument. The value ``layout_type::dynamic`` allows specifying any strided index scheme at runtime (including row-major and column-major schemes), while ``layout_type::row_major`` and ``layout_type::column_major`` fixes the strided index scheme and disable ``resize`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template parameter is ``DEFAULT_LAYOUT``.
-- at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``resize`` and constructor overloads allow specifying a set of strides or a layout value to avoid strides computation. If neither strides nor layout is specified when instantiating or resizing a multi-dimensional array, strides corresponding to ``DEFAULT_LAYOUT`` are used.
+- at compile time, as a template argument. The value ``layout_type::dynamic`` allows specifying any strided index scheme at runtime (including row-major and column-major schemes), while ``layout_type::row_major`` and ``layout_type::column_major`` fixes the strided index scheme and disable ``resize`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template parameter is ``XTENSOR_DEFAULT_LAYOUT``.
+- at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``resize`` and constructor overloads allow specifying a set of strides or a layout value to avoid strides computation. If neither strides nor layout is specified when instantiating or resizing a multi-dimensional array, strides corresponding to ``XTENSOR_DEFAULT_LAYOUT`` are used.
 
 The following example shows how to initialize a multi-dimensional array of dynamic layout with specified strides:
 
@@ -30,7 +30,7 @@ The following example shows how to initialize a multi-dimensional array of dynam
 
     #include <vector>
     #include "xtensor/xarray.hpp"
-    
+
     std::vector<size_t> shape = { 3, 2, 4 };
     std::vector<size_t> strides = { 8, 4, 1 };
     xt::xarray<double, layout_type::dynamic> a(shape, strides);
@@ -140,7 +140,7 @@ The aliasing phenomenon is illustrated in the following example:
 
     std::vector<size_t> a_shape = {3, 2, 4};
     xt::xarray<double> a(a_shape);
-    
+
     std::vector<size_t> b_shape = {2, 4};
     xt::xarray<double> b(b_shape);
 
@@ -149,7 +149,7 @@ The aliasing phenomenon is illustrated in the following example:
 
 In the above example, the shape of ``a + b`` is ``{ 3, 2, 4 }``. Therefore, ``b`` must first be resized, which impacts how the right-hand side is computed.
 
-If the values of ``b`` were copied into the new buffer directly without an intermediary variable, then we would have 
+If the values of ``b`` were copied into the new buffer directly without an intermediary variable, then we would have
 ``new_b(0, i, j) == old_b(i, j) for (i,j) in [0,1] x [0, 3]``. After the resize of ``bb``, ``a(0, i, j) + b(0, i, j)`` is assigned to ``b(0, i, j)``, then,
 due to broadcasting rules, ``a(1, i, j) + b(0, i, j)`` is assigned to ``b(1, i, j)``. The issue is ``b(0, i, j)`` has been changed by the previous assignment.
 

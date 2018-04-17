@@ -29,7 +29,7 @@ namespace xt
     template <class C = dynamic_shape<std::size_t>>
     struct layout_result
     {
-        using vector_type = uvector<int, DEFAULT_ALLOCATOR(int)>;
+        using vector_type = uvector<int, XTENSOR_DEFAULT_ALLOCATOR(int)>;
         using size_type = typename C::value_type;
         using difference_type = typename C::difference_type;
         using shape_type = C;

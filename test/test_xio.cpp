@@ -126,7 +126,7 @@ namespace xt
 
         std::stringstream out;
         out << (rn > 0);
-        std::string res = (DEFAULT_LAYOUT == layout_type::row_major) ? bool_fn_rm : bool_fn_cm;
+        std::string res = (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major) ? bool_fn_rm : bool_fn_cm;
         EXPECT_EQ(res, out.str());
     }
 

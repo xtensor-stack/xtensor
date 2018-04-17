@@ -123,10 +123,8 @@ if(XTENSOR_USE_XSIMD)
     target_link_libraries(xtensor INTERFACE xsimd)
 endif()
 
-message(STATUS "${XTENSOR_DEPENDENCIES}")
-
 if(DEFAULT_COLUMN_MAJOR)
-    add_definitions(-DDEFAULT_LAYOUT=layout_type::column_major)
+    add_definitions(-DXTENSOR_DEFAULT_LAYOUT=layout_type::column_major)
 endif()
 
 if(DISABLE_VS2017)

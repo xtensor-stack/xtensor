@@ -117,7 +117,7 @@ namespace xt
         {
             dynamic_shape<std::size_t> strides;
             strides.resize(e.shape().size());
-            compute_strides(e.shape(), DEFAULT_LAYOUT, strides);
+            compute_strides(e.shape(), XTENSOR_DEFAULT_LAYOUT, strides);
             return strides;
         }
     }
@@ -805,7 +805,7 @@ namespace xt
                 resize_container(m_index, m_e.dimension());
                 resize_container(m_strides, m_e.dimension());
                 m_size = compute_size(m_e.shape());
-                // Fallback to DEFAULT_LAYOUT when the underlying layout is not
+                // Fallback to XTENSOR_DEFAULT_LAYOUT when the underlying layout is not
                 // row-major or column major.
                 m_layout = default_assignable_layout(m_e.layout());
                 compute_strides(m_e.shape(), m_layout, m_strides);

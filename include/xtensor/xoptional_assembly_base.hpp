@@ -20,7 +20,7 @@ namespace xt
     template <class D, bool is_const>
     class xoptional_assembly_iterator;
 
-#define DL DEFAULT_LAYOUT
+#define DL XTENSOR_DEFAULT_LAYOUT
 
     /***************************
      * xoptional_assembly_base *

@@ -178,8 +178,8 @@ namespace xt
         template <class E, class F>
         xtensor<std::size_t, 0> arg_func_impl(const E& e, F&& f)
         {
-            return cmp_idx(e.template begin<DEFAULT_LAYOUT>(),
-                           e.template end<DEFAULT_LAYOUT>(), 1,
+            return cmp_idx(e.template begin<XTENSOR_DEFAULT_LAYOUT>(),
+                           e.template end<XTENSOR_DEFAULT_LAYOUT>(), 1,
                            std::forward<F>(f));
         }
 
