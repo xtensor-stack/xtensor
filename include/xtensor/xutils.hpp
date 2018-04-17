@@ -15,6 +15,7 @@
 #include <complex>
 #include <cstddef>
 #include <initializer_list>
+#include <iostream>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -891,6 +892,85 @@ namespace xt
      */
     template <class T>
     using squared_norm_type_t = typename squared_norm_type<T>::type;
+
+    namespace alloc_tracking
+    {
+        static bool enabled = false;
+
+        static void enable()
+        {
+            enabled = true;
+        }
+
+        static void disable()
+        {
+            enabled = false;
+        }
+    }
+
+    template <typename T>
+    struct tracking_allocator
+    {
+        using value_type = T;
+        using reference = T&;
+        using const_reference = const T&;
+        using pointer = T*;
+        using const_pointer = const T*;
+        using size_type = std::size_t;
+        using difference_type = std::ptrdiff_t;
+
+        tracking_allocator() = default;
+
+        template <class U>
+        tracking_allocator(const tracking_allocator<U>&)
+        {
+        }
+
+        T* allocate(std::size_t n)
+        {
+            if (alloc_tracking::enabled)
+            {
+                std::cout << "xtensor allocating: " << n << "" << std::endl;
+            }
+            if (n <= std::numeric_limits<std::size_t>::max() / sizeof(T))
+            {
+                if (auto ptr = std::malloc(n * sizeof(T)))
+                {
+                    return static_cast<T*>(ptr);
+                }
+            }
+            throw std::bad_alloc();
+        }
+
+        void deallocate(T* ptr, std::size_t n)
+        {
+            std::free(ptr);
+        }
+
+        template <class U, class... Args>
+        void construct(U* p, Args&&... args)
+        {
+            new ((void*)p) U(std::forward<Args>(args)...);
+        }
+
+        template <class U>
+        void destroy(U* p)
+        {
+            p->~U();
+        }
+    };
+
+    template <typename T, typename U>
+    inline bool operator==(const tracking_allocator<T>&, const tracking_allocator<U>&)
+    {
+      return true;
+    }
+
+    template <typename T, typename U>
+    inline bool operator!=(const tracking_allocator<T>& a, const tracking_allocator<U>& b)
+    {
+      return !(a == b);
+    }
 }
 
 #endif
