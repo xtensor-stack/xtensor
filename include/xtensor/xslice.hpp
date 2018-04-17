@@ -183,21 +183,6 @@ namespace xt
         return xall_tag();
     }
 
-    template <class T>
-    class xellipsis : public xslice<xellipsis<T>>
-    {
-    public:
-
-        using size_type = T;
-
-        xellipsis() = default;
-
-        size_type operator()(size_type i) const noexcept;
-
-        size_type size() const noexcept;
-        size_type step_size() const noexcept;
-    };
-
     struct xellipsis_tag
     {
     };
@@ -495,12 +480,6 @@ namespace xt
     }
 
     template <class E>
-    inline auto get_slice_implementation(E& /*e*/, xellipsis_tag, std::size_t /*index*/)
-    {
-        return xellipsis<typename E::size_type>();
-    }
-
-    template <class E>
     inline auto get_slice_implementation(E& /*e*/, xnewaxis_tag, std::size_t /*index*/)
     {
         return xnewaxis<typename E::size_type>();
@@ -528,12 +507,6 @@ namespace xt
         struct get_slice_type_impl<E, xall_tag>
         {
             using type = xall<typename E::size_type>;
-        };
-
-        template <class E>
-        struct get_slice_type_impl<E, xellipsis_tag>
-        {
-            using type = xellipsis<typename E::size_type>;
         };
 
         template <class E>
@@ -741,28 +714,6 @@ namespace xt
     inline bool xall<T>::operator!=(const self_type& rhs) const noexcept
     {
         return !(*this == rhs);
-    }
-
-    /****************************
-     * xellipsis implementation *
-     ****************************/
-
-    template <class T>
-    inline auto xellipsis<T>::operator()(size_type /*i*/) const noexcept -> size_type
-    {
-        return 0;
-    }
-
-    template <class T>
-    inline auto xellipsis<T>::size() const noexcept -> size_type
-    {
-        return 0;
-    }
-
-    template <class T>
-    inline auto xellipsis<T>::step_size() const noexcept -> size_type
-    {
-        return 1;
     }
 
     /***************************

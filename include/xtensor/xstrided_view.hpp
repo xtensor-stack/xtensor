@@ -279,6 +279,10 @@ namespace xt
         container_type& data() noexcept;
         const container_type& data() const noexcept;
 
+        size_type offset() const noexcept;
+        xexpression_type& expression() noexcept;
+        const xexpression_type& expression() const noexcept;
+
         template <class E = std::decay_t<CT>>
         std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, value_type*>
         raw_data() noexcept;
@@ -475,6 +479,24 @@ namespace xt
     inline auto xstrided_view<CT, S, FS>::raw_data_offset() const noexcept -> size_type
     {
         return m_offset;
+    }
+
+    template <class CT, class S, class FS>
+    inline auto xstrided_view<CT, S, FS>::offset() const noexcept -> size_type
+    {
+        return m_offset;
+    }
+
+    template <class CT, class S, class FS>
+    inline auto xstrided_view<CT, S, FS>::expression() noexcept -> xexpression_type&
+    {
+        return m_e;
+    }
+
+    template <class CT, class S, class FS>
+    inline auto xstrided_view<CT, S, FS>::expression() const noexcept -> const xexpression_type&
+    {
+        return m_e;
     }
     //@}
 
@@ -853,27 +875,28 @@ namespace xt
             layout_type m_layout;
         };
 
-        template <class E>
+        template <class S>
         struct slice_getter_impl
         {
-            E& m_expr;
+            const S& m_shape;
             mutable std::size_t idx;
 
-            slice_getter_impl(E& expr)
-                : m_expr(expr), idx(0)
+            slice_getter_impl(const S& shape)
+                : m_shape(shape), idx(0)
             {
             }
 
             template <class T>
-            std::array<std::ptrdiff_t, 3> operator()(const T& t) const
+            std::array<std::ptrdiff_t, 3> operator()(const T& /*t*/) const
             {
-                auto sl = get_slice_implementation(m_expr, t, idx);
-                return std::array<std::ptrdiff_t, 3>({std::ptrdiff_t(sl(0)), std::ptrdiff_t(sl.size()), std::ptrdiff_t(sl.step_size())});
+                return {0, 0, 0};
             }
 
-            std::array<std::ptrdiff_t, 3> operator()(const std::ptrdiff_t& /*t*/) const
+            template <class A, class B, class C>
+            std::array<std::ptrdiff_t, 3> operator()(const xrange_adaptor<A, B, C>& range) const
             {
-                return std::array<std::ptrdiff_t, 3>({0, 0, 0});
+                auto sl = range.get(m_shape[idx]);
+                return {sl(0), sl.size(), sl.step_size()};
             }
         };
     }
@@ -904,6 +927,128 @@ namespace xt
      */
     using slice_vector = std::vector<slice_variant<std::ptrdiff_t>>;
 
+    namespace detail
+    {
+        template <class S, class ST>
+        inline auto get_dynamic_view_args(const S& shape, ST&& strides, std::size_t base_offset, layout_type layout, const slice_vector& slices)
+        {
+            // Compute dimension
+            std::size_t dimension = shape.size(), n_newaxis = 0, n_add_all = 0;
+            std::ptrdiff_t dimension_check = static_cast<std::ptrdiff_t>(shape.size());
+
+            bool has_ellipsis = false;
+            for (const auto& el : slices)
+            {
+                if (xtl::get_if<xt::xnewaxis_tag>(&el) != nullptr)
+                {
+                    ++dimension;
+                    ++n_newaxis;
+                }
+                else if (xtl::get_if<std::ptrdiff_t>(&el) != nullptr)
+                {
+                    --dimension;
+                    --dimension_check;
+                }
+                else if (xtl::get_if<xt::xellipsis_tag>(&el) != nullptr)
+                {
+                    if (has_ellipsis == true)
+                    {
+                        throw std::runtime_error("Ellipsis can only appear once.");
+                    }
+                    has_ellipsis = true;
+                }
+                else
+                {
+                    --dimension_check;
+                }
+            }
+
+            if (dimension_check < 0)
+            {
+                throw std::runtime_error("Too many slices for view.");
+            }
+
+            if (has_ellipsis)
+            {
+                // replace ellipsis with N * xt::all
+                // remove -1 because of the ellipsis slize itself
+                n_add_all = shape.size() - (slices.size() - 1 - n_newaxis);
+            }
+
+            // Compute strided view
+            std::size_t offset = base_offset;
+            using shape_type = dynamic_shape<std::size_t>;
+
+            shape_type new_shape(dimension);
+            shape_type new_strides(dimension);
+
+            auto old_shape = shape;
+            auto&& old_strides = strides;
+
+    #define MS(v) static_cast<std::ptrdiff_t>(v)
+    #define MU(v) static_cast<std::size_t>(v)
+
+            std::ptrdiff_t i = 0, axis_skip = 0;
+            std::size_t idx = 0;
+
+            auto slice_getter = detail::slice_getter_impl<S>(shape);
+
+            for (; i < MS(slices.size()); ++i)
+            {
+                auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[MU(i)]);
+                if (ptr != nullptr)
+                {
+                    std::size_t slice0 = static_cast<std::size_t>(*ptr);
+                    offset += slice0 * old_strides[MU(i - axis_skip)];
+                }
+                else if (xtl::get_if<xt::xnewaxis_tag>(&slices[MU(i)]) != nullptr)
+                {
+                    new_shape[idx] = 1;
+                    ++axis_skip, ++idx;
+                }
+                else if (xtl::get_if<xt::xellipsis_tag>(&slices[MU(i)]) != nullptr)
+                {
+                    for (std::size_t j = 0; j < n_add_all; ++j)
+                    {
+                        new_shape[idx] = old_shape[MU(i - axis_skip)];
+                        new_strides[idx] = old_strides[MU(i - axis_skip)];
+                        --axis_skip, ++idx;
+                    }
+                    ++axis_skip;  // because i++
+                }
+                else if (xtl::get_if<xt::xall_tag>(&slices[MU(i)]) != nullptr)
+                {
+                    new_shape[idx] = old_shape[MU(i - axis_skip)];
+                    new_strides[idx] = old_strides[MU(i - axis_skip)];
+                    ++idx;
+                }
+                else
+                {
+                    slice_getter.idx = MU(i - axis_skip);
+                    auto info = xtl::visit(slice_getter, slices[MU(i)]);
+                    offset += std::size_t(info[0]) * old_strides[MU(i - axis_skip)];
+                    new_shape[idx] = std::size_t(info[1]);
+                    new_strides[idx] = std::size_t(info[2]) * old_strides[MU(i - axis_skip)];
+                    ++idx;
+                }
+            }
+
+            for (; MU(i - axis_skip) < old_shape.size(); ++i)
+            {
+                new_shape[idx] = old_shape[MU(i - axis_skip)];
+                new_strides[idx] = old_strides[MU(i - axis_skip)];
+                ++idx;
+            }
+
+            layout_type new_layout = do_strides_match(new_shape, new_strides, layout) ? layout : layout_type::dynamic;
+
+            return std::make_tuple(std::move(new_shape), std::move(new_strides), offset, new_layout);
+
+    #undef MU
+    #undef MS
+        }
+    }
+
     /**
      * Function to create a dynamic view from
      * a xexpression and a slice_vector.
@@ -932,123 +1077,25 @@ namespace xt
     template <class E>
     inline auto dynamic_view(E&& e, const slice_vector& slices)
     {
-        // Compute dimension
-        std::size_t dimension = e.dimension(), n_newaxis = 0, n_add_all = 0;
-        std::ptrdiff_t dimension_check = static_cast<std::ptrdiff_t>(e.dimension());
+        auto args = detail::get_dynamic_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        using view_type = xstrided_view<xclosure_t<E>, std::decay_t<decltype(std::get<0>(args))>>;
+        return view_type(std::forward<E>(e), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
+    }
 
-        bool has_ellipsis = false;
-        for (const auto& el : slices)
-        {
-            if (xtl::get_if<xt::xnewaxis_tag>(&el) != nullptr)
-            {
-                ++dimension;
-                ++n_newaxis;
-            }
-            else if (xtl::get_if<std::ptrdiff_t>(&el) != nullptr)
-            {
-                --dimension;
-                --dimension_check;
-            }
-            else if (xtl::get_if<xt::xellipsis_tag>(&el) != nullptr)
-            {
-                if (has_ellipsis == true)
-                {
-                    throw std::runtime_error("Ellipsis can only appear once.");
-                }
-                has_ellipsis = true;
-            }
-            else
-            {
-                --dimension_check;
-            }
-        }
+    template <class CT, class S, class FS>
+    auto dynamic_view(const xstrided_view<CT, S, FS>& e, const slice_vector& slices)
+    {
+        auto args = detail::get_dynamic_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
+        return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
+    }
 
-        if (dimension_check < 0)
-        {
-            throw std::runtime_error("Too many slices for view.");
-        }
-
-        if (has_ellipsis)
-        {
-            // replace ellipsis with N * xt::all
-            // remove -1 because of the ellipsis slize itself
-            n_add_all = e.dimension() - (slices.size() - 1 - n_newaxis);
-        }
-
-        // Compute strided view
-        std::size_t offset = detail::get_offset(e);
-        using shape_type = dynamic_shape<std::size_t>;
-
-        shape_type new_shape(dimension);
-        shape_type new_strides(dimension);
-
-        auto old_shape = e.shape();
-        auto&& old_strides = detail::get_strides(e);
-
-#define MS(v) static_cast<std::ptrdiff_t>(v)
-#define MU(v) static_cast<std::size_t>(v)
-
-        std::ptrdiff_t i = 0, axis_skip = 0;
-        std::size_t idx = 0;
-
-        auto slice_getter = detail::slice_getter_impl<E>(e);
-
-        for (; i < MS(slices.size()); ++i)
-        {
-            auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[MU(i)]);
-            if (ptr != nullptr)
-            {
-                std::size_t slice0 = static_cast<std::size_t>(*ptr);
-                offset += slice0 * old_strides[MU(i - axis_skip)];
-            }
-            else if (xtl::get_if<xt::xnewaxis_tag>(&slices[MU(i)]) != nullptr)
-            {
-                new_shape[idx] = 1;
-                new_strides[idx] = 0;
-                ++axis_skip;
-                ++idx;
-            }
-            else if (xtl::get_if<xt::xellipsis_tag>(&slices[MU(i)]) != nullptr)
-            {
-                for (std::size_t j = 0; j < n_add_all; ++j)
-                {
-                    new_shape[idx] = old_shape[MU(i - axis_skip)];
-                    new_strides[idx] = old_strides[MU(i - axis_skip)];
-                    ++idx, --axis_skip;
-                }
-                ++axis_skip;  // because i++
-            }
-            else if (xtl::get_if<xt::xall_tag>(&slices[MU(i)]) != nullptr)
-            {
-                new_shape[idx] = old_shape[MU(i - axis_skip)];
-                new_strides[idx] = old_strides[MU(i - axis_skip)];
-                ++idx;
-            }
-            else
-            {
-                slice_getter.idx = MU(i - axis_skip);
-                std::array<std::ptrdiff_t, 3> info = xtl::visit(slice_getter, slices[MU(i)]);
-                offset += std::size_t(info[0]) * old_strides[MU(i - axis_skip)];
-                new_shape[idx] = std::size_t(info[1]);
-                new_strides[idx] = std::size_t(info[2]) * old_strides[MU(i - axis_skip)];
-                ++idx;
-            }
-        }
-
-        for (; MU(i - axis_skip) < old_shape.size(); ++i)
-        {
-            new_shape[idx] = old_shape[MU(i - axis_skip)];
-            new_strides[idx] = old_strides[MU(i - axis_skip)];
-            ++idx;
-        }
-
-        using view_type = xstrided_view<xclosure_t<E>, shape_type>;
-
-        // TODO change layout type?
-        return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), offset, layout_type::dynamic);
-
-#undef MU
-#undef MS
+    template <class CT, class S, class FS>
+    auto dynamic_view(xstrided_view<CT, S, FS>& e, const slice_vector& slices)
+    {
+        auto args = detail::get_dynamic_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
+        return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
     }
 
     /****************************
@@ -1268,7 +1315,6 @@ namespace xt
             inline static auto run(E&& e)
             {
                 // Case where the static layout is either row_major or column major.
-                using flat_proxy_type = flat_expression_adaptor<xclosure_t<E>>;
                 using shape_type = typename std::decay_t<E>::shape_type;
                 shape_type strides;
                 resize_container(strides, e.shape().size());
@@ -1332,7 +1378,7 @@ namespace xt
             end -= std::find_if(e.crbegin(), e.crend(), find_fun) - e.crbegin();
         }
 
-        return dynamic_view(std::forward<E>(e), {range(static_cast<int>(begin), static_cast<int>(end))});
+        return dynamic_view(std::forward<E>(e), { range(begin, end) });
     }
 
     /**
@@ -1432,7 +1478,7 @@ namespace xt
     template <class E, class Tag = check_policy::none>
     inline auto squeeze(E&& e, std::size_t axis, Tag check_policy = Tag())
     {
-        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>({axis}), check_policy);
+        return squeeze(std::forward<E>(e), std::array<std::size_t, 1>{ axis }, check_policy);
     }
     /// @endcond
 
@@ -1549,7 +1595,7 @@ namespace xt
         std::vector<decltype(dynamic_view(e, sv))> result;
         for (std::size_t i = 0; i < n; ++i)
         {
-            sv[axis] = range(static_cast<int>(i * step), static_cast<int>((i + 1) * step));
+            sv[axis] = range(i * step, (i + 1) * step);
             result.emplace_back(dynamic_view(e, sv));
         }
         return result;

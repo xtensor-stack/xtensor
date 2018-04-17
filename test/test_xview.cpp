@@ -53,7 +53,6 @@ namespace xt
         EXPECT_EQ(a(1, 1), view1(0));
         EXPECT_EQ(a(1, 2), view1(1));
         EXPECT_EQ(size_t(1), view1.dimension());
-        EXPECT_EQ(layout_type::dynamic, view1.layout());
         EXPECT_ANY_THROW(view1.at(10));
         EXPECT_ANY_THROW(view1.at(0, 0));
 
@@ -87,6 +86,27 @@ namespace xt
         EXPECT_EQ(a(0, 2), view7(0));
         EXPECT_EQ(a(1, 2), view7(1));
         EXPECT_EQ(a(2, 2), view7(2));
+
+        if (a.layout() == layout_type::row_major)
+        {
+            EXPECT_EQ(a.layout(), view1.layout());
+            EXPECT_EQ(layout_type::dynamic, view2.layout());
+            EXPECT_EQ(a.layout(), view4.layout());
+            EXPECT_EQ(a.layout(), view5.layout());
+            EXPECT_EQ(a.layout(), view6.layout());
+            EXPECT_EQ(layout_type::dynamic, view7.layout());
+        }
+        else
+        {
+            EXPECT_EQ(layout_type::dynamic, view1.layout());
+            EXPECT_EQ(a.layout(), view2.layout());
+            EXPECT_EQ(layout_type::dynamic, view4.layout());
+            // TODO ideally this would return the underlying expression's layout
+            // but needs special casing 'view-on-view'
+            EXPECT_EQ(layout_type::dynamic, view5.layout());
+            EXPECT_EQ(layout_type::dynamic, view6.layout());
+            EXPECT_EQ(a.layout(), view7.layout());
+        }
     }
 
     TEST(xview, copy_semantic)
@@ -103,7 +123,14 @@ namespace xt
             EXPECT_EQ(a(1, 1), view2(0));
             EXPECT_EQ(a(1, 2), view2(1));
             EXPECT_EQ(size_t(1), view2.dimension());
-            EXPECT_EQ(layout_type::dynamic, view2.layout());
+            if (a.layout() == layout_type::row_major)
+            {
+                EXPECT_EQ(a.layout(), view2.layout());
+            }
+            else
+            {
+                EXPECT_EQ(layout_type::dynamic, view2.layout());
+            }
         }
 
         {
@@ -131,7 +158,14 @@ namespace xt
             EXPECT_EQ(a(1, 1), view2(0));
             EXPECT_EQ(a(1, 2), view2(1));
             EXPECT_EQ(size_t(1), view2.dimension());
-            EXPECT_EQ(layout_type::dynamic, view2.layout());
+            if (a.layout() == layout_type::row_major)
+            {
+                EXPECT_EQ(a.layout(), view2.layout());
+            }
+            else
+            {
+                EXPECT_EQ(layout_type::dynamic, view2.layout());
+            }
         }
 
         {
@@ -715,8 +749,12 @@ namespace xt
         EXPECT_EQ(s3, s3e);
 
         auto s4 = view(a, xt::range(0, 1, 2), 1, 0, xt::all(), xt::newaxis()).strides();
-        std::vector<std::size_t> s4e = {72 * 2, 1, 0};
+        std::vector<std::size_t> s4e = {0, 1, 0};
         EXPECT_EQ(s4, s4e);
+
+        auto s4x = view(a, xt::range(0, 5, 2), 1, 0, xt::all(), xt::newaxis()).strides();
+        std::vector<std::size_t> s4xe = {72 * 2, 1, 0};
+        EXPECT_EQ(s4x, s4xe);
 
         auto s5 = view(a, xt::all(), 1).strides();
         std::vector<std::size_t> s5e = {72, 6, 1};

@@ -459,7 +459,7 @@ namespace xt
     template <class CT, class... S>
     inline layout_type xview<CT, S...>::layout() const noexcept
     {
-        return static_layout;
+        return do_strides_match(shape(), strides(), m_e.layout()) ? m_e.layout() : layout_type::dynamic;
     }
     //@}
 
@@ -741,6 +741,11 @@ namespace xt
             strides[i] = index < sizeof...(S) ?
                 apply<size_type>(index, func, m_slices) * m_e.strides()[index - newaxis_count_before<S...>(index)] :
                 m_e.strides()[index - newaxis_count_before<S...>(index)];
+            // adapt strides for shape[i] == 1 to make consistent with rest of xtensor
+            if (shape()[i] == 1)
+            {
+                strides[i] = 0;
+            }
         }
 
         return strides;
