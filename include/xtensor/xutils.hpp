@@ -908,23 +908,20 @@ namespace xt
         }
     }
 
-    template <typename T>
+    template <class T, class A>
     struct tracking_allocator
+        : private A
     {
-        using value_type = T;
-        using reference = T&;
-        using const_reference = const T&;
-        using pointer = T*;
-        using const_pointer = const T*;
-        using size_type = std::size_t;
-        using difference_type = std::ptrdiff_t;
+        using base_type = A;
+        using value_type = typename A::value_type;
+        using reference = typename A::reference;
+        using const_reference = typename A::const_reference;
+        using pointer = typename A::pointer;
+        using const_pointer = typename A::const_pointer;
+        using size_type = typename A::size_type;
+        using difference_type = typename A::difference_type;
 
         tracking_allocator() = default;
-
-        template <class U>
-        tracking_allocator(const tracking_allocator<U>&)
-        {
-        }
 
         T* allocate(std::size_t n)
         {
@@ -932,42 +929,22 @@ namespace xt
             {
                 std::cout << "xtensor allocating: " << n << "" << std::endl;
             }
-            if (n <= std::numeric_limits<std::size_t>::max() / sizeof(T))
-            {
-                if (auto ptr = std::malloc(n * sizeof(T)))
-                {
-                    return static_cast<T*>(ptr);
-                }
-            }
-            throw std::bad_alloc();
+            return base_type::allocate(n);
         }
 
-        void deallocate(T* ptr, std::size_t n)
-        {
-            std::free(ptr);
-        }
-
-        template <class U, class... Args>
-        void construct(U* p, Args&&... args)
-        {
-            new ((void*)p) U(std::forward<Args>(args)...);
-        }
-
-        template <class U>
-        void destroy(U* p)
-        {
-            p->~U();
-        }
+        using base_type::deallocate;
+        using base_type::construct;
+        using base_type::destroy;
     };
 
-    template <typename T, typename U>
-    inline bool operator==(const tracking_allocator<T>&, const tracking_allocator<U>&)
+    template <class T, class AT, class U, class AU>
+    inline bool operator==(const tracking_allocator<T, AT>&, const tracking_allocator<U, AU>&)
     {
       return true;
     }
 
-    template <typename T, typename U>
-    inline bool operator!=(const tracking_allocator<T>& a, const tracking_allocator<U>& b)
+    template <class T, class AT, class U, class AU>
+    inline bool operator!=(const tracking_allocator<T, AT>& a, const tracking_allocator<U, AU>& b)
     {
       return !(a == b);
     }
