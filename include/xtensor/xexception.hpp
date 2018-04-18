@@ -127,12 +127,15 @@ namespace xt
     inline void check_element_index(const S& shape, It first, It last)
     {
         auto dst = static_cast<typename S::size_type>(last - first);
-        It efirst = last - std::min(shape.size(), dst);
+        It efirst = last - static_cast<std::ptrdiff_t>(std::min(shape.size(), dst));
         std::size_t axis = 0;
         while (efirst != last)
         {
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wsign-compare"
             if (*efirst >= shape[axis] && shape[axis] != 1)
             {
+        #pragma GCC diagnostic pop
                 throw std::out_of_range("index " + std::to_string(*efirst) + " is out of bounds for axis "
                     + std::to_string(axis) + " with size " + std::to_string(shape[axis]));
             }
