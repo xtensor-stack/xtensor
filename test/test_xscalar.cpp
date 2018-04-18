@@ -19,6 +19,21 @@ namespace xt
         EXPECT_EQ(x.size(), size_t(1));
     }
 
+    TEST(xscalar, construct_convert)
+    {
+        xscalar<int> a, b, c;
+        b = 123;
+        c = 3;
+
+        int bc = b;
+        int ac = a;
+        int abc = a + b;
+        EXPECT_EQ(b(), 123);
+        EXPECT_EQ(bc, 123);
+        EXPECT_EQ(ac, 0);
+        EXPECT_EQ(abc, 123);
+    }
+
     TEST(xscalar, access)
     {
         // Calling operator() with no argument returns the wrapped value.
