@@ -1098,7 +1098,8 @@ namespace xt
     template <class It, class BIt>
     inline auto xbounded_iterator<It, BIt>::operator*() const -> value_type
     {
-        return (*m_it < *m_bound_it) ? *m_it : static_cast<value_type>((*m_bound_it) - 1);
+        using type = decltype(*m_bound_it);
+        return (static_cast<type>(*m_it) < *m_bound_it) ? *m_it : static_cast<value_type>((*m_bound_it) - 1);
     }
 
     template <class It, class BIt>

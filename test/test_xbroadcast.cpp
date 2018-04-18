@@ -69,8 +69,9 @@ namespace xt
 
     TEST(xbroadcast, shape_forwarding)
     {
-        std::array<std::size_t, 2> bc_shape;
+        std::array<std::size_t, 2> bc_shape{3, 3};
         auto m1_broadcast = broadcast(123, bc_shape);
+        ASSERT_EQ(m1_broadcast(0, 0), 123);
     }
 
     TEST(xbroadcast, xiterator)
