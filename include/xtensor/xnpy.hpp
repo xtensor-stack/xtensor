@@ -647,7 +647,7 @@ namespace xt
             detail::write_header(stream, typestring, fortran_order, shape);
 
             std::size_t size = compute_size(shape);
-            stream.write(reinterpret_cast<const char*>(eval_ex.raw_data()),
+            stream.write(reinterpret_cast<const char*>(eval_ex.data()),
                          std::streamsize((sizeof(value_type) * size)));
         }
     }  // namespace detail

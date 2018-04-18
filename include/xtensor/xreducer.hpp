@@ -81,10 +81,10 @@ namespace xt
         // Fast track for complete reduction
         if (e.dimension() == axes.size())
         {
-            auto begin = e.data().begin();
+            auto begin = e.storage().begin();
             result_type tmp = init_fct(*begin);
             ++begin;
-            result = std::accumulate(begin, e.data().end(), tmp, acc_fct);
+            result = std::accumulate(begin, e.storage().end(), tmp, acc_fct);
             return result;
         }
 
@@ -178,9 +178,9 @@ namespace xt
                                                      iter_strides.begin(), std::ptrdiff_t(0)));
         };
 
-        auto begin = e.raw_data();
-        auto out = result.raw_data();
-        auto out_begin = result.raw_data();
+        auto begin = e.data();
+        auto out = result.data();
+        auto out_begin = result.data();
 
         std::ptrdiff_t next_stride = 0;
 

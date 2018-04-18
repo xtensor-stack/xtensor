@@ -91,18 +91,18 @@ namespace xt
     {
     public:
 
-        using container_type = C;
+        using storage_type = C;
         using subiterator_type = get_stepper_iterator<C>;
         using subiterator_traits = std::iterator_traits<subiterator_type>;
         using value_type = typename subiterator_traits::value_type;
         using reference = typename subiterator_traits::reference;
         using pointer = typename subiterator_traits::pointer;
         using difference_type = typename subiterator_traits::difference_type;
-        using size_type = typename container_type::size_type;
-        using shape_type = typename container_type::shape_type;
+        using size_type = typename storage_type::size_type;
+        using shape_type = typename storage_type::shape_type;
 
         xstepper() = default;
-        xstepper(container_type* c, subiterator_type it, size_type offset) noexcept;
+        xstepper(storage_type* c, subiterator_type it, size_type offset) noexcept;
 
         reference operator*() const;
 
@@ -118,7 +118,7 @@ namespace xt
 
     private:
 
-        container_type* p_c;
+        storage_type* p_c;
         subiterator_type m_it;
         size_type m_offset;
     };
@@ -408,7 +408,7 @@ namespace xt
      ***************************/
 
     template <class C>
-    inline xstepper<C>::xstepper(container_type* c, subiterator_type it, size_type offset) noexcept
+    inline xstepper<C>::xstepper(storage_type* c, subiterator_type it, size_type offset) noexcept
         : p_c(c), m_it(it), m_offset(offset)
     {
     }

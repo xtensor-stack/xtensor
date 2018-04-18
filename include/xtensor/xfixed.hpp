@@ -252,7 +252,7 @@ namespace xt
         using shape_type = std::array<typename inner_shape_type::value_type,
                                       std::tuple_size<inner_shape_type>::value>;
         using strides_type = shape_type;
-        using container_type = aligned_array<ET, detail::fixed_compute_size<S>::value>;
+        using storage_type = aligned_array<ET, detail::fixed_compute_size<S>::value>;
         using temporary_type = xfixed_container<ET, S, L, Tag>;
         static constexpr layout_type layout = L;
     };
@@ -287,7 +287,7 @@ namespace xt
         using base_type = xcontainer<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
 
-        using container_type = typename base_type::container_type;
+        using storage_type = typename base_type::storage_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
@@ -337,14 +337,14 @@ namespace xt
 
     private:
 
-        container_type m_data;
+        storage_type m_storage;
 
         CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
         CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
         CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
-        container_type& data_impl() noexcept;
-        const container_type& data_impl() const noexcept;
+        storage_type& storage_impl() noexcept;
+        const storage_type& storage_impl() const noexcept;
 
         CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
         CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
@@ -375,7 +375,7 @@ namespace xt
     template <class EC, class S, layout_type L, class Tag>
     struct xcontainer_inner_types<xfixed_adaptor<EC, S, L, Tag>>
     {
-        using container_type = std::remove_reference_t<EC>;
+        using storage_type = std::remove_reference_t<EC>;
         using inner_shape_type = typename S::cast_type;
         using inner_strides_type = inner_shape_type;
         using backstrides_type = inner_shape_type;
@@ -383,7 +383,7 @@ namespace xt
         using shape_type = std::array<typename inner_shape_type::value_type,
                                       std::tuple_size<inner_shape_type>::value>;
         using strides_type = shape_type;
-        using temporary_type = xfixed_container<typename container_type::value_type, S, L, Tag>;
+        using temporary_type = xfixed_container<typename storage_type::value_type, S, L, Tag>;
         static constexpr layout_type layout = L;
     };
 
@@ -419,7 +419,7 @@ namespace xt
         using self_type = xfixed_adaptor<EC, S, L, Tag>;
         using base_type = xcontainer<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
-        using container_type = typename base_type::container_type;
+        using storage_type = typename base_type::storage_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
@@ -429,8 +429,8 @@ namespace xt
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
-        xfixed_adaptor(container_type&& data);
-        xfixed_adaptor(const container_type& data);
+        xfixed_adaptor(storage_type&& data);
+        xfixed_adaptor(const storage_type& data);
 
         template <class D>
         xfixed_adaptor(D&& data);
@@ -451,14 +451,14 @@ namespace xt
 
     private:
 
-        container_closure_type m_data;
+        container_closure_type m_storage;
 
         CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
         CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
         CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
-        container_type& data_impl() noexcept;
-        const container_type& data_impl() const noexcept;
+        storage_type& storage_impl() noexcept;
+        const storage_type& storage_impl() const noexcept;
 
         CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
         CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
@@ -540,7 +540,7 @@ namespace xt
     template <class ET, class S, layout_type L, class Tag>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
     {
-        L == layout_type::row_major ? nested_copy(m_data.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
+        L == layout_type::row_major ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
     //@}
 
@@ -608,15 +608,15 @@ namespace xt
     }
 
     template <class ET, class S, layout_type L, class Tag>
-    inline auto xfixed_container<ET, S, L, Tag>::data_impl() noexcept -> container_type&
+    inline auto xfixed_container<ET, S, L, Tag>::storage_impl() noexcept -> storage_type&
     {
-        return m_data;
+        return m_storage;
     }
 
     template <class ET, class S, layout_type L, class Tag>
-    inline auto xfixed_container<ET, S, L, Tag>::data_impl() const noexcept -> const container_type&
+    inline auto xfixed_container<ET, S, L, Tag>::storage_impl() const noexcept -> const storage_type&
     {
-        return m_data;
+        return m_storage;
     }
 
     template <class ET, class S, layout_type L, class Tag>
@@ -650,8 +650,8 @@ namespace xt
      * @param data the container to adapt
      */
     template <class EC, class S, layout_type L, class Tag>
-    inline xfixed_adaptor<EC, S, L, Tag>::xfixed_adaptor(container_type&& data)
-        : base_type(), m_data(std::move(data))
+    inline xfixed_adaptor<EC, S, L, Tag>::xfixed_adaptor(storage_type&& data)
+        : base_type(), m_storage(std::move(data))
     {
     }
 
@@ -660,8 +660,8 @@ namespace xt
      * @param data the container to adapt
      */
     template <class EC, class S, layout_type L, class Tag>
-    inline xfixed_adaptor<EC, S, L, Tag>::xfixed_adaptor(const container_type& data)
-        : base_type(), m_data(data)
+    inline xfixed_adaptor<EC, S, L, Tag>::xfixed_adaptor(const storage_type& data)
+        : base_type(), m_storage(data)
     {
     }
 
@@ -675,7 +675,7 @@ namespace xt
     template <class EC, class S, layout_type L, class Tag>
     template <class D>
     inline xfixed_adaptor<EC, S, L, Tag>::xfixed_adaptor(D&& data)
-        : base_type(), m_data(std::forward<D>(data))
+        : base_type(), m_storage(std::forward<D>(data))
     {
     }
     //@}
@@ -684,7 +684,7 @@ namespace xt
     inline auto xfixed_adaptor<EC, S, L, Tag>::operator=(const xfixed_adaptor& rhs) -> self_type&
     {
         base_type::operator=(rhs);
-        m_data = rhs.m_data;
+        m_storage = rhs.m_storage;
         return *this;
     }
 
@@ -692,14 +692,14 @@ namespace xt
     inline auto xfixed_adaptor<EC, S, L, Tag>::operator=(xfixed_adaptor&& rhs) -> self_type&
     {
         base_type::operator=(std::move(rhs));
-        m_data = rhs.m_data;
+        m_storage = rhs.m_storage;
         return *this;
     }
 
     template <class EC, class S, layout_type L, class Tag>
     inline auto xfixed_adaptor<EC, S, L, Tag>::operator=(temporary_type&& rhs) -> self_type&
     {
-        m_data = xtl::forward_sequence<container_type>(std::move(rhs.data()));
+        m_storage = xtl::forward_sequence<storage_type>(std::move(rhs.storage()));
         return *this;
     }
 
@@ -719,15 +719,15 @@ namespace xt
     //@}
 
     template <class EC, class S, layout_type L, class Tag>
-    inline auto xfixed_adaptor<EC, S, L, Tag>::data_impl() noexcept -> container_type&
+    inline auto xfixed_adaptor<EC, S, L, Tag>::storage_impl() noexcept -> storage_type&
     {
-        return m_data;
+        return m_storage;
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    inline auto xfixed_adaptor<EC, S, L, Tag>::data_impl() const noexcept -> const container_type&
+    inline auto xfixed_adaptor<EC, S, L, Tag>::storage_impl() const noexcept -> const storage_type&
     {
-        return m_data;
+        return m_storage;
     }
 
     template <class EC, class S, layout_type L, class Tag>

@@ -24,7 +24,7 @@ namespace xt
     {
     public:
 
-        using container_type = C;
+        using storage_type = C;
     };
 
     using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;

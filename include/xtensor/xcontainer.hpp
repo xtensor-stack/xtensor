@@ -31,7 +31,7 @@ namespace xt
     struct xcontainer_iterable_types
     {
         using inner_shape_type = typename xcontainer_inner_types<D>::inner_shape_type;
-        using container_type = typename xcontainer_inner_types<D>::container_type;
+        using storage_type = typename xcontainer_inner_types<D>::storage_type;
         using stepper = xstepper<D>;
         using const_stepper = xstepper<const D>;
     };
@@ -76,17 +76,17 @@ namespace xt
         using derived_type = D;
 
         using inner_types = xcontainer_inner_types<D>;
-        using container_type = typename inner_types::container_type;
-        using allocator_type = allocator_type_t<std::decay_t<container_type>>;
-        using value_type = typename container_type::value_type;
-        using reference = std::conditional_t<std::is_const<container_type>::value,
-                                             typename container_type::const_reference,
-                                             typename container_type::reference>;
-        using const_reference = typename container_type::const_reference;
-        using pointer = typename container_type::pointer;
-        using const_pointer = typename container_type::const_pointer;
-        using size_type = typename container_type::size_type;
-        using difference_type = typename container_type::difference_type;
+        using storage_type = typename inner_types::storage_type;
+        using allocator_type = allocator_type_t<std::decay_t<storage_type>>;
+        using value_type = typename storage_type::value_type;
+        using reference = std::conditional_t<std::is_const<storage_type>::value,
+                                             typename storage_type::const_reference,
+                                             typename storage_type::reference>;
+        using const_reference = typename storage_type::const_reference;
+        using pointer = typename storage_type::pointer;
+        using const_pointer = typename storage_type::const_pointer;
+        using size_type = typename storage_type::size_type;
+        using difference_type = typename storage_type::difference_type;
         using simd_value_type = xsimd::simd_type<value_type>;
 
         using shape_type = typename inner_types::shape_type;
@@ -103,7 +103,7 @@ namespace xt
 
         static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
-        using data_alignment = xsimd::container_alignment_t<container_type>;
+        using data_alignment = xsimd::container_alignment_t<storage_type>;
         using simd_type = xsimd::simd_type<value_type>;
 
         static_assert(static_layout != layout_type::any, "Container layout can never be layout_type::any!");
@@ -145,12 +145,12 @@ namespace xt
         template <class It>
         const_reference element(It first, It last) const;
 
-        container_type& data() noexcept;
-        const container_type& data() const noexcept;
+        storage_type& storage() noexcept;
+        const storage_type& storage() const noexcept;
 
-        value_type* raw_data() noexcept;
-        const value_type* raw_data() const noexcept;
-        const size_type raw_data_offset() const noexcept;
+        value_type* data() noexcept;
+        const value_type* data() const noexcept;
+        const size_type data_offset() const noexcept;
 
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
@@ -206,10 +206,10 @@ namespace xt
         template <class S, layout_type L>
         using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
 
-        using storage_iterator = typename container_type::iterator;
-        using const_storage_iterator = typename container_type::const_iterator;
-        using reverse_storage_iterator = typename container_type::reverse_iterator;
-        using const_reverse_storage_iterator = typename container_type::const_reverse_iterator;
+        using storage_iterator = typename storage_type::iterator;
+        using const_storage_iterator = typename storage_type::const_iterator;
+        using reverse_storage_iterator = typename storage_type::reverse_iterator;
+        using const_reverse_storage_iterator = typename storage_type::const_reverse_iterator;
 
         template <layout_type L, class It1, class It2>
         using select_iterator_impl = std::conditional_t<L == static_layout, It1, It2>;
@@ -374,7 +374,7 @@ namespace xt
     public:
 
         using base_type = xcontainer<D>;
-        using container_type = typename base_type::container_type;
+        using storage_type = typename base_type::storage_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
@@ -468,7 +468,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::size() const noexcept -> size_type
     {
-        return contiguous_layout ? data().size() : compute_size(shape());
+        return contiguous_layout ? storage().size() : compute_size(shape());
     }
 
     /**
@@ -524,8 +524,8 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
-        return data()[index];
+        size_type index = xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        return storage()[index];
     }
 
     /**
@@ -540,8 +540,8 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = data_offset<size_type>(strides(), static_cast<size_type>(args)...);
-        return data()[index];
+        size_type index = xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        return storage()[index];
     }
 
     /**
@@ -644,7 +644,7 @@ namespace xt
     inline auto xcontainer<D>::element(It first, It last) -> reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        return data()[element_offset<size_type>(strides(), first, last)];
+        return storage()[element_offset<size_type>(strides(), first, last)];
     }
 
     /**
@@ -659,16 +659,16 @@ namespace xt
     inline auto xcontainer<D>::element(It first, It last) const -> const_reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        return data()[element_offset<size_type>(strides(), first, last)];
+        return storage()[element_offset<size_type>(strides(), first, last)];
     }
 
     /**
      * Returns a reference to the buffer containing the elements of the container.
      */
     template <class D>
-    inline auto xcontainer<D>::data() noexcept -> container_type&
+    inline auto xcontainer<D>::storage() noexcept -> storage_type&
     {
-        return derived_cast().data_impl();
+        return derived_cast().storage_impl();
     }
 
     /**
@@ -676,31 +676,31 @@ namespace xt
      * container.
      */
     template <class D>
-    inline auto xcontainer<D>::data() const noexcept -> const container_type&
+    inline auto xcontainer<D>::storage() const noexcept -> const storage_type&
     {
-        return derived_cast().data_impl();
+        return derived_cast().storage_impl();
     }
 
     /**
      * Returns the offset to the first element in the container.
      */
     template <class D>
-    inline auto xcontainer<D>::raw_data() noexcept -> value_type*
+    inline auto xcontainer<D>::data() noexcept -> value_type*
     {
-        return data().data();
+        return storage().data();
     }
 
     template <class D>
-    inline auto xcontainer<D>::raw_data() const noexcept -> const value_type*
+    inline auto xcontainer<D>::data() const noexcept -> const value_type*
     {
-        return data().data();
+        return storage().data();
     }
 
     /**
      * Returns the offset to the first element in the container.
      */
     template <class D>
-    inline auto xcontainer<D>::raw_data_offset() const noexcept -> const size_type
+    inline auto xcontainer<D>::data_offset() const noexcept -> const size_type
     {
         return size_type(0);
     }
@@ -968,84 +968,84 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::storage_begin() noexcept -> storage_iterator
     {
-        return data().begin();
+        return storage().begin();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_end() noexcept -> storage_iterator
     {
-        return data().end();
+        return storage().end();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_begin() const noexcept -> const_storage_iterator
     {
-        return data().begin();
+        return storage().begin();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_end() const noexcept -> const_storage_iterator
     {
-        return data().end();
+        return storage().end();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_cbegin() const noexcept -> const_storage_iterator
     {
-        return data().cbegin();
+        return storage().cbegin();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_cend() const noexcept -> const_storage_iterator
     {
-        return data().cend();
+        return storage().cend();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_rbegin() noexcept -> reverse_storage_iterator
     {
-        return data().rbegin();
+        return storage().rbegin();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_rend() noexcept -> reverse_storage_iterator
     {
-        return data().rend();
+        return storage().rend();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
     {
-        return data().rbegin();
+        return storage().rbegin();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_rend() const noexcept -> const_reverse_storage_iterator
     {
-        return data().rend();
+        return storage().rend();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
     {
-        return data().crbegin();
+        return storage().crbegin();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::storage_crend() const noexcept -> const_reverse_storage_iterator
     {
-        return data().crend();
+        return storage().crend();
     }
 
     /***************
@@ -1087,25 +1087,25 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::data_xbegin() noexcept -> container_iterator
     {
-        return data().begin();
+        return storage().begin();
     }
 
     template <class D>
     inline auto xcontainer<D>::data_xbegin() const noexcept -> const_container_iterator
     {
-        return data().begin();
+        return storage().begin();
     }
 
     template <class D>
     inline auto xcontainer<D>::data_xend(layout_type l) noexcept -> container_iterator
     {
-        return data_xend_impl(data().end(), l);
+        return data_xend_impl(storage().end(), l);
     }
 
     template <class D>
     inline auto xcontainer<D>::data_xend(layout_type l) const noexcept -> const_container_iterator
     {
-        return data_xend_impl(data().end(), l);
+        return data_xend_impl(storage().end(), l);
     }
 
     template <class D>
@@ -1129,13 +1129,13 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::data_element(size_type i) -> reference
     {
-        return data()[i];
+        return storage()[i];
     }
 
     template <class D>
     inline auto xcontainer<D>::data_element(size_type i) const -> const_reference
     {
-        return data()[i];
+        return storage()[i];
     }
 
     template <class D>
@@ -1143,7 +1143,7 @@ namespace xt
     inline void xcontainer<D>::store_simd(size_type i, const simd& e)
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        xsimd::store_simd<value_type, typename simd::value_type>(&(data()[i]), e, align_mode());
+        xsimd::store_simd<value_type, typename simd::value_type>(&(storage()[i]), e, align_mode());
     }
 
     template <class D>
@@ -1151,7 +1151,7 @@ namespace xt
     inline auto xcontainer<D>::load_simd(size_type i) const -> simd
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        return xsimd::load_simd<value_type, typename simd::value_type>(&(data()[i]), align_mode());
+        return xsimd::load_simd<value_type, typename simd::value_type>(&(storage()[i]), align_mode());
     }
 
     /*************************************
@@ -1256,7 +1256,7 @@ namespace xt
             resize_container(m_strides, m_shape.size());
             resize_container(m_backstrides, m_shape.size());
             size_type data_size = compute_strides(m_shape, m_layout, m_strides, m_backstrides);
-            detail::resize_data_container(this->data(), data_size);
+            detail::resize_data_container(this->storage(), data_size);
         }
     }
 
@@ -1295,7 +1295,7 @@ namespace xt
         resize_container(m_backstrides, m_strides.size());
         adapt_strides(m_shape, m_strides, m_backstrides);
         m_layout = layout_type::dynamic;
-        detail::resize_data_container(this->data(), compute_size(m_shape));
+        detail::resize_data_container(this->storage(), compute_size(m_shape));
     }
 
     /**

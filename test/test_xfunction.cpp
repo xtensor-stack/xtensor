@@ -27,11 +27,11 @@ namespace xt
     {
         row_major_result<> rm;
         m_a.resize(rm.shape(), rm.strides());
-        std::copy(rm.data().cbegin(), rm.data().cend(), m_a.begin());
+        std::copy(rm.storage().cbegin(), rm.storage().cend(), m_a.begin());
 
         unit_shape_result<> us;
         m_b.resize(us.shape(), us.strides());
-        std::copy(us.data().cbegin(), us.data().cend(), m_b.begin());
+        std::copy(us.storage().cbegin(), us.storage().cend(), m_b.begin());
 
         using shape_type = layout_result<>::shape_type;
         shape_type sh = {4, 3, 2, 4};

@@ -58,7 +58,7 @@ namespace xt
 
             for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
-                fct(ev.raw_data() + offset, ev.raw_data() + offset + secondary_stride);
+                fct(ev.data() + offset, ev.data() + offset + secondary_stride);
             }
         }
 

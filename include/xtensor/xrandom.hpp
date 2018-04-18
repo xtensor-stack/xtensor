@@ -249,9 +249,9 @@ namespace xt
             result.resize({n});
 
             xtensor<typename T::value_type, 1> shuffled = de;
-            shuffle(shuffled.data().begin(), shuffled.data().end(), engine);
+            shuffle(shuffled.storage().begin(), shuffled.storage().end(), engine);
 
-            std::copy(shuffled.data().begin(), shuffled.data().begin() + n, result.begin());
+            std::copy(shuffled.storage().begin(), shuffled.storage().begin() + n, result.begin());
 
             return result;
 

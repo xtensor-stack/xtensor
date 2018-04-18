@@ -133,7 +133,7 @@ namespace xt
                 pos = i * outer_stride;
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
-                    e.data()[pos] = f(e.data()[pos]);
+                    e.storage()[pos] = f(e.storage()[pos]);
                     pos += inner_stride;
                 }
             }
@@ -193,8 +193,8 @@ namespace xt
             {
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
-                    result.data()[pos + inner_stride] = std::get<0>(f)(result.data()[pos],
-                                                                       result.data()[pos + inner_stride]);
+                    result.storage()[pos + inner_stride] = std::get<0>(f)(result.storage()[pos],
+                                                                       result.storage()[pos + inner_stride]);
                     pos += outer_stride;
                 }
                 pos += inner_stride;
@@ -214,12 +214,12 @@ namespace xt
 
             auto it = e.template begin<XTENSOR_DEFAULT_LAYOUT>();
 
-            result.data()[0] = std::get<1>(f)(*it);
+            result.storage()[0] = std::get<1>(f)(*it);
             ++it;
 
             for (std::size_t idx = 0; it != e.template end<XTENSOR_DEFAULT_LAYOUT>(); ++it)
             {
-                result.data()[idx + 1] = std::get<0>(f)(result.data()[idx], *it);
+                result.storage()[idx + 1] = std::get<0>(f)(result.storage()[idx], *it);
                 ++idx;
             }
             return result;

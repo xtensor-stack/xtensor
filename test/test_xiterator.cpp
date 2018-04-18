@@ -31,7 +31,7 @@ namespace xt
         using size_type = typename R::size_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
-        vector_type data = result.data();
+        vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
         size_type nb_inc = L == layout_type::row_major ?
@@ -88,7 +88,7 @@ namespace xt
         using difference_type = typename R::difference_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
-        vector_type data = result.data();
+        vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
         difference_type nb_inc = difference_type(L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
@@ -142,7 +142,7 @@ namespace xt
         using size_type = typename R::size_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
-        vector_type data = result.data();
+        vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
         size_type size = a.size();
@@ -193,7 +193,7 @@ namespace xt
         using size_type = typename R::size_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
-        vector_type data = result.data();
+        vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
         size_type nb_inc = L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
@@ -248,7 +248,7 @@ namespace xt
         using difference_type = typename R::difference_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
-        vector_type data = result.data();
+        vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
         difference_type nb_inc = difference_type(L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
@@ -301,7 +301,7 @@ namespace xt
         using size_type = typename R::size_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
-        vector_type data = result.data();
+        vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
         size_type size = a.size();
@@ -352,7 +352,7 @@ namespace xt
         using difference_type = typename R::difference_type;
         using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
-        vector_type data = result.data();
+        vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
         
         size_type size = shape.size();
@@ -472,7 +472,7 @@ namespace xt
     {
         row_major_result<> rm;
         using vector_type = row_major_result<>::vector_type;
-        xarray_adaptor<vector_type, layout_type::dynamic> a(rm.data(), rm.shape(), rm.strides());
+        xarray_adaptor<vector_type, layout_type::dynamic> a(rm.storage(), rm.shape(), rm.strides());
         
         {
             SCOPED_TRACE("row_major iterator");
@@ -493,7 +493,7 @@ namespace xt
     {
         row_major_result<> rm;
         using vector_type = row_major_result<>::vector_type;
-        xarray_adaptor<vector_type, layout_type::dynamic> a(rm.data(), rm.shape(), rm.strides());
+        xarray_adaptor<vector_type, layout_type::dynamic> a(rm.storage(), rm.shape(), rm.strides());
 
         {
             SCOPED_TRACE("row_major iterator");

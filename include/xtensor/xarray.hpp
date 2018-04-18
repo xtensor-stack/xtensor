@@ -29,7 +29,7 @@ namespace xt
     template <class EC, layout_type L, class SC, class Tag>
     struct xcontainer_inner_types<xarray_container<EC, L, SC, Tag>>
     {
-        using container_type = EC;
+        using storage_type = EC;
         using shape_type = SC;
         using strides_type = shape_type;
         using backstrides_type = shape_type;
@@ -68,7 +68,7 @@ namespace xt
         using self_type = xarray_container<EC, L, SC, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
-        using container_type = typename base_type::container_type;
+        using storage_type = typename base_type::storage_type;
         using allocator_type = typename base_type::allocator_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
@@ -88,7 +88,7 @@ namespace xt
         explicit xarray_container(const shape_type& shape, const_reference value, layout_type l = L);
         explicit xarray_container(const shape_type& shape, const strides_type& strides);
         explicit xarray_container(const shape_type& shape, const strides_type& strides, const_reference value);
-        explicit xarray_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
+        explicit xarray_container(storage_type&& data, inner_shape_type&& shape, inner_strides_type&& strides);
 
         xarray_container(const value_type& t);
         xarray_container(nested_initializer_list_t<value_type, 1> t);
@@ -116,10 +116,10 @@ namespace xt
 
     private:
 
-        container_type m_data;
+        storage_type m_data;
 
-        container_type& data_impl() noexcept;
-        const container_type& data_impl() const noexcept;
+        storage_type& storage_impl() noexcept;
+        const storage_type& storage_impl() const noexcept;
 
         friend class xcontainer<xarray_container<EC, L, SC, Tag>>;
     };
@@ -131,14 +131,14 @@ namespace xt
     template <class EC, layout_type L, class SC, class Tag>
     struct xcontainer_inner_types<xarray_adaptor<EC, L, SC, Tag>>
     {
-        using container_type = std::remove_reference_t<EC>;
+        using storage_type = std::remove_reference_t<EC>;
         using shape_type = SC;
         using strides_type = shape_type;
         using backstrides_type = shape_type;
         using inner_shape_type = shape_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
-        using temporary_type = xarray_container<temporary_container_t<container_type>, L, SC, Tag>;
+        using temporary_type = xarray_container<temporary_container_t<storage_type>, L, SC, Tag>;
         static constexpr layout_type layout = L;
     };
 
@@ -174,7 +174,7 @@ namespace xt
         using self_type = xarray_adaptor<EC, L, SC, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
-        using container_type = typename base_type::container_type;
+        using storage_type = typename base_type::storage_type;
         using allocator_type = typename base_type::allocator_type;
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
@@ -182,8 +182,8 @@ namespace xt
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
-        xarray_adaptor(container_type&& data);
-        xarray_adaptor(const container_type& data);
+        xarray_adaptor(storage_type&& data);
+        xarray_adaptor(const storage_type& data);
 
         template <class D>
         xarray_adaptor(D&& data, const shape_type& shape, layout_type l = L);
@@ -207,8 +207,8 @@ namespace xt
 
         container_closure_type m_data;
 
-        container_type& data_impl() noexcept;
-        const container_type& data_impl() const noexcept;
+        storage_type& storage_impl() noexcept;
+        const storage_type& storage_impl() const noexcept;
 
 
         friend class xcontainer<xarray_adaptor<EC, L, SC, Tag>>;
@@ -307,7 +307,7 @@ namespace xt
      * @param strides the strides of the xarray_container
      */
     template <class EC, layout_type L, class SC, class Tag>
-    inline xarray_container<EC, L, SC, Tag>::xarray_container(container_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(storage_type&& data, inner_shape_type&& shape, inner_strides_type&& strides)
         : base_type(std::move(shape), std::move(strides)), m_data(std::move(data))
     {
     }
@@ -423,13 +423,13 @@ namespace xt
     //@}
 
     template <class EC, layout_type L, class SC, class Tag>
-    inline auto xarray_container<EC, L, SC, Tag>::data_impl() noexcept -> container_type&
+    inline auto xarray_container<EC, L, SC, Tag>::storage_impl() noexcept -> storage_type&
     {
         return m_data;
     }
 
     template <class EC, layout_type L, class SC, class Tag>
-    inline auto xarray_container<EC, L, SC, Tag>::data_impl() const noexcept -> const container_type&
+    inline auto xarray_container<EC, L, SC, Tag>::storage_impl() const noexcept -> const storage_type&
     {
         return m_data;
     }
@@ -447,7 +447,7 @@ namespace xt
      * @param data the container to adapt
      */
     template <class EC, layout_type L, class SC, class Tag>
-    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(container_type&& data)
+    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(storage_type&& data)
         : base_type(), m_data(std::move(data))
     {
     }
@@ -457,7 +457,7 @@ namespace xt
      * @param data the container to adapt
      */
     template <class EC, layout_type L, class SC, class Tag>
-    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(const container_type& data)
+    inline xarray_adaptor<EC, L, SC, Tag>::xarray_adaptor(const storage_type& data)
         : base_type(), m_data(data)
     {
     }
@@ -515,7 +515,7 @@ namespace xt
         base_type::shape_impl() = std::move(const_cast<shape_type&>(rhs.shape()));
         base_type::strides_impl() = std::move(const_cast<strides_type&>(rhs.strides()));
         base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(rhs.backstrides()));
-        m_data = std::move(rhs.data());
+        m_data = std::move(rhs.storage());
         return *this;
     }
 
@@ -535,13 +535,13 @@ namespace xt
     //@}
 
     template <class EC, layout_type L, class SC, class Tag>
-    inline auto xarray_adaptor<EC, L, SC, Tag>::data_impl() noexcept -> container_type&
+    inline auto xarray_adaptor<EC, L, SC, Tag>::storage_impl() noexcept -> storage_type&
     {
         return m_data;
     }
 
     template <class EC, layout_type L, class SC, class Tag>
-    inline auto xarray_adaptor<EC, L, SC, Tag>::data_impl() const noexcept -> const container_type&
+    inline auto xarray_adaptor<EC, L, SC, Tag>::storage_impl() const noexcept -> const storage_type&
     {
         return m_data;
     }

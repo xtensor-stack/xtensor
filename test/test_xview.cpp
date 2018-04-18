@@ -672,7 +672,7 @@ namespace xt
         for (std::size_t i = 0; i < v1.size(); ++i)
         {
             auto linear_idx = std::inner_product(idx1.begin(), idx1.end(), strides1.begin(), std::size_t(0));
-            EXPECT_EQ(v1[idx1], v1.raw_data()[v1.raw_data_offset() + linear_idx]);
+            EXPECT_EQ(v1[idx1], v1.data()[v1.data_offset() + linear_idx]);
             next_idx(idx1, shape1);
         }
 
@@ -683,7 +683,7 @@ namespace xt
         for (std::size_t i = 0; i < v2.size(); ++i)
         {
             auto linear_idx = std::inner_product(idx2.begin(), idx2.end(), strides2.begin(), std::size_t(0));
-            EXPECT_EQ(v2[idx2], v2.raw_data()[v2.raw_data_offset() + linear_idx]);
+            EXPECT_EQ(v2[idx2], v2.data()[v2.data_offset() + linear_idx]);
             next_idx(idx2, shape2);
         }
     }

@@ -51,7 +51,7 @@ namespace xt
     class operation : public ::testing::Test
     {
     public:
-        using container_type = C;
+        using storage_type = C;
     };
 
     using testing_types = ::testing::Types<xarray<double>, xtensor<double, 2>>;

@@ -65,8 +65,8 @@ namespace xt
             int value = 2;
             dyn_opt_ass_type ra(rm.m_shape, value, layout_type::row_major);
             compare_shape(ra, rm);
-            dyn_opt_ass_type::value_expression::container_type vec(ra.size(), value);
-            EXPECT_EQ(ra.value().data(), vec);
+            dyn_opt_ass_type::value_expression::storage_type vec(ra.size(), value);
+            EXPECT_EQ(ra.value().storage(), vec);
         }
 
         {
@@ -75,8 +75,8 @@ namespace xt
             int value = 2;
             cm_opt_ass_type ca(cm.m_shape, value);
             compare_shape(ca, cm);
-            cm_opt_ass_type::value_expression::container_type vec(ca.size(), value);
-            EXPECT_EQ(ca.value().data(), vec);
+            cm_opt_ass_type::value_expression::storage_type vec(ca.size(), value);
+            EXPECT_EQ(ca.value().storage(), vec);
         }
     }
 
@@ -86,8 +86,8 @@ namespace xt
         int value = 2;
         dyn_opt_ass_type cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
-        dyn_opt_ass_type::value_expression::container_type vec(cma.size(), value);
-        EXPECT_EQ(cma.value().data(), vec);
+        dyn_opt_ass_type::value_expression::storage_type vec(cma.size(), value);
+        EXPECT_EQ(cma.value().storage(), vec);
     }
 
     TEST(xoptional_assembly, xscalar_constructor)
@@ -144,20 +144,20 @@ namespace xt
             SCOPED_TRACE("copy constructor");
             dyn_opt_ass_type b(a);
             compare_shape(a, b);
-            EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.value().storage(), b.value().storage());
+            EXPECT_EQ(a.has_value().storage(), b.has_value().storage());
         }
 
         {
             SCOPED_TRACE("assignment operator");
             row_major_result<> r;
             dyn_opt_ass_type c(r.m_shape, dyn_opt_ass_type::value_type(0, false));
-            EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.value().storage(), c.value().storage());
+            EXPECT_NE(a.has_value().storage(), c.has_value().storage());
             c = a;
             compare_shape(a, c);
-            EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.value().storage(), c.value().storage());
+            EXPECT_EQ(a.has_value().storage(), c.has_value().storage());
         }
     }
 
@@ -172,21 +172,21 @@ namespace xt
             dyn_opt_ass_type tmp(a);
             dyn_opt_ass_type b(std::move(tmp));
             compare_shape(a, b);
-            EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.value().storage(), b.value().storage());
+            EXPECT_EQ(a.has_value().storage(), b.has_value().storage());
         }
 
         {
             SCOPED_TRACE("move assignment");
             row_major_result<> r;
             dyn_opt_ass_type c(r.m_shape, dyn_opt_ass_type::value_type(0, false));
-            EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.value().storage(), c.value().storage());
+            EXPECT_NE(a.has_value().storage(), c.has_value().storage());
             dyn_opt_ass_type tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
-            EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.value().storage(), c.value().storage());
+            EXPECT_EQ(a.has_value().storage(), c.has_value().storage());
         }
     }
 
@@ -337,7 +337,7 @@ namespace xt
             {
                 ++iter;
             }
-            EXPECT_EQ(vec.value().data()[nb_iter], *iter);
+            EXPECT_EQ(vec.value().storage()[nb_iter], *iter);
             for (size_t i = 0; i < nb_iter; ++i)
             {
                 ++iter;
@@ -418,7 +418,7 @@ namespace xt
             {
                 ++iter;
             }
-            EXPECT_EQ(vec.value().data()[nb_iter - 1], *iter);
+            EXPECT_EQ(vec.value().storage()[nb_iter - 1], *iter);
             for (size_t i = 0; i < nb_iter; ++i)
             {
                 ++iter;
@@ -437,7 +437,7 @@ namespace xt
             {
                 ++iter;
             }
-            EXPECT_EQ(vec.value().data()[2 * nb_iter - 1], *iter);
+            EXPECT_EQ(vec.value().storage()[2 * nb_iter - 1], *iter);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
             {
                 ++iter;
