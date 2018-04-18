@@ -20,7 +20,7 @@ namespace xt
 
         auto&& b = eval(a);
 
-        EXPECT_EQ(a.data().data(), b.data().data());
+        EXPECT_EQ(a.storage().data(), b.storage().data());
         EXPECT_EQ(&a, &b);
         bool type_eq = std::is_same<decltype(b), xarray<double>&>::value;
         EXPECT_TRUE(type_eq);
@@ -29,7 +29,7 @@ namespace xt
 
         auto&& i = eval(t);
 
-        EXPECT_EQ(t.data().data(), i.data().data());
+        EXPECT_EQ(t.storage().data(), i.storage().data());
         EXPECT_EQ(&t, &i);
         bool type_eq_2 = std::is_same<decltype(i), xtensor<double, 2>&>::value;
         EXPECT_TRUE(type_eq_2);

@@ -17,11 +17,11 @@ namespace xt
     template <class F, class C>
     struct view_op_tester : operation_tester<F, C>
     {
-        using container_type = C;
-        container_type vres_rr;
-        container_type vres_rc;
-        container_type vres_rct;
-        container_type vres_ru;
+        using storage_type = C;
+        storage_type vres_rr;
+        storage_type vres_rc;
+        storage_type vres_rct;
+        storage_type vres_ru;
 
         size_t x_slice;
         xrange<size_t> y_slice;
@@ -75,7 +75,7 @@ namespace xt
     {
     public:
 
-        using container_type = C;
+        using storage_type = C;
     };
 
     using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;

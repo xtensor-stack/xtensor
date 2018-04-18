@@ -99,13 +99,13 @@ namespace xt
     xcsv_tensor<T, A> load_csv(std::istream& stream)
     {
         using tensor_type = xcsv_tensor<T, A>;
-        using container_type = typename tensor_type::container_type;
+        using storage_type = typename tensor_type::storage_type;
         using size_type = typename tensor_type::size_type;
         using inner_shape_type = typename tensor_type::inner_shape_type;
         using inner_strides_type = typename tensor_type::inner_strides_type;
-        using output_iterator = std::back_insert_iterator<container_type>;
+        using output_iterator = std::back_insert_iterator<storage_type>;
 
-        container_type data;
+        storage_type data;
         size_type nbrow = 0, nbcol = 0;
         {
             output_iterator output(data);

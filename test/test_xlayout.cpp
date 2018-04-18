@@ -30,22 +30,22 @@ namespace xt
         EXPECT_EQ(rm1, cm1);
         std::vector<double> cm_data = {1, 4, 7, 2, 5, 8, 3, 6, 9};
         std::vector<double> rm_data = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        EXPECT_FALSE(cm.data() == rm.data());
-        EXPECT_EQ(cm_data, cm.data());
-        EXPECT_EQ(rm_data, rm.data());
+        EXPECT_FALSE(cm.storage() == rm.storage());
+        EXPECT_EQ(cm_data, cm.storage());
+        EXPECT_EQ(rm_data, rm.storage());
         if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
         {
-            EXPECT_EQ(rm_data, dm.data());
+            EXPECT_EQ(rm_data, dm.storage());
         }
         else
         {
-            EXPECT_EQ(cm_data, dm.data());
+            EXPECT_EQ(cm_data, dm.storage());
         }
-        EXPECT_TRUE(cm.data()[1] == 4);
-        EXPECT_TRUE(rm.data()[1] == 2);
+        EXPECT_TRUE(cm.storage()[1] == 4);
+        EXPECT_TRUE(rm.storage()[1] == 2);
 
         xarray<double, layout_type::column_major> cm_assigned = rm;
-        EXPECT_EQ(cm.data(), cm_assigned.data());
+        EXPECT_EQ(cm.storage(), cm_assigned.storage());
     }
 
     TEST(xlayout, xtensor_initializer_constructors)
@@ -61,22 +61,22 @@ namespace xt
         EXPECT_EQ(rm1, cm1);
         std::vector<double> cm_data = {1, 4, 7, 2, 5, 8, 3, 6, 9};
         std::vector<double> rm_data = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-        EXPECT_FALSE(cm.data() == rm.data());
-        EXPECT_EQ(cm_data, cm.data());
-        EXPECT_EQ(rm_data, rm.data());
+        EXPECT_FALSE(cm.storage() == rm.storage());
+        EXPECT_EQ(cm_data, cm.storage());
+        EXPECT_EQ(rm_data, rm.storage());
         if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
         {
-            EXPECT_EQ(rm_data, dm.data());
+            EXPECT_EQ(rm_data, dm.storage());
         }
         else
         {
-            EXPECT_EQ(cm_data, dm.data());
+            EXPECT_EQ(cm_data, dm.storage());
         }
-        EXPECT_TRUE(cm.data()[1] == 4);
-        EXPECT_TRUE(rm.data()[1] == 2);
+        EXPECT_TRUE(cm.storage()[1] == 4);
+        EXPECT_TRUE(rm.storage()[1] == 2);
 
         xtensor<double, 2, layout_type::column_major> cm_assigned = rm;
-        EXPECT_EQ(cm.data(), cm_assigned.data());
+        EXPECT_EQ(cm.storage(), cm_assigned.storage());
     }
 
     TEST(xlayout, xfunctions_mix_layouts)
@@ -118,8 +118,8 @@ namespace xt
         xarray<double, layout_type::row_major> rmt1 = triu(cm);
         xarray<double, layout_type::row_major> rmt2 = triu(rm);
 
-        EXPECT_EQ(cmt1.data(), cmt2.data());
-        EXPECT_EQ(rmt1.data(), rmt2.data());
+        EXPECT_EQ(cmt1.storage(), cmt2.storage());
+        EXPECT_EQ(rmt1.storage(), rmt2.storage());
         EXPECT_TRUE(all(equal(cmt1, cmt2)));
         EXPECT_TRUE(all(equal(rmt1, rmt2)));
 

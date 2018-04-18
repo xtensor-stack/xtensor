@@ -158,7 +158,7 @@ namespace xt
         struct optional_containers
         {
             using optional_expression = std::remove_const_t<E>;
-            using optional_container = typename optional_expression::container_type;
+            using optional_container = typename optional_expression::storage_type;
             using tmp_value_container = typename optional_container::base_container_type;
             using tmp_flag_container = typename optional_container::flag_container_type;
             using value_container = std::conditional_t<std::is_const<E>::value, const tmp_value_container, tmp_value_container>;
@@ -176,12 +176,12 @@ namespace xt
 
             static inline value_expression value(OA arg)
             {
-                return value_expression(std::move(arg.data().value()), arg.shape());
+                return value_expression(std::move(arg.storage().value()), arg.shape());
             }
 
             static inline flag_expression has_value(OA arg)
             {
-                return flag_expression(std::move(arg.data().has_value()), arg.shape());
+                return flag_expression(std::move(arg.storage().has_value()), arg.shape());
             }
         };
 
@@ -196,12 +196,12 @@ namespace xt
 
             static inline value_expression value(OA& arg)
             {
-                return value_expression(arg.data().value(), arg.shape());
+                return value_expression(arg.storage().value(), arg.shape());
             }
 
             static inline flag_expression has_value(OA& arg)
             {
-                return flag_expression(arg.data().has_value(), arg.shape());
+                return flag_expression(arg.storage().has_value(), arg.shape());
             }
         };
 
@@ -234,12 +234,12 @@ namespace xt
 
             static inline value_expression value(OT arg)
             {
-                return value_expression(std::move(arg.data().value()), arg.shape());
+                return value_expression(std::move(arg.storage().value()), arg.shape());
             }
 
             static inline flag_expression has_value(OT arg)
             {
-                return flag_expression(std::move(arg.data().has_value()), arg.shape());
+                return flag_expression(std::move(arg.storage().has_value()), arg.shape());
             }
         };
 
@@ -254,12 +254,12 @@ namespace xt
 
             static inline value_expression value(OT& arg)
             {
-                return value_expression(arg.data().value(), arg.shape());
+                return value_expression(arg.storage().value(), arg.shape());
             }
 
             static inline flag_expression has_value(OT& arg)
             {
-                return flag_expression(arg.data().has_value(), arg.shape());
+                return flag_expression(arg.storage().has_value(), arg.shape());
             }
         };
 

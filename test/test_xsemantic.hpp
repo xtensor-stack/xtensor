@@ -23,19 +23,19 @@ namespace xt
     template <class F, class C>
     struct operation_tester
     {
-        using container_type = C;
+        using storage_type = C;
         using shape_type = typename C::shape_type;
 
-        container_type a;
-        container_type ra;
-        container_type ca;
-        container_type cta;
-        container_type ua;
+        storage_type a;
+        storage_type ra;
+        storage_type ca;
+        storage_type cta;
+        storage_type ua;
 
-        container_type res_rr;
-        container_type res_rc;
-        container_type res_rct;
-        container_type res_ru;
+        storage_type res_rr;
+        storage_type res_rc;
+        storage_type res_rct;
+        storage_type res_ru;
 
         operation_tester();
     };
@@ -85,19 +85,19 @@ namespace xt
     template <class F, class C>
     struct scalar_operation_tester
     {
-        using container_type = C;
+        using storage_type = C;
         using shape_type = typename C::shape_type;
 
         int b;
-        container_type ra;
-        container_type ca;
-        container_type cta;
-        container_type ua;
+        storage_type ra;
+        storage_type ca;
+        storage_type cta;
+        storage_type ua;
 
-        container_type res_r;
-        container_type res_c;
-        container_type res_ct;
-        container_type res_u;
+        storage_type res_r;
+        storage_type res_c;
+        storage_type res_ct;
+        storage_type res_u;
 
         scalar_operation_tester();
     };

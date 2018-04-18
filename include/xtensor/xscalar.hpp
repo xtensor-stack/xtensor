@@ -313,21 +313,21 @@ namespace xt
     public:
 
         using self_type = xscalar_stepper<is_const, CT>;
-        using container_type = std::conditional_t<is_const,
+        using storage_type = std::conditional_t<is_const,
                                                   const xscalar<CT>,
                                                   xscalar<CT>>;
 
-        using value_type = typename container_type::value_type;
+        using value_type = typename storage_type::value_type;
         using reference = std::conditional_t<is_const,
-                                             typename container_type::const_reference,
-                                             typename container_type::reference>;
+                                             typename storage_type::const_reference,
+                                             typename storage_type::reference>;
         using pointer = std::conditional_t<is_const,
-                                           typename container_type::const_pointer,
-                                           typename container_type::pointer>;
-        using size_type = typename container_type::size_type;
-        using difference_type = typename container_type::difference_type;
+                                           typename storage_type::const_pointer,
+                                           typename storage_type::pointer>;
+        using size_type = typename storage_type::size_type;
+        using difference_type = typename storage_type::difference_type;
 
-        xscalar_stepper(container_type* c) noexcept;
+        xscalar_stepper(storage_type* c) noexcept;
 
         reference operator*() const noexcept;
 
@@ -343,7 +343,7 @@ namespace xt
 
     private:
 
-        container_type* p_c;
+        storage_type* p_c;
     };
 
     template <bool is_const, class CT>
@@ -382,17 +382,17 @@ namespace xt
     public:
 
         using self_type = xdummy_iterator<is_const, CT>;
-        using container_type = std::conditional_t<is_const,
+        using storage_type = std::conditional_t<is_const,
                                                   const xscalar<CT>,
                                                   xscalar<CT>>;
 
-        using value_type = typename container_type::value_type;
+        using value_type = typename storage_type::value_type;
         using reference = detail::dummy_reference_t<is_const, CT>;
         using pointer = detail::dummy_pointer_t<is_const, CT>;
-        using difference_type = typename container_type::difference_type;
+        using difference_type = typename storage_type::difference_type;
         using iterator_category = std::random_access_iterator_tag;
 
-        explicit xdummy_iterator(container_type* c) noexcept;
+        explicit xdummy_iterator(storage_type* c) noexcept;
 
         self_type& operator++() noexcept;
         self_type& operator--() noexcept;
@@ -409,7 +409,7 @@ namespace xt
 
     private:
 
-        container_type* p_c;
+        storage_type* p_c;
     };
 
     template <bool is_const, class CT>
@@ -939,7 +939,7 @@ namespace xt
      **********************************/
 
     template <bool is_const, class CT>
-    inline xscalar_stepper<is_const, CT>::xscalar_stepper(container_type* c) noexcept
+    inline xscalar_stepper<is_const, CT>::xscalar_stepper(storage_type* c) noexcept
         : p_c(c)
     {
     }
@@ -1007,7 +1007,7 @@ namespace xt
      **********************************/
 
     template <bool is_const, class CT>
-    inline xdummy_iterator<is_const, CT>::xdummy_iterator(container_type* c) noexcept
+    inline xdummy_iterator<is_const, CT>::xdummy_iterator(storage_type* c) noexcept
         : p_c(c)
     {
     }

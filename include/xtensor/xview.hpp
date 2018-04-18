@@ -167,28 +167,28 @@ namespace xt
         const_stepper stepper_end(const ST& shape, layout_type l) const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, typename T::container_type&>
-        data();
+        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&>
+        storage();
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::container_type&>
-        data() const;
+        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
+        storage() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, const strides_type&>
+        std::enable_if_t<has_data_interface<T>::value, const strides_type&>
         strides() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, const value_type*>
-        raw_data() const;
+        std::enable_if_t<has_data_interface<T>::value, const value_type*>
+        data() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, value_type*>
-        raw_data();
+        std::enable_if_t<has_data_interface<T>::value, value_type*>
+        data();
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_raw_data_interface<T>::value, const std::size_t>
-        raw_data_offset() const noexcept;
+        std::enable_if_t<has_data_interface<T>::value, const std::size_t>
+        data_offset() const noexcept;
 
         size_type underlying_size(size_type dim) const;
 
@@ -606,18 +606,18 @@ namespace xt
      */
     template <class CT, class... S>
     template <class T>
-    inline auto xview<CT, S...>::data() ->
-        std::enable_if_t<has_raw_data_interface<T>::value, typename T::container_type&>
+    inline auto xview<CT, S...>::storage() ->
+        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&>
     {
-        return m_e.data();
+        return m_e.storage();
     }
 
     template <class CT, class... S>
     template <class T>
-    inline auto xview<CT, S...>::data() const ->
-        std::enable_if_t<has_raw_data_interface<T>::value, const typename T::container_type&>
+    inline auto xview<CT, S...>::storage() const ->
+        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
     {
-        return m_e.data();
+        return m_e.storage();
     }
 
     /**
@@ -626,7 +626,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::strides() const ->
-        std::enable_if_t<has_raw_data_interface<T>::value, const strides_type&>
+        std::enable_if_t<has_data_interface<T>::value, const strides_type&>
     {
         if (!m_strides_computed)
         {
@@ -641,18 +641,18 @@ namespace xt
      */
     template <class CT, class... S>
     template <class T>
-    inline auto xview<CT, S...>::raw_data() const ->
-        std::enable_if_t<has_raw_data_interface<T>::value, const value_type*>
+    inline auto xview<CT, S...>::data() const ->
+        std::enable_if_t<has_data_interface<T>::value, const value_type*>
     {
-        return m_e.raw_data();
+        return m_e.data();
     }
 
     template <class CT, class... S>
     template <class T>
-    inline auto xview<CT, S...>::raw_data() ->
-        std::enable_if_t<has_raw_data_interface<T>::value, value_type*>
+    inline auto xview<CT, S...>::data() ->
+        std::enable_if_t<has_data_interface<T>::value, value_type*>
     {
-        return m_e.raw_data();
+        return m_e.data();
     }
 
     /**
@@ -660,11 +660,11 @@ namespace xt
      */
     template <class CT, class... S>
     template <class T>
-    inline auto xview<CT, S...>::raw_data_offset() const noexcept ->
-        std::enable_if_t<has_raw_data_interface<T>::value, const std::size_t>
+    inline auto xview<CT, S...>::data_offset() const noexcept ->
+        std::enable_if_t<has_data_interface<T>::value, const std::size_t>
     {
         auto func = [](const auto& s) { return xt::value(s, 0); };
-        typename T::size_type offset = m_e.raw_data_offset();
+        typename T::size_type offset = m_e.data_offset();
 
         for (size_type i = 0; i < sizeof...(S); ++i)
         {

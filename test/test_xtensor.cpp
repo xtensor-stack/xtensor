@@ -12,7 +12,7 @@
 
 namespace xt
 {
-    using container_type = std::array<std::size_t, 3>;
+    using storage_type = std::array<std::size_t, 3>;
     using xtensor_dynamic = xtensor<int, 3, layout_type::dynamic>;
 
     TEST(xtensor, initializer_constructor)
@@ -33,14 +33,14 @@ namespace xt
     {
         {
             SCOPED_TRACE("row_major constructor");
-            row_major_result<container_type> rm;
+            row_major_result<storage_type> rm;
             xtensor_dynamic ra(rm.m_shape, layout_type::row_major);
             compare_shape(ra, rm);
         }
 
         {
             SCOPED_TRACE("column_major constructor");
-            column_major_result<container_type> cm;
+            column_major_result<storage_type> cm;
             xtensor_dynamic ca(cm.m_shape, layout_type::column_major);
             compare_shape(ca, cm);
         }
@@ -59,7 +59,7 @@ namespace xt
 
     TEST(xtensor, strided_constructor)
     {
-        central_major_result<container_type> cmr;
+        central_major_result<storage_type> cmr;
         xtensor_dynamic cma(cmr.m_shape, cmr.m_strides);
         compare_shape(cma, cmr);
     }
@@ -68,33 +68,33 @@ namespace xt
     {
         {
             SCOPED_TRACE("row_major valued constructor");
-            row_major_result<container_type> rm;
+            row_major_result<storage_type> rm;
             int value = 2;
             xtensor_dynamic ra(rm.m_shape, value, layout_type::row_major);
             compare_shape(ra, rm);
-            xtensor_dynamic::container_type vec(ra.size(), value);
-            EXPECT_EQ(ra.data(), vec);
+            xtensor_dynamic::storage_type vec(ra.size(), value);
+            EXPECT_EQ(ra.storage(), vec);
         }
 
         {
             SCOPED_TRACE("column_major valued constructor");
-            column_major_result<container_type> cm;
+            column_major_result<storage_type> cm;
             int value = 2;
             xtensor_dynamic ca(cm.m_shape, value, layout_type::column_major);
             compare_shape(ca, cm);
-            xtensor_dynamic::container_type vec(ca.size(), value);
-            EXPECT_EQ(ca.data(), vec);
+            xtensor_dynamic::storage_type vec(ca.size(), value);
+            EXPECT_EQ(ca.storage(), vec);
         }
     }
 
     TEST(xtensor, strided_valued_constructor)
     {
-        central_major_result<container_type> cmr;
+        central_major_result<storage_type> cmr;
         int value = 2;
         xtensor_dynamic cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
-        xtensor_dynamic::container_type vec(cma.size(), value);
-        EXPECT_EQ(cma.data(), vec);
+        xtensor_dynamic::storage_type vec(cma.size(), value);
+        EXPECT_EQ(cma.storage(), vec);
     }
 
     TEST(xtensor, xscalar_constructor)
@@ -106,7 +106,7 @@ namespace xt
 
     TEST(xtensor, copy_semantic)
     {
-        central_major_result<container_type> res;
+        central_major_result<storage_type> res;
         int value = 2;
         xtensor_dynamic a(res.m_shape, res.m_strides, value);
 
@@ -114,23 +114,23 @@ namespace xt
             SCOPED_TRACE("copy constructor");
             xtensor_dynamic b(a);
             compare_shape(a, b);
-            EXPECT_EQ(a.data(), b.data());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
             SCOPED_TRACE("assignment operator");
-            row_major_result<container_type> r;
+            row_major_result<storage_type> r;
             xtensor_dynamic c(r.m_shape, 0);
-            EXPECT_NE(a.data(), c.data());
+            EXPECT_NE(a.storage(), c.storage());
             c = a;
             compare_shape(a, c);
-            EXPECT_EQ(a.data(), c.data());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 
     TEST(xtensor, move_semantic)
     {
-        central_major_result<container_type> res;
+        central_major_result<storage_type> res;
         int value = 2;
         xtensor_dynamic a(res.m_shape, res.m_strides, value);
 
@@ -139,61 +139,61 @@ namespace xt
             xtensor_dynamic tmp(a);
             xtensor_dynamic b(std::move(tmp));
             compare_shape(a, b);
-            EXPECT_EQ(a.data(), b.data());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
             SCOPED_TRACE("move assignment");
-            row_major_result<container_type> r;
+            row_major_result<storage_type> r;
             xtensor_dynamic c(r.m_shape, 0);
-            EXPECT_NE(a.data(), c.data());
+            EXPECT_NE(a.storage(), c.storage());
             xtensor_dynamic tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
-            EXPECT_EQ(a.data(), c.data());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 
     TEST(xtensor, resize)
     {
         xtensor_dynamic a;
-        test_resize<xtensor_dynamic, container_type>(a);
+        test_resize<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, reshape)
     {
         xtensor_dynamic a;
-        test_reshape<xtensor_dynamic, container_type>(a);
+        test_reshape<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, transpose)
     {
         xtensor_dynamic a;
-        test_transpose<xtensor_dynamic, container_type>(a);
+        test_transpose<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, access)
     {
         xtensor_dynamic a;
-        test_access<xtensor_dynamic, container_type>(a);
+        test_access<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, at)
     {
         xtensor_dynamic a;
-        test_at<xtensor_dynamic, container_type>(a);
+        test_at<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, element)
     {
         xtensor_dynamic a;
-        test_element<xtensor_dynamic, container_type>(a);
+        test_element<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, indexed_access)
     {
         xtensor_dynamic a;
-        test_indexed_access<xtensor_dynamic, container_type>(a);
+        test_indexed_access<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, broadcast_shape)
@@ -208,7 +208,7 @@ namespace xt
         using xtensor_cm = xtensor<int, 3, layout_type::column_major>;
         xtensor_rm arm;
         xtensor_cm acm;
-        test_iterator<xtensor_rm, xtensor_cm, container_type>(arm, acm);
+        test_iterator<xtensor_rm, xtensor_cm, storage_type>(arm, acm);
     }
 
     TEST(xtensor, zerod)
@@ -220,13 +220,13 @@ namespace xt
     TEST(xtensor, xiterator)
     {
         xtensor_dynamic a;
-        test_xiterator<xtensor_dynamic, container_type>(a);
+        test_xiterator<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, reverse_xiterator)
     {
         xtensor_dynamic a;
-        test_reverse_xiterator<xtensor_dynamic, container_type>(a);
+        test_reverse_xiterator<xtensor_dynamic, storage_type>(a);
     }
 
     TEST(xtensor, single_element)

@@ -53,7 +53,7 @@ namespace xt
             SCOPED_TRACE("copy constructor");
             adaptor_type b(a);
             compare_shape(a, b);
-            EXPECT_EQ(a.data(), b.data());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
@@ -61,10 +61,10 @@ namespace xt
             row_major_result<> r;
             vec_type v2(r.size(), 0);
             adaptor_type c(v2, r.shape());
-            EXPECT_NE(a.data(), c.data());
+            EXPECT_NE(a.storage(), c.storage());
             c = a;
             compare_shape(a, c);
-            EXPECT_EQ(a.data(), c.data());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 
@@ -80,7 +80,7 @@ namespace xt
             adaptor_type tmp(a);
             adaptor_type b(std::move(tmp));
             compare_shape(a, b);
-            EXPECT_EQ(a.data(), b.data());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
@@ -88,11 +88,11 @@ namespace xt
             row_major_result<> r;
             vec_type v2(r.size(), 0);
             adaptor_type c(v2, r.shape());
-            EXPECT_NE(a.data(), c.data());
+            EXPECT_NE(a.storage(), c.storage());
             adaptor_type tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
-            EXPECT_EQ(a.data(), c.data());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 

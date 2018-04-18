@@ -38,8 +38,8 @@ namespace xt
             SCOPED_TRACE("copy constructor");
             adaptor_type b(a);
             compare_shape(a, b);
-            EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.value().storage(), b.value().storage());
+            EXPECT_EQ(a.has_value().storage(), b.has_value().storage());
         }
 
         {
@@ -47,12 +47,12 @@ namespace xt
             array_type v2 = {{1, 2, 13}, {14, 15, 16}};
             flag_array_type hv2 = {{false, true, true}, {false, true, false}};
             adaptor_type c(v2, hv2);
-            EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.value().storage(), c.value().storage());
+            EXPECT_NE(a.has_value().storage(), c.has_value().storage());
             c = a;
             compare_shape(a, c);
-            EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.value().storage(), c.value().storage());
+            EXPECT_EQ(a.has_value().storage(), c.has_value().storage());
         }
     }
 
@@ -67,8 +67,8 @@ namespace xt
             adaptor_type tmp(a);
             adaptor_type b(std::move(tmp));
             compare_shape(a, b);
-            EXPECT_EQ(a.value().data(), b.value().data());
-            EXPECT_EQ(a.has_value().data(), b.has_value().data());
+            EXPECT_EQ(a.value().storage(), b.value().storage());
+            EXPECT_EQ(a.has_value().storage(), b.has_value().storage());
         }
 
         {
@@ -76,13 +76,13 @@ namespace xt
             array_type v2 = {{1, 2, 13}, {14, 15, 16}};
             flag_array_type hv2 = {{false, true, true}, {false, true, false}};
             adaptor_type c(v2, hv2);
-            EXPECT_NE(a.value().data(), c.value().data());
-            EXPECT_NE(a.has_value().data(), c.has_value().data());
+            EXPECT_NE(a.value().storage(), c.value().storage());
+            EXPECT_NE(a.has_value().storage(), c.has_value().storage());
             adaptor_type tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
-            EXPECT_EQ(a.value().data(), c.value().data());
-            EXPECT_EQ(a.has_value().data(), c.has_value().data());
+            EXPECT_EQ(a.value().storage(), c.value().storage());
+            EXPECT_EQ(a.has_value().storage(), c.has_value().storage());
         }
     }
 
@@ -269,7 +269,7 @@ namespace xt
             {
                 ++iter;
             }
-            EXPECT_EQ(vec.value().data()[nb_iter], *iter);
+            EXPECT_EQ(vec.value().storage()[nb_iter], *iter);
             for (size_t i = 0; i < nb_iter; ++i)
             {
                 ++iter;
@@ -352,7 +352,7 @@ namespace xt
             {
                 ++iter;
             }
-            EXPECT_EQ(vec.value().data()[nb_iter - 1], *iter);
+            EXPECT_EQ(vec.value().storage()[nb_iter - 1], *iter);
             for (size_t i = 0; i < nb_iter; ++i)
             {
                 ++iter;
@@ -371,7 +371,7 @@ namespace xt
             {
                 ++iter;
             }
-            EXPECT_EQ(vec.value().data()[2 * nb_iter - 1], *iter);
+            EXPECT_EQ(vec.value().storage()[2 * nb_iter - 1], *iter);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
             {
                 ++iter;

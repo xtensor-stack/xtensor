@@ -492,15 +492,15 @@ namespace xt
     }
 
     /*****************************************
-     * has_raw_data_interface implementation *
+     * has_data_interface implementation *
      *****************************************/
 
     template <class T>
-    class has_raw_data_interface
+    class has_data_interface
     {
         // the test function has one argument -- the return type of the function we're searching if it exists
         template <class C>
-        static std::true_type test(decltype(std::declval<C>().raw_data()));
+        static std::true_type test(decltype(std::declval<C>().data()));
 
         template <class C>
         static std::false_type test(...);

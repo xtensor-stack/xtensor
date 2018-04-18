@@ -176,15 +176,15 @@ namespace xt
         EXPECT_TRUE((std::is_same<squared_norm_type_t<std::vector<long double>>, long double>::value));
     }
 
-    TEST(utils, has_raw_data_interface)
+    TEST(utils, has_data_interface)
     {
-        bool b = has_raw_data_interface<xarray<int>>::value;
+        bool b = has_data_interface<xarray<int>>::value;
         EXPECT_TRUE(b);
-        b = has_raw_data_interface<const xarray<int>>::value;
+        b = has_data_interface<const xarray<int>>::value;
         EXPECT_TRUE(b);
-        b = has_raw_data_interface<const xtensor<double, 2>>::value;
+        b = has_data_interface<const xtensor<double, 2>>::value;
         EXPECT_TRUE(b);
-        b = has_raw_data_interface<const xtensorf<double, xshape<3, 4>>>::value;
+        b = has_data_interface<const xtensorf<double, xshape<3, 4>>>::value;
         EXPECT_TRUE(b);
 
         xarray<int> a = xarray<int>::from_shape({3, 4, 5});
@@ -193,11 +193,11 @@ namespace xt
         auto vv2 = dynamic_view(v2, {all(), 2});
         auto v3 = dynamic_view(f, {all(), 2});
 
-        b = has_raw_data_interface<decltype(v2)>::value;
+        b = has_data_interface<decltype(v2)>::value;
         EXPECT_TRUE(b);
-        b = has_raw_data_interface<decltype(vv2)>::value;
+        b = has_data_interface<decltype(vv2)>::value;
         EXPECT_TRUE(b);
-        b = has_raw_data_interface<decltype(v3)>::value;
+        b = has_data_interface<decltype(v3)>::value;
         EXPECT_FALSE(b);
     }
 }

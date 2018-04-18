@@ -36,7 +36,7 @@ namespace xt
     template <class... S>
     constexpr std::size_t newaxis_count();
 
-    // number of newaxis types in the specified sequence of types before specified index
+// number of newaxis types in the specified sequence of types before specified index
     template <class... S>
     constexpr std::size_t newaxis_count_before(std::size_t i);
 

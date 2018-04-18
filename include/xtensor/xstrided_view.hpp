@@ -58,43 +58,43 @@ namespace xt
         struct flat_storage_type;
 
         template <typename CT>
-        struct flat_storage_type<CT, typename std::enable_if_t<has_raw_data_interface<std::decay_t<CT>>::value>>
+        struct flat_storage_type<CT, typename std::enable_if_t<has_data_interface<std::decay_t<CT>>::value>>
         {
-            // Note: we could also use the container_type typedef.
+            // Note: we could also use the storage_type typedef.
             // using type = std::conditional_t<
             //    std::is_const<std::remove_reference_t<CT>>::value,
-            //    const typename std::decay_t<CT>::container_type&,
-            //    typename std::decay_t<CT>::container_type&>;
-            using type = decltype(std::declval<CT>().data());
+            //    const typename std::decay_t<CT>::storage_type&,
+            //    typename std::decay_t<CT>::storage_type&>;
+            using type = decltype(std::declval<CT>().storage());
         };
 
         template <typename CT>
-        struct flat_storage_type<CT, typename std::enable_if_t<!has_raw_data_interface<std::decay_t<CT>>::value>>
+        struct flat_storage_type<CT, typename std::enable_if_t<!has_data_interface<std::decay_t<CT>>::value>>
         {
             using type = flat_expression_adaptor<CT>;
         };
 
-        // with raw_data_interface
-        template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        // with data_interface
+        template <class E, std::enable_if_t<has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline decltype(auto) get_flat_storage(E& e)
         {
-            return e.data();
+            return e.storage();
         }
 
-        template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        template <class E, std::enable_if_t<has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline std::size_t get_offset(E&& e)
         {
-            return e.raw_data_offset();
+            return e.data_offset();
         }
 
-        template <class E, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        template <class E, std::enable_if_t<has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline decltype(auto) get_strides(E&& e)
         {
             return e.strides();
         }
 
-        // without raw_data_interface
-        template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        // without data_interface
+        template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_flat_storage(E& e) -> flat_expression_adaptor<E>
         {
             return flat_expression_adaptor<E>(e);
@@ -106,13 +106,13 @@ namespace xt
             return flat_expression_adaptor<E>(e, std::forward<S>(s), l);
         }
 
-        template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline std::size_t get_offset(E&& /*e*/)
         {
             return std::size_t(0);
         }
 
-        template <class E, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_strides(E&& e)
         {
             dynamic_shape<std::size_t> strides;
@@ -181,8 +181,8 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        using inner_container_type = FS;
-        using container_type = std::decay_t<inner_container_type>;
+        using inner_storage_type = FS;
+        using storage_type = std::decay_t<inner_storage_type>;
 
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
@@ -272,25 +272,25 @@ namespace xt
         stepper_end(const ST& shape, layout_type l) const;
 
         using container_iterator = std::conditional_t<is_const,
-                                                      typename container_type::const_iterator,
-                                                      typename container_type::iterator>;
-        using const_container_iterator = typename container_type::const_iterator;
+                                                      typename storage_type::const_iterator,
+                                                      typename storage_type::iterator>;
+        using const_container_iterator = typename storage_type::const_iterator;
 
-        container_type& data() noexcept;
-        const container_type& data() const noexcept;
+        storage_type& storage() noexcept;
+        const storage_type& storage() const noexcept;
 
         size_type offset() const noexcept;
         xexpression_type& expression() noexcept;
         const xexpression_type& expression() const noexcept;
 
         template <class E = std::decay_t<CT>>
-        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, value_type*>
-        raw_data() noexcept;
+        std::enable_if_t<has_data_interface<std::decay_t<E>>::value, value_type*>
+        data() noexcept;
         template <class E = std::decay_t<CT>>
-        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, const value_type*>
-        raw_data() const noexcept;
+        std::enable_if_t<has_data_interface<std::decay_t<E>>::value, const value_type*>
+        data() const noexcept;
 
-        size_type raw_data_offset() const noexcept;
+        size_type data_offset() const noexcept;
 
     protected:
 
@@ -313,7 +313,7 @@ namespace xt
         void assign_temporary_impl(temporary_type&& tmp);
 
         CT m_e;
-        inner_container_type m_data;
+        inner_storage_type m_storage;
         shape_type m_shape;
         strides_type m_strides;
         backstrides_type m_backstrides;
@@ -344,7 +344,7 @@ namespace xt
     template <class CTA>
     inline xstrided_view<CT, S, FS>::xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept
         : m_e(std::forward<CTA>(e)),
-          m_data(detail::get_flat_storage<CT>(m_e)),
+          m_storage(detail::get_flat_storage<CT>(m_e)),
           m_shape(std::move(shape)),
           m_strides(std::move(strides)),
           m_offset(offset),
@@ -358,7 +358,7 @@ namespace xt
     template <class CTA, class FST>
     inline xstrided_view<CT, S, FS>::xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout, FST&& flatten_strides, layout_type flatten_layout) noexcept
         : m_e(std::forward<CTA>(e)),
-          m_data(detail::get_flat_storage<CT>(m_e, std::forward<FST>(flatten_strides), flatten_layout)),
+          m_storage(detail::get_flat_storage<CT>(m_e, std::forward<FST>(flatten_strides), flatten_layout)),
           m_shape(std::move(shape)),
           m_strides(std::move(strides)),
           m_offset(offset),
@@ -448,35 +448,35 @@ namespace xt
     }
 
     template <class CT, class S, class FS>
-    inline auto xstrided_view<CT, S, FS>::data() noexcept -> container_type&
+    inline auto xstrided_view<CT, S, FS>::storage() noexcept -> storage_type&
     {
-        return m_data;
+        return m_storage;
     }
 
     template <class CT, class S, class FS>
-    inline auto xstrided_view<CT, S, FS>::data() const noexcept -> const container_type&
+    inline auto xstrided_view<CT, S, FS>::storage() const noexcept -> const storage_type&
     {
-        return m_data;
-    }
-
-    template <class CT, class S, class FS>
-    template <class E>
-    inline auto xstrided_view<CT, S, FS>::raw_data() noexcept ->
-        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, value_type*>
-    {
-        return m_e.raw_data();
+        return m_storage;
     }
 
     template <class CT, class S, class FS>
     template <class E>
-    inline auto xstrided_view<CT, S, FS>::raw_data() const noexcept ->
-        std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value, const value_type*>
+    inline auto xstrided_view<CT, S, FS>::data() noexcept ->
+        std::enable_if_t<has_data_interface<std::decay_t<E>>::value, value_type*>
     {
-        return m_e.raw_data();
+        return m_e.data();
     }
 
     template <class CT, class S, class FS>
-    inline auto xstrided_view<CT, S, FS>::raw_data_offset() const noexcept -> size_type
+    template <class E>
+    inline auto xstrided_view<CT, S, FS>::data() const noexcept ->
+        std::enable_if_t<has_data_interface<std::decay_t<E>>::value, const value_type*>
+    {
+        return m_e.data();
+    }
+
+    template <class CT, class S, class FS>
+    inline auto xstrided_view<CT, S, FS>::data_offset() const noexcept -> size_type
     {
         return m_offset;
     }
@@ -506,13 +506,13 @@ namespace xt
     template <class CT, class S, class FS>
     inline auto xstrided_view<CT, S, FS>::operator()() -> reference
     {
-        return m_data[m_offset];
+        return m_storage[m_offset];
     }
 
     template <class CT, class S, class FS>
     inline auto xstrided_view<CT, S, FS>::operator()() const -> const_reference
     {
-        return m_data[m_offset];
+        return m_storage[m_offset];
     }
 
     template <class CT, class S, class FS>
@@ -520,8 +520,8 @@ namespace xt
     inline auto xstrided_view<CT, S, FS>::operator()(Args... args) -> reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
-        size_type index = m_offset + data_offset<size_type>(strides(), static_cast<size_type>(args)...);
-        return m_data[index];
+        size_type index = m_offset + xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        return m_storage[index];
     }
 
     /**
@@ -536,8 +536,8 @@ namespace xt
     inline auto xstrided_view<CT, S, FS>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
-        size_type index = m_offset + data_offset<size_type>(strides(), static_cast<size_type>(args)...);
-        return m_data[index];
+        size_type index = m_offset + xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        return m_storage[index];
     }
 
     /**
@@ -629,14 +629,14 @@ namespace xt
     template <class It>
     inline auto xstrided_view<CT, S, FS>::element(It first, It last) -> reference
     {
-        return m_data[m_offset + element_offset<size_type>(strides(), first, last)];
+        return m_storage[m_offset + element_offset<size_type>(strides(), first, last)];
     }
 
     template <class CT, class S, class FS>
     template <class It>
     inline auto xstrided_view<CT, S, FS>::element(It first, It last) const -> const_reference
     {
-        return m_data[m_offset + element_offset<size_type>(strides(), first, last)];
+        return m_storage[m_offset + element_offset<size_type>(strides(), first, last)];
     }
     //@}
 
@@ -739,25 +739,25 @@ namespace xt
     template <class CT, class S, class FS>
     inline auto xstrided_view<CT, S, FS>::data_xbegin() noexcept -> container_iterator
     {
-        return data_xbegin_impl(m_data.begin());
+        return data_xbegin_impl(m_storage.begin());
     }
 
     template <class CT, class S, class FS>
     inline auto xstrided_view<CT, S, FS>::data_xbegin() const noexcept -> const_container_iterator
     {
-        return data_xbegin_impl(m_data.cbegin());
+        return data_xbegin_impl(m_storage.cbegin());
     }
 
     template <class CT, class S, class FS>
     inline auto xstrided_view<CT, S, FS>::data_xend(layout_type l) noexcept -> container_iterator
     {
-        return data_xend_impl(m_data.end(), l);
+        return data_xend_impl(m_storage.end(), l);
     }
 
     template <class CT, class S, class FS>
     inline auto xstrided_view<CT, S, FS>::data_xend(layout_type l) const noexcept -> const_container_iterator
     {
-        return data_xend_impl(m_data.cend(), l);
+        return data_xend_impl(m_storage.cend(), l);
     }
 
     /**
@@ -1188,13 +1188,13 @@ namespace xt
             return transpose_impl(std::forward<E>(e), std::forward<S>(permutation), check_policy::none());
         }
 
-        template <class E, class S, std::enable_if_t<has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        template <class E, class S, std::enable_if_t<has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline void compute_transposed_strides(E&& e, const S&, S& strides)
         {
             std::copy(e.strides().crbegin(), e.strides().crend(), strides.begin());
         }
 
-        template <class E, class S, std::enable_if_t<!has_raw_data_interface<std::decay_t<E>>::value>* = nullptr>
+        template <class E, class S, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline void compute_transposed_strides(E&&, const S& shape, S& strides)
         {
             layout_type l = transpose_layout(std::decay_t<E>::static_layout);

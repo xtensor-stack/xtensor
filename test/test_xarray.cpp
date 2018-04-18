@@ -58,8 +58,8 @@ namespace xt
             int value = 2;
             xarray_dynamic ra(rm.m_shape, value, layout_type::row_major);
             compare_shape(ra, rm);
-            xarray_dynamic::container_type vec(ra.size(), value);
-            EXPECT_EQ(ra.data(), vec);
+            xarray_dynamic::storage_type vec(ra.size(), value);
+            EXPECT_EQ(ra.storage(), vec);
         }
 
         {
@@ -68,8 +68,8 @@ namespace xt
             int value = 2;
             xarray<int, layout_type::column_major> ca(cm.m_shape, value);
             compare_shape(ca, cm);
-            xarray_dynamic::container_type vec(ca.size(), value);
-            EXPECT_EQ(ca.data(), vec);
+            xarray_dynamic::storage_type vec(ca.size(), value);
+            EXPECT_EQ(ca.storage(), vec);
         }
     }
 
@@ -79,8 +79,8 @@ namespace xt
         int value = 2;
         xarray<int, layout_type::dynamic> cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
-        xarray_dynamic::container_type vec(cma.size(), value);
-        EXPECT_EQ(cma.data(), vec);
+        xarray_dynamic::storage_type vec(cma.size(), value);
+        EXPECT_EQ(cma.storage(), vec);
     }
 
     TEST(xarray, xscalar_constructor)
@@ -100,17 +100,17 @@ namespace xt
             SCOPED_TRACE("copy constructor");
             xarray_dynamic b(a);
             compare_shape(a, b);
-            EXPECT_EQ(a.data(), b.data());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
             SCOPED_TRACE("assignment operator");
             row_major_result<> r;
             xarray_dynamic c(r.m_shape, 0);
-            EXPECT_NE(a.data(), c.data());
+            EXPECT_NE(a.storage(), c.storage());
             c = a;
             compare_shape(a, c);
-            EXPECT_EQ(a.data(), c.data());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 
@@ -125,18 +125,18 @@ namespace xt
             xarray_dynamic tmp(a);
             xarray_dynamic b(std::move(tmp));
             compare_shape(a, b);
-            EXPECT_EQ(a.data(), b.data());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
             SCOPED_TRACE("move assignment");
             row_major_result<> r;
             xarray_dynamic c(r.m_shape, 0);
-            EXPECT_NE(a.data(), c.data());
+            EXPECT_NE(a.storage(), c.storage());
             xarray_dynamic tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
-            EXPECT_EQ(a.data(), c.data());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 
