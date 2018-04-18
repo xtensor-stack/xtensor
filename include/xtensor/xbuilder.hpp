@@ -478,7 +478,7 @@ namespace xt
             template <class It>
             inline value_type element(It first, It) const
             {
-                return m_source(*(first + m_axis));
+                return m_source(*(first + static_cast<std::ptrdiff_t>(m_axis)));
             }
 
         private:

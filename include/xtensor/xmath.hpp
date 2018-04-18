@@ -303,6 +303,9 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 
         // The following specializations are needed to avoid 'ambiguous overload' errors,
         // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
+        // we're still adding those functions to silence warnings
+        UNSIGNED_ABS_FUNC(unsigned char);
+        UNSIGNED_ABS_FUNC(unsigned short);
         UNSIGNED_ABS_FUNC(unsigned int);
         UNSIGNED_ABS_FUNC(unsigned long);
         UNSIGNED_ABS_FUNC(unsigned long long);

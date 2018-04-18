@@ -726,7 +726,7 @@ namespace xt
     template <class It>
     inline It xstrided_view<CT, S, FS>::data_xbegin_impl(It begin) const noexcept
     {
-        return begin + m_offset;
+        return begin + static_cast<std::ptrdiff_t>(m_offset);
     }
 
     template <class CT, class S, class FS>
