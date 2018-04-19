@@ -940,7 +940,7 @@ namespace xt
     template <class T, class AT, class U, class AU>
     inline bool operator==(const tracking_allocator<T, AT>&, const tracking_allocator<U, AU>&)
     {
-      return true;
+      return std::is_same<AT, AU>::value;
     }
 
     template <class T, class AT, class U, class AU>
