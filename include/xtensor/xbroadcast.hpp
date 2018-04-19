@@ -21,6 +21,7 @@
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
+#include "xscalar.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
 
@@ -132,6 +133,9 @@ namespace xt
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
+
+        template <class E, class XCT = CT, class = std::enable_if_t<xt::is_xscalar<XCT>::value>>
+        void assign_to(xexpression<E>& e) const;
 
     private:
 
@@ -363,6 +367,15 @@ namespace xt
     {
         // Could check if (broadcastable(shape, m_shape)
         return m_e.stepper_end(shape, l);
+    }
+
+    template <class CT, class X>
+    template <class E, class XCT, class>
+    inline void xbroadcast<CT, X>::assign_to(xexpression<E>& e) const
+    {
+        auto& ed = e.derived_cast();
+        ed.resize(m_shape);
+        std::fill(ed.begin(), ed.end(), m_e());
     }
 }
 
