@@ -25,7 +25,7 @@ Defined in ``xtensor/xstrided_view.hpp``
 .. doxygentypedef:: xt::slice_vector
    :project: xtensor
 
-.. doxygenfunction:: xt::dynamic_view
+.. doxygenfunction:: xt::dynamic_view(E&&, const slice_vector&)
    :project: xtensor
 
 .. doxygenfunction:: xt::ravel
