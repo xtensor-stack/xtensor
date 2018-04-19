@@ -780,7 +780,6 @@ namespace xt
         auto av = view(a, 1, 1);
         auto av1 = view(a, 1, 1, 0);
 
-
         bool ax = is_xscalar<decltype(av)>::value;
         EXPECT_FALSE(ax);
         ax = is_xscalar<decltype(av1)>::value;
@@ -791,10 +790,18 @@ namespace xt
 
         auto afv = view(af, 1, 1);
         auto afv1 = view(af, 1, 1, 0);
+        double& afd1 = view(af, 1, 1, 0);
+        EXPECT_EQ(afd1, af(1, 1, 0));
         ax = is_xscalar<decltype(afv)>::value;
         EXPECT_FALSE(ax);
         ax = is_xscalar<decltype(afv1)>::value;
         EXPECT_TRUE(ax);
+
+        const xtensor<double, 2> ac = {{1,2}, {3,4}};
+        double a1 = view(ac, 0, 0);
+        const double& a2 = view(ac, 0, 0);
+
+        EXPECT_EQ(a1, a2);
 
         double conv = av1;
         double conv1 = afv1;

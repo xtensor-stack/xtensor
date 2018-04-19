@@ -191,7 +191,10 @@ namespace xt
         data_offset() const noexcept;
 
         template <class ST = self_type, class = std::enable_if_t<is_xscalar<ST>::value, int>>
-        operator value_type();
+        operator reference();
+
+        template <class ST = self_type, class = std::enable_if_t<is_xscalar<ST>::value, int>>
+        operator const_reference() const;
 
         size_type underlying_size(size_type dim) const;
 
@@ -375,7 +378,7 @@ namespace xt
         template <class CT, class... S>
         struct is_xscalar_impl<xview<CT, S...>>
         {
-            static constexpr bool value = integral_count<S...>() == static_dimension<typename std::decay_t<CT>::shape_type>::value ? true : false;
+            static constexpr bool value = static_cast<std::ptrdiff_t>(integral_count<S...>()) == static_dimension<typename std::decay_t<CT>::shape_type>::value ? true : false;
         };
     }
 
@@ -707,7 +710,14 @@ namespace xt
 
     template <class CT, class... S>
     template <class ST, class>
-    xview<CT, S...>::operator value_type()
+    xview<CT, S...>::operator reference()
+    {
+        return (*this)();
+    }
+
+    template <class CT, class... S>
+    template <class ST, class>
+    xview<CT, S...>::operator const_reference() const
     {
         return (*this)();
     }
