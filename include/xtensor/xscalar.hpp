@@ -459,6 +459,7 @@ namespace xt
      * xscalar implementation *
      **************************/
 
+    // This constructor will not compile when CT is a reference type.
     template <class CT>
     inline xscalar<CT>::xscalar() noexcept
         : m_value()
