@@ -895,16 +895,20 @@ namespace xt
 
     namespace alloc_tracking
     {
-        static bool enabled = false;
-
-        static void enable()
+        inline bool& enabled()
         {
-            enabled = true;
+            static bool enabled;
+            return enabled;
+        };
+
+        inline void enable()
+        {
+            enabled() = true;
         }
 
-        static void disable()
+        inline void disable()
         {
-            enabled = false;
+            enabled() = false;
         }
     }
 
@@ -925,7 +929,7 @@ namespace xt
 
         T* allocate(std::size_t n)
         {
-            if (alloc_tracking::enabled)
+            if (alloc_tracking::enabled())
             {
                 std::cout << "xtensor allocating: " << n << "" << std::endl;
             }
