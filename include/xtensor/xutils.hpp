@@ -15,6 +15,7 @@
 #include <complex>
 #include <cstddef>
 #include <initializer_list>
+#include <iostream>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -891,6 +892,66 @@ namespace xt
      */
     template <class T>
     using squared_norm_type_t = typename squared_norm_type<T>::type;
+
+    namespace alloc_tracking
+    {
+        inline bool& enabled()
+        {
+            static bool enabled;
+            return enabled;
+        };
+
+        inline void enable()
+        {
+            enabled() = true;
+        }
+
+        inline void disable()
+        {
+            enabled() = false;
+        }
+    }
+
+    template <class T, class A>
+    struct tracking_allocator
+        : private A
+    {
+        using base_type = A;
+        using value_type = typename A::value_type;
+        using reference = typename A::reference;
+        using const_reference = typename A::const_reference;
+        using pointer = typename A::pointer;
+        using const_pointer = typename A::const_pointer;
+        using size_type = typename A::size_type;
+        using difference_type = typename A::difference_type;
+
+        tracking_allocator() = default;
+
+        T* allocate(std::size_t n)
+        {
+            if (alloc_tracking::enabled())
+            {
+                std::cout << "xtensor allocating: " << n << "" << std::endl;
+            }
+            return base_type::allocate(n);
+        }
+
+        using base_type::deallocate;
+        using base_type::construct;
+        using base_type::destroy;
+    };
+
+    template <class T, class AT, class U, class AU>
+    inline bool operator==(const tracking_allocator<T, AT>&, const tracking_allocator<U, AU>&)
+    {
+      return std::is_same<AT, AU>::value;
+    }
+
+    template <class T, class AT, class U, class AU>
+    inline bool operator!=(const tracking_allocator<T, AT>& a, const tracking_allocator<U, AU>& b)
+    {
+      return !(a == b);
+    }
 }
 
 #endif

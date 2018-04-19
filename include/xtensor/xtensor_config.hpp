@@ -32,13 +32,24 @@
 #endif
 
 #ifndef XTENSOR_DEFAULT_ALLOCATOR
-#ifdef XTENSOR_USE_XSIMD
-#include <xsimd/xsimd.hpp>
-#define XTENSOR_DEFAULT_ALLOCATOR(T) \
-    xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
+#ifdef XTENSOR_ALLOC_TRACKING
+    #ifdef XTENSOR_USE_XSIMD
+        #include <xsimd/xsimd.hpp>
+        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+            xt::tracking_allocator<T, xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>>
+    #else
+        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+            xt::tracking_allocator<T, std::allocator<T>>
+    #endif
 #else
-#define XTENSOR_DEFAULT_ALLOCATOR(T) \
-    std::allocator<T>
+    #ifdef XTENSOR_USE_XSIMD
+    #include <xsimd/xsimd.hpp>
+    #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+        xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
+    #else
+    #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+        std::allocator<T>
+    #endif
 #endif
 #endif
 
