@@ -778,11 +778,13 @@ namespace xt
         xarray<double> b = a;
 
         auto av = view(a, 1, 1);
-        auto av1 = view(a, 1, 1, 0);
+        const auto av1 = view(a, 1, 1, 0);
+        const double& ad1 = av1;
+        EXPECT_EQ(ad1, av1());
 
-        bool ax = is_xscalar<decltype(av)>::value;
+        bool ax = is_xscalar<std::decay_t<decltype(av)>>::value;
         EXPECT_FALSE(ax);
-        ax = is_xscalar<decltype(av1)>::value;
+        ax = is_xscalar<std::decay_t<decltype(av1)>>::value;
         EXPECT_TRUE(ax);
         auto bv = view(b, 1, 1, 1);
         ax = is_xscalar<decltype(bv)>::value;
@@ -790,6 +792,7 @@ namespace xt
 
         auto afv = view(af, 1, 1);
         auto afv1 = view(af, 1, 1, 0);
+
         double& afd1 = view(af, 1, 1, 0);
         EXPECT_EQ(afd1, af(1, 1, 0));
         ax = is_xscalar<decltype(afv)>::value;

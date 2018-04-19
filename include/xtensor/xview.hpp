@@ -190,11 +190,17 @@ namespace xt
         std::enable_if_t<has_data_interface<T>::value, const std::size_t>
         data_offset() const noexcept;
 
-        template <class ST = self_type, class = std::enable_if_t<is_xscalar<ST>::value, int>>
-        operator reference();
+        template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
+        operator reference()
+        {
+            return (*this)();
+        }
 
-        template <class ST = self_type, class = std::enable_if_t<is_xscalar<ST>::value, int>>
-        operator const_reference() const;
+        template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
+        operator const_reference() const
+        {
+            return (*this)();
+        }
 
         size_type underlying_size(size_type dim) const;
 
@@ -707,21 +713,6 @@ namespace xt
         return offset;
     }
     //@}
-
-    template <class CT, class... S>
-    template <class ST, class>
-    xview<CT, S...>::operator reference()
-    {
-        return (*this)();
-    }
-
-    template <class CT, class... S>
-    template <class ST, class>
-    xview<CT, S...>::operator const_reference() const
-    {
-        return (*this)();
-    }
-
 
     template <class CT, class... S>
     inline auto xview<CT, S...>::underlying_size(size_type dim) const -> size_type
