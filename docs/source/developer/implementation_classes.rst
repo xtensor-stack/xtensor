@@ -99,7 +99,7 @@ totally:
     template <class It>
     const_reference element(It first, It last) const;
 
-    const container_type& data() const;
+    const storage_type& storage() const;
 
 **iteration methods**
 
@@ -128,10 +128,10 @@ every class inheriting from ``xcontainer`` provides the following methods:
 
 .. code::
 
-    container_type& data_impl() noexcept;
-    const container_type& data_impl() const noexcept;
+    storage_type& storage_impl() noexcept;
+    const storage_type& storage_impl() const noexcept;
 
-These are the implementation methods of the ``data()`` interface methods defined in ``xcontainer``,
+These are the implementation methods of the ``storage()`` interface methods defined in ``xcontainer``,
 and thus are defined in the private section of ``xarray`` and ``xtensor``. In order to grant access
 to ``xcontainer``, this last one is declared as ``friend``:
 
@@ -147,9 +147,9 @@ to ``xcontainer``, this last one is declared as ``friend``:
 
     private:
 
-        container_type m_data;
-        container_type& data() noexcept;
-        const container_type& data() const noexcept;
+        storage_type m_storage;
+        storage_type& storage() noexcept;
+        const storage_type& storage() const noexcept;
 
         friend class xcontainer<xarray<EC, L, SC, Tag>>;
     };
@@ -169,9 +169,9 @@ container type hold by ``xarray``:
 
 .. code::
 
-    using value_type = typename container_type::value_type;
-    using reference = typename container_type::reference;
-    using const_reference = typename container_type::const_reference;
+    using value_type = typename storage_type::value_type;
+    using reference = typename storage_type::reference;
+    using const_reference = typename storage_type::const_reference;
     ...
 
 Moreover, CRTP base classes cannot access inner types defined in CRTP leaf classes, because
@@ -210,7 +210,7 @@ The semantic classes only expect the following type: ``temporary_type``.
 
 .. code::
 
-    container_type;
+    storage_type;
     shape_type;
     strides_type;
     backstrides_type;
