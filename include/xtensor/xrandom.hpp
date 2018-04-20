@@ -17,8 +17,10 @@
 #include <random>
 #include <utility>
 
+#include "xbuilder.hpp"
 #include "xgenerator.hpp"
 #include "xtensor.hpp"
+#include "xview.hpp"
 
 namespace xt
 {
@@ -72,6 +74,9 @@ namespace xt
         auto randn(const I (&shape)[L], T mean = 0, T std_dev = 1,
                    E& engine = random::get_default_random_engine());
 #endif
+
+        template <class T, class E = random::default_engine_type>
+        void shuffle(xexpression<T>& e, E& engine = random::get_default_random_engine());
 
         template <class T, class E = random::default_engine_type>
         xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n,
@@ -230,6 +235,39 @@ namespace xt
 #endif
 
         /**
+         * Randomly shuffle elements inplace in xcontainer along first axis.
+         * The order of sub-arrays is changed but their contents remain the same.
+         *
+         * @param e xcontainer to shuffle inplace
+         * @param engine random number engine
+         */
+        template <class T, class E>
+        void shuffle(xexpression<T>& e, E& engine)
+        {
+            T& de = e.derived_cast();
+
+            if (de.dimension() == 1)
+            {
+                std::shuffle(de.storage().begin(), de.storage().end(), engine);
+            }
+            else
+            {
+                using size_type = typename T::size_type;
+                decltype(auto) buf = empty_like(view(de, 0));
+
+                for (std::size_t i = de.shape()[0] - 1; i > 0; --i)
+                {
+                    std::uniform_int_distribution<size_type> dist(0, i);
+                    size_type j = dist(engine);
+
+                    buf = view(de, j);
+                    view(de, j) = view(de, i);
+                    view(de, i) = buf;
+                }
+            }
+        }
+
+        /**
          * Randomly select n unique elements from xexpression e.
          * Note: this function makes a copy of your data, and only 1D data is accepted.
          *
@@ -249,7 +287,7 @@ namespace xt
             result.resize({n});
 
             xtensor<typename T::value_type, 1> shuffled = de;
-            shuffle(shuffled.storage().begin(), shuffled.storage().end(), engine);
+            std::shuffle(shuffled.storage().begin(), shuffled.storage().end(), engine);
 
             std::copy(shuffled.storage().begin(), shuffled.storage().begin() + n, result.begin());
 

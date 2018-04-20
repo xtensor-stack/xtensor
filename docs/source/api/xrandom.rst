@@ -26,3 +26,6 @@ Defined in ``xtensor/xrandom.hpp``
 
 .. doxygenfunction:: xt::random::choice
    :project: xtensor
+
+.. doxygenfunction:: xt::random::shuffle
+   :project: xtensor

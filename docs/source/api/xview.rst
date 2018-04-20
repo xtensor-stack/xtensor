@@ -32,3 +32,6 @@ Defined in ``xtensor/xslice.hpp``
 
 .. doxygenfunction:: xt::ellipsis
    :project: xtensor
+
+.. doxygenfunction:: xt::islice(T&&)
+   :project: xtensor
