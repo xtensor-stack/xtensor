@@ -123,7 +123,7 @@ Bitwise operators
 - Bitwise or: ``operator|``
 - Bitwise xor: ``operator^``
 - Bitwise not: ``operator~``
-- Bitwise left/right shift: ``shift_left``, ``shift_right``
+- Bitwise left/right shift: ``left_shift``, ``right_shift``
 
 Mathematical functions
 ----------------------

@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor internals
-=================
+Internals of xtensor
+====================
 
 This section provides information about `xtensor`'s internals and its architecture. It is intended for developers
 who want to contribute to `xtensor` or simply understand how it works under the hood. `xtensor` makes heavy use
