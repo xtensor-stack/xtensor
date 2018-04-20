@@ -131,11 +131,8 @@ namespace xt
         std::size_t axis = 0;
         while (efirst != last)
         {
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wsign-compare"
             if (*efirst >= shape[axis] && shape[axis] != 1)
             {
-        #pragma GCC diagnostic pop
                 throw std::out_of_range("index " + std::to_string(*efirst) + " is out of bounds for axis "
                     + std::to_string(axis) + " with size " + std::to_string(shape[axis]));
             }

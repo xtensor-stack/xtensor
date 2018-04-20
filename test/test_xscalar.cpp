@@ -70,6 +70,15 @@ namespace xt
         EXPECT_EQ(iter, iter_end);
     }
 
+
+    TEST(xscalar, stepper)
+    {
+        xarray<double> ref = zeros<double>({ 4,6 });
+        xarray<int> a{ 0,1 };
+        ref[a + 1] = 1;
+        EXPECT_EQ(ref(1, 2), 1);
+    }
+
     TEST(xscalar, dummy_iterator)
     {
         xscalar<int> x(2);
