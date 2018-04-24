@@ -109,7 +109,7 @@ namespace xt
         a0(3) = 3;
         EXPECT_EQ(1, v0[0]);
         EXPECT_EQ(3, v0[3]);
-        
+
         vec_type v(4, 0);
         using shape_type = std::array<vec_type::size_type, 2>;
         shape_type s = {2, 2};
@@ -144,6 +144,28 @@ namespace xt
         auto a2 = adapt(data, size, no_ownership(), s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, data[2]);
+
+        delete[] data;
+    }
+
+    TEST(xtensor_adaptor, pointer_const_no_ownership)
+    {
+        size_t size = 4;
+        int* data = new int[size];
+        const int* const_data = data;
+
+        auto a0 = adapt(data, size, no_ownership());
+        auto a0_view = adapt(const_data, size, no_ownership());
+        a0(3) = 3;
+        EXPECT_EQ(3, a0_view[3]);
+
+        using shape_type = std::array<vec_type::size_type, 2>;
+        shape_type s = {2, 2};
+
+        auto a1 = adapt(data, size, no_ownership(), s);
+        auto a1_view = adapt(data, size, no_ownership(), s);
+        a1(0, 1) = 1;
+        EXPECT_EQ(1, a1_view(0, 1));
 
         delete[] data;
     }
