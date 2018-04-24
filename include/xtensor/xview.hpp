@@ -190,6 +190,18 @@ namespace xt
         std::enable_if_t<has_data_interface<T>::value, const std::size_t>
         data_offset() const noexcept;
 
+        template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
+        operator reference()
+        {
+            return (*this)();
+        }
+
+        template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
+        operator const_reference() const
+        {
+            return (*this)();
+        }
+
         size_type underlying_size(size_type dim) const;
 
         xtl::xclosure_pointer<self_type&> operator&() &;
@@ -348,6 +360,33 @@ namespace xt
     {
         using type = std::array<I, L - integral_count<S...>() + newaxis_count<S...>()>;
     };
+
+    namespace detail
+    {
+        template <class T>
+        struct static_dimension
+        {
+            static constexpr std::ptrdiff_t value = -1;
+        };
+
+        template <class T, std::size_t N>
+        struct static_dimension<std::array<T, N>>
+        {
+            static constexpr std::ptrdiff_t value = static_cast<std::ptrdiff_t>(N);
+        };
+
+        template <class T, std::size_t N>
+        struct static_dimension<xt::const_array<T, N>>
+        {
+            static constexpr std::ptrdiff_t value = static_cast<std::ptrdiff_t>(N);
+        };
+
+        template <class CT, class... S>
+        struct is_xscalar_impl<xview<CT, S...>>
+        {
+            static constexpr bool value = static_cast<std::ptrdiff_t>(integral_count<S...>()) == static_dimension<typename std::decay_t<CT>::shape_type>::value ? true : false;
+        };
+    }
 
     /************************
      * xview implementation *

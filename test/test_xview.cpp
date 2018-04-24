@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
@@ -767,5 +768,46 @@ namespace xt
         auto s7 = view(a, xt::all(), 1, xt::newaxis(), xt::all()).strides();
         std::vector<std::size_t> s7e = {72, 0, 6, 1};
         EXPECT_EQ(s7, s7e);
+    }
+
+    TEST(xview, to_scalar)
+    {
+        std::array<std::size_t, 3> sh{2,2,2};
+        xtensor<double, 3> a(sh);
+        xtensorf<double, xshape<2, 2, 2>> af = a;
+        xarray<double> b = a;
+
+        auto av = view(a, 1, 1);
+        const auto av1 = view(a, 1, 1, 0);
+        const double& ad1 = av1;
+        EXPECT_EQ(ad1, av1());
+
+        bool ax = is_xscalar<std::decay_t<decltype(av)>>::value;
+        EXPECT_FALSE(ax);
+        ax = is_xscalar<std::decay_t<decltype(av1)>>::value;
+        EXPECT_TRUE(ax);
+        auto bv = view(b, 1, 1, 1);
+        ax = is_xscalar<decltype(bv)>::value;
+        EXPECT_FALSE(ax);
+
+        auto afv = view(af, 1, 1);
+        auto afv1 = view(af, 1, 1, 0);
+
+        double& afd1 = view(af, 1, 1, 0);
+        EXPECT_EQ(afd1, af(1, 1, 0));
+        ax = is_xscalar<decltype(afv)>::value;
+        EXPECT_FALSE(ax);
+        ax = is_xscalar<decltype(afv1)>::value;
+        EXPECT_TRUE(ax);
+
+        const xtensor<double, 2> ac = {{1,2}, {3,4}};
+        double a1 = view(ac, 0, 0);
+        const double& a2 = view(ac, 0, 0);
+
+        EXPECT_EQ(a1, a2);
+
+        double conv = av1;
+        double conv1 = afv1;
+        EXPECT_EQ(conv, conv1);
     }
 }
