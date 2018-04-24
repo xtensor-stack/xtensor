@@ -33,7 +33,7 @@ The following example shows how to initialize a multi-dimensional array of dynam
 
     std::vector<size_t> shape = { 3, 2, 4 };
     std::vector<size_t> strides = { 8, 4, 1 };
-    xt::xarray<double, layout_type::dynamic> a(shape, strides);
+    xt::xarray<double, xt::layout_type::dynamic> a(shape, strides);
 
 However, this requires to carefully compute the strides to avoid buffer overflow when accessing elements of the array. We can use the following shortcut to specify the strides instead of computing them:
 
@@ -43,7 +43,7 @@ However, this requires to carefully compute the strides to avoid buffer overflow
     #include "xtensor/xarray.hpp"
 
     std::vector<size_t> shape = { 3, 2, 4 };
-    xt::xarray<double, layout_type::dynamic> a(shape, xt::layout::row_major);
+    xt::xarray<double, xt::layout_type::dynamic> a(shape, xt::layout::row_major);
 
 If the layout of the array can be fixed at compile time, we can make it even simpler:
 
@@ -53,7 +53,7 @@ If the layout of the array can be fixed at compile time, we can make it even sim
     #include "xtensor/xarray.hpp"
 
     std::vector<size_t> shape = { 3, 2, 4 };
-    xt::xarray<double, layout_type::row_major> a(shape);
+    xt::xarray<double, xt::layout_type::row_major> a(shape);
     // this shortcut is equivalent:
     // xt::xarray<double> a(shape);
 
@@ -79,7 +79,7 @@ Let's use ``xtensor`` instead of ``xarray`` in the previous example:
     std::array<size_t, 3> shape = { 3, 2, 4 };
     xt::xtensor<double, 3> a(shape);
     // whis is equivalent to
-    // xt::xtensor<double, 3, layout_type::row_major> a(shape);
+    // xt::xtensor<double, 3, xt::layout_type::row_major> a(shape);
 
 Or when using ``xtensorf``:
 
@@ -152,4 +152,3 @@ In the above example, the shape of ``a + b`` is ``{ 3, 2, 4 }``. Therefore, ``b`
 If the values of ``b`` were copied into the new buffer directly without an intermediary variable, then we would have
 ``new_b(0, i, j) == old_b(i, j) for (i,j) in [0,1] x [0, 3]``. After the resize of ``bb``, ``a(0, i, j) + b(0, i, j)`` is assigned to ``b(0, i, j)``, then,
 due to broadcasting rules, ``a(1, i, j) + b(0, i, j)`` is assigned to ``b(1, i, j)``. The issue is ``b(0, i, j)`` has been changed by the previous assignment.
-
