@@ -927,6 +927,17 @@ namespace xt
      */
     using slice_vector = std::vector<slice_variant<std::ptrdiff_t>>;
 
+    template <class T>
+    struct select_strided_view
+    {
+        template <class CT, class S>
+        using type = xstrided_view<CT, S>;
+    };
+
+    template <class T>
+    using select_strided_view_t = typename select_strided_view<T>::type;
+
+ 
     namespace detail
     {
         template <class S, class ST>
@@ -1167,7 +1178,7 @@ namespace xt
                 new_layout = transpose_layout_noexcept(e.layout());
             }
 
-            using view_type = xstrided_view<xclosure_t<E>, shape_type>;
+            using view_type = typename select_strided_view<std::decay_t<E>>::template type<xclosure_t<E>, shape_type>;
             return view_type(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), 0, new_layout);
         }
 
@@ -1220,7 +1231,7 @@ namespace xt
 
         layout_type new_layout = detail::transpose_layout_noexcept(e.layout());
 
-        using view_type = xstrided_view<xclosure_t<E>, shape_type>;
+        using view_type = typename select_strided_view<std::decay_t<E>>::template type<xclosure_t<E>, shape_type>;
         return view_type(std::forward<E>(e), std::move(shape), std::move(strides), 0, new_layout);
     }
 
