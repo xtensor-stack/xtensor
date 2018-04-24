@@ -104,7 +104,11 @@ namespace xt
         static constexpr layout_type static_layout = layout_type::any;
         static constexpr bool contiguous_layout = true;
 
+        xscalar() noexcept;
         xscalar(CT value) noexcept;
+
+        operator value_type&() noexcept;
+        operator const value_type&() const noexcept;
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
@@ -456,10 +460,29 @@ namespace xt
      * xscalar implementation *
      **************************/
 
+    // This constructor will not compile when CT is a reference type.
+    template <class CT>
+    inline xscalar<CT>::xscalar() noexcept
+        : m_value()
+    {
+    }
+
     template <class CT>
     inline xscalar<CT>::xscalar(CT value) noexcept
         : m_value(value)
     {
+    }
+
+    template <class CT>
+    inline xscalar<CT>::operator value_type&() noexcept
+    {
+        return m_value;
+    }
+
+    template <class CT>
+    inline xscalar<CT>::operator const value_type&() const noexcept
+    {
+        return m_value;
     }
 
     template <class CT>
