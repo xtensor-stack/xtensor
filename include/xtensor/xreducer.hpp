@@ -41,41 +41,76 @@ namespace xt
 
     template <class F, class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>>
-    auto reduce(F&& f, E&& e, X&& axes, ES es = ES()) noexcept;
+    auto reduce(F&& f, E&& e, X&& axes, ES es = ES());
 
     template <class F, class E, class ES = DEFAULT_STRATEGY_REDUCERS,
               class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>
-    auto reduce(F&& f, E&& e, ES es = ES()) noexcept;
+    auto reduce(F&& f, E&& e, ES es = ES());
 
 #ifdef X_OLD_CLANG
-    template <class F, class E, class I>
-    auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept;
+    template <class F, class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>
+    auto reduce(F&& f, E&& e, std::initializer_list<I> axes, ES es = ES());
 #else
     template <class F, class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>
-    auto reduce(F&& f, E&& e, const I (&axes)[N], ES es = ES()) noexcept;
+    auto reduce(F&& f, E&& e, const I (&axes)[N], ES es = ES());
 #endif
+
+    template <class ST, class X>
+    struct xreducer_shape_type;
+
+    template <class E, class X, class result_type>
+    struct xreducer_result_container
+    {
+        using type = xarray<result_type, std::decay_t<E>::static_layout>;
+    };
+
+    template <class T, std::size_t N, layout_type L, class A, class X, std::size_t NX, class result_type>
+    struct xreducer_result_container<xtensor<T, N, L, A>, std::array<X, NX>, result_type>
+    {
+        using type = xtensor<result_type, N - NX, L>;
+    };
+
+    template <class T, std::size_t... N, layout_type L, class X, std::size_t NX, class result_type>
+    struct xreducer_result_container<xtensorf<T, xshape<N...>, L>, std::array<X, NX>, result_type>
+    {
+        using type = xtensor<result_type, sizeof...(N) - NX, L>;
+    };
 
     template <class F, class E, class X>
     auto reduce_immediate(F&& f, E&& e, X&& axes)
     {
-        using shape_type = dynamic_shape<std::size_t>;
-        using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
-        using result_type = typename accumulate_functor::result_type;
+        using shape_type = typename xreducer_shape_type<typename std::decay_t<E>::shape_type, std::decay_t<X>>::type;
+
+        using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
+        using init_functor_type = typename std::decay_t<F>::init_functor_type;
+        using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
+
+        using expr_value_type = typename std::decay_t<E>::value_type;
+
+        using result_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
+            std::declval<init_functor_type>()(std::declval<expr_value_type>()), std::declval<expr_value_type>()))>;
 
         // retrieve functors from triple struct
-        auto acc_fct = std::get<0>(f);
+        auto reduce_func = std::get<0>(f);
         auto init_fct = std::get<1>(f);
         auto merge_fct = std::get<2>(f);
 
-        shape_type result_shape(e.dimension() - axes.size());
-        shape_type iter_shape = e.shape();
-        shape_type iter_strides(e.dimension());
+        shape_type result_shape;
+        resize_container(result_shape, e.dimension() - axes.size());
 
-        xt::xarray<result_type, std::decay_t<E>::static_layout> result;
+        dynamic_shape<std::size_t> iter_shape = xtl::forward_sequence<dynamic_shape<std::size_t>>(e.shape());
+        dynamic_shape<std::size_t> iter_strides(e.dimension());
+
+        using result_container_type = typename xreducer_result_container<std::decay_t<E>, X, result_type>::type;
+        result_container_type result;
 
         if (!std::is_sorted(axes.cbegin(), axes.cend()))
         {
             throw std::runtime_error("Reducing axes should be sorted");
+        }
+        if (axes.size() != 0 && axes[axes.size() - 1] > e.dimension() - 1)
+        {
+            throw std::runtime_error("Axis " + std::to_string(axes[axes.size() - 1]) + " out of bounds for reduction.");
         }
 
         // Fast track for complete reduction
@@ -84,7 +119,7 @@ namespace xt
             auto begin = e.storage().begin();
             result_type tmp = init_fct(*begin);
             ++begin;
-            result = std::accumulate(begin, e.storage().end(), tmp, acc_fct);
+            result.data()[0] = std::accumulate(begin, e.storage().end(), tmp, reduce_func);
             return result;
         }
 
@@ -187,7 +222,7 @@ namespace xt
         std::pair<bool, std::ptrdiff_t> idx_res(false, 0);
 
         // Remark: eventually some modifications here to make conditions faster where merge + accumulate is the
-        // same function (e.g. check std::is_same<decltype(merge_fct), decltype(acc_fct)>::value) ...
+        // same function (e.g. check std::is_same<decltype(merge_fct), decltype(reduce_func)>::value) ...
 
         auto merge_border = out;
         bool merge = false;
@@ -204,7 +239,7 @@ namespace xt
                 // std::accumulate here -- probably some cache behavior
                 result_type tmp;
                 tmp = init_fct(*begin);
-                tmp = std::accumulate(begin + 1, begin + outer_loop_size, tmp, acc_fct);
+                tmp = std::accumulate(begin + 1, begin + outer_loop_size, tmp, reduce_func);
 
                 // use merge function if necessary
                 *out = merge ? merge_fct(*out, tmp) : tmp;
@@ -239,7 +274,7 @@ namespace xt
                 begin += inner_stride;
                 for (std::size_t i = 1; i < outer_loop_size; ++i)
                 {
-                    std::transform(out, out + inner_loop_size, begin, out, acc_fct);
+                    std::transform(out, out + inner_loop_size, begin, out, reduce_func);
                     begin += inner_stride;
                 }
 
@@ -265,9 +300,6 @@ namespace xt
     /*************
      * xreducer  *
      *************/
-
-    template <class ST, class X>
-    struct xreducer_shape_type;
 
     template <class REDUCE_FUNC, class INIT_FUNC = xtl::identity, class MERGE_FUNC = REDUCE_FUNC>
     struct xreducer_functors
@@ -444,22 +476,22 @@ namespace xt
     namespace detail
     {
         template <class F, class E, class X>
-        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::lazy) noexcept
+        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::lazy)
         {
             using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<X>>;
             return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
         }
 
         template <class F, class E, class X>
-        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::immediate) noexcept
+        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::immediate)
         {
             return reduce_immediate(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
         }
     }
 
     /**
-     * @brief Returns an \ref xexpression applying the speficied reducing
-     * function to an expresssion over the given axes.
+     * @brief Returns an \ref xexpression applying the specified reducing
+     * function to an expression over the given axes.
      *
      * @param f the reducing function to apply.
      * @param e the \ref xexpression to reduce.
@@ -471,29 +503,31 @@ namespace xt
      */
 
     template <class F, class E, class X, class ES, class>
-    inline auto reduce(F&& f, E&& e, X&& axes, ES evaluation_strategy) noexcept
+    inline auto reduce(F&& f, E&& e, X&& axes, ES evaluation_strategy)
     {
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes), evaluation_strategy);
     }
 
     template <class F, class E, class ES, class>
-    inline auto reduce(F&& f, E&& e, ES evaluation_strategy) noexcept
+    inline auto reduce(F&& f, E&& e, ES evaluation_strategy)
     {
-        auto ar = arange(e.dimension());
+        typename std::decay_t<E>::shape_type ar;
+        resize_container(ar, e.dimension());
+        std::iota(ar.begin(), ar.end(), 0);
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ar), evaluation_strategy);
     }
 
 #ifdef X_OLD_CLANG
-    template <class F, class E, class I>
-    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes) noexcept
+    template <class F, class E, class I, class ES>
+    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, ES evaluation_strategy)
     {
         using axes_type = std::vector<typename std::decay_t<E>::size_type>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
-        return reducer_type(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes));
+        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
     }
 #else
     template <class F, class E, class I, std::size_t N, class ES>
-    inline auto reduce(F&& f, E&& e, const I (&axes)[N], ES evaluation_strategy) noexcept
+    inline auto reduce(F&& f, E&& e, const I (&axes)[N], ES evaluation_strategy)
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
@@ -639,6 +673,10 @@ namespace xt
         if (!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
         {
             throw std::runtime_error("Reducing axes should be sorted");
+        }
+        if (m_axes.size() != 0 && m_axes[m_axes.size() - 1] > m_e.dimension() - 1)
+        {
+            throw std::runtime_error("Axis " + std::to_string(m_axes[m_axes.size() - 1]) + " out of bounds for reduction.");
         }
         detail::excluding_copy(m_e.shape().cbegin(), m_e.shape().cend(),
                                m_axes.cbegin(), m_axes.cend(),

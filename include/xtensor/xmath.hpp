@@ -380,7 +380,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 #define REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                              \
     template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
-    inline auto NAME(E&& e, X&& axes, ES es = ES()) noexcept                                                      \
+    inline auto NAME(E&& e, X&& axes, ES es = ES())                                                               \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -390,7 +390,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
                                                                                                                   \
     template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,                                                      \
               class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>               \
-    inline auto NAME(E&& e, ES es = ES()) noexcept                                                                \
+    inline auto NAME(E&& e, ES es = ES())                                                                         \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -399,16 +399,16 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 
 #define OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                             \
     template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                             \
-        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES()) noexcept                             \
+        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES())                                      \
         {                                                                                                         \
             using result_type = RESULT_TYPE;                                                                      \
             using functor_type = FUNCTOR<result_type>;                                                            \
-            return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes);                       \
+            return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                   \
         }                                                                                                         \
 
 #define MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                          \
     template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
-    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES()) noexcept                                            \
+    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES())                                                     \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1586,7 +1586,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xexpression
      */
     template <class E, class X>
-    inline auto mean(E&& e, X&& axes) noexcept
+    inline auto mean(E&& e, X&& axes)
     {
         auto size = e.size();
         auto s = sum(std::forward<E>(e), std::forward<X>(axes));
@@ -1594,7 +1594,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     }
 
     template <class E>
-    inline auto mean(E&& e) noexcept
+    inline auto mean(E&& e)
     {
         auto size = e.size();
         return sum(std::forward<E>(e)) / static_cast<double>(size);
@@ -1602,7 +1602,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 
 #ifdef X_OLD_CLANG
     template <class E, class I>
-    inline auto mean(E&& e, std::initializer_list<I> axes) noexcept
+    inline auto mean(E&& e, std::initializer_list<I> axes)
     {
         auto size = e.size();
         auto s = sum(std::forward<E>(e), axes);
@@ -1610,7 +1610,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
     }
 #else
     template <class E, class I, std::size_t N>
-    inline auto mean(E&& e, const I (&axes)[N]) noexcept
+    inline auto mean(E&& e, const I (&axes)[N])
     {
         auto size = e.size();
         auto s = sum(std::forward<E>(e), axes);
@@ -1629,7 +1629,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      */
     template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,
               XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, ES>::value>>
-    inline auto minmax(E&& e, ES es = ES()) noexcept
+    inline auto minmax(E&& e, ES es = ES())
     {
         using std::min;
         using std::max;
@@ -1670,14 +1670,14 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xarray<T>
      */
     template <class E>
-    inline auto cumsum(E&& e, std::size_t axis) noexcept
+    inline auto cumsum(E&& e, std::size_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::plus<result_type>()), std::forward<E>(e), axis);
     }
 
     template <class E>
-    inline auto cumsum(E&& e) noexcept
+    inline auto cumsum(E&& e)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::plus<result_type>()), std::forward<E>(e));
@@ -1694,14 +1694,14 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @return an \ref xarray<T>
      */
     template <class E>
-    inline auto cumprod(E&& e, std::size_t axis) noexcept
+    inline auto cumprod(E&& e, std::size_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::multiplies<result_type>()), std::forward<E>(e), axis);
     }
 
     template <class E>
-    inline auto cumprod(E&& e) noexcept
+    inline auto cumprod(E&& e)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::multiplies<result_type>()), std::forward<E>(e));
@@ -1799,7 +1799,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 #define NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                     \
     template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
-    inline auto NAME(E&& e, X&& axes, ES es = ES()) noexcept                                                      \
+    inline auto NAME(E&& e, X&& axes, ES es = ES())                                                               \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1810,7 +1810,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
                                                                                                                   \
     template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,                                                      \
               class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>               \
-    inline auto NAME(E&& e, ES es = ES()) noexcept                                                                \
+    inline auto NAME(E&& e, ES es = ES())                                                                         \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1818,19 +1818,19 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);        \
     }
 
-#define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                    \
-    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                             \
-        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES()) noexcept                             \
-        {                                                                                                         \
-            using result_type = RESULT_TYPE;                                                                      \
-            using functor_type = FUNCTOR<result_type>;                                                            \
-            using init_functor_type = detail::nan_init<result_type, NAN>;                                         \
-            return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes);  \
+#define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                       \
+    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                                \
+        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES())                                         \
+        {                                                                                                            \
+            using result_type = RESULT_TYPE;                                                                         \
+            using functor_type = FUNCTOR<result_type>;                                                               \
+            using init_functor_type = detail::nan_init<result_type, NAN>;                                            \
+            return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es); \
         }
 
 #define MODERN_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                 \
     template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
-    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES()) noexcept                                            \
+    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES())                                                     \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1877,6 +1877,57 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
 #undef NAN_REDUCER_FUNCTION
 #undef OLD_CLANG_NAN_REDUCER
 #undef MODERN_CLANG_NAN_REDUCER
+
+#define COUNT_NON_ZEROS_CONTENT                                         \
+    using result_type = std::size_t;                                    \
+    using value_type = typename std::decay_t<E>::value_type;            \
+    auto init_fct = [](value_type const& lhs)                           \
+    {                                                                   \
+        return (lhs != 0) ? 1 : 0;                                      \
+    };                                                                  \
+    auto reduce_fct = [](const result_type& lhs, const value_type& rhs) \
+    {                                                                   \
+        return (rhs != 0) ? lhs + 1 : lhs;                              \
+    };                                                                  \
+    auto merge_func = std::plus<result_type>();                         \
+
+    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>
+    inline auto count_nonzeros(E&& e, ES es = ES())
+    {
+        COUNT_NON_ZEROS_CONTENT;
+        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+                      std::forward<E>(e), es);
+    }
+
+    template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, X>::value, int>>
+    inline auto count_nonzeros(E&& e, X&& axes, ES es = ES())
+    {
+        COUNT_NON_ZEROS_CONTENT;
+        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+                      std::forward<E>(e), std::forward<X>(axes), es);
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>
+    inline auto count_nonzeros(E&& e, std::initializer_list<I> axes, ES es = ES())
+    {
+        COUNT_NON_ZEROS_CONTENT;
+        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+                      std::forward<E>(e), axes, es);
+    }
+#else
+    template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>
+    inline auto count_nonzeros(E&& e, const I (&axes)[N], ES es = ES())
+    {
+        COUNT_NON_ZEROS_CONTENT;
+        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+                      std::forward<E>(e), axes, es);
+    }
+#endif
+
+#undef COUNT_NON_ZEROS_CONTENT
 
     /**
      * @ingroup nan_functions

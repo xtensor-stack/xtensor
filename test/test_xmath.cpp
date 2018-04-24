@@ -674,4 +674,22 @@ namespace xt
         auto p = ::xt::numeric_constants<>::PI;
         EXPECT_EQ(p, 3.141592653589793238463);
     }
+
+    TEST(xmath, count_nonzeros)
+    {
+        xarray<double> a = {{1, 2, 3, 4}, {0, 0, 0, 0}, {3, 0, 1, 0}};
+        std::size_t as = count_nonzeros(a)();
+        std::size_t ase = count_nonzeros(a, evaluation_strategy::immediate())();
+        EXPECT_EQ(as, 6);
+        EXPECT_EQ(ase, 6);
+
+        xarray<std::size_t> ea0 = {2, 1, 2, 1};
+        xarray<std::size_t> ea1 = {4, 0, 2};
+
+        EXPECT_EQ(count_nonzeros(a, {0}), ea0);
+        EXPECT_EQ(count_nonzeros(a, {1}), ea1);
+
+        EXPECT_EQ(count_nonzeros(a, {0}, evaluation_strategy::immediate()), ea0);
+        EXPECT_EQ(count_nonzeros(a, {1}, evaluation_strategy::immediate()), ea1);
+    }
 }
