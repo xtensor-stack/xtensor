@@ -7,6 +7,9 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#ifndef XTENSOR_NPY_HPP
+#define XTENSOR_NPY_HPP
+
 // Derived from https://github.com/llohse/libnpy by Leon Merten Lohse,
 // relicensed from MIT License with permission
 
@@ -694,3 +697,6 @@ namespace xt
     }
 
 }  // namespace xt
+
+#endif
+

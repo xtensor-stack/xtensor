@@ -996,58 +996,58 @@ namespace xt
             auto old_shape = shape;
             auto&& old_strides = strides;
 
-    #define MS(v) static_cast<std::ptrdiff_t>(v)
-    #define MU(v) static_cast<std::size_t>(v)
+    #define XTENSOR_MS(v) static_cast<std::ptrdiff_t>(v)
+    #define XTENSOR_MU(v) static_cast<std::size_t>(v)
 
             std::ptrdiff_t i = 0, axis_skip = 0;
             std::size_t idx = 0;
 
             auto slice_getter = detail::slice_getter_impl<S>(shape);
 
-            for (; i < MS(slices.size()); ++i)
+            for (; i < XTENSOR_MS(slices.size()); ++i)
             {
-                auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[MU(i)]);
+                auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[XTENSOR_MU(i)]);
                 if (ptr != nullptr)
                 {
                     std::size_t slice0 = static_cast<std::size_t>(*ptr);
-                    offset += slice0 * old_strides[MU(i - axis_skip)];
+                    offset += slice0 * old_strides[XTENSOR_MU(i - axis_skip)];
                 }
-                else if (xtl::get_if<xt::xnewaxis_tag>(&slices[MU(i)]) != nullptr)
+                else if (xtl::get_if<xt::xnewaxis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
                 {
                     new_shape[idx] = 1;
                     ++axis_skip, ++idx;
                 }
-                else if (xtl::get_if<xt::xellipsis_tag>(&slices[MU(i)]) != nullptr)
+                else if (xtl::get_if<xt::xellipsis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
                 {
                     for (std::size_t j = 0; j < n_add_all; ++j)
                     {
-                        new_shape[idx] = old_shape[MU(i - axis_skip)];
-                        new_strides[idx] = old_strides[MU(i - axis_skip)];
+                        new_shape[idx] = old_shape[XTENSOR_MU(i - axis_skip)];
+                        new_strides[idx] = old_strides[XTENSOR_MU(i - axis_skip)];
                         --axis_skip, ++idx;
                     }
                     ++axis_skip;  // because i++
                 }
-                else if (xtl::get_if<xt::xall_tag>(&slices[MU(i)]) != nullptr)
+                else if (xtl::get_if<xt::xall_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
                 {
-                    new_shape[idx] = old_shape[MU(i - axis_skip)];
-                    new_strides[idx] = old_strides[MU(i - axis_skip)];
+                    new_shape[idx] = old_shape[XTENSOR_MU(i - axis_skip)];
+                    new_strides[idx] = old_strides[XTENSOR_MU(i - axis_skip)];
                     ++idx;
                 }
                 else
                 {
-                    slice_getter.idx = MU(i - axis_skip);
-                    auto info = xtl::visit(slice_getter, slices[MU(i)]);
-                    offset += std::size_t(info[0]) * old_strides[MU(i - axis_skip)];
+                    slice_getter.idx = XTENSOR_MU(i - axis_skip);
+                    auto info = xtl::visit(slice_getter, slices[XTENSOR_MU(i)]);
+                    offset += std::size_t(info[0]) * old_strides[XTENSOR_MU(i - axis_skip)];
                     new_shape[idx] = std::size_t(info[1]);
-                    new_strides[idx] = std::size_t(info[2]) * old_strides[MU(i - axis_skip)];
+                    new_strides[idx] = std::size_t(info[2]) * old_strides[XTENSOR_MU(i - axis_skip)];
                     ++idx;
                 }
             }
 
-            for (; MU(i - axis_skip) < old_shape.size(); ++i)
+            for (; XTENSOR_MU(i - axis_skip) < old_shape.size(); ++i)
             {
-                new_shape[idx] = old_shape[MU(i - axis_skip)];
-                new_strides[idx] = old_strides[MU(i - axis_skip)];
+                new_shape[idx] = old_shape[XTENSOR_MU(i - axis_skip)];
+                new_strides[idx] = old_strides[XTENSOR_MU(i - axis_skip)];
                 ++idx;
             }
 
@@ -1055,8 +1055,8 @@ namespace xt
 
             return std::make_tuple(std::move(new_shape), std::move(new_strides), offset, new_layout);
 
-    #undef MU
-    #undef MS
+    #undef XTENSOR_MU
+    #undef XTENSOR_MS
         }
     }
 

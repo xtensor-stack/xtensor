@@ -21,14 +21,14 @@
 #include "xsemantic.hpp"
 
 #ifdef _MSC_VER
-    #define CONSTEXPR_ENHANCED const
-    #define CONSTEXPR_ENHANCED_STATIC const
-    #define CONSTEXPR_RETURN
+    #define XTENSOR_CONSTEXPR_ENHANCED const
+    #define XTENSOR_CONSTEXPR_ENHANCED_STATIC const
+    #define XTENSOR_CONSTEXPR_RETURN
 #else
-    #define CONSTEXPR_ENHANCED constexpr
-    #define CONSTEXPR_RETURN constexpr
-    #define CONSTEXPR_ENHANCED_STATIC constexpr static
-    #define HAS_CONSTEXPR_ENHANCED
+    #define XTENSOR_CONSTEXPR_ENHANCED constexpr
+    #define XTENSOR_CONSTEXPR_RETURN constexpr
+    #define XTENSOR_CONSTEXPR_ENHANCED_STATIC constexpr static
+    #define XTENSOR_HAS_CONSTEXPR_ENHANCED
 #endif
 
 namespace xt
@@ -339,21 +339,21 @@ namespace xt
 
         storage_type m_storage;
 
-        CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
-        CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
-        CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
         storage_type& storage_impl() noexcept;
         const storage_type& storage_impl() const noexcept;
 
-        CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
-        CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
-        CONSTEXPR_RETURN const inner_backstrides_type& backstrides_impl() const noexcept;
+        XTENSOR_CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
+        XTENSOR_CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
+        XTENSOR_CONSTEXPR_RETURN const inner_backstrides_type& backstrides_impl() const noexcept;
 
         friend class xcontainer<xfixed_container<ET, S, L, Tag>>;
     };
 
-#ifdef HAS_CONSTEXPR_ENHANCED
+#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
     // Out of line definitions to prevent linker errors prior to C++17
     template <class ET, class S, layout_type L, class Tag>
     constexpr typename xfixed_container<ET, S, L, Tag>::inner_shape_type xfixed_container<ET, S, L, Tag>::m_shape;
@@ -453,21 +453,21 @@ namespace xt
 
         container_closure_type m_storage;
 
-        CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
-        CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
-        CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
         storage_type& storage_impl() noexcept;
         const storage_type& storage_impl() const noexcept;
 
-        CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
-        CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
-        CONSTEXPR_RETURN const inner_backstrides_type& backstrides_impl() const noexcept;
+        XTENSOR_CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
+        XTENSOR_CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
+        XTENSOR_CONSTEXPR_RETURN const inner_backstrides_type& backstrides_impl() const noexcept;
 
         friend class xcontainer<xfixed_adaptor<EC, S, L, Tag>>;
     };
 
-#ifdef HAS_CONSTEXPR_ENHANCED
+#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
     // Out of line definitions to prevent linker errors prior to C++17
     template <class EC, class S, layout_type L, class Tag>
     constexpr typename xfixed_adaptor<EC, S, L, Tag>::inner_shape_type xfixed_adaptor<EC, S, L, Tag>::m_shape;
@@ -620,19 +620,19 @@ namespace xt
     }
 
     template <class ET, class S, layout_type L, class Tag>
-    CONSTEXPR_RETURN auto xfixed_container<ET, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
+    XTENSOR_CONSTEXPR_RETURN auto xfixed_container<ET, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
 
     template <class ET, class S, layout_type L, class Tag>
-    CONSTEXPR_RETURN auto xfixed_container<ET, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
+    XTENSOR_CONSTEXPR_RETURN auto xfixed_container<ET, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
     {
         return m_strides;
     }
 
     template <class ET, class S, layout_type L, class Tag>
-    CONSTEXPR_RETURN auto xfixed_container<ET, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
+    XTENSOR_CONSTEXPR_RETURN auto xfixed_container<ET, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
     }
@@ -737,27 +737,27 @@ namespace xt
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
+    XTENSOR_CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
+    XTENSOR_CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::strides_impl() const noexcept -> const inner_strides_type&
     {
         return m_strides;
     }
 
     template <class EC, class S, layout_type L, class Tag>
-    CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
+    XTENSOR_CONSTEXPR_RETURN auto xfixed_adaptor<EC, S, L, Tag>::backstrides_impl() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
     }
 }
 
-#undef CONSTEXPR_ENHANCED
-#undef CONSTEXPR_RETURN
-#undef CONSTEXPR_ENHANCED_STATIC
-#undef HAS_CONSTEXPR_ENHANCED
+#undef XTENSOR_CONSTEXPR_ENHANCED
+#undef XTENSOR_CONSTEXPR_RETURN
+#undef XTENSOR_CONSTEXPR_ENHANCED_STATIC
+#undef XTENSOR_HAS_CONSTEXPR_ENHANCED
 
 #endif

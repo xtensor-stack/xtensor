@@ -21,12 +21,12 @@
 #include "xtensor_simd.hpp"
 #include "xutils.hpp"
 
-#ifndef XALIGNMENT
+#ifndef XTENSOR_ALIGNMENT
     #ifdef XTENSOR_USE_XSIMD
         #include <xsimd/xsimd.hpp>
-        #define XALIGNMENT XSIMD_DEFAULT_ALIGNMENT
+        #define XTENSOR_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
     #else
-        #define XALIGNMENT 0
+        #define XTENSOR_ALIGNMENT 0
     #endif
 #endif
 
@@ -1221,14 +1221,14 @@ namespace xt
         lhs.swap(rhs);
     }
 
-#define SELECT_ALIGN (XALIGNMENT != 0 ? XALIGNMENT : alignof(T))
+#define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
 
     /**
      * This array class is modeled after ``std::array`` but adds optional alignment through a template parameter.
      *
      * To be moved to xtl, along with the rest of xstorage.hpp
      */
-    template <class T, std::size_t N, std::size_t Align = SELECT_ALIGN>
+    template <class T, std::size_t N, std::size_t Align = XTENSOR_SELECT_ALIGN>
     class alignas(Align) aligned_array : public std::array<T, N>
     {
     public:
@@ -1240,9 +1240,9 @@ namespace xt
     };
 
 #if defined(_MSC_VER)
-    #define CONST
+    #define XTENSOR_CONST
 #else
-    #define CONST const
+    #define XTENSOR_CONST const
 #endif
 
     /**
@@ -1331,11 +1331,12 @@ namespace xt
             return N;
         }
 
-        CONST T m_data[N > 0 ? N : 1];
+        XTENSOR_CONST T m_data[N > 0 ? N : 1];
     };
 }
 
-#undef XALIGNMENT
-#undef SELECT_ALIGN
+#undef XTENSOR_CONST
+#undef XTENSOR_ALIGNMENT
+#undef XTENSOR_SELECT_ALIGN
 
 #endif
