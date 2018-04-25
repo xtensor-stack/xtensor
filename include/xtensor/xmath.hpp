@@ -46,32 +46,32 @@ namespace xt
      * Helpers *
      ***********/
 
-#define UNSIGNED_ABS_FUNC(T)                                                      \
+#define XTENSOR_UNSIGNED_ABS_FUNC(T)                                              \
 constexpr inline T abs(const T& x)                                                \
 {                                                                                 \
     return x;                                                                     \
 }                                                                                 \
 
-#define INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, T)                         \
+#define XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, T)                 \
 constexpr inline bool FUNC_NAME(const T& /*x*/) noexcept                          \
 {                                                                                 \
     return RETURN_VAL;                                                            \
 }                                                                                 \
 
-#define INT_SPECIALIZATION(FUNC_NAME, RETURN_VAL)                                 \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, char);                             \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, short);                            \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, int);                              \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long);                             \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long long);                        \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned char);                    \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned short);                   \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned int);                     \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long);                    \
-INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);               \
+#define XTENSOR_INT_SPECIALIZATION(FUNC_NAME, RETURN_VAL)                         \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, char);                     \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, short);                    \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, int);                      \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long);                     \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, long long);                \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned char);            \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned short);           \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned int);             \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long);            \
+XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);       \
 
 
-#define UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                          \
+#define XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                  \
     template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
@@ -102,10 +102,10 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         };                                                                        \
     }
 
-#define UNARY_MATH_FUNCTOR(NAME) UNARY_MATH_FUNCTOR_IMPL(NAME, T)
-#define UNARY_BOOL_FUNCTOR(NAME) UNARY_MATH_FUNCTOR_IMPL(NAME, bool)
+#define XTENSOR_UNARY_MATH_FUNCTOR(NAME) XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, T)
+#define XTENSOR_UNARY_BOOL_FUNCTOR(NAME) XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
-#define UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)                                 \
+#define XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)                         \
     template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
@@ -135,7 +135,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         };                                                                        \
     }
 
-#define BINARY_MATH_FUNCTOR_IMPL(NAME, R)                                         \
+#define XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, R)                                 \
     template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
@@ -168,10 +168,10 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         };                                                                        \
     }
 
-#define BINARY_MATH_FUNCTOR(NAME) BINARY_MATH_FUNCTOR_IMPL(NAME, T)
-#define BINARY_BOOL_FUNCTOR(NAME) BINARY_MATH_FUNCTOR_IMPL(NAME, bool)
+#define XTENSOR_BINARY_MATH_FUNCTOR(NAME) XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, T)
+#define XTENSOR_BINARY_BOOL_FUNCTOR(NAME) XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
-#define TERNARY_MATH_FUNCTOR_IMPL(NAME, R)                                        \
+#define XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, R)                                \
     template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
@@ -209,8 +209,8 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         };                                                                        \
     }
 
-#define TERNARY_MATH_FUNCTOR(NAME) TERNARY_MATH_FUNCTOR_IMPL(NAME, T)
-#define TERNARY_BOOL_FUNCTOR(NAME) TERNARY_MATH_FUNCTOR_IMPL(NAME, bool)
+#define XTENSOR_TERNARY_MATH_FUNCTOR(NAME) XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, T)
+#define XTENSOR_TERNARY_BOOL_FUNCTOR(NAME) XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
     namespace math
     {
@@ -304,80 +304,79 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         // The following specializations are needed to avoid 'ambiguous overload' errors,
         // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
         // we're still adding those functions to silence warnings
-        UNSIGNED_ABS_FUNC(unsigned char);
-        UNSIGNED_ABS_FUNC(unsigned short);
-        UNSIGNED_ABS_FUNC(unsigned int);
-        UNSIGNED_ABS_FUNC(unsigned long);
-        UNSIGNED_ABS_FUNC(unsigned long long);
+        XTENSOR_UNSIGNED_ABS_FUNC(unsigned char);
+        XTENSOR_UNSIGNED_ABS_FUNC(unsigned short);
+        XTENSOR_UNSIGNED_ABS_FUNC(unsigned int);
+        XTENSOR_UNSIGNED_ABS_FUNC(unsigned long);
+        XTENSOR_UNSIGNED_ABS_FUNC(unsigned long long);
 
 #ifdef _WIN32
-        INT_SPECIALIZATION(isinf, false);
-        INT_SPECIALIZATION(isnan, false);
-        INT_SPECIALIZATION(isfinite, true);
+        XTENSOR_INT_SPECIALIZATION(isinf, false);
+        XTENSOR_INT_SPECIALIZATION(isnan, false);
+        XTENSOR_INT_SPECIALIZATION(isfinite, true);
 #endif
 
-        UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
+        XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(abs);
 
-        UNARY_MATH_FUNCTOR(fabs);
-        BINARY_MATH_FUNCTOR(fmod);
-        BINARY_MATH_FUNCTOR(remainder);
-        TERNARY_MATH_FUNCTOR(fma);
-        BINARY_MATH_FUNCTOR(fmax);
-        BINARY_MATH_FUNCTOR(fmin);
-        BINARY_MATH_FUNCTOR(fdim);
-        UNARY_MATH_FUNCTOR(exp);
-        UNARY_MATH_FUNCTOR(exp2);
-        UNARY_MATH_FUNCTOR(expm1);
-        UNARY_MATH_FUNCTOR(log);
-        UNARY_MATH_FUNCTOR(log10);
-        UNARY_MATH_FUNCTOR(log2);
-        UNARY_MATH_FUNCTOR(log1p);
-        BINARY_MATH_FUNCTOR(pow);
-        UNARY_MATH_FUNCTOR(sqrt);
-        UNARY_MATH_FUNCTOR(cbrt);
-        BINARY_MATH_FUNCTOR(hypot);
-        UNARY_MATH_FUNCTOR(sin);
-        UNARY_MATH_FUNCTOR(cos);
-        UNARY_MATH_FUNCTOR(tan);
-        UNARY_MATH_FUNCTOR(asin);
-        UNARY_MATH_FUNCTOR(acos);
-        UNARY_MATH_FUNCTOR(atan);
-        BINARY_MATH_FUNCTOR(atan2);
-        UNARY_MATH_FUNCTOR(sinh);
-        UNARY_MATH_FUNCTOR(cosh);
-        UNARY_MATH_FUNCTOR(tanh);
-        UNARY_MATH_FUNCTOR(asinh);
-        UNARY_MATH_FUNCTOR(acosh);
-        UNARY_MATH_FUNCTOR(atanh);
-        UNARY_MATH_FUNCTOR(erf);
-        UNARY_MATH_FUNCTOR(erfc);
-        UNARY_MATH_FUNCTOR(tgamma);
-        UNARY_MATH_FUNCTOR(lgamma);
-        UNARY_MATH_FUNCTOR(ceil);
-        UNARY_MATH_FUNCTOR(floor);
-        UNARY_MATH_FUNCTOR(trunc);
-        UNARY_MATH_FUNCTOR(round);
-        UNARY_MATH_FUNCTOR(nearbyint);
-        UNARY_MATH_FUNCTOR(rint);
-        UNARY_BOOL_FUNCTOR(isfinite);
-        UNARY_BOOL_FUNCTOR(isinf);
-        UNARY_BOOL_FUNCTOR(isnan);
+        XTENSOR_UNARY_MATH_FUNCTOR(fabs);
+        XTENSOR_BINARY_MATH_FUNCTOR(fmod);
+        XTENSOR_BINARY_MATH_FUNCTOR(remainder);
+        XTENSOR_TERNARY_MATH_FUNCTOR(fma);
+        XTENSOR_BINARY_MATH_FUNCTOR(fmax);
+        XTENSOR_BINARY_MATH_FUNCTOR(fmin);
+        XTENSOR_BINARY_MATH_FUNCTOR(fdim);
+        XTENSOR_UNARY_MATH_FUNCTOR(exp);
+        XTENSOR_UNARY_MATH_FUNCTOR(exp2);
+        XTENSOR_UNARY_MATH_FUNCTOR(expm1);
+        XTENSOR_UNARY_MATH_FUNCTOR(log);
+        XTENSOR_UNARY_MATH_FUNCTOR(log10);
+        XTENSOR_UNARY_MATH_FUNCTOR(log2);
+        XTENSOR_UNARY_MATH_FUNCTOR(log1p);
+        XTENSOR_BINARY_MATH_FUNCTOR(pow);
+        XTENSOR_UNARY_MATH_FUNCTOR(sqrt);
+        XTENSOR_UNARY_MATH_FUNCTOR(cbrt);
+        XTENSOR_BINARY_MATH_FUNCTOR(hypot);
+        XTENSOR_UNARY_MATH_FUNCTOR(sin);
+        XTENSOR_UNARY_MATH_FUNCTOR(cos);
+        XTENSOR_UNARY_MATH_FUNCTOR(tan);
+        XTENSOR_UNARY_MATH_FUNCTOR(asin);
+        XTENSOR_UNARY_MATH_FUNCTOR(acos);
+        XTENSOR_UNARY_MATH_FUNCTOR(atan);
+        XTENSOR_BINARY_MATH_FUNCTOR(atan2);
+        XTENSOR_UNARY_MATH_FUNCTOR(sinh);
+        XTENSOR_UNARY_MATH_FUNCTOR(cosh);
+        XTENSOR_UNARY_MATH_FUNCTOR(tanh);
+        XTENSOR_UNARY_MATH_FUNCTOR(asinh);
+        XTENSOR_UNARY_MATH_FUNCTOR(acosh);
+        XTENSOR_UNARY_MATH_FUNCTOR(atanh);
+        XTENSOR_UNARY_MATH_FUNCTOR(erf);
+        XTENSOR_UNARY_MATH_FUNCTOR(erfc);
+        XTENSOR_UNARY_MATH_FUNCTOR(tgamma);
+        XTENSOR_UNARY_MATH_FUNCTOR(lgamma);
+        XTENSOR_UNARY_MATH_FUNCTOR(ceil);
+        XTENSOR_UNARY_MATH_FUNCTOR(floor);
+        XTENSOR_UNARY_MATH_FUNCTOR(trunc);
+        XTENSOR_UNARY_MATH_FUNCTOR(round);
+        XTENSOR_UNARY_MATH_FUNCTOR(nearbyint);
+        XTENSOR_UNARY_MATH_FUNCTOR(rint);
+        XTENSOR_UNARY_BOOL_FUNCTOR(isfinite);
+        XTENSOR_UNARY_BOOL_FUNCTOR(isinf);
+        XTENSOR_UNARY_BOOL_FUNCTOR(isnan);
     }
 
-#undef UNARY_MATH_FUNCTOR
-#undef UNARY_BOOL_FUNCTOR
-#undef UNARY_MATH_FUNCTOR_IMPL
-#undef BINARY_MATH_FUNCTOR
-#undef BINARY_BOOL_FUNCTOR
-#undef BINARY_MATH_FUNCTOR_IMPL
-#undef TERNARY_MATH_FUNCTOR
-#undef TERNARY_BOOL_FUNCTOR
-#undef TERNARY_MATH_FUNCTOR_IMPL
-#undef UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
-#undef UNSIGNED_ABS_FUNCTOR
-#undef UNSIGNED_ABS_FUNC
+#undef XTENSOR_UNARY_MATH_FUNCTOR
+#undef XTENSOR_UNARY_BOOL_FUNCTOR
+#undef XTENSOR_UNARY_MATH_FUNCTOR_IMPL
+#undef XTENSOR_BINARY_MATH_FUNCTOR
+#undef XTENSOR_BINARY_BOOL_FUNCTOR
+#undef XTENSOR_BINARY_MATH_FUNCTOR_IMPL
+#undef XTENSOR_TERNARY_MATH_FUNCTOR
+#undef XTENSOR_TERNARY_BOOL_FUNCTOR
+#undef XTENSOR_TERNARY_MATH_FUNCTOR_IMPL
+#undef XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
+#undef XTENSOR_UNSIGNED_ABS_FUNC
 
-#define REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                              \
+#define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                      \
     template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
     inline auto NAME(E&& e, X&& axes, ES es = ES())                                                               \
@@ -397,7 +396,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), es);                             \
     }
 
-#define OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                             \
+#define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                     \
     template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                             \
         inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES())                                      \
         {                                                                                                         \
@@ -406,7 +405,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
             return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                   \
         }                                                                                                         \
 
-#define MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                          \
+#define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                  \
     template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
     inline auto NAME(E&& e, const I (&axes)[N], ES es = ES())                                                     \
     {                                                                                                             \
@@ -668,11 +667,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type);
+    XTENSOR_REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type);
 #ifdef X_OLD_CLANG
-    OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type);
+    XTENSOR_OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type);
 #else
-    MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type);
+    XTENSOR_MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type);
 #endif
 
     /**
@@ -686,11 +685,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type);
+    XTENSOR_REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type);
 #ifdef X_OLD_CLANG
-    OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type);
+    XTENSOR_OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type);
 #else
-    MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type);
+    XTENSOR_MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type);
 #endif
 
     /**
@@ -1550,11 +1549,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    REDUCER_FUNCTION(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
+    XTENSOR_REDUCER_FUNCTION(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #ifdef X_OLD_CLANG
-    OLD_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
+    XTENSOR_OLD_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #else
-    MODERN_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
+    XTENSOR_MODERN_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #endif
 
     /**
@@ -1568,11 +1567,11 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    REDUCER_FUNCTION(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
+    XTENSOR_REDUCER_FUNCTION(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #ifdef X_OLD_CLANG
-    OLD_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
+    XTENSOR_OLD_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #else
-    MODERN_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
+    XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>);
 #endif
 
     /**
@@ -1796,7 +1795,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
         return detail::make_xfunction<detail::nan_to_num_functor>(std::forward<E>(e));
     }
 
-#define NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                     \
+#define XTENSOR_NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                             \
     template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
     inline auto NAME(E&& e, X&& axes, ES es = ES())                                                               \
@@ -1849,7 +1848,7 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param es evaluation strategy of the reducer (optional)
      * @return an \ref xreducer
      */
-    NAN_REDUCER_FUNCTION(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
+    XTENSOR_NAN_REDUCER_FUNCTION(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
 #ifdef X_OLD_CLANG
     OLD_CLANG_NAN_REDUCER(nansum, detail::nan_plus, typename std::decay_t<E>::value_type, 0);
 #else
@@ -1867,14 +1866,14 @@ INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);             
      * @param es evaluation strategy of the reducer (optional)
      * @return an \ref xreducer
      */
-    NAN_REDUCER_FUNCTION(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
+    XTENSOR_NAN_REDUCER_FUNCTION(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
 #ifdef X_OLD_CLANG
     OLD_CLANG_NAN_REDUCER(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
 #else
     MODERN_CLANG_NAN_REDUCER(nanprod, detail::nan_multiplies, typename std::decay_t<E>::value_type, 1);
 #endif
 
-#undef NAN_REDUCER_FUNCTION
+#undef XTENSOR_NAN_REDUCER_FUNCTION
 #undef OLD_CLANG_NAN_REDUCER
 #undef MODERN_CLANG_NAN_REDUCER
 
