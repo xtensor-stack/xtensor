@@ -36,7 +36,7 @@ namespace xt
         using shape_type = std::vector<vec_type::size_type>;
         shape_type s({2, 2});
 
-        auto a1 = adapt(v, s, XTENSOR_DEFAULT_LAYOUT);
+        auto a1 = adapt<layout_type::dynamic>(v, s, layout_type::row_major);
         a1(0, 1) = 1;
         EXPECT_EQ(1, v[a1.strides()[1]]);
     }
@@ -120,7 +120,7 @@ namespace xt
         using shape_type = std::vector<vec_type::size_type>;
         shape_type s = { size };
 
-        auto a0 = adapt(data, size, no_ownership(), s, XTENSOR_DEFAULT_LAYOUT);
+        auto a0 = adapt<layout_type::dynamic>(data, size, no_ownership(), s, layout_type::row_major);
         a0(3) = 3;
         EXPECT_EQ(3, data[3]);
 
@@ -156,7 +156,7 @@ namespace xt
         using shape_type = std::array<vec_type::size_type, 2>;
         shape_type s = {2, 2};
 
-        auto a1 = adapt(v, s, XTENSOR_DEFAULT_LAYOUT);
+        auto a1 = adapt<layout_type::dynamic>(v, s, layout_type::column_major);
         a1(0, 1) = 1;
         EXPECT_EQ(1, v[a1.strides()[1]]);
     }
@@ -313,7 +313,7 @@ namespace xt
         using shape_type = std::array<vec_type::size_type, 1>;
         shape_type s = { size };
 
-        auto a0 = adapt(data, size, no_ownership(), s, XTENSOR_DEFAULT_LAYOUT);
+        auto a0 = adapt<layout_type::dynamic>(data, size, no_ownership(), s, layout_type::column_major);
         a0(3) = 3;
         EXPECT_EQ(3, data[3]);
 
