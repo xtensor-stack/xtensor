@@ -160,11 +160,11 @@ namespace xt
     {
         xtl::mpl::static_if<has_assign_to<E1, E2>::value>([&](auto self)
         {
-            self(e2).derived_cast().assign_to(e1);
+            self(e2).derived_cast().assign_to(self(e1));
         }, /*else*/ [&](auto self)
         {
             using tag = xexpression_tag_t<E1, E2>;
-            xexpression_assigner<tag>::assign_xexpression(e1, e2);
+            xexpression_assigner<tag>::assign_xexpression(self(e1), self(e2));
         });
     }
 
