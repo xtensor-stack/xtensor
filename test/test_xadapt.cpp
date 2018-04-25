@@ -30,6 +30,17 @@ namespace xt
         EXPECT_EQ(1, v[2]);
     }
 
+    TEST(xarray_adaptor, adapt_layout)
+    {
+        vec_type v(4, 0);
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s({2, 2});
+
+        auto a1 = adapt(v, s, XTENSOR_DEFAULT_LAYOUT);
+        a1(0, 1) = 1;
+        EXPECT_EQ(1, v[a1.strides()[1]]);
+    }
+
     TEST(xarray_adaptor, pointer_no_ownership)
     {
         size_t size = 4;
@@ -76,9 +87,9 @@ namespace xt
         using shape_type = std::vector<vec_type::size_type>;
         shape_type s({ 1 });
 
-        auto a1 = adapt(&data1, size, xt::no_ownership(), s);
-        auto a2 = adapt(&data2, size, xt::no_ownership(), s);
-        auto a3 = adapt(&data3, size, xt::no_ownership(), s);
+        auto a1 = adapt(&data1, size, no_ownership(), s);
+        auto a2 = adapt(&data2, size, no_ownership(), s);
+        auto a3 = adapt(&data3, size, no_ownership(), s);
         a3 = a1 + a2;
         EXPECT_EQ(1, data3);
     }
@@ -94,11 +105,26 @@ namespace xt
         using shape_type = std::vector<vec_type::size_type>;
         shape_type s({ 1 });
 
-        auto a1 = adapt(data1, size, xt::acquire_ownership(), s);
-        auto a2 = adapt(data2, size, xt::acquire_ownership(), s);
-        auto a3 = adapt(data3, size_t(0), xt::acquire_ownership(), s);
+        auto a1 = adapt(data1, size, acquire_ownership(), s);
+        auto a2 = adapt(data2, size, acquire_ownership(), s);
+        auto a3 = adapt(data3, size_t(0), acquire_ownership(), s);
         a3 = a1 + a2;
         EXPECT_EQ(1, *data3);
+    }
+
+    TEST(xarray_adaptor, ptr_adapt_layout)
+    {
+        size_t size = 4;
+        int* data = new int[size];
+
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s = { size };
+
+        auto a0 = adapt(data, size, no_ownership(), s, XTENSOR_DEFAULT_LAYOUT);
+        a0(3) = 3;
+        EXPECT_EQ(3, data[3]);
+
+        delete[] data;
     }
 
     TEST(xtensor_adaptor, adapt)
@@ -122,6 +148,17 @@ namespace xt
         auto a2 = adapt(v, s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, v[2]);
+    }
+
+    TEST(xtensor_adaptor, adapt_layout)
+    {
+        vec_type v(4, 0);
+        using shape_type = std::array<vec_type::size_type, 2>;
+        shape_type s = {2, 2};
+
+        auto a1 = adapt(v, s, XTENSOR_DEFAULT_LAYOUT);
+        a1(0, 1) = 1;
+        EXPECT_EQ(1, v[a1.strides()[1]]);
     }
 
     TEST(xtensor_adaptor, pointer_no_ownership)
@@ -221,9 +258,9 @@ namespace xt
         using shape_type = std::array<vec_type::size_type, 1>;
         shape_type s = { 1 };
 
-        auto a1 = adapt(&data1, size, xt::no_ownership(), s);
-        auto a2 = adapt(&data2, size, xt::no_ownership(), s);
-        auto a3 = adapt(&data3, size, xt::no_ownership(), s);
+        auto a1 = adapt(&data1, size, no_ownership(), s);
+        auto a2 = adapt(&data2, size, no_ownership(), s);
+        auto a3 = adapt(&data3, size, no_ownership(), s);
         a3 = a1 + a2;
         EXPECT_EQ(1, data3);
     }
@@ -241,9 +278,9 @@ namespace xt
         using shape_type = std::array<vec_type::size_type, 1>;
         shape_type s = { 1 };
 
-        auto a1 = adapt(p_data1, size, xt::no_ownership(), s);
-        auto a2 = adapt(p_data2, size, xt::no_ownership(), s);
-        auto a3 = adapt(p_data3, size, xt::no_ownership(), s);
+        auto a1 = adapt(p_data1, size, no_ownership(), s);
+        auto a2 = adapt(p_data2, size, no_ownership(), s);
+        auto a3 = adapt(p_data3, size, no_ownership(), s);
 
         a3 = a1 + a2;
 
@@ -261,10 +298,25 @@ namespace xt
         using shape_type = std::array<vec_type::size_type, 1>;
         shape_type s = { 1 };
 
-        auto a1 = adapt(data1, size, xt::acquire_ownership(), s);
-        auto a2 = adapt(data2, size, xt::acquire_ownership(), s);
-        auto a3 = adapt(data3, size_t(0), xt::acquire_ownership(), s);
+        auto a1 = adapt(data1, size, acquire_ownership(), s);
+        auto a2 = adapt(data2, size, acquire_ownership(), s);
+        auto a3 = adapt(data3, size_t(0), acquire_ownership(), s);
         a3 = a1 + a2;
         EXPECT_EQ(1, *data3);
+    }
+
+    TEST(xtensor_adaptor, ptr_adapt_layout)
+    {
+        size_t size = 4;
+        int* data = new int[size];
+
+        using shape_type = std::array<vec_type::size_type, 1>;
+        shape_type s = { size };
+
+        auto a0 = adapt(data, size, no_ownership(), s, XTENSOR_DEFAULT_LAYOUT);
+        a0(3) = 3;
+        EXPECT_EQ(3, data[3]);
+
+        delete[] data;
     }
 }
