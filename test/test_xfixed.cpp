@@ -23,7 +23,7 @@
 #define VS_X86_WORKAROUND 1
 #endif
 
-#if _MSC_VER < 1910 || (_MSC_VER >= 1910 && !defined(DISABLE_VS2017))
+#if _MSC_VER < 1910 || (_MSC_VER >= 1910 && !defined(DISABLE_VS2017)) || !defined(_MSC_VER)
 
 namespace xt
 {

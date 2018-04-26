@@ -336,7 +336,12 @@ namespace xt
         explicit xfixed_container(value_type v);
         explicit xfixed_container(const inner_shape_type& shape, layout_type l = L);
         explicit xfixed_container(const inner_shape_type& shape, value_type v, layout_type l = L);
+
+#ifndef X_OLD_CLANG
         xfixed_container(const get_init_type_t<value_type, S>& init);
+#else
+        xfixed_container(nested_initializer_list_t<value_type, N> t);
+#endif
 
         ~xfixed_container() = default;
 
@@ -567,13 +572,22 @@ namespace xt
      * The type returned by get_init_type_t is raw C array ``value_type[X][Y][Z]`` for ``xt::xshape<X, Y, Z>``. 
      * C arrays can be initialized with the initializer list syntax, but the size is checked at compile
      * time to prevent errors.
+     * Note: for clang < 3.8 this is an initializer_list and the size is not checked at compile-or runtime.
      */
+#ifndef X_OLD_CLANG
     template <class ET, class S, layout_type L, class Tag>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(const get_init_type_t<value_type, S>& init)
     {
         std::copy(reinterpret_cast<const_pointer>(&init), reinterpret_cast<const_pointer>(&init) + this->size(),
                   this->template begin<layout_type::row_major>());
     }
+#else
+    template <class ET, class S, layout_type L, class Tag>
+    inline xfixed_container<ET, S, L, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
+    {
+        L == layout_type::row_major ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
+    }
+#endif
     //@}
 
     /**
