@@ -910,9 +910,15 @@ namespace xt
         {
             enabled() = false;
         }
+
+        enum policy
+        {
+            print,
+            assert
+        };
     }
 
-    template <class T, class A>
+    template <class T, class A, alloc_tracking::policy P>
     struct tracking_allocator
         : private A
     {
@@ -931,7 +937,14 @@ namespace xt
         {
             if (alloc_tracking::enabled())
             {
-                std::cout << "xtensor allocating: " << n << "" << std::endl;
+                if (P == alloc_tracking::print)
+                {
+                    std::cout << "xtensor allocating: " << n << "" << std::endl;
+                }
+                else if (P == alloc_tracking::assert)
+                {
+                    throw std::runtime_error("xtensor allocation of " + std::to_string(n) + " elements detected");
+                }
             }
             return base_type::allocate(n);
         }
@@ -939,16 +952,22 @@ namespace xt
         using base_type::deallocate;
         using base_type::construct;
         using base_type::destroy;
+
+        template <class U>
+        struct rebind
+        {
+            using other = tracking_allocator<U, typename A::template rebind<U>::other, P>;
+        };
     };
 
-    template <class T, class AT, class U, class AU>
-    inline bool operator==(const tracking_allocator<T, AT>&, const tracking_allocator<U, AU>&)
+    template <class T, class AT, alloc_tracking::policy PT, class U, class AU, alloc_tracking::policy PU>
+    inline bool operator==(const tracking_allocator<T, AT, PT>&, const tracking_allocator<U, AU, PU>&)
     {
       return std::is_same<AT, AU>::value;
     }
 
-    template <class T, class AT, class U, class AU>
-    inline bool operator!=(const tracking_allocator<T, AT>& a, const tracking_allocator<U, AU>& b)
+    template <class T, class AT, alloc_tracking::policy PT, class U, class AU, alloc_tracking::policy PU>
+    inline bool operator!=(const tracking_allocator<T, AT, PT>& a, const tracking_allocator<U, AU, PU>& b)
     {
       return !(a == b);
     }
