@@ -49,6 +49,12 @@ link:
 
 [![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.6?filepath=notebooks/xtensor.ipynb)
 
+## Documentation
+
+To get started with using `xtensor`, check out the full documentation
+
+http://xtensor.readthedocs.io/
+
 ## Dependencies
 
 `xtensor` depends on the [xtl](https://github.com/QuantStack/xtl) library and has an optional dependency on the [xsimd](https://github.com/QuantStack/xsimd) library:
