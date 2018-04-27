@@ -89,7 +89,6 @@ namespace xt
         else
         {
             auto leading_stride = (l == layout_type::row_major ? c.strides().back() : c.strides().front());
-            leading_stride = std::max(leading_stride, typename strides_type::value_type(1));
             return end + difference_type(leading_stride - 1);
         }
     }
