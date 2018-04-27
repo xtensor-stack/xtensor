@@ -7,7 +7,10 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+
 #include "test_common.hpp"
 
 namespace xt
@@ -508,5 +511,108 @@ namespace xt
             std::copy(a.crbegin<layout_type::column_major>(), a.crend<layout_type::column_major>(), dst.rbegin<layout_type::column_major>());
             EXPECT_EQ(a, dst);
         }
+    }
+
+    TEST(xiterator, reverse_corner_cases)
+    {
+        xtensor<double, 3> a = {{{13, 16},
+                                 {13, 16},
+                                 {13, 16}}};
+
+        constexpr auto cm = layout_type::column_major;
+        constexpr auto rm = layout_type::row_major;
+        {
+            std::vector<double> exp_iter = {16, 16, 16, 13, 13, 13};
+            auto e_iter = exp_iter.begin();
+            for (auto it = a.template rbegin<cm>(); it != a.template rend<cm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+            EXPECT_TRUE(e_iter == exp_iter.end());
+        }
+
+        {
+            std::vector<double> exp_iter = {16, 13, 16, 13, 16, 13};
+            auto e_iter = exp_iter.begin();
+            for (auto it = a.template rbegin<rm>(); it != a.template rend<rm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+            EXPECT_TRUE(e_iter == exp_iter.end());
+        }
+
+        {
+            std::vector<double> exp_iter = {13, 16, 13, 16, 13, 16};
+            auto e_iter = exp_iter.begin();
+            for (auto it = a.template begin<rm>(); it != a.template end<rm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+            EXPECT_TRUE(e_iter == exp_iter.end());
+        }
+
+        {
+            std::vector<double> exp_iter = {13, 13, 13, 16, 16, 16};
+            auto e_iter = exp_iter.begin();
+            for (auto it = a.template begin<cm>(); it != a.template end<cm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+        }
+
+        xtensor<double, 3> b = {{{1},
+                                 {1}},
+                                {{2},
+                                 {2}},
+                                {{3},
+                                 {3}}};
+
+       {
+            std::vector<double> exp_iter = {3, 2, 1, 3, 2, 1};
+            auto e_iter = exp_iter.begin();
+            for (auto it = b.template rbegin<cm>(); it != b.template rend<cm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+            EXPECT_TRUE(e_iter == exp_iter.end());
+       }
+
+       {
+            std::vector<double> exp_iter = {3, 3, 2, 2, 1, 1};
+            auto e_iter = exp_iter.begin();
+            for (auto it = b.template rbegin<rm>(); it != b.template rend<rm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+            EXPECT_TRUE(e_iter == exp_iter.end());
+       }
+
+       {
+            std::vector<double> exp_iter = {1, 1, 2, 2, 3, 3};
+            auto e_iter = exp_iter.begin();
+            for (auto it = b.template begin<rm>(); it != b.template end<rm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+            EXPECT_TRUE(e_iter == exp_iter.end());
+       }
+
+       {
+            std::vector<double> exp_iter = {1, 2, 3, 1, 2, 3};
+            auto e_iter = exp_iter.begin();
+            for (auto it = b.template begin<cm>(); it != b.template end<cm>(); ++it)
+            {
+                EXPECT_EQ(*e_iter, *it);
+                ++e_iter;
+            }
+            EXPECT_TRUE(e_iter == exp_iter.end());
+       }
     }
 }
