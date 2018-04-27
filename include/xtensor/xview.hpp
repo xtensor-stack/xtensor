@@ -318,8 +318,6 @@ namespace xt
         void to_begin();
         void to_end(layout_type);
 
-        bool equal(const xview_stepper& rhs) const;
-
     private:
 
         bool is_newaxis_slice(size_type index) const noexcept;
@@ -338,15 +336,6 @@ namespace xt
         substepper_type m_it;
         size_type m_offset;
     };
-
-    template <bool is_const, class CT, class... S>
-    bool operator==(const xview_stepper<is_const, CT, S...>& lhs,
-                    const xview_stepper<is_const, CT, S...>& rhs);
-
-    template <bool is_const, class CT, class... S>
-    bool operator!=(const xview_stepper<is_const, CT, S...>& lhs,
-                    const xview_stepper<is_const, CT, S...>& rhs);
-
 
     // meta-function returning the shape type for an xview
     template <class ST, class... S>
@@ -1054,12 +1043,6 @@ namespace xt
     }
 
     template <bool is_const, class CT, class... S>
-    inline bool xview_stepper<is_const, CT, S...>::equal(const xview_stepper& rhs) const
-    {
-        return p_view == rhs.p_view && m_it == rhs.m_it && m_offset == rhs.m_offset;
-    }
-
-    template <bool is_const, class CT, class... S>
     inline bool xview_stepper<is_const, CT, S...>::is_newaxis_slice(size_type index) const noexcept
     {
         // A bit tricky but avoids a lot of template instantiations
@@ -1136,20 +1119,6 @@ namespace xt
             index -= newaxis_count_before<S...>(index);
             f(index, step_size * size);
         }
-    }
-
-    template <bool is_const, class CT, class... S>
-    inline bool operator==(const xview_stepper<is_const, CT, S...>& lhs,
-                           const xview_stepper<is_const, CT, S...>& rhs)
-    {
-        return lhs.equal(rhs);
-    }
-
-    template <bool is_const, class CT, class... S>
-    inline bool operator!=(const xview_stepper<is_const, CT, S...>& lhs,
-                           const xview_stepper<is_const, CT, S...>& rhs)
-    {
-        return !(lhs.equal(rhs));
     }
 }
 

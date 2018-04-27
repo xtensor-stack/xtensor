@@ -362,21 +362,11 @@ namespace xt
 
         reference operator*() const;
 
-        bool equal(const self_type& rhs) const;
-
     private:
 
         value_stepper m_vs;
         flag_stepper m_fs;
     };
-
-    template <class D, bool is_const>
-    bool operator==(const xoptional_assembly_stepper<D, is_const>& lhs,
-                    const xoptional_assembly_stepper<D, is_const>& rhs);
-
-    template <class D, bool is_const>
-    bool operator!=(const xoptional_assembly_stepper<D, is_const>& lhs,
-                    const xoptional_assembly_stepper<D, is_const>& rhs);
 
     /******************************************
      * xoptional_assembly_base implementation *
@@ -1003,26 +993,6 @@ namespace xt
     inline auto xoptional_assembly_stepper<D, C>::operator*() const -> reference
     {
         return reference(*m_vs, *m_fs);
-    }
-
-    template <class D, bool C>
-    inline bool xoptional_assembly_stepper<D, C>::equal(const self_type& rhs) const
-    {
-        return m_vs.equal(rhs.m_vs) && m_fs.equal(rhs.m_fs);
-    }
-
-    template <class D, bool is_const>
-    inline bool operator==(const xoptional_assembly_stepper<D, is_const>& lhs,
-                           const xoptional_assembly_stepper<D, is_const>& rhs)
-    {
-        return lhs.equal(rhs);
-    }
-
-    template <class D, bool is_const>
-    inline bool operator!=(const xoptional_assembly_stepper<D, is_const>& lhs,
-                           const xoptional_assembly_stepper<D, is_const>& rhs)
-    {
-        return !(lhs == rhs);
     }
 }
 

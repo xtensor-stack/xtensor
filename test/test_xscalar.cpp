@@ -88,8 +88,8 @@ namespace xt
 
     TEST(xscalar, stepper)
     {
-        xarray<double> ref = zeros<double>({ 4,6 });
-        xarray<int> a{ 0,1 };
+        xarray<double> ref = zeros<double>({4, 6});
+        xarray<int> a{0, 1};
         ref[a + 1] = 1;
         EXPECT_EQ(ref(1, 2), 1);
     }
