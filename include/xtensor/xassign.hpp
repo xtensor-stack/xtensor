@@ -117,7 +117,6 @@ namespace xt
 
         lhs_iterator m_lhs;
         rhs_iterator m_rhs;
-        rhs_iterator m_rhs_end;
 
         index_type m_index;
     };
@@ -321,7 +320,7 @@ namespace xt
     template <class E1, class E2, layout_type L>
     inline data_assigner<E1, E2, L>::data_assigner(E1& e1, const E2& e2)
         : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
-          m_rhs(e2.stepper_begin(e1.shape())), m_rhs_end(e2.stepper_end(e1.shape(), L)),
+          m_rhs(e2.stepper_begin(e1.shape())),
           m_index(xtl::make_sequence<index_type>(e1.shape().size(), size_type(0)))
     {
     }
@@ -329,11 +328,13 @@ namespace xt
     template <class E1, class E2, layout_type L>
     inline void data_assigner<E1, E2, L>::run()
     {
+        using size_type = typename E1::size_type;
         using argument_type = std::decay_t<decltype(*m_rhs)>;
         using result_type = std::decay_t<decltype(*m_lhs)>;
         constexpr bool is_narrowing = is_narrowing_conversion<argument_type, result_type>::value;
 
-        while (m_rhs != m_rhs_end)
+        size_type s = m_e1.size();
+        for (size_type i = 0; i < s; ++i)
         {
             *m_lhs = conditional_cast<is_narrowing, result_type>(*m_rhs);
             stepper_tools<L>::increment_stepper(*this, m_index, m_e1.shape());
