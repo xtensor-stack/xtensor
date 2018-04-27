@@ -114,22 +114,12 @@ namespace xt
         void to_begin();
         void to_end(layout_type l);
 
-        bool equal(const xstepper& rhs) const;
-
     private:
 
         storage_type* p_c;
         subiterator_type m_it;
         size_type m_offset;
     };
-
-    template <class C>
-    bool operator==(const xstepper<C>& lhs,
-                    const xstepper<C>& rhs);
-
-    template <class C>
-    bool operator!=(const xstepper<C>& lhs,
-                    const xstepper<C>& rhs);
 
     template <layout_type L>
     struct stepper_tools
@@ -199,22 +189,12 @@ namespace xt
         void to_begin();
         void to_end(layout_type l);
 
-        bool equal(const self_type& rhs) const;
-
     private:
 
         xexpression_type* p_e;
         index_type m_index;
         size_type m_offset;
     };
-
-    template <class C, bool is_const>
-    bool operator==(const xindexed_stepper<C, is_const>& lhs,
-                    const xindexed_stepper<C, is_const>& rhs);
-
-    template <class C, bool is_const>
-    bool operator!=(const xindexed_stepper<C, is_const>& lhs,
-                    const xindexed_stepper<C, is_const>& rhs);
 
     /*************
      * xiterator *
@@ -465,26 +445,6 @@ namespace xt
     inline void xstepper<C>::to_end(layout_type l)
     {
         m_it = p_c->data_xend(l);
-    }
-
-    template <class C>
-    inline bool xstepper<C>::equal(const xstepper& rhs) const
-    {
-        return p_c == rhs.p_c && m_it == rhs.m_it && m_offset == rhs.m_offset;
-    }
-
-    template <class C>
-    inline bool operator==(const xstepper<C>& lhs,
-                           const xstepper<C>& rhs)
-    {
-        return lhs.equal(rhs);
-    }
-
-    template <class C>
-    inline bool operator!=(const xstepper<C>& lhs,
-                           const xstepper<C>& rhs)
-    {
-        return !(lhs.equal(rhs));
     }
 
     template <>
@@ -815,7 +775,8 @@ namespace xt
     {
         if (end)
         {
-            to_end(layout_type::row_major);
+            // Note: the layout here doesn't matter (unused) but using default layout looks more "correct"
+            to_end(XTENSOR_DEFAULT_LAYOUT);
         }
     }
 
@@ -871,26 +832,6 @@ namespace xt
     inline void xindexed_stepper<C, is_const>::to_end(layout_type)
     {
         std::copy(p_e->shape().begin(), p_e->shape().end(), m_index.begin());
-    }
-
-    template <class C, bool is_const>
-    inline bool xindexed_stepper<C, is_const>::equal(const self_type& rhs) const
-    {
-        return p_e == rhs.p_e && m_index == rhs.m_index && m_offset == rhs.m_offset;
-    }
-
-    template <class C, bool is_const>
-    inline bool operator==(const xindexed_stepper<C, is_const>& lhs,
-                           const xindexed_stepper<C, is_const>& rhs)
-    {
-        return lhs.equal(rhs);
-    }
-
-    template <class C, bool is_const>
-    inline bool operator!=(const xindexed_stepper<C, is_const>& lhs,
-                           const xindexed_stepper<C, is_const>& rhs)
-    {
-        return !lhs.equal(rhs);
     }
 
     /****************************
@@ -1024,13 +965,15 @@ namespace xt
     template <class It, class S, layout_type L>
     inline bool xiterator<It, S, L>::equal(const xiterator& rhs) const
     {
-        return m_it == rhs.m_it && this->shape() == rhs.shape();
+        XTENSOR_ASSERT(this->shape() == rhs.shape());
+        return m_linear_index == rhs.m_linear_index;
     }
 
     template <class It, class S, layout_type L>
     inline bool xiterator<It, S, L>::less_than(const xiterator& rhs) const
     {
-        return m_index < rhs.m_index && this->shape() == rhs.shape();
+        XTENSOR_ASSERT(this->shape() == rhs.shape());
+        return m_linear_index < rhs.m_linear_index;
     }
 
     template <class It, class S, layout_type L>

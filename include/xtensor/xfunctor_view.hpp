@@ -389,21 +389,11 @@ namespace xt
         void to_begin();
         void to_end(layout_type);
 
-        bool equal(const xfunctor_stepper& rhs) const;
-
     private:
 
         ST m_stepper;
         const functor_type* p_functor;
     };
-
-    template <class F, class ST>
-    bool operator==(const xfunctor_stepper<F, ST>& lhs,
-                    const xfunctor_stepper<F, ST>& rhs);
-
-    template <class F, class ST>
-    bool operator!=(const xfunctor_stepper<F, ST>& lhs,
-                    const xfunctor_stepper<F, ST>& rhs);
 
     /********************************
      * xfunctor_view implementation *
@@ -1290,26 +1280,6 @@ namespace xt
     void xfunctor_stepper<F, ST>::to_end(layout_type l)
     {
         m_stepper.to_end(l);
-    }
-
-    template <class F, class ST>
-    auto xfunctor_stepper<F, ST>::equal(const xfunctor_stepper& rhs) const -> bool
-    {
-        return m_stepper == rhs.m_stepper;
-    }
-
-    template <class F, class ST>
-    bool operator==(const xfunctor_stepper<F, ST>& lhs,
-                    const xfunctor_stepper<F, ST>& rhs)
-    {
-        return lhs.equal(rhs);
-    }
-
-    template <class F, class ST>
-    bool operator!=(const xfunctor_stepper<F, ST>& lhs,
-                    const xfunctor_stepper<F, ST>& rhs)
-    {
-        return !lhs.equal(rhs);
     }
 }
 #endif

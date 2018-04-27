@@ -571,8 +571,6 @@ namespace xt
         void to_begin();
         void to_end(layout_type l);
 
-        bool equal(const self_type& rhs) const;
-
     private:
 
         reference aggregate(size_type dim) const;
@@ -586,14 +584,6 @@ namespace xt
         size_type m_offset;
         mutable substepper_type m_stepper;
     };
-
-    template <class F, class CT, class X>
-    bool operator==(const xreducer_stepper<F, CT, X>& lhs,
-                    const xreducer_stepper<F, CT, X>& rhs);
-
-    template <class F, class CT, class X>
-    bool operator!=(const xreducer_stepper<F, CT, X>& lhs,
-                    const xreducer_stepper<F, CT, X>& rhs);
 
     /******************
      * xreducer utils *
@@ -940,12 +930,6 @@ namespace xt
     }
 
     template <class F, class CT, class X>
-    inline bool xreducer_stepper<F, CT, X>::equal(const self_type& rhs) const
-    {
-        return m_reducer == rhs.m_reducer && m_stepper.equal(rhs.m_stepper);
-    }
-
-    template <class F, class CT, class X>
     inline auto xreducer_stepper<F, CT, X>::aggregate(size_type dim) const -> reference
     {
         size_type index = axis(dim);
@@ -995,20 +979,6 @@ namespace xt
     inline auto xreducer_stepper<F, CT, X>::axis(size_type i) const noexcept -> size_type
     {
         return m_reducer->m_axes[i];
-    }
-
-    template <class F, class CT, class X>
-    inline bool operator==(const xreducer_stepper<F, CT, X>& lhs,
-                           const xreducer_stepper<F, CT, X>& rhs)
-    {
-        return lhs.equal(rhs);
-    }
-
-    template <class F, class CT, class X>
-    inline bool operator!=(const xreducer_stepper<F, CT, X>& lhs,
-                           const xreducer_stepper<F, CT, X>& rhs)
-    {
-        return !lhs.equal(rhs);
     }
 }
 

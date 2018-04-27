@@ -467,8 +467,6 @@ namespace xt
 
         reference operator*() const;
 
-        bool equal(const self_type& rhs) const;
-
     private:
 
         template <std::size_t... I>
@@ -477,14 +475,6 @@ namespace xt
         const xfunction_type* p_f;
         std::tuple<typename std::decay_t<CT>::const_stepper...> m_it;
     };
-
-    template <class F, class R, class... CT>
-    bool operator==(const xfunction_stepper<F, R, CT...>& it1,
-                    const xfunction_stepper<F, R, CT...>& it2);
-
-    template <class F, class R, class... CT>
-    bool operator!=(const xfunction_stepper<F, R, CT...>& it1,
-                    const xfunction_stepper<F, R, CT...>& it2);
 
     /*************
      * xfunction *
@@ -1075,30 +1065,10 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline bool xfunction_stepper<F, R, CT...>::equal(const self_type& rhs) const
-    {
-        return p_f == rhs.p_f && m_it == rhs.m_it;
-    }
-
-    template <class F, class R, class... CT>
     template <std::size_t... I>
     inline auto xfunction_stepper<F, R, CT...>::deref_impl(std::index_sequence<I...>) const -> reference
     {
         return (p_f->m_f)(*std::get<I>(m_it)...);
-    }
-
-    template <class F, class R, class... CT>
-    inline bool operator==(const xfunction_stepper<F, R, CT...>& it1,
-                           const xfunction_stepper<F, R, CT...>& it2)
-    {
-        return it1.equal(it2);
-    }
-
-    template <class F, class R, class... CT>
-    inline bool operator!=(const xfunction_stepper<F, R, CT...>& it1,
-                           const xfunction_stepper<F, R, CT...>& it2)
-    {
-        return !(it1.equal(it2));
     }
 
     /****************************
