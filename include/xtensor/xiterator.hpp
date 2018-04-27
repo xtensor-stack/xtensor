@@ -965,13 +965,15 @@ namespace xt
     template <class It, class S, layout_type L>
     inline bool xiterator<It, S, L>::equal(const xiterator& rhs) const
     {
-        return m_linear_index == rhs.m_linear_index && this->shape() == rhs.shape();
+        XTENSOR_ASSERT(this->shape() == rhs.shape());
+        return m_linear_index == rhs.m_linear_index;
     }
 
     template <class It, class S, layout_type L>
     inline bool xiterator<It, S, L>::less_than(const xiterator& rhs) const
     {
-        return m_index < rhs.m_index && this->shape() == rhs.shape();
+        XTENSOR_ASSERT(this->shape() == rhs.shape());
+        return m_linear_index < rhs.m_linear_index;
     }
 
     template <class It, class S, layout_type L>

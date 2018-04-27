@@ -960,7 +960,6 @@ namespace xt
     template <bool is_const, class CT>
     inline auto xscalar_stepper<is_const, CT>::operator*() const noexcept -> reference
     {
-        // return m_end ? (p_c - 1)->operator()() : p_c->operator()();
         return p_c->operator()();
     }
 
