@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.16.0
+------
+
+- Support for JSON serialization and deserialization of xtensor expressions
+  `#830 <https://github.com/QuantStack/xtensor/pull/830>`_.
+
 0.15.9
 ------
 
