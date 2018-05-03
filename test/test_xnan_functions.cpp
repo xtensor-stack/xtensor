@@ -87,8 +87,8 @@ namespace xt
         xarray<double> arr = xt::arange(3 * 4 * 2 * 8 * 7);
         arr.reshape({3, 4, 2, 8, 7});
         xarray<double> carr = arr;
-        dynamic_view(arr, {0, xt::ellipsis()}) = nanv;
-        dynamic_view(carr, {0, xt::ellipsis()}) = 0;
+        strided_view(arr, {0, xt::ellipsis()}) = nanv;
+        strided_view(carr, {0, xt::ellipsis()}) = 0;
 
         EXPECT_EQ(nancumsum(arr, 0), cumsum(carr, 0));
         EXPECT_EQ(nancumsum(arr, 1), cumsum(carr, 1));

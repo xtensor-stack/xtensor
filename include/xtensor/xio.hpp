@@ -106,7 +106,7 @@ namespace xt
         {
             using size_type = typename E::size_type;
 
-            const auto view = xt::dynamic_view(e, slices);
+            const auto view = xt::strided_view(e, slices);
             if (view.dimension() == 0)
             {
                 printer.print_next(out);
@@ -171,7 +171,7 @@ namespace xt
         static void recurser_run(F& fn, const E& e, slice_vector& slices, std::size_t lim = 0)
         {
             using size_type = typename E::size_type;
-            const auto view = dynamic_view(e, slices);
+            const auto view = strided_view(e, slices);
             if (view.dimension() == 0)
             {
                 fn.update(view());

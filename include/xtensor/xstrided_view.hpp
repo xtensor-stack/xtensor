@@ -941,7 +941,7 @@ namespace xt
     namespace detail
     {
         template <class S, class ST>
-        inline auto get_dynamic_view_args(const S& shape, ST&& strides, std::size_t base_offset, layout_type layout, const slice_vector& slices)
+        inline auto get_strided_view_args(const S& shape, ST&& strides, std::size_t base_offset, layout_type layout, const slice_vector& slices)
         {
             // Compute dimension
             std::size_t dimension = shape.size(), n_newaxis = 0, n_add_all = 0;
@@ -1073,7 +1073,7 @@ namespace xt
      * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
      * xt::slice_vector sv({xt::range(0, 1)});
      * sv.push_back(xt::range(0, 3, 2));
-     * auto v = xt::dynamic_view(a, sv);
+     * auto v = xt::strided_view(a, sv);
      * // ==> {{1, 3}}
      * \endcode
      *
@@ -1081,30 +1081,30 @@ namespace xt
      *
      * \code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
-     * auto v = xt::dynamic_view(a, {xt::range(0, 1), xt::range(0, 3, 2)});
+     * auto v = xt::strided_view(a, {xt::range(0, 1), xt::range(0, 3, 2)});
      * // ==> {{1, 3}}
      * \endcode
      */
     template <class E>
-    inline auto dynamic_view(E&& e, const slice_vector& slices)
+    inline auto strided_view(E&& e, const slice_vector& slices)
     {
-        auto args = detail::get_dynamic_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        auto args = detail::get_strided_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<E>, std::decay_t<decltype(std::get<0>(args))>>;
         return view_type(std::forward<E>(e), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
     }
 
     template <class CT, class S, layout_type L, class FS>
-    auto dynamic_view(const xstrided_view<CT, S, L, FS>& e, const slice_vector& slices)
+    auto strided_view(const xstrided_view<CT, S, L, FS>& e, const slice_vector& slices)
     {
-        auto args = detail::get_dynamic_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        auto args = detail::get_strided_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
         return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
     }
 
     template <class CT, class S, layout_type L, class FS>
-    auto dynamic_view(xstrided_view<CT, S, L, FS>& e, const slice_vector& slices)
+    auto strided_view(xstrided_view<CT, S, L, FS>& e, const slice_vector& slices)
     {
-        auto args = detail::get_dynamic_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        auto args = detail::get_strided_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
         return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
     }
@@ -1389,7 +1389,7 @@ namespace xt
             end -= std::find_if(e.crbegin(), e.crend(), find_fun) - e.crbegin();
         }
 
-        return dynamic_view(std::forward<E>(e), { range(begin, end) });
+        return strided_view(std::forward<E>(e), { range(begin, end) });
     }
 
     /**
@@ -1497,31 +1497,31 @@ namespace xt
      * @brief Expand the shape of an xexpression.
      *
      * Insert a new axis that will appear at the axis position in the expanded array shape.
-     * This will return a ``dynamic_view`` with a ``xt::newaxis()`` at the indicated axis.
+     * This will return a ``strided_view`` with a ``xt::newaxis()`` at the indicated axis.
      *
      * @param e input xexpression
      * @param axis axis to expand
-     * @return returns a ``dynamic_view`` with expanded dimension
+     * @return returns a ``strided_view`` with expanded dimension
      */
     template <class E>
     auto expand_dims(E&& e, std::size_t axis)
     {
         slice_vector sv(e.dimension() + 1, xt::all());
         sv[axis] = xt::newaxis();
-        return dynamic_view(std::forward<E>(e), std::move(sv));
+        return strided_view(std::forward<E>(e), std::move(sv));
     }
 
     /**
      * Expand dimensions of xexpression to at least `N`
      *
-     * This adds ``newaxis()`` slices to a ``dynamic_view`` until
+     * This adds ``newaxis()`` slices to a ``strided_view`` until
      * the dimension of the view reaches at least `N`.
      * Note: dimensions are added equally at the beginning and the end.
      * For example, a 1-D array of shape (N,) becomes a view of shape (1, N, 1).
      *
      * @param e input xexpression
      * @tparam N the number of requested dimensions
-     * @return ``dynamic_view`` with expanded dimensions
+     * @return ``strided_view`` with expanded dimensions
      */
     template <std::size_t N, class E>
     auto atleast_Nd(E&& e)
@@ -1540,7 +1540,7 @@ namespace xt
                 sv[i] = xt::newaxis();
             }
         }
-        return dynamic_view(std::forward<E>(e), std::move(sv));
+        return strided_view(std::forward<E>(e), std::move(sv));
     }
 
     /**
@@ -1577,7 +1577,7 @@ namespace xt
      * @brief Split xexpression along axis into subexpressions
      *
      * This splits an xexpression along the axis in `n` equal parts and
-     * returns a vector of ``dynamic_view``.
+     * returns a vector of ``strided_view``.
      * Calling split with axis > dimension of e or a `n` that does not result in
      * an equal division of the xexpression will throw a runtime_error.
      *
@@ -1603,11 +1603,11 @@ namespace xt
             throw std::runtime_error("Split does not result in equal division.");
         }
 
-        std::vector<decltype(dynamic_view(e, sv))> result;
+        std::vector<decltype(strided_view(e, sv))> result;
         for (std::size_t i = 0; i < n; ++i)
         {
             sv[axis] = range(i * step, (i + 1) * step);
-            result.emplace_back(dynamic_view(e, sv));
+            result.emplace_back(strided_view(e, sv));
         }
         return result;
     }

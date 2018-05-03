@@ -176,7 +176,7 @@ namespace xt
     /**
      * Returns a slice representing a full dimension,
      * to be used as an argument of view function.
-     * @sa view, dynamic_view
+     * @sa view, strided_view
      */
     inline auto all() noexcept
     {
@@ -193,15 +193,15 @@ namespace xt
      * to a series of `all()` slices, until the number of slices is
      * equal to the number of dimensions of the source array.
      *
-     * Note: ellipsis can only be used in dynamic_view!
+     * Note: ellipsis can only be used in strided_view!
      *
      * \code{.cpp}
      * xarray<double> a = xarray<double>::from_shape({5, 5, 1, 1, 5});
-     * auto v = xt::dynamic_view(a, {2, xt::ellipsis(), 2});
+     * auto v = xt::strided_view(a, {2, xt::ellipsis(), 2});
      * // equivalent to using {2, xt::all(), xt::all(), xt::all(), 2};
      * \endcode
      *
-     * @sa dynamic_view
+     * @sa strided_view
      */
     inline auto ellipsis() noexcept
     {
@@ -238,7 +238,7 @@ namespace xt
     /**
      * Returns a slice representing a new axis of length one,
      * to be used as an argument of view function.
-     * @sa view, dynamic_view
+     * @sa view, strided_view
      */
     inline auto newaxis() noexcept
     {
@@ -386,7 +386,7 @@ namespace xt
      * range(_, _)  // equivalent to `all()`
      * \endcode
      *
-     * @sa view, dynamic_view
+     * @sa view, strided_view
      */
     template <class A, class B>
     inline auto range(A min_val, B max_val)
@@ -404,7 +404,7 @@ namespace xt
      * range(3, _, 5)  // select from index 3 to the end with stepsize 5
      * \endcode
      *
-     * @sa view, dynamic_view
+     * @sa view, strided_view
      */
     template <class A, class B, class C>
     inline auto range(A min_val, B max_val, C step)

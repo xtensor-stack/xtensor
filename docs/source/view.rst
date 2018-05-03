@@ -68,13 +68,13 @@ you are actually also altering the underlying expression.
     // => a(1, 0, 1) = 1
 
 
-Dynamic views
+Strided views
 -------------
 
-While the ``xt::view`` is a compile-time static expression, xtensor also contains a dynamic view in ``xstrided_view.hpp``. The dynamic
-view and the slice vector allow to dynamically push_back slices, so when the dimension is unknown at compile time, the slice vector can
-be built dynamically at runtime. Note that the slice vector is actually a type-alias for a ``std::vector`` of a ``variant`` for all the
-slice types. All the same slices as in xview can be used.
+While the ``xt::view`` is a compile-time static expression, xtensor also contains a dynamic strided view in ``xstrided_view.hpp``.
+The strided view and the slice vector allow to dynamically push_back slices, so when the dimension is unknown at compile time, the slice
+vector can be built dynamically at runtime. Note that the slice vector is actually a type-alias for a ``std::vector`` of a ``variant`` for
+all the slice types. All the same slices as in xview can be used.
 
 .. code::
 
@@ -87,11 +87,10 @@ slice types. All the same slices as in xview can be used.
     sv.push_back(1);
     sv.push_back(xt::all());
 
-    auto v1 = xt::dynamic_view(a, sv);
+    auto v1 = xt::strided_view(a, sv);
     // v1 has the same behavior as the static view
 
-The ``dynamic_view`` is implemented on top of the ``xstrided_view``, which is very efficient on contigous memory (e.g. ``xtensor`` or
-``xarray``) but less efficient on xexpressions.
+The ``xstrided_view`` is very efficient on contigous memory (e.g. ``xtensor`` or ``xarray``) but less efficient on xexpressions.
 
 Transposed views
 ----------------
@@ -112,7 +111,7 @@ a transposed view on a expression with a dynamic layout throws an exception.
     auto tr2 = xt::transpose(b);
     // => throw transpose_error
 
-Like the dynamic view, the transposed view is built upon the ``xstrided_view``.
+Like the strided view, the transposed view is built upon the ``xstrided_view``.
 
 Flatten views
 -------------
@@ -135,7 +134,7 @@ uses the layout of the expression.
     std::cout << fl << std::endl;
     // => prints { 0, 1, 2, 3, 4, 5 }
 
-Like the dynamic view and the transposed view, the flatten view is built upon the ``xstrided_view``.
+Like the strided view and the transposed view, the flatten view is built upon the ``xstrided_view``.
 
 Index views
 -----------
