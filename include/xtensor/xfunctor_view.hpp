@@ -722,7 +722,7 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_view<F, CT>::begin() const noexcept
     {
-        return cbegin<L>();
+        return this->template cbegin<L>();
     }
 
     /**
@@ -734,7 +734,7 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_view<F, CT>::end() const noexcept
     {
-        return cend<L>();
+        return this->template cend<L>();
     }
 
     /**
@@ -889,7 +889,7 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_view<F, CT>::rbegin() const noexcept
     {
-        return crbegin<L>();
+        return this->template crbegin<L>();
     }
 
     /**
@@ -901,7 +901,7 @@ namespace xt
     template <layout_type L>
     inline auto xfunctor_view<F, CT>::rend() const noexcept
     {
-        return crend<L>();
+        return this->template crend<L>();
     }
 
     /**
