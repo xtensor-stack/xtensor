@@ -770,14 +770,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::begin() const noexcept -> select_const_iterator<L>
     {
-        return cbegin<L>();
+        return this->template cbegin<L>();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::end() const noexcept -> select_const_iterator<L>
     {
-        return cend<L>();
+        return this->template cend<L>();
     }
 
     template <class D>
@@ -836,14 +836,14 @@ namespace xt
     template <layout_type L>
     inline auto xcontainer<D>::rbegin() const noexcept -> select_const_reverse_iterator<L>
     {
-        return crbegin<L>();
+        return this->template crbegin<L>();
     }
 
     template <class D>
     template <layout_type L>
     inline auto xcontainer<D>::rend() const noexcept -> select_const_reverse_iterator<L>
     {
-        return crend<L>();
+        return this->template crend<L>();
     }
 
     template <class D>

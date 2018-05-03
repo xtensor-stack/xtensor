@@ -777,84 +777,84 @@ namespace xt
     template <layout_type L>
     inline auto xscalar<CT>::storage_begin() noexcept -> iterator
     {
-        return begin<L>();
+        return this->template begin<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_end() noexcept -> iterator
     {
-        return end<L>();
+        return this->template end<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_begin() const noexcept -> const_iterator
     {
-        return begin<L>();
+        return this->template begin<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_end() const noexcept -> const_iterator
     {
-        return end<L>();
+        return this->template end<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_cbegin() const noexcept -> const_iterator
     {
-        return cbegin<L>();
+        return this->template cbegin<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_cend() const noexcept -> const_iterator
     {
-        return cend<L>();
+        return this->template cend<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_rbegin() noexcept -> reverse_iterator
     {
-        return rbegin<L>();
+        return this->template rbegin<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_rend() noexcept -> reverse_iterator
     {
-        return rend<L>();
+        return this->template rend<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_rbegin() const noexcept -> const_reverse_iterator
     {
-        return rbegin<L>();
+        return this->template rbegin<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_rend() const noexcept -> const_reverse_iterator
     {
-        return rend<L>();
+        return this->template rend<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_crbegin() const noexcept -> const_reverse_iterator
     {
-        return crbegin<L>();
+        return this->template crbegin<L>();
     }
 
     template <class CT>
     template <layout_type L>
     inline auto xscalar<CT>::storage_crend() const noexcept -> const_reverse_iterator
     {
-        return crend<L>();
+        return this->template crend<L>();
     }
 
     template <class CT>
