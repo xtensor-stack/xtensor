@@ -98,7 +98,6 @@ set(XTENSOR_TESTS
     test_xcontainer_semantic.cpp
     test_xcomplex.cpp
     test_xcsv.cpp
-    test_xdynamic_view.cpp
     test_xeval.cpp
     test_xexception.cpp
     test_xfunction.cpp

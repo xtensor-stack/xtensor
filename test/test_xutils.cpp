@@ -189,9 +189,9 @@ namespace xt
 
         xarray<int> a = xarray<int>::from_shape({3, 4, 5});
         auto f = a + a - 23;
-        auto v2 = dynamic_view(a, {all(), 1, all()});
-        auto vv2 = dynamic_view(v2, {all(), 2});
-        auto v3 = dynamic_view(f, {all(), 2});
+        auto v2 = strided_view(a, {all(), 1, all()});
+        auto vv2 = strided_view(v2, {all(), 2});
+        auto v3 = strided_view(f, {all(), 2});
 
         b = has_data_interface<decltype(v2)>::value;
         EXPECT_TRUE(b);
