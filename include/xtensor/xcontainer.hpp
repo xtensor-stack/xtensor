@@ -1311,7 +1311,7 @@ namespace xt
     {
         if (compute_size(shape) != this->size())
         {
-            throw std::runtime_error("Cannot reshape with incorrect number of elements.");
+            throw std::runtime_error("Cannot reshape with incorrect number of elements. Do you mean to resize?");
         }
         if (layout == layout_type::dynamic || layout == layout_type::any)
         {

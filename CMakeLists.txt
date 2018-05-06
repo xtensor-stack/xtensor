@@ -29,7 +29,10 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # ============
 
 find_package(xtl 0.4.1 REQUIRED)
+
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
+
+find_package(nlohmann_json 3.1.1)
 
 # Build
 # =====
@@ -59,6 +62,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterable.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xjson.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp

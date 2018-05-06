@@ -114,6 +114,9 @@ namespace xt
     using is_xexpression = detail::is_xexpression_impl<E>;
 
     template <class E, class R = void>
+    using enable_xexpression = typename std::enable_if<is_xexpression<E>::value, R>::type;
+
+    template <class E, class R = void>
     using disable_xexpression = typename std::enable_if<!is_xexpression<E>::value, R>::type;
 
     template <class... E>

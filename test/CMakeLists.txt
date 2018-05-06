@@ -106,6 +106,7 @@ set(XTENSOR_TESTS
     test_xinfo.cpp
     test_xiterator.cpp
     test_xio.cpp
+    test_xjson.cpp
     test_xlayout.cpp
     test_xmath.cpp
     test_xnan_functions.cpp

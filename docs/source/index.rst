@@ -74,6 +74,7 @@ for details.
    api/expression_index
    api/container_index
    api/function_index
+   api/io_index
    api/xmath
 
 .. toctree::
