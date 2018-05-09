@@ -22,6 +22,9 @@
 #include "xaccumulator.hpp"
 #include "xoperation.hpp"
 #include "xreducer.hpp"
+#include "xslice.hpp"
+#include "xstrided_view.hpp"
+#include "xeval.hpp"
 
 namespace xt
 {
@@ -1974,6 +1977,37 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), detail::nan_init<result_type, 1>()), std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Integrate along the given axis using the composite trapezoidal rule.
+     *
+     * Returns definite integral as approximated by trapezoidal rule. This function is not lazy (might change in the future).
+     * @param y an \ref xexpression
+     * @param dx the spacing between sample points (optional)
+     * @param axis the axis along which to integrate.
+     * @return an xarray
+     */
+    template <class T>
+    auto trapz(const xexpression<T>& y, typename T::value_type dx = 1.0, std::ptrdiff_t axis = -1)
+    {
+        auto& yd = y.derived_cast();
+        std::size_t saxis = static_cast<std::size_t>(axis);
+
+        if (axis == -1)
+        {
+          saxis = yd.dimension() - 1;
+        }
+
+        slice_vector slice1(yd.dimension(), all());
+        slice_vector slice2(yd.dimension(), all());
+        slice1[saxis] = range(1, xnone());
+        slice2[saxis] = range(xnone(), yd.shape()[saxis] - 1);
+
+        auto trap = dx * (strided_view(yd, slice1) + strided_view(yd, slice2)) * 0.5;
+
+        return eval(sum(trap, {saxis}));
     }
 }
 

@@ -26,6 +26,9 @@ namespace xt
     template <class C>
     struct xcontainer_inner_types;
 
+    template <class D>
+    class xcontainer;
+
     template <class EC,
               layout_type L = XTENSOR_DEFAULT_LAYOUT,
               class SC = XTENSOR_DEFAULT_SHAPE_CONTAINER(typename EC::value_type,

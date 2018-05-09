@@ -11,6 +11,8 @@
 #include "xtensor/xtensor_config.hpp"
 #include "xtensor/xeval.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 
 namespace xt
 {

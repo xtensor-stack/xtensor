@@ -23,6 +23,10 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: mean(E&&, X&&)
    :project: xtensor
 
+.. _trapz-function-reference:
+.. doxygenfunction:: trapz(const xexpression<T>&, typename T::value_type, std::ptrdiff_t)
+   :project: xtensor
+
 Defined in ``xtensor/xnorm.hpp``
 
 .. _norm-l0-func-ref:

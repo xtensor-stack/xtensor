@@ -18,12 +18,12 @@
 #include <xtl/xsequence.hpp>
 #include <xtl/xvariant.hpp>
 
-#include "xarray.hpp"
+#include "xtensor_forward.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
+#include "xsemantic.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
-#include "xview.hpp"
 
 namespace xt
 {
@@ -937,7 +937,7 @@ namespace xt
     template <class T>
     using select_strided_view_t = typename select_strided_view<T>::type;
 
- 
+
     namespace detail
     {
         template <class S, class ST>
