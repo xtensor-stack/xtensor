@@ -989,7 +989,7 @@ namespace xt
 
             // Compute strided view
             std::size_t offset = base_offset;
-            using shape_type = dynamic_shape<std::size_t>;
+            using shape_type = dynamic_shape<std::ptrdiff_t>;
 
             shape_type new_shape(dimension);
             shape_type new_strides(dimension);
@@ -1022,16 +1022,16 @@ namespace xt
                 {
                     for (std::size_t j = 0; j < n_add_all; ++j)
                     {
-                        new_shape[idx] = old_shape[XTENSOR_MU(i - axis_skip)];
-                        new_strides[idx] = old_strides[XTENSOR_MU(i - axis_skip)];
+                        new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
+                        new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
                         --axis_skip, ++idx;
                     }
                     ++axis_skip;  // because i++
                 }
                 else if (xtl::get_if<xt::xall_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
                 {
-                    new_shape[idx] = old_shape[XTENSOR_MU(i - axis_skip)];
-                    new_strides[idx] = old_strides[XTENSOR_MU(i - axis_skip)];
+                    new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
+                    new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
                     ++idx;
                 }
                 else
@@ -1039,16 +1039,16 @@ namespace xt
                     slice_getter.idx = XTENSOR_MU(i - axis_skip);
                     auto info = xtl::visit(slice_getter, slices[XTENSOR_MU(i)]);
                     offset += std::size_t(info[0]) * old_strides[XTENSOR_MU(i - axis_skip)];
-                    new_shape[idx] = std::size_t(info[1]);
-                    new_strides[idx] = std::size_t(info[2]) * old_strides[XTENSOR_MU(i - axis_skip)];
+                    new_shape[idx] = std::ptrdiff_t(info[1]);
+                    new_strides[idx] = std::ptrdiff_t(info[2]) * XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
                     ++idx;
                 }
             }
 
             for (; XTENSOR_MU(i - axis_skip) < old_shape.size(); ++i)
             {
-                new_shape[idx] = old_shape[XTENSOR_MU(i - axis_skip)];
-                new_strides[idx] = old_strides[XTENSOR_MU(i - axis_skip)];
+                new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
+                new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
                 ++idx;
             }
 
