@@ -424,54 +424,6 @@ namespace xt
         ASSERT_EQ(expected, t);
     }
 
-    TEST(xbuilder, flipud)
-    {
-        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-        xarray<double> t = xt::flip(e, 0);
-        xarray<double> expected = {{7, 8, 9}, {4, 5, 6}, {1, 2, 3}};
-        ASSERT_EQ(expected, t);
-
-        xindex idx = {0, 0};
-        ASSERT_EQ(7, t[idx]);
-        ASSERT_EQ(2, t(2, 1));
-        ASSERT_EQ(7, t.element(idx.begin(), idx.end()));
-
-        xarray<double> f = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
-
-        xarray<double> ft = xt::flip(f, 0);
-        xarray<double> expected_2 = {{{6, 7, 8},
-                                      {9, 10, 11}},
-                                     {{0, 1, 2},
-                                      {3, 4, 5}}};
-        ASSERT_EQ(expected_2, ft);
-    }
-
-    TEST(xbuilder, fliplr)
-    {
-        xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
-        xarray<double> t = xt::flip(e, 1);
-        xarray<double> expected = {{3, 2, 1}, {6, 5, 4}, {9, 8, 7}};
-        ASSERT_EQ(expected, t);
-
-        xindex idx = {0, 0};
-        ASSERT_EQ(3, t[idx]);
-        ASSERT_EQ(8, t(2, 1));
-        ASSERT_EQ(3, t.element(idx.begin(), idx.end()));
-
-        xarray<double> f = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
-
-        xarray<double> ft = xt::flip(f, 1);
-        xarray<double> expected_2 = {{{3, 4, 5},
-                                      {0, 1, 2}},
-                                     {{9, 10, 11},
-                                      {6, 7, 8}}};
-
-        ASSERT_EQ(expected_2, ft);
-        auto flipped_range = xt::flip(xt::stack(xt::xtuple(arange<double>(2), arange<double>(2))), 1);
-        xarray<double> expected_range = {{1, 0}, {1, 0}};
-        ASSERT_TRUE(all(equal(flipped_range, expected_range)));
-    }
-
     TEST(xbuilder, arange_broadcast)
     {
         auto a = arange<int>(1);

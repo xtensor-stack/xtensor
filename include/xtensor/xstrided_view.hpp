@@ -1611,6 +1611,61 @@ namespace xt
         }
         return result;
     }
+
+    template <class T>
+    struct make_signed_shape;
+
+    template <class E, std::size_t N>
+    struct make_signed_shape<std::array<E, N>>
+    {
+        using type = std::array<typename std::make_signed<E>::type, N>;
+    };
+
+    template <class E>
+    struct make_signed_shape<std::vector<E>>
+    {
+        using type = std::vector<typename std::make_signed<E>::type>;
+    };
+
+    template <class E>
+    struct make_signed_shape<xt::svector<E>>
+    {
+        using type = xt::svector<typename std::make_signed<E>::type>;
+    };
+
+    template <class T>
+    using make_signed_shape_t = typename make_signed_shape<T>::type;
+
+    /**
+     * @brief Reverse the order of elements in an xexpression along the given axis.
+     * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
+     * `fliplr(arr)` to `xt::flip(arr, 1)`.
+     *
+     * @param arr the input xexpression
+     * @param axis the axis along which elements should be reversed
+     *
+     * @return returns a view with the result of the flip
+     */
+    template <class E>
+    inline auto flip(E&& e, std::size_t axis)
+    {
+        using shape_type = typename std::decay_t<E>::shape_type;
+        using signed_shape_type = make_signed_shape_t<shape_type>;
+
+        signed_shape_type shape;
+        resize_container(shape, e.shape().size());
+        std::copy(e.shape().cbegin(), e.shape().cend(), shape.begin());
+
+        signed_shape_type strides;
+        auto&& old_strides = detail::get_strides(e);
+        resize_container(strides, old_strides.size());
+        std::copy(old_strides.cbegin(), old_strides.cend(), strides.begin());
+
+        strides[axis] *= -1;
+        std::size_t offset = old_strides[axis] * (e.shape()[axis] - 1);
+
+        return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), offset);
+    }
 }
 
 #endif
