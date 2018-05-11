@@ -6,13 +6,13 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_MATH_HPP
-#define BENCHMARK_MATH_HPP
-
 #include <chrono>
 #include <cstddef>
 #include <map>
 #include <string>
+
+#include <benchmark/benchmark.h>
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
@@ -272,5 +272,3 @@ namespace xt
         BENCHMARK_TEMPLATE(math_xtensor_1, rint_fn, xtensor<double, 2>)->Range(MATH_RANGE);
     }
 }
-
-#endif

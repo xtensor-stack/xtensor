@@ -6,12 +6,11 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_CONTAINER_HPP
-#define BENCHMARK_CONTAINER_HPP
-
 #include <cstddef>
 #include <chrono>
 #include <string>
+
+#include <benchmark/benchmark.h>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
@@ -203,5 +202,3 @@ namespace xt
         BENCHMARK_TEMPLATE(sum_assign, xtensor_container<xt::uvector<double>, 2>);
     }
 }
-
-#endif

@@ -6,10 +6,6 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-
-#ifndef BENCHMARK_SHAPE_HPP
-#define BENCHMARK_SHAPE_HPP
-
 #include <benchmark/benchmark.h>
 
 // #include "xtensor/xshape.hpp"
@@ -141,5 +137,3 @@ namespace xt
     // BENCHMARK_TEMPLATE(bm_no_adapter, uvector_type_i64_ra);
     // BENCHMARK_TEMPLATE(bm_no_adapter, uvector_type_i64_16);
 }
-
-#endif

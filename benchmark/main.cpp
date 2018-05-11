@@ -13,15 +13,6 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xarray.hpp"
 
-#include "benchmark_assign.cpp"
-#include "benchmark_increment_stepper.cpp"
-#include "benchmark_adapter.cpp"
-#include "benchmark_math.cpp"
-#include "benchmark_reducer.cpp"
-#include "benchmark_views.cpp"
-#include "benchmark_container.cpp"
-#include "benchmark_xshape.cpp"
-
 #ifdef XTENSOR_USE_XSIMD
 #ifdef __GNUC__
 template <class T>

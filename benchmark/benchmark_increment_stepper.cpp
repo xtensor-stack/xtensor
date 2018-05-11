@@ -6,9 +6,6 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_INCREMENT_STEPPER_HPP
-#define BENCHMARK_INCREMENT_STEPPER_HPP
-
 #include <benchmark/benchmark.h>
 
 #include "xtensor/xarray.hpp"
@@ -71,5 +68,3 @@ namespace xt
 
     }
 }
-
-#endif

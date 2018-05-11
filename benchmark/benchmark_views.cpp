@@ -6,14 +6,11 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_VIEWS_HPP
-#define BENCHMARK_VIEWS_HPP
-
-#include <benchmark/benchmark.h>
-
 #include <cstddef>
 #include <chrono>
 #include <string>
+
+#include <benchmark/benchmark.h>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
@@ -226,5 +223,3 @@ namespace xt
         BENCHMARK_CAPTURE(transpose_transpose_cm_rm, 10x20x500, {10, 20, 500});
     }
 }
-
-#endif

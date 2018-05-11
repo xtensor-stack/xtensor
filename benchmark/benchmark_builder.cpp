@@ -6,9 +6,6 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BUILDER_HPP
-#define BUILDER_HPP
-
 #include <benchmark/benchmark.h>
 
 #include "xtensor/xnoalias.hpp"
@@ -187,15 +184,15 @@ namespace xt
         }
     }
 
-    // inline auto std_fill(benchmark::State& state)
-    // {
-    //     for (auto _ : state)
-    //     {
-    //         xt::xarray<double> res(xt::dynamic_shape<std::size_t>{200, 200});
-    //         std::fill(res.begin(), res.end(), 1);
-       //      benchmark::DoNotOptimize(res.storage().data());
-    //     }
-    // }
+    inline auto std_fill(benchmark::State& state)
+    {
+        for (auto _ : state)
+        {
+            xt::xarray<double> res(xt::dynamic_shape<std::size_t>{200, 200});
+            std::fill(res.begin(), res.end(), 1);
+            benchmark::DoNotOptimize(res.storage().data());
+        }
+    }
 
     BENCHMARK_TEMPLATE(xarange, xarray<double>);
     BENCHMARK_TEMPLATE(xarange, xtensor<double, 1>);
@@ -219,4 +216,3 @@ namespace xt
     BENCHMARK(ones_expr_for);
     BENCHMARK(std_fill);
 }
-#endif

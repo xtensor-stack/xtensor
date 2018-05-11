@@ -6,9 +6,6 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_REDUCER_HPP
-#define BENCHMARK_REDUCER_HPP
-
 #include <benchmark/benchmark.h>
 
 #include "xtensor/xarray.hpp"
@@ -101,5 +98,3 @@ namespace xt
         BENCHMARK_CAPTURE(benchmark_strided_reducer, 100000x10/axis 0, v, res0, axis1);
     }
 }
-
-#endif
