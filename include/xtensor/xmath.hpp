@@ -14,6 +14,7 @@
 #define XTENSOR_MATH_HPP
 
 #include <cmath>
+#include <array>
 #include <complex>
 #include <type_traits>
 
@@ -2040,7 +2041,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an xarray
      */
     template <class T>
-    auto trapz(const xexpression<T>& y, typename T::value_type dx = 1.0, std::ptrdiff_t axis = -1)
+    auto trapz(const xexpression<T>& y, double dx = 1.0, std::ptrdiff_t axis = -1)
     {
         auto& yd = y.derived_cast();
         std::size_t saxis = static_cast<std::size_t>(axis);
@@ -2048,6 +2049,54 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         if (axis == -1)
         {
           saxis = yd.dimension() - 1;
+        }
+
+        slice_vector slice1(yd.dimension(), all());
+        slice_vector slice2(yd.dimension(), all());
+        slice1[saxis] = range(1, xnone());
+        slice2[saxis] = range(xnone(), yd.shape()[saxis] - 1);
+
+        auto trap = dx * (strided_view(yd, slice1) + strided_view(yd, slice2)) * 0.5;
+
+        return eval(sum(trap, {saxis}));
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Integrate along the given axis using the composite trapezoidal rule.
+     *
+     * Returns definite integral as approximated by trapezoidal rule. This function is not lazy (might change in the future).
+     * @param y an \ref xexpression
+     * @param x an \ref xexpression representing the sample points corresponding to the y values.
+     * @param axis the axis along which to integrate.
+     * @return an xarray
+     */
+    template <class T, class E>
+    auto trapz(const xexpression<T>& y, const xexpression<E>& x, std::ptrdiff_t axis = -1)
+    {
+        auto& yd = y.derived_cast();
+        auto& xd = x.derived_cast();
+        decltype(diff(x)) dx;
+
+        std::size_t saxis = static_cast<std::size_t>(axis);
+
+        if (axis == -1)
+        {
+            saxis = yd.dimension() - 1;
+        }
+
+        if (xd.dimension() == 1)
+        {
+            dx = diff(x);
+            typename std::decay_t<decltype(yd)>::shape_type shape;
+            resize_container(shape, yd.dimension());
+            std::fill(shape.begin(), shape.end(), 1);
+            shape[saxis] = dx.shape()[0];
+            dx.reshape(shape);
+        }
+        else
+        {
+            dx = diff(x, 1, axis);
         }
 
         slice_vector slice1(yd.dimension(), all());

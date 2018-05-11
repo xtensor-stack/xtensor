@@ -31,6 +31,10 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: trapz(const xexpression<T>&, typename T::value_type, std::ptrdiff_t)
    :project: xtensor
 
+.. _trapz-function-reference2:
+.. doxygenfunction:: trapz(const xexpression<T>&, const xexpression<E>&, std::ptrdiff_t)
+   :project: xtensor
+
 Defined in ``xtensor/xnorm.hpp``
 
 .. _norm-l0-func-ref:

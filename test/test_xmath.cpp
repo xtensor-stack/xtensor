@@ -731,5 +731,10 @@ namespace xt
         xt::xarray<int> c = {1, 2, 3};
         auto res4 = trapz(c, 2.0);
         EXPECT_EQ(res4[0], 8.0);
+
+        xt::xarray<int> d = {1, 2, 3};
+        xt::xarray<int> d_x = {4, 6, 8};
+        auto res5 = trapz(d, d_x);
+        EXPECT_EQ(res5[0], 8.0);
     }
 }
