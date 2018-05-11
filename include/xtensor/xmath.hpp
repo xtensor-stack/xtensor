@@ -1981,6 +1981,56 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     /**
      * @ingroup red_functions
+     * @brief Calculate the n-th discrete difference along the given axis.
+     *
+     * Calculate the n-th discrete difference along the given axis. This function is not lazy (might change in the future).
+     * @param a an \ref xexpression
+     * @param n The number of times values are differenced. If zero, the input is returned as-is. (optional)
+     * @param axis The axis along which the difference is taken, default is the last axis.
+     * @return an xarray
+     */
+    template <class T>
+    auto diff(const xexpression<T>& a, unsigned int n = 1, std::ptrdiff_t axis = -1)
+    {
+        auto ad = a.derived_cast();
+        std::size_t saxis = static_cast<std::size_t>(axis);
+
+        if (n == 0)
+        {
+            return eval(ad);
+        }
+
+        if (axis == -1)
+        {
+            saxis = ad.dimension() - 1;
+        }
+
+        slice_vector slice1(ad.dimension(), all());
+        slice_vector slice2(ad.dimension(), all());
+        slice1[saxis] = range(1, xnone());
+
+        if (std::is_same<typename T::value_type, bool>::value)
+        {
+            for (unsigned int i = 0; i < n; ++i)
+            {
+                slice2[saxis] = range(xnone(), ad.shape()[saxis] - 1);
+                ad = not_equal(strided_view(ad, slice1), strided_view(ad, slice2));
+            }
+        }
+        else
+        {
+            for (unsigned int i = 0; i < n; ++i)
+            {
+                slice2[saxis] = range(xnone(), ad.shape()[saxis] - 1);
+                ad = strided_view(ad, slice1) - strided_view(ad, slice2);
+            }
+        }
+
+        return eval(ad);
+    }
+
+    /**
+     * @ingroup red_functions
      * @brief Integrate along the given axis using the composite trapezoidal rule.
      *
      * Returns definite integral as approximated by trapezoidal rule. This function is not lazy (might change in the future).

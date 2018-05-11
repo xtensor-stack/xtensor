@@ -254,6 +254,8 @@ Mathematical functions
 +----------------------------------------+---------------------------------------------------------------------+
 | :ref:`mean <mean-function-reference>`  | mean of elements over given axes                                    |
 +----------------------------------------+---------------------------------------------------------------------+
+| :ref:`diff <diff-function-reference>`  | Calculate the n-th discrete difference along the given axis         |
++----------------------------------------+---------------------------------------------------------------------+
 | :ref:`trapz <trapz-function-reference>`| Integrate along the given axis using the composite trapezoidal rule |
 +----------------------------------------+---------------------------------------------------------------------+
 | :ref:`norm_l0 <norm-l0-func-ref>`      | L0 pseudo-norm over given axes                                      |
