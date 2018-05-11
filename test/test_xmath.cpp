@@ -693,6 +693,27 @@ namespace xt
         EXPECT_EQ(count_nonzeros(a, {1}, evaluation_strategy::immediate()), ea1);
     }
 
+    TEST(xmath, diff)
+    {
+        xt::xarray<int> a = {1, 2, 4, 7, 0};
+        xt::xarray<int> expected1 = {1,  2,  3, -7};
+        EXPECT_EQ(xt::diff(a), expected1);
+        xt::xarray<int> expected2 = {1, 1, -10};
+        EXPECT_EQ(xt::diff(a, 2), expected2);
+
+        xt::xarray<int> b = {{1, 3, 6, 10}, {0, 5, 6, 8}};
+        xt::xarray<int> expected3 = {{2, 3, 4}, {5, 1, 2}};
+        EXPECT_EQ(xt::diff(b), expected3);
+        xt::xarray<int> expected4 = {{-1, 2, 0, -2}};
+        EXPECT_EQ(xt::diff(b, 1, 0), expected4);
+
+        xt::xarray<bool> c = {{true, false, true}, {true, true, true}};
+        xt::xarray<bool> expected6 = {{true, true}, {false, false}};
+        EXPECT_EQ(xt::diff(c, 1), expected6);
+        xt::xarray<bool> expected7({2, 1}, false);
+        EXPECT_EQ(xt::diff(c, 2), expected7);
+    }
+
     TEST(xmath, trapz)
     {
         xt::xarray<int> a = {{0, 1, 2},
@@ -710,5 +731,10 @@ namespace xt
         xt::xarray<int> c = {1, 2, 3};
         auto res4 = trapz(c, 2.0);
         EXPECT_EQ(res4[0], 8.0);
+
+        xt::xarray<int> d = {1, 2, 3};
+        xt::xarray<int> d_x = {4, 6, 8};
+        auto res5 = trapz(d, d_x);
+        EXPECT_EQ(res5[0], 8.0);
     }
 }
