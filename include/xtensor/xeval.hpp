@@ -9,8 +9,7 @@
 #ifndef XTENSOR_EVAL_HPP
 #define XTENSOR_EVAL_HPP
 
-#include "xarray.hpp"
-#include "xtensor.hpp"
+#include "xtensor_forward.hpp"
 
 namespace xt
 {

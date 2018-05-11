@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xarray.hpp"
 #include "test_common.hpp"
 
 namespace xt

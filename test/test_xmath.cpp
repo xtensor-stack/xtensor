@@ -692,4 +692,23 @@ namespace xt
         EXPECT_EQ(count_nonzeros(a, {0}, evaluation_strategy::immediate()), ea0);
         EXPECT_EQ(count_nonzeros(a, {1}, evaluation_strategy::immediate()), ea1);
     }
+
+    TEST(xmath, trapz)
+    {
+        xt::xarray<int> a = {{0, 1, 2},
+                             {3, 4, 5}};
+        xt::xarray<double> expected1 = {1.5, 2.5, 3.5};
+        EXPECT_EQ(trapz(a, 1.0, 0), expected1);
+
+        xt::xarray<double> expected2 = {2.0, 8.0};
+        EXPECT_EQ(trapz(a, 1.0, 1), expected2);
+
+        xt::xarray<int> b = {1, 2, 3};
+        auto res3 = trapz(b);
+        EXPECT_EQ(res3[0], 4.0);
+
+        xt::xarray<int> c = {1, 2, 3};
+        auto res4 = trapz(c, 2.0);
+        EXPECT_EQ(res4[0], 8.0);
+    }
 }

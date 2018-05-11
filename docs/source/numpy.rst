@@ -333,6 +333,8 @@ hold any values and are computed upon access or assigmnent.
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.mean(a)``                                | ``xt::mean(a)``                               |
 +-----------------------------------------------+-----------------------------------------------+
+| ``np.trapz(a, dx=2.0, axis=-1)``              | ``xt::trapz(a, 2.0, -1)``                     |
++-----------------------------------------------+-----------------------------------------------+
 
 More generally, one can use the ``xt::reduce(function, input, axes)`` which allows the specification
 of an arbitrary binary function for the reduction. The binary function must be cummutative and
@@ -467,7 +469,7 @@ Linear algebra
 
 Many functions found in the ``numpy.linalg`` module are implemented in `xtensor-blas`_, a seperate package offering BLAS and LAPACK bindings, as well as a convenient interface replicating the ``linalg`` module.
 
-Please note, however, that while we're trying to be as close to NumPy as possible, some features are not 
+Please note, however, that while we're trying to be as close to NumPy as possible, some features are not
 implemented yet. Most prominently that is broadcasting for all functions except for ``dot``.
 
 
@@ -549,4 +551,3 @@ implemented yet. Most prominently that is broadcasting for all functions except 
 
 
 .. _`xtensor-blas`: https://github.com/QuantStack/xtensor-blas
-
