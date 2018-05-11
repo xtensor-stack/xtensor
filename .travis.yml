@@ -131,7 +131,7 @@ install:
         cmake -DXTENSOR_USE_XSIMD=ON -DBUILD_TESTS=ON ..;
       fi
     - make -j2 test_xtensor_lib
-    - if [[ "$BUILD_BENCHMARK" == 1]]; then
+    - if [[ "$BUILD_BENCHMARK" == 1 ]]; then
         make -j2 benchmark_xtensor ;
       fi
     - cd test
