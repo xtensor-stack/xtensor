@@ -6,20 +6,13 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_VIEWS_HPP
-#define BENCHMARK_VIEWS_HPP
+#ifndef BENCHMARK_REDUCER_HPP
+#define BENCHMARK_REDUCER_HPP
 
 #include <benchmark/benchmark.h>
 
-#include <cstddef>
-#include <chrono>
-#include <string>
-
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xnoalias.hpp"
-#include "xtensor/xstrides.hpp"
-#include "xtensor/xstrided_view.hpp"
+#include "xtensor/xreducer.hpp"
 
 namespace xt
 {
@@ -88,7 +81,7 @@ namespace xt
             {
                 for (std::size_t j = 0; j < res.shape()[0]; ++j)
                 {
-                    auto begin = x.raw_data() + (offset_iter * j);
+                    auto begin = x.data() + (offset_iter * j);
                     auto end = begin + offset_end;
                     value_type temp = *begin;
                     begin += stride;
@@ -106,35 +99,6 @@ namespace xt
         BENCHMARK_CAPTURE(benchmark_strided_reducer, 10x100000/axis 1, u, res1, axis1);
         BENCHMARK_CAPTURE(benchmark_strided_reducer, 100000x10/axis 1, v, res1, axis0);
         BENCHMARK_CAPTURE(benchmark_strided_reducer, 100000x10/axis 0, v, res0, axis1);
-    }
-
-    namespace stridedview
-    {
-
-        template <layout_type L1, layout_type L2>
-        inline auto benchmark_stridedview(benchmark::State& state, std::vector<std::size_t> shape)
-        {
-            xarray<double, L1> x = xt::arange<double>(compute_size(shape));
-            x.resize(shape);
-
-            xarray<double, L2> res;
-            res.resize(std::vector<std::size_t>(shape.rbegin(), shape.rend()));
-
-            while (state.KeepRunning())
-            {
-                res = transpose(x);
-            }
-        }
-
-        auto benchmark_stridedview_rm_rm = benchmark_stridedview<layout_type::row_major, layout_type::row_major>;
-        auto benchmark_stridedview_cm_cm = benchmark_stridedview<layout_type::column_major, layout_type::column_major>;
-        auto benchmark_stridedview_rm_cm = benchmark_stridedview<layout_type::row_major, layout_type::column_major>;
-        auto benchmark_stridedview_cm_rm = benchmark_stridedview<layout_type::column_major, layout_type::row_major>;
-
-        BENCHMARK_CAPTURE(benchmark_stridedview_rm_rm, 10x20x500, {10, 20, 500});
-        BENCHMARK_CAPTURE(benchmark_stridedview_cm_cm, 10x20x500, {10, 20, 500});
-        BENCHMARK_CAPTURE(benchmark_stridedview_rm_cm, 10x20x500, {10, 20, 500});
-        BENCHMARK_CAPTURE(benchmark_stridedview_cm_rm, 10x20x500, {10, 20, 500});
     }
 }
 

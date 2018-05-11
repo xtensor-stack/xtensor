@@ -6,8 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_VIEW_ITERATION_HPP
-#define BENCHMARK_VIEW_ITERATION_HPP
+#ifndef BENCHMARK_VIEWS_HPP
+#define BENCHMARK_VIEWS_HPP
 
 #include <benchmark/benchmark.h>
 
@@ -35,7 +35,7 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 std::copy(v.begin(), v.end(), res.begin());
@@ -63,7 +63,7 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 for(std::size_t k = 0; k < v.shape()[0]; ++k)
@@ -114,7 +114,7 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 xt::noalias(res) = v;
@@ -138,13 +138,13 @@ namespace xt
         }
 
         template <class V>
-        void assign_dynamic_view(benchmark::State& state)
+        void assign_strided_view(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
-            auto r = xt::dynamic_view(res, xt::slice_vector{xt::all()});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto r = xt::strided_view(res, xt::slice_vector{xt::all()});
 
             for (auto _ : state)
             {
@@ -169,13 +169,13 @@ namespace xt
         }
 
         template <class V>
-        void assign_dynamic_view_noalias(benchmark::State& state)
+        void assign_strided_view_noalias(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
-            auto r = xt::dynamic_view(res, xt::slice_vector{xt::all()});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto r = xt::strided_view(res, xt::slice_vector{xt::all()});
 
             for (auto _ : state)
             {
@@ -191,9 +191,39 @@ namespace xt
         BENCHMARK_TEMPLATE(loop_raw, float);
         BENCHMARK_TEMPLATE(assign, float);
         BENCHMARK_TEMPLATE(assign_view, float);
-        BENCHMARK_TEMPLATE(assign_dynamic_view, float);
+        BENCHMARK_TEMPLATE(assign_strided_view, float);
         BENCHMARK_TEMPLATE(assign_view_noalias, float);
-        BENCHMARK_TEMPLATE(assign_dynamic_view_noalias, float);
+        BENCHMARK_TEMPLATE(assign_strided_view_noalias, float);
+    }
+
+
+    namespace stridedview
+    {
+
+        template <layout_type L1, layout_type L2>
+        inline auto transpose_transpose(benchmark::State& state, std::vector<std::size_t> shape)
+        {
+            xarray<double, L1> x = xt::arange<double>(compute_size(shape));
+            x.resize(shape);
+
+            xarray<double, L2> res;
+            res.resize(std::vector<std::size_t>(shape.rbegin(), shape.rend()));
+
+            while (state.KeepRunning())
+            {
+                res = transpose(x);
+            }
+        }
+
+        auto transpose_transpose_rm_rm = transpose_transpose<layout_type::row_major, layout_type::row_major>;
+        auto transpose_transpose_cm_cm = transpose_transpose<layout_type::column_major, layout_type::column_major>;
+        auto transpose_transpose_rm_cm = transpose_transpose<layout_type::row_major, layout_type::column_major>;
+        auto transpose_transpose_cm_rm = transpose_transpose<layout_type::column_major, layout_type::row_major>;
+
+        BENCHMARK_CAPTURE(transpose_transpose_rm_rm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(transpose_transpose_cm_cm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(transpose_transpose_rm_cm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(transpose_transpose_cm_rm, 10x20x500, {10, 20, 500});
     }
 }
 

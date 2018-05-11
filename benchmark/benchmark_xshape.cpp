@@ -54,20 +54,19 @@ namespace xt
             }
         }
 
-
         BENCHMARK_TEMPLATE(bm_initializer, std::vector<std::size_t>);
-        BENCHMARK_TEMPLATE(bm_initializer,  xt::svector<std::size_t, 4>);
+        BENCHMARK_TEMPLATE(bm_initializer, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(bm_initializer, std::array<std::size_t, 4>);
-        BENCHMARK_TEMPLATE(bm_initializer,  xt::svector<std::size_t, 4>);
-        BENCHMARK_TEMPLATE(bm_initializer_long,  xt::svector<std::size_t, 4>);
+        BENCHMARK_TEMPLATE(bm_initializer, xt::svector<std::size_t, 4>);
+        BENCHMARK_TEMPLATE(bm_initializer_long, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(bm_initializer_long, xt::uvector<std::size_t>);
         BENCHMARK_TEMPLATE(bm_initializer_long, std::vector<std::size_t>);
-        BENCHMARK_TEMPLATE(bm_initializer,  xt::svector<std::size_t, 4>);
-        BENCHMARK_TEMPLATE(bm_initializer_long,  xt::svector<std::size_t, 4>);
-        BENCHMARK_TEMPLATE(bm_initializer,  xt::svector<std::size_t, 4>);
+        BENCHMARK_TEMPLATE(bm_initializer, xt::svector<std::size_t, 4>);
+        BENCHMARK_TEMPLATE(bm_initializer_long, xt::svector<std::size_t, 4>);
+        BENCHMARK_TEMPLATE(bm_initializer, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(bm_access, xt::uvector<double>);
         BENCHMARK_TEMPLATE(bm_access, std::vector<double>);
-        BENCHMARK_TEMPLATE(bm_access,  xt::svector<std::size_t, 4>);
+        BENCHMARK_TEMPLATE(bm_access, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(bm_access, std::array<std::size_t, 4>);
     }
 }
