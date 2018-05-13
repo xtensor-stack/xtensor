@@ -207,7 +207,7 @@ namespace xt
             xarray<double, L2> res;
             res.resize(std::vector<std::size_t>(shape.rbegin(), shape.rend()));
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 res = transpose(x);
             }

@@ -74,7 +74,7 @@ namespace xt
 
             auto f = F();
 
-            while(state.KeepRunning())
+            for (auto _ : state)
             {
                 benchmark::DoNotOptimize(xt::noalias(res) = f(lhs, rhs));
             }
@@ -88,7 +88,7 @@ namespace xt
 
             auto f = F();
 
-            while(state.KeepRunning())
+            for (auto _ : state)
             {
                 benchmark::DoNotOptimize(xt::noalias(res) = f(lhs));
             }
@@ -102,7 +102,7 @@ namespace xt
             init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
             size_t size = lhs.shape()[0] * lhs.shape()[1];
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 for (std::size_t i = 0; i < size; ++i)
                 {
@@ -119,7 +119,7 @@ namespace xt
             init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
             size_t size = lhs.shape()[0] * lhs.shape()[1];
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 for (std::size_t i = 0; i < size; ++i)
                 {

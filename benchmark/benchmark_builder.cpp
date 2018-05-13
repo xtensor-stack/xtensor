@@ -30,7 +30,7 @@ namespace xt
         for (auto _ : state)
         {
             T res = T::from_shape({10000});
-            for (int i = 0; i < 10000; ++i)
+            for (std::size_t i = 0; i < 10000; ++i)
             {
                 res.storage()[i] = i;
             }
@@ -154,8 +154,8 @@ namespace xt
         {
             xt::xtensor<double, 2> res(xt::static_shape<size_t, 2>({200, 200}));
             auto xo = xt::ones<double>({200, 200}) * 0.15;
-            for (int i = 0; i < xo.shape()[0]; ++i)
-                for (int j = 0; j < xo.shape()[1]; ++j)
+            for (std::size_t i = 0; i < xo.shape()[0]; ++i)
+                for (std::size_t j = 0; j < xo.shape()[1]; ++j)
                     res(i, j) = xo(i, j);
             benchmark::DoNotOptimize(res.storage().data());
         }

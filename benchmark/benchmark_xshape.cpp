@@ -23,7 +23,7 @@ namespace xt
         template <class T>
         void bm_initializer(benchmark::State& state)
         {
-            while(state.KeepRunning())
+            for (auto _ : state)
             {
                 T sv({2,3,1});
                 benchmark::DoNotOptimize(sv.data());
@@ -33,7 +33,7 @@ namespace xt
         template <class T>
         void bm_initializer_long(benchmark::State& state)
         {
-            while(state.KeepRunning())
+            for (auto _ : state)
             {
                 T sv({2, 3, 1, 2, 6, 1, 2, 3, 45, 6, 12, 3, 5, 45, 5, 6});
                 benchmark::DoNotOptimize(sv.data());
@@ -44,7 +44,7 @@ namespace xt
         void bm_access(benchmark::State& state)
         {
             T a({3,2,1,3});
-            while(state.KeepRunning())
+            for (auto _ : state)
             {
                 a[0] = a[1] * a[2] + a[3];
                 a[3] = a[1];

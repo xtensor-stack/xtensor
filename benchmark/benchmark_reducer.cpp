@@ -18,7 +18,7 @@ namespace xt
         template <class E, class X>
         void benchmark_reducer(benchmark::State& state, const E& x, E& res, const X& axes)
         {
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 res = sum(x, axes);
                 benchmark::DoNotOptimize(res.data());
@@ -28,7 +28,7 @@ namespace xt
         template <class E, class X>
         void benchmark_immediate_reducer(benchmark::State& state, const E& x, E& res, const X& axes)
         {
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 res = sum(x, axes, evaluation_strategy::immediate());
                 benchmark::DoNotOptimize(res.data());
@@ -74,7 +74,7 @@ namespace xt
                 offset_iter = x.strides()[1];
             }
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 for (std::size_t j = 0; j < res.shape()[0]; ++j)
                 {

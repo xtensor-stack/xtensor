@@ -45,7 +45,7 @@ namespace xt
             E x, y, res;
             init_benchmark(x, y, res, state.range(0));
             value_type a = value_type(2.7);
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 auto iterx = x.begin();
                 auto itery = y.begin();
@@ -69,7 +69,7 @@ namespace xt
             init_benchmark(x, y, res, state.range(0));
             value_type a = value_type(2.7);
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 auto iterx = x.begin();
                 auto itery = y.begin();
@@ -94,7 +94,7 @@ namespace xt
             init_benchmark(x, y, res, state.range(0));
             value_type a = value_type(2.7);
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 size_type n = x.size();
                 for (size_type i = 0; i < n; ++i)
@@ -147,7 +147,7 @@ namespace xt
             E x, y, z, res;
             init_benchmark(x, y, z, res);
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 res = 3 * x - 2 * y * z;
             }
@@ -190,7 +190,7 @@ namespace xt
             E x, y, res;
             init_benchmark(x, y, res);
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 res = 3 * x - 2 * y;
             }
