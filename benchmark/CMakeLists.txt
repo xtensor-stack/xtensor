@@ -122,8 +122,6 @@ set(XTENSOR_BENCHMARK
 set(XTENSOR_BENCHMARK_TARGET benchmark_xtensor)
 add_executable(${XTENSOR_BENCHMARK_TARGET} EXCLUDE_FROM_ALL ${XTENSOR_BENCHMARK} ${XTENSOR_HEADERS})
 target_link_libraries(${XTENSOR_BENCHMARK_TARGET} xtensor ${GBENCHMARK_LIBRARIES})
-file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/upload_benchmark.py
-     DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 add_custom_target(xbenchmark
     COMMAND benchmark_xtensor
@@ -134,5 +132,4 @@ add_custom_target(xpowerbench
     COMMAND sudo cpupower frequency-set --governor performance
     COMMAND benchmark_xtensor --benchmark_out=results.csv --benchmark_out_format=csv
     COMMAND sudo cpupower frequency-set --governor powersave
-    COMMAND python3 upload_benchmark.py
     DEPENDS ${XTENSOR_BENCHMARK_TARGET})
