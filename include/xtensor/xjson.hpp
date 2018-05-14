@@ -77,7 +77,7 @@ namespace xt
             {
                 using size_type = typename D::size_type;
                 size_type nrows = view.shape()[0];
-                for (auto i = 0; i != nrows; ++i)
+                for (size_type i = 0; i != nrows; ++i)
                 {
                     slices.push_back(i);
                     const nlohmann::json& k = j[i];

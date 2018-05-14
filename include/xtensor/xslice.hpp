@@ -335,13 +335,12 @@ namespace xt
     template <class T, std::size_t N>
     auto islice(const T (&cont)[N])
     {
-        return xislice<std::array<T, N>>(xtl::forward_sequence<std::array<T, N>>(cont));
+        return xislice<std::array<std::size_t, N>>(xtl::forward_sequence<std::array<std::size_t, N>>(cont));
     }
 #else
-    template <class I>
-    auto islice(std::initializer_list<I> cont)
+    auto islice(std::initializer_list<std::size_t> cont)
     {
-        return xislice<std::vector<I>>(cont);
+        return xislice<std::vector<std::size_t>>(cont);
     }
 #endif
 
