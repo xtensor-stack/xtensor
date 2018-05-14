@@ -35,7 +35,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 BOUND_CHECKS=1
+      env: COMPILER=gcc GCC=6 BOUND_CHECKS=1 BUILD_BENCHMARK=1
     - os: linux
       addons:
         apt:
@@ -122,7 +122,7 @@ install:
     - mkdir build
     - cd build
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
-        cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON ..;
+        cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON -DBUILD_BENCHMARK=ON ..;
       elif [[ "$COLUMN_MAJOR_LAYOUT" == 1 ]]; then
         cmake -DBUILD_TESTS=ON -DDEFAULT_COLUMN_MAJOR=ON ..;
       elif [[ "$DISABLE_XSIMD" == 1 ]]; then
@@ -131,6 +131,9 @@ install:
         cmake -DXTENSOR_USE_XSIMD=ON -DBUILD_TESTS=ON ..;
       fi
     - make -j2 test_xtensor_lib
+    - if [[ "$BUILD_BENCHMARK" == 1 ]]; then
+        make -j2 benchmark_xtensor ;
+      fi
     - cd test
 script:
     - ./test_xtensor_lib

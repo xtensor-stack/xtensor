@@ -6,20 +6,18 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_VIEW_ITERATION_HPP
-#define BENCHMARK_VIEW_ITERATION_HPP
-
-#include <benchmark/benchmark.h>
-
 #include <cstddef>
 #include <chrono>
 #include <string>
 
+#include <benchmark/benchmark.h>
+
 #include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
 #include "xtensor/xnoalias.hpp"
-#include "xtensor/xstrides.hpp"
 #include "xtensor/xstrided_view.hpp"
+#include "xtensor/xstrides.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -30,12 +28,12 @@ namespace xt
         constexpr int SIZE = 1000;
 
         template <class V>
-        void dynamic_iterator(benchmark::State& state)
+        void view_dynamic_iterator(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 std::copy(v.begin(), v.end(), res.begin());
@@ -44,7 +42,7 @@ namespace xt
         }
 
         template <class V>
-        void iterator(benchmark::State& state)
+        void view_iterator(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
@@ -58,12 +56,12 @@ namespace xt
         }
 
         template <class V>
-        void loop(benchmark::State& state)
+        void view_loop(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 for(std::size_t k = 0; k < v.shape()[0]; ++k)
@@ -75,7 +73,7 @@ namespace xt
         }
 
         template <class V>
-        void loop_view(benchmark::State& state)
+        void view_loop_view(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
@@ -92,7 +90,7 @@ namespace xt
         }
 
         template <class V>
-        void loop_raw(benchmark::State& state)
+        void view_loop_raw(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
@@ -109,12 +107,12 @@ namespace xt
         }
 
         template <class V>
-        void assign(benchmark::State& state)
+        void view_assign(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 xt::noalias(res) = v;
@@ -123,7 +121,7 @@ namespace xt
         }
 
         template <class V>
-        void assign_view(benchmark::State& state)
+        void view_assign_view(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
@@ -138,13 +136,13 @@ namespace xt
         }
 
         template <class V>
-        void assign_dynamic_view(benchmark::State& state)
+        void view_assign_strided_view(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
-            auto r = xt::dynamic_view(res, xt::slice_vector{xt::all()});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto r = xt::strided_view(res, xt::slice_vector{xt::all()});
 
             for (auto _ : state)
             {
@@ -154,7 +152,7 @@ namespace xt
         }
 
         template <class V>
-        void assign_view_noalias(benchmark::State& state)
+        void view_assign_view_noalias(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
@@ -169,13 +167,13 @@ namespace xt
         }
 
         template <class V>
-        void assign_dynamic_view_noalias(benchmark::State& state)
+        void view_assign_strided_view_noalias(benchmark::State& state)
         {
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::dynamic_view(data, xt::slice_vector{xt::all(), SIZE/2});
-            auto r = xt::dynamic_view(res, xt::slice_vector{xt::all()});
+            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto r = xt::strided_view(res, xt::slice_vector{xt::all()});
 
             for (auto _ : state)
             {
@@ -184,17 +182,45 @@ namespace xt
             }
         }
 
-        BENCHMARK_TEMPLATE(dynamic_iterator, float);
-        BENCHMARK_TEMPLATE(iterator, float);
-        BENCHMARK_TEMPLATE(loop, float);
-        BENCHMARK_TEMPLATE(loop_view, float);
-        BENCHMARK_TEMPLATE(loop_raw, float);
-        BENCHMARK_TEMPLATE(assign, float);
-        BENCHMARK_TEMPLATE(assign_view, float);
-        BENCHMARK_TEMPLATE(assign_dynamic_view, float);
-        BENCHMARK_TEMPLATE(assign_view_noalias, float);
-        BENCHMARK_TEMPLATE(assign_dynamic_view_noalias, float);
+        BENCHMARK_TEMPLATE(view_dynamic_iterator, float);
+        BENCHMARK_TEMPLATE(view_iterator, float);
+        BENCHMARK_TEMPLATE(view_loop, float);
+        BENCHMARK_TEMPLATE(view_loop_view, float);
+        BENCHMARK_TEMPLATE(view_loop_raw, float);
+        BENCHMARK_TEMPLATE(view_assign, float);
+        BENCHMARK_TEMPLATE(view_assign_view, float);
+        BENCHMARK_TEMPLATE(view_assign_strided_view, float);
+        BENCHMARK_TEMPLATE(view_assign_view_noalias, float);
+        BENCHMARK_TEMPLATE(view_assign_strided_view_noalias, float);
+    }
+
+
+    namespace stridedview
+    {
+
+        template <layout_type L1, layout_type L2>
+        inline auto transpose_assign(benchmark::State& state, std::vector<std::size_t> shape)
+        {
+            xarray<double, L1> x = xt::arange<double>(compute_size(shape));
+            x.resize(shape);
+
+            xarray<double, L2> res;
+            res.resize(std::vector<std::size_t>(shape.rbegin(), shape.rend()));
+
+            for (auto _ : state)
+            {
+                res = transpose(x);
+            }
+        }
+
+        auto transpose_assign_rm_rm = transpose_assign<layout_type::row_major, layout_type::row_major>;
+        auto transpose_assign_cm_cm = transpose_assign<layout_type::column_major, layout_type::column_major>;
+        auto transpose_assign_rm_cm = transpose_assign<layout_type::row_major, layout_type::column_major>;
+        auto transpose_assign_cm_rm = transpose_assign<layout_type::column_major, layout_type::row_major>;
+
+        BENCHMARK_CAPTURE(transpose_assign_rm_rm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(transpose_assign_cm_cm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(transpose_assign_rm_cm, 10x20x500, {10, 20, 500});
+        BENCHMARK_CAPTURE(transpose_assign_cm_rm, 10x20x500, {10, 20, 500});
     }
 }
-
-#endif

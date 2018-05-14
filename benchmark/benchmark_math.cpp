@@ -6,13 +6,13 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef BENCHMARK_MATH_HPP
-#define BENCHMARK_MATH_HPP
-
 #include <chrono>
 #include <cstddef>
 #include <map>
 #include <string>
+
+#include <benchmark/benchmark.h>
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xtensor.hpp"
@@ -74,9 +74,26 @@ namespace xt
 
             auto f = F();
 
-            while(state.KeepRunning())
+            for (auto _ : state)
             {
-                benchmark::DoNotOptimize(xt::noalias(res) = f(lhs, rhs));
+                xt::noalias(res) = f(lhs, rhs);
+                benchmark::DoNotOptimize(res.data());
+            }
+        }
+
+        template <class F, class V>
+        inline void math_xtensor_cpy_2(benchmark::State& state)
+        {
+            xtensor<double, 2> lhs, rhs, res;
+            init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
+
+            auto f = F();
+
+            for (auto _ : state)
+            {
+                auto fct = f(lhs, rhs);
+                std::copy(fct.storage_begin(), fct.storage_end(), res.storage_begin());
+                benchmark::DoNotOptimize(res.data());
             }
         }
 
@@ -88,9 +105,10 @@ namespace xt
 
             auto f = F();
 
-            while(state.KeepRunning())
+            for (auto _ : state)
             {
-                benchmark::DoNotOptimize(xt::noalias(res) = f(lhs));
+                xt::noalias(res) = f(lhs);
+                benchmark::DoNotOptimize(res.data());
             }
         }
 
@@ -102,12 +120,13 @@ namespace xt
             init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
             size_t size = lhs.shape()[0] * lhs.shape()[1];
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 for (std::size_t i = 0; i < size; ++i)
                 {
-                    benchmark::DoNotOptimize(res.data()[i] = f(lhs.data()[i], res.data()[i]));
+                    res.data()[i] = f(lhs.data()[i], res.data()[i]);
                 }
+                benchmark::DoNotOptimize(res.data());
             }
         }
 
@@ -119,12 +138,13 @@ namespace xt
             init_xtensor_benchmark(lhs, rhs, res, state.range(0), state.range(0));
             size_t size = lhs.shape()[0] * lhs.shape()[1];
 
-            while (state.KeepRunning())
+            for (auto _ : state)
             {
                 for (std::size_t i = 0; i < size; ++i)
                 {
-                    benchmark::DoNotOptimize(res.data()[i] = f(lhs.data()[i]));
+                    res.data()[i] = f(lhs.data()[i]);
                 }
+                benchmark::DoNotOptimize(res.data());
             }
         }
 
@@ -198,15 +218,19 @@ namespace xt
 
         BENCHMARK_TEMPLATE(math_ref_2, add_fn)->Range(MATH_RANGE);
         BENCHMARK_TEMPLATE(math_xtensor_2, add_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_cpy_2, add_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
         BENCHMARK_TEMPLATE(math_ref_2, sub_fn)->Range(MATH_RANGE);
         BENCHMARK_TEMPLATE(math_xtensor_2, sub_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_cpy_2, sub_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
         BENCHMARK_TEMPLATE(math_ref_2, mul_fn)->Range(MATH_RANGE);
         BENCHMARK_TEMPLATE(math_xtensor_2, mul_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_cpy_2, mul_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
         BENCHMARK_TEMPLATE(math_ref_2, div_fn)->Range(MATH_RANGE);
         BENCHMARK_TEMPLATE(math_xtensor_2, div_fn, xtensor<double, 2>)->Range(MATH_RANGE);
+        BENCHMARK_TEMPLATE(math_xtensor_cpy_2, div_fn, xtensor<double, 2>)->Range(MATH_RANGE);
 
         BENCHMARK_TEMPLATE(math_ref_1, exp_fn)->Range(MATH_RANGE);
         BENCHMARK_TEMPLATE(math_xtensor_1, exp_fn, xtensor<double, 2>)->Range(MATH_RANGE);
@@ -272,5 +296,3 @@ namespace xt
         BENCHMARK_TEMPLATE(math_xtensor_1, rint_fn, xtensor<double, 2>)->Range(MATH_RANGE);
     }
 }
-
-#endif
