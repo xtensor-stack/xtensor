@@ -776,7 +776,7 @@ namespace xt
     {
         std::array<std::size_t, 3> sh{2,2,2};
         xtensor<double, 3> a(sh);
-        xtensorf<double, xshape<2, 2, 2>> af = a;
+        xtensor_fixed<double, xshape<2, 2, 2>> af = a;
         xarray<double> b = a;
 
         auto av = view(a, 1, 1);

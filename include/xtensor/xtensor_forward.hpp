@@ -125,7 +125,7 @@ namespace xt
 
     /**
      * @typedef xshape
-     * Alias template for ``fixed_shape`` allows for a shorter template shape definition in ``xtensorf``.
+     * Alias template for ``fixed_shape`` allows for a shorter template shape definition in ``xtensor_fixed``.
      */
     template <std::size_t... N>
     using xshape = fixed_shape<N...>;
@@ -137,12 +137,12 @@ namespace xt
     class xfixed_adaptor;
 
     /**
-     * @typedef xtensorf
+     * @typedef xtensor_fixed
      * Alias template on xfixed_container with default parameters for layout
      * type. This allows to write
      *
      * \code{.cpp}
-     * xt::xtensorf<double, xt::xshape<2, 2>> a = {{1., 2.}, {3., 4.}};
+     * xt::xtensor_fixed<double, xt::xshape<2, 2>> a = {{1., 2.}, {3., 4.}};
      * \endcode
      *
      * instead of the syntax
@@ -159,7 +159,7 @@ namespace xt
     template <class T,
               class FS,
               layout_type L = XTENSOR_DEFAULT_LAYOUT>
-    using xtensorf = xfixed_container<T, FS, L>;
+    using xtensor_fixed = xfixed_container<T, FS, L>;
 
     /**
      * @typedef xtensor_optional
