@@ -303,7 +303,7 @@ namespace xt
      * @tparam S The xshape template paramter of the container. 
      * @tparam L The layout_type of the tensor.
      * @tparam Tag The expression tag.
-     * @sa xtensorf
+     * @sa xtensor_fixed
      */
     template <class ET, class S, layout_type L, class Tag>
     class xfixed_container : public xcontainer<xfixed_container<ET, S, L, Tag>>,
@@ -636,7 +636,7 @@ namespace xt
     {
         if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size() && layout == L))
         {
-            throw std::runtime_error("Trying to reshape xtensorf with different shape or layout.");
+            throw std::runtime_error("Trying to reshape xtensor_fixed with different shape or layout.");
         }
     }
 

@@ -91,13 +91,13 @@ namespace xt
 #endif
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf) with uninitialized values of
+     * Create a xcontainer (xarray, xtensor or xtensor_fixed) with uninitialized values of
      * with value_type T and shape. Selects the best container match automatically
      * from the supplied shape.
      *
      * - ``std::vector`` → ``xarray<T>``
      * - ``std::array`` or ``initializer_list`` → ``xtensor<T, N>``
-     * - ``xshape<N...>`` → ``xtensorf<T, xshape<N...>>``
+     * - ``xshape<N...>`` → ``xtensor_fixed<T, xshape<N...>>``
      *
      * @param shape shape of the new xcontainer
      */
@@ -124,13 +124,13 @@ namespace xt
 #endif
 
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, std::size_t... N>
-    inline xtensorf<T, fixed_shape<N...>, L> empty(const fixed_shape<N...>& /*shape*/)
+    inline xtensor_fixed<T, fixed_shape<N...>, L> empty(const fixed_shape<N...>& /*shape*/)
     {
-        return xtensorf<T, fixed_shape<N...>, L>();
+        return xtensor_fixed<T, fixed_shape<N...>, L>();
     }
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf) with uninitialized values of
+     * Create a xcontainer (xarray, xtensor or xtensor_fixed) with uninitialized values of
      * the same shape, value type and layout as the input xexpression *e*.
      *
      * @param e the xexpression from which to extract shape, value type and layout.
@@ -143,7 +143,7 @@ namespace xt
     }
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf), filled with *fill_value* and of
+     * Create a xcontainer (xarray, xtensor or xtensor_fixed), filled with *fill_value* and of
      * the same shape, value type and layout as the input xexpression *e*.
      *
      * @param e the xexpression from which to extract shape, value type and layout.
@@ -157,7 +157,7 @@ namespace xt
     }
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf), filled with zeros and of
+     * Create a xcontainer (xarray, xtensor or xtensor_fixed), filled with zeros and of
      * the same shape, value type and layout as the input xexpression *e*.
      *
      * Note: contrary to zeros(shape), this function returns a non-lazy, allocated container!
@@ -172,7 +172,7 @@ namespace xt
     }
 
     /**
-     * Create a xcontainer (xarray, xtensor or xtensorf), filled with ones and of
+     * Create a xcontainer (xarray, xtensor or xtensor_fixed), filled with ones and of
      * the same shape, value type and layout as the input xexpression *e*.
      *
      * Note: contrary to ones(shape), this function returns a non-lazy, evaluated container!

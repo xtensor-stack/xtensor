@@ -184,7 +184,7 @@ namespace xt
         EXPECT_TRUE(b);
         b = has_data_interface<const xtensor<double, 2>>::value;
         EXPECT_TRUE(b);
-        b = has_data_interface<const xtensorf<double, xshape<3, 4>>>::value;
+        b = has_data_interface<const xtensor_fixed<double, xshape<3, 4>>>::value;
         EXPECT_TRUE(b);
 
         xarray<int> a = xarray<int>::from_shape({3, 4, 5});

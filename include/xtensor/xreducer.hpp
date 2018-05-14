@@ -71,7 +71,7 @@ namespace xt
     };
 
     template <class T, std::size_t... N, layout_type L, class X, std::size_t NX, class result_type>
-    struct xreducer_result_container<xtensorf<T, xshape<N...>, L>, std::array<X, NX>, result_type>
+    struct xreducer_result_container<xtensor_fixed<T, xshape<N...>, L>, std::array<X, NX>, result_type>
     {
         using type = xtensor<result_type, sizeof...(N) - NX, L>;
     };

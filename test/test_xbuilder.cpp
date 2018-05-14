@@ -38,7 +38,7 @@ namespace xt
     {
         bool type_equal = false;
         auto arr = xarray<int>::from_shape({3,2,5});
-        auto xfx = xtensorf<int, xt::xshape<3, 3, 3>>();
+        auto xfx = xtensor_fixed<int, xt::xshape<3, 3, 3>>();
 
         auto onas = ones_like(arr);
         EXPECT_EQ(onas.shape(), arr.shape());
@@ -451,12 +451,12 @@ namespace xt
         EXPECT_TRUE(b);
 
         auto e2 = empty<double>(xshape<3, 3, 3>());
-        b = std::is_same<decltype(e2), xtensorf<double, xshape<3, 3, 3>>>::value;
+        b = std::is_same<decltype(e2), xtensor_fixed<double, xshape<3, 3, 3>>>::value;
         EXPECT_TRUE(b);
 
         auto shapef = xshape<3, 2>();
         auto e22 = empty<double, layout_type::column_major>(shapef);
-        b = std::is_same<decltype(e22), xtensorf<double, xshape<3, 2>, layout_type::column_major>>::value;
+        b = std::is_same<decltype(e22), xtensor_fixed<double, xshape<3, 2>, layout_type::column_major>>::value;
         EXPECT_TRUE(b);
 
         xt::dynamic_shape<std::size_t> sd = {3, 2, 1};

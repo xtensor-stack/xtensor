@@ -317,7 +317,7 @@ namespace xt
 
     TEST(xreducer, xfixed_reduction)
     {
-        xtensorf<double, xshape<3, 3, 3>> a;
+        xtensor_fixed<double, xshape<3, 3, 3>> a;
         std::iota(a.storage().begin(), a.storage().end(), 0);
 
         xtensor<double, 3> b;

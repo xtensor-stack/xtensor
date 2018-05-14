@@ -17,7 +17,7 @@
 // when used for a function parameter, even indirectly. This means that
 // we cannot pass parameters whose class is declared with alignas specifier
 // or any type wrapping or inheriting from such a type.
-// The xtensorf class internally uses aligned_array which is declared as
+// The xtensor_fixed class internally uses aligned_array which is declared as
 // alignas(something_different_from_0), hence the workaround.
 #if _MSC_VER < 1910 && !_WIN64
 #define VS_X86_WORKAROUND 1
@@ -27,10 +27,10 @@
 
 namespace xt
 {
-    using xtensorf3x4 = xtensorf<double, xt::xshape<3, 4>>;
-    using xtensorf4 = xtensorf<double, xt::xshape<4>>;
+    using xtensorf3x4 = xtensor_fixed<double, xt::xshape<3, 4>>;
+    using xtensorf4 = xtensor_fixed<double, xt::xshape<4>>;
 
-    TEST(xtensorf, basic)
+    TEST(xtensor_fixed, basic)
     {
         xtensorf3x4 a({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
         xtensorf3x4 b({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
@@ -46,7 +46,7 @@ namespace xt
 #endif
     }
 
-    TEST(xtensorf, broadcast)
+    TEST(xtensor_fixed, broadcast)
     {
         xtensorf3x4 a({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
         xtensorf4 b({4, 5, 6, 7});
@@ -79,9 +79,9 @@ namespace xt
         EXPECT_THROW(a.reshape({3, 4}, layout_type::any), std::runtime_error);
     }
 
-    TEST(xtensorf, strides)
+    TEST(xtensor_fixed, strides)
     {
-        xtensorf<double, xshape<3, 7, 2, 5, 3>, layout_type::row_major> arm;
+        xtensor_fixed<double, xshape<3, 7, 2, 5, 3>, layout_type::row_major> arm;
         xtensor<double, 5, layout_type::row_major> brm = xtensor<double, 5, layout_type::row_major>::from_shape({3, 7, 2, 5, 3});
 
         EXPECT_TRUE(std::equal(arm.strides().begin(), arm.strides().end(), brm.strides().begin()));
@@ -90,7 +90,7 @@ namespace xt
         EXPECT_EQ(arm.backstrides().size(), brm.backstrides().size());
         EXPECT_EQ(arm.size(), 3 * 7 * 2 * 5 * 3);
 
-        xtensorf<double, xshape<3, 7, 2, 5, 3>, layout_type::column_major> acm;
+        xtensor_fixed<double, xshape<3, 7, 2, 5, 3>, layout_type::column_major> acm;
         xtensor<double, 5, layout_type::column_major> bcm = xtensor<double, 5, layout_type::column_major>::from_shape({3, 7, 2, 5, 3});
 
         EXPECT_TRUE(std::equal(acm.strides().begin(), acm.strides().end(), bcm.strides().begin()));
@@ -110,7 +110,7 @@ namespace xt
         EXPECT_EQ(sc[2], 12);
     }
 
-    TEST(xtensorf, adapt)
+    TEST(xtensor_fixed, adapt)
     {
         std::vector<double> a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         std::vector<double> b = a;
@@ -128,11 +128,11 @@ namespace xt
         EXPECT_EQ(a[0], 2);
     }
 
-    TEST(xtensorf, layout)
+    TEST(xtensor_fixed, layout)
     {
-        xtensorf<double, xshape<2, 2>, layout_type::row_major> a;
+        xtensor_fixed<double, xshape<2, 2>, layout_type::row_major> a;
         EXPECT_EQ(a.layout(), layout_type::row_major);
-        xtensorf<double, xshape<2, 2>, layout_type::column_major> b;
+        xtensor_fixed<double, xshape<2, 2>, layout_type::column_major> b;
         EXPECT_EQ(b.layout(), layout_type::column_major);
     }
 }
