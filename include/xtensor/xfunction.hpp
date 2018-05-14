@@ -94,7 +94,7 @@ namespace xt
         };
 
         template <class F, class R>
-        struct simd_return_type<F, R, void_t<decltype(&F::simd_apply)>>
+        struct simd_return_type<F, R, void_t<decltype(&F::template simd_apply<R>)>>
         {
             using type = R;
         };
