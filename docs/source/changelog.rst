@@ -10,8 +10,83 @@ Changelog
 0.16.0
 ------
 
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- ``data`` renamed in ``storage``, ``raw_data`` renamed in ``data``
+  `#792 <https://github.com/QuantStack/xtensor/pull/792>`_.
+- Added layout template parameter to ``xstrided_view``
+  `#796 <https://github.com/QuantStack/xtensor/pull/796>`_.
+- Remove equality operator from stepper
+  `#824 <https://github.com/QuantStack/xtensor/pull/824>`_.
+- ``dynamic_view`` renamed in ``strided_view``
+  `#832 <https://github.com/QuantStack/xtensor/pull/832>`_.
+- ``xtensorf`` renamed in ``xtensor_fixed``
+  `#846 <https://github.com/QuantStack/xtensor/pull/846>`_.
+
+New features
+~~~~~~~~~~~~
+
+- Added strided view selector
+  `#765 <https://github.com/QuantStack/xtensor/pull/765>`_.
+- Added ``count_nonzeros``
+  `#781 <https://github.com/QuantStack/xtensor/pull/781>`_.
+- Added implicit conversion to scalar in ``xview``
+  `#788 <https://github.com/QuantStack/xtensor/pull/788>`_.
+- Added tracking allocators to ``xutils.hpp``
+  `#789 <https://github.com/QuantStack/xtensor/pull/789>`_.
+- ``xindexslice`` and ``shuffle`` function
+  `#804 <https://github.com/QuantStack/xtensor/pull/804>`_.
+- Allow ``xadapt`` with dynamic layout
+  `#816 <https://github.com/QuantStack/xtensor/pull/816>`_.
+- Added ``xtensorf`` initialization from C array
+  `#819 <https://github.com/QuantStack/xtensor/pull/819>`_.
+- Added policy to allocation tracking for throw option
+  `#820 <https://github.com/QuantStack/xtensor/pull/820>`_.
+- Free function ``empty`` for construction from shape
+  `#827 <https://github.com/QuantStack/xtensor/pull/827>`_.
 - Support for JSON serialization and deserialization of xtensor expressions
   `#830 <https://github.com/QuantStack/xtensor/pull/830>`_.
+- Add ``trapz`` function
+  `#837 <https://github.com/QuantStack/xtensor/pull/837>`_.
+- Add ``diff`` and ``trapz(y, x)`` functions
+  `#841 <https://github.com/QuantStack/xtensor/pull/841>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- Added fast path for specific assigns
+  `#767 <https://github.com/QuantStack/xtensor/pull/767>`_.
+- Renamed internal macros to prevent collisions
+  `#772 <https://github.com/QuantStack/xtensor/pull/772>`_.
+- ``dynamic_view`` unwrapping
+  `#775 <https://github.com/QuantStack/xtensor/pull/775>`_.
+- ``xreducer_stepper`` copy semantic fixed
+  `#785 <https://github.com/QuantStack/xtensor/pull/785>`_.
+- ``xfunction`` copy constructor fixed
+  `#787 <https://github.com/QuantStack/xtensor/pull/787>`_.
+- warnings removed
+  `#791 <https://github.com/QuantStack/xtensor/pull/791>`_.
+- ``xscalar_stepper`` fixed
+  `#802 <https://github.com/QuantStack/xtensor/pull/802>`_.
+- Fixup ``xadapt`` on const pointers
+  `#809 <https://github.com/QuantStack/xtensor/pull/809>`_.
+- Fix in owning buffer adaptors
+  `#810 <https://github.com/QuantStack/xtensor/pull/810>`_.
+- Macros fixup
+  `#812 <https://github.com/QuantStack/xtensor/pull/812>`_.
+- More fixes in ``xadapt``
+  `#813 <https://github.com/QuantStack/xtensor/pull/813>`_.
+- Mute unused variable warning
+  `#815 <https://github.com/QuantStack/xtensor/pull/815>`_.
+- Remove comparison of steppers in assign loop
+  `#823 <https://github.com/QuantStack/xtensor/pull/823>`_.
+- Fix reverse iterators
+  `#825 <https://github.com/QuantStack/xtensor/pull/825>`_.
+- gcc-8 fix for template method calls
+  `#833 <https://github.com/QuantStack/xtensor/pull/833>`_.
+- ``flip`` now returns a view
+  `#843 <https://github.com/QuantStack/xtensor/pull/843>`_.
 
 0.15.9
 ------
