@@ -65,6 +65,5 @@ namespace xt
             }
         }
         BENCHMARK(stepper_stepper_ref)->Range(RANGE);
-
     }
 }

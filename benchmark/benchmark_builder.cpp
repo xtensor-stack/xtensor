@@ -15,7 +15,7 @@
 namespace xt
 {
     template <class T>
-    inline auto xarange(benchmark::State& state)
+    inline auto builder_xarange(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -25,7 +25,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto xarange_manual(benchmark::State& state)
+    inline auto builder_xarange_manual(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -38,7 +38,7 @@ namespace xt
         }
     }
 
-    inline auto iota_vector(benchmark::State& state)
+    inline auto builder_iota_vector(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -50,7 +50,7 @@ namespace xt
     }
     
     template <class T>
-    inline auto arange_for_loop_assign(benchmark::State& state)
+    inline auto builder_arange_for_loop_assign(benchmark::State& state)
     {
         for (auto _ : state)
         { 
@@ -65,7 +65,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto arange_for_loop_iter_assign(benchmark::State& state)
+    inline auto builder_arange_for_loop_iter_assign(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -82,7 +82,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto arange_for_loop_iter_assign_backward(benchmark::State& state)
+    inline auto builder_arange_for_loop_iter_assign_backward(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -102,7 +102,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto arange_assign_iterator(benchmark::State& state)
+    inline auto builder_arange_assign_iterator(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -114,7 +114,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto std_iota(benchmark::State& state)
+    inline auto builder_std_iota(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -124,7 +124,7 @@ namespace xt
         }
     }
 
-    inline auto ones(benchmark::State& state)
+    inline auto builder_ones(benchmark::State& state)
     {
         for (auto _ : state)
         { 
@@ -134,7 +134,7 @@ namespace xt
     }
 
 
-    inline auto ones_assign_iterator(benchmark::State& state)
+    inline auto builder_ones_assign_iterator(benchmark::State& state)
     {
         auto xo = xt::ones<double>({200, 200});
         for (auto _ : state)
@@ -146,7 +146,7 @@ namespace xt
         }
     }
 
-    inline auto ones_expr_for(benchmark::State& state)
+    inline auto builder_ones_expr_for(benchmark::State& state)
     {
         auto xo = xt::ones<double>({200, 200});
 
@@ -161,7 +161,7 @@ namespace xt
         }
     }
 
-    inline auto ones_expr(benchmark::State& state)
+    inline auto builder_ones_expr(benchmark::State& state)
     {
         auto xo = xt::ones<double>({200, 200});
 
@@ -172,7 +172,7 @@ namespace xt
         }
     }
 
-    inline auto ones_expr_fill(benchmark::State& state)
+    inline auto builder_ones_expr_fill(benchmark::State& state)
     {
         auto xo = xt::ones<double>({200, 200});
 
@@ -184,7 +184,7 @@ namespace xt
         }
     }
 
-    inline auto std_fill(benchmark::State& state)
+    inline auto builder_std_fill(benchmark::State& state)
     {
         for (auto _ : state)
         {
@@ -194,25 +194,25 @@ namespace xt
         }
     }
 
-    BENCHMARK_TEMPLATE(xarange, xarray<double>);
-    BENCHMARK_TEMPLATE(xarange, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(xarange_manual, xarray<double>);
-    BENCHMARK_TEMPLATE(xarange_manual, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(arange_for_loop_assign, xarray<double>);
-    BENCHMARK_TEMPLATE(arange_for_loop_assign, xtensor<double, 1>);
+    BENCHMARK_TEMPLATE(builder_xarange, xarray<double>);
+    BENCHMARK_TEMPLATE(builder_xarange, xtensor<double, 1>);
+    BENCHMARK_TEMPLATE(builder_xarange_manual, xarray<double>);
+    BENCHMARK_TEMPLATE(builder_xarange_manual, xtensor<double, 1>);
+    BENCHMARK_TEMPLATE(builder_arange_for_loop_assign, xarray<double>);
+    BENCHMARK_TEMPLATE(builder_arange_for_loop_assign, xtensor<double, 1>);
 
-    BENCHMARK_TEMPLATE(arange_assign_iterator, xarray<double>);
-    BENCHMARK_TEMPLATE(arange_assign_iterator, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(arange_for_loop_iter_assign, xarray<double>);
-    BENCHMARK_TEMPLATE(arange_for_loop_iter_assign_backward, xarray<double>);
-    BENCHMARK_TEMPLATE(arange_for_loop_iter_assign, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(arange_for_loop_iter_assign_backward, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(std_iota, xarray<double>);
-    BENCHMARK(iota_vector);
-    BENCHMARK(ones);
-    BENCHMARK(ones_assign_iterator);
-    BENCHMARK(ones_expr);
-    BENCHMARK(ones_expr_fill);
-    BENCHMARK(ones_expr_for);
-    BENCHMARK(std_fill);
+    BENCHMARK_TEMPLATE(builder_arange_assign_iterator, xarray<double>);
+    BENCHMARK_TEMPLATE(builder_arange_assign_iterator, xtensor<double, 1>);
+    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign, xarray<double>);
+    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign_backward, xarray<double>);
+    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign, xtensor<double, 1>);
+    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign_backward, xtensor<double, 1>);
+    BENCHMARK_TEMPLATE(builder_std_iota, xarray<double>);
+    BENCHMARK(builder_iota_vector);
+    BENCHMARK(builder_ones);
+    BENCHMARK(builder_ones_assign_iterator);
+    BENCHMARK(builder_ones_expr);
+    BENCHMARK(builder_ones_expr_fill);
+    BENCHMARK(builder_ones_expr_for);
+    BENCHMARK(builder_std_fill);
 }

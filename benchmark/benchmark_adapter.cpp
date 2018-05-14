@@ -17,7 +17,7 @@
 namespace xt
 {
     template <class V>
-    void bm_array_adapter(benchmark::State& state)
+    void shape_array_adapter(benchmark::State& state)
     {
         const V a({1,2,3,4});
         const V b({1,2,3,4});
@@ -34,7 +34,7 @@ namespace xt
     }
 
     template <class V>
-    void bm_array_adapter_result(benchmark::State& state)
+    void shape_array_adapter_result(benchmark::State& state)
     {
         const V a({1, 2, 3, 4});
         const V b({1, 2, 3, 4});
@@ -51,7 +51,7 @@ namespace xt
     }
 
     template <class V>
-    void bm_array_adapter_result_copy(benchmark::State& state)
+    void shape_array_adapter_result_copy(benchmark::State& state)
     {
         const V a({1, 2, 3, 4});
         const V b({1, 2, 3, 4});
@@ -69,7 +69,7 @@ namespace xt
     }
 
     template <class V>
-    void bm_array_adapter_result_transform(benchmark::State& state)
+    void shape_array_adapter_result_transform(benchmark::State& state)
     {
         const V a({1, 2, 3, 4});
         const V b({1, 2, 3, 4});
@@ -88,7 +88,7 @@ namespace xt
     }
 
     template <class V>
-    void bm_no_adapter(benchmark::State& state)
+    void shape_no_adapter(benchmark::State& state)
     {
         V a({1, 2, 3, 4});
         V b({1, 2, 3, 4});
@@ -116,24 +116,24 @@ namespace xt
     using small_type = xt::svector<int64_t, 4, xsimd::aligned_allocator<int64_t, 32>>;
     using small_type_d = xt::svector<double, 4, xsimd::aligned_allocator<double, 32>>;
 
-    // BENCHMARK_TEMPLATE(bm_array_adapter, array_type);
-    // BENCHMARK_TEMPLATE(bm_array_adapter, uvector_type);
-    // BENCHMARK_TEMPLATE(bm_array_adapter, uvector_type_i64);
-    // BENCHMARK_TEMPLATE(bm_array_adapter, uvector_type_i64_ra);
-    // BENCHMARK_TEMPLATE(bm_array_adapter, std::vector<std::size_t>);
-    // BENCHMARK_TEMPLATE(bm_array_adapter, small_type);
-    // BENCHMARK_TEMPLATE(bm_array_adapter, small_type_d);
-    // BENCHMARK_TEMPLATE(bm_array_adapter_result, small_type);
-    // BENCHMARK_TEMPLATE(bm_array_adapter_result, small_type_d);
-    BENCHMARK_TEMPLATE(bm_array_adapter_result, array_type);
-    // BENCHMARK_TEMPLATE(bm_array_adapter_result, array_type_ll);
-    // BENCHMARK_TEMPLATE(bm_array_adapter_result_2, array_type);
-    BENCHMARK_TEMPLATE(bm_array_adapter_result_copy, array_type);
-    BENCHMARK_TEMPLATE(bm_array_adapter_result_transform, array_type);
-    // // BENCHMARK_TEMPLATE(bm_array_adapter_result_2, array_type_ll);
-    BENCHMARK_TEMPLATE(bm_no_adapter, array_type);
-    // BENCHMARK_TEMPLATE(bm_no_adapter, std::vector<int64_t>);
-    // BENCHMARK_TEMPLATE(bm_no_adapter, uvector_type_i64);
-    // BENCHMARK_TEMPLATE(bm_no_adapter, uvector_type_i64_ra);
-    // BENCHMARK_TEMPLATE(bm_no_adapter, uvector_type_i64_16);
+    // BENCHMARK_TEMPLATE(shape_array_adapter, array_type);
+    // BENCHMARK_TEMPLATE(shape_array_adapter, uvector_type);
+    // BENCHMARK_TEMPLATE(shape_array_adapter, uvector_type_i64);
+    // BENCHMARK_TEMPLATE(shape_array_adapter, uvector_type_i64_ra);
+    // BENCHMARK_TEMPLATE(shape_array_adapter, std::vector<std::size_t>);
+    // BENCHMARK_TEMPLATE(shape_array_adapter, small_type);
+    // BENCHMARK_TEMPLATE(shape_array_adapter, small_type_d);
+    // BENCHMARK_TEMPLATE(shape_array_adapter_result, small_type);
+    // BENCHMARK_TEMPLATE(shape_array_adapter_result, small_type_d);
+    BENCHMARK_TEMPLATE(shape_array_adapter_result, array_type);
+    // BENCHMARK_TEMPLATE(shape_array_adapter_result, array_type_ll);
+    // BENCHMARK_TEMPLATE(shape_array_adapter_result_2, array_type);
+    BENCHMARK_TEMPLATE(shape_array_adapter_result_copy, array_type);
+    BENCHMARK_TEMPLATE(shape_array_adapter_result_transform, array_type);
+    // // BENCHMARK_TEMPLATE(shape_array_adapter_result_2, array_type_ll);
+    BENCHMARK_TEMPLATE(shape_no_adapter, array_type);
+    // BENCHMARK_TEMPLATE(shape_no_adapter, std::vector<int64_t>);
+    // BENCHMARK_TEMPLATE(shape_no_adapter, uvector_type_i64);
+    // BENCHMARK_TEMPLATE(shape_no_adapter, uvector_type_i64_ra);
+    // BENCHMARK_TEMPLATE(shape_no_adapter, uvector_type_i64_16);
 }
