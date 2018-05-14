@@ -6,6 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include <algorithm>
+
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xfixed.hpp"
@@ -13,7 +15,7 @@
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
-#include <algorithm>
+
 
 namespace xt
 {
@@ -809,5 +811,75 @@ namespace xt
         double conv = av1;
         double conv1 = afv1;
         EXPECT_EQ(conv, conv1);
+    }
+
+    template <class V, class A>
+    inline void test_view_iter(V& v, A& exp)
+    {
+        auto iter_expv1 = exp.begin();
+        for (auto iter = v.begin(); iter != v.end(); ++iter)
+        {
+            EXPECT_EQ(*iter, *iter_expv1);
+            ++iter_expv1;
+        }
+
+        auto riter_expv1 = exp.rbegin();
+        for (auto iter = v.rbegin(); iter != v.rend(); ++iter)
+        {
+            EXPECT_EQ(*iter, *riter_expv1);
+            ++riter_expv1;
+        }
+
+        auto rciter_expv1 = exp.template rbegin<layout_type::column_major>();
+        for (auto iter = v.template rbegin<layout_type::column_major>();
+             iter != v.template rend<layout_type::column_major>(); ++iter)
+        {
+            EXPECT_EQ(*iter, *rciter_expv1);
+            ++rciter_expv1;
+        }
+    }
+
+    TEST(xview, islice)
+    {
+        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
+                                                         { 5, 6, 7, 8}}, 
+                                                        {{ 9,10,11,12},
+                                                         {13,14,15,16}},
+                                                        {{17,18,19,20},
+                                                         {21,22,23,24}}};
+
+        auto v1 = xt::view(a, islice({1}), islice({0, 1}), islice({0, 3}));
+        xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
+        EXPECT_EQ(v1, exp_v1);
+
+        test_view_iter(v1, exp_v1);
+
+        auto v2 = xt::view(a, islice({1}), xt::all(), xt::range(0, xt::xnone(), 3));
+        EXPECT_EQ(v2, v1);
+        EXPECT_EQ(v2, exp_v1);
+
+        auto v3 = xt::view(a, islice({1}), islice({1, 1, 1, 1}), islice({0, 3}));
+        xtensor<double, 3> exp_v3 = {{{13, 16}, {13, 16}, {13, 16}, {13, 16}}};
+        EXPECT_EQ(v3, exp_v3);
+
+        test_view_iter(v3, exp_v3);
+
+        auto v4 = xt::view(a, islice({0, 2}), islice({0}));
+        xtensor<double, 3> exp_v4 = {{{  1.,   2.,   3.,   4.}},
+                                     {{ 17.,  18.,  19.,  20.}}};
+        EXPECT_EQ(v4, exp_v4);
+
+        v4(0, 0) = 123;
+        v4(1, 0) = 123;
+        EXPECT_EQ(a(0, 0, 0), 123);
+        EXPECT_EQ(a(1, 0, 0), 123);
+
+        v3(0, 2, 1) = 1000;
+        EXPECT_EQ(a(1, 1, 3), 1000);
+
+        bool b = detail::slices_contigous<xislice<int>, int>::value;
+        EXPECT_FALSE(b);
+        b = detail::slices_contigous<xrange<int>, xrange<int>, int>::value;
+        EXPECT_TRUE(b);
     }
 }

@@ -245,6 +245,106 @@ namespace xt
         return xnewaxis_tag();
     }
 
+    template <class T>
+    class xislice : public xslice<xislice<T>>
+    {
+    public:
+
+        using container_type = std::decay_t<T>;
+        using size_type = typename container_type::value_type;
+
+        explicit xislice(const container_type& cont)
+            : m_indices(cont)
+        {
+        }
+
+        explicit xislice(container_type&& cont)
+            : m_indices(std::move(cont))
+        {
+        }
+
+        size_type operator()(size_type i) const noexcept
+        {
+            return m_indices[i];
+        }
+
+        size_type size() const noexcept
+        {
+            // TODO change return type to container_type::size_type (e.g. size_t?)
+            return static_cast<size_type>(m_indices.size());
+        }
+
+        size_type step_size(size_type i, size_type n = 1) const noexcept
+        {
+            // special case one-past-end step (should be removed soon)
+            if (i == static_cast<size_type>(m_indices.size()))
+            {
+                return 1;
+            }
+            else
+            {
+                --i;
+                return m_indices[i + n] - m_indices[i];
+            }
+        }
+
+        size_type revert_index(size_type i) const
+        {
+            auto it = std::find(m_indices.begin(), m_indices.end(), i);
+            if (it != m_indices.end())
+            {
+                return std::distance(m_indices.begin(), it);
+            }
+            else
+            {
+                throw std::runtime_error("Index i (" + std::to_string(i) + ") not in indices of islice.");
+            }
+        }
+
+        bool contains(size_type i) const noexcept
+        {
+            return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? false : true;
+        }
+
+    private:
+
+        T m_indices;
+    };
+
+    /**
+     * Create a non-contigous slice from a container of indices.
+     * Note: this slice can **only** be used in the xview!
+     *
+     * \code{.cpp}
+     * xt::xarray<double> a = xt::arange(9);
+     * a.reshape({3, 3});
+     * xt::view(a, xt::islice({0, 2}); // => {{0, 1, 2}, {6, 7, 8}}
+     * xt::view(a, xt::islice({1, 1, 1}); // => {{3, 4, 5}, {3, 4, 5}, {3, 4, 5}}
+     * \endcode
+     *
+     * @param indices The indices container
+     * @return instance of xislice
+     */
+    template <class T>
+    auto islice(T&& indices)
+    {
+        return xislice<T>(std::forward<T>(indices));
+    }
+
+#ifndef X_OLD_CLANG
+    template <class T, std::size_t N>
+    auto islice(const T (&cont)[N])
+    {
+        return xislice<std::array<T, N>>(xtl::forward_sequence<std::array<T, N>>(cont));
+    }
+#else
+    template <class I>
+    auto islice(std::initializer_list<I> cont)
+    {
+        return xislice<std::vector<I>>(cont);
+    }
+#endif
+
     /******************
      * xrange_adaptor *
      ******************/
@@ -435,15 +535,27 @@ namespace xt
      *******************************************************/
 
     template <class S>
-    inline disable_xslice<S, std::size_t> step_size(const S&) noexcept
+    inline disable_xslice<S, std::size_t> step_size(const S&, std::size_t) noexcept
     {
         return 0;
     }
 
     template <class S>
-    inline auto step_size(const xslice<S>& slice) noexcept
+    inline disable_xslice<S, std::size_t> step_size(const S&, std::size_t, std::size_t) noexcept
     {
-        return slice.derived_cast().step_size();
+        return 0;
+    }
+
+    template <class S>
+    inline auto step_size(const xslice<S>& slice, std::size_t idx) noexcept
+    {
+        return slice.derived_cast().step_size(idx);
+    }
+
+    template <class S>
+    inline auto step_size(const xslice<S>& slice, std::size_t idx, std::size_t n) noexcept
+    {
+        return slice.derived_cast().step_size(idx, n);
     }
 
     /*********************************************

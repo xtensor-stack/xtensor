@@ -24,6 +24,7 @@ Slices can be specified in the following ways:
 - ``range(min, max, step)``, a slice representing a stepped interval
 - ``all()``, a slice representing all the elements of a dimension
 - ``newaxis()``, a slice representing an additional dimension of length one
+- ``islice({i, j, k, ...})`` a slice selecting non-contigous indices on the underlying array
 
 .. code::
 

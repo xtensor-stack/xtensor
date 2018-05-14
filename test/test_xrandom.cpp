@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -58,5 +59,48 @@ namespace xt
         auto ac3 = xt::random::choice(a, 5);
         EXPECT_EQ(ac1, ac3);
         EXPECT_NE(ac1, ac2);
+    }
+
+    TEST(xrandom, shuffle)
+    {
+        xarray<double> a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        xt::random::shuffle(a);
+        EXPECT_FALSE(std::is_sorted(a.begin(), a.end()));
+
+        a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        a.reshape({3, 4});
+        auto ar = a;
+
+        xt::random::seed(123);
+        // Unfortunately MSVC & OS X seem to produce different shuffles even though the
+        // generated integer sequence should be the same ...
+#ifdef __linux__
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({0, 1, 2})), a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({1, 2, 0})), a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({0, 2, 1})), a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({0, 1, 2})), a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({1, 0, 2})), a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({1, 2, 0})), a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({2, 1, 0})), a);
+        xt::random::shuffle(a);
+        xt::random::shuffle(a);
+        xt::random::shuffle(a);
+        xt::random::shuffle(a);
+        xt::random::shuffle(a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, islice({0, 2, 1})), a);
+#else
+        xt::random::shuffle(a);
+        xt::random::shuffle(a);
+        EXPECT_FALSE(std::is_sorted(a.begin(), a.end()));
+#endif
+
     }
 }
