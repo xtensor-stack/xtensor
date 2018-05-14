@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xfixed.hpp"
 
 #include "xtensor/xio.hpp"
@@ -478,5 +479,43 @@ namespace xt
         xarray<int> b = { 1, 2, 3 };
         xarray<int> res = a + b;
         EXPECT_EQ(res, b);
+    }
+
+    TEST(xbuilder, empty)
+    {
+
+        bool b = false;
+    #ifndef X_OLD_CLANG
+        auto e1 = empty<double>({3, 4, 1});
+        b = std::is_same<decltype(e1), xtensor<double, 3>>::value;
+        EXPECT_TRUE(b);
+        b = std::is_same<decltype(empty<int, layout_type::column_major>({3,3,3})),
+                         xtensor<int, 3, layout_type::column_major>>::value;
+        EXPECT_TRUE(b);
+    #endif
+
+        auto es = empty<double>(std::array<std::size_t, 3>{3, 4, 1});
+        b = std::is_same<decltype(es), xtensor<double, 3>>::value;
+        EXPECT_TRUE(b);
+
+        auto e2 = empty<double>(xshape<3, 3, 3>());
+        b = std::is_same<decltype(e2), xtensorf<double, xshape<3, 3, 3>>>::value;
+        EXPECT_TRUE(b);
+
+        auto shapef = xshape<3, 2>();
+        auto e22 = empty<double, layout_type::column_major>(shapef);
+        b = std::is_same<decltype(e22), xtensorf<double, xshape<3, 2>, layout_type::column_major>>::value;
+        EXPECT_TRUE(b);
+
+        xt::dynamic_shape<std::size_t> sd = {3, 2, 1};
+        auto ed1 = empty<double>(sd);
+        auto ed2 = empty<double, layout_type::column_major>(dynamic_shape<std::size_t>({3, 3, 3}));
+        auto ed3 = empty<double>(std::vector<std::size_t>({3, 3, 3}));
+        b = std::is_same<decltype(ed1), xarray<double>>::value;
+        EXPECT_TRUE(b);
+        b = std::is_same<decltype(ed2), xarray<double, layout_type::column_major>>::value;
+        EXPECT_TRUE(b);
+        b = std::is_same<decltype(ed3), xarray<double>>::value;
+        EXPECT_TRUE(b);
     }
 }

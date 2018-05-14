@@ -92,6 +92,45 @@ namespace xt
 
     /**
      * Create a xcontainer (xarray, xtensor or xtensorf) with uninitialized values of
+     * with value_type T and shape. Selects the best container match automatically
+     * from the supplied shape.
+     *
+     * - ``std::vector`` → ``xarray<T>``
+     * - ``std::array`` or ``initializer_list`` → ``xtensor<T, N>``
+     * - ``xshape<N...>`` → ``xtensorf<T, xshape<N...>>``
+     *
+     * @param shape shape of the new xcontainer
+     */
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class S>
+    inline xarray<T, L> empty(const S& shape)
+    {
+        return xarray<T, L>::from_shape(shape);
+    }
+
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class ST, std::size_t N>
+    inline xtensor<T, N, L> empty(const std::array<ST, N>& shape)
+    {
+        using shape_type = typename xtensor<T, N>::shape_type;
+        return xtensor<T, N, L>(xtl::forward_sequence<shape_type>(shape));
+    }
+
+#ifndef X_OLD_CLANG
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class I, std::size_t N>
+    inline xtensor<T, N, L> empty(const I(&shape)[N])
+    {
+        using shape_type = typename xtensor<T, N>::shape_type;
+        return xtensor<T, N, L>(xtl::forward_sequence<shape_type>(shape));
+    }
+#endif
+
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, std::size_t... N>
+    inline xtensorf<T, fixed_shape<N...>, L> empty(const fixed_shape<N...>& /*shape*/)
+    {
+        return xtensorf<T, fixed_shape<N...>, L>();
+    }
+
+    /**
+     * Create a xcontainer (xarray, xtensor or xtensorf) with uninitialized values of
      * the same shape, value type and layout as the input xexpression *e*.
      *
      * @param e the xexpression from which to extract shape, value type and layout.

@@ -21,6 +21,9 @@ Defined in ``xtensor/xbuilder.hpp``
 .. doxygenfunction:: xt::zeros(const I (&)[L])
    :project: xtensor
 
+.. doxygenfunction:: xt::empty(const S&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::full_like(const xexpression<E>&)
    :project: xtensor
 
