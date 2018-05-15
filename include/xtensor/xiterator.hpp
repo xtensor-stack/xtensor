@@ -793,7 +793,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_index[dim - m_offset] += n;
+            m_index[dim - m_offset] += static_cast<typename index_type::value_type>(n);
         }
     }
 
@@ -802,7 +802,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_index[dim - m_offset] -= n;
+            m_index[dim - m_offset] -= static_cast<typename index_type::value_type>(n);
         }
     }
 

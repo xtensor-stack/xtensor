@@ -1530,7 +1530,8 @@ namespace xt
         if (e.dimension() < N)
         {
             std::size_t i = 0;
-            for (; i < std::round(double((N - e.dimension()) / double(N))); ++i)
+            std::size_t end = static_cast<std::size_t>(std::round(double(N - e.dimension()) / double(N)));
+            for (; i < end; ++i)
             {
                 sv[i] = xt::newaxis();
             }
