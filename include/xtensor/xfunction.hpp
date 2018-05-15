@@ -110,6 +110,13 @@ namespace xt
         };
 
         template <class T>
+        struct functor_return_type<T, std::complex<T>>
+        {
+            using type = std::complex<T>;
+            using simd_type = xsimd::simd_type<std::complex<T>>;
+        };
+
+        template <class T>
         struct functor_return_type<T, bool>
         {
             using type = bool;

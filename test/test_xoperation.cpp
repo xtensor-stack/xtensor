@@ -495,6 +495,100 @@ namespace xt
         EXPECT_EQ(res, expected);
     }
 
+    TYPED_TEST(operation, assign_traits)
+    {
+        TypeParam a = { { 0., 1., 2. },{ 3., 4., 5. } };
+        TypeParam b = { { 0., 1., 2. },{ 3., 4., 5. } };
+
+        {
+            SCOPED_TRACE("xarray<double> + xarray<double>");
+            auto fd = a + b;
+            using assign_traits_double = xassign_traits<TypeParam, decltype(fd)>;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_double::same_type());
+            EXPECT_TRUE(assign_traits_double::simd_size());
+            EXPECT_FALSE(assign_traits_double::forbid_simd());
+            EXPECT_TRUE(assign_traits_double::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits_double::same_type());
+            EXPECT_FALSE(assign_traits_double::simd_size());
+            EXPECT_FALSE(assign_traits_double::simd_assign());
+#endif
+        }
+
+        {
+            SCOPED_TRACE("double * xarray<double>");
+            xscalar<double> sd = 2.;
+            auto fsd = sd * a;
+            using assign_traits_scalar_double = xassign_traits<TypeParam, decltype(fsd)>;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_scalar_double::same_type());
+            EXPECT_TRUE(assign_traits_scalar_double::simd_size());
+            EXPECT_FALSE(assign_traits_scalar_double::forbid_simd());
+            EXPECT_TRUE(assign_traits_scalar_double::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits_scalar_double::same_type());
+            EXPECT_FALSE(assign_traits_scalar_double::simd_size());
+            EXPECT_FALSE(assign_traits_scalar_double::simd_assign());
+#endif
+        }
+
+        {
+            SCOPED_TRACE("xarray<double> + xarray<int>");
+            using int_container_t = rebind_container_t<TypeParam, int>;
+            int_container_t c = { { 0, 1, 2 },{ 3, 4, 5 } };
+            auto fm = a + c;
+            using assign_traits_mixed = xassign_traits<TypeParam, decltype(fm)>;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_mixed::same_type());
+            EXPECT_TRUE(assign_traits_mixed::simd_size());
+            EXPECT_FALSE(assign_traits_mixed::forbid_simd());
+            EXPECT_TRUE(assign_traits_mixed::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits_mixed::same_type());
+            EXPECT_FALSE(assign_traits_mixed::simd_size());
+            EXPECT_FALSE(assign_traits_mixed::simd_assign());
+#endif
+        }
+
+        {
+            SCOPED_TRACE("int * xarray<double>");
+            xscalar<int> si = 2;
+            auto fsm = si * a;
+            using assign_traits_scalar_mixed = xassign_traits<TypeParam, decltype(fsm)>;
+            TypeParam res = fsm;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_scalar_mixed::same_type());
+            EXPECT_TRUE(assign_traits_scalar_mixed::simd_size());
+            EXPECT_FALSE(assign_traits_scalar_mixed::forbid_simd());
+            EXPECT_TRUE(assign_traits_scalar_mixed::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits_scalar_mixed::same_type());
+            EXPECT_FALSE(assign_traits_scalar_mixed::simd_size());
+            EXPECT_FALSE(assign_traits_scalar_mixed::simd_assign());
+#endif
+        }
+
+        {
+            SCOPED_TRACE("xarray<double> + xarray<char>");
+            using char_container_t = rebind_container_t<TypeParam, char>;
+            char_container_t d = { { 0, 1, 2 },{ 3, 4, 5 } };
+            auto fdc = a + d;
+            using assign_traits_char_double = xassign_traits<TypeParam, decltype(fdc)>;
+            //TypeParam res = fdc;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_char_double::same_type());
+            EXPECT_TRUE(assign_traits_char_double::simd_size());
+            EXPECT_TRUE(assign_traits_char_double::forbid_simd());
+            EXPECT_FALSE(assign_traits_char_double::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits_char_double::same_type());
+            EXPECT_FALSE(assign_traits_char_double::simd_size());
+            EXPECT_FALSE(assign_traits_char_double::simd_assign());
+#endif
+        }
+    }
+
     TEST(operation, left_shift)
     {
         xarray<int> arr({5,1, 1000});

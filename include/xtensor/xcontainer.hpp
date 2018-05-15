@@ -171,10 +171,13 @@ namespace xt
         reference data_element(size_type i);
         const_reference data_element(size_type i) const;
 
+        template <class simd>
+        using simd_return_type = xsimd::simd_return_type<value_type, typename simd::value_type>;
+
         template <class align, class simd = simd_value_type>
         void store_simd(size_type i, const simd& e);
         template <class align, class simd = simd_value_type>
-        simd load_simd(size_type i) const;
+        simd_return_type<simd> load_simd(size_type i) const;
 
 #if defined(_MSC_VER) && _MSC_VER >= 1910
         // Workaround for compiler bug in Visual Studio 2017 with respect to alias templates with non-type parameters.
@@ -1148,7 +1151,7 @@ namespace xt
 
     template <class D>
     template <class alignment, class simd>
-    inline auto xcontainer<D>::load_simd(size_type i) const -> simd
+    inline auto xcontainer<D>::load_simd(size_type i) const -> simd_return_type<simd>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         return xsimd::load_simd<value_type, typename simd::value_type>(&(storage()[i]), align_mode());
