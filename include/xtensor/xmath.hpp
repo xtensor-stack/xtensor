@@ -1884,13 +1884,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #define COUNT_NON_ZEROS_CONTENT                                                 \
     using result_type = std::size_t;                                            \
     using value_type = typename std::decay_t<E>::value_type;                    \
-    result_type init_fct = [](value_type const& lhs)                            \
+    auto init_fct = [](value_type const& lhs) -> result_type                    \
     {                                                                           \
-        return (lhs != 0) ? result_type(1) : result_type(0);                    \
+        return (lhs != value_type(0)) ? result_type(1) : result_type(0);        \
     };                                                                          \
-    result_type reduce_fct = [](const result_type& lhs, const value_type& rhs)  \
+    auto reduce_fct = [](const result_type& lhs, const value_type& rhs)         \
+         -> result_type                                                         \
     {                                                                           \
-        return (rhs != 0) ? lhs + result_type(1) : lhs;                         \
+        return (rhs != value_type(0)) ? lhs + result_type(1) : lhs;             \
     };                                                                          \
     auto merge_func = std::plus<result_type>();                                 \
 
