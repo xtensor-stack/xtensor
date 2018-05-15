@@ -89,8 +89,8 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
-        size_type step_size(size_type i, size_type n = 1) const noexcept;
-        size_type revert_index(size_type i) const noexcept;
+        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept;
+        size_type revert_index(std::size_t i) const noexcept;
 
         bool contains(size_type i) const noexcept;
 
@@ -122,8 +122,8 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
-        size_type step_size(size_type i, size_type n = 1) const noexcept;
-        size_type revert_index(size_type i) const noexcept;
+        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept;
+        size_type revert_index(std::size_t i) const noexcept;
 
         bool contains(size_type i) const noexcept;
 
@@ -156,8 +156,8 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
-        size_type step_size(size_type i, size_type n = 1) const noexcept;
-        size_type revert_index(size_type i) const noexcept;
+        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept;
+        size_type revert_index(std::size_t i) const noexcept;
 
         bool contains(size_type i) const noexcept;
 
@@ -225,8 +225,8 @@ namespace xt
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
-        size_type step_size(size_type i, size_type n = 1) const noexcept;
-        size_type revert_index(size_type i) const noexcept;
+        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept;
+        size_type revert_index(std::size_t i) const noexcept;
 
         bool contains(size_type i) const noexcept;
     };
@@ -274,7 +274,7 @@ namespace xt
             return static_cast<size_type>(m_indices.size());
         }
 
-        size_type step_size(size_type i, size_type n = 1) const noexcept
+        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept
         {
             // special case one-past-end step (should be removed soon)
             if (i == static_cast<size_type>(m_indices.size()))
@@ -288,7 +288,7 @@ namespace xt
             }
         }
 
-        size_type revert_index(size_type i) const
+        size_type revert_index(std::size_t i) const
         {
             auto it = std::find(m_indices.begin(), m_indices.end(), i);
             if (it != m_indices.end())
@@ -681,13 +681,13 @@ namespace xt
     }
 
     template <class T>
-    inline auto xrange<T>::step_size(size_type /*i*/, size_type n) const noexcept -> size_type
+    inline auto xrange<T>::step_size(std::size_t /*i*/, std::size_t n) const noexcept -> size_type
     {
-        return n;
+        return static_cast<size_type>(n);
     }
 
     template <class T>
-    inline auto xrange<T>::revert_index(size_type i) const noexcept -> size_type
+    inline auto xrange<T>::revert_index(std::size_t i) const noexcept -> size_type
     {
         return i - m_min;
     }
@@ -740,13 +740,13 @@ namespace xt
     }
 
     template <class T>
-    inline auto xstepped_range<T>::step_size(size_type /*i*/, size_type n) const noexcept -> size_type
+    inline auto xstepped_range<T>::step_size(std::size_t /*i*/, std::size_t n) const noexcept -> size_type
     {
-        return m_step * n;
+        return m_step * static_cast<size_type>(n);
     }
 
     template <class T>
-    inline auto xstepped_range<T>::revert_index(size_type i) const noexcept -> size_type
+    inline auto xstepped_range<T>::revert_index(std::size_t i) const noexcept -> size_type
     {
         return (i - m_min) / m_step;
     }
@@ -798,13 +798,13 @@ namespace xt
     }
 
     template <class T>
-    inline auto xall<T>::step_size(size_type /*i*/, size_type n) const noexcept -> size_type
+    inline auto xall<T>::step_size(std::size_t /*i*/, std::size_t n) const noexcept -> size_type
     {
-        return n;
+        return static_cast<size_type>(n);
     }
 
     template <class T>
-    inline auto xall<T>::revert_index(size_type i) const noexcept -> size_type
+    inline auto xall<T>::revert_index(std::size_t i) const noexcept -> size_type
     {
         return i;
     }
@@ -850,13 +850,13 @@ namespace xt
     }
 
     template <class T>
-    inline auto xnewaxis<T>::step_size(size_type /*i*/, size_type /*n*/) const noexcept -> size_type
+    inline auto xnewaxis<T>::step_size(std::size_t /*i*/, std::size_t /*n*/) const noexcept -> size_type
     {
         return 0;
     }
 
     template <class T>
-    inline auto xnewaxis<T>::revert_index(size_type i) const noexcept -> size_type
+    inline auto xnewaxis<T>::revert_index(std::size_t i) const noexcept -> size_type
     {
         return i;
     }
