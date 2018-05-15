@@ -1980,6 +1980,37 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), detail::nan_init<result_type, 1>()), std::forward<E>(e));
     }
 
+    namespace detail
+    {
+        template <class T>
+        struct diff_impl
+        {
+            template <class Arg>
+            inline void operator()(Arg& ad, const std::size_t& n, slice_vector& slice1, slice_vector& slice2, const std::size_t& saxis)
+            {
+                for (std::size_t i = 0; i < n; ++i)
+                {
+                    slice2[saxis] = range(xnone(), ad.shape()[saxis] - 1);
+                    ad = strided_view(ad, slice1) - strided_view(ad, slice2);
+                }
+            };
+        };
+
+        template <>
+        struct diff_impl<bool>
+        {
+            template <class Arg>
+            inline void operator()(Arg& ad, const std::size_t& n, slice_vector& slice1, slice_vector& slice2, const std::size_t& saxis)
+            {
+                for (std::size_t i = 0; i < n; ++i)
+                {
+                    slice2[saxis] = range(xnone(), ad.shape()[saxis] - 1);
+                    ad = not_equal(strided_view(ad, slice1), strided_view(ad, slice2));
+                }
+            };
+        };
+    }
+
     /**
      * @ingroup red_functions
      * @brief Calculate the n-th discrete difference along the given axis.
@@ -1991,7 +2022,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an xarray
      */
     template <class T>
-    auto diff(const xexpression<T>& a, unsigned int n = 1, std::ptrdiff_t axis = -1)
+    auto diff(const xexpression<T>& a, std::size_t n = 1, std::ptrdiff_t axis = -1)
     {
         auto ad = a.derived_cast();
         std::size_t saxis = static_cast<std::size_t>(axis);
@@ -2010,22 +2041,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         slice_vector slice2(ad.dimension(), all());
         slice1[saxis] = range(1, xnone());
 
-        if (std::is_same<typename T::value_type, bool>::value)
-        {
-            for (unsigned int i = 0; i < n; ++i)
-            {
-                slice2[saxis] = range(xnone(), ad.shape()[saxis] - 1);
-                ad = not_equal(strided_view(ad, slice1), strided_view(ad, slice2));
-            }
-        }
-        else
-        {
-            for (unsigned int i = 0; i < n; ++i)
-            {
-                slice2[saxis] = range(xnone(), ad.shape()[saxis] - 1);
-                ad = strided_view(ad, slice1) - strided_view(ad, slice2);
-            }
-        }
+        detail::diff_impl<typename T::value_type> impl;
+        impl(ad, n, slice1, slice2, saxis);
 
         return eval(ad);
     }
