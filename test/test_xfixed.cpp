@@ -17,6 +17,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xnoalias.hpp"
+#include "xtensor/xmanipulation.hpp"
 
 // On VS2015, when compiling in x86 mode, alignas(T) leads to C2718
 // when used for a function parameter, even indirectly. This means that

@@ -15,6 +15,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
+#include "xtensor/xmanipulation.hpp"
 #include "xtensor/xstrides.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"

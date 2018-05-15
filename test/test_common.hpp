@@ -10,7 +10,7 @@
 #define TEST_COMMON_HPP
 
 #include "xtensor/xlayout.hpp"
-#include "xtensor/xstrided_view.hpp"
+#include "xtensor/xmanipulation.hpp"
 
 namespace xt
 {
