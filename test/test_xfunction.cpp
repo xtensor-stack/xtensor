@@ -311,5 +311,4 @@ namespace xt
             test_xfunction_iterator_end(f.m_c, f.m_a);
         }
     }
-
 }

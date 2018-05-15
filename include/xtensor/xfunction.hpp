@@ -94,7 +94,7 @@ namespace xt
         };
 
         template <class F, class R>
-        struct simd_return_type<F, R, void_t<decltype(&F::simd_apply)>>
+        struct simd_return_type<F, R, void_t<decltype(&F::template simd_apply<R>)>>
         {
             using type = R;
         };
@@ -107,6 +107,13 @@ namespace xt
         {
             using type = R;
             using simd_type = xsimd::simd_type<T>;
+        };
+
+        template <class T>
+        struct functor_return_type<T, std::complex<T>>
+        {
+            using type = std::complex<T>;
+            using simd_type = xsimd::simd_type<std::complex<T>>;
         };
 
         template <class T>

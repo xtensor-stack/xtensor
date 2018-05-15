@@ -213,13 +213,44 @@ namespace xt
             static constexpr bool value = true;
         };
 
+        // Double steps check for xfunction because the default
+        // parameter void_t of forbid_simd_assign prevents additional
+        // specializations.
+        template <class E>
+        struct xfunction_forbid_simd;
+
         template <class E>
         struct forbid_simd_assign<E,
             void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
         {
+            static constexpr bool value = false || xfunction_forbid_simd<E>::value;
+        };
+
+        template <class E>
+        struct xfunction_forbid_simd
+        {
             static constexpr bool value = false;
         };
+
+        template <class F, class R, class... CT>
+        struct xfunction_forbid_simd<xfunction<F, R, CT...>>
+        {
+            static constexpr bool value = xtl::disjunction<
+                std::integral_constant<bool, forbid_simd_assign<typename std::decay<CT>::type>::value>...>::value;
+        };
     }
+
+    template <class E1, class E2>
+    struct xassign_traits
+    {
+        // constexpr methods instead of constexpr data members avoid the need of difinitions at namespace
+        // scope of these data members (since they are odr-used).
+        static constexpr bool contiguous_layout() { return E1::contiguous_layout && E2::contiguous_layout; }
+        static constexpr bool same_type() { return std::is_same<typename E1::value_type, typename E2::value_type>::value; }
+        static constexpr bool simd_size() { return xsimd::simd_traits<typename E1::value_type>::size > 1; }
+        static constexpr bool forbid_simd() { return detail::forbid_simd_assign<E2>::value; }
+        static constexpr bool simd_assign() { return contiguous_layout() && same_type() && simd_size() && !forbid_simd(); }
+    };
 
     template <class E1, class E2>
     inline void xexpression_assigner_base<xtensor_expression_tag>::assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial)
@@ -230,11 +261,7 @@ namespace xt
         bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
         if (trivial_broadcast)
         {
-            constexpr bool contiguous_layout = E1::contiguous_layout && E2::contiguous_layout;
-            constexpr bool same_type = std::is_same<typename E1::value_type, typename E2::value_type>::value;
-            constexpr bool simd_size = xsimd::simd_traits<typename E1::value_type>::size > 1;
-            constexpr bool forbid_simd = detail::forbid_simd_assign<E2>::value;
-            constexpr bool simd_assign = contiguous_layout && same_type && simd_size && !forbid_simd;
+            constexpr bool simd_assign = xassign_traits<E1, E2>::simd_assign();
             trivial_assigner<simd_assign>::run(de1, de2);
         }
         else

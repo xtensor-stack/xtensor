@@ -115,6 +115,9 @@ namespace xsimd
     {
         return size;
     }
+
+    template <class T1, class T2>
+    using simd_return_type = simd_type<T2>;
 }
 
 #endif  // XTENSOR_USE_XSIMD
