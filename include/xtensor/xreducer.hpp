@@ -91,7 +91,7 @@ namespace xt
             std::declval<init_functor_type>()(std::declval<expr_value_type>()), std::declval<expr_value_type>()))>;
 
         // retrieve functors from triple struct
-        auto reduce_func = std::get<0>(f);
+        auto reduce_fct = std::get<0>(f);
         auto init_fct = std::get<1>(f);
         auto merge_fct = std::get<2>(f);
 
@@ -119,7 +119,7 @@ namespace xt
             auto begin = e.storage().begin();
             result_type tmp = init_fct(*begin);
             ++begin;
-            result.data()[0] = std::accumulate(begin, e.storage().end(), tmp, reduce_func);
+            result.data()[0] = std::accumulate(begin, e.storage().end(), tmp, reduce_fct);
             return result;
         }
 
@@ -222,7 +222,7 @@ namespace xt
         std::pair<bool, std::ptrdiff_t> idx_res(false, 0);
 
         // Remark: eventually some modifications here to make conditions faster where merge + accumulate is the
-        // same function (e.g. check std::is_same<decltype(merge_fct), decltype(reduce_func)>::value) ...
+        // same function (e.g. check std::is_same<decltype(merge_fct), decltype(reduce_fct)>::value) ...
 
         auto merge_border = out;
         bool merge = false;
@@ -239,7 +239,7 @@ namespace xt
                 // std::accumulate here -- probably some cache behavior
                 result_type tmp;
                 tmp = init_fct(*begin);
-                tmp = std::accumulate(begin + 1, begin + outer_loop_size, tmp, reduce_func);
+                tmp = std::accumulate(begin + 1, begin + outer_loop_size, tmp, reduce_fct);
 
                 // use merge function if necessary
                 *out = merge ? merge_fct(*out, tmp) : tmp;
@@ -267,14 +267,17 @@ namespace xt
             while (idx_res.first != true)
             {
                 std::transform(out, out + inner_loop_size, begin, out,
-                               [merge, &init_fct, &merge_fct](auto&& v1, auto&& v2) {
-                                   return merge ? merge_fct(v1, v2) : init_fct(v2);
+                               [merge, &init_fct, &merge_fct, &reduce_fct](auto&& v1, auto&& v2) {
+                                    return merge ?
+                                        reduce_fct(v1, v2) :
+                                        // cast because return type of identity function is not upcasted
+                                        static_cast<result_type>(init_fct(v2));
                                });
 
                 begin += inner_stride;
                 for (std::size_t i = 1; i < outer_loop_size; ++i)
                 {
-                    std::transform(out, out + inner_loop_size, begin, out, reduce_func);
+                    std::transform(out, out + inner_loop_size, begin, out, reduce_fct);
                     begin += inner_stride;
                 }
 

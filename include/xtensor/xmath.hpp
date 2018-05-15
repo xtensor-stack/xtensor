@@ -1881,18 +1881,19 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #undef OLD_CLANG_NAN_REDUCER
 #undef MODERN_CLANG_NAN_REDUCER
 
-#define COUNT_NON_ZEROS_CONTENT                                         \
-    using result_type = std::size_t;                                    \
-    using value_type = typename std::decay_t<E>::value_type;            \
-    auto init_fct = [](value_type const& lhs)                           \
-    {                                                                   \
-        return (lhs != 0) ? 1 : 0;                                      \
-    };                                                                  \
-    auto reduce_fct = [](const result_type& lhs, const value_type& rhs) \
-    {                                                                   \
-        return (rhs != 0) ? lhs + 1 : lhs;                              \
-    };                                                                  \
-    auto merge_func = std::plus<result_type>();                         \
+#define COUNT_NON_ZEROS_CONTENT                                                 \
+    using result_type = std::size_t;                                            \
+    using value_type = typename std::decay_t<E>::value_type;                    \
+    auto init_fct = [](value_type const& lhs) -> result_type                    \
+    {                                                                           \
+        return (lhs != value_type(0)) ? result_type(1) : result_type(0);        \
+    };                                                                          \
+    auto reduce_fct = [](const result_type& lhs, const value_type& rhs)         \
+         -> result_type                                                         \
+    {                                                                           \
+        return (rhs != value_type(0)) ? lhs + result_type(1) : lhs;             \
+    };                                                                          \
+    auto merge_func = std::plus<result_type>();                                 \
 
     template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,
               class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>

@@ -12,6 +12,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xmath.hpp"
+#include "xtensor/xrandom.hpp"
 
 namespace xt
 {
@@ -691,6 +692,11 @@ namespace xt
 
         EXPECT_EQ(count_nonzeros(a, {0}, evaluation_strategy::immediate()), ea0);
         EXPECT_EQ(count_nonzeros(a, {1}, evaluation_strategy::immediate()), ea1);
+
+        a = random::randint<int>({5, 5, 5, 5, 5}, 10);
+        auto lm = count_nonzeros(a, {0, 1, 3}, evaluation_strategy::immediate());
+        auto lz = count_nonzeros(a, {0, 1, 3});
+        EXPECT_EQ(lm, lz);
     }
 
     TEST(xmath, diff)
