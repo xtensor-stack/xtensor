@@ -326,19 +326,19 @@ namespace xt
      * @return instance of xislice
      */
     template <class T>
-    auto islice(T&& indices)
+    inline auto islice(T&& indices)
     {
         return xislice<T>(std::forward<T>(indices));
     }
 
 #ifndef X_OLD_CLANG
     template <class T, std::size_t N>
-    auto islice(const T (&cont)[N])
+    inline auto islice(const T (&cont)[N])
     {
         return xislice<std::array<std::size_t, N>>(xtl::forward_sequence<std::array<std::size_t, N>>(cont));
     }
 #else
-    auto islice(std::initializer_list<std::size_t> cont)
+    inline auto islice(std::initializer_list<std::size_t> cont)
     {
         return xislice<std::vector<std::size_t>>(cont);
     }
