@@ -404,7 +404,8 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_it += difference_type(n * p_c->strides()[dim - m_offset]);
+            using strides_value_type = decltype(p_c->strides()[0]);
+            m_it += difference_type(static_cast<strides_value_type>(n) * p_c->strides()[dim - m_offset]);
         }
     }
 
@@ -413,7 +414,8 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            m_it -= difference_type(n * p_c->strides()[dim - m_offset]);
+            using strides_value_type = decltype(p_c->strides()[0]);
+            m_it -= difference_type(static_cast<strides_value_type>(n) * p_c->strides()[dim - m_offset]);
         }
     }
 
