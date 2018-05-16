@@ -22,6 +22,7 @@
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xsemantic.hpp"
+#include "xslice.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
 
