@@ -85,8 +85,16 @@ Other changes
   `#825 <https://github.com/QuantStack/xtensor/pull/825>`_.
 - gcc-8 fix for template method calls
   `#833 <https://github.com/QuantStack/xtensor/pull/833>`_.
+- refactor benchmarks for upcoming release
+  `#842 <https://github.com/QuantStack/xtensor/pull/842>`_.
 - ``flip`` now returns a view
   `#843 <https://github.com/QuantStack/xtensor/pull/843>`_.
+- initial warning pass
+  `#850 <https://github.com/QuantStack/xtensor/pull/850>`_.
+- Fix warning on diff function
+  `#851 <https://github.com/QuantStack/xtensor/pull/851>`_.
+- xsimd assignment fixed
+  `#852 <https://github.com/QuantStack/xtensor/pull/852>`_.
 
 0.15.9
 ------
