@@ -1476,7 +1476,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                     return a == b;
                 }
                 auto d = math::abs(internal_type(a) - internal_type(b));
-                return d <= m_atol || d <= m_rtol * double(std::max(math::abs(a), math::abs(b)));
+                return d <= m_atol || d <= m_rtol * double((std::max)(math::abs(a), math::abs(b)));
             }
 
             template <class U>
@@ -1640,16 +1640,16 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using result_type = std::array<value_type, 2>;
 
         auto reduce_func = [](result_type r, value_type const& v) {
-            r[0] = min(r[0], v);
-            r[1] = max(r[1], v);
+            r[0] = (min)(r[0], v);
+            r[1] = (max)(r[1], v);
             return r;
         };
         auto init_func = [](value_type const& v) {
             return result_type{v, v};
         };
         auto merge_func = [](result_type r, result_type const& s) {
-            r[0] = min(r[0], s[0]);
-            r[1] = max(r[1], s[1]);
+            r[0] = (min)(r[0], s[0]);
+            r[1] = (max)(r[1], s[1]);
             return r;
         };
         return reduce(make_xreducer_functor(std::move(reduce_func),
@@ -1736,7 +1736,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                     }
                     else
                     {
-                        return std::numeric_limits<result_type>::max();
+                        return (std::numeric_limits<result_type>::max)();
                     }
                 }
                 return a;

@@ -895,7 +895,7 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::compute_dimension() const noexcept -> size_type
     {
-        auto func = [](size_type d, auto&& e) noexcept { return std::max(d, e.dimension()); };
+        auto func = [](size_type d, auto&& e) noexcept { return (std::max)(d, e.dimension()); };
         return accumulate(func, size_type(0), m_e);
     }
 
@@ -980,7 +980,7 @@ namespace xt
                                                                 const data_type& rhs) const -> difference_type
     {
         auto diff = std::make_tuple((std::get<I>(lhs) - std::get<I>(rhs))...);
-        auto func = [](difference_type n, auto&& v) { return std::max(n, v); };
+        auto func = [](difference_type n, auto&& v) { return (std::max)(n, v); };
         return accumulate(func, difference_type(0), diff);
     }
 

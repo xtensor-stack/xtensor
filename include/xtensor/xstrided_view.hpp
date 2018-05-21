@@ -1527,7 +1527,7 @@ namespace xt
     template <std::size_t N, class E>
     auto atleast_Nd(E&& e)
     {
-        slice_vector sv(std::max(e.dimension(), N), xt::all());
+        slice_vector sv((std::max)(e.dimension(), N), xt::all());
         if (e.dimension() < N)
         {
             std::size_t i = 0;

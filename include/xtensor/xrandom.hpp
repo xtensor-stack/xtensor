@@ -41,7 +41,7 @@ namespace xt
                   E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
-        auto randint(const S& shape, T lower = 0, T upper = std::numeric_limits<T>::max(),
+        auto randint(const S& shape, T lower = 0, T upper = (std::numeric_limits<T>::max)(),
                      E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
@@ -55,7 +55,7 @@ namespace xt
 
         template <class T, class I, class E = random::default_engine_type>
         auto randint(std::initializer_list<I> shape,
-                     T lower = 0, T upper = std::numeric_limits<T>::max(),
+                     T lower = 0, T upper = (std::numeric_limits<T>::max)(),
                      E& engine = random::get_default_random_engine());
 
         template <class T, class I, class E = random::default_engine_type>
@@ -67,7 +67,7 @@ namespace xt
                   E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
-        auto randint(const I (&shape)[L], T lower = 0, T upper = std::numeric_limits<T>::max(),
+        auto randint(const I (&shape)[L], T lower = 0, T upper = (std::numeric_limits<T>::max)(),
                      E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
