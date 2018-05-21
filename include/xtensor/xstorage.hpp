@@ -1106,12 +1106,16 @@ namespace xt
         }
 
         if (rhs.size() > this->capacity())
+        {
             this->resize(rhs.size());
+        }
         if (this->size() > rhs.capacity())
+        {
             rhs.resize(this->size());
+        }
 
         // Swap the shared elements.
-        size_t num_shared = std::min(this->size(), rhs.size());
+        size_t num_shared = (std::min)(this->size(), rhs.size());
 
         for (size_type i = 0; i != num_shared; ++i)
         {

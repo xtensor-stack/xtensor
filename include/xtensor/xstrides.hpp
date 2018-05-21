@@ -151,7 +151,7 @@ namespace xt
     inline size_type element_offset(const S& strides, It first, It last) noexcept
     {
         using difference_type = typename std::iterator_traits<It>::difference_type;
-        auto size = static_cast<difference_type>(std::min(static_cast<typename S::size_type>(std::distance(first, last)), strides.size()));
+        auto size = static_cast<difference_type>((std::min)(static_cast<typename S::size_type>(std::distance(first, last)), strides.size()));
         return std::inner_product(last - size, last, strides.cend() - size, size_type(0));
     }
 
