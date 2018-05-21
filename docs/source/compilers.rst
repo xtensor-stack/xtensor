@@ -19,13 +19,18 @@ Visual Studio 2017 and alias templates with non-class template parameters and mu
 
 Alias template with non-class parameters only, and multiple levels of aliasing are not properly considered as types by Visual Studio 2017. The base ``xcontainer`` template class underlying xtensor container types has such alias templates defined. We avoid the multiple levels of aliasing in the case of Visual Studio.
 
+Visual Studio 2017 (15.7.1) seeing declarations as extra overloads
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In ``xvectorize.hpp``, Visual Studio 15.7.1 sees the forward declaration of ``vectorize(E&&)`` as a separate ovarload.
+
 GCC-4.9 and Clang < 3.8 and constexpr ``std::min`` and ``std::max``
 -------------------------------------------------------------------
 
 ``std::min`` and ``std::max`` are not constexpr in these compilers. In ``xio.hpp``, we locally define a ``XTENSOR_MIN`` macro used instead of ``std::min``. The macro is undefined right after it is used.
 
-Clang < 3.8 matching ``initializer_list`` with static arrays
-------------------------------------------------------------
+Clang < 3.8 not matching ``initializer_list`` with static arrays
+----------------------------------------------------------------
 
 Old versions of Clang don't handle overload resolution with braced initializer lists correctly: braced initializer lists are not properly matched to static arrays. This prevent compile-time detection of the length of a braced initializer list.
 

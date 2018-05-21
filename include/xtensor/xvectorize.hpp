@@ -54,7 +54,8 @@ namespace xt
     xvectorizer<F, R> vectorize(F&& f, R (*)(Args...));
 
 // Workaround for Visual Studio 15.7.1.
-// Error C2668 (ambiguous call to overloaded function) on forward declarations vs definitions.
+// Error C2668 (ambiguous call to overloaded function) mistaking a declarations
+// for the definition of another overload.
 #ifndef _MSC_VER
     template <class F>
     auto vectorize(F&& f) -> decltype(vectorize(std::forward<F>(f), std::declval<detail::get_function_type<F>*>()));

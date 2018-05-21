@@ -7,6 +7,14 @@
 Changelog
 =========
 
+0.16.1
+------
+
+- Workaround for Visual Studio Bug
+  `#858 <https://github.com/QuantStack/xtensor/pull/858>`_.
+- Fixup example notebook
+  `#861 <https://github.com/QUantStack/xtensor/pull/861>`_.
+
 0.16.0
 ------
 
