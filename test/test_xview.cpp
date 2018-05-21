@@ -839,6 +839,28 @@ namespace xt
         }
     }
 
+    TEST(xview, random_stepper)
+    {
+        xt::xarray<double> x = xt::arange(0, 100);
+        x.reshape({5, 5, 4});
+
+        xt::xarray<double> expected = {0,1,2,3, 20,21,22,23, 40,41,42,43, 60,61,62,63, 80,81,82,83};
+        auto v = xt::view(x, all(), 0);
+
+        auto it1 = v.begin();
+        auto it2 = v.storage_begin();
+        auto it3 = v.rbegin();
+        auto it4 = v.storage_rbegin();
+        for (auto i = 0; i < expected.size(); ++i)
+        {
+            EXPECT_EQ(*(it1 + i), expected[i]);
+            EXPECT_EQ(*(it2 + i), expected[i]);
+            EXPECT_EQ(*(it3 + i), expected[expected.size() - 1 - i]);
+            EXPECT_EQ(*(it4 + i), expected[expected.size() - 1 - i]);
+        }
+
+    }
+
     TEST(xview, islice)
     {
         xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
