@@ -1174,7 +1174,7 @@ namespace xt
             if (!is_newaxis_slice(index))
             {
                 size_type step_size = index < sizeof...(S) ?
-                    apply<size_type>(index, func, p_view->slices()) : 1;
+                    apply<size_type>(index, func, p_view->slices()) : n;
                 index -= newaxis_count_before<S...>(index);
                 f(index, step_size);
             }
@@ -1217,7 +1217,7 @@ namespace xt
             if (!is_newaxis_slice(index))
             {
                 size_type step_size = index < sizeof...(S) ?
-                    apply<size_type>(index, func, p_view->slices()) : 1;
+                    apply<size_type>(index, func, p_view->slices()) : n;
                 index -= newaxis_count_before<S...>(index);
                 f(index, step_size);
             }
