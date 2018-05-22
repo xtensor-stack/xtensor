@@ -28,7 +28,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-find_package(xtl 0.4.1 REQUIRED)
+find_package(xtl 0.4.9 REQUIRED)
 
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
@@ -122,7 +122,7 @@ endif()
 
 if(XTENSOR_USE_XSIMD)
     add_definitions(-DXTENSOR_USE_XSIMD)
-    find_package(xsimd 4 REQUIRED)
+    find_package(xsimd 4.1.3 REQUIRED)
     message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
     target_link_libraries(xtensor INTERFACE xsimd)
 endif()
