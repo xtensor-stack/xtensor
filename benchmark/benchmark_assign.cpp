@@ -179,17 +179,51 @@ namespace xt
             }
         }
 
+        template <class E>
+        inline auto assign_c_scalar_computed(benchmark::State& state)
+        {
+            using size_type = typename E::size_type;
+
+            E x, y, res;
+            init_xtensor_benchmark(x, y, res, state.range(0), state.range(0));
+
+            for (auto _ : state)
+            {
+                size_type csize = x.size();
+                for (size_type i = 0; i < csize; ++i)
+                {
+                    res.data()[i] += 3.123;
+                }
+                benchmark::DoNotOptimize(res.data());
+            }
+        }
+
+        template <class E>
+        inline auto assign_x_scalar_computed(benchmark::State& state)
+        {
+            E x, y, res;
+            init_xtensor_benchmark(x, y, res, state.range(0), state.range(0));
+            for (auto _ : state)
+            {
+                res += 3.123;
+                benchmark::DoNotOptimize(res.data());
+            }
+        }
+
+
         BENCHMARK_TEMPLATE(assign_c_assign, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double>)->Range(32, 32<<3);
         BENCHMARK_TEMPLATE(assign_x_assign, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double, layout_type::dynamic>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_x_assign, xt::xtensor<double, 2, layout_type::dynamic>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_xiter_copy, xt::xtensor<double, 2>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_xstorageiter_copy, xt::xtensor<double, 2>)->Range(32, 32<<3);
         BENCHMARK_TEMPLATE(assign_c_assign_ii, xt::xtensor<double, 2>)->Range(32, 32<<3);
         BENCHMARK_TEMPLATE(assign_x_assign_ii, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_c_assign_iii, xt::xtensor<double, 2>)->Range(32, 32<<3);
         BENCHMARK_TEMPLATE(assign_x_assign_iii, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_xstorageiter_copy, xt::xtensor<double, 2>)->Range(32, 32<<3);
-        BENCHMARK_TEMPLATE(assign_xiter_copy, xt::xtensor<double, 2>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_c_assign_iii, xt::xtensor<double, 2>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_x_assign, xt::xarray<double, layout_type::dynamic>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_x_assign, xt::xtensor<double, 2, layout_type::dynamic>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_c_scalar_computed, xt::xtensor<double, 2>)->Range(32, 32<<3);
+        BENCHMARK_TEMPLATE(assign_x_scalar_computed, xt::xtensor<double, 2>)->Range(32, 32<<3);
     }
 }
 
