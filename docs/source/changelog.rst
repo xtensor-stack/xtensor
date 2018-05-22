@@ -14,6 +14,8 @@ Changelog
   `#858 <https://github.com/QuantStack/xtensor/pull/858>`_.
 - Fixup example notebook
   `#861 <https://github.com/QUantStack/xtensor/pull/861>`_.
+- Fix regression with respect to random access stepping with views
+  `#865 <https://github.com/QUantStack/xtensor/pull/865>`_.
 
 0.16.0
 ------
