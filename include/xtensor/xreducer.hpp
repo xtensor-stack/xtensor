@@ -39,20 +39,20 @@ namespace xt
 
 #define DEFAULT_STRATEGY_REDUCERS evaluation_strategy::lazy
 
-    template <class F, class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,
+    template <class F, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>>
-    auto reduce(F&& f, E&& e, X&& axes, ES es = ES());
+    auto reduce(F&& f, E&& e, X&& axes, EVS es = EVS());
 
-    template <class F, class E, class ES = DEFAULT_STRATEGY_REDUCERS,
-              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>
-    auto reduce(F&& f, E&& e, ES es = ES());
+    template <class F, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, EVS>::value, int>>
+    auto reduce(F&& f, E&& e, EVS es = EVS());
 
 #ifdef X_OLD_CLANG
-    template <class F, class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>
-    auto reduce(F&& f, E&& e, std::initializer_list<I> axes, ES es = ES());
+    template <class F, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    auto reduce(F&& f, E&& e, std::initializer_list<I> axes, EVS es = EVS());
 #else
-    template <class F, class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>
-    auto reduce(F&& f, E&& e, const I (&axes)[N], ES es = ES());
+    template <class F, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    auto reduce(F&& f, E&& e, const I (&axes)[N], EVS es = EVS());
 #endif
 
     template <class ST, class X>
@@ -505,14 +505,14 @@ namespace xt
      * depending on whether \p e is an lvalue or an rvalue.
      */
 
-    template <class F, class E, class X, class ES, class>
-    inline auto reduce(F&& f, E&& e, X&& axes, ES evaluation_strategy)
+    template <class F, class E, class X, class EVS, class>
+    inline auto reduce(F&& f, E&& e, X&& axes, EVS evaluation_strategy)
     {
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes), evaluation_strategy);
     }
 
-    template <class F, class E, class ES, class>
-    inline auto reduce(F&& f, E&& e, ES evaluation_strategy)
+    template <class F, class E, class EVS, class>
+    inline auto reduce(F&& f, E&& e, EVS evaluation_strategy)
     {
         typename std::decay_t<E>::shape_type ar;
         resize_container(ar, e.dimension());
@@ -521,16 +521,16 @@ namespace xt
     }
 
 #ifdef X_OLD_CLANG
-    template <class F, class E, class I, class ES>
-    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, ES evaluation_strategy)
+    template <class F, class E, class I, class EVS>
+    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, EVS evaluation_strategy)
     {
         using axes_type = std::vector<typename std::decay_t<E>::size_type>;
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
     }
 #else
-    template <class F, class E, class I, std::size_t N, class ES>
-    inline auto reduce(F&& f, E&& e, const I (&axes)[N], ES evaluation_strategy)
+    template <class F, class E, class I, std::size_t N, class EVS>
+    inline auto reduce(F&& f, E&& e, const I (&axes)[N], EVS evaluation_strategy)
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);

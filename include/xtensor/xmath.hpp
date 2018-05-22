@@ -381,9 +381,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #undef XTENSOR_UNSIGNED_ABS_FUNC
 
 #define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                      \
-    template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                            \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
-    inline auto NAME(E&& e, X&& axes, ES es = ES())                                                               \
+    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -391,9 +391,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                       std::forward<X>(axes), es);                                                                 \
     }                                                                                                             \
                                                                                                                   \
-    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,                                                      \
-              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>               \
-    inline auto NAME(E&& e, ES es = ES())                                                                         \
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                                     \
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, EVS>::value, int>>              \
+    inline auto NAME(E&& e, EVS es = EVS())                                                                       \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -401,8 +401,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
 #define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                     \
-    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                             \
-        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES())                                      \
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                                            \
+        inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                    \
         {                                                                                                         \
             using result_type = RESULT_TYPE;                                                                      \
             using functor_type = FUNCTOR<result_type>;                                                            \
@@ -410,8 +410,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }                                                                                                         \
 
 #define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                  \
-    template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
-    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES())                                                     \
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                             \
+    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1630,9 +1630,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an \ref xexpression of type ``std::array<value_type, 2>``, whose first
      *         and second element represent the minimum and maximum respectively
      */
-    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,
-              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, ES>::value>>
-    inline auto minmax(E&& e, ES es = ES())
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, EVS>::value>>
+    inline auto minmax(E&& e, EVS es = EVS())
     {
         using std::min;
         using std::max;
@@ -1800,9 +1800,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
 #define XTENSOR_NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                             \
-    template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,                                             \
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                            \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
-    inline auto NAME(E&& e, X&& axes, ES es = ES())                                                               \
+    inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1811,9 +1811,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                       std::forward<X>(axes), es);                                                                 \
     }                                                                                                             \
                                                                                                                   \
-    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,                                                      \
-              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>               \
-    inline auto NAME(E&& e, ES es = ES())                                                                         \
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                                     \
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, EVS>::value, int>>              \
+    inline auto NAME(E&& e, EVS es = EVS())                                                                       \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1822,8 +1822,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
 #define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                       \
-    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>                                                \
-        inline auto NAME(E&& e, std::initializer_list<I> axes, ES es = ES())                                         \
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                                               \
+        inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                       \
         {                                                                                                            \
             using result_type = RESULT_TYPE;                                                                         \
             using functor_type = FUNCTOR<result_type>;                                                               \
@@ -1832,8 +1832,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }
 
 #define MODERN_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                 \
-    template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>                              \
-    inline auto NAME(E&& e, const I (&axes)[N], ES es = ES())                                                     \
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                             \
+    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
     {                                                                                                             \
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
@@ -1895,18 +1895,18 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     };                                                                          \
     auto merge_func = std::plus<result_type>();                                 \
 
-    template <class E, class ES = DEFAULT_STRATEGY_REDUCERS,
-              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, ES>::value, int>>
-    inline auto count_nonzeros(E&& e, ES es = ES())
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, EVS>::value, int>>
+    inline auto count_nonzeros(E&& e, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), es);
     }
 
-    template <class E, class X, class ES = DEFAULT_STRATEGY_REDUCERS,
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, X>::value, int>>
-    inline auto count_nonzeros(E&& e, X&& axes, ES es = ES())
+    inline auto count_nonzeros(E&& e, X&& axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
@@ -1914,16 +1914,16 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
 #ifdef X_OLD_CLANG
-    template <class E, class I, class ES = DEFAULT_STRATEGY_REDUCERS>
-    inline auto count_nonzeros(E&& e, std::initializer_list<I> axes, ES es = ES())
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto count_nonzeros(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), axes, es);
     }
 #else
-    template <class E, class I, std::size_t N, class ES = DEFAULT_STRATEGY_REDUCERS>
-    inline auto count_nonzeros(E&& e, const I (&axes)[N], ES es = ES())
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto count_nonzeros(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),

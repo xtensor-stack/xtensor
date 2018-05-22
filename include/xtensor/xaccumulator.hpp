@@ -70,16 +70,16 @@ namespace xt
 
     namespace detail
     {
-        template <class F, class E, class ES>
-        xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, std::size_t, ES)
+        template <class F, class E, class EVS>
+        xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, std::size_t, EVS)
         {
-            static_assert(!std::is_same<evaluation_strategy::lazy, ES>::value, "Lazy accumulators not yet implemented.");
+            static_assert(!std::is_same<evaluation_strategy::lazy, EVS>::value, "Lazy accumulators not yet implemented.");
         }
 
-        template <class F, class E, class ES>
-        xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, ES)
+        template <class F, class E, class EVS>
+        xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, EVS)
         {
-            static_assert(!std::is_same<evaluation_strategy::lazy, ES>::value, "Lazy accumulators not yet implemented.");
+            static_assert(!std::is_same<evaluation_strategy::lazy, EVS>::value, "Lazy accumulators not yet implemented.");
         }
 
         template <class T, class R>
@@ -236,11 +236,11 @@ namespace xt
      *
      * @return returns xarray<T> filled with accumulated values
      */
-    template <class F, class E, class ES = DEFAULT_STRATEGY_ACCUMULATORS,
-              typename std::enable_if_t<!std::is_integral<ES>::value, int> = 0>
-    inline auto accumulate(F&& f, E&& e, ES evaluation_strategy = ES())
+    template <class F, class E, class EVS = DEFAULT_STRATEGY_ACCUMULATORS,
+              typename std::enable_if_t<!std::is_integral<EVS>::value, int> = 0>
+    inline auto accumulate(F&& f, E&& e, EVS evaluation_strategy = EVS())
     {
-        // Note we need to check is_integral above in order to prohibit ES = int, and not taking the std::size_t
+        // Note we need to check is_integral above in order to prohibit EVS = int, and not taking the std::size_t
         // overload below!
         return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), evaluation_strategy);
     }
@@ -256,8 +256,8 @@ namespace xt
      *
      * @return returns xarray<T> filled with accumulated values
      */
-    template <class F, class E, class ES = DEFAULT_STRATEGY_ACCUMULATORS>
-    inline auto accumulate(F&& f, E&& e, std::size_t axis, ES evaluation_strategy = ES())
+    template <class F, class E, class EVS = DEFAULT_STRATEGY_ACCUMULATORS>
+    inline auto accumulate(F&& f, E&& e, std::size_t axis, EVS evaluation_strategy = EVS())
     {
         return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), axis, evaluation_strategy);
     }
