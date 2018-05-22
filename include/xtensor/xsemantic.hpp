@@ -28,7 +28,7 @@ namespace xt
      *           provides the interface.
      */
     template <class D>
-    class xsemantic_base : public xexpression<D>
+    class xsemantic_base : public xexpression_shaped<D, typename xcontainer_inner_types<D>::shape_type>
     {
     public:
 

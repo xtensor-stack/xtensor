@@ -302,6 +302,16 @@ namespace xt
                                                   >
     {
     };
+
+    template <class D, class S>
+    class xexpression_shaped : public xexpression<D>
+    {
+    public:
+
+        using base_type = xexpression<D>;
+        using derived_type = typename base_type::derived_type;
+        using base_type::derived_cast;
+    };
 }
 
 #endif
