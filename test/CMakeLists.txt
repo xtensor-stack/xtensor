@@ -106,7 +106,6 @@ set(XTENSOR_TESTS
     test_xinfo.cpp
     test_xiterator.cpp
     test_xio.cpp
-    test_xjson.cpp
     test_xlayout.cpp
     test_xmath.cpp
     test_xnan_functions.cpp
@@ -134,6 +133,10 @@ set(XTENSOR_TESTS
     test_xview_semantic.cpp
     test_xutils.cpp
 )
+
+if(nlohmann_json_FOUND)
+    list(APPEND XTENSOR_TESTS test_xjson.cpp)
+endif()
 
 # remove xinfo tests for compilers < GCC 5
 if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 5))
