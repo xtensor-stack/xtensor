@@ -34,6 +34,7 @@ namespace xt
     {
         using xexpression_type = std::decay_t<CT>;
         using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
+        using shape_type = S;
     };
 
     template <class CT, class S, layout_type L, class FST>
