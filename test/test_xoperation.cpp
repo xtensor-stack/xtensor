@@ -315,7 +315,7 @@ namespace xt
         using bool_container = rebind_container_t<container_1d, bool>;
         bool_container a = {0, 0, 0, 1, 0};
         bool_container expected = {0, 0, 0, 0, 0};
-        bool_container b = a && 0;
+        bool_container b = a && false;
         bool_container c = a && a;
         EXPECT_EQ(expected, b);
         EXPECT_EQ(c, a);
@@ -328,8 +328,8 @@ namespace xt
         bool_container a = {0, 0, 0, 1, 0};
         bool_container other = {0, 0, 0, 0, 0};
         bool_container b = a || other;
-        bool_container c = a || 0;
-        bool_container d = a || 1;
+        bool_container c = a || false;
+        bool_container d = a || true;
         EXPECT_EQ(b, a);
         EXPECT_EQ(c, a);
 
@@ -494,9 +494,6 @@ namespace xt
         TypeParam expected = {{0., 3., 6.}, {9., 12., 15.}};
         EXPECT_EQ(res, expected);
     }
-
-    template <class T>
-    struct PRINT;
 
     TYPED_TEST(operation, assign_traits)
     {
