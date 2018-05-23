@@ -25,7 +25,7 @@ namespace xt
         {
             for (auto _ : state)
             {
-                T sv({2,3,1});
+                T sv({2, 3, 1});
                 benchmark::DoNotOptimize(sv.data());
             }
         }
@@ -57,13 +57,9 @@ namespace xt
         BENCHMARK_TEMPLATE(xshape_initializer, std::vector<std::size_t>);
         BENCHMARK_TEMPLATE(xshape_initializer, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(xshape_initializer, std::array<std::size_t, 4>);
-        BENCHMARK_TEMPLATE(xshape_initializer, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(xshape_initializer_long, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(xshape_initializer_long, xt::uvector<std::size_t>);
         BENCHMARK_TEMPLATE(xshape_initializer_long, std::vector<std::size_t>);
-        BENCHMARK_TEMPLATE(xshape_initializer, xt::svector<std::size_t, 4>);
-        BENCHMARK_TEMPLATE(xshape_initializer_long, xt::svector<std::size_t, 4>);
-        BENCHMARK_TEMPLATE(xshape_initializer, xt::svector<std::size_t, 4>);
         BENCHMARK_TEMPLATE(xshape_access, xt::uvector<double>);
         BENCHMARK_TEMPLATE(xshape_access, std::vector<double>);
         BENCHMARK_TEMPLATE(xshape_access, xt::svector<std::size_t, 4>);
