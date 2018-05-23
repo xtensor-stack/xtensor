@@ -43,7 +43,7 @@ namespace xt
     template <class S1, class S2>
     [[noreturn]] void throw_broadcast_error(const S1&, const S2&)
     {
-        throw broadcast_error("Incompatible dimneison of arrays, compile in DEBUG for more info");
+        throw broadcast_error("Incompatible dimension of arrays, compile in DEBUG for more info");
     }
 #else
     template <class S1, class S2>
