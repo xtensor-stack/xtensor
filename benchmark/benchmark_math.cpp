@@ -295,4 +295,77 @@ namespace xt
         BENCHMARK_TEMPLATE(math_ref_1, rint_fn)->Range(MATH_RANGE);
         BENCHMARK_TEMPLATE(math_xtensor_1, rint_fn, xtensor<double, 2>)->Range(MATH_RANGE);
     }
+
+    template <class T>
+    void scalar_assign(benchmark::State& state)
+    {
+        T res;
+        std::size_t sz = static_cast<std::size_t>(state.range(0));
+        res.resize({sz, sz});
+        for (auto _ : state)
+        {
+            res += typename T::value_type(1);
+            benchmark::DoNotOptimize(res.data());
+        }
+    }
+
+    template <class T>
+    void scalar_assign_ref(benchmark::State& state)
+    {
+        T res;
+        std::size_t sz = static_cast<std::size_t>(state.range(0));
+        res.resize({sz, sz});
+        for (auto _ : state)
+        {
+            auto szt = res.size();
+            for (std::size_t i = 0; i < szt; ++i)
+            {
+                res.data()[i] += typename T::value_type(1);
+            }
+            benchmark::DoNotOptimize(res.data());
+        }
+    }
+
+    template <class T>
+    void boolean_func(benchmark::State& state)
+    {
+        T a, b;
+        std::size_t sz = static_cast<std::size_t>(state.range(0));
+
+        a.resize({sz, sz});
+        b.resize({sz, sz});
+        xtensor<bool, 2> res; res.resize({sz, sz});
+
+        for (auto _ : state)
+        {
+            res = equal(a, b);
+            benchmark::DoNotOptimize(res.data());
+        }
+    }
+
+    template <class T>
+    void boolean_func_ref(benchmark::State& state)
+    {
+        T a, b;
+        std::size_t sz = static_cast<std::size_t>(state.range(0));
+
+        a.resize({sz, sz});
+        b.resize({sz, sz});
+        xtensor<bool, 2> res; res.resize({sz, sz});
+
+        for (auto _ : state)
+        {
+            auto szt = res.size();
+            for (std::size_t i = 0; i < szt; ++i)
+            {
+                res.data()[i] = (a.data()[i] == b.data()[i]);
+            }
+            benchmark::DoNotOptimize(res.data());
+        }
+    }
+
+    BENCHMARK_TEMPLATE(scalar_assign, xtensor<double, 2>)->Range(MATH_RANGE);
+    BENCHMARK_TEMPLATE(scalar_assign_ref, xtensor<double, 2>)->Range(MATH_RANGE);
+    BENCHMARK_TEMPLATE(boolean_func, xtensor<double, 2>)->Range(MATH_RANGE);
+    BENCHMARK_TEMPLATE(boolean_func_ref, xtensor<double, 2>)->Range(MATH_RANGE);
 }
