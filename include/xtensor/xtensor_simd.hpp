@@ -55,6 +55,7 @@ namespace xsimd
     {
         using type = T;
         using bool_type = bool;
+        using batch_bool = bool;
         static constexpr size_t size = 1;
     };
 
