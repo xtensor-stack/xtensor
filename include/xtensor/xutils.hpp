@@ -389,6 +389,25 @@ namespace xt
         return size == N;
     }
 
+    /******************
+     * get_value_type *
+     ******************/
+
+    template <class T, class = void_t<>>
+    struct get_value_type
+    {
+        using type = T;
+    };
+
+    template <class T>
+    struct get_value_type<T, void_t<typename T::value_type>>
+    {
+        using type = typename T::value_type;
+    };
+
+    template <class T>
+    using get_value_type_t = typename get_value_type<T>::type;
+
     /***************************
      * apply_cv implementation *
      ***************************/

@@ -46,7 +46,7 @@ namespace xt
             return OP arg;                                                      \
         }                                                                       \
         template <class B>                                                      \
-        constexpr typename frt<typename B::value_type, R>::simd_type            \
+        constexpr typename frt<get_value_type_t<B>, R>::simd_type               \
         simd_apply(const B& arg) const                                          \
         {                                                                       \
             return OP arg;                                                      \
@@ -85,7 +85,7 @@ namespace xt
             return (arg1 OP arg2);                                               \
         }                                                                        \
         template <class B>                                                       \
-        constexpr typename frt<typename B::value_type, R>::simd_type             \
+        constexpr typename frt<get_value_type_t<B>, R>::simd_type                \
         simd_apply(const B& arg1, const B& arg2) const                           \
         {                                                                        \
             return (arg1 OP arg2);                                               \
