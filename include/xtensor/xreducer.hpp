@@ -730,6 +730,8 @@ namespace xt
     template <class... Args>
     inline auto xreducer<F, CT, X>::operator()(Args... args) const -> const_reference
     {
+        XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         std::array<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
         return element(arg_array.cbegin(), arg_array.cend());
     }
@@ -789,6 +791,7 @@ namespace xt
     template <class It>
     inline auto xreducer<F, CT, X>::element(It first, It last) const -> const_reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         auto stepper = const_stepper(*this, 0);
         size_type dim = 0;
         while (first != last)

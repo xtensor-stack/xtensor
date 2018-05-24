@@ -520,6 +520,8 @@ namespace xt
     template <class... Args>
     inline auto xfunctor_view<F, CT>::operator()(Args... args) -> reference
     {
+        XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_functor(m_e(args...));
     }
 
@@ -579,6 +581,7 @@ namespace xt
     template <class IT>
     inline auto xfunctor_view<F, CT>::element(IT first, IT last) -> reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_functor(m_e.element(first, last));
     }
 
@@ -592,6 +595,8 @@ namespace xt
     template <class... Args>
     inline auto xfunctor_view<F, CT>::operator()(Args... args) const -> const_reference
     {
+        XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_functor(m_e(args...));
     }
 
@@ -651,6 +656,7 @@ namespace xt
     template <class IT>
     inline auto xfunctor_view<F, CT>::element(IT first, IT last) const -> const_reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_functor(m_e.element(first, last));
     }
     //@}

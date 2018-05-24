@@ -521,6 +521,7 @@ namespace xt
     inline auto xstrided_view<CT, S, L, FS>::operator()(Args... args) -> reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         size_type index = m_offset + xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return m_storage[index];
     }
@@ -537,6 +538,7 @@ namespace xt
     inline auto xstrided_view<CT, S, L, FS>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         size_type index = m_offset + xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
         return m_storage[index];
     }
@@ -630,6 +632,7 @@ namespace xt
     template <class It>
     inline auto xstrided_view<CT, S, L, FS>::element(It first, It last) -> reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_storage[m_offset + element_offset<size_type>(strides(), first, last)];
     }
 
@@ -637,6 +640,7 @@ namespace xt
     template <class It>
     inline auto xstrided_view<CT, S, L, FS>::element(It first, It last) const -> const_reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_storage[m_offset + element_offset<size_type>(strides(), first, last)];
     }
     //@}

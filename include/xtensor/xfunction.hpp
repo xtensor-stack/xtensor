@@ -825,6 +825,8 @@ namespace xt
     template <std::size_t... I, class... Args>
     inline auto xfunction_base<F, R, CT...>::access_impl(std::index_sequence<I...>, Args... args) const -> const_reference
     {
+        XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_f(detail::get_element(std::get<I>(m_e), args...)...);
     }
 
@@ -832,6 +834,7 @@ namespace xt
     template <std::size_t... I, class It>
     inline auto xfunction_base<F, R, CT...>::element_access_impl(std::index_sequence<I...>, It first, It last) const -> const_reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_f((std::get<I>(m_e).element(first, last))...);
     }
 
