@@ -96,18 +96,8 @@ namespace xt
         template <class F, class CST, class R>
         struct simd_return_type<F, CST, R, void_t<decltype(&F::template simd_apply<CST>)>>
         {
-            using type = xsimd::simd_type<xsimd::simd_return_type<xsimd::revert_simd_type<CST>, xsimd::revert_simd_type<R>>>;
+            using type = xsimd::simd_type<xsimd::simd_return_type<CST, R>>;
         };
-
-// TODO: add traits for batch_bool in xsimd and remove this ugly hack
-
-#ifdef XTENSOR_USE_XSIMD
-        template <class F, class CST, class RB, std::size_t N>
-        struct simd_return_type<F, CST, xsimd::batch_bool<RB, N>, void_t<decltype(&F::template simd_apply<CST>)>>
-        {
-            using type = xsimd::batch_bool<RB, N>;
-        };
-#endif
 
         template <class F, class CST, class R>
         using simd_return_type_t = typename simd_return_type<F, CST, R>::type;
