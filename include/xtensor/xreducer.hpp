@@ -794,9 +794,21 @@ namespace xt
         XTENSOR_TRY(check_element_index(shape(), first, last));
         auto stepper = const_stepper(*this, 0);
         size_type dim = 0;
-        while (first != last)
+        // drop left most elements
+        using difference_type = typename std::iterator_traits<It>::difference_type;
+        auto size = std::ptrdiff_t(dimension()) - std::distance(first, last);
+        auto begin = first - size;
+        while (begin != last)
         {
-            stepper.step(dim++, std::size_t(*first++));
+            if (begin < first)
+            {
+                stepper.step(dim++, std::size_t(0));
+                begin++;
+            }
+            else
+            {
+                stepper.step(dim++, std::size_t(*begin++));
+            }
         }
         return *stepper;
     }
