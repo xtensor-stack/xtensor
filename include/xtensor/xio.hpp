@@ -21,12 +21,6 @@
 #include "xmath.hpp"
 #include "xstrided_view.hpp"
 
-#ifdef _WIN32
-    using precision_type = typename std::streamsize;
-#else
-    using precision_type = int;
-#endif
-
 namespace xt
 {
 
@@ -40,7 +34,7 @@ namespace xt
             std::size_t edgeitems = 3;
             std::size_t line_width = 75;
             std::size_t threshold = 1000;
-            precision_type precision = -1;  // default precision
+            std::streamsize precision = -1;  // default precision
         };
 
         inline print_options_impl& print_options()
@@ -88,7 +82,7 @@ namespace xt
          *
          * @param precision The number of digits for floating point output
          */
-        inline void set_precision(precision_type precision)
+        inline void set_precision(std::streamsize precision)
         {
             print_options().precision = precision;
         }
@@ -102,7 +96,7 @@ namespace xt
     {
         template <class E, class F>
         std::ostream& xoutput(std::ostream& out, const E& e, slice_vector& slices, F& printer, std::size_t blanks,
-                              precision_type element_width, std::size_t edgeitems, std::size_t line_width)
+                              std::streamsize element_width, std::size_t edgeitems, std::size_t line_width)
         {
             using size_type = typename E::size_type;
 
@@ -205,7 +199,7 @@ namespace xt
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(precision_type precision)
+            explicit printer(std::streamsize precision)
                 : m_precision(precision)
             {
             }
@@ -226,10 +220,10 @@ namespace xt
                 }
                 else
                 {
-                    precision_type decimals = 1;  // print a leading 0
+                    std::streamsize decimals = 1;  // print a leading 0
                     if (std::floor(m_max) != 0)
                     {
-                        decimals += precision_type(std::log10(std::floor(m_max)));
+                        decimals += std::streamsize(std::log10(std::floor(m_max)));
                     }
                     // 2 => sign and dot
                     m_width = 2 + decimals + m_precision;
@@ -245,7 +239,10 @@ namespace xt
                 if (!m_scientific)
                 {
                     std::stringstream buf;
-                    buf << std::setw(m_width) << std::fixed << std::setprecision(m_precision) << (*m_it);
+                    buf.width(m_width);
+                    buf << std::fixed;
+                    buf.precision(m_precision);
+                    buf << (*m_it);
                     if (!m_required_precision)
                     {
                         buf << '.';
@@ -263,12 +260,17 @@ namespace xt
                 {
                     if (!m_large_exponent)
                     {
-                        out << std::scientific << std::setw(m_width) << (*m_it);
+                        out << std::scientific;
+                        out.width(m_width);
+                        out << (*m_it);
                     }
                     else
                     {
                         std::stringstream buf;
-                        buf << std::setw(m_width) << std::scientific << std::setprecision(m_precision) << (*m_it);
+                        buf.width(m_width);
+                        buf << std::scientific;
+                        buf.precision(m_precision);
+                        buf << (*m_it);
                         std::string res = buf.str();
 
                         if (res[res.size() - 4] == 'e')
@@ -315,7 +317,7 @@ namespace xt
                 m_cache.push_back(val);
             }
 
-            precision_type width()
+            std::streamsize width()
             {
                 return m_width;
             }
@@ -324,9 +326,9 @@ namespace xt
 
             bool m_large_exponent = false;
             bool m_scientific = false;
-            precision_type m_width = 9;
-            precision_type m_precision;
-            precision_type m_required_precision = 0;
+            std::streamsize m_width = 9;
+            std::streamsize m_precision;
+            std::streamsize m_required_precision = 0;
             value_type m_max = 0;
 
             cache_type m_cache;
@@ -340,21 +342,22 @@ namespace xt
             using cache_type = std::vector<value_type>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(precision_type)
+            explicit printer(std::streamsize)
             {
             }
 
             void init()
             {
                 m_it = m_cache.cbegin();
-                m_width = 1 + precision_type(std::log10(m_max)) + m_sign;
+                m_width = 1 + std::streamsize(std::log10(m_max)) + m_sign;
             }
 
             std::ostream& print_next(std::ostream& out)
             {
                 // + enables printing of chars etc. as numbers
                 // TODO should chars be printed as numbers?
-                out << std::setw(m_width) << +(*m_it);
+                out.width(m_width);
+                out << +(*m_it);
                 ++m_it;
                 return out;
             }
@@ -372,14 +375,14 @@ namespace xt
                 m_cache.push_back(val);
             }
 
-            precision_type width()
+            std::streamsize width()
             {
                 return m_width;
             }
 
         private:
 
-            precision_type m_width;
+            std::streamsize m_width;
             bool m_sign = false;
             value_type m_max = 0;
 
@@ -394,7 +397,7 @@ namespace xt
             using cache_type = std::vector<bool>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(precision_type)
+            explicit printer(std::streamsize)
             {
             }
 
@@ -413,8 +416,8 @@ namespace xt
                 {
                     out << "false";
                 }
-                // the following std::setw(5) isn't working correctly on OSX.
-                // out << std::boolalpha << std::setw(m_width) << (*m_it);
+                // TODO: the following std::setw(5) isn't working correctly on OSX.
+                //out << std::boolalpha << std::setw(m_width) << (*m_it);
                 ++m_it;
                 return out;
             }
@@ -424,14 +427,14 @@ namespace xt
                 m_cache.push_back(val);
             }
 
-            precision_type width()
+            std::streamsize width()
             {
                 return m_width;
             }
 
         private:
 
-            precision_type m_width = 5;
+            std::streamsize m_width = 5;
 
             cache_type m_cache;
             cache_iterator m_it;
@@ -444,7 +447,7 @@ namespace xt
             using cache_type = std::vector<bool>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(precision_type precision)
+            explicit printer(std::streamsize precision)
                 : real_printer(precision), imag_printer(precision)
             {
             }
@@ -489,7 +492,7 @@ namespace xt
                 m_signs.push_back(std::signbit(val.imag()));
             }
 
-            precision_type width()
+            std::streamsize width()
             {
                 return real_printer.width() + imag_printer.width() + 2;
             }
@@ -508,7 +511,7 @@ namespace xt
             using cache_type = std::vector<std::string>;
             using cache_iterator = typename cache_type::const_iterator;
 
-            printer(precision_type)
+            explicit printer(std::streamsize)
             {
             }
 
@@ -523,7 +526,8 @@ namespace xt
 
             std::ostream& print_next(std::ostream& out)
             {
-                out << std::setw(m_width) << *m_it;
+                out.width(m_width);
+                out << *m_it;
                 ++m_it;
                 return out;
             }
@@ -535,19 +539,19 @@ namespace xt
                 std::string s = buf.str();
                 if (int(s.size()) > m_width)
                 {
-                    m_width = int(s.size());
+                    m_width = std::streamsize(s.size());
                 }
                 m_cache.push_back(s);
             }
 
-            precision_type width()
+            std::streamsize width()
             {
                 return m_width;
             }
 
         private:
 
-            precision_type m_width = 0;
+            std::streamsize m_width = 0;
             cache_type m_cache;
             cache_iterator m_it;
         };
@@ -598,11 +602,11 @@ namespace xt
             return out;
         }
 
-        precision_type temp_precision = precision_type(out.precision());
-        precision_type precision = temp_precision;
+        auto temp_precision = out.precision();
+        auto precision = temp_precision;
         if (print_options::print_options().precision != -1)
         {
-            out << std::setprecision(print_options::print_options().precision);
+            out.precision(print_options::print_options().precision);
             precision = print_options::print_options().precision;
         }
 
@@ -614,7 +618,7 @@ namespace xt
         sv.clear();
         xoutput(out, d, sv, p, 1, p.width(), lim, print_options::print_options().line_width);
 
-        out << std::setprecision(temp_precision);  // restore precision
+        out.precision(temp_precision);  // restore precision
 
         return out;
     }
