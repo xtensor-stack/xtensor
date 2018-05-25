@@ -503,7 +503,7 @@ namespace xt
     template <class... Args>
     inline auto xscalar<CT>::operator()(Args...) noexcept -> reference
     {
-        XTENSOR_ASSERT(sizeof...(Args) == 0);
+        XTENSOR_CHECK_DIMENSION((std::array<int, 0>()), Args()...);
         return m_value;
     }
 
@@ -541,7 +541,7 @@ namespace xt
     template <class... Args>
     inline auto xscalar<CT>::operator()(Args...) const noexcept -> const_reference
     {
-        XTENSOR_ASSERT(sizeof...(Args) == 0);
+        XTENSOR_CHECK_DIMENSION((std::array<int, 0>()), Args()...);
         return m_value;
     }
 
