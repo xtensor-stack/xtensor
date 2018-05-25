@@ -374,7 +374,6 @@ namespace xt
     TEST(xreducer, wrong_number_of_indices)
     {
         xt::xtensor<double, 4> a = xt::random::rand<double>({5, 5, 5, 5});
-#ifndef XTENSOR_ENABLE_CHECK_DIMENSION
         double e = xt::sum(a)();
         double s1 = xt::sum(a)(0);
         EXPECT_EQ(s1, e);
@@ -385,6 +384,5 @@ namespace xt
         EXPECT_EQ(red(2), red(0, 0, 2));
         EXPECT_EQ(red(1, 2), red(0, 1, 2));
         EXPECT_EQ(red(1, 2), red(1, 1, 1, 1, 1, 0, 1, 2));
-#endif
     }
 }
