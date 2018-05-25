@@ -13,9 +13,31 @@ Changelog
 - Workaround for Visual Studio Bug
   `#858 <https://github.com/QuantStack/xtensor/pull/858>`_.
 - Fixup example notebook
-  `#861 <https://github.com/QUantStack/xtensor/pull/861>`_.
+  `#861 <https://github.com/QuantStack/xtensor/pull/861>`_.
+- Prevent expansion of min and max macros on Windows
+  `#863 <https://github.com/QuantStack/xtensor/pull/863>`_.
+- Renamed ``m_data`` to ``m_storage``
+  `#864 <https://github.com/QuantStack/xtensor/pull/864>`_.
 - Fix regression with respect to random access stepping with views
-  `#865 <https://github.com/QUantStack/xtensor/pull/865>`_.
+  `#865 <https://github.com/QuantStack/xtensor/pull/865>`_.
+- Remove use of CS, DS and ES qualifiers for Solaris builds
+  `#866 <https://github.com/QuantStack/xtensor/pull/866>`_.
+- Removal of precision type
+  `#870 <https://github.com/QuantStack/xtensor/pull/870>`_.
+- Make json tests optional, bump xtl/xsimd versions
+  `#871 <https://github.com/QuantStack/xtensor/pull/871>`_.
+- Add more benchmarks
+  `#876 <https://github.com/QuantStack/xtensor/pull/876>`_.
+- Forbid simd fixed
+  `#877 <https://github.com/QuantStack/xtensor/pull/877>`_.
+- Add more asserts
+  `#879 <https://github.com/QuantStack/xtensor/pull/879>`_.
+- Add missing ``batch_bool`` typedef
+  `#881 <https://github.com/QuantStack/xtensor/pull/881>`_.
+- ``simd_return_type`` hack removed
+  `#882 <https://github.com/QuantStack/xtensor/pull/882>`_.
+- Removed test guard and fixed dimension check in ``xscalar``
+  `#883 <https://github.com/QuantStack/xtensor/pull/883>`_.
 
 0.16.0
 ------
