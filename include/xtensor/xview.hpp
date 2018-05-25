@@ -538,6 +538,8 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) -> reference
     {
+        XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?
@@ -589,6 +591,7 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::element(It first, It last) -> reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         // TODO: avoid memory allocation
         auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
@@ -604,6 +607,8 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) const -> const_reference
     {
+        XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?

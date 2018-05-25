@@ -730,6 +730,8 @@ namespace xt
     template <class... Args>
     inline auto xreducer<F, CT, X>::operator()(Args... args) const -> const_reference
     {
+        XTENSOR_TRY(check_index(shape(), args...));
+        XTENSOR_CHECK_DIMENSION(shape(), args...);
         std::array<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
         return element(arg_array.cbegin(), arg_array.cend());
     }
@@ -789,11 +791,24 @@ namespace xt
     template <class It>
     inline auto xreducer<F, CT, X>::element(It first, It last) const -> const_reference
     {
+        XTENSOR_TRY(check_element_index(shape(), first, last));
         auto stepper = const_stepper(*this, 0);
         size_type dim = 0;
-        while (first != last)
+        // drop left most elements
+        using difference_type = typename std::iterator_traits<It>::difference_type;
+        auto size = std::ptrdiff_t(dimension()) - std::distance(first, last);
+        auto begin = first - size;
+        while (begin != last)
         {
-            stepper.step(dim++, std::size_t(*first++));
+            if (begin < first)
+            {
+                stepper.step(dim++, std::size_t(0));
+                begin++;
+            }
+            else
+            {
+                stepper.step(dim++, std::size_t(*begin++));
+            }
         }
         return *stepper;
     }
