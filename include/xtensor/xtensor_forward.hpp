@@ -130,10 +130,10 @@ namespace xt
     template <std::size_t... N>
     using xshape = fixed_shape<N...>;
 
-    template <class EC, class FS, layout_type L = XTENSOR_DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
+    template <class ET, class S, layout_type L = XTENSOR_DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xfixed_container;
 
-    template <class EC, class FS, layout_type L = XTENSOR_DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
+    template <class ET, class S, layout_type L = XTENSOR_DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xfixed_adaptor;
 
     /**
@@ -152,14 +152,14 @@ namespace xt
      * \endcode
      *
      * @tparam T The value type of the elements.
-     * @tparam FS A xshape template shape.
+     * @tparam FSH A xshape template shape.
      * @tparam L The layout_type of the tensor (default: row_major).
      * @tparam A The allocator of the containers holding the elements.
      */
     template <class T,
-              class FS,
+              class FSH,
               layout_type L = XTENSOR_DEFAULT_LAYOUT>
-    using xtensor_fixed = xfixed_container<T, FS, L>;
+    using xtensor_fixed = xfixed_container<T, FSH, L>;
 
     /**
      * @typedef xtensor_optional
