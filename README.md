@@ -47,7 +47,7 @@ make install
 To try out xtensor interactively in your web browser, just click on the binder
 link:
 
-[![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.15.6?filepath=notebooks/xtensor.ipynb)
+[![Binder](binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.16.1?filepath=notebooks/xtensor.ipynb)
 
 ## Documentation
 
