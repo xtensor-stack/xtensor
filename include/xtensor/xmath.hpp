@@ -84,7 +84,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
-        using return_type = xt::detail::functor_return_type<T, R>;                \
+        template <class U, class RT>                                              \
+        using frt = xt::detail::functor_return_type<U, RT>;                       \
+        using return_type = frt<T, R>;                                            \
         using argument_type = T;                                                  \
         using result_type = decltype(exec(std::declval<T>()));                    \
         using simd_value_type = xsimd::simd_type<T>;                              \
@@ -94,7 +96,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg) const   \
+        template <class B>                                                        \
+        constexpr typename frt<get_value_type_t<B>, R>::simd_type                 \
+        simd_apply(const B& arg) const                                            \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
@@ -127,7 +131,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg) const   \
+        template <class B>                                                        \
+        constexpr simd_result_type simd_apply(const B& arg) const                 \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
@@ -148,6 +153,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \
         }                                                                         \
+        template <class U, class RT>                                              \
+        using frt = xt::detail::functor_return_type<U, RT>;                       \
         using return_type = xt::detail::functor_return_type<T, R>;                \
         using first_argument_type = T;                                            \
         using second_argument_type = T;                                           \
@@ -159,8 +166,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \
         }                                                                         \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg1,        \
-                                              const simd_value_type& arg2) const  \
+        template <class B>                                                        \
+        constexpr typename frt<get_value_type_t<B>, R>::simd_type                 \
+        simd_apply(const B& arg1, const B& arg2) const                            \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \
@@ -184,6 +192,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using math::NAME;                                                     \
             return NAME(arg1, arg2, arg3);                                        \
         }                                                                         \
+        template <class U, class RT>                                              \
+        using frt = xt::detail::functor_return_type<U, RT>;                       \
         using return_type = xt::detail::functor_return_type<T, R>;                \
         using first_argument_type = T;                                            \
         using second_argument_type = T;                                           \
@@ -199,9 +209,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using math::NAME;                                                     \
             return NAME(arg1, arg2, arg3);                                        \
         }                                                                         \
-        constexpr simd_result_type simd_apply(const simd_value_type& arg1,        \
-                                              const simd_value_type& arg2,        \
-                                              const simd_value_type& arg3) const  \
+        template <class B>                                                        \
+        constexpr typename frt<get_value_type_t<B>, R>::simd_type                 \
+        simd_apply(const B& arg1, const B& arg2, const B& arg3) const             \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2, arg3);                                        \
