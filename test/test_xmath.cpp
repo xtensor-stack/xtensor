@@ -341,6 +341,75 @@ namespace xt
      * Exponential functions *
      *************************/
 
+    TEST(xmath, assign_traits)
+    {
+        using array_type = xarray<double>;
+        array_type a = { {1.2, 2.3}, {3.4, 4.5} };
+        
+        {
+            SCOPED_TRACE("unary function");
+            auto fexp = exp(a);
+            using assign_traits = xassign_traits<array_type, decltype(fexp)>;
+            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
+            // triggers the same error as the one caught by mingw.
+            using return_type = decltype(fexp.template load_simd<aligned_mode>(std::size_t(0)));
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits::same_type());
+            EXPECT_TRUE(assign_traits::simd_size());
+            EXPECT_FALSE(assign_traits::forbid_simd());
+            EXPECT_TRUE(assign_traits::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits::same_type());
+            EXPECT_FALSE(assign_traits::simd_size());
+            EXPECT_TRUE(assign_traits::forbid_simd());
+            EXPECT_FALSE(assign_traits::simd_assign());
+            EXPECT_TRUE((std::is_same<return_type, double>::value));
+#endif
+        }
+
+        {
+            SCOPED_TRACE("binary function");
+            auto fpow = pow(a, a);
+            using assign_traits = xassign_traits<array_type, decltype(fpow)>;
+            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
+            // triggers the same error as the one caught by mingw.
+            using return_type = decltype(fpow.template load_simd<aligned_mode>(std::size_t(0)));
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits::same_type());
+            EXPECT_TRUE(assign_traits::simd_size());
+            EXPECT_FALSE(assign_traits::forbid_simd());
+            EXPECT_TRUE(assign_traits::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits::same_type());
+            EXPECT_FALSE(assign_traits::simd_size());
+            EXPECT_TRUE(assign_traits::forbid_simd());
+            EXPECT_FALSE(assign_traits::simd_assign());
+            EXPECT_TRUE((std::is_same<return_type, double>::value));
+#endif
+        }
+
+        {
+            SCOPED_TRACE("ternary function");
+            auto ffma = xt::fma(a, a, a);
+            using assign_traits = xassign_traits<array_type, decltype(ffma)>;
+            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
+            // triggers the same error as the one caught by mingw.
+            using return_type = decltype(ffma.template load_simd<aligned_mode>(std::size_t(0)));
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits::same_type());
+            EXPECT_TRUE(assign_traits::simd_size());
+            EXPECT_FALSE(assign_traits::forbid_simd());
+            EXPECT_TRUE(assign_traits::simd_assign());
+#else
+            EXPECT_TRUE(assign_traits::same_type());
+            EXPECT_FALSE(assign_traits::simd_size());
+            EXPECT_TRUE(assign_traits::forbid_simd());
+            EXPECT_FALSE(assign_traits::simd_assign());
+            EXPECT_TRUE((std::is_same<return_type, double>::value));
+#endif
+        }
+    }
+
     TEST(xmath, exp)
     {
         shape_type shape = {3, 2};
