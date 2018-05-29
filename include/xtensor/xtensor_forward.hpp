@@ -61,7 +61,7 @@ namespace xt
               layout_type L = XTENSOR_DEFAULT_LAYOUT,
               class A = XTENSOR_DEFAULT_ALLOCATOR(T),
               class SA = std::allocator<typename std::vector<T, A>::size_type>>
-    using xarray = xarray_container<XTENSOR_DATA_SHAPE_CONTAINER(T, A), L, XTENSOR_DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
+    using xarray = xarray_container<XTENSOR_DEFAULT_DATA_CONTAINER(T, A), L, XTENSOR_DEFAULT_SHAPE_CONTAINER(T, A, SA)>;
 
     template <class EC,
               layout_type L = XTENSOR_DEFAULT_LAYOUT,
@@ -115,7 +115,7 @@ namespace xt
               std::size_t N,
               layout_type L = XTENSOR_DEFAULT_LAYOUT,
               class A = XTENSOR_DEFAULT_ALLOCATOR(T)>
-    using xtensor = xtensor_container<XTENSOR_DATA_SHAPE_CONTAINER(T, A), N, L>;
+    using xtensor = xtensor_container<XTENSOR_DEFAULT_DATA_CONTAINER(T, A), N, L>;
 
     template <class EC, std::size_t N, layout_type L = XTENSOR_DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_adaptor;

@@ -212,6 +212,12 @@ namespace xt
         test_iterator<xtensor_rm, xtensor_cm, storage_type>(arm, acm);
     }
 
+    TEST(xtensor, fill)
+    {
+        xtensor<int, 2> a;
+        test_fill(a);
+    }
+
     TEST(xtensor, zerod)
     {
         xtensor_dynamic a;

@@ -116,6 +116,9 @@ namespace xt
         constexpr const inner_strides_type& strides() const noexcept;
         constexpr const inner_backstrides_type& backstrides() const noexcept;
 
+        template <class T>
+        void fill(const T& value);
+
         template <class... Args>
         reference operator()(Args... args);
 
@@ -514,6 +517,18 @@ namespace xt
     /**
      * @name Data
      */
+
+    /**
+     * Fills the container with the given value.
+     * @param value the value to fill the container with.
+     */
+    template <class D>
+    template <class T>
+    inline void xcontainer<D>::fill(const T& value)
+    {
+        std::fill(storage_begin(), storage_end(), value);
+    }
+
     //@{
     /**
      * Returns a reference to the element at the specified position in the container.

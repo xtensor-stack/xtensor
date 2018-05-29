@@ -670,6 +670,19 @@ namespace xt
         }
     }
 
+    template <class V>
+    void test_fill(V& vec)
+    {
+        using value_type = typename V::value_type;
+        vec.resize({ 3, 4 });
+        value_type v(4);
+        vec.fill(v);
+        for (auto it = vec.cbegin(); it != vec.cend(); ++it)
+        {
+            EXPECT_EQ(*it, v);
+        }
+    }
+
     template <class V, class C = dynamic_shape<std::size_t>>
     void test_xiterator(V& vec)
     {
