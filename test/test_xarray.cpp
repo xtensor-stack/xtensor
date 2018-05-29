@@ -209,6 +209,12 @@ namespace xt
         test_iterator(arm, acm);
     }
 
+    TEST(xarray, fill)
+    {
+        xarray_dynamic a;
+        test_fill(a);
+    }
+
     TEST(xarray, initializer_list)
     {
         xarray_dynamic a0(1);

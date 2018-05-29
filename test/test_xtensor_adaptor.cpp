@@ -149,6 +149,13 @@ namespace xt
         test_iterator<adaptor_rm, adaptor_cm, storage_type>(arm, acm);
     }
 
+    TEST(xtensor_adaptor, fill)
+    {
+        vec_type v;
+        xtensor_adaptor<vec_type, 2> a(v);
+        test_fill(a);
+    }
+
     TEST(xtensor_adaptor, xiterator)
     {
         vec_type v;

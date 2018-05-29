@@ -149,6 +149,13 @@ namespace xt
         test_iterator(arm, acm);
     }
 
+    TEST(xarray_adaptor, fill)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_fill(a);
+    }
+
     TEST(xarray_adaptor, xiterator)
     {
         vec_type v;
