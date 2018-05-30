@@ -74,6 +74,14 @@ namespace xt
         EXPECT_TRUE(!any(e2 > 0.5));
     }
 
+    TEST(xindex_view, access)
+    {
+        xarray<double> e = {{ 1, 0, 0 }, { 0, 1, 0 }, { 0, 0, 1 }};
+        auto v = filter(e, e > 0);
+        EXPECT_EQ(v(), v(0));
+        EXPECT_EQ(v(1, 2, 1), v(1));
+    }
+
     TEST(xindex_view, indices_on_function)
     {
         xarray<double> e = xt::random::rand<double>({3, 3});

@@ -184,45 +184,6 @@ namespace xt
     template <class E>
     using xvalue_type_t = typename xvalue_type<E>::type;
 
-    /***************
-     * get_element *
-     ***************/
-
-    namespace detail
-    {
-        template <class E>
-        inline typename E::reference get_element(E& e)
-        {
-            return e();
-        }
-
-        template <class E, class S, class... Args>
-        inline typename E::reference get_element(E& e, S i, Args... args)
-        {
-            if (sizeof...(Args) >= e.dimension())
-            {
-                return get_element(e, args...);
-            }
-            return e(i, args...);
-        }
-
-        template <class E>
-        inline typename E::const_reference get_element(const E& e)
-        {
-            return e();
-        }
-
-        template <class E, class S, class... Args>
-        inline typename E::const_reference get_element(const E& e, S i, Args... args)
-        {
-            if (sizeof...(Args) >= e.dimension())
-            {
-                return get_element(e, args...);
-            }
-            return e(i, args...);
-        }
-    }
-
     /*************************
      * expression tag system *
      *************************/

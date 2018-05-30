@@ -260,7 +260,7 @@ namespace xt
     template <class... Args>
     inline auto xbroadcast<CT, X>::operator()(Args... args) const -> const_reference
     {
-        return detail::get_element(m_e, args...);
+        return m_e(args...);
     }
 
     /**
