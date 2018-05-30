@@ -153,6 +153,8 @@ namespace xt
         reference operator()(Args... args);
         template <class... Args>
         reference at(Args... args);
+        template <class... Args>
+        reference unchecked(Args... args);
         template <class OS>
         disable_integral_t<OS, reference> operator[](const OS& index);
         template <class I>
@@ -165,6 +167,8 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference at(Args... args) const;
+        template <class... Args>
+        const_reference unchecked(Args... args) const;
         template <class OS>
         disable_integral_t<OS, const_reference> operator[](const OS& index) const;
         template <class I>
@@ -260,6 +264,12 @@ namespace xt
 
         template <class Arg, class... Args>
         const_reference access(Arg arg, Args... args) const;
+
+        template <typename std::decay_t<CT>::size_type... I, class... Args>
+        reference unchecked_impl(std::index_sequence<I...>, Args... args);
+
+        template <typename std::decay_t<CT>::size_type... I, class... Args>
+        const_reference unchecked_impl(std::index_sequence<I...>, Args... args) const;
 
         template <typename std::decay_t<CT>::size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args);
@@ -556,7 +566,6 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access(static_cast<size_type>(args)...);
-        //return detail::get_element(*this, static_cast<size_type>(args)...);
     }
 
     /**
@@ -576,6 +585,38 @@ namespace xt
         return this->operator()(args...);
     }
 
+    /**
+    * Returns a reference to the element at the specified position in the view.
+    * @param args a list of indices specifying the position in the view. Indices
+    * must be unsigned integers, the number of indices must be equal to the number of
+    * dimensions of the view, else the behavior is undefined.
+    *
+    * @warning This method is meant for performance, for expressions with a dynamic
+    * number of dimensions (i.e. not known at compile time). Since it may have
+    * undefined behavior (see parameters), operator() should be prefered whenever
+    * it is possible.
+    * @warning This method is NOT compatible with broadcasting, meaning the following
+    * code has undefined behavior:
+    * \code{.cpp}
+    * xt::xarray<double> a = {{0, 1}, {2, 3}};
+    * xt::xarray<double> b = {0, 1};
+    * auto fd = a + b;
+    * double res = fd.uncheked(0, 1);
+    * \endcode
+    */
+    template <class CT, class... S>
+    template <class... Args>
+    inline auto xview<CT, S...>::unchecked(Args... args) -> reference
+    {
+        return unchecked_impl(make_index_sequence(args...), static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the view.
+     * @param index a sequence of indices specifying the position in the view. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the view.
+     */
     template <class CT, class... S>
     template <class OS>
     inline auto xview<CT, S...>::operator[](const OS& index)
@@ -623,11 +664,10 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access(static_cast<size_type>(args)...);
-        //return detail::get_element(*this, static_cast<size_type>(args)...);
     }
 
     /**
-     * Returns a constant reference to the element at the specified position in the expression,
+     * Returns a constant reference to the element at the specified position in the view,
      * after dimension and bounds checking.
      * @param args a list of indices specifying the position in the function. Indices
      * must be unsigned integers, the number of indices should be equal to the number of dimensions
@@ -643,6 +683,38 @@ namespace xt
         return this->operator()(args...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the view.
+     * @param args a list of indices specifying the position in the view. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the view, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class CT, class... S>
+    template <class... Args>
+    inline auto xview<CT, S...>::unchecked(Args... args) const -> const_reference
+    {
+        return unchecked_impl(make_index_sequence(args...), static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the view.
+     * @param index a sequence of indices specifying the position in the view. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the view.
+     */
     template <class CT, class... S>
     template <class OS>
     inline auto xview<CT, S...>::operator[](const OS& index) const
@@ -867,6 +939,20 @@ namespace xt
             return access(args...);
         }
         return access_impl(make_index_sequence(arg, args...), arg, args...);
+    }
+
+    template <class CT, class... S>
+    template <typename std::decay_t<CT>::size_type... I, class... Args>
+    inline auto xview<CT, S...>::unchecked_impl(std::index_sequence<I...>, Args... args) -> reference
+    {
+        return m_e.unchecked(index<I>(args...)...);
+    }
+
+    template <class CT, class... S>
+    template <typename std::decay_t<CT>::size_type... I, class... Args>
+    inline auto xview<CT, S...>::unchecked_impl(std::index_sequence<I...>, Args... args) const -> const_reference
+    {
+        return m_e.unchecked(index<I>(args...)...);
     }
 
     template <class CT, class... S>

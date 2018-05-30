@@ -259,6 +259,12 @@ namespace xt
         EXPECT_EQ(c(2, 3, 1, 1, 2), c(1, 1, 2));
     }
 
+    TEST(xbuilder, unchecked)
+    {
+        auto ls = linspace<float>(20.f, 50.f, 100, false);
+        EXPECT_EQ(ls.unchecked(10), ls(10));
+    }
+
     TEST(xbuilder, stack)
     {
         xarray<double> a = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};

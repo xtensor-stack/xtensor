@@ -170,6 +170,28 @@ namespace xt
         }
     }
 
+    TEST(xfunciton, unchecked)
+    {
+        xfunction_features f;
+        size_t i = f.m_a.shape()[0] - 1;
+        size_t j = f.m_a.shape()[1] - 1;
+        size_t k = f.m_a.shape()[2] - 1;
+
+        {
+            SCOPED_TRACE("same shape");
+            int a = (f.m_a + f.m_a)(i, j, k);
+            int b = (f.m_a + f.m_a).unchecked(i, j, k);
+            EXPECT_EQ(a, b);
+        }
+
+        {
+            SCOPED_TRACE("different shape");
+            int a = (f.m_a + f.m_b)(i, j, k);
+            int b = (f.m_a + f.m_b).unchecked(i, j, k);
+            EXPECT_EQ(a, b);
+        }
+    }
+
     TEST(xfunction, at)
     {
         xfunction_features f;

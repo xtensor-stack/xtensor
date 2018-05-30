@@ -110,6 +110,7 @@ namespace xt
         reference operator()(size_type idx = size_type(0));
         template <class... Args>
         reference operator()(size_type idx0, size_type idx1, Args... args);
+        reference unchecked(size_type idx);
         template <class S>
         disable_integral_t<S, reference> operator[](const S& index);
         template <class OI>
@@ -122,6 +123,7 @@ namespace xt
         const_reference operator()(size_type idx = size_type(0)) const;
         template <class... Args>
         const_reference operator()(size_type idx0, size_type idx1, Args... args) const;
+        const_reference unchecked(size_type idx) const;
         template <class S>
         disable_integral_t<S, const_reference> operator[](const S& index) const;
         template <class OI>
@@ -333,6 +335,16 @@ namespace xt
         return this->operator()(idx1, args...);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the xindex_view.
+     * @param idx index specifying the position in the index_view.
+     */
+    template <class CT, class I>
+    inline auto xindex_view<CT, I>::unchecked(size_type idx) -> reference
+    {
+        return this->operator()(idx);
+    }
+
     template <class CT, class I>
     inline auto xindex_view<CT, I>::operator()(size_type idx) const -> const_reference
     {
@@ -350,6 +362,16 @@ namespace xt
     inline auto xindex_view<CT, I>::operator()(size_type, size_type idx1, Args... args) const -> const_reference
     {
         return this->operator()(idx1, args...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the xindex_view.
+     * @param idx index specifying the position in the index_view.
+     */
+    template <class CT, class I>
+    inline auto xindex_view<CT, I>::unchecked(size_type idx) const -> const_reference
+    {
+        return this->operator()(idx);
     }
 
     /**

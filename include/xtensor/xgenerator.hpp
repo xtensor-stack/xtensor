@@ -92,6 +92,8 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference at(Args... args) const;
+        template <class... Args>
+        const_reference unchecked(Args... args) const;
         template <class OS>
         disable_integral_t<OS, const_reference> operator[](const OS& index) const;
         template <class I>
@@ -218,6 +220,32 @@ namespace xt
     {
         check_access(shape(), args...);
         return this->operator()(args...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the expression. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the expression, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     *  code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class F, class R, class S>
+    template <class... Args>
+    inline auto xgenerator<F, R, S>::unchecked(Args... args) const -> const_reference
+    {
+        return m_f(args...);
     }
 
     template <class F, class R, class S>

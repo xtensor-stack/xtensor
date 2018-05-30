@@ -288,6 +288,23 @@ namespace xt
         EXPECT_EQ(v3(2, 3, 1, 1), arr(1, 2));
     }
 
+    TEST(xview, unchecked)
+    {
+        xt::xarray<double> arr
+        { { 1.0, 2.0, 3.0 },
+        { 2.0, 5.0, 7.0 },
+        { 2.0, 5.0, 7.0 } };
+
+        auto v1 = xt::view(arr, 1, xt::range(1, 3));
+        EXPECT_EQ(v1.unchecked(1), arr(1, 2));
+
+        auto v2 = xt::view(arr, all(), newaxis(), all());
+        EXPECT_EQ(v2.unchecked(1, 0, 2), arr(1, 2));
+
+        auto v3 = xt::view(arr, xt::range(0, 2), xt::range(1, 3));
+        EXPECT_EQ(v3.unchecked(1, 1), arr(1, 2));
+    }
+
     TEST(xview, iterator)
     {
         view_shape_type shape = {2, 3, 4};

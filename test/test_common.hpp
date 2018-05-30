@@ -420,6 +420,46 @@ namespace xt
     }
 
     template <class V, class C = dynamic_shape<std::size_t>>
+    void test_unchecked(V& vec)
+    {
+        {
+            SCOPED_TRACE("row_major access");
+            row_major_result<C> rm;
+            vec.resize(rm.m_shape, layout_type::row_major);
+            assign_array(vec, rm.m_assigner);
+            EXPECT_TRUE(std::equal(vec.storage().cbegin(), vec.storage().cend(), rm.m_data.cbegin()));
+            EXPECT_EQ(vec.unchecked(0, 1, 1), vec(0, 1, 1));
+        }
+
+        {
+            SCOPED_TRACE("column_major access");
+            column_major_result<C> cm;
+            vec.resize(cm.m_shape, layout_type::column_major);
+            assign_array(vec, cm.m_assigner);
+            EXPECT_TRUE(std::equal(vec.storage().cbegin(), vec.storage().cend(), cm.m_data.cbegin()));
+            EXPECT_EQ(vec.unchecked(0, 1, 1), vec(0, 1, 1));
+        }
+
+        {
+            SCOPED_TRACE("central_major access");
+            central_major_result<C> cem;
+            vec.resize(cem.m_shape, cem.m_strides);
+            assign_array(vec, cem.m_assigner);
+            EXPECT_TRUE(std::equal(vec.storage().cbegin(), vec.storage().cend(), cem.m_data.cbegin()));
+            EXPECT_EQ(vec.unchecked(0, 1, 1), vec(0, 1, 1));
+        }
+
+        {
+            SCOPED_TRACE("unit_shape access");
+            unit_shape_result<C> usr;
+            vec.resize(usr.m_shape, layout_type::row_major);
+            assign_array(vec, usr.m_assigner);
+            EXPECT_TRUE(std::equal(vec.storage().cbegin(), vec.storage().cend(), usr.m_data.cbegin()));
+            EXPECT_EQ(vec.unchecked(0, 1, 0), vec(0, 1, 0));
+        }
+    }
+
+    template <class V, class C = dynamic_shape<std::size_t>>
     void test_at(V& vec)
     {
         {

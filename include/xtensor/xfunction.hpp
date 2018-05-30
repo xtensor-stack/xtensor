@@ -235,6 +235,9 @@ namespace xt
         template <class... Args>
         const_reference at(Args... args) const;
 
+        template <class... Args>
+        const_reference unchecked(Args... args) const;
+
         template <class S>
         disable_integral_t<S, const_reference> operator[](const S& index) const;
         template <class I>
@@ -312,6 +315,9 @@ namespace xt
 
         template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
+        
+        template <std::size_t... I, class... Args>
+        const_reference unchecked_impl(std::index_sequence<I...>, Args... args) const;
 
         template <std::size_t... I, class It>
         const_reference element_access_impl(std::index_sequence<I...>, It first, It last) const;
@@ -627,6 +633,34 @@ namespace xt
         return this->operator()(args...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the expression. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the expression, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class F, class R, class... CT>
+    template <class... Args>
+    inline auto xfunction_base<F, R, CT...>::unchecked(Args... args) const -> const_reference
+    {
+        // The static cast prevents the compiler from instantiating the template methods with signed integers,
+        // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
+        return unchecked_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
+    }
+
     template <class F, class R, class... CT>
     template <class S>
     inline auto xfunction_base<F, R, CT...>::operator[](const S& index) const
@@ -818,6 +852,13 @@ namespace xt
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_f(std::get<I>(m_e)(args...)...);
+    }
+    
+    template <class F, class R, class... CT>
+    template <std::size_t... I, class... Args>
+    inline auto xfunction_base<F, R, CT...>::unchecked_impl(std::index_sequence<I...>, Args... args) const -> const_reference
+    {
+        return m_f(std::get<I>(m_e).unchecked(args...)...);
     }
 
     template <class F, class R, class... CT>

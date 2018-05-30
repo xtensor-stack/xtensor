@@ -82,6 +82,13 @@ namespace xt
         EXPECT_EQ(v(1, 2, 1), v(1));
     }
 
+    TEST(xindex_view, unchecked)
+    {
+        xarray<double> e = { { 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 } };
+        auto v = filter(e, e > 0);
+        EXPECT_EQ(v.unchecked(1), v(1));
+    }
+
     TEST(xindex_view, indices_on_function)
     {
         xarray<double> e = xt::random::rand<double>({3, 3});

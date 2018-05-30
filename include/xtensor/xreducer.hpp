@@ -439,6 +439,8 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference at(Args... args) const;
+        template <class... Args>
+        const_reference unchecked(Args... args) const;
         template <class S>
         disable_integral_t<S, const_reference> operator[](const S& index) const;
         template <class I>
@@ -752,6 +754,34 @@ namespace xt
         check_access(shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the reducer.
+     * @param args a list of indices specifying the position in the reducer. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the reducer, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class F, class CT, class X>
+    template <class... Args>
+    inline auto xreducer<F, CT, X>::unchecked(Args... args) const -> const_reference
+    {
+        std::array<std::size_t, sizeof...(Args)> arg_array = { { static_cast<std::size_t>(args)... } };
+        return element(arg_array.cbegin(), arg_array.cend());
+    }
+
     /**
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param index a sequence of indices specifying the position in the reducer. Indices
