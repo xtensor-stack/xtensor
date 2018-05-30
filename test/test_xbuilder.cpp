@@ -252,6 +252,13 @@ namespace xt
         ASSERT_TRUE(arange(8) == t);
     }
 
+    TEST(xbuilder, access)
+    {
+        xarray<double> a = { { { 0, 1, 2 },{ 3, 4, 5 } },{ { 6, 7, 8 },{ 9, 10, 11 } } };
+        auto c = concatenate(xtuple(a, a, a), 2);
+        EXPECT_EQ(c(2, 3, 1, 1, 2), c(1, 1, 2));
+    }
+
     TEST(xbuilder, stack)
     {
         xarray<double> a = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};

@@ -246,7 +246,20 @@ namespace xt
         mutable strides_type m_strides;
         mutable bool m_strides_computed;
 
+        template <class... Args>
+        auto make_index_sequence(Args... args) const noexcept;
+
         strides_type compute_strides() const;
+
+        reference access();
+
+        template <class Arg, class... Args>
+        reference access(Arg arg, Args... args);
+
+        const_reference access() const;
+
+        template <class Arg, class... Args>
+        const_reference access(Arg arg, Args... args) const;
 
         template <typename std::decay_t<CT>::size_type... I, class... Args>
         reference access_impl(std::index_sequence<I...>, Args... args);
@@ -542,10 +555,8 @@ namespace xt
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
-        return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?
-                                                        sizeof...(Args) + integral_count<S...>() - newaxis_count<S...>() :
-                                                        0)>(),
-                           static_cast<size_type>(args)...);
+        return access(static_cast<size_type>(args)...);
+        //return detail::get_element(*this, static_cast<size_type>(args)...);
     }
 
     /**
@@ -611,10 +622,8 @@ namespace xt
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
-        return access_impl(std::make_index_sequence<(sizeof...(Args) + integral_count<S...>() > newaxis_count<S...>() ?
-                                                        sizeof...(Args) + integral_count<S...>() - newaxis_count<S...>() :
-                                                        0)>(),
-                           static_cast<size_type>(args)...);
+        return access(static_cast<size_type>(args)...);
+        //return detail::get_element(*this, static_cast<size_type>(args)...);
     }
 
     /**
@@ -795,6 +804,15 @@ namespace xt
     //@}
 
     template <class CT, class... S>
+    template <class... Args>
+    inline auto xview<CT, S...>::make_index_sequence(Args...) const noexcept
+    {
+        return std::make_index_sequence<(sizeof...(Args)+integral_count<S...>() > newaxis_count<S...>() ?
+                                         sizeof...(Args)+integral_count<S...>() - newaxis_count<S...>() :
+                                         0)>();
+    }
+
+    template <class CT, class... S>
     inline auto xview<CT, S...>::compute_strides() const -> strides_type
     {
         strides_type strides = xtl::make_sequence<strides_type>(dimension(), 0);
@@ -815,6 +833,40 @@ namespace xt
         }
 
         return strides;
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::access() -> reference
+    {
+        return access_impl(make_index_sequence());
+    }
+
+    template <class CT, class... S>
+    template <class Arg, class... Args>
+    inline auto xview<CT, S...>::access(Arg arg, Args... args) -> reference
+    {
+        if (sizeof...(Args) >= dimension())
+        {
+            return access(args...);
+        }
+        return access_impl(make_index_sequence(arg, args...), arg, args...);
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::access() const -> const_reference
+    {
+        return access_impl(make_index_sequence());
+    }
+
+    template <class CT, class... S>
+    template <class Arg, class... Args>
+    inline auto xview<CT, S...>::access(Arg arg, Args... args) const -> const_reference
+    {
+        if (sizeof...(Args) >= dimension())
+        {
+            return access(args...);
+        }
+        return access_impl(make_index_sequence(arg, args...), arg, args...);
     }
 
     template <class CT, class... S>

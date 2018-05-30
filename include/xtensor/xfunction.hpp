@@ -817,7 +817,7 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        return m_f(detail::get_element(std::get<I>(m_e), args...)...);
+        return m_f(std::get<I>(m_e)(args...)...);
     }
 
     template <class F, class R, class... CT>
