@@ -179,6 +179,12 @@ namespace xt
         test_access<xtensor_dynamic, storage_type>(a);
     }
 
+    TEST(xtensor, unchecked)
+    {
+        xtensor_dynamic a;
+        test_unchecked<xtensor_dynamic, storage_type>(a);
+    }
+
     TEST(xtensor, at)
     {
         xtensor_dynamic a;

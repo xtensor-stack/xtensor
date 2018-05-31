@@ -26,11 +26,14 @@ namespace xt
      * data offset *
      ***************/
 
-    template <class size_type, class S, size_t dim = 0>
+    template <class size_type, class S>
     size_type data_offset(const S& strides) noexcept;
 
-    template <class size_type, class S, size_t dim = 0, class Arg, class... Args>
+    template <class size_type, class S, class Arg, class... Args>
     size_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
+
+    template <class size_type, class S, class... Args>
+    size_type unchecked_data_offset(const S& strides, Args... args) noexcept;
 
     template <class size_type, class S, class It>
     size_type element_offset(const S& strides, It first, It last) noexcept;
@@ -106,45 +109,51 @@ namespace xt
 
     namespace detail
     {
-        template <class size_type, class S, std::size_t dim>
+        template <class size_type, std::size_t dim, class S>
         inline size_type raw_data_offset(const S&) noexcept
         {
             return 0;
         }
 
-        template <class size_type, class S, std::size_t dim, class Arg, class... Args>
+        template <class size_type, std::size_t dim, class S, class Arg, class... Args>
         inline size_type raw_data_offset(const S& strides, Arg arg, Args... args) noexcept
         {
-            return arg * strides[dim] + raw_data_offset<size_type, S, dim + 1>(strides, args...);
+            return arg * strides[dim] + raw_data_offset<size_type, dim + 1>(strides, args...);
         }
     }
 
-    template <class size_type, class S, std::size_t dim>
+    template <class size_type, class S>
     inline size_type data_offset(const S&) noexcept
     {
         return 0;
     }
 
-    template <class size_type, class S, std::size_t dim, class Arg, class... Args>
+    template <class size_type, class S, class Arg, class... Args>
     inline size_type data_offset(const S& strides, Arg arg, Args... args) noexcept
     {
-        constexpr std::size_t nargs = sizeof...(Args) + dim + 1;
+        constexpr std::size_t nargs = sizeof...(Args) + 1;
         if (nargs == strides.size())
         {
             // Correct number of arguments: iterate
-            return detail::raw_data_offset<size_type, S, dim, Arg, Args...>(strides, arg, args...);
+            return detail::raw_data_offset<size_type, 0>(strides, arg, args...);
         }
         else if (nargs > strides.size())
         {
             // Too many arguments: drop the first
-            return data_offset<size_type, S, dim>(strides, args...);
+            return data_offset<size_type, S>(strides, args...);
         }
         else
         {
             // Too few arguments: right to left scalar product
             auto view = strides.cend() - nargs;
-            return detail::raw_data_offset<size_type, const typename S::const_iterator, dim, Arg, Args...>(view, arg, args...);
+            return detail::raw_data_offset<size_type, 0>(view, arg, args...);
         }
+    }
+
+    template <class size_type, class S, class... Args>
+    inline size_type unchecked_data_offset(const S& strides, Args... args) noexcept
+    {
+        return detail::raw_data_offset<size_type, 0>(strides.cbegin(), args...);
     }
 
     template <class size_type, class S, class It>

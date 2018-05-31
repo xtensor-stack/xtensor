@@ -118,6 +118,13 @@ namespace xt
         test_access<adaptor_type, storage_type>(a);
     }
 
+    TEST(xtensor_adaptor, unchecked)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_unchecked<adaptor_type, storage_type>(a);
+    }
+
     TEST(xtensor_adaptor, at)
     {
         vec_type v;

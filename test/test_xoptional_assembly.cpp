@@ -212,6 +212,16 @@ namespace xt
         EXPECT_EQ(a(1, 1), opt(4, true));
     }
 
+    TEST(xoptional_assembly, unchecked)
+    {
+        using opt = xtl::xoptional<int>;
+        opt_ass_type a = { { opt(1), opt(2, false) },{ opt(3, false), opt(4) } };
+        EXPECT_EQ(a.unchecked(0, 0), opt(1, true));
+        EXPECT_EQ(a.unchecked(0, 1), opt(2, false));
+        EXPECT_EQ(a.unchecked(1, 0), opt(3, false));
+        EXPECT_EQ(a.unchecked(1, 1), opt(4, true));
+    }
+
     TEST(xoptional_assembly, at)
     {
         using opt = xtl::xoptional<int>;

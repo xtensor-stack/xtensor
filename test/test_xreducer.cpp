@@ -83,6 +83,13 @@ namespace xt
         EXPECT_EQ(features.m_red(1, 2, 1, 0, 1), features.m_red(1, 0, 1));
     }
 
+    TEST(xreducer, unchecked)
+    {
+        xreducer_features features;
+        EXPECT_EQ(12, features.m_red.unchecked(0, 0, 0));
+        EXPECT_EQ(24, features.m_red.unchecked(1, 1, 1));
+    }
+
     TEST(xreducer, indexed_access)
     {
         xreducer_features features;

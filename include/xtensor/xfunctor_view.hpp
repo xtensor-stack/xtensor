@@ -168,6 +168,9 @@ namespace xt
         template <class... Args>
         reference at(Args... args);
 
+        template <class... Args>
+        reference unchecked(Args... args);
+
         template <class S>
         disable_integral_t<S, reference> operator[](const S& index);
         template <class I>
@@ -179,6 +182,9 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args... args) const;
+
+        template <class... Args>
+        const_reference unchecked(Args... args) const;
 
         template <class... Args>
         const_reference at(Args... args) const;
@@ -544,6 +550,32 @@ namespace xt
 
     /**
      * Returns a reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the expression. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the expression, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class F, class CT>
+    template <class... Args>
+    inline auto xfunctor_view<F, CT>::unchecked(Args... args) -> reference
+    {
+        return m_functor(m_e.unchecked(args...));
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the expression.
      * @param index a sequence of indices specifying the position in the function. Indices
      * must be unsigned integers, the number of indices in the sequence should be equal or greater
      * than the number of dimensions of the container.
@@ -615,6 +647,32 @@ namespace xt
     {
         check_access(shape(), args...);
         return this->operator()(args...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the expression. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the expression, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class F, class CT>
+    template <class... Args>
+    inline auto xfunctor_view<F, CT>::unchecked(Args... args) const -> const_reference
+    {
+        return m_functor(m_e.unchecked(args...));
     }
 
     /**

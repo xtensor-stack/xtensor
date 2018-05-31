@@ -177,6 +177,12 @@ namespace xt
         test_access(a);
     }
 
+    TEST(xarray, unchecked)
+    {
+        xarray_dynamic a;
+        test_unchecked(a);
+    }
+
     TEST(xarray, at)
     {
         xarray_dynamic a;

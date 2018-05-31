@@ -33,6 +33,7 @@ namespace xt
         EXPECT_EQ(size_t(1), view1.dimension());
         EXPECT_EQ(view1(), view1(0));
         EXPECT_EQ(view1(1, 0), view1(0));
+        EXPECT_EQ(view1.unchecked(0), view1(0));
 
         auto view0 = strided_view(a, slice_vector({ 0, range(0, 3) }));
         EXPECT_EQ(a(0, 0), view0(0));

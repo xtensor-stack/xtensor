@@ -117,6 +117,13 @@ namespace xt
         test_access(a);
     }
 
+    TEST(xarray_adaptor, unchecked)
+    {
+        vec_type v;
+        adaptor_type a(v);
+        test_unchecked(a);
+    }
+
     TEST(xarray_adaptor, at)
     {
         vec_type v;
