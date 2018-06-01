@@ -17,6 +17,38 @@
 
 namespace xt
 {
+
+    TEST(xsort, argsort)
+    {
+        xarray<double> a1 = {2, 3, 1};
+        xarray<double, xt::layout_type::column_major> a2_c = {{2, 3, 1}, {4, 6, 5}};
+        xarray<double, xt::layout_type::row_major> a2_r = {{2, 3, 1}, {4, 6, 5}};
+        xarray<float> a3 = {{{1,3,2},{4,2,1}},{{5,1,3},{4,2,6}}};
+
+        xarray<std::size_t> ex = {2, 0, 1};
+        EXPECT_EQ(ex, argsort(a1, 0));
+        EXPECT_EQ(ex, argsort(a1));
+
+        xarray<std::size_t> ex2_0 = {{0, 0, 0}, {1, 1, 1}};
+        xarray<std::size_t> ex2_1 = {{2, 0, 1}, {0, 2, 1}};
+
+        EXPECT_EQ(ex2_1, argsort(a2_c));
+        EXPECT_EQ(ex2_1, argsort(a2_r));
+        EXPECT_EQ(ex2_0, argsort(a2_c, 0));
+        EXPECT_EQ(ex2_0, argsort(a2_r, 0));
+        EXPECT_EQ(ex2_1, argsort(a2_c, 1));
+        EXPECT_EQ(ex2_1, argsort(a2_r, 1));
+
+        xarray<std::size_t> ex3_0 = {{{0,1,0},{0,0,0}},{{1,0,1},{1,1,1}}};
+        xarray<std::size_t> ex3_1 = {{{0,1,1},{1,0,0}},{{1,0,0},{0,1,1}}};
+        xarray<std::size_t> ex3_2 = {{{0,2,1},{2,1,0}},{{1,2,0},{1,0,2}}};
+
+        EXPECT_EQ(ex3_2, argsort(a3));
+        EXPECT_EQ(ex3_0, argsort(a3, 0));
+        EXPECT_EQ(ex3_1, argsort(a3, 1));
+        EXPECT_EQ(ex3_2, argsort(a3, 2));
+    }
+
     TEST(xsort, sort_easy)
     {
         xarray<double> a = {{5, 3, 1}, {4, 4, 4}};
