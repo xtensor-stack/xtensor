@@ -20,6 +20,16 @@ namespace xt
     using shape_t = std::vector<std::size_t>;
     using view_shape_type = dynamic_shape<size_t>;
 
+    bool operator==(const view_shape_type& lhs, const dynamic_shape<ptrdiff_t>& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+
+    bool operator==(const dynamic_shape<ptrdiff_t>& lhs, const dynamic_shape<size_t>& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+
     TEST(xstrided_view, simple)
     {
         view_shape_type shape = { 3, 4 };
