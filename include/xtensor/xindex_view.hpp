@@ -331,18 +331,17 @@ namespace xt
         std::fill(this->storage_begin(), this->storage_end(), value);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the xindex_view.
+     * @param idx index specifying the position in the index_view. More indices may be provided,
+     * only the last one will be used.
+     */
     template <class CT, class I>
     inline auto xindex_view<CT, I>::operator()(size_type idx) -> reference
     {
         return m_e[m_indices[idx]];
     }
 
-    /**
-     * Returns a reference to the element at the specified position in the xindex_view.
-     * @param first index specifying the position in the index_view. This index is discarded
-     * is args is not empty.
-     * @param args a list of indices specifying the position in the container.
-     */
     template <class CT, class I>
     template <class... Args>
     inline auto xindex_view<CT, I>::operator()(size_type, size_type idx1, Args... args) -> reference
@@ -360,18 +359,17 @@ namespace xt
         return this->operator()(idx);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the xindex_view.
+     * @param idx index specifying the position in the index_view. More indices may be provided,
+     * only the last one will be used.
+     */
     template <class CT, class I>
     inline auto xindex_view<CT, I>::operator()(size_type idx) const -> const_reference
     {
         return m_e[m_indices[idx]];
     }
 
-    /**
-     * Returns a constant reference to the element at the specified position in the xindex_view.
-     * @param first index specifying the position in the index_view. This index is discarded
-     * is args is not empty.
-     * @param args a list of indices specifying the position in the container.
-     */
     template <class CT, class I>
     template <class... Args>
     inline auto xindex_view<CT, I>::operator()(size_type, size_type idx1, Args... args) const -> const_reference
@@ -411,18 +409,18 @@ namespace xt
         return m_e[m_indices[*(index.begin())]];
     }
 
-    /**
-     * Returns a constant reference to the element at the specified position in the container.
-     * @param index a sequence of indices specifying the position in the container. Indices
-     * must be unsigned integers, the number of indices in the list should be equal or greater
-     * than the number of dimensions of the container.
-     */
     template <class CT, class I>
     inline auto xindex_view<CT, I>::operator[](size_type i) -> reference
     {
         return operator()(i);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the container.
+     * @param index a sequence of indices specifying the position in the container. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the container.
+     */
     template <class CT, class I>
     template <class S>
     inline auto xindex_view<CT, I>::operator[](const S& index) const
@@ -477,6 +475,7 @@ namespace xt
     /**
      * Broadcast the shape of the xindex_view to the specified parameter.
      * @param shape the result shape
+     * @param reuse_cache parameter for internal optimization
      * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class CT, class I>

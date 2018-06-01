@@ -9,8 +9,8 @@ xaccumulator
 
 Defined in ``xtensor/xaccumulator.hpp``
 
-.. doxygenfunction:: xt::accumulate(F&&, E&&, ES)
+.. doxygenfunction:: xt::accumulate(F&&, E&&, EVS)
    :project: xtensor
 
-.. doxygenfunction:: xt::accumulate(F&&, E&&, std::size_t, ES)
+.. doxygenfunction:: xt::accumulate(F&&, E&&, std::size_t, EVS)
    :project: xtensor

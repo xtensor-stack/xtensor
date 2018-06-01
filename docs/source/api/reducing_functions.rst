@@ -12,11 +12,11 @@ Reducing functions
 Defined in ``xtensor/xmath.hpp``
 
 .. _sum-function-reference:
-.. doxygenfunction:: sum(E&&, X&&, ES)
+.. doxygenfunction:: sum(E&&, X&&, EVS)
    :project: xtensor
 
 .. _prod-function-reference:
-.. doxygenfunction:: prod(E&&, X&&, ES)
+.. doxygenfunction:: prod(E&&, X&&, EVS)
    :project: xtensor
 
 .. _mean-function-reference:
@@ -28,7 +28,7 @@ Defined in ``xtensor/xmath.hpp``
    :project: xtensor
 
 .. _trapz-function-reference:
-.. doxygenfunction:: trapz(const xexpression<T>&, typename T::value_type, std::ptrdiff_t)
+.. doxygenfunction:: trapz(const xexpression<T>&, double, std::ptrdiff_t)
    :project: xtensor
 
 .. _trapz-function-reference2:

@@ -16,11 +16,11 @@ Defined in ``xtensor/xmath.hpp``
    :project: xtensor
 
 .. _nansum-function-reference:
-.. doxygenfunction:: nansum(E&&, X&&, ES)
+.. doxygenfunction:: nansum(E&&, X&&, EVS)
    :project: xtensor
 
 .. _nanprod-function-reference:
-.. doxygenfunction:: nanprod(E&&, X&&, ES)
+.. doxygenfunction:: nanprod(E&&, X&&, EVS)
    :project: xtensor
 
 .. _nancumsum-function-reference:
