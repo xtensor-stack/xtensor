@@ -219,6 +219,9 @@ namespace xt
         const backstrides_type& backstrides() const noexcept;
         layout_type layout() const noexcept;
 
+        template <class T>
+        void fill(const T& value);
+
         reference operator()();
         template <class... Args>
         reference operator()(Args... args);
@@ -508,6 +511,19 @@ namespace xt
     /**
      * @name Data
      */
+    //@{
+
+    /**
+     * Fills the view with the given value.
+     * @param value the value to fill the view with.
+     */
+    template <class CT, class S, layout_type L, class FST>
+    template <class T>
+    inline void xstrided_view<CT, S, L, FST>::fill(const T& value)
+    {
+        return std::fill(this->storage_begin(), this->storage_end(), value);
+    }
+
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::operator()() -> reference
     {

@@ -82,6 +82,15 @@ namespace xt
         EXPECT_EQ(v(1, 2, 1), v(1));
     }
 
+    TEST(xindex_view, fill)
+    {
+        xarray<double> e = { { 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 } };
+        xarray<double> res = { {1, 2, 2}, {2, 1, 2}, {2, 2, 1} };
+        auto v = filter(e, e < 1);
+        v.fill(2);
+        EXPECT_EQ(e, res);
+    }
+
     TEST(xindex_view, unchecked)
     {
         xarray<double> e = { { 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 } };

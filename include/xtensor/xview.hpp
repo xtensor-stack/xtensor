@@ -149,6 +149,9 @@ namespace xt
         const slice_type& slices() const noexcept;
         layout_type layout() const noexcept;
 
+        template <class T>
+        void fill(const T& value);
+
         template <class... Args>
         reference operator()(Args... args);
         template <class... Args>
@@ -551,6 +554,18 @@ namespace xt
      * @name Data
      */
     //@{
+
+    /**
+     * Fills the view with the given value.
+     * @param value the value to fill the view with.
+     */
+    template <class CT, class... S>
+    template <class T>
+    inline void xview<CT, S...>::fill(const T& value)
+    {
+        std::fill(this->storage_begin(), this->storage_end(), value);
+    }
+
     /**
      * Returns a reference to the element at the specified position in the view.
      * @param args a list of indices specifying the position in the view. Indices
