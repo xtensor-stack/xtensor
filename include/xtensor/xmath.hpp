@@ -1637,6 +1637,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      *
      * Returns an \ref xreducer for the minimum and maximum of an expression's elements.
      * @param e an \ref xexpression
+     * @param es evaluation strategy to use (lazy (default), or immediate)
      * @return an \ref xexpression of type ``std::array<value_type, 2>``, whose first
      *         and second element represent the minimum and maximum respectively
      */

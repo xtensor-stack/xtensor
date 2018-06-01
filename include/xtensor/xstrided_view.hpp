@@ -151,7 +151,7 @@ namespace xt
      *
      * The xstrided_view class implements a view utilizing an initial offset
      * and strides.
-     *.
+     *
      * @tparam CT the closure type of the \ref xexpression type underlying this view
      * @tparam S the strides type of the strided view
      * @tparam FST the flat storage type used for the strided view.
@@ -726,6 +726,7 @@ namespace xt
     /**
      * Broadcast the shape of the xstrided_view to the specified parameter.
      * @param shape the result shape
+     * @param reuse_cache parameter for internal optimization
      * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class CT, class S, layout_type L, class FST>
@@ -1721,7 +1722,7 @@ namespace xt
      * Note: A NumPy/Matlab style `flipud(arr)` is equivalent to `xt::flip(arr, 0)`,
      * `fliplr(arr)` to `xt::flip(arr, 1)`.
      *
-     * @param arr the input xexpression
+     * @param e the input xexpression
      * @param axis the axis along which elements should be reversed
      *
      * @return returns a view with the result of the flip

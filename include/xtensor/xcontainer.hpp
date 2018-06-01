@@ -791,6 +791,7 @@ namespace xt
     /**
      * Broadcast the shape of the container to the specified parameter.
      * @param shape the result shape
+     * @param reuse_cache parameter for internal optimization
      * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class D>

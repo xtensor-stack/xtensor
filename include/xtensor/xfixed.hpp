@@ -715,8 +715,6 @@ namespace xt
      * Constructs an xfixed_adaptor of the given stl-like container,
      * with the specified shape and layout_type.
      * @param data the container to adapt
-     * @param shape the shape of the xfixed_adaptor
-     * @param l the layout_type of the xfixed_adaptor
      */
     template <class EC, class S, layout_type L, class Tag>
     template <class D>

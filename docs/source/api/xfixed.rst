@@ -4,14 +4,15 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xreducer
-========
+xtensor_fixed
+=============
 
-Defined in ``xtensor/xreducer.hpp``
+Defined in ``xtensor/xfixed.hpp``
 
-.. doxygenclass:: xt::xreducer
+.. doxygenclass:: xt::xfixed_container
    :project: xtensor
    :members:
 
-.. doxygenfunction:: xt::reduce(F&&, E&&, X&&, EVS)
+.. doxygentypedef:: xt::xtensor_fixed
    :project: xtensor
+

@@ -124,7 +124,7 @@ namespace xt
         const_reference operator[](size_type i) const;
 
         template <class It>
-        const_reference element(It, It last) const;
+        const_reference element(It first, It last) const;
 
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
@@ -358,6 +358,7 @@ namespace xt
     /**
      * Broadcast the shape of the function to the specified parameter.
      * @param shape the result shape
+     * @param reuse_cache parameter for internal optimization
      * @return a boolean indicating whether the broadcasting is trivial
      */
     template <class CT, class X>
