@@ -106,6 +106,9 @@ namespace xt
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
+        
+        template <class T>
+        void fill(const T& value);
 
         reference operator()(size_type idx = size_type(0));
         template <class... Args>
@@ -316,6 +319,18 @@ namespace xt
      * @name Data
      */
     //@{
+    
+    /**
+     * Fills the view with the given value.
+     * @param value the value to fill the view with.
+     */
+    template <class CT, class I>
+    template <class T>
+    inline void xindex_view<CT, I>::fill(const T& value)
+    {
+        std::fill(this->storage_begin(), this->storage_end(), value);
+    }
+
     template <class CT, class I>
     inline auto xindex_view<CT, I>::operator()(size_type idx) -> reference
     {
