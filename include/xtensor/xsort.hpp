@@ -155,7 +155,7 @@ namespace xt
         };
 
         template <class Ed, class Ei>
-        void argsort_over_leading_axis(Ed& data, Ei& inds)
+        void argsort_over_leading_axis(const Ed& data, Ei& inds)
         {
             using value_type = typename Ed::value_type;
             std::size_t n_iters = 1;
@@ -198,7 +198,7 @@ namespace xt
         using value_type = typename E::value_type;
         using result_type = typename detail::argsort_result_type<E>::type;
 
-        const auto de = e.derived_cast();
+        const auto& de = e.derived_cast();
 
         result_type result;
         result.resize({de.size()});
@@ -236,9 +236,7 @@ namespace xt
             return argsort(de, xnone());
         }
 
-        eval_type ev;
-
-        if (axis != detail::leading_axis(ev))
+        if (axis != detail::leading_axis(de))
         {
             auto axis_numbers = arange<std::size_t>(de.shape().size());
             std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
@@ -260,18 +258,16 @@ namespace xt
                 reverse_permutation.push_back(std::size_t(std::distance(permutation.begin(), it)));
             }
 
-            ev = transpose(de, permutation);
+            eval_type ev = transpose(de, permutation);
             result_type res(ev.shape(), ev.layout());
             detail::argsort_over_leading_axis(ev, res);
-            ev = transpose(ev, reverse_permutation);
             res = transpose(res, reverse_permutation);
             return res;
         }
         else
         {
-            ev = de;
             result_type res(de.shape(), de.layout());
-            detail::argsort_over_leading_axis(ev, res);
+            detail::argsort_over_leading_axis(de, res);
             return res;
         }
     }
