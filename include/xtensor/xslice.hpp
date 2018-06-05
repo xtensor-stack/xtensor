@@ -17,11 +17,14 @@
 
 #include "xutils.hpp"
 
+
 #ifndef XTENSOR_CONSTEXPR
-    #ifndef _MSC_VER
-        #define XTENSOR_CONSTEXPR constexpr
-    #else
+    #if(defined(_MSC_VER) || __GNUC__ < 8)
         #define XTENSOR_CONSTEXPR inline
+        #define XTENSOR_GLOBAL_CONSTEXPR static const
+    #else
+        #define XTENSOR_CONSTEXPR constexpr
+        #define XTENSOR_GLOBAL_CONSTEXPR constexpr
     #endif
 #endif
 
@@ -42,7 +45,7 @@ namespace xt
         template <class... Args>
         struct rangemaker
         {
-            ptrdiff_t rng[3] = {0, 0, 0};
+            ptrdiff_t rng[3];// = { 0, 0, 0 };
         };
 
         XTENSOR_CONSTEXPR xtuph get_tuph_or_val(std::ptrdiff_t /*val*/, std::true_type)
@@ -67,7 +70,7 @@ namespace xt
                 };
             }
 
-            ptrdiff_t rng[3] = {0, 0, 0};
+            ptrdiff_t rng[3];// = { 0, 0, 0 };
         };
 
         template <class A, class B>
@@ -82,7 +85,7 @@ namespace xt
                 };
             }
 
-            ptrdiff_t rng[3] = {0, 0, 0};
+            ptrdiff_t rng[3];// = { 0, 0, 0 };
         };
 
         template <class... OA>
@@ -101,11 +104,11 @@ namespace xt
         }
 
 
-        constexpr xtuph _{};
-        constexpr rangemaker<> _r{};
-        constexpr xall_tag _a{};
-        constexpr xnewaxis_tag _n{};
-        constexpr xellipsis_tag _e{};
+        XTENSOR_GLOBAL_CONSTEXPR xtuph _{};
+        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r{0, 0, 0};
+        XTENSOR_GLOBAL_CONSTEXPR xall_tag _a{};
+        XTENSOR_GLOBAL_CONSTEXPR xnewaxis_tag _n{};
+        XTENSOR_GLOBAL_CONSTEXPR xellipsis_tag _e{};
     }
 
     inline auto xnone()
