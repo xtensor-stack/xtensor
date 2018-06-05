@@ -231,7 +231,8 @@ namespace xt
     template <class shape_type, class strides_type>
     inline bool do_strides_match(const shape_type& shape, const strides_type& strides, layout_type l)
     {
-        std::size_t data_size = 1;
+        using shape_value_type = typename shape_type::value_type;
+        shape_value_type data_size = 1;
         if (l == layout_type::row_major)
         {
             for (std::size_t i = strides.size(); i != 0; --i)

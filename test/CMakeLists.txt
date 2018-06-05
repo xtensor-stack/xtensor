@@ -124,6 +124,7 @@ set(XTENSOR_TESTS
     test_xsort.cpp
     test_xstorage.cpp
     test_xstrided_view.cpp
+    test_xstrided_view_extended.cpp
     test_xstrides.cpp
     test_xtensor.cpp
     test_xtensor_adaptor.cpp
@@ -159,6 +160,16 @@ foreach(filename IN LISTS XNPY_FILES)
         ${CMAKE_CURRENT_BINARY_DIR}/files/xnpy_files/${filename} COPYONLY)
 endforeach()
 
+set(XTENSOR_PREPROCESS_FILES
+    files/cppy_source/test_xstrided_view_extended.cppy
+)
+
+add_custom_target(
+    preprocess_cppy
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/files/preprocess.py
+    DEPENDS ${XTENSOR_PREPROCESS_FILES}
+)
+
 foreach(filename IN LISTS XTENSOR_TESTS)
     string(REPLACE ".cpp" "" targetname ${filename})
     add_executable(${targetname} ${COMMON_BASE} ${filename} ${XTENSOR_HEADERS})
@@ -166,7 +177,10 @@ foreach(filename IN LISTS XTENSOR_TESTS)
     if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
         add_dependencies(${targetname} gtest_main)
     endif()
-    add_custom_target(x${targetname} COMMAND ${targetname} DEPENDS ${targetname})
+    add_custom_target(
+        x${targetname}
+        COMMAND ${targetname}
+        DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
 endforeach()
 
 add_executable(${XTENSOR_TARGET} ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})

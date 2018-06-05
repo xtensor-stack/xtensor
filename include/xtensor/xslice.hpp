@@ -17,17 +17,98 @@
 
 #include "xutils.hpp"
 
+
+#ifndef XTENSOR_CONSTEXPR
+    #if(defined(_MSC_VER) || __GNUC__ < 8)
+        #define XTENSOR_CONSTEXPR inline
+        #define XTENSOR_GLOBAL_CONSTEXPR static const
+    #else
+        #define XTENSOR_CONSTEXPR constexpr
+        #define XTENSOR_GLOBAL_CONSTEXPR constexpr
+    #endif
+#endif
+
 namespace xt
 {
+    struct xall_tag {};
+    struct xnewaxis_tag {};
+    struct xellipsis_tag {};
+
+    template <class A, class B, class C>
+    struct xrange_adaptor;
 
     namespace placeholders
     {
         // xtensor universal placeholder
-        struct xtuph
+        struct xtuph {};
+
+        template <class... Args>
+        struct rangemaker
         {
+            ptrdiff_t rng[3];// = { 0, 0, 0 };
         };
 
-        constexpr xtuph _{};
+        XTENSOR_CONSTEXPR xtuph get_tuph_or_val(std::ptrdiff_t /*val*/, std::true_type)
+        {
+            return xtuph();
+        }
+
+        XTENSOR_CONSTEXPR std::ptrdiff_t get_tuph_or_val(std::ptrdiff_t val, std::false_type)
+        {
+            return val;
+        }
+
+        template <class A, class B, class C>
+        struct rangemaker<A, B, C>
+        {
+            XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, C>()
+            {
+                return {
+                    get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
+                    get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
+                    get_tuph_or_val(rng[2], std::is_same<C, xtuph>())
+                };
+            }
+
+            ptrdiff_t rng[3];// = { 0, 0, 0 };
+        };
+
+        template <class A, class B>
+        struct rangemaker<A, B>
+        {
+            XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, xt::placeholders::xtuph>()
+            {
+                return {
+                    get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
+                    get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
+                    xtuph()
+                };
+            }
+
+            ptrdiff_t rng[3];// = { 0, 0, 0 };
+        };
+
+        template <class... OA>
+        XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const std::ptrdiff_t& t)
+        {
+            auto nrng = rangemaker<OA..., ptrdiff_t>{rng.rng[0], rng.rng[1], rng.rng[2]};
+            nrng.rng[sizeof...(OA)] = t;
+            return nrng; 
+        }
+
+        template <class... OA>
+        XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const xt::placeholders::xtuph& /*t*/)
+        {
+            auto nrng = rangemaker<OA..., xt::placeholders::xtuph>{rng.rng[0], rng.rng[1], rng.rng[2]};
+            return nrng;
+        }
+
+
+        XTENSOR_GLOBAL_CONSTEXPR xtuph _{};
+        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r{0, 0, 0};
+        XTENSOR_GLOBAL_CONSTEXPR xall_tag _a{};
+        XTENSOR_GLOBAL_CONSTEXPR xnewaxis_tag _n{};
+        XTENSOR_GLOBAL_CONSTEXPR xellipsis_tag _e{};
     }
 
     inline auto xnone()
@@ -83,7 +164,7 @@ namespace xt
         using self_type = xrange<T>;
 
         xrange() = default;
-        xrange(size_type min_val, size_type max_val) noexcept;
+        xrange(size_type start_val, size_type stop_val) noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -99,7 +180,7 @@ namespace xt
 
     private:
 
-        size_type m_min;
+        size_type m_start;
         size_type m_size;
     };
 
@@ -116,7 +197,7 @@ namespace xt
         using self_type = xstepped_range<T>;
 
         xstepped_range() = default;
-        xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept;
+        xstepped_range(size_type start_val, size_type stop_val, size_type step) noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -132,7 +213,7 @@ namespace xt
 
     private:
 
-        size_type m_min;
+        size_type m_start;
         size_type m_size;
         size_type m_step;
     };
@@ -169,10 +250,6 @@ namespace xt
         size_type m_size;
     };
 
-    struct xall_tag
-    {
-    };
-
     /**
      * Returns a slice representing a full dimension,
      * to be used as an argument of view function.
@@ -182,10 +259,6 @@ namespace xt
     {
         return xall_tag();
     }
-
-    struct xellipsis_tag
-    {
-    };
 
     /**
      * Returns a slice representing all remaining dimensions,
@@ -229,10 +302,6 @@ namespace xt
         size_type revert_index(std::size_t i) const noexcept;
 
         bool contains(size_type i) const noexcept;
-    };
-
-    struct xnewaxis_tag
-    {
     };
 
     /**
@@ -351,9 +420,36 @@ namespace xt
     template <class A, class B, class C>
     struct xrange_adaptor
     {
-        xrange_adaptor(A min_val, B max_val, C step)
-            : m_min(min_val), m_max(max_val), m_step(step)
+        xrange_adaptor(A start_val, B stop_val, C step)
+            : m_start(start_val), m_stop(stop_val), m_step(step)
         {
+        }
+
+        auto normalize(std::ptrdiff_t val, std::size_t ssize) const
+        {
+            std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
+            val = (val >= 0) ? val : val + size;
+            return std::max(std::ptrdiff_t(0), std::min(size, val));
+        }
+
+        auto get_stepped_range(std::ptrdiff_t start, std::ptrdiff_t stop, std::ptrdiff_t step, std::size_t ssize) const
+        {
+            std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
+            start = (start >= 0) ? start : start + size;
+            stop = (stop >= 0) ? stop : stop + size;
+
+            if(step > 0)
+            {
+                start = std::max(std::ptrdiff_t(0), std::min(size, start));
+                stop  = std::max(std::ptrdiff_t(0), std::min(size, stop));
+            }
+            else
+            {
+                start = std::max(std::ptrdiff_t(-1), std::min(size - 1, start));
+                stop  = std::max(std::ptrdiff_t(-1), std::min(size - 1, stop));
+            }
+
+            return xstepped_range<std::ptrdiff_t>(start, stop, step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -361,9 +457,9 @@ namespace xt
                                 std::is_integral<MA>::value &&
                                 std::is_integral<STEP>::value,
                                 xstepped_range<std::ptrdiff_t>>
-            get(std::size_t /*size*/) const
+            get(std::size_t size) const
         {
-            return xstepped_range<std::ptrdiff_t>(m_min, m_max, m_step);
+            return get_stepped_range(m_start, m_stop, m_step, size);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -373,7 +469,7 @@ namespace xt
                                 xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            return xstepped_range<std::ptrdiff_t>(m_step > 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1, m_max, m_step);
+            return get_stepped_range(m_step > 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1, m_stop, m_step, size);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -383,7 +479,8 @@ namespace xt
                                 xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            return xstepped_range<std::ptrdiff_t>(m_min, m_step > 0 ? static_cast<std::ptrdiff_t>(size) : -1, m_step);
+            auto sz = static_cast<std::ptrdiff_t>(size);
+            return get_stepped_range(m_start, m_step > 0 ? sz : -(sz + 1), m_step, size);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -391,9 +488,9 @@ namespace xt
                                 std::is_integral<MA>::value &&
                                 !std::is_integral<STEP>::value,
                                 xrange<std::ptrdiff_t>>
-            get(std::size_t /*size*/) const
+        get(std::size_t size) const
         {
-            return xrange<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(m_min), static_cast<std::ptrdiff_t>(m_max));
+            return xrange<std::ptrdiff_t>(normalize(m_start, size), normalize(m_stop, size));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -403,9 +500,9 @@ namespace xt
                                 xstepped_range<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            std::ptrdiff_t min_val_arg = m_step > 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1;
-            std::ptrdiff_t max_val_arg = m_step > 0 ? static_cast<std::ptrdiff_t>(size) : -1;
-            return xstepped_range<std::ptrdiff_t>(min_val_arg, max_val_arg, m_step);
+            std::ptrdiff_t start = m_step >= 0 ? 0 : static_cast<std::ptrdiff_t>(size) - 1;
+            std::ptrdiff_t stop = m_step >= 0 ? static_cast<std::ptrdiff_t>(size) : -1;
+            return xstepped_range<std::ptrdiff_t>(start, stop, m_step);
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -415,7 +512,7 @@ namespace xt
                                 xrange<std::ptrdiff_t>>
         get(std::size_t size) const
         {
-            return xrange<std::ptrdiff_t>(static_cast<std::ptrdiff_t>(m_min), static_cast<std::ptrdiff_t>(size));
+            return xrange<std::ptrdiff_t>(normalize(m_start, size), static_cast<std::ptrdiff_t>(size));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -423,9 +520,9 @@ namespace xt
                                 std::is_integral<MA>::value &&
                                 !std::is_integral<STEP>::value,
                                 xrange<std::ptrdiff_t>>
-            get(std::size_t /*size*/) const
+        get(std::size_t size) const
         {
-            return xrange<std::ptrdiff_t>(0, static_cast<std::ptrdiff_t>(m_max));
+            return xrange<std::ptrdiff_t>(0, normalize(m_stop, size));
         }
 
         template <class MI = A, class MA = B, class STEP = C>
@@ -440,8 +537,8 @@ namespace xt
 
     private:
 
-        A m_min;
-        B m_max;
+        A m_start;
+        B m_stop;
         C m_step;
     };
 
@@ -474,7 +571,7 @@ namespace xt
     }
 
     /**
-     * Select a range from min_val to max_val.
+     * Select a range from start_val to stop_val.
      * You can use the shorthand `_` syntax to select from the start or until the end.
      *
      * \code{.cpp}
@@ -488,14 +585,14 @@ namespace xt
      * @sa view, strided_view
      */
     template <class A, class B>
-    inline auto range(A min_val, B max_val)
+    inline auto range(A start_val, B stop_val)
     {
         return xrange_adaptor<detail::cast_if_integer_t<A>, detail::cast_if_integer_t<B>, placeholders::xtuph>(
-            detail::cast_if_integer<A>{}(min_val), detail::cast_if_integer<B>{}(max_val), placeholders::xtuph());
+            detail::cast_if_integer<A>{}(start_val), detail::cast_if_integer<B>{}(stop_val), placeholders::xtuph());
     }
 
     /**
-     * Select a range from min_val to max_val with step
+     * Select a range from start_val to stop_val with step
      * You can use the shorthand `_` syntax to select from the start or until the end.
      *
      * \code{.cpp}
@@ -506,10 +603,10 @@ namespace xt
      * @sa view, strided_view
      */
     template <class A, class B, class C>
-    inline auto range(A min_val, B max_val, C step)
+    inline auto range(A start_val, B stop_val, C step)
     {
         return xrange_adaptor<detail::cast_if_integer_t<A>, detail::cast_if_integer_t<B>, detail::cast_if_integer_t<C>>(
-            detail::cast_if_integer<A>{}(min_val), detail::cast_if_integer<B>{}(max_val), detail::cast_if_integer<C>{}(step));
+            detail::cast_if_integer<A>{}(start_val), detail::cast_if_integer<B>{}(stop_val), detail::cast_if_integer<C>{}(step));
     }
 
 
@@ -657,15 +754,15 @@ namespace xt
      *************************/
 
     template <class T>
-    inline xrange<T>::xrange(size_type min_val, size_type max_val) noexcept
-        : m_min(min_val), m_size(max_val - min_val)
+    inline xrange<T>::xrange(size_type start_val, size_type stop_val) noexcept
+        : m_start(start_val), m_size(stop_val > start_val ? stop_val - start_val: 0)
     {
     }
 
     template <class T>
     inline auto xrange<T>::operator()(size_type i) const noexcept -> size_type
     {
-        return m_min + i;
+        return m_start + i;
     }
 
     template <class T>
@@ -689,19 +786,19 @@ namespace xt
     template <class T>
     inline auto xrange<T>::revert_index(std::size_t i) const noexcept -> size_type
     {
-        return i - m_min;
+        return i - m_start;
     }
 
     template <class T>
     inline bool xrange<T>::contains(size_type i) const noexcept
     {
-        return i >= m_min && i < m_min + m_size;
+        return i >= m_start && i < m_start + m_size;
     }
 
     template <class T>
     inline bool xrange<T>::operator==(const self_type& rhs) const noexcept
     {
-        return (m_min == rhs.m_min) && (m_size == rhs.m_size);
+        return (m_start == rhs.m_start) && (m_size == rhs.m_size);
     }
 
     template <class T>
@@ -715,8 +812,8 @@ namespace xt
      ********************************/
 
     template <class T>
-    inline xstepped_range<T>::xstepped_range(size_type min_val, size_type max_val, size_type step) noexcept
-        : m_min(min_val), m_size(size_type(std::ceil(double(max_val - min_val) / double(step)))), m_step(step)
+    inline xstepped_range<T>::xstepped_range(size_type start_val, size_type stop_val, size_type step) noexcept
+        : m_start(start_val), m_size(size_type(std::ceil(double(stop_val - start_val) / double(step)))), m_step(step)
     {
     }
 
@@ -724,7 +821,7 @@ namespace xt
     template <class T>
     inline auto xstepped_range<T>::operator()(size_type i) const noexcept -> size_type
     {
-        return m_min + i * m_step;
+        return m_start + i * m_step;
     }
 
     template <class T>
@@ -748,19 +845,19 @@ namespace xt
     template <class T>
     inline auto xstepped_range<T>::revert_index(std::size_t i) const noexcept -> size_type
     {
-        return (i - m_min) / m_step;
+        return (i - m_start) / m_step;
     }
 
     template <class T>
     inline bool xstepped_range<T>::contains(size_type i) const noexcept
     {
-        return i >= m_min && i < m_min + m_size * m_step && ((i - m_min) % m_step == 0);
+        return i >= m_start && i < m_start + m_size * m_step && ((i - m_start) % m_step == 0);
     }
 
     template <class T>
     inline bool xstepped_range<T>::operator==(const self_type& rhs) const noexcept
     {
-        return (m_min == rhs.m_min) && (m_size == rhs.m_size) && (m_step == rhs.m_step);
+        return (m_start == rhs.m_start) && (m_size == rhs.m_size) && (m_step == rhs.m_step);
     }
 
     template <class T>
@@ -867,5 +964,7 @@ namespace xt
         return i == 0;
     }
 }
+
+#undef XTENSOR_CONSTEXPR
 
 #endif

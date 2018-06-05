@@ -117,7 +117,7 @@ namespace xt
                 out << '{';
                 for (; i != view.shape()[0] - 1; ++i)
                 {
-                    if (edgeitems && view.shape()[0] > (edgeitems * 2) && i == edgeitems)
+                    if (edgeitems && size_type(view.shape()[0]) > (edgeitems * 2) && i == edgeitems)
                     {
                         out << "..., ";
                         if (view.dimension() > 1)
@@ -175,7 +175,7 @@ namespace xt
                 size_type i = 0;
                 for (; i != view.shape()[0] - 1; ++i)
                 {
-                    if (lim && view.shape()[0] > (lim * 2) && i == lim)
+                    if (lim && size_type(view.shape()[0]) > (lim * 2) && i == lim)
                     {
                         i = view.shape()[0] - lim;
                     }
