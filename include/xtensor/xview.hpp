@@ -1399,10 +1399,13 @@ namespace xt
                 size = size - 1;
             }
 
-            auto ss = index < sizeof...(S) ? apply<size_type>(index, end_func, p_view->slices()) : p_view->shape()[dim];
             size_type sz = index < sizeof...(S) ? apply<size_type>(index, size_func, p_view->slices()) : p_view->shape()[dim];
-            this->m_index_keeper[dim] = backwards ? sz : 0;
+            if (dim < m_index_keeper.size())
+            {
+                m_index_keeper[dim] = backwards ? sz : 0;
+            }
 
+            auto ss = index < sizeof...(S) ? apply<size_type>(index, end_func, p_view->slices()) : p_view->shape()[dim];
             size_type reset_n = index < sizeof...(S) ? ss : size;
             index -= newaxis_count_before<S...>(index);
             f(index, reset_n);

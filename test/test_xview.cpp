@@ -977,4 +977,23 @@ namespace xt
         b = detail::slices_contigous<xrange<int>, xrange<int>, int>::value;
         EXPECT_TRUE(b);
     }
+
+    TEST(xview, mixed_types)
+    {
+        xt::xarray<std::uint8_t> input;
+        xt::xarray<float> output;
+        input.resize({ { 50,16,16,3 } });
+        output.resize({ { 50,16,16,3 } });
+
+        input.fill(std::uint8_t(1));
+        output.fill(float(2.));
+        for (int i = 0; i<50; ++i)
+        {
+            auto in_view = xt::view(input, i);
+            auto out_view = xt::view(output, i);
+            out_view = in_view;
+        }
+
+        EXPECT_EQ(output(0, 5, 5, 2), 1);
+    }
 }
