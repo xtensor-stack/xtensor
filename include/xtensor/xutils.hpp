@@ -133,6 +133,29 @@ namespace xt
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
 
+    namespace detail
+    {
+        template <std::size_t I, class F, class... T>
+        inline typename std::enable_if<I == sizeof...(T), void>::type
+        for_each_impl(F&& /*f*/, const std::tuple<T...>& /*t*/) noexcept(noexcept(std::declval<F>()))
+        {
+        }
+
+        template <std::size_t I, class F, class... T>
+        inline typename std::enable_if<I < sizeof...(T), void>::type
+        for_each_impl(F&& f, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+        {
+            f(std::get<I>(t));
+            for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
+        }
+    }
+
+    template <class F, class... T>
+    inline void for_each(F&& f, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+    {
+        detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
+    }
+
     /*****************************
      * accumulate implementation *
      *****************************/

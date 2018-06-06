@@ -44,6 +44,12 @@ namespace xt
     template <class E1, class E2>
     void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
 
+    template <class E1, class E2>
+    void strided_assign(E1& e1, const E2& e2, std::false_type);
+
+    template <class E1, class E2>
+    void strided_assign(E1& e1, const E2& e2, std::true_type);
+
     /************************
      * xexpression_assigner *
      ************************/
@@ -238,6 +244,35 @@ namespace xt
             static constexpr bool value = xtl::disjunction<
                 std::integral_constant<bool, forbid_simd_assign<typename std::decay<CT>::type>::value>...>::value;
         };
+
+        template <class E, class = void>
+        struct has_strides : std::false_type
+        {
+        };
+
+        template <class E>
+        struct has_strides<E, void_t<decltype(std::declval<E>().strides())>>
+            : std::true_type
+        {
+        };
+
+        template <class T>
+        struct use_strided_loop
+        {
+            static constexpr bool value = has_strides<T>::value;
+        };
+
+        template <class T>
+        struct use_strided_loop<xscalar<T>>
+        {
+            static constexpr bool value = true;
+        };
+
+        template <class F, class R, class... CT>
+        struct use_strided_loop<xfunction<F, R, CT...>>
+        {
+            static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value;
+        };
     }
 
     template <class E1, class E2>
@@ -250,6 +285,7 @@ namespace xt
         static constexpr bool simd_size() { return xsimd::simd_traits<typename E1::value_type>::size > 1; }
         static constexpr bool forbid_simd() { return detail::forbid_simd_assign<E2>::value; }
         static constexpr bool simd_assign() { return contiguous_layout() && same_type() && simd_size() && !forbid_simd(); }
+        static constexpr bool simd_strided_loop() { return same_type() && simd_size() && detail::use_strided_loop<E2>::value; }
     };
 
     template <class E1, class E2>
@@ -263,6 +299,10 @@ namespace xt
         {
             constexpr bool simd_assign = xassign_traits<E1, E2>::simd_assign();
             trivial_assigner<simd_assign>::run(de1, de2);
+        }
+        else if (xassign_traits<E1, E2>::simd_strided_loop())
+        {
+            strided_assign(de1, de2, std::integral_constant<bool, xassign_traits<E1, E2>::simd_strided_loop()>{});
         }
         else
         {
@@ -456,6 +496,152 @@ namespace xt
         // To avoid compilation problems in effectively unused code trivial_assigner_run_impl is
         // empty in this case.
         assigner_detail::trivial_assigner_run_impl(e1, e2, is_convertible());
+    }
+
+    /***********************
+     * Strided assign loop *
+     ***********************/
+
+    namespace strided_assign_detail
+    {
+        template <class T>
+        void next_idx(T& outer_index, T& outer_shape)
+        {
+            std::size_t i = outer_index.size();
+            for (; i > 0; --i)
+            {
+                if (ptrdiff_t(outer_index[i - 1]) >= ptrdiff_t(outer_shape[i - 1]) - 1)
+                {
+                    outer_index[i - 1] = 0;
+                }
+                else
+                {
+                    outer_index[i - 1]++;
+                    break;
+                }
+            }
+        }
+
+        template <class S1, class S2>
+        std::size_t check_strides(S1& s1, S2& s2)
+        {
+            // Indices are faster than reverse iterators
+            std::size_t s1_index = s1.size();
+            std::size_t s2_index = s2.size();
+
+            for (; s2_index != 0; --s1_index, --s2_index)
+            {
+                if (s1[s1_index - 1] != s2[s2_index - 1])
+                {
+                    break;
+                }
+            }
+            return s1_index;
+        }
+
+        struct check_strides_functor
+        {
+            template <class T>
+            void operator()(const T& el)
+            {
+                auto var = check_strides(max_strides, el.strides());
+                if (var > cut)
+                {
+                    cut = var;
+                }
+            }
+
+            template <class T>
+            void operator()(const xt::xscalar<T>& el)
+            {
+            }
+
+            template <class F, class R, class... CT>
+            void operator()(const xt::xfunction<F, R, CT...>& xf)
+            {
+                xt::for_each(*this, xf.arguments());
+            }
+
+            std::size_t cut;
+            xt::dynamic_shape<std::size_t> max_strides;
+        };
+
+        template <class E, class... T>
+        auto get_loop_sizes(const E& res, const std::tuple<T...>& args)
+        {
+            auto s_fct = check_strides_functor{};
+            xt::resize_container(s_fct.max_strides, res.strides().size());
+            std::copy(res.strides().begin(), res.strides().end(), s_fct.max_strides.begin());
+            xt::for_each(s_fct, args);
+
+            std::size_t cut = s_fct.cut;
+            std::size_t inner_loop_size = 1;
+            std::size_t outer_loop_size = 1;
+            std::size_t i = 0;
+
+            for (; i < cut; ++i)
+            {
+                outer_loop_size *= res.shape()[i];
+            }
+            for (; i < res.dimension(); ++i)
+            {
+                inner_loop_size *= res.shape()[i];
+            }
+
+            return std::make_tuple(inner_loop_size, outer_loop_size, cut);
+        }
+    }
+
+
+    template <class E1, class E2>
+    void strided_assign(E1& e1, const E2& e2, std::true_type)
+    {
+        std::size_t inner_loop_size, outer_loop_size, cut;
+
+        std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2.arguments());
+
+        if (cut == e1.dimension() - 1)
+        {
+            // last dimensions is != 1, fall back to data_assigner
+            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(e1, e2);
+            assigner.run();
+        }
+
+        dynamic_shape<std::size_t> idx(cut);
+        dynamic_shape<std::size_t> max(e1.shape().begin(), e1.shape().begin() + cut);
+
+        using simd_type = xsimd::simd_type<typename E1::value_type>;
+
+        std::size_t simd_size = inner_loop_size / simd_type::size;
+        std::size_t simd_rest = inner_loop_size % simd_type::size;
+
+        auto fct_stepper = e2.stepper_begin(e1.shape());
+        auto res_stepper = e1.stepper_begin(e1.shape());
+    
+        for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
+        {
+            for (std::size_t i = 0; i < simd_size; i++)
+            {
+                res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
+            }
+            for (std::size_t i = 0; i < simd_rest; ++i)
+            {
+                *(res_stepper) = *(fct_stepper);
+                res_stepper.step_leading();
+                fct_stepper.step_leading();
+            }
+            strided_assign_detail::next_idx(idx, max);
+            fct_stepper.to_begin();
+            for (std::size_t i = 0; i < idx.size(); ++i)
+            {
+                fct_stepper.step(i, idx[i]);
+            }
+        }
+    }
+
+    template <class E1, class E2>
+    void strided_assign(xexpression<E1>& e1, const xexpression<E2>& e2, std::false_type)
+    {
     }
 }
 
