@@ -134,14 +134,17 @@ namespace xt
             using simd_bool_type = xsimd::simd_bool_type<T>;
             using simd_result_type = simd_value_type;
 
+            template <class B>
+            using get_batch_bool = typename xsimd::simd_traits<typename xsimd::revert_simd_traits<B>::type>::bool_type;
+
             constexpr result_type operator()(bool t1, const T& t2, const T& t3) const noexcept
             {
                 return t1 ? t2 : t3;
             }
             template <class B>
-            constexpr B simd_apply(const typename xsimd::simd_traits<B>::batch_bool& t1,
-                                   const simd_value_type& t2,
-                                   const simd_value_type& t3) const noexcept
+            constexpr B simd_apply(const get_batch_bool<B>& t1,
+                                   const B& t2,
+                                   const B& t3) const noexcept
             {
                 return xsimd::select(t1, t2, t3);
             }

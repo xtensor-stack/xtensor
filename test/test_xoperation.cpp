@@ -461,6 +461,13 @@ namespace xt
         TypeParam res = where(a > b, b, a);
         TypeParam expected = { { 1, 1, 1 },{ 0, 1, 0 },{ 0, 1, 1 } };
         EXPECT_EQ(expected, res);
+
+#ifdef XTENSOR_USE_XSIMD
+        // This will fail to compile if simd is broken for conditional_ternary
+        auto func = where(a > b, b, a);
+        auto s = func.template load_simd<xsimd::aligned_mode>(0);
+        (void)s;
+#endif
     }
 
     TYPED_TEST(operation, where_cast)
