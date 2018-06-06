@@ -52,6 +52,18 @@ Slices can be specified in the following ways:
     // => v3.shape() = { 3, 2, 1, 4 }
     // => v3(0, 0, 0, 0) = a(0, 0, 0)
 
+The range function supports the placeholder ``_`` syntax:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xstrided_view.hpp"
+
+    auto a = xt::xarray<int>::from_shape({3, 2, 4});
+    auto v1 = xt::view(a, xt::range(_, 2), xt::all(), xt::range(1, _));
+    // The previous line is equivalent to
+    auto v2 = xt::view(a, xt::range(0, 3), xt::all(), xt::range(1, 4));
+
 ``xview`` does not perform a copy of the underlying expression. This means if you modify an element of the ``xview``,
 you are actually also altering the underlying expression.
 
@@ -90,6 +102,20 @@ all the slice types. All the same slices as in xview can be used.
 
     auto v1 = xt::strided_view(a, sv);
     // v1 has the same behavior as the static view
+
+Since ``xtensor 0.16.3``, a new range syntax can be used with strided views:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xstrided_view.hpp"
+
+    using namespace xt::placeholders;
+
+    auto a = xt::xarray<int>::from_shape({3, 2, 3, 4, 5});
+    auto v1 = xt::strided_view(a, {_r|0|1, 1, _r|_|2, _r|_|_|-1});
+    // The previous line is equivalent to
+    auto v2 = xt::strided_view(a, {xt::range(0, 1), xt::range(_, 2), xt::range(_, _, -1)});
 
 The ``xstrided_view`` is very efficient on contigous memory (e.g. ``xtensor`` or ``xarray``) but less efficient on xexpressions.
 
