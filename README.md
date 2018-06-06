@@ -1,4 +1,4 @@
-# ![xtensor](http://quantstack.net/assets/images/xtensor.svg)
+# ![xtensor](docs/source/xtensor.svg)
 
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
@@ -244,19 +244,19 @@ Therefore, when building an application with xtensor, we recommend using statica
 
 ## Language bindings
 
-### [![xtensor-python](xtensor-python-small.svg)](https://github.com/QuantStack/xtensor-python)
+### [![xtensor-python](docs/source/xtensor-python-small.svg)](https://github.com/QuantStack/xtensor-python)
 
 The [xtensor-python](https://github.com/QuantStack/xtensor-python) project provides the implementation of two `xtensor` containers, `pyarray` and `pytensor` which effectively wrap numpy arrays, allowing inplace modification, including reshapes.
 
 Utilities to automatically generate numpy-style universal functions, exposed to Python from scalar function are also provided.
 
-### [![xtensor-julia](xtensor-julia-small.svg)](https://github.com/QuantStack/xtensor-julia)
+### [![xtensor-julia](docs/source/xtensor-julia-small.svg)](https://github.com/QuantStack/xtensor-julia)
 
 The [xtensor-julia](https://github.com/QuantStack/xtensor-julia) project provides the implementation of two `xtensor` containers, `jlarray` and `jltensor` which effectively wrap julia arrays, allowing inplace modification, including reshapes.
 
 Like in the Python case, utilities to generate numpy-style universal functions are provided.
 
-### [![xtensor-r](xtensor-r-small.svg)](https://github.com/QuantStack/xtensor-r)
+### [![xtensor-r](docs/source/xtensor-r-small.svg)](https://github.com/QuantStack/xtensor-r)
 
 The [xtensor-r](https://github.com/QuantStack/xtensor-r) project provides the implementation of two `xtensor` containers, `rarray` and `rtensor` which effectively wrap R arrays, allowing inplace modification, including reshapes.
 
@@ -264,11 +264,11 @@ Like for the Python and Julia bindings, utilities to generate numpy-style univer
 
 ## Library bindings
 
-### [![xtensor-blas](xtensor-blas-small.svg)](https://github.com/QuantStack/xtensor-blas)
+### [![xtensor-blas](docs/source/xtensor-blas-small.svg)](https://github.com/QuantStack/xtensor-blas)
 
 The [xtensor-blas](https://github.com/QuantStack/xtensor-blas) project provides bindings to BLAS libraries, enabling linear-algebra operations on xtensor expressions.
 
-### [![xtensor-io](xtensor-io-small.svg)](https://github.com/QuantStack/xtensor-io)
+### [![xtensor-io](docs/source/xtensor-io-small.svg)](https://github.com/QuantStack/xtensor-io)
 
 The [xtensor-io](https://github.com/QuantStack/xtensor-io) project enables the loading of a variety of file formats into xtensor expressions, such as image files, sound files, as well as  NumPy npy and npz files.
 
