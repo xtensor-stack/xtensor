@@ -7,6 +7,34 @@
 Changelog
 =========
 
+0.16.3
+------
+
+- simd on mathematical functions fixed
+  `#886 <https://github.com/QuantStack/xtensor/pull/886>`_.
+- ``fill`` method added to containers
+  `#887 <https://github.com/QuantStack/xtensor/pull/887>`_.
+- access with more arguments than dimensions
+  `#889 <https://github.com/QuantStack/xtensor/pull/889>`_.
+- unchecked method implemented
+  `#890 <https://github.com/QuantStack/xtensor/pull/890>`_.
+- ``fill`` method implemented in view
+  `#893 <https://github.com/QuantStack/xtensor/pull/893>`_.
+- documentation fixed and warnings removed
+  `#894 <https://github.com/QuantStack/xtensor/pull/894>`_.
+- negative slices and new range syntax
+  `#895 <https://github.com/QuantStack/xtensor/pull/895>`_.
+- ``xview_stepper`` with implicit ``xt::all`` bug fix
+  `#899 <https://github.com/QuantStack/xtensor/pull/899>`_.
+
+0.16.2
+------
+
+- Add include of ``xview.hpp`` in example
+  `#884 <https://github.com/QuantStack/xtensor/pull/884>`_.
+- Remove ``FS`` identifier
+  `#885 <https://github.com/QuantStack/xtensor/pull/885>`_.
+
 0.16.1
 ------
 
