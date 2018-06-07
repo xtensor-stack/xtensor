@@ -1137,7 +1137,8 @@ namespace xt
     template <class ST, std::size_t... I>
     inline ST xfunction_stepper<F, R, CT...>::step_simd_impl(std::index_sequence<I...>)
     {
-        return (p_f->m_f.simd_apply)(std::get<I>(m_it).template step_simd<ST>()...);
+        return (p_f->m_f.simd_apply)(std::get<I>(m_it).template
+            step_simd<detail::get_simd_type_t<std::tuple_element_t<I, typename xfunction_type::tuple_type>, ST, typename xfunction_type::simd_argument_type>>()...);
     }
 
     template <class F, class R, class... CT>
