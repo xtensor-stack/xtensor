@@ -515,26 +515,56 @@ namespace xt
 
     namespace strided_assign_detail
     {
-        template <class T>
-        void next_idx(T& outer_index, T& outer_shape)
+        template <layout_type layout>
+        struct idx_tools;
+
+        template <>
+        struct idx_tools<layout_type::row_major>
         {
-            std::size_t i = outer_index.size();
-            for (; i > 0; --i)
+            template <class T>
+            static void next_idx(T& outer_index, T& outer_shape)
             {
-                if (ptrdiff_t(outer_index[i - 1]) >= ptrdiff_t(outer_shape[i - 1]) - 1)
+                std::size_t i = outer_index.size();
+                for (; i > 0; --i)
                 {
-                    outer_index[i - 1] = 0;
-                }
-                else
-                {
-                    outer_index[i - 1]++;
-                    break;
+                    if (ptrdiff_t(outer_index[i - 1]) >= ptrdiff_t(outer_shape[i - 1]) - 1)
+                    {
+                        outer_index[i - 1] = 0;
+                    }
+                    else
+                    {
+                        outer_index[i - 1]++;
+                        break;
+                    }
                 }
             }
-        }
+        };
+
+        template <>
+        struct idx_tools<layout_type::column_major>
+        {
+            template <class T>
+            static void next_idx(T& outer_index, T& outer_shape)
+            {
+                std::size_t i = 0;
+                std::size_t sz = outer_index.size();
+                for (; i < sz; ++i)
+                {
+                    if (ptrdiff_t(outer_index[i]) >= ptrdiff_t(outer_shape[i]) - 1)
+                    {
+                        outer_index[i] = 0;
+                    }
+                    else
+                    {
+                        outer_index[i]++;
+                        break;
+                    }
+                }
+            }
+        };
 
         template <class S1, class S2>
-        std::size_t check_strides(S1& s1, S2& s2)
+        std::size_t check_strides_row_major(const S1& s1, const S2& s2)
         {
             // Indices are faster than reverse iterators
             std::size_t s1_index = s1.size();
@@ -550,13 +580,44 @@ namespace xt
             return s1_index;
         }
 
+        template <class S1, class S2>
+        std::size_t check_strides_column_major(const S1& s1, const S2& s2)
+        {
+            // Indices are faster than reverse iterators
+            std::size_t index = 0;
+            std::size_t size = s2.size();
+
+            for (; index < size; ++index)
+            {
+                if (s1[index] != s2[index])
+                {
+                    break;
+                }
+            }
+            return index;
+        }
+
+
+        template <layout_type L>
         struct check_strides_functor
         {
-            template <class T>
-            void operator()(const T& el)
+            template <class T, layout_type LE = L>
+            std::enable_if_t<LE == layout_type::row_major, void>
+            operator()(const T& el)
             {
-                auto var = check_strides(max_strides, el.strides());
+                auto var = check_strides_row_major(max_strides, el.strides());
                 if (var > cut)
+                {
+                    cut = var;
+                }
+            }
+
+            template <class T, layout_type LE = L>
+            std::enable_if_t<LE == layout_type::column_major, void>
+            operator()(const T& el)
+            {
+                auto var = check_strides_column_major(max_strides, el.strides());
+                if (var < cut)
                 {
                     cut = var;
                 }
@@ -580,15 +641,27 @@ namespace xt
         template <class E1, class E2>
         auto get_loop_sizes(const E1& e1, const E2& e2)
         {
-            auto s_fct = check_strides_functor{};
-            xt::resize_container(s_fct.max_strides, e1.strides().size());
-            std::copy(e1.strides().begin(), e1.strides().end(), s_fct.max_strides.begin());
-            s_fct(e2);
-
-            std::size_t cut = s_fct.cut;
+            std::size_t cut = 0;
             std::size_t inner_loop_size = 1;
             std::size_t outer_loop_size = 1;
             std::size_t i = 0;
+
+            if (e1.layout() == layout_type::row_major || (e1.layout() != layout_type::column_major && XTENSOR_DEFAULT_LAYOUT == layout_type::row_major))
+            {
+                auto s_fct = check_strides_functor<layout_type::row_major>{};
+                xt::resize_container(s_fct.max_strides, e1.strides().size());
+                std::copy(e1.strides().begin(), e1.strides().end(), s_fct.max_strides.begin());
+                s_fct(e2);
+                cut = s_fct.cut;
+            }
+            if (e1.layout() == layout_type::column_major || (e1.layout() != layout_type::row_major && XTENSOR_DEFAULT_LAYOUT == layout_type::column_major))
+            {
+                auto s_fct = check_strides_functor<layout_type::column_major>{};
+                xt::resize_container(s_fct.max_strides, e1.strides().size());
+                std::copy(e1.strides().begin(), e1.strides().end(), s_fct.max_strides.begin());
+                s_fct(e2);
+                cut = s_fct.cut;
+            }
 
             for (; i < cut; ++i)
             {
@@ -599,6 +672,11 @@ namespace xt
                 inner_loop_size *= e1.shape()[i];
             }
 
+            if (e1.layout() == layout_type::column_major)
+            {
+                std::swap(outer_loop_size, inner_loop_size);
+            }
+
             return std::make_tuple(inner_loop_size, outer_loop_size, cut);
         }
     }
@@ -607,10 +685,31 @@ namespace xt
     template <class E1, class E2>
     void strided_assign(E1& e1, const E2& e2, std::true_type)
     {
+        bool fallback = false;
         std::size_t inner_loop_size, outer_loop_size, cut;
-        std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2);
 
-        if (cut == e1.dimension())
+        if (e1.layout() == layout_type::row_major)
+        {
+            std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2);
+            if (cut == e1.dimension())
+            {
+                fallback = true;
+            }
+        }
+        else if (e1.layout() == layout_type::column_major)
+        {
+            std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2);
+            if (cut == 0)
+            {
+                fallback = true;
+            }
+        }
+        else
+        {
+            fallback = true;
+        }
+
+        if (fallback)
         {
             // last dimensions is != 1, fall back to data_assigner
             data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(e1, e2);
@@ -629,25 +728,56 @@ namespace xt
         auto fct_stepper = e2.stepper_begin(e1.shape());
         auto res_stepper = e1.stepper_begin(e1.shape());
     
-        for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
+        if (e1.layout() == layout_type::row_major)
         {
-            for (std::size_t i = 0; i < simd_size; i++)
+            std::cout << "e1 layout == row_major " << std::endl; 
+            for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
             {
-                res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
-            }
-            for (std::size_t i = 0; i < simd_rest; ++i)
-            {
-                *(res_stepper) = *(fct_stepper);
-                res_stepper.step_leading();
-                fct_stepper.step_leading();
-            }
-            strided_assign_detail::next_idx(idx, max);
-            fct_stepper.to_begin();
-            for (std::size_t i = 0; i < idx.size(); ++i)
-            {
-                fct_stepper.step(i, idx[i]);
+                for (std::size_t i = 0; i < simd_size; i++)
+                {
+                    res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
+                }
+                for (std::size_t i = 0; i < simd_rest; ++i)
+                {
+                    *(res_stepper) = *(fct_stepper);
+                    res_stepper.step_leading();
+                    fct_stepper.step_leading();
+                }
+                strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max);
+                fct_stepper.to_begin();
+                for (std::size_t i = 0; i < idx.size(); ++i)
+                {
+                    fct_stepper.step(i, idx[i]);
+                }
             }
         }
+        else
+        {
+            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(e1, e2);
+            assigner.run();
+            return;
+
+            // for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
+            // {
+            //     for (std::size_t i = 0; i < simd_size; i++)
+            //     {
+            //         res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
+            //     }
+            //     for (std::size_t i = 0; i < simd_rest; ++i)
+            //     {
+            //         *(res_stepper) = *(fct_stepper);
+            //         res_stepper.step_leading();
+            //         fct_stepper.step_leading();
+            //     }
+            //     strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max);
+            //     fct_stepper.to_begin();
+            //     for (std::size_t i = cut; i < cut + idx.size(); ++i)
+            //     {
+            //         fct_stepper.step(i, idx[i]);
+            //     }
+            // }
+        }
+
     }
 
     template <class E1, class E2>

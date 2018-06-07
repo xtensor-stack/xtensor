@@ -171,6 +171,9 @@ namespace xt
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
 
         using value_type = typename xexpression_type::value_type;
+        // using simd_value_type = typename xexpression_type::simd_value_type;
+        using simd_value_type = xsimd::simd_type<value_type>;
+
         using reference = std::conditional_t<is_const,
                                              typename xexpression_type::const_reference,
                                              typename xexpression_type::reference>;
