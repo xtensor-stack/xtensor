@@ -106,7 +106,7 @@ namespace xt
             }
             else
             {
-                if (arg >= shape[dim] && shape[dim] != 1)
+                if (arg >= std::size_t(shape[dim]) && shape[dim] != 1)
                 {
                     throw std::out_of_range("index " + std::to_string(arg) + " is out of bounds for axis "
                         + std::to_string(dim) + " with size " + std::to_string(shape[dim]));
@@ -126,12 +126,13 @@ namespace xt
     template <class S, class It>
     inline void check_element_index(const S& shape, It first, It last)
     {
+        using value_type = typename std::iterator_traits<It>::value_type;
         auto dst = static_cast<typename S::size_type>(last - first);
         It efirst = last - static_cast<std::ptrdiff_t>((std::min)(shape.size(), dst));
         std::size_t axis = 0;
         while (efirst != last)
         {
-            if (*efirst >= shape[axis] && shape[axis] != 1)
+            if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)
             {
                 throw std::out_of_range("index " + std::to_string(*efirst) + " is out of bounds for axis "
                     + std::to_string(axis) + " with size " + std::to_string(shape[axis]));

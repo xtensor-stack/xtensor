@@ -33,7 +33,7 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::xstrided_slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 std::copy(v.begin(), v.end(), res.begin());
@@ -61,7 +61,7 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::xstrided_slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 for(std::size_t k = 0; k < v.shape()[0]; ++k)
@@ -112,7 +112,7 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
+            auto v = xt::strided_view(data, xt::xstrided_slice_vector{xt::all(), SIZE/2});
             for (auto _ : state)
             {
                 xt::noalias(res) = v;
@@ -141,8 +141,8 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
-            auto r = xt::strided_view(res, xt::slice_vector{xt::all()});
+            auto v = xt::strided_view(data, xt::xstrided_slice_vector{xt::all(), SIZE/2});
+            auto r = xt::strided_view(res, xt::xstrided_slice_vector{xt::all()});
 
             for (auto _ : state)
             {
@@ -172,8 +172,8 @@ namespace xt
             xt::xtensor<V, 2> data = xt::ones<V>({SIZE,SIZE});
             xt::xtensor<V, 1> res = xt::ones<V>({SIZE});
 
-            auto v = xt::strided_view(data, xt::slice_vector{xt::all(), SIZE/2});
-            auto r = xt::strided_view(res, xt::slice_vector{xt::all()});
+            auto v = xt::strided_view(data, xt::xstrided_slice_vector{xt::all(), SIZE/2});
+            auto r = xt::strided_view(res, xt::xstrided_slice_vector{xt::all()});
 
             for (auto _ : state)
             {

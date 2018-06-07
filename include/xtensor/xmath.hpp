@@ -1998,7 +1998,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         struct diff_impl
         {
             template <class Arg>
-            inline void operator()(Arg& ad, const std::size_t& n, slice_vector& slice1, slice_vector& slice2, const std::size_t& saxis)
+            inline void operator()(Arg& ad, const std::size_t& n,
+                                   xstrided_slice_vector& slice1, xstrided_slice_vector& slice2,
+                                   const std::size_t& saxis)
             {
                 for (std::size_t i = 0; i < n; ++i)
                 {
@@ -2012,7 +2014,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         struct diff_impl<bool>
         {
             template <class Arg>
-            inline void operator()(Arg& ad, const std::size_t& n, slice_vector& slice1, slice_vector& slice2, const std::size_t& saxis)
+            inline void operator()(Arg& ad, const std::size_t& n,
+                                   xstrided_slice_vector& slice1, xstrided_slice_vector& slice2,
+                                   const std::size_t& saxis)
             {
                 for (std::size_t i = 0; i < n; ++i)
                 {
@@ -2049,8 +2053,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             saxis = ad.dimension() - 1;
         }
 
-        slice_vector slice1(ad.dimension(), all());
-        slice_vector slice2(ad.dimension(), all());
+        xstrided_slice_vector slice1(ad.dimension(), all());
+        xstrided_slice_vector slice2(ad.dimension(), all());
         slice1[saxis] = range(1, xnone());
 
         detail::diff_impl<typename T::value_type> impl;
@@ -2080,8 +2084,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
           saxis = yd.dimension() - 1;
         }
 
-        slice_vector slice1(yd.dimension(), all());
-        slice_vector slice2(yd.dimension(), all());
+        xstrided_slice_vector slice1(yd.dimension(), all());
+        xstrided_slice_vector slice2(yd.dimension(), all());
         slice1[saxis] = range(1, xnone());
         slice2[saxis] = range(xnone(), yd.shape()[saxis] - 1);
 
@@ -2128,8 +2132,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             dx = diff(x, 1, axis);
         }
 
-        slice_vector slice1(yd.dimension(), all());
-        slice_vector slice2(yd.dimension(), all());
+        xstrided_slice_vector slice1(yd.dimension(), all());
+        xstrided_slice_vector slice2(yd.dimension(), all());
         slice1[saxis] = range(1, xnone());
         slice2[saxis] = range(xnone(), yd.shape()[saxis] - 1);
 
