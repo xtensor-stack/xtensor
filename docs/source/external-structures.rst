@@ -64,6 +64,10 @@ with the following simple example:
         static constexpr layout_type layout = layout_type::dynamic;
     };
 
+    // This is the adaptor we need to define to plug raw_tensor in xtensor
+    template <class T>
+    class raw_tensor_adaptor;
+
 Define inner types
 ~~~~~~~~~~~~~~~~~~
 
@@ -72,7 +76,7 @@ The following tells ``xtensor`` which types must be used for getting shape, stri
 .. code::
 
     template <class T>
-    struct xcontainer_inner_types<raw_tensor<T>>
+    struct xcontainer_inner_types<raw_tensor_adaptor<T>>
     {
         using container_type = typename raw_tensor<T>::container_type;
         using inner_shape_type = typename raw_tensor<T>::shape_type;
@@ -93,8 +97,8 @@ Next, bring all the iterable features with this simple definition:
 .. code::
 
     template <class T>
-    struct xiterable_inner_types<raw_tensor<T>>
-        : xcontainer_iterable_types<raw_tensor<T>>
+    struct xiterable_inner_types<raw_tensor_adaptor<T>>
+        : xcontainer_iterable_types<raw_tensor_adaptor<T>>
     {
     };
 
@@ -112,7 +116,9 @@ Next step is to inherit from the ``xcontainer`` and the ``xcontainer_semantic`` 
         ...
     };
 
-Thanks to definition of the previous structures, inheriting from ``xcontainer`` brings almost all the container API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the support for mathematical operations.
+Thanks to definition of the previous structures, inheriting from ``xcontainer`` brings almost all the container
+API available in the other entities of ``xtensor``, while  inheriting from ``xtensor_semantic`` brings the support
+for mathematical operations.
 
 Define semantic
 ~~~~~~~~~~~~~~~
@@ -168,7 +174,8 @@ The last two methods are extended copy constructor and assign operator. They all
 Implement the resize methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The next methods to define are the overloads of ``resize``. ``xtensor`` provides utility functions to compute strides based on the shape and the layout, so the implementation of the ``resize`` overloads is straightforward:
+The next methods to define are the overloads of ``resize``. ``xtensor`` provides utility functions to compute
+strides based on the shape and the layout, so the implementation of the ``resize`` overloads is straightforward:
 
 .. code::
 
@@ -224,7 +231,8 @@ be declared as a friend class so that it can access them.
 Embedding a full tensor structure
 ---------------------------------
 
-You may need to plug structures that already provide n-dimensional access methods, instead of a one-dimensional container with a strided index scheme. This section illustrates how to adapt such structures with the following (minimal) API:
+You may need to plug structures that already provide n-dimensional access methods, instead of a one-dimensional
+container with a strided index scheme. This section illustrates how to adapt such structures with the following (minimal) API:
 
 .. code::
 
@@ -251,6 +259,10 @@ You may need to plug structures that already provide n-dimensional access method
         const T& element(It first, It last) const;
     };
 
+    // This is the adaptor we need to define to plug table in xtensor
+    template <class T>
+    class table_adaptor;
+
 Define inner types
 ~~~~~~~~~~~~~~~~~~
 
@@ -259,13 +271,13 @@ The following definitions are required:
 .. code::
 
     template <class T>
-    struct xcontainer_inner_type<table<T>>
+    struct xcontainer_inner_type<table_adaptor<T>>
     {
-        using temporary_type = table<T>;
+        using temporary_type = xarray<T>;
     };
 
     template <class T>
-    struct xiterable_inner_types<table<T>>
+    struct xiterable_inner_types<table_adaptor<T>>
     {
         using inner_shape_type = typename table<T>::shape_type;
         using stepper = xindexed_stepper<table<T>, false>;
