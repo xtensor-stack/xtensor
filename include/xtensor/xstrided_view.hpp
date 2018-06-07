@@ -406,7 +406,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline void xstrided_view<CT, S, L, FST>::assign_temporary_impl(temporary_type&& tmp)
     {
-        std::copy(tmp.cbegin(), tmp.cend(), this->begin());
+        strided_assign(*this, tmp, std::true_type{});
     }
 
     /**
@@ -785,6 +785,7 @@ namespace xt
     template <class ST, class STEP>
     inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type l) const -> std::enable_if_t<!detail::is_indexed_stepper<STEP>::value, STEP>
     {
+        // TODO check that data_xend(l) does the correct stuff here! 
         size_type offset = shape.size() - dimension();
         return const_stepper(this, data_xend(l), offset);
     }
@@ -814,9 +815,17 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class It>
-    inline It xstrided_view<CT, S, L, FST>::data_xend_impl(It end, layout_type l) const noexcept
+    inline It xstrided_view<CT, S, L, FST>::data_xend_impl(It begin, layout_type l) const noexcept
     {
-        return strided_data_end(*this, end, l);
+        std::ptrdiff_t end_offset = 0;
+        for (std::size_t i = 0; i < strides().size(); ++i)
+        {
+            if (strides()[i] != 0)
+            {
+                end_offset += strides()[i] * (shape()[i] - 1);
+            }
+        }
+        return strided_data_end(*this, begin + m_offset + end_offset + 1, l);
     }
 
     template <class CT, class S, layout_type L, class FST>
@@ -834,13 +843,13 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::data_xend(layout_type l) noexcept -> container_iterator
     {
-        return data_xend_impl(m_storage.end(), l);
+        return data_xend_impl(m_storage.begin(), l);
     }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::data_xend(layout_type l) const noexcept -> const_container_iterator
     {
-        return data_xend_impl(m_storage.cend(), l);
+        return data_xend_impl(m_storage.cbegin(), l);
     }
 
     /**

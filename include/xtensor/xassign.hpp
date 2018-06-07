@@ -646,7 +646,7 @@ namespace xt
             std::size_t outer_loop_size = 1;
             std::size_t i = 0;
 
-            if (e1.layout() == layout_type::row_major || (e1.layout() != layout_type::column_major && XTENSOR_DEFAULT_LAYOUT == layout_type::row_major))
+            if (e1.strides().back() == 1)
             {
                 auto s_fct = check_strides_functor<layout_type::row_major>{};
                 xt::resize_container(s_fct.max_strides, e1.strides().size());
@@ -654,7 +654,7 @@ namespace xt
                 s_fct(e2);
                 cut = s_fct.cut;
             }
-            if (e1.layout() == layout_type::column_major || (e1.layout() != layout_type::row_major && XTENSOR_DEFAULT_LAYOUT == layout_type::column_major))
+            else if (e1.strides().front() == 1)
             {
                 auto s_fct = check_strides_functor<layout_type::column_major>{};
                 xt::resize_container(s_fct.max_strides, e1.strides().size());
@@ -672,7 +672,7 @@ namespace xt
                 inner_loop_size *= e1.shape()[i];
             }
 
-            if (e1.layout() == layout_type::column_major)
+            if (e1.strides().back() != 1) // column major mode
             {
                 std::swap(outer_loop_size, inner_loop_size);
             }
@@ -681,14 +681,13 @@ namespace xt
         }
     }
 
-
     template <class E1, class E2>
     void strided_assign(E1& e1, const E2& e2, std::true_type)
     {
         bool fallback = false;
         std::size_t inner_loop_size, outer_loop_size, cut;
 
-        if (e1.layout() == layout_type::row_major)
+        if (e1.strides().back() == 1) // row major case
         {
             std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2);
             if (cut == e1.dimension())
@@ -696,7 +695,7 @@ namespace xt
                 fallback = true;
             }
         }
-        else if (e1.layout() == layout_type::column_major)
+        else if (e1.strides().front() == 1) // col major case
         {
             std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2);
             if (cut == 0)
@@ -728,9 +727,46 @@ namespace xt
         auto fct_stepper = e2.stepper_begin(e1.shape());
         auto res_stepper = e1.stepper_begin(e1.shape());
     
-        if (e1.layout() == layout_type::row_major)
+        // TODO in 1D case this is ambigous -- could be RM or CM. Use default layout to make decision
+        if (e1.strides().back() == 1) // row major case
         {
-            std::cout << "e1 layout == row_major " << std::endl; 
+            for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
+            {
+                for (std::size_t i = 0; i < simd_size; i++)
+                {
+                    res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
+                }
+                for (std::size_t i = 0; i < simd_rest; ++i)
+                {
+                    *(res_stepper) = *(fct_stepper);
+                    res_stepper.step_leading();
+                    fct_stepper.step_leading();
+
+                }
+                strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max);
+                // TODO move out of the loop?
+                fct_stepper.to_begin();
+                // need to step E1 as well if not contigous assign (e.g. view)
+                if (!E1::contiguous_layout)
+                {
+                    res_stepper.to_begin();
+                    for (std::size_t i = 0; i < idx.size(); ++i)
+                    {
+                        fct_stepper.step(i, idx[i]);
+                        res_stepper.step(i, idx[i]);
+                    }
+                }
+                else
+                {
+                    for (std::size_t i = 0; i < idx.size(); ++i)
+                    {
+                        fct_stepper.step(i, idx[i]);
+                    }
+                }
+            }
+        }
+        else if(e1.strides().front() == 1)
+        {
             for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
             {
                 for (std::size_t i = 0; i < simd_size; i++)
@@ -743,41 +779,26 @@ namespace xt
                     res_stepper.step_leading();
                     fct_stepper.step_leading();
                 }
-                strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max);
+                strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max);
                 fct_stepper.to_begin();
-                for (std::size_t i = 0; i < idx.size(); ++i)
+                if (!E1::contiguous_layout)
                 {
-                    fct_stepper.step(i, idx[i]);
+                    res_stepper.to_begin();
+                    for (std::size_t i = cut; i < cut + idx.size(); ++i)
+                    {
+                        fct_stepper.step(i, idx[i]);
+                        res_stepper.step(i, idx[i]);
+                    }
+                }
+                else
+                {
+                    for (std::size_t i = 0; i < idx.size(); ++i)
+                    {
+                        fct_stepper.step(i, idx[i]);
+                    }
                 }
             }
         }
-        else
-        {
-            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(e1, e2);
-            assigner.run();
-            return;
-
-            // for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
-            // {
-            //     for (std::size_t i = 0; i < simd_size; i++)
-            //     {
-            //         res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
-            //     }
-            //     for (std::size_t i = 0; i < simd_rest; ++i)
-            //     {
-            //         *(res_stepper) = *(fct_stepper);
-            //         res_stepper.step_leading();
-            //         fct_stepper.step_leading();
-            //     }
-            //     strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max);
-            //     fct_stepper.to_begin();
-            //     for (std::size_t i = cut; i < cut + idx.size(); ++i)
-            //     {
-            //         fct_stepper.step(i, idx[i]);
-            //     }
-            // }
-        }
-
     }
 
     template <class E1, class E2>
