@@ -117,7 +117,7 @@ namespace xt
 
         template <class R>
         R step_simd();
-    
+
         value_type step_leading();
 
         template <class R>
@@ -462,7 +462,8 @@ namespace xt
     template <class R>
     inline R xstepper<C>::step_simd()
     {
-        R reg(&(*m_it), xsimd::unaligned_mode());
+        R reg;
+        reg.load_unaligned(&(*m_it));
         m_it += xsimd::simd_batch_traits<R>::size;
         return reg;
     }

@@ -51,8 +51,13 @@ namespace xt
     {
         using xexpression_type = std::decay_t<CT>;
         using inner_shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
-        using stepper = xview_stepper<std::is_const<std::remove_reference_t<CT>>::value, CT, S...>;
-        using const_stepper = xview_stepper<true, std::remove_cv_t<CT>, S...>;
+        constexpr static bool has_strides_v = has_strides<xview<CT, S...>>::value;
+        using stepper = std::conditional_t<has_strides_v,
+                            xstepper<xview<CT, S...>>,
+                            xview_stepper<std::is_const<std::remove_reference_t<CT>>::value, CT, S...>>;
+        using const_stepper = std::conditional_t<has_strides_v,
+                            xstepper<const xview<CT, S...>>,
+                            xview_stepper<true, std::remove_cv_t<CT>, S...>>;
     };
 
 

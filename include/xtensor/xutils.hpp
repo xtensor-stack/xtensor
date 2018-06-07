@@ -554,6 +554,17 @@ namespace xt
         constexpr static bool value = decltype(test<T>(std::declval<const std::add_pointer_t<typename T::value_type>>()))::value == true;
     };
 
+    template <class E, class = void>
+    struct has_strides : std::false_type
+    {
+    };
+
+    template <class E>
+    struct has_strides<E, void_t<decltype(std::declval<E>().strides())>>
+        : std::true_type
+    {
+    };
+
     /******************
      * enable_if_type *
      ******************/
