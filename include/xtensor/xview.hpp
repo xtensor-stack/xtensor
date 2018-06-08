@@ -260,14 +260,7 @@ namespace xt
         template <class It>
         inline It data_xend_impl(It begin, layout_type l) const noexcept
         {
-            std::ptrdiff_t end_offset = 0;
-            for (std::size_t i = 0; i < strides().size(); ++i)
-            {
-                if (strides()[i] != 0)
-                {
-                    end_offset += strides()[i] * (shape()[i] - 1);
-                }
-            }
+            std::ptrdiff_t end_offset = static_cast<std::ptrdiff_t>(std::accumulate(backstrides().begin(), backstrides().end(), std::size_t(0)));
             return strided_data_end(*this, begin + end_offset + 1, l);
         }
 
@@ -1150,7 +1143,8 @@ namespace xt
     template <class CT, class... S>
     inline void xview<CT, S...>::assign_temporary_impl(temporary_type&& tmp)
     {
-        constexpr bool fast_assign = has_data_interface<xexpression_type>::value && detail::slices_contigous<S...>::value;
+        constexpr bool fast_assign = has_data_interface<xexpression_type>::value && detail::slices_contigous<S...>::value && \
+                                     xassign_traits<xview<CT, S...>, temporary_type>::simd_strided_loop();
         xview_detail::run_assign_temporary_impl(*this, tmp, std::integral_constant<bool, fast_assign>{});
     }
 
@@ -1263,7 +1257,6 @@ namespace xt
     inline auto xview<CT, S...>::stepper_begin(const ST& shape) const -> std::enable_if_t<Enable, const_stepper>
     {
         size_type offset = shape.size() - dimension();
-        const xexpression_type& e = m_e;
         return const_stepper(this, data_xbegin(), offset);
     }
 
@@ -1272,7 +1265,6 @@ namespace xt
     inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) const-> std::enable_if_t<Enable, const_stepper>
     {
         size_type offset = shape.size() - dimension();
-        const xexpression_type& e = m_e;
         return const_stepper(this, data_xend(l), offset);
     }
 

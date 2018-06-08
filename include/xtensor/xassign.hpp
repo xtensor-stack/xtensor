@@ -306,6 +306,7 @@ namespace xt
         const E2& de2 = e2.derived_cast();
 
         bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
+
         if (trivial_broadcast)
         {
             constexpr bool simd_assign = xassign_traits<E1, E2>::simd_assign();
@@ -744,7 +745,7 @@ namespace xt
 
                 }
                 strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max);
-                // TODO move out of the loop?
+
                 fct_stepper.to_begin();
                 // need to step E1 as well if not contigous assign (e.g. view)
                 if (!E1::contiguous_layout)

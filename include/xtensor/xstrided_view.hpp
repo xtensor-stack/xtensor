@@ -403,10 +403,26 @@ namespace xt
         return *this;
     }
 
+    namespace xstrided_view_detail
+    {
+        template <class V, class T>
+        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type)
+        {
+            strided_assign(v, t, std::true_type{});
+        }
+
+        template <class V, class T>
+        inline void run_assign_temporary_impl(V& v, const T& t, std::false_type)
+        {
+            std::copy(t.cbegin(), t.cend(), v.begin());
+        }
+    }
+
     template <class CT, class S, layout_type L, class FST>
     inline void xstrided_view<CT, S, L, FST>::assign_temporary_impl(temporary_type&& tmp)
     {
-        strided_assign(*this, tmp, std::true_type{});
+        constexpr bool fast_assign = xassign_traits<xstrided_view<CT, S, L, FST>, temporary_type>::simd_strided_loop();
+        xstrided_view_detail::run_assign_temporary_impl(*this, tmp, std::integral_constant<bool, fast_assign>{});
     }
 
     /**
@@ -817,14 +833,7 @@ namespace xt
     template <class It>
     inline It xstrided_view<CT, S, L, FST>::data_xend_impl(It begin, layout_type l) const noexcept
     {
-        std::ptrdiff_t end_offset = 0;
-        for (std::size_t i = 0; i < strides().size(); ++i)
-        {
-            if (strides()[i] != 0)
-            {
-                end_offset += strides()[i] * (shape()[i] - 1);
-            }
-        }
+        std::ptrdiff_t end_offset = static_cast<std::ptrdiff_t>(std::accumulate(backstrides().begin(), backstrides().end(), std::size_t(0)));
         return strided_data_end(*this, begin + m_offset + end_offset + 1, l);
     }
 
