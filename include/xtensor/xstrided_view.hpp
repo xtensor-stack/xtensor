@@ -406,13 +406,13 @@ namespace xt
     namespace xstrided_view_detail
     {
         template <class V, class T>
-        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type)
+        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type /* enable strided assign */)
         {
             strided_assign(v, t, std::true_type{});
         }
 
         template <class V, class T>
-        inline void run_assign_temporary_impl(V& v, const T& t, std::false_type)
+        inline void run_assign_temporary_impl(V& v, const T& t, std::false_type /* fallback to iterator assign */)
         {
             std::copy(t.cbegin(), t.cend(), v.begin());
         }
@@ -801,7 +801,6 @@ namespace xt
     template <class ST, class STEP>
     inline auto xstrided_view<CT, S, L, FST>::stepper_end(const ST& shape, layout_type l) const -> std::enable_if_t<!detail::is_indexed_stepper<STEP>::value, STEP>
     {
-        // TODO check that data_xend(l) does the correct stuff here! 
         size_type offset = shape.size() - dimension();
         return const_stepper(this, data_xend(l), offset);
     }
@@ -834,7 +833,7 @@ namespace xt
     inline It xstrided_view<CT, S, L, FST>::data_xend_impl(It begin, layout_type l) const noexcept
     {
         std::ptrdiff_t end_offset = static_cast<std::ptrdiff_t>(std::accumulate(backstrides().begin(), backstrides().end(), std::size_t(0)));
-        return strided_data_end(*this, begin + m_offset + end_offset + 1, l);
+        return strided_data_end(*this, begin + std::ptrdiff_t(m_offset) + end_offset + 1, l);
     }
 
     template <class CT, class S, layout_type L, class FST>

@@ -108,14 +108,14 @@ endif()
 include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
-    benchmark_assign.cpp
+    # benchmark_assign.cpp
     benchmark_builder.cpp
-    benchmark_container.cpp
-    benchmark_increment_stepper.cpp
-    benchmark_math.cpp
-    benchmark_reducer.cpp
-    benchmark_views.cpp
-    benchmark_xshape.cpp
+    # benchmark_container.cpp
+    # benchmark_increment_stepper.cpp
+    # benchmark_math.cpp
+    # benchmark_reducer.cpp
+    # benchmark_views.cpp
+    # benchmark_xshape.cpp
     main.cpp
 )
 

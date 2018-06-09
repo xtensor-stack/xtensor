@@ -464,7 +464,7 @@ namespace xt
     {
         R reg;
         reg.load_unaligned(&(*m_it));
-        m_it += xsimd::simd_batch_traits<R>::size;
+        m_it += xsimd::revert_simd_traits<R>::size;
         return reg;
     }
 
@@ -473,7 +473,7 @@ namespace xt
     inline void xstepper<C>::store_simd(const R& vec)
     {
         vec.store_unaligned(&(*m_it));
-        m_it += xsimd::simd_batch_traits<R>::size;;
+        m_it += xsimd::revert_simd_traits<R>::size;;
     }
 
     template <class C>

@@ -1128,13 +1128,13 @@ namespace xt
     namespace xview_detail
     {
         template <class V, class T>
-        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type)
+        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type /* enable strided assign */)
         {
             strided_assign(v, t, std::true_type{});
         }
 
         template <class V, class T>
-        inline void run_assign_temporary_impl(V& v, const T& t, std::false_type)
+        inline void run_assign_temporary_impl(V& v, const T& t, std::false_type /* fallback to iterator assign */)
         {
             std::copy(t.cbegin(), t.cend(), v.begin());
         }

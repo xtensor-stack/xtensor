@@ -60,12 +60,6 @@ namespace xsimd
     };
 
     template <class T>
-    struct simd_batch_traits
-    {
-        static constexpr size_t size = 1;
-    };
-
-    template <class T>
     struct revert_simd_traits
     {
         using type = T;

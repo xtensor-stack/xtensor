@@ -384,6 +384,52 @@ namespace xt
         }
         return res;
     }
+
+    template <layout_type L>
+    struct check_strides_overlap;
+
+    template <>
+    struct check_strides_overlap<layout_type::row_major>
+    {
+        template <class S1, class S2>
+        static std::size_t get(const S1& s1, const S2& s2)
+        {
+            // Indices are faster than reverse iterators
+            auto s1_index = s1.size();
+            auto s2_index = s2.size();
+
+            for (; s2_index != 0; --s1_index, --s2_index)
+            {
+                if (s1[s1_index - 1] != s2[s2_index - 1])
+                {
+                    break;
+                }
+            }
+            return s1_index;
+        }
+    };
+
+    template <>
+    struct check_strides_overlap<layout_type::column_major>
+    {
+        template <class S1, class S2>
+        static std::size_t get(const S1& s1, const S2& s2)
+        {
+            // Indices are faster than reverse iterators
+            using size_type = typename S1::size_type;
+            size_type index = 0;
+            auto size = s2.size();
+
+            for (; index < size; ++index)
+            {
+                if (s1[index] != s2[index])
+                {
+                    break;
+                }
+            }
+            return index;
+        }
+    };
 }
 
 #endif
