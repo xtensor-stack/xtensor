@@ -76,6 +76,13 @@ namespace xt
     template <class S1, class S2>
     bool broadcastable(const S1& s1, S2& s2);
 
+    /*************************
+     * check strides overlap *
+     *************************/
+
+    template <layout_type L>
+    struct check_strides_overlap;
+
     /********************************************
      * utility functions for strided containers *
      ********************************************/
@@ -385,9 +392,6 @@ namespace xt
         return res;
     }
 
-    template <layout_type L>
-    struct check_strides_overlap;
-
     template <>
     struct check_strides_overlap<layout_type::row_major>
     {
@@ -418,6 +422,12 @@ namespace xt
             // Indices are faster than reverse iterators
             using size_type = typename S1::size_type;
             size_type index = 0;
+
+            // This check is necessary as column major "broadcasting" is still
+            // peformed in a row major fashion
+            if (s1.size() != s2.size())
+                return 0;
+
             auto size = s2.size();
 
             for (; index < size; ++index)

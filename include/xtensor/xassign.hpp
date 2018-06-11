@@ -680,31 +680,35 @@ namespace xt
         {
             fallback = true;
         }
-        std::cout << "Fallback: " << fallback << std::endl;
-        std::cout << "OL: " << outer_loop_size << ", IL: " << inner_loop_size << std::endl;
 
         if (fallback)
         {
-            // last dimensions is != 1, fall back to data_assigner
             data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(e1, e2);
             assigner.run();
             return;
         }
 
         // TODO can we get rid of this and use `shape_type`?
-        dynamic_shape<std::size_t> idx(cut);
+        dynamic_shape<std::size_t> idx;
+
         using iterator_type = decltype(e1.shape().begin());
         iterator_type max_shape_begin, max_shape_end;
         if (is_row_major)
         {
+            xt::resize_container(idx, cut);
             max_shape_begin = e1.shape().begin();
             max_shape_end = e1.shape().begin() + cut;
         }
         else
         {
+            xt::resize_container(idx, e1.shape().size() - cut);
             max_shape_begin = e1.shape().begin() + cut;
             max_shape_end = e1.shape().end();
         }
+
+        // add this when we have std::array index!
+        // std::fill(idx.begin(), idx.end(), 0);
+
         dynamic_shape<std::size_t> max(max_shape_begin, max_shape_end);
 
         using simd_type = xsimd::simd_type<typename E1::value_type>;
@@ -722,8 +726,6 @@ namespace xt
         {
             step_dim = cut;
         }
-
-        std::cout << "STEP DIM ADD: " << step_dim << std::endl;
 
         for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
         {
@@ -743,14 +745,13 @@ namespace xt
                 strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max);
 
             fct_stepper.to_begin();
+
             // need to step E1 as well if not contigous assign (e.g. view)
-            std::cout << e1 << std::endl;
             if (!E1::contiguous_layout)
             {
                 res_stepper.to_begin();
                 for (std::size_t i = 0; i < idx.size(); ++i)
                 {
-                    std::cout << "Stepping in : " << i + step_dim << " to " << idx[i] << std::endl;
                     fct_stepper.step(i + step_dim, idx[i]);
                     res_stepper.step(i + step_dim, idx[i]);
                 }
