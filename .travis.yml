@@ -19,7 +19,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-5
-      env: COMPILER=gcc GCC=5
+      env: COMPILER=gcc GCC=5 DISABLE_XSIMD=1
     - os: linux
       addons:
         apt:
@@ -43,7 +43,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1 DISABLE_XSIMD=1
+      env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
     - os: linux
       addons:
         apt:

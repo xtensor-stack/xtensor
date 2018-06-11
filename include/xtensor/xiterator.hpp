@@ -100,6 +100,7 @@ namespace xt
         using difference_type = typename subiterator_traits::difference_type;
         using size_type = typename storage_type::size_type;
         using shape_type = typename storage_type::shape_type;
+        using simd_type = xsimd::simd_type<value_type>;
 
         xstepper() = default;
         xstepper(storage_type* c, subiterator_type it, size_type offset) noexcept;
@@ -113,6 +114,14 @@ namespace xt
 
         void to_begin();
         void to_end(layout_type l);
+
+        template <class R>
+        R step_simd();
+
+        value_type step_leading();
+
+        template <class R>
+        void store_simd(const R& vec);
 
     private:
 
@@ -447,6 +456,31 @@ namespace xt
     inline void xstepper<C>::to_end(layout_type l)
     {
         m_it = p_c->data_xend(l);
+    }
+
+    template <class C>
+    template <class R>
+    inline R xstepper<C>::step_simd()
+    {
+        R reg;
+        reg.load_unaligned(&(*m_it));
+        m_it += xsimd::revert_simd_traits<R>::size;
+        return reg;
+    }
+
+    template <class C>
+    template <class R>
+    inline void xstepper<C>::store_simd(const R& vec)
+    {
+        vec.store_unaligned(&(*m_it));
+        m_it += xsimd::revert_simd_traits<R>::size;;
+    }
+
+    template <class C>
+    auto xstepper<C>::step_leading() -> value_type
+    {
+        ++m_it;
+        return *m_it;
     }
 
     template <>

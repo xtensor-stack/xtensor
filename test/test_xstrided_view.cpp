@@ -866,4 +866,45 @@ namespace xt
         xarray<double> expected_range = {{1, 0}, {1, 0}};
         ASSERT_TRUE(all(equal(flipped_range, expected_range)));
     }
+
+    TEST(xstrided_view, reverse_iteration)
+    {
+        view_shape_type shape = {2, 3, 4};
+        xarray<double, layout_type::row_major> a(shape);
+        std::vector<double> data = {1,  2,  3,  4,  5,  6,  7,  8,  9,  10, 11, 12,
+            13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24};
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+
+        auto view1 = strided_view(a, {range(0, 2), 1, range(1, 4)});
+        auto iter = view1.template rbegin<layout_type::row_major>();
+        auto iter_end = view1.template rend<layout_type::row_major>();
+
+        EXPECT_EQ(20, *iter);
+        ++iter;
+        EXPECT_EQ(19, *iter);
+        ++iter;
+        EXPECT_EQ(18, *iter);
+        ++iter;
+        EXPECT_EQ(8, *iter);
+        ++iter;
+        EXPECT_EQ(7, *iter);
+        ++iter;
+        EXPECT_EQ(6, *iter);
+        ++iter;
+        EXPECT_EQ(iter, iter_end);
+
+        auto view2 = strided_view(view1, {range(0, 2), range(1, 3)});
+        auto iter2 = view2.template rbegin<layout_type::row_major>();
+        auto iter_end2 = view2.template rend<layout_type::row_major>();
+
+        EXPECT_EQ(20, *iter2);
+        ++iter2;
+        EXPECT_EQ(19, *iter2);
+        ++iter2;
+        EXPECT_EQ(8, *iter2);
+        ++iter2;
+        EXPECT_EQ(7, *iter2);
+        ++iter2;
+        EXPECT_EQ(iter2, iter_end2);
+    }
 }

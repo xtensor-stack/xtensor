@@ -481,10 +481,21 @@ namespace xt
 
         reference operator*() const;
 
+        template <class ST>
+        ST step_simd();
+
+        value_type step_leading();
+
     private:
 
         template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
+
+        template <class ST, std::size_t... I>
+        ST step_simd_impl(std::index_sequence<I...>);
+
+        template <std::size_t... I>
+        value_type step_leading_impl(std::index_sequence<I...>);
 
         const xfunction_type* p_f;
         std::tuple<typename std::decay_t<CT>::const_stepper...> m_it;
@@ -1120,6 +1131,36 @@ namespace xt
     inline auto xfunction_stepper<F, R, CT...>::deref_impl(std::index_sequence<I...>) const -> reference
     {
         return (p_f->m_f)(*std::get<I>(m_it)...);
+    }
+
+    template <class F, class R, class... CT>
+    template <class ST, std::size_t... I>
+    inline ST xfunction_stepper<F, R, CT...>::step_simd_impl(std::index_sequence<I...>)
+    {
+        return (p_f->m_f.simd_apply)(std::get<I>(m_it).template
+            step_simd<detail::get_simd_type_t<std::tuple_element_t<I, typename xfunction_type::tuple_type>, ST, typename xfunction_type::simd_argument_type>>()...);
+    }
+
+    template <class F, class R, class... CT>
+    template <class ST>
+    inline ST xfunction_stepper<F, R, CT...>::step_simd()
+    {
+        return step_simd_impl<ST>(std::make_index_sequence<sizeof...(CT)>());
+    }
+
+    template <class F, class R, class... CT>
+    template <std::size_t... I>
+    inline auto xfunction_stepper<F, R, CT...>::step_leading_impl(std::index_sequence<I...>)
+        -> value_type
+    {
+        return (p_f->m_f)(std::get<I>(m_it).step_leading()...);
+    }
+
+    template <class F, class R, class... CT>
+    inline auto xfunction_stepper<F, R, CT...>::step_leading() 
+        -> value_type
+    {
+        return step_leading_impl(std::make_index_sequence<sizeof...(CT)>());
     }
 
     /****************************

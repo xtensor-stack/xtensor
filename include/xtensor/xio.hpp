@@ -115,7 +115,7 @@ namespace xt
                 size_type line_lim = static_cast<size_type>(std::floor(line_width / ewp2));
 
                 out << '{';
-                for (; i != view.shape()[0] - 1; ++i)
+                for (; i != size_type(view.shape()[0] - 1); ++i)
                 {
                     if (edgeitems && size_type(view.shape()[0]) > (edgeitems * 2) && i == edgeitems)
                     {
@@ -126,7 +126,7 @@ namespace xt
                             out << std::endl
                                 << indents;
                         }
-                        i = view.shape()[0] - edgeitems;
+                        i = size_type(view.shape()[0] - edgeitems);
                     }
                     if (view.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
                     {

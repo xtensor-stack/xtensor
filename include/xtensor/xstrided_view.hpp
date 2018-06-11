@@ -171,6 +171,9 @@ namespace xt
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
 
         using value_type = typename xexpression_type::value_type;
+        // using simd_value_type = typename xexpression_type::simd_value_type;
+        using simd_value_type = xsimd::simd_type<value_type>;
+
         using reference = std::conditional_t<is_const,
                                              typename xexpression_type::const_reference,
                                              typename xexpression_type::reference>;
@@ -400,10 +403,26 @@ namespace xt
         return *this;
     }
 
+    namespace xstrided_view_detail
+    {
+        template <class V, class T>
+        inline void run_assign_temporary_impl(V& v, const T& t, std::true_type /* enable strided assign */)
+        {
+            strided_assign(v, t, std::true_type{});
+        }
+
+        template <class V, class T>
+        inline void run_assign_temporary_impl(V& v, const T& t, std::false_type /* fallback to iterator assign */)
+        {
+            std::copy(t.cbegin(), t.cend(), v.begin());
+        }
+    }
+
     template <class CT, class S, layout_type L, class FST>
     inline void xstrided_view<CT, S, L, FST>::assign_temporary_impl(temporary_type&& tmp)
     {
-        std::copy(tmp.cbegin(), tmp.cend(), this->begin());
+        constexpr bool fast_assign = xassign_traits<xstrided_view<CT, S, L, FST>, temporary_type>::simd_strided_loop();
+        xstrided_view_detail::run_assign_temporary_impl(*this, tmp, std::integral_constant<bool, fast_assign>{});
     }
 
     /**
@@ -811,9 +830,10 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class It>
-    inline It xstrided_view<CT, S, L, FST>::data_xend_impl(It end, layout_type l) const noexcept
+    inline It xstrided_view<CT, S, L, FST>::data_xend_impl(It begin, layout_type l) const noexcept
     {
-        return strided_data_end(*this, end, l);
+        std::ptrdiff_t end_offset = static_cast<std::ptrdiff_t>(std::accumulate(backstrides().begin(), backstrides().end(), std::size_t(0)));
+        return strided_data_end(*this, begin + std::ptrdiff_t(m_offset) + end_offset + 1, l);
     }
 
     template <class CT, class S, layout_type L, class FST>
@@ -831,13 +851,13 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::data_xend(layout_type l) noexcept -> container_iterator
     {
-        return data_xend_impl(m_storage.end(), l);
+        return data_xend_impl(m_storage.begin(), l);
     }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::data_xend(layout_type l) const noexcept -> const_container_iterator
     {
-        return data_xend_impl(m_storage.cend(), l);
+        return data_xend_impl(m_storage.cbegin(), l);
     }
 
     /**

@@ -76,6 +76,13 @@ namespace xt
     template <class S1, class S2>
     bool broadcastable(const S1& s1, S2& s2);
 
+    /*************************
+     * check strides overlap *
+     *************************/
+
+    template <layout_type L>
+    struct check_strides_overlap;
+
     /********************************************
      * utility functions for strided containers *
      ********************************************/
@@ -388,6 +395,55 @@ namespace xt
         }
         return res;
     }
+
+    template <>
+    struct check_strides_overlap<layout_type::row_major>
+    {
+        template <class S1, class S2>
+        static std::size_t get(const S1& s1, const S2& s2)
+        {
+            // Indices are faster than reverse iterators
+            auto s1_index = s1.size();
+            auto s2_index = s2.size();
+
+            for (; s2_index != 0; --s1_index, --s2_index)
+            {
+                if (s1[s1_index - 1] != s2[s2_index - 1])
+                {
+                    break;
+                }
+            }
+            return s1_index;
+        }
+    };
+
+    template <>
+    struct check_strides_overlap<layout_type::column_major>
+    {
+        template <class S1, class S2>
+        static std::size_t get(const S1& s1, const S2& s2)
+        {
+            // Indices are faster than reverse iterators
+            using size_type = typename S1::size_type;
+            size_type index = 0;
+
+            // This check is necessary as column major "broadcasting" is still
+            // peformed in a row major fashion
+            if (s1.size() != s2.size())
+                return 0;
+
+            auto size = s2.size();
+
+            for (; index < size; ++index)
+            {
+                if (s1[index] != s2[index])
+                {
+                    break;
+                }
+            }
+            return index;
+        }
+    };
 }
 
 #endif
