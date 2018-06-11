@@ -765,6 +765,11 @@ namespace xt
             }
         }
     }
+
+    template <class E1, class E2>
+    inline void strided_assign(E1& e1, const E2& e2, std::false_type /*disable*/)
+    {
+    }
 }
 
 #endif

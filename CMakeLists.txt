@@ -82,6 +82,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsort.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstorage.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstrided_view.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xstrided_view_base.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xstrides.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp

@@ -95,7 +95,8 @@ namespace xt
     namespace detail
     {
         template <class E, class F>
-        std::ostream& xoutput(std::ostream& out, const E& e, slice_vector& slices, F& printer, std::size_t blanks,
+        std::ostream& xoutput(std::ostream& out, const E& e,
+                              xstrided_slice_vector& slices, F& printer, std::size_t blanks,
                               std::streamsize element_width, std::size_t edgeitems, std::size_t line_width)
         {
             using size_type = typename E::size_type;
@@ -162,7 +163,7 @@ namespace xt
         }
 
         template <class F, class E>
-        static void recurser_run(F& fn, const E& e, slice_vector& slices, std::size_t lim = 0)
+        static void recurser_run(F& fn, const E& e, xstrided_slice_vector& slices, std::size_t lim = 0)
         {
             using size_type = typename E::size_type;
             const auto view = strided_view(e, slices);
@@ -612,7 +613,7 @@ namespace xt
 
         detail::printer<E> p(precision);
 
-        slice_vector sv;
+        xstrided_slice_vector sv;
         detail::recurser_run(p, d, sv, lim);
         p.init();
         sv.clear();

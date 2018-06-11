@@ -523,6 +523,7 @@ namespace xt
     /**
      * @name Data
      */
+    //@{
 
     /**
      * Fills the container with the given value.
@@ -535,7 +536,6 @@ namespace xt
         std::fill(storage_begin(), storage_end(), value);
     }
 
-    //@{
     /**
      * Returns a reference to the element at the specified position in the container.
      * @param args a list of indices specifying the position in the container. Indices
@@ -760,7 +760,9 @@ namespace xt
     }
 
     /**
-     * Returns the offset to the first element in the container.
+     * Returns a pointer to the underlying array serving as element storage. The pointer
+     * is such that range [data(); data() + size()] is always a valid range, even if the
+     * container is empty (data() is not is not dereferenceable in that case)
      */
     template <class D>
     inline auto xcontainer<D>::data() noexcept -> value_type*
@@ -768,6 +770,11 @@ namespace xt
         return storage().data();
     }
 
+    /**
+    * Returns a constant pointer to the underlying array serving as element storage. The pointer
+    * is such that range [data(); data() + size()] is always a valid range, even if the
+    * container is empty (data() is not is not dereferenceable in that case)
+    */
     template <class D>
     inline auto xcontainer<D>::data() const noexcept -> const value_type*
     {

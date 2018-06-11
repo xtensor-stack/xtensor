@@ -205,6 +205,18 @@ namespace xt
         size_type m_offset;
     };
 
+    template <class T>
+    struct is_indexed_stepper
+    {
+        static const bool value = false;
+    };
+
+    template <class T, bool B>
+    struct is_indexed_stepper<xindexed_stepper<T, B>>
+    {
+        static const bool value = true;
+    };
+
     /*************
      * xiterator *
      *************/

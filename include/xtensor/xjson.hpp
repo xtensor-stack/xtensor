@@ -41,7 +41,7 @@ namespace xt
     namespace detail
     {
         template <class D>
-        void to_json_impl(nlohmann::json& j, const xexpression<D>& e, slice_vector& slices)
+        void to_json_impl(nlohmann::json& j, const xexpression<D>& e, xstrided_slice_vector& slices)
         {
             const auto view = strided_view(e.derived_cast(), slices);
             if (view.dimension() == 0)
@@ -65,7 +65,7 @@ namespace xt
         }
 
         template <class D>
-        inline void from_json_impl(const nlohmann::json& j, xexpression<D>& e, slice_vector& slices)
+        inline void from_json_impl(const nlohmann::json& j, xexpression<D>& e, xstrided_slice_vector& slices)
         {
             auto view = strided_view(e.derived_cast(), slices);
 
@@ -127,7 +127,7 @@ namespace xt
     template <class E>
     inline enable_xexpression<E> to_json(nlohmann::json& j, const E& e)
     {
-        auto sv = slice_vector();
+        auto sv = xstrided_slice_vector();
         detail::to_json_impl(j, e, sv);
     }
 
@@ -157,7 +157,7 @@ namespace xt
         // In the case of a container, we resize the container.
         e.resize(s);
 
-        auto sv = slice_vector();
+        auto sv = xstrided_slice_vector();
         detail::from_json_impl(j, e, sv);
     }
 
@@ -174,7 +174,7 @@ namespace xt
             throw std::runtime_error("Shape mismatch when deserializing JSON to view");
         }
 
-        auto sv = slice_vector();
+        auto sv = xstrided_slice_vector();
         detail::from_json_impl(j, e, sv);
     }
     /// @endcond
