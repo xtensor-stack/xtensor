@@ -449,4 +449,16 @@ namespace xt
 
         EXPECT_EQ(res, a);
     }
+
+    TYPED_TEST(view_semantic, higher_dimension_broadcast)
+    {
+        using container_2d = redim_container_t<TypeParam, 2>;
+
+        container_2d a = { {1, 2, 3}, {4, 5, 6} };
+        container_2d b = { {11, 12, 13} };
+        container_2d res = { { 11, 12, 13 }, { 4, 5, 6 } };
+
+        auto viewa = view(a, 0, all());
+        EXPECT_ANY_THROW(viewa = b);
+    }
 }
