@@ -13,16 +13,16 @@ namespace xt
 {
     template <class T,
               XTENSOR_REQUIRE<std::is_integral<T>::value>>
-    int test_concept_check(T) {}
+    int test_concept_check(T);
 
     template <class T,
               XTENSOR_REQUIRE<!std::is_integral<T>::value>>
-    void* test_concept_check(T) {}
+    void test_concept_check(T);
 
     TEST(concepts, concept_check)
     {
         EXPECT_TRUE((std::is_same<decltype(test_concept_check(1)), int>::value));
-        EXPECT_TRUE((std::is_same<decltype(test_concept_check(1.0)), void*>::value));
+        EXPECT_TRUE((std::is_same<decltype(test_concept_check(1.0)), void>::value));
     }
 
     TEST(concepts, iterator_concept)

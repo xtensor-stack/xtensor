@@ -127,7 +127,7 @@ namespace xt
                             out << std::endl
                                 << indents;
                         }
-                        i = size_type(view.shape()[0] - edgeitems);
+                        i = size_type(view.shape()[0]) - edgeitems;
                     }
                     if (view.dimension() == 1 && line_lim != 0 && elems_on_line >= line_lim)
                     {
@@ -174,11 +174,11 @@ namespace xt
             else
             {
                 size_type i = 0;
-                for (; i != view.shape()[0] - 1; ++i)
+                for (; i != static_cast<size_type>(view.shape()[0] - 1); ++i)
                 {
                     if (lim && size_type(view.shape()[0]) > (lim * 2) && i == lim)
                     {
-                        i = view.shape()[0] - lim;
+                        i = static_cast<size_type>(view.shape()[0]) - lim;
                     }
                     slices.push_back(static_cast<int>(i));
                     recurser_run(fn, e, slices, lim);

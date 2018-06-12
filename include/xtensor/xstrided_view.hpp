@@ -484,7 +484,7 @@ namespace xt
             template <class A, class B, class C>
             std::array<std::ptrdiff_t, 3> operator()(const xrange_adaptor<A, B, C>& range) const
             {
-                auto sl = range.get(m_shape[idx]);
+                auto sl = range.get(static_cast<std::size_t>(m_shape[idx]));
                 return {sl(0), sl.size(), sl.step_size()};
             }
         };
@@ -558,6 +558,8 @@ namespace xt
             auto old_shape = shape;
             auto&& old_strides = strides;
 
+            using old_strides_vt = std::decay_t<decltype(old_strides[0])>;
+
     #define XTENSOR_MS(v) static_cast<std::ptrdiff_t>(v)
     #define XTENSOR_MU(v) static_cast<std::size_t>(v)
 
@@ -571,8 +573,8 @@ namespace xt
                 auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[XTENSOR_MU(i)]);
                 if (ptr != nullptr)
                 {
-                    std::size_t slice0 = static_cast<std::size_t>(*ptr);
-                    offset += slice0 * old_strides[XTENSOR_MU(i - axis_skip)];
+                    auto slice0 = static_cast<old_strides_vt>(*ptr);
+                    offset += static_cast<std::size_t>(slice0 * old_strides[XTENSOR_MU(i - axis_skip)]);
                 }
                 else if (xtl::get_if<xt::xnewaxis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
                 {
@@ -599,7 +601,7 @@ namespace xt
                 {
                     slice_getter.idx = XTENSOR_MU(i - axis_skip);
                     auto info = xtl::visit(slice_getter, slices[XTENSOR_MU(i)]);
-                    offset += std::size_t(info[0]) * old_strides[XTENSOR_MU(i - axis_skip)];
+                    offset += XTENSOR_MU(static_cast<old_strides_vt>(info[0]) * old_strides[XTENSOR_MU(i - axis_skip)]);
                     new_shape[idx] = std::ptrdiff_t(info[1]);
                     new_strides[idx] = std::ptrdiff_t(info[2]) * XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
                     ++idx;

@@ -83,7 +83,6 @@ namespace xt
 
         using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
         using init_functor_type = typename std::decay_t<F>::init_functor_type;
-        using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
 
         using expr_value_type = typename std::decay_t<E>::value_type;
 
@@ -95,7 +94,7 @@ namespace xt
         auto init_fct = std::get<1>(f);
         auto merge_fct = std::get<2>(f);
 
-        shape_type result_shape;
+        shape_type result_shape{};
         resize_container(result_shape, e.dimension() - axes.size());
 
         dynamic_shape<std::size_t> iter_shape = xtl::forward_sequence<dynamic_shape<std::size_t>>(e.shape());
@@ -825,7 +824,6 @@ namespace xt
         auto stepper = const_stepper(*this, 0);
         size_type dim = 0;
         // drop left most elements
-        using difference_type = typename std::iterator_traits<It>::difference_type;
         auto size = std::ptrdiff_t(dimension()) - std::distance(first, last);
         auto begin = first - size;
         while (begin != last)

@@ -1,0 +1,135 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
+#include <algorithm>
+
+#include "gtest/gtest.h"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xnoalias.hpp"
+#include "xtensor/xstrided_view.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
+
+namespace xt
+{
+    using namespace xt::placeholders;
+
+    /*py
+    a = np.arange(35, dtype=np.float64).reshape(5, 7)
+    */
+    TEST(xtest_extended, negative_slices_twod)
+    {
+        // py_a
+        // py_av0 = a[:-2, ::-1]
+        auto av0 = xt::strided_view(py_a, {_r|_|-2, _r|_|_|-1});
+        EXPECT_EQ(av0, py_av0);
+        // py_av1 = a[::-1, ::-1]
+        auto av1 = xt::strided_view(py_a, {_r|_|_|-1, _r|_|_|-1});
+        EXPECT_EQ(av1, py_av1);
+        // py_av2 = a[1:-3, -3:2:-1]
+        auto av2 = xt::strided_view(py_a, {_r|1|-3, _r|-3|2|-1});
+        EXPECT_EQ(av2, py_av2);
+        // py_av3 = a[-1:-4:-1, -3:1:-2]
+        auto av3 = xt::strided_view(py_a, {_r|-1|-4|-1, _r|-3|1|-2});
+        EXPECT_EQ(av3, py_av3);
+        auto av4 = xt::strided_view(py_a, {_r|-3|-5, _r|-3|10});
+        EXPECT_EQ(av4.size(), 0);
+        // py_av5 = a[-5:-2, -3:10]
+        auto av5 = xt::strided_view(py_a, {_r|-5|-2, _r|-3|10});
+        EXPECT_EQ(av5, py_av5);
+    }
+
+    /*py
+    a0 = np.arange(35).reshape(5, 7)
+    a = np.copy(a0)
+    a[0:-2] += a[:3:-1]
+    at = np.copy(a)
+    at[::-2] += at[::2]
+    */
+    TEST(xtest_extended, negative_slices_math)
+    {
+        // py_a0
+        strided_view(py_a0, {_r|0|-2}) += strided_view(py_a0, {{_r|_|3|-1}});
+        // py_a
+        EXPECT_EQ(py_a0, py_a);
+        strided_view(py_a0, {_r|_|_|-2}) += strided_view(py_a0, {_r|_|_|2});
+        // py_at
+        EXPECT_EQ(py_a0, py_at);
+    }
+
+    /*py
+    a1 = np.arange(35).reshape(5, 1, 7)
+    a2 = np.copy(a).reshape(1, 5, 1, 7)
+    a3 = np.array([6,2,3,5,1]).reshape(1, 5, 1, 1)
+    a1_a2 = a1 + a2
+    b1 = np.arange(7)
+    b1_a1 = a1 + b1
+    b2 = np.copy(b1).reshape(1, 1, 1, 7)
+    a1_b2 = a1 + b2
+    b3 = np.random.random((2, 5, 4, 7))
+    a2_b3 = a2 + b3
+    */
+    TEST(xtest_extended, broadcasting)
+    {
+        // py_a1
+        // py_a2
+        // py_b1
+        // py_b2
+        // py_b3
+        xt::xarray<long> a1_a2 = py_a1 + py_a2;
+        // py_a1_a2
+        EXPECT_EQ(a1_a2, py_a1_a2);
+
+        xt::xarray<long> b1_a1 = py_b1 + py_a1;
+        // py_b1_a1
+        EXPECT_EQ(b1_a1, py_b1_a1);
+
+        xt::xarray<long> a1_b2 = py_a1 + py_b2;
+        // py_a1_b2
+        EXPECT_EQ(a1_b2, py_a1_b2);
+
+        xt::xarray<double> a2_b3 = xt::cast<double>(py_a2) + py_b3;
+        // py_a2_b3
+        EXPECT_TRUE(xt::allclose(a2_b3, py_a2_b3));
+    }
+
+    /*py
+    a0 = np.arange(5 * 3 * 7).reshape(5, 3, 7)
+    a1 = np.copy(a0)
+    b1 = np.arange(5 * 3).reshape(5, 3)
+    a1[:, :, 2] = b1
+    a2 = np.copy(a1)
+    ar2 = np.arange(35).reshape(5, 1, 7)
+    a1[:, 0, np.newaxis, :] = ar2
+    a3 = np.copy(a1)
+    a1[:, 2, :] = np.arange(7)
+    a4 = np.copy(a1)
+    */
+    TEST(xtest_extended, broadcast_into_view)
+    {
+        // py_a0
+        xt::xarray<long> a = py_a0;
+
+        // py_b1
+        // py_a2
+        view(a, all(), all(), 2) = py_b1;
+        EXPECT_EQ(a, py_a2);
+
+        // py_ar2
+        xt::xarray<long> ar2 = py_ar2;
+        view(a, all(), 0, newaxis(), all()) = ar2;
+
+        // py_a3
+        EXPECT_EQ(a, py_a3);
+
+        view(a, all(), 2, all()) = xt::arange(7);
+        // py_a4
+        EXPECT_EQ(a, py_a4);
+    }
+}

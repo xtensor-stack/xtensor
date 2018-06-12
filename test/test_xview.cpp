@@ -927,10 +927,11 @@ namespace xt
         auto it4 = v.storage_rbegin();
         for (std::size_t i = 0; i < expected.size(); ++i)
         {
-            EXPECT_EQ(*(it1 + i), expected[i]);
-            EXPECT_EQ(*(it2 + i), expected[i]);
-            EXPECT_EQ(*(it3 + i), expected[expected.size() - 1 - i]);
-            EXPECT_EQ(*(it4 + i), expected[expected.size() - 1 - i]);
+            std::ptrdiff_t ix = static_cast<std::ptrdiff_t>(i);
+            EXPECT_EQ(*(it1 + ix), expected[i]);
+            EXPECT_EQ(*(it2 + ix), expected[i]);
+            EXPECT_EQ(*(it3 + ix), expected[expected.size() - 1 - i]);
+            EXPECT_EQ(*(it4 + ix), expected[expected.size() - 1 - i]);
         }
     }
 

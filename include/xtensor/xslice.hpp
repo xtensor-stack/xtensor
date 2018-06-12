@@ -457,7 +457,7 @@ namespace xt
                                 std::is_integral<MA>::value &&
                                 std::is_integral<STEP>::value,
                                 xstepped_range<std::ptrdiff_t>>
-            get(std::size_t size) const
+        get(std::size_t size) const
         {
             return get_stepped_range(m_start, m_stop, m_step, size);
         }
