@@ -225,6 +225,12 @@ namespace xt
                 }
             }
 
+            template <class S, class SX>
+            inline S step_simd(const SX& I) const
+            {
+                return S(I[0]) + S(0, 1, 2, 3);
+            }
+
         private:
 
             value_type m_start;

@@ -117,6 +117,12 @@ namespace xt
         template <class E, class FE = F, class = std::enable_if_t<has_assign_to<E, FE>::value>>
         void assign_to(xexpression<E>& e) const noexcept;
 
+        template <class SX, class SS>
+        SX step_simd(const SS& I) const noexcept
+        {
+            return m_f.template step_simd<SX>(I);
+        }
+
     private:
 
         template <std::size_t dim>
