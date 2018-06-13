@@ -211,6 +211,9 @@ namespace xt
         };
         */
     }
+
+    template <class CT, class X>
+    class xbroadcast;
 }
 
 #endif

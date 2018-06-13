@@ -182,6 +182,16 @@ namespace xt
         }
     }
 
+    inline auto builder_ones_strided_assign(benchmark::State& state)
+    {
+        for (auto _ : state)
+        {
+            xt::xarray<double> res;
+            res.resize({200, 200});
+            strided_assign(res, xt::ones<double>({200, 200}), std::true_type{});
+            benchmark::DoNotOptimize(res.data());
+        }
+    }
 
     inline auto builder_ones_assign_iterator(benchmark::State& state)
     {
@@ -238,30 +248,31 @@ namespace xt
         for (auto _ : state)
         {
             xt::xarray<double> res(xt::dynamic_shape<std::size_t>{200, 200});
-            std::fill(res.begin(), res.end(), 1);
+            std::fill(res.storage().begin(), res.storage().end(), 1.0);
             benchmark::DoNotOptimize(res.storage().data());
         }
     }
 
-    BENCHMARK_TEMPLATE(builder_xarange, xarray<double>);
-    BENCHMARK_TEMPLATE(builder_xarange, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_arange_pure_xsimd, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_arange_xsimd, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_arange_xsimd_stepper, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_xarange_manual, xarray<double>);
-    BENCHMARK_TEMPLATE(builder_xarange_manual, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_arange_for_loop_assign, xarray<double>);
-    BENCHMARK_TEMPLATE(builder_arange_for_loop_assign, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_xarange, xarray<double>);
+    // BENCHMARK_TEMPLATE(builder_xarange, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_arange_pure_xsimd, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_arange_xsimd, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_arange_xsimd_stepper, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_xarange_manual, xarray<double>);
+    // BENCHMARK_TEMPLATE(builder_xarange_manual, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_arange_for_loop_assign, xarray<double>);
+    // BENCHMARK_TEMPLATE(builder_arange_for_loop_assign, xtensor<double, 1>);
 
-    BENCHMARK_TEMPLATE(builder_arange_assign_iterator, xarray<double>);
-    BENCHMARK_TEMPLATE(builder_arange_assign_iterator, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign, xarray<double>);
-    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign_backward, xarray<double>);
-    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign_backward, xtensor<double, 1>);
-    BENCHMARK_TEMPLATE(builder_std_iota, xarray<double>);
-    BENCHMARK(builder_iota_vector);
+    // BENCHMARK_TEMPLATE(builder_arange_assign_iterator, xarray<double>);
+    // BENCHMARK_TEMPLATE(builder_arange_assign_iterator, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign, xarray<double>);
+    // BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign_backward, xarray<double>);
+    // BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_arange_for_loop_iter_assign_backward, xtensor<double, 1>);
+    // BENCHMARK_TEMPLATE(builder_std_iota, xarray<double>);
+    // BENCHMARK(builder_iota_vector);
     BENCHMARK(builder_ones);
+    BENCHMARK(builder_ones_strided_assign);
     BENCHMARK(builder_ones_assign_iterator);
     BENCHMARK(builder_ones_expr);
     BENCHMARK(builder_ones_expr_fill);

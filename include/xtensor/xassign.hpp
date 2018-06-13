@@ -267,6 +267,12 @@ namespace xt
             static constexpr bool value = true;
         };
 
+        template <class T, class S>
+        struct use_strided_loop<xbroadcast<xscalar<T>, S>>
+        {
+            static constexpr bool value = true;
+        };
+
         template <class F, class R, class... CT>
         struct use_strided_loop<xfunction<F, R, CT...>>
         {
@@ -591,6 +597,12 @@ namespace xt
 
             template <class T>
             std::size_t operator()(const xt::xscalar<T>& /*el*/)
+            {
+                return m_cut;
+            }
+
+            template <class T, class SX>
+            std::size_t operator()(const xt::xbroadcast<xt::xscalar<T>, SX>& /*el*/)
             {
                 return m_cut;
             }

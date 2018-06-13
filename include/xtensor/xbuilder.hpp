@@ -194,10 +194,13 @@ namespace xt
         public:
 
             using value_type = T;
+            using simd_type = xsimd::simd_type<T>;
+            constexpr static std::size_t simd_size = xsimd::revert_simd_traits<simd_type>::size;
 
             arange_impl(T start, T stop, T step)
                 : m_start(start), m_stop(stop), m_step(step)
             {
+                reset_simd();
             }
 
             template <class... Args>
@@ -228,11 +231,37 @@ namespace xt
             template <class S, class SX>
             inline S step_simd(const SX& I) const
             {
-                return S(I[0]) + S(0, 1, 2, 3);
+                if (I[-1] > idx)
+                {
+                    simd_type ret = simd_state;
+                    simd_state += simd_type(simd_size);
+                    return simd_state;
+                }
+                else
+                {
+                    reset_simd();
+                    simd_type ret = simd_state;
+                    simd_state += simd_type(simd_size);
+                    return simd_state;
+                }
+            }
+
+            void reset_simd() const
+            {
+                T temp[simd_size];
+                T val = m_start;
+
+                for (std::size_t i = 0; i < simd_size; ++i)
+                {
+                    temp[i] = val;
+                    val += m_step;
+                }
             }
 
         private:
 
+            mutable simd_type simd_state;
+            mutable size_t idx = 0;
             value_type m_start;
             value_type m_stop;
             value_type m_step;
