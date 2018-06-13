@@ -143,7 +143,8 @@ namespace xt
     template <class F, class R, class... CT>
     struct xiterable_inner_types<xfunction_base<F, R, CT...>>
     {
-        using inner_shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
+        using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
+        using inner_shape_type = index_from_shape_t<shape_type>;
         using const_stepper = xfunction_stepper<F, R, CT...>;
         using stepper = const_stepper;
     };
@@ -187,8 +188,8 @@ namespace xt
         using simd_value_type = typename detail::functor_return_type<detail::common_value_type_t<std::decay_t<CT>...>, R>::simd_type;
         using simd_argument_type = xsimd::simd_type<detail::common_value_type_t<std::decay_t<CT>...>>;
         using iterable_base = xconst_iterable<xfunction_base<F, R, CT...>>;
+        using shape_type = typename iterable_base::shape_type;
         using inner_shape_type = typename iterable_base::inner_shape_type;
-        using shape_type = inner_shape_type;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
@@ -226,7 +227,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const;
+        const inner_shape_type& shape() const;
         layout_type layout() const noexcept;
 
         template <class... Args>
@@ -338,7 +339,7 @@ namespace xt
 
         tuple_type m_e;
         functor_type m_f;
-        mutable shape_type m_shape;
+        mutable inner_shape_type m_shape;
         mutable bool m_shape_trivial;
         mutable bool m_shape_computed;
 
@@ -555,7 +556,7 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func, class... CTA, class U>
     inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CTA&&... e) noexcept
-        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(0))),
+        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<inner_shape_type>(0, size_type(0))),
           m_shape_computed(false)
     {
     }
@@ -588,11 +589,11 @@ namespace xt
      * Returns the shape of the xfunction.
      */
     template <class F, class R, class... CT>
-    inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
+    inline auto xfunction_base<F, R, CT...>::shape() const -> const inner_shape_type&
     {
         if (!m_shape_computed)
         {
-            m_shape = xtl::make_sequence<shape_type>(compute_dimension(), size_type(0));
+            m_shape = xtl::make_sequence<inner_shape_type>(compute_dimension(), size_type(0));
             m_shape_trivial = broadcast_shape(m_shape, false);
             m_shape_computed = true;
         }

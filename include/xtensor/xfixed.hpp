@@ -44,6 +44,8 @@ namespace xt
     public:
 
         using cast_type = const_array<std::size_t, sizeof...(X)>;
+        using value_type = std::size_t;
+        using size_type = std::size_t;
 
         constexpr static std::size_t size()
         {
@@ -66,6 +68,12 @@ namespace std
     template <class T, size_t N>
     class tuple_size<xt::const_array<T, N>> :
         public integral_constant<size_t, N>
+    {
+    };
+
+    template <size_t... N>
+    class tuple_size<xt::fixed_shape<N...>> :
+        public integral_constant<size_t, sizeof...(N)>
     {
     };
 }
@@ -281,9 +289,9 @@ namespace xt
         using inner_strides_type = inner_shape_type;
         using backstrides_type = inner_shape_type;
         using inner_backstrides_type = backstrides_type;
-        using shape_type = std::array<typename inner_shape_type::value_type,
+        using shape_type = S;
+        using strides_type = std::array<typename inner_shape_type::value_type,
                                       std::tuple_size<inner_shape_type>::value>;
-        using strides_type = shape_type;
         using storage_type = aligned_array<ET, detail::fixed_compute_size<S>::value>;
         using temporary_type = xfixed_container<ET, S, L, Tag>;
         static constexpr layout_type layout = L;

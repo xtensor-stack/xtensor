@@ -372,18 +372,35 @@ namespace xt
         }
     }
 
+    namespace detail
+    {
+        template <class E1, class E2>
+        bool resize_impl(xexpression<E1>& e1, const xexpression<E2>& e2, std::true_type)
+        {
+            using shape_type = typename E1::shape_type;
+            using size_type = typename E1::size_type;
+            const E2& de2 = e2.derived_cast();
+            size_type size = de2.dimension();
+            shape_type shape = xtl::make_sequence<shape_type>(size, size_type(0));
+            bool trivial_broadcast = de2.broadcast_shape(shape, true);
+            e1.derived_cast().resize(std::move(shape));
+            return trivial_broadcast;
+        }
+
+        template <class E1, class E2>
+        bool resize_impl(xexpression<E1>& e1, const xexpression<E2>& e2, std::false_type)
+        {
+            return true;
+        }
+    }
+
     template <class Tag>
     template <class E1, class E2>
     inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        using shape_type = typename E1::shape_type;
-        using size_type = typename E1::size_type;
-        const E2& de2 = e2.derived_cast();
-        size_type size = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(0));
-        bool trivial_broadcast = de2.broadcast_shape(shape, true);
-        e1.derived_cast().resize(std::move(shape));
-        return trivial_broadcast;
+        return detail::resize_impl(e1, e2, 
+                                   std::integral_constant<bool,
+                                                          !xt::detail::is_fixed<typename E1::shape_type>::value>());
     }
 
     /********************************

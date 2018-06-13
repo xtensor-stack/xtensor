@@ -41,6 +41,7 @@ namespace xt
         using derived_type = D;
 
         using iterable_types = xiterable_inner_types<D>;
+        using shape_type = typename iterable_types::shape_type;
         using inner_shape_type = typename iterable_types::inner_shape_type;
 
         using stepper = typename iterable_types::stepper;
