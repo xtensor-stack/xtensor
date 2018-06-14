@@ -124,7 +124,6 @@ set(XTENSOR_TESTS
     test_xsort.cpp
     test_xstorage.cpp
     test_xstrided_view.cpp
-    test_xstrided_view_extended.cpp
     test_xstrides.cpp
     test_xtensor.cpp
     test_xtensor_adaptor.cpp
@@ -133,6 +132,7 @@ set(XTENSOR_TESTS
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
+    test_extended_broadcast_view.cpp
 )
 
 if(nlohmann_json_FOUND)

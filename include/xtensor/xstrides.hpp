@@ -90,7 +90,6 @@ namespace xt
     template <class C, class It>
     It strided_data_end(const C& c, It end, layout_type l)
     {
-        using strides_type = std::decay_t<decltype(c.strides())>;
         using difference_type = typename std::iterator_traits<It>::difference_type;
         if (c.dimension() == 0)
         {
@@ -125,7 +124,8 @@ namespace xt
         template <class size_type, std::size_t dim, class S, class Arg, class... Args>
         inline size_type raw_data_offset(const S& strides, Arg arg, Args... args) noexcept
         {
-            return arg * strides[dim] + raw_data_offset<size_type, dim + 1>(strides, args...);
+            using strides_type = decltype(strides[0]);
+            return strides_type(arg) * strides[dim] + raw_data_offset<size_type, dim + 1>(strides, args...);
         }
     }
 
@@ -391,7 +391,7 @@ namespace xt
         bool res = dst_shape.size() >= src_shape.size();
         for (; src_iter != src_shape.crend() && res; ++src_iter, ++dst_iter)
         {
-            res = (*src_iter == *dst_iter) || (*src_iter == 1);
+            res = (static_cast<std::size_t>(*src_iter) == static_cast<std::size_t>(*dst_iter)) || (*src_iter == 1);
         }
         return res;
     }
@@ -402,13 +402,14 @@ namespace xt
         template <class S1, class S2>
         static std::size_t get(const S1& s1, const S2& s2)
         {
+            using value_type = typename S1::value_type;
             // Indices are faster than reverse iterators
             auto s1_index = s1.size();
             auto s2_index = s2.size();
 
             for (; s2_index != 0; --s1_index, --s2_index)
             {
-                if (s1[s1_index - 1] != s2[s2_index - 1])
+                if (static_cast<value_type>(s1[s1_index - 1]) != static_cast<value_type>(s2[s2_index - 1]))
                 {
                     break;
                 }
@@ -425,6 +426,7 @@ namespace xt
         {
             // Indices are faster than reverse iterators
             using size_type = typename S1::size_type;
+            using value_type = typename S1::value_type;
             size_type index = 0;
 
             // This check is necessary as column major "broadcasting" is still
@@ -436,7 +438,7 @@ namespace xt
 
             for (; index < size; ++index)
             {
-                if (s1[index] != s2[index])
+                if (static_cast<value_type>(s1[index]) != static_cast<value_type>(s2[index]))
                 {
                     break;
                 }

@@ -386,8 +386,9 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = m_offset + xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
-        return m_storage[index];
+        using offset_type = typename strides_type::value_type;
+        offset_type index = static_cast<offset_type>(m_offset) + xt::data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+        return m_storage[static_cast<size_type>(index)];
     }
 
     /**
@@ -402,8 +403,9 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = m_offset + xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
-        return m_storage[index];
+        using offset_type = typename strides_type::value_type;
+        offset_type index = static_cast<offset_type>(m_offset) + xt::data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+        return m_storage[static_cast<size_type>(index)];
     }
 
     /**
@@ -463,8 +465,9 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view_base<CT, S, L, FST>::unchecked(Args... args) -> reference
     {
-        size_type index = m_offset + xt::unchecked_data_offset<size_type>(strides(), static_cast<size_type>(args)...);
-        return m_storage[index];
+        using offset_type = typename strides_type::value_type;
+        offset_type index = static_cast<offset_type>(m_offset) + xt::unchecked_data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+        return m_storage[static_cast<size_type>(index)];
     }
 
     /**

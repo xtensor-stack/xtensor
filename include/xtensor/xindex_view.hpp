@@ -346,7 +346,7 @@ namespace xt
     template <class... Args>
     inline auto xindex_view<CT, I>::operator()(size_type, size_type idx1, Args... args) -> reference
     {
-        return this->operator()(idx1, args...);
+        return this->operator()(idx1, static_cast<size_type>(args)...);
     }
 
     /**

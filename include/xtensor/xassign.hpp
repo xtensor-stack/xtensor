@@ -638,10 +638,10 @@ namespace xt
 
             using shape_value_type = typename E1::shape_type::value_type;
             std::size_t outer_loop_size = static_cast<std::size_t>(
-                            std::accumulate(e1.shape().begin(), e1.shape().begin() + cut,
+                            std::accumulate(e1.shape().begin(), e1.shape().begin() + static_cast<std::ptrdiff_t>(cut),
                                 shape_value_type(1), std::multiplies<shape_value_type>{}));
             std::size_t inner_loop_size = static_cast<std::size_t>(
-                            std::accumulate(e1.shape().begin() + cut, e1.shape().end(),
+                            std::accumulate(e1.shape().begin() + static_cast<std::ptrdiff_t>(cut), e1.shape().end(),
                                 shape_value_type(1), std::multiplies<shape_value_type>{}));
 
             if (e1.strides().back() != 1) // column major mode
@@ -697,12 +697,12 @@ namespace xt
         {
             xt::resize_container(idx, cut);
             max_shape_begin = e1.shape().begin();
-            max_shape_end = e1.shape().begin() + cut;
+            max_shape_end = e1.shape().begin() + static_cast<std::ptrdiff_t>(cut);
         }
         else
         {
             xt::resize_container(idx, e1.shape().size() - cut);
-            max_shape_begin = e1.shape().begin() + cut;
+            max_shape_begin = e1.shape().begin() + static_cast<std::ptrdiff_t>(cut);
             max_shape_end = e1.shape().end();
         }
 
@@ -767,7 +767,7 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void strided_assign(E1& e1, const E2& e2, std::false_type /*disable*/)
+    inline void strided_assign(E1& /*e1*/, const E2& /*e2*/, std::false_type /*disable*/)
     {
     }
 }

@@ -1078,7 +1078,7 @@ namespace xt
     template <typename std::decay_t<CT>::size_type I, class T>
     inline auto xview<CT, S...>::sliced_access(const xslice<T>& slice) const -> size_type
     {
-        return slice.derived_cast()(0);
+        return static_cast<size_type>(slice.derived_cast()(0));
     }
 
     template <class CT, class... S>
@@ -1176,7 +1176,6 @@ namespace xt
         inline auto make_view_impl(E&& e, std::index_sequence<I...>, S&&... slices)
         {
             // Checks that no ellipsis slice is used
-            using type = typename check_slice<S...>::type;
             using view_type = xview<xtl::closure_type_t<E>, get_slice_type<std::decay_t<E>, S>...>;
             return view_type(std::forward<E>(e),
                 get_slice_implementation(e, std::forward<S>(slices), get_underlying_shape_index<std::decay_t<E>, S...>(I))...
