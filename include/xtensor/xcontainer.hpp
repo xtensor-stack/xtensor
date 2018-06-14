@@ -30,7 +30,6 @@ namespace xt
     template <class D>
     struct xcontainer_iterable_types
     {
-        using shape_type = typename xcontainer_inner_types<D>::shape_type;
         using inner_shape_type = typename xcontainer_inner_types<D>::inner_shape_type;
         using storage_type = typename xcontainer_inner_types<D>::storage_type;
         using stepper = xstepper<D>;

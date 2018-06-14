@@ -12,7 +12,8 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmath.hpp"
-#include "xtensor/xio.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xfixed.hpp"
 
 namespace xt
 {
@@ -163,7 +164,6 @@ namespace xt
         EXPECT_EQ(expected, res);
     }
 
-
     TEST(xaccumulator, cumprod)
     {
         xarray<long> arg_0 = {{ 0, 1, 2},
@@ -188,5 +188,26 @@ namespace xt
                                    {  6, 42, 336},
                                    {  9, 90, 990}};
         EXPECT_TRUE(allclose(expected_1, res_1));
+    }
+
+    TEST(xaccumulator, xfixed)
+    {
+        xtensor_fixed<float, xshape<2, 4, 3>> a = xt::random::rand<float>({2, 4, 3});
+        auto res = cumsum(a, 1);
+
+        bool truth = std::is_same<decltype(res), xtensor_fixed<double, xshape<2, 4, 3>>>::value;
+        EXPECT_TRUE(truth);
+        xtensor_fixed<long, xshape<4, 3>> arg_0({{ 0, 1, 2},
+                                                 { 3, 4, 5},
+                                                 { 6, 7, 8},
+                                                 { 9,10,11}});
+        auto res_0 = cumprod(arg_0, 0);
+        xarray<long> expected_0 = {{  0,   1,   2},
+                                   {  0,   4,  10},
+                                   {  0,  28,  80},
+                                   {  0, 280, 880}};
+        EXPECT_TRUE(expected_0 == res_0);
+        truth = std::is_same<typename decltype(res_0)::shape_type, xshape<4, 3>>::value;
+        EXPECT_TRUE(truth);
     }
 }

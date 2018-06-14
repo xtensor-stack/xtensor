@@ -43,6 +43,7 @@ namespace xt
     {
         using value_type = std::decay_t<CT>;
         using inner_shape_type = std::array<std::size_t, 0>;
+        using shape_type = inner_shape_type;
         using const_stepper = xscalar_stepper<true, CT>;
         using stepper = xscalar_stepper<false, CT>;
     };

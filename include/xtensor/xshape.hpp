@@ -39,6 +39,9 @@ namespace xtl
 {
     namespace detail
     {
+        template <class S>
+        struct sequence_builder;
+
         template <std::size_t... I>
         struct sequence_builder<xt::fixed_shape<I...>>
         {
@@ -108,10 +111,16 @@ namespace xt
         template <std::size_t IX, std::size_t... I, std::size_t... J>
         struct broadcast_fixed_shape_cmp_impl<IX, fixed_shape<I...>, fixed_shape<J...>>
         {
-            static constexpr std::size_t index_diff = sizeof...(I) - sizeof...(J);
-            static constexpr std::size_t value = detail::at<IX, I...>::value == 1 && (IX - index_diff) < sizeof...(J) ? 
-                                                    detail::at<IX - index_diff, J...>::value :
-                                                    detail::at<IX, I...>::value;
+            static constexpr std::size_t JX = IX - (sizeof...(I) - sizeof...(J));
+
+            // we're statically checking if the broadcast shapes are either one on either of them or equal
+            static_assert(JX < sizeof...(J) ?
+                            detail::at<IX, I...>::value == 1 ||
+                            detail::at<JX, J...>::value == 1 ||
+                            detail::at<JX, J...>::value == detail::at<IX, I...>::value : true, "broadcast shapes do not match.");
+
+            static constexpr std::size_t value = (detail::at<IX, I...>::value == 1 && JX < sizeof...(J)) ?
+                                                    detail::at<JX, J...>::value : detail::at<IX, I...>::value;
         };
 
         template <std::size_t... IX, std::size_t... I, std::size_t... J>
@@ -154,11 +163,25 @@ namespace xt
             static constexpr bool value = true;
         };
 
+        template <class S>
+        struct is_scalar_shape
+        {
+            static constexpr bool value = false;
+        };
+
+        template <class T>
+        struct is_scalar_shape<std::array<T, 0>>
+        {
+            static constexpr bool value = true;
+        };
+
         template <class... S>
         using only_array = xtl::conjunction<xtl::disjunction<is_array<S>, is_fixed<S>>...>;
 
+        // test that at least one argument is a fixed shape. If yes, then either argument has to be fixed or scalar
         template <class... S>
-        using only_fixed = xtl::conjunction<is_fixed<S>...>;
+        using only_fixed = std::integral_constant<bool, xtl::disjunction<is_fixed<S>...>::value &&
+                                                        xtl::conjunction<xtl::disjunction<is_fixed<S>, is_scalar_shape<S>>...>::value>;
 
         // The promote_index meta-function returns std::vector<promoted_value_type> in the
         // general case and an array of the promoted value type and maximal size if all
@@ -176,19 +199,34 @@ namespace xt
             using type = std::array<std::size_t, 0>;
         };
 
+        template <class S>
+        struct filter_scalar
+        {
+            using type = S;
+        };
+
+        template <class T>
+        struct filter_scalar<std::array<T, 0>>
+        {
+            using type = fixed_shape<1>;
+        };
+
+        template <class S>
+        using filter_scalar_t = typename filter_scalar<S>::type;
+
         template <class... S>
         struct broadcast_fixed;
 
         template <class S1, class S2>
         struct broadcast_fixed<S1, S2>
         {
-            using type = typename broadcast_fixed_shape<S1, S2>::type;
+            using type = typename broadcast_fixed_shape<filter_scalar_t<S1>, filter_scalar_t<S2>>::type;
         };
 
         template <class S1, class... S>
         struct broadcast_fixed<S1, S...>
         {
-            using type = typename broadcast_fixed_shape<S1, typename broadcast_fixed<S...>::type>::type;
+            using type = typename broadcast_fixed_shape<filter_scalar_t<S1>, typename broadcast_fixed<S...>::type>::type;
         };
 
         template <bool all_index, bool all_array, class... S>
@@ -198,6 +236,13 @@ namespace xt
         struct select_promote_index<true, true, S...>
         {
             using type = typename broadcast_fixed<S...>::type;
+        };
+
+        template <>
+        struct select_promote_index<true, true>
+        {
+            // todo correct? used in xvectorize
+            using type = dynamic_shape<std::size_t>;
         };
 
         template <class... S>

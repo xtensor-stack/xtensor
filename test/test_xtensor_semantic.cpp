@@ -75,7 +75,7 @@ namespace xt
     TEST(xtensor_semantic, broadcasting_single_element)
     {
         xtensor<int, 2> t = xt::zeros<int>({ 1, 1 });
-        EXPECT_EQ(t.backstrides().size(), 2);
+        EXPECT_EQ(t.backstrides().size(), 2u);
         EXPECT_EQ(t.backstrides()[0], 0u);
         EXPECT_EQ(t.backstrides()[1], 0u);
     }

@@ -77,6 +77,12 @@ namespace xt
         {
             using type = std::array<V, L>;
         };
+
+        template <std::size_t... I>
+        struct index_type_impl<fixed_shape<I...>>
+        {
+            using type = std::array<std::size_t, sizeof...(I)>;
+        };
     }
 
     template <class C>
@@ -380,25 +386,25 @@ namespace xt
     namespace detail
     {
         template <class C>
-        constexpr auto trivial_begin(C& c) noexcept
+        XTENSOR_CONSTEXPR_RETURN auto trivial_begin(C& c) noexcept
         {
             return c.storage_begin();
         }
 
         template <class C>
-        constexpr auto trivial_end(C& c) noexcept
+        XTENSOR_CONSTEXPR_RETURN auto trivial_end(C& c) noexcept
         {
             return c.storage_end();
         }
 
         template <class C>
-        constexpr auto trivial_begin(const C& c) noexcept
+        XTENSOR_CONSTEXPR_RETURN auto trivial_begin(const C& c) noexcept
         {
             return c.storage_begin();
         }
 
         template <class C>
-        constexpr auto trivial_end(const C& c) noexcept
+        XTENSOR_CONSTEXPR_RETURN auto trivial_end(const C& c) noexcept
         {
             return c.storage_end();
         }

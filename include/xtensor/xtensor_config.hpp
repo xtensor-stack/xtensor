@@ -22,6 +22,18 @@
     #endif
 #endif
 
+// Workaround for some missing constexpr functionality in MSVC 2015
+#if defined(_MSC_VER) && (_MSC_VER < 1910)
+#define XTENSOR_CONSTEXPR_ENHANCED const
+#define XTENSOR_CONSTEXPR_ENHANCED_STATIC const
+#define XTENSOR_CONSTEXPR_RETURN inline
+#else
+#define XTENSOR_CONSTEXPR_ENHANCED constexpr
+#define XTENSOR_CONSTEXPR_RETURN constexpr
+#define XTENSOR_CONSTEXPR_ENHANCED_STATIC constexpr static
+#define XTENSOR_HAS_CONSTEXPR_ENHANCED
+#endif
+
 #ifndef XTENSOR_DEFAULT_DATA_CONTAINER
 #define XTENSOR_DEFAULT_DATA_CONTAINER(T, A) uvector<T, A>
 #endif

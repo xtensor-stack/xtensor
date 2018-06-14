@@ -178,7 +178,7 @@ namespace xt
         template <class T, class S, class E>
         inline auto randint(const S& shape, T lower, T upper, E& engine)
         {
-            std::uniform_int_distribution<T> dist(lower, upper - 1);
+            std::uniform_int_distribution<T> dist(lower, T(upper - 1));
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
@@ -213,7 +213,7 @@ namespace xt
         template <class T, class I, class E>
         inline auto randint(std::initializer_list<I> shape, T lower, T upper, E& engine)
         {
-            std::uniform_int_distribution<T> dist(lower, upper - 1);
+            std::uniform_int_distribution<T> dist(lower, T(upper - 1));
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
@@ -234,7 +234,7 @@ namespace xt
         template <class T, class I, std::size_t L, class E>
         inline auto randint(const I (&shape)[L], T lower, T upper, E& engine)
         {
-            std::uniform_int_distribution<T> dist(lower, upper - 1);
+            std::uniform_int_distribution<T> dist(lower, T(upper - 1));
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
