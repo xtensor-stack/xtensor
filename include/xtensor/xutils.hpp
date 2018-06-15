@@ -1024,6 +1024,17 @@ namespace xt
     {
       return !(a == b);
     }
+
+    template <class E1, class E2, class = void>
+    struct has_assign_to : std::false_type
+    {
+    };
+
+    template <class E1, class E2>
+    struct has_assign_to<E1, E2, void_t<decltype(std::declval<const E2&>().assign_to(std::declval<E1&>()))>>
+        : std::true_type
+    {
+    };
 }
 
 #endif

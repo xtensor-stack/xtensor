@@ -114,6 +114,9 @@ namespace xt
         template <class O>
         const_stepper stepper_end(const O& shape, layout_type) const noexcept;
 
+        template <class E, class FE = F, class = std::enable_if_t<has_assign_to<E, FE>::value>>
+        void assign_to(xexpression<E>& e) const noexcept;
+
     private:
 
         template <std::size_t dim>
@@ -331,6 +334,14 @@ namespace xt
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset, true);
+    }
+
+    template <class F, class R, class S>
+    template <class E, class, class>
+    inline void xgenerator<F, R, S>::assign_to(xexpression<E>& e) const noexcept
+    {
+        e.derived_cast().resize(m_shape);
+        m_f.assign_to(e);
     }
 
     template <class F, class R, class S>

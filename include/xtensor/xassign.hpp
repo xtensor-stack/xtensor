@@ -149,17 +149,6 @@ namespace xt
         xexpression_assigner<tag>::assign_data(e1, e2, trivial);
     }
 
-    template <class E1, class E2, class = void>
-    struct has_assign_to : std::false_type
-    {
-    };
-
-    template <class E1, class E2>
-    struct has_assign_to<E1, E2, void_t<decltype(std::declval<const E2&>().assign_to(std::declval<E1&>()))>>
-        : std::true_type
-    {
-    };
-
     template <class E1, class E2>
     inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {

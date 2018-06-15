@@ -212,6 +212,19 @@ namespace xt
                 return m_start + m_step * T(*first);
             }
 
+            template <class E>
+            inline void assign_to(xexpression<E>& e) const noexcept
+            {
+                auto& de = e.derived_cast();
+                value_type value = m_start;
+
+                for (auto& el : de.storage())
+                {
+                    el = value;
+                    value += m_step;
+                }
+            }
+
         private:
 
             value_type m_start;
