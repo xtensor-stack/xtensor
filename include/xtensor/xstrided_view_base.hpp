@@ -42,17 +42,17 @@ namespace xt
         using storage_type = std::remove_reference_t<inner_storage_type>;
 
         using shape_type = S;
-        using strides_type = shape_type;
-        using backstrides_type = shape_type;
+        using strides_type = get_strides_t<shape_type>;
+        using backstrides_type = strides_type;
 
         static constexpr layout_type static_layout = L;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
         template <class CTA>
-        xstrided_view_base(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept;
+        xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
 
         template <class CTA, class FLS>
-        xstrided_view_base(CTA&& e, S&& shape, S&& strides, std::size_t offset,
+        xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset,
                            layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
 
         size_type size() const noexcept;
@@ -256,7 +256,7 @@ namespace xt
         template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_strides(E&& e)
         {
-            dynamic_shape<std::size_t> strides;
+            dynamic_shape<std::ptrdiff_t> strides;
             strides.resize(e.shape().size());
             compute_strides(e.shape(), XTENSOR_DEFAULT_LAYOUT, strides);
             return strides;
@@ -282,7 +282,7 @@ namespace xt
      */
     template <class CT, class S, layout_type L, class FST>
     template <class CTA>
-    inline xstrided_view_base<CT, S, L, FST>::xstrided_view_base(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept
+    inline xstrided_view_base<CT, S, L, FST>::xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept
         : m_e(std::forward<CTA>(e)),
           m_storage(detail::get_flat_storage<CT>(m_e)),
           m_shape(std::move(shape)),
@@ -296,7 +296,7 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class CTA, class FLS>
-    inline xstrided_view_base<CT, S, L, FST>::xstrided_view_base(CTA&& e, S&& shape, S&& strides,
+    inline xstrided_view_base<CT, S, L, FST>::xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides,
                                                                  std::size_t offset, layout_type layout,
                                                                  FLS&& flatten_strides, layout_type flatten_layout) noexcept
         : m_e(std::forward<CTA>(e)),

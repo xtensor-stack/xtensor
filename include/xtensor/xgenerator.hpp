@@ -72,7 +72,7 @@ namespace xt
         using iterable_base = xconst_iterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
-        using strides_type = S;
+        using strides_type = get_strides_t<S>;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;

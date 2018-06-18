@@ -31,8 +31,8 @@ namespace xt
     {
         using storage_type = EC;
         using shape_type = std::array<typename storage_type::size_type, N>;
-        using strides_type = shape_type;
-        using backstrides_type = shape_type;
+        using strides_type = get_strides_t<shape_type>;
+        using backstrides_type = get_strides_t<shape_type>;
         using inner_shape_type = shape_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
@@ -128,8 +128,8 @@ namespace xt
     {
         using storage_type = std::remove_reference_t<EC>;
         using shape_type = std::array<typename storage_type::size_type, N>;
-        using strides_type = shape_type;
-        using backstrides_type = shape_type;
+        using strides_type = get_strides_t<shape_type>;
+        using backstrides_type = get_strides_t<shape_type>;
         using inner_shape_type = shape_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;

@@ -754,8 +754,8 @@ namespace xt
             { 5, 6 }
         };
         auto row = xt::view(a, 1, xt::all());
-        bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::size_t, 1>>::value;
-        bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::size_t, 1>&>::value;
+        bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::ptrdiff_t, 1>>::value;
+        bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::ptrdiff_t, 1>&>::value;
         EXPECT_TRUE(cond1);
         EXPECT_TRUE(cond2);
     }
@@ -766,7 +766,7 @@ namespace xt
         auto matrix = xt::view(vector, xt::all(), xt::newaxis());
         auto mt = xt::transpose(matrix);
         EXPECT_EQ(mt.shape(), std::vector<std::size_t>({1, 10}));
-        EXPECT_EQ(mt.strides(), std::vector<std::size_t>({0, 1}));
+        EXPECT_EQ(mt.strides(), std::vector<std::ptrdiff_t>({0, 1}));
         int sum = 0;
         for (std::size_t i = 0; i < vector.size(); ++i)
         {
@@ -794,36 +794,37 @@ namespace xt
         // Strides: 72/24/6/1
         xarray<int, layout_type::row_major> a = xarray<int, layout_type::row_major>::from_shape({5, 3, 4, 6});
 
+        using strides_type = std::vector<std::ptrdiff_t>;
         auto s1 = view(a, 1, 1, xt::all(), xt::all()).strides();
-        std::vector<std::size_t> s1e = {6, 1};
+        strides_type s1e = {6, 1};
         EXPECT_EQ(s1, s1e);
 
         auto s2 = view(a, 1, xt::all(), xt::all(), 1).strides();
-        std::vector<std::size_t> s2e = {24, 6};
+        strides_type s2e = {24, 6};
         EXPECT_EQ(s2, s2e);
 
         auto s3 = view(a, 1, xt::all(), 1, xt::newaxis(), xt::newaxis(), xt::all()).strides();
-        std::vector<std::size_t> s3e = {24, 0, 0, 1};
+        strides_type s3e = {24, 0, 0, 1};
         EXPECT_EQ(s3, s3e);
 
         auto s4 = view(a, xt::range(0, 1, 2), 1, 0, xt::all(), xt::newaxis()).strides();
-        std::vector<std::size_t> s4e = {0, 1, 0};
+        strides_type s4e = {0, 1, 0};
         EXPECT_EQ(s4, s4e);
 
         auto s4x = view(a, xt::range(0, 5, 2), 1, 0, xt::all(), xt::newaxis()).strides();
-        std::vector<std::size_t> s4xe = {72 * 2, 1, 0};
+        strides_type s4xe = {72 * 2, 1, 0};
         EXPECT_EQ(s4x, s4xe);
 
         auto s5 = view(a, xt::all(), 1).strides();
-        std::vector<std::size_t> s5e = {72, 6, 1};
+        strides_type s5e = {72, 6, 1};
         EXPECT_EQ(s5, s5e);
 
         auto s6 = view(a, xt::all(), 1, 1, xt::newaxis(), xt::all()).strides();
-        std::vector<std::size_t> s6e = {72, 0, 1};
+        strides_type s6e = {72, 0, 1};
         EXPECT_EQ(s6, s6e);
 
         auto s7 = view(a, xt::all(), 1, xt::newaxis(), xt::all()).strides();
-        std::vector<std::size_t> s7e = {72, 0, 6, 1};
+        strides_type s7e = {72, 0, 6, 1};
         EXPECT_EQ(s7, s7e);
     }
 

@@ -1047,6 +1047,25 @@ namespace xt
         : std::true_type
     {
     };
+
+    template <class X, class C>
+    struct rebind_container;
+
+    template <class X, template <class, class> class C, class T, class A>
+    struct rebind_container<X, C<T, A>>
+    {
+        using allocator = typename A::template rebind<X>::other;
+        using type = C<X, allocator>;
+    };
+
+    template <class X, template <class, std::size_t> class C, class T, std::size_t N>
+    struct rebind_container<X, C<T, N>>
+    {
+        using type = C<X, N>;
+    };
+
+    template <class C>
+    using get_strides_t = typename rebind_container<std::ptrdiff_t, C>::type;
 }
 
 #endif

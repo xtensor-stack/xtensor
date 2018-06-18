@@ -22,7 +22,7 @@ namespace xt
 
         auto a1 = adapt(v, s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, v[a1.strides()[1]]);
+        EXPECT_EQ(1, v[std::size_t(a1.strides()[1])]);
 
         shape_type str({2, 1});
         auto a2 = adapt(v, s, str);
@@ -38,7 +38,7 @@ namespace xt
 
         auto a1 = adapt<layout_type::dynamic>(v, s, layout_type::row_major);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, v[a1.strides()[1]]);
+        EXPECT_EQ(1, v[std::size_t(a1.strides()[1])]);
     }
 
     TEST(xarray_adaptor, pointer_no_ownership)
@@ -50,7 +50,7 @@ namespace xt
 
         auto a1 = adapt(data, size, no_ownership(), s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, data[a1.strides()[1]]);
+        EXPECT_EQ(1, data[std::size_t(a1.strides()[1])]);
 
         shape_type str({2, 1});
         auto a2 = adapt(data, size, no_ownership(), s, str);
@@ -70,7 +70,7 @@ namespace xt
 
         auto a1 = adapt(data, size, acquire_ownership(), s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, data[a1.strides()[1]]);
+        EXPECT_EQ(1, data[std::size_t(a1.strides()[1])]);
 
         shape_type str({2, 1});
         auto a2 = adapt(data2, size, acquire_ownership(), s, str);
@@ -142,7 +142,7 @@ namespace xt
 
         auto a1 = adapt(v, s);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, v[a1.strides()[1]]);
+        EXPECT_EQ(1, v[std::size_t(a1.strides()[1])]);
 
         shape_type str = {2, 1};
         auto a2 = adapt(v, s, str);
@@ -158,7 +158,7 @@ namespace xt
 
         auto a1 = adapt<layout_type::dynamic>(v, s, layout_type::column_major);
         a1(0, 1) = 1;
-        EXPECT_EQ(1, v[a1.strides()[1]]);
+        EXPECT_EQ(1, v[std::size_t(a1.strides()[1])]);
     }
 
     TEST(xtensor_adaptor, pointer_no_ownership)

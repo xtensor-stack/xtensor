@@ -548,7 +548,7 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        size_type index = static_cast<size_type>(xt::data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
 
@@ -564,7 +564,7 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        size_type index = xt::data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        size_type index = static_cast<std::size_t>(xt::data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
 
@@ -625,7 +625,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::unchecked(Args... args) -> reference
     {
-        size_type index = xt::unchecked_data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        size_type index = static_cast<size_type>(xt::unchecked_data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
 
@@ -652,7 +652,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::unchecked(Args... args) const -> const_reference
     {
-        size_type index = xt::unchecked_data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        size_type index = static_cast<size_type>(xt::unchecked_data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
 
