@@ -8,6 +8,8 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xinfo.hpp"
 #include "xtensor/xview.hpp"
@@ -47,6 +49,14 @@ namespace xt
         EXPECT_EQ(ex3_0, argsort(a3, 0));
         EXPECT_EQ(ex3_1, argsort(a3, 1));
         EXPECT_EQ(ex3_2, argsort(a3, 2));
+
+        xtensor<double, 1> t1 = {2, 3, 1};
+        xtensor<std::size_t, 1> ex4 = {2, 0, 1};
+        EXPECT_EQ(ex4, argsort(t1, 0));
+        EXPECT_EQ(ex4, argsort(t1));
+
+        xtensor_fixed<double, xt::xshape<2,3>> tf1 = a2_r;
+        EXPECT_EQ(ex2_1, argsort(tf1));
     }
 
     TEST(xsort, sort_easy)

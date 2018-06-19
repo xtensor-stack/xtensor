@@ -145,16 +145,35 @@ namespace xt
     }
 
     namespace detail {
+        template <class VT, class T>
+        struct rebind_value_type
+        {
+            using type = xarray<VT, xt::layout_type::dynamic>;
+        };
+
+        template <class VT, class EC, layout_type L>
+        struct rebind_value_type<VT, xarray<EC, L>>
+        {
+            using type = xarray<VT, L>;
+        };
+
+        template <class VT, class EC, size_t N, layout_type L>
+        struct rebind_value_type<VT, xtensor<EC, N, L>>
+        {
+            using type = xtensor<VT, N, L>;
+        };
+
+        template <class VT, class ET, class S, layout_type L>
+        struct rebind_value_type<VT, xtensor_fixed<ET, S, L>>
+        {
+            using type = xtensor_fixed<VT, S, L>;
+        };
+
         template <class T>
         struct argsort_result_type
         {
-            using type = xarray<std::size_t, xt::layout_type::dynamic>;
-        };
-
-        template <class T, std::size_t N>
-        struct argsort_result_type<xtensor<T, N>>
-        {
-            using type = xtensor<std::size_t, N>;
+            using type = typename rebind_value_type<typename T::temporary_type::size_type,
+                                                    typename T::temporary_type>::type;
         };
 
         template <class Ed, class Ei>
