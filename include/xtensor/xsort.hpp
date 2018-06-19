@@ -141,17 +141,62 @@ namespace xt
         return sort(de, de.dimension() - 1);
     }
 
-    namespace detail {
+    namespace detail
+    {
+        template <class VT, class T>
+        struct rebind_value_type
+        {
+            using type = xarray<VT, xt::layout_type::dynamic>;
+        };
+
+        template <class VT, class EC, layout_type L>
+        struct rebind_value_type<VT, xarray<EC, L>>
+        {
+            using type = xarray<VT, L>;
+        };
+
+        template <class VT, class EC, size_t N, layout_type L>
+        struct rebind_value_type<VT, xtensor<EC, N, L>>
+        {
+            using type = xtensor<VT, N, L>;
+        };
+
+        template <class VT, class ET, class S, layout_type L>
+        struct rebind_value_type<VT, xtensor_fixed<ET, S, L>>
+        {
+            using type = xtensor_fixed<VT, S, L>;
+        };
+
+        template <class VT, class T>
+        struct flatten_rebind_value_type
+        {
+            using type = typename rebind_value_type<VT, T>::type;
+        };
+
+        template <class VT, class EC, size_t N, layout_type L>
+        struct flatten_rebind_value_type<VT, xtensor<EC, N, L>>
+        {
+            using type = xtensor<VT, 1, L>;
+        };
+
+        template <class VT, class ET, class S, layout_type L>
+        struct flatten_rebind_value_type<VT, xtensor_fixed<ET, S, L>>
+        {
+            using type = xtensor_fixed<VT, xshape<fixed_compute_size<S>::value>, L>;
+        };
+
         template <class T>
         struct argsort_result_type
         {
-            using type = xarray<std::size_t, xt::layout_type::dynamic>;
+            using type = typename rebind_value_type<typename T::temporary_type::size_type,
+                                                    typename T::temporary_type>::type;
         };
 
-        template <class T, std::size_t N>
-        struct argsort_result_type<xtensor<T, N>>
+        template <class T>
+        struct linear_argsort_result_type
         {
-            using type = xtensor<std::size_t, N>;
+            using type = typename flatten_rebind_value_type<typename T::temporary_type::size_type,
+                                                            typename T::temporary_type>::type;
         };
 
         template <class Ed, class Ei>
@@ -190,25 +235,31 @@ namespace xt
                 std::sort(inds.data() + inds_offset, inds.data() + inds_offset + inds_secondary_stride, comp);
             }
         }
+
+        template <class E, class R = typename detail::linear_argsort_result_type<E>::type>
+        inline auto flatten_argsort_impl(const xexpression<E>& e)
+        {
+            using value_type = typename E::value_type;
+            using result_type = R;
+
+            const auto& de = e.derived_cast();
+
+            result_type result;
+            result.resize({de.size()});
+            auto comp = [&de](std::size_t x, std::size_t y) {
+                return de[x] < de[y];
+            };
+            std::iota(result.begin(), result.end(), 0);
+            std::sort(result.begin(), result.end(), comp);
+
+            return result;
+        }
     }
 
     template <class E>
-    auto argsort(const xexpression<E>& e, placeholders::xtuph /*t*/)
+    inline auto argsort(const xexpression<E>& e, placeholders::xtuph /*t*/)
     {
-        using value_type = typename E::value_type;
-        using result_type = typename detail::argsort_result_type<E>::type;
-
-        const auto& de = e.derived_cast();
-
-        result_type result;
-        result.resize({de.size()});
-        auto comp = [&de](std::size_t x, std::size_t y) {
-            return de[x] < de[y];
-        };
-        std::iota(result.begin(), result.end(), 0);
-        std::sort(result.begin(), result.end(), comp);
-
-        return result;
+        return detail::flatten_argsort_impl(e);
     }
 
     /**
@@ -223,7 +274,7 @@ namespace xt
      * @return argsorted index array
      */
     template <class E>
-    auto argsort(const xexpression<E>& e, std::size_t axis)
+    inline auto argsort(const xexpression<E>& e, std::size_t axis)
     {
         using eval_type = typename E::temporary_type;
         using value_type = typename E::value_type;
@@ -233,7 +284,7 @@ namespace xt
 
         if (de.dimension() == 1)
         {
-            return argsort(de, xnone());
+            return detail::flatten_argsort_impl<E, result_type>(e);
         }
 
         if (axis != detail::leading_axis(de))
