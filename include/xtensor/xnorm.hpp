@@ -21,6 +21,9 @@
 
 namespace xt
 {
+    template <class X>
+    using disable_evaluation_strategy = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>;
+
     /*************************************
      * norm functions for built-in types *
      *************************************/
@@ -173,21 +176,21 @@ namespace xt
      ***********************************/
 
 #ifdef X_OLD_CLANG
-#define XTENSOR_NORM_FUNCTION_AXES(NAME)                                         \
-    template <class E, class I>                                                  \
-    inline auto NAME(E&& e, std::initializer_list<I> axes) noexcept              \
-    {                                                                            \
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;      \
-        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes)); \
+#define XTENSOR_NORM_FUNCTION_AXES(NAME)                                             \
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>               \
+    inline auto NAME(E&& e, std::initializer_list<I> axes, EVS ev = EVS()) noexcept  \
+    {                                                                                \
+        using axes_type = std::vector<typename std::decay_t<E>::size_type>;          \
+        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), ev); \
     }
 
 #else
-#define XTENSOR_NORM_FUNCTION_AXES(NAME)                                         \
-    template <class E, class I, std::size_t N>                                   \
-    inline auto NAME(E&& e, const I(&axes)[N]) noexcept                          \
-    {                                                                            \
-        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;    \
-        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes)); \
+#define XTENSOR_NORM_FUNCTION_AXES(NAME)                                                \
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>   \
+    inline auto NAME(E&& e, const I(&axes)[N], EVS ev = EVS()) noexcept                 \
+    {                                                                                   \
+        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;           \
+        return NAME(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), ev);    \
     }
 #endif
 
@@ -195,8 +198,9 @@ namespace xt
 #define XTENSOR_EMPTY
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC) \
-    template <class E, class X>                                                      \
-    inline auto NAME(E&& e, X&& axes) noexcept                                       \
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,               \
+              class = disable_evaluation_strategy<X>>                                \
+    inline auto NAME(E&& e, X&& axes, EVS ev = EVS()) noexcept                       \
     {                                                                                \
         using value_type = typename std::decay_t<E>::value_type;                     \
         using result_type = RESULT_TYPE;                                             \
@@ -210,13 +214,14 @@ namespace xt
         return reduce(make_xreducer_functor(std::move(reduce_func),                  \
                                             std::move(init_func),                    \
                                             MERGE_FUNC<result_type>()),              \
-                      std::forward<E>(e), std::forward<X>(axes));                    \
+                      std::forward<E>(e), std::forward<X>(axes), ev);                \
     }                                                                                \
                                                                                      \
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>                    \
-    inline auto NAME(E&& e) noexcept                                                 \
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                        \
+              XTENSOR_REQUIRE<is_xexpression<E>::value>>                             \
+    inline auto NAME(E&& e, EVS ev = EVS()) noexcept                                 \
     {                                                                                \
-        return NAME(std::forward<E>(e), arange(e.dimension()));                      \
+        return NAME(std::forward<E>(e), arange(e.dimension()), ev);                  \
     }                                                                                \
     XTENSOR_NORM_FUNCTION_AXES(NAME)
 
@@ -237,12 +242,13 @@ namespace xt
      * Returns an \ref xreducer for the L0 pseudo-norm of the elements across given \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the norm is computed (optional)
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X>
-    auto norm_l0(E&& e, X&& axes) noexcept;
+    template <class E, class X, class EVS, class>
+    auto norm_l0(E&& e, X&& axes, EVS es) noexcept;
 
     /**
      * @ingroup red_functions
@@ -251,12 +257,13 @@ namespace xt
      * Returns an \ref xreducer for the L1 norm of the elements across given \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the norm is computed (optional)
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X>
-    auto norm_l1(E&& e, X&& axes) noexcept;
+    template <class E, class X, class EVS, class>
+    auto norm_l1(E&& e, X&& axes, EVS es) noexcept;
 
     /**
      * @ingroup red_functions
@@ -265,25 +272,27 @@ namespace xt
      * Returns an \ref xreducer for the squared L2 norm of the elements across given \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the norm is computed (optional)
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X>
-    auto norm_sq(E&& e, X&& axes) noexcept;
+    template <class E, class X, class EVS, class>
+    auto norm_sq(E&& e, X&& axes, EVS es) noexcept;
 
     /**
      * @ingroup red_functions
      * @brief L2 norm of a scalar or array-like argument.
-     *
+     * @param e an xexpression
+     * @param es evaluation strategy to use (lazy (default), or immediate)
      *  For scalar types: implemented as <tt>abs(t)</tt><br>
      *  otherwise: implemented as <tt>sqrt(norm_sq(t))</tt>.
     */
-    template <class E>
-    inline auto norm_l2(E&& e) noexcept
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    inline auto norm_l2(E&& e, EVS es = EVS()) noexcept
     {
         using std::sqrt;
-        return sqrt(norm_sq(std::forward<E>(e)));
+        return sqrt(norm_sq(std::forward<E>(e), es));
     }
 
     /**
@@ -292,14 +301,32 @@ namespace xt
      *
      * Returns an \ref xreducer for the L2 norm of the elements across given \em axes.
      * @param e an \ref xexpression
+     * @param es evaluation strategy to use (lazy (default), or immediate)
      * @param axes the axes along which the norm is computed
-     * @return an \ref xreducer (specifically: <tt>sqrt(norm_sq(e, axes))</tt>)
+     * @return an \ref xreducer (specifically: <tt>sqrt(norm_sq(e, axes))</tt>) (or xcontainer, depending on evaluation strategy)
     */
-    template <class E, class X>
-    inline auto norm_l2(E&& e, X&& axes) noexcept
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<is_xexpression<E>::value>, class = disable_evaluation_strategy<X>>
+    inline auto norm_l2(E&& e, X&& axes, EVS ev = EVS()) noexcept
     {
-        return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes)));
+        return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes), ev));
     }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_l2(E&& e, std::initializer_list<I> axes, EVS ev = EVS()) noexcept
+    {
+        using axes_type = std::vector<typename std::decay_t<E>::size_type>;
+        return sqrt(norm_sq(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), ev));
+    }
+#else
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_l2(E&& e, const I (&axes)[N], EVS ev = EVS()) noexcept
+    {
+        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
+        return sqrt(norm_sq(std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), ev));
+    }
+#endif
 
     /**
      * @ingroup red_functions
@@ -308,12 +335,13 @@ namespace xt
      * Returns an \ref xreducer for the infinity norm of the elements across given \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the norm is computed (optional)
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X>
-    auto norm_linf(E&& e, X&& axes) noexcept;
+    template <class E, class X, class EVS, class>
+    auto norm_linf(E&& e, X&& axes, EVS ev) noexcept;
 
     /**
      * @ingroup red_functions
@@ -323,12 +351,13 @@ namespace xt
      * @param e an \ref xexpression
      * @param p
      * @param axes the axes along which the norm is computed (optional)
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X>
-    inline auto norm_lp_to_p(E&& e, double p, X&& axes) noexcept
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, class = disable_evaluation_strategy<X>>
+    inline auto norm_lp_to_p(E&& e, double p, X&& axes, EVS ev = EVS()) noexcept
     {
         using value_type = typename std::decay_t<E>::value_type;
         using result_type = norm_type_t<std::decay_t<E>>;
@@ -341,28 +370,28 @@ namespace xt
             return norm_lp_to_p(v, p);
         };
         return reduce(make_xreducer_functor(std::move(reduce_func), std::move(init_func), std::plus<result_type>()),
-                      std::forward<E>(e), std::forward<X>(axes));
+                      std::forward<E>(e), std::forward<X>(axes), ev);
     }
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_lp_to_p(E&& e, double p) noexcept
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_lp_to_p(E&& e, double p, EVS ev = EVS()) noexcept
     {
-        return norm_lp_to_p(std::forward<E>(e), p, arange(e.dimension()));
+        return norm_lp_to_p(std::forward<E>(e), p, arange(e.dimension()), ev);
     }
 
 #ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto norm_lp_to_p(E&& e, double p, std::initializer_list<I> axes) noexcept
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_lp_to_p(E&& e, double p, std::initializer_list<I> axes, EVS ev = EVS()) noexcept
     {
         using axes_type = std::vector<typename std::decay_t<E>::size_type>;
-        return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes));
+        return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes), ev);
     }
 #else
-    template <class E, class I, std::size_t N>
-    inline auto norm_lp_to_p(E&& e, double p, const I (&axes)[N]) noexcept
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_lp_to_p(E&& e, double p, const I (&axes)[N], EVS ev = EVS()) noexcept
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
-        return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes));
+        return norm_lp_to_p(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes), ev);
     }
 #endif
 
@@ -374,37 +403,38 @@ namespace xt
      * @param e an \ref xexpression
      * @param p
      * @param axes the axes along which the norm is computed (optional)
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X>
-    inline auto norm_lp(E&& e, double p, X&& axes)
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, class = disable_evaluation_strategy<X>>
+    inline auto norm_lp(E&& e, double p, X&& axes, EVS ev = EVS())
     {
         XTENSOR_PRECONDITION(p != 0,
                              "norm_lp(): p must be nonzero, use norm_l0() instead.");
-        return pow(norm_lp_to_p(std::forward<E>(e), p, std::forward<X>(axes)), 1.0 / p);
+        return pow(norm_lp_to_p(std::forward<E>(e), p, std::forward<X>(axes), ev), 1.0 / p);
     }
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_lp(E&& e, double p) noexcept
+    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_lp(E&& e, double p, EVS ev = EVS())
     {
-        return norm_lp(std::forward<E>(e), p, arange(e.dimension()));
+        return norm_lp(std::forward<E>(e), p, arange(e.dimension()), ev);
     }
 
 #ifdef X_OLD_CLANG
-    template <class E, class I>
-    inline auto norm_lp(E&& e, double p, std::initializer_list<I> axes) noexcept
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_lp(E&& e, double p, std::initializer_list<I> axes, EVS ev = EVS())
     {
         using axes_type = std::vector<typename std::decay_t<E>::size_type>;
-        return norm_lp(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes));
+        return norm_lp(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes), ev);
     }
 #else
-    template <class E, class I, std::size_t N>
-    inline auto norm_lp(E&& e, double p, const I (&axes)[N]) noexcept
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto norm_lp(E&& e, double p, const I (&axes)[N], EVS ev = EVS())
     {
         using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
-        return norm_lp(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes));
+        return norm_lp(std::forward<E>(e), p, xtl::forward_sequence<axes_type>(axes), ev);
     }
 #endif
 
@@ -414,14 +444,15 @@ namespace xt
      *
      * Returns an \ref xreducer for the induced L1 norm (i.e. the maximum of the L1 norms of e's columns).
      * @param e a 2D \ref xexpression
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      */
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_induced_l1(E&& e)
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    inline auto norm_induced_l1(E&& e, EVS ev = EVS())
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,
                              "norm_induced_l1(): only applicable to matrices (e.dimension() must be 2).");
-        return norm_linf(norm_l1(std::forward<E>(e), {0}));
+        return norm_linf(norm_l1(std::forward<E>(e), {0}, ev), ev);
     }
 
     /**
@@ -430,14 +461,15 @@ namespace xt
      *
      * Returns an \ref xreducer for the induced L-infinity norm (i.e. the maximum of the L1 norms of e's rows).
      * @param e a 2D \ref xexpression
-     * @return an \ref xreducer
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      */
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    inline auto norm_induced_linf(E&& e)
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    inline auto norm_induced_linf(E&& e, EVS ev = EVS())
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,
                              "norm_induced_linf(): only applicable to matrices (e.dimension() must be 2).");
-        return norm_linf(norm_l1(std::forward<E>(e), {1}));
+        return norm_linf(norm_l1(std::forward<E>(e), {1}, ev), ev);
     }
 
 }  // namespace xt
