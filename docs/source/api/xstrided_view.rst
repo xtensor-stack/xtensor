@@ -19,7 +19,7 @@ Defined in ``xtensor/xstrided_view.hpp``
 .. doxygenfunction:: xt::strided_view(E&&, I&&, I&&, std::size_t, layout_type)
    :project: xtensor
 
-.. doxygenfunction:: xt::strided_view(E&&, const slice_vector&)
+.. doxygenfunction:: xt::strided_view(E&&, const xstrided_slice_vector&)
    :project: xtensor
 
 .. doxygenfunction:: xt::transpose(E&&)
@@ -32,6 +32,9 @@ Defined in ``xtensor/xstrided_view.hpp``
    :project: xtensor
 
 .. doxygenfunction:: xt::flatten
+   :project: xtensor
+
+.. doxygenfunction:: xt::reshape_view(E&&, S&&, layout_type)
    :project: xtensor
 
 .. doxygenfunction:: xt::trim_zeros

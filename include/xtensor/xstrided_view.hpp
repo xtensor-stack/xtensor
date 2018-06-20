@@ -20,6 +20,7 @@
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
+#include "xlayout.hpp"
 #include "xsemantic.hpp"
 #include "xstrided_view_base.hpp"
 
@@ -40,7 +41,7 @@ namespace xt
     {
         using inner_shape_type = S;
         using inner_strides_type = inner_shape_type;
-        using inner_backstrides_type_type = inner_shape_type;
+        using inner_backstrides_type = inner_shape_type;
 
         using const_stepper = std::conditional_t<
             is_indexed_stepper<typename std::decay_t<CT>::stepper>::value,
@@ -219,12 +220,12 @@ namespace xt
     >;
 
     /**
-     * @typedef xstrided_slice
+     * @typedef xstrided_slice_vector
      * @brief vector of slices used to build a `xstrided_view`
      */
     using xstrided_slice_vector = std::vector<xstrided_slice<std::ptrdiff_t>>;
 
-    template <class E, class I>
+    template <layout_type L = layout_type::dynamic, class E, class I>
     auto strided_view(E&& e, I&& shape, I&& strides, std::size_t offset = 0, layout_type layout = layout_type::dynamic) noexcept;
 
     template <class E>
@@ -450,15 +451,16 @@ namespace xt
      * @param offset the offset of the first element in the underlying container
      * @param layout the new layout of the expression
      *
+     * @tparam L the static layout type of the view (default: dynamic)
      * @tparam E type of xexpression
      * @tparam I shape and strides type
      *
      * @return the view
      */
-    template <class E, class I>
+    template <layout_type L, class E, class I>
     inline auto strided_view(E&& e, I&& shape, I&& strides, std::size_t offset, layout_type layout) noexcept
     {
-        using view_type = xstrided_view<xclosure_t<E>, I>;
+        using view_type = xstrided_view<xclosure_t<E>, I, L>;
         return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides), offset, layout);
     }
 
@@ -1231,6 +1233,72 @@ namespace xt
 
         return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), offset);
     }
+
+    template <class E, class S>
+    inline auto reshape_view(E&& e, S&& shape)
+    {
+        using shape_type = S;
+
+        shape_type strides;
+        xt::resize_container(strides, shape.size());
+        compute_strides(shape, default_assignable_layout(std::decay_t<E>::static_layout), strides);
+
+        return strided_view<std::decay_t<E>::static_layout>(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0);
+    }
+
+    /**
+     * @brief Return a view on a container with a new shape
+     *
+     * Note: if you resize the underlying container, this view becomes
+     * invalidated.
+     *
+     * @param e xexpression to reshape
+     * @param shape new shape
+     * @param layout new layout (optional)
+     *
+     * @return view on xexpression with new shape
+     */
+    template <class E, class S>
+    inline auto reshape_view(E&& e, S&& shape, layout_type layout)
+    {
+        using shape_type = S;
+
+        shape_type strides;
+        xt::resize_container(strides, shape.size());
+        compute_strides(shape, layout, strides);
+
+        return strided_view(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0);
+    }
+
+#if !defined(X_OLD_CLANG)
+    template <class E, class I, std::size_t N>
+    inline auto reshape_view(E&& e, const I(&shape)[N], layout_type l)
+    {
+        using shape_type = std::array<std::size_t, N>;
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape), l);
+    }
+
+    template <class E, class I, std::size_t N>
+    inline auto reshape_view(E&& e, const I(&shape)[N])
+    {
+        using shape_type = std::array<std::size_t, N>;
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape));
+    }
+#else
+    template <class E, class I>
+    inline auto reshape_view(E&& e, const std::initializer_list<I>& shape)
+    {
+        using shape_type = xt::dynamic_shape<std::size_t>;
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape));
+    }
+
+    template <class E, class I>
+    inline auto reshape_view(E&& e, const std::initializer_list<I>& shape, layout_type l)
+    {
+        using shape_type = xt::dynamic_shape<std::size_t>;
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape), l);
+    }
+#endif
 }
 
 #endif

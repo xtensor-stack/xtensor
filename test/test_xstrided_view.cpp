@@ -907,4 +907,20 @@ namespace xt
         ++iter2;
         EXPECT_EQ(iter2, iter_end2);
     }
+
+    TEST(xstrided_view, reshape_view)
+    {
+        xarray<double> a = xt::arange<double>(9);
+        auto av = xt::reshape_view(a, {3, 3});
+        xtensor<double, 2> e = xt::reshape_view(xt::arange(9), {3, 3});
+
+        a.reshape({3, 3});
+        EXPECT_EQ(av, e);
+        EXPECT_EQ(av, a);
+
+    #if !defined(X_OLD_CLANG)
+        bool truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
+        EXPECT_TRUE(truthy);
+    #endif
+    }
 }

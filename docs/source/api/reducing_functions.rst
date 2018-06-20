@@ -38,37 +38,37 @@ Defined in ``xtensor/xmath.hpp``
 Defined in ``xtensor/xnorm.hpp``
 
 .. _norm-l0-func-ref:
-.. doxygenfunction:: norm_l0(E&&, X&&)
+.. doxygenfunction:: norm_l0(E&&, X&&, EVS)
    :project: xtensor
 
 .. _norm-l1-func-ref:
-.. doxygenfunction:: norm_l1(E&&, X&&)
+.. doxygenfunction:: norm_l1(E&&, X&&, EVS)
    :project: xtensor
 
 .. _norm-sq-func-ref:
-.. doxygenfunction:: norm_sq(E&&, X&&)
+.. doxygenfunction:: norm_sq(E&&, X&&, EVS)
    :project: xtensor
 
 .. _norm-l2-func-ref:
-.. doxygenfunction:: norm_l2(E&&, X&&)
+.. doxygenfunction:: norm_l2(E&&, X&&, EVS)
    :project: xtensor
 
 .. _norm-linf-func-ref:
-.. doxygenfunction:: norm_linf(E&&, X&&)
+.. doxygenfunction:: norm_linf(E&&, X&&, EVS)
    :project: xtensor
 
 .. _nlptop-func-ref:
-.. doxygenfunction:: norm_lp_to_p(E&&, double, X&&)
+.. doxygenfunction:: norm_lp_to_p(E&&, double, X&&, EVS)
    :project: xtensor
 
 .. _norm-lp-func-ref:
-.. doxygenfunction:: norm_lp(E&&, double, X&&)
+.. doxygenfunction:: norm_lp(E&&, double, X&&, EVS)
    :project: xtensor
 
 .. _nind-l1-ref:
-.. doxygenfunction:: norm_induced_l1(E&&)
+.. doxygenfunction:: norm_induced_l1(E&&, EVS)
    :project: xtensor
 
 .. _nilinf-ref:
-.. doxygenfunction:: norm_induced_linf(E&&)
+.. doxygenfunction:: norm_induced_linf(E&&, EVS)
    :project: xtensor
