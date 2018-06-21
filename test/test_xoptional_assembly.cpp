@@ -144,20 +144,17 @@ namespace xt
             SCOPED_TRACE("copy constructor");
             dyn_opt_ass_type b(a);
             compare_shape(a, b);
-            EXPECT_EQ(a.value().storage(), b.value().storage());
-            EXPECT_EQ(a.has_value().storage(), b.has_value().storage());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
             SCOPED_TRACE("assignment operator");
             row_major_result<> r;
             dyn_opt_ass_type c(r.m_shape, dyn_opt_ass_type::value_type(0, false));
-            EXPECT_NE(a.value().storage(), c.value().storage());
-            EXPECT_NE(a.has_value().storage(), c.has_value().storage());
+            EXPECT_NE(a.storage(), c.storage());
             c = a;
             compare_shape(a, c);
-            EXPECT_EQ(a.value().storage(), c.value().storage());
-            EXPECT_EQ(a.has_value().storage(), c.has_value().storage());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 
@@ -172,8 +169,7 @@ namespace xt
             dyn_opt_ass_type tmp(a);
             dyn_opt_ass_type b(std::move(tmp));
             compare_shape(a, b);
-            EXPECT_EQ(a.value().storage(), b.value().storage());
-            EXPECT_EQ(a.has_value().storage(), b.has_value().storage());
+            EXPECT_EQ(a.storage(), b.storage());
         }
 
         {
@@ -185,8 +181,7 @@ namespace xt
             dyn_opt_ass_type tmp(a);
             c = std::move(tmp);
             compare_shape(a, c);
-            EXPECT_EQ(a.value().storage(), c.value().storage());
-            EXPECT_EQ(a.has_value().storage(), c.has_value().storage());
+            EXPECT_EQ(a.storage(), c.storage());
         }
     }
 
@@ -210,6 +205,24 @@ namespace xt
         EXPECT_EQ(a(0, 1), opt(2, false));
         EXPECT_EQ(a(1, 0), opt(3, false));
         EXPECT_EQ(a(1, 1), opt(4, true));
+    }
+
+    TEST(xoptional_assembly, fill)
+    {
+        using opt = xtl::xoptional<int>;
+        opt_ass_type a = {{opt(1), opt(2, false)}, {opt(3, false), opt(4)}};
+
+        a.fill(opt(5, false));
+        EXPECT_EQ(a(0, 0), opt(5, false));
+        EXPECT_EQ(a(0, 1), opt(5, false));
+        EXPECT_EQ(a(1, 0), opt(5, false));
+        EXPECT_EQ(a(1, 1), opt(5, false));
+
+        a.fill(3);
+        EXPECT_EQ(a(0, 0), opt(3, true));
+        EXPECT_EQ(a(0, 1), opt(3, true));
+        EXPECT_EQ(a(1, 0), opt(3, true));
+        EXPECT_EQ(a(1, 1), opt(3, true));
     }
 
     TEST(xoptional_assembly, unchecked)

@@ -116,6 +116,7 @@ set(XTENSOR_TESTS
     test_xoptional.cpp
     test_xoptional_assembly.cpp
     test_xoptional_assembly_adaptor.cpp
+    test_xoptional_assembly_storage.cpp
     test_xrandom.cpp
     test_xreducer.cpp
     test_xscalar.cpp
@@ -190,4 +191,3 @@ endif()
 target_link_libraries(${XTENSOR_TARGET} xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND ${XTENSOR_TARGET} DEPENDS ${XTENSOR_TARGET})
-

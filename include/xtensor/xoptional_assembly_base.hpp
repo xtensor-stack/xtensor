@@ -11,14 +11,12 @@
 
 #include "xiterable.hpp"
 #include "xtensor_forward.hpp"
+#include "xoptional_assembly_storage.hpp"
 
 namespace xt
 {
     template <class D, bool is_const>
     class xoptional_assembly_stepper;
-
-    template <class D, bool is_const>
-    class xoptional_assembly_iterator;
 
 #define DL XTENSOR_DEFAULT_LAYOUT
 
@@ -57,11 +55,13 @@ namespace xt
         using flag_reference = typename flag_expression::reference;
         using flag_const_reference = typename flag_expression::const_reference;
 
-        using value_type = xtl::xoptional<base_value_type, flag_type>;
-        using reference = xtl::xoptional<base_reference, flag_reference>;
-        using const_reference = xtl::xoptional<base_const_reference, flag_const_reference>;
-        using pointer = xtl::xclosure_pointer<reference>;
-        using const_pointer = xtl::xclosure_pointer<const_reference>;
+        using storage_type = typename inner_types::storage_type;
+
+        using value_type = typename storage_type::value_type;
+        using reference = typename storage_type::reference;
+        using const_reference = typename storage_type::const_reference;
+        using pointer = typename storage_type::pointer;
+        using const_pointer = typename storage_type::const_pointer;
         using size_type = typename value_expression::size_type;
         using difference_type = typename value_expression::difference_type;
         using simd_value_type = xsimd::simd_type<value_type>;
@@ -101,10 +101,10 @@ namespace xt
         template <class S, layout_type L>
         using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
 
-        using storage_iterator = xoptional_assembly_iterator<D, false>;
-        using const_storage_iterator = xoptional_assembly_iterator<D, true>;
-        using reverse_storage_iterator = std::reverse_iterator<storage_iterator>;
-        using const_reverse_storage_iterator = std::reverse_iterator<const_storage_iterator>;
+        using storage_iterator = typename storage_type::iterator;
+        using const_storage_iterator = typename storage_type::const_iterator;
+        using reverse_storage_iterator = typename storage_type::reverse_iterator;
+        using const_reverse_storage_iterator = typename storage_type::const_reverse_iterator;
 
         using iterator = typename iterable_base::iterator;
         using const_iterator = typename iterable_base::const_iterator;
@@ -129,6 +129,9 @@ namespace xt
         void reshape(const S& shape, layout_type layout = static_layout);
 
         layout_type layout() const noexcept;
+
+        template <class T>
+        void fill(const T& value);
 
         template <class... Args>
         reference operator()(Args... args);
@@ -164,6 +167,13 @@ namespace xt
         reference element(It first, It last);
         template <class It>
         const_reference element(It first, It last) const;
+
+        storage_type& storage() noexcept;
+        const storage_type& storage() const noexcept;
+
+        value_type* data() noexcept;
+        const value_type* data() const noexcept;
+        const size_type data_offset() const noexcept;
 
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
@@ -249,81 +259,6 @@ namespace xt
 
 #undef DL
 
-    /*******************************
-     * xoptional_assembly_iterator *
-     *******************************/
-
-    namespace detail
-    {
-        template <class D, bool is_const>
-        using get_optional_reference_t = std::conditional_t<is_const,
-                                                            typename xoptional_assembly_base<D>::const_reference,
-                                                            typename xoptional_assembly_base<D>::reference>;
-
-        template <class D, bool is_const>
-        using get_optional_pointer_t = std::conditional_t<is_const,
-                                                          typename xoptional_assembly_base<D>::const_pointer,
-                                                          typename xoptional_assembly_base<D>::pointer>;
-    }
-
-    template <class D, bool is_const>
-    class xoptional_assembly_iterator
-        : public xtl::xrandom_access_iterator_base<xoptional_assembly_iterator<D, is_const>,
-                                                   typename xoptional_assembly_base<D>::value_type,
-                                                   typename xoptional_assembly_base<D>::difference_type,
-                                                   detail::get_optional_pointer_t<D, is_const>,
-                                                   detail::get_optional_reference_t<D, is_const>>
-
-    {
-    public:
-
-        using self_type = xoptional_assembly_iterator<D, is_const>;
-        using assembly_type = xoptional_assembly_base<D>;
-        using value_type = typename xoptional_assembly_base<D>::value_type;
-        using reference = detail::get_optional_reference_t<D, is_const>;
-        using pointer = detail::get_optional_pointer_t<D, is_const>;
-        using difference_type = typename assembly_type::difference_type;
-        using iterator_category = std::random_access_iterator_tag;
-
-        using value_expression = typename assembly_type::value_expression;
-        using flag_expression = typename assembly_type::flag_expression;
-        using value_iterator = std::conditional_t<is_const,
-                                                  typename value_expression::const_storage_iterator,
-                                                  typename value_expression::storage_iterator>;
-        using flag_iterator = std::conditional_t<is_const,
-                                                 typename flag_expression::const_storage_iterator,
-                                                 typename flag_expression::storage_iterator>;
-
-        xoptional_assembly_iterator(value_iterator vit, flag_iterator fit) noexcept;
-
-        self_type& operator++();
-        self_type& operator--();
-
-        self_type& operator+=(difference_type n);
-        self_type& operator-=(difference_type n);
-
-        difference_type operator-(const self_type& rhs) const;
-
-        reference operator*() const;
-        pointer operator->() const;
-
-        bool equal(const self_type& rhs) const;
-        bool less_than(const self_type& rhs) const;
-
-    private:
-
-        value_iterator m_vit;
-        flag_iterator m_fit;
-    };
-
-    template <class D, bool is_const>
-    bool operator==(const xoptional_assembly_iterator<D, is_const>& lhs,
-                    const xoptional_assembly_iterator<D, is_const>& rhs);
-
-    template <class D, bool is_const>
-    bool operator<(const xoptional_assembly_iterator<D, is_const>& lhs,
-                   const xoptional_assembly_iterator<D, is_const>& rhs);
-
     /******************************
      * xoptional_assembly_stepper *
      ******************************/
@@ -334,7 +269,7 @@ namespace xt
     public:
 
         using self_type = xoptional_assembly_stepper<D, is_const>;
-        using assembly_type = xoptional_assembly_base<D>;
+        using assembly_type = typename D::assembly_type;
         using value_type = typename assembly_type::value_type;
         using reference = std::conditional_t<is_const,
                                              typename assembly_type::const_reference,
@@ -488,6 +423,17 @@ namespace xt
     inline layout_type xoptional_assembly_base<D>::layout() const noexcept
     {
         return value().layout();
+    }
+
+    /**
+     * Fills the data with the given value.
+     * @param value the value to fill the data with.
+     */
+    template <class D>
+    template <class T>
+    inline void xoptional_assembly_base<D>::fill(const T& value)
+    {
+        std::fill(this->storage_begin(), this->storage_end(), value);
     }
 
     /**
@@ -688,6 +634,36 @@ namespace xt
         return const_reference(value().element(first, last), has_value().element(first, last));
     }
     //@}
+
+    template <class D>
+    inline auto xoptional_assembly_base<D>::storage() noexcept -> storage_type&
+    {
+        return derived_cast().storage_impl();
+    }
+
+    template <class D>
+    inline auto xoptional_assembly_base<D>::storage() const noexcept -> const storage_type&
+    {
+        return derived_cast().storage_impl();
+    }
+
+    template <class D>
+    inline auto xoptional_assembly_base<D>::data() noexcept -> value_type*
+    {
+        return storage().data();
+    }
+
+    template <class D>
+    inline auto xoptional_assembly_base<D>::data() const noexcept -> const value_type*
+    {
+        return storage().data();
+    }
+
+    template <class D>
+    inline auto xoptional_assembly_base<D>::data_offset() const noexcept -> const size_type
+    {
+        return size_type(0);
+    }
 
     /**
      * @name Broadcasting
@@ -894,92 +870,6 @@ namespace xt
     inline auto xoptional_assembly_base<D>::derived_cast() const noexcept -> const derived_type&
     {
         return *static_cast<const derived_type*>(this);
-    }
-
-    /**********************************************
-     * xoptional_assembly_iterator implementation *
-     **********************************************/
-
-    template <class D, bool C>
-    inline xoptional_assembly_iterator<D, C>::xoptional_assembly_iterator(value_iterator vit, flag_iterator fit) noexcept
-        : m_vit(vit), m_fit(fit)
-    {
-    }
-
-    template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator++() -> self_type&
-    {
-        ++m_vit;
-        ++m_fit;
-        return *this;
-    }
-
-    template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator--() -> self_type&
-    {
-        --m_vit;
-        --m_fit;
-        return *this;
-    }
-
-    template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator+=(difference_type n) -> self_type&
-    {
-        m_vit += n;
-        m_fit += n;
-        return *this;
-    }
-
-    template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator-=(difference_type n) -> self_type&
-    {
-        m_vit -= n;
-        m_fit -= n;
-        return *this;
-    }
-
-    template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator-(const self_type& rhs) const -> difference_type
-    {
-        return m_vit - rhs.m_vit;
-    }
-
-    template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator*() const -> reference
-    {
-        return reference(*m_vit, *m_fit);
-    }
-
-    template <class D, bool C>
-    inline auto xoptional_assembly_iterator<D, C>::operator-> () const -> pointer
-    {
-        return &(this->operator*());
-    }
-
-    template <class D, bool C>
-    inline bool xoptional_assembly_iterator<D, C>::equal(const self_type& rhs) const
-    {
-        return m_vit.equal(rhs.m_vit) && m_fit.equal(rhs.m_fit);
-    }
-
-    template <class D, bool C>
-    inline bool xoptional_assembly_iterator<D, C>::less_than(const self_type& rhs) const
-    {
-        return m_vit.less_than(rhs.m_vit) && m_fit.less_than(rhs.m_fit);
-    }
-
-    template <class D, bool is_const>
-    inline bool operator==(const xoptional_assembly_iterator<D, is_const>& lhs,
-                           const xoptional_assembly_iterator<D, is_const>& rhs)
-    {
-        return lhs.equal(rhs);
-    }
-
-    template <class D, bool is_const>
-    inline bool operator<(const xoptional_assembly_iterator<D, is_const>& lhs,
-                          const xoptional_assembly_iterator<D, is_const>& rhs)
-    {
-        return lhs.less_than(rhs);
     }
 
     /*********************************************
