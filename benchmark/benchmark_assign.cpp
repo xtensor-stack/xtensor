@@ -189,10 +189,10 @@ namespace xt
 
             for (auto _ : state)
             {
-                size_type csize = x.size();
+                size_type csize = res.size();
                 for (size_type i = 0; i < csize; ++i)
                 {
-                    res.data()[i] += 3.123;
+                    res.storage()[i] += 3.123;
                 }
                 benchmark::DoNotOptimize(res.data());
             }
