@@ -337,13 +337,15 @@ namespace xt
         constexpr static std::size_t N = std::tuple_size<shape_type>::value;
 
         xfixed_container();
-        explicit xfixed_container(value_type v);
+        [[deprecated]] explicit xfixed_container(value_type v);
         explicit xfixed_container(const inner_shape_type& shape, layout_type l = L);
         explicit xfixed_container(const inner_shape_type& shape, value_type v, layout_type l = L);
 
 #ifndef X_OLD_CLANG
         xfixed_container(const get_init_type_t<value_type, S>& init);
 #else
+        // remove this enable_if when removing the other value_type constructor
+        template <class IX = std::integral_constant<std::size_t, N>, class EN = std::enable_if_t<IX::value != 0, int>>
         xfixed_container(nested_initializer_list_t<value_type, N> t);
 #endif
 
@@ -587,6 +589,7 @@ namespace xt
     }
 #else
     template <class ET, class S, layout_type L, class Tag>
+    template <class IX, class EN>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
     {
         L == layout_type::row_major ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
