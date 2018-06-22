@@ -139,20 +139,20 @@ namespace xt
 
         *****************************************************************************************/
 
+        template <std::size_t IDX, std::size_t... X>
+        struct at
+        {
+            constexpr static std::size_t arr[sizeof...(X)] = {X...};
+            constexpr static std::size_t value = arr[IDX];
+        };
+
         template <layout_type L, std::size_t I, std::size_t... X>
         struct calculate_stride;
 
         template <std::size_t I, std::size_t Y, std::size_t... X>
         struct calculate_stride<layout_type::column_major, I, Y, X...>
         {
-            constexpr static std::size_t value = Y *
-                (calculate_stride<layout_type::column_major, I - 1, X...>::value == 0 ? 1 : calculate_stride<layout_type::column_major, I - 1, X...>::value);
-        };
-
-        template <std::size_t I, std::size_t... X>
-        struct calculate_stride<layout_type::column_major, I, 1, X...>
-        {
-            constexpr static std::size_t value = 0;
+            constexpr static std::size_t value = Y * calculate_stride<layout_type::column_major, I - 1, X...>::value;
         };
 
         template <std::size_t Y, std::size_t... X>
@@ -161,19 +161,10 @@ namespace xt
             constexpr static std::size_t value = 1;
         };
 
-        template <std::size_t IDX, std::size_t... X>
-        struct at
-        {
-            constexpr static std::size_t arr[sizeof...(X)] = {X...};
-            constexpr static std::size_t value = arr[IDX];
-        };
-
         template <std::size_t I, std::size_t... X>
         struct calculate_stride_row_major
         {
-            constexpr static std::size_t value = (at<sizeof...(X) - I, X...>::value == 1 ? 0 : at<sizeof...(X) - I, X...>::value) *
-                (calculate_stride_row_major<I - 1, X...>::value == 0 ? 
-                    1 : calculate_stride_row_major<I - 1, X...>::value);
+            constexpr static std::size_t value = at<sizeof...(X) - I, X...>::value * calculate_stride_row_major<I - 1, X...>::value;
         };
 
         template <std::size_t... X>
@@ -194,7 +185,7 @@ namespace xt
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
                           "Layout not supported for fixed array");
-            return {calculate_stride<L, I, X...>::value...};
+            return const_array<std::size_t, sizeof...(X)>{at<I, X...>::value == 1 ? 0 : calculate_stride<L, I, X...>::value...};
         }
 
         template <class T, std::size_t... I>
@@ -218,6 +209,13 @@ namespace xt
             constexpr static std::size_t value = X;
         };
 
+        template <>
+        struct compute_size_impl<>
+        {
+            // support for 0D xtensor fixed (empty shape = xshape<>)
+            constexpr static std::size_t value = 1;
+        };
+
         // TODO unify with constexpr compute_size when dropping MSVC 2015
         template <class T>
         struct fixed_compute_size;
@@ -235,6 +233,12 @@ namespace xt
         struct get_init_type_impl<V, Y>
         {
             using type = V[Y];
+        };
+
+        template <class V>
+        struct get_init_type_impl<V>
+        {
+            using type = V[1];
         };
 
         template <class V, std::size_t Y, std::size_t... X>

@@ -108,6 +108,23 @@ namespace xt
         EXPECT_EQ(sc[0], 1);
         EXPECT_EQ(sc[1], 3);
         EXPECT_EQ(sc[2], 12);
+
+        std::array<std::size_t, 3> ts1 = {1, 5, 3}, tt1;
+
+        auto sc2 = get_strides<layout_type::column_major>(xshape<1, 5, 3>());
+        compute_strides(ts1, layout_type::column_major, tt1);
+        EXPECT_EQ(tt1[0], sc2[0]);
+        EXPECT_EQ(tt1[1], sc2[1]);
+        EXPECT_EQ(tt1[2], sc2[2]);
+
+        auto sc3c = get_strides<layout_type::column_major>(xshape<3, 1, 3, 2, 1, 3>());
+        auto sc3r = get_strides<layout_type::row_major>(xshape<3, 1, 3, 2, 1, 3>());
+        std::vector<std::size_t> ts2({3, 1, 3, 2, 1, 3}), tt2(6);
+
+        compute_strides(ts2, layout_type::column_major, tt2);
+        EXPECT_TRUE(std::equal(tt2.begin(), tt2.end(), sc3c.begin()) && ts2.size() == sc3c.size());
+        compute_strides(ts2, layout_type::row_major, tt2);
+        EXPECT_TRUE(std::equal(tt2.begin(), tt2.end(), sc3r.begin()) && ts2.size() == sc3r.size());
     }
 
     TEST(xtensor_fixed, adapt)
@@ -134,6 +151,18 @@ namespace xt
         EXPECT_EQ(a.layout(), layout_type::row_major);
         xtensor_fixed<double, xshape<2, 2>, layout_type::column_major> b;
         EXPECT_EQ(b.layout(), layout_type::column_major);
+    }
+
+    TEST(xtensor_fixed, nulld)
+    {
+        xtensor_fixed<double, xshape<>> a{123};
+        xtensor_fixed<double, xshape<>> b{4};
+        xtensor_fixed<double, xshape<>> c{123};
+
+        EXPECT_EQ(a(), 123);
+        b += 432;
+        EXPECT_EQ(b(), 432 + 4);
+        EXPECT_TRUE(c == a);
     }
 }
 
