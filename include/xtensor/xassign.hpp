@@ -351,8 +351,13 @@ namespace xt
     inline void xexpression_assigner<Tag>::scalar_computed_assign(xexpression<E1>& e1, const E2& e2, F&& f)
     {
         E1& d = e1.derived_cast();
-        std::transform(d.cbegin(), d.cend(), d.begin(),
-                       [e2, &f](const auto& v) { return f(v, e2); });
+        using size_type = typename E1::size_type;
+        auto dst = d.storage().begin();
+        for (size_type i = d.size(); i > 0; --i)
+        {
+            *dst = f(*dst, e2);
+            ++dst;
+        }
     }
 
     template <class Tag>
@@ -473,10 +478,24 @@ namespace xt
 
     namespace assigner_detail
     {
+        template <class C, class It, class Ot>
+        inline void assign_loop(It src, Ot dst, std::size_t n)
+        {
+            for(; n > 0; --n)
+            {
+                *dst = static_cast<C>(*src);
+                ++src;
+                ++dst;
+            }
+        }
+
         template <class E1, class E2>
         inline void trivial_assigner_run_impl(E1& e1, const E2& e2, std::true_type)
         {
-            std::transform(e2.storage_cbegin(), e2.storage_cend(), e1.storage_begin(), [](typename E2::value_type x) { return static_cast<typename E1::value_type>(x); });
+            using size_type = typename E1::size_type;
+            auto src = e2.storage_cbegin();
+            auto dst = e1.storage_begin();
+            assign_loop<typename E1::value_type>(src, dst, e1.size());
         }
 
         template <class E1, class E2>

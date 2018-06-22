@@ -23,14 +23,15 @@ namespace xt
             std::vector<std::size_t> shape = {SHAPE, std::size_t(state.range(0))};
             xt::xarray<double> a = xt::random::rand<double>(shape);
             xt::xarray<double> b = xt::random::rand<double>(shape);
-            xindex index(shape.size());
-            xindex bindex(shape.size());
             volatile double c = 0;
             for (auto _ : state)
             {
                 auto end = compute_size(shape);
                 auto it = a.stepper_begin(shape);
                 auto bit = b.stepper_begin(shape);
+
+                xindex index(shape.size());
+                xindex bindex(shape.size());
 
                 for (std::size_t i = 0; i < end; ++i)
                 {
