@@ -225,6 +225,9 @@ namespace xt
      */
     using xstrided_slice_vector = std::vector<xstrided_slice<std::ptrdiff_t>>;
 
+    // TODO: remove this type used for backward compatibility only
+    using slice_vector = xstrided_slice_vector;
+
     template <layout_type L = layout_type::dynamic, class E, class I>
     auto strided_view(E&& e, I&& shape, I&& strides, std::size_t offset = 0, layout_type layout = layout_type::dynamic) noexcept;
 

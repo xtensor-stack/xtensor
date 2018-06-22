@@ -7,6 +7,32 @@
 Changelog
 =========
 
+0.16.4
+------
+
+- removed usage of ``std::transfomr`` in assign
+  `#868 <https://github.com/QuantStack/xtensor/pull/868>`_.
+- add strided assignment
+  `#901 <https://github.com/QuantStack/xtensor/pull/901>`_.
+- simd activated for conditional ternary functor
+  `#903 <https://github.com/QuantStack/xtensor/pull/903>`_.
+- ``xstrided_view`` split
+  `#905 <https://github.com/QuantStack/xtensor/pull/905>`_.
+- assigning an expression to a view throws if it has more dimensions
+  `#910 <https://github.com/QuantStack/xtensor/pull/910>`_.
+- faster random
+  `#913 <https://github.com/QuantStack/xtensor/pull/913>`_.
+- ``xoptional_assembly_base`` storage type
+  `#915 <https://github.com/QuantStack/xtensor/pull/915>`_.
+- new tests and warning pass
+  `#916 <https://github.com/QuantStack/xtensor/pull/916>`_.
+- norm immediate reducer
+  `#924 <https://github.com/QuantStack/xtensor/pull/924>`_.
+- add ``reshape_view``
+  `#927 <https://github.com/QuantStack/xtensor/pull/927>`_.
+- fix immediate reducers with 0 strides
+  `#935 <https://github.com/QuantStack/xtensor/pull/935>`_.
+
 0.16.3
 ------
 
