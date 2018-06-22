@@ -125,6 +125,10 @@ namespace xt
         EXPECT_TRUE(std::equal(tt2.begin(), tt2.end(), sc3c.begin()) && ts2.size() == sc3c.size());
         compute_strides(ts2, layout_type::row_major, tt2);
         EXPECT_TRUE(std::equal(tt2.begin(), tt2.end(), sc3r.begin()) && ts2.size() == sc3r.size());
+
+        xtensor_fixed<double, xshape<3, 1, 3, 2, 1, 3>> saxa;
+        xtensor<double, 6> saxt(std::array<std::size_t, 6>{3, 1, 3, 2, 1, 3});
+        EXPECT_TRUE(std::equal(saxa.backstrides().begin(), saxa.backstrides().end(), saxt.backstrides().begin()));
     }
 
     TEST(xtensor_fixed, adapt)

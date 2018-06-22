@@ -56,7 +56,7 @@ namespace xt
 
         constexpr operator cast_type() const
         {
-            return cast_type({X...});
+            return {{X...}};
         }
     };
 }
@@ -185,13 +185,13 @@ namespace xt
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
                           "Layout not supported for fixed array");
-            return const_array<std::size_t, sizeof...(X)>{at<I, X...>::value == 1 ? 0 : calculate_stride<L, I, X...>::value...};
+            return {{at<I, X...>::value == 1 ? 0 : calculate_stride<L, I, X...>::value...}};
         }
 
         template <class T, std::size_t... I>
         constexpr T get_backstrides_impl(const T& shape, const T& strides, std::index_sequence<I...>)
         {
-            return T({(strides[I] * (shape[I] - 1))...});
+            return {{(strides[I] * (shape[I] - 1))...}};
         }
 
         template <std::size_t... X>
