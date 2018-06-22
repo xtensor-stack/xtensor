@@ -338,9 +338,9 @@ namespace xt
 
         xfixed_container();
 #if defined(_MSC_VER) && _MSC_VER < 1910
-        [[deprecated]] explicit xfixed_container(value_type v);
-#else
         explicit xfixed_container(value_type v);
+#else
+        [[deprecated]] explicit xfixed_container(value_type v);
 #endif
         explicit xfixed_container(const inner_shape_type& shape, layout_type l = L);
         explicit xfixed_container(const inner_shape_type& shape, value_type v, layout_type l = L);
