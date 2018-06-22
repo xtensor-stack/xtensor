@@ -135,10 +135,17 @@ namespace xt
 
         result.resize(result_shape, e.layout());
 
-        std::size_t ax_idx = (e.layout() == layout_type::row_major) ? axes.size() - 1 : 0;
-        std::size_t inner_loop_size = e.strides()[axes[ax_idx]];
-        std::size_t inner_stride = e.strides()[axes[ax_idx]];
-        std::size_t outer_loop_size = e.shape()[axes[ax_idx]];
+        std::size_t leading_ax = axes[(e.layout() == layout_type::row_major) ? axes.size() - 1 : 0];
+        auto strides_finder = e.strides().begin() + static_cast<std::ptrdiff_t>(leading_ax);
+        // The computed strides contain "0" where the shape is 1 -- therefore find the next none-zero number
+        std::size_t inner_stride = *strides_finder;
+        while (inner_stride == 0)
+        {
+            (e.layout() == layout_type::row_major) ? --strides_finder : ++strides_finder;
+            inner_stride = *strides_finder;
+        }
+        std::size_t inner_loop_size = inner_stride;
+        std::size_t outer_loop_size = e.shape()[leading_ax];
 
         // The following code merges reduction axes "at the end" (or the beginning for col_major)
         // together by increasing the size of the outer loop where appropriate

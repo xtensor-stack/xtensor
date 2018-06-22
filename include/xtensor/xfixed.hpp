@@ -56,7 +56,7 @@ namespace xt
 
         constexpr operator cast_type() const
         {
-            return cast_type({X...});
+            return {{X...}};
         }
     };
 }
@@ -139,20 +139,20 @@ namespace xt
 
         *****************************************************************************************/
 
+        template <std::size_t IDX, std::size_t... X>
+        struct at
+        {
+            constexpr static std::size_t arr[sizeof...(X)] = {X...};
+            constexpr static std::size_t value = arr[IDX];
+        };
+
         template <layout_type L, std::size_t I, std::size_t... X>
         struct calculate_stride;
 
         template <std::size_t I, std::size_t Y, std::size_t... X>
         struct calculate_stride<layout_type::column_major, I, Y, X...>
         {
-            constexpr static std::size_t value = Y *
-                (calculate_stride<layout_type::column_major, I - 1, X...>::value == 0 ? 1 : calculate_stride<layout_type::column_major, I - 1, X...>::value);
-        };
-
-        template <std::size_t I, std::size_t... X>
-        struct calculate_stride<layout_type::column_major, I, 1, X...>
-        {
-            constexpr static std::size_t value = 0;
+            constexpr static std::size_t value = Y * calculate_stride<layout_type::column_major, I - 1, X...>::value;
         };
 
         template <std::size_t Y, std::size_t... X>
@@ -161,19 +161,10 @@ namespace xt
             constexpr static std::size_t value = 1;
         };
 
-        template <std::size_t IDX, std::size_t... X>
-        struct at
-        {
-            constexpr static std::size_t arr[sizeof...(X)] = {X...};
-            constexpr static std::size_t value = arr[IDX];
-        };
-
         template <std::size_t I, std::size_t... X>
         struct calculate_stride_row_major
         {
-            constexpr static std::size_t value = (at<sizeof...(X) - I, X...>::value == 1 ? 0 : at<sizeof...(X) - I, X...>::value) *
-                (calculate_stride_row_major<I - 1, X...>::value == 0 ? 
-                    1 : calculate_stride_row_major<I - 1, X...>::value);
+            constexpr static std::size_t value = at<sizeof...(X) - I, X...>::value * calculate_stride_row_major<I - 1, X...>::value;
         };
 
         template <std::size_t... X>
@@ -194,13 +185,13 @@ namespace xt
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
                           "Layout not supported for fixed array");
-            return {calculate_stride<L, I, X...>::value...};
+            return {{at<I, X...>::value == 1 ? 0 : calculate_stride<L, I, X...>::value...}};
         }
 
         template <class T, std::size_t... I>
         constexpr T get_backstrides_impl(const T& shape, const T& strides, std::index_sequence<I...>)
         {
-            return T({(strides[I] * (shape[I] - 1))...});
+            return {{(strides[I] * (shape[I] - 1))...}};
         }
 
         template <std::size_t... X>
@@ -216,6 +207,13 @@ namespace xt
         struct compute_size_impl<X>
         {
             constexpr static std::size_t value = X;
+        };
+
+        template <>
+        struct compute_size_impl<>
+        {
+            // support for 0D xtensor fixed (empty shape = xshape<>)
+            constexpr static std::size_t value = 1;
         };
 
         // TODO unify with constexpr compute_size when dropping MSVC 2015
@@ -235,6 +233,12 @@ namespace xt
         struct get_init_type_impl<V, Y>
         {
             using type = V[Y];
+        };
+
+        template <class V>
+        struct get_init_type_impl<V>
+        {
+            using type = V[1];
         };
 
         template <class V, std::size_t Y, std::size_t... X>
@@ -333,13 +337,19 @@ namespace xt
         constexpr static std::size_t N = std::tuple_size<shape_type>::value;
 
         xfixed_container();
+#if defined(_MSC_VER) && _MSC_VER < 1910
         explicit xfixed_container(value_type v);
+#else
+        [[deprecated]] explicit xfixed_container(value_type v);
+#endif
         explicit xfixed_container(const inner_shape_type& shape, layout_type l = L);
         explicit xfixed_container(const inner_shape_type& shape, value_type v, layout_type l = L);
 
 #ifndef X_OLD_CLANG
         xfixed_container(const get_init_type_t<value_type, S>& init);
 #else
+        // remove this enable_if when removing the other value_type constructor
+        template <class IX = std::integral_constant<std::size_t, N>, class EN = std::enable_if_t<IX::value != 0, int>>
         xfixed_container(nested_initializer_list_t<value_type, N> t);
 #endif
 
@@ -583,6 +593,7 @@ namespace xt
     }
 #else
     template <class ET, class S, layout_type L, class Tag>
+    template <class IX, class EN>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
     {
         L == layout_type::row_major ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);

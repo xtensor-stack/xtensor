@@ -270,6 +270,15 @@ namespace xt
         a_lz = sum(a, {1, 2, 3});
         a_gd = sum(a, {1, 2, 3}, evaluation_strategy::immediate());
         EXPECT_EQ(a_lz, a_gd);
+
+        xtensor<short, 3> ct = xt::random::randint<short>({1, 5, 3});
+        EXPECT_EQ(sum(ct, {0, 2}), sum(ct, {0, 2}, evaluation_strategy::immediate()));
+
+        xtensor<short, 5> ct2 = xt::random::randint<short>({1, 5, 1, 2, 3});
+        // EXPECT_EQ(sum(ct2, {0, 1, 2}) * 2, sum(xt::cast<short>(ct2) * 2, {0, 1, 2}, evaluation_strategy::immediate()));
+        EXPECT_EQ(sum(ct2, {0, 1, 2}), sum(ct2, {0, 1, 2}, evaluation_strategy::immediate()));
+        EXPECT_EQ(sum(ct2, {2, 3}), sum(ct2, {2, 3}, evaluation_strategy::immediate()));
+        EXPECT_EQ(sum(ct2, {1, 3}), sum(ct2, {1, 3}, evaluation_strategy::immediate()));
     }
 
     TEST(xreducer, chaining_reducers)
