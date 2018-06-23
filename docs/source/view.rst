@@ -281,3 +281,25 @@ of ``RHS``. However, since views *cannot be resized*, when assigning an expressi
     tr = b;
     // => a = {{1.2, 1.2, 1.2}, {3., 4., 5.}}
 
+    
+islicing a view
+--------------
+
+In order to slice with a variable indices array, the slicing array must be ``const``. 
+
+.. code::
+
+    #include <vector>
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xview.hpp"
+
+    xt::xarray<double> arr = xt::arange(10);
+
+    // Slice 4, 5, 9
+    auto v1 = xt::view(arr, xt::islice({4, 5, 9}));
+    // => v1 = { 4., 5., 9. }
+
+    // Slice with a variable array
+    const xt::xarray<int> inds = {4, 5, 9};
+    auto v2 = xt::view(arr, xt::islice(inds));
+    // => v2 = { 4., 5., 9. }
