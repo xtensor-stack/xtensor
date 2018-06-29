@@ -175,13 +175,13 @@ Outputs:
 1
 ```
 
-## The NumPy to xtensor cheat sheet
+### The NumPy to xtensor cheat sheet
 
 If you are familiar with NumPy APIs, and you are interested in xtensor, you can
 check out the [NumPy to xtensor cheat sheet](https://xtensor.readthedocs.io/en/latest/numpy.html)
 provided in the documentation.
 
-## Lazy broadcasting with `xtensor`
+### Lazy broadcasting with `xtensor`
 
 Xtensor can operate on arrays of different shapes of dimensions in an
 element-wise fashion. Broadcasting rules of xtensor are similar to those of
@@ -279,18 +279,25 @@ Besides, two access operators are provided:
    of size determined at runtime. `operator[]` also supports access with braced
    initializers.
 
-### Performances
+## Performances
 
 Xtensor operations make use of SIMD acceleration depending on what instruction
-sets are available on the platform at hand (SSE, AVX, AVX512, Neon). The
-[xsimd](https://github.com/QuantStack/xsimd) project underlies the detection of
-the available instruction sets, and provides generic high-level wrappers and
-memory allocators for client libraries such as xtensor.
+sets are available on the platform at hand (SSE, AVX, AVX512, Neon).
+
+### [![xsimd](docs/source/xsimd-small.svg)](https://github.com/QuantStack/xsimd)
+
+The [xsimd](https://github.com/QuantStack/xsimd) project underlies the
+detection of the available instruction sets, and provides generic high-level
+wrappers and memory allocators for client libraries such as xtensor.
+
+### Continuous benchmarking
 
 Xtensor operations are continuously benchmarked, and are significantly improved
 at each new version. Current performances on statically dimensioned tensors
 match those of the Eigen library. Dynamically dimension tensors for which the
 shape is heap allocated come at a small additional cost.
+
+### Stack allocation for shapes and strides
 
 More generally, the library implement a `promote_shape` mechanism at build time
 to determine the optimal sequence type to hold the shape of an expression. The
