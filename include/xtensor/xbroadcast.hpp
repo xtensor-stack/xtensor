@@ -82,6 +82,7 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
 
         using value_type = typename xexpression_type::value_type;
+        using simd_value_type = typename xexpression_type::simd_value_type;
         using reference = typename xexpression_type::reference;
         using const_reference = typename xexpression_type::const_reference;
         using pointer = typename xexpression_type::pointer;

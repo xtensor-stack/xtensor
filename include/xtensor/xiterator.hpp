@@ -198,6 +198,14 @@ namespace xt
         void to_begin();
         void to_end(layout_type l);
 
+        template <class S>
+        S step_simd()
+        {
+            S res = p_e->template step_simd<S>(m_index);            
+            m_index.back() += S::size;
+            return res;
+        }
+
     private:
 
         xexpression_type* p_e;
