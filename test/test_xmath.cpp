@@ -169,8 +169,12 @@ namespace xt
     TEST(xmath, abs)
     {
         shape_type shape = {3, 2};
-        xarray<double> a(shape, 4.5);
+        xarray<double> a(shape, -4.5);
         EXPECT_EQ(abs(a)(0, 0), std::abs(a(0, 0)));
+
+        // check SIMD type deduction
+        xarray<double> res = xt::abs(a);
+
     }
 
     TEST(xmath, fabs)
