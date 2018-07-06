@@ -22,6 +22,10 @@
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
 
+#if defined(XTENSOR_USE_TBB)
+#include <tbb/tbb.h>
+#endif
+
 namespace xt
 {
 
@@ -457,7 +461,7 @@ namespace xt
         using simd_type = xsimd::simd_type<value_type>;
         using size_type = typename E1::size_type;
         size_type size = e1.size();
-        size_type simd_size = simd_type::size;
+        constexpr size_type simd_size = simd_type::size;
 
         size_type align_begin = is_aligned ? 0 : xsimd::get_alignment_offset(e1.data(), size, simd_size);
         size_type align_end = align_begin + ((size - align_begin) & ~(simd_size - 1));
@@ -466,10 +470,19 @@ namespace xt
         {
             e1.data_element(i) = e2.data_element(i);
         }
+
+
+        #if defined(XTENSOR_USE_TBB)
+        tbb::parallel_for(align_begin, align_end, simd_size, [&](size_t i)
+        {
+            e1.template store_simd<lhs_align_mode, simd_type>(i, e2.template load_simd<rhs_align_mode, simd_type>(i));
+        });
+        #else
         for (size_type i = align_begin; i < align_end; i += simd_size)
         {
             e1.template store_simd<lhs_align_mode, simd_type>(i, e2.template load_simd<rhs_align_mode, simd_type>(i));
         }
+        #endif
         for (size_type i = align_end; i < size; ++i)
         {
             e1.data_element(i) = e2.data_element(i);
@@ -478,15 +491,23 @@ namespace xt
 
     namespace assigner_detail
     {
+
         template <class C, class It, class Ot>
         inline void assign_loop(It src, Ot dst, std::size_t n)
         {
-            for (; n > 0; --n)
+        #if defined(XTENSOR_USE_TBB)
+            tbb::parallel_for(size_t(0), n, [&](size_t i)
+            {
+                dst[i] = static_cast<C>(src[i]);
+            });
+        #else
+            for(; n > 0; --n)
             {
                 *dst = static_cast<C>(*src);
                 ++src;
                 ++dst;
             }
+        #endif
         }
 
         template <class E1, class E2>
@@ -730,7 +751,7 @@ namespace xt
 
         for (std::size_t ox = 0; ox < outer_loop_size; ++ox)
         {
-            for (std::size_t i = 0; i < simd_size; i++)
+            for (std::size_t i = 0; i < simd_size; ++i)
             {
                 res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
             }

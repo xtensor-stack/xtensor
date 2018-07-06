@@ -27,7 +27,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6
+      env: COMPILER=gcc GCC=6 ENABLE_TBB=1
     - os: linux
       addons:
         apt:
@@ -61,7 +61,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-      env: COMPILER=clang CLANG=3.7
+      env: COMPILER=clang CLANG=3.7 ENABLE_TBB=1
     - os: linux
       addons:
         apt:
@@ -118,6 +118,9 @@ install:
     - conda install xtl==0.4.14 -c QuantStack
     - conda install xsimd -c QuantStack
     - conda install nlohmann_json -c QuantStack
+    - if [[ "$ENABLE_TBB" == 1 ]]; then
+        conda install tbb -c conda-forge;
+      fi
     # Testing
     - mkdir build
     - cd build
@@ -127,6 +130,8 @@ install:
         cmake -DBUILD_TESTS=ON -DDEFAULT_COLUMN_MAJOR=ON ..;
       elif [[ "$DISABLE_XSIMD" == 1 ]]; then
         cmake -DBUILD_TESTS=ON ..;
+      elif [[ "$ENABLE_TBB" == 1 ]]; then
+        cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=/home/travis/miniconda/include -DTBB_LIBRARY=/home/travis/miniconda/lib ..;
       else
         cmake -DXTENSOR_USE_XSIMD=ON -DBUILD_TESTS=ON ..;
       fi
