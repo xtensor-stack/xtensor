@@ -63,6 +63,9 @@ matrix:
             - clang-3.7
       env: COMPILER=clang CLANG=3.7
     - os: linux
+      before_install:
+          - sudo apt-key update
+          - sudo apt-get update
       addons:
         apt:
           sources:
