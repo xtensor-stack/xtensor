@@ -1,5 +1,5 @@
 language: cpp
-dist: precise
+dist: xenial
 env:
 matrix:
   fast_finish: true
@@ -78,6 +78,7 @@ matrix:
             - ubuntu-toolchain-r-test
             - llvm-toolchain-precise-3.9
           packages:
+            - g++-4.9
             - clang-3.9
       env: COMPILER=clang CLANG=3.9
     - os: osx
