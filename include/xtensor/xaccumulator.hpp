@@ -218,6 +218,7 @@ namespace xt
 
             result.storage()[0] = std::get<1>(f)(*it);
             it += stride;
+            --sz;
 
             for (std::size_t idx = 0; idx < sz; it += stride, ++idx)
             {
