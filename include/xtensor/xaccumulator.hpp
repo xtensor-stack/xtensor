@@ -213,7 +213,8 @@ namespace xt
             auto result = result_type::from_shape({sz});
 
             auto it = e.data() + e.data_offset();
-            std::ptrdiff_t stride = e.strides().back();
+            std::ptrdiff_t stride = static_cast<std::ptrdiff_t>(e.layout() == layout_type::row_major ? 
+                                                                    e.strides().back() : e.strides().front());
 
             result.storage()[0] = std::get<1>(f)(*it);
             it += stride;
