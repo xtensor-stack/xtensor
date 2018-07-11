@@ -481,6 +481,26 @@ namespace xt
         EXPECT_EQ(sqrt(a)(0, 0), std::sqrt(a(0, 0)));
     }
 
+    TEST(xmath, square)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a(shape, 3.7);
+        EXPECT_EQ(square(a)(0, 0), (a(0, 0) * a(0, 0)));
+        xarray<double> b = square(a);
+        xarray<double> exp = a * a;
+        EXPECT_EQ(b, exp);
+    }
+
+    TEST(xmath, cube)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a(shape, 3.7);
+        EXPECT_EQ(cube(a)(0, 0), (a(0, 0) * a(0, 0) * a(0, 0)));
+        xarray<double> b = cube(a);
+        xarray<double> exp = a * a * a;
+        EXPECT_EQ(b, exp);
+    }
+
     TEST(xmath, cbrt)
     {
         shape_type shape = {3, 2};

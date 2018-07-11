@@ -931,6 +931,89 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         return detail::make_xfunction<math::pow_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
+    namespace detail
+    {
+        template<class F, class... T, typename = decltype(std::declval<F>()(std::declval<T>()...))>
+        std::true_type  supports_test(const F&, const T&...);
+        std::false_type supports_test(...);
+
+        template<class... T> struct supports;
+
+        template<class F, class... T> struct supports<F(T...)>
+            : decltype(supports_test(std::declval<F>(), std::declval<T>()...))
+        {
+        };
+
+        template <class F>
+        struct lambda_adapt
+        {
+            lambda_adapt(F&& lmbd)
+                : m_lambda(lmbd)
+            {
+            }
+            template <class... T>
+            auto operator()(T... args) const
+            {
+                return m_lambda(args...);
+            }
+
+            template <class... T, class = std::enable_if_t<detail::supports<F(T...)>::value, int>>
+            auto simd_apply(T... args) const
+            {
+                return m_lambda(args...);
+            }
+
+            F m_lambda;
+        };
+
+        template <class F, class... E>
+        inline auto make_lambda_function(F&& lambda, E&&... args)
+        {
+            using xfunction_type = xfunction<lambda_adapt<F>,
+                                             decltype(lambda(std::declval<typename std::decay_t<E>::value_type>()...)),
+                                             const_xclosure_t<E>...>;
+            return xfunction_type(lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
+        }
+    }
+
+    /**
+     * @ingroup pow_functions
+     * @brief Square power function, equivalent to e1 * e1.
+     *
+     * Returns an \ref xfunction for the element-wise value of
+     * of \em e1 * \em e1.
+     * @param e1 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     * @note e1 and e2 can't be both scalars.
+     */
+    template <class E1>
+    inline auto square(E1&& e1) noexcept
+    {
+        auto fnct = [](auto x) -> decltype(x * x) {
+            return x * x;
+        };
+        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+    }
+
+    /**
+     * @ingroup pow_functions
+     * @brief Cube power function, equivalent to e1 * e1 * e1.
+     *
+     * Returns an \ref xfunction for the element-wise value of
+     * of \em e1 * \em e1.
+     * @param e1 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     * @note e1 and e2 can't be both scalars.
+     */
+    template <class E1>
+    inline auto cube(E1&& e1) noexcept
+    {
+        auto fnct = [](auto x) -> decltype(x * x * x) {
+            return x * x * x;
+        };
+        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+    }
+
     /**
      * @ingroup pow_functions
      * @brief Square root function.
