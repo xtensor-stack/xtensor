@@ -948,9 +948,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         struct lambda_adapt
         {
             lambda_adapt(F&& lmbd)
-                : m_lambda(lmbd)
+                : m_lambda(std::move(lmbd))
             {
             }
+
             template <class... T>
             auto operator()(T... args) const
             {
@@ -984,7 +985,6 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * of \em e1 * \em e1.
      * @param e1 an \ref xexpression or a scalar
      * @return an \ref xfunction
-     * @note e1 and e2 can't be both scalars.
      */
     template <class E1>
     inline auto square(E1&& e1) noexcept
@@ -1003,7 +1003,6 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * of \em e1 * \em e1.
      * @param e1 an \ref xexpression or a scalar
      * @return an \ref xfunction
-     * @note e1 and e2 can't be both scalars.
      */
     template <class E1>
     inline auto cube(E1&& e1) noexcept
