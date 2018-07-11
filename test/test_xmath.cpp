@@ -489,6 +489,16 @@ namespace xt
         xarray<double> b = square(a);
         xarray<double> exp = a * a;
         EXPECT_EQ(b, exp);
+
+        auto f = square(a);
+        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits::same_type());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
+#endif
     }
 
     TEST(xmath, cube)

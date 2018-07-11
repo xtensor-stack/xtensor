@@ -977,6 +977,31 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }
     }
 
+#define GCC_VERSION (__GNUC__ * 10000 \
+                     + __GNUC_MINOR__ * 100 \
+                     + __GNUC_PATCHLEVEL__)
+#if defined(__GNUC__) && GCC_VERSION < 49999
+    struct square_fct
+    {
+        template <class T>
+        auto operator()(T x) const
+            -> decltype(x * x)
+        {
+            return x * x;
+        }
+    };
+
+    struct cube_fct
+    {
+        template <class T>
+        auto operator()(T x) const
+            -> decltype(x * x * x)
+        {
+            return x * x * x;
+        }
+    };
+#endif
+
     /**
      * @ingroup pow_functions
      * @brief Square power function, equivalent to e1 * e1.
@@ -989,10 +1014,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E1>
     inline auto square(E1&& e1) noexcept
     {
+#if defined(__GNUC__) && GCC_VERSION < 49999
+        return detail::make_lambda_function(square_fct{}, std::forward<E1>(e1));
+#else
         auto fnct = [](auto x) -> decltype(x * x) {
             return x * x;
         };
         return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+#endif
     }
 
     /**
@@ -1007,11 +1036,17 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E1>
     inline auto cube(E1&& e1) noexcept
     {
+#if defined(__GNUC__) && GCC_VERSION < 49999
+        return detail::make_lambda_function(cube_fct{}, std::forward<E1>(e1));
+#else
         auto fnct = [](auto x) -> decltype(x * x * x) {
             return x * x * x;
         };
         return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+#endif
     }
+
+#undef GCC_VERSION
 
     /**
      * @ingroup pow_functions
