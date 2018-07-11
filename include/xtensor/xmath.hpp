@@ -947,7 +947,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         template <class F>
         struct lambda_adapt
         {
-            lambda_adapt(F&& lmbd)
+            explicit lambda_adapt(F&& lmbd)
                 : m_lambda(std::move(lmbd))
             {
             }
