@@ -194,7 +194,7 @@ namespace xt
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
                     result.storage()[pos + inner_stride] = std::get<0>(f)(result.storage()[pos],
-                                                                       result.storage()[pos + inner_stride]);
+                                                                          result.storage()[pos + inner_stride]);
                     pos += outer_stride;
                 }
                 pos += inner_stride;
@@ -212,15 +212,15 @@ namespace xt
             std::size_t sz = e.size();
             auto result = result_type::from_shape({sz});
 
-            auto it = e.template begin<XTENSOR_DEFAULT_LAYOUT>();
+            auto it = e.data() + e.data_offset();
+            std::ptrdiff_t stride = e.strides().back();
 
             result.storage()[0] = std::get<1>(f)(*it);
-            ++it;
+            it += stride;
 
-            for (std::size_t idx = 0; it != e.template end<XTENSOR_DEFAULT_LAYOUT>(); ++it)
+            for (std::size_t idx = 0; idx < sz; it += stride, ++idx)
             {
                 result.storage()[idx + 1] = std::get<0>(f)(result.storage()[idx], *it);
-                ++idx;
             }
             return result;
         }
