@@ -50,6 +50,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xconcepts.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xdynamic_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xeval.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexpression.hpp

@@ -66,8 +66,9 @@ namespace xt
      * and strides.
      *
      * @tparam CT the closure type of the \ref xexpression type underlying this view
+     * @tparam L the layout of the strided view
      * @tparam S the strides type of the strided view
-     * @tparam FST the flat storage type used for the strided view.
+     * @tparam FST the flat storage type used for the strided view
      *
      * @sa strided_view, transpose
      */
@@ -117,7 +118,8 @@ namespace xt
         xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout) noexcept;
 
         template <class CTA, class FLS>
-        xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
+        xstrided_view(CTA&& e, S&& shape, S&& strides, std::size_t offset,
+                      layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -172,17 +174,12 @@ namespace xt
                                                       typename storage_type::iterator>;
         using const_container_iterator = typename storage_type::const_iterator;
 
-    protected:
+    private:
 
         container_iterator data_xbegin() noexcept;
         const_container_iterator data_xbegin() const noexcept;
         container_iterator data_xend(layout_type l) noexcept;
         const_container_iterator data_xend(layout_type l) const noexcept;
-
-    private:
-
-        template <class C>
-        friend class xstepper;
 
         template <class It>
         It data_xbegin_impl(It begin) const noexcept;
@@ -192,6 +189,8 @@ namespace xt
 
         void assign_temporary_impl(temporary_type&& tmp);
 
+        template <class C>
+        friend class xstepper;
         friend class xview_semantic<xstrided_view<CT, S, L, FST>>;
     };
 
@@ -220,9 +219,9 @@ namespace xt
     >;
 
     /**
-     * @typedef xstrided_slice_vector
-     * @brief vector of slices used to build a `xstrided_view`
-     */
+    * @typedef xstrided_slice_vector
+    * @brief vector of slices used to build a `xstrided_view`
+    */
     using xstrided_slice_vector = std::vector<xstrided_slice<std::ptrdiff_t>>;
 
     // TODO: remove this type used for backward compatibility only
@@ -467,34 +466,6 @@ namespace xt
         return view_type(std::forward<E>(e), std::forward<I>(shape), std::forward<I>(strides), offset, layout);
     }
 
-    namespace detail
-    {
-        template <class S>
-        struct slice_getter_impl
-        {
-            const S& m_shape;
-            mutable std::size_t idx;
-
-            slice_getter_impl(const S& shape)
-                : m_shape(shape), idx(0)
-            {
-            }
-
-            template <class T>
-            std::array<std::ptrdiff_t, 3> operator()(const T& /*t*/) const
-            {
-                return {0, 0, 0};
-            }
-
-            template <class A, class B, class C>
-            std::array<std::ptrdiff_t, 3> operator()(const xrange_adaptor<A, B, C>& range) const
-            {
-                auto sl = range.get(static_cast<std::size_t>(m_shape[idx]));
-                return {sl(0), sl.size(), sl.step_size()};
-            }
-        };
-    }
-
     template <class T>
     struct select_strided_view
     {
@@ -507,126 +478,22 @@ namespace xt
 
     namespace detail
     {
-        template <class S, class ST>
-        inline auto get_strided_view_args(const S& shape, ST&& strides, std::size_t base_offset, layout_type layout, const xstrided_slice_vector& slices)
+        struct no_adj_strides_policy
         {
-            // Compute dimension
-            std::size_t dimension = shape.size(), n_newaxis = 0, n_add_all = 0;
-            std::ptrdiff_t dimension_check = static_cast<std::ptrdiff_t>(shape.size());
+        protected:
 
-            bool has_ellipsis = false;
-            for (const auto& el : slices)
+            inline void resize(std::size_t) {}
+            inline void set_fake_slice(std::size_t) {}
+
+            template <class ST, class S>
+            bool fill_args(const xstrided_slice_vector& /*slices*/, std::size_t /*sl_idx*/,
+                           std::size_t /*i*/, std::size_t /*old_shape*/,
+                           const ST& /*old_stride*/,
+                           S& /*shape*/, S& /*strides*/)
             {
-                if (xtl::get_if<xt::xnewaxis_tag>(&el) != nullptr)
-                {
-                    ++dimension;
-                    ++n_newaxis;
-                }
-                else if (xtl::get_if<std::ptrdiff_t>(&el) != nullptr)
-                {
-                    --dimension;
-                    --dimension_check;
-                }
-                else if (xtl::get_if<xt::xellipsis_tag>(&el) != nullptr)
-                {
-                    if (has_ellipsis == true)
-                    {
-                        throw std::runtime_error("Ellipsis can only appear once.");
-                    }
-                    has_ellipsis = true;
-                }
-                else
-                {
-                    --dimension_check;
-                }
+                return false;
             }
-
-            if (dimension_check < 0)
-            {
-                throw std::runtime_error("Too many slices for view.");
-            }
-
-            if (has_ellipsis)
-            {
-                // replace ellipsis with N * xt::all
-                // remove -1 because of the ellipsis slize itself
-                n_add_all = shape.size() - (slices.size() - 1 - n_newaxis);
-            }
-
-            // Compute strided view
-            std::size_t offset = base_offset;
-            using shape_type = dynamic_shape<std::ptrdiff_t>;
-
-            shape_type new_shape(dimension);
-            shape_type new_strides(dimension);
-
-            auto old_shape = shape;
-            auto&& old_strides = strides;
-
-            using old_strides_vt = std::decay_t<decltype(old_strides[0])>;
-
-    #define XTENSOR_MS(v) static_cast<std::ptrdiff_t>(v)
-    #define XTENSOR_MU(v) static_cast<std::size_t>(v)
-
-            std::ptrdiff_t i = 0, axis_skip = 0;
-            std::size_t idx = 0;
-
-            auto slice_getter = detail::slice_getter_impl<S>(shape);
-
-            for (; i < XTENSOR_MS(slices.size()); ++i)
-            {
-                auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[XTENSOR_MU(i)]);
-                if (ptr != nullptr)
-                {
-                    auto slice0 = static_cast<old_strides_vt>(*ptr);
-                    offset += static_cast<std::size_t>(slice0 * old_strides[XTENSOR_MU(i - axis_skip)]);
-                }
-                else if (xtl::get_if<xt::xnewaxis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
-                {
-                    new_shape[idx] = 1;
-                    ++axis_skip, ++idx;
-                }
-                else if (xtl::get_if<xt::xellipsis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
-                {
-                    for (std::size_t j = 0; j < n_add_all; ++j)
-                    {
-                        new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
-                        new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
-                        --axis_skip, ++idx;
-                    }
-                    ++axis_skip;  // because i++
-                }
-                else if (xtl::get_if<xt::xall_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
-                {
-                    new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
-                    new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
-                    ++idx;
-                }
-                else
-                {
-                    slice_getter.idx = XTENSOR_MU(i - axis_skip);
-                    auto info = xtl::visit(slice_getter, slices[XTENSOR_MU(i)]);
-                    offset += XTENSOR_MU(static_cast<old_strides_vt>(info[0]) * old_strides[XTENSOR_MU(i - axis_skip)]);
-                    new_shape[idx] = std::ptrdiff_t(info[1]);
-                    new_strides[idx] = std::ptrdiff_t(info[2]) * XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
-                    ++idx;
-                }
-            }
-
-            for (; XTENSOR_MU(i - axis_skip) < old_shape.size(); ++i)
-            {
-                new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
-                new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
-                ++idx;
-            }
-
-            layout_type new_layout = do_strides_match(new_shape, new_strides, layout) ? layout : layout_type::dynamic;
-
-            return std::make_tuple(std::move(new_shape), std::move(new_strides), offset, new_layout);
-
-    #undef XTENSOR_MU
-    #undef XTENSOR_MS
-        }
+        };
     }
 
     /**
@@ -657,25 +524,28 @@ namespace xt
     template <class E>
     inline auto strided_view(E&& e, const xstrided_slice_vector& slices)
     {
-        auto args = detail::get_strided_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
-        using view_type = xstrided_view<xclosure_t<E>, std::decay_t<decltype(std::get<0>(args))>>;
-        return view_type(std::forward<E>(e), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
+        detail::strided_view_args<detail::no_adj_strides_policy> args;
+        args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        using view_type = xstrided_view<xclosure_t<E>, decltype(args.new_shape)>;
+        return view_type(std::forward<E>(e), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
     }
 
     template <class CT, class S, layout_type L, class FST>
     auto strided_view(const xstrided_view<CT, S, L, FST>& e, const xstrided_slice_vector& slices)
     {
-        auto args = detail::get_strided_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
-        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
-        return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
+        detail::strided_view_args<detail::no_adj_strides_policy> args;
+        args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, decltype(args.new_shape)>;
+        return view_type(e.expression(), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
     }
 
     template <class CT, class S, layout_type L, class FST>
     auto strided_view(xstrided_view<CT, S, L, FST>& e, const xstrided_slice_vector& slices)
     {
-        auto args = detail::get_strided_view_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
-        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, std::decay_t<decltype(std::get<0>(args))>>;
-        return view_type(e.expression(), std::move(std::get<0>(args)), std::move(std::get<1>(args)), std::get<2>(args), std::get<3>(args));
+        detail::strided_view_args<detail::no_adj_strides_policy> args;
+        args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, decltype(args.new_shape)>;
+        return view_type(e.expression(), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
     }
 
     /****************************
