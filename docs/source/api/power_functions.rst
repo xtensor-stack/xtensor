@@ -16,6 +16,15 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: pow(E1&&, E2&&)
    :project: xtensor
 
+.. doxygenfunction:: pow(E1&&)
+   :project: xtensor
+
+.. doxygenfunction:: square(E1&&)
+   :project: xtensor
+
+.. doxygenfunction:: cube(E1&&)
+   :project: xtensor
+
 .. _sqrt-function-reference:
 .. doxygenfunction:: sqrt(E&&)
    :project: xtensor

@@ -977,10 +977,15 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }
     }
 
-#define GCC_VERSION (__GNUC__ * 10000 \
-                     + __GNUC_MINOR__ * 100 \
-                     + __GNUC_PATCHLEVEL__)
-#if defined(__GNUC__) && GCC_VERSION < 49999
+
+#define XTENSOR_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+// Workaround for MSVC 2015 & GCC 4.9
+#if (defined(_MSC_VER) && _MSC_VER < 1910) || (defined(__GNUC__) && GCC_VERSION < 49999)
+    #define XTENSOR_DISABLE_LAMBDA_FCT
+#endif
+
+#ifdef XTENSOR_DISABLE_LAMBDA_FCT
     struct square_fct
     {
         template <class T>
@@ -1014,7 +1019,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E1>
     inline auto square(E1&& e1) noexcept
     {
-#if defined(__GNUC__) && GCC_VERSION < 49999
+#ifdef XTENSOR_DISABLE_LAMBDA_FCT
         return detail::make_lambda_function(square_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x) {
@@ -1036,7 +1041,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E1>
     inline auto cube(E1&& e1) noexcept
     {
-#if defined(__GNUC__) && GCC_VERSION < 49999
+#ifdef XTENSOR_DISABLE_LAMBDA_FCT
         return detail::make_lambda_function(cube_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x * x) {
@@ -1046,7 +1051,73 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #endif
     }
 
-#undef GCC_VERSION
+#undef XTENSOR_GCC_VERSION
+#undef XTENSOR_DISABLE_LAMBDA_FCT
+
+    namespace detail
+    {
+        // Thanks to Matt Pharr in http://pbrt.org/hair.pdf
+        template <std::size_t N>
+        struct pow_impl;
+
+        template <std::size_t N>
+        struct pow_impl
+        {
+            template <class T>
+            auto operator()(T v) const
+                -> decltype(v * v)
+            {
+                T temp = pow_impl<N / 2>{}(v);
+                return temp * temp * pow_impl<N & 1>{}(v);
+            }
+        };
+
+        template <>
+        struct pow_impl<1>
+        {
+            template <class T>
+            auto operator()(T v) const
+                -> T
+            {
+                return v;
+            }
+        };
+
+        template <>
+        struct pow_impl<0>
+        {
+            template <class T>
+            auto operator()(T /*v*/) const
+                -> T
+            {
+                return T(1);
+            }
+        };
+    }
+
+    /**
+     * @ingroup pow_functions
+     * @brief Integer power function.
+     *
+     * Returns an \ref xfunction for the element-wise power of e1 to
+     * an integral constant.
+     *
+     * Instead of computing the power by using the (expensive) logarithm, this function
+     * computes the power in a number of straight-forward multiplication steps. This function
+     * is therefore much faster (even for high N) than the generic pow-function.
+     *
+     * For example, `e1^20` can be expressed as `(((e1^2)^2)^2)^2*(e1^2)^2`, which is just 5 multiplications.
+     *
+     * @param e an \ref xexpression
+     * @tparam N the exponent (has to be positive integer)
+     * @return an \ref xfunction
+     */
+    template <std::size_t N, class E1>
+    inline auto pow(E1&& e1) noexcept
+    {
+        static_assert(N > 0, "integer power cannot be negative");
+        return detail::make_lambda_function(detail::pow_impl<N>{}, std::forward<E1>(e1));
+    }
 
     /**
      * @ingroup pow_functions
