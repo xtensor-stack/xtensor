@@ -326,7 +326,10 @@ namespace xt
         using container_type = svector<T>;
         using size_type = typename container_type::value_type;
 
-        explicit xkeep_slice(const container_type& cont);
+        template <class C>
+        explicit xkeep_slice(const C& cont);
+        template <class C>
+        explicit xkeep_slice(C& cont);
         explicit xkeep_slice(container_type&& cont);
 
         template <class S>
@@ -334,6 +337,8 @@ namespace xt
 
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
+
+        void normalize(std::size_t s);
 
         size_type step_size(std::size_t i, std::size_t n = 1) const noexcept;
         size_type revert_index(std::size_t i) const;
@@ -343,6 +348,7 @@ namespace xt
     private:
 
         container_type m_indices;
+        container_type m_raw_indices;
     };
 
     /**
@@ -362,7 +368,7 @@ namespace xt
     template <class T>
     inline auto keep(T&& indices)
     {
-        return xkeep_slice<typename T::value_type>(std::forward<T>(indices));
+        return xkeep_slice<typename std::decay_t<T>::value_type>(std::forward<T>(indices));
     }
 
     template <class T, class R = big_promote_type_t<T>>
@@ -639,20 +645,27 @@ namespace xt
         return std::forward<SL>(slice);
     }
 
+    template <class E, class T>
+    inline auto get_slice_implementation(E& e, xkeep_slice<T>&& slice, std::size_t index)
+    {
+        slice.normalize(e.shape()[index]);
+        return slice;
+    }
+
     template <class E>
-    inline auto get_slice_implementation(E& e, xall_tag, std::size_t index)
+    inline auto get_slice_implementation(E& e, xall_tag&&, std::size_t index)
     {
         return xall<typename E::size_type>(e.shape()[index]);
     }
 
     template <class E>
-    inline auto get_slice_implementation(E& /*e*/, xnewaxis_tag, std::size_t /*index*/)
+    inline auto get_slice_implementation(E& /*e*/, xnewaxis_tag&&, std::size_t /*index*/)
     {
         return xnewaxis<typename E::size_type>();
     }
 
     template <class E, class A, class B, class C>
-    inline auto get_slice_implementation(E& e, xrange_adaptor<A, B, C> adaptor, std::size_t index)
+    inline auto get_slice_implementation(E& e, xrange_adaptor<A, B, C>&& adaptor, std::size_t index)
     {
         return adaptor.get(e.shape()[index]);
     }
@@ -927,24 +940,43 @@ namespace xt
      ******************************/
 
     template <class T>
-    inline xkeep_slice<T>::xkeep_slice(const container_type& cont)
-        : m_indices(cont)
+    template <class C>
+    inline xkeep_slice<T>::xkeep_slice(const C& cont)
+        : m_raw_indices(cont.begin(), cont.end())
+    {
+    }
+
+    template <class T>
+    template <class C>
+    inline xkeep_slice<T>::xkeep_slice(C& cont)
+        : m_raw_indices(cont.begin(), cont.end())
     {
     }
 
     template <class T>
     inline xkeep_slice<T>::xkeep_slice(container_type&& cont)
-        : m_indices(std::move(cont))
+        : m_raw_indices(std::move(cont))
     {
     }
 
     template <class T>
     template <class S>
     inline xkeep_slice<T>::xkeep_slice(std::initializer_list<S> t)
-        : m_indices(t.size())
+        : m_raw_indices(t.size())
     {
-        std::transform(t.begin(), t.end(), m_indices.begin(),
+        std::transform(t.begin(), t.end(), m_raw_indices.begin(),
             [](auto t) { return static_cast<size_type>(t); });
+    }
+
+    template <class T>
+    inline void xkeep_slice<T>::normalize(std::size_t shape)
+    {
+        m_indices.resize(m_raw_indices.size());
+        std::size_t sz = m_indices.size();
+        for (std::size_t i = 0; i < sz; ++i)
+        {
+            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<std::ptrdiff_t>(shape) + m_raw_indices[i] : m_raw_indices[i];
+        }
     }
 
     template <class T>
