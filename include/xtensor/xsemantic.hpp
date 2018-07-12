@@ -103,6 +103,15 @@ namespace xt
         template <class E>
         derived_type& modulus_assign(const xexpression<E>&);
 
+        template <class E>
+        derived_type& bit_and_assign(const xexpression<E>&);
+
+        template <class E>
+        derived_type& bit_or_assign(const xexpression<E>&);
+
+        template <class E>
+        derived_type& bit_xor_assign(const xexpression<E>&);
+
     protected:
 
         xsemantic_base() = default;
@@ -535,6 +544,45 @@ namespace xt
         return this->derived_cast().computed_assign(this->derived_cast() % e.derived_cast());
     }
 
+    /**
+     * Computes the bitwise and of \c e to \c *this. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression to add.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::bit_and_assign(const xexpression<E>& e) -> derived_type&
+    {
+        return this->derived_cast().computed_assign(this->derived_cast() & e.derived_cast());
+    }
+
+    /**
+     * Computes the bitwise or of \c e to \c *this. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression to add.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::bit_or_assign(const xexpression<E>& e) -> derived_type&
+    {
+        return this->derived_cast().computed_assign(this->derived_cast() | e.derived_cast());
+    }
+
+    /**
+     * Computes the bitwise xor of \c e to \c *this. Ensures no temporary
+     * will be used to perform the assignment.
+     * @param e the xexpression to add.
+     * @return a reference to \c *this.
+     */
+    template <class D>
+    template <class E>
+    inline auto xsemantic_base<D>::bit_xor_assign(const xexpression<E>& e) -> derived_type&
+    {
+        return this->derived_cast().computed_assign(this->derived_cast() ^ e.derived_cast());
+    }
+
     template <class D>
     template <class E>
     inline auto xsemantic_base<D>::operator=(const xexpression<E>& e) -> derived_type&
@@ -628,8 +676,14 @@ namespace xt
     inline auto xview_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
     {
         D& d = this->derived_cast();
-        std::transform(d.begin(), d.end(), d.begin(),
-                       [e, &f](const auto& v) { return f(v, e); });
+
+        using size_type = typename D::size_type;
+        auto dst = d.begin();
+        for (size_type i = d.size(); i > 0; --i)
+        {
+            *dst = f(*dst, e);
+            ++dst;
+        }
         return this->derived_cast();
     }
 

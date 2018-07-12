@@ -23,6 +23,30 @@ namespace xt
         noalias_proxy(A& a) noexcept;
 
         template <class E>
+        disable_xexpression<E, A&> operator+=(const E&);
+
+        template <class E>
+        disable_xexpression<E, A&> operator-=(const E&);
+
+        template <class E>
+        disable_xexpression<E, A&> operator*=(const E&);
+
+        template <class E>
+        disable_xexpression<E, A&> operator/=(const E&);
+
+        template <class E>
+        disable_xexpression<E, A&> operator%=(const E&);
+
+        template <class E>
+        disable_xexpression<E, A&> operator&=(const E&);
+
+        template <class E>
+        disable_xexpression<E, A&> operator|=(const E&);
+
+        template <class E>
+        disable_xexpression<E, A&> operator^=(const E&);
+
+        template <class E>
         A& operator=(const xexpression<E>& e);
 
         template <class E>
@@ -39,7 +63,16 @@ namespace xt
 
         template <class E>
         A& operator%=(const xexpression<E>& e);
-        
+
+        template <class E>
+        A& operator&=(const xexpression<E>&);
+
+        template <class E>
+        A& operator|=(const xexpression<E>&);
+
+        template <class E>
+        A& operator^=(const xexpression<E>&);
+
     private:
 
         A& m_array;
@@ -56,6 +89,62 @@ namespace xt
     inline noalias_proxy<A>::noalias_proxy(A& a) noexcept
         : m_array(a)
     {
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator+=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::plus<>());
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator-=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::minus<>());
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator*=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::multiplies<>());
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator/=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::divides<>());
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator%=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::modulus<>());
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator&=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::bit_and<>());
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator|=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::bit_or<>());
+    }
+
+    template <class A>
+    template <class E>
+    inline auto noalias_proxy<A>::operator^=(const E& e) -> disable_xexpression<E, A&>
+    {
+        return m_array.scalar_computed_assign(e, std::bit_xor<>());
     }
 
     template <class A>
@@ -98,6 +187,27 @@ namespace xt
     inline A& noalias_proxy<A>::operator%=(const xexpression<E>& e)
     {
         return m_array.modulus_assign(e);
+    }
+
+    template <class A>
+    template <class E>
+    inline A& noalias_proxy<A>::operator&=(const xexpression<E>& e)
+    {
+        return m_array.bit_and_assign(e);
+    }
+
+    template <class A>
+    template <class E>
+    inline A& noalias_proxy<A>::operator|=(const xexpression<E>& e)
+    {
+        return m_array.bit_or_assign(e);
+    }
+
+    template <class A>
+    template <class E>
+    inline A& noalias_proxy<A>::operator^=(const xexpression<E>& e)
+    {
+        return m_array.bit_xor_assign(e);
     }
 
     template <class A>

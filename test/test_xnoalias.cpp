@@ -287,4 +287,61 @@ namespace xt
             EXPECT_EQ(tester.res_ru, b);
         }
     }
+
+    TEST(xnoalias, scalar_ops)
+    {
+        xarray<int> a = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<int> b = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<int> c = {{1,2,3}, {4,5,6}, {7,8,9}};
+
+        xscalar<int> one(1), five(5), twelve(12), seven(7), bhalf(0b00001111), bxor(0b01001111);
+
+        xt::noalias(a) += 1;
+        b += 1;
+        xt::noalias(c) += one;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+
+        xt::noalias(a) -= 5;
+        b -= 5;
+        xt::noalias(c) -= five;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+
+        xt::noalias(a) *= 12;
+        b *= 12;
+        xt::noalias(c) *= twelve;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+
+        xt::noalias(a) /= 7;
+        b /= 7;
+        xt::noalias(c) /= seven;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+
+        xt::noalias(a) %= 7;
+        b %= 7;
+        xt::noalias(c) %= seven;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+
+        xt::noalias(a) &= 0b00001111;
+        b &= 0b00001111;
+        xt::noalias(c) &= bhalf;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+
+        xt::noalias(a) |= 0b00001111;
+        b |= 0b00001111;
+        xt::noalias(c) |= bhalf;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+
+        xt::noalias(a) ^= 0b01001111;
+        b ^= 0b01001111;
+        xt::noalias(c) ^= bxor;
+        EXPECT_EQ(a, b);
+        EXPECT_EQ(a, c);
+    }
 }
