@@ -935,7 +935,7 @@ namespace xt
         }
     }
 
-    TEST(xview, islice)
+    TEST(xview, keep_slice)
     {
         xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
                                                          { 5, 6, 7, 8}},
@@ -944,23 +944,23 @@ namespace xt
                                                         {{17,18,19,20},
                                                          {21,22,23,24}}};
 
-        auto v1 = xt::view(a, islice({1}), islice({0, 1}), islice({0, 3}));
+        auto v1 = xt::view(a, keep({1}), keep({0, 1}), keep({0, 3}));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
         EXPECT_EQ(v1, exp_v1);
 
         test_view_iter(v1, exp_v1);
 
-        auto v2 = xt::view(a, islice({1}), xt::all(), xt::range(0, xt::xnone(), 3));
+        auto v2 = xt::view(a, keep({1}), xt::all(), xt::range(0, xt::xnone(), 3));
         EXPECT_EQ(v2, v1);
         EXPECT_EQ(v2, exp_v1);
 
-        auto v3 = xt::view(a, islice({1}), islice({1, 1, 1, 1}), islice({0, 3}));
+        auto v3 = xt::view(a, keep({1}), keep({1, 1, 1, 1}), keep({0, 3}));
         xtensor<double, 3> exp_v3 = {{{13, 16}, {13, 16}, {13, 16}, {13, 16}}};
         EXPECT_EQ(v3, exp_v3);
 
         test_view_iter(v3, exp_v3);
 
-        auto v4 = xt::view(a, islice({0, 2}), islice({0}));
+        auto v4 = xt::view(a, keep({0, 2}), keep({0}));
         xtensor<double, 3> exp_v4 = {{{  1.,   2.,   3.,   4.}},
                                      {{ 17.,  18.,  19.,  20.}}};
         EXPECT_EQ(v4, exp_v4);
@@ -973,7 +973,7 @@ namespace xt
         v3(0, 2, 1) = 1000;
         EXPECT_EQ(a(1, 1, 3), 1000);
 
-        bool b = detail::slices_contigous<xislice<int>, int>::value;
+        bool b = detail::slices_contigous<xkeep_slice<int>, int>::value;
         EXPECT_FALSE(b);
         b = detail::slices_contigous<xrange<int>, xrange<int>, int>::value;
         EXPECT_TRUE(b);

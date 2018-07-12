@@ -314,104 +314,62 @@ namespace xt
         return xnewaxis_tag();
     }
 
+    /***************************
+     * xkeep_slice declaration *
+     ***************************/
+
     template <class T>
-    class xislice : public xslice<xislice<T>>
+    class xkeep_slice : public xslice<xkeep_slice<T>>
     {
     public:
 
-        using container_type = std::decay_t<T>;
+        using container_type = svector<T>;
         using size_type = typename container_type::value_type;
 
-        explicit xislice(const container_type& cont)
-            : m_indices(cont)
-        {
-        }
+        explicit xkeep_slice(const container_type& cont);
+        explicit xkeep_slice(container_type&& cont);
 
-        explicit xislice(container_type&& cont)
-            : m_indices(std::move(cont))
-        {
-        }
+        template <class S>
+        explicit xkeep_slice(std::initializer_list<S> t);
 
-        size_type operator()(size_type i) const noexcept
-        {
-            return m_indices[i];
-        }
+        size_type operator()(size_type i) const noexcept;
+        size_type size() const noexcept;
 
-        size_type size() const noexcept
-        {
-            // TODO change return type to container_type::size_type (e.g. size_t?)
-            return static_cast<size_type>(m_indices.size());
-        }
+        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept;
+        size_type revert_index(std::size_t i) const;
 
-        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept
-        {
-            // special case one-past-end step (should be removed soon)
-            if (i == static_cast<size_type>(m_indices.size()))
-            {
-                return 1;
-            }
-            else
-            {
-                --i;
-                return m_indices[i + n] - m_indices[i];
-            }
-        }
-
-        size_type revert_index(std::size_t i) const
-        {
-            auto it = std::find(m_indices.begin(), m_indices.end(), i);
-            if (it != m_indices.end())
-            {
-                return std::distance(m_indices.begin(), it);
-            }
-            else
-            {
-                throw std::runtime_error("Index i (" + std::to_string(i) + ") not in indices of islice.");
-            }
-        }
-
-        bool contains(size_type i) const noexcept
-        {
-            return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? false : true;
-        }
+        bool contains(size_type i) const noexcept;
 
     private:
 
-        T m_indices;
+        container_type m_indices;
     };
 
     /**
      * Create a non-contigous slice from a container of indices.
-     * Note: this slice can **only** be used in the xview!
+     * Note: this slice cannot be used in the xstrided_view!
      *
      * \code{.cpp}
      * xt::xarray<double> a = xt::arange(9);
      * a.reshape({3, 3});
-     * xt::view(a, xt::islice({0, 2}); // => {{0, 1, 2}, {6, 7, 8}}
-     * xt::view(a, xt::islice({1, 1, 1}); // => {{3, 4, 5}, {3, 4, 5}, {3, 4, 5}}
+     * xt::view(a, xt::keep({0, 2}); // => {{0, 1, 2}, {6, 7, 8}}
+     * xt::view(a, xt::keep({1, 1, 1}); // => {{3, 4, 5}, {3, 4, 5}, {3, 4, 5}}
      * \endcode
      *
      * @param indices The indices container
-     * @return instance of xislice
+     * @return instance of xkeep_slice
      */
     template <class T>
-    inline auto islice(T&& indices)
+    inline auto keep(T&& indices)
     {
-        return xislice<T>(std::forward<T>(indices));
+        return xkeep_slice<typename T::value_type>(std::forward<T>(indices));
     }
 
-#ifndef X_OLD_CLANG
-    template <class T, std::size_t N>
-    inline auto islice(const T (&cont)[N])
+    template <class T, class R = big_promote_type_t<T>>
+    inline auto keep(std::initializer_list<T> indices)
     {
-        return xislice<std::array<std::size_t, N>>(xtl::forward_sequence<std::array<std::size_t, N>>(cont));
+        return xkeep_slice<R>(indices);
     }
-#else
-    inline auto islice(std::initializer_list<std::size_t> cont)
-    {
-        return xislice<std::vector<std::size_t>>(cont);
-    }
-#endif
 
     /******************
      * xrange_adaptor *
@@ -962,6 +920,78 @@ namespace xt
     inline bool xnewaxis<T>::contains(size_type i) const noexcept
     {
         return i == 0;
+    }
+
+    /******************************
+     * xkeep_slice implementation *
+     ******************************/
+
+    template <class T>
+    inline xkeep_slice<T>::xkeep_slice(const container_type& cont)
+        : m_indices(cont)
+    {
+    }
+
+    template <class T>
+    inline xkeep_slice<T>::xkeep_slice(container_type&& cont)
+        : m_indices(std::move(cont))
+    {
+    }
+
+    template <class T>
+    template <class S>
+    inline xkeep_slice<T>::xkeep_slice(std::initializer_list<S> t)
+        : m_indices(t.size())
+    {
+        std::transform(t.begin(), t.end(), m_indices.begin(),
+            [](auto t) { return static_cast<size_type>(t); });
+    }
+
+    template <class T>
+    inline auto xkeep_slice<T>::operator()(size_type i) const noexcept -> size_type
+    {
+        return m_indices[i];
+    }
+
+    template <class T>
+    inline auto xkeep_slice<T>::size() const noexcept -> size_type
+    {
+        return static_cast<size_type>(m_indices.size());
+    }
+
+    template <class T>
+    inline auto xkeep_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
+    {
+        // special case one-past-end step (should be removed soon)
+        if (i == static_cast<size_type>(m_indices.size()))
+        {
+            return 1;
+        }
+        else
+        {
+            --i;
+            return m_indices[i + n] - m_indices[i];
+        }
+    }
+
+    template <class T>
+    inline auto xkeep_slice<T>::revert_index(std::size_t i) const -> size_type
+    {
+        auto it = std::find(m_indices.begin(), m_indices.end(), i);
+        if (it != m_indices.end())
+        {
+            return std::distance(m_indices.begin(), it);
+        }
+        else
+        {
+            throw std::runtime_error("Index i (" + std::to_string(i) + ") not in indices of islice.");
+        }
+    }
+
+    template <class T>
+    inline bool xkeep_slice<T>::contains(size_type i) const noexcept
+    {
+        return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? false : true;
     }
 }
 

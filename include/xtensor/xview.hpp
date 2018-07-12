@@ -55,7 +55,7 @@ namespace xt
         };
 
         template <class T>
-        struct is_contigous_slice<xislice<T>>
+        struct is_contigous_slice<xkeep_slice<T>>
         {
             static constexpr bool value = false;
         };

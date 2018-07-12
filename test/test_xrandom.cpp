@@ -76,26 +76,26 @@ namespace xt
         // generated integer sequence should be the same ...
 #ifdef __linux__
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({0, 1, 2})), a);
+        EXPECT_EQ(xt::view(ar, keep({0, 1, 2})), a);
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({1, 2, 0})), a);
+        EXPECT_EQ(xt::view(ar, keep({1, 2, 0})), a);
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({0, 2, 1})), a);
+        EXPECT_EQ(xt::view(ar, keep({0, 2, 1})), a);
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({0, 1, 2})), a);
+        EXPECT_EQ(xt::view(ar, keep({0, 1, 2})), a);
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({1, 0, 2})), a);
+        EXPECT_EQ(xt::view(ar, keep({1, 0, 2})), a);
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({1, 2, 0})), a);
+        EXPECT_EQ(xt::view(ar, keep({1, 2, 0})), a);
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({2, 1, 0})), a);
-        xt::random::shuffle(a);
-        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, keep({2, 1, 0})), a);
         xt::random::shuffle(a);
         xt::random::shuffle(a);
         xt::random::shuffle(a);
         xt::random::shuffle(a);
-        EXPECT_EQ(xt::view(ar, islice({0, 2, 1})), a);
+        xt::random::shuffle(a);
+        xt::random::shuffle(a);
+        EXPECT_EQ(xt::view(ar, keep({0, 2, 1})), a);
 #else
         xt::random::shuffle(a);
         xt::random::shuffle(a);
