@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xnoalias.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xview.hpp"
 #include "test_xsemantic.hpp"
 
 namespace xt
@@ -343,5 +345,26 @@ namespace xt
         xt::noalias(c) ^= bxor;
         EXPECT_EQ(a, b);
         EXPECT_EQ(a, c);
+
+        xt::noalias(a) = 123;
+        b = 123;
+
+        EXPECT_EQ(a, b);
+    }
+
+    TEST(xnoalias, rvalue)
+    {
+        xarray<int> a = {{1,2,3}, {4,5,6}, {7,8,9}};
+        xarray<int> b = {{1,2,3}, {4,5,6}, {7,8,9}};
+
+        xt::noalias(xt::view(a, 1)) += 10;
+        xt::view(b, 1) += 10;
+
+        EXPECT_EQ(a, b);
+
+        xt::noalias(xt::view(a, 1)) = 10;
+        xt::view(b, 1) = 10;
+
+        EXPECT_EQ(a, b);
     }
 }
