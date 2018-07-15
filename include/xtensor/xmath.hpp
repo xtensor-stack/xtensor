@@ -931,6 +931,194 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         return detail::make_xfunction<math::pow_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
+    namespace detail
+    {
+        template<class F, class... T, typename = decltype(std::declval<F>()(std::declval<T>()...))>
+        std::true_type  supports_test(const F&, const T&...);
+        std::false_type supports_test(...);
+
+        template<class... T> struct supports;
+
+        template<class F, class... T> struct supports<F(T...)>
+            : decltype(supports_test(std::declval<F>(), std::declval<T>()...))
+        {
+        };
+
+        template <class F>
+        struct lambda_adapt
+        {
+            explicit lambda_adapt(F&& lmbd)
+                : m_lambda(std::move(lmbd))
+            {
+            }
+
+            template <class... T>
+            auto operator()(T... args) const
+            {
+                return m_lambda(args...);
+            }
+
+            template <class... T, class = std::enable_if_t<detail::supports<F(T...)>::value, int>>
+            auto simd_apply(T... args) const
+            {
+                return m_lambda(args...);
+            }
+
+            F m_lambda;
+        };
+
+        template <class F, class... E>
+        inline auto make_lambda_function(F&& lambda, E&&... args)
+        {
+            using xfunction_type = xfunction<lambda_adapt<F>,
+                                             decltype(lambda(std::declval<typename std::decay_t<E>::value_type>()...)),
+                                             const_xclosure_t<E>...>;
+            return xfunction_type(lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
+        }
+    }
+
+
+#define XTENSOR_GCC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
+
+// Workaround for MSVC 2015 & GCC 4.9
+#if (defined(_MSC_VER) && _MSC_VER < 1910) || (defined(__GNUC__) && GCC_VERSION < 49999)
+    #define XTENSOR_DISABLE_LAMBDA_FCT
+#endif
+
+#ifdef XTENSOR_DISABLE_LAMBDA_FCT
+    struct square_fct
+    {
+        template <class T>
+        auto operator()(T x) const
+            -> decltype(x * x)
+        {
+            return x * x;
+        }
+    };
+
+    struct cube_fct
+    {
+        template <class T>
+        auto operator()(T x) const
+            -> decltype(x * x * x)
+        {
+            return x * x * x;
+        }
+    };
+#endif
+
+    /**
+     * @ingroup pow_functions
+     * @brief Square power function, equivalent to e1 * e1.
+     *
+     * Returns an \ref xfunction for the element-wise value of
+     * of \em e1 * \em e1.
+     * @param e1 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
+    template <class E1>
+    inline auto square(E1&& e1) noexcept
+    {
+#ifdef XTENSOR_DISABLE_LAMBDA_FCT
+        return detail::make_lambda_function(square_fct{}, std::forward<E1>(e1));
+#else
+        auto fnct = [](auto x) -> decltype(x * x) {
+            return x * x;
+        };
+        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+#endif
+    }
+
+    /**
+     * @ingroup pow_functions
+     * @brief Cube power function, equivalent to e1 * e1 * e1.
+     *
+     * Returns an \ref xfunction for the element-wise value of
+     * of \em e1 * \em e1.
+     * @param e1 an \ref xexpression or a scalar
+     * @return an \ref xfunction
+     */
+    template <class E1>
+    inline auto cube(E1&& e1) noexcept
+    {
+#ifdef XTENSOR_DISABLE_LAMBDA_FCT
+        return detail::make_lambda_function(cube_fct{}, std::forward<E1>(e1));
+#else
+        auto fnct = [](auto x) -> decltype(x * x * x) {
+            return x * x * x;
+        };
+        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+#endif
+    }
+
+#undef XTENSOR_GCC_VERSION
+#undef XTENSOR_DISABLE_LAMBDA_FCT
+
+    namespace detail
+    {
+        // Thanks to Matt Pharr in http://pbrt.org/hair.pdf
+        template <std::size_t N>
+        struct pow_impl;
+
+        template <std::size_t N>
+        struct pow_impl
+        {
+            template <class T>
+            auto operator()(T v) const
+                -> decltype(v * v)
+            {
+                T temp = pow_impl<N / 2>{}(v);
+                return temp * temp * pow_impl<N & 1>{}(v);
+            }
+        };
+
+        template <>
+        struct pow_impl<1>
+        {
+            template <class T>
+            auto operator()(T v) const
+                -> T
+            {
+                return v;
+            }
+        };
+
+        template <>
+        struct pow_impl<0>
+        {
+            template <class T>
+            auto operator()(T /*v*/) const
+                -> T
+            {
+                return T(1);
+            }
+        };
+    }
+
+    /**
+     * @ingroup pow_functions
+     * @brief Integer power function.
+     *
+     * Returns an \ref xfunction for the element-wise power of e1 to
+     * an integral constant.
+     *
+     * Instead of computing the power by using the (expensive) logarithm, this function
+     * computes the power in a number of straight-forward multiplication steps. This function
+     * is therefore much faster (even for high N) than the generic pow-function.
+     *
+     * For example, `e1^20` can be expressed as `(((e1^2)^2)^2)^2*(e1^2)^2`, which is just 5 multiplications.
+     *
+     * @param e an \ref xexpression
+     * @tparam N the exponent (has to be positive integer)
+     * @return an \ref xfunction
+     */
+    template <std::size_t N, class E1>
+    inline auto pow(E1&& e1) noexcept
+    {
+        static_assert(N > 0, "integer power cannot be negative");
+        return detail::make_lambda_function(detail::pow_impl<N>{}, std::forward<E1>(e1));
+    }
+
     /**
      * @ingroup pow_functions
      * @brief Square root function.

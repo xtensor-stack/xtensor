@@ -481,6 +481,76 @@ namespace xt
         EXPECT_EQ(sqrt(a)(0, 0), std::sqrt(a(0, 0)));
     }
 
+    TEST(xmath, square)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a(shape, 3.7);
+        EXPECT_EQ(square(a)(0, 0), (a(0, 0) * a(0, 0)));
+        xarray<double> b = square(a);
+        xarray<double> exp = a * a;
+        EXPECT_EQ(b, exp);
+
+        auto f = square(a);
+        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits::same_type());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
+#endif
+    }
+
+    TEST(xmath, integer_pow)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a(shape, 3);
+
+        xarray<double> b = pow<16>(a);
+        xarray<double> exp = pow(a, 16);
+        EXPECT_TRUE(allclose(exp, b));
+
+        b = pow<1>(a);
+        exp = pow(a, 1);
+        EXPECT_TRUE(allclose(exp, b));
+        b = pow<2>(a);
+        exp = pow(a, 2);
+        EXPECT_TRUE(allclose(exp, b));
+        b = pow<3>(a);
+        exp = pow(a, 3);
+        EXPECT_TRUE(allclose(exp, b));
+        b = pow<4>(a);
+        exp = pow(a, 4);
+        EXPECT_TRUE(allclose(exp, b));
+        b = pow<5>(a);
+        exp = pow(a, 5);
+        EXPECT_TRUE(allclose(exp, b));
+        b = pow<13>(a);
+        exp = pow(a, 13);
+        EXPECT_TRUE(allclose(exp, b));
+
+        auto f = pow<13>(a);
+        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits::same_type());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
+#endif
+
+    }
+
+    TEST(xmath, cube)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a(shape, 3.7);
+        EXPECT_EQ(cube(a)(0, 0), (a(0, 0) * a(0, 0) * a(0, 0)));
+        xarray<double> b = cube(a);
+        xarray<double> exp = a * a * a;
+        EXPECT_EQ(b, exp);
+    }
+
     TEST(xmath, cbrt)
     {
         shape_type shape = {3, 2};

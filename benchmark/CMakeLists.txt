@@ -105,6 +105,7 @@ if (xsimd_FOUND)
     add_definitions("-DXTENSOR_USE_XSIMD=1")
 endif()
 
+include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
@@ -112,6 +113,7 @@ set(XTENSOR_BENCHMARK
     benchmark_builder.cpp
     benchmark_container.cpp
     benchmark_increment_stepper.cpp
+    benchmark_lambda_expressions.cpp
     benchmark_math.cpp
     benchmark_random.cpp
     benchmark_reducer.cpp
