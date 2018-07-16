@@ -121,6 +121,19 @@ namespace xt
         template <class O>
         bool is_trivial_broadcast(const O& strides) const noexcept;
 
+    protected:
+
+        using offset_type = typename strides_type::value_type;
+
+        template <class... Args>
+        offset_type compute_index(Args... args) const;
+
+        template <class... Args>
+        offset_type compute_unchecked_index(Args... args) const;
+
+        template <class It>
+        offset_type compute_element_index(It first, It last) const;
+
     private:
 
         CT m_e;
@@ -386,8 +399,7 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        using offset_type = typename strides_type::value_type;
-        offset_type index = static_cast<offset_type>(m_offset) + xt::data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+        offset_type index = compute_index(args...);
         return m_storage[static_cast<size_type>(index)];
     }
 
@@ -403,8 +415,7 @@ namespace xt
     {
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
-        using offset_type = typename strides_type::value_type;
-        offset_type index = static_cast<offset_type>(m_offset) + xt::data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+        offset_type index = compute_index(args...);
         return m_storage[static_cast<size_type>(index)];
     }
 
@@ -465,8 +476,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view_base<CT, S, L, FST>::unchecked(Args... args) -> reference
     {
-        using offset_type = typename strides_type::value_type;
-        offset_type index = static_cast<offset_type>(m_offset) + xt::unchecked_data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+        offset_type index = compute_unchecked_index(args...);
         return m_storage[static_cast<size_type>(index)];
     }
 
@@ -493,7 +503,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view_base<CT, S, L, FST>::unchecked(Args... args) const -> const_reference
     {
-        size_type index = m_offset + xt::unchecked_data_offset<size_type>(strides(), static_cast<size_type>(args)...);
+        offset_type index = compute_unchecked_index(args...);
         return m_storage[index];
     }
 
@@ -565,7 +575,7 @@ namespace xt
     inline auto xstrided_view_base<CT, S, L, FST>::element(It first, It last) -> reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        return m_storage[m_offset + element_offset<size_type>(strides(), first, last)];
+        return m_storage[compute_element_index(first, last)];
     }
 
     /**
@@ -580,7 +590,7 @@ namespace xt
     inline auto xstrided_view_base<CT, S, L, FST>::element(It first, It last) const -> const_reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        return m_storage[m_offset + element_offset<size_type>(strides(), first, last)];
+        return m_storage[compute_element_index(first, last)];
     }
 
     /**
@@ -684,11 +694,32 @@ namespace xt
     }
     //@}
 
+    template <class CT, class S, layout_type L, class FST>
+    template <class... Args>
+    inline auto xstrided_view_base<CT, S, L, FST>::compute_index(Args... args) const -> offset_type
+    {
+        return static_cast<offset_type>(m_offset) + xt::data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    template <class... Args>
+    inline auto xstrided_view_base<CT, S, L, FST>::compute_unchecked_index(Args... args) const -> offset_type
+    {
+        return static_cast<offset_type>(m_offset) + xt::unchecked_data_offset<offset_type>(strides(), static_cast<offset_type>(args)...);
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    template <class It>
+    inline auto xstrided_view_base<CT, S, L, FST>::compute_element_index(It first, It last) const -> offset_type
+    {
+        return static_cast<offset_type>(m_offset) + xt::element_offset<offset_type>(strides(), first, last);
+    }
+
     /******************************************
      * flat_expression_adaptor implementation *
      ******************************************/
 
-        namespace detail
+    namespace detail
     {
         template <class CT>
         inline flat_expression_adaptor<CT>::flat_expression_adaptor(CT& e)
@@ -767,6 +798,179 @@ namespace xt
         {
             return m_e.cend();
         }
+    }
+
+    /**********************************
+     * Builder helpers implementation *
+     **********************************/
+
+    namespace detail
+    {
+        template <class S>
+        struct slice_getter_impl
+        {
+            const S& m_shape;
+            mutable std::size_t idx;
+
+            explicit slice_getter_impl(const S& shape)
+                : m_shape(shape), idx(0)
+            {
+            }
+
+            template <class T>
+            std::array<std::ptrdiff_t, 3> operator()(const T& /*t*/) const
+            {
+                return{ 0, 0, 0 };
+            }
+
+            template <class A, class B, class C>
+            std::array<std::ptrdiff_t, 3> operator()(const xrange_adaptor<A, B, C>& range) const
+            {
+                auto sl = range.get(static_cast<std::size_t>(m_shape[idx]));
+                return{ sl(0), sl.size(), sl.step_size() };
+            }
+        };
+
+        template <class adj_strides_policy>
+        struct strided_view_args : adj_strides_policy
+        {
+            using base_type = adj_strides_policy;
+
+            template <class S, class ST, class V>
+            void fill_args(const S& shape, ST&& strides, std::size_t base_offset, layout_type layout, const V& slices)
+            {
+                // Compute dimension
+                std::size_t dimension = shape.size(), n_newaxis = 0, n_add_all = 0;
+                std::ptrdiff_t dimension_check = static_cast<std::ptrdiff_t>(shape.size());
+
+                bool has_ellipsis = false;
+                for (const auto& el : slices)
+                {
+                    if (xtl::get_if<xt::xnewaxis_tag>(&el) != nullptr)
+                    {
+                        ++dimension;
+                        ++n_newaxis;
+                    }
+                    else if (xtl::get_if<std::ptrdiff_t>(&el) != nullptr)
+                    {
+                        --dimension;
+                        --dimension_check;
+                    }
+                    else if (xtl::get_if<xt::xellipsis_tag>(&el) != nullptr)
+                    {
+                        if (has_ellipsis == true)
+                        {
+                            throw std::runtime_error("Ellipsis can only appear once.");
+                        }
+                        has_ellipsis = true;
+                    }
+                    else
+                    {
+                        --dimension_check;
+                    }
+                }
+
+                if (dimension_check < 0)
+                {
+                    throw std::runtime_error("Too many slices for view.");
+                }
+
+                if (has_ellipsis)
+                {
+                    // replace ellipsis with N * xt::all
+                    // remove -1 because of the ellipsis slize itself
+                    n_add_all = shape.size() - (slices.size() - 1 - n_newaxis);
+                }
+
+                // Compute strided view
+                new_offset = base_offset;
+                new_shape.resize(dimension);
+                new_strides.resize(dimension);
+                base_type::resize(dimension);
+
+                auto old_shape = shape;
+                auto&& old_strides = strides;
+
+                using old_strides_vt = std::decay_t<decltype(old_strides[0])>;
+
+#define XTENSOR_MS(v) static_cast<std::ptrdiff_t>(v)
+#define XTENSOR_MU(v) static_cast<std::size_t>(v)
+
+                std::ptrdiff_t i = 0, axis_skip = 0;
+                std::size_t idx = 0;
+
+                auto slice_getter = detail::slice_getter_impl<S>(shape);
+
+                for (; i < XTENSOR_MS(slices.size()); ++i)
+                {
+                    auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[XTENSOR_MU(i)]);
+                    if (ptr != nullptr)
+                    {
+                        auto slice0 = static_cast<old_strides_vt>(*ptr);
+                        new_offset += static_cast<std::size_t>(slice0 * old_strides[XTENSOR_MU(i - axis_skip)]);
+                    }
+                    else if (xtl::get_if<xt::xnewaxis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
+                    {
+                        new_shape[idx] = 1;
+                        base_type::set_fake_slice(idx);
+                        ++axis_skip, ++idx;
+                    }
+                    else if (xtl::get_if<xt::xellipsis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
+                    {
+                        for (std::size_t j = 0; j < n_add_all; ++j)
+                        {
+                            new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
+                            new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                            base_type::set_fake_slice(idx);
+                            --axis_skip, ++idx;
+                        }
+                        ++axis_skip;  // because i++
+                    }
+                    else if (xtl::get_if<xt::xall_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
+                    {
+                        new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
+                        new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                        base_type::set_fake_slice(idx);
+                        ++idx;
+                    }
+                    else if (base_type::fill_args(slices, XTENSOR_MU(i), idx,
+                                                  old_shape[XTENSOR_MU(i - axis_skip)],
+                                                  old_strides[XTENSOR_MU(i - axis_skip)],
+                                                  new_shape, new_strides))
+                    {
+                        ++idx;
+                    }
+                    else
+                    {
+                        slice_getter.idx = XTENSOR_MU(i - axis_skip);
+                        auto info = xtl::visit(slice_getter, slices[XTENSOR_MU(i)]);
+                        new_offset += XTENSOR_MU(static_cast<old_strides_vt>(info[0]) * old_strides[XTENSOR_MU(i - axis_skip)]);
+                        new_shape[idx] = std::ptrdiff_t(info[1]);
+                        new_strides[idx] = std::ptrdiff_t(info[2]) * XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                        base_type::set_fake_slice(idx);
+                        ++idx;
+                    }
+                }
+
+                for (; XTENSOR_MU(i - axis_skip) < old_shape.size(); ++i)
+                {
+                    new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
+                    new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                    base_type::set_fake_slice(idx);
+                    ++idx;
+                }
+
+                new_layout = do_strides_match(new_shape, new_strides, layout) ? layout : layout_type::dynamic;
+#undef XTENSOR_MU
+#undef XTENSOR_MS
+            }
+
+            using shape_type = dynamic_shape<std::ptrdiff_t>;
+            shape_type new_shape;
+            shape_type new_strides;
+            std::size_t new_offset;
+            layout_type new_layout;
+        };
     }
 }
 

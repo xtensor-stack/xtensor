@@ -351,6 +351,16 @@ namespace xt
         container_type m_raw_indices;
     };
 
+    namespace detail
+    {
+        template <class T>
+        using disable_integral_keep = std::enable_if_t<!std::is_integral<std::decay_t<T>>::value,
+            xkeep_slice<typename std::decay_t<T>::value_type>>;
+
+        template <class T, class R>
+        using enable_integral_keep = std::enable_if_t<std::is_integral<T>::value, xkeep_slice<R>>;
+    }
+
     /**
      * Create a non-contigous slice from a container of indices.
      * Note: this slice cannot be used in the xstrided_view!
@@ -366,15 +376,27 @@ namespace xt
      * @return instance of xkeep_slice
      */
     template <class T>
-    inline auto keep(T&& indices)
+    inline detail::disable_integral_keep<T> keep(T&& indices)
     {
         return xkeep_slice<typename std::decay_t<T>::value_type>(std::forward<T>(indices));
     }
 
-    template <class T, class R = big_promote_type_t<T>>
-    inline auto keep(std::initializer_list<T> indices)
+    template <class R = std::ptrdiff_t, class T>
+    inline detail::enable_integral_keep<T, R> keep(T i)
     {
-        return xkeep_slice<R>(indices);
+        using slice_type = xkeep_slice<R>;
+        using container_type = typename slice_type::container_type;
+        container_type tmp = { static_cast<R>(i) };
+        return slice_type(std::move(tmp));
+    }
+
+    template <class R = std::ptrdiff_t, class Arg0, class Arg1, class... Args>
+    inline xkeep_slice<R> keep(Arg0 i0, Arg1 i1, Args... args)
+    {
+        using slice_type = xkeep_slice<R>;
+        using container_type = typename slice_type::container_type;
+        container_type tmp = { static_cast<R>(i0), static_cast<R>(i1), static_cast<R>(args)... };
+        return slice_type(std::move(tmp));
     }
 
     /******************
@@ -988,7 +1010,7 @@ namespace xt
     template <class T>
     inline auto xkeep_slice<T>::size() const noexcept -> size_type
     {
-        return static_cast<size_type>(m_indices.size());
+        return static_cast<size_type>(m_raw_indices.size());
     }
 
     template <class T>
