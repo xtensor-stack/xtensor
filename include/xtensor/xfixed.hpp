@@ -557,8 +557,8 @@ namespace xt
      */
     template <class ET, class S, layout_type L, class Tag>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(const inner_shape_type& /*shape*/, value_type v, layout_type /*l*/)
-        : xfixed_container(v)
     {
+        std::fill(m_storage.begin(), m_storage.end(), v);
     }
 
     namespace detail
