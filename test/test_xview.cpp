@@ -979,6 +979,25 @@ namespace xt
         EXPECT_TRUE(b);
     }
 
+    TEST(xview, keep_negative)
+    {
+        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
+                                                         { 5, 6, 7, 8}},
+                                                        {{ 9,10,11,12},
+                                                         {13,14,15,16}},
+                                                        {{17,18,19,20},
+                                                         {21,22,23,24}}};
+
+        auto v1 = xt::view(a, keep({-2}), keep({-0, -1}), keep({0, -1}));
+        xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
+        EXPECT_EQ(v1, exp_v1);
+
+        // check compilation
+        // std::vector<std::ptrdiff_t> ixx({1,2});
+        // xt::xview v2(a, keep(ixx));
+        // EXPECT_EQ(xt::xview(a, keep({1, 2})), v2);
+    }
+
     TEST(xview, mixed_types)
     {
         xt::xarray<std::uint8_t> input;
