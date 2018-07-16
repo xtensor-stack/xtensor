@@ -108,6 +108,7 @@ set(XTENSOR_TESTS
     test_xiterator.cpp
     test_xio.cpp
     test_xlayout.cpp
+    test_xmasked_view.cpp
     test_xmath.cpp
     test_xnan_functions.cpp
     test_xnoalias.cpp
