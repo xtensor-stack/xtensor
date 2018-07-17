@@ -338,6 +338,10 @@ hold any values and are computed upon access or assigmnent.
 | ``np.trapz(a, dx=2.0, axis=-1)``              | ``xt::trapz(a, 2.0, -1)``                     |
 | ``np.trapz(a, x=b, axis=-1)``                 | ``xt::trapz(a, b, -1)``                       |
 +-----------------------------------------------+-----------------------------------------------+
+| ``np.count_nonzero(a, axis=[0, 1])``          | ``xt::count_nonzero(a, {0, 1})``              |
++-----------------------------------------------+-----------------------------------------------+
+| ``np.count_nonzero(a)``                       | ``xt::count_nonzero(a)``                      |
++-----------------------------------------------+-----------------------------------------------+
 
 More generally, one can use the ``xt::reduce(function, input, axes)`` which allows the specification
 of an arbitrary binary function for the reduction. The binary function must be cummutative and

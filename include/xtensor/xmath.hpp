@@ -2099,7 +2099,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, EVS>::value, int>>
-    inline auto count_nonzeros(E&& e, EVS es = EVS())
+    inline auto count_nonzero(E&& e, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
@@ -2108,7 +2108,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, X>::value, int>>
-    inline auto count_nonzeros(E&& e, X&& axes, EVS es = EVS())
+    inline auto count_nonzero(E&& e, X&& axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
@@ -2117,7 +2117,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
 #ifdef X_OLD_CLANG
     template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto count_nonzeros(E&& e, std::initializer_list<I> axes, EVS es = EVS())
+    inline auto count_nonzero(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
@@ -2125,7 +2125,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 #else
     template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto count_nonzeros(E&& e, const I (&axes)[N], EVS es = EVS())
+    inline auto count_nonzero(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
