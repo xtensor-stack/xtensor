@@ -336,22 +336,14 @@ namespace xt
 
         constexpr static std::size_t N = std::tuple_size<shape_type>::value;
 
-        xfixed_container();
-#if defined(_MSC_VER) && _MSC_VER < 1910
-        explicit xfixed_container(value_type v);
-#else
-        [[deprecated]] explicit xfixed_container(value_type v);
-#endif
+        xfixed_container() = default;
+        xfixed_container(const value_type& v);
         explicit xfixed_container(const inner_shape_type& shape, layout_type l = L);
         explicit xfixed_container(const inner_shape_type& shape, value_type v, layout_type l = L);
 
-#ifndef X_OLD_CLANG
-        xfixed_container(const get_init_type_t<value_type, S>& init);
-#else
         // remove this enable_if when removing the other value_type constructor
         template <class IX = std::integral_constant<std::size_t, N>, class EN = std::enable_if_t<IX::value != 0, int>>
         xfixed_container(nested_initializer_list_t<value_type, N> t);
-#endif
 
         ~xfixed_container() = default;
 
@@ -530,24 +522,6 @@ namespace xt
      * @name Constructors
      */
     //@{
-    /**
-     * Create an uninitialized xfixed_container according to the shape template parameter.
-     */
-    template <class ET, class S, layout_type L, class Tag>
-    inline xfixed_container<ET, S, L, Tag>::xfixed_container()
-    {
-    }
-
-    /**
-     * Create an xfixed_container, and initialize with the value of v.
-     *
-     * @param v the fill value
-     */
-    template <class ET, class S, layout_type L, class Tag>
-    inline xfixed_container<ET, S, L, Tag>::xfixed_container(value_type v)
-    {
-        std::fill(this->begin(), this->end(), v);
-    }
 
     /**
      * Create an uninitialized xfixed_container.
@@ -562,6 +536,16 @@ namespace xt
     {
     }
 
+    template <class ET, class S, layout_type L, class Tag>
+    inline xfixed_container<ET, S, L, Tag>::xfixed_container(const value_type& v)
+    {
+        if (this->size() != 1)
+        {
+            throw std::runtime_error("wrong shape for scalar assignment (has to be xshape<>).");
+        }
+        m_storage[0] = v;
+    }
+
     /**
      * Create an xfixed_container, and initialize with the value of v.
      * Note, the shape argument to this function is only provided for homogenity,
@@ -573,8 +557,37 @@ namespace xt
      */
     template <class ET, class S, layout_type L, class Tag>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(const inner_shape_type& /*shape*/, value_type v, layout_type /*l*/)
-        : xfixed_container(v)
     {
+        std::fill(m_storage.begin(), m_storage.end(), v);
+    }
+
+    namespace detail
+    {
+        template <std::size_t X>
+        struct check_initializer_list_shape
+        {
+            template <class T, class S>
+            static bool run(const T& t, const S& shape)
+            {
+                std::size_t IX = shape.size() - X;
+                bool result = (shape[IX] == t.size());
+                for (std::size_t i = 0; i < shape[IX]; ++i)
+                {
+                    result = result && check_initializer_list_shape<X - 1>::run(t.begin()[i], shape);
+                }
+                return result;
+            }
+        };
+
+        template <>
+        struct check_initializer_list_shape<0>
+        {
+            template <class T, class S>
+            static bool run(const T& /*t*/, const S& /*shape*/)
+            {
+                return true;
+            }
+        };
     }
 
     /**
@@ -584,21 +597,13 @@ namespace xt
      * time to prevent errors.
      * Note: for clang < 3.8 this is an initializer_list and the size is not checked at compile-or runtime.
      */
-#ifndef X_OLD_CLANG
-    template <class ET, class S, layout_type L, class Tag>
-    inline xfixed_container<ET, S, L, Tag>::xfixed_container(const get_init_type_t<value_type, S>& init)
-    {
-        std::copy(reinterpret_cast<const_pointer>(&init), reinterpret_cast<const_pointer>(&init) + this->size(),
-                  this->template begin<layout_type::row_major>());
-    }
-#else
     template <class ET, class S, layout_type L, class Tag>
     template <class IX, class EN>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(nested_initializer_list_t<value_type, N> t)
     {
+        XTENSOR_ASSERT_MSG(detail::check_initializer_list_shape<N>::run(t, this->shape()) == true, "initializer list shape does not match fixed shape");
         L == layout_type::row_major ? nested_copy(m_storage.begin(), t) : nested_copy(this->template begin<layout_type::row_major>(), t);
     }
-#endif
     //@}
 
     /**

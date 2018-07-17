@@ -159,14 +159,45 @@ namespace xt
 
     TEST(xtensor_fixed, nulld)
     {
-        xtensor_fixed<double, xshape<>> a{123};
-        xtensor_fixed<double, xshape<>> b{4};
-        xtensor_fixed<double, xshape<>> c{123};
+        xtensor_fixed<double, xshape<>> a = 123;
+        xtensor_fixed<double, xshape<>> b(4);
+        xtensor_fixed<double, xshape<>> c = 123;
 
         EXPECT_EQ(a(), 123);
         b += 432;
         EXPECT_EQ(b(), 432 + 4);
         EXPECT_TRUE(c == a);
+    }
+
+    auto check_shape_a()
+    {
+        xtensor_fixed<double, xshape<3, 4>> a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {9,10,11,12}};
+        return a;
+    }
+
+    auto check_shape_b()
+    {
+        xtensor_fixed<double, xshape<3, 4>> a({{1,2}, {5,6,7,8}, {9,10,11,12}});
+        return a;
+    }
+
+    auto check_shape_c()
+    {
+        xtensor_fixed<double, xshape<3, 4>> a = {{1,2,3}, {5,6,7}, {9,10,11}};
+        return a;
+    }
+
+    TEST(xtensor_fixed, initializer_list_constructor)
+    {
+        using T = xtensor_fixed<double, xshape<3, 4>>;
+        T a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
+
+    #ifdef XTENSOR_ENABLE_ASSERT
+        EXPECT_THROW(T{{1}}, std::runtime_error);
+        EXPECT_THROW(check_shape_a(), std::runtime_error);
+        EXPECT_THROW(check_shape_b(), std::runtime_error);
+        EXPECT_THROW(check_shape_c(), std::runtime_error);
+    #endif
     }
 }
 
