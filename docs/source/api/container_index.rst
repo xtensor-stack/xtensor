@@ -19,6 +19,7 @@ Containers and views
    xoptional_assembly_base
    xoptional_assembly
    xoptional_assembly_adaptor
+   xmasked_view
    xview
    xstrided_view
    xbroadcast

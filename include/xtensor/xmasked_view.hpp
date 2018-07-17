@@ -17,6 +17,10 @@
 
 namespace xt
 {
+    /****************************
+    * xmasked_view declaration  *
+    *****************************/
+
     template <class CTD, class CTM>
     class xmasked_view;
 
@@ -29,10 +33,21 @@ namespace xt
         using const_stepper = xoptional_assembly_stepper<assembly_type, true>;
     };
 
-    /*****************
-     * xmasked_view  *
-     *****************/
-
+    /**
+     * @class xmasked_view
+     * @brief View on an xoptional_assembly or xoptional_assembly_adaptor
+     * hiding values depending on a given mask.
+     *
+     * The xmasked_view class implements a view on an xoptional_assembly or
+     * xoptional_assembly_adaptor, it takes this xoptional_assembly and a
+     * mask as input. The mask is an xexpression containing boolean values,
+     * whenever the value of the mask is false, the optional value of
+     * xmasked_view is considered missing, otherwise it depends on the
+     * underlying xoptional_assembly.
+     *
+     * @tparam CTD The type of expression holding the values.
+     * @tparam CTM The type of expression holding the mask.
+     */
     template <class CTD, class CTM>
     class xmasked_view : public xexpression<xmasked_view<CTD, CTM>>, // Will be replaced by xview_semantic
                          private xiterable<xmasked_view<CTD, CTM>>
@@ -228,6 +243,17 @@ namespace xt
     template <class CTD, class CTM>
     thread_local typename xmasked_view<CTD, CTM>::value_type xmasked_view<CTD, CTM>::m_missing_ref = value_type(inner_value_type(0), false);
 
+    /**
+     * @name Constructors
+     */
+    //@{
+    /**
+     * Creates an xmasked_view, given the xoptional_assembly or
+     * xoptional_assembly_adaptor and the mask
+     *
+     * @param data the underlying xoptional_assembly or xoptional_assembly_adaptor
+     * @param mask the mask.
+     */
     template <class CTD, class CTM>
     template <class D, class M>
     inline xmasked_view<CTD, CTM>::xmasked_view(D&& data, M&& mask)
@@ -239,42 +265,70 @@ namespace xt
     {
     }
 
+    /**
+     * @name Size and shape
+     */
+    //@{
+    /**
+     * Returns the number of dimensions of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline constexpr auto xmasked_view<CTD, CTM>::dimension() const noexcept -> size_type
     {
         return m_data.dimension();
     }
 
+    /**
+     * Returns the number of elements in the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::size() const noexcept -> size_type
     {
         return m_data.size();
     }
 
+    /**
+     * Returns the shape of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::shape() const noexcept -> const inner_shape_type&
     {
         return m_data.shape();
     }
 
+    /**
+     * Returns the strides of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::strides() const noexcept -> const inner_strides_type&
     {
         return m_data.strides();
     }
 
+    /**
+     * Returns the backstrides of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return m_data.backstrides();
     }
+    //@}
 
+    /**
+     * Return the layout_type of the xmasked_view
+     * @return layout_type of the xmasked_view
+     */
     template <class CTD, class CTM>
     inline layout_type xmasked_view<CTD, CTM>::layout() const noexcept
     {
         return m_data.layout();
     }
 
+    /**
+     * Fills the data with the given value.
+     * @param value the value to fill the data with.
+     */
     template <class CTD, class CTM>
     template <class T>
     inline void xmasked_view<CTD, CTM>::fill(const T& value)
@@ -283,6 +337,16 @@ namespace xt
         m_data_cached = false;
     }
 
+    /**
+     * @name Data
+     */
+    //@{
+    /**
+     * Returns a reference to the element at the specified position in the xmasked_view.
+     * @param args a list of indices specifying the position in the xmasked_view. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the xmasked_view.
+     */
     template <class CTD, class CTM>
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::operator()(Args... args) -> reference
@@ -290,6 +354,12 @@ namespace xt
         return call_operator_impl(missing(), args...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the xmasked_view.
+     * @param args a list of indices specifying the position in the xmasked_view. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the xmasked_view.
+     */
     template <class CTD, class CTM>
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::operator()(Args... args) const -> const_reference
@@ -297,6 +367,15 @@ namespace xt
         return call_operator_impl(missing(), args...);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the xmasked_view,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the xmasked_view. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the xmasked_view.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
     template <class CTD, class CTM>
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::at(Args... args) -> reference
@@ -305,6 +384,15 @@ namespace xt
         return call_operator_impl(missing(), args...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the xmasked_view,
+     * after dimension and bounds checking.
+     * @param args a list of indices specifying the position in the xmasked_view. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the xmasked_view.
+     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
+     * or if indices are out of bounds.
+     */
     template <class CTD, class CTM>
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::at(Args... args) const -> const_reference
@@ -313,6 +401,25 @@ namespace xt
         return call_operator_impl(missing(), args...);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the  xmasked_view.
+     * @param args a list of indices specifying the position in the  xmasked_view. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the  xmasked_view, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
     template <class CTD, class CTM>
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::unchecked(Args... args) -> reference
@@ -320,6 +427,25 @@ namespace xt
         return unchecked_impl(missing(), args...);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the xmasked_view.
+     * @param args a list of indices specifying the position in the  xmasked_view. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the  xmasked_view, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
     template <class CTD, class CTM>
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::unchecked(Args... args) const -> const_reference
@@ -327,6 +453,12 @@ namespace xt
         return unchecked_impl(missing(), args...);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the xmasked_view.
+     * @param index a sequence of indices specifying the position in the xmasked_view. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the xmasked_view.
+     */
     template <class CTD, class CTM>
     template <class S>
     inline auto xmasked_view<CTD, CTM>::operator[](const S& index) -> disable_integral_t<S, reference>
@@ -347,6 +479,12 @@ namespace xt
         return access_operator_impl(missing(), i);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the xmasked_view.
+     * @param index a sequence of indices specifying the position in the xmasked_view. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the xmasked_view.
+     */
     template <class CTD, class CTM>
     template <class S>
     inline auto xmasked_view<CTD, CTM>::operator[](const S& index) const -> disable_integral_t<S, const_reference>
@@ -367,6 +505,13 @@ namespace xt
         return access_operator_impl(missing(), i);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the xmasked_view.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
+     * than the number of dimensions of the xmasked_view.
+     */
     template <class CTD, class CTM>
     template <class It>
     inline auto xmasked_view<CTD, CTM>::element(It first, It last) -> reference
@@ -374,12 +519,20 @@ namespace xt
         return element_impl(missing(), first, last);
     }
 
+    /**
+     * Returns a constant reference to the element at the specified position in the xmasked_view.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
+     * than the number of dimensions of the xmasked_view.
+     */
     template <class CTD, class CTM>
     template <class It>
     inline auto xmasked_view<CTD, CTM>::element(It first, It last) const -> const_reference
     {
         return element_impl(missing(), first, last);
     }
+    //@}
 
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::storage() noexcept -> storage_type&
@@ -395,18 +548,27 @@ namespace xt
         return m_storage_cache;
     }
 
+    /**
+     * Return an expression for the values of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::value() noexcept -> value_expression&
     {
         return m_data.value();
     }
 
+    /**
+     * Return a constant expression for the values of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::value() const noexcept -> const value_expression&
     {
         return m_data.value();
     }
 
+    /**
+     * Return an expression for the missing mask of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::has_value() noexcept -> flag_expression&
     {
@@ -414,6 +576,9 @@ namespace xt
         return m_flag_container_cache;
     }
 
+    /**
+     * Return a constant expression for the missing mask of the xmasked_view.
+     */
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::has_value() const noexcept -> const flag_expression&
     {
