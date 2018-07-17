@@ -333,7 +333,7 @@ namespace xt
         explicit xkeep_slice(container_type&& cont);
 
         template <class S>
-        explicit xkeep_slice(std::initializer_list<S> t);
+        xkeep_slice(std::initializer_list<S> t);
 
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
@@ -362,14 +362,14 @@ namespace xt
     }
 
     /**
-     * Create a non-contigous slice from a container of indices.
+     * Create a non-contigous slice from a container of indices to keep.
      * Note: this slice cannot be used in the xstrided_view!
      *
      * \code{.cpp}
      * xt::xarray<double> a = xt::arange(9);
      * a.reshape({3, 3});
-     * xt::view(a, xt::keep({0, 2}); // => {{0, 1, 2}, {6, 7, 8}}
-     * xt::view(a, xt::keep({1, 1, 1}); // => {{3, 4, 5}, {3, 4, 5}, {3, 4, 5}}
+     * xt::view(a, xt::keep(0, 2); // => {{0, 1, 2}, {6, 7, 8}}
+     * xt::view(a, xt::keep(1, 1, 1); // => {{3, 4, 5}, {3, 4, 5}, {3, 4, 5}}
      * \endcode
      *
      * @param indices The indices container
@@ -394,6 +394,93 @@ namespace xt
     inline xkeep_slice<R> keep(Arg0 i0, Arg1 i1, Args... args)
     {
         using slice_type = xkeep_slice<R>;
+        using container_type = typename slice_type::container_type;
+        container_type tmp = { static_cast<R>(i0), static_cast<R>(i1), static_cast<R>(args)... };
+        return slice_type(std::move(tmp));
+    }
+
+    /***************************
+     * xdrop_slice declaration *
+     ***************************/
+
+
+    template <class T>
+    class xdrop_slice : public xslice<xdrop_slice<T>>
+    {
+    public:
+
+        using container_type = svector<T>;
+        using size_type = typename container_type::value_type;
+
+        template <class C>
+        explicit xdrop_slice(const C& cont);
+        template <class C>
+        explicit xdrop_slice(C& cont);
+        explicit xdrop_slice(container_type&& cont);
+
+        template <class S>
+        xdrop_slice(std::initializer_list<S> t);
+
+        size_type operator()(size_type i) const noexcept;
+        size_type size() const noexcept;
+
+        void normalize(std::size_t s);
+
+        size_type step_size(std::size_t i, std::size_t n = 1) const noexcept;
+        size_type revert_index(std::size_t i) const;
+
+        bool contains(size_type i) const noexcept;
+
+    private:
+
+        container_type m_indices;
+        container_type m_raw_indices;
+        std::map<size_type, size_type> m_inc;
+        size_type m_size;
+    };
+
+    namespace detail
+    {
+        template <class T>
+        using disable_integral_drop = std::enable_if_t<!std::is_integral<std::decay_t<T>>::value,
+                                     xdrop_slice<typename std::decay_t<T>::value_type>>;
+
+        template <class T, class R>
+        using enable_integral_drop = std::enable_if_t<std::is_integral<T>::value, xdrop_slice<R>>;
+    }
+
+    /**
+     * Create a non-contigous slice from a container of indices to drop.
+     * Note: this slice cannot be used in the xstrided_view!
+     *
+     * \code{.cpp}
+     * xt::xarray<double> a = xt::arange(9);
+     * a.reshape({3, 3});
+     * xt::view(a, xt::drop(0, 2); // => {{3, 4, 5}}
+     * \endcode
+     *
+     * @param indices The container of indices to drop
+     * @return instance of xdrop_slice
+     */
+    template <class T>
+    inline detail::disable_integral_drop<T> drop(T&& indices)
+    {
+        return xdrop_slice<typename std::decay_t<T>::value_type>(std::forward<T>(indices));
+    }
+
+    template <class R = std::ptrdiff_t, class T>
+    inline detail::enable_integral_drop<T, R> drop(T i)
+    {
+        using slice_type = xdrop_slice<R>;
+        using container_type = typename slice_type::container_type;
+        container_type tmp = { static_cast<R>(i) };
+        return slice_type(std::move(tmp));
+    }
+
+    template <class R = std::ptrdiff_t, class Arg0, class Arg1, class... Args>
+    inline xdrop_slice<R> drop(Arg0 i0, Arg1 i1, Args... args)
+    {
+        using slice_type = xdrop_slice<R>;
         using container_type = typename slice_type::container_type;
         container_type tmp = { static_cast<R>(i0), static_cast<R>(i1), static_cast<R>(args)... };
         return slice_type(std::move(tmp));
@@ -1046,6 +1133,123 @@ namespace xt
     inline bool xkeep_slice<T>::contains(size_type i) const noexcept
     {
         return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? false : true;
+    }
+
+    /******************************
+     * xdrop_slice implementation *
+     ******************************/
+
+    template <class T>
+    template <class C>
+    inline xdrop_slice<T>::xdrop_slice(const C& cont)
+        : m_raw_indices(cont.begin(), cont.end())
+    {
+    }
+
+    template <class T>
+    template <class C>
+    inline xdrop_slice<T>::xdrop_slice(C& cont)
+        : m_raw_indices(cont.begin(), cont.end())
+    {
+    }
+
+    template <class T>
+    inline xdrop_slice<T>::xdrop_slice(container_type&& cont)
+        : m_raw_indices(std::move(cont))
+    {
+    }
+
+    template <class T>
+    template <class S>
+    inline xdrop_slice<T>::xdrop_slice(std::initializer_list<S> t)
+        : m_raw_indices(t.size())
+    {
+        std::transform(t.begin(), t.end(), m_raw_indices.begin(),
+            [](auto t) { return static_cast<size_type>(t); });
+    }
+
+    template <class T>
+    inline void xdrop_slice<T>::normalize(std::size_t shape)
+    {
+        m_size = static_cast<size_type>(shape - m_raw_indices.size());
+
+        m_indices.resize(m_raw_indices.size());
+        std::size_t sz = m_indices.size();
+        for (std::size_t i = 0; i < sz; ++i)
+        {
+            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<std::ptrdiff_t>(shape) + m_raw_indices[i] : m_raw_indices[i];
+        }
+        size_type cum = size_type(0);
+        size_type prev_cum = cum;
+        for (std::size_t i = 0; i < sz; ++i)
+        {
+            std::size_t ind = i;
+            size_type d = m_indices[i];
+            while (i + 1 < sz && m_indices[i + 1] == m_indices[i] + 1)
+            {
+                ++i;
+            }
+            cum += (i - ind) + 1;
+            m_inc[d - prev_cum] = size_type(cum);
+            prev_cum = cum;
+        }
+    }
+
+    template <class T>
+    inline auto xdrop_slice<T>::operator()(size_type i) const noexcept -> size_type
+    {
+        if (i < m_inc.begin()->first)
+        {
+            return i;
+        }
+        else
+        {
+            auto iter = --m_inc.upper_bound(i);
+            return i + iter->second;
+        }
+    }
+
+    template <class T>
+    inline auto xdrop_slice<T>::size() const noexcept -> size_type
+    {
+        return m_size;
+    }
+
+    template <class T>
+    inline auto xdrop_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
+    {
+        // special case one-past-end step (should be removed soon)
+        if (i == static_cast<size_type>(m_indices.size()))
+        {
+            return 1;
+        }
+        else
+        {
+            return (*this)(i + n) - (*this)(i);
+        }
+    }
+
+    template <class T>
+    inline auto xdrop_slice<T>::revert_index(std::size_t i) const -> size_type
+    {
+        if (i < m_inc.begin()->first)
+        {
+            return i;
+        }
+        else
+        {
+            auto iter = --m_inc.lower_bound(i);
+            auto check = iter->first + iter->second;
+            if (check > i)
+                --iter;
+            return i - iter->second;
+        }
+    }
+
+    template <class T>
+    inline bool xdrop_slice<T>::contains(size_type i) const noexcept
+    {
+        return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? true : false;
     }
 }
 

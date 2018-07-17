@@ -95,7 +95,7 @@ namespace xt
 
         using simd_value_type = xsimd::simd_type<value_type>;
         using strides_vt = typename strides_type::value_type;
-        using slice_type = xtl::variant<detail::xfake_slice<strides_vt>, xkeep_slice<strides_vt>>;
+        using slice_type = xtl::variant<detail::xfake_slice<strides_vt>, xkeep_slice<strides_vt>, xdrop_slice<strides_vt>>;
         using slice_vector_type = std::vector<slice_type>;
 
         template <class CTA>
@@ -245,6 +245,7 @@ namespace xt
         xrange_adaptor<placeholders::xtuph, placeholders::xtuph, placeholders::xtuph>,
 
         xkeep_slice<T>,
+        xdrop_slice<T>,
 
         xall_tag,
         xellipsis_tag,
@@ -662,19 +663,31 @@ namespace xt
                            const ST& old_stride,
                            S& shape, S& strides)
             {
-                auto* sl = xtl::get_if<xkeep_slice<std::ptrdiff_t>>(&slices[sl_idx]);
+                return fill_args_impl<xkeep_slice<std::ptrdiff_t>>(slices, sl_idx, i, old_shape, old_stride, shape, strides)
+                    || fill_args_impl<xdrop_slice<std::ptrdiff_t>>(slices, sl_idx, i, old_shape, old_stride, shape, strides);
+            }
+
+            template <class SL, class ST, class S>
+            bool fill_args_impl(const xdynamic_slice_vector& slices, std::size_t sl_idx,
+                                std::size_t i, std::size_t old_shape,
+                                const ST& old_stride,
+                                S& shape, S& strides)
+            {
+                auto* sl = xtl::get_if<SL>(&slices[sl_idx]);
                 if (sl != nullptr)
                 {
-                    shape[i] = sl->size();
-                    strides[i] = std::ptrdiff_t(0);
                     new_slices[i] = *sl;
-                    xtl::get<xkeep_slice<std::ptrdiff_t>>(new_slices[i]).normalize(old_shape);
+                    auto& ns = xtl::get<SL>(new_slices[i]);
+                    ns.normalize(old_shape);
+                    shape[i] = ns.size();
+                    strides[i] = std::ptrdiff_t(0);
                     new_adj_strides[i] = static_cast<std::ptrdiff_t>(old_stride);
                 }
                 return sl != nullptr;
             }
         };
     }
+
     template <class E>
     inline auto dynamic_view(E&& e, const xdynamic_slice_vector& slices)
     {
