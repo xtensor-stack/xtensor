@@ -5,5 +5,5 @@ channels:
 dependencies:
   - xtensor=0.16.4
   - xtensor-blas=0.11.0
-  - xeus-cling=0.3.0
+  - xeus-cling=0.4.5
   - notebook
