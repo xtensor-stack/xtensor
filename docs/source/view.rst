@@ -198,12 +198,41 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
     v += 100;
     // => a = {{1, 105, 3}, {4, 105, 106}}
 
+Masked view
+-----------
+
+Masked views are multidimensional views on an ``xoptional_assembly`` or ``xoptional_assembly_adaptor``, it applies a mask on an optional container.
+
+.. code::
+
+    #include "xtensor/xoptional_assembly.hpp"
+    #include "xtensor/xmasked_view.hpp"
+
+    using value_type = xt::xarray<double>;
+    using has_value_type = xt::xarray<bool>;
+
+    xt::xoptional_assembly<value_type, has_value_type> a = {
+        {1.0, 2.0, 3.0},
+        {2.0, 5.0, 7.0},
+        {2.0, 5.0, 7.0}};
+    // => a = {{ 1,   2,   3}, {  2,   5,   7}, {  2,   5,   7}}
+    a(0, 0).has_value() = false;
+    // => a = {{N/A,   2,   3}, {  2,   5,   7}, {  2,   5,   7}}
+
+    has_value_type mask = {
+        { true, true, true},
+        { true,false, true},
+        { true,false,false}};
+
+    auto m = xt::masked_view(a, mask);
+    // => m = {{N/A,   2,   3}, {  2, N/A,   7}, {  2, N/A, N/A}}
+
 Filtration
 ----------
 
 Sometimes, the only thing you want to do with a filter is to assign it a scalar. Though this can be done as shown
 in the previous section, this is not the *optimal* way to do it. `xtensor` provides a specially optimized mechanism
-for that, called filtration. A filtration IS NOT an ``xexpression``, the only methods it provides are scalar and 
+for that, called filtration. A filtration IS NOT an ``xexpression``, the only methods it provides are scalar and
 computed scalar assignments.
 
 .. code::
@@ -281,11 +310,11 @@ of ``RHS``. However, since views *cannot be resized*, when assigning an expressi
     tr = b;
     // => a = {{1.2, 1.2, 1.2}, {3., 4., 5.}}
 
-    
+
 islicing a view
 --------------
 
-In order to slice with a variable indices array, the slicing array must be ``const``. 
+In order to slice with a variable indices array, the slicing array must be ``const``.
 
 .. code::
 
