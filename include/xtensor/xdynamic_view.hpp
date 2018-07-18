@@ -118,6 +118,11 @@ namespace xt
         using base_type::shape;
         using base_type::layout;
 
+        // Explicitly deleting strides method to avoid compilers complaining
+        // about not being able to call the strides method from xstrided_view_base
+        // private base
+        const strides_type& strides() const = delete;
+
         reference operator()();
         const_reference operator()() const;
 
@@ -182,12 +187,6 @@ namespace xt
                                                       typename storage_type::const_iterator,
                                                       typename storage_type::iterator>;
         using const_container_iterator = typename storage_type::const_iterator;
-
-#ifdef __clang__
-        template <class T = xexpression_type>
-        std::enable_if_t<has_data_interface<T>::value && false, const strides_type&>
-        strides() const { return m_adj_strides; }
-#endif
 
     private:
 
