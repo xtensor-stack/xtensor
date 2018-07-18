@@ -64,7 +64,7 @@ namespace xt
     S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l);
 
     template <class S>
-    S unravel_index(typename S::value_type index, const S& shape, layout_type l);
+    get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l);
 
     /***********************
      * broadcast functions *
@@ -115,17 +115,17 @@ namespace xt
 
     namespace detail
     {
-        template <class size_type, std::size_t dim, class S>
-        inline size_type raw_data_offset(const S&) noexcept
+        template <std::size_t dim, class S>
+        inline auto raw_data_offset(const S&) noexcept
         {
-            return 0;
+            using strides_value_type = std::decay_t<decltype(std::declval<S>()[0])>;
+            return strides_value_type(0);
         }
 
-        template <class size_type, std::size_t dim, class S, class Arg, class... Args>
-        inline size_type raw_data_offset(const S& strides, Arg arg, Args... args) noexcept
+        template <std::size_t dim, class S, class Arg, class... Args>
+        inline auto raw_data_offset(const S& strides, Arg arg, Args... args) noexcept
         {
-            using strides_type = decltype(strides[0]);
-            return strides_type(arg) * strides[dim] + raw_data_offset<size_type, dim + 1>(strides, args...);
+            return arg * strides[dim] + raw_data_offset<dim + 1>(strides, args...);
         }
     }
 
@@ -142,7 +142,7 @@ namespace xt
         if (nargs == strides.size())
         {
             // Correct number of arguments: iterate
-            return detail::raw_data_offset<size_type, 0>(strides, arg, args...);
+            return static_cast<size_type>(detail::raw_data_offset<0>(strides, arg, args...));
         }
         else if (nargs > strides.size())
         {
@@ -153,14 +153,14 @@ namespace xt
         {
             // Too few arguments: right to left scalar product
             auto view = strides.cend() - nargs;
-            return detail::raw_data_offset<size_type, 0>(view, arg, args...);
+            return static_cast<size_type>(detail::raw_data_offset<0>(view, arg, args...));
         }
     }
 
     template <class size_type, class S, class... Args>
     inline size_type unchecked_data_offset(const S& strides, Args... args) noexcept
     {
-        return detail::raw_data_offset<size_type, 0>(strides.cbegin(), args...);
+        return static_cast<size_type>(detail::raw_data_offset<0>(strides.cbegin(), args...));
     }
 
     template <class size_type, class S, class It>
@@ -181,7 +181,7 @@ namespace xt
             {
                 strides[i] = 0;
             }
-            (*backstrides)[i] = strides[i] * (shape[i] - 1);
+            (*backstrides)[i] = strides[i] * std::ptrdiff_t(shape[i] - 1);
         }
 
         template <class shape_type, class strides_type>
@@ -198,13 +198,14 @@ namespace xt
         inline std::size_t compute_strides(const shape_type& shape, layout_type l,
                                            strides_type& strides, bs_ptr bs)
         {
-            std::size_t data_size = 1;
+            using strides_value_type = std::decay_t<decltype(strides[0])>;
+            strides_value_type data_size = 1;
             if (l == layout_type::row_major)
             {
                 for (std::size_t i = strides.size(); i != 0; --i)
                 {
                     strides[i - 1] = data_size;
-                    data_size = strides[i - 1] * shape[i - 1];
+                    data_size = strides[i - 1] * static_cast<strides_value_type>(shape[i - 1]);
                     adapt_strides(shape, strides, bs, i - 1);
                 }
             }
@@ -213,11 +214,11 @@ namespace xt
                 for (std::size_t i = 0; i < strides.size(); ++i)
                 {
                     strides[i] = data_size;
-                    data_size = strides[i] * shape[i];
+                    data_size = strides[i] * static_cast<strides_value_type>(shape[i]);
                     adapt_strides(shape, strides, bs, i);
                 }
             }
-            return data_size;
+            return static_cast<std::size_t>(data_size);
         }
     }
 
@@ -238,8 +239,8 @@ namespace xt
     template <class shape_type, class strides_type>
     inline bool do_strides_match(const shape_type& shape, const strides_type& strides, layout_type l)
     {
-        using shape_value_type = typename shape_type::value_type;
-        shape_value_type data_size = 1;
+        using value_type = typename strides_type::value_type;
+        value_type data_size = 1;
         if (l == layout_type::row_major)
         {
             for (std::size_t i = strides.size(); i != 0; --i)
@@ -248,7 +249,7 @@ namespace xt
                 {
                     return false;
                 }
-                data_size *= shape[i - 1];
+                data_size *= static_cast<value_type>(shape[i - 1]);
             }
             return true;
         }
@@ -260,7 +261,7 @@ namespace xt
                 {
                     return false;
                 }
-                data_size *= shape[i];
+                data_size *= static_cast<value_type>(shape[i]);
             }
             return true;
         }
@@ -332,11 +333,12 @@ namespace xt
     }
 
     template <class S>
-    inline S unravel_index(typename S::value_type index, const S& shape, layout_type l)
+    inline get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l)
     {
-        S strides = xtl::make_sequence<S>(shape.size(), 0);
+        get_strides_t<S> strides = xtl::make_sequence<get_strides_t<S>>(shape.size(), 0);
+        using strides_value_type = std::decay_t<decltype(strides[0])>;
         compute_strides(shape, l, strides);
-        return unravel_from_strides(index, strides, l);
+        return unravel_from_strides(static_cast<strides_value_type>(index), strides, l);
     }
 
     template <class S1, class S2>

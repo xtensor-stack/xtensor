@@ -1227,6 +1227,13 @@ namespace xt
 
     #define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
 
+    template <class X, class T, std::size_t N, class A>
+    struct rebind_container<X, svector<T, N, A>>
+    {
+        using allocator = typename A::template rebind<X>::other;
+        using type = svector<X, N, allocator>;
+    };
+
     /**
      * This array class is modeled after ``std::array`` but adds optional alignment through a template parameter.
      *

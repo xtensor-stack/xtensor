@@ -147,13 +147,13 @@ namespace xt
         std::size_t leading_ax = axes[(e.layout() == layout_type::row_major) ? axes.size() - 1 : 0];
         auto strides_finder = e.strides().begin() + static_cast<std::ptrdiff_t>(leading_ax);
         // The computed strides contain "0" where the shape is 1 -- therefore find the next none-zero number
-        std::size_t inner_stride = *strides_finder;
+        std::size_t inner_stride = static_cast<std::size_t>(*strides_finder);
         while (inner_stride == 0)
         {
             (e.layout() == layout_type::row_major) ? --strides_finder : ++strides_finder;
-            inner_stride = *strides_finder;
+            inner_stride = static_cast<std::size_t>(*strides_finder);
         }
-        std::size_t inner_loop_size = inner_stride;
+        std::size_t inner_loop_size = static_cast<std::size_t>(inner_stride);
         std::size_t outer_loop_size = e.shape()[leading_ax];
 
         // The following code merges reduction axes "at the end" (or the beginning for col_major)
@@ -178,7 +178,7 @@ namespace xt
             if (std::find(axes.begin(), axes.end(), i) == axes.end())
             {
                 // i not in axes!
-                iter_strides[i] = result.strides()[idx];
+                iter_strides[i] = static_cast<std::size_t>(result.strides()[idx]);
                 ++idx;
             }
         }
