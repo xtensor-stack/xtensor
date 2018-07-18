@@ -10,10 +10,12 @@
 #ifndef XTENSOR_XMASKED_VIEW_HPP
 #define XTENSOR_XMASKED_VIEW_HPP
 
-#include "xtensor/xoptional_assembly_base.hpp"
-#include "xtensor/xoptional_assembly_storage.hpp"
-#include "xtensor/xexpression.hpp"
-#include "xtensor/xiterable.hpp"
+#include "xtl/xoptional.hpp"
+
+#include "xoptional_assembly_base.hpp"
+#include "xoptional_assembly_storage.hpp"
+#include "xexpression.hpp"
+#include "xiterable.hpp"
 
 namespace xt
 {
@@ -24,6 +26,27 @@ namespace xt
     template <class CTD, class CTM>
     class xmasked_view;
 
+    template <class T, class IO = void>
+    struct xcontainer_inner_types_impl;
+
+    template <class CTD, class CTM>
+    struct xcontainer_inner_types_impl<xmasked_view<CTD, CTM>, std::enable_if_t<is_xoptional_expression<std::decay_t<CTD>>::value>>
+    {
+        using temporary_type = CTD;
+    };
+
+    template <class CTD, class CTM>
+    struct xcontainer_inner_types_impl<xmasked_view<CTD, CTM>, std::enable_if_t<!is_xoptional_expression<std::decay_t<CTD>>::value>>
+    {
+        using temporary_type = xoptional_assembly<CTD, CTM>;
+    };
+
+    template <class CTD, class CTM>
+    struct xcontainer_inner_types<xmasked_view<CTD, CTM>>
+    {
+        using temporary_type = typename xcontainer_inner_types_impl<xmasked_view<CTD, CTM>>::temporary_type;
+    };
+
     template <class CTD, class CTM>
     struct xiterable_inner_types<xmasked_view<CTD, CTM>>
     {
@@ -32,6 +55,196 @@ namespace xt
         using stepper = xoptional_assembly_stepper<assembly_type, false>;
         using const_stepper = xoptional_assembly_stepper<assembly_type, true>;
     };
+
+    template <class T, class IO = void>
+    struct xmasked_view_inner_types;
+
+    template <class CTD, class CTM>
+    struct xmasked_view_inner_types<xmasked_view<CTD, CTM>, std::enable_if_t<is_xoptional_expression<std::decay_t<CTD>>::value>>
+    {
+        using data_closure_type = CTD;
+        using mask_closure_type = CTM;
+
+        using data_type = std::decay_t<data_closure_type>;
+        using value_expression = typename data_type::value_expression;
+        using flag_expression = typename data_type::flag_expression;
+        using storage_type = typename data_type::storage_type;
+    };
+
+    template <class CTD, class CTM>
+    struct xmasked_view_inner_types<xmasked_view<CTD, CTM>, std::enable_if_t<!is_xoptional_expression<std::decay_t<CTD>>::value>>
+    {
+        using data_closure_type = CTD;
+        using mask_closure_type = CTM;
+
+        using value_expression = std::decay_t<data_closure_type>;
+        using flag_expression = std::decay_t<mask_closure_type>;
+
+        using data_storage_type = typename value_expression::storage_type&;
+        using mask_storage_type = typename flag_expression::storage_type&;
+
+        using storage_type = xoptional_assembly_storage<data_storage_type, mask_storage_type>;
+    };
+
+    namespace detail
+    {
+        template <class CTD, class CTM, class IO = void>
+        struct xmasked_view_storage;
+
+        template <class CTD, class CTM>
+        struct xmasked_view_storage<CTD, CTM, std::enable_if_t<is_xoptional_expression<std::decay_t<CTD>>::value>>
+        {
+            using data_type = std::decay_t<CTD>;
+
+            using flag_expression = typename data_type::flag_expression;
+            using storage_type = typename data_type::storage_type;
+            using size_type = typename data_type::size_type;
+
+            flag_expression get_flag_container_cache(CTD data, CTM /*mask*/)
+            {
+                return flag_expression(data.has_value().shape(), data.has_value().layout());
+            }
+
+            storage_type get_storage_cache(CTD data, CTM /*mask*/, flag_expression& flag_container_cache)
+            {
+                return storage_type(data.storage().value(), flag_container_cache.storage());
+            }
+
+            template <class T, class D, class M, class... Args>
+            inline T call_operator_impl(T&& missing_val, D&& data, M&& mask, Args... args)
+            {
+                if (!mask(args...))
+                {
+                    return missing_val;
+                }
+
+                return data(args...);
+            }
+
+            template <class T, class D, class M, class... Args>
+            inline T unchecked_impl(T&& missing_val, D&& data, M&& mask, Args... args)
+            {
+                if (!mask.unchecked(args...))
+                {
+                    return missing_val;
+                }
+
+                return data.unchecked(args...);
+            }
+
+            template <class T, class D, class M, class S>
+            inline disable_integral_t<S, T> access_operator_impl(T&& missing_val, D&& data, M&& mask, const S& index)
+            {
+                if (!mask[index])
+                {
+                    return missing_val;
+                }
+
+                return data[index];
+            }
+
+            template <class T, class D, class M, class I>
+            inline T access_operator_impl(T&& missing_val, D&& data, M&& mask, std::initializer_list<I> index)
+            {
+                if (!mask[index])
+                {
+                    return missing_val;
+                }
+
+                return data[index];
+            }
+
+            template <class T, class D, class M>
+            inline T access_operator_impl(T&& missing_val, D&& data, M&& mask, size_type i)
+            {
+                if (!mask[i])
+                {
+                    return missing_val;
+                }
+
+                return data[i];
+            }
+
+            template <class T, class D, class M, class It>
+            inline T element_impl(T&& missing_val, D&& data, M&& mask, It first, It last)
+            {
+                if (!mask.element(first, last))
+                {
+                    return missing_val;
+                }
+
+                return data.element(first, last);
+            }
+
+            template <class D>
+            inline auto value_impl(D&& data) -> decltype(data.value())
+            {
+                return data.value();
+            }
+        };
+
+        template <class CTD, class CTM>
+        struct xmasked_view_storage<CTD, CTM, std::enable_if_t<!is_xoptional_expression<std::decay_t<CTD>>::value>>
+        {
+            using data_type = std::decay_t<CTD>;
+
+            using flag_expression = CTM;
+            using storage_type = xoptional_assembly_storage<typename std::decay_t<CTD>::storage_type&, typename std::decay_t<CTM>::storage_type&>;
+            using size_type = typename data_type::size_type;
+
+            flag_expression get_flag_container_cache(CTD /*data*/, CTM mask)
+            {
+                return mask;
+            }
+
+            storage_type get_storage_cache(CTD data, CTM mask, flag_expression& /*flag_container_cache*/)
+            {
+                return storage_type(data.storage(), mask.storage());
+            }
+
+            template <class T, class D, class M, class... Args>
+            inline T call_operator_impl(T&& /*missing_val*/, D&& data, M&& mask, Args... args)
+            {
+                return T(data(args...), mask(args...));
+            }
+
+            template <class T, class D, class M, class... Args>
+            inline T unchecked_impl(T&& /*missing_val*/, D&& data, M&& mask, Args... args)
+            {
+                return T(data.unchecked(args...), mask.unchecked(args...));
+            }
+
+            template <class T, class D, class M, class S>
+            inline disable_integral_t<S, T> access_operator_impl(T&& /*missing_val*/, D&& data, M&& mask, const S& index)
+            {
+                return disable_integral_t<S, T>(data[index], mask[index]);
+            }
+
+            template <class T, class D, class M, class I>
+            inline T access_operator_impl(T&& /*missing_val*/, D&& data, M&& mask, std::initializer_list<I> index)
+            {
+                return T(data[index], mask[index]);
+            }
+
+            template <class T, class D, class M>
+            inline T access_operator_impl(T&& /*missing_val*/, D&& data, M&& mask, size_type i)
+            {
+                return T(data[i], mask[i]);
+            }
+
+            template <class T, class D, class M, class It>
+            inline T element_impl(T&& /*missing_val*/, D&& data, M&& mask, It first, It last)
+            {
+                return T(data.element(first, last), mask.element(first, last));
+            }
+
+            template <class D>
+            inline auto value_impl(D&& data) -> decltype(data)
+            {
+                return data;
+            }
+        };
+    }
 
     /**
      * @class xmasked_view
@@ -49,12 +262,13 @@ namespace xt
      * @tparam CTM The type of expression holding the mask.
      */
     template <class CTD, class CTM>
-    class xmasked_view : public xexpression<xmasked_view<CTD, CTM>>, // Will be replaced by xview_semantic
+    class xmasked_view : public xview_semantic<xmasked_view<CTD, CTM>>,
                          private xiterable<xmasked_view<CTD, CTM>>
     {
     public:
 
         using self_type = xmasked_view<CTD, CTM>;
+        using semantic_base = xview_semantic<xmasked_view<CTD, CTM>>;
         using assembly_type = self_type;
         using data_closure_type = CTD;
         using mask_closure_type = CTM;
@@ -62,25 +276,27 @@ namespace xt
         static constexpr bool is_data_const = std::is_const<std::remove_reference_t<data_closure_type>>::value;
 
         using data_type = std::decay_t<data_closure_type>;
-        using value_expression = typename data_type::value_expression;
-        using flag_expression = typename data_type::flag_expression;
+        using masked_view_inner_types = xmasked_view_inner_types<self_type>;
 
-        using value_type = typename data_type::value_type;
+        using value_expression = typename masked_view_inner_types::value_expression;
+        using flag_expression = typename masked_view_inner_types::flag_expression;
+        using storage_type = typename masked_view_inner_types::storage_type;
+
+        using value_type = typename storage_type::value_type;
         using inner_value_type = typename value_type::value_type;
         using reference = std::conditional_t<is_data_const,
-                                             typename data_type::const_reference,
-                                             typename data_type::reference>;
-        using const_reference = typename data_type::const_reference;
+                                             typename storage_type::const_reference,
+                                             typename storage_type::reference>;
+        using const_reference = typename storage_type::const_reference;
         using pointer = std::conditional_t<is_data_const,
-                                           typename data_type::const_pointer,
-                                           typename data_type::pointer>;
-        using const_pointer = typename data_type::const_pointer;
+                                           typename storage_type::const_pointer,
+                                           typename storage_type::pointer>;
+        using const_pointer = typename storage_type::const_pointer;
         using size_type = typename data_type::size_type;
         using difference_type = typename data_type::difference_type;
 
         using shape_type = typename data_type::shape_type;
         using strides_type = typename data_type::strides_type;
-        using storage_type = typename data_type::storage_type;
 
         static constexpr layout_type static_layout = value_expression::static_layout;
 
@@ -200,33 +416,26 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
+        template <class E>
+        self_type& operator=(const xexpression<E>& e);
+
+        template <class E>
+        disable_xexpression<E, self_type>& operator=(const E& e);
+
     private:
 
-        template <class T, class... Args>
-        T call_operator_impl(T&& missing_val, Args... args) const;
+        template <class E>
+        std::enable_if_t<is_xoptional_expression<E>::value> evaluate_cache() const;
 
-        template <class T, class... Args>
-        T unchecked_impl(T&& missing_val, Args... args) const;
-
-        template <class T, class S>
-        disable_integral_t<S, T> access_operator_impl(T&& missing_val, const S& index) const;
-
-        template <class T, class I>
-        T access_operator_impl(T&& missing_val, std::initializer_list<I> index) const;
-
-        template <class T>
-        T access_operator_impl(T&& missing_val, size_type i) const;
-
-        template <class T, class It>
-        T element_impl(T&& missing_val, It first, It last) const;
+        template <class E>
+        std::enable_if_t<!is_xoptional_expression<E>::value> evaluate_cache() const;
 
         const_reference missing() const;
         reference missing();
 
-        void evaluate_cache() const;
-
         CTD m_data;
         CTM m_mask;
+        detail::xmasked_view_storage<CTD, CTM> m_masked_view_storage;
         mutable flag_expression m_flag_container_cache;
         mutable storage_type m_storage_cache;
         mutable bool m_data_cached;
@@ -259,8 +468,9 @@ namespace xt
     inline xmasked_view<CTD, CTM>::xmasked_view(D&& data, M&& mask)
         : m_data(std::forward<D>(data)),
           m_mask(std::forward<M>(mask)),
-          m_flag_container_cache(m_data.has_value().shape(), m_data.has_value().layout()),
-          m_storage_cache(m_data.storage().value(), m_flag_container_cache.storage()),
+          m_masked_view_storage(),
+          m_flag_container_cache(m_masked_view_storage.get_flag_container_cache(m_data, m_mask)),
+          m_storage_cache(m_masked_view_storage.get_storage_cache(m_data, m_mask, m_flag_container_cache)),
           m_data_cached(false)
     {
     }
@@ -351,7 +561,7 @@ namespace xt
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::operator()(Args... args) -> reference
     {
-        return call_operator_impl(missing(), args...);
+        return m_masked_view_storage.call_operator_impl(missing(), m_data, m_mask, args...);
     }
 
     /**
@@ -364,7 +574,7 @@ namespace xt
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::operator()(Args... args) const -> const_reference
     {
-        return call_operator_impl(missing(), args...);
+        return m_masked_view_storage.call_operator_impl(missing(), m_data, m_mask, args...);
     }
 
     /**
@@ -381,7 +591,7 @@ namespace xt
     inline auto xmasked_view<CTD, CTM>::at(Args... args) -> reference
     {
         check_access(shape(), static_cast<size_type>(args)...);
-        return call_operator_impl(missing(), args...);
+        return m_masked_view_storage.call_operator_impl(missing(), m_data, m_mask, args...);
     }
 
     /**
@@ -398,7 +608,7 @@ namespace xt
     inline auto xmasked_view<CTD, CTM>::at(Args... args) const -> const_reference
     {
         check_access(shape(), static_cast<size_type>(args)...);
-        return call_operator_impl(missing(), args...);
+        return m_masked_view_storage.call_operator_impl(missing(), m_data, m_mask, args...);
     }
 
     /**
@@ -424,7 +634,7 @@ namespace xt
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::unchecked(Args... args) -> reference
     {
-        return unchecked_impl(missing(), args...);
+        return m_masked_view_storage.unchecked_impl(missing(), m_data, m_mask, args...);
     }
 
     /**
@@ -450,7 +660,7 @@ namespace xt
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::unchecked(Args... args) const -> const_reference
     {
-        return unchecked_impl(missing(), args...);
+        return m_masked_view_storage.unchecked_impl(missing(), m_data, m_mask, args...);
     }
 
     /**
@@ -463,20 +673,20 @@ namespace xt
     template <class S>
     inline auto xmasked_view<CTD, CTM>::operator[](const S& index) -> disable_integral_t<S, reference>
     {
-        return access_operator_impl(missing(), index);
+        return m_masked_view_storage.access_operator_impl(missing(), m_data, m_mask, index);
     }
 
     template <class CTD, class CTM>
     template <class I>
     inline auto xmasked_view<CTD, CTM>::operator[](std::initializer_list<I> index) -> reference
     {
-        return access_operator_impl(missing(), index);
+        return m_masked_view_storage.access_operator_impl(missing(), m_data, m_mask, index);
     }
 
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::operator[](size_type i) -> reference
     {
-        return access_operator_impl(missing(), i);
+        return m_masked_view_storage.access_operator_impl(missing(), m_data, m_mask, i);
     }
 
     /**
@@ -489,20 +699,20 @@ namespace xt
     template <class S>
     inline auto xmasked_view<CTD, CTM>::operator[](const S& index) const -> disable_integral_t<S, const_reference>
     {
-        return access_operator_impl(missing(), index);
+        return m_masked_view_storage.access_operator_impl(missing(), m_data, m_mask, index);
     }
 
     template <class CTD, class CTM>
     template <class I>
     inline auto xmasked_view<CTD, CTM>::operator[](std::initializer_list<I> index) const -> const_reference
     {
-        return access_operator_impl(missing(), index);
+        return m_masked_view_storage.access_operator_impl(missing(), m_data, m_mask, index);
     }
 
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::operator[](size_type i) const -> const_reference
     {
-        return access_operator_impl(missing(), i);
+        return m_masked_view_storage.access_operator_impl(missing(), m_data, m_mask, i);
     }
 
     /**
@@ -516,7 +726,7 @@ namespace xt
     template <class It>
     inline auto xmasked_view<CTD, CTM>::element(It first, It last) -> reference
     {
-        return element_impl(missing(), first, last);
+        return m_masked_view_storage.element_impl(missing(), m_data, m_mask, first, last);
     }
 
     /**
@@ -530,21 +740,21 @@ namespace xt
     template <class It>
     inline auto xmasked_view<CTD, CTM>::element(It first, It last) const -> const_reference
     {
-        return element_impl(missing(), first, last);
+        return m_masked_view_storage.element_impl(missing(), m_data, m_mask, first, last);
     }
     //@}
 
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::storage() noexcept -> storage_type&
     {
-        evaluate_cache();
+        evaluate_cache<CTD>();
         return m_storage_cache;
     }
 
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::storage() const noexcept -> const storage_type&
     {
-        evaluate_cache();
+        evaluate_cache<CTD>();
         return m_storage_cache;
     }
 
@@ -554,7 +764,7 @@ namespace xt
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::value() noexcept -> value_expression&
     {
-        return m_data.value();
+        return m_masked_view_storage.value_impl(m_data);
     }
 
     /**
@@ -563,7 +773,7 @@ namespace xt
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::value() const noexcept -> const value_expression&
     {
-        return m_data.value();
+        return m_masked_view_storage.value_impl(m_data);
     }
 
     /**
@@ -572,7 +782,7 @@ namespace xt
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::has_value() noexcept -> flag_expression&
     {
-        evaluate_cache();
+        evaluate_cache<CTD>();
         return m_flag_container_cache;
     }
 
@@ -582,21 +792,21 @@ namespace xt
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::has_value() const noexcept -> const flag_expression&
     {
-        evaluate_cache();
+        evaluate_cache<CTD>();
         return m_flag_container_cache;
     }
 
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::data() noexcept -> value_type*
     {
-        evaluate_cache();
+        evaluate_cache<CTD>();
         return m_storage_cache.data();
     }
 
     template <class CTD, class CTM>
     inline auto xmasked_view<CTD, CTM>::data() const noexcept -> const value_type*
     {
-        evaluate_cache();
+        evaluate_cache<CTD>();
         return m_storage_cache.data();
     }
 
@@ -635,75 +845,18 @@ namespace xt
     }
 
     template <class CTD, class CTM>
-    template <class T, class... Args>
-    inline auto xmasked_view<CTD, CTM>::call_operator_impl(T&& missing_val, Args... args) const -> T
+    template <class E>
+    inline auto xmasked_view<CTD, CTM>::operator=(const xexpression<E>& e) -> self_type&
     {
-        if (!m_mask(args...))
-        {
-            return missing_val;
-        }
-
-        return m_data(args...);
+        return semantic_base::operator=(e);
     }
 
     template <class CTD, class CTM>
-    template <class T, class... Args>
-    inline auto xmasked_view<CTD, CTM>::unchecked_impl(T&& missing_val, Args... args) const -> T
+    template <class E>
+    inline auto xmasked_view<CTD, CTM>::operator=(const E& e) -> disable_xexpression<E, self_type>&
     {
-        if (!m_mask(args...))
-        {
-            return missing_val;
-        }
-
-        return m_data.unchecked(args...);
-    }
-
-    template <class CTD, class CTM>
-    template <class T, class S>
-    inline auto xmasked_view<CTD, CTM>::access_operator_impl(T&& missing_val, const S& index) const -> disable_integral_t<S, T>
-    {
-        if (!m_mask[index])
-        {
-            return missing_val;
-        }
-
-        return m_data[index];
-    }
-
-    template <class CTD, class CTM>
-    template <class T, class I>
-    inline auto xmasked_view<CTD, CTM>::access_operator_impl(T&& missing_val, std::initializer_list<I> index) const -> T
-    {
-        if (!m_mask[index])
-        {
-            return missing_val;
-        }
-
-        return m_data[index];
-    }
-
-    template <class CTD, class CTM>
-    template <class T>
-    inline auto xmasked_view<CTD, CTM>::access_operator_impl(T&& missing_val, size_type i) const -> T
-    {
-        if (!m_mask[i])
-        {
-            return missing_val;
-        }
-
-        return m_data[i];
-    }
-
-    template <class CTD, class CTM>
-    template <class T, class It>
-    inline auto xmasked_view<CTD, CTM>::element_impl(T&& missing_val, It first, It last) const -> T
-    {
-        if (!m_mask.element(first, last))
-        {
-            return missing_val;
-        }
-
-        return m_data.element(first, last);
+        std::fill(this->begin(), this->end(), e);
+        return *this;
     }
 
     template <class CTD, class CTM>
@@ -720,7 +873,8 @@ namespace xt
     }
 
     template <class CTD, class CTM>
-    inline void xmasked_view<CTD, CTM>::evaluate_cache() const
+    template <class E>
+    inline std::enable_if_t<is_xoptional_expression<E>::value> xmasked_view<CTD, CTM>::evaluate_cache() const
     {
         if (m_data_cached)
         {
@@ -730,6 +884,12 @@ namespace xt
         m_flag_container_cache = m_data.has_value() && m_mask;
 
         m_data_cached = true;
+    }
+
+    template <class CTD, class CTM>
+    template <class E>
+    inline std::enable_if_t<!is_xoptional_expression<E>::value> xmasked_view<CTD, CTM>::evaluate_cache() const
+    {
     }
 
     template <class CTD, class CTM>

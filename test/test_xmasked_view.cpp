@@ -180,4 +180,30 @@ namespace xt
         EXPECT_EQ(masked_data.at(2, 1), 2.);
         EXPECT_EQ(masked_data.at(2, 2), 2.);
     }
+
+    TEST(xmasked_view, non_optional_data)
+    {
+        xarray<double> data = {{ 1., 2., 3.},
+                               { 4., 5., 6.},
+                               { 7., 8., 9.}};
+        xarray<bool> mask = {{ true,  true,  true},
+                             { true, false, false},
+                             { true, false,  true}};
+
+        auto masked_data = masked_view(data, mask);
+
+        EXPECT_EQ(masked_data(0, 0), 1.);
+        EXPECT_EQ(masked_data.at(0, 1), 2.);
+        EXPECT_EQ(masked_data.at(0, 2), 3.);
+        EXPECT_EQ(masked_data.unchecked(1, 0), 4.);
+        EXPECT_EQ(masked_data.unchecked(1, 1), xtl::missing<double>());
+        auto index1 = std::array<int, 2>({1, 2});
+        EXPECT_EQ(masked_data[index1], xtl::missing<double>());
+
+        masked_data = 3.65;
+        xarray<double> expected = {{3.65, 3.65, 3.65},
+                                   {3.65, 5.  , 6.  },
+                                   {3.65, 8.  , 3.65}};
+        EXPECT_EQ(masked_data.value(), expected);
+    }
 }
