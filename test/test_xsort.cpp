@@ -25,7 +25,10 @@ namespace xt
         xarray<double> a1 = {2, 3, 1};
         xarray<double, xt::layout_type::column_major> a2_c = {{2, 3, 1}, {4, 6, 5}};
         xarray<double, xt::layout_type::row_major> a2_r = {{2, 3, 1}, {4, 6, 5}};
-        xarray<float> a3 = {{{1,3,2},{4,2,1}},{{5,1,3},{4,2,6}}};
+        xarray<float> a3 = {{{1,3,2},
+                             {4,2,1}},
+                            {{5,1,3},
+                             {4,2,6}}};
 
         xarray<std::size_t> ex = {2, 0, 1};
         EXPECT_EQ(ex, argsort(a1, 0));
@@ -55,8 +58,16 @@ namespace xt
         EXPECT_EQ(ex4, argsort(t1, 0));
         EXPECT_EQ(ex4, argsort(t1));
 
-        xtensor_fixed<double, xt::xshape<2, 3>> tf1 = a2_r;
-        EXPECT_EQ(ex2_1, argsort(tf1));
+        if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
+        {
+            xtensor_fixed<double, xt::xshape<2, 3>> tf1 = a2_r;
+            EXPECT_EQ(ex2_1, argsort(tf1));
+        }
+        else
+        {
+            xtensor_fixed<double, xt::xshape<2, 3>> tf1 = a2_c;
+            EXPECT_EQ(ex2_1, argsort(tf1));
+        }
     }
 
     TEST(xsort, sort_easy)
@@ -77,6 +88,17 @@ namespace xt
 
         xarray<double> ex_3 = {{1, 3, 5}, {4, 4, 4}};
         EXPECT_EQ(ex_3, sort(a, 1));
+    }
+
+    TEST(xsort, fixed)
+    {
+        xtensor_fixed<double, xshape<4, 3>> a = {{5, 3, 1}, {4, 4, 4}, {5, 9, 1}, {2, 4, 2}};
+        xarray<double> b = {{5, 3, 1}, {4, 4, 4}, {5, 9, 1}, {2, 4, 2}};
+
+        EXPECT_EQ(sort(a, xnone()), sort(b, xnone()));
+        EXPECT_EQ(sort(a), sort(b));
+        EXPECT_EQ(sort(a, 1), sort(b, 1));
+        EXPECT_EQ(sort(a, 0), sort(b, 0));
     }
 
     TEST(xsort, argmin)
