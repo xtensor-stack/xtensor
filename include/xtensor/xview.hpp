@@ -468,6 +468,12 @@ namespace xt
         using type = std::array<I, L - integral_count<S...>() + newaxis_count<S...>()>;
     };
 
+    template <std::size_t... I, class... S>
+    struct xview_shape_type<fixed_shape<I...>, S...>
+    {
+        using type = std::array<std::size_t, sizeof...(I) - integral_count<S...>() + newaxis_count<S...>()>;
+    };
+
     namespace detail
     {
         template <class T>
@@ -486,6 +492,12 @@ namespace xt
         struct static_dimension<xt::const_array<T, N>>
         {
             static constexpr std::ptrdiff_t value = static_cast<std::ptrdiff_t>(N);
+        };
+
+        template <std::size_t... I>
+        struct static_dimension<xt::fixed_shape<I...>>
+        {
+            static constexpr std::ptrdiff_t value = sizeof...(I);
         };
 
         template <class CT, class... S>

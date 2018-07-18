@@ -376,11 +376,11 @@ namespace xt
     template <class E1, class E2>
     inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        using shape_type = typename E1::shape_type;
+        using index_type = xindex_type_t<typename E1::shape_type>;
         using size_type = typename E1::size_type;
         const E2& de2 = e2.derived_cast();
         size_type size = de2.dimension();
-        shape_type shape = xtl::make_sequence<shape_type>(size, size_type(0));
+        index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
         e1.derived_cast().resize(std::move(shape));
         return trivial_broadcast;

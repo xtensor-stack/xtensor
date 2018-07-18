@@ -73,7 +73,7 @@ namespace xt
         EXPECT_THROW(a.resize({2, 2}), std::runtime_error);
 #endif
         // reshaping fixed container
-        EXPECT_THROW(a.reshape({1, 9}), std::runtime_error);
+        EXPECT_THROW(a.reshape({{1, 9}}), std::runtime_error);
         EXPECT_NO_THROW(a.reshape({3, 4}));
         EXPECT_NO_THROW(a.reshape({3, 4}, XTENSOR_DEFAULT_LAYOUT));
         EXPECT_THROW(a.reshape({3, 4}, layout_type::any), std::runtime_error);
@@ -88,7 +88,7 @@ namespace xt
         EXPECT_EQ(arm.strides().size(), brm.strides().size());
         EXPECT_TRUE(std::equal(arm.backstrides().begin(), arm.backstrides().end(), brm.backstrides().begin()));
         EXPECT_EQ(arm.backstrides().size(), brm.backstrides().size());
-        EXPECT_EQ(arm.size(), 3 * 7 * 2 * 5 * 3);
+        EXPECT_EQ(arm.size(), std::size_t(3 * 7 * 2 * 5 * 3));
 
         xtensor_fixed<double, xshape<3, 7, 2, 5, 3>, layout_type::column_major> acm;
         xtensor<double, 5, layout_type::column_major> bcm = xtensor<double, 5, layout_type::column_major>::from_shape({3, 7, 2, 5, 3});
@@ -97,17 +97,17 @@ namespace xt
         EXPECT_EQ(acm.strides().size(), bcm.strides().size());
         EXPECT_TRUE(std::equal(acm.backstrides().begin(), acm.backstrides().end(), bcm.backstrides().begin()));
         EXPECT_EQ(acm.backstrides().size(), bcm.backstrides().size());
-        EXPECT_EQ(acm.size(), 3 * 7 * 2 * 5 * 3);
+        EXPECT_EQ(acm.size(), std::size_t(3 * 7 * 2 * 5 * 3));
 
         auto s = get_strides<layout_type::row_major>(xshape<3, 4, 5>());
-        EXPECT_EQ(s[0], 20);
-        EXPECT_EQ(s[1], 5);
-        EXPECT_EQ(s[2], 1);
+        EXPECT_EQ(s[0], 20u);
+        EXPECT_EQ(s[1], 5u);
+        EXPECT_EQ(s[2], 1u);
 
         auto sc = get_strides<layout_type::column_major>(xshape<3, 4, 5>());
-        EXPECT_EQ(sc[0], 1);
-        EXPECT_EQ(sc[1], 3);
-        EXPECT_EQ(sc[2], 12);
+        EXPECT_EQ(sc[0], 1u);
+        EXPECT_EQ(sc[1], 3u);
+        EXPECT_EQ(sc[2], 12u);
 
         std::array<std::size_t, 3> ts1 = {1, 5, 3}, tt1;
 
@@ -198,6 +198,44 @@ namespace xt
         EXPECT_THROW(check_shape_b(), std::runtime_error);
         EXPECT_THROW(check_shape_c(), std::runtime_error);
     #endif
+    }
+
+    TEST(xtensor_fixed, xfunction_eval)
+    {
+        xtensorf3x4 a({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
+        xtensorf4 b({4, 5, 6, 7});
+
+        auto f1 = a + b;
+        bool truth = std::is_same<typename decltype(f1)::shape_type, xshape<3, 4>>::value;
+        EXPECT_TRUE(truth);
+        auto f2 = a + b + 5.0;
+        auto f3 = 5 + a + b;
+        auto f4 = a / 5 + b;
+
+        truth = std::is_same<typename decltype(f2)::shape_type, xshape<3, 4>>::value;
+        EXPECT_TRUE(truth);
+        truth = std::is_same<typename decltype(f3)::shape_type, xshape<3, 4>>::value;
+        EXPECT_TRUE(truth);
+        truth = std::is_same<typename decltype(f4)::shape_type, xshape<3, 4>>::value;
+        EXPECT_TRUE(truth);
+
+        auto e1 = xt::eval(f1);
+        auto e2 = xt::eval(f3);
+        truth = std::is_same<decltype(e1), xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_TRUE(truth);
+        truth = std::is_same<decltype(e2), xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_TRUE(truth);
+
+        xtensor_fixed<char, xshape<   2, 1, 10, 5>> xa;
+        xtensor_fixed<char, xshape<   2, 1, 10, 5>> xc;
+        xtensor_fixed<char, xshape<3, 2, 4, 10, 1>> xb;
+
+        auto fx1 = xa * xb;
+        auto fx2 = 5 + xb * xa;
+        truth = std::is_same<typename decltype(fx1)::shape_type, xshape<3, 2, 4, 10, 5>>::value;
+        EXPECT_TRUE(truth);
+        truth = std::is_same<typename decltype(fx2)::shape_type, xshape<3, 2, 4, 10, 5>>::value;
+        EXPECT_TRUE(truth);
     }
 }
 

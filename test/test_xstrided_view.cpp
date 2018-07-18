@@ -694,7 +694,7 @@ namespace xt
         using ds = xt::dynamic_shape<std::size_t>;
         std::iota(b.begin(), b.end(), 0);
         auto s1 = split(b, 3);
-        EXPECT_EQ(s1.size(), 3);
+        EXPECT_EQ(s1.size(), 3u);
         EXPECT_EQ(s1[0].shape(), ds({1, 3, 3}));
         EXPECT_EQ(s1[0](0, 0), b(0, 0, 0));
         EXPECT_EQ(s1[1](0, 0), b(1, 0, 0));
@@ -704,7 +704,7 @@ namespace xt
         EXPECT_THROW(split(b, 2), std::runtime_error);
 
         auto s2 = split(b, 1);
-        EXPECT_EQ(s2.size(), 1);
+        EXPECT_EQ(s2.size(), 1u);
         EXPECT_EQ(s2[0].shape(), ds({3, 3, 3}));
 
         auto s3 = split(b, 3, 1);

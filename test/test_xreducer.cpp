@@ -271,11 +271,10 @@ namespace xt
         a_gd = sum(a, {1, 2, 3}, evaluation_strategy::immediate());
         EXPECT_EQ(a_lz, a_gd);
 
-        xtensor<short, 3> ct = xt::random::randint<short>({1, 5, 3});
+        xtensor<short, 3, layout_type::column_major> ct = xt::random::randint<short>({1, 5, 3});
         EXPECT_EQ(sum(ct, {0, 2}), sum(ct, {0, 2}, evaluation_strategy::immediate()));
 
-        xtensor<short, 5> ct2 = xt::random::randint<short>({1, 5, 1, 2, 3});
-        // EXPECT_EQ(sum(ct2, {0, 1, 2}) * 2, sum(xt::cast<short>(ct2) * 2, {0, 1, 2}, evaluation_strategy::immediate()));
+        xtensor<short, 5, layout_type::column_major> ct2 = xt::random::randint<short>({1, 5, 1, 2, 3});
         EXPECT_EQ(sum(ct2, {0, 1, 2}), sum(ct2, {0, 1, 2}, evaluation_strategy::immediate()));
         EXPECT_EQ(sum(ct2, {2, 3}), sum(ct2, {2, 3}, evaluation_strategy::immediate()));
         EXPECT_EQ(sum(ct2, {1, 3}), sum(ct2, {1, 3}, evaluation_strategy::immediate()));
@@ -353,8 +352,8 @@ namespace xt
         EXPECT_EQ(a_lz, a_gd);
         EXPECT_TRUE(is_arr(a_gd.shape()));
 
-        a_lz = sum(a, {1});
-        auto a_gd_1 = sum(a, {1}, evaluation_strategy::immediate());
+        a_lz = sum(a, xt::dynamic_shape<std::size_t>{1});
+        auto a_gd_1 = sum(a, xt::dynamic_shape<std::size_t>{1}, evaluation_strategy::immediate());
         auto b_gd_1 = sum(b, {1}, evaluation_strategy::immediate());
         EXPECT_EQ(a_lz, a_gd_1);
         EXPECT_EQ(a_lz, b_gd_1);
@@ -367,13 +366,45 @@ namespace xt
         EXPECT_EQ(a_gd_2.dimension(), 1);
 
     #ifndef X_OLD_CLANG
-        EXPECT_TRUE(is_arr(a_gd_1.shape()));
+        // EXPECT_TRUE(is_arr(a_gd_1.shape()));
         EXPECT_TRUE(is_arr(a_gd_2.shape()));
     #endif
 
         a_lz = sum(a, {1, 2});
         a_gd_2 = sum(a, {1, 2}, evaluation_strategy::immediate());
         EXPECT_EQ(a_lz, a_gd_2);
+
+        auto a_lz_3 = sum(a, xshape<1, 2>());
+        auto a_gd_3 = sum(a, xshape<1, 2>(), evaluation_strategy::immediate());
+        EXPECT_EQ(a_lz_3, a_gd_2);
+        EXPECT_TRUE(a_gd_3 == a_gd_2);
+        bool truth = std::is_same<decltype(a_gd_3), xtensor_fixed<double, xshape<3>>>::value;
+        EXPECT_TRUE(truth);
+
+        xtensor<short, 3> ct = xt::random::randint<short>({1, 5, 3});
+        xtensor_fixed<short, xshape<1, 5, 3>> c = ct;
+        auto b_fx_1 = sum(c, xshape<0, 2>(), evaluation_strategy::immediate());
+        auto b_fx_2 = sum(c, xshape<0, 1>(), evaluation_strategy::immediate());
+        auto b_fx_3 = sum(c, xshape<0, 1, 2>(), evaluation_strategy::immediate());
+
+        EXPECT_EQ(sum(ct, {0, 2}, evaluation_strategy::immediate()), sum(c, {0, 2}));
+        EXPECT_TRUE(b_fx_1 == sum(c, {0, 2}));
+        EXPECT_TRUE(b_fx_2 == sum(c, {0, 1}));
+        EXPECT_EQ(b_fx_3, sum(c, {0, 1, 2}));
+
+        truth = std::is_same<std::decay_t<decltype(b_fx_1)>, xtensor_fixed<long long, xshape<5>>>::value;
+        EXPECT_TRUE(truth);
+        truth = std::is_same<std::decay_t<decltype(b_fx_3)>, xtensor_fixed<long long, xshape<>>>::value;
+        EXPECT_TRUE(truth);
+
+        truth = std::is_same<xshape<1, 3>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<1>>::type>();
+        EXPECT_TRUE(truth);
+        truth = std::is_same<xshape<5>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<0, 2>>::type>();
+        EXPECT_TRUE(truth);
+        truth = std::is_same<xshape<>, typename fixed_xreducer_shape_type<xshape<1, 5, 3>, xshape<0, 1, 2>>::type>();
+        EXPECT_TRUE(truth);
+        truth = std::is_same<xshape<1, 5>, typename fixed_xreducer_shape_type<xshape<1, 5>, xshape<2>>::type>();
+        EXPECT_TRUE(truth);
     }
 
     TEST(xreducer, view_steppers)

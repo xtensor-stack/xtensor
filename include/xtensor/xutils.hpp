@@ -68,6 +68,12 @@ namespace xt
     template <class T, std::size_t N>
     bool resize_container(std::array<T, N>& a, typename std::array<T, N>::size_type size);
 
+    template <std::size_t... I>
+    class fixed_shape;
+
+    template <std::size_t... I>
+    bool resize_container(fixed_shape<I...>& a, std::size_t size);
+
     // gcc 4.9 is affected by C++14 defect CGW 1558
     // see http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
     template <class... T>
@@ -410,6 +416,12 @@ namespace xt
     inline bool resize_container(std::array<T, N>& /*a*/, typename std::array<T, N>::size_type size)
     {
         return size == N;
+    }
+
+    template <std::size_t... I>
+    inline bool resize_container(xt::fixed_shape<I...>&, std::size_t size)
+    {
+        return sizeof...(I) == size;
     }
 
     /******************

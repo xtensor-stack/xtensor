@@ -24,6 +24,7 @@
 #include "xiterable.hpp"
 #include "xlayout.hpp"
 #include "xscalar.hpp"
+#include "xshape.hpp"
 #include "xstrides.hpp"
 #include "xtensor_simd.hpp"
 #include "xutils.hpp"
@@ -226,7 +227,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const;
+        const inner_shape_type& shape() const;
         layout_type layout() const noexcept;
 
         template <class... Args>
@@ -263,13 +264,13 @@ namespace xt
         using iterable_base::crend;
 
         template <layout_type L = DL>
-        const_storage_iterator storage_begin() const noexcept;
+        auto storage_begin() const noexcept;
         template <layout_type L = DL>
-        const_storage_iterator storage_end() const noexcept;
+        auto storage_end() const noexcept;
         template <layout_type L = DL>
-        const_storage_iterator storage_cbegin() const noexcept;
+        auto storage_cbegin() const noexcept;
         template <layout_type L = DL>
-        const_storage_iterator storage_cend() const noexcept;
+        auto storage_cend() const noexcept;
 
         template <layout_type L = DL>
         const_reverse_storage_iterator storage_rbegin() const noexcept;
@@ -332,13 +333,15 @@ namespace xt
         const_stepper build_stepper(Func&& f, std::index_sequence<I...>) const noexcept;
 
         template <class Func, std::size_t... I>
-        const_storage_iterator build_iterator(Func&& f, std::index_sequence<I...>) const noexcept;
+        auto build_iterator(Func&& f, std::index_sequence<I...>) const noexcept;
 
         size_type compute_dimension() const noexcept;
 
+        void compute_cached_shape() const;
+
         tuple_type m_e;
         functor_type m_f;
-        mutable shape_type m_shape;
+        mutable inner_shape_type m_shape;
         mutable bool m_shape_trivial;
         mutable bool m_shape_computed;
 
@@ -555,7 +558,7 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func, class... CTA, class U>
     inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CTA&&... e) noexcept
-        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<shape_type>(0, size_type(0))),
+        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<inner_shape_type>(0, size_type(0))),
           m_shape_computed(false)
     {
     }
@@ -584,18 +587,28 @@ namespace xt
         return dimension;
     }
 
+    template <class F, class R, class... CT>
+    inline void xfunction_base<F, R, CT...>::compute_cached_shape() const
+    {
+        m_shape = xtl::make_sequence<xindex_type_t<inner_shape_type>>(compute_dimension(), size_type(0));
+        m_shape_trivial = broadcast_shape(m_shape, false);
+        m_shape_computed = true;
+    }
+
     /**
      * Returns the shape of the xfunction.
      */
     template <class F, class R, class... CT>
-    inline auto xfunction_base<F, R, CT...>::shape() const -> const shape_type&
+    inline auto xfunction_base<F, R, CT...>::shape() const -> const inner_shape_type&
     {
-        if (!m_shape_computed)
+        xtl::mpl::static_if<!detail::is_fixed<inner_shape_type>::value>([&](auto self)
         {
-            m_shape = xtl::make_sequence<shape_type>(compute_dimension(), size_type(0));
-            m_shape_trivial = broadcast_shape(m_shape, false);
-            m_shape_computed = true;
-        }
+            if(!this->m_shape_computed)
+            {
+                self(this)->compute_cached_shape();
+            }
+        },
+        [](auto self){});
         return m_shape;
     }
 
@@ -751,21 +764,24 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_begin() const noexcept -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_begin() const noexcept
+        //  -> const_storage_iterator
     {
         return storage_cbegin<L>();
     }
 
     template <class F, class R, class... CT>
     template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_end() const noexcept -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_end() const noexcept
+        //  -> const_storage_iterator
     {
         return storage_cend<L>();
     }
 
     template <class F, class R, class... CT>
     template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_cbegin() const noexcept -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_cbegin() const noexcept
+        //  -> const_storage_iterator
     {
         auto f = [](const auto& e) noexcept { return detail::trivial_begin(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
@@ -773,7 +789,8 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_cend() const noexcept -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_cend() const noexcept
+        //  -> const_storage_iterator
     {
         auto f = [](const auto& e) noexcept { return detail::trivial_end(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
@@ -942,7 +959,7 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <class Func, std::size_t... I>
-    inline auto xfunction_base<F, R, CT...>::build_iterator(Func&& f, std::index_sequence<I...>) const noexcept -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::build_iterator(Func&& f, std::index_sequence<I...>) const noexcept
     {
         return const_storage_iterator(this, f(std::get<I>(m_e))...);
     }

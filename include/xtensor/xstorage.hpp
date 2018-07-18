@@ -1225,7 +1225,7 @@ namespace xt
         lhs.swap(rhs);
     }
 
-#define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
+    #define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
 
     /**
      * This array class is modeled after ``std::array`` but adds optional alignment through a template parameter.
@@ -1247,6 +1247,47 @@ namespace xt
     #define XTENSOR_CONST
 #else
     #define XTENSOR_CONST const
+#endif
+
+#if defined(__GNUC__) && __GNUC__ < 5
+    #define GCC4_FALLBACK
+
+    namespace const_array_detail
+    {
+        template <class T, std::size_t N>
+        struct array_traits
+        {
+            using storage_type = T[N];
+
+            static constexpr T& ref(const storage_type& t, std::size_t n) noexcept
+            {
+                return const_cast<T&>(t[n]);
+            }
+
+            static constexpr T* ptr(const storage_type& t) noexcept
+            {
+                return const_cast<T*>(t);
+            }
+        };
+
+        template <class T>
+        struct array_traits<T, 0>
+        {
+            struct empty {};
+
+            using storage_type = empty;
+
+            static constexpr T& ref(const storage_type& /*t*/, std::size_t /*n*/) noexcept
+            {
+                return *static_cast<T*>(nullptr);
+            }
+
+            static constexpr T* ptr(const storage_type& /*t*/) noexcept
+            {
+                return nullptr;
+            }
+        };
+    }
 #endif
 
     /**
@@ -1271,7 +1312,11 @@ namespace xt
 
         constexpr const_reference operator[](std::size_t idx) const
         {
+        #ifdef GCC4_FALLBACK
+            return const_array_detail::array_traits<T, N>::ref(m_data, idx);
+        #else
             return m_data[idx];
+        #endif
         }
 
         constexpr const_iterator begin() const noexcept
@@ -1286,12 +1331,12 @@ namespace xt
 
         constexpr const_iterator cbegin() const noexcept
         {
-            return m_data;
+            return data();
         }
 
         constexpr const_iterator cend() const noexcept
         {
-            return m_data + N;
+            return data() + N;
         }
 
         // TODO make constexpr once C++17 arrives
@@ -1317,17 +1362,30 @@ namespace xt
 
         constexpr const_pointer data() const noexcept
         {
+        #ifdef GCC4_FALLBACK
+            return const_array_detail::array_traits<T, N>::ptr(m_data);
+        #else
             return m_data;
+        #endif
         }
 
         constexpr const_reference front() const noexcept
         {
+        #ifdef GCC4_FALLBACK
+            return const_array_detail::array_traits<T, N>::ref(m_data, 0);
+        #else
             return m_data[0];
+        #endif
         }
 
         constexpr const_reference back() const noexcept
         {
+        #ifdef GCC4_FALLBACK
+            return N ? const_array_detail::array_traits<T, N>::ref(m_data, N - 1) :
+                       const_array_detail::array_traits<T, N>::ref(m_data, 0);
+        #else
             return m_data[size() - 1];
+        #endif
         }
 
         constexpr size_type size() const noexcept
@@ -1335,9 +1393,105 @@ namespace xt
             return N;
         }
 
+    #ifdef GCC4_FALLBACK
+        XTENSOR_CONST typename const_array_detail::array_traits<T, N>::storage_type m_data;
+    #else
         XTENSOR_CONST T m_data[N > 0 ? N : 1];
+    #endif
+    };
+
+#undef GCC4_FALLBACK
+
+    /**
+     * @class fixed_shape
+     * Fixed shape implementation for compile time defined arrays.
+     * @sa xshape
+     */
+    template <std::size_t... X>
+    class fixed_shape
+    {
+    public:
+
+        using cast_type = const_array<std::size_t, sizeof...(X)>;
+        using value_type = std::size_t;
+        using size_type = std::size_t;
+
+        constexpr static std::size_t size()
+        {
+            return sizeof...(X);
+        }
+
+        constexpr operator cast_type() const
+        {
+            return cast_type({{X...}});
+        }
+
+        constexpr auto begin() const
+        {
+            return m_array.begin();
+        }
+
+        constexpr auto end() const
+        {
+            return m_array.end();
+        }
+
+        auto rbegin() const
+        {
+            return m_array.rbegin();
+        }
+
+        auto rend() const
+        {
+            return m_array.rend();
+        }
+
+        constexpr auto cbegin() const
+        {
+            return m_array.cbegin();
+        }
+
+        constexpr auto cend() const
+        {
+            return m_array.cend();
+        }
+
+        constexpr std::size_t operator[](std::size_t idx) const
+        {
+            return m_array[idx];
+        }
+
+    private:
+
+         XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = {{X...}};
+    };
+
+#ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
+    template <std::size_t... X>
+    constexpr typename fixed_shape<X...>::cast_type fixed_shape<X...>::m_array;
+#endif
+
+}
+
+/******************************
+ * std::tuple_size extensions *
+ ******************************/
+
+namespace std
+{
+    template <class T, size_t N>
+    class tuple_size<xt::const_array<T, N>> :
+        public integral_constant<size_t, N>
+    {
+    };
+
+    template <size_t... N>
+    class tuple_size<xt::fixed_shape<N...>> :
+        public integral_constant<size_t, sizeof...(N)>
+    {
     };
 }
+
 
 #undef XTENSOR_CONST
 #undef XTENSOR_ALIGNMENT

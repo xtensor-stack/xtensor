@@ -88,14 +88,56 @@ namespace xt
             using type = xarray<R>;
         };
 
-        template <class T, std::size_t N, class R>
-        struct xaccumulator_return_type<xtensor<T, N>, R>
+        template <class T, layout_type L, class R>
+        struct xaccumulator_return_type<xarray<T, L>, R>
         {
-            using type = xtensor<R, N>;
+            using type = xarray<R, L>;
+        };
+
+        template <class T, std::size_t N, layout_type L, class R>
+        struct xaccumulator_return_type<xtensor<T, N, L>, R>
+        {
+            using type = xtensor<R, N, L>;
+        };
+
+        template <class T, std::size_t... I, layout_type L, class R>
+        struct xaccumulator_return_type<xtensor_fixed<T, xshape<I...>, L>, R>
+        {
+            using type = xtensor_fixed<R, xshape<I...>, L>;
         };
 
         template <class T, class R>
         using xaccumulator_return_type_t = typename xaccumulator_return_type<T, R>::type;
+
+        template <class T>
+        struct fixed_compute_size;
+
+        template <class T, class R>
+        struct xaccumulator_linear_return_type
+        {
+            using type = xtensor<R, 1>;
+        };
+
+        template <class T, layout_type L, class R>
+        struct xaccumulator_linear_return_type<xarray<T, L>, R>
+        {
+            using type = xtensor<R, 1, L>;
+        };
+
+        template <class T, std::size_t N, layout_type L, class R>
+        struct xaccumulator_linear_return_type<xtensor<T, N, L>, R>
+        {
+            using type = xtensor<R, 1, L>;
+        };
+
+        template <class T, std::size_t... I, layout_type L, class R>
+        struct xaccumulator_linear_return_type<xtensor_fixed<T, xshape<I...>, L>, R>
+        {
+            using type = xtensor_fixed<R, xshape<fixed_compute_size<xshape<I...>>::value>, L>;
+        };
+
+        template <class T, class R>
+        using xaccumulator_linear_return_type_t = typename xaccumulator_linear_return_type<T, R>::type;
 
         template <class F, class E>
         inline auto accumulator_init_with_f(F&& f, E& e, std::size_t axis)
@@ -208,7 +250,7 @@ namespace xt
             using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
             using T = typename accumulate_functor::result_type;
 
-            using result_type = xtensor<T, 1>;
+            using result_type = xaccumulator_linear_return_type_t<std::decay_t<E>, T>;
             std::size_t sz = e.size();
             auto result = result_type::from_shape({sz});
 

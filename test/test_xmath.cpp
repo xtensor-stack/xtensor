@@ -824,8 +824,8 @@ namespace xt
         xarray<double> a = {{1, 2, 3, 4}, {0, 0, 0, 0}, {3, 0, 1, 0}};
         std::size_t as = count_nonzero(a)();
         std::size_t ase = count_nonzero(a, evaluation_strategy::immediate())();
-        EXPECT_EQ(as, 6);
-        EXPECT_EQ(ase, 6);
+        EXPECT_EQ(as, 6u);
+        EXPECT_EQ(ase, 6u);
 
         xarray<std::size_t> ea0 = {2, 1, 2, 1};
         xarray<std::size_t> ea1 = {4, 0, 2};
