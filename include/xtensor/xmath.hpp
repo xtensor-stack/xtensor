@@ -926,6 +926,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      */
     template <class E1, class E2>
     inline auto pow(E1&& e1, E2&& e2) noexcept
+        // -> std::enable_if_t<!std::is_integral<E2>::value, detail::xfunction_type_t<math::pow_fun, E1, E2>>
         -> detail::xfunction_type_t<math::pow_fun, E1, E2>
     {
         return detail::make_xfunction<math::pow_fun>(std::forward<E1>(e1), std::forward<E2>(e2));
@@ -1117,6 +1118,32 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {
         static_assert(N > 0, "integer power cannot be negative");
         return detail::make_lambda_function(detail::pow_impl<N>{}, std::forward<E1>(e1));
+    }
+
+    template <class E1, class E2>
+    inline auto integer_pow(E1&& e1, E2&& e2) noexcept
+    {
+        auto fnct = [](auto a, auto b)
+        {
+            const int recip = b < 0;
+            typename std::decay_t<E1>::value_type r = 1;
+            while (1)
+            {
+                if (b & 1)
+                {
+                    r *= a;
+                }
+                b /= 2;
+                if (b == 0)
+                {
+                    break;
+                }
+                a *= a;
+            }
+            return recip ? 1 / r : r;
+        };
+
+        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1), xscalar<E2>(e2));
     }
 
     /**
