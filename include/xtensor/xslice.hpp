@@ -12,6 +12,7 @@
 #include <cstddef>
 #include <type_traits>
 #include <utility>
+#include <map>
 
 #include <xtl/xtype_traits.hpp>
 
