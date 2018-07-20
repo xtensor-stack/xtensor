@@ -16,9 +16,447 @@
 #include "xoptional_assembly_storage.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
+#include "xutils.hpp"
 
 namespace xt
 {
+    template <class T, class B>
+    class xmasked_value;
+
+    namespace detail
+    {
+        template <class E>
+        struct is_xmasked_value_impl : std::false_type
+        {
+        };
+
+        template <class T, class B>
+        struct is_xmasked_value_impl<xmasked_value<T, B>> : std::true_type
+        {
+        };
+    }
+
+    template <class E>
+    using is_xmasked_value = detail::is_xmasked_value_impl<E>;
+
+    template <class E, class R>
+    using disable_xoptional_like = std::enable_if_t<!xtl::is_xoptional<E>::value && !is_xmasked_value<E>::value, R>;
+
+    template <class T, class B>
+    class xmasked_value
+    {
+    public:
+
+        using self_type = xmasked_value<T, B>;
+
+        using value_type = T;
+        using flag_type = B;
+        using optional_type = xtl::xoptional<value_type, flag_type>;
+
+        template <class T1, class B1>
+        inline constexpr xmasked_value(T1&& value, B1&& flag)
+            : m_value(std::forward<T1>(value)), m_flag(std::forward<B1>(flag))
+        {
+        }
+
+        inline explicit constexpr xmasked_value(const xtl::xoptional<T, B>& opt)
+            : m_value(opt.value()), m_flag(opt.has_value())
+        {
+        }
+
+        inline operator optional_type&() {
+            static auto val = optional_type(m_value, m_flag);
+            return val;
+        }
+
+        inline value_type value()
+        {
+            return m_value;
+        }
+
+        inline flag_type has_value()
+        {
+            return m_flag;
+        }
+
+        inline value_type value() const
+        {
+            return m_value;
+        }
+
+        inline flag_type has_value() const
+        {
+            return m_flag;
+        }
+
+        template <class T1, class B1>
+        inline bool equal(const xmasked_value<T1, B1>& rhs) const noexcept
+        {
+            return (!m_flag && !rhs.m_flag) || (m_value == rhs.m_value && (m_flag && rhs.m_flag));
+        }
+
+        template <class T1, class B1>
+        inline bool equal(const xtl::xoptional<T1, B1>& rhs) const noexcept
+        {
+            return (!m_flag && !rhs.has_value()) || (m_value == rhs.value() && (m_flag && rhs.has_value()));
+        }
+
+        template <class T1>
+        inline auto equal(const T1& rhs) const noexcept -> disable_xoptional_like<T1, bool>
+        {
+            return m_flag && m_value == rhs;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator=(T1&& value)
+        {
+            if (m_flag)
+            {
+                m_value = std::forward<T1>(value);
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator+=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value += value;
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator-=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value -= value;
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator*=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value *= value;
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator/=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value /= value;
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator%=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value %= value;
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator&=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value &= value;
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator|=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value |= value;
+            }
+            return *this;
+        }
+
+        template <class T1>
+        inline xmasked_value& operator^=(const T1& value)
+        {
+            if (m_flag)
+            {
+                m_value ^= value;
+            }
+            return *this;
+        }
+
+        inline void swap(xmasked_value& other)
+        {
+            std::swap(m_value, other.m_value);
+            std::swap(m_flag, other.m_flag);
+        }
+
+    private:
+
+        value_type m_value;
+        flag_type m_flag;
+    };
+
+    template <class T1, class B1, class T2, class B2>
+    inline bool operator==(const xmasked_value<T1, B1>& lhs, const xmasked_value<T2, B2>& rhs) noexcept
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline bool operator==(const xmasked_value<T1, B1>& lhs, const xtl::xoptional<T2, B2>& rhs) noexcept
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline bool operator==(const xtl::xoptional<T1, B1>& lhs, const xmasked_value<T2, B2>& rhs) noexcept
+    {
+        return rhs.equal(lhs);
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator==(const T1& lhs, const xmasked_value<T2, B2>& rhs) noexcept -> disable_xoptional_like<T1, bool>
+    {
+        return rhs.equal(lhs);
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator==(const xmasked_value<T1, B1>& lhs, const T2& rhs) noexcept -> disable_xoptional_like<T2, bool>
+    {
+        return lhs.equal(rhs);
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline bool operator!=(const xmasked_value<T1, B1>& lhs, const xmasked_value<T2, B2>& rhs) noexcept
+    {
+        return !lhs.equal(rhs);
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline bool operator!=(xmasked_value<T1, B1> lhs, xtl::xoptional<T2, B2> rhs) noexcept
+    {
+        return !lhs.equal(rhs);
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline bool operator!=(xtl::xoptional<T1, B1> lhs, xmasked_value<T2, B2> rhs) noexcept
+    {
+        return !rhs.equal(lhs);
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator!=(const T1& lhs, const xmasked_value<T2, B2>& rhs) noexcept -> disable_xoptional_like<T1, bool>
+    {
+        return !rhs.equal(lhs);
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator!=(const xmasked_value<T1, B1>& lhs, const T2& rhs) noexcept -> disable_xoptional_like<T2, bool>
+    {
+        return !lhs.equal(rhs);
+    }
+
+    template <class T, class B>
+    inline auto operator+(const xmasked_value<T, B>& e) noexcept
+        -> xmasked_value<std::decay_t<T>, std::decay_t<B>>
+    {
+        return xmasked_value<std::decay_t<T>, std::decay_t<B>>(e.value(), e.has_value());
+    }
+
+    template <class T, class B>
+    inline auto operator-(const xmasked_value<T, B>& e) noexcept
+        -> xmasked_value<std::decay_t<T>, std::decay_t<B>>
+    {
+        return xmasked_value<std::decay_t<T>, std::decay_t<B>>(-e.value(), e.has_value());
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator+(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() + e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator+(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() + e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator+(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() + e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator+(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept
+        -> disable_xoptional_like<T2, xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() ? e1.value() + e2 : xtl::missing<value_type>();
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator+(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> disable_xoptional_like<T1, xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e2.has_value() ? e2.value() + e1 : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator-(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() - e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator-(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() - e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator-(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() - e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator-(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() ? e1.value() - e2 : xtl::missing<value_type>();
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator-(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e2.has_value() ? e1 - e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator*(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() * e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator*(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() * e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator*(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() * e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator*(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() ? e1.value() * e2 : xtl::missing<value_type>();
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator*(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e2.has_value() ? e2.value() * e1 : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator/(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() / e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator/(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() / e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2, class B2>
+    inline auto operator/(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() && e2.has_value() ? e1.value() / e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T1, class B1, class T2>
+    inline auto operator/(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e1.has_value() ? e1.value() / e2 : xtl::missing<value_type>();
+    }
+
+    template <class T1, class T2, class B2>
+    inline auto operator/(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept
+        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>
+    {
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;
+        return e2.has_value() ? e1 / e2.value() : xtl::missing<value_type>();
+    }
+
+    template <class T, class B, class OC, class OT>
+    inline std::basic_ostream<OC, OT>& operator<<(std::basic_ostream<OC, OT>& out, xmasked_value<T, B> v)
+    {
+        if (v.has_value())
+        {
+            out << v.value();
+        }
+        else
+        {
+            out << "N/A";
+        }
+        return out;
+    }
+
     /****************************
     * xmasked_view declaration  *
     *****************************/
@@ -118,7 +556,7 @@ namespace xt
                     return missing_val;
                 }
 
-                return data(args...);
+                return T(data(args...));
             }
 
             template <class T, class D, class M, class... Args>
@@ -129,7 +567,7 @@ namespace xt
                     return missing_val;
                 }
 
-                return data.unchecked(args...);
+                return T(data.unchecked(args...));
             }
 
             template <class T, class D, class M, class S>
@@ -140,7 +578,7 @@ namespace xt
                     return missing_val;
                 }
 
-                return data[index];
+                return T(data[index]);
             }
 
             template <class T, class D, class M, class I>
@@ -151,7 +589,7 @@ namespace xt
                     return missing_val;
                 }
 
-                return data[index];
+                return T(data[index]);
             }
 
             template <class T, class D, class M>
@@ -162,7 +600,7 @@ namespace xt
                     return missing_val;
                 }
 
-                return data[i];
+                return T(data[i]);
             }
 
             template <class T, class D, class M, class It>
@@ -173,7 +611,7 @@ namespace xt
                     return missing_val;
                 }
 
-                return data.element(first, last);
+                return T(data.element(first, last));
             }
 
             template <class D>
@@ -284,10 +722,15 @@ namespace xt
 
         using value_type = typename storage_type::value_type;
         using inner_value_type = typename value_type::value_type;
+
+        using inner_reference =  typename storage_type::reference;
+        using inner_const_reference =  typename storage_type::const_reference;
+
+        using const_reference = xmasked_value<const inner_value_type&, const bool&>;
         using reference = std::conditional_t<is_data_const,
-                                             typename storage_type::const_reference,
-                                             typename storage_type::reference>;
-        using const_reference = typename storage_type::const_reference;
+                                             const_reference,
+                                             xmasked_value<inner_value_type&, bool&>>;
+
         using pointer = std::conditional_t<is_data_const,
                                            typename storage_type::const_pointer,
                                            typename storage_type::pointer>;
