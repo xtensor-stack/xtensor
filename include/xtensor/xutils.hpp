@@ -74,6 +74,8 @@ namespace xt
     template <std::size_t... I>
     bool resize_container(fixed_shape<I...>& a, std::size_t size);
 
+    std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis);
+
     // gcc 4.9 is affected by C++14 defect CGW 1558
     // see http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
     template <class... T>
@@ -422,6 +424,15 @@ namespace xt
     inline bool resize_container(xt::fixed_shape<I...>&, std::size_t size)
     {
         return sizeof...(I) == size;
+    }
+
+    /*********************************
+     * normalize_axis implementation *
+     *********************************/
+
+    inline std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis)
+    {
+        return axis < 0 ? static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis) : static_cast<std::size_t>(axis);
     }
 
     /******************
