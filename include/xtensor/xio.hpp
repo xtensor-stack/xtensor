@@ -591,7 +591,7 @@ namespace xt
     {
         const E& d = e.derived_cast();
 
-        size_t lim = 0;
+        std::size_t lim = 0;
         std::size_t sz = compute_size(d.shape());
         if (sz > print_options::print_options().threshold)
         {
@@ -870,10 +870,10 @@ namespace xt
         return mime_bundle_repr_impl(expr);
     }
 
-    template <class EC, size_t N, layout_type L, class Tag>
+    template <class EC, std::size_t N, layout_type L, class Tag>
     class xtensor_container;
 
-    template <class EC, size_t N, layout_type L, class Tag>
+    template <class EC, std::size_t N, layout_type L, class Tag>
     xeus::xjson mime_bundle_repr(const xtensor_container<EC, N, L, Tag>& expr)
     {
         return mime_bundle_repr_impl(expr);

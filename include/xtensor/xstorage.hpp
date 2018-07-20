@@ -1115,7 +1115,7 @@ namespace xt
         }
 
         // Swap the shared elements.
-        size_t num_shared = (std::min)(this->size(), rhs.size());
+        std::size_t num_shared = (std::min)(this->size(), rhs.size());
 
         for (size_type i = 0; i != num_shared; ++i)
         {
@@ -1125,7 +1125,7 @@ namespace xt
         // Copy over the extra elts.
         if (this->size() > rhs.size())
         {
-            size_t elements_diff = this->size() - rhs.size();
+            std::size_t elements_diff = this->size() - rhs.size();
             std::copy(this->begin() + num_shared, this->end(), rhs.end());
             rhs.m_end = rhs.end() + elements_diff;
             this->destroy_range(this->begin() + num_shared, this->end());
@@ -1133,7 +1133,7 @@ namespace xt
         }
         else if (rhs.size() > this->size())
         {
-            size_t elements_diff = rhs.size() - this->size();
+            std::size_t elements_diff = rhs.size() - this->size();
             std::uninitialized_copy(rhs.begin() + num_shared, rhs.end(), this->end());
             this->m_end = this->end() + elements_diff;
             this->destroy_range(rhs.begin() + num_shared, rhs.end());
@@ -1227,11 +1227,11 @@ namespace xt
 
     #define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
 
-    template <class X, class T, std::size_t N, class A>
-    struct rebind_container<X, svector<T, N, A>>
+    template <class X, class T, std::size_t N, class A, bool B>
+    struct rebind_container<X, svector<T, N, A, B>>
     {
         using allocator = typename A::template rebind<X>::other;
-        using type = svector<X, N, allocator>;
+        using type = svector<X, N, allocator, B>;
     };
 
     /**
@@ -1409,6 +1409,22 @@ namespace xt
 
 #undef GCC4_FALLBACK
 
+
+// Workaround for rebind_container problems on GCC 8  with C++17 enabled
+#if defined(__GNUC__) && __GNUC__ > 7 && !defined(__clang__) && __cplusplus >= 201703L
+    template <class X, class T, std::size_t N>
+    struct rebind_container<X, aligned_array<T, N>>
+    {
+        using type = aligned_array<X, N>;
+    };
+
+    template <class X, class T, std::size_t N>
+    struct rebind_container<X, const_array<T, N>>
+    {
+        using type = const_array<X, N>;
+    };
+#endif
+
     /**
      * @class fixed_shape
      * Fixed shape implementation for compile time defined arrays.
@@ -1419,7 +1435,11 @@ namespace xt
     {
     public:
 
+#if defined(_MSC_VER)
+        using cast_type = std::array<std::size_t, sizeof...(X)>;
+#else
         using cast_type = const_array<std::size_t, sizeof...(X)>;
+#endif
         using value_type = std::size_t;
         using size_type = std::size_t;
 
@@ -1495,15 +1515,15 @@ namespace xt
 
 namespace std
 {
-    template <class T, size_t N>
+    template <class T, std::size_t N>
     class tuple_size<xt::const_array<T, N>> :
-        public integral_constant<size_t, N>
+        public integral_constant<std::size_t, N>
     {
     };
 
-    template <size_t... N>
+    template <std::size_t... N>
     class tuple_size<xt::fixed_shape<N...>> :
-        public integral_constant<size_t, sizeof...(N)>
+        public integral_constant<std::size_t, sizeof...(N)>
     {
     };
 }

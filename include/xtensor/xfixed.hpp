@@ -122,13 +122,12 @@ namespace xt
             constexpr static std::ptrdiff_t value = calculate_stride_row_major<sizeof...(X) - I - 1, X...>::value;
         };
 
-        template <layout_type L, std::size_t... X, std::size_t... I>
-        constexpr const_array<std::ptrdiff_t, sizeof...(X)>
-        get_strides_impl(const xt::fixed_shape<X...>& shape, std::index_sequence<I...>)
+        template <layout_type L, class R, std::size_t... X, std::size_t... I>
+        constexpr R get_strides_impl(const xt::fixed_shape<X...>& shape, std::index_sequence<I...>)
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
                           "Layout not supported for fixed array");
-            return const_array<std::ptrdiff_t, sizeof...(X)>({shape[I] == 1 ? 0 : calculate_stride<L, I, X...>::value...});
+            return R({shape[I] == 1 ? 0 : calculate_stride<L, I, X...>::value...});
         }
 
         template <class S, class T, std::size_t... I>
@@ -192,10 +191,10 @@ namespace xt
         };
     }
 
-    template <layout_type L, std::size_t... X>
-    constexpr const_array<std::ptrdiff_t, sizeof...(X)> get_strides(const fixed_shape<X...>& shape) noexcept
+    template <layout_type L, class R, std::size_t... X>
+    constexpr R get_strides(const fixed_shape<X...>& shape) noexcept
     {
-        return detail::get_strides_impl<L>(shape, std::make_index_sequence<sizeof...(X)>{});
+        return detail::get_strides_impl<L, R>(shape, std::make_index_sequence<sizeof...(X)>{});
     }
 
     template <class S, class T>
@@ -332,7 +331,7 @@ namespace xt
         storage_type m_storage;
 
         XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
-        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L, inner_strides_type>(S());
         XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
         storage_type& storage_impl() noexcept;
@@ -368,13 +367,12 @@ namespace xt
     struct xcontainer_inner_types<xfixed_adaptor<EC, S, L, Tag>>
     {
         using storage_type = std::remove_reference_t<EC>;
+        using shape_type = S;
         using inner_shape_type = typename S::cast_type;
         using strides_type = get_strides_t<inner_shape_type>;
         using backstrides_type = strides_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
-        using shape_type = std::array<typename inner_shape_type::value_type,
-                                      std::tuple_size<inner_shape_type>::value>;
         using temporary_type = xfixed_container<typename storage_type::value_type, S, L, Tag>;
         static constexpr layout_type layout = L;
     };
@@ -446,7 +444,7 @@ namespace xt
         container_closure_type m_storage;
 
         XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_shape_type m_shape = S();
-        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L>(S());
+        XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_strides_type m_strides = get_strides<L, inner_strides_type>(S());
         XTENSOR_CONSTEXPR_ENHANCED_STATIC inner_backstrides_type m_backstrides = get_backstrides(m_shape, m_strides);
 
         storage_type& storage_impl() noexcept;

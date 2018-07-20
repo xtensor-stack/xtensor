@@ -22,10 +22,38 @@
 #include "xiterable.hpp"
 #include "xlayout.hpp"
 #include "xsemantic.hpp"
+#include "xstorage.hpp"
 #include "xstrided_view_base.hpp"
 
 namespace xt
 {
+    namespace detail
+    {
+        template <class S>
+        struct xtype_for_shape
+        {
+            template <class T, layout_type L>
+            using type = xarray<T, L>;
+        };
+
+        template <template <class, std::size_t> class S, class X, std::size_t N>
+        struct xtype_for_shape<S<X, N>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor<T, N, L>;
+        };
+
+        template <template <std::size_t...> class S, std::size_t... X>
+        struct xtype_for_shape<S<X...>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor_fixed<T, xshape<X...>, L>;
+        };
+
+        template <class T, class S, layout_type L>
+        using temporary_type_t = typename xtype_for_shape<S>::template type<T, L>;
+    }
+
     template <class CT, class S, layout_type L, class FST>
     class xstrided_view;
 
@@ -33,8 +61,7 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
-        // TODO decide on shape type which temporary type to use!
-        using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
+        using temporary_type = detail::temporary_type_t<typename xexpression_type::value_type, S, L>;
     };
 
     template <class CT, class S, layout_type L, class FST>
@@ -121,6 +148,8 @@ namespace xt
         template <class CTA, class FLS>
         xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset,
                       layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
+
+        xstrided_view(const xstrided_view& rhs) = default;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -229,7 +258,7 @@ namespace xt
     using slice_vector = xstrided_slice_vector;
 
     template <layout_type L = layout_type::dynamic, class E, class S, class X>
-    auto strided_view(E&& e, S&& shape, X&& stride, std::size_t offset = 0, layout_type layout = layout_type::dynamic) noexcept;
+    auto strided_view(E&& e, S&& shape, X&& stride, std::size_t offset = 0, layout_type layout = L) noexcept;
 
     template <class E>
     auto strided_view(E&& e, const xstrided_slice_vector& slices);
@@ -491,7 +520,7 @@ namespace xt
             bool fill_args(const xstrided_slice_vector& /*slices*/, std::size_t /*sl_idx*/,
                            std::size_t /*i*/, std::size_t /*old_shape*/,
                            const ST& /*old_stride*/,
-                           S& /*shape*/, S& /*strides*/)
+                           S& /*shape*/, get_strides_t<S>& /*strides*/)
             {
                 return false;
             }
@@ -661,7 +690,7 @@ namespace xt
     template <class E>
     inline auto transpose(E&& e) noexcept
     {
-        using shape_type = typename std::decay_t<E>::shape_type;
+        using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
         shape_type shape;
         resize_container(shape, e.shape().size());
         std::copy(e.shape().crbegin(), e.shape().crend(), shape.begin());
@@ -735,7 +764,7 @@ namespace xt
         inline auto build_ravel_view(E&& e, S&& flatten_strides, layout_type l)
         {
             using shape_type = static_shape<std::size_t, 1>;
-            using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_expression_adaptor<xclosure_t<E>>>;
+            using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_expression_adaptor<std::remove_reference_t<E>>>;
 
             shape_type new_shape;
             get_strides_t<shape_type> new_strides;
@@ -769,7 +798,7 @@ namespace xt
             inline static auto run(E&& e)
             {
                 // Case where the static layout is either row_major or column major.
-                using shape_type = typename std::decay_t<E>::shape_type;
+                using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
                 get_strides_t<shape_type> strides;
                 resize_container(strides, e.shape().size());
                 layout_type l = detail::transpose_layout(e.layout());
@@ -845,15 +874,15 @@ namespace xt
     template <class E>
     inline auto squeeze(E&& e)
     {
-        xt::dynamic_shape<std::size_t> new_shape;
-        xt::dynamic_shape<std::ptrdiff_t> new_strides;
+        dynamic_shape<std::size_t> new_shape;
+        dynamic_shape<std::ptrdiff_t> new_strides;
         std::copy_if(e.shape().cbegin(), e.shape().cend(), std::back_inserter(new_shape),
                      [](std::size_t i) { return i != 1; });
         decltype(auto) old_strides = detail::get_strides(e);
         std::copy_if(old_strides.cbegin(), old_strides.cend(), std::back_inserter(new_strides),
                      [](std::ptrdiff_t i) { return i != 0; });
 
-        using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>>;
+        using view_type = xstrided_view<xclosure_t<E>, dynamic_shape<std::size_t>>;
         return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
     }
 
@@ -863,8 +892,8 @@ namespace xt
         inline auto squeeze_impl(E&& e, S&& axis, check_policy::none)
         {
             std::size_t new_dim = e.dimension() - axis.size();
-            xt::dynamic_shape<std::size_t> new_shape(new_dim);
-            xt::dynamic_shape<std::ptrdiff_t> new_strides(new_dim);
+            dynamic_shape<std::size_t> new_shape(new_dim);
+            dynamic_shape<std::ptrdiff_t> new_strides(new_dim);
 
             decltype(auto) old_strides = detail::get_strides(e);
 
@@ -877,7 +906,7 @@ namespace xt
                 }
             }
 
-            using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>>;
+            using view_type = xstrided_view<xclosure_t<E>, dynamic_shape<std::size_t>>;
             return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
         }
 
@@ -951,8 +980,8 @@ namespace xt
     template <class E>
     auto expand_dims(E&& e, std::size_t axis)
     {
-        xstrided_slice_vector sv(e.dimension() + 1, xt::all());
-        sv[axis] = xt::newaxis();
+        xstrided_slice_vector sv(e.dimension() + 1, all());
+        sv[axis] = newaxis();
         return strided_view(std::forward<E>(e), std::move(sv));
     }
 
@@ -971,19 +1000,19 @@ namespace xt
     template <std::size_t N, class E>
     auto atleast_Nd(E&& e)
     {
-        xstrided_slice_vector sv((std::max)(e.dimension(), N), xt::all());
+        xstrided_slice_vector sv((std::max)(e.dimension(), N), all());
         if (e.dimension() < N)
         {
             std::size_t i = 0;
             std::size_t end = static_cast<std::size_t>(std::round(double(N - e.dimension()) / double(N)));
             for (; i < end; ++i)
             {
-                sv[i] = xt::newaxis();
+                sv[i] = newaxis();
             }
             i += e.dimension();
             for (; i < N; ++i)
             {
-                sv[i] = xt::newaxis();
+                sv[i] = newaxis();
             }
         }
         return strided_view(std::forward<E>(e), std::move(sv));
@@ -1040,7 +1069,7 @@ namespace xt
         }
 
         std::size_t ax_sz = e.shape()[axis];
-        xstrided_slice_vector sv(e.dimension(), xt::all());
+        xstrided_slice_vector sv(e.dimension(), all());
         std::size_t step = ax_sz / n;
         std::size_t rest = ax_sz % n;
 
@@ -1071,7 +1100,7 @@ namespace xt
     template <class E>
     inline auto flip(E&& e, std::size_t axis)
     {
-        using shape_type = typename std::decay_t<E>::shape_type;
+        using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
 
         shape_type shape;
         resize_container(shape, e.shape().size());
@@ -1091,9 +1120,9 @@ namespace xt
     template <class E, class S>
     inline auto reshape_view(E&& e, S&& shape)
     {
-        using shape_type = S;
-
+        using shape_type = std::decay_t<S>;
         get_strides_t<shape_type> strides;
+
         xt::resize_container(strides, shape.size());
         compute_strides(shape, default_assignable_layout(std::decay_t<E>::static_layout), strides);
 
@@ -1115,9 +1144,9 @@ namespace xt
     template <class E, class S>
     inline auto reshape_view(E&& e, S&& shape, layout_type layout)
     {
-        using shape_type = S;
+        using shape_type = std::decay_t<S>;
+        get_strides_t<shape_type> strides;
 
-        shape_type strides;
         xt::resize_container(strides, shape.size());
         compute_strides(shape, layout, strides);
 

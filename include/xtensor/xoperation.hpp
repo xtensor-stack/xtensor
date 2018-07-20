@@ -35,9 +35,11 @@ namespace xt
     struct NAME                                                                 \
     {                                                                           \
         template <class U, class RT>                                            \
+        using fvt_t = xt::detail::functor_value_type_t<U, RT>;                  \
+        template <class U, class RT>                                            \
         using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;             \
         using argument_type = T;                                                \
-        using result_type = R;                                                  \
+        using result_type = fvt_t<T, R>;                                        \
         using simd_value_type = xsimd::simd_type<T>;                            \
         using simd_result_type = fst_t<simd_value_type, R>;                     \
         constexpr result_type operator()(const T& arg) const                    \
@@ -71,10 +73,12 @@ namespace xt
     struct NAME                                                                  \
     {                                                                            \
         template <class U, class RT>                                             \
+        using fvt_t = xt::detail::functor_value_type_t<U, RT>;                   \
+        template <class U, class RT>                                             \
         using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;              \
         using first_argument_type = T;                                           \
         using second_argument_type = T;                                          \
-        using result_type = R;                                                   \
+        using result_type = fvt_t<T, R>;                                         \
         using simd_value_type = xsimd::simd_type<T>;                             \
         using simd_result_type = fst_t<simd_value_type, R>;                      \
         template <class T1, class T2>                                            \

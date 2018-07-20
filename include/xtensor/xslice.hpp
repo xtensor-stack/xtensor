@@ -16,6 +16,7 @@
 
 #include <xtl/xtype_traits.hpp>
 
+#include "xstorage.hpp"
 #include "xutils.hpp"
 
 
@@ -46,7 +47,7 @@ namespace xt
         template <class... Args>
         struct rangemaker
         {
-            ptrdiff_t rng[3]; // = { 0, 0, 0 };
+            std::ptrdiff_t rng[3]; // = { 0, 0, 0 };
         };
 
         XTENSOR_CONSTEXPR xtuph get_tuph_or_val(std::ptrdiff_t /*val*/, std::true_type)
@@ -64,14 +65,14 @@ namespace xt
         {
             XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, C>()
             {
-                return {
+                return xrange_adaptor<A, B, C>({
                     get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
                     get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
                     get_tuph_or_val(rng[2], std::is_same<C, xtuph>())
-                };
+                });
             }
 
-            ptrdiff_t rng[3];// = { 0, 0, 0 };
+            std::ptrdiff_t rng[3];// = { 0, 0, 0 };
         };
 
         template <class A, class B>
@@ -79,20 +80,20 @@ namespace xt
         {
             XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, xt::placeholders::xtuph>()
             {
-                return {
+                return xrange_adaptor<A, B, xt::placeholders::xtuph>({
                     get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
                     get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
                     xtuph()
-                };
+                });
             }
 
-            ptrdiff_t rng[3];  // = { 0, 0, 0 };
+            std::ptrdiff_t rng[3];  // = { 0, 0, 0 };
         };
 
         template <class... OA>
         XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const std::ptrdiff_t& t)
         {
-            auto nrng = rangemaker<OA..., ptrdiff_t>{rng.rng[0], rng.rng[1], rng.rng[2]};
+            auto nrng = rangemaker<OA..., std::ptrdiff_t>({rng.rng[0], rng.rng[1], rng.rng[2]});
             nrng.rng[sizeof...(OA)] = t;
             return nrng;
         }
@@ -100,13 +101,13 @@ namespace xt
         template <class... OA>
         XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const xt::placeholders::xtuph& /*t*/)
         {
-            auto nrng = rangemaker<OA..., xt::placeholders::xtuph>{rng.rng[0], rng.rng[1], rng.rng[2]};
+            auto nrng = rangemaker<OA..., xt::placeholders::xtuph>({rng.rng[0], rng.rng[1], rng.rng[2]});
             return nrng;
         }
 
 
         XTENSOR_GLOBAL_CONSTEXPR xtuph _{};
-        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r{0, 0, 0};
+        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r = rangemaker<>({0, 0, 0});
         XTENSOR_GLOBAL_CONSTEXPR xall_tag _a{};
         XTENSOR_GLOBAL_CONSTEXPR xnewaxis_tag _n{};
         XTENSOR_GLOBAL_CONSTEXPR xellipsis_tag _e{};
@@ -326,6 +327,7 @@ namespace xt
 
         using container_type = svector<T>;
         using size_type = typename container_type::value_type;
+        using self_type = xkeep_slice<T>;
 
         template <class C>
         explicit xkeep_slice(const C& cont);
@@ -345,6 +347,9 @@ namespace xt
         size_type revert_index(std::size_t i) const;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
 
     private:
 
@@ -404,7 +409,6 @@ namespace xt
      * xdrop_slice declaration *
      ***************************/
 
-
     template <class T>
     class xdrop_slice : public xslice<xdrop_slice<T>>
     {
@@ -412,6 +416,7 @@ namespace xt
 
         using container_type = svector<T>;
         using size_type = typename container_type::value_type;
+        using self_type = xdrop_slice<T>;
 
         template <class C>
         explicit xdrop_slice(const C& cont);
@@ -431,6 +436,9 @@ namespace xt
         size_type revert_index(std::size_t i) const;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
 
     private:
 
@@ -503,7 +511,7 @@ namespace xt
         {
             std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
             val = (val >= 0) ? val : val + size;
-            return std::max(std::ptrdiff_t(0), std::min(size, val));
+            return (std::max)(std::ptrdiff_t(0), (std::min)(size, val));
         }
 
         auto get_stepped_range(std::ptrdiff_t start, std::ptrdiff_t stop, std::ptrdiff_t step, std::size_t ssize) const
@@ -514,13 +522,13 @@ namespace xt
 
             if(step > 0)
             {
-                start = std::max(std::ptrdiff_t(0), std::min(size, start));
-                stop  = std::max(std::ptrdiff_t(0), std::min(size, stop));
+                start = (std::max)(std::ptrdiff_t(0), (std::min)(size, start));
+                stop  = (std::max)(std::ptrdiff_t(0), (std::min)(size, stop));
             }
             else
             {
-                start = std::max(std::ptrdiff_t(-1), std::min(size - 1, start));
-                stop  = std::max(std::ptrdiff_t(-1), std::min(size - 1, stop));
+                start = (std::max)(std::ptrdiff_t(-1), (std::min)(size - 1, start));
+                stop  = (std::max)(std::ptrdiff_t(-1), (std::min)(size - 1, stop));
             }
 
             return xstepped_range<std::ptrdiff_t>(start, stop, step);
@@ -1136,6 +1144,18 @@ namespace xt
         return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? false : true;
     }
 
+    template <class T>
+    inline bool xkeep_slice<T>::operator==(const self_type& rhs) const noexcept
+    {
+        return m_indices == rhs.m_indices;
+    }
+
+    template <class T>
+    inline bool xkeep_slice<T>::operator!=(const self_type& rhs) const noexcept
+    {
+        return !(*this == rhs);
+    }
+
     /******************************
      * xdrop_slice implementation *
      ******************************/
@@ -1251,6 +1271,18 @@ namespace xt
     inline bool xdrop_slice<T>::contains(size_type i) const noexcept
     {
         return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? true : false;
+    }
+
+    template <class T>
+    inline bool xdrop_slice<T>::operator==(const self_type& rhs) const noexcept
+    {
+        return m_indices == rhs.m_indices;
+    }
+
+    template <class T>
+    inline bool xdrop_slice<T>::operator!=(const self_type& rhs) const noexcept
+    {
+        return !(*this == rhs);
     }
 }
 

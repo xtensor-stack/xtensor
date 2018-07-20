@@ -3,7 +3,7 @@ channels:
   - QuantStack
   - conda-forge
 dependencies:
-  - xtensor=0.16.4
-  - xtensor-blas=0.11.0
+  - xtensor=0.17.1
+  - xtensor-blas=0.12.0
   - xeus-cling=0.4.5
   - notebook

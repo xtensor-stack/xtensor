@@ -19,7 +19,7 @@ In order to be able to perform the differed computation of ``x + y``, the return
 copies of the members ``x`` and ``y``, depending on how arguments were passed to ``operator+``. The actual types held by the expressions
 are the **closure types**.
 
-The concept of closure type is key in the implementation of ``xtensor`` and appears in all the expressions defined in xtensor, and the utility functions and metafunctions complement the tools of the standard library for the move semantics. 
+The concept of closure type is key in the implementation of ``xtensor`` and appears in all the expressions defined in xtensor, and the utility functions and metafunctions complement the tools of the standard library for the move semantics.
 
 Basic rules for determining closure types
 -----------------------------------------
@@ -65,7 +65,7 @@ The implementation for ``const_closure`` is slightly shorter.
             underlying_type&,
             underlying_type>::type;
     };
-        
+
     template <class S>
     using const_closure_t = typename const_closure<S>::type;
 
@@ -144,6 +144,7 @@ local variables of a function in an unevaluated expression unless one properly f
 
    - If the laziness is not important for your use case, returning ``xt::eval(x + y / z)`` will return an evaluated container and avoid these complications.
    - Otherwise, the key is to *move* lvalues that become invalid when leaving the current scope.
+   - If you would need to *move* more than once, take a look at the `Reusing expressions / sharing expressions`_.
 
 **Example: moving local variables and forwarding universal references**
 
@@ -165,7 +166,7 @@ Let us first consider the following implementation of the ``mean`` function in x
         using value_type = typename std::decay_t<E>::value_type;
         auto size = e.size();
         auto s = sum(std::forward<E>(e));
-        return std::move(s) / value_type(size); 
+        return std::move(s) / value_type(size);
     }
 
 The first thing to take into account is that the result of the final division is an expression, which performs the actual computation
@@ -180,3 +181,55 @@ The other place in this example where the C++ move semantics is used is the line
 hold a const reference or a value for ``e`` depending on the lvalue-ness of the parameter passed to the function.
 
 
+Reusing expressions / sharing expressions
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Sometimes it is necessary to use a xexpression in two seperate places in another xexpression. For example, when computing
+something like ``sin(A) + cos(A)`` we can see A being referenced twice. This works fine if we can guarantee that ``A`` has a
+long enough lifetime. However, when writing generic interfaces that accept rvalues we cannot always guarantee that ``A`` will
+live long enough.
+Another scenario is the creation of a temporary, which needs to be used at more than one place in the resulting expression.
+We can only `std::move(...)` the temporary once into the expression to hand lifetime management to the expression.
+
+In order to solve this problem, xtensor offers two solutions: the first involves ad-hoc lambda construction and the second utilizes
+shared pointers wrapped in a ``xshared_expression``.
+
+We can rewrite the ``sin(A) + cos(A)`` function as a lambda that we use to create a vectorized xfunction, and xtensor has a simple
+utility to achieve this:
+
+.. code:: cpp
+
+    template <class E>
+    inline auto sin_plus_cos(E&& e) noexcept
+    {
+        auto func = [](auto x) -> decltype(sin(x) + cos(x)) {
+            return sin(x) + cos(x);
+        };
+        return detail::make_lambda_function(std::move(func), std::forward<E>(e));
+    }
+
+Note: writing a lambda is just sugar for writing a functor.
+Also, using `auto x` as the function argument enables automatic `xsimd` acceleration.
+
+As the data flow through the lambda is entirely transparent to the compiler, using this construct
+is generally faster than using ``xshared_expressions``. The usage of ``xshared_expression`` also
+requires the creation of a ``shared_ptr`` which dynamically allocates some memory and is therefore slow(ish).
+But under certain circumstances it might be required, e.g. to implement a fully lazy average:
+
+.. code:: cpp
+
+    template <class E, class W>
+    inline auto average(E&& e, W&& weights, std::ptrdiff_t axis) noexcept
+    {
+        auto shared_weights = xt::make_xshared(std::move(weights));
+        auto expr = xt::sum(e * shared_weights) , {axis}) / xt::sum(shared_weights);
+        // the following line prints how often shared_weights is used
+        std::cout << shared_weights.use_count() << std::endl; // ==> 3
+        return expr;
+    }
+
+We can see that, before returning from the function, three copies of ``shared_weights``
+exist: two in the two ``xt::sum`` functions, and one is the temporary. After returning
+from the function, only two copies of the ``xshared_expression`` will exist.
+As discussed before, ``xt::make_xshared`` has the same overhead as creating a ``std::shared_ptr``
+which is used internally by the shared expression.

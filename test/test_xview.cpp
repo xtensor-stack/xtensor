@@ -1017,4 +1017,21 @@ namespace xt
 
         EXPECT_EQ(output(0, 5, 5, 2), 1);
     }
+
+    TEST(xview, where_operation)
+    {
+        xt::xtensor<size_t, 2> I = {{0, 0}, {1, 1}, {2, 2}};
+        auto col = xt::view(I, xt::all(), 0);
+        auto idx = xt::where(xt::equal(col, size_t(0)));
+
+        std::array<std::size_t, 1> exp_idx = {0};
+        EXPECT_EQ(idx[0], exp_idx);
+
+        auto idx2 = xt::where(col > size_t(0));
+        EXPECT_EQ(idx2.size(), 2);
+        exp_idx[0] = 1;
+        EXPECT_EQ(idx2[0], exp_idx);
+        exp_idx[0] = 2;
+        EXPECT_EQ(idx2[1], exp_idx);
+    }
 }

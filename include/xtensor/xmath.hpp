@@ -279,7 +279,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using std::arg;
 
         using std::atan2;
+
+// copysign is not in the std namespace for MSVC
+#if !defined(_MSC_VER)
         using std::copysign;
+#endif
         using std::fdim;
         using std::fmax;
         using std::fmin;
@@ -963,14 +967,41 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             F m_lambda;
         };
 
-        template <class F, class... E>
-        inline auto make_lambda_function(F&& lambda, E&&... args)
-        {
-            using xfunction_type = xfunction<lambda_adapt<F>,
-                                             decltype(lambda(std::declval<typename std::decay_t<E>::value_type>()...)),
-                                             const_xclosure_t<E>...>;
-            return xfunction_type(lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
-        }
+    }
+
+    /**
+     * Create a xfunction from a lambda
+     *
+     * This function can be used to easily create performant xfunctions from lambdas:
+     *
+     * \code{cpp}
+     * template <class E1>
+     * inline auto square(E1&& e1) noexcept
+     * {
+     *     auto fnct = [](auto x) -> decltype(x * x) {
+     *         return x * x;
+     *     };
+     *     return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
+     * }
+     * \endcode
+     *
+     * Lambda function allow the reusal of a single arguments in multiple places (otherwise
+     * only correctly possible when using xshared_expressions). ``auto`` lambda functions are
+     * automatically vectorized with ``xsimd`` if possible (note that the trailing
+     * ``-> decltype(...)`` is mandatory for the feature detection to work).
+     *
+     * @param lambda the lambda to be vectorized
+     * @param args forwarded arguments
+     *
+     * @return lazy xfunction
+     */
+    template <class F, class... E>
+    inline auto make_lambda_xfunction(F&& lambda, E&&... args)
+    {
+        using xfunction_type = xfunction<detail::lambda_adapt<F>,
+                                         decltype(lambda(std::declval<typename std::decay_t<E>::value_type>()...)),
+                                         const_xclosure_t<E>...>;
+        return xfunction_type(detail::lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
     }
 
 
@@ -1016,12 +1047,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto square(E1&& e1) noexcept
     {
 #ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return detail::make_lambda_function(square_fct{}, std::forward<E1>(e1));
+        return make_lambda_xfunction(square_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x) {
             return x * x;
         };
-        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+        return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
 #endif
     }
 
@@ -1038,12 +1069,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto cube(E1&& e1) noexcept
     {
 #ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return detail::make_lambda_function(cube_fct{}, std::forward<E1>(e1));
+        return make_lambda_xfunction(cube_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x * x) {
             return x * x * x;
         };
-        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+        return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
 #endif
     }
 
@@ -1112,7 +1143,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto pow(E&& e) noexcept
     {
         static_assert(N > 0, "integer power cannot be negative");
-        return detail::make_lambda_function(detail::pow_impl<N>{}, std::forward<E>(e));
+        return make_lambda_xfunction(detail::pow_impl<N>{}, std::forward<E>(e));
     }
 
     /**
@@ -1817,6 +1848,49 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         return std::move(s) / static_cast<double>(size / s.size());
     }
 #endif
+
+    /**
+     * @ingroup red_functions
+     * @brief Average of elements over given axes using weights.
+     *
+     * Returns an \ref xreducer for the mean of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the mean is computed (optional)
+     * @return an \ref xexpression
+     *
+     * @sa mean
+     */
+    template <class E, class W>
+    inline auto average(E&& e, W&& weights, std::ptrdiff_t axis)
+    {
+        std::size_t ax = normalize_axis(e.dimension(), axis);
+
+        if (weights.dimension() != 1 && weights.size() != e.shape()[ax])
+        {
+            throw std::runtime_error("Weights need to have the same shape as expression at axis.");
+        }
+
+        auto div = sum(weights, xt::evaluation_strategy::immediate{})();
+
+        dynamic_shape<std::size_t> broadcast_shape(e.dimension(), 1);
+        broadcast_shape[ax] = weights.size();
+
+        return sum(std::forward<E>(e) * reshape_view(std::forward<W>(weights), std::move(broadcast_shape)), std::array<std::size_t, 1>({ax})) / std::move(div);
+    }
+
+    template <class E, class W>
+    inline auto average(E&& e, W&& weights)
+    {
+        if (weights.dimension() != e.dimension() || !std::equal(weights.shape().begin(), weights.shape().end(), e.shape().begin()))
+        {
+            throw std::runtime_error("Weights need to have the same shape as expression.");
+        }
+
+        auto div = sum(weights, xt::evaluation_strategy::immediate{})();
+        auto s = sum(std::forward<E>(e) * std::forward<W>(weights)) / std::move(div);
+        return s;
+    }
 
     /**
      * @ingroup red_functions

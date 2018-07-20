@@ -3,7 +3,7 @@
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.16.4?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
@@ -57,7 +57,7 @@ make install
 To try out xtensor interactively in your web browser, just click on the binder
 link:
 
-[![Binder](docs/source/binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/0.16.4?filepath=notebooks/xtensor.ipynb)
+[![Binder](docs/source/binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
 
 ## Documentation
 
@@ -71,24 +71,16 @@ http://xtensor.readthedocs.io/
 has an optional dependency on the [xsimd](https://github.com/QuantStack/xsimd)
 library:
 
-| `xtensor` | `xtl`  |`xsimd` (optional) |
-|-----------|--------|-------------------|
-|  master   | ^0.4.9 |       ^4.1.6      |
-|  0.16.4   | ^0.4.9 |       ^4.1.6      |
-|  0.16.3   | ^0.4.9 |       ^4.1.6      |
-|  0.16.2   | ^0.4.9 |       ^4.1.6      |
-|  0.16.1   | ^0.4.9 |       ^4.1.6      |
-|  0.16.0   | ^0.4.9 |       ^4.1.3      |
-|  0.15.9   | ^0.4.1 |       ^4.1.1      |
-|  0.15.8   | ^0.4.1 |       ^4.1.1      |
-|  0.15.7   | ^0.4.1 |       ^4.1.1      |
-|  0.15.6   | ^0.4.1 |       ^4.1.1      |
-|  0.15.5   | ^0.4.0 |       ^4.0.0      |
-|  0.15.4   | ^0.4.0 |       ^4.0.0      |
-|  0.15.3   | ^0.4.0 |       ^4.0.0      |
-|  0.15.2   | ^0.4.0 |       ^4.0.0      |
-|  0.15.1   | ^0.4.0 |       ^4.0.0      |
-|  0.15.0   | ^0.4.0 |       ^4.0.0      |
+| `xtensor` | `xtl`   |`xsimd` (optional) |
+|-----------|---------|-------------------|
+|  master   | ^0.4.14 |       ^6.1.4      |
+|  0.17.1   | ^0.4.14 |       ^6.1.4      |
+|  0.17.0   | ^0.4.13 |       ^6.1.4      |
+|  0.16.4   | ^0.4.9  |       ^4.1.6      |
+|  0.16.3   | ^0.4.9  |       ^4.1.6      |
+|  0.16.2   | ^0.4.9  |       ^4.1.6      |
+|  0.16.1   | ^0.4.9  |       ^4.1.6      |
+|  0.16.0   | ^0.4.9  |       ^4.1.3      |
 
 The dependency on `xsimd` is required if you want to enable SIMD acceleration
 in `xtensor`. This can be done by defining the macro `XTENSOR_USE_XSIMD`

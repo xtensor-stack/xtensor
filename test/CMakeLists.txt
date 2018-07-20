@@ -101,6 +101,7 @@ set(XTENSOR_TESTS
     test_xdynamic_view.cpp
     test_xeval.cpp
     test_xexception.cpp
+    test_xexpression.cpp
     test_xfunction.cpp
     test_xfixed.cpp
     test_xindex_view.cpp

@@ -103,6 +103,7 @@ namespace xt
             if (std::is_same<T, long double>::value) return 'f';
 
             if (std::is_same<T, char>::value) return 'i';
+            if (std::is_same<T, signed char>::value) return 'i';
             if (std::is_same<T, short>::value) return 'i';
             if (std::is_same<T, int>::value) return 'i';
             if (std::is_same<T, long>::value) return 'i';
@@ -592,8 +593,8 @@ namespace xt
 
             std::vector<std::size_t> m_shape;
             bool m_fortran_order;
-            size_t m_word_size;
-            size_t m_n_bytes;
+            std::size_t m_word_size;
+            std::size_t m_n_bytes;
             std::string m_typestring;
             char* m_buffer;
         };

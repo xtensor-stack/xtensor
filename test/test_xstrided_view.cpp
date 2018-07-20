@@ -12,7 +12,9 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -912,15 +914,34 @@ namespace xt
     {
         xarray<double> a = xt::arange<double>(9);
         auto av = xt::reshape_view(a, {3, 3});
+        auto xv = xt::reshape_view(a, xshape<3, 3>());
+
         xtensor<double, 2> e = xt::reshape_view(xt::arange(9), {3, 3});
 
         a.reshape({3, 3});
         EXPECT_EQ(av, e);
         EXPECT_EQ(av, a);
 
+        bool truthy;
+        truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>>>();
+        EXPECT_TRUE(truthy);
+
     #if !defined(X_OLD_CLANG)
-        bool truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
+        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2>>();
+        EXPECT_TRUE(truthy);
+        truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
     #endif
+    }
+
+    TEST(xstrided_view, on_xview)
+    {
+        xarray<double> a = {0,1,2,3,4,5,6,7,8};
+        auto v = view(a, keep(3, 5, 6));
+        auto v2 = strided_view(v, {2});
+        EXPECT_EQ(v2(0), 6);
+        auto v3 = strided_view(v, {all()});
+        EXPECT_EQ(v3(0), 3);
+        EXPECT_EQ(v3(1), 5);
     }
 }
