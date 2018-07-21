@@ -24,6 +24,7 @@
 #include "xiterable.hpp"
 #include "xsemantic.hpp"
 #include "xtensor_forward.hpp"
+#include "xtensor.hpp"
 #include "xview_utils.hpp"
 
 namespace xt
