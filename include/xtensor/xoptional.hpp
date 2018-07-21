@@ -28,10 +28,9 @@ namespace xt
     namespace detail
     {
         template <class CT, class CB>
-        struct functor_return_type<xtl::xoptional<CT, CB>, bool>
+        struct functor_simd_type<xtl::xoptional<CT, CB>, bool>
         {
             using type = xtl::xoptional<bool>;
-            using simd_type = xtl::xoptional<bool>;
         };
 
         template <class T, class Tag>

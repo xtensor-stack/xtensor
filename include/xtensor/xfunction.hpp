@@ -89,6 +89,10 @@ namespace xt
         template <class... Args>
         using common_value_type_t = typename common_value_type<Args...>::type;
 
+        /********************
+         * simd_return_type *
+         ********************/
+
         template <class F, class CST, class R, class = void_t<>>
         struct simd_return_type
         {
@@ -97,39 +101,52 @@ namespace xt
         template <class F, class CST, class R>
         struct simd_return_type<F, CST, R, void_t<decltype(&F::template simd_apply<CST>)>>
         {
-            using type = xsimd::simd_type<xsimd::simd_return_type<CST, R>>;
+            using type = xsimd::simd_return_type<CST, R>;
         };
 
         template <class F, class CST, class R>
         using simd_return_type_t = typename simd_return_type<F, CST, R>::type;
 
+        /*********************
+         * functor_simd_type *
+         *********************/
+
+        // General case
         template <class T, class R>
-        struct functor_return_type
+        struct functor_simd_type
         {
-            using type = R;
-            using simd_type = xsimd::simd_type<T>;
+            // Never use xsimd::simd_type<R>. A function may operates on int32_t but
+            // be asked to load arguments as batches of double because it is part
+            // of an expression whose promote_type is double.
+            using type = xsimd::simd_type<T>;
         };
 
+        // Comparison functions
         template <class T>
-        struct functor_return_type<T, std::complex<T>>
+        struct functor_simd_type<T, bool>
         {
-            using type = std::complex<T>;
-            using simd_type = xsimd::simd_type<std::complex<T>>;
+            using type = xsimd::simd_bool_type<T>;
         };
 
+        // complex reducers (abs, args)
         template <class T>
-        struct functor_return_type<T, bool>
+        struct functor_simd_type<std::complex<T>, T>
         {
-            using type = bool;
-            using simd_type = xsimd::simd_bool_type<T>;
+            using type = xsimd::simd_type<T>;
         };
 
-        template <>
-        struct functor_return_type<void, bool>
+        template <class T, class R>
+        using functor_simd_type_t = typename functor_simd_type<T, R>::type;
+
+        template <class B, class R>
+        struct functor_batch_simd_type
         {
-            using type = bool;
-            using simd_type = bool;
+            using batch_value_type = typename xsimd::revert_simd_traits<B>::type;
+            using type = typename functor_simd_type<batch_value_type, R>::type;
         };
+
+        template <class B, class R>
+        using functor_batch_simd_type_t = typename functor_batch_simd_type<B, R>::type;
     }
 
     template <class F, class R, class... CT>
@@ -185,11 +202,14 @@ namespace xt
         using const_pointer = const value_type*;
         using size_type = detail::common_size_type_t<std::decay_t<CT>...>;
         using difference_type = detail::common_difference_type_t<std::decay_t<CT>...>;
-        using simd_value_type = typename detail::functor_return_type<detail::common_value_type_t<std::decay_t<CT>...>, R>::simd_type;
+        using simd_value_type = detail::functor_simd_type_t<detail::common_value_type_t<std::decay_t<CT>...>, R>;
         using simd_argument_type = xsimd::simd_type<detail::common_value_type_t<std::decay_t<CT>...>>;
         using iterable_base = xconst_iterable<xfunction_base<F, R, CT...>>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
+
+        template <class simd>
+        using simd_return_type = detail::simd_return_type_t<functor_type, simd_argument_type, simd>;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
@@ -292,7 +312,7 @@ namespace xt
         operator value_type() const;
 
         template <class align, class simd = simd_value_type>
-        detail::simd_return_type_t<functor_type, simd_argument_type, simd> load_simd(size_type i) const;
+        simd_return_type<simd> load_simd(size_type i) const;
 
         const tuple_type& arguments() const noexcept;
 
@@ -855,7 +875,7 @@ namespace xt
 
     template <class F, class R, class... CT>
     template <class align, class simd>
-    inline auto xfunction_base<F, R, CT...>::load_simd(size_type i) const -> detail::simd_return_type_t<functor_type, simd_argument_type, simd>
+    inline auto xfunction_base<F, R, CT...>::load_simd(size_type i) const ->simd_return_type<simd>
     {
         return load_simd_impl<align, simd>(std::make_index_sequence<sizeof...(CT)>(), i);
     }
@@ -906,22 +926,6 @@ namespace xt
 
     namespace detail
     {
-// TODO: add traits for batch_bool in xsimd and remove this ugly hack
-
-        template <class V>
-        struct is_batch_bool
-        {
-            static constexpr bool value = false;
-        };
-
-#ifdef XTENSOR_USE_XSIMD
-        template <class T, std::size_t N>
-        struct is_batch_bool<xsimd::batch_bool<T, N>>
-        {
-            static constexpr bool value = true;
-        };
-#endif
-
         // This metafunction avoids loading boolean values as batches of floating points and
         // reciprocally. However, we cannot always load data as batches of their scalar type
         // since this prevents mixed arithmetic.
@@ -929,11 +933,12 @@ namespace xt
         struct get_simd_type
         {
             using simd_value_type = typename std::decay_t<T>::simd_value_type;
-            static constexpr bool is_arg_bool = is_batch_bool<simd_value_type>::value;
-            static constexpr bool is_res_bool = is_batch_bool<simd>::value;
+            static constexpr bool is_arg_bool = ::xsimd::is_batch_bool<simd_value_type>::value;
+            static constexpr bool is_res_bool = ::xsimd::is_batch_bool<simd>::value;
+            static constexpr bool is_arg_cplx = ::xsimd::is_batch_complex<simd_value_type>::value;
             using type = std::conditional_t<is_res_bool,
                                             common_simd,
-                                            std::conditional_t<is_arg_bool,
+                                            std::conditional_t<is_arg_bool || is_arg_cplx,
                                                                simd_value_type,
                                                                simd>>;
         };

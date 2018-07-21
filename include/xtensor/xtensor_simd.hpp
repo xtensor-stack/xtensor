@@ -119,6 +119,16 @@ namespace xsimd
 
     template <class T1, class T2>
     using simd_return_type = simd_type<T2>;
+
+    template <class V>
+    struct is_batch_bool : std::false_type
+    {
+    };
+
+    template <class V>
+    struct is_batch_complex : std::false_type
+    {
+    };
 }
 
 #endif  // XTENSOR_USE_XSIMD

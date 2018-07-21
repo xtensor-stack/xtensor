@@ -85,19 +85,18 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg);                                                     \
         }                                                                         \
         template <class U, class RT>                                              \
-        using frt = xt::detail::functor_return_type<U, RT>;                       \
-        using return_type = frt<T, R>;                                            \
+        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;                \
         using argument_type = T;                                                  \
         using result_type = decltype(exec(std::declval<T>()));                    \
         using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = typename return_type::simd_type;                 \
+        using simd_result_type = fst_t<simd_value_type, R>;                       \
         constexpr result_type operator()(const T& arg) const                      \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
         template <class B>                                                        \
-        constexpr typename frt<get_value_type_t<B>, R>::simd_type                 \
+        constexpr fst_t<B, R>                                                     \
         simd_apply(const B& arg) const                                            \
         {                                                                         \
             using math::NAME;                                                     \
@@ -123,12 +122,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg);                                                     \
         }                                                                         \
         template <class U, class RT>                                              \
-        using frt = xt::detail::functor_return_type<U, RT>;                       \
-        using return_type = frt<T, T>;                                            \
+        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
         using argument_type = T;                                                  \
         using result_type = decltype(exec(std::declval<T>()));                    \
         using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = typename return_type::simd_type;                 \
+        using simd_result_type = fst_t<simd_value_type, result_type>;             \
         constexpr result_type operator()(const T& arg) const                      \
         {                                                                         \
             using math::NAME;                                                     \
@@ -157,20 +155,19 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg1, arg2);                                              \
         }                                                                         \
         template <class U, class RT>                                              \
-        using frt = xt::detail::functor_return_type<U, RT>;                       \
-        using return_type = xt::detail::functor_return_type<T, R>;                \
+        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
         using first_argument_type = T;                                            \
         using second_argument_type = T;                                           \
         using result_type = decltype(exec(std::declval<T>(), std::declval<T>())); \
         using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = typename return_type::simd_type;                 \
+        using simd_result_type = fst_t<simd_value_type, R> ;                      \
         constexpr result_type operator()(const T& arg1, const T& arg2) const      \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \
         }                                                                         \
         template <class B>                                                        \
-        constexpr typename frt<get_value_type_t<B>, R>::simd_type                 \
+        constexpr fst_t<B, R>                                                     \
         simd_apply(const B& arg1, const B& arg2) const                            \
         {                                                                         \
             using math::NAME;                                                     \
@@ -196,15 +193,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg1, arg2, arg3);                                        \
         }                                                                         \
         template <class U, class RT>                                              \
-        using frt = xt::detail::functor_return_type<U, RT>;                       \
-        using return_type = xt::detail::functor_return_type<T, R>;                \
+        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
         using first_argument_type = T;                                            \
         using second_argument_type = T;                                           \
         using third_argument_type = T;                                            \
         using result_type = decltype(exec(std::declval<T>(), std::declval<T>(),   \
                     std::declval<T>()));                                          \
         using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = typename return_type::simd_type;                 \
+        using simd_result_type = fst_t<simd_value_type, R>;                       \
         constexpr result_type operator()(const T& arg1,                           \
                                          const T& arg2,                           \
                                          const T& arg3) const                     \
@@ -213,7 +209,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg1, arg2, arg3);                                        \
         }                                                                         \
         template <class B>                                                        \
-        constexpr typename frt<get_value_type_t<B>, R>::simd_type                 \
+        constexpr fst_t<B, R>                                                     \
         simd_apply(const B& arg1, const B& arg2, const B& arg3) const             \
         {                                                                         \
             using math::NAME;                                                     \

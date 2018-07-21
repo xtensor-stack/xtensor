@@ -175,6 +175,21 @@ namespace xt
         // check SIMD type deduction
         xarray<double> res = xt::abs(a);
 
+        xarray<std::complex<double>> b(shape, std::complex<double>(1.2, 2.3));
+        EXPECT_EQ(abs(b)(0, 0), std::abs(b(0, 0)));
+
+        // check SIMD type deduction
+        xarray<double> res2 = xt::abs(b);
+
+        auto f = abs(b);
+        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits::same_type());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
+#endif
     }
 
     TEST(xmath, fabs)
