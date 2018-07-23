@@ -282,7 +282,7 @@ namespace xt
             while (idx_res.first != true)
             {
                 std::transform(out, out + inner_loop_size, begin, out,
-                               [merge, &init_fct, &merge_fct, &reduce_fct](auto&& v1, auto&& v2) {
+                               [merge, &init_fct, &reduce_fct](auto&& v1, auto&& v2) {
                                     return merge ?
                                         reduce_fct(v1, v2) :
                                         // cast because return type of identity function is not upcasted

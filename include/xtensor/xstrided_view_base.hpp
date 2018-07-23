@@ -378,13 +378,13 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view_base<CT, S, L, FST>::operator()() -> reference
     {
-        return m_storage[m_offset];
+        return m_storage[static_cast<size_type>(m_offset)];
     }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view_base<CT, S, L, FST>::operator()() const -> const_reference
     {
-        return m_storage[m_offset];
+        return m_storage[static_cast<size_type>(m_offset)];
     }
 
     /**
@@ -504,7 +504,7 @@ namespace xt
     inline auto xstrided_view_base<CT, S, L, FST>::unchecked(Args... args) const -> const_reference
     {
         offset_type index = compute_unchecked_index(args...);
-        return m_storage[index];
+        return m_storage[static_cast<size_type>(index)];
     }
 
     /**
@@ -575,7 +575,7 @@ namespace xt
     inline auto xstrided_view_base<CT, S, L, FST>::element(It first, It last) -> reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        return m_storage[compute_element_index(first, last)];
+        return m_storage[static_cast<size_type>(compute_element_index(first, last))];
     }
 
     /**
@@ -590,7 +590,7 @@ namespace xt
     inline auto xstrided_view_base<CT, S, L, FST>::element(It first, It last) const -> const_reference
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
-        return m_storage[compute_element_index(first, last)];
+        return m_storage[static_cast<size_type>(compute_element_index(first, last))];
     }
 
     /**
@@ -934,7 +934,7 @@ namespace xt
                         ++idx;
                     }
                     else if (base_type::fill_args(slices, XTENSOR_MU(i), idx,
-                                                  old_shape[XTENSOR_MU(i - axis_skip)],
+                                                  XTENSOR_MU(old_shape[XTENSOR_MU(i - axis_skip)]),
                                                   old_strides[XTENSOR_MU(i - axis_skip)],
                                                   new_shape, new_strides))
                     {

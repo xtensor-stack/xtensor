@@ -1256,7 +1256,7 @@ namespace xt
     #define XTENSOR_CONST const
 #endif
 
-#if defined(__GNUC__) && __GNUC__ < 5
+#if defined(__GNUC__) && __GNUC__ < 5 && !defined(__clang__)
     #define GCC4_FALLBACK
 
     namespace const_array_detail
@@ -1484,6 +1484,15 @@ namespace xt
  * std::tuple_size extensions *
  ******************************/
 
+// The C++ standard defines tuple_size as a class, however
+// G++ 8 C++ library does define it as a struct hence we get
+// clang warnings here
+
+#if defined(__clang__)
+    #pragma clang diagnostic push
+    #pragma clang diagnostic ignored "-Wmismatched-tags"
+#endif
+
 namespace std
 {
     template <class T, size_t N>
@@ -1499,6 +1508,9 @@ namespace std
     };
 }
 
+#if defined(__clang__)
+    #pragma clang diagnostic pop
+#endif
 
 #undef XTENSOR_CONST
 #undef XTENSOR_ALIGNMENT

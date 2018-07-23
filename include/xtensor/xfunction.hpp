@@ -608,7 +608,7 @@ namespace xt
                 self(this)->compute_cached_shape();
             }
         },
-        [](auto self){});
+        [](auto /*self*/){});
         return m_shape;
     }
 

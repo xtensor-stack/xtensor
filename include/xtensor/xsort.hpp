@@ -22,7 +22,6 @@ namespace xt
     template <class E>
     auto sort(const xexpression<E>& e, placeholders::xtuph /*t*/)
     {
-        using value_type = typename E::value_type;
         const auto de = e.derived_cast();
         E ev;
         ev.resize({de.size()});
@@ -38,7 +37,6 @@ namespace xt
         template <class E, class F>
         void call_over_leading_axis(E& ev, F&& fct)
         {
-            using value_type = typename E::value_type;
             std::size_t n_iters = 1;
             std::ptrdiff_t secondary_stride;
             if (ev.layout() == layout_type::row_major)
@@ -91,7 +89,6 @@ namespace xt
     auto sort(const xexpression<E>& e, std::size_t axis)
     {
         using eval_type = typename E::temporary_type;
-        using value_type = typename E::value_type;
 
         const auto& de = e.derived_cast();
 
@@ -307,7 +304,8 @@ namespace xt
         auto end = std::unique(sorted.begin(), sorted.end());
         std::size_t sz = static_cast<std::size_t>(std::distance(sorted.begin(), end));
         // TODO check if we can shrink the vector without reallocation
-        auto result = xtensor<typename E::value_type, 1>::from_shape({sz});
+        using value_type = typename E::value_type;
+        auto result = xtensor<value_type, 1>::from_shape({sz});
         std::copy(sorted.begin(), end, result.begin());
         return result;
     }

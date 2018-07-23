@@ -100,8 +100,8 @@ namespace xt
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = typename base_type::shape_type;
-        using strides_type = typename base_type::strides_type;;
-        using backstrides_type = typename base_type::backstrides_type;;
+        using strides_type = typename base_type::strides_type;
+        using backstrides_type = typename base_type::backstrides_type;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
@@ -1082,7 +1082,7 @@ namespace xt
         std::copy(old_strides.cbegin(), old_strides.cend(), strides.begin());
 
         strides[axis] *= -1;
-        std::size_t offset = old_strides[axis] * (e.shape()[axis] - 1);
+        std::size_t offset = static_cast<std::size_t>(old_strides[axis] * (static_cast<std::ptrdiff_t>(e.shape()[axis]) - 1));
 
         return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), offset);
     }
