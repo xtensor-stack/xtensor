@@ -234,4 +234,23 @@ namespace xt
             EXPECT_EQ(setdiff1d(ar1, ar2), out);
         }
     }
+
+    TEST(xsort, median)
+    {
+        xt::xtensor<float, 2> a = {{ 3, 4, 2, 1},
+                                   { 1, 1, 3, 2},
+                                   { 9, 9, 9, 9},
+                                   {12,12,12,12},
+                                   { 5, 5, 5, 5}};
+        auto mall = median(a);
+        auto ma0 = median(a, 0);
+        auto ma1 = median(a, 1);
+
+        EXPECT_EQ(mall, 5);
+
+        xt::xtensor<float, 1> ma0_exp = {5, 5, 5, 5};
+        xt::xtensor<float, 1> ma1_exp = {2.5, 1.5, 9., 12., 5.};
+        EXPECT_EQ(ma0, ma0_exp);
+        EXPECT_EQ(ma1, ma1_exp);
+    }
 }
