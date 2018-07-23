@@ -81,8 +81,8 @@ namespace xt
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = typename base_type::shape_type;
-        using strides_type = typename base_type::strides_type;;
-        using backstrides_type = typename base_type::backstrides_type;;
+        using strides_type = typename base_type::strides_type;
+        using backstrides_type = typename base_type::backstrides_type;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
@@ -580,7 +580,7 @@ namespace xt
     template <class T, class... Args>
     inline auto xdynamic_view<CT, S, L, FST>::adjust_offset(offset_type offset, T idx, Args... args) const noexcept -> offset_type
     {
-        constexpr size_type nb_args = sizeof...(Args)+1;
+        constexpr size_type nb_args = sizeof...(Args) + 1;
         size_type dim = base_type::dimension();
         offset_type res = nb_args > dim ? adjust_offset(offset, args...) : adjust_offset_impl(offset, dim - nb_args, idx, args...);
         return res;
@@ -621,8 +621,8 @@ namespace xt
         for (offset_type i = loop_offset; i < dim; ++i, ++first)
         {
             offset_type j = first[idx_offset];
-            offset_type sl_offset = xtl::visit([j](const auto& sl) { return sl(j); }, m_slices[i]);
-            res += sl_offset * m_adj_strides[i];
+            offset_type sl_offset = xtl::visit([j](const auto& sl) { return static_cast<offset_type>(sl(j)); }, m_slices[static_cast<std::size_t>(i)]);
+            res += sl_offset * m_adj_strides[static_cast<std::size_t>(i)];
         }
         return res;
     }

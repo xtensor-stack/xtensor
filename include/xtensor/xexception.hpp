@@ -97,8 +97,8 @@ namespace xt
         {
         }
 
-        template <class S, std::size_t dim, class... Args>
-        inline void check_index_impl(const S& shape, std::size_t arg, Args... args)
+        template <class S, std::size_t dim, class T, class... Args>
+        inline void check_index_impl(const S& shape, T arg, Args... args)
         {
             if (sizeof...(Args) + 1 > shape.size())
             {
@@ -106,7 +106,7 @@ namespace xt
             }
             else
             {
-                if (arg >= std::size_t(shape[dim]) && shape[dim] != 1)
+                if (std::size_t(arg) >= std::size_t(shape[dim]) && shape[dim] != 1)
                 {
                     throw std::out_of_range("index " + std::to_string(arg) + " is out of bounds for axis "
                         + std::to_string(dim) + " with size " + std::to_string(shape[dim]));

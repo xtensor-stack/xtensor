@@ -492,7 +492,6 @@ namespace xt
         template <class E1, class E2>
         inline void trivial_assigner_run_impl(E1& e1, const E2& e2, std::true_type)
         {
-            using size_type = typename E1::size_type;
             auto src = e2.storage_cbegin();
             auto dst = e1.storage_begin();
             assign_loop<typename E1::value_type>(src, dst, e1.size());
@@ -697,27 +696,21 @@ namespace xt
         }
 
         // TODO can we get rid of this and use `shape_type`?
-        dynamic_shape<std::size_t> idx;
+        dynamic_shape<std::size_t> idx, max_shape;
 
-        using iterator_type = decltype(e1.shape().begin());
-        iterator_type max_shape_begin, max_shape_end;
         if (is_row_major)
         {
             xt::resize_container(idx, cut);
-            max_shape_begin = e1.shape().begin();
-            max_shape_end = e1.shape().begin() + static_cast<std::ptrdiff_t>(cut);
+            max_shape.assign(e1.shape().begin(), e1.shape().begin() + static_cast<std::ptrdiff_t>(cut));
         }
         else
         {
             xt::resize_container(idx, e1.shape().size() - cut);
-            max_shape_begin = e1.shape().begin() + static_cast<std::ptrdiff_t>(cut);
-            max_shape_end = e1.shape().end();
+            max_shape.assign(e1.shape().begin() + static_cast<std::ptrdiff_t>(cut), e1.shape().end());
         }
 
         // add this when we have std::array index!
         // std::fill(idx.begin(), idx.end(), 0);
-
-        dynamic_shape<std::size_t> max(max_shape_begin, max_shape_end);
 
         using simd_type = xsimd::simd_type<typename E1::value_type>;
 
@@ -749,8 +742,8 @@ namespace xt
             }
 
             is_row_major ?
-                strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max) : 
-                strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max);
+                strided_assign_detail::idx_tools<layout_type::row_major>::next_idx(idx, max_shape) :
+                strided_assign_detail::idx_tools<layout_type::column_major>::next_idx(idx, max_shape);
 
             fct_stepper.to_begin();
 

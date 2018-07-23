@@ -32,7 +32,6 @@ namespace xt
     void test_increment(const R& result, const S& shape)
     {
         using size_type = typename R::size_type;
-        using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
@@ -87,9 +86,7 @@ namespace xt
     template <layout_type L, class R, class S>
     void test_random_increment(const R& result, const S& shape)
     {
-        using size_type = typename R::size_type;
         using difference_type = typename R::difference_type;
-        using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
@@ -143,7 +140,6 @@ namespace xt
     void test_end(const R& result)
     {
         using size_type = typename R::size_type;
-        using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
@@ -194,7 +190,6 @@ namespace xt
     void test_decrement(const R& result, const S& shape)
     {
         using size_type = typename R::size_type;
-        using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
@@ -247,9 +242,7 @@ namespace xt
     template <layout_type L, class R, class S>
     void test_random_decrement(const R& result, const S& shape)
     {
-        using size_type = typename R::size_type;
         using difference_type = typename R::difference_type;
-        using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
@@ -302,7 +295,6 @@ namespace xt
     void test_rend(const R& result)
     {
         using size_type = typename R::size_type;
-        using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
@@ -353,7 +345,6 @@ namespace xt
     {
         using size_type = typename R::size_type;
         using difference_type = typename R::difference_type;
-        using shape_type = typename R::shape_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());

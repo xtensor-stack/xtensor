@@ -354,15 +354,15 @@ namespace xt
             SCOPED_TRACE("unary function");
             auto fexp = exp(a);
             using assign_traits = xassign_traits<array_type, decltype(fexp)>;
-            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
-            // triggers the same error as the one caught by mingw.
-            using return_type = decltype(fexp.template load_simd<aligned_mode>(std::size_t(0)));
 #if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits::same_type());
             EXPECT_TRUE(assign_traits::simd_size());
             EXPECT_FALSE(assign_traits::forbid_simd());
             EXPECT_TRUE(assign_traits::simd_assign());
 #else
+            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
+            // triggers the same error as the one caught by mingw.
+            using return_type = decltype(fexp.template load_simd<aligned_mode>(std::size_t(0)));
             EXPECT_TRUE(assign_traits::same_type());
             EXPECT_FALSE(assign_traits::simd_size());
             EXPECT_TRUE(assign_traits::forbid_simd());
@@ -375,15 +375,15 @@ namespace xt
             SCOPED_TRACE("binary function");
             auto fpow = pow(a, a);
             using assign_traits = xassign_traits<array_type, decltype(fpow)>;
-            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
-            // triggers the same error as the one caught by mingw.
-            using return_type = decltype(fpow.template load_simd<aligned_mode>(std::size_t(0)));
 #if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits::same_type());
             EXPECT_TRUE(assign_traits::simd_size());
             EXPECT_FALSE(assign_traits::forbid_simd());
             EXPECT_TRUE(assign_traits::simd_assign());
 #else
+            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
+            // triggers the same error as the one caught by mingw.
+            using return_type = decltype(fpow.template load_simd<aligned_mode>(std::size_t(0)));
             EXPECT_TRUE(assign_traits::same_type());
             EXPECT_FALSE(assign_traits::simd_size());
             EXPECT_TRUE(assign_traits::forbid_simd());
@@ -396,15 +396,15 @@ namespace xt
             SCOPED_TRACE("ternary function");
             auto ffma = xt::fma(a, a, a);
             using assign_traits = xassign_traits<array_type, decltype(ffma)>;
-            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
-            // triggers the same error as the one caught by mingw.
-            using return_type = decltype(ffma.template load_simd<aligned_mode>(std::size_t(0)));
 #if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits::same_type());
             EXPECT_TRUE(assign_traits::simd_size());
             EXPECT_FALSE(assign_traits::forbid_simd());
             EXPECT_TRUE(assign_traits::simd_assign());
 #else
+            // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
+            // triggers the same error as the one caught by mingw.
+            using return_type = decltype(ffma.template load_simd<aligned_mode>(std::size_t(0)));
             EXPECT_TRUE(assign_traits::same_type());
             EXPECT_FALSE(assign_traits::simd_size());
             EXPECT_TRUE(assign_traits::forbid_simd());
@@ -491,9 +491,9 @@ namespace xt
         EXPECT_EQ(b, exp);
 
         auto f = square(a);
-        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
 
 #if XTENSOR_USE_XSIMD
+        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
         EXPECT_TRUE(assign_traits::same_type());
         EXPECT_TRUE(assign_traits::simd_size());
         EXPECT_FALSE(assign_traits::forbid_simd());
@@ -530,9 +530,9 @@ namespace xt
         EXPECT_TRUE(allclose(exp, b));
 
         auto f = pow<13>(a);
-        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
 
 #if XTENSOR_USE_XSIMD
+        using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
         EXPECT_TRUE(assign_traits::same_type());
         EXPECT_TRUE(assign_traits::simd_size());
         EXPECT_FALSE(assign_traits::forbid_simd());

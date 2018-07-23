@@ -227,7 +227,6 @@ namespace xt
         EXPECT_TRUE(truth);
 
         xtensor_fixed<char, xshape<   2, 1, 10, 5>> xa;
-        xtensor_fixed<char, xshape<   2, 1, 10, 5>> xc;
         xtensor_fixed<char, xshape<3, 2, 4, 10, 1>> xb;
 
         auto fx1 = xa * xb;
@@ -236,6 +235,11 @@ namespace xt
         EXPECT_TRUE(truth);
         truth = std::is_same<typename decltype(fx2)::shape_type, xshape<3, 2, 4, 10, 5>>::value;
         EXPECT_TRUE(truth);
+
+        // xtensor_fixed<char, xshape<   2, 1, 10, 5>> xc;
+        // auto fx3 = xa * xc;
+        // truth = std::is_same<typename decltype(fx3)::shape_type, xshape<2, 1, 10, 5>>::value;
+        // EXPECT_TRUE(truth);
     }
 }
 

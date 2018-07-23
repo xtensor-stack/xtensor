@@ -587,7 +587,7 @@ namespace xt
     template <class E>
     inline auto xfiltration<ECT, CCT>::operator+=(const E& e) -> disable_xexpression<E, self_type&>
     {
-        return apply([this, &e](const_reference v, bool cond) { return cond ? v + e : v; });
+        return apply([&e](const_reference v, bool cond) { return cond ? v + e : v; });
     }
 
     /**
@@ -599,7 +599,7 @@ namespace xt
     template <class E>
     inline auto xfiltration<ECT, CCT>::operator-=(const E& e) -> disable_xexpression<E, self_type&>
     {
-        return apply([this, &e](const_reference v, bool cond) { return cond ? v - e : v; });
+        return apply([&e](const_reference v, bool cond) { return cond ? v - e : v; });
     }
 
     /**
@@ -611,7 +611,7 @@ namespace xt
     template <class E>
     inline auto xfiltration<ECT, CCT>::operator*=(const E& e) -> disable_xexpression<E, self_type&>
     {
-        return apply([this, &e](const_reference v, bool cond) { return cond ? v * e : v; });
+        return apply([&e](const_reference v, bool cond) { return cond ? v * e : v; });
     }
 
     /**
@@ -623,7 +623,7 @@ namespace xt
     template <class E>
     inline auto xfiltration<ECT, CCT>::operator/=(const E& e) -> disable_xexpression<E, self_type&>
     {
-        return apply([this, &e](const_reference v, bool cond) { return cond ? v / e : v; });
+        return apply([&e](const_reference v, bool cond) { return cond ? v / e : v; });
     }
 
     /**
@@ -635,7 +635,7 @@ namespace xt
     template <class E>
     inline auto xfiltration<ECT, CCT>::operator%=(const E& e) -> disable_xexpression<E, self_type&>
     {
-        return apply([this, &e](const_reference v, bool cond) { return cond ? v % e : v; });
+        return apply([&e](const_reference v, bool cond) { return cond ? v % e : v; });
     }
 
     template <class ECT, class CCT>

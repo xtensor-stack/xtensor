@@ -46,7 +46,7 @@ namespace xt
         template <class... Args>
         struct rangemaker
         {
-            ptrdiff_t rng[3];// = { 0, 0, 0 };
+            ptrdiff_t rng[3]; // = { 0, 0, 0 };
         };
 
         XTENSOR_CONSTEXPR xtuph get_tuph_or_val(std::ptrdiff_t /*val*/, std::true_type)
@@ -86,7 +86,7 @@ namespace xt
                 };
             }
 
-            ptrdiff_t rng[3];// = { 0, 0, 0 };
+            ptrdiff_t rng[3];  // = { 0, 0, 0 };
         };
 
         template <class... OA>
@@ -94,7 +94,7 @@ namespace xt
         {
             auto nrng = rangemaker<OA..., ptrdiff_t>{rng.rng[0], rng.rng[1], rng.rng[2]};
             nrng.rng[sizeof...(OA)] = t;
-            return nrng; 
+            return nrng;
         }
 
         template <class... OA>
@@ -1092,7 +1092,7 @@ namespace xt
     template <class T>
     inline auto xkeep_slice<T>::operator()(size_type i) const noexcept -> size_type
     {
-        return m_indices[i];
+        return m_indices[static_cast<std::size_t>(i)];
     }
 
     template <class T>
@@ -1105,7 +1105,7 @@ namespace xt
     inline auto xkeep_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
     {
         // special case one-past-end step (should be removed soon)
-        if (i == static_cast<size_type>(m_indices.size()))
+        if (i == m_indices.size())
         {
             return 1;
         }
@@ -1190,8 +1190,8 @@ namespace xt
             {
                 ++i;
             }
-            cum += (i - ind) + 1;
-            m_inc[d - prev_cum] = size_type(cum);
+            cum += (static_cast<size_type>(i) - static_cast<size_type>(ind)) + 1;
+            m_inc[d - prev_cum] = cum;
             prev_cum = cum;
         }
     }
