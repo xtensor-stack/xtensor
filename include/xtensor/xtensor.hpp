@@ -109,6 +109,11 @@ namespace xt
         template <class E>
         xtensor_container& operator=(const xexpression<E>& e);
 
+        const shape_type& shape_impl() const
+        {
+            return base_type::container_shape_impl();
+        }
+
     private:
 
         storage_type m_storage;

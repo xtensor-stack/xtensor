@@ -30,6 +30,7 @@ namespace xt
     struct xcontainer_inner_types<xindex_view<CT, I>>
     {
         using xexpression_type = std::decay_t<CT>;
+        using shape_type = std::array<std::size_t, 1>;
         using temporary_type = xarray<typename xexpression_type::value_type, xexpression_type::static_layout>;
     };
 

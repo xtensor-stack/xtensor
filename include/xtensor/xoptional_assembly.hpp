@@ -33,6 +33,7 @@ namespace xt
         using flag_storage_type = typename flag_expression::storage_type&;
         using storage_type = xoptional_assembly_storage<value_storage_type, flag_storage_type>;
         using temporary_type = xoptional_assembly<VE, FE>;
+        using shape_type = typename VE::inner_shape_type;
     };
 
     template <class VE, class FE>
@@ -152,6 +153,7 @@ namespace xt
                                                      const typename flag_expression::storage_type&,
                                                      typename flag_expression::storage_type&>;
         using storage_type = xoptional_assembly_storage<value_storage_type, flag_storage_type>;
+        using shape_type = typename std::decay_t<VEC>::inner_shape_type;
         using temporary_type = xoptional_assembly<value_expression, flag_expression>;
     };
 

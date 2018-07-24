@@ -70,6 +70,7 @@ namespace xt
     struct xcontainer_inner_types<xfunctor_view<F, CT>>
     {
         using xexpression_type = std::decay_t<CT>;
+        using shape_type = typename xexpression_type::shape_type;
         using temporary_type = typename xfunctor_view_temporary_type<F, xexpression_type>::type;
     };
 
