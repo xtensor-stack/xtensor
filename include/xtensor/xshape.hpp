@@ -26,8 +26,13 @@ namespace xt
     template <class T>
     using dynamic_shape = svector<T, 4>;
 
+    using dshape = dynamic_shape<std::size_t>;
+
     template <class T, std::size_t N>
     using static_shape = std::array<T, N>;
+
+    template <std::size_t N>
+    using sshape = static_shape<std::size_t, N>;
 
     template <std::size_t... X>
     class fixed_shape;

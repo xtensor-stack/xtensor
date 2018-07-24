@@ -96,11 +96,12 @@ set(XTENSOR_TESTS
     test_xbuilder.cpp
     test_xconcepts.cpp
     test_xcontainer_semantic.cpp
-    test_xcomplex.cpp
+    # test_xcomplex.cpp
     test_xcsv.cpp
-    test_xdynamic_view.cpp
+    # test_xdynamic_view.cpp
     test_xeval.cpp
     test_xexception.cpp
+    test_xexpression.cpp
     test_xfunction.cpp
     test_xfixed.cpp
     test_xindex_view.cpp
@@ -108,7 +109,7 @@ set(XTENSOR_TESTS
     test_xiterator.cpp
     test_xio.cpp
     test_xlayout.cpp
-    test_xmasked_view.cpp
+    # test_xmasked_view.cpp
     test_xmath.cpp
     test_xnan_functions.cpp
     test_xnoalias.cpp
@@ -116,13 +117,13 @@ set(XTENSOR_TESTS
     test_xnpy.cpp
     test_xoperation.cpp
     test_xoptional.cpp
-    test_xoptional_assembly.cpp
-    test_xoptional_assembly_adaptor.cpp
-    test_xoptional_assembly_storage.cpp
+    # test_xoptional_assembly.cpp
+    # test_xoptional_assembly_adaptor.cpp
+    # test_xoptional_assembly_storage.cpp
     test_xrandom.cpp
     test_xreducer.cpp
     test_xscalar.cpp
-    test_xscalar_semantic.cpp
+    # test_xscalar_semantic.cpp
     test_xshape.cpp
     test_xsort.cpp
     test_xstorage.cpp
