@@ -463,6 +463,8 @@ namespace xt
 
         constexpr layout_type layout() const noexcept;
 
+        XTENSOR_CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
+
     private:
 
         container_closure_type m_storage;
@@ -474,7 +476,6 @@ namespace xt
         storage_type& storage_impl() noexcept;
         const storage_type& storage_impl() const noexcept;
 
-        XTENSOR_CONSTEXPR_RETURN const inner_shape_type& shape_impl() const noexcept;
         XTENSOR_CONSTEXPR_RETURN const inner_strides_type& strides_impl() const noexcept;
         XTENSOR_CONSTEXPR_RETURN const inner_backstrides_type& backstrides_impl() const noexcept;
 

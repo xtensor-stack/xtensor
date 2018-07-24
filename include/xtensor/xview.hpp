@@ -738,7 +738,7 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::element(It first, It last) -> reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape_impl(), first, last));
         // TODO: avoid memory allocation
         auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());

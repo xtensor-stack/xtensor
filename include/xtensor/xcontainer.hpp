@@ -546,7 +546,7 @@ namespace xt
     inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
         XTENSOR_TRY(check_index(derived_cast().shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_CHECK_DIMENSION(derived_cast().shape(), args...);
         size_type index = static_cast<size_type>(xt::data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
@@ -562,7 +562,7 @@ namespace xt
     inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_TRY(check_index(derived_cast().shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_CHECK_DIMENSION(derived_cast().shape(), args...);
         size_type index = static_cast<std::size_t>(xt::data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
@@ -720,7 +720,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) -> reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(derived_cast().shape(), first, last));
         return storage()[element_offset<size_type>(strides(), first, last)];
     }
 
@@ -735,7 +735,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) const -> const_reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(derived_cast().shape(), first, last));
         return storage()[element_offset<size_type>(strides(), first, last)];
     }
 
