@@ -16,11 +16,15 @@
 #include <xtl/xclosure.hpp>
 #include <xtl/xtype_traits.hpp>
 
+#include "xlayout.hpp"
 #include "xshape.hpp"
 #include "xutils.hpp"
 
 namespace xt
 {
+
+    template <class E>
+    class xshared_expression;
 
     /***************************
      * xexpression declaration *
@@ -136,6 +140,12 @@ namespace xt
     };
 
     template <class E>
+    struct xclosure<xshared_expression<E>, std::enable_if_t<true>>
+    {
+        using type = xshared_expression<E>; // force copy
+    };
+
+    template <class E>
     struct xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
         using type = xscalar<xtl::closure_type_t<E>>;
@@ -154,6 +164,12 @@ namespace xt
     struct const_xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
         using type = xscalar<xtl::const_closure_type_t<E>>;
+    };
+
+    template <class E>
+    struct const_xclosure<xshared_expression<E>&, std::enable_if_t<true>>
+    {
+        using type = xshared_expression<E>; // force copy
     };
 
     template <class E>
@@ -302,6 +318,135 @@ namespace xt
                                                   >
     {
     };
+
+#define FORWARD_METHOD(name)                   \
+    auto name() const                          \
+        -> decltype(std::declval<E>().name())  \
+    {                                          \
+        return m_ptr->name();                  \
+    }
+
+    template <class E>
+    class xshared_expression
+        : public xexpression<xshared_expression<E>>
+    {
+    public:
+
+        using base_class = xexpression<xshared_expression<E>>;
+
+        using value_type = typename E::value_type;
+        using reference = typename E::reference;
+        using const_reference = typename E::const_reference;
+        using pointer = typename E::pointer;
+        using const_pointer = typename E::const_pointer;
+        using size_type = typename E::size_type;
+        using difference_type = typename E::difference_type;
+
+        using shape_type = typename E::shape_type;
+        using strides_type = typename E::strides_type;
+        using backstrides_type = typename E::backstrides_type;
+
+        using inner_shape_type = typename E::inner_shape_type;
+        using inner_strides_type = typename E::inner_strides_type;
+        using inner_backstrides_type = typename E::inner_backstrides_type;
+
+        using stepper = typename E::stepper;
+        using const_stepper = typename E::const_stepper;
+
+        using storage_iterator = typename E::storage_iterator;
+        using const_storage_iterator = typename E::const_storage_iterator;
+
+
+        static constexpr layout_type static_layout = E::static_layout;
+        static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
+
+        explicit xshared_expression(std::shared_ptr<E>&& ptr)
+            : m_ptr(std::move(ptr))
+        {
+        }
+
+        template <class... Args>
+        auto operator()(Args... args)
+        {
+            return m_ptr->operator()(args...);
+        }
+
+        FORWARD_METHOD(shape);
+        FORWARD_METHOD(dimension);
+        FORWARD_METHOD(size);
+        FORWARD_METHOD(begin);
+        FORWARD_METHOD(cbegin);
+        FORWARD_METHOD(storage_begin);
+        FORWARD_METHOD(storage_cbegin);
+        FORWARD_METHOD(storage_end);
+        FORWARD_METHOD(storage_cend);
+
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        FORWARD_METHOD(strides);
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        FORWARD_METHOD(data);
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        FORWARD_METHOD(data_offset);
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        FORWARD_METHOD(storage);
+
+        template <class S>
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const
+        {
+            return m_ptr->broadcast_shape(shape, reuse_cache);
+        }
+
+        template <class S>
+        bool is_trivial_broadcast(const S& strides) const noexcept
+        {
+            return m_ptr->is_trivial_broadcast(strides);
+        }
+
+        template <class S>
+        auto stepper_begin(const S& shape) noexcept
+            -> decltype(std::declval<E>().stepper_begin(shape))
+        {
+            return m_ptr->stepper_begin(shape);
+        }
+
+        template <class S>
+        auto stepper_end(const S& shape, layout_type l) noexcept
+            -> decltype(std::declval<E>().stepper_end(shape, l))
+        {
+            return m_ptr->stepper_end(shape, l);
+        }
+
+        template <class S>
+        auto stepper_begin(const S& shape) const noexcept
+            -> decltype(std::declval<const E>().stepper_begin(shape))
+        {
+            return static_cast<const E*>(m_ptr.get())->stepper_begin(shape);
+        }
+        template <class S>
+        auto stepper_end(const S& shape, layout_type l) const noexcept
+            -> decltype(std::declval<const E>().stepper_end(shape, l))
+        {
+            return static_cast<const E*>(m_ptr.get())->stepper_end(shape, l);
+        }
+
+        long use_count() const noexcept
+        {
+            return m_ptr.use_count();
+        }
+
+    private:
+
+        std::shared_ptr<E> m_ptr;
+    };
+
+    template <class E>
+    auto make_xshared(xexpression<E>&& e)
+    {
+        return xshared_expression<E>(std::make_shared<E>(e));
+    }
+
+#undef FORWARD_METHOD
+
 }
 
 #endif
