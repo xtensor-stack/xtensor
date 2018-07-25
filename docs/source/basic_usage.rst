@@ -14,6 +14,7 @@ Basic usage
     #include <iostream>
     #include "xtensor/xarray.hpp"
     #include "xtensor/xio.hpp"
+    #include "xtensor/xview.hpp"
 
     xt::xarray<double> arr1
       {{1.0, 2.0, 3.0},
