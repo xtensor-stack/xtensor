@@ -319,13 +319,38 @@ namespace xt
     {
     };
 
-#define FORWARD_METHOD(name)                   \
+#define XTENSOR_FORWARD_METHOD(name)           \
     auto name() const                          \
         -> decltype(std::declval<E>().name())  \
     {                                          \
         return m_ptr->name();                  \
     }
 
+    /**
+     * @class xshared_expression
+     * @brief Shared xexpressions
+     *
+     * Due to C++ lifetime constraints it's sometimes necessary to create shared
+     * expressions (akin to a shared pointer).
+     *
+     * For example, when a temporary expression needs to be used twice in another
+     * expression, shared expressions can come to the rescue:
+     *
+     * \code{.cpp}
+     * template <class E>
+     * auto cos_plus_sin(xexpression<E>&& expr)
+     * {
+     *     // THIS IS WRONG: forwarding rvalue twice not permitted!
+     *     // return xt::sin(std::forward<E>(expr)) + xt::cos(std::forward<E>(expr));
+     *     // THIS IS WRONG TOO: because second `expr` is taken as reference (which will be invalid)
+     *     // return xt::sin(std::forward<E>(expr)) + xt::cos(expr)
+     *     auto shared_expr = xt::make_xshared(std::forward<E>(expr));
+     *     auto result = xt::sin(shared_expr) + xt::cos(shared_expr);
+     *     std::cout << shared_expr.use_count() << std::endl; // Will print 3 because used twice in expression
+     *     return result; // all valid because expr lifetime managed by xshared_expression / shared_ptr.
+     * }
+     * \endcode
+     */
     template <class E>
     class xshared_expression
         : public xexpression<xshared_expression<E>>
@@ -356,39 +381,37 @@ namespace xt
         using storage_iterator = typename E::storage_iterator;
         using const_storage_iterator = typename E::const_storage_iterator;
 
-
         static constexpr layout_type static_layout = E::static_layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
-        explicit xshared_expression(std::shared_ptr<E>&& ptr)
-            : m_ptr(std::move(ptr))
-        {
-        }
+        explicit xshared_expression(std::shared_ptr<E>&& ptr);
+        long use_count() const noexcept;
 
         template <class... Args>
         auto operator()(Args... args)
+            -> decltype(std::declval<E>()(args...))
         {
             return m_ptr->operator()(args...);
         }
 
-        FORWARD_METHOD(shape);
-        FORWARD_METHOD(dimension);
-        FORWARD_METHOD(size);
-        FORWARD_METHOD(begin);
-        FORWARD_METHOD(cbegin);
-        FORWARD_METHOD(storage_begin);
-        FORWARD_METHOD(storage_cbegin);
-        FORWARD_METHOD(storage_end);
-        FORWARD_METHOD(storage_cend);
+        XTENSOR_FORWARD_METHOD(shape);
+        XTENSOR_FORWARD_METHOD(dimension);
+        XTENSOR_FORWARD_METHOD(size);
+        XTENSOR_FORWARD_METHOD(begin);
+        XTENSOR_FORWARD_METHOD(cbegin);
+        XTENSOR_FORWARD_METHOD(storage_begin);
+        XTENSOR_FORWARD_METHOD(storage_cbegin);
+        XTENSOR_FORWARD_METHOD(storage_end);
+        XTENSOR_FORWARD_METHOD(storage_cend);
 
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        FORWARD_METHOD(strides);
+        XTENSOR_FORWARD_METHOD(strides);
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        FORWARD_METHOD(data);
+        XTENSOR_FORWARD_METHOD(data);
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        FORWARD_METHOD(data_offset);
+        XTENSOR_FORWARD_METHOD(data_offset);
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        FORWARD_METHOD(storage);
+        XTENSOR_FORWARD_METHOD(storage);
 
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const
@@ -429,23 +452,47 @@ namespace xt
             return static_cast<const E*>(m_ptr.get())->stepper_end(shape, l);
         }
 
-        long use_count() const noexcept
-        {
-            return m_ptr.use_count();
-        }
-
     private:
 
         std::shared_ptr<E> m_ptr;
     };
 
+    /**
+     * Constructor for xshared expression (note: usually the free function
+     * `make_xshared` is recommended).
+     *
+     * @param ptr shared ptr that contains the expression
+     * @sa make_xshared
+     */
     template <class E>
-    auto make_xshared(xexpression<E>&& e)
+    inline xshared_expression<E>::xshared_expression(std::shared_ptr<E>&& ptr)
+        : m_ptr(std::move(ptr))
     {
-        return xshared_expression<E>(std::make_shared<E>(e));
     }
 
-#undef FORWARD_METHOD
+    /**
+     * Return the number of times this expression is referenced.
+     * Internally calls the use_count() function of the std::shared_ptr.
+     */
+    template <class E>
+    inline long xshared_expression<E>::use_count() const noexcept
+    {
+        return m_ptr.use_count();
+    }
+
+    /**
+     * Helper function to create shared expression from any xexpression
+     *
+     * @param expr rvalue expression that will be shared
+     * @return xshared expression
+     */
+    template <class E>
+    auto make_xshared(xexpression<E>&& expr)
+    {
+        return xshared_expression<E>(std::make_shared<E>(expr));
+    }
+
+#undef XTENSOR_FORWARD_METHOD
 
 }
 
