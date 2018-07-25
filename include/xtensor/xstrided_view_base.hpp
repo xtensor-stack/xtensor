@@ -943,81 +943,78 @@ namespace xt
 
                 using old_strides_vt = std::decay_t<decltype(old_strides[0])>;
 
-#define XTENSOR_MS(v) static_cast<std::ptrdiff_t>(v)
-#define XTENSOR_MU(v) static_cast<std::size_t>(v)
-
-                std::ptrdiff_t i = 0, axis_skip = 0;
-                std::size_t idx = 0;
+                std::ptrdiff_t axis_skip = 0;
+                std::size_t idx = 0, i = 0, i_ax = 0;
 
                 auto slice_getter = detail::slice_getter_impl<S>(shape);
 
-                for (; i < XTENSOR_MS(slices.size()); ++i)
+                for (; i < slices.size(); ++i)
                 {
-                    auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[XTENSOR_MU(i)]);
+                    i_ax = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(i) - axis_skip);
+                    auto ptr = xtl::get_if<std::ptrdiff_t>(&slices[i]);
                     if (ptr != nullptr)
                     {
                         auto slice0 = static_cast<old_strides_vt>(*ptr);
-                        new_offset += static_cast<std::size_t>(slice0 * old_strides[XTENSOR_MU(i - axis_skip)]);
+                        new_offset += static_cast<std::size_t>(slice0 * old_strides[i_ax]);
                     }
-                    else if (xtl::get_if<xt::xnewaxis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
+                    else if (xtl::get_if<xt::xnewaxis_tag>(&slices[i]) != nullptr)
                     {
                         new_shape[idx] = 1;
                         base_type::set_fake_slice(idx);
                         ++axis_skip, ++idx;
                     }
-                    else if (xtl::get_if<xt::xellipsis_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
+                    else if (xtl::get_if<xt::xellipsis_tag>(&slices[i]) != nullptr)
                     {
                         for (std::size_t j = 0; j < n_add_all; ++j)
                         {
-                            new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
-                            new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                            new_shape[idx] = old_shape[i_ax];
+                            new_strides[idx] = old_strides[i_ax];
                             base_type::set_fake_slice(idx);
-                            --axis_skip, ++idx;
+                            ++idx, ++i_ax;
                         }
-                        ++axis_skip;  // because i++
+                        axis_skip = axis_skip - static_cast<ptrdiff_t>(n_add_all) + 1;
                     }
-                    else if (xtl::get_if<xt::xall_tag>(&slices[XTENSOR_MU(i)]) != nullptr)
+                    else if (xtl::get_if<xt::xall_tag>(&slices[i]) != nullptr)
                     {
-                        new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
-                        new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                        new_shape[idx] = old_shape[i_ax];
+                        new_strides[idx] = old_strides[i_ax];
                         base_type::set_fake_slice(idx);
                         ++idx;
                     }
-                    else if (base_type::fill_args(slices, XTENSOR_MU(i), idx,
-                                                  XTENSOR_MU(old_shape[XTENSOR_MU(i - axis_skip)]),
-                                                  old_strides[XTENSOR_MU(i - axis_skip)],
+                    else if (base_type::fill_args(slices, i, idx,
+                                                  old_shape[i_ax],
+                                                  old_strides[i_ax],
                                                   new_shape, new_strides))
                     {
                         ++idx;
                     }
                     else
                     {
-                        slice_getter.idx = XTENSOR_MU(i - axis_skip);
-                        auto info = xtl::visit(slice_getter, slices[XTENSOR_MU(i)]);
-                        new_offset += XTENSOR_MU(static_cast<old_strides_vt>(info[0]) * old_strides[XTENSOR_MU(i - axis_skip)]);
-                        new_shape[idx] = std::ptrdiff_t(info[1]);
-                        new_strides[idx] = std::ptrdiff_t(info[2]) * XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                        slice_getter.idx = i_ax;
+                        auto info = xtl::visit(slice_getter, slices[i]);
+                        new_offset += static_cast<std::size_t>(info[0] * old_strides[i_ax]);
+                        new_shape[idx] = static_cast<std::size_t>(info[1]);
+                        new_strides[idx] = info[2] * old_strides[i_ax];
                         base_type::set_fake_slice(idx);
                         ++idx;
                     }
                 }
 
-                for (; XTENSOR_MU(i - axis_skip) < old_shape.size(); ++i)
+                i_ax = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(i) - axis_skip);
+                for (; i_ax < old_shape.size(); ++i_ax, ++idx)
                 {
-                    new_shape[idx] = XTENSOR_MS(old_shape[XTENSOR_MU(i - axis_skip)]);
-                    new_strides[idx] = XTENSOR_MS(old_strides[XTENSOR_MU(i - axis_skip)]);
+                    new_shape[idx] = old_shape[i_ax];
+                    new_strides[idx] = old_strides[i_ax];
                     base_type::set_fake_slice(idx);
-                    ++idx;
                 }
 
                 new_layout = do_strides_match(new_shape, new_strides, layout) ? layout : layout_type::dynamic;
-#undef XTENSOR_MU
-#undef XTENSOR_MS
             }
 
-            using shape_type = dynamic_shape<std::ptrdiff_t>;
+            using shape_type = dynamic_shape<std::size_t>;
             shape_type new_shape;
-            shape_type new_strides;
+            using strides_type = dynamic_shape<std::ptrdiff_t>;
+            strides_type new_strides;
             std::size_t new_offset;
             layout_type new_layout;
         };

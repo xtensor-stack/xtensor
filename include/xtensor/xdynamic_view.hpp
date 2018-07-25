@@ -660,7 +660,7 @@ namespace xt
             bool fill_args(const xdynamic_slice_vector& slices, std::size_t sl_idx,
                            std::size_t i, std::size_t old_shape,
                            const ST& old_stride,
-                           S& shape, S& strides)
+                           S& shape, get_strides_t<S>& strides)
             {
                 return fill_args_impl<xkeep_slice<std::ptrdiff_t>>(slices, sl_idx, i, old_shape, old_stride, shape, strides)
                     || fill_args_impl<xdrop_slice<std::ptrdiff_t>>(slices, sl_idx, i, old_shape, old_stride, shape, strides);
@@ -670,7 +670,7 @@ namespace xt
             bool fill_args_impl(const xdynamic_slice_vector& slices, std::size_t sl_idx,
                                 std::size_t i, std::size_t old_shape,
                                 const ST& old_stride,
-                                S& shape, S& strides)
+                                S& shape, get_strides_t<S>& strides)
             {
                 auto* sl = xtl::get_if<SL>(&slices[sl_idx]);
                 if (sl != nullptr)
