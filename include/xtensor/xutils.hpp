@@ -637,7 +637,7 @@ namespace xt
     inline auto conditional_cast(U&& u)
     {
         return conditional_cast_functor<condition, T>()(std::forward<U>(u));
-    };
+    }
 
     /************************************
      * arithmetic type promotion traits *
@@ -693,7 +693,7 @@ namespace xt
         using type = typename promote_type<bool, typename promote_type<REST...>::type>::type;
     };
 
-    /** 
+    /**
      * @brief Abbreviation of 'typename promote_type<T>::type'.
      */
     template <class... T>
@@ -710,7 +710,7 @@ namespace xt
     struct big_promote_type
     {
     private:
-        
+
         using V = std::decay_t<T>;
         static constexpr bool is_arithmetic = std::is_arithmetic<V>::value;
         static constexpr bool is_signed = std::is_signed<V>::value;
@@ -964,7 +964,7 @@ namespace xt
         {
             static bool enabled;
             return enabled;
-        };
+        }
 
         inline void enable()
         {
