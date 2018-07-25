@@ -22,8 +22,8 @@
     #endif
 #endif
 
-// Workaround for some missing constexpr functionality in MSVC 2015
-#if defined(_MSC_VER) && (_MSC_VER < 1910)
+// Workaround for some missing constexpr functionality in MSVC 2015 and MSVC 2017 x86
+#if defined(_MSC_VER) && (_MSC_VER < 1910 || !defined(_WIN64))
 #define XTENSOR_CONSTEXPR_ENHANCED const
 #define XTENSOR_CONSTEXPR_ENHANCED_STATIC const
 #define XTENSOR_CONSTEXPR_RETURN inline

@@ -33,6 +33,7 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
+        // TODO decide on shape type which temporary type to use!
         using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
     };
 
@@ -587,13 +588,13 @@ namespace xt
             }
 
             // permute stride and shape
-            using strides_type = get_strides_t<typename std::decay_t<E>::strides_type>;
-            strides_type temp_strides;
-            resize_container(temp_strides, e.strides().size());
-
-            using shape_type = typename std::decay_t<E>::shape_type;
+            using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
             shape_type temp_shape;
             resize_container(temp_shape, e.shape().size());
+
+            using strides_type = get_strides_t<shape_type>;
+            strides_type temp_strides;
+            resize_container(temp_strides, e.strides().size());
 
             using size_type = typename std::decay_t<E>::size_type;
             for (std::size_t i = 0; i < e.shape().size(); ++i)

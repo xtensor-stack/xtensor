@@ -546,9 +546,9 @@ namespace xt
         return N;
     }
 
-    /*****************************************
+    /*************************************
      * has_data_interface implementation *
-     *****************************************/
+     *************************************/
 
     template <class T>
     class has_data_interface

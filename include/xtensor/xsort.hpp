@@ -10,6 +10,7 @@
 #define XTENSOR_SORT_HPP
 
 #include <algorithm>
+#include <utility>
 
 #include "xarray.hpp"
 #include "xeval.hpp"
@@ -19,23 +20,15 @@
 
 namespace xt
 {
-    template <class E>
-    auto sort(const xexpression<E>& e, placeholders::xtuph /*t*/)
-    {
-        const auto de = e.derived_cast();
-        E ev;
-        ev.resize({de.size()});
-
-        std::copy(de.cbegin(), de.cend(), ev.begin());
-        std::sort(ev.begin(), ev.end());
-
-        return ev;
-    }
-
     namespace detail
     {
+        constexpr std::size_t normalize_axis(std::ptrdiff_t axis, std::size_t dim)
+        {
+            return axis >= 0 ? static_cast<std::size_t>(axis) : static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis);
+        }
+
         template <class E, class F>
-        void call_over_leading_axis(E& ev, F&& fct)
+        inline void call_over_leading_axis(E& ev, F&& fct)
         {
             std::size_t n_iters = 1;
             std::ptrdiff_t secondary_stride;
@@ -73,6 +66,106 @@ namespace xt
             }
             throw std::runtime_error("Layout not supported.");
         }
+
+        // get permutations to transpose and reverse-transpose array
+        inline std::pair<dynamic_shape<std::size_t>, dynamic_shape<std::size_t>>
+        get_permutations(std::size_t dim, std::size_t ax, layout_type layout)
+        {
+            dynamic_shape<std::size_t> permutation(dim);
+            std::iota(permutation.begin(), permutation.end(), std::size_t(0));
+            permutation.erase(permutation.begin() + std::ptrdiff_t(ax));
+
+            if (layout == layout_type::row_major)
+            {
+                permutation.push_back(ax);
+            }
+            else
+            {
+                permutation.insert(permutation.begin(), ax);
+            }
+
+            // TODO find a more clever way to get reverse permutation?
+            dynamic_shape<std::size_t> reverse_permutation;
+            for (std::size_t i = 0; i < dim; ++i)
+            {
+                auto it = std::find(permutation.begin(), permutation.end(), i);
+                reverse_permutation.push_back(std::size_t(std::distance(permutation.begin(), it)));
+            }
+
+            return std::make_pair(std::move(permutation), std::move(reverse_permutation));
+        }
+
+        template <class E, class R, class F>
+        inline auto run_lambda_over_axis(const E& e, R& res, std::size_t axis, F&& lambda)
+        {
+            if (axis != detail::leading_axis(res))
+            {
+                dynamic_shape<std::size_t> permutation, reverse_permutation;
+                std::tie(permutation, reverse_permutation) = get_permutations(e.dimension(), axis, e.layout());
+
+                res = transpose(e, permutation);
+                detail::call_over_leading_axis(res, std::forward<F>(lambda));
+                res = transpose(res, reverse_permutation);
+            }
+            else
+            {
+                res = e;
+                detail::call_over_leading_axis(res, std::forward<F>(lambda));
+            }
+        }
+
+        template <class VT>
+        struct flatten_sort_result_type
+        {
+            using type = VT;
+        };
+
+        template <class VT, size_t N, layout_type L>
+        struct flatten_sort_result_type<xtensor<VT, N, L>>
+        {
+            using type = xtensor<VT, 1, L>;
+        };
+
+        template <class VT, class S, layout_type L>
+        struct flatten_sort_result_type<xtensor_fixed<VT, S, L>>
+        {
+            using type = xtensor_fixed<VT, xshape<fixed_compute_size<S>::value>, L>;
+        };
+
+
+        template <class E, class R = typename flatten_sort_result_type<E>::type>
+        inline auto flat_sort_impl(const xexpression<E>& e)
+        {
+            const auto& de = e.derived_cast();
+            R ev;
+            ev.resize({de.size()});
+
+            std::copy(de.cbegin(), de.cend(), ev.begin());
+            std::sort(ev.begin(), ev.end());
+
+            return ev;
+        }
+    }
+
+    template <class E>
+    inline auto sort(const xexpression<E>& e, placeholders::xtuph /*t*/)
+    {
+        return detail::flat_sort_impl(e);
+    }
+
+    namespace detail
+    {
+        template <class T>
+        struct sort_eval_type
+        {
+            using type = typename T::temporary_type;
+        };
+
+        template <class T, std::size_t... I, layout_type L>
+        struct sort_eval_type<xtensor_fixed<T, fixed_shape<I...>, L>>
+        {
+            using type = xtensor<T, sizeof...(I), L>;
+        };
     }
 
     /**
@@ -86,59 +179,186 @@ namespace xt
      * @return sorted array (copy)
      */
     template <class E>
-    auto sort(const xexpression<E>& e, std::size_t axis)
+    inline auto sort(const xexpression<E>& e, std::ptrdiff_t axis = -1)
     {
-        using eval_type = typename E::temporary_type;
+        using eval_type = typename detail::sort_eval_type<E>::type;
 
         const auto& de = e.derived_cast();
 
         if (de.dimension() == 1)
         {
-            return sort(de, xnone());
+            return detail::flat_sort_impl<std::decay_t<decltype(de)>, eval_type>(de);
         }
 
-        eval_type ev;
+        std::size_t ax = detail::normalize_axis(axis, de.dimension());
 
-        if (axis != detail::leading_axis(ev))
+        eval_type res;
+        detail::run_lambda_over_axis(de, res, ax, [](auto begin, auto end) { std::sort(begin, end); });
+        return res;
+    }
+
+    namespace detail
+    {
+        template <class VT, class T>
+        struct rebind_value_type
         {
-            auto axis_numbers = arange<std::size_t>(de.shape().size());
-            std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
-            permutation.erase(permutation.begin() + std::ptrdiff_t(axis));
-            if (de.layout() == layout_type::row_major)
+            using type = xarray<VT, xt::layout_type::dynamic>;
+        };
+
+        template <class VT, class EC, layout_type L>
+        struct rebind_value_type<VT, xarray<EC, L>>
+        {
+            using type = xarray<VT, L>;
+        };
+
+        template <class VT, class EC, size_t N, layout_type L>
+        struct rebind_value_type<VT, xtensor<EC, N, L>>
+        {
+            using type = xtensor<VT, N, L>;
+        };
+
+        template <class VT, class ET, class S, layout_type L>
+        struct rebind_value_type<VT, xtensor_fixed<ET, S, L>>
+        {
+            using type = xtensor_fixed<VT, S, L>;
+        };
+
+        template <class VT, class T>
+        struct flatten_rebind_value_type
+        {
+            using type = typename rebind_value_type<VT, T>::type;
+        };
+
+        template <class VT, class EC, size_t N, layout_type L>
+        struct flatten_rebind_value_type<VT, xtensor<EC, N, L>>
+        {
+            using type = xtensor<VT, 1, L>;
+        };
+
+        template <class VT, class ET, class S, layout_type L>
+        struct flatten_rebind_value_type<VT, xtensor_fixed<ET, S, L>>
+        {
+            using type = xtensor_fixed<VT, xshape<fixed_compute_size<S>::value>, L>;
+        };
+
+        template <class T>
+        struct argsort_result_type
+        {
+            using type = typename rebind_value_type<typename T::temporary_type::size_type,
+                                                    typename T::temporary_type>::type;
+        };
+
+        template <class T>
+        struct linear_argsort_result_type
+        {
+            using type = typename flatten_rebind_value_type<typename T::temporary_type::size_type,
+                                                            typename T::temporary_type>::type;
+        };
+
+        template <class Ed, class Ei>
+        inline void argsort_over_leading_axis(const Ed& data, Ei& inds)
+        {
+            std::size_t n_iters = 1;
+            std::ptrdiff_t data_secondary_stride;
+            std::ptrdiff_t inds_secondary_stride;
+            if (data.layout() == layout_type::row_major)
             {
-                permutation.push_back(axis);
+                n_iters = std::accumulate(data.shape().begin(), data.shape().end() - 1,
+                                          std::size_t(1), std::multiplies<>());
+                data_secondary_stride = static_cast<std::ptrdiff_t>(data.strides()[data.dimension() - 2]);
+                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.strides()[inds.dimension() - 2]);
             }
             else
             {
-                permutation.insert(permutation.begin(), axis);
+                n_iters = std::accumulate(data.shape().begin() + 1, data.shape().end(),
+                                          std::size_t(1), std::multiplies<>());
+                data_secondary_stride = static_cast<std::ptrdiff_t>(data.strides()[1]);
+                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.strides()[1]);
             }
 
-            // TODO find a more clever way to get reverse permutation?
-            std::vector<std::size_t> reverse_permutation;
-            for (auto el : axis_numbers)
+            std::ptrdiff_t data_offset = 0;
+            std::ptrdiff_t inds_offset = 0;
+
+            for (std::size_t i = 0; i < n_iters; ++i, data_offset += data_secondary_stride,
+                    inds_offset += inds_secondary_stride)
             {
-                auto it = std::find(permutation.begin(), permutation.end(), el);
-                reverse_permutation.push_back(std::size_t(std::distance(permutation.begin(), it)));
+                auto comp = [&data, &data_offset](std::size_t x, std::size_t y) {
+                    return (*(data.data() + data_offset + x) <
+                            *(data.data() + data_offset + y));
+                };
+                std::iota(inds.data() + inds_offset, inds.data() + inds_offset + inds_secondary_stride, 0);
+                std::sort(inds.data() + inds_offset, inds.data() + inds_offset + inds_secondary_stride, comp);
             }
-
-            ev = transpose(de, permutation);
-            detail::call_over_leading_axis(ev, [](auto begin, auto end) { std::sort(begin, end); });
-            ev = transpose(ev, reverse_permutation);
-            return ev;
         }
-        else
+
+        template <class E, class R = typename detail::linear_argsort_result_type<E>::type>
+        inline auto flatten_argsort_impl(const xexpression<E>& e)
         {
-            ev = de;
-            detail::call_over_leading_axis(ev, [](auto begin, auto end) { std::sort(begin, end); });
-            return ev;
+            using result_type = R;
+
+            const auto& de = e.derived_cast();
+
+            result_type result;
+            result.resize({de.size()});
+            auto comp = [&de](std::size_t x, std::size_t y) {
+                return de[x] < de[y];
+            };
+            std::iota(result.begin(), result.end(), 0);
+            std::sort(result.begin(), result.end(), comp);
+
+            return result;
         }
     }
 
     template <class E>
-    auto sort(const xexpression<E>& e)
+    inline auto argsort(const xexpression<E>& e, placeholders::xtuph /*t*/)
     {
+        return detail::flatten_argsort_impl(e);
+    }
+
+    /**
+     * Argsort xexpression (optionally along axis)
+     * Performs an indirect sort along the given axis. Returns an xarray
+     * of indices of the same shape as e that index data along the given axis in
+     * sorted order.
+     *
+     * @param e xexpression to argsort
+     * @param axis axis along which argsort is performed
+     *
+     * @return argsorted index array
+     */
+    template <class E>
+    inline auto argsort(const xexpression<E>& e, std::ptrdiff_t axis = -1)
+    {
+        using eval_type = typename detail::sort_eval_type<E>::type;
+        using result_type = typename detail::argsort_result_type<eval_type>::type;
+
         const auto& de = e.derived_cast();
-        return sort(de, de.dimension() - 1);
+
+        std::size_t ax = detail::normalize_axis(axis, de.dimension());
+
+        if (de.dimension() == 1)
+        {
+            return detail::flatten_argsort_impl<E, result_type>(e);
+        }
+
+        if (ax != detail::leading_axis(de))
+        {
+            dynamic_shape<std::size_t> permutation, reverse_permutation;
+            std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
+
+            eval_type ev = transpose(de, permutation);
+            result_type res = result_type::from_shape(ev.shape());
+            detail::argsort_over_leading_axis(ev, res);
+            res = transpose(res, reverse_permutation);
+            return res;
+        }
+        else
+        {
+            result_type res = result_type::from_shape(de.shape());
+            detail::argsort_over_leading_axis(de, res);
+            return res;
+        }
     }
 
     namespace detail
@@ -173,7 +393,7 @@ namespace xt
         }
 
         template <class E, class F>
-        xtensor<std::size_t, 0> arg_func_impl(const E& e, F&& f)
+        inline xtensor<std::size_t, 0> arg_func_impl(const E& e, F&& f)
         {
             return cmp_idx(e.template begin<XTENSOR_DEFAULT_LAYOUT>(),
                            e.template end<XTENSOR_DEFAULT_LAYOUT>(), 1,
@@ -181,9 +401,10 @@ namespace xt
         }
 
         template <class E, class F>
-        typename argfunc_result_type<E>::type
+        inline typename argfunc_result_type<E>::type
         arg_func_impl(const E& e, std::size_t axis, F&& cmp)
         {
+            using eval_type = typename detail::sort_eval_type<E>::type;
             using value_type = typename E::value_type;
             using result_type = typename argfunc_result_type<E>::type;
 
@@ -216,21 +437,11 @@ namespace xt
 
             if (axis != detail::leading_axis(e))
             {
-                E input;
-                auto axis_numbers = arange<std::size_t>(e.shape().size());
-                std::vector<std::size_t> permutation(axis_numbers.cbegin(), axis_numbers.cend());
-                permutation.erase(permutation.begin() + std::ptrdiff_t(axis));
-                if (input.layout() == layout_type::row_major)
-                {
-                    permutation.push_back(axis);
-                }
-                else
-                {
-                    permutation.insert(permutation.begin(), axis);
-                }
-                // Note we create a copy
-                input = transpose(e, permutation);
+                dynamic_shape<std::size_t> permutation, reverse_permutation;
+                std::tie(permutation, reverse_permutation) = detail::get_permutations(e.dimension(), axis, e.layout());
 
+                // note: creating copy
+                eval_type input = transpose(e, permutation);
                 detail::call_over_leading_axis(input, arg_func_lambda);
                 return result;
             }
@@ -244,7 +455,7 @@ namespace xt
     }
 
     template <class E>
-    auto argmin(const xexpression<E>& e)
+    inline auto argmin(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
@@ -260,7 +471,7 @@ namespace xt
      * @return returns xarray with positions of minimal value
      */
     template <class E>
-    auto argmin(const xexpression<E>& e, std::size_t axis)
+    inline auto argmin(const xexpression<E>& e, std::size_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
@@ -268,7 +479,7 @@ namespace xt
     }
 
     template <class E>
-    auto argmax(const xexpression<E>& e)
+    inline auto argmax(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
@@ -284,7 +495,7 @@ namespace xt
      * @return returns xarray with positions of maximal value
      */
     template <class E>
-    auto argmax(const xexpression<E>& e, std::size_t axis)
+    inline auto argmax(const xexpression<E>& e, std::size_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
@@ -298,7 +509,7 @@ namespace xt
      * @param e input xexpression (will be flattened)
      */
     template <class E>
-    auto unique(const xexpression<E>& e)
+    inline auto unique(const xexpression<E>& e)
     {
         auto sorted = sort(e, xnone());
         auto end = std::unique(sorted.begin(), sorted.end());

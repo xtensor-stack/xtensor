@@ -64,6 +64,10 @@ namespace xt
     template <class C>
     using get_stepper_iterator = typename detail::get_stepper_iterator_impl<C>::type;
 
+    /********************************
+     * xindex_type_t implementation *
+     ********************************/
+
     namespace detail
     {
         template <class ST>
