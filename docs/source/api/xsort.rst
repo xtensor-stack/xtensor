@@ -18,6 +18,15 @@ Defined in ``xtensor/xsort.hpp``
 .. doxygenfunction:: xt::sort(const xexpression<E>&, std::size_t)
    :project: xtensor
 
+.. doxygenfunction:: xt::argsort(const xexpression<E>&)
+    :project: xtensor
+
+.. doxygenfunction:: xt::argsort(const xexpression<E>&, placeholders::xtuph)
+    :project: xtensor
+
+.. doxygenfunction:: xt::argsort(const xexpression<E>&, std::size_t)
+    :project: xtensor
+
 .. doxygenfunction:: xt::argmin(const xexpression<E>&)
    :project: xtensor
 

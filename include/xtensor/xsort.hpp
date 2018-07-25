@@ -141,6 +141,163 @@ namespace xt
         return sort(de, de.dimension() - 1);
     }
 
+    namespace detail {
+        template <class VT, class T>
+        struct rebind_value_type
+        {
+            using type = xarray<VT, xt::layout_type::dynamic>;
+        };
+
+        template <class VT, class EC, layout_type L>
+        struct rebind_value_type<VT, xarray<EC, L>>
+        {
+            using type = xarray<VT, L>;
+        };
+
+        template <class VT, class EC, size_t N, layout_type L>
+        struct rebind_value_type<VT, xtensor<EC, N, L>>
+        {
+            using type = xtensor<VT, N, L>;
+        };
+
+        template <class VT, class ET, class S, layout_type L>
+        struct rebind_value_type<VT, xtensor_fixed<ET, S, L>>
+        {
+            using type = xtensor_fixed<VT, S, L>;
+        };
+
+        template <class T>
+        struct argsort_result_type
+        {
+            using type = typename rebind_value_type<typename T::temporary_type::size_type,
+                                                    typename T::temporary_type>::type;
+        };
+
+        template <class Ed, class Ei>
+        void argsort_over_leading_axis(const Ed& data, Ei& inds)
+        {
+            using value_type = typename Ed::value_type;
+            std::size_t n_iters = 1;
+            std::ptrdiff_t data_secondary_stride;
+            std::ptrdiff_t inds_secondary_stride;
+            if (data.layout() == layout_type::row_major)
+            {
+                n_iters = std::accumulate(data.shape().begin(), data.shape().end() - 1,
+                                          std::size_t(1), std::multiplies<>());
+                data_secondary_stride = static_cast<std::ptrdiff_t>(data.strides()[data.dimension() - 2]);
+                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.strides()[inds.dimension() - 2]);
+            }
+            else
+            {
+                n_iters = std::accumulate(data.shape().begin() + 1, data.shape().end(),
+                                          std::size_t(1), std::multiplies<>());
+                data_secondary_stride = static_cast<std::ptrdiff_t>(data.strides()[1]);
+                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.strides()[1]);
+            }
+
+            std::ptrdiff_t data_offset = 0;
+            std::ptrdiff_t inds_offset = 0;
+
+            for (std::size_t i = 0; i < n_iters; ++i, data_offset += data_secondary_stride,
+                    inds_offset += inds_secondary_stride)
+            {
+                auto comp = [&data, &data_offset](std::size_t x, std::size_t y) {
+                    return (*(data.data() + data_offset + x) <
+                            *(data.data() + data_offset + y));
+                };
+                std::iota(inds.data() + inds_offset, inds.data() + inds_offset + inds_secondary_stride, 0);
+                std::sort(inds.data() + inds_offset, inds.data() + inds_offset + inds_secondary_stride, comp);
+            }
+        }
+    }
+
+    template <class E>
+    auto argsort(const xexpression<E>& e, placeholders::xtuph /*t*/)
+    {
+        using value_type = typename E::value_type;
+        using result_type = typename detail::argsort_result_type<E>::type;
+
+        const auto& de = e.derived_cast();
+
+        result_type result;
+        result.resize({de.size()});
+        auto comp = [&de](std::size_t x, std::size_t y) {
+            return de[x] < de[y];
+        };
+        std::iota(result.begin(), result.end(), 0);
+        std::sort(result.begin(), result.end(), comp);
+
+        return result;
+    }
+
+    /**
+     * Argsort xexpression (optionally along axis)
+     * Performs an indirect sort along the given axis. Returns an xarray
+     * of indices of the same shape as e that index data along the given axis in
+     * sorted order.
+     *
+     * @param e xexpression to argsort
+     * @param axis axis along which argsort is performed
+     *
+     * @return argsorted index array
+     */
+    template <class E>
+    auto argsort(const xexpression<E>& e, std::size_t axis)
+    {
+        using eval_type = typename E::temporary_type;
+        using value_type = typename E::value_type;
+        using result_type = typename detail::argsort_result_type<E>::type;
+
+        const auto& de = e.derived_cast();
+
+        if (de.dimension() == 1)
+        {
+            return argsort(de, xnone());
+        }
+
+        if (axis != detail::leading_axis(de))
+        {
+            auto axis_numbers = arange<std::size_t>(de.shape().size());
+            std::vector<std::size_t> permutation(axis_numbers.begin(), axis_numbers.end());
+            permutation.erase(permutation.begin() + std::ptrdiff_t(axis));
+            if (de.layout() == layout_type::row_major)
+            {
+                permutation.push_back(axis);
+            }
+            else
+            {
+                permutation.insert(permutation.begin(), axis);
+            }
+
+            // TODO find a more clever way to get reverse permutation?
+            std::vector<std::size_t> reverse_permutation;
+            for (auto el : axis_numbers)
+            {
+                auto it = std::find(permutation.begin(), permutation.end(), el);
+                reverse_permutation.push_back(std::size_t(std::distance(permutation.begin(), it)));
+            }
+
+            eval_type ev = transpose(de, permutation);
+            result_type res(ev.shape(), ev.layout());
+            detail::argsort_over_leading_axis(ev, res);
+            res = transpose(res, reverse_permutation);
+            return res;
+        }
+        else
+        {
+            result_type res(de.shape(), de.layout());
+            detail::argsort_over_leading_axis(de, res);
+            return res;
+        }
+    }
+
+    template <class E>
+    auto argsort(const xexpression<E>& e)
+    {
+        const auto& de = e.derived_cast();
+        return argsort(de, de.dimension() - 1);
+    }
+
     namespace detail
     {
         template <class T>
