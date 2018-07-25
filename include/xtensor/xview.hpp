@@ -155,7 +155,6 @@ namespace xt
         size_type dimension() const noexcept;
 
         size_type size() const noexcept;
-        const inner_shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
         layout_type layout() const noexcept;
 
@@ -304,6 +303,9 @@ namespace xt
         xtl::xclosure_pointer<self_type> operator&() &&;
 
     private:
+
+        const inner_shape_type& shape_impl() const noexcept;
+        friend xexpression_shaped<self_type, inner_shape_type>;
 
         // VS 2015 workaround (yes, really)
         template <std::size_t I>
@@ -582,7 +584,7 @@ namespace xt
     template <class CT, class... S>
     inline auto xview<CT, S...>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        return compute_size(shape_impl());
     }
 
     /**
@@ -598,7 +600,7 @@ namespace xt
      * Returns the shape of the view.
      */
     template <class CT, class... S>
-    inline auto xview<CT, S...>::shape() const noexcept -> const inner_shape_type&
+    inline auto xview<CT, S...>::shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
@@ -620,7 +622,7 @@ namespace xt
     {
         return xtl::mpl::static_if<detail::slices_contigous<S...>::value>([&](auto self)
         {
-            return do_strides_match(self(this)->shape(), self(this)->strides(), self(this)->m_e.layout()) ?
+            return do_strides_match(self(this)->shape_impl(), self(this)->strides(), self(this)->m_e.layout()) ?
                 self(this)->m_e.layout() : layout_type::dynamic;
         }, /* else */ [&](auto /*self*/) {
             return layout_type::dynamic;
@@ -654,8 +656,8 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) -> reference
     {
-        XTENSOR_TRY(check_index(shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_TRY(check_index(shape_impl(), args...));
+        XTENSOR_CHECK_DIMENSION(shape_impl(), args...);
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access(static_cast<size_type>(args)...);
@@ -674,7 +676,7 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::at(Args... args) -> reference
     {
-        check_access(shape(), static_cast<size_type>(args)...);
+        check_access(shape_impl(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -736,7 +738,7 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::element(It first, It last) -> reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape_impl(), first, last));
         // TODO: avoid memory allocation
         auto index = make_index(first, last);
         return m_e.element(index.cbegin(), index.cend());
@@ -752,8 +754,8 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::operator()(Args... args) const -> const_reference
     {
-        XTENSOR_TRY(check_index(shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_TRY(check_index(shape_impl(), args...));
+        XTENSOR_CHECK_DIMENSION(shape_impl(), args...);
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access(static_cast<size_type>(args)...);
@@ -772,7 +774,7 @@ namespace xt
     template <class... Args>
     inline auto xview<CT, S...>::at(Args... args) const -> const_reference
     {
-        check_access(shape(), static_cast<size_type>(args)...);
+        check_access(shape_impl(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -1008,7 +1010,7 @@ namespace xt
                 apply<strides_value_type>(index, func, m_slices) * m_e.strides()[index - newaxis_count_before<S...>(index)] :
                 m_e.strides()[index - newaxis_count_before<S...>(index)];
             // adapt strides for shape[i] == 1 to make consistent with rest of xtensor
-            detail::adapt_strides(shape(), m_strides, &m_backstrides, i);
+            detail::adapt_strides(shape_impl(), m_strides, &m_backstrides, i);
         }
     }
 

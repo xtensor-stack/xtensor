@@ -302,6 +302,74 @@ namespace xt
                                                   >
     {
     };
+
+    template <class T>
+    struct fixed_dimension
+    {
+        constexpr static ptrdiff_t value = -1;
+    };
+
+    template <std::size_t... I>
+    struct fixed_dimension<xt::fixed_shape<I...>>
+    {
+        constexpr static ptrdiff_t value = sizeof...(I);
+    };
+
+    template <class T, std::size_t N>
+    struct fixed_dimension<std::array<T, N>>
+    {
+        constexpr static ptrdiff_t value = N;
+    };
+
+
+    template <class D, std::ptrdiff_t N = -1>
+    class xexpression_dimensioned :
+         public xexpression<D>
+    {
+    public:
+
+        using base_type = xexpression<D>;
+        using derived_type = typename base_type::derived_type;
+        using base_type::derived_cast;
+    };
+
+    template <class D, class S>
+    class xexpression_shaped :
+        public xexpression_dimensioned<D, fixed_dimension<S>::value>
+    {
+    public:
+
+        using base_type = xexpression_dimensioned<D, fixed_dimension<S>::value>;
+        using derived_type = typename base_type::derived_type;
+        using base_type::derived_cast;
+        using xexpression_inner_shape_type = S;
+
+        constexpr inline const xexpression_inner_shape_type& shape() const noexcept;
+        inline std::size_t shape(std::size_t i) const noexcept;
+        template <class C>
+        inline std::size_t shape(std::size_t i) const noexcept;
+    };
+
+    template <class D, class S>
+    inline std::size_t xexpression_shaped<D, S>::shape(std::size_t i) const noexcept
+    {
+        return derived_cast().shape_impl()[i];
+    }
+
+    template <class D, class S>
+    template <class C>
+    inline std::size_t xexpression_shaped<D, S>::shape(std::size_t i) const noexcept
+    {
+        return static_cast<C>(derived_cast().shape_impl()[i]);
+    }
+
+    template <class D, class S>
+    constexpr inline auto xexpression_shaped<D, S>::shape() const noexcept
+        -> const xexpression_inner_shape_type&
+    {
+        return derived_cast().shape_impl();
+    }
+
 }
 
 #endif

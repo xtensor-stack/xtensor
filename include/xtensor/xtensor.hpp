@@ -109,6 +109,11 @@ namespace xt
         template <class E>
         xtensor_container& operator=(const xexpression<E>& e);
 
+        const auto& shape_impl() const
+        {
+            return base_type::container_shape_impl();
+        }
+
     private:
 
         storage_type m_storage;
@@ -197,6 +202,11 @@ namespace xt
 
         template <class E>
         xtensor_adaptor& operator=(const xexpression<E>& e);
+
+        const auto& shape_impl() const
+        {
+            return base_type::container_shape_impl();
+        }
 
     private:
 
@@ -441,7 +451,7 @@ namespace xt
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline auto xtensor_adaptor<EC, N, L, Tag>::operator=(temporary_type&& rhs) -> self_type&
     {
-        base_type::shape_impl() = std::move(const_cast<shape_type&>(rhs.shape()));
+        base_type::container_shape_impl() = std::move(const_cast<shape_type&>(rhs.shape()));
         base_type::strides_impl() = std::move(const_cast<strides_type&>(rhs.strides()));
         base_type::backstrides_impl() = std::move(const_cast<backstrides_type&>(rhs.backstrides()));
         m_storage = std::move(rhs.storage());

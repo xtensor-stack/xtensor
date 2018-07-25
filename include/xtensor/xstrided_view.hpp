@@ -129,7 +129,7 @@ namespace xt
 
         using base_type::size;
         using base_type::dimension;
-        using base_type::shape;
+        using base_type::shape_impl;
         using base_type::strides;
         using base_type::backstrides;
         using base_type::layout;

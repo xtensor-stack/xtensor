@@ -112,7 +112,6 @@ namespace xt
 
         constexpr size_type dimension() const noexcept;
 
-        constexpr const inner_shape_type& shape() const noexcept;
         constexpr const inner_strides_type& strides() const noexcept;
         constexpr const inner_backstrides_type& backstrides() const noexcept;
 
@@ -411,6 +410,9 @@ namespace xt
 
         layout_type layout() const noexcept;
 
+        inner_shape_type& container_shape_impl() noexcept;
+        const inner_shape_type& container_shape_impl() const noexcept;
+
     protected:
 
         xstrided_container() noexcept;
@@ -423,9 +425,6 @@ namespace xt
         xstrided_container& operator=(xstrided_container&&) = default;
 
         explicit xstrided_container(inner_shape_type&&, inner_strides_type&&) noexcept;
-
-        inner_shape_type& shape_impl() noexcept;
-        const inner_shape_type& shape_impl() const noexcept;
 
         inner_strides_type& strides_impl() noexcept;
         const inner_strides_type& strides_impl() const noexcept;
@@ -455,7 +454,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::mutable_shape() -> inner_shape_type&
     {
-        return derived_cast().shape_impl();
+        return derived_cast().container_shape_impl();
     }
 
     template <class D>
@@ -480,7 +479,7 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::size() const noexcept -> size_type
     {
-        return contiguous_layout ? storage().size() : compute_size(shape());
+        return contiguous_layout ? storage().size() : compute_size(derived_cast().shape());
     }
 
     /**
@@ -489,17 +488,17 @@ namespace xt
     template <class D>
     inline constexpr auto xcontainer<D>::dimension() const noexcept -> size_type
     {
-        return shape().size();
+        return derived_cast().shape().size();
     }
 
-    /**
+    /*
      * Returns the shape of the container.
-     */
     template <class D>
     constexpr inline auto xcontainer<D>::shape() const noexcept -> const inner_shape_type&
     {
-        return derived_cast().shape_impl();
+        return derived_cast().derived_cast().shape();
     }
+    */
 
     /**
      * Returns the strides of the container.
@@ -546,8 +545,8 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) -> reference
     {
-        XTENSOR_TRY(check_index(shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_TRY(check_index(derived_cast().shape(), args...));
+        XTENSOR_CHECK_DIMENSION(derived_cast().shape(), args...);
         size_type index = static_cast<size_type>(xt::data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
@@ -562,8 +561,8 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::operator()(Args... args) const -> const_reference
     {
-        XTENSOR_TRY(check_index(shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_TRY(check_index(derived_cast().shape(), args...));
+        XTENSOR_CHECK_DIMENSION(derived_cast().shape(), args...);
         size_type index = static_cast<std::size_t>(xt::data_offset<std::ptrdiff_t>(strides(), static_cast<std::ptrdiff_t>(args)...));
         return storage()[index];
     }
@@ -581,7 +580,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::at(Args... args) -> reference
     {
-        check_access(shape(), static_cast<size_type>(args)...);
+        check_access(derived_cast().shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -598,7 +597,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::at(Args... args) const -> const_reference
     {
-        check_access(shape(), static_cast<size_type>(args)...);
+        check_access(derived_cast().shape(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -721,7 +720,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) -> reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(derived_cast().shape(), first, last));
         return storage()[element_offset<size_type>(strides(), first, last)];
     }
 
@@ -736,7 +735,7 @@ namespace xt
     template <class It>
     inline auto xcontainer<D>::element(It first, It last) const -> const_reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(derived_cast().shape(), first, last));
         return storage()[element_offset<size_type>(strides(), first, last)];
     }
 
@@ -805,7 +804,7 @@ namespace xt
     template <class S>
     inline bool xcontainer<D>::broadcast_shape(S& shape, bool) const
     {
-        return xt::broadcast_shape(this->shape(), shape);
+        return xt::broadcast_shape(derived_cast().shape(), shape);
     }
 
     /**
@@ -1262,13 +1261,13 @@ namespace xt
     }
 
     template <class D>
-    inline auto xstrided_container<D>::shape_impl() noexcept -> inner_shape_type&
+    inline auto xstrided_container<D>::container_shape_impl() noexcept -> inner_shape_type&
     {
         return m_shape;
     }
 
     template <class D>
-    inline auto xstrided_container<D>::shape_impl() const noexcept -> const inner_shape_type&
+    inline auto xstrided_container<D>::container_shape_impl() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }

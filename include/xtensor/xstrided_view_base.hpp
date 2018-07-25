@@ -57,7 +57,7 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const noexcept;
+        const shape_type& shape_impl() const noexcept;
         const strides_type& strides() const noexcept;
         const backstrides_type& backstrides() const noexcept;
         layout_type layout() const noexcept;
@@ -321,7 +321,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view_base<CT, S, L, FST>::size() const noexcept -> size_type
     {
-        return compute_size(shape());
+        return compute_size(shape_impl());
     }
 
     /**
@@ -337,7 +337,7 @@ namespace xt
      * Returns the shape of the xtrided_view_base.
      */
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view_base<CT, S, L, FST>::shape() const noexcept -> const shape_type&
+    inline auto xstrided_view_base<CT, S, L, FST>::shape_impl() const noexcept -> const shape_type&
     {
         return m_shape;
     }
@@ -397,8 +397,8 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view_base<CT, S, L, FST>::operator()(Args... args) -> reference
     {
-        XTENSOR_TRY(check_index(shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_TRY(check_index(shape_impl(), args...));
+        XTENSOR_CHECK_DIMENSION(shape_impl(), args...);
         offset_type index = compute_index(args...);
         return m_storage[static_cast<size_type>(index)];
     }
@@ -413,8 +413,8 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view_base<CT, S, L, FST>::operator()(Args... args) const -> const_reference
     {
-        XTENSOR_TRY(check_index(shape(), args...));
-        XTENSOR_CHECK_DIMENSION(shape(), args...);
+        XTENSOR_TRY(check_index(shape_impl(), args...));
+        XTENSOR_CHECK_DIMENSION(shape_impl(), args...);
         offset_type index = compute_index(args...);
         return m_storage[static_cast<size_type>(index)];
     }
@@ -432,7 +432,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view_base<CT, S, L, FST>::at(Args... args) -> reference
     {
-        check_access(shape(), static_cast<size_type>(args)...);
+        check_access(shape_impl(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -449,7 +449,7 @@ namespace xt
     template <class... Args>
     inline auto xstrided_view_base<CT, S, L, FST>::at(Args... args) const -> const_reference
     {
-        check_access(shape(), static_cast<size_type>(args)...);
+        check_access(shape_impl(), static_cast<size_type>(args)...);
         return this->operator()(args...);
     }
 
@@ -574,7 +574,7 @@ namespace xt
     template <class It>
     inline auto xstrided_view_base<CT, S, L, FST>::element(It first, It last) -> reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape_impl(), first, last));
         return m_storage[static_cast<size_type>(compute_element_index(first, last))];
     }
 
@@ -589,7 +589,7 @@ namespace xt
     template <class It>
     inline auto xstrided_view_base<CT, S, L, FST>::element(It first, It last) const -> const_reference
     {
-        XTENSOR_TRY(check_element_index(shape(), first, last));
+        XTENSOR_TRY(check_element_index(shape_impl(), first, last));
         return m_storage[static_cast<size_type>(compute_element_index(first, last))];
     }
 
