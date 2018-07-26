@@ -963,14 +963,41 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             F m_lambda;
         };
 
-        template <class F, class... E>
-        inline auto make_lambda_function(F&& lambda, E&&... args)
-        {
-            using xfunction_type = xfunction<lambda_adapt<F>,
-                                             decltype(lambda(std::declval<typename std::decay_t<E>::value_type>()...)),
-                                             const_xclosure_t<E>...>;
-            return xfunction_type(lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
-        }
+    }
+
+    /**
+     * Create a xfunction from a lambda
+     *
+     * This function can be used to easily create performant xfunctions from lambdas:
+     *
+     * \code{cpp}
+     * template <class E1>
+     * inline auto square(E1&& e1) noexcept
+     * {
+     *     auto fnct = [](auto x) -> decltype(x * x) {
+     *         return x * x;
+     *     };
+     *     return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
+     * }
+     * \endcode
+     *
+     * Lambda function allow the reusal of a single arguments in multiple places (otherwise
+     * only correctly possible when using xshared_expressions). ``auto`` lambda functions are
+     * automatically vectorized with ``xsimd`` if possible (note that the trailing
+     * ``-> decltype(...)`` is mandatory for the feature detection to work).
+     *
+     * @param lambda the lambda to be vectorized
+     * @param args forwarded arguments
+     *
+     * @return lazy xfunction
+     */
+    template <class F, class... E>
+    inline auto make_lambda_xfunction(F&& lambda, E&&... args)
+    {
+        using xfunction_type = xfunction<detail::lambda_adapt<F>,
+                                         decltype(lambda(std::declval<typename std::decay_t<E>::value_type>()...)),
+                                         const_xclosure_t<E>...>;
+        return xfunction_type(detail::lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
     }
 
 
@@ -1016,12 +1043,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto square(E1&& e1) noexcept
     {
 #ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return detail::make_lambda_function(square_fct{}, std::forward<E1>(e1));
+        return make_lambda_xfunction(square_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x) {
             return x * x;
         };
-        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+        return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
 #endif
     }
 
@@ -1038,12 +1065,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto cube(E1&& e1) noexcept
     {
 #ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return detail::make_lambda_function(cube_fct{}, std::forward<E1>(e1));
+        return make_lambda_xfunction(cube_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x * x) {
             return x * x * x;
         };
-        return detail::make_lambda_function(std::move(fnct), std::forward<E1>(e1));
+        return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
 #endif
     }
 
@@ -1112,7 +1139,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto pow(E&& e) noexcept
     {
         static_assert(N > 0, "integer power cannot be negative");
-        return detail::make_lambda_function(detail::pow_impl<N>{}, std::forward<E>(e));
+        return make_lambda_xfunction(detail::pow_impl<N>{}, std::forward<E>(e));
     }
 
     /**
