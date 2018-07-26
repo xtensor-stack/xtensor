@@ -99,13 +99,13 @@ namespace xt
         using slice_vector_type = std::vector<slice_type>;
 
         template <class CTA>
-        xdynamic_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout,
-                      slice_vector_type&& slices, S&& adj_strides) noexcept;
+        xdynamic_view(CTA&& e, S&& shape, get_strides_t<S>&& strides, std::size_t offset, layout_type layout,
+                      slice_vector_type&& slices, get_strides_t<S>&& adj_strides) noexcept;
 
         template <class CTA, class FLS>
-        xdynamic_view(CTA&& e, S&& shape, S&& strides, std::size_t offset, layout_type layout,
+        xdynamic_view(CTA&& e, S&& shape, get_strides_t<S>&& strides, std::size_t offset, layout_type layout,
                       FLS&& flatten_strides, layout_type flatten_layout,
-                      slice_vector_type&& slices, S&& adj_strides) noexcept;
+                      slice_vector_type&& slices, get_strides_t<S>&& adj_strides) noexcept;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -320,9 +320,9 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class CTA>
-    inline xdynamic_view<CT, S, L, FST>::xdynamic_view(CTA&& e, S&& shape, S&& strides,
+    inline xdynamic_view<CT, S, L, FST>::xdynamic_view(CTA&& e, S&& shape, get_strides_t<S>&& strides,
                                                        std::size_t offset, layout_type layout,
-                                                       slice_vector_type&& slices, S&& adj_strides) noexcept
+                                                       slice_vector_type&& slices, get_strides_t<S>&& adj_strides) noexcept
         : base_type(std::forward<CTA>(e), std::move(shape), std::move(strides), offset, layout),
           m_slices(std::move(slices)), m_adj_strides(std::move(adj_strides))
     {
@@ -330,10 +330,10 @@ namespace xt
 
     template <class CT, class S, layout_type L, class FST>
     template <class CTA, class FLS>
-    inline xdynamic_view<CT, S, L, FST>::xdynamic_view(CTA&& e, S&& shape, S&& strides,
+    inline xdynamic_view<CT, S, L, FST>::xdynamic_view(CTA&& e, S&& shape, get_strides_t<S>&& strides,
                                                        std::size_t offset, layout_type layout,
                                                        FLS&& flatten_strides, layout_type flatten_layout,
-                                                       slice_vector_type&& slices, S&& adj_strides) noexcept
+                                                       slice_vector_type&& slices, get_strides_t<S>&& adj_strides) noexcept
         : base_type(std::forward<CTA>(e), std::move(shape), std::move(strides),
                     offset, layout, std::forward<FLS>(flatten_strides), flatten_layout),
           m_slices(std::move(slices)), m_adj_strides(std::move(adj_strides))
@@ -620,7 +620,7 @@ namespace xt
         offset_type res = offset;
         for (offset_type i = loop_offset; i < dim; ++i, ++first)
         {
-            offset_type j = first[idx_offset];
+            offset_type j = static_cast<offset_type>(first[idx_offset]);
             offset_type sl_offset = xtl::visit([j](const auto& sl) { return static_cast<offset_type>(sl(j)); }, m_slices[static_cast<std::size_t>(i)]);
             res += sl_offset * m_adj_strides[static_cast<std::size_t>(i)];
         }
@@ -678,7 +678,7 @@ namespace xt
                     new_slices[i] = *sl;
                     auto& ns = xtl::get<SL>(new_slices[i]);
                     ns.normalize(old_shape);
-                    shape[i] = ns.size();
+                    shape[i] = static_cast<std::size_t>(ns.size());
                     strides[i] = std::ptrdiff_t(0);
                     new_adj_strides[i] = static_cast<std::ptrdiff_t>(old_stride);
                 }
@@ -690,7 +690,7 @@ namespace xt
     template <class E>
     inline auto dynamic_view(E&& e, const xdynamic_slice_vector& slices)
     {
-        using view_type = xdynamic_view<xclosure_t<E>, dynamic_shape<std::ptrdiff_t>>;
+        using view_type = xdynamic_view<xclosure_t<E>, dynamic_shape<std::size_t>>;
         using slice_vector = typename view_type::slice_vector_type;
         using policy = detail::adj_strides_policy<slice_vector>;
         detail::strided_view_args<policy> args;

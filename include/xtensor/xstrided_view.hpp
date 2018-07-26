@@ -27,6 +27,33 @@
 
 namespace xt
 {
+    namespace detail
+    {
+        template <class S>
+        struct xtype_for_shape
+        {
+            template <class T, layout_type L>
+            using type = xarray<T, L>;
+        };
+
+        template <template <class, std::size_t> class S, class X, std::size_t N>
+        struct xtype_for_shape<S<X, N>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor<T, N, L>;
+        };
+
+        template <template <std::size_t...> class S, std::size_t... X>
+        struct xtype_for_shape<S<X...>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor_fixed<T, xshape<X...>, L>;
+        };
+
+        template <class T, class S, layout_type L>
+        using temporary_type_t = typename xtype_for_shape<S>::template type<T, L>;
+    }
+
     template <class CT, class S, layout_type L, class FST>
     class xstrided_view;
 
@@ -34,8 +61,7 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
-        // TODO decide on shape type which temporary type to use!
-        using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
+        using temporary_type = detail::temporary_type_t<typename xexpression_type::value_type, S, L>;
     };
 
     template <class CT, class S, layout_type L, class FST>
