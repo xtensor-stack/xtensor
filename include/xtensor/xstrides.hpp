@@ -26,17 +26,17 @@ namespace xt
      * data offset *
      ***************/
 
-    template <class size_type, class S>
-    size_type data_offset(const S& strides) noexcept;
+    template <class offset_type, class S>
+    offset_type data_offset(const S& strides) noexcept;
 
-    template <class size_type, class S, class Arg, class... Args>
-    size_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
+    template <class offset_type, class S, class Arg, class... Args>
+    offset_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
 
-    template <class size_type, class S, class... Args>
-    size_type unchecked_data_offset(const S& strides, Args... args) noexcept;
+    template <class offset_type, class S, class... Args>
+    offset_type unchecked_data_offset(const S& strides, Args... args) noexcept;
 
-    template <class size_type, class S, class It>
-    size_type element_offset(const S& strides, It first, It last) noexcept;
+    template <class offset_type, class S, class It>
+    offset_type element_offset(const S& strides, It first, It last) noexcept;
 
     /*******************
      * strides builder *
@@ -129,46 +129,46 @@ namespace xt
         }
     }
 
-    template <class size_type, class S>
-    inline size_type data_offset(const S&) noexcept
+    template <class offset_type, class S>
+    inline offset_type data_offset(const S&) noexcept
     {
-        return 0;
+        return offset_type(0);
     }
 
-    template <class size_type, class S, class Arg, class... Args>
-    inline size_type data_offset(const S& strides, Arg arg, Args... args) noexcept
+    template <class offset_type, class S, class Arg, class... Args>
+    inline offset_type data_offset(const S& strides, Arg arg, Args... args) noexcept
     {
         constexpr std::size_t nargs = sizeof...(Args) + 1;
         if (nargs == strides.size())
         {
             // Correct number of arguments: iterate
-            return static_cast<size_type>(detail::raw_data_offset<0>(strides, arg, args...));
+            return static_cast<offset_type>(detail::raw_data_offset<0>(strides, arg, args...));
         }
         else if (nargs > strides.size())
         {
             // Too many arguments: drop the first
-            return data_offset<size_type, S>(strides, args...);
+            return data_offset<offset_type, S>(strides, args...);
         }
         else
         {
             // Too few arguments: right to left scalar product
             auto view = strides.cend() - nargs;
-            return static_cast<size_type>(detail::raw_data_offset<0>(view, arg, args...));
+            return static_cast<offset_type>(detail::raw_data_offset<0>(view, arg, args...));
         }
     }
 
-    template <class size_type, class S, class... Args>
-    inline size_type unchecked_data_offset(const S& strides, Args... args) noexcept
+    template <class offset_type, class S, class... Args>
+    inline offset_type unchecked_data_offset(const S& strides, Args... args) noexcept
     {
-        return static_cast<size_type>(detail::raw_data_offset<0>(strides.cbegin(), args...));
+        return static_cast<offset_type>(detail::raw_data_offset<0>(strides.cbegin(), args...));
     }
 
-    template <class size_type, class S, class It>
-    inline size_type element_offset(const S& strides, It first, It last) noexcept
+    template <class offset_type, class S, class It>
+    inline offset_type element_offset(const S& strides, It first, It last) noexcept
     {
         using difference_type = typename std::iterator_traits<It>::difference_type;
         auto size = static_cast<difference_type>((std::min)(static_cast<typename S::size_type>(std::distance(first, last)), strides.size()));
-        return std::inner_product(last - size, last, strides.cend() - size, size_type(0));
+        return std::inner_product(last - size, last, strides.cend() - size, offset_type(0));
     }
 
     namespace detail

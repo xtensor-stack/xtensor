@@ -1108,11 +1108,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @tparam N the exponent (has to be positive integer)
      * @return an \ref xfunction
      */
-    template <std::size_t N, class E1>
-    inline auto pow(E1&& e1) noexcept
+    template <std::size_t N, class E>
+    inline auto pow(E&& e) noexcept
     {
         static_assert(N > 0, "integer power cannot be negative");
-        return detail::make_lambda_function(detail::pow_impl<N>{}, std::forward<E1>(e1));
+        return detail::make_lambda_function(detail::pow_impl<N>{}, std::forward<E>(e));
     }
 
     /**

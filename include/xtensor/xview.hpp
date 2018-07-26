@@ -93,7 +93,7 @@ namespace xt
      * @tparam CT the closure type of the \ref xexpression to adapt
      * @tparam S the slices type describing the shape adaptation
      *
-     * @sa view, range, all, newaxis
+     * @sa view, range, all, newaxis, keep, drop
      */
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,

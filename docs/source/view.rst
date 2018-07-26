@@ -13,7 +13,7 @@ provides many kinds of views.
 Sliced views
 ------------
 
-Sliced views consist of the combination of the ``xexpression`` to adapt, and a list of ``slice`` s that specify how
+Sliced views consist of the combination of the ``xexpression`` to adapt, and a list of ``slice`` that specify how
 the shape must be adapted. Sliced views are implemented by the ``xview`` class. Objects of this type should not be
 instantiated directly, but though the ``view`` helper function.
 
@@ -24,7 +24,8 @@ Slices can be specified in the following ways:
 - ``range(min, max, step)``, a slice representing a stepped interval
 - ``all()``, a slice representing all the elements of a dimension
 - ``newaxis()``, a slice representing an additional dimension of length one
-- ``islice({i, j, k, ...})`` a slice selecting non-contigous indices on the underlying array
+- ``keep(i0, i1, i2, ...)`` a slice selecting non-contiguous indices to keep on the underlying expression
+- ``drop(i0, i1, i2, ...)`` a slice selecting non-contiguous indices to drop on the underlying expression
 
 .. code::
 
@@ -51,6 +52,12 @@ Slices can be specified in the following ways:
     auto v3 = xt::view(a, xt::all(), xt::all(), xt::newaxis(), xt::all());
     // => v3.shape() = { 3, 2, 1, 4 }
     // => v3(0, 0, 0, 0) = a(0, 0, 0)
+
+    // View with non contiguous slices
+    auto v4 = xt::view(a, xt::drop(0), xt::all(), xt::keep(0, 3));
+    // => v4.shape() = { 2, 2, 2 }
+    // => v4(0, 0, 0) = a(1, 0, 0)
+    // => v4(1, 1, 1) = a(2, 1, 3)
 
 The range function supports the placeholder ``_`` syntax:
 
@@ -87,7 +94,7 @@ Strided views
 While the ``xt::view`` is a compile-time static expression, xtensor also contains a dynamic strided view in ``xstrided_view.hpp``.
 The strided view and the slice vector allow to dynamically push_back slices, so when the dimension is unknown at compile time, the slice
 vector can be built dynamically at runtime. Note that the slice vector is actually a type-alias for a ``std::vector`` of a ``variant`` for
-all the slice types. All the same slices as in xview can be used.
+all the slice types. The strided view does not support the slices returned by the ``keep`` and ``drop`` functions.
 
 .. code::
 
@@ -96,12 +103,20 @@ all the slice types. All the same slices as in xview can be used.
 
     auto a = xt::xarray<int>::from_shape({3, 2, 3, 4, 5});
 
-    xt::slice_vector sv({xt::range(0, 1), xt::newaxis()});
+    xt::xstrided_slice_vector sv({xt::range(0, 1), xt::newaxis()});
     sv.push_back(1);
     sv.push_back(xt::all());
 
     auto v1 = xt::strided_view(a, sv);
     // v1 has the same behavior as the static view
+
+    // Equivalent but shorter
+    auto v2 = xt::strided_view(a, { xt::range(0, 1), xt::newaxis(), 1, xt::all() });
+    // v2 == v1
+
+    // ILLEGAL: 
+    auto v2 = xt::strided_view(a, { xt::all(), xt::all(), xt::all(), xt::keep(0, 3), xt::drop(1, 4) });
+    // xt::drop and xt::keep are not supported with strided views
 
 Since ``xtensor 0.16.3``, a new range syntax can be used with strided views:
 
@@ -163,6 +178,53 @@ uses the layout of the expression.
 
 Like the strided view and the transposed view, the flatten view is built upon the ``xstrided_view``.
 
+Reshape views
+-------------
+
+The reshape view allows to handle an expression as if it was given a new shape, however no additional memory allocation occurs,
+the original expression keeps its shape. Like any view, the underlying expression is not copied, thus assigning a value through
+the view modifies the underlying exression.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xstrided_view.hpp"
+
+    auto a = xt::xarray<int>::from_shape({3, 2, 4});
+    auto v = xt::reshape_view(a, { 4, 2, 3 });
+    // a(0, 0, 3) == v(0, 1, 0)
+    // a(0, 1, 0) == v(0, 1, 1)
+    
+    v(0, 2, 0) = 4;
+    // a(0, 1, 2) == 4
+
+Like the strided view and the transposed view, the reshape view is built upon the ``xstrided_view``.
+
+Dynamic views
+-------------
+
+The dynamic view is like the strided view, but with support of the slices returned by the ``keep`` and ``drop`` functions.
+However, this support has a cost and the dynamic view is slower than the strided view, even when no keeping or dropping
+slice is involved.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xdynamic_view.hpp
+
+    auto a = xt::xarray<int>::from_shape({3, 2, 3, 4, 5});
+    xt::xdynamic_slice_vector sv({xt::range(0, 1), xt::newaxis()});
+    sv.push_back(1);
+    sv.push_back(xt::all());
+    sv.push_back(xt::keep(0, 2, 3));
+    sv.push_back(xt::drop(1, 2, 4));
+
+    auto v1 = xt::dynamic_view(a, sv});
+
+    // Equivalent but shorter
+    auto v2 = xt::dynamic_view(a, { xt::range(0, 1), xt::newaxis(), 1, xt::all(), xt::keep(0, 2, 3), xt::drop(1, 2, 4) });
+    // v2 == v1
+
 Index views
 -----------
 
@@ -201,7 +263,7 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
 Masked view
 -----------
 
-Masked views are multidimensional views on an ``xoptional_assembly`` or ``xoptional_assembly_adaptor``, it applies a mask on an optional container.
+Masked views are multidimensional views that apply a mask on an expression.
 
 .. code::
 
@@ -310,25 +372,3 @@ of ``RHS``. However, since views *cannot be resized*, when assigning an expressi
     tr = b;
     // => a = {{1.2, 1.2, 1.2}, {3., 4., 5.}}
 
-
-islicing a view
---------------
-
-In order to slice with a variable indices array, the slicing array must be ``const``.
-
-.. code::
-
-    #include <vector>
-    #include "xtensor/xarray.hpp"
-    #include "xtensor/xview.hpp"
-
-    xt::xarray<double> arr = xt::arange(10);
-
-    // Slice 4, 5, 9
-    auto v1 = xt::view(arr, xt::islice({4, 5, 9}));
-    // => v1 = { 4., 5., 9. }
-
-    // Slice with a variable array
-    const xt::xarray<int> inds = {4, 5, 9};
-    auto v2 = xt::view(arr, xt::islice(inds));
-    // => v2 = { 4., 5., 9. }
