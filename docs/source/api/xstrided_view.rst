@@ -16,7 +16,7 @@ Defined in ``xtensor/xstrided_view.hpp``
 .. doxygentypedef:: xt::xstrided_slice_vector
    :project: xtensor
 
-.. doxygenfunction:: xt::strided_view(E&&, I&&, I&&, std::size_t, layout_type)
+.. doxygenfunction:: xt::strided_view(E&&, S&&, X&&, std::size_t, layout_type)
    :project: xtensor
 
 .. doxygenfunction:: xt::strided_view(E&&, const xstrided_slice_vector&)
