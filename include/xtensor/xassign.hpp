@@ -270,8 +270,9 @@ namespace xt
         template <class F, class R, class... CT>
         struct use_strided_loop<xfunction<F, R, CT...>>
         {
+            using simd_arg_type = typename xfunction<F, R, CT...>::simd_argument_type;
             static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value &&
-                                          has_simd_apply<F, xsimd::simd_type<R>>::value;
+                                          has_simd_apply<F, simd_arg_type>::value;
         };
     }
 
@@ -281,11 +282,15 @@ namespace xt
         // constexpr methods instead of constexpr data members avoid the need of difinitions at namespace
         // scope of these data members (since they are odr-used).
         static constexpr bool contiguous_layout() { return E1::contiguous_layout && E2::contiguous_layout; }
-        static constexpr bool same_type() { return std::is_same<typename E1::value_type, typename E2::value_type>::value; }
-        static constexpr bool simd_size() { return xsimd::simd_traits<typename E1::value_type>::size > 1; }
+        static constexpr bool convertible_types() { return std::is_convertible<typename E2::value_type, typename E1::value_type>::value; }
+        static constexpr bool lhs_simd_size() { return xsimd::simd_traits<typename E1::value_type>::size > 1; }
+        static constexpr bool rhs_simd_size() { return xsimd::simd_traits<typename E2::value_type>::size > 1; }
+        static constexpr bool simd_size() { return lhs_simd_size() && rhs_simd_size(); }
         static constexpr bool forbid_simd() { return detail::forbid_simd_assign<E2>::value; }
-        static constexpr bool simd_assign() { return contiguous_layout() && same_type() && simd_size() && !forbid_simd(); }
-        static constexpr bool simd_strided_loop() { return same_type() && simd_size() && detail::use_strided_loop<E2>::value && detail::use_strided_loop<E1>::value; }
+        static constexpr bool simd_assign() { return contiguous_layout() && convertible_types() && simd_size() && !forbid_simd(); }
+        static constexpr bool simd_strided_loop() { return convertible_types() && simd_size() &&
+                                                           detail::use_strided_loop<E2>::value &&
+                                                           detail::use_strided_loop<E1>::value; }
     };
 
     template <class E1, class E2>
@@ -509,8 +514,8 @@ namespace xt
     template <class E1, class E2>
     inline void trivial_assigner<false>::run(E1& e1, const E2& e2)
     {
-        using is_convertible = std::is_convertible<typename std::decay_t<E1>::value_type,
-                                                   typename std::decay_t<E2>::value_type>;
+        using is_convertible = std::is_convertible<typename std::decay_t<E2>::value_type,
+                                                   typename std::decay_t<E1>::value_type>;
         // If the types are not compatible, this function is still instantiated but never called.
         // To avoid compilation problems in effectively unused code trivial_assigner_run_impl is
         // empty in this case.
@@ -711,8 +716,8 @@ namespace xt
 
         // add this when we have std::array index!
         // std::fill(idx.begin(), idx.end(), 0);
-
-        using simd_type = xsimd::simd_type<typename E1::value_type>;
+        using value_type = std::common_type_t<typename E1::value_type, typename E2::value_type>;
+        using simd_type = xsimd::simd_type<value_type>;
 
         std::size_t simd_size = inner_loop_size / simd_type::size;
         std::size_t simd_rest = inner_loop_size % simd_type::size;
