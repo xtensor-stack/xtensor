@@ -1820,6 +1820,49 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     /**
      * @ingroup red_functions
+     * @brief Average of elements over given axes using weights.
+     *
+     * Returns an \ref xreducer for the mean of elements over given
+     * \em axes.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the mean is computed (optional)
+     * @return an \ref xexpression
+     *
+     * @sa mean
+     */
+    template <class E, class W>
+    inline auto average(E&& e, W&& weights, std::ptrdiff_t axis)
+    {
+        std::size_t ax = normalize_axis(e.dimension(), axis);
+
+        if (weights.dimension() != 1 && weights.size() != e.shape()[ax])
+        {
+            throw std::runtime_error("Weights need to have the same shape as expression at axis.");
+        }
+
+        auto div = sum(weights, xt::evaluation_strategy::immediate{})();
+
+        dynamic_shape<size_t> broadcast_shape(e.dimension(), 1);
+        broadcast_shape[ax] = weights.size();
+
+        return sum(std::forward<E>(e) * reshape_view(std::forward<W>(weights), std::move(broadcast_shape)), std::array<std::size_t, 1>({ax})) / std::move(div);
+    }
+
+    template <class E, class W>
+    inline auto average(E&& e, W&& weights)
+    {
+        if (weights.dimension() != e.dimension() || !std::equal(weights.shape().begin(), weights.shape().end(), e.shape().begin()))
+        {
+            throw std::runtime_error("Weights need to have the same shape as expression.");
+        }
+
+        auto div = sum(weights, xt::evaluation_strategy::immediate{})();
+        auto s = sum(std::forward<E>(e) * std::forward<W>(weights)) / std::move(div);
+        return s;
+    }
+
+    /**
+     * @ingroup red_functions
      * @brief Minimum and maximum among the elements of an array or expression.
      *
      * Returns an \ref xreducer for the minimum and maximum of an expression's elements.

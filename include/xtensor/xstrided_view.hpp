@@ -22,6 +22,7 @@
 #include "xiterable.hpp"
 #include "xlayout.hpp"
 #include "xsemantic.hpp"
+#include "xstorage.hpp"
 #include "xstrided_view_base.hpp"
 
 namespace xt
@@ -121,6 +122,8 @@ namespace xt
         template <class CTA, class FLS>
         xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset,
                       layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
+
+        xstrided_view(const xstrided_view& rhs) = default;
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -229,7 +232,7 @@ namespace xt
     using slice_vector = xstrided_slice_vector;
 
     template <layout_type L = layout_type::dynamic, class E, class S, class X>
-    auto strided_view(E&& e, S&& shape, X&& stride, std::size_t offset = 0, layout_type layout = layout_type::dynamic) noexcept;
+    auto strided_view(E&& e, S&& shape, X&& stride, std::size_t offset = 0, layout_type layout = L) noexcept;
 
     template <class E>
     auto strided_view(E&& e, const xstrided_slice_vector& slices);
@@ -735,7 +738,7 @@ namespace xt
         inline auto build_ravel_view(E&& e, S&& flatten_strides, layout_type l)
         {
             using shape_type = static_shape<std::size_t, 1>;
-            using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_expression_adaptor<xclosure_t<E>>>;
+            using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_expression_adaptor<std::remove_reference_t<E>>>;
 
             shape_type new_shape;
             get_strides_t<shape_type> new_strides;
@@ -1091,9 +1094,9 @@ namespace xt
     template <class E, class S>
     inline auto reshape_view(E&& e, S&& shape)
     {
-        using shape_type = S;
-
+        using shape_type = std::decay_t<S>;
         get_strides_t<shape_type> strides;
+
         xt::resize_container(strides, shape.size());
         compute_strides(shape, default_assignable_layout(std::decay_t<E>::static_layout), strides);
 
@@ -1115,9 +1118,9 @@ namespace xt
     template <class E, class S>
     inline auto reshape_view(E&& e, S&& shape, layout_type layout)
     {
-        using shape_type = S;
+        using shape_type = std::decay_t<S>;
+        get_strides_t<shape_type> strides;
 
-        shape_type strides;
         xt::resize_container(strides, shape.size());
         compute_strides(shape, layout, strides);
 
