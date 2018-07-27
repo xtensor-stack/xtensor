@@ -1075,12 +1075,6 @@ namespace xt
         using type = C<X, N>;
     };
 
-    template <class X, std::size_t... I>
-    struct rebind_container<X, fixed_shape<I...>>
-    {
-        using type = std::array<X, sizeof...(I)>;
-    };
-
     template <class S>
     struct get_strides_type
     {
