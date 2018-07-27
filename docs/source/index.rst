@@ -57,7 +57,7 @@ for details.
    :caption: USAGE
    :maxdepth: 2
 
-   basic_usage
+   getting_started
    expression
    container
    scalar

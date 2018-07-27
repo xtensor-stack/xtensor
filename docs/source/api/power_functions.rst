@@ -16,7 +16,7 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: pow(E1&&, E2&&)
    :project: xtensor
 
-.. doxygenfunction:: pow(E1&&)
+.. doxygenfunction:: pow(E&&)
    :project: xtensor
 
 .. doxygenfunction:: square(E1&&)
