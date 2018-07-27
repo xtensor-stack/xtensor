@@ -200,6 +200,14 @@ namespace xt
     #endif
     }
 
+    TEST(xtensor_fixed, transpose)
+    {
+        xtensorf3x4 a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
+        xtensor_fixed<double, xshape<4, 3>> ta = xt::transpose(a);
+        EXPECT_EQ(a(1, 1), ta(1, 1));
+        EXPECT_EQ(a(2, 1), ta(1, 2));
+    }
+
     TEST(xtensor_fixed, xfunction_eval)
     {
         xtensorf3x4 a({{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}});
