@@ -1075,8 +1075,23 @@ namespace xt
         using type = C<X, N>;
     };
 
+    template <class S>
+    struct get_strides_type
+    {
+        using type = typename rebind_container<std::ptrdiff_t, S>::type;
+    };
+
+    template <std::size_t... I>
+    struct get_strides_type<fixed_shape<I...>>
+    {
+        // TODO we could compute the strides statically here.
+        //      But we'll need full constexpr support to have a
+        //      homogenous ``compute_strides`` method
+        using type = std::array<std::ptrdiff_t, sizeof...(I)>;
+    };
+
     template <class C>
-    using get_strides_t = typename rebind_container<std::ptrdiff_t, C>::type;
+    using get_strides_t = typename get_strides_type<C>::type;
 }
 
 #endif

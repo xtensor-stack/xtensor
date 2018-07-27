@@ -27,6 +27,33 @@
 
 namespace xt
 {
+    namespace detail
+    {
+        template <class S>
+        struct xtype_for_shape
+        {
+            template <class T, layout_type L>
+            using type = xarray<T, L>;
+        };
+
+        template <template <class, std::size_t> class S, class X, std::size_t N>
+        struct xtype_for_shape<S<X, N>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor<T, N, L>;
+        };
+
+        template <template <std::size_t...> class S, std::size_t... X>
+        struct xtype_for_shape<S<X...>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor_fixed<T, xshape<X...>, L>;
+        };
+
+        template <class T, class S, layout_type L>
+        using temporary_type_t = typename xtype_for_shape<S>::template type<T, L>;
+    }
+
     template <class CT, class S, layout_type L, class FST>
     class xstrided_view;
 
@@ -34,8 +61,7 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
-        // TODO decide on shape type which temporary type to use!
-        using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
+        using temporary_type = detail::temporary_type_t<typename xexpression_type::value_type, S, L>;
     };
 
     template <class CT, class S, layout_type L, class FST>
@@ -494,7 +520,7 @@ namespace xt
             bool fill_args(const xstrided_slice_vector& /*slices*/, std::size_t /*sl_idx*/,
                            std::size_t /*i*/, std::size_t /*old_shape*/,
                            const ST& /*old_stride*/,
-                           S& /*shape*/, S& /*strides*/)
+                           S& /*shape*/, get_strides_t<S>& /*strides*/)
             {
                 return false;
             }
@@ -848,15 +874,15 @@ namespace xt
     template <class E>
     inline auto squeeze(E&& e)
     {
-        xt::dynamic_shape<std::size_t> new_shape;
-        xt::dynamic_shape<std::ptrdiff_t> new_strides;
+        dynamic_shape<std::size_t> new_shape;
+        dynamic_shape<std::ptrdiff_t> new_strides;
         std::copy_if(e.shape().cbegin(), e.shape().cend(), std::back_inserter(new_shape),
                      [](std::size_t i) { return i != 1; });
         decltype(auto) old_strides = detail::get_strides(e);
         std::copy_if(old_strides.cbegin(), old_strides.cend(), std::back_inserter(new_strides),
                      [](std::ptrdiff_t i) { return i != 0; });
 
-        using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>>;
+        using view_type = xstrided_view<xclosure_t<E>, dynamic_shape<std::size_t>>;
         return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
     }
 
@@ -866,8 +892,8 @@ namespace xt
         inline auto squeeze_impl(E&& e, S&& axis, check_policy::none)
         {
             std::size_t new_dim = e.dimension() - axis.size();
-            xt::dynamic_shape<std::size_t> new_shape(new_dim);
-            xt::dynamic_shape<std::ptrdiff_t> new_strides(new_dim);
+            dynamic_shape<std::size_t> new_shape(new_dim);
+            dynamic_shape<std::ptrdiff_t> new_strides(new_dim);
 
             decltype(auto) old_strides = detail::get_strides(e);
 
@@ -880,7 +906,7 @@ namespace xt
                 }
             }
 
-            using view_type = xstrided_view<xclosure_t<E>, xt::dynamic_shape<std::size_t>>;
+            using view_type = xstrided_view<xclosure_t<E>, dynamic_shape<std::size_t>>;
             return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
         }
 
@@ -954,8 +980,8 @@ namespace xt
     template <class E>
     auto expand_dims(E&& e, std::size_t axis)
     {
-        xstrided_slice_vector sv(e.dimension() + 1, xt::all());
-        sv[axis] = xt::newaxis();
+        xstrided_slice_vector sv(e.dimension() + 1, all());
+        sv[axis] = newaxis();
         return strided_view(std::forward<E>(e), std::move(sv));
     }
 
@@ -974,19 +1000,19 @@ namespace xt
     template <std::size_t N, class E>
     auto atleast_Nd(E&& e)
     {
-        xstrided_slice_vector sv((std::max)(e.dimension(), N), xt::all());
+        xstrided_slice_vector sv(std::max(e.dimension(), N), all());
         if (e.dimension() < N)
         {
             std::size_t i = 0;
             std::size_t end = static_cast<std::size_t>(std::round(double(N - e.dimension()) / double(N)));
             for (; i < end; ++i)
             {
-                sv[i] = xt::newaxis();
+                sv[i] = newaxis();
             }
             i += e.dimension();
             for (; i < N; ++i)
             {
-                sv[i] = xt::newaxis();
+                sv[i] = newaxis();
             }
         }
         return strided_view(std::forward<E>(e), std::move(sv));
@@ -1043,7 +1069,7 @@ namespace xt
         }
 
         std::size_t ax_sz = e.shape()[axis];
-        xstrided_slice_vector sv(e.dimension(), xt::all());
+        xstrided_slice_vector sv(e.dimension(), all());
         std::size_t step = ax_sz / n;
         std::size_t rest = ax_sz % n;
 
