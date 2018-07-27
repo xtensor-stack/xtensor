@@ -16,11 +16,15 @@
 #include <xtl/xclosure.hpp>
 #include <xtl/xtype_traits.hpp>
 
+#include "xlayout.hpp"
 #include "xshape.hpp"
 #include "xutils.hpp"
 
 namespace xt
 {
+
+    template <class E>
+    class xshared_expression;
 
     /***************************
      * xexpression declaration *
@@ -136,6 +140,12 @@ namespace xt
     };
 
     template <class E>
+    struct xclosure<xshared_expression<E>, std::enable_if_t<true>>
+    {
+        using type = xshared_expression<E>; // force copy
+    };
+
+    template <class E>
     struct xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
         using type = xscalar<xtl::closure_type_t<E>>;
@@ -154,6 +164,12 @@ namespace xt
     struct const_xclosure<E, disable_xexpression<std::decay_t<E>>>
     {
         using type = xscalar<xtl::const_closure_type_t<E>>;
+    };
+
+    template <class E>
+    struct const_xclosure<xshared_expression<E>&, std::enable_if_t<true>>
+    {
+        using type = xshared_expression<E>; // force copy
     };
 
     template <class E>
@@ -302,6 +318,182 @@ namespace xt
                                                   >
     {
     };
+
+#define XTENSOR_FORWARD_METHOD(name)           \
+    auto name() const                          \
+        -> decltype(std::declval<E>().name())  \
+    {                                          \
+        return m_ptr->name();                  \
+    }
+
+    /**
+     * @class xshared_expression
+     * @brief Shared xexpressions
+     *
+     * Due to C++ lifetime constraints it's sometimes necessary to create shared
+     * expressions (akin to a shared pointer).
+     *
+     * For example, when a temporary expression needs to be used twice in another
+     * expression, shared expressions can come to the rescue:
+     *
+     * \code{.cpp}
+     * template <class E>
+     * auto cos_plus_sin(xexpression<E>&& expr)
+     * {
+     *     // THIS IS WRONG: forwarding rvalue twice not permitted!
+     *     // return xt::sin(std::forward<E>(expr)) + xt::cos(std::forward<E>(expr));
+     *     // THIS IS WRONG TOO: because second `expr` is taken as reference (which will be invalid)
+     *     // return xt::sin(std::forward<E>(expr)) + xt::cos(expr)
+     *     auto shared_expr = xt::make_xshared(std::forward<E>(expr));
+     *     auto result = xt::sin(shared_expr) + xt::cos(shared_expr);
+     *     std::cout << shared_expr.use_count() << std::endl; // Will print 3 because used twice in expression
+     *     return result; // all valid because expr lifetime managed by xshared_expression / shared_ptr.
+     * }
+     * \endcode
+     */
+    template <class E>
+    class xshared_expression
+        : public xexpression<xshared_expression<E>>
+    {
+    public:
+
+        using base_class = xexpression<xshared_expression<E>>;
+
+        using value_type = typename E::value_type;
+        using reference = typename E::reference;
+        using const_reference = typename E::const_reference;
+        using pointer = typename E::pointer;
+        using const_pointer = typename E::const_pointer;
+        using size_type = typename E::size_type;
+        using difference_type = typename E::difference_type;
+
+        using shape_type = typename E::shape_type;
+        using strides_type = typename E::strides_type;
+        using backstrides_type = typename E::backstrides_type;
+
+        using inner_shape_type = typename E::inner_shape_type;
+        using inner_strides_type = typename E::inner_strides_type;
+        using inner_backstrides_type = typename E::inner_backstrides_type;
+
+        using stepper = typename E::stepper;
+        using const_stepper = typename E::const_stepper;
+
+        using storage_iterator = typename E::storage_iterator;
+        using const_storage_iterator = typename E::const_storage_iterator;
+
+        static constexpr layout_type static_layout = E::static_layout;
+        static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
+
+        explicit xshared_expression(std::shared_ptr<E>&& ptr);
+        long use_count() const noexcept;
+
+        template <class... Args>
+        auto operator()(Args... args)
+            -> decltype(std::declval<E>()(args...))
+        {
+            return m_ptr->operator()(args...);
+        }
+
+        XTENSOR_FORWARD_METHOD(shape);
+        XTENSOR_FORWARD_METHOD(dimension);
+        XTENSOR_FORWARD_METHOD(size);
+        XTENSOR_FORWARD_METHOD(begin);
+        XTENSOR_FORWARD_METHOD(cbegin);
+        XTENSOR_FORWARD_METHOD(storage_begin);
+        XTENSOR_FORWARD_METHOD(storage_cbegin);
+        XTENSOR_FORWARD_METHOD(storage_end);
+        XTENSOR_FORWARD_METHOD(storage_cend);
+
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        XTENSOR_FORWARD_METHOD(strides);
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        XTENSOR_FORWARD_METHOD(data);
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        XTENSOR_FORWARD_METHOD(data_offset);
+        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
+        XTENSOR_FORWARD_METHOD(storage);
+
+        template <class S>
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const
+        {
+            return m_ptr->broadcast_shape(shape, reuse_cache);
+        }
+
+        template <class S>
+        bool is_trivial_broadcast(const S& strides) const noexcept
+        {
+            return m_ptr->is_trivial_broadcast(strides);
+        }
+
+        template <class S>
+        auto stepper_begin(const S& shape) noexcept
+            -> decltype(std::declval<E>().stepper_begin(shape))
+        {
+            return m_ptr->stepper_begin(shape);
+        }
+
+        template <class S>
+        auto stepper_end(const S& shape, layout_type l) noexcept
+            -> decltype(std::declval<E>().stepper_end(shape, l))
+        {
+            return m_ptr->stepper_end(shape, l);
+        }
+
+        template <class S>
+        auto stepper_begin(const S& shape) const noexcept
+            -> decltype(std::declval<const E>().stepper_begin(shape))
+        {
+            return static_cast<const E*>(m_ptr.get())->stepper_begin(shape);
+        }
+        template <class S>
+        auto stepper_end(const S& shape, layout_type l) const noexcept
+            -> decltype(std::declval<const E>().stepper_end(shape, l))
+        {
+            return static_cast<const E*>(m_ptr.get())->stepper_end(shape, l);
+        }
+
+    private:
+
+        std::shared_ptr<E> m_ptr;
+    };
+
+    /**
+     * Constructor for xshared expression (note: usually the free function
+     * `make_xshared` is recommended).
+     *
+     * @param ptr shared ptr that contains the expression
+     * @sa make_xshared
+     */
+    template <class E>
+    inline xshared_expression<E>::xshared_expression(std::shared_ptr<E>&& ptr)
+        : m_ptr(std::move(ptr))
+    {
+    }
+
+    /**
+     * Return the number of times this expression is referenced.
+     * Internally calls the use_count() function of the std::shared_ptr.
+     */
+    template <class E>
+    inline long xshared_expression<E>::use_count() const noexcept
+    {
+        return m_ptr.use_count();
+    }
+
+    /**
+     * Helper function to create shared expression from any xexpression
+     *
+     * @param expr rvalue expression that will be shared
+     * @return xshared expression
+     */
+    template <class E>
+    auto make_xshared(xexpression<E>&& expr)
+    {
+        return xshared_expression<E>(std::make_shared<E>(expr));
+    }
+
+#undef XTENSOR_FORWARD_METHOD
+
 }
 
 #endif
