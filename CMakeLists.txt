@@ -32,7 +32,7 @@ find_package(xtl 0.4.9 REQUIRED)
 
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
-find_package(nlohmann_json 3.1.1)
+find_package(nlohmann_json 3.1.1 QUIET)
 
 # Build
 # =====
