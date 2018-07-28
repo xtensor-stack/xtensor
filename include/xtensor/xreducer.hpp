@@ -25,6 +25,7 @@
 #include <xtl/xsequence.hpp>
 
 #include "xbuilder.hpp"
+#include "xeval.hpp"
 #include "xexpression.hpp"
 #include "xgenerator.hpp"
 #include "xiterable.hpp"
@@ -505,7 +506,7 @@ namespace xt
         template <class F, class E, class X>
         inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::immediate)
         {
-            return reduce_immediate(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
+            return reduce_immediate(std::forward<F>(f), eval(std::forward<E>(e)), std::forward<X>(axes));
         }
     }
 

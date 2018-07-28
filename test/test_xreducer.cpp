@@ -205,18 +205,24 @@ namespace xt
     TEST(xreducer, average)
     {
         xt::xtensor<float, 2> a = {{ 3, 4, 2, 1}, { 1, 1, 3, 2}};
+        xt::xarray<double> all_weights = {{1, 2, 3, 4}, { 5, 6, 7, 8}};
+        auto avg_all = xt::average(a, all_weights);
+        auto avg_all_2 = xt::average(a, all_weights, {0, 1});
 
-        auto avg_all = xt::average(a, xt::xarray<double>{{1, 2, 3, 4}, { 5, 6, 7, 8}});
         auto avg0 = xt::average(a, xt::xarray<double>{3, 9}, 0);
         auto avg1 = xt::average(a, xt::xarray<double>{1,2,3,4}, 1);
+        auto avg_m1 = xt::average(a, xt::xarray<double>{1,2,3,4}, {-1});
+        auto avg_d1 = xt::average(a, xt::xarray<double>{1,2,3,4}, {-1}, evaluation_strategy::immediate());
 
         xtensor<double, 0> expect_all = 1.9166666666666667;
         xtensor<double, 1> expect0 = {1.5, 1.75, 2.75, 1.75};
         xtensor<double, 1> expect1 = {2.1, 2.0};
 
         EXPECT_TRUE(allclose(avg_all, expect_all));
+        EXPECT_TRUE(allclose(avg_all_2, expect_all));
         EXPECT_TRUE(all(equal(avg0, expect0)));
         EXPECT_TRUE(all(equal(avg1, expect1)));
+        EXPECT_TRUE(all(equal(avg_m1, expect1)));
     }
 
     TEST(xreducer, minmax)

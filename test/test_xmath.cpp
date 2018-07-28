@@ -23,7 +23,7 @@ namespace xt
      * type conversion *
      *******************/
 
-#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                  \
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
     {                                                                                \
         using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
         EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \

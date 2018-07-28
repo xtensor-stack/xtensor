@@ -74,7 +74,19 @@ namespace xt
     template <std::size_t... I>
     bool resize_container(fixed_shape<I...>& a, std::size_t size);
 
+    template <class X, class C>
+    struct rebind_container;
+
+    template <class X, class C>
+    using rebind_container_t = typename rebind_container<X, C>::type;
+
     std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis);
+
+    template <class C>
+    rebind_container_t<std::size_t, C> normalize_axis(std::size_t dim, C& axis);
+
+    template <class S1, class S2>
+    inline bool same_shape(const S1& s1, const S2& s2) noexcept;
 
     // gcc 4.9 is affected by C++14 defect CGW 1558
     // see http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
@@ -434,6 +446,32 @@ namespace xt
     {
         return axis < 0 ? static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis) : static_cast<std::size_t>(axis);
     }
+
+    template <class C>
+    inline rebind_container_t<std::size_t, C> normalize_axis(std::size_t dim, const C& axis)
+    {
+        using result_type = rebind_container_t<std::size_t, C>;
+        result_type res;
+        xt::resize_container(res, axis.size());
+
+        for (std::size_t i = 0; i < axis.size(); ++i)
+        {
+            res[i] = normalize_axis(dim, axis[i]);
+        }
+
+        return res;
+    }
+
+    /*****************************
+     * same_shape implementation *
+     *****************************/
+
+    template <class S1, class S2>
+    inline bool same_shape(const S1& s1, const S2& s2) noexcept
+    {
+        return s1.size() == s2.size() && std::equal(s1.begin(), s1.end(), s2.begin());
+    }
+
 
     /******************
      * get_value_type *
@@ -1058,9 +1096,6 @@ namespace xt
         : std::true_type
     {
     };
-
-    template <class X, class C>
-    struct rebind_container;
 
     template <class X, template <class, class> class C, class T, class A>
     struct rebind_container<X, C<T, A>>

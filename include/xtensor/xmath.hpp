@@ -1861,26 +1861,66 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      *
      * @sa mean
      */
-    template <class E, class W>
-    inline auto average(E&& e, W&& weights, std::ptrdiff_t axis)
+    template <class E, class W, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, EVS>::value>,
+              XTENSOR_REQUIRE<!std::is_integral<X>::value>>
+    inline auto average(E&& e, W&& weights, const X& axis, EVS ev = EVS())
     {
-        std::size_t ax = normalize_axis(e.dimension(), axis);
+        auto ax = normalize_axis(e.dimension(), axis);
 
-        if (weights.dimension() != 1 && weights.size() != e.shape()[ax])
+        xindex_type_t<typename std::decay_t<E>::shape_type> broadcast_shape;
+        xt::resize_container(broadcast_shape, e.dimension());
+
+        if (weights.dimension() == 1)
         {
-            throw std::runtime_error("Weights need to have the same shape as expression at axis.");
+            if (weights.size() != e.shape()[ax[0]])
+            {
+                throw std::runtime_error("Weights need to have the same shape as expression at axis.");
+            }
+
+            std::fill(broadcast_shape.begin(), broadcast_shape.end(), std::size_t(1));
+            broadcast_shape[ax[0]] = weights.size();
+        }
+        else
+        {
+            if (!same_shape(e.shape(), weights.shape()))
+            {
+                throw std::runtime_error("Weights with dim > 1 need to have the same shape as expression.");
+            }
+
+            std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
         }
 
         auto div = sum(weights, xt::evaluation_strategy::immediate{})();
-
-        dynamic_shape<std::size_t> broadcast_shape(e.dimension(), 1);
-        broadcast_shape[ax] = weights.size();
-
-        return sum(std::forward<E>(e) * reshape_view(std::forward<W>(weights), std::move(broadcast_shape)), std::array<std::size_t, 1>({ax})) / std::move(div);
+        auto weights_view = reshape_view(std::forward<W>(weights), std::move(broadcast_shape));
+        return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(div);
     }
 
-    template <class E, class W>
-    inline auto average(E&& e, W&& weights)
+#ifndef X_OLD_CLANG
+    template <class E, class W, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto average(E&& e, W&& weights, const std::ptrdiff_t (&axis)[N], EVS ev = EVS())
+    {
+        return average(std::forward<E>(e), std::forward<W>(weights),
+                       xtl::forward_sequence<std::array<std::ptrdiff_t, N>>(axis), ev);
+    }
+#else
+    template <class E, class W, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto average(E&& e, W&& weights, std::initializer_list<I> axis, EVS ev = EVS())
+    {
+        return average(std::forward<E>(e), std::forward<W>(weights),
+                       xtl::forward_sequence<std::vector<std::ptrdiff_t>>(axis), ev);
+    }
+#endif
+
+    template <class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto average(E&& e, W&& weights, const std::ptrdiff_t axis, EVS ev = EVS())
+    {
+        return average(std::forward<E>(e), std::forward<W>(weights), std::array<std::ptrdiff_t, 1>({axis}), ev);
+    }
+
+    template <class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, EVS>::value>>
+    inline auto average(E&& e, W&& weights, EVS ev = EVS())
     {
         if (weights.dimension() != e.dimension() || !std::equal(weights.shape().begin(), weights.shape().end(), e.shape().begin()))
         {
@@ -1888,7 +1928,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }
 
         auto div = sum(weights, xt::evaluation_strategy::immediate{})();
-        auto s = sum(std::forward<E>(e) * std::forward<W>(weights)) / std::move(div);
+        auto s = sum(std::forward<E>(e) * std::forward<W>(weights), ev) / std::move(div);
         return s;
     }
 
