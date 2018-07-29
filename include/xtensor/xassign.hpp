@@ -88,7 +88,12 @@ namespace xt
     private:
 
         template <class E1, class E2>
-        static bool resize(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static auto resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+        -> std::enable_if_t<!detail::only_fixed<typename E1::shape_type, typename E2::shape_type>::value, bool>;
+
+        template <class E1, class E2>
+        static auto resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+        -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename E2::shape_type>::value, bool>;
     };
 
     /*****************
@@ -321,23 +326,6 @@ namespace xt
     template <class E1, class E2>
     inline void xexpression_assigner<Tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
     {
-        using e1_shape = typename E1::shape_type;
-        using e2_shape = typename E2::shape_type;
-
-        //constexpr bool purely_fixed = detail::only_fixed<e1_shape, e2_shape>::value;
-        using test = std::enable_if_t<detail::only_fixed<e1_shape, e2_shape>::value>;
-        using result_shape = typename detail::broadcast_fixed_shape<e1_shape, e2_shape>::type;
-
-        /*if(purely_fixed){
-            //using result_shape = typename detail::broadcast_fixed_shape<e1_shape, e2_shape>::type;
-            //Staticly check that result_shape \cong e1_shape, else throw
-            //trivial_broadcast iff result_shape is e2_shape
-            constexpr bool trivial_broadcast = true;
-            base_type::assign_data(e1, e2, trivial_broadcast);
-        } else{
-            bool trivial_broadcast = resize(e1, e2);
-            base_type::assign_data(e1, e2, trivial_broadcast);
-        }*/
         bool trivial_broadcast = resize(e1, e2);
         base_type::assign_data(e1, e2, trivial_broadcast);
     }
@@ -396,7 +384,8 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline auto xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+    -> std::enable_if_t<!detail::only_fixed<typename E1::shape_type, typename E2::shape_type>::value, bool>
     {
         using index_type = xindex_type_t<typename E1::shape_type>;
         using size_type = typename E1::size_type;
@@ -405,6 +394,20 @@ namespace xt
         index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
         e1.derived_cast().resize(std::move(shape));
+        return trivial_broadcast;
+    }
+
+    template <class Tag>
+    template <class E1, class E2>
+    inline auto xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+    -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename E2::shape_type>::value, bool>
+    {
+        using e1_shape = typename E1::shape_type;
+        using e2_shape = typename E2::shape_type;
+
+        using result_shape = typename detail::broadcast_fixed_shape<e1_shape, e2_shape>::type;
+        static_assert(std::is_same<e1_shape, result_shape>::value, "Attempted to risize a fixed container");
+        constexpr bool trivial_broadcast = std::is_same<e2_shape, result_shape>::value;
         return trivial_broadcast;
     }
 
