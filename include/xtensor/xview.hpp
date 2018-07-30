@@ -361,7 +361,7 @@ namespace xt
         template <typename std::decay_t<CT>::size_type I, class T, class... Args>
         disable_xslice<T, size_type> sliced_access(const T& squeeze, Args...) const;
 
-        using base_index_type = xindex_type_t<shape_type>;
+        using base_index_type = xindex_type_t<typename xexpression_type::shape_type>;
 
         template <class It>
         base_index_type make_index(It first, It last) const;
@@ -1115,8 +1115,7 @@ namespace xt
     template <class It>
     inline auto xview<CT, S...>::make_index(It first, It last) const -> base_index_type
     {
-        // todo make signed?
-        auto index = xtl::make_sequence<typename xexpression_type::shape_type>(m_e.dimension(), 0);
+        auto index = xtl::make_sequence<base_index_type>(m_e.dimension(), 0);
         auto func1 = [&first](const auto& s) {
             return get_slice_value(s, first);
         };
