@@ -79,7 +79,7 @@ namespace xt
         void shuffle(xexpression<T>& e, E& engine = random::get_default_random_engine());
 
         template <class T, class E = random::default_engine_type>
-        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n,
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, bool replace = true,
                                                   E& engine = random::get_default_random_engine());
     }
 
@@ -285,28 +285,47 @@ namespace xt
          *
          * @param e expression to sample from
          * @param n number of elements to sample
+         * @param replace whether to sample with or without replacement
          * @param engine random number engine
          *
          * @return xtensor containing 1D container of sampled elements
          */
         template <class T, class E>
-        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, E& engine)
+        xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, bool replace, E& engine)
         {
             const auto& de = e.derived_cast();
-            XTENSOR_ASSERT(de.dimension() == 1);
-            XTENSOR_ASSERT(de.size() >= n);
+            if (de.dimension() != 1)
+            {
+                throw std::runtime_error("Sample expression must be 1 dimensional");
+            }
+            if (de.size() < n && !replace)
+            {
+                throw std::runtime_error("If replace is false, then the sample expression's size must be > n");
+            }
             xtensor<typename T::value_type, 1> result;
             result.resize({n});
-
-            xtensor<typename T::value_type, 1> shuffled = de;
-            std::shuffle(shuffled.storage().begin(), shuffled.storage().end(), engine);
-
-            std::copy(shuffled.storage().begin(), shuffled.storage().begin() + n, result.begin());
-
+            
+            if (replace)
+            {
+                auto dist = std::uniform_int_distribution<std::size_t>(0, de.size() - 1);
+                for(std::size_t i = 0; i < n; i++)
+                {
+                    result[i] = de.storage()[dist(engine)];
+                }
+            }
+            else
+            {
+                // Naive resevoir sampling without weighting:
+                std::copy(de.storage().begin(), de.storage().begin() + n, result.begin());
+                std::size_t i = n;
+                for(auto it = de.storage().begin() + n; it != de.storage().end(); ++it, ++i)
+                {
+                    auto idx = std::uniform_int_distribution<std::size_t>(0, i)(engine);
+                    if (idx < n)
+                        result.storage()[idx] = *it;
+                }
+            } 
             return result;
-
-            // Doesn't exist yet but would be much nicer as it probably prevent copies
-            // std::experimental::sample(de.begin(), de.end(), result.begin(), std::ref(engine));
         }
     }
 }

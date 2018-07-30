@@ -53,12 +53,27 @@ namespace xt
     {
         xarray<double> a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         xt::random::seed(42);
-        auto ac1 = xt::random::choice(a, 5);
-        auto ac2 = xt::random::choice(a, 5);
+        auto ac1 = xt::random::choice(a, 5, false);
+        auto ac2 = xt::random::choice(a, 5, false);
         xt::random::seed(42);
-        auto ac3 = xt::random::choice(a, 5);
-        EXPECT_EQ(ac1, ac3);
-        EXPECT_NE(ac1, ac2);
+        auto ac3 = xt::random::choice(a, 5, false);
+        ASSERT_EQ(ac1, ac3);
+        ASSERT_NE(ac1, ac2);
+
+        xt::random::seed(42);
+        auto acr1 = xt::random::choice(a, 5, true);
+        auto acr2 = xt::random::choice(a, 5, true);
+        xt::random::seed(42);
+        auto acr3 = xt::random::choice(a, 5, true);
+        ASSERT_EQ(acr1, acr3);
+        ASSERT_NE(acr1, acr2);
+
+        xarray<double> b = {-1, 1};
+        xt::random::seed(42);
+        ASSERT_THROW(xt::random::choice(b, 5, false), std::runtime_error);
+        ASSERT_NO_THROW(xt::random::choice(b, 5, true));
+        xarray<double> multidim_input = { {1,2,3}, {3,4,5} };
+        ASSERT_THROW(xt::random::choice(multidim_input, 5, true), std::runtime_error);
     }
 
     TEST(xrandom, shuffle)
