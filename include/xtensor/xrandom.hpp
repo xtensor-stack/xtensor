@@ -322,7 +322,9 @@ namespace xt
                 {
                     auto idx = std::uniform_int_distribution<std::size_t>(0, i)(engine);
                     if (idx < n)
+                    {
                         result.storage()[idx] = *it;
+                    }
                 }
             } 
             return result;
