@@ -133,6 +133,7 @@ namespace xt
         EXPECT_TRUE(all(equal(res_2, expected_2)));
 
         auto res_3 = cumsum(arg_0, 3);
+        auto res_m1 = cumsum(arg_0, -1);
         xarray<double> expected_3 = {{{{  0.,  1.,  3.},
                                        {  3.,  7., 12.}},
 
@@ -152,6 +153,7 @@ namespace xt
                                       {{ 30., 61., 93.},
                                        { 33., 67.,102.}}}};
         EXPECT_TRUE(allclose(expected_3, res_3));
+        EXPECT_TRUE(allclose(expected_3, res_m1));
     }
 
     TEST(xaccumulator, xtensor)

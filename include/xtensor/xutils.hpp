@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <xtl/xfunctional.hpp>
+#include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
 
 #include "xtensor_config.hpp"
@@ -81,9 +82,6 @@ namespace xt
     using rebind_container_t = typename rebind_container<X, C>::type;
 
     std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis);
-
-    template <class C>
-    rebind_container_t<std::size_t, C> normalize_axis(std::size_t dim, C& axis);
 
     template <class S1, class S2>
     inline bool same_shape(const S1& s1, const S2& s2) noexcept;
@@ -442,24 +440,77 @@ namespace xt
      * normalize_axis implementation *
      *********************************/
 
+
+    // scalar normalize axis
     inline std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis)
     {
         return axis < 0 ? static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis) : static_cast<std::size_t>(axis);
     }
 
-    template <class C>
-    inline rebind_container_t<std::size_t, C> normalize_axis(std::size_t dim, const C& axis)
+    template <class E, class C>
+    inline std::enable_if_t<!std::is_integral<std::decay_t<C>>::value &&
+                     std::is_signed<typename std::decay_t<C>::value_type>::value,
+                     rebind_container_t<std::size_t, std::decay_t<C>>>
+    normalize_axis(E& expr, C&& axes)
     {
-        using result_type = rebind_container_t<std::size_t, C>;
-        result_type res;
-        xt::resize_container(res, axis.size());
+        rebind_container_t<std::size_t, std::decay_t<C>> res;
+        resize_container(res, axes.size());
 
-        for (std::size_t i = 0; i < axis.size(); ++i)
+        for (std::size_t i = 0; i < axes.size(); ++i)
         {
-            res[i] = normalize_axis(dim, axis[i]);
+            res[i] = normalize_axis(expr.dimension(), axes[i]);
         }
 
+        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+
         return res;
+    }
+
+    template <class C, class E>
+    inline std::enable_if_t<!std::is_integral<std::decay_t<C>>::value && std::is_unsigned<typename std::decay_t<C>::value_type>::value, C&&>
+    normalize_axis(E& expr, C&& axes)
+    {
+        static_cast<void>(expr);
+        XTENSOR_ASSERT(std::all_of(axes.begin(), axes.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        return std::forward<C>(axes);
+    }
+
+    template <class R, class E, class C>
+    inline auto forward_normalize(E& expr, C&& axes)
+        -> std::enable_if_t<std::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value, R>
+    {
+        R res;
+        xt::resize_container(res, xtl::sequence_size(axes));
+        auto dim = expr.dimension();
+        std::transform(std::begin(axes), std::end(axes), std::begin(res), [&dim](auto ax_el) {
+            return normalize_axis(dim, ax_el);
+        });
+
+        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+
+        return res;
+    }
+
+    template <class R, class E, class C>
+    inline auto forward_normalize(E& expr, C&& axes)
+        -> std::enable_if_t<!std::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && !std::is_same<R, std::decay_t<C>>::value, R>
+    {
+        static_cast<void>(expr);
+
+        R res;
+        xt::resize_container(res, xtl::sequence_size(axes));
+        std::copy(std::begin(axes), std::end(axes), std::begin(res));
+        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        return res;
+    }
+
+    template <class R, class E, class C>
+    inline auto forward_normalize(E& expr, C&& axes)
+        -> std::enable_if_t<!std::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && std::is_same<R, std::decay_t<C>>::value, R&&>
+    {
+        static_cast<void>(expr);
+        XTENSOR_ASSERT(std::all_of(std::begin(axes), std::end(axes), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        return std::move(axes);
     }
 
     /*****************************

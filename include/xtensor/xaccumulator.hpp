@@ -302,9 +302,10 @@ namespace xt
      * @return returns xarray<T> filled with accumulated values
      */
     template <class F, class E, class EVS = DEFAULT_STRATEGY_ACCUMULATORS>
-    inline auto accumulate(F&& f, E&& e, std::size_t axis, EVS evaluation_strategy = EVS())
+    inline auto accumulate(F&& f, E&& e, std::ptrdiff_t axis, EVS evaluation_strategy = EVS())
     {
-        return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), axis, evaluation_strategy);
+        std::size_t ax = normalize_axis(e.dimension(), axis);
+        return detail::accumulator_impl(std::forward<F>(f), std::forward<E>(e), ax, evaluation_strategy);
     }
 }
 

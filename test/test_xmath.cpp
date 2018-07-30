@@ -886,7 +886,7 @@ namespace xt
         EXPECT_EQ(trapz(a, 1.0, 0), expected1);
 
         xt::xarray<double> expected2 = {2.0, 8.0};
-        EXPECT_EQ(trapz(a, 1.0, 1), expected2);
+        EXPECT_EQ(trapz(a, 1.0, -1), expected2);
 
         xt::xarray<int> b = {1, 2, 3};
         auto res3 = trapz(b);

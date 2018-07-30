@@ -1864,18 +1864,16 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E, class W, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, EVS>::value>,
               XTENSOR_REQUIRE<!std::is_integral<X>::value>>
-    inline auto average(E&& e, W&& weights, const X& axis, EVS ev = EVS())
+    inline auto average(E&& e, W&& weights, X&& axes, EVS ev = EVS())
     {
-        auto ax = normalize_axis(e.dimension(), axis);
-
         xindex_type_t<typename std::decay_t<E>::shape_type> broadcast_shape;
         xt::resize_container(broadcast_shape, e.dimension());
-
+        auto ax = normalize_axis(e, axes);
         if (weights.dimension() == 1)
         {
             if (weights.size() != e.shape()[ax[0]])
             {
-                throw std::runtime_error("Weights need to have the same shape as expression at axis.");
+                throw std::runtime_error("Weights need to have the same shape as expression at axes.");
             }
 
             std::fill(broadcast_shape.begin(), broadcast_shape.end(), std::size_t(1));
@@ -1891,32 +1889,28 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
         }
 
-        auto div = sum(weights, xt::evaluation_strategy::immediate{})();
+        using result_type = promote_type_t<double, typename std::decay_t<E>::value_type>;
+        result_type scl = static_cast<result_type>(sum(weights, xt::evaluation_strategy::immediate{})());
         auto weights_view = reshape_view(std::forward<W>(weights), std::move(broadcast_shape));
-        return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(div);
+        return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
 
 #ifndef X_OLD_CLANG
-    template <class E, class W, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto average(E&& e, W&& weights, const std::ptrdiff_t (&axis)[N], EVS ev = EVS())
+    template <class E, class W, class X, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto average(E&& e, W&& weights, const X(&axes)[N], EVS ev = EVS())
     {
-        return average(std::forward<E>(e), std::forward<W>(weights),
-                       xtl::forward_sequence<std::array<std::ptrdiff_t, N>>(axis), ev);
+        // need to select the X&& overload and forward to different type
+        using ax_t = std::array<std::size_t, N>;
+        return average(std::forward<E>(e), std::forward<W>(weights), xt::forward_normalize<ax_t>(e, axes), ev);
     }
 #else
     template <class E, class W, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto average(E&& e, W&& weights, std::initializer_list<I> axis, EVS ev = EVS())
+    inline auto average(E&& e, W&& weights, std::initializer_list<I> axes, EVS ev = EVS())
     {
-        return average(std::forward<E>(e), std::forward<W>(weights),
-                       xtl::forward_sequence<std::vector<std::ptrdiff_t>>(axis), ev);
+        using ax_t = std::vector<std::size_t>;
+        return average(std::forward<E>(e), std::forward<W>(weights), xt::forward_normalize<ax_t>(e, axes), ev);
     }
 #endif
-
-    template <class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS>
-    inline auto average(E&& e, W&& weights, const std::ptrdiff_t axis, EVS ev = EVS())
-    {
-        return average(std::forward<E>(e), std::forward<W>(weights), std::array<std::ptrdiff_t, 1>({axis}), ev);
-    }
 
     template <class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, EVS>::value>>
@@ -1927,7 +1921,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             throw std::runtime_error("Weights need to have the same shape as expression.");
         }
 
-        auto div = sum(weights, xt::evaluation_strategy::immediate{})();
+        auto div = sum(weights, evaluation_strategy::immediate{})();
         auto s = sum(std::forward<E>(e) * std::forward<W>(weights), ev) / std::move(div);
         return s;
     }
@@ -1985,7 +1979,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an \ref xarray<T>
      */
     template <class E>
-    inline auto cumsum(E&& e, std::size_t axis)
+    inline auto cumsum(E&& e, std::ptrdiff_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::plus<result_type>()), std::forward<E>(e), axis);
@@ -2009,7 +2003,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an \ref xarray<T>
      */
     template <class E>
-    inline auto cumprod(E&& e, std::size_t axis)
+    inline auto cumprod(E&& e, std::ptrdiff_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::multiplies<result_type>()), std::forward<E>(e), axis);
@@ -2256,7 +2250,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an xaccumulator
      */
     template <class E>
-    inline auto nancumsum(E&& e, std::size_t axis)
+    inline auto nancumsum(E&& e, std::ptrdiff_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), detail::nan_init<result_type, 0>()), std::forward<E>(e), axis);
@@ -2280,7 +2274,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an xaccumulator
      */
     template <class E>
-    inline auto nancumprod(E&& e, std::size_t axis)
+    inline auto nancumprod(E&& e, std::ptrdiff_t axis)
     {
         using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), detail::nan_init<result_type, 1>()), std::forward<E>(e), axis);
@@ -2301,7 +2295,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             template <class Arg>
             inline void operator()(Arg& ad, const std::size_t& n,
                                    xstrided_slice_vector& slice1, xstrided_slice_vector& slice2,
-                                   const std::size_t& saxis)
+                                   std::size_t saxis)
             {
                 for (std::size_t i = 0; i < n; ++i)
                 {
@@ -2317,7 +2311,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             template <class Arg>
             inline void operator()(Arg& ad, const std::size_t& n,
                                    xstrided_slice_vector& slice1, xstrided_slice_vector& slice2,
-                                   const std::size_t& saxis)
+                                   std::size_t saxis)
             {
                 for (std::size_t i = 0; i < n; ++i)
                 {
@@ -2342,16 +2336,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     auto diff(const xexpression<T>& a, std::size_t n = 1, std::ptrdiff_t axis = -1)
     {
         auto ad = a.derived_cast();
-        std::size_t saxis = static_cast<std::size_t>(axis);
+        std::size_t saxis = normalize_axis(ad.dimension(), axis);
 
         if (n == 0)
         {
             return eval(ad);
-        }
-
-        if (axis == -1)
-        {
-            saxis = ad.dimension() - 1;
         }
 
         xstrided_slice_vector slice1(ad.dimension(), all());
@@ -2378,12 +2367,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     auto trapz(const xexpression<T>& y, double dx = 1.0, std::ptrdiff_t axis = -1)
     {
         auto& yd = y.derived_cast();
-        std::size_t saxis = static_cast<std::size_t>(axis);
-
-        if (axis == -1)
-        {
-          saxis = yd.dimension() - 1;
-        }
+        std::size_t saxis = normalize_axis(yd.dimension(), axis);
 
         xstrided_slice_vector slice1(yd.dimension(), all());
         xstrided_slice_vector slice2(yd.dimension(), all());
@@ -2412,12 +2396,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         auto& xd = x.derived_cast();
         decltype(diff(x)) dx;
 
-        std::size_t saxis = static_cast<std::size_t>(axis);
-
-        if (axis == -1)
-        {
-            saxis = yd.dimension() - 1;
-        }
+        std::size_t saxis = normalize_axis(yd.dimension(), axis);
 
         if (xd.dimension() == 1)
         {
