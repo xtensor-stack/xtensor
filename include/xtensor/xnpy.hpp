@@ -103,6 +103,7 @@ namespace xt
             if (std::is_same<T, long double>::value) return 'f';
 
             if (std::is_same<T, char>::value) return 'i';
+            if (std::is_same<T, signed char>::value) return 'i';
             if (std::is_same<T, short>::value) return 'i';
             if (std::is_same<T, int>::value) return 'i';
             if (std::is_same<T, long>::value) return 'i';
