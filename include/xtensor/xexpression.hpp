@@ -368,12 +368,15 @@ namespace xt
         using difference_type = typename E::difference_type;
 
         using shape_type = typename E::shape_type;
-        using strides_type = typename E::strides_type;
-        using backstrides_type = typename E::backstrides_type;
 
         using inner_shape_type = typename E::inner_shape_type;
+
+        /* Temporarily disabled, in the future expose these types only if they exist.
+        using strides_type = typename E::strides_type;
+        using backstrides_type = typename E::backstrides_type;
         using inner_strides_type = typename E::inner_strides_type;
         using inner_backstrides_type = typename E::inner_backstrides_type;
+        */
 
         using stepper = typename E::stepper;
         using const_stepper = typename E::const_stepper;
@@ -404,7 +407,8 @@ namespace xt
         XTENSOR_FORWARD_METHOD(storage_end);
         XTENSOR_FORWARD_METHOD(storage_cend);
         XTENSOR_FORWARD_METHOD(layout);
-        
+       
+        /* Temporarily disabled, in the future expose these functions only if they exist.
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
         XTENSOR_FORWARD_METHOD(strides);
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
@@ -413,6 +417,7 @@ namespace xt
         XTENSOR_FORWARD_METHOD(data_offset);
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
         XTENSOR_FORWARD_METHOD(storage);
+        */
        
         template <class It>
         auto element(It first, It last) {
@@ -500,7 +505,7 @@ namespace xt
     template <class E>
     auto make_xshared(xexpression<E>&& expr)
     {
-        return xshared_expression<E>(std::make_shared<E>(expr));
+        return xshared_expression<E>(std::make_shared<E>(std::move(expr).derived_cast()));
     }
 
 #undef XTENSOR_FORWARD_METHOD
