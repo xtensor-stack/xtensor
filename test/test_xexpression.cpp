@@ -7,10 +7,12 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include <sstream>
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xexpression.hpp"
 #include "xtensor/xmath.hpp"
+#include "xtensor/xio.hpp"
 
 namespace xt
 {
@@ -42,6 +44,10 @@ namespace xt
         EXPECT_EQ(sa.use_count(), 1);
         auto cpysa = sa;
         EXPECT_EQ(sa.use_count(), 2);
+        
+        std::stringstream buffer;
+        buffer << sa;
+        EXPECT_EQ(buffer.str(), "{{ 1.,  2.,  3.,  4.},\n { 5.,  6.,  7.,  8.}}");
     }
 
     TEST(xexpression, shared_xfunctions)
@@ -56,6 +62,9 @@ namespace xt
 
         EXPECT_EQ(sa.use_count(), 3);
         EXPECT_TRUE(all(equal(expr1, expr2)));
+        std::stringstream buffer;
+        buffer << expr1;
+        EXPECT_EQ(buffer.str(), "{{  2.,   4.,   6.,   8.},\n { 10.,  12.,  14.,  16.}}");
     }
 
     TEST(xexpression, shared_expr_return)

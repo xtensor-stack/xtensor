@@ -403,7 +403,8 @@ namespace xt
         XTENSOR_FORWARD_METHOD(storage_cbegin);
         XTENSOR_FORWARD_METHOD(storage_end);
         XTENSOR_FORWARD_METHOD(storage_cend);
-
+        XTENSOR_FORWARD_METHOD(layout);
+        
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
         XTENSOR_FORWARD_METHOD(strides);
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
@@ -412,6 +413,16 @@ namespace xt
         XTENSOR_FORWARD_METHOD(data_offset);
         template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
         XTENSOR_FORWARD_METHOD(storage);
+       
+        template <class It>
+        auto element(It first, It last) {
+            return m_ptr->element(first, last); 
+        }
+        
+        template <class It>
+        auto element(It first, It last) const {
+            return m_ptr->element(first, last); 
+        }
 
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const
