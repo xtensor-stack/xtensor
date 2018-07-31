@@ -80,6 +80,9 @@ namespace xt
 
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
+        using inner_strides_type = typename base_type::inner_strides_type;
+        using inner_backstrides_type = typename base_type::inner_backstrides_type;
+
         using shape_type = typename base_type::shape_type;
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
@@ -121,7 +124,7 @@ namespace xt
         // Explicitly deleting strides method to avoid compilers complaining
         // about not being able to call the strides method from xstrided_view_base
         // private base
-        const strides_type& strides() const = delete;
+        const inner_strides_type& strides() const noexcept = delete;
 
         reference operator()();
         const_reference operator()() const;
@@ -193,7 +196,7 @@ namespace xt
         using offset_type = typename base_type::offset_type;
 
         slice_vector_type m_slices;
-        strides_type m_adj_strides;
+        inner_strides_type m_adj_strides;
 
         container_iterator data_xbegin() noexcept;
         const_container_iterator data_xbegin() const noexcept;

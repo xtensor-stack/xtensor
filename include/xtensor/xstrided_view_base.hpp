@@ -45,6 +45,10 @@ namespace xt
         using strides_type = get_strides_t<shape_type>;
         using backstrides_type = strides_type;
 
+        using inner_shape_type = shape_type;
+        using inner_strides_type = strides_type;
+        using inner_backstrides_type = backstrides_type;
+
         static constexpr layout_type static_layout = L;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
@@ -61,9 +65,9 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const noexcept;
-        const strides_type& strides() const noexcept;
-        const backstrides_type& backstrides() const noexcept;
+        const inner_shape_type& shape() const noexcept;
+        const inner_strides_type& strides() const noexcept;
+        const inner_backstrides_type& backstrides() const noexcept;
         layout_type layout() const noexcept;
 
         reference operator()();
@@ -142,9 +146,9 @@ namespace xt
 
         CT m_e;
         inner_storage_type m_storage;
-        shape_type m_shape;
-        strides_type m_strides;
-        backstrides_type m_backstrides;
+        inner_shape_type m_shape;
+        inner_strides_type m_strides;
+        inner_backstrides_type m_backstrides;
         std::size_t m_offset;
         layout_type m_layout;
     };
@@ -387,7 +391,7 @@ namespace xt
      * Returns the shape of the xtrided_view_base.
      */
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view_base<CT, S, L, FST>::shape() const noexcept -> const shape_type&
+    inline auto xstrided_view_base<CT, S, L, FST>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
     }
@@ -396,7 +400,7 @@ namespace xt
      * Returns the strides of the xtrided_view_base.
      */
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view_base<CT, S, L, FST>::strides() const noexcept -> const strides_type&
+    inline auto xstrided_view_base<CT, S, L, FST>::strides() const noexcept -> const inner_strides_type&
     {
         return m_strides;
     }
@@ -405,7 +409,7 @@ namespace xt
      * Returns the backstrides of the xtrided_view_base.
      */
     template <class CT, class S, layout_type L, class FST>
-    inline auto xstrided_view_base<CT, S, L, FST>::backstrides() const noexcept -> const backstrides_type&
+    inline auto xstrided_view_base<CT, S, L, FST>::backstrides() const noexcept -> const inner_backstrides_type&
     {
         return m_backstrides;
     }
