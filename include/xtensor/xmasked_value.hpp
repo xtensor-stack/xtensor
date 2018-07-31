@@ -16,8 +16,14 @@
 
 namespace xt
 {
-    template <class T, class B>
+    template <class T, class B = bool>
     class xmasked_value;
+
+    template <class T>
+    inline xmasked_value<T, bool> missing() noexcept
+    {
+        return xmasked_value<T, bool>(T(0), false);
+    }
 
     namespace detail
     {
@@ -29,6 +35,64 @@ namespace xt
         template <class T, class B>
         struct is_xmasked_value_impl<xmasked_value<T, B>> : std::true_type
         {
+        };
+
+        template <class... Args>
+        struct common_masked_value_impl;
+
+        template <class T>
+        struct common_masked_value_impl<T>
+        {
+            using type = std::conditional_t<is_xmasked_value_impl<T>::value , T, xmasked_value<T>>;
+        };
+
+        template <class T>
+        struct id
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct get_value_type
+        {
+            using type = typename T::value_type;
+        };
+
+        template<class T1, class T2>
+        struct common_masked_value_impl<T1, T2>
+        {
+            using decay_t1 = std::decay_t<T1>;
+            using decay_t2 = std::decay_t<T2>;
+            using type1 = xtl::mpl::eval_if_t<std::is_fundamental<decay_t1>, id<decay_t1>, get_value_type<decay_t1>>;
+            using type2 = xtl::mpl::eval_if_t<std::is_fundamental<decay_t2>, id<decay_t2>, get_value_type<decay_t2>>;
+            using type = xmasked_value<std::common_type_t<type1, type2>>;
+        };
+
+        template <class T1, class T2, class B2>
+        struct common_masked_value_impl<T1, xmasked_value<T2, B2>>
+            : common_masked_value_impl<T1, T2>
+        {
+        };
+
+        template <class T1, class B1, class T2>
+        struct common_masked_value_impl<xmasked_value<T1, B1>, T2>
+            : common_masked_value_impl<T2, xmasked_value<T1, B1>>
+        {
+        };
+
+        template <class T1, class B1, class T2, class B2>
+        struct common_masked_value_impl<xmasked_value<T1, B1>, xmasked_value<T2, B2>>
+            : common_masked_value_impl<T1, T2>
+        {
+        };
+
+        template <class T1, class T2, class... Args>
+        struct common_masked_value_impl<T1, T2, Args...>
+        {
+            using type = typename common_masked_value_impl<
+                             typename common_masked_value_impl<T1, T2>::type,
+                             Args...
+                         >::type;
         };
     }
 
@@ -44,6 +108,14 @@ namespace xt
             !xtl::is_xoptional<E2>::value && !is_xmasked_value<E2>::value,
         R
     >;
+
+    template <class... Args>
+    struct common_masked_value : detail::common_masked_value_impl<Args...>
+    {
+    };
+
+    template <class... Args>
+    using common_masked_value_t = typename common_masked_value<Args...>::type;
 
     /****************
     * xmasked_value *
@@ -136,7 +208,8 @@ namespace xt
             return *this;                                                                     \
         }                                                                                     \
                                                                                               \
-        inline xmasked_value& operator OP(const xmasked_value<T, B>& value)                   \
+        template <class T1, class B1>                                                         \
+        inline xmasked_value& operator OP(const xmasked_value<T1, B1>& value)                 \
         {                                                                                     \
             m_flag = m_flag && value.has_value();                                             \
             if (m_flag)                                                                       \
@@ -169,6 +242,24 @@ namespace xt
         value_type m_value;
         flag_type m_flag;
     };
+
+    template <class T>
+    inline auto masked_value(T&& val) -> disable_xoptional_like<std::decay_t<T>, xmasked_value<T>>
+    {
+        return xmasked_value<T>(std::forward<T>(val));
+    }
+
+    template <class T, class B>
+    inline auto masked_value(const xtl::xoptional<T, B>& val)
+    {
+        return xmasked_value<T, B>(val);
+    }
+
+    template <class T, class B>
+    inline auto masked_value(T&& val, B&& mask)
+    {
+        return xmasked_value<T, B>(std::forward<T>(val), std::forward<B>(mask));
+    }
 
     template <class T1, class B1, class T2, class B2>
     inline bool operator==(const xmasked_value<T1, B1>& lhs, const xmasked_value<T2, B2>& rhs) noexcept
@@ -246,17 +337,17 @@ namespace xt
 
     template <class T, class B>
     inline auto operator~(const xmasked_value<T, B>& e) noexcept
-        -> xtl::xoptional<std::decay_t<T>>
+        -> xmasked_value<std::decay_t<T>>
     {
         using value_type = std::decay_t<T>;
-        return e.has_value() ? ~e.value() : xtl::missing<value_type>();
+        return e.has_value() ? masked_value(~e.value()) : missing<value_type>();
     }
 
     template <class T, class B>
     inline auto operator!(const xmasked_value<T, B>& e) noexcept
-        -> xtl::xoptional<bool>
+        -> xmasked_value<bool>
     {
-        return e.has_value() ? !e.value() : xtl::missing<bool>();
+        return e.has_value() ? masked_value(!e.value()) : missing<bool>();
     }
 
     template <class T, class B, class OC, class OT>
@@ -273,81 +364,81 @@ namespace xt
         return out;
     }
 
-#define DEFINE_OPERATOR(OP)                                                                                         \
-    template <class T1, class B1, class T2, class B2>                                                               \
-    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept             \
-        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>                                   \
-    {                                                                                                               \
-        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                  \
-        return e1.has_value() && e2.has_value() ? e1.value() OP e2.value() : xtl::missing<value_type>();            \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class B1, class T2, class B2>                                                               \
-    inline auto operator OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept             \
-        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>                                   \
-    {                                                                                                               \
-        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                  \
-        return e1.has_value() && e2.has_value() ? e1.value() OP e2.value() : xtl::missing<value_type>();            \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class B1, class T2, class B2>                                                               \
-    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept              \
-        -> xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>                                   \
-    {                                                                                                               \
-        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                  \
-        return e1.has_value() && e2.has_value() ? e1.value() OP e2.value() : xtl::missing<value_type>();            \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class B1, class T2>                                                                         \
-    inline auto operator OP(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept                                 \
-        -> disable_xoptional_like<T2, xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>>       \
-    {                                                                                                               \
-        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                  \
-        return e1.has_value() ? e1.value() OP e2 : xtl::missing<value_type>();                                      \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class T2, class B2>                                                                         \
-    inline auto operator OP(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept                                 \
-        -> disable_xoptional_like<T1, xtl::xoptional<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>>       \
-    {                                                                                                               \
-        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                  \
-        return e2.has_value() ? e1 OP e2.value() : xtl::missing<value_type>();                                      \
+#define DEFINE_OPERATOR(OP)                                                                                      \
+    template <class T1, class B1, class T2, class B2>                                                            \
+    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept          \
+        -> xmasked_value<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>                                 \
+    {                                                                                                            \
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                               \
+        return e1.has_value() && e2.has_value() ? masked_value(e1.value() OP e2.value()) : missing<value_type>();\
+    }                                                                                                            \
+                                                                                                                 \
+    template <class T1, class B1, class T2, class B2>                                                            \
+    inline auto operator OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept          \
+        -> xmasked_value<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>                                 \
+    {                                                                                                            \
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                               \
+        return e1.has_value() && e2.has_value() ? masked_value(e1.value() OP e2.value()) : missing<value_type>();\
+    }                                                                                                            \
+                                                                                                                 \
+    template <class T1, class B1, class T2, class B2>                                                            \
+    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept           \
+        -> xmasked_value<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>                                 \
+    {                                                                                                            \
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                               \
+        return e1.has_value() && e2.has_value() ? masked_value(e1.value() OP e2.value()) : missing<value_type>();\
+    }                                                                                                            \
+                                                                                                                 \
+    template <class T1, class B1, class T2>                                                                      \
+    inline auto operator OP(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept                              \
+        -> disable_xoptional_like<T2, xmasked_value<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>>     \
+    {                                                                                                            \
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                               \
+        return e1.has_value() ? masked_value(e1.value() OP e2) : missing<value_type>();                          \
+    }                                                                                                            \
+                                                                                                                 \
+    template <class T1, class T2, class B2>                                                                      \
+    inline auto operator OP(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept                              \
+        -> disable_xoptional_like<T1, xmasked_value<xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>>>     \
+    {                                                                                                            \
+        using value_type = xt::promote_type_t<std::decay_t<T1>, std::decay_t<T2>>;                               \
+        return e2.has_value() ? masked_value(e1 OP e2.value()) : missing<value_type>();                          \
     }
 
-#define DEFINE_BOOL_OPERATOR(OP)                                                                                    \
-    template <class T1, class B1, class T2, class B2>                                                               \
-    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept             \
-        -> xtl::xoptional<bool>                                                                                     \
-    {                                                                                                               \
-        return e1.has_value() && e2.has_value() ? e1.value() OP e2.value() : xtl::missing<bool>();                  \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class B1, class T2, class B2>                                                               \
-    inline auto operator OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept             \
-        -> xtl::xoptional<bool>                                                                                     \
-    {                                                                                                               \
-        return e1.has_value() && e2.has_value() ? e1.value() OP e2.value() : xtl::missing<bool>();                  \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class B1, class T2, class B2>                                                               \
-    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept              \
-        -> xtl::xoptional<bool>                                                                                     \
-    {                                                                                                               \
-        return e1.has_value() && e2.has_value() ? e1.value() OP e2.value() : xtl::missing<bool>();                  \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class B1, class T2>                                                                         \
-    inline auto operator OP(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept                                 \
-        -> disable_xoptional_like<T2, xtl::xoptional<bool>>                                                         \
-    {                                                                                                               \
-        return e1.has_value() ? e1.value() OP e2 : xtl::missing<bool>();                                            \
-    }                                                                                                               \
-                                                                                                                    \
-    template <class T1, class T2, class B2>                                                                         \
-    inline auto operator OP(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept                                 \
-        -> disable_xoptional_like<T1, xtl::xoptional<bool>>                                                         \
-    {                                                                                                               \
-        return e2.has_value() ? e1 OP e2.value() : xtl::missing<bool>();                                            \
+#define DEFINE_BOOL_OPERATOR(OP)                                                                           \
+    template <class T1, class B1, class T2, class B2>                                                      \
+    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2) noexcept    \
+        -> xmasked_value<bool>                                                                             \
+    {                                                                                                      \
+        return e1.has_value() && e2.has_value() ? masked_value(e1.value() OP e2.value()) : missing<bool>();\
+    }                                                                                                      \
+                                                                                                           \
+    template <class T1, class B1, class T2, class B2>                                                      \
+    inline auto operator OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept    \
+        -> xmasked_value<bool>                                                                             \
+    {                                                                                                      \
+        return e1.has_value() && e2.has_value() ? masked_value(e1.value() OP e2.value()) : missing<bool>();\
+    }                                                                                                      \
+                                                                                                           \
+    template <class T1, class B1, class T2, class B2>                                                      \
+    inline auto operator OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2) noexcept     \
+        -> xmasked_value<bool>                                                                             \
+    {                                                                                                      \
+        return e1.has_value() && e2.has_value() ? masked_value(e1.value() OP e2.value()) : missing<bool>();\
+    }                                                                                                      \
+                                                                                                           \
+    template <class T1, class B1, class T2>                                                                \
+    inline auto operator OP(const xmasked_value<T1, B1>& e1, const T2& e2) noexcept                        \
+        -> disable_xoptional_like<T2, xmasked_value<bool>>                                                 \
+    {                                                                                                      \
+        return e1.has_value() ? masked_value(e1.value() OP e2) : missing<bool>();                          \
+    }                                                                                                      \
+                                                                                                           \
+    template <class T1, class T2, class B2>                                                                \
+    inline auto operator OP(const T1& e1, const xmasked_value<T2, B2>& e2) noexcept                        \
+        -> disable_xoptional_like<T1, xmasked_value<bool>>                                                 \
+    {                                                                                                      \
+        return e2.has_value() ? masked_value(e1 OP e2.value()) : missing<bool>();                          \
     }
 
     DEFINE_OPERATOR(+);
@@ -365,63 +456,63 @@ namespace xt
     DEFINE_BOOL_OPERATOR(>);
     DEFINE_BOOL_OPERATOR(>=);
 
-#define DEFINE_UNARY_OPERATOR(OP)                                                    \
-    template <class T, class B>                                                      \
-    inline xtl::xoptional<std::decay_t<T>> OP(const xmasked_value<T, B>& e)          \
-    {                                                                                \
-        return e.has_value() ? std::OP(e.value()) : xtl::missing<std::decay_t<T>>(); \
+#define DEFINE_UNARY_OPERATOR(OP)                                                             \
+    template <class T, class B>                                                               \
+    inline xmasked_value<std::decay_t<T>> OP(const xmasked_value<T, B>& e)                    \
+    {                                                                                         \
+        return e.has_value() ? masked_value(std::OP(e.value())) : missing<std::decay_t<T>>(); \
     }
 
-#define DEFINE_UNARY_BOOL_OPERATOR(OP)                                          \
-    template <class T, class B>                                                 \
-    inline xtl::xoptional<bool> OP(const xmasked_value<T, B>& e)                \
-    {                                                                           \
-        return e.has_value() ? bool(std::OP(e.value())) : xtl::missing<bool>(); \
+#define DEFINE_UNARY_BOOL_OPERATOR(OP)                                                   \
+    template <class T, class B>                                                          \
+    inline xmasked_value<bool> OP(const xmasked_value<T, B>& e)                          \
+    {                                                                                    \
+        return e.has_value() ? masked_value(bool(std::OP(e.value()))) : missing<bool>(); \
     }
 
-#define DEFINE_BINARY_OPERATOR_MM(OP)                                                                           \
-    template <class T1, class B1, class T2, class B2>                                                           \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2)                            \
-        -> xtl::common_optional_t<T1, T2>                                                                       \
-    {                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;                              \
-        return e1.has_value() && e2.has_value() ? std::OP(e1.value(), e2.value()) : xtl::missing<value_type>(); \
+#define DEFINE_BINARY_OPERATOR_MM(OP)                                                                                    \
+    template <class T1, class B1, class T2, class B2>                                                                    \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2)                                     \
+        -> common_masked_value_t<T1, T2>                                                                                 \
+    {                                                                                                                    \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                       \
+        return e1.has_value() && e2.has_value() ? masked_value(std::OP(e1.value(), e2.value())) : missing<value_type>(); \
     }
 
-#define DEFINE_BINARY_OPERATOR_MT(OP)                                                   \
-    template <class T1, class B1, class T2>                                             \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const T2& e2)                       \
-        -> disable_xoptional_like<T2, xtl::common_optional_t<T1, T2>>                   \
-    {                                                                                   \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;      \
-        return e1.has_value() ? std::OP(e1.value(), e2) : xtl::missing<value_type>();   \
+#define DEFINE_BINARY_OPERATOR_MT(OP)                                                            \
+    template <class T1, class B1, class T2>                                                      \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const T2& e2)                                \
+        -> disable_xoptional_like<T2, common_masked_value_t<T1, T2>>                             \
+    {                                                                                            \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;               \
+        return e1.has_value() ? masked_value(std::OP(e1.value(), e2)) : missing<value_type>();   \
     }
 
-#define DEFINE_BINARY_OPERATOR_TM(OP)                                                   \
-    template <class T1, class T2, class B2>                                             \
-    inline auto OP(const T1& e1, const xmasked_value<T2, B2>& e2)                       \
-        -> disable_xoptional_like<T1, xtl::common_optional_t<T1, T2>>                   \
-    {                                                                                   \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;      \
-        return e2.has_value() ? std::OP(e1, e2.value()) : xtl::missing<value_type>();   \
+#define DEFINE_BINARY_OPERATOR_TM(OP)                                                            \
+    template <class T1, class T2, class B2>                                                      \
+    inline auto OP(const T1& e1, const xmasked_value<T2, B2>& e2)                                \
+        -> disable_xoptional_like<T1, common_masked_value_t<T1, T2>>                             \
+    {                                                                                            \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;               \
+        return e2.has_value() ? masked_value(std::OP(e1, e2.value())) : missing<value_type>();   \
     }
 
-#define DEFINE_BINARY_OPERATOR_MO(OP)                                                                           \
-    template <class T1, class B1, class T2, class B2>                                                           \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2)                           \
-        -> xtl::common_optional_t<T1, T2>                                                                       \
-    {                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;                              \
-        return e1.has_value() && e2.has_value() ? std::OP(e1.value(), e2.value()) : xtl::missing<value_type>(); \
+#define DEFINE_BINARY_OPERATOR_MO(OP)                                                                                    \
+    template <class T1, class B1, class T2, class B2>                                                                    \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2)                                    \
+        -> common_masked_value_t<T1, T2>                                                                                 \
+    {                                                                                                                    \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                       \
+        return e1.has_value() && e2.has_value() ? masked_value(std::OP(e1.value(), e2.value())) : missing<value_type>(); \
     }
 
-#define DEFINE_BINARY_OPERATOR_OM(OP)                                                                           \
-    template <class T1, class B1, class T2, class B2>                                                           \
-    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2)                           \
-        -> xtl::common_optional_t<T1, T2>                                                                       \
-    {                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;                              \
-        return e1.has_value() && e2.has_value() ? std::OP(e1.value(), e2.value()) : xtl::missing<value_type>(); \
+#define DEFINE_BINARY_OPERATOR_OM(OP)                                                                                    \
+    template <class T1, class B1, class T2, class B2>                                                                    \
+    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2)                                    \
+        -> common_masked_value_t<T1, T2>                                                                                 \
+    {                                                                                                                    \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>>;                                       \
+        return e1.has_value() && e2.has_value() ? masked_value(std::OP(e1.value(), e2.value())) : missing<value_type>(); \
     }
 
 #define DEFINE_BINARY_OPERATOR(OP)  \
@@ -431,175 +522,191 @@ namespace xt
     DEFINE_BINARY_OPERATOR_MO(OP)   \
     DEFINE_BINARY_OPERATOR_OM(OP)
 
-#define DEFINE_TERNARY_OPERATOR_MMM(OP)                                                                                                         \
-    template <class T1, class B1, class T2, class B2, class T3, class B3>                                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xmasked_value<T3, B3>& e3)                           \
-        -> xtl::common_optional_t<T1, T2>                                                                                                       \
-    {                                                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                            \
-        return (e1.has_value() && e2.has_value() && e3.has_value()) ? std::OP(e1.value(), e2.value(), e3.value()) : xtl::missing<value_type>(); \
-    }
-
-#define DEFINE_TERNARY_OPERATOR_MMT(OP)                                                                               \
-    template <class T1, class B1, class T2, class B2, class T3>                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const T3& e3)                    \
-        -> disable_xoptional_like<T3, xtl::common_optional_t<T1, T2, T3>>                                             \
+#define DEFINE_TERNARY_OPERATOR_MMM(OP)                                                                               \
+    template <class T1, class B1, class T2, class B2, class T3, class B3>                                             \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xmasked_value<T3, B3>& e3) \
+        -> common_masked_value_t<T1, T2>                                                                              \
     {                                                                                                                 \
         using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e1.has_value() && e2.has_value()) ? std::OP(e1.value(), e2.value(), e3) : xtl::missing<value_type>(); \
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?                                                 \
+                masked_value(std::OP(e1.value(), e2.value(), e3.value())) : missing<value_type>();                    \
     }
 
-#define DEFINE_TERNARY_OPERATOR_MTM(OP)                                                                               \
-    template <class T1, class B1, class T2, class T3, class B3>                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const T2& e2, const xmasked_value<T3, B3>& e3)                    \
-        -> disable_xoptional_like<T2, xtl::common_optional_t<T1, T2, T3>>                                             \
-    {                                                                                                                 \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e1.has_value() && e3.has_value()) ? std::OP(e1.value(), e2, e3.value()) : xtl::missing<value_type>(); \
+#define DEFINE_TERNARY_OPERATOR_MMT(OP)                                                              \
+    template <class T1, class B1, class T2, class B2, class T3>                                      \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const T3& e3)   \
+        -> disable_xoptional_like<T3, common_masked_value_t<T1, T2, T3>>                             \
+    {                                                                                                \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
+        return (e1.has_value() && e2.has_value()) ?                                                  \
+                masked_value(std::OP(e1.value(), e2.value(), e3)) : missing<value_type>();           \
     }
 
-#define DEFINE_TERNARY_OPERATOR_TMM(OP)                                                                               \
-    template <class T1, class T2, class B2, class T3, class B3>                                                       \
-    inline auto OP(const T1& e1, const xmasked_value<T2, B2>& e2, const xmasked_value<T3, B3>& e3)                    \
-        -> disable_xoptional_like<T1, xtl::common_optional_t<T1, T2, T3>>                                             \
-    {                                                                                                                 \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e2.has_value() && e3.has_value()) ? std::OP(e1, e2.value(), e3.value()) : xtl::missing<value_type>(); \
+#define DEFINE_TERNARY_OPERATOR_MTM(OP)                                                              \
+    template <class T1, class B1, class T2, class T3, class B3>                                      \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const T2& e2, const xmasked_value<T3, B3>& e3)   \
+        -> disable_xoptional_like<T2, common_masked_value_t<T1, T2, T3>>                             \
+    {                                                                                                \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
+        return (e1.has_value() && e3.has_value()) ?                                                  \
+                masked_value(std::OP(e1.value(), e2, e3.value())) : missing<value_type>();           \
+    }
+
+#define DEFINE_TERNARY_OPERATOR_TMM(OP)                                                              \
+    template <class T1, class T2, class B2, class T3, class B3>                                      \
+    inline auto OP(const T1& e1, const xmasked_value<T2, B2>& e2, const xmasked_value<T3, B3>& e3)   \
+        -> disable_xoptional_like<T1, common_masked_value_t<T1, T2, T3>>                             \
+    {                                                                                                \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
+        return (e2.has_value() && e3.has_value()) ?                                                  \
+                masked_value(std::OP(e1, e2.value(), e3.value())) : missing<value_type>();           \
     }
 
 #define DEFINE_TERNARY_OPERATOR_TTM(OP)                                                              \
     template <class T1, class T2, class T3, class B3>                                                \
     inline auto OP(const T1& e1, const T2& e2, const xmasked_value<T3, B3>& e3)                      \
-        -> disable_both_xoptional_like<T1, T2, xtl::common_optional_t<T1, T2, T3>>                   \
+        -> disable_both_xoptional_like<T1, T2, common_masked_value_t<T1, T2, T3>>                    \
     {                                                                                                \
         using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
-        return e3.has_value() ? std::OP(e1, e2, e3.value()) : xtl::missing<value_type>();            \
+        return e3.has_value() ? masked_value(std::OP(e1, e2, e3.value())) : missing<value_type>();   \
     }
 
 #define DEFINE_TERNARY_OPERATOR_TMT(OP)                                                              \
     template <class T1, class T2, class B2, class T3>                                                \
     inline auto OP(const T1& e1, const xmasked_value<T2, B2>& e2, const T3& e3)                      \
-        -> disable_both_xoptional_like<T1, T3, xtl::common_optional_t<T1, T2, T3>>                   \
+        -> disable_both_xoptional_like<T1, T3, common_masked_value_t<T1, T2, T3>>                    \
     {                                                                                                \
         using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
-        return e2.has_value() ? std::OP(e1, e2.value(), e3) : xtl::missing<value_type>();            \
+        return e2.has_value() ? masked_value(std::OP(e1, e2.value(), e3)) : missing<value_type>();   \
     }
 
 #define DEFINE_TERNARY_OPERATOR_MTT(OP)                                                              \
     template <class T1, class B1, class T2, class T3>                                                \
     inline auto OP(const xmasked_value<T1, B1>& e1, const T2& e2, const T3& e3)                      \
-        -> disable_both_xoptional_like<T2, T3, xtl::common_optional_t<T1, T2, T3>>                   \
+        -> disable_both_xoptional_like<T2, T3, common_masked_value_t<T1, T2, T3>>                    \
     {                                                                                                \
         using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>; \
-        return e1.has_value() ? std::OP(e1.value(), e2, e3) : xtl::missing<value_type>();            \
+        return e1.has_value() ? masked_value(std::OP(e1.value(), e2, e3)) : missing<value_type>();   \
     }
 
-#define DEFINE_TERNARY_OPERATOR_MMO(OP)                                                                                                         \
-    template <class T1, class B1, class T2, class B2, class T3, class B3>                                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3)                          \
-        -> xtl::common_optional_t<T1, T2, T3>                                                                                                   \
-    {                                                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                            \
-        return (e1.has_value() && e2.has_value() && e3.has_value()) ? std::OP(e1.value(), e2.value(), e3.value()) : xtl::missing<value_type>(); \
-    }
-
-#define DEFINE_TERNARY_OPERATOR_MOM(OP)                                                                                                         \
-    template <class T1, class B1, class T2, class B2, class T3, class B3>                                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const xmasked_value<T3, B3>& e3)                          \
-        -> xtl::common_optional_t<T1, T2, T3>                                                                                                   \
-    {                                                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                            \
-        return (e1.has_value() && e2.has_value() && e3.has_value()) ? std::OP(e1.value(), e2.value(), e3.value()) : xtl::missing<value_type>(); \
-    }
-
-#define DEFINE_TERNARY_OPERATOR_OMM(OP)                                                                                                         \
-    template <class T1, class B1, class T2, class B2, class T3, class B3>                                                                       \
-    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xmasked_value<T3, B3>& e3)                          \
-        -> xtl::common_optional_t<T1, T2, T3>                                                                                                   \
-    {                                                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                            \
-        return (e1.has_value() && e2.has_value() && e3.has_value()) ? std::OP(e1.value(), e2.value(), e3.value()) : xtl::missing<value_type>(); \
-    }
-
-#define DEFINE_TERNARY_OPERATOR_OOM(OP)                                                                                                         \
-    template <class T1, class B1, class T2, class B2, class T3, class B3>                                                                       \
-    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const xmasked_value<T3, B3>& e3)                         \
-        -> xtl::common_optional_t<T1, T2, T3>                                                                                                   \
-    {                                                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                            \
-        return (e1.has_value() && e2.has_value() && e3.has_value()) ? std::OP(e1.value(), e2.value(), e3.value()) : xtl::missing<value_type>(); \
-    }
-
-#define DEFINE_TERNARY_OPERATOR_OMO(OP)                                                                                                         \
-    template <class T1, class B1, class T2, class B2, class T3, class B3>                                                                       \
-    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3)                         \
-        -> xtl::common_optional_t<T1, T2, T3>                                                                                                   \
-    {                                                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                            \
-        return (e1.has_value() && e2.has_value() && e3.has_value()) ? std::OP(e1.value(), e2.value(), e3.value()) : xtl::missing<value_type>(); \
-    }
-
-#define DEFINE_TERNARY_OPERATOR_MOO(OP)                                                                                                         \
-    template <class T1, class B1, class T2, class B2, class T3, class B3>                                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3)                         \
-        -> xtl::common_optional_t<T1, T2, T3>                                                                                                   \
-    {                                                                                                                                           \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                                            \
-        return (e1.has_value() && e2.has_value() && e3.has_value()) ? std::OP(e1.value(), e2.value(), e3.value()) : xtl::missing<value_type>(); \
-    }
-
-#define DEFINE_TERNARY_OPERATOR_TMO(OP)                                                                               \
-    template <class T1, class T2, class B2, class T3, class B3>                                                       \
-    inline auto OP(const T1& e1, const xmasked_value<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3)                   \
-        -> disable_xoptional_like<T1, xtl::common_optional_t<T1, T2, T3>>                                             \
+#define DEFINE_TERNARY_OPERATOR_MMO(OP)                                                                               \
+    template <class T1, class B1, class T2, class B2, class T3, class B3>                                             \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3)\
+        -> common_masked_value_t<T1, T2, T3>                                                                          \
     {                                                                                                                 \
         using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e2.has_value() && e3.has_value()) ? std::OP(e1, e2.value(), e3.value()) : xtl::missing<value_type>(); \
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?                                                 \
+                masked_value(std::OP(e1.value(), e2.value(), e3.value())) : missing<value_type>();                    \
     }
 
-#define DEFINE_TERNARY_OPERATOR_MTO(OP)                                                                               \
-    template <class T1, class B1, class T2, class T3, class B3>                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const T2& e2, const xtl::xoptional<T3, B3>& e3)                   \
-        -> disable_xoptional_like<T2, xtl::common_optional_t<T1, T2, T3>>                                             \
+#define DEFINE_TERNARY_OPERATOR_MOM(OP)                                                                               \
+    template <class T1, class B1, class T2, class B2, class T3, class B3>                                             \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const xmasked_value<T3, B3>& e3)\
+        -> common_masked_value_t<T1, T2, T3>                                                                          \
     {                                                                                                                 \
         using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e1.has_value() && e3.has_value()) ? std::OP(e1.value(), e2, e3.value()) : xtl::missing<value_type>(); \
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?                                                 \
+                masked_value(std::OP(e1.value(), e2.value(), e3.value())) : missing<value_type>();                    \
     }
 
-#define DEFINE_TERNARY_OPERATOR_MOT(OP)                                                                               \
-    template <class T1, class B1, class T2, class B2, class T3>                                                       \
-    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const T3& e3)                   \
-        -> disable_xoptional_like<T3, xtl::common_optional_t<T1, T2, T3>>                                             \
+#define DEFINE_TERNARY_OPERATOR_OMM(OP)                                                                               \
+    template <class T1, class B1, class T2, class B2, class T3, class B3>                                             \
+    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xmasked_value<T3, B3>& e3)\
+        -> common_masked_value_t<T1, T2, T3>                                                                          \
     {                                                                                                                 \
         using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e1.has_value() && e2.has_value()) ? std::OP(e1.value(), e2.value(), e3) : xtl::missing<value_type>(); \
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?                                                 \
+                masked_value(std::OP(e1.value(), e2.value(), e3.value())) : missing<value_type>();                    \
     }
 
-#define DEFINE_TERNARY_OPERATOR_OMT(OP)                                                                               \
-    template <class T1, class B1, class T2, class B2, class T3>                                                       \
-    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const T3& e3)                   \
-        -> disable_xoptional_like<T3, xtl::common_optional_t<T1, T2, T3>>                                             \
-    {                                                                                                                 \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e1.has_value() && e2.has_value()) ? std::OP(e1.value(), e2.value(), e3) : xtl::missing<value_type>(); \
+#define DEFINE_TERNARY_OPERATOR_OOM(OP)                                                                                \
+    template <class T1, class B1, class T2, class B2, class T3, class B3>                                              \
+    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const xmasked_value<T3, B3>& e3)\
+        -> common_masked_value_t<T1, T2, T3>                                                                           \
+    {                                                                                                                  \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                   \
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?                                                  \
+                masked_value(std::OP(e1.value(), e2.value(), e3.value())) : missing<value_type>();                     \
     }
 
-#define DEFINE_TERNARY_OPERATOR_OTM(OP)                                                                               \
-    template <class T1, class B1, class T2, class T3, class B3>                                                       \
-    inline auto OP(const xtl::xoptional<T1, B1>& e1, const T2& e2, const xmasked_value<T3, B3>& e3)                   \
-        -> disable_xoptional_like<T2, xtl::common_optional_t<T1, T2, T3>>                                             \
-    {                                                                                                                 \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e1.has_value() && e3.has_value()) ? std::OP(e1.value(), e2, e3.value()) : xtl::missing<value_type>(); \
+#define DEFINE_TERNARY_OPERATOR_OMO(OP)                                                                                 \
+    template <class T1, class B1, class T2, class B2, class T3, class B3>                                               \
+    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3) \
+        -> common_masked_value_t<T1, T2, T3>                                                                            \
+    {                                                                                                                   \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                    \
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?                                                   \
+                masked_value(std::OP(e1.value(), e2.value(), e3.value())) : missing<value_type>();                      \
     }
 
-#define DEFINE_TERNARY_OPERATOR_TOM(OP)                                                                               \
-    template <class T1, class T2, class B2, class T3, class B3>                                                       \
-    inline auto OP(const T1& e1, const xtl::xoptional<T2, B2>& e2, const xmasked_value<T3, B3>& e3)                   \
-        -> disable_xoptional_like<T1, xtl::common_optional_t<T1, T2, T3>>                                             \
-    {                                                                                                                 \
-        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                  \
-        return (e2.has_value() && e3.has_value()) ? std::OP(e1, e2.value(), e3.value()) : xtl::missing<value_type>(); \
+#define DEFINE_TERNARY_OPERATOR_MOO(OP)                                                                                 \
+    template <class T1, class B1, class T2, class B2, class T3, class B3>                                               \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3) \
+        -> common_masked_value_t<T1, T2, T3>                                                                            \
+    {                                                                                                                   \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;                    \
+        return (e1.has_value() && e2.has_value() && e3.has_value()) ?                                                   \
+                masked_value(std::OP(e1.value(), e2.value(), e3.value())) : missing<value_type>();                      \
+    }
+
+#define DEFINE_TERNARY_OPERATOR_TMO(OP)                                                               \
+    template <class T1, class T2, class B2, class T3, class B3>                                       \
+    inline auto OP(const T1& e1, const xmasked_value<T2, B2>& e2, const xtl::xoptional<T3, B3>& e3)   \
+        -> disable_xoptional_like<T1, common_masked_value_t<T1, T2, T3>>                              \
+    {                                                                                                 \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;  \
+        return (e2.has_value() && e3.has_value()) ?                                                   \
+                masked_value(std::OP(e1, e2.value(), e3.value())) : missing<value_type>();            \
+    }
+
+#define DEFINE_TERNARY_OPERATOR_MTO(OP)                                                               \
+    template <class T1, class B1, class T2, class T3, class B3>                                       \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const T2& e2, const xtl::xoptional<T3, B3>& e3)   \
+        -> disable_xoptional_like<T2, common_masked_value_t<T1, T2, T3>>                              \
+    {                                                                                                 \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;  \
+        return (e1.has_value() && e3.has_value()) ?                                                   \
+                masked_value(std::OP(e1.value(), e2, e3.value())) : missing<value_type>();            \
+    }
+
+#define DEFINE_TERNARY_OPERATOR_MOT(OP)                                                               \
+    template <class T1, class B1, class T2, class B2, class T3>                                       \
+    inline auto OP(const xmasked_value<T1, B1>& e1, const xtl::xoptional<T2, B2>& e2, const T3& e3)   \
+        -> disable_xoptional_like<T3, common_masked_value_t<T1, T2, T3>>                              \
+    {                                                                                                 \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;  \
+        return (e1.has_value() && e2.has_value()) ?                                                   \
+                masked_value(std::OP(e1.value(), e2.value(), e3)) : missing<value_type>();            \
+    }
+
+#define DEFINE_TERNARY_OPERATOR_OMT(OP)                                                               \
+    template <class T1, class B1, class T2, class B2, class T3>                                       \
+    inline auto OP(const xtl::xoptional<T1, B1>& e1, const xmasked_value<T2, B2>& e2, const T3& e3)   \
+        -> disable_xoptional_like<T3, common_masked_value_t<T1, T2, T3>>                              \
+    {                                                                                                 \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;  \
+        return (e1.has_value() && e2.has_value()) ?                                                   \
+                masked_value(std::OP(e1.value(), e2.value(), e3)) : missing<value_type>();            \
+    }
+
+#define DEFINE_TERNARY_OPERATOR_OTM(OP)                                                               \
+    template <class T1, class B1, class T2, class T3, class B3>                                       \
+    inline auto OP(const xtl::xoptional<T1, B1>& e1, const T2& e2, const xmasked_value<T3, B3>& e3)   \
+        -> disable_xoptional_like<T2, common_masked_value_t<T1, T2, T3>>                              \
+    {                                                                                                 \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;  \
+        return (e1.has_value() && e3.has_value()) ?                                                   \
+                masked_value(std::OP(e1.value(), e2, e3.value())) : missing<value_type>();            \
+    }
+
+#define DEFINE_TERNARY_OPERATOR_TOM(OP)                                                               \
+    template <class T1, class T2, class B2, class T3, class B3>                                       \
+    inline auto OP(const T1& e1, const xtl::xoptional<T2, B2>& e2, const xmasked_value<T3, B3>& e3)   \
+        -> disable_xoptional_like<T1, common_masked_value_t<T1, T2, T3>>                              \
+    {                                                                                                 \
+        using value_type = std::common_type_t<std::decay_t<T1>, std::decay_t<T2>, std::decay_t<T3>>;  \
+        return (e2.has_value() && e3.has_value()) ?                                                   \
+                masked_value(std::OP(e1, e2.value(), e3.value())) : missing<value_type>();            \
     }
 
 #define DEFINE_TERNARY_OPERATOR(OP) \

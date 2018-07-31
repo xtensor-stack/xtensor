@@ -15,6 +15,15 @@ namespace xt
 {
     using optional_type = xtl::xoptional<double&, bool&>;
 
+    TEST(xmasked_value, ctor)
+    {
+        double a = 5.2;
+
+        auto m = xmasked_value<double&>(a);
+        EXPECT_EQ(m.value(), 5.2);
+        EXPECT_EQ(m.has_value(), true);
+    }
+
     TEST(xmasked_value, value)
     {
         double a = 5.2;
