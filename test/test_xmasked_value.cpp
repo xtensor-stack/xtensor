@@ -53,7 +53,7 @@ namespace xt
         EXPECT_FALSE(c.has_value());
     }
 
-    TEST(xmasked_value, conversion_to_optional)
+    TEST(xmasked_value, conversion)
     {
         double a = 5.2;
         bool bool_val = true;
@@ -63,6 +63,12 @@ namespace xt
         optional_type c = b;
         EXPECT_EQ(c.value(), 5.2);
         EXPECT_TRUE(c.has_value());
+
+        double& val = b;
+        EXPECT_EQ(val, 5.2);
+        val = 36.;
+        EXPECT_EQ(c.value(), 36.);
+        EXPECT_EQ(b.value(), 36.);
     }
 
     TEST(xmasked_value, comparison)

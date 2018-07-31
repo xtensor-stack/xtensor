@@ -143,9 +143,12 @@ namespace xt
         {
         }
 
-        inline operator optional_type&() {
-            static auto val = optional_type(m_value, m_flag);
-            return val;
+        inline operator value_type() {
+            return m_value;
+        }
+
+        inline operator optional_type() {
+            return optional_type(m_value, m_flag);
         }
 
         inline value_type value()
