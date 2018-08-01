@@ -28,7 +28,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-find_package(xtl 0.4.9 REQUIRED)
+find_package(xtl 0.4.13 REQUIRED)
 
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 

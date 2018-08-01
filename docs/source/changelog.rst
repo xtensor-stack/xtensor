@@ -55,7 +55,7 @@ New features
 Other changes
 ~~~~~~~~~~~~~
 
-- ``xhared_expresion`` fixed
+- ``xshared_expresion`` fixed
   `#1025 <https://github.com/QuantStack/xtensor/pull/1025>`_.
 - fix ``make_xshared``
   `#1024 <https://github.com/QuantStack/xtensor/pull/1024>`_.
