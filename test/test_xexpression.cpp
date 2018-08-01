@@ -65,6 +65,14 @@ namespace xt
         std::stringstream buffer;
         buffer << expr1;
         EXPECT_EQ(buffer.str(), "{{  2.,   4.,   6.,   8.},\n { 10.,  12.,  14.,  16.}}");
+
+        // Compilation test
+        auto sexpr1 = make_xshared(std::move(expr1));
+        using expr_type = decltype(sexpr1);
+        using strides_type = typename expr_type::strides_type;
+        using inner_strides_type = typename expr_type::inner_strides_type;
+        using backstrides_type = typename expr_type::backstrides_type;
+        using inner_strides_tybackstrides_typepe = typename expr_type::inner_backstrides_type;
     }
 
     TEST(xexpression, shared_expr_return)

@@ -122,8 +122,12 @@ namespace xt
 
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
+        using inner_strides_type = get_strides_t<inner_shape_type>;
+        using inner_backstrides_type = inner_strides_type;
+
         using shape_type = inner_shape_type;
-        using strides_type = get_strides_t<shape_type>;
+        using strides_type = inner_strides_type;
+        using backstrides_type = inner_backstrides_type;
 
         using slice_type = std::tuple<S...>;
 
@@ -233,11 +237,11 @@ namespace xt
         storage() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const strides_type&>
+        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const inner_strides_type&>
         strides() const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const strides_type&>
+        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const inner_backstrides_type&>
         backstrides() const;
 
         template <class T = xexpression_type>
@@ -315,8 +319,8 @@ namespace xt
         CT m_e;
         slice_type m_slices;
         inner_shape_type m_shape;
-        mutable strides_type m_strides;
-        mutable strides_type m_backstrides;
+        mutable inner_strides_type m_strides;
+        mutable inner_backstrides_type m_backstrides;
         mutable bool m_strides_computed;
 
         template <class... Args>
@@ -866,7 +870,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::strides() const ->
-        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const strides_type&>
+        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const inner_strides_type&>
     {
         if (!m_strides_computed)
         {
@@ -879,7 +883,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::backstrides() const ->
-        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const strides_type&>
+        std::enable_if_t<has_data_interface<T>::value && detail::slices_contigous<S...>::value, const inner_backstrides_type&>
     {
         if (!m_strides_computed)
         {
