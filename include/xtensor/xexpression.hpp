@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <xtl/xclosure.hpp>
+#include <xtl/xmeta_utils.hpp>
 #include <xtl/xtype_traits.hpp>
 
 #include "xlayout.hpp"
@@ -326,6 +327,33 @@ namespace xt
         return m_ptr->name();                  \
     }
 
+    namespace detail
+    {
+        template <class E>
+        struct expr_strides_type
+        {
+            using type = typename E::strides_type;
+        };
+
+        template <class E>
+        struct expr_inner_strides_type
+        {
+            using type = typename E::inner_strides_type;
+        };
+
+        template <class E>
+        struct expr_backstrides_type
+        {
+            using type = typename E::backstrides_type;
+        };
+
+        template <class E>
+        struct expr_inner_backstrides_type
+        {
+            using type = typename E::inner_backstrides_type;
+        };
+    }
+
     /**
      * @class xshared_expression
      * @brief Shared xexpressions
@@ -367,14 +395,21 @@ namespace xt
         using size_type = typename E::size_type;
         using difference_type = typename E::difference_type;
 
+        using inner_shape_type = typename E::inner_shape_type;
         using shape_type = typename E::shape_type;
 
-        using inner_shape_type = typename E::inner_shape_type;
-
-        using strides_type = typename E::strides_type;
-        using backstrides_type = typename E::backstrides_type;
-        using inner_strides_type = typename E::inner_strides_type;
-        using inner_backstrides_type = typename E::inner_backstrides_type;
+        using strides_type = xtl::mpl::eval_if_t<has_strides<E>,
+                                                 detail::expr_strides_type<E>,
+                                                 get_strides_type<shape_type>>;
+        using backstrides_type = xtl::mpl::eval_if_t<has_strides<E>,
+                                                     detail::expr_backstrides_type<E>,
+                                                     get_strides_type<shape_type>>;
+        using inner_strides_type = xtl::mpl::eval_if_t<has_strides<E>,
+                                                       detail::expr_inner_strides_type<E>,
+                                                       get_strides_type<shape_type>>;
+        using inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<E>,
+                                                           detail::expr_inner_backstrides_type<E>,
+                                                           get_strides_type<shape_type>>;
 
         using stepper = typename E::stepper;
         using const_stepper = typename E::const_stepper;
@@ -405,15 +440,55 @@ namespace xt
         XTENSOR_FORWARD_METHOD(storage_end);
         XTENSOR_FORWARD_METHOD(storage_cend);
         XTENSOR_FORWARD_METHOD(layout);
-       
-        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        XTENSOR_FORWARD_METHOD(strides);
-        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        XTENSOR_FORWARD_METHOD(data);
-        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        XTENSOR_FORWARD_METHOD(data_offset);
-        template <class CE = E, class = std::enable_if_t<has_data_interface<CE>::value, int>>
-        XTENSOR_FORWARD_METHOD(storage);
+        
+        template <class T = E>
+        std::enable_if_t<has_strides<T>::value, const inner_strides_type&>
+        strides() const
+        {
+            return m_ptr->strides();
+        }
+
+        template <class T = E>
+        std::enable_if_t<has_strides<T>::value, const inner_strides_type&>
+        backstrides() const
+        {
+            return m_ptr->backstrides();
+        }
+
+        template <class T = E>
+        std::enable_if_t<has_data_interface<T>::value, pointer>
+        data() noexcept
+        {
+            return m_ptr->data();
+        }
+
+        template <class T = E>
+        std::enable_if_t<has_data_interface<T>::value, pointer>
+        data() const noexcept
+        {
+            return m_ptr->data();
+        }
+
+        template <class T = E>
+        std::enable_if_t<has_data_interface<T>::value, size_type>
+        data_offset() const noexcept
+        {
+            return m_ptr->data_offset();
+        }
+
+        template <class T = E>
+        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&>
+        storage() noexcept
+        {
+            return m_ptr->storage();
+        }
+
+        template <class T = E>
+        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
+        storage() const noexcept
+        {
+            return m_ptr->storage();
+        }
        
         template <class It>
         auto element(It first, It last) {
