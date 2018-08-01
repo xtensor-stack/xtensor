@@ -7,6 +7,91 @@
 Changelog
 =========
 
+0.17.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Changed strides to ``std::ptrdiff_t``
+  `#925 <https://github.com/QuantStack/xtensor/pull/925>`_.
+- Renamed ``count_nonzeros`` in ``count_nonzero``
+  `#974 <https://github.com/QuantStack/xtensor/pull/974>`_.
+- homogenize ``xfixed`` constructors
+  `#970 <https://github.com/QuantStack/xtensor/pull/970>`_.
+
+New features
+~~~~~~~~~~~~
+
+- add ``signed char`` to npy deserialization format
+  `#1017 <https://github.com/QuantStack/xtensor/pull/1017>`_.
+- simd assignment now requires convertible types instead of same type
+  `#1000 <https://github.com/QuantStack/xtensor/pull/1000>`_.
+- shared expression and automatic xclosure detection
+  `#992 <https://github.com/QuantStack/xtensor/pull/992>`_.
+- average function
+  `#987 <https://github.com/QuantStack/xtensor/pull/987>`_.
+- added simd support for complex
+  `#985 <https://github.com/QuantStack/xtensor/pull/985>`_.
+- argsort function
+  `#977 <https://github.com/QuantStack/xtensor/pull/977>`_.
+- propagate fixed shape
+  `#922 <https://github.com/QuantStack/xtensor/pull/922>`_.
+- added xdrop_slice
+  `#972 <https://github.com/QuantStack/xtensor/pull/972>`_.
+- added doc for ``xmasked_view``
+  `#971 <https://github.com/QuantStack/xtensor/pull/971>`_.
+- added ``xmasked_view``
+  `#969 <https://github.com/QuantStack/xtensor/pull/969>`_.
+- added ``dynamic_view``
+  `#966 <https://github.com/QuantStack/xtensor/pull/966>`_.
+- added ability to use negative indices in keep slice
+  `#964 <https://github.com/QuantStack/xtensor/pull/964>`_.
+- added an easy way to create lambda expressions, square and cube
+  `#961 <https://github.com/QuantStack/xtensor/pull/961>`_.
+- noalias on rvalue
+  `#965 <https://github.com/QuantStack/xtensor/pull/965>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- ``xhared_expresion`` fixed
+  `#1025 <https://github.com/QuantStack/xtensor/pull/1025>`_.
+- fix ``make_xshared``
+  `#1024 <https://github.com/QuantStack/xtensor/pull/1024>`_.
+- add tests to evaluate shared expressions
+  `#1019 <https://github.com/QuantStack/xtensor/pull/1019>`_.
+- fix ``where`` on ``xview``
+  `#1012 <https://github.com/QuantStack/xtensor/pull/1012>`_.
+- Improve ``random::choice``
+  `#1011 <https://github.com/QuantStack/xtensor/pull/1011>`_.
+- basic usage replaced with getting started
+  `#1004 <https://github.com/QuantStack/xtensor/pull/1004>`_.
+- avoided installation failure in absence of ``nlohmann_json``
+  `#1001 <https://github.com/QuantStack/xtensor/pull/1001>`_.
+- code and documentation clean up
+  `#998 <https://github.com/QuantStack/xtensor/pull/998>`_.
+- removed g++ "pedantic" compiler warnings
+  `#997 <https://github.com/QuantStack/xtensor/pull/997>`_.
+- added missing header in basic_usage.rst
+  `#996 <https://github.com/QuantStack/xtensor/pull/996>`_.
+- warning pass
+  `#990 <https://github.com/QuantStack/xtensor/pull/990>`_.
+- added missing include in ``xview``
+  `#989 <https://github.com/QuantStack/xtensor/pull/989>`_.
+- added missing ``<map>`` include
+  `#983 <https://github.com/QuantStack/xtensor/pull/983>`_.
+- xislice refactoring
+  `#962 <https://github.com/QuantStack/xtensor/pull/962>`_.
+- added missing operators to noalias
+  `#932 <https://github.com/QuantStack/xtensor/pull/932>`_.
+- cmake fix for Intel compiler on Windows
+  `#951 <https://github.com/QuantStack/xtensor/pull/951>`_.
+- fixed xsimd abs deduction
+  `#946 <https://github.com/QuantStack/xtensor/pull/946>`_.
+- added islice example to view doc
+  `#940 <https://github.com/QuantStack/xtensor/pull/940>`_.
+
 0.16.4
 ------
 
