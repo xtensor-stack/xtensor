@@ -31,8 +31,8 @@ xtensor has been packaged for the conda package manager. Once the new tag has be
 - Check for the versions of the dependencies.
 - Optionally, rerender the conda-forge feedstock.
 
-Updating the binder link
-------------------------
+Updating the stable branch
+--------------------------
 
-Once the conda-forge package has been updated, update the binder link in the
-README.
+Once the conda-forge package has been updated, update the ``stable`` branch to
+the newly added tag.
