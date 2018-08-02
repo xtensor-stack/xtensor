@@ -591,7 +591,7 @@ namespace xt
     template <class E>
     inline xfixed_container<ET, S, L, Tag>::xfixed_container(const xexpression<E>& e)
     {
-        semantic_base::assign(e);
+        semantic_base::assign(e, true); // adding true here doesn't change anything though
     }
 
     /**

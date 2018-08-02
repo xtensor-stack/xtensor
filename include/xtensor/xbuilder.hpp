@@ -213,7 +213,7 @@ namespace xt
             }
 
             template <class E>
-            inline void assign_to(xexpression<E>& e) const noexcept
+            inline void assign_to(xexpression<E>& e, bool /*force_resize*/) const noexcept
             {
                 auto& de = e.derived_cast();
                 value_type value = m_start;

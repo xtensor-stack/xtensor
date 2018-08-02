@@ -27,7 +27,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU"
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
 
     if (HAS_CPP14_FLAG)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -g")
     else()
         message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
     endif()
@@ -109,16 +109,17 @@ include_directories(${XTENSOR_INCLUDE_DIR})
 include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
-    benchmark_assign.cpp
+    # benchmark_assign.cpp
     benchmark_builder.cpp
-    benchmark_container.cpp
-    benchmark_increment_stepper.cpp
-    benchmark_lambda_expressions.cpp
-    benchmark_math.cpp
-    benchmark_random.cpp
-    benchmark_reducer.cpp
-    benchmark_views.cpp
-    benchmark_xshape.cpp
+    # benchmark_container.cpp
+    # benchmark_increment_stepper.cpp
+    # benchmark_lambda_expressions.cpp
+    # benchmark_math.cpp
+    # benchmark_random.cpp
+    # benchmark_reducer.cpp
+    # benchmark_views.cpp
+    # benchmark_xshape.cpp
+    benchmark_view_assignment.cpp
     main.cpp
 )
 

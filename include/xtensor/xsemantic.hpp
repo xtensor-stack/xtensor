@@ -86,7 +86,7 @@ namespace xt
         derived_type& operator^=(const xexpression<E>&);
 
         template <class E>
-        derived_type& assign(const xexpression<E>&);
+        derived_type& assign(const xexpression<E>&, bool force_resize = false);
 
         template <class E>
         derived_type& plus_assign(const xexpression<E>&);
@@ -150,7 +150,7 @@ namespace xt
         derived_type& assign_temporary(temporary_type&&);
 
         template <class E>
-        derived_type& assign_xexpression(const xexpression<E>& e);
+        derived_type& assign_xexpression(const xexpression<E>& e, bool force_resize);
 
         template <class E>
         derived_type& computed_assign(const xexpression<E>& e);
@@ -217,7 +217,7 @@ namespace xt
         derived_type& assign_temporary(temporary_type&&);
 
         template <class E>
-        derived_type& assign_xexpression(const xexpression<E>& e);
+        derived_type& assign_xexpression(const xexpression<E>& e, bool force_resize);
 
         template <class E>
         derived_type& computed_assign(const xexpression<E>& e);
@@ -474,9 +474,9 @@ namespace xt
      */
     template <class D>
     template <class E>
-    inline auto xsemantic_base<D>::assign(const xexpression<E>& e) -> derived_type&
+    inline auto xsemantic_base<D>::assign(const xexpression<E>& e, bool force_resize) -> derived_type&
     {
-        return this->derived_cast().assign_xexpression(e);
+        return this->derived_cast().assign_xexpression(e, force_resize);
     }
 
     /**
@@ -608,9 +608,9 @@ namespace xt
 
     template <class D>
     template <class E>
-    inline auto xcontainer_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
+    inline auto xcontainer_semantic<D>::assign_xexpression(const xexpression<E>& e, bool force_resize) -> derived_type&
     {
-        xt::assign_xexpression(*this, e);
+        xt::assign_xexpression(*this, e, force_resize);
         return this->derived_cast();
     }
 
@@ -655,7 +655,7 @@ namespace xt
 
     template <class D>
     template <class E>
-    inline auto xview_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
+    inline auto xview_semantic<D>::assign_xexpression(const xexpression<E>& e, bool /*force_resize*/) -> derived_type&
     {
         xt::assert_compatible_shape(*this, e);
         xt::assign_data(*this, e, false);

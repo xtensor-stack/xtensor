@@ -1480,6 +1480,92 @@ namespace xt
 
 }
 
+template <class E, std::ptrdiff_t Start, std::ptrdiff_t End = -1>
+class container_offset_view
+{
+public:
+
+    using value_type = typename E::value_type;
+    using size_type = typename E::size_type;
+
+    container_offset_view(const E& container)
+        : m_original_container(container)
+    {
+    }
+
+    size_type size() const
+    {
+        if (End == -1)
+        {
+            return m_original_container.size() - Start;
+        }
+        else
+        {
+            return End - Start;
+        }
+    }
+
+    auto operator[](std::size_t idx) const
+    {
+        return m_original_container[idx + Start];
+    }
+
+    auto end() const
+    {
+        if (End != -1)
+        {
+            return m_original_container.end() - End;
+        }
+        else
+        {
+            return m_original_container.end();
+        }
+    }
+
+    auto begin() const
+    {
+        return m_original_container.begin() + Start;
+    }
+
+    auto cend() const
+    {
+        if (End != -1)
+        {
+            return m_original_container.cend() - End;
+        }
+        else
+        {
+            return m_original_container.cend();
+        }
+    }
+
+    auto cbegin() const
+    {
+        return m_original_container.cbegin() + Start;
+    }
+
+    auto front() const
+    {
+        return *(m_original_container.begin() + Start);
+    }
+
+    auto back() const
+    {
+        if (End == -1)
+        {
+            return *(m_original_container.end() - 1);
+        }
+        else
+        {
+            return *(m_original_container.begin() + End - 1);
+        }
+    }
+
+private:
+    const E& m_original_container;
+};
+
+
 /******************************
  * std::tuple_size extensions *
  ******************************/

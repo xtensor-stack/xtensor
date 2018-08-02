@@ -33,7 +33,7 @@ namespace xt
     void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
 
     template <class E1, class E2>
-    void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+    void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2, bool force_resize = false);
 
     template <class E1, class E2>
     void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
@@ -74,7 +74,7 @@ namespace xt
         using base_type = xexpression_assigner_base<Tag>;
 
         template <class E1, class E2>
-        static void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2, bool force_resize);
 
         template <class E1, class E2>
         static void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
@@ -88,7 +88,7 @@ namespace xt
     private:
 
         template <class E1, class E2>
-        static bool resize(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static bool resize(xexpression<E1>& e1, const xexpression<E2>& e2, bool force_resize);
     };
 
     /*****************
@@ -150,15 +150,15 @@ namespace xt
     }
 
     template <class E1, class E2>
-    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2, bool force_resize)
     {
         xtl::mpl::static_if<has_assign_to<E1, E2>::value>([&](auto self)
         {
-            self(e2).derived_cast().assign_to(e1);
+            self(e2).derived_cast().assign_to(e1, force_resize);
         }, /*else*/ [&](auto /*self*/)
         {
             using tag = xexpression_tag_t<E1, E2>;
-            xexpression_assigner<tag>::assign_xexpression(e1, e2);
+            xexpression_assigner<tag>::assign_xexpression(e1, e2, force_resize);
         });
     }
 
@@ -300,7 +300,6 @@ namespace xt
         const E2& de2 = e2.derived_cast();
 
         bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
-
         if (trivial_broadcast)
         {
             constexpr bool simd_assign = xassign_traits<E1, E2>::simd_assign();
@@ -319,10 +318,12 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<Tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<Tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2, bool force_resize)
     {
-        bool trivial_broadcast = resize(e1, e2);
+        bool trivial_broadcast = resize(e1, e2, force_resize);
         base_type::assign_data(e1, e2, trivial_broadcast);
+        // e1.derived_cast().resize(e2.derived_cast().shape(), true);
+        // base_type::assign_data(e1, e2, true);
     }
 
     template <class Tag>
@@ -379,7 +380,7 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2, bool force_resize)
     {
         using index_type = xindex_type_t<typename E1::shape_type>;
         using size_type = typename E1::size_type;
@@ -387,7 +388,7 @@ namespace xt
         size_type size = de2.dimension();
         index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
         bool trivial_broadcast = de2.broadcast_shape(shape, true);
-        e1.derived_cast().resize(std::move(shape));
+        e1.derived_cast().resize(std::move(shape), force_resize);
         return trivial_broadcast;
     }
 
