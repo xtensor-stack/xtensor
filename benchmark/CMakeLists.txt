@@ -110,7 +110,7 @@ include_directories(${GBENCHMARK_INCLUDE_DIRS})
 
 set(XTENSOR_BENCHMARK
     # benchmark_assign.cpp
-    benchmark_builder.cpp
+    # benchmark_builder.cpp
     # benchmark_container.cpp
     # benchmark_increment_stepper.cpp
     # benchmark_lambda_expressions.cpp

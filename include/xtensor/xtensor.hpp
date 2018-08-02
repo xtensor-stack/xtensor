@@ -337,7 +337,7 @@ namespace xt
         {
             detail::resize_data_container(m_storage, std::size_t(1));
         }
-        semantic_base::assign(e, /* force_resize */ true);
+        semantic_base::assign(e, /* force_resize */ false);
     }
 
     /**

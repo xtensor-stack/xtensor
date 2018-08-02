@@ -625,6 +625,7 @@ namespace xt
         const_pointer data() const;
 
         void resize(size_type n);
+        void resize(size_type n, const value_type& val);
 
         size_type capacity() const;
         void push_back(const T& elt);
@@ -864,11 +865,22 @@ namespace xt
         {
             grow(n);
         }
+
         m_end = m_begin + n;
-        if (Init)
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    void svector<T, N, A, Init>::resize(size_type n, const value_type& val)
+    {
+        auto prev_size = size();
+
+        if (n > N)
         {
-            std::fill(begin(), end(), T());
+            grow(n);
         }
+        m_end = m_begin + n;
+
+        std::fill(begin() + prev_size, end(), val);
     }
 
     template <class T, std::size_t N, class A, bool Init>
@@ -1478,92 +1490,119 @@ namespace xt
     constexpr typename fixed_shape<X...>::cast_type fixed_shape<X...>::m_array;
 #endif
 
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End = -1>
+    class container_offset_view
+    {
+    public:
+
+        using value_type = typename E::value_type;
+        using size_type = typename E::size_type;
+
+        container_offset_view(const E& container)
+            : m_original_container(container)
+        {
+        }
+
+        size_type size() const
+        {
+            if (End == -1)
+            {
+                return m_original_container.size() - static_cast<size_type>(Start);
+            }
+            else
+            {
+                return static_cast<size_type>(End - Start);
+            }
+        }
+
+        auto operator[](std::size_t idx) const
+        {
+            return m_original_container[idx + Start];
+        }
+
+        auto end() const
+        {
+            if (End != -1)
+            {
+                return m_original_container.end() - End;
+            }
+            else
+            {
+                return m_original_container.end();
+            }
+        }
+
+        auto begin() const
+        {
+            return m_original_container.begin() + Start;
+        }
+
+        auto cend() const
+        {
+            if (End != -1)
+            {
+                return m_original_container.cend() - End;
+            }
+            else
+            {
+                return m_original_container.cend();
+            }
+        }
+
+        auto cbegin() const
+        {
+            return m_original_container.cbegin() + Start;
+        }
+
+        auto rend() const
+        {
+            return m_original_container.rend() - Start;
+        }
+
+        auto rbegin() const
+        {
+            if (End == -1)
+            {
+                return m_original_container.crbegin();
+            }
+            else
+            {
+                return m_original_container.crbegin() + (m_original_container.size() - End);
+            }
+        }
+
+        auto crend() const
+        {
+            return rend();
+        }
+
+        auto crbegin() const
+        {
+            return rbegin();
+        }
+
+        auto front() const
+        {
+            return *(m_original_container.begin() + Start);
+        }
+
+        auto back() const
+        {
+            if (End == -1)
+            {
+                return *(m_original_container.end() - 1);
+            }
+            else
+            {
+                return *(m_original_container.begin() + End - 1);
+            }
+        }
+
+    private:
+        const E& m_original_container;
+    };
 }
 
-template <class E, std::ptrdiff_t Start, std::ptrdiff_t End = -1>
-class container_offset_view
-{
-public:
-
-    using value_type = typename E::value_type;
-    using size_type = typename E::size_type;
-
-    container_offset_view(const E& container)
-        : m_original_container(container)
-    {
-    }
-
-    size_type size() const
-    {
-        if (End == -1)
-        {
-            return m_original_container.size() - Start;
-        }
-        else
-        {
-            return End - Start;
-        }
-    }
-
-    auto operator[](std::size_t idx) const
-    {
-        return m_original_container[idx + Start];
-    }
-
-    auto end() const
-    {
-        if (End != -1)
-        {
-            return m_original_container.end() - End;
-        }
-        else
-        {
-            return m_original_container.end();
-        }
-    }
-
-    auto begin() const
-    {
-        return m_original_container.begin() + Start;
-    }
-
-    auto cend() const
-    {
-        if (End != -1)
-        {
-            return m_original_container.cend() - End;
-        }
-        else
-        {
-            return m_original_container.cend();
-        }
-    }
-
-    auto cbegin() const
-    {
-        return m_original_container.cbegin() + Start;
-    }
-
-    auto front() const
-    {
-        return *(m_original_container.begin() + Start);
-    }
-
-    auto back() const
-    {
-        if (End == -1)
-        {
-            return *(m_original_container.end() - 1);
-        }
-        else
-        {
-            return *(m_original_container.begin() + End - 1);
-        }
-    }
-
-private:
-    const E& m_original_container;
-};
 
 
 /******************************

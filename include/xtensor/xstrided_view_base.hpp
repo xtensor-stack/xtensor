@@ -251,13 +251,14 @@ namespace xt
         template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
         inline auto get_flat_storage(E& e) -> flat_expression_adaptor<std::remove_reference_t<E>>
         {
-            return flat_expression_adaptor<std::remove_reference_t<E>>(&e);
+            // moved to addressof because ampersand on xview returns a closure pointer
+            return flat_expression_adaptor<std::remove_reference_t<E>>(std::addressof(e));
         }
 
         template <class E, class S>
         inline auto get_flat_storage(E& e, S&& s, layout_type l) -> flat_expression_adaptor<std::remove_reference_t<E>>
         {
-            return flat_expression_adaptor<std::remove_reference_t<E>>(&e, std::forward<S>(s), l);
+            return flat_expression_adaptor<std::remove_reference_t<E>>(std::addressof(e), std::forward<S>(s), l);
         }
 
         template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
@@ -335,7 +336,7 @@ namespace xt
         auto copy_move_storage(T& expr, const detail::flat_expression_adaptor<E>& storage)
         {
             detail::flat_expression_adaptor<E> new_storage = storage; // copy storage
-            new_storage.update_pointer(&expr);
+            new_storage.update_pointer(std::addressof(expr));
             return new_storage;
         }
     }
@@ -891,7 +892,7 @@ namespace xt
             using base_type = adj_strides_policy;
 
             template <class S, class ST, class V>
-            void fill_args(const S& shape, ST&& strides, std::size_t base_offset, layout_type layout, const V& slices)
+            void fill_args(const S& shape, ST&& old_strides, std::size_t base_offset, layout_type layout, const V& slices)
             {
                 // Compute dimension
                 std::size_t dimension = shape.size(), n_newaxis = 0, n_add_all = 0;
@@ -938,13 +939,11 @@ namespace xt
 
                 // Compute strided view
                 new_offset = base_offset;
-                new_shape.resize(dimension);
-                new_strides.resize(dimension);
+                new_shape.resize(dimension, 1);
+                new_strides.resize(dimension, 0);
                 base_type::resize(dimension);
 
                 auto old_shape = shape;
-                auto&& old_strides = strides;
-
                 using old_strides_vt = std::decay_t<decltype(old_strides[0])>;
 
                 std::ptrdiff_t axis_skip = 0;

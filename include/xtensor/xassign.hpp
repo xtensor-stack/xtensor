@@ -322,8 +322,6 @@ namespace xt
     {
         bool trivial_broadcast = resize(e1, e2, force_resize);
         base_type::assign_data(e1, e2, trivial_broadcast);
-        // e1.derived_cast().resize(e2.derived_cast().shape(), true);
-        // base_type::assign_data(e1, e2, true);
     }
 
     template <class Tag>

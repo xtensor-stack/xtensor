@@ -1335,9 +1335,10 @@ namespace xt
     {
         if (m_shape.size() != shape.size() || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
-            if (D::static_layout == layout_type::dynamic)
+            if (D::static_layout == layout_type::dynamic && m_layout == layout_type::dynamic)
             {
-                m_layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
+                // fall back to default layout
+                m_layout = XTENSOR_DEFAULT_LAYOUT;
             }
             m_shape = xtl::forward_sequence<shape_type>(shape);
             resize_container(m_strides, m_shape.size());
