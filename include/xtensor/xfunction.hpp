@@ -89,6 +89,19 @@ namespace xt
         template <class... Args>
         using common_value_type_t = typename common_value_type<Args...>::type;
 
+        /**********************
+         * functor_value_type *
+         **********************/
+
+        template <class T, class R>
+        struct functor_value_type
+        {
+            using type = R;
+        };
+
+        template <class T, class R>
+        using functor_value_type_t = typename functor_value_type<T, R>::type;
+
         /********************
          * simd_return_type *
          ********************/
