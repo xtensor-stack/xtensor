@@ -16,6 +16,7 @@
 
 #include <xtl/xtype_traits.hpp>
 
+#include "xstorage.hpp"
 #include "xutils.hpp"
 
 
@@ -326,6 +327,7 @@ namespace xt
 
         using container_type = svector<T>;
         using size_type = typename container_type::value_type;
+        using self_type = xkeep_slice<T>;
 
         template <class C>
         explicit xkeep_slice(const C& cont);
@@ -345,6 +347,9 @@ namespace xt
         size_type revert_index(std::size_t i) const;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
 
     private:
 
@@ -404,7 +409,6 @@ namespace xt
      * xdrop_slice declaration *
      ***************************/
 
-
     template <class T>
     class xdrop_slice : public xslice<xdrop_slice<T>>
     {
@@ -412,6 +416,7 @@ namespace xt
 
         using container_type = svector<T>;
         using size_type = typename container_type::value_type;
+        using self_type = xdrop_slice<T>;
 
         template <class C>
         explicit xdrop_slice(const C& cont);
@@ -431,6 +436,9 @@ namespace xt
         size_type revert_index(std::size_t i) const;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
 
     private:
 
@@ -1136,6 +1144,18 @@ namespace xt
         return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? false : true;
     }
 
+    template <class T>
+    inline bool xkeep_slice<T>::operator==(const self_type& rhs) const noexcept
+    {
+        return m_indices == rhs.m_indices;
+    }
+
+    template <class T>
+    inline bool xkeep_slice<T>::operator!=(const self_type& rhs) const noexcept
+    {
+        return !(*this == rhs);
+    }
+
     /******************************
      * xdrop_slice implementation *
      ******************************/
@@ -1251,6 +1271,18 @@ namespace xt
     inline bool xdrop_slice<T>::contains(size_type i) const noexcept
     {
         return (std::find(m_indices.begin(), m_indices.end(), i) == m_indices.end()) ? true : false;
+    }
+
+    template <class T>
+    inline bool xdrop_slice<T>::operator==(const self_type& rhs) const noexcept
+    {
+        return m_indices == rhs.m_indices;
+    }
+
+    template <class T>
+    inline bool xdrop_slice<T>::operator!=(const self_type& rhs) const noexcept
+    {
+        return !(*this == rhs);
     }
 }
 
