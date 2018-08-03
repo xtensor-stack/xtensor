@@ -1227,11 +1227,11 @@ namespace xt
 
     #define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
 
-    template <class X, class T, std::size_t N, class A>
-    struct rebind_container<X, svector<T, N, A>>
+    template <class X, class T, std::size_t N, class A, bool B>
+    struct rebind_container<X, svector<T, N, A, B>>
     {
         using allocator = typename A::template rebind<X>::other;
-        using type = svector<X, N, allocator>;
+        using type = svector<X, N, allocator, B>;
     };
 
     /**
@@ -1408,6 +1408,22 @@ namespace xt
     };
 
 #undef GCC4_FALLBACK
+
+
+// Workaround for rebind_container problems on GCC 8  with C++17 enabled
+#if defined(__GNUC__) && __GNUC__ > 7 && !defined(__clang__) && __cplusplus >= 201703L
+    template <class X, class T, std::size_t N>
+    struct rebind_container<X, aligned_array<T, N>>
+    {
+        using type = aligned_array<X, N>;
+    };
+
+    template <class X, class T, std::size_t N>
+    struct rebind_container<X, const_array<T, N>>
+    {
+        using type = const_array<X, N>;
+    };
+#endif
 
     /**
      * @class fixed_shape
