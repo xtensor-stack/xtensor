@@ -15,12 +15,25 @@
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
+#include "xtensor/xrandom.hpp"
 
 
 namespace xt
 {
     using std::size_t;
     using view_shape_type = dynamic_shape<size_t>;
+
+    template <class A, class B, std::ptrdiff_t BB, std::ptrdiff_t BE>
+    bool operator==(const A& lhs, const container_offset_view<B, BB, BE>& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(rhs.begin(), rhs.end(), lhs.begin());
+    }
+
+    template <class A, class B, std::ptrdiff_t BB, std::ptrdiff_t BE>
+    bool operator==(const container_offset_view<B, BB, BE>& lhs, const A& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(rhs.begin(), rhs.end(), lhs.begin());
+    }
 
     TEST(xview, temporary_type)
     {
@@ -754,10 +767,20 @@ namespace xt
             { 5, 6 }
         };
         auto row = xt::view(a, 1, xt::all());
-        bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::ptrdiff_t, 1>>::value;
-        bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::ptrdiff_t, 1>&>::value;
-        EXPECT_TRUE(cond1);
-        EXPECT_TRUE(cond2);
+        if (a.layout() == layout_type::row_major)
+        {
+            bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::ptrdiff_t, 1>>::value;
+            bool cond2 = std::is_same<decltype(row.strides()), const xt::container_offset_view<std::array<std::ptrdiff_t, 2>, 1, -1>&>::value;
+            EXPECT_TRUE(cond1);
+            EXPECT_TRUE(cond2);
+        }
+        else
+        {
+            bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::ptrdiff_t, 1>>::value;
+            bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::ptrdiff_t, 1>&>::value;
+            EXPECT_TRUE(cond1);
+            EXPECT_TRUE(cond2);
+        }
     }
 
     TEST(xview, transpose)
@@ -974,9 +997,9 @@ namespace xt
         v3(0, 2, 1) = 1000;
         EXPECT_EQ(a(1, 1, 3), 1000);
 
-        bool b = detail::slices_contigous<xkeep_slice<int>, int>::value;
+        bool b = detail::is_strided_view<decltype(a), xkeep_slice<int>, int>::value;
         EXPECT_FALSE(b);
-        b = detail::slices_contigous<xrange<int>, xrange<int>, int>::value;
+        b = detail::is_strided_view<decltype(a), xrange<int>, xrange<int>, int>::value;
         EXPECT_TRUE(b);
     }
 
@@ -1033,5 +1056,126 @@ namespace xt
         EXPECT_EQ(idx2[0], exp_idx);
         exp_idx[0] = 2;
         EXPECT_EQ(idx2[1], exp_idx);
+    }
+
+    TEST(xview, contiguous)
+    {
+        using xtes = xt::xtensor<double, 4, layout_type::row_major>;
+        using xarr = xt::xarray<double, layout_type::row_major>;
+        using xfix = xt::xtensor_fixed<double, xshape<3, 4, 2, 5>, layout_type::row_major>;
+
+        using ctes = xt::xtensor<double, 4, layout_type::column_major>;
+        using carr = xt::xarray<double, layout_type::column_major>;
+        using cfix = xt::xtensor_fixed<double, xshape<3, 4, 2, 5>, layout_type::column_major>;
+
+        EXPECT_TRUE((detail::is_contiguous_view<xtes, xall<int>, xall<int>, xall<int>>()));
+        EXPECT_TRUE((detail::is_contiguous_view<xarr, xall<int>, xall<int>, xall<int>>()));
+        EXPECT_TRUE((detail::is_contiguous_view<xfix, xall<int>, xall<int>, xall<int>>()));
+        EXPECT_TRUE((detail::is_contiguous_view<xtes, int, int, xall<int>>()));
+        EXPECT_TRUE((detail::is_contiguous_view<xtes, int, xall<int>, xall<int>>()));
+        EXPECT_TRUE((detail::is_contiguous_view<xtes, int, xall<int>, xall<int>, xall<int>>()));
+        EXPECT_TRUE((detail::is_contiguous_view<xtes, int, int, xrange<int>>()));
+        EXPECT_TRUE((detail::is_contiguous_view<xtes, int, xrange<int>>()));
+        EXPECT_FALSE((detail::is_contiguous_view<xtes, int, xrange<int>, int>()));
+
+        EXPECT_TRUE((detail::is_contiguous_view<ctes, xall<int>, xall<int>, xall<int>, xall<int>>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, int, int, xall<int>>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, int, xall<int>, xall<int>>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, int, xall<int>, xall<int>, xall<int>>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, int, int, xrange<int>>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, int, xrange<int>>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, int, xrange<int>, int>()));
+
+        EXPECT_TRUE((detail::is_contiguous_view<ctes, xall<int>, xall<int>, int, int>()));
+        EXPECT_TRUE((detail::is_contiguous_view<cfix, xall<int>, xall<int>, int, int>()));
+        EXPECT_FALSE((detail::is_contiguous_view<xarr, xall<int>, xall<int>, int, int>()));
+        EXPECT_TRUE((detail::is_contiguous_view<ctes, xall<int>, xall<int>, xrange<int>, int>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, xall<int>, xrange<int>, xrange<int>, int>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, xall<int>, xrange<int>, xall<int>, int>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, xall<int>, xrange<int>, xrange<int>, int>()));
+        EXPECT_FALSE((detail::is_contiguous_view<ctes, xall<int>, xstepped_range<int>, int, int>()));
+    }
+
+    TEST(xview, container_offset_view)
+    {
+        using vector_type = std::vector<int>;
+        using array_type = std::array<int, 7>;
+        auto a = vector_type({0,1,2,3,4,5,6});
+        auto b = array_type({0,1,2,3,4,5,6});
+
+        auto va = container_offset_view<vector_type, 3>(a);
+        auto vb = container_offset_view<array_type, 3>(b);
+
+        EXPECT_EQ(va[0], a[3]);
+        EXPECT_EQ(va[1], a[4]);
+        EXPECT_EQ(*va.end(), *a.end());
+        EXPECT_TRUE(std::equal(a.begin() + 3, a.end(), va.begin()));
+        EXPECT_EQ(a.size() - 3, va.size());
+
+        EXPECT_EQ(vb[0], b[3]);
+        EXPECT_EQ(vb[1], b[4]);
+        EXPECT_EQ(*(vb.end() - 1), *(b.end() - 1));
+        EXPECT_TRUE(std::equal(b.begin() + 3, b.end(), vb.begin()));
+        EXPECT_EQ(b.size() - 3, vb.size());
+
+        auto vae = container_offset_view<vector_type, 3, 5>(a);
+        auto vbe = container_offset_view<array_type, 3, 5>(b);
+
+        EXPECT_EQ(vae[0], b[3]);
+        EXPECT_EQ(vae[1], b[4]);
+        EXPECT_EQ(vae.back(), b[4]);
+        EXPECT_EQ(*vae.end(), *(a.end() - 2));
+        EXPECT_TRUE(std::equal(a.begin() + 3, a.end() - 1, vae.begin()));
+        EXPECT_EQ(2, vae.size());
+
+        auto r_iter = vae.rbegin();
+        EXPECT_EQ(std::distance(a.rbegin(), a.rend()), a.size());
+        EXPECT_EQ(std::distance(r_iter, vae.rend()), vae.size());
+
+        for (std::size_t i = 0; i < vae.size(); ++i)
+        {
+            EXPECT_EQ(*r_iter, b[4 - i]);
+            ++r_iter;
+        }
+        EXPECT_EQ(r_iter, vae.rend());
+
+        EXPECT_EQ(vbe[0], b[3]);
+        EXPECT_EQ(vbe[1], b[4]);
+        EXPECT_EQ(vbe.back(), b[4]);
+        EXPECT_EQ(*vbe.end(), *(a.end() - 2));
+        EXPECT_TRUE(std::equal(a.begin() + 3, a.end() - 1, vbe.begin()));
+        EXPECT_EQ(2, vbe.size());
+
+        auto rb_iter = vbe.rbegin();
+        EXPECT_EQ(std::distance(a.rbegin(), a.rend()), a.size());
+        EXPECT_EQ(std::distance(rb_iter, vbe.rend()), vbe.size());
+
+        for (std::size_t i = 0; i < vbe.size(); ++i)
+        {
+            EXPECT_EQ(*rb_iter, b[4 - i]);
+            ++rb_iter;
+        }
+        EXPECT_EQ(rb_iter, vbe.rend());
+
+
+    }
+
+    TEST(xview, data_offset)
+    {
+        xt::xtensor<double, 6> ax = xt::random::rand<double>({3, 3, 3, 3, 3, 3});
+
+        auto do1 = xt::view(ax, 1, 1, newaxis(), 1).data_offset();
+        auto dos = xt::strided_view(ax, {1, 1, newaxis(), 1}).data_offset();
+
+        EXPECT_EQ(do1, dos);
+        EXPECT_EQ(ax.storage()[do1], ax(1, 1, 1, 0, 0, 0));
+        auto doe = ax.strides()[0] * 1 + ax.strides()[1] * 1 + ax.strides()[2] * 1;
+        EXPECT_EQ(doe, do1);
+
+        auto do2 = xt::view(ax, 1, 2, newaxis(), range(1, 2), range(2, 2, 4), all()).data_offset();
+        auto dos2 = xt::strided_view(ax, {1, 2, newaxis(), range(1, 2), range(2, 2, 4), all()}).data_offset();
+        EXPECT_EQ(do2, dos2);
+        auto doe2 = ax.strides()[0] * 1 + ax.strides()[1] * 2 + ax.strides()[2] * 1 + ax.strides()[3] * 2;
+        EXPECT_EQ(doe2, do2);
     }
 }

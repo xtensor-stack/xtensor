@@ -110,6 +110,14 @@ namespace xt
     a3 = np.copy(a1)
     a1[:, 2, :] = np.arange(7)
     a4 = np.copy(a1)
+    ax1 = np.copy(a0)
+    ax1[1, :, :] = -1
+    ax2 = np.copy(a0)
+    ax2[0:2, 0:2, :] = -1
+    ax3 = np.copy(a0)
+    ax3[1, 0:2:2, :] = -1
+    ax4 = np.copy(a0)
+    ax4[:, 0:2, :] = -1
     */
     TEST(xtest_extended, broadcast_into_view)
     {
@@ -131,5 +139,28 @@ namespace xt
         view(a, all(), 2, all()) = xt::arange(7);
         // py_a4
         EXPECT_EQ(a, py_a4);
+
+        a = py_a0;
+        view(a, 1, all(), all()) = -1;
+
+        // py_ax1
+        EXPECT_EQ(a, py_ax1);
+
+        a = py_a0;
+        view(a, range(0, 2), range(0, 2), all()) = -1;
+
+        // py_ax2
+        EXPECT_EQ(a, py_ax2);
+
+        a = py_a0;
+        view(a, all(), range(0, 2), all()) = -1;
+        // py_ax4
+        EXPECT_EQ(a, py_ax4);
+
+        a = py_a0;
+        view(a, 1, range(0, 2, 2), all()) = -1;
+        // py_ax3
+        EXPECT_EQ(a, py_ax3);
     }
+
 }

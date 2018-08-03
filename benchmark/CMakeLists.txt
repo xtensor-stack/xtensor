@@ -120,6 +120,8 @@ set(XTENSOR_BENCHMARK
     benchmark_reducer.cpp
     benchmark_views.cpp
     benchmark_xshape.cpp
+    benchmark_view_access.cpp
+    benchmark_view_assignment.cpp
     main.cpp
 )
 

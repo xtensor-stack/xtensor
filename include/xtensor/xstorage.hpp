@@ -1439,8 +1439,10 @@ namespace xt
 
 #if defined(_MSC_VER)
         using cast_type = std::array<std::size_t, sizeof...(X)>;
+        #define XTENSOR_FIXED_SHAPE_CONSTEXPR inline
 #else
         using cast_type = const_array<std::size_t, sizeof...(X)>;
+        #define XTENSOR_FIXED_SHAPE_CONSTEXPR constexpr
 #endif
         using value_type = std::size_t;
         using size_type = std::size_t;
@@ -1450,17 +1452,17 @@ namespace xt
             return sizeof...(X);
         }
 
-        constexpr operator cast_type() const
+        XTENSOR_FIXED_SHAPE_CONSTEXPR operator cast_type() const
         {
-            return cast_type({{X...}});
+            return cast_type({X...});
         }
 
-        constexpr auto begin() const
+        XTENSOR_FIXED_SHAPE_CONSTEXPR auto begin() const
         {
             return m_array.begin();
         }
 
-        constexpr auto end() const
+        XTENSOR_FIXED_SHAPE_CONSTEXPR auto end() const
         {
             return m_array.end();
         }
@@ -1475,30 +1477,32 @@ namespace xt
             return m_array.rend();
         }
 
-        constexpr auto cbegin() const
+        XTENSOR_FIXED_SHAPE_CONSTEXPR auto cbegin() const
         {
             return m_array.cbegin();
         }
 
-        constexpr auto cend() const
+        XTENSOR_FIXED_SHAPE_CONSTEXPR auto cend() const
         {
             return m_array.cend();
         }
 
-        constexpr std::size_t operator[](std::size_t idx) const
+        XTENSOR_FIXED_SHAPE_CONSTEXPR std::size_t operator[](std::size_t idx) const
         {
             return m_array[idx];
         }
 
     private:
 
-         XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = {{X...}};
+         XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = cast_type({X...});
     };
 
 #ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
     template <std::size_t... X>
     constexpr typename fixed_shape<X...>::cast_type fixed_shape<X...>::m_array;
 #endif
+
+#undef XTENSOR_FIXED_SHAPE_CONSTEXPR
 
 }
 

@@ -632,7 +632,7 @@ namespace xt
     inline auto xview_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
     {
         xt::assert_compatible_shape(*this, e);
-        xt::assign_data(*this, e, false);
+        xt::assign_data(*this, e, true);
         return this->derived_cast();
     }
 
