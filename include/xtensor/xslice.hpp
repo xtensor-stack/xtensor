@@ -235,7 +235,7 @@ namespace xt
         xall() = default;
         explicit xall(size_type size) noexcept;
 
-        size_type operator()(size_type i) const noexcept;
+        constexpr size_type operator()(size_type i) const noexcept;
 
         size_type size() const noexcept;
         size_type step_size() const noexcept;
@@ -770,6 +770,13 @@ namespace xt
         return slice;
     }
 
+    template <class E, class T>
+    inline auto get_slice_implementation(E& e, xdrop_slice<T>&& slice, std::size_t index)
+    {
+        slice.normalize(e.shape()[index]);
+        return slice;
+    }
+
     template <class E>
     inline auto get_slice_implementation(E& e, xall_tag&&, std::size_t index)
     {
@@ -966,7 +973,7 @@ namespace xt
     }
 
     template <class T>
-    inline auto xall<T>::operator()(size_type i) const noexcept -> size_type
+    constexpr auto xall<T>::operator()(size_type i) const noexcept -> size_type
     {
         return i;
     }

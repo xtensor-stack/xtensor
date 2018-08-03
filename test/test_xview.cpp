@@ -22,6 +22,18 @@ namespace xt
     using std::size_t;
     using view_shape_type = dynamic_shape<size_t>;
 
+    template <class A, class B, std::ptrdiff_t BB, std::ptrdiff_t BE>
+    bool operator==(const A& lhs, const container_offset_view<B, BB, BE>& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(rhs.begin(), rhs.end(), lhs.begin());
+    }
+
+    template <class A, class B, std::ptrdiff_t BB, std::ptrdiff_t BE>
+    bool operator==(const container_offset_view<B, BB, BE>& lhs, const A& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(rhs.begin(), rhs.end(), lhs.begin());
+    }
+
     TEST(xview, temporary_type)
     {
         {
@@ -755,7 +767,7 @@ namespace xt
         };
         auto row = xt::view(a, 1, xt::all());
         bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::ptrdiff_t, 1>>::value;
-        bool cond2 = std::is_same<decltype(row.strides()), const std::array<std::ptrdiff_t, 1>&>::value;
+        bool cond2 = std::is_same<decltype(row.strides()), const xt::container_offset_view<std::array<std::ptrdiff_t, 2>, 1, -1>&>::value;
         EXPECT_TRUE(cond1);
         EXPECT_TRUE(cond2);
     }
@@ -974,9 +986,9 @@ namespace xt
         v3(0, 2, 1) = 1000;
         EXPECT_EQ(a(1, 1, 3), 1000);
 
-        bool b = detail::slices_contigous<xkeep_slice<int>, int>::value;
+        bool b = detail::is_strided_view<decltype(a), xkeep_slice<int>, int>::value;
         EXPECT_FALSE(b);
-        b = detail::slices_contigous<xrange<int>, xrange<int>, int>::value;
+        b = detail::is_strided_view<decltype(a), xrange<int>, xrange<int>, int>::value;
         EXPECT_TRUE(b);
     }
 

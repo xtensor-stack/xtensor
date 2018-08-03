@@ -138,7 +138,7 @@ namespace xt
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
         template <class E, class XCT = CT, class = std::enable_if_t<xt::is_xscalar<XCT>::value>>
-        void assign_to(xexpression<E>& e) const;
+        void assign_to(xexpression<E>& e, bool force_resize) const;
 
     private:
 
@@ -401,10 +401,10 @@ namespace xt
 
     template <class CT, class X>
     template <class E, class XCT, class>
-    inline void xbroadcast<CT, X>::assign_to(xexpression<E>& e) const
+    inline void xbroadcast<CT, X>::assign_to(xexpression<E>& e, bool force_resize) const
     {
         auto& ed = e.derived_cast();
-        ed.resize(m_shape);
+        ed.resize(m_shape, force_resize);
         std::fill(ed.begin(), ed.end(), m_e());
     }
 }

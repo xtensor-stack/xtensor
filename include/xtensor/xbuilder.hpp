@@ -138,8 +138,8 @@ namespace xt
     template <class E>
     inline typename E::temporary_type empty_like(const xexpression<E>& e)
     {
-        typename E::temporary_type res(e.derived_cast().shape());
-        return res;
+        using xtype = typename E::temporary_type;
+        return xtype::from_shape(e.derived_cast().shape());
     }
 
     /**
@@ -152,7 +152,9 @@ namespace xt
     template <class E>
     inline typename E::temporary_type full_like(const xexpression<E>& e, typename E::value_type fill_value)
     {
-        typename E::temporary_type res(e.derived_cast().shape(), fill_value);
+        using xtype = typename E::temporary_type;
+        xtype res = xtype::from_shape(e.derived_cast().shape());
+        res.fill(fill_value);
         return res;
     }
 
@@ -213,7 +215,7 @@ namespace xt
             }
 
             template <class E>
-            inline void assign_to(xexpression<E>& e) const noexcept
+            inline void assign_to(xexpression<E>& e, bool /*force_resize*/) const noexcept
             {
                 auto& de = e.derived_cast();
                 value_type value = m_start;

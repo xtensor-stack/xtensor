@@ -1054,7 +1054,7 @@ namespace xt
     };
 
     template <class E1, class E2>
-    struct has_assign_to<E1, E2, void_t<decltype(std::declval<const E2&>().assign_to(std::declval<E1&>()))>>
+    struct has_assign_to<E1, E2, void_t<decltype(std::declval<const E2&>().assign_to(std::declval<E1&>(), true))>>
         : std::true_type
     {
     };

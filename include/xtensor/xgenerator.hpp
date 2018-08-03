@@ -114,7 +114,7 @@ namespace xt
         const_stepper stepper_end(const O& shape, layout_type) const noexcept;
 
         template <class E, class FE = F, class = std::enable_if_t<has_assign_to<E, FE>::value>>
-        void assign_to(xexpression<E>& e) const noexcept;
+        void assign_to(xexpression<E>& e, bool force_resize) const noexcept;
 
     private:
 
@@ -337,10 +337,10 @@ namespace xt
 
     template <class F, class R, class S>
     template <class E, class, class>
-    inline void xgenerator<F, R, S>::assign_to(xexpression<E>& e) const noexcept
+    inline void xgenerator<F, R, S>::assign_to(xexpression<E>& e, bool force_resize) const noexcept
     {
-        e.derived_cast().resize(m_shape);
-        m_f.assign_to(e);
+        e.derived_cast().resize(m_shape, force_resize);
+        m_f.assign_to(e, force_resize);
     }
 
     template <class F, class R, class S>

@@ -62,20 +62,20 @@ namespace xt
         EXPECT_EQ(2, dist);
     }
 
-    TEST(xaxis_iterator, nested)
-    {
-        xarray<int> a = get_test_array();
-        auto iter = axis_begin(a);
-        ++iter;
-        auto niter = axis_begin(*iter);
-        ++niter;
-        EXPECT_EQ(size_t(1), niter->dimension());
-        EXPECT_EQ(a.shape()[2], niter->shape()[0]);
-        EXPECT_EQ(a(1, 1, 0), (*niter)(0));
-        EXPECT_EQ(a(1, 1, 1), (*niter)(1));
-        EXPECT_EQ(a(1, 1, 2), (*niter)(2));
-        EXPECT_EQ(a(1, 1, 3), (*niter)(3));
-    }
+    // TEST(xaxis_iterator, nested)
+    // {
+    //     xarray<int> a = get_test_array();
+    //     auto iter = axis_begin(a);
+    //     ++iter;
+    //     auto niter = axis_begin(*iter);
+    //     ++niter;
+    //     EXPECT_EQ(size_t(1), niter->dimension());
+    //     EXPECT_EQ(a.shape()[2], niter->shape()[0]);
+    //     EXPECT_EQ(a(1, 1, 0), (*niter)(0));
+    //     EXPECT_EQ(a(1, 1, 1), (*niter)(1));
+    //     EXPECT_EQ(a(1, 1, 2), (*niter)(2));
+    //     EXPECT_EQ(a(1, 1, 3), (*niter)(3));
+    // }
 
     TEST(xaxis_iterator, const_array)
     {

@@ -132,6 +132,25 @@ namespace xt
             a.resize(size2);
             EXPECT_EQ(size2, a.size());
         }
+
+        vector_type b = {1,2,3};
+
+        b.resize(6);
+        EXPECT_EQ(b[0], 1);
+        EXPECT_EQ(b[1], 2);
+        EXPECT_EQ(b[2], 3);
+        b[2] = 15;
+        b.resize(3);
+        EXPECT_EQ(b.size(), 3);
+        EXPECT_EQ(b[2], 15);
+        b[2] = 100;
+        b.resize(6, 12);
+        EXPECT_EQ(b[2], 100);
+        EXPECT_EQ(b[3], 12);
+
+        vector_type c;
+        c.resize(10, 0);
+        EXPECT_EQ(c[6], 0);
     }
 
     TEST(svector, access)

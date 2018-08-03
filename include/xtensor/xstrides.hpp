@@ -42,10 +42,10 @@ namespace xt
      * strides builder *
      *******************/
 
-    template <class shape_type, class strides_type>
+    template <layout_type L = layout_type::dynamic, class shape_type, class strides_type>
     std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides);
 
-    template <class shape_type, class strides_type, class backstrides_type>
+    template <layout_type L = layout_type::dynamic, class shape_type, class strides_type, class backstrides_type>
     std::size_t compute_strides(const shape_type& shape, layout_type l,
                                 strides_type& strides, backstrides_type& backstrides);
 
@@ -194,13 +194,13 @@ namespace xt
             }
         }
 
-        template <class shape_type, class strides_type, class bs_ptr>
+        template <layout_type L = layout_type::dynamic, class shape_type, class strides_type, class bs_ptr>
         inline std::size_t compute_strides(const shape_type& shape, layout_type l,
                                            strides_type& strides, bs_ptr bs)
         {
             using strides_value_type = std::decay_t<decltype(strides[0])>;
             strides_value_type data_size = 1;
-            if (l == layout_type::row_major)
+            if (L == layout_type::row_major || l == layout_type::row_major)
             {
                 for (std::size_t i = strides.size(); i != 0; --i)
                 {
@@ -222,18 +222,18 @@ namespace xt
         }
     }
 
-    template <class shape_type, class strides_type>
+    template <layout_type L, class shape_type, class strides_type>
     inline std::size_t compute_strides(const shape_type& shape, layout_type l, strides_type& strides)
     {
-        return detail::compute_strides(shape, l, strides, nullptr);
+        return detail::compute_strides<L>(shape, l, strides, nullptr);
     }
 
-    template <class shape_type, class strides_type, class backstrides_type>
+    template <layout_type L, class shape_type, class strides_type, class backstrides_type>
     inline std::size_t compute_strides(const shape_type& shape, layout_type l,
                                        strides_type& strides,
                                        backstrides_type& backstrides)
     {
-        return detail::compute_strides(shape, l, strides, &backstrides);
+        return detail::compute_strides<L>(shape, l, strides, &backstrides);
     }
 
     template <class shape_type, class strides_type>
