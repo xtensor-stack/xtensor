@@ -64,6 +64,19 @@ namespace xt
         ASSERT_FALSE(res(1, 1).has_value());
     }
 
+    TEST(xoptional, bool_operation)
+    {
+        xtensor_optional<bool, 2> m1
+            {{ false ,       true },
+             { false , xtl::missing<bool>() }};
+
+        xtensor_optional<bool, 2> res = m1 && m1;
+        EXPECT_FALSE(res(0, 0).value());
+        EXPECT_TRUE(res(0, 1).value());
+        EXPECT_FALSE(res(1, 0).value());
+        EXPECT_EQ(res(1, 1), xtl::missing<bool>());
+    }
+
     TEST(xoptional, xio)
     {
         std::ostringstream oss;
