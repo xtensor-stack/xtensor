@@ -276,12 +276,11 @@ namespace xt
         *  done because thie template is specialized in file xview.hpp. */
 
         template <class E>
-        struct is_xscalar_impl : is_CRTP_base<E, sxcalar>;
-        };
+        struct is_xscalar_impl : is_CRTP_base<E, xscalar> {};
     }
 
     template <class E>
-    using is_xscalar = is_xscalar_impl<E>;
+    using is_xscalar = detail::is_xscalar_impl<E>;
 
     namespace detail
     {
