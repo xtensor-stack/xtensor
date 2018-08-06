@@ -270,21 +270,8 @@ namespace xt
     };
 #undef DL
 
-    namespace detail
-    {
-        template <class E>
-        struct is_xscalar_impl : std::false_type
-        {
-        };
-
-        template <class E>
-        struct is_xscalar_impl<xscalar<E>> : std::true_type
-        {
-        };
-    }
-
     template <class E>
-    using is_xscalar = detail::is_xscalar_impl<E>;
+    using is_xscalar = is_CRTP_base<E, xscalar>;
 
     namespace detail
     {
