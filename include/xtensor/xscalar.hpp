@@ -270,8 +270,18 @@ namespace xt
     };
 #undef DL
 
+    namespace detail
+    {
+        /*Not congrouous with previous use of this idiom;
+        *  done because thie template is specialized in file xview.hpp. */
+
+        template <class E>
+        struct is_xscalar_impl : is_CRTP_base<E, sxcalar>;
+        };
+    }
+
     template <class E>
-    using is_xscalar = is_CRTP_base<E, xscalar>;
+    using is_xscalar = is_xscalar_impl<E>;
 
     namespace detail
     {
