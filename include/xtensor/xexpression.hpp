@@ -104,19 +104,19 @@ namespace xt
 
     namespace detail
     {
-        template <class E>
-        struct is_xexpression_impl : std::is_base_of<xexpression<std::decay_t<E>>, std::decay_t<E>>
-        {
-        };
+        template <class E, template<class> class B>
+        struct is_CRTP_base_impl : std::is_base_of< B<E>, E> {};
 
-        template <class E>
-        struct is_xexpression_impl<xexpression<E>> : std::true_type
-        {
-        };
+        template <class E, template<class> class F, template<class> class B>
+        struct is_CRTP_base_impl<F<E>, B> :
+        xtl::disjunction< std::is_base_of< B<E>, F<E> >, std::is_base_of< B<F<E>>, F<E> > > {};
     }
 
+    template <class E, template<class> class B>
+    using is_CRTP_base = detail::is_CRTP_base_impl<std::decay_t<E>, B>;
+
     template <class E>
-    using is_xexpression = detail::is_xexpression_impl<E>;
+    using is_xexpression = is_CRTP_base<E, xexpression>;
 
     template <class E, class R = void>
     using enable_xexpression = typename std::enable_if<is_xexpression<E>::value, R>::type;
@@ -440,7 +440,7 @@ namespace xt
         XTENSOR_FORWARD_METHOD(storage_end);
         XTENSOR_FORWARD_METHOD(storage_cend);
         XTENSOR_FORWARD_METHOD(layout);
-        
+
         template <class T = E>
         std::enable_if_t<has_strides<T>::value, const inner_strides_type&>
         strides() const
@@ -489,15 +489,15 @@ namespace xt
         {
             return m_ptr->storage();
         }
-       
+
         template <class It>
         auto element(It first, It last) {
-            return m_ptr->element(first, last); 
+            return m_ptr->element(first, last);
         }
-        
+
         template <class It>
         auto element(It first, It last) const {
-            return m_ptr->element(first, last); 
+            return m_ptr->element(first, last);
         }
 
         template <class S>
