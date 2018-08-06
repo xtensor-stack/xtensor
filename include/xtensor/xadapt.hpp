@@ -48,9 +48,15 @@ namespace xt
      * @param l the layout_type of the xarray_adaptor
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, class SC,
-              typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0>
+              typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0,
+              typename std::enable_if_t<!std::is_pointer<C>::value, int> = 0>
     xarray_adaptor<xtl::closure_type_t<C>, L, std::decay_t<SC>>
     adapt(C&& container, const SC& shape, layout_type l = L);
+
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, class SC,
+              typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int> = 0,
+              typename std::enable_if_t<std::is_pointer<C>::value, int> = 0>
+    inline auto adapt(C&& pointer, const SC& shape, layout_type l = L);
 
     /**
      * Constructs an xarray_adaptor of the given stl-like container,
@@ -120,9 +126,15 @@ namespace xt
      * @param l the layout_type of the xtensor_adaptor
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, class SC,
-              typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int> = 0>
+              typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int> = 0,
+              typename std::enable_if_t<!std::is_pointer<C>::value, int> = 0>
     xtensor_adaptor<C, detail::array_size<SC>::value, L>
     adapt(C&& container, const SC& shape, layout_type l = L);
+
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, class SC,
+              typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int> = 0,
+              typename std::enable_if_t<std::is_pointer<C>::value, int> = 0>
+    auto adapt(C&& ptr, const SC& shape, layout_type l = L);
 
     /**
      * Constructs an xtensor_adaptor of the given stl-like container,
@@ -190,12 +202,24 @@ namespace xt
 
     // shape only - container version
     template <layout_type L, class C, class SC,
-              typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int>>
+              typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int>,
+              typename std::enable_if_t<!std::is_pointer<C>::value, int>>
     inline xarray_adaptor<xtl::closure_type_t<C>, L, std::decay_t<SC>>
     adapt(C&& container, const SC& shape, layout_type l)
     {
         using return_type = xarray_adaptor<xtl::closure_type_t<C>, L, std::decay_t<SC>>;
         return return_type(std::forward<C>(container), shape, l);
+    }
+
+    template <layout_type L, class C, class SC,
+              typename std::enable_if_t<!detail::is_array<std::decay_t<SC>>::value, int>,
+              typename std::enable_if_t<std::is_pointer<C>::value, int>>
+    inline auto adapt(C&& pointer, const SC& shape, layout_type l)
+    {
+        using buffer_type = xbuffer_adaptor<C, xt::no_ownership, std::allocator<typename std::remove_pointer<C>::type>>;
+        using return_type = xarray_adaptor<buffer_type, L, std::decay_t<SC>>;
+        std::size_t size = compute_size(shape);
+        return return_type(buffer_type(pointer, size), shape, l);
     }
 
     // shape and strides - container version
@@ -238,11 +262,11 @@ namespace xt
                            xtl::forward_sequence<typename return_type::inner_strides_type>(strides));
     }
 
-    /******************************************
-     * xtensor_adaptor builder implementation *
-     ******************************************/
+    // /******************************************
+    //  * xtensor_adaptor builder implementation *
+    //  ******************************************/
 
-    // 1-D case - container version
+    // // 1-D case - container version
     template <layout_type L, class C>
     inline xtensor_adaptor<C, 1, L>
     adapt(C&& container, layout_type l)
@@ -252,9 +276,10 @@ namespace xt
         return return_type(std::forward<C>(container), shape, l);
     }
 
-    // shape only - container version
+    // // shape only - container version
     template <layout_type L, class C, class SC,
-              typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int>>
+              typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int>,
+              typename std::enable_if_t<!std::is_pointer<C>::value, int>>
     inline xtensor_adaptor<C, detail::array_size<SC>::value, L>
     adapt(C&& container, const SC& shape, layout_type l)
     {
@@ -262,6 +287,42 @@ namespace xt
         using return_type = xtensor_adaptor<xtl::closure_type_t<C>, N, L>;
         return return_type(std::forward<C>(container), shape, l);
     }
+
+    template <layout_type L, class C, class SC,
+              typename std::enable_if_t<detail::is_array<std::decay_t<SC>>::value, int>,
+              typename std::enable_if_t<std::is_pointer<C>::value, int>>
+    inline auto adapt(C&& ptr, const SC& shape, layout_type l)
+    {
+        using buffer_type = xbuffer_adaptor<C, xt::no_ownership, std::allocator<typename std::remove_pointer<C>::type>>;
+        constexpr std::size_t N = detail::array_size<SC>::value;
+        using return_type = xtensor_adaptor<buffer_type, N, L>;
+        return return_type(buffer_type(ptr, compute_size(shape)), shape, l);
+    }
+
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, std::size_t... X,
+              typename std::enable_if_t<std::is_pointer<C>::value, int> = 0>
+    inline auto adapt(C&& ptr, const fixed_shape<X...>& /*shape*/)
+    {
+        using buffer_type = xbuffer_adaptor<C, xt::no_ownership, std::allocator<typename std::remove_pointer<C>::type>>;
+        using return_type = xfixed_adaptor<buffer_type, fixed_shape<X...>, L>;
+        return return_type(buffer_type(ptr, detail::fixed_compute_size<fixed_shape<X...>>::value));
+    }
+
+#ifndef X_OLD_CLANG
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C,  std::size_t N>
+    inline auto adapt(C&& ptr, const std::size_t (&shape)[N])
+    {
+        using shape_type = std::array<std::size_t, N>;
+        return adapt(std::forward<C>(ptr), xtl::forward_sequence<shape_type>(shape));
+    }
+#else
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C>
+    inline auto adapt(C&& ptr, std::initializer_list<std::size_t> shape)
+    {
+        using shape_type = xt::dynamic_shape<std::size_t>;
+        return adapt(std::forward<C>(ptr), xtl::forward_sequence<shape_type>(shape));
+    }
+#endif
 
     // shape and strides - container version
     template <class C, class SC, class SS,
