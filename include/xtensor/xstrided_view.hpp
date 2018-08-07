@@ -690,7 +690,7 @@ namespace xt
     template <class E>
     inline auto transpose(E&& e) noexcept
     {
-        using shape_type = typename std::decay_t<E>::shape_type;
+        using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
         shape_type shape;
         resize_container(shape, e.shape().size());
         std::copy(e.shape().crbegin(), e.shape().crend(), shape.begin());
@@ -798,7 +798,7 @@ namespace xt
             inline static auto run(E&& e)
             {
                 // Case where the static layout is either row_major or column major.
-                using shape_type = typename std::decay_t<E>::shape_type;
+                using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
                 get_strides_t<shape_type> strides;
                 resize_container(strides, e.shape().size());
                 layout_type l = detail::transpose_layout(e.layout());
@@ -1100,7 +1100,7 @@ namespace xt
     template <class E>
     inline auto flip(E&& e, std::size_t axis)
     {
-        using shape_type = typename std::decay_t<E>::shape_type;
+        using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
 
         shape_type shape;
         resize_container(shape, e.shape().size());

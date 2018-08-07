@@ -1435,7 +1435,11 @@ namespace xt
     {
     public:
 
+#if defined(_MSC_VER)
+        using cast_type = std::array<std::size_t, sizeof...(X)>;
+#else
         using cast_type = const_array<std::size_t, sizeof...(X)>;
+#endif
         using value_type = std::size_t;
         using size_type = std::size_t;
 

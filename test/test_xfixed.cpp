@@ -99,26 +99,26 @@ namespace xt
         EXPECT_EQ(acm.backstrides().size(), bcm.backstrides().size());
         EXPECT_EQ(acm.size(), std::size_t(3 * 7 * 2 * 5 * 3));
 
-        auto s = get_strides<layout_type::row_major>(xshape<3, 4, 5>());
+        auto s = get_strides<layout_type::row_major, const_array<ptrdiff_t, 3>>(xshape<3, 4, 5>());
         EXPECT_EQ(s[0], 20u);
         EXPECT_EQ(s[1], 5u);
         EXPECT_EQ(s[2], 1u);
 
-        auto sc = get_strides<layout_type::column_major>(xshape<3, 4, 5>());
+        auto sc = get_strides<layout_type::column_major, const_array<ptrdiff_t, 3>>(xshape<3, 4, 5>());
         EXPECT_EQ(sc[0], 1u);
         EXPECT_EQ(sc[1], 3u);
         EXPECT_EQ(sc[2], 12u);
 
         std::array<std::size_t, 3> ts1 = {1, 5, 3}, tt1;
 
-        auto sc2 = get_strides<layout_type::column_major>(xshape<1, 5, 3>());
+        auto sc2 = get_strides<layout_type::column_major, const_array<ptrdiff_t, 3>>(xshape<1, 5, 3>());
         compute_strides(ts1, layout_type::column_major, tt1);
         EXPECT_EQ(tt1[0], sc2[0]);
         EXPECT_EQ(tt1[1], sc2[1]);
         EXPECT_EQ(tt1[2], sc2[2]);
 
-        auto sc3c = get_strides<layout_type::column_major>(xshape<3, 1, 3, 2, 1, 3>());
-        auto sc3r = get_strides<layout_type::row_major>(xshape<3, 1, 3, 2, 1, 3>());
+        auto sc3c = get_strides<layout_type::column_major, const_array<ptrdiff_t, 6>>(xshape<3, 1, 3, 2, 1, 3>());
+        auto sc3r = get_strides<layout_type::row_major, const_array<ptrdiff_t, 6>>(xshape<3, 1, 3, 2, 1, 3>());
         std::vector<std::size_t> ts2({3, 1, 3, 2, 1, 3}), tt2(6);
 
         compute_strides(ts2, layout_type::column_major, tt2);
@@ -198,6 +198,14 @@ namespace xt
         EXPECT_THROW(check_shape_b(), std::runtime_error);
         EXPECT_THROW(check_shape_c(), std::runtime_error);
     #endif
+    }
+
+    TEST(xtensor_fixed, transpose)
+    {
+        xtensorf3x4 a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
+        xtensor_fixed<double, xshape<4, 3>> ta = xt::transpose(a);
+        EXPECT_EQ(a(1, 1), ta(1, 1));
+        EXPECT_EQ(a(2, 1), ta(1, 2));
     }
 
     TEST(xtensor_fixed, xfunction_eval)
