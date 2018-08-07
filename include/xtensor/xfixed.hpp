@@ -367,13 +367,12 @@ namespace xt
     struct xcontainer_inner_types<xfixed_adaptor<EC, S, L, Tag>>
     {
         using storage_type = std::remove_reference_t<EC>;
+        using shape_type = S;
         using inner_shape_type = typename S::cast_type;
         using strides_type = get_strides_t<inner_shape_type>;
         using backstrides_type = strides_type;
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
-        using shape_type = std::array<typename inner_shape_type::value_type,
-                                      std::tuple_size<inner_shape_type>::value>;
         using temporary_type = xfixed_container<typename storage_type::value_type, S, L, Tag>;
         static constexpr layout_type layout = L;
     };
