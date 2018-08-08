@@ -319,4 +319,54 @@ namespace xt
 
         delete[] data;
     }
+
+    TEST(xarray_adaptor, short_syntax)
+    {
+        std::vector<int> a({1,2,3,4,5,6,7,8});
+        auto xa = adapt(&a[1], std::vector<std::size_t>({3}));
+        xa(1) = 123;
+
+        EXPECT_EQ(a[2], 123);
+        EXPECT_EQ(xa(2), 4);
+    }
+
+    TEST(xtensor_adaptor, nice_syntax)
+    {
+        std::vector<int> a({1,2,3,4,5,6,7,8});
+#ifndef X_OLD_CLANG
+        auto xa = adapt(&a[0], {2, 4});
+        bool truthy = std::is_same<decltype(xa)::shape_type, std::array<std::size_t, 2>>::value;
+        EXPECT_TRUE(truthy);
+#else
+        auto xa = adapt(&a[0], {2, 4});
+        bool truthy = std::is_same<decltype(xa)::shape_type, xt::dynamic_shape<size_t>>::value;
+        EXPECT_TRUE(truthy);
+#endif
+        xa(0, 0) = 100;
+        xa(1, 3) = 1000;
+        EXPECT_EQ(a[0], 100);
+        EXPECT_EQ(a[7], 1000);
+    }
+
+    TEST(xtensor_fixed_adaptor, adapt)
+    {
+        std::vector<int> a({1,2,3,4,5,6,7,8});
+        auto xa = adapt(&a[0], xshape<2, 4>());
+        xa(0, 0) = 100;
+        xa(1, 3) = 1000;
+        EXPECT_EQ(a[0], 100);
+        EXPECT_EQ(a[7], 1000);
+        bool truthy = std::is_same<decltype(xa)::shape_type, xshape<2, 4>>::value;
+        EXPECT_TRUE(truthy);
+        const std::vector<int> b({5,5,19,5});
+        auto xb = adapt(&b[0], xshape<2, 2>());
+        if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
+        {
+            EXPECT_EQ(xb(1,0), 19);
+        }
+        else
+        {
+            EXPECT_EQ(xb(1,0), 5);
+        }
+    }
 }
