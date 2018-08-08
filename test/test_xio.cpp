@@ -266,4 +266,14 @@ namespace xt
 
         EXPECT_EQ(custom_formatter_result, out.str());
     }
+
+    TEST(xio, view_on_broadcast)
+    {
+        auto on = xt::ones<int>({5, 5});
+        auto von = xt::view(on, 1);
+        std::stringstream out;
+        out << von;
+        std::string exp = "{1, 1, 1, 1, 1}";
+        EXPECT_EQ(exp, out.str());
+    }
 }

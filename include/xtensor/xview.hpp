@@ -622,7 +622,7 @@ namespace xt
     template <class CT, class... S>
     inline layout_type xview<CT, S...>::layout() const noexcept
     {
-        return xtl::mpl::static_if<detail::slices_contigous<S...>::value>([&](auto self)
+        return xtl::mpl::static_if<detail::slices_contigous<S...>::value && has_strides<xexpression_type>::value>([&](auto self)
         {
             return do_strides_match(self(this)->shape(), self(this)->strides(), self(this)->m_e.layout()) ?
                 self(this)->m_e.layout() : layout_type::dynamic;
