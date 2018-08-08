@@ -14,6 +14,7 @@
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -931,5 +932,16 @@ namespace xt
         truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
     #endif
+    }
+
+    TEST(xstrided_view, on_xview)
+    {
+        xarray<double> a = {0,1,2,3,4,5,6,7,8};
+        auto v = view(a, keep(3, 5, 6));
+        auto v2 = strided_view(v, {2});
+        EXPECT_EQ(v2(0), 6);
+        auto v3 = strided_view(v, {all()});
+        EXPECT_EQ(v3(0), 3);
+        EXPECT_EQ(v3(1), 5);
     }
 }
