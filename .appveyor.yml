@@ -30,7 +30,7 @@ install:
   - conda update -q conda
   - conda info -a
   - conda install gtest cmake -c conda-forge
-  - conda install xtl==0.4.13 -c QuantStack
+  - conda install xtl==0.4.14 -c QuantStack
   - conda install xsimd -c QuantStack
   - conda install nlohmann_json -c QuantStack
     # - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DDISABLE_VS2017=ON .

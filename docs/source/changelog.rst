@@ -7,6 +7,24 @@
 Changelog
 =========
 
+0.17.1
+------
+
+- Add std namespace to size_t everywhere, remove std::copysign for MSVC
+  `#1053 <https://github.com/QuantStack/xtensor/pull/1053>`_.
+- Fix (wrong) bracket warnings for older clang versions (e.g. clang 5 on OS X)
+  `#1050 <https://github.com/QuantStack/xtensor/pull/1050>`_.
+- Fix strided view on view by using std::addressof
+  `#1049 <https://github.com/QuantStack/xtensor/pull/1049>`_.
+- Add more adapt functions and shorthands
+  `#1043 <https://github.com/QuantStack/xtensor/pull/1043>`_.
+- Improve CRTP base class detection
+  `#1041 <https://github.com/QuantStack/xtensor/pull/1041>`_.
+- Fix rebind container ambiguous template for C++17 / GCC 8 regression
+  `#1038 <https://github.com/QuantStack/xtensor/pull/1038>`_.
+- Fix functor return value
+  `#1035 <https://github.com/QuantStack/xtensor/pull/1035>`_.
+
 0.17.0
 ------
 
@@ -19,6 +37,8 @@ Breaking changes
   `#974 <https://github.com/QuantStack/xtensor/pull/974>`_.
 - homogenize ``xfixed`` constructors
   `#970 <https://github.com/QuantStack/xtensor/pull/970>`_.
+- Improve ``random::choice``
+  `#1011 <https://github.com/QuantStack/xtensor/pull/1011>`_.
 
 New features
 ~~~~~~~~~~~~
@@ -55,7 +75,7 @@ New features
 Other changes
 ~~~~~~~~~~~~~
 
-- ``xshared_expresion`` fixed
+- ``xshared_expression`` fixed
   `#1025 <https://github.com/QuantStack/xtensor/pull/1025>`_.
 - fix ``make_xshared``
   `#1024 <https://github.com/QuantStack/xtensor/pull/1024>`_.
@@ -63,8 +83,6 @@ Other changes
   `#1019 <https://github.com/QuantStack/xtensor/pull/1019>`_.
 - fix ``where`` on ``xview``
   `#1012 <https://github.com/QuantStack/xtensor/pull/1012>`_.
-- Improve ``random::choice``
-  `#1011 <https://github.com/QuantStack/xtensor/pull/1011>`_.
 - basic usage replaced with getting started
   `#1004 <https://github.com/QuantStack/xtensor/pull/1004>`_.
 - avoided installation failure in absence of ``nlohmann_json``
