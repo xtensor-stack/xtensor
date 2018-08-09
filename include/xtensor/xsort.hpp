@@ -120,7 +120,7 @@ namespace xt
             using type = VT;
         };
 
-        template <class VT, size_t N, layout_type L>
+        template <class VT, std::size_t N, layout_type L>
         struct flatten_sort_result_type<xtensor<VT, N, L>>
         {
             using type = xtensor<VT, 1, L>;
@@ -211,7 +211,7 @@ namespace xt
             using type = xarray<VT, L>;
         };
 
-        template <class VT, class EC, size_t N, layout_type L>
+        template <class VT, class EC, std::size_t N, layout_type L>
         struct rebind_value_type<VT, xtensor<EC, N, L>>
         {
             using type = xtensor<VT, N, L>;
@@ -229,7 +229,7 @@ namespace xt
             using type = typename rebind_value_type<VT, T>::type;
         };
 
-        template <class VT, class EC, size_t N, layout_type L>
+        template <class VT, class EC, std::size_t N, layout_type L>
         struct flatten_rebind_value_type<VT, xtensor<EC, N, L>>
         {
             using type = xtensor<VT, 1, L>;

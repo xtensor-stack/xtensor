@@ -56,14 +56,14 @@ namespace xsimd
         using type = T;
         using bool_type = bool;
         using batch_bool = bool;
-        static constexpr size_t size = 1;
+        static constexpr std::size_t size = 1;
     };
 
     template <class T>
     struct revert_simd_traits
     {
         using type = T;
-        static constexpr size_t size = simd_traits<type>::size;
+        static constexpr std::size_t size = simd_traits<type>::size;
     };
 
     template <class T>

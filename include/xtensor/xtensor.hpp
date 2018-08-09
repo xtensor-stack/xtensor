@@ -60,7 +60,7 @@ namespace xt
      * @tparam Tag The expression tag.
      * @sa xtensor
      */
-    template <class EC, size_t N, layout_type L, class Tag>
+    template <class EC, std::size_t N, layout_type L, class Tag>
     class xtensor_container : public xstrided_container<xtensor_container<EC, N, L, Tag>>,
                               public xcontainer_semantic<xtensor_container<EC, N, L, Tag>>
     {
