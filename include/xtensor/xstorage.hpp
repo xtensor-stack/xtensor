@@ -1517,13 +1517,13 @@ namespace std
 {
     template <class T, std::size_t N>
     class tuple_size<xt::const_array<T, N>> :
-        public integral_constant<size_t, N>
+        public integral_constant<std::size_t, N>
     {
     };
 
-    template <size_t... N>
+    template <std::size_t... N>
     class tuple_size<xt::fixed_shape<N...>> :
-        public integral_constant<size_t, sizeof...(N)>
+        public integral_constant<std::size_t, sizeof...(N)>
     {
     };
 }
