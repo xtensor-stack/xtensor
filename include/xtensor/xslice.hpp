@@ -65,11 +65,11 @@ namespace xt
         {
             XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, C>()
             {
-                return {
+                return xrange_adaptor<A, B, C>({
                     get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
                     get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
                     get_tuph_or_val(rng[2], std::is_same<C, xtuph>())
-                };
+                });
             }
 
             ptrdiff_t rng[3];// = { 0, 0, 0 };
@@ -80,11 +80,11 @@ namespace xt
         {
             XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, xt::placeholders::xtuph>()
             {
-                return {
+                return xrange_adaptor<A, B, xt::placeholders::xtuph>({
                     get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
                     get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
                     xtuph()
-                };
+                });
             }
 
             ptrdiff_t rng[3];  // = { 0, 0, 0 };
@@ -93,7 +93,7 @@ namespace xt
         template <class... OA>
         XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const std::ptrdiff_t& t)
         {
-            auto nrng = rangemaker<OA..., ptrdiff_t>{rng.rng[0], rng.rng[1], rng.rng[2]};
+            auto nrng = rangemaker<OA..., ptrdiff_t>({rng.rng[0], rng.rng[1], rng.rng[2]});
             nrng.rng[sizeof...(OA)] = t;
             return nrng;
         }
@@ -101,13 +101,13 @@ namespace xt
         template <class... OA>
         XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const xt::placeholders::xtuph& /*t*/)
         {
-            auto nrng = rangemaker<OA..., xt::placeholders::xtuph>{rng.rng[0], rng.rng[1], rng.rng[2]};
+            auto nrng = rangemaker<OA..., xt::placeholders::xtuph>({rng.rng[0], rng.rng[1], rng.rng[2]});
             return nrng;
         }
 
 
         XTENSOR_GLOBAL_CONSTEXPR xtuph _{};
-        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r{0, 0, 0};
+        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r = rangemaker<>({0, 0, 0});
         XTENSOR_GLOBAL_CONSTEXPR xall_tag _a{};
         XTENSOR_GLOBAL_CONSTEXPR xnewaxis_tag _n{};
         XTENSOR_GLOBAL_CONSTEXPR xellipsis_tag _e{};

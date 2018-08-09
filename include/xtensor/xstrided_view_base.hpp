@@ -875,14 +875,14 @@ namespace xt
             template <class T>
             std::array<std::ptrdiff_t, 3> operator()(const T& /*t*/) const
             {
-                return{ 0, 0, 0 };
+                return std::array<std::ptrdiff_t, 3>({0, 0, 0});
             }
 
             template <class A, class B, class C>
             std::array<std::ptrdiff_t, 3> operator()(const xrange_adaptor<A, B, C>& range) const
             {
                 auto sl = range.get(static_cast<std::size_t>(m_shape[idx]));
-                return{ sl(0), sl.size(), sl.step_size() };
+                return std::array<std::ptrdiff_t, 3>({sl(0), sl.size(), sl.step_size()});
             }
         };
 
