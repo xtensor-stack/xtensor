@@ -1022,12 +1022,12 @@ namespace xt
     {
         xt::xtensor<size_t, 2> I = {{0, 0}, {1, 1}, {2, 2}};
         auto col = xt::view(I, xt::all(), 0);
-        auto idx = xt::where(xt::equal(col, 0));
+        auto idx = xt::where(xt::equal(col, size_t(0)));
 
         std::array<std::size_t, 1> exp_idx = {0};
         EXPECT_EQ(idx[0], exp_idx);
 
-        auto idx2 = xt::where(col > 0);
+        auto idx2 = xt::where(col > size_t(0));
         EXPECT_EQ(idx2.size(), 2);
         exp_idx[0] = 1;
         EXPECT_EQ(idx2[0], exp_idx);
