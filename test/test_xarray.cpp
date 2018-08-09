@@ -8,6 +8,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xio.hpp"
 #include "test_common.hpp"
 
@@ -271,5 +272,25 @@ namespace xt
     {
         xarray_dynamic a = {1};
         EXPECT_FALSE((a.begin() == a.end()));
+    }
+
+    TEST(xarray, move_from_xtensor)
+    {
+        xtensor<double, 3> a = {{{1,2,3}, {4,5,6}}, {{10, 10, 10}, {1,5,10}}};
+        xtensor<double, 3> a1 = a;
+        xarray<double> b(std::move(a1));
+        EXPECT_EQ(a, b);
+        EXPECT_TRUE(std::equal(a.strides().begin(), a.strides().end(), b.strides().begin()) && a.strides().size() == b.strides().size());
+        EXPECT_TRUE(std::equal(a.backstrides().begin(), a.backstrides().end(), b.backstrides().begin()) && a.backstrides().size() == b.backstrides().size());
+        EXPECT_EQ(a.layout(), b.layout());
+
+        xtensor<double, 3> a2 = a;
+        xarray<double> c;
+        c = std::move(a2);
+
+        EXPECT_EQ(a, c);
+        EXPECT_TRUE(std::equal(a.strides().begin(), a.strides().end(), c.strides().begin()) && a.strides().size() == c.strides().size());
+        EXPECT_TRUE(std::equal(a.backstrides().begin(), a.backstrides().end(), c.backstrides().begin()) && a.backstrides().size() == c.backstrides().size());
+        EXPECT_EQ(a.layout(), c.layout());
     }
 }

@@ -80,6 +80,7 @@ namespace xt
         using strides_type = typename base_type::strides_type;
         using backstrides_type = typename base_type::backstrides_type;
         using inner_strides_type = typename base_type::inner_strides_type;
+        using inner_backstrides_type = typename base_type::inner_backstrides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
@@ -107,6 +108,11 @@ namespace xt
 
         xarray_container(xarray_container&&) = default;
         xarray_container& operator=(xarray_container&&) = default;
+
+        template <std::size_t N>
+        explicit xarray_container(xtensor_container<EC, N, L, Tag>&& rhs);
+        template <std::size_t N>
+        xarray_container& operator=(xtensor_container<EC, N, L, Tag>&& rhs);
 
         template <class E>
         xarray_container(const xexpression<E>& e);
@@ -209,7 +215,6 @@ namespace xt
 
         storage_type& storage_impl() noexcept;
         const storage_type& storage_impl() const noexcept;
-
 
         friend class xcontainer<xarray_adaptor<EC, L, SC, Tag>>;
     };
@@ -388,6 +393,29 @@ namespace xt
     {
         shape_type shape = xtl::forward_sequence<shape_type>(s);
         return self_type(shape);
+    }
+
+    template <class EC, layout_type L, class SC, class Tag>
+    template <std::size_t N>
+    inline xarray_container<EC, L, SC, Tag>::xarray_container(xtensor_container<EC, N, L, Tag>&& rhs)
+        : base_type(inner_shape_type(rhs.shape().cbegin(), rhs.shape().cend()),
+                    inner_strides_type(rhs.strides().cbegin(), rhs.strides().cend()),
+                    inner_backstrides_type(rhs.backstrides().cbegin(), rhs.backstrides().cend()),
+                    std::move(rhs.layout())),
+          m_storage(std::move(rhs.storage()))
+    {
+    }
+
+    template <class EC, layout_type L, class SC, class Tag>
+    template <std::size_t N>
+    inline xarray_container<EC, L, SC, Tag>& xarray_container<EC, L, SC, Tag>::operator=(xtensor_container<EC, N, L, Tag>&& rhs)
+    {
+        this->shape_impl().assign(rhs.shape().cbegin(), rhs.shape().cend());
+        this->strides_impl().assign(rhs.strides().cbegin(), rhs.strides().cend());
+        this->backstrides_impl().assign(rhs.backstrides().cbegin(), rhs.backstrides().cend());
+        this->mutable_layout() = rhs.layout();
+        m_storage = std::move(rhs.storage());
+        return *this;
     }
 
     /**

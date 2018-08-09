@@ -423,6 +423,7 @@ namespace xt
         xstrided_container& operator=(xstrided_container&&) = default;
 
         explicit xstrided_container(inner_shape_type&&, inner_strides_type&&) noexcept;
+        explicit xstrided_container(inner_shape_type&&, inner_strides_type&&, inner_backstrides_type&&, layout_type&&) noexcept;
 
         inner_shape_type& shape_impl() noexcept;
         const inner_shape_type& shape_impl() const noexcept;
@@ -432,6 +433,11 @@ namespace xt
 
         inner_backstrides_type& backstrides_impl() noexcept;
         const inner_backstrides_type& backstrides_impl() const noexcept;
+
+        layout_type& mutable_layout() noexcept
+        {
+            return m_layout;
+        }
 
     private:
 
@@ -1262,6 +1268,12 @@ namespace xt
     }
 
     template <class D>
+    inline xstrided_container<D>::xstrided_container(inner_shape_type&& shape, inner_strides_type&& strides, inner_backstrides_type&& backstrides, layout_type&& layout) noexcept
+        : base_type(), m_shape(std::move(shape)), m_strides(std::move(strides)), m_backstrides(std::move(backstrides)), m_layout(std::move(layout))
+    {
+    }
+
+    template <class D>
     inline auto xstrided_container<D>::shape_impl() noexcept -> inner_shape_type&
     {
         return m_shape;
@@ -1333,16 +1345,17 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::resize(S&& shape, bool force)
     {
-        if (m_shape.size() != shape.size() || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
+        std::size_t dim = shape.size();
+        if (m_shape.size() != dim || !std::equal(std::begin(shape), std::end(shape), std::begin(m_shape)) || force)
         {
-            if (m_layout == layout_type::dynamic || m_layout == layout_type::any)
+            if (D::static_layout == layout_type::dynamic && m_layout == layout_type::dynamic)
             {
                 m_layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
             }
             m_shape = xtl::forward_sequence<shape_type>(shape);
-            resize_container(m_strides, m_shape.size());
-            resize_container(m_backstrides, m_shape.size());
-            size_type data_size = compute_strides(m_shape, m_layout, m_strides, m_backstrides);
+            resize_container(m_strides, dim);
+            resize_container(m_backstrides, dim);
+            size_type data_size = compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
             detail::resize_data_container(this->storage(), data_size);
         }
     }
@@ -1399,11 +1412,11 @@ namespace xt
         {
             throw std::runtime_error("Cannot reshape with incorrect number of elements. Do you mean to resize?");
         }
-        if (layout == layout_type::dynamic || layout == layout_type::any)
+        if (D::static_layout == layout_type::dynamic && layout == layout_type::dynamic)
         {
             layout = XTENSOR_DEFAULT_LAYOUT;  // fall back to default layout
         }
-        if (layout != base_type::static_layout && base_type::static_layout != layout_type::dynamic)
+        if (D::static_layout != layout_type::dynamic && layout != D::static_layout)
         {
             throw std::runtime_error("Cannot reshape with different layout if static layout != dynamic.");
         }
@@ -1411,7 +1424,7 @@ namespace xt
         m_shape = xtl::forward_sequence<shape_type>(shape);
         resize_container(m_strides, m_shape.size());
         resize_container(m_backstrides, m_shape.size());
-        compute_strides(m_shape, m_layout, m_strides, m_backstrides);
+        compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
     }
 }
 
