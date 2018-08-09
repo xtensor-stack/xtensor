@@ -102,6 +102,15 @@ namespace xt
     }
     //@}
 
+    /* is_crtp_base_of<B, E>
+    * Resembles std::is_base_of, but adresses the problem of whether _some_ instatntiation
+    * of a CRTP templated class B is a base of class E. A CRTP templated class is correctly
+    * templated with the most derived type in the CRTP hierarchy. Using this assumption,
+    * this implementation deals with either CRTP final classes (checks for inheritance
+    * with E as the CRTP parameter of B) or CRTP base classes (which are singly templated
+    * by the most derived class, and that's pulled out to use as a templete parameter for B).
+    */
+
     namespace detail
     {
         template <template<class> class B, class E>
