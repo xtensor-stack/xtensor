@@ -47,7 +47,7 @@ namespace xt
         template <class... Args>
         struct rangemaker
         {
-            ptrdiff_t rng[3]; // = { 0, 0, 0 };
+            std::ptrdiff_t rng[3]; // = { 0, 0, 0 };
         };
 
         XTENSOR_CONSTEXPR xtuph get_tuph_or_val(std::ptrdiff_t /*val*/, std::true_type)
@@ -72,7 +72,7 @@ namespace xt
                 });
             }
 
-            ptrdiff_t rng[3];// = { 0, 0, 0 };
+            std::ptrdiff_t rng[3];// = { 0, 0, 0 };
         };
 
         template <class A, class B>
@@ -87,13 +87,13 @@ namespace xt
                 });
             }
 
-            ptrdiff_t rng[3];  // = { 0, 0, 0 };
+            std::ptrdiff_t rng[3];  // = { 0, 0, 0 };
         };
 
         template <class... OA>
         XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const std::ptrdiff_t& t)
         {
-            auto nrng = rangemaker<OA..., ptrdiff_t>({rng.rng[0], rng.rng[1], rng.rng[2]});
+            auto nrng = rangemaker<OA..., std::ptrdiff_t>({rng.rng[0], rng.rng[1], rng.rng[2]});
             nrng.rng[sizeof...(OA)] = t;
             return nrng;
         }

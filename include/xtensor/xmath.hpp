@@ -279,7 +279,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using std::arg;
 
         using std::atan2;
+
+// copysign is not in the std namespace for MSVC
+#if !defined(_MSC_VER)
         using std::copysign;
+#endif
         using std::fdim;
         using std::fmax;
         using std::fmin;
@@ -1869,7 +1873,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
         auto div = sum(weights, xt::evaluation_strategy::immediate{})();
 
-        dynamic_shape<size_t> broadcast_shape(e.dimension(), 1);
+        dynamic_shape<std::size_t> broadcast_shape(e.dimension(), 1);
         broadcast_shape[ax] = weights.size();
 
         return sum(std::forward<E>(e) * reshape_view(std::forward<W>(weights), std::move(broadcast_shape)), std::array<std::size_t, 1>({ax})) / std::move(div);

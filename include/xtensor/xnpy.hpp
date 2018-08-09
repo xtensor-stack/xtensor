@@ -593,8 +593,8 @@ namespace xt
 
             std::vector<std::size_t> m_shape;
             bool m_fortran_order;
-            size_t m_word_size;
-            size_t m_n_bytes;
+            std::size_t m_word_size;
+            std::size_t m_n_bytes;
             std::string m_typestring;
             char* m_buffer;
         };

@@ -29,28 +29,28 @@ namespace xt
      *************************************/
 
 ///@cond DOXYGEN_INCLUDE_SFINAE
-#define XTENSOR_DEFINE_SIGNED_NORMS(T)                          \
-    inline auto                                                 \
-    norm_lp(T t, double p) noexcept                             \
-    {                                                           \
-        using rt = decltype(std::abs(t));                       \
-        return p == 0.0                                         \
-            ? static_cast<rt>(t != 0)                           \
-            : std::abs(t);                                      \
-    }                                                           \
-    inline auto                                                 \
-    norm_lp_to_p(T t, double p) noexcept                        \
-    {                                                           \
-        using rt = real_promote_type_t<T>;                      \
-        return p == 0.0                                         \
-            ? static_cast<rt>(t != 0)                           \
-            : std::pow(static_cast<rt>(std::abs(t)),            \
-                       static_cast<rt>(p));                     \
-    }                                                           \
-    inline size_t norm_l0(T t) noexcept { return (t != 0); }    \
-    inline auto norm_l1(T t) noexcept { return std::abs(t); }   \
-    inline auto norm_l2(T t) noexcept { return std::abs(t); }   \
-    inline auto norm_linf(T t) noexcept { return std::abs(t); } \
+#define XTENSOR_DEFINE_SIGNED_NORMS(T)                            \
+    inline auto                                                   \
+    norm_lp(T t, double p) noexcept                               \
+    {                                                             \
+        using rt = decltype(std::abs(t));                         \
+        return p == 0.0                                           \
+            ? static_cast<rt>(t != 0)                             \
+            : std::abs(t);                                        \
+    }                                                             \
+    inline auto                                                   \
+    norm_lp_to_p(T t, double p) noexcept                          \
+    {                                                             \
+        using rt = real_promote_type_t<T>;                        \
+        return p == 0.0                                           \
+            ? static_cast<rt>(t != 0)                             \
+            : std::pow(static_cast<rt>(std::abs(t)),              \
+                       static_cast<rt>(p));                       \
+    }                                                             \
+    inline std::size_t norm_l0(T t) noexcept { return (t != 0); } \
+    inline auto norm_l1(T t) noexcept { return std::abs(t); }     \
+    inline auto norm_l2(T t) noexcept { return std::abs(t); }     \
+    inline auto norm_linf(T t) noexcept { return std::abs(t); }   \
     inline auto norm_sq(T t) noexcept { return t * t; }
 
     XTENSOR_DEFINE_SIGNED_NORMS(signed char)

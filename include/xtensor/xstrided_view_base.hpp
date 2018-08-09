@@ -975,7 +975,7 @@ namespace xt
                             base_type::set_fake_slice(idx);
                             ++idx, ++i_ax;
                         }
-                        axis_skip = axis_skip - static_cast<ptrdiff_t>(n_add_all) + 1;
+                        axis_skip = axis_skip - static_cast<std::ptrdiff_t>(n_add_all) + 1;
                     }
                     else if (xtl::get_if<xt::xall_tag>(&slices[i]) != nullptr)
                     {

@@ -1115,7 +1115,7 @@ namespace xt
         }
 
         // Swap the shared elements.
-        size_t num_shared = (std::min)(this->size(), rhs.size());
+        std::size_t num_shared = (std::min)(this->size(), rhs.size());
 
         for (size_type i = 0; i != num_shared; ++i)
         {
@@ -1125,7 +1125,7 @@ namespace xt
         // Copy over the extra elts.
         if (this->size() > rhs.size())
         {
-            size_t elements_diff = this->size() - rhs.size();
+            std::size_t elements_diff = this->size() - rhs.size();
             std::copy(this->begin() + num_shared, this->end(), rhs.end());
             rhs.m_end = rhs.end() + elements_diff;
             this->destroy_range(this->begin() + num_shared, this->end());
@@ -1133,7 +1133,7 @@ namespace xt
         }
         else if (rhs.size() > this->size())
         {
-            size_t elements_diff = rhs.size() - this->size();
+            std::size_t elements_diff = rhs.size() - this->size();
             std::uninitialized_copy(rhs.begin() + num_shared, rhs.end(), this->end());
             this->m_end = this->end() + elements_diff;
             this->destroy_range(rhs.begin() + num_shared, rhs.end());
@@ -1515,15 +1515,15 @@ namespace xt
 
 namespace std
 {
-    template <class T, size_t N>
+    template <class T, std::size_t N>
     class tuple_size<xt::const_array<T, N>> :
-        public integral_constant<size_t, N>
+        public integral_constant<std::size_t, N>
     {
     };
 
-    template <size_t... N>
+    template <std::size_t... N>
     class tuple_size<xt::fixed_shape<N...>> :
-        public integral_constant<size_t, sizeof...(N)>
+        public integral_constant<std::size_t, sizeof...(N)>
     {
     };
 }
