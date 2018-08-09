@@ -173,21 +173,8 @@ namespace xt
         derived_type& operator=(const xexpression<E>&);
     };
 
-    namespace detail
-    {
-        template <class E>
-        struct has_container_semantics_impl : std::is_base_of<xcontainer_semantic<std::decay_t<E>>, std::decay_t<E>>
-        {
-        };
-
-        template <class E>
-        struct has_container_semantics_impl<xcontainer_semantic<E>> : std::true_type
-        {
-        };
-    }
-
     template <class E>
-    using has_container_semantics = detail::has_container_semantics_impl<E>;
+    using has_container_semantics = is_crtp_base_of<xcontainer_semantic, E>;
 
     template <class E, class R = void>
     using enable_xcontainer_semantics = typename std::enable_if<has_container_semantics<E>::value, R>::type;
@@ -240,21 +227,8 @@ namespace xt
         derived_type& operator=(const xexpression<E>&);
     };
 
-    namespace detail
-    {
-        template <class E>
-        struct has_view_semantics_impl : std::is_base_of<xview_semantic<std::decay_t<E>>, std::decay_t<E>>
-        {
-        };
-
-        template <class E>
-        struct has_view_semantics_impl<xview_semantic<E>> : std::true_type
-        {
-        };
-    }
-
     template <class E>
-    using has_view_semantics = detail::has_view_semantics_impl<E>;
+    using has_view_semantics = is_crtp_base_of<xview_semantic, E>;
 
     template <class E, class R = void>
     using enable_xview_semantics = typename std::enable_if<has_view_semantics<E>::value, R>::type;

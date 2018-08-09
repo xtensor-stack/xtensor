@@ -102,21 +102,30 @@ namespace xt
     }
     //@}
 
+    /* is_crtp_base_of<B, E>
+    * Resembles std::is_base_of, but adresses the problem of whether _some_ instatntiation
+    * of a CRTP templated class B is a base of class E. A CRTP templated class is correctly
+    * templated with the most derived type in the CRTP hierarchy. Using this assumption,
+    * this implementation deals with either CRTP final classes (checks for inheritance
+    * with E as the CRTP parameter of B) or CRTP base classes (which are singly templated
+    * by the most derived class, and that's pulled out to use as a templete parameter for B).
+    */
+
     namespace detail
     {
-        template <class E>
-        struct is_xexpression_impl : std::is_base_of<xexpression<std::decay_t<E>>, std::decay_t<E>>
-        {
-        };
+        template <template<class> class B, class E>
+        struct is_crtp_base_of_impl : std::is_base_of<B<E>, E> {};
 
-        template <class E>
-        struct is_xexpression_impl<xexpression<E>> : std::true_type
-        {
-        };
+        template <template<class> class B, class E, template<class> class F>
+        struct is_crtp_base_of_impl<B, F<E>> :
+        xtl::disjunction< std::is_base_of<B<E>, F<E>>, std::is_base_of<B<F<E>>, F<E>>> {};
     }
 
+    template <template<class> class B, class E>
+    using is_crtp_base_of = detail::is_crtp_base_of_impl<B, std::decay_t<E>>;
+
     template <class E>
-    using is_xexpression = detail::is_xexpression_impl<E>;
+    using is_xexpression = is_crtp_base_of<xexpression, E>;
 
     template <class E, class R = void>
     using enable_xexpression = typename std::enable_if<is_xexpression<E>::value, R>::type;
@@ -440,7 +449,7 @@ namespace xt
         XTENSOR_FORWARD_METHOD(storage_end);
         XTENSOR_FORWARD_METHOD(storage_cend);
         XTENSOR_FORWARD_METHOD(layout);
-        
+
         template <class T = E>
         std::enable_if_t<has_strides<T>::value, const inner_strides_type&>
         strides() const
@@ -489,15 +498,15 @@ namespace xt
         {
             return m_ptr->storage();
         }
-       
+
         template <class It>
         auto element(It first, It last) {
-            return m_ptr->element(first, last); 
+            return m_ptr->element(first, last);
         }
-        
+
         template <class It>
         auto element(It first, It last) const {
-            return m_ptr->element(first, last); 
+            return m_ptr->element(first, last);
         }
 
         template <class S>
