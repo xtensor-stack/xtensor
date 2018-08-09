@@ -174,7 +174,7 @@ namespace xt
     };
 
     template <class E>
-    using has_container_semantics = is_CRTP_base<E, xcontainer_semantic>;
+    using has_container_semantics = is_crtp_base_of<xcontainer_semantic, E>;
 
     template <class E, class R = void>
     using enable_xcontainer_semantics = typename std::enable_if<has_container_semantics<E>::value, R>::type;
@@ -228,7 +228,7 @@ namespace xt
     };
 
     template <class E>
-    using has_view_semantics = is_CRTP_base<E, xview_semantic>;
+    using has_view_semantics = is_crtp_base_of<xview_semantic, E>;
 
     template <class E, class R = void>
     using enable_xview_semantics = typename std::enable_if<has_view_semantics<E>::value, R>::type;
