@@ -367,11 +367,6 @@ namespace xt
         {
             using type = typename E::storage_type;
         };
-
-        struct void_wrapper
-        {
-            using type = void;
-        };
     }
 
     /**
@@ -432,7 +427,7 @@ namespace xt
                                                            get_strides_type<shape_type>>;
         using storage_type = xtl::mpl::eval_if_t<has_data_interface<E>,
                                                  detail::expr_storage_type<E>,
-                                                 detail::void_wrapper>;
+                                                 make_invalid_type<>>;
 
         using stepper = typename E::stepper;
         using const_stepper = typename E::const_stepper;

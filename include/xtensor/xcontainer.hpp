@@ -69,7 +69,7 @@ namespace xt
      *           provides the interface.
      */
     template <class D>
-    class xcontainer : private xiterable<D>
+    class xcontainer : public xcontiguous_iterable<D>
     {
     public:
 
@@ -105,6 +105,11 @@ namespace xt
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
         using data_alignment = xsimd::container_alignment_t<storage_type>;
         using simd_type = xsimd::simd_type<value_type>;
+
+        using storage_iterator = typename storage_type::iterator;
+        using const_storage_iterator = typename storage_type::const_iterator;
+        using reverse_storage_iterator = typename storage_type::reverse_iterator;
+        using const_reverse_storage_iterator = typename storage_type::const_reverse_iterator;
 
         static_assert(static_layout != layout_type::any, "Container layout can never be layout_type::any!");
 
@@ -166,8 +171,8 @@ namespace xt
 
         template <class S>
         bool is_trivial_broadcast(const S& strides) const noexcept;
-
         template <class S>
+
         stepper stepper_begin(const S& shape) noexcept;
         template <class S>
         stepper stepper_end(const S& shape, layout_type l) noexcept;
@@ -188,141 +193,20 @@ namespace xt
         template <class align, class simd = simd_value_type>
         simd_return_type<simd> load_simd(size_type i) const;
 
-#if defined(_MSC_VER) && _MSC_VER >= 1910
-        // Workaround for compiler bug in Visual Studio 2017 with respect to alias templates with non-type parameters.
-        template <layout_type L>
-        using layout_iterator = xiterator<typename iterable_base::stepper, typename iterable_base::inner_shape_type*, L>;
-        template <layout_type L>
-        using const_layout_iterator = xiterator<typename iterable_base::const_stepper, typename iterable_base::inner_shape_type*, L>;
-        template <layout_type L>
-        using reverse_layout_iterator = std::reverse_iterator<layout_iterator<L>>;
-        template <layout_type L>
-        using const_reverse_layout_iterator = std::reverse_iterator<const_layout_iterator<L>>;
-#else
-        template <layout_type L>
-        using layout_iterator = typename iterable_base::template layout_iterator<L>;
-        template <layout_type L>
-        using const_layout_iterator = typename iterable_base::template const_layout_iterator<L>;
-        template <layout_type L>
-        using reverse_layout_iterator = typename iterable_base::template reverse_layout_iterator<L>;
-        template <layout_type L>
-        using const_reverse_layout_iterator = typename iterable_base::template const_reverse_layout_iterator<L>;
-#endif
-
-        template <class S, layout_type L>
-        using broadcast_iterator = typename iterable_base::template broadcast_iterator<S, L>;
-        template <class S, layout_type L>
-        using const_broadcast_iterator = typename iterable_base::template const_broadcast_iterator<S, L>;
-        template <class S, layout_type L>
-        using reverse_broadcast_iterator = typename iterable_base::template reverse_broadcast_iterator<S, L>;
-        template <class S, layout_type L>
-        using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
-
-        using storage_iterator = typename storage_type::iterator;
-        using const_storage_iterator = typename storage_type::const_iterator;
-        using reverse_storage_iterator = typename storage_type::reverse_iterator;
-        using const_reverse_storage_iterator = typename storage_type::const_reverse_iterator;
-
-        template <layout_type L, class It1, class It2>
-        using select_iterator_impl = std::conditional_t<L == static_layout, It1, It2>;
-
-        template <layout_type L>
-        using select_iterator = select_iterator_impl<L, storage_iterator, layout_iterator<L>>;
-        template <layout_type L>
-        using select_const_iterator = select_iterator_impl<L, const_storage_iterator, const_layout_iterator<L>>;
-        template <layout_type L>
-        using select_reverse_iterator = select_iterator_impl<L, reverse_storage_iterator, reverse_layout_iterator<L>>;
-        template <layout_type L>
-        using select_const_reverse_iterator = select_iterator_impl<L, const_reverse_storage_iterator, const_reverse_layout_iterator<L>>;
-
-        using iterator = select_iterator<DL>;
-        using const_iterator = select_const_iterator<DL>;
-        using reverse_iterator = select_reverse_iterator<DL>;
-        using const_reverse_iterator = select_const_reverse_iterator<DL>;
-
-        template <layout_type L = DL>
-        select_iterator<L> begin() noexcept;
-        template <layout_type L = DL>
-        select_iterator<L> end() noexcept;
-
-        template <layout_type L = DL>
-        select_const_iterator<L> begin() const noexcept;
-        template <layout_type L = DL>
-        select_const_iterator<L> end() const noexcept;
-        template <layout_type L = DL>
-        select_const_iterator<L> cbegin() const noexcept;
-        template <layout_type L = DL>
-        select_const_iterator<L> cend() const noexcept;
-
-        template <layout_type L = DL>
-        select_reverse_iterator<L> rbegin() noexcept;
-        template <layout_type L = DL>
-        select_reverse_iterator<L> rend() noexcept;
-
-        template <layout_type L = DL>
-        select_const_reverse_iterator<L> rbegin() const noexcept;
-        template <layout_type L = DL>
-        select_const_reverse_iterator<L> rend() const noexcept;
-        template <layout_type L = DL>
-        select_const_reverse_iterator<L> crbegin() const noexcept;
-        template <layout_type L = DL>
-        select_const_reverse_iterator<L> crend() const noexcept;
-
-        template <class S, layout_type L = DL>
-        broadcast_iterator<S, L> begin(const S& shape) noexcept;
-        template <class S, layout_type L = DL>
-        broadcast_iterator<S, L> end(const S& shape) noexcept;
-
-        template <class S, layout_type L = DL>
-        const_broadcast_iterator<S, L> begin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
-        const_broadcast_iterator<S, L> end(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
-        const_broadcast_iterator<S, L> cbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
-        const_broadcast_iterator<S, L> cend(const S& shape) const noexcept;
-
-
-        template <class S, layout_type L = DL>
-        reverse_broadcast_iterator<S, L> rbegin(const S& shape) noexcept;
-        template <class S, layout_type L = DL>
-        reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
-
-        template <class S, layout_type L = DL>
-        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
-        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
-        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
-        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
-
-        template <layout_type L = DL>
         storage_iterator storage_begin() noexcept;
-        template <layout_type L = DL>
         storage_iterator storage_end() noexcept;
 
-        template <layout_type L = DL>
         const_storage_iterator storage_begin() const noexcept;
-        template <layout_type L = DL>
         const_storage_iterator storage_end() const noexcept;
-        template <layout_type L = DL>
         const_storage_iterator storage_cbegin() const noexcept;
-        template <layout_type L = DL>
         const_storage_iterator storage_cend() const noexcept;
 
-        template <layout_type L = DL>
         reverse_storage_iterator storage_rbegin() noexcept;
-        template <layout_type L = DL>
         reverse_storage_iterator storage_rend() noexcept;
 
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_rbegin() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_rend() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_crbegin() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_crend() const noexcept;
 
         using container_iterator = storage_iterator;
@@ -833,316 +717,28 @@ namespace xt
     }
     //@}
 
-    /****************
-     * Iterator api *
-     ****************/
-
     template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::begin() noexcept -> select_iterator<L>
+    inline auto xcontainer<D>::derived_cast() const & noexcept -> const derived_type&
     {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_begin<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template begin<L>();
-        });
+        return *static_cast<const derived_type*>(this);
     }
 
     template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::end() noexcept -> select_iterator<L>
+    inline auto xcontainer<D>::derived_cast() && noexcept -> derived_type
     {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_end<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template end<L>();
-        });
+        return *static_cast<derived_type*>(this);
     }
 
     template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::begin() const noexcept -> select_const_iterator<L>
+    inline auto xcontainer<D>::data_element(size_type i) -> reference
     {
-        return this->template cbegin<L>();
+        return storage()[i];
     }
 
     template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::end() const noexcept -> select_const_iterator<L>
+    inline auto xcontainer<D>::data_element(size_type i) const -> const_reference
     {
-        return this->template cend<L>();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::cbegin() const noexcept -> select_const_iterator<L>
-    {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_cbegin<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template cbegin<L>();
-        });
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::cend() const noexcept -> select_const_iterator<L>
-    {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_cend<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template cend<L>();
-        });
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::rbegin() noexcept -> select_reverse_iterator<L>
-    {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_rbegin<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template rbegin<L>();
-        });
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::rend() noexcept -> select_reverse_iterator<L>
-    {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_rend<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template rend<L>();
-        });
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::rbegin() const noexcept -> select_const_reverse_iterator<L>
-    {
-        return this->template crbegin<L>();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::rend() const noexcept -> select_const_reverse_iterator<L>
-    {
-        return this->template crend<L>();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::crbegin() const noexcept -> select_const_reverse_iterator<L>
-    {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_crbegin<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template crbegin<L>();
-        });
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::crend() const noexcept -> select_const_reverse_iterator<L>
-    {
-        return xtl::mpl::static_if<L == static_layout>([&](auto self)
-        {
-            return self(*this).template storage_crend<L>();
-        }, /*else*/ [&](auto self)
-        {
-            return self(*this).iterable_base::template crend<L>();
-        });
-    }
-
-    /*****************************
-     * Broadcasting iterator api *
-     *****************************/
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::begin(const S& shape) noexcept -> broadcast_iterator<S, L>
-    {
-        return iterable_base::template begin<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
-    {
-        return iterable_base::template end<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::begin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
-    {
-        return iterable_base::template begin<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::end(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
-    {
-        return iterable_base::template end<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::cbegin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
-    {
-        return iterable_base::template cbegin<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
-    {
-        return iterable_base::template cend<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
-    {
-        return iterable_base::template rbegin<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
-    {
-        return iterable_base::template rend<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::rbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
-    {
-        return iterable_base::template rbegin<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::rend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
-    {
-        return iterable_base::template rend<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::crbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
-    {
-        return iterable_base::template crbegin<S, L>(shape);
-    }
-
-    template <class D>
-    template <class S, layout_type L>
-    inline auto xcontainer<D>::crend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
-    {
-        return iterable_base::template crend<S, L>(shape);
-    }
-
-    /***********************
-     * Linear iterator api *
-     ***********************/
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_begin() noexcept -> storage_iterator
-    {
-        return storage().begin();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_end() noexcept -> storage_iterator
-    {
-        return storage().end();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_begin() const noexcept -> const_storage_iterator
-    {
-        return storage().begin();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_end() const noexcept -> const_storage_iterator
-    {
-        return storage().end();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_cbegin() const noexcept -> const_storage_iterator
-    {
-        return storage().cbegin();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_cend() const noexcept -> const_storage_iterator
-    {
-        return storage().cend();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_rbegin() noexcept -> reverse_storage_iterator
-    {
-        return storage().rbegin();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_rend() noexcept -> reverse_storage_iterator
-    {
-        return storage().rend();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
-    {
-        return storage().rbegin();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_rend() const noexcept -> const_reverse_storage_iterator
-    {
-        return storage().rend();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
-    {
-        return storage().crbegin();
-    }
-
-    template <class D>
-    template <layout_type L>
-    inline auto xcontainer<D>::storage_crend() const noexcept -> const_reverse_storage_iterator
-    {
-        return storage().crend();
+        return storage()[i];
     }
 
     /***************
@@ -1206,36 +802,6 @@ namespace xt
     }
 
     template <class D>
-    inline auto xcontainer<D>::derived_cast() & noexcept -> derived_type&
-    {
-        return *static_cast<derived_type*>(this);
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::derived_cast() const & noexcept -> const derived_type&
-    {
-        return *static_cast<const derived_type*>(this);
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::derived_cast() && noexcept -> derived_type
-    {
-        return *static_cast<derived_type*>(this);
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::data_element(size_type i) -> reference
-    {
-        return storage()[i];
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::data_element(size_type i) const -> const_reference
-    {
-        return storage()[i];
-    }
-
-    template <class D>
     template <class alignment, class simd>
     inline void xcontainer<D>::store_simd(size_type i, const simd& e)
     {
@@ -1249,6 +815,84 @@ namespace xt
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         return xsimd::load_simd<value_type, typename simd::value_type>(&(storage()[i]), align_mode());
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_begin() noexcept -> storage_iterator
+    {
+        return storage().begin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_end() noexcept -> storage_iterator
+    {
+        return storage().end();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_begin() const noexcept -> const_storage_iterator
+    {
+        return storage().begin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_end() const noexcept -> const_storage_iterator
+    {
+        return storage().cend();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_cbegin() const noexcept -> const_storage_iterator
+    {
+        return storage().cbegin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_cend() const noexcept -> const_storage_iterator
+    {
+        return storage().cend();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_rbegin() noexcept -> reverse_storage_iterator
+    {
+        return storage().rbegin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_rend() noexcept -> reverse_storage_iterator
+    {
+        return storage().rend();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
+    {
+        return storage().rbegin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_rend() const noexcept -> const_reverse_storage_iterator
+    {
+        return storage().rend();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
+    {
+        return storage().crbegin();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::storage_crend() const noexcept -> const_reverse_storage_iterator
+    {
+        return storage().crend();
+    }
+
+    template <class D>
+    inline auto xcontainer<D>::derived_cast() & noexcept -> derived_type&
+    {
+        return *static_cast<derived_type*>(this);
     }
 
     /*************************************

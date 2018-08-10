@@ -97,6 +97,18 @@ namespace xt
     template <class... T>
     using void_t = typename make_void<T...>::type;
 
+    // This is used for non existant types (e.g. storage for some expressions
+    // like generators)
+    struct invalid_type
+    {
+    };
+
+    template <class... T>
+    struct make_invalid_type
+    {
+        using type = invalid_type;
+    };
+
     template <class T, class R>
     using disable_integral_t = std::enable_if_t<!std::is_integral<T>::value, R>;
 
