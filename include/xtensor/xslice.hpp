@@ -511,7 +511,7 @@ namespace xt
         {
             std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
             val = (val >= 0) ? val : val + size;
-            return std::max(std::ptrdiff_t(0), std::min(size, val));
+            return (std::max)(std::ptrdiff_t(0), (std::min)(size, val));
         }
 
         auto get_stepped_range(std::ptrdiff_t start, std::ptrdiff_t stop, std::ptrdiff_t step, std::size_t ssize) const
@@ -522,13 +522,13 @@ namespace xt
 
             if(step > 0)
             {
-                start = std::max(std::ptrdiff_t(0), std::min(size, start));
-                stop  = std::max(std::ptrdiff_t(0), std::min(size, stop));
+                start = (std::max)(std::ptrdiff_t(0), (std::min)(size, start));
+                stop  = (std::max)(std::ptrdiff_t(0), (std::min)(size, stop));
             }
             else
             {
-                start = std::max(std::ptrdiff_t(-1), std::min(size - 1, start));
-                stop  = std::max(std::ptrdiff_t(-1), std::min(size - 1, stop));
+                start = (std::max)(std::ptrdiff_t(-1), (std::min)(size - 1, start));
+                stop  = (std::max)(std::ptrdiff_t(-1), (std::min)(size - 1, stop));
             }
 
             return xstepped_range<std::ptrdiff_t>(start, stop, step);
