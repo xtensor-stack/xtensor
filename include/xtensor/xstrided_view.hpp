@@ -1000,7 +1000,7 @@ namespace xt
     template <std::size_t N, class E>
     auto atleast_Nd(E&& e)
     {
-        xstrided_slice_vector sv(std::max(e.dimension(), N), all());
+        xstrided_slice_vector sv((std::max)(e.dimension(), N), all());
         if (e.dimension() < N)
         {
             std::size_t i = 0;
