@@ -157,7 +157,6 @@ namespace xt
         EXPECT_NE(rrm_wrong, rcm);
     }
 
-
     TEST(xlayout, equal_iterator)
     {
         xarray<double, layout_type::column_major> cm = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
@@ -168,5 +167,21 @@ namespace xt
         {
             EXPECT_TRUE(*iter);
         }
+    }
+
+    TEST(xlayout, select_layout)
+    {
+        layout_type l = select_layout<layout_type::dynamic, xt::static_shape<std::size_t, 3>>::value;
+        EXPECT_EQ(l, layout_type::dynamic);
+        l = select_layout<layout_type::row_major, xt::static_shape<std::size_t, 3>>::value;
+        EXPECT_EQ(l, layout_type::row_major);
+        l = select_layout<layout_type::row_major, xt::static_shape<std::size_t, 1>>::value;
+        EXPECT_EQ(l, layout_type::any);
+        l = select_layout<layout_type::column_major, xt::static_shape<std::size_t, 1>>::value;
+        EXPECT_EQ(l, layout_type::any);
+        l = select_layout<layout_type::column_major, xt::fixed_shape<>>::value;
+        EXPECT_EQ(l, layout_type::any);
+        l = select_layout<layout_type::column_major, xt::fixed_shape<2, 3>>::value;
+        EXPECT_EQ(l, layout_type::column_major);
     }
 }
