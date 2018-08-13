@@ -402,12 +402,25 @@ namespace xt
     inline auto xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
     -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename E2::shape_type>::value, bool>
     {
-        using e1_shape = typename E1::shape_type;
+        //Current goal is to make the remainder of my changes CI compliant
+        //Thus I am restoring the original function body
+
+        /*using e1_shape = typename E1::shape_type;
         using e2_shape = typename E2::shape_type;
 
-        using result_shape = typename detail::broadcast_fixed_shape<e1_shape, e2_shape>::type;
+        using promote = detail::promote_index<e1_shape, e2_shape>;
+        using result_shape = typename promote::type;
         static_assert(std::is_same<e1_shape, result_shape>::value, "Attempted to risize a fixed container");
         constexpr bool trivial_broadcast = std::is_same<e2_shape, result_shape>::value;
+        return trivial_broadcast;*/
+
+        using index_type = xindex_type_t<typename E1::shape_type>;
+        using size_type = typename E1::size_type;
+        const E2& de2 = e2.derived_cast();
+        size_type size = de2.dimension();
+        index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
+        bool trivial_broadcast = de2.broadcast_shape(shape, true);
+        e1.derived_cast().resize(std::move(shape));
         return trivial_broadcast;
     }
 
