@@ -189,7 +189,7 @@ namespace xt
     template <class F, class R, class... T>
     inline R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
     {
-        return detail::accumulate_impl<0, F, R, T...>(f, init, t);
+        return detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t);
     }
 
     /***************************
