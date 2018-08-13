@@ -113,7 +113,7 @@ namespace xt
         using simd_type = xsimd::simd_type<value_type>;
 
         xstepper() = default;
-        xstepper(storage_type* c, subiterator_type it, size_type offset) noexcept;
+        xstepper(storage_type* c, subiterator_type it, difference_type offset) noexcept;
 
         reference operator*() const;
 
@@ -137,7 +137,7 @@ namespace xt
 
         storage_type* p_c;
         subiterator_type m_it;
-        size_type m_offset;
+        difference_type m_offset;
     };
 
     template <layout_type L>
@@ -196,7 +196,7 @@ namespace xt
         using index_type = xindex_type_t<shape_type>;
 
         xindexed_stepper() = default;
-        xindexed_stepper(xexpression_type* e, size_type offset, bool end = false) noexcept;
+        xindexed_stepper(xexpression_type* e, difference_type offset, bool end = false) noexcept;
 
         reference operator*() const;
 
@@ -212,7 +212,7 @@ namespace xt
 
         xexpression_type* p_e;
         index_type m_index;
-        size_type m_offset;
+        difference_type m_offset;
     };
 
     template <class T>
@@ -419,7 +419,7 @@ namespace xt
      ***************************/
 
     template <class C>
-    inline xstepper<C>::xstepper(storage_type* c, subiterator_type it, size_type offset) noexcept
+    inline xstepper<C>::xstepper(storage_type* c, subiterator_type it, difference_type offset) noexcept
         : p_c(c), m_it(it), m_offset(offset)
     {
     }
@@ -433,38 +433,38 @@ namespace xt
     template <class C>
     inline void xstepper<C>::step(size_type dim, size_type n)
     {
-        if (dim >= m_offset)
+        if (static_cast<difference_type>(dim) >= m_offset)
         {
             using strides_value_type = decltype(p_c->strides()[0]);
-            m_it += difference_type(static_cast<strides_value_type>(n) * p_c->strides()[dim - m_offset]);
+            m_it += difference_type(static_cast<strides_value_type>(n) * p_c->strides()[static_cast<size_type>(static_cast<difference_type>(dim) - m_offset)]);
         }
     }
 
     template <class C>
     inline void xstepper<C>::step_back(size_type dim, size_type n)
     {
-        if (dim >= m_offset)
+        if (static_cast<difference_type>(dim) >= m_offset)
         {
             using strides_value_type = decltype(p_c->strides()[0]);
-            m_it -= difference_type(static_cast<strides_value_type>(n) * p_c->strides()[dim - m_offset]);
+            m_it -= difference_type(static_cast<strides_value_type>(n) * p_c->strides()[static_cast<size_type>(static_cast<difference_type>(dim) - m_offset)]);
         }
     }
 
     template <class C>
     inline void xstepper<C>::reset(size_type dim)
     {
-        if (dim >= m_offset)
+        if (static_cast<difference_type>(dim) >= m_offset)
         {
-            m_it -= difference_type(p_c->backstrides()[dim - m_offset]);
+            m_it -= difference_type(p_c->backstrides()[static_cast<size_type>(static_cast<difference_type>(dim) - m_offset)]);
         }
     }
 
     template <class C>
     inline void xstepper<C>::reset_back(size_type dim)
     {
-        if (dim >= m_offset)
+        if (static_cast<difference_type>(dim) >= m_offset)
         {
-            m_it += difference_type(p_c->backstrides()[dim - m_offset]);
+            m_it += difference_type(p_c->backstrides()[static_cast<size_type>(static_cast<difference_type>(dim) - m_offset)]);
         }
     }
 
@@ -828,7 +828,7 @@ namespace xt
      ***********************************/
 
     template <class C, bool is_const>
-    inline xindexed_stepper<C, is_const>::xindexed_stepper(xexpression_type* e, size_type offset, bool end) noexcept
+    inline xindexed_stepper<C, is_const>::xindexed_stepper(xexpression_type* e, difference_type offset, bool end) noexcept
         : p_e(e), m_index(xtl::make_sequence<index_type>(e->shape().size(), size_type(0))), m_offset(offset)
     {
         if (end)

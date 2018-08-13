@@ -54,7 +54,7 @@ namespace xt
     struct xiterable_inner_types<xbroadcast<CT, X>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using inner_shape_type = promote_shape_t<typename xexpression_type::shape_type, X>;
+        using inner_shape_type = X;
         using const_stepper = typename xexpression_type::const_stepper;
         using stepper = const_stepper;
     };
@@ -206,7 +206,25 @@ namespace xt
     inline xbroadcast<CT, X>::xbroadcast(CTA&& e, S&& s)
         : m_e(std::forward<CTA>(e)), m_shape(std::forward<S>(s))
     {
-        xt::broadcast_shape(m_e.shape(), m_shape);
+        if (m_shape.size() < m_e.dimension())
+        {
+            for (std::size_t i = 0; i < (m_e.dimension() - m_shape.size()); ++i)
+            {
+                if (m_e.shape()[i] != 1)
+                {
+                    throw xt::broadcast_error("Cannot broadcast-squeeze axis != 1.");
+                }
+            }
+            shape_type tmp;
+            xt::resize_container(tmp, m_shape.size());
+            // copy the end of the original shape
+            std::copy(m_e.shape().rbegin(), m_e.shape().rbegin() + static_cast<std::ptrdiff_t>(m_shape.size()), tmp.rbegin());
+            xt::broadcast_shape(tmp, m_shape);
+        }
+        else
+        {
+            xt::broadcast_shape(m_e.shape(), m_shape);
+        }
     }
     //@}
 
