@@ -22,6 +22,7 @@
 #include <vector>
 
 #include <xtl/xfunctional.hpp>
+#include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
 
 #include "xtensor_config.hpp"
@@ -74,7 +75,16 @@ namespace xt
     template <std::size_t... I>
     bool resize_container(fixed_shape<I...>& a, std::size_t size);
 
+    template <class X, class C>
+    struct rebind_container;
+
+    template <class X, class C>
+    using rebind_container_t = typename rebind_container<X, C>::type;
+
     std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis);
+
+    template <class S1, class S2>
+    inline bool same_shape(const S1& s1, const S2& s2) noexcept;
 
     // gcc 4.9 is affected by C++14 defect CGW 1558
     // see http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
@@ -430,10 +440,89 @@ namespace xt
      * normalize_axis implementation *
      *********************************/
 
+
+    // scalar normalize axis
     inline std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis)
     {
         return axis < 0 ? static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis) : static_cast<std::size_t>(axis);
     }
+
+    template <class E, class C>
+    inline std::enable_if_t<!std::is_integral<std::decay_t<C>>::value &&
+                     std::is_signed<typename std::decay_t<C>::value_type>::value,
+                     rebind_container_t<std::size_t, std::decay_t<C>>>
+    normalize_axis(E& expr, C&& axes)
+    {
+        rebind_container_t<std::size_t, std::decay_t<C>> res;
+        resize_container(res, axes.size());
+
+        for (std::size_t i = 0; i < axes.size(); ++i)
+        {
+            res[i] = normalize_axis(expr.dimension(), axes[i]);
+        }
+
+        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+
+        return res;
+    }
+
+    template <class C, class E>
+    inline std::enable_if_t<!std::is_integral<std::decay_t<C>>::value && std::is_unsigned<typename std::decay_t<C>::value_type>::value, C&&>
+    normalize_axis(E& expr, C&& axes)
+    {
+        static_cast<void>(expr);
+        XTENSOR_ASSERT(std::all_of(axes.begin(), axes.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        return std::forward<C>(axes);
+    }
+
+    template <class R, class E, class C>
+    inline auto forward_normalize(E& expr, C&& axes)
+        -> std::enable_if_t<std::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value, R>
+    {
+        R res;
+        xt::resize_container(res, xtl::sequence_size(axes));
+        auto dim = expr.dimension();
+        std::transform(std::begin(axes), std::end(axes), std::begin(res), [&dim](auto ax_el) {
+            return normalize_axis(dim, ax_el);
+        });
+
+        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+
+        return res;
+    }
+
+    template <class R, class E, class C>
+    inline auto forward_normalize(E& expr, C&& axes)
+        -> std::enable_if_t<!std::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && !std::is_same<R, std::decay_t<C>>::value, R>
+    {
+        static_cast<void>(expr);
+
+        R res;
+        xt::resize_container(res, xtl::sequence_size(axes));
+        std::copy(std::begin(axes), std::end(axes), std::begin(res));
+        XTENSOR_ASSERT(std::all_of(res.begin(), res.end(), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        return res;
+    }
+
+    template <class R, class E, class C>
+    inline auto forward_normalize(E& expr, C&& axes)
+        -> std::enable_if_t<!std::is_signed<std::decay_t<decltype(*std::begin(axes))>>::value && std::is_same<R, std::decay_t<C>>::value, R&&>
+    {
+        static_cast<void>(expr);
+        XTENSOR_ASSERT(std::all_of(std::begin(axes), std::end(axes), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
+        return std::move(axes);
+    }
+
+    /*****************************
+     * same_shape implementation *
+     *****************************/
+
+    template <class S1, class S2>
+    inline bool same_shape(const S1& s1, const S2& s2) noexcept
+    {
+        return s1.size() == s2.size() && std::equal(s1.begin(), s1.end(), s2.begin());
+    }
+
 
     /******************
      * get_value_type *
@@ -1058,9 +1147,6 @@ namespace xt
         : std::true_type
     {
     };
-
-    template <class X, class C>
-    struct rebind_container;
 
     template <class X, template <class, class> class C, class T, class A>
     struct rebind_container<X, C<T, A>>

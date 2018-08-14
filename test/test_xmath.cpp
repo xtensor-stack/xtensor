@@ -23,7 +23,7 @@ namespace xt
      * type conversion *
      *******************/
 
-#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                  \
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
     {                                                                                \
         using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
         EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
@@ -886,7 +886,7 @@ namespace xt
         EXPECT_EQ(trapz(a, 1.0, 0), expected1);
 
         xt::xarray<double> expected2 = {2.0, 8.0};
-        EXPECT_EQ(trapz(a, 1.0, 1), expected2);
+        EXPECT_EQ(trapz(a, 1.0, -1), expected2);
 
         xt::xarray<int> b = {1, 2, 3};
         auto res3 = trapz(b);

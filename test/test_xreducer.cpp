@@ -9,13 +9,14 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xutils.hpp"
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xreducer.hpp"
-#include "xtensor/xview.hpp" 
-#include "xtensor/xstrided_view.hpp" 
-#include "xtensor/xrandom.hpp" 
+#include "xtensor/xview.hpp"
+#include "xtensor/xstrided_view.hpp"
+#include "xtensor/xrandom.hpp"
 
 namespace xt
 {
@@ -152,8 +153,19 @@ namespace xt
         xarray<double> resu0 = sum(u, {0});
         EXPECT_EQ(expectedu0, resu0);
         xarray<double> expectedu1 = 4 * ones<double>({2});
-        xarray<double> resu1 = sum(u, {1});
+        xarray<double> resu1 = sum(u, {std::size_t(1)});
+        xarray<double> resm1 = sum(u, {-1});
+
+        std::array<std::size_t, 1> a_us = {1};
+        std::array<std::ptrdiff_t, 1> a_ss = {-1};
+        xarray<double> res_refu1 = sum(u, a_us);
+        xarray<double> res_refm1 = sum(u, a_ss);
+
+        EXPECT_EQ(expectedu1, resm1);
         EXPECT_EQ(expectedu1, resu1);
+        EXPECT_EQ(expectedu1, res_refm1);
+        EXPECT_EQ(expectedu1, res_refu1);
+
         xarray<double> v = ones<double>({4, 2});
         xarray<double> expectedv0 = 4 * ones<double>({2});
         xarray<double> resv0 = sum(v, {0});
@@ -205,18 +217,25 @@ namespace xt
     TEST(xreducer, average)
     {
         xt::xtensor<float, 2> a = {{ 3, 4, 2, 1}, { 1, 1, 3, 2}};
+        xt::xarray<double> all_weights = {{1, 2, 3, 4}, { 5, 6, 7, 8}};
+        auto avg_all = xt::average(a, all_weights);
+        auto avg_all_2 = xt::average(a, all_weights, {0ul, 1ul});
 
-        auto avg_all = xt::average(a, xt::xarray<double>{{1, 2, 3, 4}, { 5, 6, 7, 8}});
-        auto avg0 = xt::average(a, xt::xarray<double>{3, 9}, 0);
-        auto avg1 = xt::average(a, xt::xarray<double>{1,2,3,4}, 1);
+        auto avg0 = xt::average(a, xt::xarray<double>{3, 9}, {0});
+        auto avg1 = xt::average(a, xt::xarray<double>{1,2,3,4}, {1});
+        auto avg_m1 = xt::average(a, xt::xarray<double>{1,2,3,4}, {-1});
+        auto avg_d1 = xt::average(a, xt::xarray<double>{1,2,3,4}, {-1}, evaluation_strategy::immediate());
 
         xtensor<double, 0> expect_all = 1.9166666666666667;
         xtensor<double, 1> expect0 = {1.5, 1.75, 2.75, 1.75};
         xtensor<double, 1> expect1 = {2.1, 2.0};
 
         EXPECT_TRUE(allclose(avg_all, expect_all));
+        EXPECT_TRUE(allclose(avg_all_2, expect_all));
         EXPECT_TRUE(all(equal(avg0, expect0)));
         EXPECT_TRUE(all(equal(avg1, expect1)));
+        EXPECT_TRUE(all(equal(avg_m1, expect1)));
+        EXPECT_TRUE(all(equal(avg_d1, expect1)));
     }
 
     TEST(xreducer, minmax)
@@ -450,5 +469,23 @@ namespace xt
         EXPECT_EQ(red(2), red(0, 0, 2));
         EXPECT_EQ(red(1, 2), red(0, 1, 2));
         EXPECT_EQ(red(1, 2), red(1, 1, 1, 1, 1, 0, 1, 2));
+    }
+
+    TEST(xreducer, normalize_axes)
+    {
+        xt::xtensor<double, 4> x{};
+        std::vector<std::size_t> sva {0, 1, 2, 3};
+        std::vector<std::ptrdiff_t> svb = {-4, 1, -2, -1};
+        std::initializer_list<std::ptrdiff_t> initlist = {-4, 1, -2, -1};
+        std::array<std::size_t, 4> saa = {0, 1, 2, 3};
+        std::array<std::ptrdiff_t, 4> sab = {-4, 1, -2, -1};
+
+        auto resa = forward_normalize<std::vector<std::size_t>>(x, svb);
+        EXPECT_EQ(forward_normalize<std::vector<std::size_t>>(x, svb), sva);
+        EXPECT_EQ(forward_normalize<std::vector<std::size_t>>(x, initlist), sva);
+        auto resaa = forward_normalize<std::array<std::size_t, 4>>(x, saa);
+        EXPECT_EQ(resaa, saa);
+        auto resab = forward_normalize<std::array<std::size_t, 4>>(x, sab);
+        EXPECT_EQ(resab, saa);
     }
 }

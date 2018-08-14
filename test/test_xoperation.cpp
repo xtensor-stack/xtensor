@@ -29,23 +29,26 @@ namespace xt
     template <class C, std::size_t N>
     using redim_container_t = typename redim_container<C, N>::type;
 
-    template <class C, class T>
-    struct rebind_container;
-
-    template <class T, class NT>
-    struct rebind_container<xarray<T>, NT>
+    namespace xop_test
     {
-        using type = xarray<NT>;
-    };
+        template <class C, class T>
+        struct rebind_container;
 
-    template <class T, std::size_t N, class NT>
-    struct rebind_container<xtensor<T, N>, NT>
-    {
-        using type = xtensor<NT, N>;
-    };
+        template <class T, class NT>
+        struct rebind_container<xarray<T>, NT>
+        {
+            using type = xarray<NT>;
+        };
 
-    template <class C, class T>
-    using rebind_container_t = typename rebind_container<C, T>::type;
+        template <class T, std::size_t N, class NT>
+        struct rebind_container<xtensor<T, N>, NT>
+        {
+            using type = xtensor<NT, N>;
+        };
+
+        template <class C, class T>
+        using rebind_container_t = typename rebind_container<C, T>::type;
+    }
 
     template <class C>
     class operation : public ::testing::Test
@@ -139,7 +142,7 @@ namespace xt
 
     TYPED_TEST(operation, modulus)
     {
-        using int_container = rebind_container_t<TypeParam, int>;
+        using int_container = xop_test::rebind_container_t<TypeParam, int>;
         using shape_type = typename int_container::shape_type;
 
         shape_type shape = {3, 2};
@@ -232,7 +235,7 @@ namespace xt
     TYPED_TEST(operation, less)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         container_1d a = {1, 2, 3, 4, 5};
         bool_container expected = {1, 1, 1, 0, 0};
         bool_container b = a < 4;
@@ -242,7 +245,7 @@ namespace xt
     TYPED_TEST(operation, less_equal)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         container_1d a = {1, 2, 3, 4, 5};
         bool_container expected = {1, 1, 1, 1, 0};
         bool_container b = a <= 4;
@@ -252,7 +255,7 @@ namespace xt
     TYPED_TEST(operation, greater)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         container_1d a = {1, 2, 3, 4, 5};
         bool_container expected = {0, 0, 0, 0, 1};
         bool_container b = a > 4;
@@ -262,7 +265,7 @@ namespace xt
     TYPED_TEST(operation, greater_equal)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         container_1d a = {1, 2, 3, 4, 5};
         bool_container expected = {0, 0, 0, 1, 1};
         bool_container b = a >= 4;
@@ -272,7 +275,7 @@ namespace xt
     TYPED_TEST(operation, negate)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         container_1d a = {1, 2, 3, 4, 5};
         bool_container expected = {1, 1, 1, 0, 0};
         bool_container b = !(a >= 4);
@@ -282,7 +285,7 @@ namespace xt
     TYPED_TEST(operation, equal)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         container_1d a = {1, 2, 3, 4, 5};
         bool_container expected = {0, 0, 0, 1, 0};
         bool_container b = equal(a, 4);
@@ -297,7 +300,7 @@ namespace xt
     TYPED_TEST(operation, not_equal)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         container_1d a = {1, 2, 3, 4, 5};
         bool_container expected = {1, 1, 1, 0, 1};
         bool_container b = not_equal(a, 4);
@@ -312,7 +315,7 @@ namespace xt
     TYPED_TEST(operation, logical_and)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         bool_container a = {0, 0, 0, 1, 0};
         bool_container expected = {0, 0, 0, 0, 0};
         bool_container b = a && false;
@@ -324,7 +327,7 @@ namespace xt
     TYPED_TEST(operation, logical_or)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using bool_container = rebind_container_t<container_1d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_1d, bool>;
         bool_container a = {0, 0, 0, 1, 0};
         bool_container other = {0, 0, 0, 0, 0};
         bool_container b = a || other;
@@ -340,8 +343,8 @@ namespace xt
     TYPED_TEST(operation, any)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container = rebind_container_t<container_1d, int>;
-        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using int_container = xop_test::rebind_container_t<container_1d, int>;
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         int_container a = {0, 0, 3};
         EXPECT_EQ(true, any(a));
         int_container_2d b = {{0, 0, 0}, {0, 0, 0}};
@@ -351,7 +354,7 @@ namespace xt
     TYPED_TEST(operation, minimum)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container = rebind_container_t<container_1d, int>;
+        using int_container = xop_test::rebind_container_t<container_1d, int>;
         int_container a = {0, 0, 3};
         int_container b = {-1, 0, 10};
         int_container expected = {-1, 0, 3};
@@ -361,7 +364,7 @@ namespace xt
     TYPED_TEST(operation, maximum)
     {
         using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container = rebind_container_t<container_1d, int>;
+        using int_container = xop_test::rebind_container_t<container_1d, int>;
         int_container a = {0, 0, 3};
         int_container b = {-1, 0, 10};
         int_container expected = {0, 0, 10};
@@ -372,9 +375,9 @@ namespace xt
 
     TYPED_TEST(operation, amax)
     {
-        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container_1d = rebind_container_t<container_1d, int>;
+        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
         int_container_2d a = {{0, 0, 3}, {1, 2, 10}};
         EXPECT_EQ(10, amax(a)());
         int_container_1d e1 = {1, 2, 10};
@@ -385,9 +388,9 @@ namespace xt
 
     TYPED_TEST(operation, amin)
     {
-        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container_1d = rebind_container_t<container_1d, int>;
+        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
         int_container_2d a = {{0, 0, 3}, {1, 2, 10}};
         EXPECT_EQ(0, amin(a)());
         int_container_1d e1 = {0, 0, 3};
@@ -398,9 +401,9 @@ namespace xt
 
     TYPED_TEST(operation, all)
     {
-        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container_1d = rebind_container_t<container_1d, int>;
+        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
         int_container_1d a = {1, 1, 3};
         EXPECT_EQ(true, all(a));
         int_container_2d b = {{0, 2, 1}, {2, 1, 0}};
@@ -417,11 +420,11 @@ namespace xt
 
     TYPED_TEST(operation, nonzero)
     {
-        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container_1d = rebind_container_t<container_1d, int>;
+        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
         using container_3d = redim_container_t<TypeParam, 3>;
-        using bool_container = rebind_container_t<container_3d, bool>;
+        using bool_container = xop_test::rebind_container_t<container_3d, bool>;
         using shape_type = typename container_3d::shape_type;
 
         int_container_1d a = {1, 0, 3};
@@ -448,7 +451,7 @@ namespace xt
 
     TYPED_TEST(operation, where_only_condition)
     {
-        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         int_container_2d a = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
         std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected = {{0, 0}, {1, 1}, {2, 2}};
         EXPECT_EQ(expected, where(a));
@@ -472,7 +475,7 @@ namespace xt
 
     TYPED_TEST(operation, where_cast)
     {
-        using int_container_2d = rebind_container_t<TypeParam, int>;
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         int_container_2d a = {{0, 1, 0}, {3, 0, 5}};
         double res1 = 1.2;
         TypeParam b = where(equal(a, 0.0), res1, 0.0);
@@ -482,7 +485,7 @@ namespace xt
 
     TYPED_TEST(operation, cast)
     {
-        using int_container_t = rebind_container_t<TypeParam, int>;
+        using int_container_t = xop_test::rebind_container_t<TypeParam, int>;
         using shape_type = typename int_container_t::shape_type;
         shape_type shape = {3, 2};
         int_container_t a(shape, 5);
@@ -493,7 +496,7 @@ namespace xt
 
     TYPED_TEST(operation, mixed_arithmetic)
     {
-        using int_container_t = rebind_container_t<TypeParam, int>;
+        using int_container_t = xop_test::rebind_container_t<TypeParam, int>;
         TypeParam a = {{0., 1., 2.}, {3., 4., 5.}};
         int_container_t b = {{0, 1, 2}, {3, 4, 5}};
         int_container_t c = b;
@@ -550,7 +553,7 @@ namespace xt
 
         {
             SCOPED_TRACE("xarray<double> + xarray<int>");
-            using int_container_t = rebind_container_t<TypeParam, int>;
+            using int_container_t = xop_test::rebind_container_t<TypeParam, int>;
             int_container_t c = { { 0, 1, 2 },{ 3, 4, 5 } };
             auto fm = a + c;
             using assign_traits_mixed = xassign_traits<TypeParam, decltype(fm)>;
@@ -591,7 +594,7 @@ namespace xt
 
         {
             SCOPED_TRACE("xarray<double> + xarray<char>");
-            using char_container_t = rebind_container_t<TypeParam, char>;
+            using char_container_t = xop_test::rebind_container_t<TypeParam, char>;
             char_container_t d = { { 0, 1, 2 },{ 3, 4, 5 } };
             auto fdc = a + d;
             using assign_traits_char_double = xassign_traits<TypeParam, decltype(fdc)>;

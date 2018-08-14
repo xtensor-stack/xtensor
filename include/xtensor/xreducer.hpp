@@ -25,6 +25,7 @@
 #include <xtl/xsequence.hpp>
 
 #include "xbuilder.hpp"
+#include "xeval.hpp"
 #include "xexpression.hpp"
 #include "xgenerator.hpp"
 #include "xiterable.hpp"
@@ -498,14 +499,17 @@ namespace xt
         template <class F, class E, class X>
         inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::lazy)
         {
-            using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<X>>;
-            return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
+            decltype(auto) normalized_axes = normalize_axis(e, std::forward<X>(axes));
+            using reducer_type = xreducer<F, const_xclosure_t<E>, xtl::const_closure_type_t<decltype(normalized_axes)>>;
+            return reducer_type(std::forward<F>(f), std::forward<E>(e), std::forward<decltype(normalized_axes)>(normalized_axes));
         }
+
 
         template <class F, class E, class X>
         inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::immediate)
         {
-            return reduce_immediate(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes));
+            decltype(auto) normalized_axes = normalize_axis(e, std::forward<X>(axes));
+            return reduce_immediate(std::forward<F>(f), eval(std::forward<E>(e)), std::forward<decltype(normalized_axes)>(normalized_axes));
         }
     }
 
@@ -541,16 +545,18 @@ namespace xt
     template <class F, class E, class I, class EVS>
     inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, EVS evaluation_strategy)
     {
-        using axes_type = std::vector<typename std::decay_t<E>::size_type>;
+        using axes_type = std::vector<std::size_t>;
+        auto ax = xt::forward_normalize<axes_type>(e, axes);
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
-        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
+        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ax), evaluation_strategy);
     }
 #else
     template <class F, class E, class I, std::size_t N, class EVS>
     inline auto reduce(F&& f, E&& e, const I (&axes)[N], EVS evaluation_strategy)
     {
-        using axes_type = std::array<typename std::decay_t<E>::size_type, N>;
-        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), xtl::forward_sequence<axes_type>(axes), evaluation_strategy);
+        using axes_type = std::array<std::size_t, N>;
+        auto ax = xt::forward_normalize<axes_type>(e, axes);
+        return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ax), evaluation_strategy);
     }
 #endif
 
