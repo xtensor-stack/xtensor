@@ -21,6 +21,7 @@
 #include "xstrides.hpp"
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
+#include "xfunction.hpp"
 
 namespace xt
 {
@@ -74,7 +75,7 @@ namespace xt
         using base_type = xexpression_assigner_base<Tag>;
 
         template <class E1, class E2>
-        static void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static void assign_xexpression(E1& e1, const E2& e2);
 
         template <class E1, class E2>
         static void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
@@ -88,7 +89,15 @@ namespace xt
     private:
 
         template <class E1, class E2>
-        static bool resize(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static bool resize(E1& e1, const E2& e2);
+
+        template <class E1, class F, class R, class... CT>
+        static auto resize(E1& e1, const xfunction<F, R, CT...>& e2)
+        -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>;
+
+        template <class E1, class F, class R, class... CT>
+        static auto resize(E1& e1, const xfunction<F, R, CT...>& e2)
+        -> std::enable_if_t<!detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>;
     };
 
     /*****************
@@ -314,9 +323,9 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<Tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<Tag>::assign_xexpression(E1& e1, const E2& e2)
     {
-        bool trivial_broadcast = resize(e1, e2);
+        bool trivial_broadcast = resize(e1.derived_cast(), e2.derived_cast());
         base_type::assign_data(e1, e2, trivial_broadcast);
     }
 
@@ -374,15 +383,31 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline bool xexpression_assigner<Tag>::resize(E1& e1, const E2& e2)
+    {
+        e1.resize(e2.shape());
+        return true;
+    }
+
+    template <class Tag>
+    template <class E1, class F, class R, class... CT>
+    inline auto xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, R, CT...>& e2)
+    -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>
+    {
+        return detail::broadcast_fixed_shape<xfunction_promote_t<CT...>, typename E1::shape_type>::value && xfunction_trivial<CT...>::value;
+    }
+
+    template <class Tag>
+    template <class E1, class F, class R, class... CT>
+    inline auto xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, R, CT...>& e2)
+    -> std::enable_if_t<!detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>
     {
         using index_type = xindex_type_t<typename E1::shape_type>;
         using size_type = typename E1::size_type;
-        const E2& de2 = e2.derived_cast();
-        size_type size = de2.dimension();
+        size_type size = e2.dimension();
         index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
-        bool trivial_broadcast = de2.broadcast_shape(shape, true);
-        e1.derived_cast().resize(std::move(shape));
+        bool trivial_broadcast = e2.broadcast_shape(shape, true);
+        e1.resize(std::move(shape));
         return trivial_broadcast;
     }
 
@@ -620,7 +645,7 @@ namespace xt
                 return m_cut;
             }
 
-        private: 
+        private:
 
             std::size_t m_cut;
             const strides_type& m_strides;
@@ -631,7 +656,7 @@ namespace xt
         {
             std::size_t cut = 0;
 
-            // TODO! if E1 is !contigous --> initialize cut to sensible value! 
+            // TODO! if E1 is !contigous --> initialize cut to sensible value!
             if (e1.strides().back() == 1)
             {
                 auto csf = check_strides_functor<layout_type::row_major, decltype(e1.strides())>(e1.strides());
@@ -719,8 +744,8 @@ namespace xt
 
         auto fct_stepper = e2.stepper_begin(e1.shape());
         auto res_stepper = e1.stepper_begin(e1.shape());
-    
-        // TODO in 1D case this is ambigous -- could be RM or CM. 
+
+        // TODO in 1D case this is ambigous -- could be RM or CM.
         //      Use default layout to make decision
         std::size_t step_dim = 0;
         if (!is_row_major) // row major case
