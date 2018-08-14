@@ -2414,30 +2414,32 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param Value to return for x > xp[-1]
      * @return an one-dimensional xarray, same length as x.
      */
-    template<class E>
-    inline E interp(const E &x, const E &xp, const E &fp, double left, double right)
+    template<class E1, class E2, class E3, typename T>
+    inline auto interp(const E1 &x, const E2 &xp, const E3 &fp, T left, T right)
     {
+        using size_type = detail::common_size_type_t<E1,E2,E3>;
+
         // basic checks
         #ifdef XTENSOR_ENABLE_ASSERT
 
             XTENSOR_ASSERT( xp.dimension() == 1 );
 
-            for ( size_t i = 1 ; i < x.size() ; ++i ) {
-                XTENSOR_ASSERT( x[i] >= x[i-1] );
+            for ( size_type i = 1 ; i < x.size() ; ++i ) {
+                XTENSOR_ASSERT( x[i] >= x[i - 1] );
             }
 
-            for ( size_t ip = 1 ; ip < xp.size() ; ++ip ) {
-                XTENSOR_ASSERT( xp[ip] >= xp[ip-1] );
+            for ( size_type ip = 1 ; ip < xp.size() ; ++ip ) {
+                XTENSOR_ASSERT( xp[ip] >= xp[ip - 1] );
             }
 
         #endif
 
         // allocate output
-        E f = E::from_shape(x.shape());
+        E3 f = E3::from_shape(x.shape());
 
         // counter in "x"
-        size_t i    = 0;
-        size_t imax = x.size();
+        size_type i    = 0;
+        size_type imax = x.size();
 
         // fill f[i] for x[i] <= xp[0]
         for ( ; i < x.size() ; ++i ) {
@@ -2447,17 +2449,17 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
         // fill f[i] for x[-1] >= xp[-1]
         for ( ; imax-- > 0 ; ) {
-            if ( x[imax] < xp[xp.size()-1] ) { break; }
+            if ( x[imax] < xp[xp.size() - 1] ) { break; }
             f[imax] = right;
         }
 
         // counter in "xp"
-        size_t ip = 1;
+        size_type ip = 1;
 
         // fill f[i] for the interior
         for ( ; i <= imax ; ++i ) {
             while ( x[i] > xp[ip] ) { ++ip; }
-            f[i] = fp[ip-1] + ( fp[ip] - fp[ip-1] ) / ( xp[ip] - xp[ip-1] ) * ( x[i] - xp[ip-1] );
+            f[i] = fp[ip - 1] + ( fp[ip] - fp[ip - 1] ) / ( xp[ip] - xp[ip - 1] ) * ( x[i] - xp[ip - 1] );
         }
 
         return f;
@@ -2472,10 +2474,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param The y-coordinates of the data points, same length as xp.
      * @return an one-dimensional xarray, same length as x.
      */
-    template<class E>
-    inline E interp(const E &x, const E &xp, const E &fp)
+    template<class E1, class E2, class E3>
+    inline auto interp(const E1 &x, const E2 &xp, const E3 &fp)
     {
-        return interp(x,xp,fp,fp[0],fp[fp.size()-1]);
+        return interp(x, xp, fp, fp[0], fp[fp.size() - 1]);
     }
 
 }

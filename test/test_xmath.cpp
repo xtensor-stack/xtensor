@@ -914,7 +914,9 @@ namespace xt
 
         auto f = xt::interp(x,xp,fp);
 
-        for ( size_t i = 0 ; i < x.size() ; ++i )
+        for ( std::size_t i = 0 ; i < x.size() ; ++i )
+        {
             EXPECT_EQ(f[i], x[i]);
+        }
     }
 }
