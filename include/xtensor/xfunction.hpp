@@ -171,19 +171,10 @@ namespace xt
     template <class F, class R, class... CT>
     class xfunction_base;
 
-    /*template <class... CT>
-    using xfunction_promote = detail::promote_index<typename std::decay_t<CT>::shape_type...>;
-
-    template <class... CT>
-    using xfunction_promote_t = typename xfunction_promote<CT...>::type;
-
-    template <class... CT>
-    using xfunction_trivial = std::conditional_t<detail::is_fixed<xfunction_promote_t<CT...>>::value, xfunction_promote<CT...>, std::false_type>;*/
-
     template <class F, class R, class... CT>
     struct xiterable_inner_types<xfunction_base<F, R, CT...>>
     {
-        using inner_shape_type = typename detail::promote_index<typename std::decay_t<CT>::shape_type...>::type;
+        using inner_shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         using const_stepper = xfunction_stepper<F, R, CT...>;
         using stepper = const_stepper;
     };
@@ -358,7 +349,7 @@ namespace xt
 
         template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
-
+        
         template <std::size_t... I, class... Args>
         const_reference unchecked_impl(std::index_sequence<I...>, Args... args) const;
 
@@ -923,7 +914,7 @@ namespace xt
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_f(std::get<I>(m_e)(args...)...);
     }
-
+    
     template <class F, class R, class... CT>
     template <std::size_t... I, class... Args>
     inline auto xfunction_base<F, R, CT...>::unchecked_impl(std::index_sequence<I...>, Args... args) const -> const_reference
@@ -1201,7 +1192,7 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_stepper<F, R, CT...>::step_leading()
+    inline auto xfunction_stepper<F, R, CT...>::step_leading() 
         -> value_type
     {
         return step_leading_impl(std::make_index_sequence<sizeof...(CT)>());
