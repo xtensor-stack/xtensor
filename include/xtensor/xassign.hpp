@@ -394,7 +394,8 @@ namespace xt
     inline auto xexpression_assigner<Tag>::resize(E1& /*e1*/, const xfunction<F, R, CT...>& /*e2*/)
     -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>
     {
-        return detail::broadcast_fixed_shape<xfunction_promote_t<CT...>, typename E1::shape_type>::value && xfunction_trivial<CT...>::value;
+        using promote = detail::promote_index<typename std::decay_t<CT>::shape_type...>;
+        return detail::broadcast_fixed_shape<typename promote::type, typename E1::shape_type>::value && promote::value;
     }
 
     template <class Tag>

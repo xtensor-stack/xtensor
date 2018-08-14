@@ -171,19 +171,19 @@ namespace xt
     template <class F, class R, class... CT>
     class xfunction_base;
 
-    template <class... CT>
+    /*template <class... CT>
     using xfunction_promote = detail::promote_index<typename std::decay_t<CT>::shape_type...>;
 
     template <class... CT>
     using xfunction_promote_t = typename xfunction_promote<CT...>::type;
 
     template <class... CT>
-    using xfunction_trivial = std::conditional_t<detail::is_fixed<xfunction_promote_t<CT...>>::value, xfunction_promote<CT...>, void>;
+    using xfunction_trivial = std::conditional_t<detail::is_fixed<xfunction_promote_t<CT...>>::value, xfunction_promote<CT...>, std::false_type>;*/
 
     template <class F, class R, class... CT>
     struct xiterable_inner_types<xfunction_base<F, R, CT...>>
     {
-        using inner_shape_type = xfunction_promote_t<CT...>;
+        using inner_shape_type = typename detail::promote_index<typename std::decay_t<CT>::shape_type...>::type;
         using const_stepper = xfunction_stepper<F, R, CT...>;
         using stepper = const_stepper;
     };
