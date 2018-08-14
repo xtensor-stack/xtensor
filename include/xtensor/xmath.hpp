@@ -933,13 +933,13 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     namespace detail
     {
-        template<class F, class... T, typename = decltype(std::declval<F>()(std::declval<T>()...))>
+        template <class F, class... T, typename = decltype(std::declval<F>()(std::declval<T>()...))>
         std::true_type  supports_test(const F&, const T&...);
         std::false_type supports_test(...);
 
-        template<class... T> struct supports;
+        template <class... T> struct supports;
 
-        template<class F, class... T> struct supports<F(T...)>
+        template <class F, class... T> struct supports<F(T...)>
             : decltype(supports_test(std::declval<F>(), std::declval<T>()...))
         {
         };
@@ -1714,6 +1714,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             };
 
         private:
+
             double m_rtol;
             double m_atol;
             bool m_equal_nan;

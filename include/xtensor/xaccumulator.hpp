@@ -147,9 +147,7 @@ namespace xt
             // so that all "first" values are initialized in a first pass
 
             std::size_t outer_loop_size, inner_loop_size, pos = 0;
-            // Note using size_t for strides because we're sure to always have positive strides
-            // for now!
-            std::size_t outer_stride, inner_stride;
+            std::ptrdiff_t outer_stride, inner_stride;
 
             auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, std::ptrdiff_t ax) {
                 outer_loop_size = std::accumulate(first, first + ax,
@@ -159,8 +157,8 @@ namespace xt
             };
 
             auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, std::ptrdiff_t ax) {
-                outer_stride = static_cast<std::size_t>(ax == 0 ? 1 : *std::min_element(first, first + ax));
-                inner_stride = static_cast<std::size_t>((ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last));
+                outer_stride = static_cast<std::ptrdiff_t>(ax == 0 ? 1 : *std::min_element(first, first + ax));
+                inner_stride = static_cast<std::ptrdiff_t>((ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last));
             };
 
             set_loop_sizes(e.shape().begin(), e.shape().end(), static_cast<std::ptrdiff_t>(axis));

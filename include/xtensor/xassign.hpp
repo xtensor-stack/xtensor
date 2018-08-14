@@ -486,7 +486,7 @@ namespace xt
         template <class C, class It, class Ot>
         inline void assign_loop(It src, Ot dst, std::size_t n)
         {
-            for(; n > 0; --n)
+            for (; n > 0; --n)
             {
                 *dst = static_cast<C>(*src);
                 ++src;

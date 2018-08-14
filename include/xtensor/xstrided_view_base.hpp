@@ -9,6 +9,8 @@
 #ifndef XTENSOR_STRIDED_VIEW_BASE_HPP
 #define XTENSOR_STRIDED_VIEW_BASE_HPP
 
+#include <type_traits>
+
 #include <xtl/xsequence.hpp>
 
 #include "xtensor_forward.hpp"
@@ -53,10 +55,10 @@ namespace xt
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
         template <class CTA>
-        xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
+        xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
 
         template <class CTA, class FLS>
-        xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset,
+        xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, size_type offset,
                            layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
 
         xstrided_view_base(xstrided_view_base&& rhs);
@@ -149,7 +151,7 @@ namespace xt
         inner_shape_type m_shape;
         inner_strides_type m_strides;
         inner_backstrides_type m_backstrides;
-        std::size_t m_offset;
+        size_type m_offset;
         layout_type m_layout;
     };
 
@@ -186,8 +188,8 @@ namespace xt
             }
 
             size_type size() const;
-            reference operator[](std::size_t idx);
-            const_reference operator[](std::size_t idx) const;
+            reference operator[](size_type idx);
+            const_reference operator[](size_type idx) const;
 
             iterator begin();
             iterator end();
@@ -236,7 +238,7 @@ namespace xt
         }
 
         template <class E, std::enable_if_t<has_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline std::size_t get_offset(E&& e)
+        inline auto get_offset(E&& e)
         {
             return e.data_offset();
         }
@@ -262,9 +264,9 @@ namespace xt
         }
 
         template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
-        inline std::size_t get_offset(E&& /*e*/)
+        inline auto get_offset(E&& /*e*/)
         {
-            return std::size_t(0);
+            return typename std::decay_t<E>::size_type(0);
         }
 
         template <class E, std::enable_if_t<!has_data_interface<std::decay_t<E>>::value>* = nullptr>
@@ -296,7 +298,7 @@ namespace xt
      */
     template <class CT, class S, layout_type L, class FST>
     template <class CTA>
-    inline xstrided_view_base<CT, S, L, FST>::xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept
+    inline xstrided_view_base<CT, S, L, FST>::xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept
         : m_e(std::forward<CTA>(e)),
           m_storage(detail::get_flat_storage<CT>(m_e)),
           m_shape(std::move(shape)),
@@ -311,7 +313,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     template <class CTA, class FLS>
     inline xstrided_view_base<CT, S, L, FST>::xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides,
-                                                                 std::size_t offset, layout_type layout,
+                                                                 size_type offset, layout_type layout,
                                                                  FLS&& flatten_strides, layout_type flatten_layout) noexcept
         : m_e(std::forward<CTA>(e)),
           m_storage(detail::get_flat_storage<CT>(m_e, std::forward<FLS>(flatten_strides), flatten_layout)),
@@ -805,14 +807,14 @@ namespace xt
         }
 
         template <class CT>
-        inline auto flat_expression_adaptor<CT>::operator[](std::size_t idx) -> reference
+        inline auto flat_expression_adaptor<CT>::operator[](size_type idx) -> reference
         {
             m_index = detail::unravel_noexcept(idx, m_strides, m_layout);
             return m_e->element(m_index.cbegin(), m_index.cend());
         }
 
         template <class CT>
-        inline auto flat_expression_adaptor<CT>::operator[](std::size_t idx) const -> const_reference
+        inline auto flat_expression_adaptor<CT>::operator[](size_type idx) const -> const_reference
         {
             m_index = detail::unravel_noexcept(idx, m_strides, m_layout);
             return m_e->element(m_index.cbegin(), m_index.cend());

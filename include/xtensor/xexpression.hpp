@@ -113,15 +113,15 @@ namespace xt
 
     namespace detail
     {
-        template <template<class> class B, class E>
+        template <template <class> class B, class E>
         struct is_crtp_base_of_impl : std::is_base_of<B<E>, E> {};
 
-        template <template<class> class B, class E, template<class> class F>
+        template <template <class> class B, class E, template <class> class F>
         struct is_crtp_base_of_impl<B, F<E>> :
         xtl::disjunction< std::is_base_of<B<E>, F<E>>, std::is_base_of<B<F<E>>, F<E>>> {};
     }
 
-    template <template<class> class B, class E>
+    template <template <class> class B, class E>
     using is_crtp_base_of = detail::is_crtp_base_of_impl<B, std::decay_t<E>>;
 
     template <class E>

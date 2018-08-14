@@ -267,7 +267,7 @@ namespace xt
                 using size_type = typename T::size_type;
                 decltype(auto) buf = empty_like(view(de, 0));
 
-                for (std::size_t i = de.shape()[0] - 1; i > 0; --i)
+                for (size_type i = de.shape()[0] - 1; i > 0; --i)
                 {
                     std::uniform_int_distribution<size_type> dist(0, i);
                     size_type j = dist(engine);
@@ -302,13 +302,15 @@ namespace xt
             {
                 throw std::runtime_error("If replace is false, then the sample expression's size must be > n");
             }
-            xtensor<typename T::value_type, 1> result;
+            using result_type = xtensor<typename T::value_type, 1>;
+            using size_type = typename result_type::size_type;
+            result_type result;
             result.resize({n});
-            
+
             if (replace)
             {
-                auto dist = std::uniform_int_distribution<std::size_t>(0, de.size() - 1);
-                for(std::size_t i = 0; i < n; i++)
+                auto dist = std::uniform_int_distribution<size_type>(0, de.size() - 1);
+                for (size_type i = 0; i < n; ++i)
                 {
                     result[i] = de.storage()[dist(engine)];
                 }
@@ -317,16 +319,16 @@ namespace xt
             {
                 // Naive resevoir sampling without weighting:
                 std::copy(de.storage().begin(), de.storage().begin() + n, result.begin());
-                std::size_t i = n;
+                size_type i = n;
                 for(auto it = de.storage().begin() + n; it != de.storage().end(); ++it, ++i)
                 {
-                    auto idx = std::uniform_int_distribution<std::size_t>(0, i)(engine);
+                    auto idx = std::uniform_int_distribution<size_type>(0, i)(engine);
                     if (idx < n)
                     {
                         result.storage()[idx] = *it;
                     }
                 }
-            } 
+            }
             return result;
         }
     }

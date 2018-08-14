@@ -520,7 +520,7 @@ namespace xt
             start = (start >= 0) ? start : start + size;
             stop = (stop >= 0) ? stop : stop + size;
 
-            if(step > 0)
+            if (step > 0)
             {
                 start = std::max(std::ptrdiff_t(0), std::min(size, start));
                 stop  = std::max(std::ptrdiff_t(0), std::min(size, stop));

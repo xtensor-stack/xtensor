@@ -683,24 +683,24 @@ namespace xt
     }
 
     /**
-    * Returns a reference to the element at the specified position in the view.
-    * @param args a list of indices specifying the position in the view. Indices
-    * must be unsigned integers, the number of indices must be equal to the number of
-    * dimensions of the view, else the behavior is undefined.
-    *
-    * @warning This method is meant for performance, for expressions with a dynamic
-    * number of dimensions (i.e. not known at compile time). Since it may have
-    * undefined behavior (see parameters), operator() should be prefered whenever
-    * it is possible.
-    * @warning This method is NOT compatible with broadcasting, meaning the following
-    * code has undefined behavior:
-    * \code{.cpp}
-    * xt::xarray<double> a = {{0, 1}, {2, 3}};
-    * xt::xarray<double> b = {0, 1};
-    * auto fd = a + b;
-    * double res = fd.uncheked(0, 1);
-    * \endcode
-    */
+     * Returns a reference to the element at the specified position in the view.
+     * @param args a list of indices specifying the position in the view. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the view, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.unchecked(0, 1);
+     * \endcode
+     */
     template <class CT, class... S>
     template <class... Args>
     inline auto xview<CT, S...>::unchecked(Args... args) -> reference
@@ -796,7 +796,7 @@ namespace xt
      * xt::xarray<double> a = {{0, 1}, {2, 3}};
      * xt::xarray<double> b = {0, 1};
      * auto fd = a + b;
-     * double res = fd.uncheked(0, 1);
+     * double res = fd.unchecked(0, 1);
      * \endcode
      */
     template <class CT, class... S>
