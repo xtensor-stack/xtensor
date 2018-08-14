@@ -123,22 +123,22 @@ namespace xt
 
 #define DEFINE_ASSIGN_OPERATOR(OP)                                                            \
         template <class T1>                                                                   \
-        inline xmasked_value& operator OP(const T1& value)                                    \
+        inline xmasked_value& operator OP(const T1& rhs)                                      \
         {                                                                                     \
             if (m_visible)                                                                    \
             {                                                                                 \
-                m_value OP value;                                                             \
+                m_value OP rhs;                                                               \
             }                                                                                 \
             return *this;                                                                     \
         }                                                                                     \
                                                                                               \
         template <class T1, class B1>                                                         \
-        inline xmasked_value& operator OP(const xmasked_value<T1, B1>& value)                 \
+        inline xmasked_value& operator OP(const xmasked_value<T1, B1>& rhs)                   \
         {                                                                                     \
-            m_visible = m_visible && value.visible();                                         \
+            m_visible = m_visible && rhs.visible();                                           \
             if (m_visible)                                                                    \
             {                                                                                 \
-                m_value OP value.value();                                                     \
+                m_value OP rhs.value();                                                       \
             }                                                                                 \
             return *this;                                                                     \
         }
