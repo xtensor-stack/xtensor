@@ -364,7 +364,7 @@ namespace xt
     {
         using array_type = xarray<double>;
         array_type a = { {1.2, 2.3}, {3.4, 4.5} };
-        
+
         {
             SCOPED_TRACE("unary function");
             auto fexp = exp(a);
@@ -900,5 +900,21 @@ namespace xt
         xt::xarray<int> d_x = {4, 6, 8};
         auto res5 = trapz(d, d_x);
         EXPECT_EQ(res5[0], 8.0);
+    }
+
+    /************************
+     * Linear interpolation *
+     ************************/
+
+    TEST(xmath, interp)
+    {
+        xt::xtensor<double,1> xp = {0.0, 1.0, 3.0};
+        xt::xtensor<double,1> fp = {0.0, 1.0, 3.0};
+        xt::xtensor<double,1> x  = {0.0, .5, 1.0, 1.5, 2.0, 2.5, 3.0};
+
+        auto f = xt::interp(x,xp,fp);
+
+        for ( size_t i = 0 ; i < x.size() ; ++i )
+            EXPECT_EQ(f[i], x[i]);
     }
 }

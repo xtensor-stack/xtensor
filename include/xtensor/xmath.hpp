@@ -2402,6 +2402,82 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
         return eval(sum(trap, {saxis}));
     }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Returns the one-dimensional piecewise linear interpolant to a function with given discrete data points (xp, fp), evaluated at x.
+     *
+     * @param The x-coordinates at which to evaluate the interpolated values (sorted).
+     * @param The x-coordinates of the data points (sorted).
+     * @param The y-coordinates of the data points, same length as xp.
+     * @param Value to return for x < xp[0].
+     * @param Value to return for x > xp[-1]
+     * @return an one-dimensional xarray, same length as x.
+     */
+    template<class E>
+    inline E interp(const E &x, const E &xp, const E &fp, double left, double right)
+    {
+        // basic checks
+        #ifdef XTENSOR_ENABLE_ASSERT
+
+            XTENSOR_ASSERT( xp.dimension() == 1 );
+
+            for ( size_t i = 1 ; i < x.size() ; ++i ) {
+                XTENSOR_ASSERT( x[i] >= x[i-1] );
+            }
+
+            for ( size_t ip = 1 ; ip < xp.size() ; ++ip ) {
+                XTENSOR_ASSERT( xp[ip] >= xp[ip-1] );
+            }
+
+        #endif
+
+        // allocate output
+        E f = E::from_shape(x.shape());
+
+        // counter in "x"
+        size_t i    = 0;
+        size_t imax = x.size();
+
+        // fill f[i] for x[i] <= xp[0]
+        for ( ; i < x.size() ; ++i ) {
+            if ( x[i] > xp[0] ) { break; }
+            f[i] = left;
+        }
+
+        // fill f[i] for x[-1] >= xp[-1]
+        for ( ; imax-- > 0 ; ) {
+            if ( x[imax] < xp[xp.size()-1] ) { break; }
+            f[imax] = right;
+        }
+
+        // counter in "xp"
+        size_t ip = 1;
+
+        // fill f[i] for the interior
+        for ( ; i <= imax ; ++i ) {
+            while ( x[i] > xp[ip] ) { ++ip; }
+            f[i] = fp[ip-1] + ( fp[ip] - fp[ip-1] ) / ( xp[ip] - xp[ip-1] ) * ( x[i] - xp[ip-1] );
+        }
+
+        return f;
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Returns the one-dimensional piecewise linear interpolant to a function with given discrete data points (xp, fp), evaluated at x.
+     *
+     * @param The x-coordinates at which to evaluate the interpolated values (sorted).
+     * @param The x-coordinates of the data points (sorted).
+     * @param The y-coordinates of the data points, same length as xp.
+     * @return an one-dimensional xarray, same length as x.
+     */
+    template<class E>
+    inline E interp(const E &x, const E &xp, const E &fp)
+    {
+        return interp(x,xp,fp,fp[0],fp[fp.size()-1]);
+    }
+
 }
 
 #endif
