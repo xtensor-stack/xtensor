@@ -133,35 +133,42 @@ namespace xt
         template <std::size_t IX, class A, class B>
         struct broadcast_fixed_shape_cmp_impl;
 
-        template <std::size_t IX, std::size_t... I, std::size_t... J>
-        struct broadcast_fixed_shape_cmp_impl<IX, fixed_shape<I...>, fixed_shape<J...>>
+        template <std::size_t JX, std::size_t... I, std::size_t... J>
+        struct broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>
         {
-            static constexpr std::size_t JX = IX - (sizeof...(I) - sizeof...(J));
+            //We line the shapes up from the last index
+            //IX may underflow, thus being a very large number
+            static constexpr std::size_t IX = JX - (sizeof...(J) - sizeof...(I));
+
+            //Out of bounds access gives value 0
+            static constexpr std::size_t I_v = at<IX, I...>::value;
+            static constexpr std::size_t J_v = at<JX, J...>::value;
 
             // we're statically checking if the broadcast shapes are either one on either of them or equal
-            static_assert(JX < sizeof...(J) ?
-                            detail::at<IX, I...>::value == 1 ||
-                            detail::at<JX, J...>::value == 1 ||
-                            detail::at<JX, J...>::value == detail::at<IX, I...>::value : true, "broadcast shapes do not match.");
+            static_assert(!I_v ||  I_v == 1 || J_v == 1 || J_v == I_v, "broadcast shapes do not match.");
 
-            static constexpr std::size_t value = (detail::at<IX, I...>::value == 1 && JX < sizeof...(J)) ?
-                                                    detail::at<JX, J...>::value : detail::at<IX, I...>::value;
+            static constexpr std::size_t ordinate = (I_v > J_v) ? I_v : J_v;
+            static constexpr bool value = (I_v == J_v);
         };
 
-        template <std::size_t... IX, std::size_t... I, std::size_t... J>
-        struct broadcast_fixed_shape_impl<std::index_sequence<IX...>, fixed_shape<I...>, fixed_shape<J...>>
+        template <std::size_t... JX, std::size_t... I, std::size_t... J>
+        struct broadcast_fixed_shape_impl<std::index_sequence<JX...>, fixed_shape<I...>, fixed_shape<J...>>
         {
-            using type = xt::fixed_shape<broadcast_fixed_shape_cmp_impl<IX, fixed_shape<I...>, fixed_shape<J...>>::value...>;
+            static_assert(sizeof... (J) >= sizeof... (I), "broadcast shapes do not match.");
+
+            using type = xt::fixed_shape<broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>::ordinate...>;
+            static constexpr bool value = xtl::conjunction<broadcast_fixed_shape_cmp_impl<JX, fixed_shape<I...>, fixed_shape<J...>>...>::value;
         };
+
+        /* broadcast_fixed_shape<fixed_shape<I...>, fixed_shape<J...>>
+         * Just like a call to broadcast_shape(cont S1& input, S2& output),
+         * except that the result shape is alised as type, and the returned
+         * bool is the member value. Asserts on an illegal broadcast, including
+         * the case where pack I is strictly longer than pack J. */
 
         template <std::size_t... I, std::size_t... J>
         struct broadcast_fixed_shape<fixed_shape<I...>, fixed_shape<J...>>
-        {
-            using type = std::conditional_t<(sizeof...(I) > sizeof...(J)),
-                    typename broadcast_fixed_shape_impl<decltype(std::make_index_sequence<sizeof...(I)>()), fixed_shape<I...>, fixed_shape<J...>>::type,
-                    typename broadcast_fixed_shape_impl<decltype(std::make_index_sequence<sizeof...(J)>()), fixed_shape<J...>, fixed_shape<I...>>::type
-                >;
-        };
+            : broadcast_fixed_shape_impl<std::make_index_sequence<sizeof...(J)>, fixed_shape<I...>, fixed_shape<J...>> {};
 
         // Simple is_array and only_array meta-functions
         template <class S>
@@ -240,28 +247,33 @@ namespace xt
         using filter_scalar_t = typename filter_scalar<S>::type;
 
         template <class... S>
-        struct broadcast_fixed;
+        struct promote_fixed : promote_fixed<filter_scalar_t<S>...> {};
 
-        template <class S1, class S2>
-        struct broadcast_fixed<S1, S2>
+        template <std::size_t... I>
+        struct promote_fixed<fixed_shape<I...>>
         {
-            using type = typename broadcast_fixed_shape<filter_scalar_t<S1>, filter_scalar_t<S2>>::type;
+            using type = fixed_shape<I...>;
+            static constexpr bool value = true;
         };
 
-        template <class S1, class... S>
-        struct broadcast_fixed<S1, S...>
+        template <std::size_t... I, std::size_t... J, class... S>
+        struct promote_fixed<fixed_shape<I...>, fixed_shape<J...>, S...>
         {
-            using type = typename broadcast_fixed_shape<filter_scalar_t<S1>, typename broadcast_fixed<S...>::type>::type;
+        private:
+            using intermediate = std::conditional_t< (sizeof... (I) > sizeof... (J)),
+                broadcast_fixed_shape<fixed_shape<J...>, fixed_shape<I...>>,
+                broadcast_fixed_shape<fixed_shape<I...>, fixed_shape<J...>>>;
+            using result = promote_fixed<typename intermediate::type, S...>;
+        public:
+            using type = typename result::type;
+            static constexpr bool value = xtl::conjunction<intermediate, result>::value;
         };
 
         template <bool all_index, bool all_array, class... S>
         struct select_promote_index;
 
         template <class... S>
-        struct select_promote_index<true, true, S...>
-        {
-            using type = typename broadcast_fixed<S...>::type;
-        };
+        struct select_promote_index<true, true, S...> : promote_fixed<S...> {};
 
         template <>
         struct select_promote_index<true, true>
@@ -271,10 +283,7 @@ namespace xt
         };
 
         template <class... S>
-        struct select_promote_index<false, true, S...>
-        {
-            using type = typename promote_array<S...>::type;
-        };
+        struct select_promote_index<false, true, S...> : promote_array<S...> {};
 
         template <class... S>
         struct select_promote_index<false, false, S...>
@@ -283,12 +292,7 @@ namespace xt
         };
 
         template <class... S>
-        struct promote_index
-        {
-            using type = typename select_promote_index<only_fixed<S...>::value,
-                                                       only_array<S...>::value,
-                                                       S...>::type;
-        };
+        struct promote_index : select_promote_index<only_fixed<S...>::value, only_array<S...>::value, S...> {};
 
         template <class T>
         struct index_from_shape_impl
