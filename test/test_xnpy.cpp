@@ -107,4 +107,13 @@ namespace xt
         EXPECT_TRUE(compare_binary_files(filename, compare_name));
         std::remove(filename.c_str());
     }
+
+    TEST(xnpy, xfunction_cast)
+    {
+        // compilation test, cf: https://github.com/QuantStack/xtensor/issues/1070
+        auto dc = cast<char>(load_npy<double>("files/xnpy_files/double.npy"));
+        EXPECT_EQ(dc(0, 0), 0);
+        xarray<char> adc = dc;
+        EXPECT_EQ(adc(0, 0), 0);
+    }
 }
