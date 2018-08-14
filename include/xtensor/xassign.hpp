@@ -21,6 +21,7 @@
 #include "xstrides.hpp"
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
+#include "xfunction.hpp"
 
 namespace xt
 {
