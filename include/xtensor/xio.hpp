@@ -508,6 +508,7 @@ namespace xt
         template <class T>
         struct printer<T, std::enable_if_t<!std::is_fundamental<typename T::value_type>::value && !xtl::is_complex<typename T::value_type>::value>>
         {
+            using const_reference = typename T::const_reference;
             using value_type = std::decay_t<typename T::value_type>;
             using cache_type = std::vector<std::string>;
             using cache_iterator = typename cache_type::const_iterator;
@@ -533,7 +534,7 @@ namespace xt
                 return out;
             }
 
-            void update(const value_type& val)
+            void update(const_reference val)
             {
                 std::stringstream buf;
                 buf << val;
