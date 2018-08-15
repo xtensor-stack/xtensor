@@ -2422,6 +2422,118 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
         return eval(sum(trap, {saxis}));
     }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Returns the one-dimensional piecewise linear interpolant to a function with given discrete data points (xp, fp), evaluated at x.
+     *
+     * @param The x-coordinates at which to evaluate the interpolated values (sorted).
+     * @param The x-coordinates of the data points (sorted).
+     * @param The y-coordinates of the data points, same length as xp.
+     * @param Value to return for x < xp[0].
+     * @param Value to return for x > xp[-1]
+     * @return an one-dimensional xarray, same length as x.
+     */
+    template<class E1, class E2, class E3, typename T>
+    inline auto interp(const E1 &x, const E2 &xp, const E3 &fp, T left, T right)
+    {
+        using size_type = detail::common_size_type_t<E1,E2,E3>;
+        using value_type = typename E3::value_type;
+
+        // basic checks
+        #ifdef XTENSOR_ENABLE_ASSERT
+
+            XTENSOR_ASSERT( xp.dimension() == 1 );
+
+            for (size_type i = 1 ; i < x.size() ; ++i)
+            {
+                XTENSOR_ASSERT( x[i] >= x[i - 1] );
+            }
+
+            for (size_type ip = 1 ; ip < xp.size() ; ++ip)
+            {
+                XTENSOR_ASSERT( xp[ip] >= xp[ip - 1] );
+            }
+
+        #endif
+
+        // allocate output
+        auto f = xtensor<value_type, 1>::from_shape(x.shape());
+
+        // counter in "x": from left
+        size_type i = 0;
+
+        // fill f[i] for x[i] <= xp[0]
+        for (; i < x.size() ; ++i)
+        {
+            if (x[i] > xp[0])
+            {
+                break;
+            }
+            f[i] = static_cast<value_type>(left);
+        }
+
+        // counter in "x": from right
+        // (index counts one right, to terminate the reverse loop, without risking being negative)
+        size_type imax = x.size();
+
+        // fill f[i] for x[-1] >= xp[-1]
+        for (; imax > 0 ; --imax)
+        {
+            if (x[imax-1] < xp[xp.size() - 1])
+            {
+                break;
+            }
+            f[imax-1] = static_cast<value_type>(right);
+        }
+
+        // catch edge case: all entries are "right"
+        if (imax == 0)
+        {
+            return f;
+        }
+
+        // set "imax" as actual index
+        // (counted one right, see above)
+        --imax;
+
+        // counter in "xp"
+        size_type ip = 1;
+
+        // fill f[i] for the interior
+        for (; i <= imax ; ++i)
+        {
+            // - search next value in "xp"
+            while (x[i] > xp[ip])
+            {
+                ++ip;
+            }
+            // - distances as doubles
+            double dfp = static_cast<double>(fp[ip] - fp[ip - 1]);
+            double dxp = static_cast<double>(xp[ip] - xp[ip - 1]);
+            double dx  = static_cast<double>(x[i] - xp[ip - 1]);
+            // - interpolate
+            f[i] = fp[ip - 1] + static_cast<value_type>(dfp / dxp * dx);
+        }
+
+        return f;
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Returns the one-dimensional piecewise linear interpolant to a function with given discrete data points (xp, fp), evaluated at x.
+     *
+     * @param The x-coordinates at which to evaluate the interpolated values (sorted).
+     * @param The x-coordinates of the data points (sorted).
+     * @param The y-coordinates of the data points, same length as xp.
+     * @return an one-dimensional xarray, same length as x.
+     */
+    template<class E1, class E2, class E3>
+    inline auto interp(const E1 &x, const E2 &xp, const E3 &fp)
+    {
+        return interp(x, xp, fp, fp[0], fp[fp.size() - 1]);
+    }
+
 }
 
 #endif
