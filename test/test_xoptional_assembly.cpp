@@ -347,6 +347,7 @@ namespace xt
         row_major_result<> rm;
         dyn_opt_ass_type vec;
         vec.resize(rm.m_shape, layout_type::row_major);
+        vec.fill(123);
         vec(1, 1, 0) = rm.m_assigner[1][1][0];
         vec.value()[0] = 4;
         size_t nb_iter = vec.size() / 2;

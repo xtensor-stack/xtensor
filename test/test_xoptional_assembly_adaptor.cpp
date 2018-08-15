@@ -254,6 +254,7 @@ namespace xt
         row_major_result<> rm;
         array_type a;
         a.resize(rm.m_shape, layout_type::row_major);
+        a.fill(0);
         a(1, 1, 0) = rm.m_assigner[1][1][0];
         a[0] = 4;
         flag_array_type fa(rm.m_shape, true);

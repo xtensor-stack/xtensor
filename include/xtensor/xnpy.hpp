@@ -482,7 +482,7 @@ namespace xt
                 // Allocate memory
                 m_word_size = std::size_t(atoi(&typestring[2]));
                 m_n_bytes = compute_size(shape) * m_word_size;
-                m_buffer = new char[m_n_bytes];
+                m_buffer = std::allocator<char>{}.allocate(m_n_bytes);
             }
 
             ~npy_file()
