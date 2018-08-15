@@ -129,8 +129,8 @@ namespace xt
         struct functor_simd_type
         {
             // Never use xsimd::simd_type<R>. A function may operates on int32_t but
-            // be asked to load arguments as batches of double because it is part
-            // of an expression whose promote_type is double.
+            // be asked to load arguments as batches of floating point numbers because it is part
+            // of an expression whose promote_type is a floating point number.
             using type = xsimd::simd_type<T>;
         };
 

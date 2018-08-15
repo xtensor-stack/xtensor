@@ -170,7 +170,7 @@ namespace xt
         }
     }
 
-    TEST(xfunciton, unchecked)
+    TEST(xfunction, unchecked)
     {
         xfunction_features f;
         size_t i = f.m_a.shape()[0] - 1;

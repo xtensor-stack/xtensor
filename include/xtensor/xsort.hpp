@@ -379,7 +379,7 @@ namespace xt
         inline std::size_t cmp_idx(IT iter, IT end, std::ptrdiff_t inc, F&& cmp)
         {
             std::size_t idx = 0;
-            double min = *iter;
+            auto min = *iter;
             iter += inc;
             for (std::size_t i = 1; iter < end; iter += inc, ++i)
             {
