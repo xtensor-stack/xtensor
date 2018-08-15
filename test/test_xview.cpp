@@ -831,7 +831,7 @@ namespace xt
     TEST(xview, to_scalar)
     {
         std::array<std::size_t, 3> sh{2,2,2};
-        xtensor<double, 3> a(sh);
+        xtensor<double, 3> a(sh, 123);
         xtensor_fixed<double, xshape<2, 2, 2>> af = a;
         xarray<double> b = a;
 

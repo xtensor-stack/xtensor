@@ -378,7 +378,6 @@ namespace xt
         inline auto xbuffer_owner_storage<CP, A>::operator=(self_type&& rhs) -> self_type&
         {
             swap(rhs);
-            rhs.m_moved_from = true;
             return *this;
         }
 

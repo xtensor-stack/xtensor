@@ -1161,7 +1161,9 @@ namespace xt
         else
         {
             // If this wasn't grown from the inline copy, grow the allocated space.
-            new_alloc = reinterpret_cast<pointer>(realloc(this->m_begin, new_capacity * sizeof(T)));
+            new_alloc = m_allocator.allocate(new_capacity);
+            std::uninitialized_copy(m_begin, m_end, new_alloc);
+            m_allocator.deallocate(m_begin, std::size_t(m_capacity - m_begin));
         }
         XTENSOR_ASSERT(new_alloc);
 

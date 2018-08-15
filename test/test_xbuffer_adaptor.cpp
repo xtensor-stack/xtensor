@@ -12,12 +12,13 @@
 namespace xt
 {
     using buffer_adaptor = xbuffer_adaptor<double*>;
+    using allocator = std::allocator<double>;
     using owner_adaptor = xbuffer_adaptor<double*&, acquire_ownership>;
 
     TEST(xbuffer_adaptor, owner_destructor)
     {
         size_t size = 100;
-        double* data = new double[size];
+        double* data = allocator{}.allocate(size);
         owner_adaptor adapt(data, size);
         EXPECT_EQ(data, adapt.data());
     }
@@ -25,7 +26,7 @@ namespace xt
     TEST(xbuffer_adaptor, owner_move)
     {
         size_t size = 100;
-        double* data = new double[size];
+        double* data = allocator{}.allocate(size);
         owner_adaptor adapt(data, size);
 
         owner_adaptor adapt2(std::move(adapt));
@@ -37,12 +38,12 @@ namespace xt
     TEST(xbuffer_adaptor, owner_copy_assign)
     {
         size_t size1 = 100;
-        double* data1 = new double[size1];
+        double* data1 = allocator{}.allocate(size1);
         data1[0] = 2.5;
         owner_adaptor adapt1(data1, size1);
 
         size_t size2 = 200;
-        double* data2 = new double[size2];
+        double* data2 = allocator{}.allocate(size2);
         data2[0] = 1.2;
         owner_adaptor adapt2(data2, size2);
 
@@ -54,12 +55,12 @@ namespace xt
     TEST(xbuffer_adaptor, owner_move_assign)
     {
         size_t size1 = 100;
-        double* data1 = new double[size1];
+        double* data1 = allocator{}.allocate(size1);
         data1[0] = 2.5;
         owner_adaptor adapt1(data1, size1);
 
         size_t size2 = 200;
-        double* data2 = new double[size2];
+        double* data2 = allocator{}.allocate(size2);
         data2[0] = 1.2;
         owner_adaptor adapt2(data2, size2);
 
@@ -71,7 +72,7 @@ namespace xt
     TEST(xbuffer_adaptor, owner_resize)
     {
         size_t size1 = 100;
-        double* data1 = new double[size1];
+        double* data1 = allocator{}.allocate(size1);
         owner_adaptor adapt(data1, size1);
 
         size_t size2 = 50;
@@ -83,7 +84,7 @@ namespace xt
     TEST(xbuffer_adaptor, owner_iterating)
     {
         size_t size = 100;
-        double* data = new double[size];
+        double* data = allocator{}.allocate(size);
         owner_adaptor adapt(data, size);
 
         std::fill(adapt.begin(), adapt.end(), 1.2);

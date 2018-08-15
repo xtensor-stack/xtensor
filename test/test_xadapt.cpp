@@ -63,8 +63,8 @@ namespace xt
     TEST(xarray_adaptor, pointer_acquire_ownership)
     {
         size_t size = 4;
-        int* data = new int[size];
-        int* data2 = new int[size];
+        int* data = std::allocator<int>{}.allocate(size);
+        int* data2 =  std::allocator<int>{}.allocate(size);;
         using shape_type = std::vector<vec_type::size_type>;
         shape_type s({2, 2});
 
@@ -97,9 +97,9 @@ namespace xt
     TEST(xarray_adaptor, acquire_ownership_assign)
     {
         size_t size = 1;
-        int* data1 = new int[1];
+        int* data1 = std::allocator<int>{}.allocate(1);
         data1[0] = 0;
-        int* data2 = new int[1];
+        int* data2 = std::allocator<int>{}.allocate(1);
         data2[0] = 1;
         int* data3 = nullptr;
         using shape_type = std::vector<vec_type::size_type>;
@@ -210,9 +210,9 @@ namespace xt
     TEST(xtensor_adaptor, pointer_acquire_ownership)
     {
         size_t size = 4;
-        int* data0 = new int[size];
-        int* data1 = new int[size];
-        int* data2 = new int[size];
+        int* data0 = std::allocator<int>{}.allocate(size);
+        int* data1 = std::allocator<int>{}.allocate(size);
+        int* data2 = std::allocator<int>{}.allocate(size);
 
         auto a0 = adapt(data0, size, acquire_ownership());
         a0(3) = 3;
@@ -234,8 +234,8 @@ namespace xt
     TEST(xtensor_adaptor, move_pointer_acquire_ownership)
     {
         size_t size = 4;
-        int* data = new int[size];
-        int* data2 = new int[size];
+        int* data = std::allocator<int>{}.allocate(size);
+        int* data2 = std::allocator<int>{}.allocate(size);
         using shape_type = std::array<vec_type::size_type, 2>;
         shape_type s = {2, 2};
 
@@ -290,9 +290,9 @@ namespace xt
     TEST(xtensor_adaptor, acquire_ownership_assign)
     {
         size_t size = 1;
-        int* data1 = new int[1];
+        int* data1 = std::allocator<int>{}.allocate(size);
         data1[0] = 0;
-        int* data2 = new int[1];
+        int* data2 = std::allocator<int>{}.allocate(size);
         data2[0] = 1;
         int* data3 = nullptr;
         using shape_type = std::array<vec_type::size_type, 1>;

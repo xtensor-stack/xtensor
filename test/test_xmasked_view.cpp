@@ -84,8 +84,8 @@ namespace xt
         EXPECT_EQ(masked_data(2, 1), 8.);
         EXPECT_EQ(masked_data(2, 2), 9.);
 
-#ifndef XTENSOR_ENABLE_ASSERT
-        masked_data(3, 3);
+#ifdef XTENSOR_ENABLE_ASSERT
+        EXPECT_ANY_THROW(masked_data(3, 3));
 #endif
     }
 
@@ -122,8 +122,8 @@ namespace xt
         EXPECT_EQ(masked_data.unchecked(2, 1), 8.);
         EXPECT_EQ(masked_data.unchecked(2, 2), 9.);
 
-#ifndef XTENSOR_ENABLE_ASSERT
-        masked_data.unchecked(3, 3);
+#ifdef XTENSOR_ENABLE_ASSERT
+        EXPECT_ANY_THROW(masked_data.unchecked(3, 3));
 #endif
     }
 
