@@ -23,7 +23,7 @@ include(CheckCXXCompilerFlag)
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Intel")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O3 -Wunused-parameter -Wextra -Wreorder")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -O3 -g -Wunused-parameter -Wextra -Wreorder")
     CHECK_CXX_COMPILER_FLAG("-std=c++14" HAS_CPP14_FLAG)
 
     if (HAS_CPP14_FLAG)
@@ -112,6 +112,7 @@ set(XTENSOR_BENCHMARK
     benchmark_assign.cpp
     benchmark_builder.cpp
     benchmark_container.cpp
+    benchmark_creation.cpp
     benchmark_increment_stepper.cpp
     benchmark_lambda_expressions.cpp
     benchmark_math.cpp

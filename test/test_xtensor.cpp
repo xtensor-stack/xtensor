@@ -253,4 +253,24 @@ namespace xt
         xt::xarray<double> ca = a * b;
     }
 
+    TEST(xtensor, move_from_xarray)
+    {
+        xarray<double> a = {{{1,2,3}, {4,5,6}}, {{10, 10, 10}, {1,5,10}}};
+        xarray<double> a1 = a;
+        xtensor<double, 3> b(std::move(a1));
+        EXPECT_EQ(a, b);
+        EXPECT_TRUE(std::equal(a.strides().begin(), a.strides().end(), b.strides().begin()) && a.strides().size() == b.strides().size());
+        EXPECT_TRUE(std::equal(a.backstrides().begin(), a.backstrides().end(), b.backstrides().begin()) && a.backstrides().size() == b.backstrides().size());
+        EXPECT_EQ(a.layout(), b.layout());
+
+        xarray<double> a2 = a;
+        xtensor<double, 3> c;
+        c = std::move(a2);
+
+        EXPECT_EQ(a, c);
+        EXPECT_TRUE(std::equal(a.strides().begin(), a.strides().end(), c.strides().begin()) && a.strides().size() == c.strides().size());
+        EXPECT_TRUE(std::equal(a.backstrides().begin(), a.backstrides().end(), c.backstrides().begin()) && a.backstrides().size() == c.backstrides().size());
+        EXPECT_EQ(a.layout(), c.layout());
+    }
+
 }
