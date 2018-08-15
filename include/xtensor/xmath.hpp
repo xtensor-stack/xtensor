@@ -2440,9 +2440,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         // allocate output
         auto f = xtensor<value_type, 1>::from_shape(x.shape());
 
-        // counter in "x"
-        size_type i    = 0;
-        size_type imax = x.size();
+        // counter in "x": from left
+        size_type i = 0;
 
         // fill f[i] for x[i] <= xp[0]
         for (; i < x.size() ; ++i)
@@ -2454,15 +2453,29 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             f[i] = static_cast<value_type>(left);
         }
 
+        // counter in "x": from right
+        // (index counts one right, to terminate the reverse loop, without risking being negative)
+        size_type imax = x.size();
+
         // fill f[i] for x[-1] >= xp[-1]
-        for (; imax-- > 0 ;)
+        for (; imax > 0 ; --imax)
         {
-            if (x[imax] < xp[xp.size() - 1])
+            if (x[imax-1] < xp[xp.size() - 1])
             {
                 break;
             }
-            f[imax] = static_cast<value_type>(right);
+            f[imax-1] = static_cast<value_type>(right);
         }
+
+        // catch edge case: all entries are "right"
+        if (imax == 0)
+        {
+            return f;
+        }
+
+        // set "imax" as actual index
+        // (counted one right, see above)
+        --imax;
 
         // counter in "xp"
         size_type ip = 1;
