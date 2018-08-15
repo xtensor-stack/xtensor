@@ -2418,48 +2418,69 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto interp(const E1 &x, const E2 &xp, const E3 &fp, T left, T right)
     {
         using size_type = detail::common_size_type_t<E1,E2,E3>;
+        using value_type = typename E3::value_type;
 
         // basic checks
         #ifdef XTENSOR_ENABLE_ASSERT
 
             XTENSOR_ASSERT( xp.dimension() == 1 );
 
-            for ( size_type i = 1 ; i < x.size() ; ++i ) {
+            for (size_type i = 1 ; i < x.size() ; ++i)
+            {
                 XTENSOR_ASSERT( x[i] >= x[i - 1] );
             }
 
-            for ( size_type ip = 1 ; ip < xp.size() ; ++ip ) {
+            for (size_type ip = 1 ; ip < xp.size() ; ++ip)
+            {
                 XTENSOR_ASSERT( xp[ip] >= xp[ip - 1] );
             }
 
         #endif
 
         // allocate output
-        E3 f = E3::from_shape(x.shape());
+        auto f = xtensor<value_type, 1>::from_shape(x.shape());
 
         // counter in "x"
         size_type i    = 0;
         size_type imax = x.size();
 
         // fill f[i] for x[i] <= xp[0]
-        for ( ; i < x.size() ; ++i ) {
-            if ( x[i] > xp[0] ) { break; }
-            f[i] = left;
+        for (; i < x.size() ; ++i)
+        {
+            if (x[i] > xp[0])
+            {
+                break;
+            }
+            f[i] = static_cast<value_type>(left);
         }
 
         // fill f[i] for x[-1] >= xp[-1]
-        for ( ; imax-- > 0 ; ) {
-            if ( x[imax] < xp[xp.size() - 1] ) { break; }
-            f[imax] = right;
+        for (; imax-- > 0 ;)
+        {
+            if (x[imax] < xp[xp.size() - 1])
+            {
+                break;
+            }
+            f[imax] = static_cast<value_type>(right);
         }
 
         // counter in "xp"
         size_type ip = 1;
 
         // fill f[i] for the interior
-        for ( ; i <= imax ; ++i ) {
-            while ( x[i] > xp[ip] ) { ++ip; }
-            f[i] = fp[ip - 1] + ( fp[ip] - fp[ip - 1] ) / ( xp[ip] - xp[ip - 1] ) * ( x[i] - xp[ip - 1] );
+        for (; i <= imax ; ++i)
+        {
+            // - search next value in "xp"
+            while (x[i] > xp[ip])
+            {
+                ++ip;
+            }
+            // - distances as doubles
+            double dfp = static_cast<double>(fp[ip] - fp[ip - 1]);
+            double dxp = static_cast<double>(xp[ip] - xp[ip - 1]);
+            double dx  = static_cast<double>(x[i] - xp[ip - 1]);
+            // - interpolate
+            f[i] = fp[ip - 1] + static_cast<value_type>(dfp / dxp * dx);
         }
 
         return f;
