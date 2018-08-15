@@ -407,16 +407,21 @@ namespace xt
             using eval_type = typename detail::sort_eval_type<E>::type;
             using value_type = typename E::value_type;
             using result_type = typename argfunc_result_type<E>::type;
+            using result_shape_type = typename result_type::shape_type;
 
             if (e.dimension() == 1)
             {
                 return arg_func_impl(e, std::forward<F>(cmp));
             }
 
-            xt::dynamic_shape<std::size_t> new_shape = e.shape();
-            new_shape.erase(new_shape.begin() + std::ptrdiff_t(axis));
+            result_shape_type alt_shape;
+            xt::resize_container(alt_shape, e.dimension() - 1);
 
-            result_type result(new_shape);
+            // Excluding copy, copy all of shape except for axis
+            std::copy(e.shape().cbegin(), e.shape().cbegin() + std::ptrdiff_t(axis), alt_shape.begin());
+            std::copy(e.shape().cbegin() + std::ptrdiff_t(axis) + 1, e.shape().cend(), alt_shape.begin() + std::ptrdiff_t(axis));
+
+            result_type result = result_type::from_shape(std::move(alt_shape));
             auto result_iter = result.begin();
 
             auto arg_func_lambda = [&result_iter, &cmp](auto begin, auto end) {

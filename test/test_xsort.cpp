@@ -120,6 +120,12 @@ namespace xt
 
         xarray<std::size_t> ex_3 = {2, 0};
         EXPECT_EQ(ex_3, argmin(a, 1));
+
+        xtensor<double, 2> xa = {{5,3,1}, {4,4,4}};
+        EXPECT_EQ(ex, argmin(xa));
+        EXPECT_EQ(ex_2, argmin(xa, 0));
+        EXPECT_EQ(ex_3, argmin(xa, 1));
+
     }
 
     TEST(xsort, argmax)
@@ -163,7 +169,7 @@ namespace xt
     {
         for (std::size_t i = 0; i < 20; ++i)
         {
-            xarray<double> a = xt::random::rand<double>({5, 5, 5, 5});
+            xarray<double> a = xt::random::rand<double>({5, 4, 6, 7});
 
             auto a_s0 = argmin(a, 0);
             auto va_s0 = view(a, xt::all(), 3, 2, 3);
