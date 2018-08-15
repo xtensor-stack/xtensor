@@ -875,7 +875,7 @@ namespace xt
             template <class T>
             std::array<std::ptrdiff_t, 3> operator()(const T& /*t*/) const
             {
-                return std::array<std::ptrdiff_t, 3>({0, 0, 0});
+                return std::array<std::ptrdiff_t, 3>{{0, 0, 0}};
             }
 
             template <class A, class B, class C>
