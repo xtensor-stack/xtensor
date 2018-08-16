@@ -129,6 +129,16 @@ namespace xt
                                                           {0.63179202 - 0.41720995i, 0.44025718 - 0.65472131i, 0.08372648 - 0.37380143i}};
         EXPECT_TRUE(allclose(cmplexpected_conj, cmplres_conj));
 
+
+        using assign_traits = xassign_traits<xarray<std::complex<double>>, decltype(cmplres_conj)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits::convertible_types());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
+#endif
+
         auto cmplres_norm = xt::norm(cmplarg_0);
         xarray<double> fieldnorm = {{0.66822937, 0.5765938, 0.19374703},
                                     {0.30205453, 1.0307235, 0.48069004},

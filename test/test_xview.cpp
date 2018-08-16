@@ -1178,4 +1178,38 @@ namespace xt
         auto doe2 = ax.strides()[0] * 1 + ax.strides()[1] * 2 + ax.strides()[2] * 1 + ax.strides()[3] * 2;
         EXPECT_EQ(doe2, do2);
     }
+
+    TEST(xview, view_simd_test)
+    {
+        xt::xarray<double> a = xt::arange<double>(3 * 4 * 5);
+        a.reshape({3, 4, 5});
+        xt::xarray<double> b = xt::arange<double>(4 * 5);
+        b.reshape({4, 5});
+        xt::xarray<double> c = xt::broadcast(b, {3, 4, 5});
+        noalias(view(a, 1, all(), all())) = b;
+        noalias(view(a, 2, all(), all())) = view(a, 0, all(), all());
+        EXPECT_EQ(a, c);
+
+        auto vxt = view(a, 1, all(), all());
+        auto vxa = view(xt::arange<double>(100), range(0, 10));
+
+        using assign_traits = xassign_traits<decltype(vxt), decltype(b)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits::convertible_types());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
+#endif
+
+        using assign_traits2 = xassign_traits<decltype(b), decltype(vxa)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits2::convertible_types());
+        EXPECT_TRUE(assign_traits2::simd_size());
+        EXPECT_TRUE(assign_traits2::forbid_simd());
+        EXPECT_FALSE(assign_traits2::simd_assign());
+#endif
+
+    }
 }

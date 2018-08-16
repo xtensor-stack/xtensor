@@ -917,6 +917,17 @@ namespace xt
         auto xv = xt::reshape_view(a, xshape<3, 3>());
 
         xtensor<double, 2> e = xt::reshape_view(xt::arange(9), {3, 3});
+        xtensor<double, 2> es = xt::reshape_view(a, {3, 3});
+
+
+        using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_traits::convertible_types());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_TRUE(assign_traits::forbid_simd());
+        EXPECT_FALSE(assign_traits::simd_assign());
+#endif
 
         a.reshape({3, 3});
         EXPECT_EQ(av, e);

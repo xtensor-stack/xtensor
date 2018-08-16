@@ -505,6 +505,24 @@ namespace xt
                   class = std::enable_if_t<has_data_interface<T>::value && is_contiguous_view, int>>
         void assign_to(xexpression<E>& e, bool force_resize) const;
 
+        //
+        // SIMD interface
+        //
+
+        template <class simd>
+        using simd_return_type = xsimd::simd_return_type<value_type, typename simd::value_type>;
+
+        template <class align, class simd = simd_value_type, class T = xexpression_type,
+                  class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
+        void store_simd(size_type i, const simd& e);
+        template <class align, class simd = simd_value_type, class T = xexpression_type,
+                  class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
+        simd_return_type<simd> load_simd(size_type i) const;
+        template <class T = xexpression_type, class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
+        inline reference data_element(size_type i);
+        template <class T = xexpression_type, class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
+        inline const_reference data_element(size_type i) const;
+
     private:
 
         // VS 2015 workaround (yes, really)
@@ -1294,6 +1312,34 @@ namespace xt
         auto& de = e.derived_cast();
         de.resize(shape(), force_resize);
         std::copy(data() + data_offset(), data() + data_offset() + de.size(), de.template begin<static_layout>());
+    }
+
+    template <class CT, class... S>
+    template <class align, class simd, class, class>
+    void xview<CT, S...>::store_simd(size_type i, const simd& e)
+    {
+        return m_e.template store_simd<xsimd::unaligned_mode>(data_offset() + i, e);
+    }
+
+    template <class CT, class... S>
+    template <class align, class simd, class, class>
+    auto xview<CT, S...>::load_simd(size_type i) const -> simd_return_type<simd>
+    {
+        return m_e.template load_simd<xsimd::unaligned_mode, simd>(data_offset() + i);
+    }
+
+    template <class CT, class... S>
+    template <class, class>
+    inline auto xview<CT, S...>::data_element(size_type i) -> reference
+    {
+        return m_e.data_element(data_offset() + i);
+    }
+
+    template <class CT, class... S>
+    template <class, class>
+    inline auto xview<CT, S...>::data_element(size_type i) const -> const_reference
+    {
+        return m_e.data_element(data_offset() + i);
     }
 
     template <class CT, class... S>

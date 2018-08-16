@@ -18,6 +18,7 @@
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xshape.hpp"
 #include "xtensor/xutils.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -199,6 +200,60 @@ namespace xt
         EXPECT_TRUE(b);
         b = has_data_interface<decltype(v3)>::value;
         EXPECT_FALSE(b);
+    }
+
+    TEST(utils, has_strides)
+    {
+        bool b = has_strides<xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<const xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<const xtensor<double, 2>>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<const xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_TRUE(b);
+
+        xarray<int> a = xarray<int>::from_shape({3, 4, 5});
+        auto f = a + a - 23;
+        auto v2 = strided_view(a, {all(), 1, all()});
+        auto vv2 = strided_view(v2, {all(), 2});
+        auto v3 = strided_view(f, {all(), 2});
+
+        b = has_strides<decltype(v2)>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<decltype(vv2)>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<decltype(v3)>::value;
+        EXPECT_TRUE(b);
+    }
+
+    TEST(utils, has_simd_interface)
+    {
+        bool b = has_simd_interface<xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_simd_interface<const xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_simd_interface<const xtensor<double, 2>>::value;
+        EXPECT_TRUE(b);
+        b = has_simd_interface<const xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_TRUE(b);
+
+        xarray<int> a = xarray<int>::from_shape({3, 4, 5});
+        auto f = a + a - 23;
+        auto v2 = strided_view(a, {all(), 1, all()});
+        auto vv2 = strided_view(v2, {all(), 2});
+        auto v3 = strided_view(f, {all(), 2});
+
+        b = has_simd_interface<decltype(v2)>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<decltype(vv2)>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<decltype(v3)>::value;
+        EXPECT_FALSE(b);
+
+        auto xv = xt::view(a, 1);
+        b = has_simd_interface<decltype(xv)>::value;
+        EXPECT_TRUE(b);
     }
 
     TEST(utils, allocation_tracking)

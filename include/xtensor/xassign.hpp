@@ -196,6 +196,7 @@ namespace xt
                     || e2.is_trivial_broadcast(e1.strides());
         }
 
+        // TODO refactor with has_simd_interface
         template <class E, class = void_t<>>
         struct forbid_simd_assign
         {

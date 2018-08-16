@@ -147,7 +147,7 @@ namespace xt
             // so that all "first" values are initialized in a first pass
 
             std::size_t outer_loop_size, inner_loop_size, pos = 0;
-            std::ptrdiff_t outer_stride, inner_stride;
+            std::size_t outer_stride, inner_stride;
 
             auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, std::ptrdiff_t ax) {
                 outer_loop_size = std::accumulate(first, first + ax,
@@ -156,9 +156,10 @@ namespace xt
                                                   std::size_t(1), std::multiplies<std::size_t>());
             };
 
+            // Note: add check that strides > 0
             auto set_loop_strides = [&outer_stride, &inner_stride](auto first, auto last, std::ptrdiff_t ax) {
-                outer_stride = static_cast<std::ptrdiff_t>(ax == 0 ? 1 : *std::min_element(first, first + ax));
-                inner_stride = static_cast<std::ptrdiff_t>((ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last));
+                outer_stride = static_cast<std::size_t>(ax == 0 ? 1 : *std::min_element(first, first + ax));
+                inner_stride = static_cast<std::size_t>((ax == std::distance(first, last) - 1) ? 1 : *std::min_element(first + ax + 1, last));
             };
 
             set_loop_sizes(e.shape().begin(), e.shape().end(), static_cast<std::ptrdiff_t>(axis));
@@ -237,7 +238,7 @@ namespace xt
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
                     result.storage()[pos + inner_stride] = std::get<0>(f)(result.storage()[pos],
-                                                                       result.storage()[pos + inner_stride]);
+                                                                          result.storage()[pos + inner_stride]);
                     pos += outer_stride;
                 }
                 pos += inner_stride;
