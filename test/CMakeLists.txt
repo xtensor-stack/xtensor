@@ -76,7 +76,7 @@ endif()
 
 find_package(Threads)
 
-include_directories(${GTEST_INCLUDE_DIRS})
+include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 
 set(COMMON_BASE
     main.cpp
