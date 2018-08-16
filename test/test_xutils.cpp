@@ -230,6 +230,8 @@ namespace xt
     TEST(utils, has_simd_interface)
     {
         bool b = has_simd_interface<xarray<int>>::value;
+
+#ifdef XTENSOR_USE_XSIMD
         EXPECT_TRUE(b);
         b = has_simd_interface<const xarray<int>>::value;
         EXPECT_TRUE(b);
@@ -237,7 +239,15 @@ namespace xt
         EXPECT_TRUE(b);
         b = has_simd_interface<const xtensor_fixed<double, xshape<3, 4>>>::value;
         EXPECT_TRUE(b);
-
+#else
+        EXPECT_FALSE(b);
+        b = has_simd_interface<const xarray<int>>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<const xtensor<double, 2>>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<const xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_FALSE(b);
+#endif
         xarray<int> a = xarray<int>::from_shape({3, 4, 5});
         auto f = a + a - 23;
         auto v2 = strided_view(a, {all(), 1, all()});
@@ -253,7 +263,11 @@ namespace xt
 
         auto xv = xt::view(a, 1);
         b = has_simd_interface<decltype(xv)>::value;
+#ifdef XTENSOR_USE_XSIMD
         EXPECT_TRUE(b);
+#else
+        EXPECT_FALSE(b);
+#endif
     }
 
     TEST(utils, allocation_tracking)

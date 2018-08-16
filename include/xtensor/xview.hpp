@@ -490,10 +490,18 @@ namespace xt
 
         inline const_container_iterator data_xend(layout_type l) const noexcept;
 
+        // Conversion operator enabled for statically "scalar" views
         template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
-        operator reference();
+        operator reference()
+        {
+            return (*this)();
+        }
+
         template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
-        operator const_reference() const;
+        operator const_reference() const
+        {
+            return (*this)();
+        }
 
         size_type underlying_size(size_type dim) const;
 
@@ -1289,21 +1297,6 @@ namespace xt
         return data_xend_impl(data() + data_offset(), l);
     }
 
-    // Conversion operator enabled for statically "scalar" views
-    template <class CT, class... S>
-    template <class ST, class ENABLE>
-    xview<CT, S...>::operator reference()
-    {
-        return (*this)();
-    }
-
-    template <class CT, class... S>
-    template <class ST, class ENABLE>
-    xview<CT, S...>::operator const_reference() const
-    {
-        return (*this)();
-    }
-
     // Assign to operator enabled for contigous views
     template <class CT, class... S>
     template <class E, class T, class>
@@ -1365,7 +1358,6 @@ namespace xt
     {
         m_strides = xtl::make_sequence<inner_strides_type>(dimension(), 0);
         m_backstrides = xtl::make_sequence<inner_strides_type>(dimension(), 0);
-        using strides_value_type = std::decay_t<decltype(m_strides[0])>;
 
         constexpr std::size_t n_strides = sizeof...(S) - integral_count<S...>();
 
