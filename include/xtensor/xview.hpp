@@ -33,137 +33,6 @@
 
 namespace xt
 {
-    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End = -1>
-    class container_offset_view
-    {
-    public:
-
-        using value_type = typename E::value_type;
-        using reference = typename E::reference;
-        using const_reference = typename E::const_reference;
-        using pointer = typename E::pointer;
-        using const_pointer = typename E::const_pointer;
-
-        using size_type = typename E::size_type;
-        using difference_type = typename E::difference_type;
-
-        using iterator = typename E::iterator;
-        using const_iterator = typename E::const_iterator;
-        using reverse_iterator = typename E::reverse_iterator;
-        using const_reverse_iterator = typename E::const_reverse_iterator;
-
-        explicit container_offset_view(const E& container)
-            : m_original_container(container)
-        {
-        }
-
-        template <std::ptrdiff_t OS, std::ptrdiff_t OE>
-        explicit container_offset_view(const container_offset_view<E, OS, OE>& other)
-            : m_original_container(other.storage())
-        {
-        }
-
-        size_type size() const
-        {
-            if (End == -1)
-            {
-                return m_original_container.size() - static_cast<size_type>(Start);
-            }
-            else
-            {
-                return static_cast<size_type>(End - Start);
-            }
-        }
-
-        const_reference operator[](std::size_t idx) const
-        {
-            return m_original_container[idx + Start];
-        }
-
-        const_iterator end() const
-        {
-            if (End != -1)
-            {
-                return m_original_container.begin() + End;
-            }
-            else
-            {
-                return m_original_container.end();
-            }
-        }
-
-        const_iterator begin() const
-        {
-            return m_original_container.begin() + Start;
-        }
-
-        const_iterator cend() const
-        {
-            return end();
-        }
-
-        const_iterator cbegin() const
-        {
-            return begin();
-        }
-
-        const_reverse_iterator rend() const
-        {
-            return const_reverse_iterator(begin());
-        }
-
-        const_reverse_iterator rbegin() const
-        {
-            return const_reverse_iterator(end());
-        }
-
-        const_reverse_iterator crend() const
-        {
-            return rend();
-        }
-
-        const_reverse_iterator crbegin() const
-        {
-            return rbegin();
-        }
-
-        const_reference front() const
-        {
-            return *(m_original_container.begin() + Start);
-        }
-
-        const_reference back() const
-        {
-            if (End == -1)
-            {
-                return m_original_container.back();
-            }
-            else
-            {
-                return m_original_container[End - 1];
-            }
-        }
-
-        const E& storage() const
-        {
-            return m_original_container;
-        }
-
-    private:
-        const E& m_original_container;
-    };
-
-    template <class T, std::ptrdiff_t TB, std::ptrdiff_t TE>
-    inline bool operator==(const container_offset_view<T, TB, TE>& lhs, const container_offset_view<T, TB, TE>& rhs)
-    {
-        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
-    }
-
-    template <class T, std::ptrdiff_t TB, std::ptrdiff_t TE>
-    inline bool operator!=(const container_offset_view<T, TB, TE>& lhs, const container_offset_view<T, TB, TE>& rhs)
-    {
-        return !(lhs == rhs);
-    }
 
     /*********************
      * xview declaration *
@@ -184,29 +53,6 @@ namespace xt
 
     namespace detail
     {
-        template <class S>
-        struct is_strided_slice_impl
-            : std::true_type
-        {
-        };
-
-        template <class T>
-        struct is_strided_slice_impl<xkeep_slice<T>>
-            : std::false_type
-        {
-        };
-
-        template <class T>
-        struct is_strided_slice_impl<xdrop_slice<T>>
-            : std::false_type
-        {
-        };
-
-        template <class E, class... S>
-        struct is_strided_view
-            : std::integral_constant<bool, xtl::conjunction<has_data_interface<E>, is_strided_slice_impl<S>...>::value>
-        {
-        };
 
         template <class T>
         struct is_xrange
@@ -235,7 +81,6 @@ namespace xt
         template <layout_type L, bool valid, bool all_seen, bool range_seen, class V>
         struct is_contiguous_view_impl
         {
-            // TODO make this work for col major
             static constexpr bool value = false;
         };
 
@@ -263,10 +108,37 @@ namespace xt
             static constexpr std::ptrdiff_t value = sizeof...(I);
         };
 
+        // if we have the same number of integers as we have static dimensions
+        // this can be interpreted like a xscalar
         template <class CT, class... S>
         struct is_xscalar_impl<xview<CT, S...>>
         {
             static constexpr bool value = static_cast<std::ptrdiff_t>(integral_count<S...>()) == static_dimension<typename std::decay_t<CT>::shape_type>::value ? true : false;
+        };
+
+        template <class S>
+        struct is_strided_slice_impl
+            : std::true_type
+        {
+        };
+
+        template <class T>
+        struct is_strided_slice_impl<xkeep_slice<T>>
+            : std::false_type
+        {
+        };
+
+        template <class T>
+        struct is_strided_slice_impl<xdrop_slice<T>>
+            : std::false_type
+        {
+        };
+
+        // If we have no discontiguous slices, we can calculate strides for this view.
+        template <class E, class... S>
+        struct is_strided_view
+            : std::integral_constant<bool, xtl::conjunction<has_data_interface<E>, is_strided_slice_impl<S>...>::value>
+        {
         };
 
         // if row major the view can only be (statically) computed as contiguous if:
@@ -331,7 +203,6 @@ namespace xt
             static constexpr bool value = valid;
         };
 
-
         // TODO relax has_data_interface constraint here!
         template <class E, class... S>
         struct is_contiguous_view
@@ -352,25 +223,25 @@ namespace xt
         template <class T, std::ptrdiff_t offset>
         struct unwrap_offset_container<layout_type::row_major, T, offset>
         {
-            using type = container_offset_view<T, offset>;
+            using type = sequence_view<T, offset, static_dimension<T>::value>;
         };
 
         template <class T, std::ptrdiff_t start, std::ptrdiff_t end, std::ptrdiff_t offset>
-        struct unwrap_offset_container<layout_type::row_major, container_offset_view<T, start, end>, offset>
+        struct unwrap_offset_container<layout_type::row_major, sequence_view<T, start, end>, offset>
         {
-            using type = container_offset_view<T, start + offset, end>;
+            using type = sequence_view<T, start + offset, end>;
         };
 
         template <class T, std::ptrdiff_t offset>
         struct unwrap_offset_container<layout_type::column_major, T, offset>
         {
-            using type = container_offset_view<T, 0, static_dimension<T>::value - offset>;
+            using type = sequence_view<T, 0, static_dimension<T>::value - offset>;
         };
 
         template <class T, std::ptrdiff_t start, std::ptrdiff_t end, std::ptrdiff_t offset>
-        struct unwrap_offset_container<layout_type::column_major, container_offset_view<T, start, end>, offset>
+        struct unwrap_offset_container<layout_type::column_major, sequence_view<T, start, end>, offset>
         {
-            using type = container_offset_view<T, start, end - offset>;
+            using type = sequence_view<T, start, end - offset>;
         };
 
         template <class E, class... S>
@@ -379,17 +250,18 @@ namespace xt
             // if we have no `range` in the slices we can re-use the shape with an offset
             using type = std::conditional_t<xtl::disjunction<is_xrange<S>...>::value, 
                                             typename xview_shape_type<typename E::shape_type, S...>::type,
+                                            // In the false branch we know that we have only integers at the front OR end, and NO range
                                             typename unwrap_offset_container<E::static_layout, typename E::inner_shape_type, integral_count<S...>()>::type>;
         };
 
         template <class T>
-        struct is_container_view
+        struct is_sequence_view
             : std::integral_constant<bool, false>
         {
         };
 
         template <class T, std::ptrdiff_t S, std::ptrdiff_t E>
-        struct is_container_view<container_offset_view<T, S, E>>
+        struct is_sequence_view<sequence_view<T, S, E>>
             : std::integral_constant<bool, true>
         {
         };
@@ -399,7 +271,6 @@ namespace xt
     struct xiterable_inner_types<xview<CT, S...>>
     {
         using xexpression_type = std::decay_t<CT>;
-        // using inner_shape_type = typename xview_shape_type<typename xexpression_type::shape_type, S...>::type;
 
         static constexpr bool is_strided_view = detail::is_strided_view<xexpression_type, S...>::value;
         static constexpr bool is_contiguous_view = detail::is_contiguous_view<xexpression_type, S...>::value;
@@ -609,49 +480,20 @@ namespace xt
         data_offset() const noexcept;
 
         template <class It>
-        inline It data_xbegin_impl(It begin) const noexcept
-        {
-            return begin + data_offset();
-        }
+        inline It data_xbegin_impl(It begin) const noexcept;
 
         template <class It>
-        inline It data_xend_impl(It begin, layout_type l) const noexcept
-        {
-            std::ptrdiff_t end_offset = static_cast<std::ptrdiff_t>(std::accumulate(backstrides().begin(), backstrides().end(), std::size_t(0)));
-            return strided_data_end(*this, begin + end_offset + 1, l);
-        }
+        inline It data_xend_impl(It begin, layout_type l) const noexcept;
+        inline container_iterator data_xbegin() noexcept;
+        inline const_container_iterator data_xbegin() const noexcept;
+        inline container_iterator data_xend(layout_type l) noexcept;
 
-        inline auto data_xbegin() noexcept -> container_iterator
-        {
-            return data_xbegin_impl(data());
-        }
-
-        inline auto data_xbegin() const noexcept -> const_container_iterator
-        {
-            return data_xbegin_impl(data());
-        }
-
-        inline auto data_xend(layout_type l) noexcept -> container_iterator
-        {
-            return data_xend_impl(data() + data_offset(), l);
-        }
-
-        inline auto data_xend(layout_type l) const noexcept -> const_container_iterator
-        {
-            return data_xend_impl(data() + data_offset(), l);
-        }
+        inline const_container_iterator data_xend(layout_type l) const noexcept;
 
         template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
-        operator reference()
-        {
-            return (*this)();
-        }
-
+        operator reference();
         template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
-        operator const_reference() const
-        {
-            return (*this)();
-        }
+        operator const_reference() const;
 
         size_type underlying_size(size_type dim) const;
 
@@ -659,40 +501,9 @@ namespace xt
         xtl::xclosure_pointer<const self_type&> operator&() const &;
         xtl::xclosure_pointer<self_type> operator&() &&;
 
-        // TODO enable for contigous_layout!
         template <class E, class T = xexpression_type,
                   class = std::enable_if_t<has_data_interface<T>::value && is_contiguous_view, int>>
-        void assign_to(xexpression<E>& e, bool force_resize) const
-        {
-            auto& de = e.derived_cast();
-            de.resize(shape(), force_resize);
-            std::copy(data() + data_offset(), data() + data_offset() + de.size(), de.data());
-        }
-
-        template <class align, class simd = simd_value_type>
-        void store_simd(size_type i, const simd& e)
-        {
-            return m_e.template store_simd<xsimd::unaligned_mode>(data_offset() + i, e);
-        }
-
-        template <class simd>
-        using simd_return_type = xsimd::simd_return_type<value_type, typename simd::value_type>;
-
-        template <class align, class simd = simd_value_type>
-        simd_return_type<simd> load_simd(size_type i) const
-        {
-            return m_e.template load_simd<xsimd::unaligned_mode, simd>(data_offset() + i);
-        }
-
-        inline auto data_element(size_type i) -> reference
-        {
-            return m_e.data_element(data_offset() + i);
-        }
-
-        inline auto data_element(size_type i) const -> const_reference
-        {
-            return m_e.data_element(data_offset() + i);
-        }
+        void assign_to(xexpression<E>& e, bool force_resize) const;
 
     private:
 
@@ -768,7 +579,7 @@ namespace xt
         void assign_temporary_impl(temporary_type&& tmp);
 
         template <std::size_t... I>
-        XTENSOR_CONSTEXPR_RETURN std::size_t data_offset_impl(std::index_sequence<I...>) const noexcept;
+        inline std::size_t data_offset_impl(std::index_sequence<I...>) const noexcept;
 
         template <std::size_t... I>
         inline auto compute_strides_impl(std::index_sequence<I...>) const noexcept;
@@ -934,7 +745,7 @@ namespace xt
     xview<CT, S...>::xview(std::true_type, CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
         : m_e(std::forward<CTA>(e)),
           m_slices(std::forward<FSL>(first_slice), std::forward<SL>(slices)...),
-          m_shape(compute_shape(detail::is_container_view<inner_shape_type>{})),
+          m_shape(compute_shape(detail::is_sequence_view<inner_shape_type>{})),
           m_strides(m_e.strides()),
           m_backstrides(m_e.backstrides()),
           m_data_offset(data_offset_impl(std::make_index_sequence<sizeof...(S)>())),
@@ -1330,7 +1141,7 @@ namespace xt
 
     template <class CT, class... S>
     template <std::size_t... I>
-    XTENSOR_CONSTEXPR_RETURN std::size_t xview<CT, S...>::data_offset_impl(std::index_sequence<I...>) const noexcept
+    inline std::size_t xview<CT, S...>::data_offset_impl(std::index_sequence<I...>) const noexcept
     {
         auto temp = std::array<std::ptrdiff_t, sizeof...(S)>({
             (static_cast<ptrdiff_t>(xt::value(std::get<I>(m_slices), 0)) * m_e.strides()[I - newaxis_count_before<S...>(I)])...
@@ -1420,6 +1231,70 @@ namespace xt
         });
     }
     //@}
+
+    template <class CT, class... S>
+    template <class It>
+    inline It xview<CT, S...>::data_xbegin_impl(It begin) const noexcept
+    {
+        return begin + data_offset();
+    }
+
+    template <class CT, class... S>
+    template <class It>
+    inline It xview<CT, S...>::data_xend_impl(It begin, layout_type l) const noexcept
+    {
+        std::ptrdiff_t end_offset = static_cast<std::ptrdiff_t>(std::accumulate(backstrides().begin(), backstrides().end(), std::size_t(0)));
+        return strided_data_end(*this, begin + end_offset + 1, l);
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::data_xbegin() noexcept -> container_iterator
+    {
+        return data_xbegin_impl(data());
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::data_xbegin() const noexcept -> const_container_iterator
+    {
+        return data_xbegin_impl(data());
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::data_xend(layout_type l) noexcept -> container_iterator
+    {
+        return data_xend_impl(data() + data_offset(), l);
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::data_xend(layout_type l) const noexcept -> const_container_iterator
+    {
+        return data_xend_impl(data() + data_offset(), l);
+    }
+
+    // Conversion operator enabled for statically "scalar" views
+    template <class CT, class... S>
+    template <class ST, class ENABLE>
+    xview<CT, S...>::operator reference()
+    {
+        return (*this)();
+    }
+
+    template <class CT, class... S>
+    template <class ST, class ENABLE>
+    xview<CT, S...>::operator const_reference() const
+    {
+        return (*this)();
+    }
+
+    // Assign to operator enabled for contigous views
+    template <class CT, class... S>
+    template <class E, class T, class>
+    void xview<CT, S...>::assign_to(xexpression<E>& e, bool force_resize) const
+    {
+        auto& de = e.derived_cast();
+        de.resize(shape(), force_resize);
+        std::copy(data() + data_offset(), data() + data_offset() + de.size(), de.template begin<static_layout>());
+    }
 
     template <class CT, class... S>
     template <class... Args>

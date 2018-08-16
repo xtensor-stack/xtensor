@@ -24,13 +24,13 @@ namespace xt
     using view_shape_type = dynamic_shape<size_t>;
 
     template <class A, class B, std::ptrdiff_t BB, std::ptrdiff_t BE>
-    bool operator==(const A& lhs, const container_offset_view<B, BB, BE>& rhs)
+    bool operator==(const A& lhs, const sequence_view<B, BB, BE>& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(rhs.begin(), rhs.end(), lhs.begin());
     }
 
     template <class A, class B, std::ptrdiff_t BB, std::ptrdiff_t BE>
-    bool operator==(const container_offset_view<B, BB, BE>& lhs, const A& rhs)
+    bool operator==(const sequence_view<B, BB, BE>& lhs, const A& rhs)
     {
         return lhs.size() == rhs.size() && std::equal(rhs.begin(), rhs.end(), lhs.begin());
     }
@@ -770,7 +770,7 @@ namespace xt
         if (a.layout() == layout_type::row_major)
         {
             bool cond1 = std::is_same<decltype(row)::strides_type, std::array<std::ptrdiff_t, 1>>::value;
-            bool cond2 = std::is_same<decltype(row.strides()), const xt::container_offset_view<std::array<std::ptrdiff_t, 2>, 1, -1>&>::value;
+            bool cond2 = std::is_same<decltype(row.strides()), const xt::sequence_view<std::array<std::ptrdiff_t, 2>, 1, 2>&>::value;
             EXPECT_TRUE(cond1);
             EXPECT_TRUE(cond2);
         }
@@ -1096,15 +1096,15 @@ namespace xt
         EXPECT_FALSE((detail::is_contiguous_view<ctes, xall<int>, xstepped_range<int>, int, int>()));
     }
 
-    TEST(xview, container_offset_view)
+    TEST(xview, sequence_view)
     {
         using vector_type = std::vector<int>;
         using array_type = std::array<int, 7>;
         auto a = vector_type({0,1,2,3,4,5,6});
         auto b = array_type({0,1,2,3,4,5,6});
 
-        auto va = container_offset_view<vector_type, 3>(a);
-        auto vb = container_offset_view<array_type, 3>(b);
+        auto va = sequence_view<vector_type, 3>(a);
+        auto vb = sequence_view<array_type, 3>(b);
 
         EXPECT_EQ(va[0], a[3]);
         EXPECT_EQ(va[1], a[4]);
@@ -1118,8 +1118,8 @@ namespace xt
         EXPECT_TRUE(std::equal(b.begin() + 3, b.end(), vb.begin()));
         EXPECT_EQ(b.size() - 3, vb.size());
 
-        auto vae = container_offset_view<vector_type, 3, 5>(a);
-        auto vbe = container_offset_view<array_type, 3, 5>(b);
+        auto vae = sequence_view<vector_type, 3, 5>(a);
+        auto vbe = sequence_view<array_type, 3, 5>(b);
 
         EXPECT_EQ(vae[0], b[3]);
         EXPECT_EQ(vae[1], b[4]);

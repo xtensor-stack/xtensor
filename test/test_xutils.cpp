@@ -216,4 +216,22 @@ namespace xt
         alloc_tracking::disable();
         EXPECT_NO_THROW(arr_t c = a);
     }
+
+    TEST(utils, static_dimension)
+    {
+        std::ptrdiff_t sdim = static_dimension<std::vector<int>>::value;
+        EXPECT_EQ(sdim, -1);
+        sdim = static_dimension<std::array<int, 4>>::value;
+        EXPECT_EQ(sdim, 4);
+        sdim = static_dimension<xt::const_array<char, 12>>::value;
+        EXPECT_EQ(sdim, 12);
+        sdim = static_dimension<xt::fixed_shape<4, 1, 2, 3>>::value;
+        EXPECT_EQ(sdim, 4);
+        sdim = static_dimension<xt::sequence_view<std::array<std::ptrdiff_t, 2>, 1, 2>>::value;
+        EXPECT_EQ(sdim, 1);
+        sdim = static_dimension<xt::sequence_view<std::array<std::ptrdiff_t, 2>, 1, -1>>::value;
+        EXPECT_EQ(sdim, -1);
+        sdim = static_dimension<xt::sequence_view<xt::fixed_shape<4, 1, 2, 3>, 1, 4>>::value;
+        EXPECT_EQ(sdim, 3);
+    }
 }

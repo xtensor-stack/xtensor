@@ -1504,6 +1504,176 @@ namespace xt
 
 #undef XTENSOR_FIXED_SHAPE_CONSTEXPR
 
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End = -1>
+    class sequence_view
+    {
+    public:
+
+        using value_type = typename E::value_type;
+        using reference = typename E::reference;
+        using const_reference = typename E::const_reference;
+        using pointer = typename E::pointer;
+        using const_pointer = typename E::const_pointer;
+
+        using size_type = typename E::size_type;
+        using difference_type = typename E::difference_type;
+
+        using iterator = typename E::iterator;
+        using const_iterator = typename E::const_iterator;
+        using reverse_iterator = typename E::reverse_iterator;
+        using const_reverse_iterator = typename E::const_reverse_iterator;
+
+        explicit sequence_view(const E& container);
+
+        template <std::ptrdiff_t OS, std::ptrdiff_t OE>
+        explicit sequence_view(const sequence_view<E, OS, OE>& other);
+
+        size_type size() const;
+        const_reference operator[](std::size_t idx) const;
+
+        const_iterator end() const;
+        const_iterator begin() const;
+        const_iterator cend() const;
+        const_iterator cbegin() const;
+
+        const_reverse_iterator rend() const;
+        const_reverse_iterator rbegin() const;
+        const_reverse_iterator crend() const;
+        const_reverse_iterator crbegin() const;
+
+        const_reference front() const;
+        const_reference back() const;
+
+        const E& storage() const;
+
+    private:
+        const E& m_sequence;
+    };
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    sequence_view<E, Start, End>::sequence_view(const E& container)
+        : m_sequence(container)
+    {
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    template <std::ptrdiff_t OS, std::ptrdiff_t OE>
+    sequence_view<E, Start, End>::sequence_view(const sequence_view<E, OS, OE>& other)
+        : m_sequence(other.storage())
+    {
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::size() const -> size_type
+    {
+        if (End == -1)
+        {
+            return m_sequence.size() - static_cast<size_type>(Start);
+        }
+        else
+        {
+            return static_cast<size_type>(End - Start);
+        }
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::operator[](std::size_t idx) const -> const_reference
+    {
+        return m_sequence[idx + static_cast<std::size_t>(Start)];
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto  sequence_view<E, Start, End>::end() const -> const_iterator
+    {
+        if (End != -1)
+        {
+            return m_sequence.begin() + End;
+        }
+        else
+        {
+            return m_sequence.end();
+        }
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto  sequence_view<E, Start, End>::begin() const -> const_iterator
+    {
+        return m_sequence.begin() + Start;
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto  sequence_view<E, Start, End>::cend() const -> const_iterator
+    {
+        return end();
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto  sequence_view<E, Start, End>::cbegin() const -> const_iterator
+    {
+        return begin();
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::rend() const -> const_reverse_iterator
+    {
+        return const_reverse_iterator(begin());
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::rbegin() const -> const_reverse_iterator
+    {
+        return const_reverse_iterator(end());
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::crend() const -> const_reverse_iterator
+    {
+        return rend();
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::crbegin() const -> const_reverse_iterator
+    {
+        return rbegin();
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::front() const -> const_reference
+    {
+        return *(m_sequence.begin() + Start);
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    auto sequence_view<E, Start, End>::back() const -> const_reference
+    {
+        if (End == -1)
+        {
+            return m_sequence.back();
+        }
+        else
+        {
+            return m_sequence[static_cast<std::size_t>(End - 1)];
+        }
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    const E& sequence_view<E, Start, End>::storage() const
+    {
+        return m_sequence;
+    }
+
+
+    template <class T, std::ptrdiff_t TB, std::ptrdiff_t TE>
+    inline bool operator==(const sequence_view<T, TB, TE>& lhs, const sequence_view<T, TB, TE>& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+
+    template <class T, std::ptrdiff_t TB, std::ptrdiff_t TE>
+    inline bool operator!=(const sequence_view<T, TB, TE>& lhs, const sequence_view<T, TB, TE>& rhs)
+    {
+        return !(lhs == rhs);
+    }
 }
 
 /******************************
@@ -1532,6 +1702,16 @@ namespace std
         public integral_constant<std::size_t, sizeof...(N)>
     {
     };
+
+    template <class T, std::ptrdiff_t Start, std::ptrdiff_t End>
+    class tuple_size<xt::sequence_view<T, Start, End>> :
+        public integral_constant<std::size_t, End - Start>
+    {
+    };
+
+    // Undefine tuple size for not-known sequence view size
+    template <class T, std::ptrdiff_t Start>
+    class tuple_size<xt::sequence_view<T, Start, -1>>;
 }
 
 #if defined(__clang__)

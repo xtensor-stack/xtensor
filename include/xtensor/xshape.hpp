@@ -64,6 +64,31 @@ namespace xtl
 namespace xt
 {
 
+    /***********************************
+     * static_dimension implementation *
+     ***********************************/
+
+    namespace detail
+    {
+        template <class T, class E = void>
+        struct static_dimension_impl
+        {
+            static constexpr std::ptrdiff_t value = -1;
+        };
+
+        template <class T>
+        struct static_dimension_impl<T, void_t<decltype(std::tuple_size<T>::value)>>
+        {
+            static constexpr std::ptrdiff_t value = static_cast<std::ptrdiff_t>(std::tuple_size<T>::value);
+        };
+    }
+
+    template <class S>
+    struct static_dimension
+    {
+        static constexpr std::ptrdiff_t value = detail::static_dimension_impl<S>::value;
+    };
+
     /*************************************
      * promote_shape and promote_strides *
      *************************************/
