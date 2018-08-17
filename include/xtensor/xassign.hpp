@@ -92,12 +92,8 @@ namespace xt
         static bool resize(E1& e1, const E2& e2);
 
         template <class E1, class F, class R, class... CT>
-        static auto resize(E1& e1, const xfunction<F, R, CT...>& e2)
-        -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>;
+        static bool resize(E1& e1, const xfunction<F, R, CT...>& e2);
 
-        template <class E1, class F, class R, class... CT>
-        static auto resize(E1& e1, const xfunction<F, R, CT...>& e2)
-        -> std::enable_if_t<!detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>;
     };
 
     /*****************
@@ -381,35 +377,60 @@ namespace xt
         }
     }
 
+    namespace detail
+    {
+        template <bool B, class... CT>
+        struct static_trivial_broadcast;
+
+        template <class... CT>
+        struct static_trivial_broadcast<true, CT...>
+        {
+            static constexpr bool value = detail::promote_index<typename std::decay_t<CT>::shape_type...>::value;
+        };
+
+        template <class... CT>
+        struct static_trivial_broadcast<false, CT...>
+        {
+            static constexpr bool value = false;
+        };
+    }
+
     template <class Tag>
     template <class E1, class E2>
     inline bool xexpression_assigner<Tag>::resize(E1& e1, const E2& e2)
     {
+        // If our RHS is not a xfunction, we know that the RHS is at least potentially trivial
+        // We check the strides of the RHS in detail::is_trivial_broadcast to see if they match up!
+        // So we can skip a shape copy and a call to broadcast_shape(...)
         e1.resize(e2.shape());
         return true;
     }
 
     template <class Tag>
     template <class E1, class F, class R, class... CT>
-    inline auto xexpression_assigner<Tag>::resize(E1& /*e1*/, const xfunction<F, R, CT...>& /*e2*/)
-    -> std::enable_if_t<detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>
+    inline bool xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, R, CT...>& e2)
     {
-        using promote = detail::promote_index<typename std::decay_t<CT>::shape_type...>;
-        return detail::broadcast_fixed_shape<typename promote::type, typename E1::shape_type>::value && promote::value;
-    }
-
-    template <class Tag>
-    template <class E1, class F, class R, class... CT>
-    inline auto xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, R, CT...>& e2)
-    -> std::enable_if_t<!detail::only_fixed<typename E1::shape_type, typename xfunction<F, R, CT...>::shape_type>::value, bool>
-    {
-        using index_type = xindex_type_t<typename E1::shape_type>;
-        using size_type = typename E1::size_type;
-        size_type size = e2.dimension();
-        index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
-        bool trivial_broadcast = e2.broadcast_shape(shape, true);
-        e1.resize(std::move(shape));
-        return trivial_broadcast;
+        return xtl::mpl::static_if<detail::is_fixed<typename xfunction<F, R, CT...>::shape_type>::value>(
+            [&](auto /*self*/) {
+                /*
+                 * If the shape of the xfunction is statically known, we can compute the broadcast triviality
+                 * at compile time plus we can resize right away.
+                 */
+                // resize in case LHS is not a fixed size container. If it is, this is a NOP
+                e1.resize(typename xfunction<F, R, CT...>::shape_type{});
+                return detail::static_trivial_broadcast<detail::is_fixed<typename xfunction<F, R, CT...>::shape_type>::value, CT...>::value;
+            },
+            /* else */ [&](auto /*self*/)
+            {
+                using index_type = xindex_type_t<typename E1::shape_type>;
+                using size_type = typename E1::size_type;
+                size_type size = e2.dimension();
+                index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
+                bool trivial_broadcast = e2.broadcast_shape(shape, true);
+                e1.resize(std::move(shape));
+                return trivial_broadcast;
+            }
+        );
     }
 
     /********************************
