@@ -61,7 +61,7 @@ matrix:
             - llvm-toolchain-precise-3.7
           packages:
             - clang-3.7
-      env: COMPILER=clang CLANG=3.7 ENABLE_TBB=1
+      env: COMPILER=clang CLANG=3.7 ENABLE_TBB=1 DISABLE_XSIMD=1
     - os: linux
       addons:
         apt:

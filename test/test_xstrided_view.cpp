@@ -916,9 +916,16 @@ namespace xt
         auto av = xt::reshape_view(a, {3, 3});
         auto xv = xt::reshape_view(a, xshape<3, 3>());
 
+
         xtensor<double, 2> e = xt::reshape_view(xt::arange(9), {3, 3});
         xtensor<double, 2> es = xt::reshape_view(a, {3, 3});
 
+        a.reshape({3, 3});
+        for (std::size_t i = 0; i < 100; ++i)
+        {
+            xtensor<double, 2> par = xt::reshape_view(xt::arange(9), {3, 3});
+            EXPECT_EQ(a, par);
+        }
 
         using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
 
@@ -929,7 +936,6 @@ namespace xt
         EXPECT_FALSE(assign_traits::simd_assign());
 #endif
 
-        a.reshape({3, 3});
         EXPECT_EQ(av, e);
         EXPECT_EQ(av, a);
 

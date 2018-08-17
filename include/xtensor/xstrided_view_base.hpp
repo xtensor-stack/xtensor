@@ -52,7 +52,7 @@ namespace xt
         using inner_backstrides_type = backstrides_type;
 
         static constexpr layout_type static_layout = L;
-        static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
+        static constexpr bool contiguous_layout = static_layout != layout_type::dynamic && xexpression_type::contiguous_layout;
 
         template <class CTA>
         xstrided_view_base(CTA&& e, S&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
@@ -746,7 +746,7 @@ namespace xt
     template <class O>
     inline bool xstrided_view_base<CT, S, L, FST>::is_trivial_broadcast(const O& str) const noexcept
     {
-        return str.size() == strides().size() &&
+        return has_data_interface<std::decay_t<CT>>::value && str.size() == strides().size() &&
             std::equal(str.cbegin(), str.cend(), strides().begin());
     }
     //@}

@@ -471,7 +471,6 @@ namespace xt
             e1.data_element(i) = e2.data_element(i);
         }
 
-
         #if defined(XTENSOR_USE_TBB)
         tbb::parallel_for(align_begin, align_end, simd_size, [&](size_t i)
         {
@@ -491,7 +490,6 @@ namespace xt
 
     namespace assigner_detail
     {
-
         template <class C, class It, class Ot>
         inline void assign_loop(It src, Ot dst, std::size_t n)
         {
