@@ -260,11 +260,14 @@ namespace xt
         struct promote_fixed<fixed_shape<I...>, fixed_shape<J...>, S...>
         {
         private:
+
             using intermediate = std::conditional_t< (sizeof... (I) > sizeof... (J)),
                 broadcast_fixed_shape<fixed_shape<J...>, fixed_shape<I...>>,
                 broadcast_fixed_shape<fixed_shape<I...>, fixed_shape<J...>>>;
             using result = promote_fixed<typename intermediate::type, S...>;
+
         public:
+
             using type = typename result::type;
             static constexpr bool value = xtl::conjunction<intermediate, result>::value;
         };

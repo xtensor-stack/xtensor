@@ -349,6 +349,7 @@ namespace xt
         using value_type = typename S2::value_type;
         auto output_index = output.size();
         auto input_index = input.size();
+
         if (output_index < input_index)
         {
             throw_broadcast_error(output, input);
