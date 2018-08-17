@@ -123,18 +123,76 @@ namespace xt
                                              {0.58362348, 0.97881125, 1.35044673}};
         EXPECT_TRUE(allclose(cmplexpected_angle, cmplres_angle));
 
+        using assign_t_angle = xassign_traits<xarray<double>, decltype(cmplres_angle)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_t_angle::convertible_types());
+        EXPECT_TRUE(assign_t_angle::simd_size());
+        EXPECT_FALSE(assign_t_angle::forbid_simd());
+        EXPECT_TRUE(assign_t_angle::simd_assign());
+#endif
+
         auto cmplres_conj = xt::conj(cmplarg_0);
         xarray<std::complex<double>> cmplexpected_conj = {{0.40101756 - 0.71233018i, 0.62731701 - 0.42786349i, 0.32415089 - 0.2977805i},
                                                           {0.24475928 - 0.49208478i, 0.69475518 - 0.74029639i, 0.59390240 - 0.35772892i},
                                                           {0.63179202 - 0.41720995i, 0.44025718 - 0.65472131i, 0.08372648 - 0.37380143i}};
         EXPECT_TRUE(allclose(cmplexpected_conj, cmplres_conj));
 
+        using assign_t_conj = xassign_traits<xarray<std::complex<double>>, decltype(cmplres_conj)>;
+
+#if XTENSOR_USE_XSIMD
+        auto b1 = cmplres_angle.template load_simd<xsimd::aligned_mode>(0);
+        auto b2 = cmplres_conj.template load_simd<xsimd::aligned_mode>(0);
+        static_cast<void>(b1);
+        static_cast<void>(b2);
+        EXPECT_TRUE(assign_t_conj::convertible_types());
+        EXPECT_TRUE(assign_t_conj::simd_size());
+        EXPECT_FALSE(assign_t_conj::forbid_simd());
+        EXPECT_TRUE(assign_t_conj::simd_assign());
+#endif
+
         auto cmplres_norm = xt::norm(cmplarg_0);
         xarray<double> fieldnorm = {{0.66822937, 0.5765938, 0.19374703},
                                     {0.30205453, 1.0307235, 0.48069004},
                                     {0.57322529, 0.62248637, 0.14673763}};
 
+        using assign_t_norm = xassign_traits<xarray<double>, decltype(cmplres_norm)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_t_norm::convertible_types());
+        EXPECT_TRUE(assign_t_norm::simd_size());
+        EXPECT_FALSE(assign_t_norm::forbid_simd());
+        EXPECT_TRUE(assign_t_norm::simd_assign());
+#endif
+
         EXPECT_TRUE(allclose(fieldnorm, cmplres_norm));
+    }
+
+    TEST(xcomplex, arg)
+    {
+        xarray<std::complex<double>> cmplarg_0 = {{0.40101756 + 0.71233018i, 0.62731701 + 0.42786349i, 0.32415089 + 0.2977805i},
+                                                  {0.24475928 + 0.49208478i, 0.69475518 + 0.74029639i, 0.59390240 + 0.35772892i},
+                                                  {0.63179202 + 0.41720995i, 0.44025718 + 0.65472131i, 0.08372648 + 0.37380143i}};
+        auto cmplres = xt::arg(cmplarg_0);
+
+        auto evc = xt::eval(cmplres);
+        auto it = cmplarg_0.begin();
+
+        for (auto el : evc)
+        {
+            auto exp = std::arg(*it);
+            EXPECT_DOUBLE_EQ(el, exp);
+            ++it;
+        }
+
+        using assign_t_arg = xassign_traits<xarray<double>, decltype(cmplres)>;
+
+        #if XTENSOR_USE_XSIMD
+                EXPECT_TRUE(assign_t_arg::convertible_types());
+                EXPECT_TRUE(assign_t_arg::simd_size());
+                EXPECT_FALSE(assign_t_arg::forbid_simd());
+                EXPECT_TRUE(assign_t_arg::simd_assign());
+        #endif
     }
 
     TEST(xcomplex, conj_real)
