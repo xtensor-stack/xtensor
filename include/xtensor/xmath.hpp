@@ -85,7 +85,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg);                                                     \
         }                                                                         \
         template <class U, class RT>                                              \
-        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;                \
+        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
         using argument_type = T;                                                  \
         using result_type = decltype(exec(std::declval<T>()));                    \
         using simd_value_type = xsimd::simd_type<T>;                              \
