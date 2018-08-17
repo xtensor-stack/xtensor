@@ -361,6 +361,17 @@ namespace xt
         {
             using type = typename E::inner_backstrides_type;
         };
+
+        template <class E>
+        struct expr_storage_type
+        {
+            using type = typename E::storage_type;
+        };
+
+        struct void_wrapper
+        {
+            using type = void;
+        };
     }
 
     /**
@@ -419,6 +430,9 @@ namespace xt
         using inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<E>,
                                                            detail::expr_inner_backstrides_type<E>,
                                                            get_strides_type<shape_type>>;
+        using storage_type = xtl::mpl::eval_if_t<has_data_interface<E>,
+                                                 detail::expr_storage_type<E>,
+                                                 detail::void_wrapper>;
 
         using stepper = typename E::stepper;
         using const_stepper = typename E::const_stepper;

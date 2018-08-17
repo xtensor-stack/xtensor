@@ -110,6 +110,14 @@ namespace xt
     a3 = np.copy(a1)
     a1[:, 2, :] = np.arange(7)
     a4 = np.copy(a1)
+    ax1 = np.copy(a0)
+    ax1[1, :, :] = -1
+    ax2 = np.copy(a0)
+    ax2[0:2, 0:2, :] = -1
+    ax3 = np.copy(a0)
+    ax3[1, 0:2:2, :] = -1
+    ax4 = np.copy(a0)
+    ax4[:, 0:2, :] = -1
     */
     TEST(xtest_extended, broadcast_into_view)
     {
@@ -131,5 +139,71 @@ namespace xt
         view(a, all(), 2, all()) = xt::arange(7);
         // py_a4
         EXPECT_EQ(a, py_a4);
+
+        a = py_a0;
+        view(a, 1, all(), all()) = -1;
+
+        // py_ax1
+        EXPECT_EQ(a, py_ax1);
+
+        a = py_a0;
+        view(a, range(0, 2), range(0, 2), all()) = -1;
+
+        // py_ax2
+        EXPECT_EQ(a, py_ax2);
+
+        a = py_a0;
+        view(a, all(), range(0, 2), all()) = -1;
+        // py_ax4
+        EXPECT_EQ(a, py_ax4);
+
+        a = py_a0;
+        view(a, 1, range(0, 2, 2), all()) = -1;
+        // py_ax3
+        EXPECT_EQ(a, py_ax3);
+    }
+
+    /*py
+    a0 = np.arange(2 * 3 * 4).reshape(2, 3, 4)
+    a1 = np.arange(3 * 4).reshape(3, 4)
+    a2 = np.arange(2 * 4).reshape(2, 1, 4)
+    a3 = np.arange(4).reshape(1, 1, 4)
+    a4 = np.arange(3 * 1).reshape(3, 1)
+    # test 1
+    a0_cp1 = np.copy(a0)
+    a0_cp1[0:2, :, :] = a0 * 2 + a4
+    a0_cp2 = np.copy(a0_cp1)
+    a0_cp2[0, :, :] *= a1 * 7 + a4
+
+    x0 = np.arange(3 * 3 * 2).reshape(3, 3, 2)
+    a0_cp3 = np.copy(a0_cp2)
+    a0_cp3[0, :, ::2] = x0[1, :, :]
+    */
+    TEST(xtest_extended, broadcast_funcs_view)
+    {
+        // py_a0
+        // py_a1
+        // py_a2
+        // py_a3
+        xt::xarray<long> py_a4 = {0, 1, 2};
+        py_a4.reshape({3, 1});
+
+        xt::xarray<long> a = py_a0;
+        xt::view(a, range(0, 2), all(), all()) = py_a0 * 2 + py_a4;
+        // py_a0_cp1
+        EXPECT_EQ(py_a0_cp1, a);
+
+        // py_a0_cp2
+        xt::view(a, 0, all(), all()) *= py_a1 * 7 + py_a4;
+        EXPECT_EQ(py_a0_cp2, a);
+
+        // py_x0
+        // py_a0_cp3
+        xt::view(a, 0, all(), range(_, _, 2)) = xt::view(py_x0, 1, all(), all());
+        EXPECT_EQ(a, py_a0_cp3);
+
+        xt::view(a, 0, all(), all()) = xt::view((py_a0 * py_a0 + 3), 0, all(), all());
+        // py_x1 = (a0 * a0 + 3)[0, :, :]
+        EXPECT_EQ(py_x1, view(a, 0, all(), all()));
     }
 }

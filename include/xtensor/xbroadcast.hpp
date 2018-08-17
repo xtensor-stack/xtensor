@@ -96,8 +96,7 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
-        static constexpr layout_type static_layout = xexpression_type::static_layout;
-        //static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
+        static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
         template <class CTA, class S>

@@ -650,20 +650,15 @@ namespace xt
      * has_data_interface implementation *
      *************************************/
 
-    template <class T>
-    class has_data_interface
+    template <class E, class = void>
+    struct has_data_interface : std::false_type
     {
-        // the test function has one argument -- the return type of the function we're searching if it exists
-        template <class C>
-        static std::true_type test(decltype(std::declval<C>().data()));
+    };
 
-        template <class C>
-        static std::false_type test(...);
-
-    public:
-
-        // we try to call the test function with the return type and report the result
-        constexpr static bool value = decltype(test<T>(std::declval<const std::add_pointer_t<typename T::value_type>>()))::value == true;
+    template <class E>
+    struct has_data_interface<E, void_t<decltype(std::declval<E>().data())>>
+        : std::true_type
+    {
     };
 
     template <class E, class = void>
@@ -673,6 +668,17 @@ namespace xt
 
     template <class E>
     struct has_strides<E, void_t<decltype(std::declval<E>().strides())>>
+        : std::true_type
+    {
+    };
+
+    template <class E, class = void>
+    struct has_simd_interface : std::false_type
+    {
+    };
+
+    template <class E>
+    struct has_simd_interface<E, void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
         : std::true_type
     {
     };

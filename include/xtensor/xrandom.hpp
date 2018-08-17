@@ -110,6 +110,7 @@ namespace xt
             template <class EX>
             inline void assign_to(xexpression<EX>& e) const noexcept
             {
+                // Note: we're not going row/col major here
                 auto& ed = e.derived_cast();
                 for (auto& el : ed.storage())
                 {

@@ -18,6 +18,7 @@
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xshape.hpp"
 #include "xtensor/xutils.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -201,6 +202,78 @@ namespace xt
         EXPECT_FALSE(b);
     }
 
+    TEST(utils, has_strides)
+    {
+        bool b = has_strides<xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<const xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<const xtensor<double, 2>>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<const xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_TRUE(b);
+
+        xarray<int> a = xarray<int>::from_shape({3, 4, 5});
+        auto f = a + a - 23;
+        auto v2 = strided_view(a, {all(), 1, all()});
+        auto vv2 = strided_view(v2, {all(), 2});
+        auto v3 = strided_view(f, {all(), 2});
+
+        b = has_strides<decltype(v2)>::value;
+        EXPECT_TRUE(b);
+        b = has_strides<decltype(vv2)>::value;
+        EXPECT_TRUE(b);
+
+#ifndef _MSC_VER
+        // TODO fix this test for MSVC 2015!
+        b = has_strides<decltype(v3)>::value;
+        EXPECT_TRUE(b);
+#endif
+    }
+
+    TEST(utils, has_simd_interface)
+    {
+        bool b = has_simd_interface<xarray<int>>::value;
+
+#ifdef XTENSOR_USE_XSIMD
+        EXPECT_TRUE(b);
+        b = has_simd_interface<const xarray<int>>::value;
+        EXPECT_TRUE(b);
+        b = has_simd_interface<const xtensor<double, 2>>::value;
+        EXPECT_TRUE(b);
+        b = has_simd_interface<const xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_TRUE(b);
+#else
+        EXPECT_FALSE(b);
+        b = has_simd_interface<const xarray<int>>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<const xtensor<double, 2>>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<const xtensor_fixed<double, xshape<3, 4>>>::value;
+        EXPECT_FALSE(b);
+#endif
+        xarray<int> a = xarray<int>::from_shape({3, 4, 5});
+        auto f = a + a - 23;
+        auto v2 = strided_view(a, {all(), 1, all()});
+        auto vv2 = strided_view(v2, {all(), 2});
+        auto v3 = strided_view(f, {all(), 2});
+
+        b = has_simd_interface<decltype(v2)>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<decltype(vv2)>::value;
+        EXPECT_FALSE(b);
+        b = has_simd_interface<decltype(v3)>::value;
+        EXPECT_FALSE(b);
+
+        auto xv = xt::view(a, 1);
+        b = has_simd_interface<decltype(xv)>::value;
+#ifdef XTENSOR_USE_XSIMD
+        EXPECT_TRUE(b);
+#else
+        EXPECT_FALSE(b);
+#endif
+    }
+
     TEST(utils, allocation_tracking)
     {
         using arr_t = xarray<double, layout_type::row_major,
@@ -215,5 +288,23 @@ namespace xt
         EXPECT_THROW(a.resize({3, 15}), std::runtime_error);
         alloc_tracking::disable();
         EXPECT_NO_THROW(arr_t c = a);
+    }
+
+    TEST(utils, static_dimension)
+    {
+        std::ptrdiff_t sdim = static_dimension<std::vector<int>>::value;
+        EXPECT_EQ(sdim, -1);
+        sdim = static_dimension<std::array<int, 4>>::value;
+        EXPECT_EQ(sdim, 4);
+        sdim = static_dimension<xt::const_array<char, 12>>::value;
+        EXPECT_EQ(sdim, 12);
+        sdim = static_dimension<xt::fixed_shape<4, 1, 2, 3>>::value;
+        EXPECT_EQ(sdim, 4);
+        sdim = static_dimension<xt::sequence_view<std::array<std::ptrdiff_t, 2>, 1, 2>>::value;
+        EXPECT_EQ(sdim, 1);
+        sdim = static_dimension<xt::sequence_view<std::array<std::ptrdiff_t, 2>, 1, -1>>::value;
+        EXPECT_EQ(sdim, -1);
+        sdim = static_dimension<xt::sequence_view<xt::fixed_shape<4, 1, 2, 3>, 1, 4>>::value;
+        EXPECT_EQ(sdim, 3);
     }
 }
