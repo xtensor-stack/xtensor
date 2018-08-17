@@ -100,7 +100,10 @@ namespace xt
         static constexpr bool contiguous_layout = false;
 
         template <class CTA, class S>
-        xbroadcast(CTA&& e, S&& s);
+        xbroadcast(CTA&& e, const S& s);
+
+        template <class CTA>
+        xbroadcast(CTA&& e, shape_type&& s);
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
@@ -163,8 +166,7 @@ namespace xt
     inline auto broadcast(E&& e, const S& s)
     {
         using broadcast_type = xbroadcast<const_xclosure_t<E>, S>;
-        using shape_type = typename broadcast_type::shape_type;
-        return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type>(s));
+        return broadcast_type(std::forward<E>(e), s);
     }
 
 #ifdef X_OLD_CLANG
@@ -202,8 +204,29 @@ namespace xt
      */
     template <class CT, class X>
     template <class CTA, class S>
-    inline xbroadcast<CT, X>::xbroadcast(CTA&& e, S&& s)
-        : m_e(std::forward<CTA>(e)), m_shape(std::forward<S>(s))
+    inline xbroadcast<CT, X>::xbroadcast(CTA&& e, const S& s)
+        : m_e(std::forward<CTA>(e))
+    {
+        if (s.size() < m_e.dimension())
+        {
+            throw xt::broadcast_error("Broadcast shape has fewer elements than original expression.");
+        }
+        xt::resize_container(m_shape, s.size());
+        std::copy(s.begin(), s.end(), m_shape.begin());
+        xt::broadcast_shape(m_e.shape(), m_shape);
+    }
+
+    /**
+     * Constructs an xbroadcast expression broadcasting the specified
+     * \ref xexpression to the given shape
+     *
+     * @param e the expression to broadcast
+     * @param s the shape to apply
+     */
+    template <class CT, class X>
+    template <class CTA>
+    inline xbroadcast<CT, X>::xbroadcast(CTA&& e, shape_type&& s)
+        : m_e(std::forward<CTA>(e)), m_shape(std::move(s))
     {
         xt::broadcast_shape(m_e.shape(), m_shape);
     }

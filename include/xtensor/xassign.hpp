@@ -21,6 +21,7 @@
 #include "xstrides.hpp"
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
+#include "xfunction.hpp"
 
 namespace xt
 {
@@ -74,7 +75,7 @@ namespace xt
         using base_type = xexpression_assigner_base<Tag>;
 
         template <class E1, class E2>
-        static void assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static void assign_xexpression(E1& e1, const E2& e2);
 
         template <class E1, class E2>
         static void computed_assign(xexpression<E1>& e1, const xexpression<E2>& e2);
@@ -88,7 +89,11 @@ namespace xt
     private:
 
         template <class E1, class E2>
-        static bool resize(xexpression<E1>& e1, const xexpression<E2>& e2);
+        static bool resize(E1& e1, const E2& e2);
+
+        template <class E1, class F, class R, class... CT>
+        static bool resize(E1& e1, const xfunction<F, R, CT...>& e2);
+
     };
 
     /*****************
@@ -314,9 +319,9 @@ namespace xt
 
     template <class Tag>
     template <class E1, class E2>
-    inline void xexpression_assigner<Tag>::assign_xexpression(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline void xexpression_assigner<Tag>::assign_xexpression(E1& e1, const E2& e2)
     {
-        bool trivial_broadcast = resize(e1, e2);
+        bool trivial_broadcast = resize(e1.derived_cast(), e2.derived_cast());
         base_type::assign_data(e1, e2, trivial_broadcast);
     }
 
@@ -372,18 +377,60 @@ namespace xt
         }
     }
 
+    namespace detail
+    {
+        template <bool B, class... CT>
+        struct static_trivial_broadcast;
+
+        template <class... CT>
+        struct static_trivial_broadcast<true, CT...>
+        {
+            static constexpr bool value = detail::promote_index<typename std::decay_t<CT>::shape_type...>::value;
+        };
+
+        template <class... CT>
+        struct static_trivial_broadcast<false, CT...>
+        {
+            static constexpr bool value = false;
+        };
+    }
+
     template <class Tag>
     template <class E1, class E2>
-    inline bool xexpression_assigner<Tag>::resize(xexpression<E1>& e1, const xexpression<E2>& e2)
+    inline bool xexpression_assigner<Tag>::resize(E1& e1, const E2& e2)
     {
-        using index_type = xindex_type_t<typename E1::shape_type>;
-        using size_type = typename E1::size_type;
-        const E2& de2 = e2.derived_cast();
-        size_type size = de2.dimension();
-        index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
-        bool trivial_broadcast = de2.broadcast_shape(shape, true);
-        e1.derived_cast().resize(std::move(shape));
-        return trivial_broadcast;
+        // If our RHS is not a xfunction, we know that the RHS is at least potentially trivial
+        // We check the strides of the RHS in detail::is_trivial_broadcast to see if they match up!
+        // So we can skip a shape copy and a call to broadcast_shape(...)
+        e1.resize(e2.shape());
+        return true;
+    }
+
+    template <class Tag>
+    template <class E1, class F, class R, class... CT>
+    inline bool xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, R, CT...>& e2)
+    {
+        return xtl::mpl::static_if<detail::is_fixed<typename xfunction<F, R, CT...>::shape_type>::value>(
+            [&](auto /*self*/) {
+                /*
+                 * If the shape of the xfunction is statically known, we can compute the broadcast triviality
+                 * at compile time plus we can resize right away.
+                 */
+                // resize in case LHS is not a fixed size container. If it is, this is a NOP
+                e1.resize(typename xfunction<F, R, CT...>::shape_type{});
+                return detail::static_trivial_broadcast<detail::is_fixed<typename xfunction<F, R, CT...>::shape_type>::value, CT...>::value;
+            },
+            /* else */ [&](auto /*self*/)
+            {
+                using index_type = xindex_type_t<typename E1::shape_type>;
+                using size_type = typename E1::size_type;
+                size_type size = e2.dimension();
+                index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
+                bool trivial_broadcast = e2.broadcast_shape(shape, true);
+                e1.resize(std::move(shape));
+                return trivial_broadcast;
+            }
+        );
     }
 
     /********************************
@@ -620,7 +667,7 @@ namespace xt
                 return m_cut;
             }
 
-        private: 
+        private:
 
             std::size_t m_cut;
             const strides_type& m_strides;
@@ -631,7 +678,7 @@ namespace xt
         {
             std::size_t cut = 0;
 
-            // TODO! if E1 is !contigous --> initialize cut to sensible value! 
+            // TODO! if E1 is !contigous --> initialize cut to sensible value!
             if (e1.strides().back() == 1)
             {
                 auto csf = check_strides_functor<layout_type::row_major, decltype(e1.strides())>(e1.strides());
@@ -719,8 +766,8 @@ namespace xt
 
         auto fct_stepper = e2.stepper_begin(e1.shape());
         auto res_stepper = e1.stepper_begin(e1.shape());
-    
-        // TODO in 1D case this is ambigous -- could be RM or CM. 
+
+        // TODO in 1D case this is ambigous -- could be RM or CM.
         //      Use default layout to make decision
         std::size_t step_dim = 0;
         if (!is_row_major) // row major case
