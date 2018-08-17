@@ -805,7 +805,7 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     inline void svector<T, N, A, Init>::assign(size_type n, const value_type& v)
     {
-        if (n > N)
+        if (n > N && n > capacity())
         {
             grow(n);
         }
@@ -825,7 +825,7 @@ namespace xt
     inline void svector<T, N, A, Init>::assign(IT other_begin, IT other_end)
     {
         std::size_t size = static_cast<std::size_t>(other_end - other_begin);
-        if (size > N)
+        if (size > N && size > capacity())
         {
             grow(size);
         }
@@ -860,7 +860,7 @@ namespace xt
     template <class T, std::size_t N, class A, bool Init>
     void svector<T, N, A, Init>::resize(size_type n)
     {
-        if (n > N)
+        if (n > N && n > capacity())
         {
             grow(n);
         }
