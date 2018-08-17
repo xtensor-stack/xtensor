@@ -496,9 +496,9 @@ namespace xt
         inline void assign_loop(It src, Ot dst, std::size_t n)
         {
         #if defined(XTENSOR_USE_TBB)
-            tbb::parallel_for(size_t(0), n, [&](size_t i)
+            tbb::parallel_for(std::ptrdiff_t(0), static_cast<std::ptrdiff_t>(n), [&](std::ptrdiff_t i)
             {
-                dst[i] = static_cast<C>(src[i]);
+                *(dst + i) = static_cast<C>(*(src + i));
             });
         #else
             for(; n > 0; --n)
