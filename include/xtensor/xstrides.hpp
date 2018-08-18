@@ -169,9 +169,16 @@ namespace xt
             using self_type = layout_data_offset<layout_type::column_major, static_dim>;
 
             template <std::size_t dim, class S, class Arg>
-            static inline auto run(const S& /*strides*/, Arg arg) noexcept
+            static inline auto run(const S& strides, Arg arg) noexcept
             {
-                return arg;
+                if (dim == 0)
+                {
+                    return arg;
+                }
+                else
+                {
+                    return arg * strides[dim];
+                }
             }
 
             template <std::size_t dim, class S, class Arg, class... Args>
