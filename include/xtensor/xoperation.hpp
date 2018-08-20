@@ -240,7 +240,7 @@ namespace xt
             using functor_type = build_functor_type_t<expression_tag, F, E...>;
             using type = select_xfunction_expression_t<expression_tag,
                 functor_type,
-                const_xclosure_t<E>...>;
+                xclosure_t<E>...>;
         };
 
         template <template <class...> class F, class... E>
