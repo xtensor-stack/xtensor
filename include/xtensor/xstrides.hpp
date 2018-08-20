@@ -32,7 +32,7 @@ namespace xt
     template <class offset_type, class S, class Arg, class... Args>
     offset_type data_offset(const S& strides, Arg arg, Args... args) noexcept;
 
-    template <class offset_type, class S, class... Args>
+    template <class offset_type, layout_type L = layout_type::dynamic, class S, class... Args>
     offset_type unchecked_data_offset(const S& strides, Args... args) noexcept;
 
     template <class offset_type, class S, class It>
@@ -127,6 +127,73 @@ namespace xt
         {
             return arg * strides[dim] + raw_data_offset<dim + 1>(strides, args...);
         }
+
+        template <layout_type L, std::ptrdiff_t static_dim>
+        struct layout_data_offset
+        {
+            template <std::size_t dim, class S, class Arg, class... Args>
+            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            {
+                return raw_data_offset<dim>(strides, arg, args...);
+            }
+        };
+
+        template <std::ptrdiff_t static_dim>
+        struct layout_data_offset<layout_type::row_major, static_dim>
+        {
+            using self_type = layout_data_offset<layout_type::row_major, static_dim>;
+
+            template <std::size_t dim, class S, class Arg>
+            static inline auto run(const S& strides, Arg arg) noexcept
+            {
+                if (std::ptrdiff_t(dim) + 1 == static_dim)
+                {
+                    return arg;
+                }
+                else
+                {
+                    return arg * strides[dim];
+                }
+            }
+
+            template <std::size_t dim, class S, class Arg, class... Args>
+            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            {
+                return arg * strides[dim] + self_type::template run<dim + 1>(strides, args...);
+            }
+        };
+
+        template <std::ptrdiff_t static_dim>
+        struct layout_data_offset<layout_type::column_major, static_dim>
+        {
+            using self_type = layout_data_offset<layout_type::column_major, static_dim>;
+
+            template <std::size_t dim, class S, class Arg>
+            static inline auto run(const S& strides, Arg arg) noexcept
+            {
+                if (dim == 0)
+                {
+                    return arg;
+                }
+                else
+                {
+                    return arg * strides[dim];
+                }
+            }
+
+            template <std::size_t dim, class S, class Arg, class... Args>
+            static inline auto run(const S& strides, Arg arg, Args... args) noexcept
+            {
+                if (dim == 0)
+                {
+                    return arg + self_type::template run<dim + 1>(strides, args...);
+                }
+                else
+                {
+                    return arg * strides[dim] + self_type::template run<dim + 1>(strides, args...);
+                }
+            }
+        };
     }
 
     template <class offset_type, class S>
@@ -157,10 +224,10 @@ namespace xt
         }
     }
 
-    template <class offset_type, class S, class... Args>
+    template <class offset_type, layout_type L, class S, class... Args>
     inline offset_type unchecked_data_offset(const S& strides, Args... args) noexcept
     {
-        return static_cast<offset_type>(detail::raw_data_offset<0>(strides.cbegin(), args...));
+        return static_cast<offset_type>(detail::layout_data_offset<L, static_dimension<S>::value>::template run<0>(strides.cbegin(), args...));
     }
 
     template <class offset_type, class S, class It>

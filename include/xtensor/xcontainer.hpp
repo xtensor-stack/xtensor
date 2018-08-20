@@ -631,7 +631,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::unchecked(Args... args) -> reference
     {
-        size_type index = xt::unchecked_data_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
         return storage()[index];
     }
 
@@ -658,7 +658,7 @@ namespace xt
     template <class... Args>
     inline auto xcontainer<D>::unchecked(Args... args) const -> const_reference
     {
-        size_type index = xt::unchecked_data_offset<size_type>(strides(), static_cast<std::ptrdiff_t>(args)...);
+        size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
         return storage()[index];
     }
 

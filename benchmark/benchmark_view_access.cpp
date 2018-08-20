@@ -12,6 +12,7 @@
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xrandom.hpp"
+#include "xtensor/xbuilder.hpp"
 #include "xtensor/xstorage.hpp"
 #include "xtensor/xutils.hpp"
 #include "xtensor/xview.hpp"
@@ -22,19 +23,35 @@ namespace xt
     class simple_array
     {
     public:
+        using self_type = simple_array<T, N>;
+        using shape_type = std::array<ptrdiff_t, N>;
 
+        simple_array() = default;
         explicit simple_array(const std::array<ptrdiff_t, N>& shape)
             : m_shape(shape)
         {
             ptrdiff_t data_size = 1;
-            m_strides[m_strides.size() - 1] = 1;
-            for (std::ptrdiff_t i = ptrdiff_t(m_strides.size()) - 1; i > 0; --i)
+            m_strides[N - 1] = 1;
+            for (std::ptrdiff_t i = N - 1; i > 0; --i)
             {
                 data_size *= static_cast<ptrdiff_t>(shape[i]);
                 m_strides[i - 1] = data_size;
             }
             data_size *= shape[0];
             memory.resize(data_size);
+        }
+
+        template <class E>
+        self_type& operator=(const xexpression<E>& e)
+        {
+            const E& de = e.derived_cast();
+            std::copy(de.cbegin(), de.cend(), memory.begin());
+            return *this;
+        }
+
+        void fill(T val)
+        {
+            std::fill(memory.begin(), memory.end(), val);
         }
 
         template <class... Args>
@@ -195,8 +212,109 @@ namespace xt
         }
     }
 
+    #define M_NELEM 3600
+    #define M_NNE 4
+    #define M_NDIM 2
+
+    template <class X, layout_type L>
+    class jumping_random
+    {
+    public:
+
+        using shape_type = typename X::shape_type;
+
+        jumping_random()
+            : m_dofs(shape_type{3721, 2}),
+              m_conn(shape_type{3600, 4})
+        {
+            m_dofs = xt::clip(xt::reshape_view(xt::arange(2 * 3721), {3721, 2}), 0, 7199);
+
+            for (std::size_t i = 0; i < 3600; ++i)
+            {
+                m_conn(i, 0) = i;
+                m_conn(i, 1) = i + 1;
+                m_conn(i, 2) = i + 62;
+                m_conn(i, 3) = i + 61;
+            }
+        }
+
+        auto calc_dofval(xt::xtensor<double, 3, L>& elemvec, xt::xtensor<double, 1, L>& dofval)
+        {
+            dofval.fill(0.0);
+            for (size_t e = 0 ; e < M_NELEM ; ++e)
+                for (size_t m = 0 ; m < M_NNE ; ++m)
+                    for (size_t i = 0 ; i < M_NDIM; ++i)
+                        dofval(m_dofs(m_conn(e, m), i)) += elemvec(e, m, i);
+        }
+
+        auto calc_dofval_simple(simple_array<double, 3>& elemvec, simple_array<double, 1>& dofval)
+        {
+            dofval.fill(0.0);
+            for (size_t e = 0 ; e < M_NELEM ; ++e)
+                for (size_t m = 0 ; m < M_NNE ; ++m)
+                    for (size_t i = 0 ; i < M_NDIM; ++i)
+                        dofval(m_dofs(m_conn(e, m), i)) += elemvec(e, m, i);
+        }
+
+        auto calc_unchecked_dofval(xt::xtensor<double, 3, L>& elemvec, xt::xtensor<double, 1, L>& dofval)
+        {
+            dofval.fill(0.0);
+            for (size_t e = 0 ; e < M_NELEM ; ++e)
+                for (size_t m = 0 ; m < M_NNE ; ++m)
+                    for (size_t i = 0 ; i < M_NDIM; ++i)
+                        dofval.unchecked(m_dofs.unchecked(m_conn.unchecked(e, m), i)) += elemvec.unchecked(e, m, i);
+        }
+
+        X m_dofs, m_conn;
+    };
+
+    template <layout_type L>
+    void jumping_access(benchmark::State& state)
+    {
+        auto rx = jumping_random<xt::xtensor<std::size_t, 2, L>, L>();
+        xt::xtensor<double, 3, L> elemvec = xt::random::rand<double>({M_NELEM, M_NNE, M_NDIM});
+        xt::xtensor<double, 1, L> dofval = xt::empty<double>({7200});
+        for (auto _ : state)
+        {
+            rx.calc_dofval(elemvec, dofval);
+            benchmark::DoNotOptimize(dofval.data());
+        }
+    }
+
+    template <layout_type L>
+    void jumping_access_unchecked(benchmark::State& state)
+    {
+        auto rx = jumping_random<xt::xtensor<std::size_t, 2, L>, L>();
+        xt::xtensor<double, 3, L> elemvec = xt::random::rand<double>({M_NELEM, M_NNE, M_NDIM});
+        xt::xtensor<double, 1, L> dofval = xt::empty<double>({7200});
+        for (auto _ : state)
+        {
+            rx.calc_unchecked_dofval(elemvec, dofval);
+            benchmark::DoNotOptimize(dofval.data());
+        }
+    }
+
+    void jumping_access_simplearray(benchmark::State& state)
+    {
+        auto rx = jumping_random<simple_array<std::size_t, 2>, layout_type::row_major>();
+        simple_array<double, 3> elemvec({M_NELEM, M_NNE, M_NDIM});
+        elemvec = xt::random::rand<double>({M_NELEM, M_NNE, M_NDIM});
+        simple_array<double, 1> dofval({7200});
+
+        for (auto _ : state)
+        {
+            rx.calc_dofval_simple(elemvec, dofval);
+            benchmark::DoNotOptimize(dofval.memory);
+        }
+    }
+
     BENCHMARK(raw_access_calc);
     BENCHMARK(unchecked_access_calc);
     BENCHMARK(simplearray_access_calc);
     BENCHMARK(xview_access_calc);
+    BENCHMARK_TEMPLATE(jumping_access, layout_type::row_major);
+    BENCHMARK_TEMPLATE(jumping_access, layout_type::column_major);
+    BENCHMARK_TEMPLATE(jumping_access_unchecked, layout_type::row_major);
+    BENCHMARK_TEMPLATE(jumping_access_unchecked, layout_type::column_major);
+    BENCHMARK(jumping_access_simplearray);
 }
