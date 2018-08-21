@@ -22,9 +22,6 @@ namespace xt
     using shape_t = std::vector<std::size_t>;
     using view_shape_type = dynamic_shape<std::size_t>;
 
-    template <class T>
-    struct DEBUG;
-
     TEST(xdynamic_view, keep)
     {
         xarray<int> a = { {{0, 1, 2, 3},
@@ -183,5 +180,51 @@ namespace xt
         auto view0 = dynamic_view(a, { 1, keep(0, 2), range(1, 4) });
         view0 += b2;
         EXPECT_EQ(view0, exp);
+    }
+
+    TEST(xdynamic_view, slice_conversion)
+    {
+        xrange<std::size_t> ru(std::size_t(1), std::size_t(12));
+        xrange<std::ptrdiff_t> rs = ru;
+        EXPECT_EQ(rs.size(), 11);
+        EXPECT_EQ(rs(0), 1);
+
+        xstepped_range<std::size_t> sru(std::size_t(1), std::size_t(5), std::size_t(2));
+        xstepped_range<std::ptrdiff_t> srs = sru;
+        EXPECT_EQ(srs.size(), 2);
+        EXPECT_EQ(srs(0), 1);
+        EXPECT_EQ(srs.step_size(), 2);
+
+        xall<std::size_t> au(std::size_t(11));
+        xall<std::ptrdiff_t> as(au);
+        EXPECT_EQ(as.size(), 11);
+        EXPECT_EQ(as(0), 0);
+
+        xnewaxis<std::size_t> nau;
+        xnewaxis<std::ptrdiff_t> nas(nau);
+        EXPECT_EQ(nas.size(), 1);
+        EXPECT_EQ(nas(0), 0);
+
+        xkeep_slice<std::ptrdiff_t> ks({ 2, 3, -1 });
+        ks.normalize(6);
+        xkeep_slice<std::size_t> ku(ks);
+        EXPECT_EQ(ku.size(), 3);
+        EXPECT_FALSE(ku.contains(0));
+        EXPECT_FALSE(ku.contains(1));
+        EXPECT_TRUE(ku.contains(2));
+        EXPECT_TRUE(ku.contains(3));
+        EXPECT_FALSE(ku.contains(4));
+        EXPECT_TRUE(ku.contains(5));
+
+        xdrop_slice<std::ptrdiff_t> ds({ 2, 3, -1 });
+        ds.normalize(6);
+        xdrop_slice<std::size_t> du(ds);
+        EXPECT_EQ(du.size(), 3);
+        EXPECT_TRUE(du.contains(0));
+        EXPECT_TRUE(du.contains(1));
+        EXPECT_FALSE(du.contains(2));
+        EXPECT_FALSE(du.contains(3));
+        EXPECT_TRUE(du.contains(4));
+        EXPECT_FALSE(du.contains(5));
     }
 }
