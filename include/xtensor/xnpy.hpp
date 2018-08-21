@@ -125,13 +125,13 @@ namespace xt
         }
 
         template <class T>
-        constexpr inline char get_endianess()
+        constexpr char get_endianess()
         {
             return sizeof(T) <= sizeof(char) ? no_endian_char : host_endian_char;
         }
 
         template <class T>
-        std::string build_typestring()
+        inline std::string build_typestring()
         {
             std::stringstream ss;
             ss << get_endianess<T>() << map_type<T>() << sizeof(T);
@@ -599,7 +599,7 @@ namespace xt
             char* m_buffer;
         };
 
-        npy_file load_npy_file(std::istream& stream)
+        inline npy_file load_npy_file(std::istream& stream)
         {
             // check magic bytes an version number
             unsigned char v_major, v_minor;
@@ -634,7 +634,7 @@ namespace xt
         }
 
         template <class O, class E>
-        void dump_npy_stream(O& stream, const xexpression<E>& e)
+        inline void dump_npy_stream(O& stream, const xexpression<E>& e)
         {
             using value_type = typename E::value_type;
             const E& ex = e.derived_cast();
@@ -664,7 +664,7 @@ namespace xt
      * @param e the xexpression
      */
     template <typename E>
-    void dump_npy(const std::string& filename, const xexpression<E>& e)
+    inline void dump_npy(const std::string& filename, const xexpression<E>& e)
     {
         std::ofstream stream(filename, std::ofstream::binary);
         if (!stream)
@@ -686,7 +686,7 @@ namespace xt
      * @return xarray with contents from npy file
      */
     template <typename T, layout_type L = layout_type::dynamic>
-    auto load_npy(const std::string& filename)
+    inline auto load_npy(const std::string& filename)
     {
         std::ifstream stream(filename, std::ifstream::binary);
         if (!stream)
