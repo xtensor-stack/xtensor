@@ -765,6 +765,7 @@ namespace xt
           )
     {
     }
+
     // contigous initializer
     template <class CT, class... S>
     template <class CTA, class FSL, class... SL>

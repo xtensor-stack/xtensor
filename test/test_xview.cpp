@@ -1214,4 +1214,34 @@ namespace xt
     #endif
         }
     }
+
+    xt::xtensor<double,2> view_assign_func(const xt::xtensor<double, 2>& a, int idx)
+    {
+        xt::xtensor<double, 2> b;
+        switch(idx)
+        {
+            case 1: b = xt::view(a,      xt::all(), xt::range(0, 1)); break;
+            case 2: b.assign(xt::view(a, xt::all(), xt::range(0, 1))); break;
+            case 3: b = xt::view(a,      xt::all(), xt::range(0, 2)); break;
+            case 4: b = 2.*xt::view(a,   xt::all(), xt::range(0, 1)); break;
+            case 5: b = xt::view(2.*a,   xt::all(), xt::range(0, 1)); break;
+            default: b = a; break;
+        }
+        return b;
+    }
+
+    TEST(xview, assign)
+    {
+        xt::xtensor<double, 2> input = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xt::xtensor<double, 2> exp1 = {{1, 4, 7}};
+        exp1.reshape({3, 1});
+
+        xt::xtensor<double, 2> exp2 = {{1, 2}, {4, 5}, {7, 8}};
+
+        EXPECT_EQ(view_assign_func(input, 1), exp1);
+        EXPECT_EQ(view_assign_func(input, 2), exp1);
+        EXPECT_EQ(view_assign_func(input, 3), exp2);
+        EXPECT_EQ(view_assign_func(input, 4), 2 * exp1);
+        EXPECT_EQ(view_assign_func(input, 5), 2 * exp1);
+    }
 }

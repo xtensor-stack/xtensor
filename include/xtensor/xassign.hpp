@@ -684,21 +684,21 @@ namespace xt
         };
 
         template <class E1, class E2>
-        auto get_loop_sizes(const E1& e1, const E2& e2)
+        auto get_loop_sizes(const E1& e1, const E2& e2, bool is_row_major)
         {
             std::size_t cut = 0;
 
-            // TODO! if E1 is !contigous --> initialize cut to sensible value!
-            if (e1.strides().back() == 1)
+            // TODO! if E1 is !contiguous --> initialize cut to sensible value!
+            if (E1::static_layout == layout_type::row_major || is_row_major)
             {
                 auto csf = check_strides_functor<layout_type::row_major, decltype(e1.strides())>(e1.strides());
                 cut = csf(e2);
             }
-            else if (e1.strides().front() == 1)
+            else if (E1::static_layout == layout_type::column_major || !is_row_major)
             {
                 auto csf = check_strides_functor<layout_type::column_major, decltype(e1.strides())>(e1.strides());
                 cut = csf(e2);
-            }
+            } // can't reach here because this would have already triggered the fallback
 
             using shape_value_type = typename E1::shape_type::value_type;
             std::size_t outer_loop_size = static_cast<std::size_t>(
@@ -708,7 +708,7 @@ namespace xt
                             std::accumulate(e1.shape().begin() + static_cast<std::ptrdiff_t>(cut), e1.shape().end(),
                                 shape_value_type(1), std::multiplies<shape_value_type>{}));
 
-            if (e1.strides().back() != 1) // column major mode
+            if (E1::static_layout == layout_type::column_major || !is_row_major)
             {
                 std::swap(outer_loop_size, inner_loop_size);
             }
@@ -720,36 +720,43 @@ namespace xt
     template <class E1, class E2>
     void strided_assign(E1& e1, const E2& e2, std::true_type /*enable*/)
     {
-        bool fallback = false, is_row_major = true;
+        bool is_row_major = true;
+        using fallback_assigner = data_assigner<E1, E2, default_assignable_layout(E1::static_layout)>;
 
-        std::size_t inner_loop_size, outer_loop_size, cut;
-        std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2);
-
-        if (E1::static_layout == layout_type::row_major || e1.strides().back() == 1) // row major case
+        if (E1::static_layout == layout_type::dynamic)
         {
-            if (cut == e1.dimension())
+            layout_type dynamic_layout = e1.layout();
+            switch (dynamic_layout)
             {
-                fallback = true;
+                case layout_type::row_major:
+                    is_row_major = true;
+                    break;
+                case layout_type::column_major:
+                    is_row_major = false;
+                    break;
+                default:
+                    return fallback_assigner(e1, e2).run();
             }
         }
-        else if (E1::static_layout == layout_type::column_major || e1.strides().front() == 1) // col major case
+        else if (E1::static_layout == layout_type::row_major)
+        {
+            is_row_major = true;
+        }
+        else if (E1::static_layout == layout_type::column_major)
         {
             is_row_major = false;
-            if (cut == 0)
-            {
-                fallback = true;
-            }
         }
         else
         {
-            fallback = true;
+            throw std::runtime_error("Illegal layout set (layout_type::any?).");
         }
 
-        if (fallback)
+        std::size_t inner_loop_size, outer_loop_size, cut;
+        std::tie(inner_loop_size, outer_loop_size, cut) = strided_assign_detail::get_loop_sizes(e1, e2, is_row_major);
+
+        if ((is_row_major && cut == e1.dimension()) || (!is_row_major && cut == 0)) 
         {
-            data_assigner<E1, E2, default_assignable_layout(E1::static_layout)> assigner(e1, e2);
-            assigner.run();
-            return;
+            return fallback_assigner(e1, e2).run();
         }
 
         // TODO can we get rid of this and use `shape_type`?
