@@ -83,6 +83,7 @@ namespace xt
         using storage_type = typename data_type::storage_type;
 
         static constexpr layout_type static_layout = value_expression::static_layout;
+        static constexpr bool contiguous_layout = false;
 
         using inner_shape_type = typename value_expression::inner_shape_type;
         using inner_strides_type = typename value_expression::inner_strides_type;
