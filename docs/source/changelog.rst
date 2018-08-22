@@ -7,6 +7,14 @@
 Changelog
 =========
 
+0.17.3
+------
+
+- ``xslice`` fix
+  `#1099 <https://github.com/QuantStack/xtensor/pull/1099>`_.
+- added missing ``static_layout`` in ``xmasked_view``
+  `#1100 <https://github.com/QuantStack/xtensor/pull/1100>`_.
+
 0.17.2
 ------
 
