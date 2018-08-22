@@ -1125,7 +1125,6 @@ namespace xt
 
         xt::resize_container(strides, shape.size());
         compute_strides(shape, default_assignable_layout(std::decay_t<E>::static_layout), strides);
-
         return strided_view<std::decay_t<E>::static_layout>(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0);
     }
 
