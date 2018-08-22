@@ -354,10 +354,10 @@ namespace xt
         };
 
         template <class T>
-        using disable_xkeep_slice_t = std::enable_if_t<!is_xkeep_slice<T>::value, void>;
+        using disable_xkeep_slice_t = std::enable_if_t<!is_xkeep_slice<std::decay_t<T>>::value, void>;
 
         template <class T>
-        using enable_xkeep_slice_t = std::enable_if_t<is_xkeep_slice<T>::value, void>;
+        using enable_xkeep_slice_t = std::enable_if_t<is_xkeep_slice<std::decay_t<T>>::value, void>;
     }
 
     template <class T>
@@ -369,8 +369,6 @@ namespace xt
         using size_type = typename container_type::value_type;
         using self_type = xkeep_slice<T>;
 
-        template <class C, typename = detail::disable_xkeep_slice_t<C>>
-        explicit xkeep_slice(const C& cont);
         template <class C, typename = detail::disable_xkeep_slice_t<C>>
         explicit xkeep_slice(C& cont);
         explicit xkeep_slice(container_type&& cont);
@@ -473,10 +471,10 @@ namespace xt
         };
 
         template <class T>
-        using disable_xdrop_slice_t = std::enable_if_t<!is_xdrop_slice<T>::value, void>;
+        using disable_xdrop_slice_t = std::enable_if_t<!is_xdrop_slice<std::decay_t<T>>::value, void>;
 
         template <class T>
-        using enable_xdrop_slice_t = std::enable_if_t<is_xdrop_slice<T>::value, void>;
+        using enable_xdrop_slice_t = std::enable_if_t<is_xdrop_slice<std::decay_t<T>>::value, void>;
     }
 
     template <class T>
@@ -488,8 +486,6 @@ namespace xt
         using size_type = typename container_type::value_type;
         using self_type = xdrop_slice<T>;
 
-        template <class C, typename = detail::disable_xdrop_slice_t<C>>
-        explicit xdrop_slice(const C& cont);
         template <class C, typename = detail::disable_xdrop_slice_t<C>>
         explicit xdrop_slice(C& cont);
         explicit xdrop_slice(container_type&& cont);
@@ -1171,13 +1167,6 @@ namespace xt
 
     template <class T>
     template <class C, typename>
-    inline xkeep_slice<T>::xkeep_slice(const C& cont)
-        : m_raw_indices(cont.begin(), cont.end())
-    {
-    }
-
-    template <class T>
-    template <class C, typename>
     inline xkeep_slice<T>::xkeep_slice(C& cont)
         : m_raw_indices(cont.begin(), cont.end())
     {
@@ -1285,13 +1274,6 @@ namespace xt
     /******************************
      * xdrop_slice implementation *
      ******************************/
-
-    template <class T>
-    template <class C, typename>
-    inline xdrop_slice<T>::xdrop_slice(const C& cont)
-        : m_raw_indices(cont.begin(), cont.end())
-    {
-    }
 
     template <class T>
     template <class C, typename>
