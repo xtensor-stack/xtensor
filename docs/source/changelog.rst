@@ -7,6 +7,51 @@
 Changelog
 =========
 
+0.17.2
+------
+
+- Add experimental TBB support for parallelized multicore assign
+  `#948 <https://github.com/QuantStack/xtensor/pull/948>`_.
+- Add inline statement to all functions in xnpy
+  `#1097 <https://github.com/QuantStack/xtensor/pull/1097>`_.
+- Fix strided assign for certain assignments
+  `#1095 <https://github.com/QuantStack/xtensor/pull/1095>`_.
+- CMake, remove gtest warnings
+  `#1085 <https://github.com/QuantStack/xtensor/pull/1085>`_.
+- Add conversion operators to slices
+  `#1093 <https://github.com/QuantStack/xtensor/pull/1093>`_.
+- Add optimization to unchecked accessors when contiguous layout is known
+  `#1060 <https://github.com/QuantStack/xtensor/pull/1060>`_.
+- Speedup assign by computing ``any`` layout on vectors
+  `#1063 <https://github.com/QuantStack/xtensor/pull/1063>`_.
+- Skip resizing for fixed shapes
+  `#1072 <https://github.com/QuantStack/xtensor/pull/1072>`_.
+- Add xsimd apply to xcomplex functors (conj, norm, arg)
+  `#1086 <https://github.com/QuantStack/xtensor/pull/1086>`_.
+- Propagate contiguous layout through views
+  `#1039 <https://github.com/QuantStack/xtensor/pull/1039>`_.
+- Fix C++17 ambiguity for GCC 7
+  `#1081 <https://github.com/QuantStack/xtensor/pull/1081>`_.
+- Correct shape type in argmin, fix svector growth
+  `#1079 <https://github.com/QuantStack/xtensor/pull/1079>`_.
+- Add ``interp`` function to xmath
+  `#1071 <https://github.com/QuantStack/xtensor/pull/1071>`_.
+- Fix valgrind warnings + memory leak in xadapt
+  `#1078 <https://github.com/QuantStack/xtensor/pull/1078>`_.
+- Remove more clang warnings & errors on OS X
+  `#1077 <https://github.com/QuantStack/xtensor/pull/1077>`_.
+- Add move constructor from xtensor <-> xarray
+  `#1051 <https://github.com/QuantStack/xtensor/pull/1051>`_.
+- Add global support for negative axes in reducers/accumulators
+  allow multiple axes in average
+  `#1010 <https://github.com/QuantStack/xtensor/pull/1010>`_.
+- Fix reference usage in xio
+  `#1076 <https://github.com/QuantStack/xtensor/pull/1076>`_.
+- Remove occurences of std::size_t and double
+  `#1073 <https://github.com/QuantStack/xtensor/pull/1073>`_.
+- Add missing parantheses around min/max for MSVC
+  `#1061 <https://github.com/QuantStack/xtensor/pull/1061>`_.
+
 0.17.1
 ------
 
