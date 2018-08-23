@@ -366,8 +366,8 @@ namespace xt
         using value_functor = typename F::template rebind<typename R::value_type>::type;
         using flag_functor = detail::optional_bitwise<bool>;
 
-        template <class Func, class U = std::enable_if<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
-        xoptional_function(Func&& func, CT... e) noexcept;
+        template <class Func, class... CTA, class U = std::enable_if<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
+        xoptional_function(Func&& func, CTA&&... e) noexcept;
 
         ~xoptional_function() = default;
 
@@ -410,9 +410,9 @@ namespace xt
      * @param e the \ref xexpression arguments
      */
     template <class F, class R, class... CT>
-    template <class Func, class U>
-    inline xoptional_function<F, R, CT...>::xoptional_function(Func&& func, CT... e) noexcept
-        : base_type(std::forward<Func>(func), e...)
+    template <class Func, class... CTA, class U>
+    inline xoptional_function<F, R, CT...>::xoptional_function(Func&& func, CTA&&... e) noexcept
+        : base_type(std::forward<Func>(func), std::forward<CTA>(e)...)
     {
     }
 
