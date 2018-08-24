@@ -12,6 +12,7 @@
 #include <vector>
 
 #include "xstorage.hpp"
+#include "xutils.hpp"
 
 #ifdef XTENSOR_USE_XSIMD
 
@@ -165,6 +166,17 @@ namespace xt
 
     template <class A1, class A2>
     using driven_align_mode_t = typename detail::driven_align_mode_impl<A1, A2>::type;
+
+    template <class E, class = void>
+    struct has_simd_interface : std::false_type
+    {
+    };
+
+    template <class E>
+    struct has_simd_interface<E, void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
+        : std::true_type
+    {
+    };
 }
 
 #endif

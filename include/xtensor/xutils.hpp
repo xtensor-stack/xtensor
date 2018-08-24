@@ -672,17 +672,6 @@ namespace xt
     {
     };
 
-    template <class E, class = void>
-    struct has_simd_interface : std::false_type
-    {
-    };
-
-    template <class E>
-    struct has_simd_interface<E, void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
-        : std::true_type
-    {
-    };
-
     /******************
      * enable_if_type *
      ******************/
