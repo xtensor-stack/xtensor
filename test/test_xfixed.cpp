@@ -6,6 +6,10 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+// xfixed leads to ICE in debug mode, this provides
+// an easy way to prevent compilation
+#ifndef VS_SKIP_XFIXED
+
 #include "gtest/gtest.h"
 
 #include "xtensor/xfixed.hpp"
@@ -252,3 +256,5 @@ namespace xt
 }
 
 #endif
+
+#endif // VS_SKIP_XFIXED
