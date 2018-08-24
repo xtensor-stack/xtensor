@@ -558,8 +558,9 @@ namespace xt
     inline xfixed_container<ET, S, L, Tag> xfixed_container<ET, S, L, Tag>::from_shape(ST&& shape)
     {
         (void) shape;
-        XTENSOR_ASSERT(shape.size() == N && std::equal(shape.begin(), shape.end(), m_shape.begin()));
-        return self_type();
+        self_type tmp;
+        XTENSOR_ASSERT(shape.size() == N && std::equal(shape.begin(), shape.end(), tmp.shape().begin()));
+        return tmp;
     }
 
     /**
