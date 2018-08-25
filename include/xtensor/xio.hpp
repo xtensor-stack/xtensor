@@ -960,6 +960,20 @@ namespace xt
     {
         return mime_bundle_repr_impl(expr);
     }
+
+    template <class T, class B>
+    class xmasked_value;
+
+    template <class T, class B>
+    xeus::xjson mime_bundle_repr(const xmasked_value<T, B>& v)
+    {
+        auto bundle = xeus::xjson::object();
+        std::stringstream tmp;
+        tmp << v;
+        bundle["text/plain"] = tmp.str();
+        return bundle;
+    }
+
 #endif
 }
 
