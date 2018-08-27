@@ -801,9 +801,8 @@ namespace xt
     template <class S>
     inline bool xfunction_base<F, R, CT...>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        if(reuse_cache)
+        if(this->m_shape_computed && reuse_cache)
         {
-            //First call will compute the shape if this has not been done so yet.
             std::copy(this->m_shape.cbegin(), this->m_shape.cend(), this->m_shape.begin());
             return this->m_shape_trivial;
         }
