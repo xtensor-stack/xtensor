@@ -160,7 +160,41 @@ namespace xt
 
         template <class B, class R>
         using functor_batch_simd_type_t = typename functor_batch_simd_type<B, R>::type;
+
+        // State storage
+        template<class S, class is_trivial>
+        struct xfunction_cache_impl
+        {
+            mutable S m_shape;
+            mutable bool m_shape_trivial;
+            mutable bool m_shape_computed;
+
+            xfunction_cache_impl() : m_shape(xtl::make_sequence<S>(0, std::size_t(0))), m_shape_computed(false) {}
+        };
+
+        template<std::size_t... N, class is_trivial>
+        struct xfunction_cache_impl<fixed_shape<N...>, is_trivial>
+        {
+            XTENSOR_CONSTEXPR_ENHANCED_STATIC fixed_shape<N...> m_shape = fixed_shape<N...>();
+            XTENSOR_CONSTEXPR_ENHANCED_STATIC bool m_shape_trivial = is_trivial::value;
+            XTENSOR_CONSTEXPR_ENHANCED_STATIC bool m_shape_computed = true;
+        };
+
+        #ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
+            // Out of line definitions to prevent linker errors prior to C++17
+            template <std::size_t... N, class is_trivial>
+            constexpr fixed_shape<N...> xfunction_cache_impl<fixed_shape<N...>, is_trivial>::m_shape;
+
+            template <std::size_t... N, class is_trivial>
+            constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_trivial>::m_shape_trivial;
+
+            template <std::size_t... N, class is_trivial>
+            constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_trivial>::m_shape_computed;
+        #endif
     }
+
+    template<class promote>
+    struct xfunction_cache : detail::xfunction_cache_impl<typename promote::type, promote> {};
 
     template <class F, class R, class... CT>
     class xfunction_iterator;
@@ -183,6 +217,8 @@ namespace xt
      * xfunction_base *
      ******************/
 
+
+
 #define DL XTENSOR_DEFAULT_LAYOUT
 
     /**
@@ -199,7 +235,8 @@ namespace xt
      * @tparam CT the closure types for arguments of the function
      */
     template <class F, class R, class... CT>
-    class xfunction_base : private xconst_iterable<xfunction_base<F, R, CT...>>
+    class xfunction_base : private xconst_iterable<xfunction_base<F, R, CT...>>,
+                           private xfunction_cache<detail::promote_index<typename std::decay_t<CT>::shape_type...>>
     {
     public:
 
@@ -349,7 +386,7 @@ namespace xt
 
         template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
-        
+
         template <std::size_t... I, class... Args>
         const_reference unchecked_impl(std::index_sequence<I...>, Args... args) const;
 
@@ -374,9 +411,6 @@ namespace xt
 
         tuple_type m_e;
         functor_type m_f;
-        mutable inner_shape_type m_shape;
-        mutable bool m_shape_trivial;
-        mutable bool m_shape_computed;
 
         friend class xfunction_iterator<F, R, CT...>;
         friend class xfunction_stepper<F, R, CT...>;
@@ -591,10 +625,7 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func, class... CTA, class U>
     inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CTA&&... e) noexcept
-        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<inner_shape_type>(0, size_type(0))),
-          m_shape_computed(false)
-    {
-    }
+        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)) {}
     //@}
 
     /**
@@ -616,16 +647,18 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::dimension() const noexcept -> size_type
     {
-        size_type dimension = m_shape_computed ? m_shape.size() : compute_dimension();
+        size_type dimension = this->m_shape_computed ? this->m_shape.size() : compute_dimension();
         return dimension;
     }
 
     template <class F, class R, class... CT>
     inline void xfunction_base<F, R, CT...>::compute_cached_shape() const
     {
-        m_shape = xtl::make_sequence<xindex_type_t<inner_shape_type>>(compute_dimension(), size_type(0));
-        m_shape_trivial = broadcast_shape(m_shape, false);
-        m_shape_computed = true;
+        static_assert(!detail::is_fixed<shape_type>::value, "Calling compute_cached_shape on fixed!");
+
+        this->m_shape = xtl::make_sequence<xindex_type_t<inner_shape_type>>(compute_dimension(), size_type(0));
+        this->m_shape_trivial = broadcast_shape(this->m_shape, false);
+        this->m_shape_computed = true;
     }
 
     /**
@@ -642,7 +675,7 @@ namespace xt
             }
         },
         [](auto /*self*/){});
-        return m_shape;
+        return this->m_shape;
     }
 
     /**
@@ -768,16 +801,16 @@ namespace xt
     template <class S>
     inline bool xfunction_base<F, R, CT...>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        if (reuse_cache && m_shape_computed)
+        if(reuse_cache)
         {
-            std::copy(m_shape.cbegin(), m_shape.cend(), shape.begin());
-            return m_shape_trivial;
+            //First call will compute the shape if this has not been done so yet.
+            std::copy(shape().cbegin(), this->m_shape.cend(), this->m_shape.begin());
+            return this->m_shape_trivial;
         }
         else
         {
-            // e.broadcast_shape must be evaluated even if b is false
-            auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
-            return accumulate(func, true, m_e);
+            //We only need one promotion operation, and triviality comes fointly from this and the cashed ones.
+            return xt::broadcast_shape(shape, shape()) && this->m_shape_trivial;
         }
     }
 
@@ -914,7 +947,7 @@ namespace xt
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_f(std::get<I>(m_e)(args...)...);
     }
-    
+
     template <class F, class R, class... CT>
     template <std::size_t... I, class... Args>
     inline auto xfunction_base<F, R, CT...>::unchecked_impl(std::index_sequence<I...>, Args... args) const -> const_reference
@@ -1192,7 +1225,7 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_stepper<F, R, CT...>::step_leading() 
+    inline auto xfunction_stepper<F, R, CT...>::step_leading()
         -> value_type
     {
         return step_leading_impl(std::make_index_sequence<sizeof...(CT)>());
