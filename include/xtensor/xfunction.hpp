@@ -803,7 +803,7 @@ namespace xt
     {
         if(this->m_shape_computed && reuse_cache)
         {
-            std::copy(this->m_shape.cbegin(), this->m_shape.cend(), this->m_shape.begin());
+            std::copy(this->m_shape.cbegin(), this->m_shape.cend(), shape.begin());
             return this->m_shape_trivial;
         }
         else
