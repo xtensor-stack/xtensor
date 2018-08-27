@@ -804,13 +804,14 @@ namespace xt
         if(reuse_cache)
         {
             //First call will compute the shape if this has not been done so yet.
-            std::copy(this->shape().cbegin(), this->m_shape.cend(), this->m_shape.begin());
+            std::copy(this->m_shape.cbegin(), this->m_shape.cend(), this->m_shape.begin());
             return this->m_shape_trivial;
         }
         else
         {
-            //We only need one promotion operation, and triviality comes fointly from this and the cashed ones.
-            return xt::broadcast_shape(shape, this->shape()) && this->m_shape_trivial;
+            // e.broadcast_shape must be evaluated even if b is false
+            auto func = [&shape](bool b, auto&& e) { return e.broadcast_shape(shape) && b; };
+            return accumulate(func, true, m_e);
         }
     }
 
