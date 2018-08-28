@@ -1,0 +1,48 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
+#include <algorithm>
+
+#include "gtest/gtest.h"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xhistogram.hpp"
+
+namespace xt
+{
+    using namespace xt::placeholders;
+
+    /*py
+
+    a = (np.random.random(1000) * 51).astype(np.int)
+
+    count, bin_edges  = np.histogram(a, 50)
+
+    prob, _  = np.histogram(a, 50, density=True)
+
+    */
+    TEST(xtest_extended_histogram, histogram_auto)
+    {
+        // py_a
+        // py_bin_edges
+        // py_count
+        // py_prob
+
+        auto bin_edges = xt::histogram_bin_edges(py_a, std::size_t(50));
+
+        auto count = xt::histogram(py_a, bin_edges);
+
+        auto prob = xt::histogram(py_a, bin_edges, true);
+
+        EXPECT_EQ(bin_edges, py_bin_edges);
+
+        EXPECT_EQ(count, py_count);
+
+        EXPECT_EQ(prob, py_prob);
+    }
+}

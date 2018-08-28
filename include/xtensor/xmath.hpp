@@ -2441,21 +2441,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using value_type = typename E3::value_type;
 
         // basic checks
-        #ifdef XTENSOR_ENABLE_ASSERT
-
-            XTENSOR_ASSERT( xp.dimension() == 1 );
-
-            for (size_type i = 1 ; i < x.size() ; ++i)
-            {
-                XTENSOR_ASSERT( x[i] >= x[i - 1] );
-            }
-
-            for (size_type ip = 1 ; ip < xp.size() ; ++ip)
-            {
-                XTENSOR_ASSERT( xp[ip] >= xp[ip - 1] );
-            }
-
-        #endif
+        XTENSOR_ASSERT( xp.dimension() == 1 );
+        XTENSOR_ASSERT( std::is_sorted(x.cbegin(), x.cend()) );
+        XTENSOR_ASSERT( std::is_sorted(xp.cbegin(), xp.cend()) );
 
         // allocate output
         auto f = xtensor<value_type, 1>::from_shape(x.shape());
