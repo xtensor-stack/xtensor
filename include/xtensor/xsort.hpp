@@ -525,6 +525,38 @@ namespace xt
         std::copy(sorted.begin(), end, result.begin());
         return result;
     }
+
+    /**
+     * Find the set difference of two xexpressions. This returns a flattened xtensor with
+     * the sorted, unique values in ar1 that are not in ar2.
+     *
+     * @param ar1 input xexpression (will be flattened)
+     * @param ar2 input xexpression
+     */
+    template <class E1, class E2>
+    inline auto setdiff1d(const xexpression<E1>& ar1, const xexpression<E2>& ar2)
+    {
+        using value_type = typename E1::value_type;
+
+        auto unique1 = unique(ar1);
+        auto unique2 = unique(ar2);
+
+        auto tmp = xtensor<value_type, 1>::from_shape({unique1.size()});
+
+        auto end = std::set_difference(
+            unique1.begin(), unique1.end(),
+            unique2.begin(), unique2.end(),
+            tmp.begin()
+        );
+
+        std::size_t sz = static_cast<std::size_t>(std::distance(tmp.begin(), end));
+
+        auto result = xtensor<value_type, 1>::from_shape({sz});
+
+        std::copy(tmp.begin(), end, result.begin());
+
+        return result;
+    }
 }
 
 #endif
