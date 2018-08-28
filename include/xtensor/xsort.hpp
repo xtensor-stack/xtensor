@@ -528,7 +528,7 @@ namespace xt
 
     /**
      * Find the set difference of two xexpressions. This returns a flattened xtensor with
-     * Return the sorted, unique values in ar1 that are not in ar2.
+     * the sorted, unique values in ar1 that are not in ar2.
      *
      * @param ar1 input xexpression (will be flattened)
      * @param ar2 input xexpression
