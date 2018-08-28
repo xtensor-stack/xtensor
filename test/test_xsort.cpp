@@ -218,14 +218,18 @@ namespace xt
 
     TEST(xsort, setdiff1d)
     {
-        xarray<size_t> ar1 = {1,2,3,4,4,4,5};
-        xarray<size_t> ar2 = {4,5};
-        xarray<size_t> out = {1,2,3};
-        EXPECT_EQ(setdiff1d(ar1, ar2), out);
+        {
+            xarray<size_t> ar1 = {1,2,3,4,4,4,5};
+            xarray<size_t> ar2 = {4,5};
+            xarray<size_t> out = {1,2,3};
+            EXPECT_EQ(setdiff1d(ar1, ar2), out);
+        }
 
-        xarray<size_t> ar1 = {{5,6,7},{4,4,4},{1,2,3}};
-        xarray<size_t> ar2 = {4,1};
-        xarray<size_t> out = {2,3,5,6,7};
-        EXPECT_EQ(setdiff1d(ar1, ar2), out);
+        {
+            xarray<size_t> ar1 = {{5,6,7},{4,4,4},{1,2,3}};
+            xarray<size_t> ar2 = {4,1};
+            xarray<size_t> out = {2,3,5,6,7};
+            EXPECT_EQ(setdiff1d(ar1, ar2), out);
+        }
     }
 }
