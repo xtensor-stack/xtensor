@@ -1463,7 +1463,7 @@ namespace xt
             auto&& dim = *it;
             if(dim < 0)
             {
-                XTENSOR_ASSERT(!neg_idx);
+                XTENSOR_ASSERT(dim == -1 && !neg_idx);
                 neg_idx = i;
             }
             accumulator *= dim;
