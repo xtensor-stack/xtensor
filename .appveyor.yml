@@ -34,7 +34,10 @@ install:
   - conda install xsimd -c QuantStack
   - conda install nlohmann_json -c QuantStack
     #- cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DDISABLE_VS2017=ON .
-  - cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDISABLE_VS2017=ON .
+    #- cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDISABLE_VS2017=ON .
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" if "%PLATFORM%" == "x64" cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDISABLE_VS2017=ON -DXTENSOR_USE_XSIMD=ON .
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" if "%PLATFORM%" == "x86" cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDISABLE_VS2017=ON .
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Previous Visual Studio 2017" cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDISABLE_VS2017=ON .
   - nmake test_xtensor_lib
   - cd test
 

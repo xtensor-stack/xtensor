@@ -520,16 +520,20 @@ namespace xt
         template <class simd>
         using simd_return_type = xsimd::simd_return_type<value_type, typename simd::value_type>;
 
-        template <class align, class simd = simd_value_type, class T = xexpression_type,
-                  class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
-        void store_simd(size_type i, const simd& e);
-        template <class align, class simd = simd_value_type, class T = xexpression_type,
-                  class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
-        simd_return_type<simd> load_simd(size_type i) const;
-        template <class T = xexpression_type, class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
-        inline reference data_element(size_type i);
-        template <class T = xexpression_type, class = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, int>>
-        inline const_reference data_element(size_type i) const;
+        template <class T, class R>
+        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, R>;
+
+        template <class align, class simd = simd_value_type, class T = xexpression_type>
+        enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
+
+        template <class align, class simd = simd_value_type, class T = xexpression_type>
+        enable_simd_interface<T, simd_return_type<simd>> load_simd(size_type i) const;
+
+        template <class T = xexpression_type>
+        enable_simd_interface<T, reference> data_element(size_type i);
+
+        template <class T = xexpression_type>
+        enable_simd_interface<T, const_reference> data_element(size_type i) const;
 
     private:
 
@@ -1309,29 +1313,29 @@ namespace xt
     }
 
     template <class CT, class... S>
-    template <class align, class simd, class, class>
-    void xview<CT, S...>::store_simd(size_type i, const simd& e)
+    template <class align, class simd, class T>
+    inline auto xview<CT, S...>::store_simd(size_type i, const simd& e) -> enable_simd_interface<T, void>
     {
         return m_e.template store_simd<xsimd::unaligned_mode>(data_offset() + i, e);
     }
 
     template <class CT, class... S>
-    template <class align, class simd, class, class>
-    auto xview<CT, S...>::load_simd(size_type i) const -> simd_return_type<simd>
+    template <class align, class simd, class T>
+    inline auto xview<CT, S...>::load_simd(size_type i) const -> enable_simd_interface<T, simd_return_type<simd>>
     {
         return m_e.template load_simd<xsimd::unaligned_mode, simd>(data_offset() + i);
     }
 
     template <class CT, class... S>
-    template <class, class>
-    inline auto xview<CT, S...>::data_element(size_type i) -> reference
+    template <class T>
+    inline auto xview<CT, S...>::data_element(size_type i) -> enable_simd_interface<T, reference>
     {
         return m_e.data_element(data_offset() + i);
     }
 
     template <class CT, class... S>
-    template <class, class>
-    inline auto xview<CT, S...>::data_element(size_type i) const -> const_reference
+    template <class T>
+    inline auto xview<CT, S...>::data_element(size_type i) const -> enable_simd_interface<T, const_reference>
     {
         return m_e.data_element(data_offset() + i);
     }
