@@ -1891,8 +1891,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }
 
         using result_type = promote_type_t<double, typename std::decay_t<E>::value_type>;
-        result_type scl = static_cast<result_type>(sum(weights, xt::evaluation_strategy::immediate{})());
         auto weights_view = reshape_view(std::forward<W>(weights), std::move(broadcast_shape));
+        auto scl = sum(weights_view, ax, xt::evaluation_strategy::immediate{});
         return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
 

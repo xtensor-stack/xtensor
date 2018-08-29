@@ -138,6 +138,7 @@ set(XTENSOR_TESTS
     test_xview_semantic.cpp
     test_xutils.cpp
     test_extended_broadcast_view.cpp
+    test_extended_xmath_average.cpp
 )
 
 if(nlohmann_json_FOUND)

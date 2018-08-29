@@ -35,7 +35,7 @@ def get_cpp_initlist(arr, name):
     if isinstance(arr, (int, str, float)):
         return get_xtype(arr) + " " + name + " = " + str(arr) + ';'
     name = get_xtype(arr) + " " + name
-    s = np.array2string(arr, separator=',')
+    s = np.array2string(arr, separator=',', precision=16)
     s = s.replace('[', '{')
     s = s.replace(']', '}')
     s = s.replace('j', 'i')
@@ -78,7 +78,7 @@ def translate_file(contents, f):
 			if '=' in lstrip:
 				exec_comment(lstrip[6:])
 				var = line.strip()[6:lstrip.index('=')].strip()
-			else:	
+			else:
 				var = line.strip()[6:]
 			indent = line[:indent_n]
 			init_list = get_cpp_initlist(current_vars[var], 'py_' + var)
