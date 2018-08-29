@@ -23,6 +23,17 @@ namespace xt
      * type conversion *
      *******************/
 
+    // TODO: Currently, we use _CHECK_RESULT_TYPE as [wip]. Once the divide<int> issue is fixed
+    // we will revert to using CHECK_RESULT_TYPE as usual.
+#define _CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                \
+    {                                                                                \
+        auto&& x = EXPRESSION;                                                       \
+        std::cout << "expression type" << typeid(decltype(EXPRESSION)).name() << std::endl; \
+        using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
+        std::cout << "Value type" << typeid(result_type).name() << std::endl;        \
+        ASSERT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+    }
+
 #define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
     {                                                                                \
         using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
@@ -30,6 +41,13 @@ namespace xt
     }
 #define ARRAY_TYPE(VALUE_TYPE)  \
     std::array<VALUE_TYPE, 2>
+
+#define CHECK_TEMPLATED_RESULT_TYPE(FUNC, INPUT)                                     \
+        _CHECK_RESULT_TYPE(FUNC<unsigned char>(INPUT), unsigned char);               \ 
+        _CHECK_RESULT_TYPE(FUNC<char>(INPUT), char);                                 \
+        _CHECK_RESULT_TYPE(FUNC<int>(INPUT), int);                                   \
+        _CHECK_RESULT_TYPE(FUNC<unsigned int>(INPUT), unsigned int);                 \
+        _CHECK_RESULT_TYPE(FUNC<unsigned long long>(INPUT), unsigned long long);
 
     TEST(xmath, result_type)
     {
@@ -55,6 +73,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(auchar), unsigned long long);
         CHECK_RESULT_TYPE(mean(auchar), double);
         CHECK_RESULT_TYPE(minmax(auchar), ARRAY_TYPE(unsigned char));
+        CHECK_TEMPLATED_RESULT_TYPE(mean, auchar);
 
         /*********
          * short *
