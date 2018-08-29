@@ -128,7 +128,7 @@ endif()
 
 if(XTENSOR_USE_XSIMD)
     add_definitions(-DXTENSOR_USE_XSIMD)
-    find_package(xsimd 6.1.4 REQUIRED)
+    find_package(xsimd 6.2.0 REQUIRED)
     message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
     target_link_libraries(xtensor INTERFACE xsimd)
 endif()
