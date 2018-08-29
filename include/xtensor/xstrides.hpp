@@ -106,11 +106,25 @@ namespace xt
      * Implementation *
      ******************/
 
+    namespace detail
+    {
+        template <class shape_type>
+        inline std::size_t compute_size_impl(const shape_type& shape, std::true_type /* is signed */) {
+            using size_type = std::decay_t<typename shape_type::value_type>;
+            return static_cast<std::size_t>(std::abs(std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>())));
+        }
+
+        template <class shape_type>
+        inline std::size_t compute_size_impl(const shape_type& shape, std::false_type /* is not signed */) {
+            using size_type = std::decay_t<typename shape_type::value_type>;
+            return static_cast<std::size_t>(std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>()));
+        }
+    }
+
     template <class shape_type>
     inline std::size_t compute_size(const shape_type& shape) noexcept
     {
-        using size_type = std::decay_t<typename shape_type::value_type>;
-        return static_cast<std::size_t>(std::accumulate(shape.cbegin(), shape.cend(), size_type(1), std::multiplies<size_type>()));
+        return detail::compute_size_impl(shape, std::is_signed<std::decay_t<typename std::decay_t<shape_type>::value_type>>());
     }
 
     namespace detail

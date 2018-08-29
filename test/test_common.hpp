@@ -226,6 +226,15 @@ namespace xt
             vec.resize(shape);
             vec.reshape(rm.m_shape, layout_type::row_major);
             compare_shape(vec, rm);
+            // --- new test
+            dynamic_shape<signed long long> signed_shape;
+            std::copy(rm.m_shape.begin(), rm.m_shape.end(), std::back_inserter(signed_shape));
+            // Will infer as sz
+            signed_shape[1] = -1;
+            vec.resize(shape);
+            vec.reshape(signed_shape, layout_type::row_major);
+            compare_shape(vec, rm);
+            // ---
             shape = rm.m_shape;
             shape.front() += 123;
             EXPECT_THROW(vec.reshape(shape), std::runtime_error);

@@ -434,6 +434,15 @@ namespace xt
         inner_backstrides_type& backstrides_impl() noexcept;
         const inner_backstrides_type& backstrides_impl() const noexcept;
 
+        template <class S = shape_type, 
+                  typename std::enable_if<!std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
+                      std::decay_t<S>>::type * = nullptr>
+        void reshape_impl(S&& shape, layout_type layout = base_type::static_layout);
+        template <class S = shape_type, 
+                  typename std::enable_if<std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
+                      std::decay_t<S>>::type * = nullptr>
+        void reshape_impl(S&& shape, layout_type layout = base_type::static_layout);
+
         layout_type& mutable_layout() noexcept
         {
             return m_layout;
@@ -1406,7 +1415,15 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(S&& shape, layout_type layout)
+    inline void xstrided_container<D>::reshape(S&& shape, layout_type layout){
+        reshape_impl(std::forward<S>(shape), std::forward<layout_type>(layout));
+    }
+
+    template <class D>
+    template <class S, 
+              typename std::enable_if<!std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
+                  std::decay_t<S>>::type*>
+    inline void xstrided_container<D>::reshape_impl(S&& shape, layout_type layout)
     {
         if (compute_size(shape) != this->size())
         {
@@ -1419,6 +1436,41 @@ namespace xt
         if (D::static_layout != layout_type::dynamic && layout != D::static_layout)
         {
             throw std::runtime_error("Cannot reshape with different layout if static layout != dynamic.");
+        }
+        m_layout = layout;
+        m_shape = xtl::forward_sequence<shape_type>(shape);
+        resize_container(m_strides, m_shape.size());
+        resize_container(m_backstrides, m_shape.size());
+        compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
+    }
+    template <class D>
+    template <class S, 
+              typename std::enable_if<std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
+                  std::decay_t<S>>::type*>
+    inline void xstrided_container<D>::reshape_impl(S&& _shape, layout_type layout)
+    {
+        using value_type = typename std::decay_t<S>::value_type;
+        if (this->size() % compute_size(_shape))
+        {
+            throw std::runtime_error("Negative axis size cannot be inferred. Shape mismatch.");
+        }
+        std::decay_t<S> shape = _shape; 
+        value_type accumulator = 1;
+        std::size_t neg_idx = 0;
+        std::size_t i = 0;
+        for(auto it = shape.begin(); it != shape.end(); ++it, i++)
+        {
+            auto&& dim = *it;
+            if(dim < 0)
+            {
+                XTENSOR_ASSERT(!neg_idx);
+                neg_idx = i;
+            }
+            accumulator *= dim;
+        }
+        if(accumulator < 0)
+        {
+            shape[neg_idx] = static_cast<value_type>(this->size()) / std::abs(accumulator);
         }
         m_layout = layout;
         m_shape = xtl::forward_sequence<shape_type>(shape);
