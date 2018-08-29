@@ -23,17 +23,6 @@ namespace xt
      * type conversion *
      *******************/
 
-    // TODO: Currently, we use _CHECK_RESULT_TYPE as [wip]. Once the divide<int> issue is fixed
-    // we will revert to using CHECK_RESULT_TYPE as usual.
-#define _CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                \
-    {                                                                                \
-        auto&& x = EXPRESSION;                                                       \
-        std::cout << "expression type" << typeid(decltype(EXPRESSION)).name() << std::endl; \
-        using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
-        std::cout << "Value type" << typeid(result_type).name() << std::endl;        \
-        ASSERT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
-    }
-
 #define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
     {                                                                                \
         using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
@@ -43,11 +32,17 @@ namespace xt
     std::array<VALUE_TYPE, 2>
 
 #define CHECK_TEMPLATED_RESULT_TYPE(FUNC, INPUT)                                     \
-        _CHECK_RESULT_TYPE(FUNC<unsigned char>(INPUT), unsigned char);               \ 
-        _CHECK_RESULT_TYPE(FUNC<char>(INPUT), char);                                 \
-        _CHECK_RESULT_TYPE(FUNC<int>(INPUT), int);                                   \
-        _CHECK_RESULT_TYPE(FUNC<unsigned int>(INPUT), unsigned int);                 \
-        _CHECK_RESULT_TYPE(FUNC<unsigned long long>(INPUT), unsigned long long);
+        CHECK_RESULT_TYPE(FUNC<unsigned char>(INPUT), int);                          \
+        CHECK_RESULT_TYPE(FUNC<signed char>(INPUT), int);                            \
+        CHECK_RESULT_TYPE(FUNC<char>(INPUT), int);                                   \
+        CHECK_RESULT_TYPE(FUNC<unsigned short>(INPUT), int);                         \
+        CHECK_RESULT_TYPE(FUNC<signed short>(INPUT), int);                           \
+        CHECK_RESULT_TYPE(FUNC<short>(INPUT), int);                                  \
+        CHECK_RESULT_TYPE(FUNC<unsigned int>(INPUT), unsigned int);                  \
+        CHECK_RESULT_TYPE(FUNC<signed int>(INPUT), signed int);                      \
+        CHECK_RESULT_TYPE(FUNC<int>(INPUT), int);                                    \
+        CHECK_RESULT_TYPE(FUNC<unsigned long long>(INPUT), unsigned long long);      \
+        CHECK_RESULT_TYPE(FUNC<signed long long>(INPUT), signed long long);
 
     TEST(xmath, result_type)
     {
@@ -86,6 +81,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(ashort), long long);
         CHECK_RESULT_TYPE(mean(ashort), double);
         CHECK_RESULT_TYPE(minmax(ashort), ARRAY_TYPE(short));
+        CHECK_TEMPLATED_RESULT_TYPE(mean, ashort);
 
         /*******
          * int *
@@ -98,6 +94,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(aint), long long);
         CHECK_RESULT_TYPE(mean(aint), double);
         CHECK_RESULT_TYPE(minmax(aint), ARRAY_TYPE(int));
+        CHECK_TEMPLATED_RESULT_TYPE(mean, aint);
 
         /****************
          * unsigned int *
@@ -110,6 +107,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(auint), unsigned long long);
         CHECK_RESULT_TYPE(mean(auint), double);
         CHECK_RESULT_TYPE(minmax(auint), ARRAY_TYPE(unsigned int));
+        CHECK_TEMPLATED_RESULT_TYPE(mean, auint);
 
         /**********************
          * unsigned long long *
@@ -122,6 +120,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(aulong), unsigned long long);
         CHECK_RESULT_TYPE(mean(aulong), double);
         CHECK_RESULT_TYPE(minmax(aulong), ARRAY_TYPE(unsigned long long));
+        CHECK_TEMPLATED_RESULT_TYPE(mean, aulong);
 
         /*********
          * float *
@@ -134,6 +133,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(afloat), double);
         CHECK_RESULT_TYPE(mean(afloat), double);
         CHECK_RESULT_TYPE(minmax(afloat), ARRAY_TYPE(float));
+        CHECK_TEMPLATED_RESULT_TYPE(mean, afloat);
 
         /**********
          * double *
@@ -145,6 +145,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(adouble), double);
         CHECK_RESULT_TYPE(mean(adouble), double);
         CHECK_RESULT_TYPE(minmax(adouble), ARRAY_TYPE(double));
+        CHECK_TEMPLATED_RESULT_TYPE(mean, adouble);
 
         /***********************
          * std::complex<float> *
