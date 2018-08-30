@@ -394,42 +394,42 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #undef XTENSOR_UNSIGNED_ABS_FUNC
 
 #define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                      \
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                            \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
-        using result_type = RESULT_TYPE;                                                                          \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
         return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e),                                  \
                       std::forward<X>(axes), es);                                                                 \
     }                                                                                                             \
                                                                                                                   \
-    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                                     \
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
               class = std::enable_if_t<std::is_base_of<evaluation_strategy::base, EVS>::value, int>>              \
     inline auto NAME(E&& e, EVS es = EVS())                                                                       \
     {                                                                                                             \
-        using result_type = RESULT_TYPE;                                                                          \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
         return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), es);                             \
-    }
+    }                                                                                                             
 
 #define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                     \
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                                            \
-        inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                    \
-        {                                                                                                         \
-            using result_type = RESULT_TYPE;                                                                      \
-            using functor_type = FUNCTOR<result_type>;                                                            \
-            return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                   \
-        }                                                                                                         \
-
-#define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                  \
-    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                             \
-    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
+    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                            \
+    inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                        \
     {                                                                                                             \
-        using result_type = RESULT_TYPE;                                                                          \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
         return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                       \
-    }
+    }                                                                                                             
+
+#define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                  \
+    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
+    inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
+    {                                                                                                             \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
+        using functor_type = FUNCTOR<result_type>;                                                                \
+        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                       \
+    }                                                                                                             
 
     /*******************
      * basic functions *
@@ -1817,36 +1817,42 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param axes the axes along which the mean is computed (optional)
      * @return an \ref xexpression
      */
-    template <class E, class X>
+    template <class T = void, class E, class X>
     inline auto mean(E&& e, X&& axes)
     {
+        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
-        auto s = sum(std::forward<E>(e), std::forward<X>(axes));
-        return std::move(s) / static_cast<double>(size / s.size());
+        // sum cannot always be a double. It could be a complex number which cannot operate on
+        // std::plus<double>.
+        auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes));
+        return std::move(s) / static_cast<value_type>(size / s.size());
     }
 
-    template <class E>
+    template <class T = void, class E>
     inline auto mean(E&& e)
     {
+        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
-        return sum(std::forward<E>(e)) / static_cast<double>(size);
+        return sum<T>(std::forward<E>(e)) / static_cast<value_type>(size);
     }
 
 #ifdef X_OLD_CLANG
-    template <class E, class I>
+    template <class T = void, class E, class I>
     inline auto mean(E&& e, std::initializer_list<I> axes)
     {
+        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
-        auto s = sum(std::forward<E>(e), axes);
-        return std::move(s) / static_cast<double>(size / s.size());
+        auto s = sum<T>(std::forward<E>(e), axes);
+        return std::move(s) / static_cast<value_type>(size / s.size());
     }
 #else
-    template <class E, class I, std::size_t N>
+    template <class T = void, class E, class I, std::size_t N>
     inline auto mean(E&& e, const I (&axes)[N])
     {
+        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
-        auto s = sum(std::forward<E>(e), axes);
-        return std::move(s) / static_cast<double>(size / s.size());
+        auto s = sum<T>(std::forward<E>(e), axes);
+        return std::move(s) / static_cast<value_type>(size / s.size());
     }
 #endif
 
