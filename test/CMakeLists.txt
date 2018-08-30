@@ -104,6 +104,7 @@ set(XTENSOR_TESTS
     test_xexpression.cpp
     test_xfunction.cpp
     test_xfixed.cpp
+    test_xhistogram.cpp
     test_xindex_view.cpp
     test_xinfo.cpp
     test_xiterator.cpp
@@ -138,6 +139,7 @@ set(XTENSOR_TESTS
     test_xview_semantic.cpp
     test_xutils.cpp
     test_extended_broadcast_view.cpp
+    test_extended_xhistogram.cpp
 )
 
 if(nlohmann_json_FOUND)

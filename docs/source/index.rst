@@ -63,6 +63,7 @@ for details.
    scalar
    adaptor
    operator
+   histogram
    view
    builder
    missing
