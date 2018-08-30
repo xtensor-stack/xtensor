@@ -27,6 +27,14 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: diff(const xexpression<T>&, unsigned int, std::ptrdiff_t)
    :project: xtensor
 
+.. _amax-function-reference:
+.. doxygenfunction:: amax(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _amin-function-reference:
+.. doxygenfunction:: amin(E&&, X&&, EVS)
+   :project: xtensor
+
 .. _trapz-function-reference:
 .. doxygenfunction:: trapz(const xexpression<T>&, double, std::ptrdiff_t)
    :project: xtensor
