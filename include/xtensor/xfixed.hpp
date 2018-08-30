@@ -137,22 +137,22 @@ namespace xt
         }
 
         template <std::size_t... X>
-        struct compute_size_impl;
+        struct fixed_compute_size_impl;
 
         template <std::size_t Y, std::size_t... X>
-        struct compute_size_impl<Y, X...>
+        struct fixed_compute_size_impl<Y, X...>
         {
-            constexpr static std::size_t value = Y * compute_size_impl<X...>::value;
+            constexpr static std::size_t value = Y * fixed_compute_size_impl<X...>::value;
         };
 
         template <std::size_t X>
-        struct compute_size_impl<X>
+        struct fixed_compute_size_impl<X>
         {
             constexpr static std::size_t value = X;
         };
 
         template <>
-        struct compute_size_impl<>
+        struct fixed_compute_size_impl<>
         {
             // support for 0D xtensor fixed (empty shape = xshape<>)
             constexpr static std::size_t value = 1;
@@ -165,7 +165,7 @@ namespace xt
         template <std::size_t... X>
         struct fixed_compute_size<xt::fixed_shape<X...>>
         {
-            constexpr static std::size_t value = compute_size_impl<X...>::value;
+            constexpr static std::size_t value = fixed_compute_size_impl<X...>::value;
         };
 
         template <class V, std::size_t... X>
