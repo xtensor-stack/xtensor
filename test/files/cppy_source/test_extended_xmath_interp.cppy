@@ -1,0 +1,37 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
+#include <algorithm>
+
+#include "gtest/gtest.h"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xmath.hpp"
+
+namespace xt
+{
+    using namespace xt::placeholders;
+
+    /*py
+    xp = np.sort(np.random.random(20) - 0.5)
+    fp = np.random.random(20) - 0.5
+    x  = np.linspace(-1,1,50)
+    f  = np.interp(x, xp, fp)
+    */
+    TEST(xtest_extended_xmath, interp)
+    {
+        // py_xp
+        // py_fp
+        // py_x
+        // py_f
+
+        auto f = xt::interp(py_x, py_xp, py_fp);
+
+        EXPECT_TRUE(xt::allclose(f, py_f));
+    }
+}

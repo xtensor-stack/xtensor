@@ -58,6 +58,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctor_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xhistogram.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xindex_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xinfo.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
