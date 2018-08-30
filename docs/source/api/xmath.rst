@@ -256,6 +256,10 @@ Mathematical functions
 +----------------------------------------+---------------------------------------------------------------------+
 | :ref:`diff <diff-function-reference>`  | Calculate the n-th discrete difference along the given axis         |
 +----------------------------------------+---------------------------------------------------------------------+
+| :ref:`amax <amax-function-reference>`  | amax of elements over given axes                                    |
++----------------------------------------+---------------------------------------------------------------------+
+| :ref:`amin <amin-function-reference>`  | amin of elements over given axes                                    |
++----------------------------------------+---------------------------------------------------------------------+
 | :ref:`trapz <trapz-function-reference>`| Integrate along the given axis using the composite trapezoidal rule |
 +----------------------------------------+---------------------------------------------------------------------+
 | :ref:`norm_l0 <norm-l0-func-ref>`      | L0 pseudo-norm over given axes                                      |
