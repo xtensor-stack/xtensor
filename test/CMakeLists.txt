@@ -140,6 +140,7 @@ set(XTENSOR_TESTS
     test_xutils.cpp
     test_extended_xmath_interp.cpp
     test_extended_broadcast_view.cpp
+    test_extended_xmath_average.cpp
     test_extended_xhistogram.cpp
 )
 
