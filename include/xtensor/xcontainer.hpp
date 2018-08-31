@@ -434,14 +434,10 @@ namespace xt
         inner_backstrides_type& backstrides_impl() noexcept;
         const inner_backstrides_type& backstrides_impl() const noexcept;
 
-        template <class S = shape_type, 
-                  typename std::enable_if<!std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
-                      std::decay_t<S>>::type * = nullptr>
-        void reshape_impl(S&& shape, layout_type layout = base_type::static_layout);
-        template <class S = shape_type, 
-                  typename std::enable_if<std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
-                      std::decay_t<S>>::type * = nullptr>
-        void reshape_impl(S&& shape, layout_type layout = base_type::static_layout);
+        template <class S = shape_type>
+        void reshape_impl(S&& shape, std::true_type, layout_type layout = base_type::static_layout);
+        template <class S = shape_type>
+        void reshape_impl(S&& shape, std::false_type, layout_type layout = base_type::static_layout);
 
         layout_type& mutable_layout() noexcept
         {
@@ -1416,14 +1412,12 @@ namespace xt
     template <class D>
     template <class S>
     inline void xstrided_container<D>::reshape(S&& shape, layout_type layout){
-        reshape_impl(std::forward<S>(shape), std::forward<layout_type>(layout));
+        reshape_impl(std::forward<S>(shape), std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
     }
 
     template <class D>
-    template <class S, 
-              typename std::enable_if<!std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
-                  std::decay_t<S>>::type*>
-    inline void xstrided_container<D>::reshape_impl(S&& shape, layout_type layout)
+    template <class S>
+    inline void xstrided_container<D>::reshape_impl(S&& shape, std::false_type /* is unsigned */, layout_type layout)
     {
         if (compute_size(shape) != this->size())
         {
@@ -1444,10 +1438,8 @@ namespace xt
         compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
     }
     template <class D>
-    template <class S, 
-              typename std::enable_if<std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>::value, 
-                  std::decay_t<S>>::type*>
-    inline void xstrided_container<D>::reshape_impl(S&& _shape, layout_type layout)
+    template <class S>
+    inline void xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
     {
         using value_type = typename std::decay_t<S>::value_type;
         if (this->size() % compute_size(_shape))
