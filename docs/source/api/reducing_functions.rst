@@ -20,7 +20,15 @@ Defined in ``xtensor/xmath.hpp``
    :project: xtensor
 
 .. _mean-function-reference:
-.. doxygenfunction:: mean(E&&, X&&)
+.. doxygenfunction:: mean(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _variance-function-reference:
+.. doxygenfunction:: variance(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _stddev-function-reference:
+.. doxygenfunction:: stddev(E&&, X&&, EVS)
    :project: xtensor
 
 .. _diff-function-reference:

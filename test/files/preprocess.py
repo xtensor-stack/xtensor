@@ -101,6 +101,8 @@ for f in cppy_files:
 	with open(f) as fi:
 		contents = fi.read()
 
+	# reset global seed
+	np.random.seed(42)
 	result = translate_file(contents, f)
 	f_result = os.path.split(f)[1]
 	with open(my_path + "/../" + f_result[:-1], 'w+') as fo:

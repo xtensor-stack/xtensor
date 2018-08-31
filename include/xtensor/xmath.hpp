@@ -1726,41 +1726,42 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param axes the axes along which the mean is computed (optional)
      * @return an \ref xexpression
      */
-    template <class T = void, class E, class X>
-    inline auto mean(E&& e, X&& axes)
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value>>
+    inline auto mean(E&& e, X&& axes, EVS es = EVS())
     {
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
-        auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes));
+        auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes), es);
         return std::move(s) / static_cast<value_type>(size / s.size());
     }
 
-    template <class T = void, class E>
-    inline auto mean(E&& e)
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto mean(E&& e, EVS es = EVS())
     {
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
-        return sum<T>(std::forward<E>(e)) / static_cast<value_type>(size);
+        return sum<T>(std::forward<E>(e), es) / static_cast<value_type>(size);
     }
 
 #ifdef X_OLD_CLANG
-    template <class T = void, class E, class I>
-    inline auto mean(E&& e, std::initializer_list<I> axes)
+    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto mean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
-        auto s = sum<T>(std::forward<E>(e), axes);
+        auto s = sum<T>(std::forward<E>(e), axes, es);
         return std::move(s) / static_cast<value_type>(size / s.size());
     }
 #else
-    template <class T = void, class E, class I, std::size_t N>
-    inline auto mean(E&& e, const I (&axes)[N])
+    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto mean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         auto size = e.size();
-        auto s = sum<T>(std::forward<E>(e), axes);
+        auto s = sum<T>(std::forward<E>(e), axes, es);
         return std::move(s) / static_cast<value_type>(size / s.size());
     }
 #endif
@@ -1822,7 +1823,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E, class W, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto average(E&& e, W&& weights, std::initializer_list<I> axes, EVS ev = EVS())
     {
-        using ax_t = std::vector<std::size_t>;
+        using ax_t = dynamic_shape<std::size_t>;
         return average(std::forward<E>(e), std::forward<W>(weights), xt::forward_normalize<ax_t>(e, axes), ev);
     }
 #endif
@@ -1841,6 +1842,121 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         return s;
     }
 
+    namespace detail
+    {
+        template<typename E>
+        std::enable_if_t<std::is_lvalue_reference<E>::value, E>
+        shared_forward(E e) noexcept
+        {
+            return e;
+        }
+
+        template<typename E>
+        std::enable_if_t<!std::is_lvalue_reference<E>::value, xshared_expression<E>>
+        shared_forward(E e) noexcept
+        {
+            return make_xshared(std::move(e));
+        }
+    }
+
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, EVS>::value>>
+    inline auto variance(E&& e, EVS es = EVS())
+    {
+        decltype(auto) sc = detail::shared_forward<E>(e);
+        return mean(square(abs(sc - mean(sc, es))), es);
+    }
+
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, EVS>::value>>
+    inline auto stddev(E&& e, EVS es = EVS())
+    {
+        return sqrt(variance(std::forward<E>(e), es));
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Compute the variance along the specified axes
+     *
+     * Returns the variance of the array elements, a measure of the spread of a
+     * distribution. The variance is computed for the flattened array by default,
+     * otherwise over the specified axes.
+     *
+     * Note: this function is not yet specialized for complex numbers.
+     *
+     * @param e an \ref xexpression
+     * @param axes the axes along which the mean is computed (optional)
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xexpression
+     *
+     * @sa stddev, mean
+     */
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value>>
+    inline auto variance(E&& e, X&& axes, EVS es = EVS())
+    {
+        decltype(auto) sc = detail::shared_forward<E>(e);
+        // note: forcing copy of first axes argument -- is there a better solution?
+        auto inner_mean = mean(sc, axes);
+        // fake keep_dims = 1
+        auto keep_dim_shape = e.shape();
+        for (const auto& el : axes)
+        {
+            keep_dim_shape[el] = 1;
+        }
+        auto mrv = xt::reshape_view(std::move(inner_mean), std::move(keep_dim_shape));
+        return mean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Compute the standard deviation along the specified axis.
+     *
+     * Returns the standard deviation, a measure of the spread of a distribution,
+     * of the array elements. The standard deviation is computed for the flattened
+     * array by default, otherwise over the specified axis.
+     *
+     * Note: this function is not yet specialized for complex numbers.
+     *
+     * @param e an \ref xexpression
+     * @param axes the axes along which the mean is computed (optional)
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xexpression
+     *
+     * @sa variance, mean
+     */
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value>>
+    inline auto stddev(E&& e, X&& axes, EVS es = EVS())
+    {
+        return sqrt(variance(std::forward<E>(e), std::forward<X>(axes), es));
+    }
+
+#ifndef X_OLD_CLANG
+    template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto stddev(E&& e, const A (&axes)[N], EVS es = EVS())
+    {
+        return stddev(std::forward<E>(e), xtl::forward_sequence<std::array<std::size_t, N>>(axes), es);
+    }
+
+    template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto variance(E&& e, const A (&axes)[N], EVS es = EVS())
+    {
+        return variance(std::forward<E>(e), xtl::forward_sequence<std::array<std::size_t, N>>(axes), es);
+    }
+#else
+    template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto stddev(E&& e, std::initializer_list<A> axes, EVS es = EVS())
+    {
+        return stddev(std::forward<E>(e), xtl::forward_sequence<dynamic_shape<std::size_t>>(axes), es);
+    }
+
+    template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto variance(E&& e, std::initializer_list<A> axes, EVS es = EVS())
+    {
+        return variance(std::forward<E>(e), xtl::forward_sequence<dynamic_shape<std::size_t>>(axes), es);
+    }
+#endif
     /**
      * @ingroup red_functions
      * @brief Minimum and maximum among the elements of an array or expression.
