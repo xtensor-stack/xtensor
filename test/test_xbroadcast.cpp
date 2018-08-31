@@ -9,6 +9,8 @@
 #include "gtest/gtest.h"
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xio.hpp"
 
 namespace xt
 {
@@ -154,5 +156,24 @@ namespace xt
             }
             EXPECT_EQ(iter, iter_end);
         }
+    }
+
+    TEST(xbroadcast, smaller)
+    {
+        xt::xtensor<double, 3> a = {{{1,2,3}}};
+        xt::xtensor<double, 3> b = {{{5}}};
+        xt::xtensor<double, 2> ea = {{1,2,3}, {1,2,3}, {1,2,3}, {1,2,3}};
+        auto bca = xt::broadcast(a, {4, 3});
+        EXPECT_EQ(bca.dimension(), 2);
+        std::array<std::size_t, 2> es = {4, 3};
+        EXPECT_EQ(bca.shape(), es);
+        EXPECT_EQ(bca, ea);
+
+        auto bcb = xt::broadcast(b, {4, 4});
+        EXPECT_EQ(bcb, xt::ones<double>({4, 4}) * 5);
+
+        EXPECT_ANY_THROW(xt::broadcast(a, {3, 4}));
+        xt::xtensor<double, 3> x = xt::ones<double>({4, 1, 4});
+        EXPECT_ANY_THROW(xt::broadcast(x, {3, 4}));
     }
 }

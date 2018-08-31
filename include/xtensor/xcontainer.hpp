@@ -1153,7 +1153,7 @@ namespace xt
     template <class S>
     inline auto xcontainer<D>::stepper_begin(const S& shape) noexcept -> stepper
     {
-        size_type offset = shape.size() - dimension();
+        ptrdiff_t offset = ptrdiff_t(shape.size()) - ptrdiff_t(dimension());
         return stepper(static_cast<derived_type*>(this), data_xbegin(), offset);
     }
 
@@ -1161,7 +1161,7 @@ namespace xt
     template <class S>
     inline auto xcontainer<D>::stepper_end(const S& shape, layout_type l) noexcept -> stepper
     {
-        size_type offset = shape.size() - dimension();
+        ptrdiff_t offset = ptrdiff_t(shape.size()) - ptrdiff_t(dimension());
         return stepper(static_cast<derived_type*>(this), data_xend(l), offset);
     }
 
@@ -1169,7 +1169,7 @@ namespace xt
     template <class S>
     inline auto xcontainer<D>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        ptrdiff_t offset = ptrdiff_t(shape.size()) - ptrdiff_t(dimension());
         return const_stepper(static_cast<const derived_type*>(this), data_xbegin(), offset);
     }
 
@@ -1177,7 +1177,7 @@ namespace xt
     template <class S>
     inline auto xcontainer<D>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        ptrdiff_t offset = ptrdiff_t(shape.size()) - ptrdiff_t(dimension());
         return const_stepper(static_cast<const derived_type*>(this), data_xend(l), offset);
     }
 
