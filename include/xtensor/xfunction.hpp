@@ -160,7 +160,41 @@ namespace xt
 
         template <class B, class R>
         using functor_batch_simd_type_t = typename functor_batch_simd_type<B, R>::type;
+
+        // State storage
+        template<class S, class is_shape_trivial>
+        struct xfunction_cache_impl
+        {
+            S shape;
+            bool is_trivial;
+            bool is_initialized;
+
+            xfunction_cache_impl() : shape(xtl::make_sequence<S>(0, std::size_t(0))), is_initialized(false) {}
+        };
+
+        template<std::size_t... N, class is_shape_trivial>
+        struct xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>
+        {
+            XTENSOR_CONSTEXPR_ENHANCED_STATIC fixed_shape<N...> shape = fixed_shape<N...>();
+            XTENSOR_CONSTEXPR_ENHANCED_STATIC bool is_trivial = is_shape_trivial::value;
+            XTENSOR_CONSTEXPR_ENHANCED_STATIC bool is_initialized = true;
+        };
+
+        #ifdef XTENSOR_HAS_CONSTEXPR_ENHANCED
+            // Out of line definitions to prevent linker errors prior to C++17
+            template <std::size_t... N, class is_shape_trivial>
+            constexpr fixed_shape<N...> xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::shape;
+
+            template <std::size_t... N, class is_shape_trivial>
+            constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_trivial;
+
+            template <std::size_t... N, class is_shape_trivial>
+            constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_initialized;
+        #endif
     }
+
+    template<class promote>
+    struct xfunction_cache : detail::xfunction_cache_impl<typename promote::type, promote> {};
 
     template <class F, class R, class... CT>
     class xfunction_iterator;
@@ -182,6 +216,8 @@ namespace xt
     /******************
      * xfunction_base *
      ******************/
+
+
 
 #define DL XTENSOR_DEFAULT_LAYOUT
 
@@ -349,7 +385,7 @@ namespace xt
 
         template <std::size_t... I, class... Args>
         const_reference access_impl(std::index_sequence<I...>, Args... args) const;
-        
+
         template <std::size_t... I, class... Args>
         const_reference unchecked_impl(std::index_sequence<I...>, Args... args) const;
 
@@ -374,9 +410,7 @@ namespace xt
 
         tuple_type m_e;
         functor_type m_f;
-        mutable inner_shape_type m_shape;
-        mutable bool m_shape_trivial;
-        mutable bool m_shape_computed;
+        mutable xfunction_cache<detail::promote_index<typename std::decay_t<CT>::shape_type...>> m_cache;
 
         friend class xfunction_iterator<F, R, CT...>;
         friend class xfunction_stepper<F, R, CT...>;
@@ -591,10 +625,7 @@ namespace xt
     template <class F, class R, class... CT>
     template <class Func, class... CTA, class U>
     inline xfunction_base<F, R, CT...>::xfunction_base(Func&& f, CTA&&... e) noexcept
-        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)), m_shape(xtl::make_sequence<inner_shape_type>(0, size_type(0))),
-          m_shape_computed(false)
-    {
-    }
+        : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)) {}
     //@}
 
     /**
@@ -616,16 +647,18 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::dimension() const noexcept -> size_type
     {
-        size_type dimension = m_shape_computed ? m_shape.size() : compute_dimension();
+        size_type dimension = m_cache.is_initialized ? m_cache.shape.size() : compute_dimension();
         return dimension;
     }
 
     template <class F, class R, class... CT>
     inline void xfunction_base<F, R, CT...>::compute_cached_shape() const
     {
-        m_shape = xtl::make_sequence<xindex_type_t<inner_shape_type>>(compute_dimension(), size_type(0));
-        m_shape_trivial = broadcast_shape(m_shape, false);
-        m_shape_computed = true;
+        static_assert(!detail::is_fixed<shape_type>::value, "Calling compute_cached_shape on fixed!");
+
+        m_cache.shape = xtl::make_sequence<xindex_type_t<inner_shape_type>>(compute_dimension(), size_type(0));
+        m_cache.is_trivial = broadcast_shape(m_cache.shape, false);
+        m_cache.is_initialized = true;
     }
 
     /**
@@ -636,13 +669,13 @@ namespace xt
     {
         xtl::mpl::static_if<!detail::is_fixed<inner_shape_type>::value>([&](auto self)
         {
-            if(!this->m_shape_computed)
+            if(!m_cache.is_initialized)
             {
                 self(this)->compute_cached_shape();
             }
         },
         [](auto /*self*/){});
-        return m_shape;
+        return m_cache.shape;
     }
 
     /**
@@ -768,10 +801,10 @@ namespace xt
     template <class S>
     inline bool xfunction_base<F, R, CT...>::broadcast_shape(S& shape, bool reuse_cache) const
     {
-        if (reuse_cache && m_shape_computed)
+        if(m_cache.is_initialized && reuse_cache)
         {
-            std::copy(m_shape.cbegin(), m_shape.cend(), shape.begin());
-            return m_shape_trivial;
+            std::copy(m_cache.shape.cbegin(), m_cache.shape.cend(), shape.begin());
+            return m_cache.is_trivial;
         }
         else
         {
@@ -914,7 +947,7 @@ namespace xt
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_f(std::get<I>(m_e)(args...)...);
     }
-    
+
     template <class F, class R, class... CT>
     template <std::size_t... I, class... Args>
     inline auto xfunction_base<F, R, CT...>::unchecked_impl(std::index_sequence<I...>, Args... args) const -> const_reference
@@ -1192,7 +1225,7 @@ namespace xt
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_stepper<F, R, CT...>::step_leading() 
+    inline auto xfunction_stepper<F, R, CT...>::step_leading()
         -> value_type
     {
         return step_leading_impl(std::make_index_sequence<sizeof...(CT)>());
