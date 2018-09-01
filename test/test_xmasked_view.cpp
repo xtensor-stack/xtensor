@@ -74,12 +74,13 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
+        auto masked_value = masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data(0, 0), 1.);
         EXPECT_EQ(masked_data(0, 1), 2.);
         EXPECT_EQ(masked_data(0, 2), xtl::missing<double>());
-        EXPECT_EQ(masked_data(1, 0), xtl::missing<double>());
-        EXPECT_EQ(masked_data(1, 1), xtl::missing<double>());
-        EXPECT_EQ(masked_data(1, 2), xtl::missing<double>());
+        EXPECT_EQ(masked_data(1, 0), masked_value);
+        EXPECT_EQ(masked_data(1, 1), masked_value);
+        EXPECT_EQ(masked_data(1, 2), masked_value);
         EXPECT_EQ(masked_data(2, 0), 7.);
         EXPECT_EQ(masked_data(2, 1), 8.);
         EXPECT_EQ(masked_data(2, 2), 9.);
@@ -94,12 +95,13 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
+        auto masked_value = masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data.at(0, 0), 1.);
         EXPECT_EQ(masked_data.at(0, 1), 2.);
         EXPECT_EQ(masked_data.at(0, 2), xtl::missing<double>());
-        EXPECT_EQ(masked_data.at(1, 0), xtl::missing<double>());
-        EXPECT_EQ(masked_data.at(1, 1), xtl::missing<double>());
-        EXPECT_EQ(masked_data.at(1, 2), xtl::missing<double>());
+        EXPECT_EQ(masked_data.at(1, 0), masked_value);
+        EXPECT_EQ(masked_data.at(1, 1), masked_value);
+        EXPECT_EQ(masked_data.at(1, 2), masked_value);
         EXPECT_EQ(masked_data.at(2, 0), 7.);
         EXPECT_EQ(masked_data.at(2, 1), 8.);
         EXPECT_EQ(masked_data.at(2, 2), 9.);
@@ -112,19 +114,16 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
+        auto masked_value = masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data.unchecked(0, 0), 1.);
         EXPECT_EQ(masked_data.unchecked(0, 1), 2.);
         EXPECT_EQ(masked_data.unchecked(0, 2), xtl::missing<double>());
-        EXPECT_EQ(masked_data.unchecked(1, 0), xtl::missing<double>());
-        EXPECT_EQ(masked_data.unchecked(1, 1), xtl::missing<double>());
-        EXPECT_EQ(masked_data.unchecked(1, 2), xtl::missing<double>());
+        EXPECT_EQ(masked_data.unchecked(1, 0), masked_value);
+        EXPECT_EQ(masked_data.unchecked(1, 1), masked_value);
+        EXPECT_EQ(masked_data.unchecked(1, 2), masked_value);
         EXPECT_EQ(masked_data.unchecked(2, 0), 7.);
         EXPECT_EQ(masked_data.unchecked(2, 1), 8.);
         EXPECT_EQ(masked_data.unchecked(2, 2), 9.);
-
-#ifdef XTENSOR_ENABLE_ASSERT
-        EXPECT_ANY_THROW(masked_data.unchecked(3, 3));
-#endif
     }
 
     TEST(xmasked_view, access2)
@@ -132,15 +131,17 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
+        auto masked_value = masked<xtl::xoptional<double, bool>>();
+
         auto val = masked_data[{0, 0}];
         EXPECT_EQ(val, 1.);
         auto val2 = masked_data[{1, 0}];
-        EXPECT_EQ(val2, xtl::missing<double>());
+        EXPECT_EQ(val2, masked_value);
 
         auto index1 = std::array<int, 2>({0, 0});
         auto index2 = std::array<int, 2>({1, 0});
         EXPECT_EQ(masked_data[index1], 1.);
-        EXPECT_EQ(masked_data[index2], xtl::missing<double>());
+        EXPECT_EQ(masked_data[index2], masked_value);
     }
 
     TEST(xmasked_view, element)
@@ -148,19 +149,12 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
+        auto masked_value = masked<xtl::xoptional<double, bool>>();
+
         auto index1 = std::array<int, 2>({0, 0});
         auto index2 = std::array<int, 2>({1, 0});
         EXPECT_EQ(masked_data.element(index1.begin(), index1.end()), 1.);
-        EXPECT_EQ(masked_data.element(index2.begin(), index2.end()), xtl::missing<double>());
-    }
-
-    TEST(xmasked_view, storage)
-    {
-        auto data = make_test_data();
-        auto masked_data = make_masked_data(data);
-
-        EXPECT_EQ(data.storage().value(), masked_data.storage().value());
-        EXPECT_NE(data.storage().has_value(), masked_data.storage().has_value());
+        EXPECT_EQ(masked_data.element(index2.begin(), index2.end()), masked_value);
     }
 
     TEST(xmasked_view, fill)
@@ -170,14 +164,59 @@ namespace xt
 
         masked_data.fill(2.);
 
+        auto masked_value = masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data.at(0, 0), 2.);
         EXPECT_EQ(masked_data.at(0, 1), 2.);
         EXPECT_EQ(masked_data.at(0, 2), 2.);
-        EXPECT_EQ(masked_data.at(1, 0), xtl::missing<double>());
-        EXPECT_EQ(masked_data.at(1, 1), xtl::missing<double>());
-        EXPECT_EQ(masked_data.at(1, 2), xtl::missing<double>());
+        EXPECT_EQ(masked_data.at(1, 0), masked_value);
+        EXPECT_EQ(masked_data.at(1, 1), masked_value);
+        EXPECT_EQ(masked_data.at(1, 2), masked_value);
         EXPECT_EQ(masked_data.at(2, 0), 2.);
         EXPECT_EQ(masked_data.at(2, 1), 2.);
         EXPECT_EQ(masked_data.at(2, 2), 2.);
+
+        EXPECT_EQ(data.at(0, 0), 2.);
+        EXPECT_EQ(data.at(0, 1), 2.);
+        EXPECT_EQ(data.at(0, 2), 2.);
+        EXPECT_EQ(data.at(1, 0), xtl::missing<double>());
+        EXPECT_EQ(data.at(1, 1), 5.);
+        EXPECT_EQ(data.at(1, 2), 6.);
+        EXPECT_EQ(data.at(2, 0), 2.);
+        EXPECT_EQ(data.at(2, 1), 2.);
+        EXPECT_EQ(data.at(2, 2), 2.);
+    }
+
+    TEST(xmasked_view, non_optional_data)
+    {
+        xarray<double> data = {{ 1.,-2., 3.},
+                               { 4., 5.,-6.},
+                               { 7., 8.,-9.}};
+        xarray<bool> mask = {{ true,  true,  true},
+                             { true, false, false},
+                             { true, false,  true}};
+
+        auto masked_data = masked_view(data, mask);
+
+        auto masked_value = masked<double>();
+
+        EXPECT_EQ(masked_data(0, 0), 1.);
+        EXPECT_EQ(masked_data.at(0, 1),-2.);
+        EXPECT_EQ(masked_data.at(0, 2), 3.);
+        EXPECT_EQ(masked_data.unchecked(1, 0), 4.);
+        EXPECT_EQ(masked_data.unchecked(1, 1), masked_value);
+        auto index1 = std::array<int, 2>({1, 2});
+        EXPECT_EQ(masked_data[index1], masked_value);
+
+        masked_data = 3.65;
+        xarray<double> expected1 = {{3.65, 3.65, 3.65},
+                                   {3.65, 5.  ,-6.  },
+                                   {3.65, 8.  , 3.65}};
+        EXPECT_EQ(data, expected1);
+
+        masked_data += 3.;
+        xarray<double> expected2 = {{6.65, 6.65, 6.65},
+                                    {6.65, 5.  ,-6.  },
+                                    {6.65, 8.  , 6.65}};
+        EXPECT_EQ(data, expected2);
     }
 }
