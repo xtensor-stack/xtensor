@@ -116,7 +116,7 @@ all the slice types. The strided view does not support the slices returned by th
     auto v2 = xt::strided_view(a, { xt::range(0, 1), xt::newaxis(), 1, xt::all() });
     // v2 == v1
 
-    // ILLEGAL: 
+    // ILLEGAL:
     auto v2 = xt::strided_view(a, { xt::all(), xt::all(), xt::all(), xt::keep(0, 3), xt::drop(1, 4) });
     // xt::drop and xt::keep are not supported with strided views
 
@@ -196,7 +196,7 @@ the view modifies the underlying exression.
     auto v = xt::reshape_view(a, { 4, 2, 3 });
     // a(0, 0, 3) == v(0, 1, 0)
     // a(0, 1, 0) == v(0, 1, 1)
-    
+
     v(0, 2, 0) = 4;
     // a(0, 1, 2) == 4
 
@@ -262,35 +262,6 @@ the elements of the underlying ``xexpression`` are not copied. Filters should be
     v += 100;
     // => a = {{1, 105, 3}, {4, 105, 106}}
 
-Masked view
------------
-
-Masked views are multidimensional views that apply a mask on an expression.
-
-.. code::
-
-    #include "xtensor/xoptional_assembly.hpp"
-    #include "xtensor/xmasked_view.hpp"
-
-    using value_type = xt::xarray<double>;
-    using has_value_type = xt::xarray<bool>;
-
-    xt::xoptional_assembly<value_type, has_value_type> a = {
-        {1.0, 2.0, 3.0},
-        {2.0, 5.0, 7.0},
-        {2.0, 5.0, 7.0}};
-    // => a = {{ 1,   2,   3}, {  2,   5,   7}, {  2,   5,   7}}
-    a(0, 0).has_value() = false;
-    // => a = {{N/A,   2,   3}, {  2,   5,   7}, {  2,   5,   7}}
-
-    has_value_type mask = {
-        { true, true, true},
-        { true,false, true},
-        { true,false,false}};
-
-    auto m = xt::masked_view(a, mask);
-    // => m = {{N/A,   2,   3}, {  2, N/A,   7}, {  2, N/A, N/A}}
-
 Filtration
 ----------
 
@@ -307,6 +278,25 @@ computed scalar assignments.
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     filtration(a, a >= 5) += 100;
     // => a = {{1, 105, 3}, {4, 105, 106}}
+
+Masked view
+-----------
+
+Masked views are multidimensional views that apply a mask on an ``xexpression``.
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xmasked_view.hpp"
+
+    xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
+    xt::xarray<bool> mask = {{true, false, false}, {false, true, false}};
+
+    auto m = xt::masked_view(a, mask);
+    // => m = {{1, masked, masked}, {masked, 5, masked}}
+
+    m += 100;
+    // => a = {{101, 5, 3}, {4, 105, 6}}
 
 Broadcasting views
 ------------------
@@ -373,4 +363,3 @@ of ``RHS``. However, since views *cannot be resized*, when assigning an expressi
     auto tr = view(a, 0, all());
     tr = b;
     // => a = {{1.2, 1.2, 1.2}, {3., 4., 5.}}
-
