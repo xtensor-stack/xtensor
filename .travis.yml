@@ -126,7 +126,7 @@ install:
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
-    - conda install gtest cmake -c conda-forge
+    - conda install gtest=1.8.0 cmake -c conda-forge
     - conda install xtl==0.4.15 -c QuantStack
     - conda install xsimd -c QuantStack
     - conda install nlohmann_json -c QuantStack
