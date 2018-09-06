@@ -961,6 +961,15 @@ namespace xt
         return mime_bundle_repr_impl(expr);
     }
 
+    template <class CTD, class CTM>
+    class xmasked_view;
+
+    template <class CTD, class CTM>
+    xeus::xjson mime_bundle_repr(const xmasked_view<CTD, CTM>& expr)
+    {
+        return mime_bundle_repr_impl(expr);
+    }
+
     template <class T, class B>
     class xmasked_value;
 
