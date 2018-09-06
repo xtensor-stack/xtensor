@@ -82,6 +82,15 @@ namespace xt
         xt::random::shuffle(a);
         EXPECT_FALSE(std::is_sorted(a.begin(), a.end()));
 
+        xarray<double> b = a;
+        b.resize({b.size(), 1});
+        xt::random::seed(42);
+        xt::random::shuffle(a);
+        xt::random::seed(42);
+        xt::random::shuffle(b);
+        b.resize({b.size()});
+        EXPECT_EQ(a, b);
+
         a = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
         a.reshape({3, 4});
         auto ar = a;
