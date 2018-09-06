@@ -261,7 +261,17 @@ namespace xt
 
             if (de.dimension() == 1)
             {
-                std::shuffle(de.storage().begin(), de.storage().end(), engine);
+                using size_type = typename T::size_type;
+                auto first = de.begin();
+                auto last = de.end();
+
+                for (size_type i = (last - first) - 1; i > 0; --i)
+                {
+                    std::uniform_int_distribution<size_type> dist(0, i);
+                    auto j = dist(engine);
+                    using std::swap;
+                    swap(first[i], first[j]);
+                }
             }
             else
             {
