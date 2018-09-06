@@ -262,8 +262,8 @@ namespace xt
             if (de.dimension() == 1)
             {
                 using size_type = typename T::size_type;
-                auto first = de.storage().begin();
-                auto last = de.storage().end();
+                auto first = de.begin();
+                auto last = de.end();
 
                 for (size_type i = (last - first) - 1; i > 0; --i)
                 {
