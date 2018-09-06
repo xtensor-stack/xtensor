@@ -364,7 +364,6 @@ namespace xt
 
         xt::noalias(xt::view(a, 1)) = 10;
         xt::view(b, 1) = 10;
-
         EXPECT_EQ(a, b);
     }
 }
