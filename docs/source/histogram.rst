@@ -79,6 +79,3 @@ The following algorithms are available:
 *   ``logspace``: bins that logarithmically increase in size.
 
 *   ``uniform``: bin-edges such that the number of data-points is the same in all bins (as much as possible).
-
-
-
