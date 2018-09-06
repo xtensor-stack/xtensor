@@ -261,12 +261,13 @@ namespace xt
 
             if (de.dimension() == 1)
             {
+                using size_type = typename T::size_type;
                 auto first = de.storage().begin();
                 auto last = de.storage().end();
 
-                for (auto i = (last - first) - 1; i > 0; --i)
+                for (size_type i = (last - first) - 1; i > 0; --i)
                 {
-                    std::uniform_int_distribution<decltype(i)> dist(0, i);
+                    std::uniform_int_distribution<size_type> dist(0, i);
                     auto j = dist(engine);
                     using std::swap;
                     swap(first[i], first[j]);
