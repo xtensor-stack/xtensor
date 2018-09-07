@@ -27,12 +27,12 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: nancumsum(E&&)
    :project: xtensor
 
-.. doxygenfunction:: nancumsum(E&&, std::size_t)
+.. doxygenfunction:: nancumsum(E&&, std::ptrdiff_t)
    :project: xtensor
 
 .. _nancumprod-function-reference:
 .. doxygenfunction:: nancumprod(E&&)
    :project: xtensor
 
-.. doxygenfunction:: nancumprod(E&&, std::size_t)
+.. doxygenfunction:: nancumprod(E&&, std::ptrdiff_t)
    :project: xtensor

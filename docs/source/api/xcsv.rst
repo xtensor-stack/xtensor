@@ -4,13 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xaccumulator
-============
+xcsv
+====
 
-Defined in ``xtensor/xaccumulator.hpp``
+Defined in ``xtensor/xcsv.hpp``
 
-.. doxygenfunction:: xt::accumulate(F&&, E&&, EVS)
+.. doxygenfunction:: xt::load_csv
    :project: xtensor
 
-.. doxygenfunction:: xt::accumulate(F&&, E&&, std::ptrdiff_t, EVS)
+.. doxygenfunction:: xt::dump_csv
    :project: xtensor

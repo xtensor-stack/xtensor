@@ -121,7 +121,7 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
     template<class E1>
-    inline auto histogram(E1&& data, size_t bins = 10, bool density = false)
+    inline auto histogram(E1&& data, std::size_t bins = 10, bool density = false)
     {
         using value_type = typename std::decay_t<E1>::value_type;
 
@@ -144,7 +144,7 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
     template<class E1, class E2>
-    inline auto histogram(E1&& data, size_t bins, E2&& weights,
+    inline auto histogram(E1&& data, std::size_t bins, E2&& weights,
                           bool density = false)
     {
         auto bin_edges = histogram_bin_edges(data, weights, bins);
@@ -173,7 +173,7 @@ namespace xt
      */
     template<class E1, class E2, class E3>
     inline auto histogram_bin_edges(E1&& data, E2&& weights, E3 left, E3 right,
-                                    size_t bins = 10, 
+                                    std::size_t bins = 10,
                                     histogram_algorithm mode = histogram_algorithm::automatic)
     {
         // counter and return type
@@ -282,7 +282,7 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
     template<class E1, class E2>
-    inline auto histogram_bin_edges(E1&& data, E2&& weights, size_t bins = 10,
+    inline auto histogram_bin_edges(E1&& data, E2&& weights, std::size_t bins = 10,
                                     histogram_algorithm mode = histogram_algorithm::automatic)
     {
         using value_type = typename std::decay_t<E1>::value_type;
@@ -303,7 +303,7 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
     template<class E1>
-    inline auto histogram_bin_edges(E1&& data, size_t bins = 10,
+    inline auto histogram_bin_edges(E1&& data, std::size_t bins = 10,
                                     histogram_algorithm mode = histogram_algorithm::automatic)
     {
         using value_type = typename std::decay_t<E1>::value_type;
@@ -329,7 +329,7 @@ namespace xt
      */
     template<class E1, class E2>
     inline auto histogram_bin_edges(E1&& data, E2 left, E2 right,
-        size_t bins=10, histogram_algorithm mode=histogram_algorithm::automatic
+        std::size_t bins=10, histogram_algorithm mode=histogram_algorithm::automatic
     )
     {
         using value_type = typename std::decay_t<E1>::value_type;
@@ -360,24 +360,26 @@ namespace xt
     template <class E1, class E2, XTENSOR_REQUIRE<is_xexpression<std::decay_t<E2>>::value>>
     inline auto bincount(E1&& data, E2&& weights, std::size_t minlength = 0)
     {
-        using value_type = typename std::decay_t<E2>::value_type;
+        using result_value_type = typename std::decay_t<E2>::value_type;
+        using input_value_type = typename std::decay_t<E1>::value_type;
+        using size_type = typename std::decay_t<E1>::size_type;
 
         static_assert(std::is_integral<typename std::decay_t<E1>::value_type>::value, "Bincount data has to be integral type.");
         XTENSOR_ASSERT(data.dimension() == 1);
         XTENSOR_ASSERT(weights.dimension() == 1);
 
-        std::array<value_type, 2> left_right;
+        std::array<input_value_type, 2> left_right;
         left_right = xt::minmax(data)();
 
-        if (left_right[0] < 0)
+        if (left_right[0] < input_value_type(0))
         {
             throw std::runtime_error("Data argument for bincount can only contain positive integers!");
         }
 
-        xt::xtensor<value_type, 1> res = xt::zeros<value_type>({std::max(minlength,
-                                                                         std::size_t(left_right[1] + 1))});
+        xt::xtensor<result_value_type, 1> res =
+            xt::zeros<result_value_type>({std::max(minlength, std::size_t(left_right[1] + 1))});
 
-        for (std::size_t i = 0; i < data.size(); ++i)
+        for (size_type i = 0; i < data.size(); ++i)
         {
             res(data(i)) += weights(i);
         }

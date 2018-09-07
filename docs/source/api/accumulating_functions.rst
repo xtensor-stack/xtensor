@@ -15,12 +15,12 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: cumsum(E&&)
    :project: xtensor
 
-.. doxygenfunction:: cumsum(E&&, std::size_t)
+.. doxygenfunction:: cumsum(E&&, std::ptrdiff_t)
    :project: xtensor
 
 .. _cumprod-function-reference:
 .. doxygenfunction:: cumprod(E&&)
    :project: xtensor
 
-.. doxygenfunction:: cumprod(E&&, std::size_t)
+.. doxygenfunction:: cumprod(E&&, std::ptrdiff_t)
    :project: xtensor

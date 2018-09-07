@@ -2433,11 +2433,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @ingroup basic_functions
      * @brief Returns the one-dimensional piecewise linear interpolant to a function with given discrete data points (xp, fp), evaluated at x.
      *
-     * @param The x-coordinates at which to evaluate the interpolated values (sorted).
-     * @param The x-coordinates of the data points (sorted).
-     * @param The y-coordinates of the data points, same length as xp.
-     * @param Value to return for x < xp[0].
-     * @param Value to return for x > xp[-1]
+     * @param x The x-coordinates at which to evaluate the interpolated values (sorted).
+     * @param xp The x-coordinates of the data points (sorted).
+     * @param fp The y-coordinates of the data points, same length as xp.
+     * @param left Value to return for x < xp[0].
+     * @param right Value to return for x > xp[-1]
      * @return an one-dimensional xarray, same length as x.
      */
     template<class E1, class E2, class E3, typename T>
@@ -2517,9 +2517,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @ingroup basic_functions
      * @brief Returns the one-dimensional piecewise linear interpolant to a function with given discrete data points (xp, fp), evaluated at x.
      *
-     * @param The x-coordinates at which to evaluate the interpolated values (sorted).
-     * @param The x-coordinates of the data points (sorted).
-     * @param The y-coordinates of the data points, same length as xp.
+     * @param x The x-coordinates at which to evaluate the interpolated values (sorted).
+     * @param xp The x-coordinates of the data points (sorted).
+     * @param fp The y-coordinates of the data points, same length as xp.
      * @return an one-dimensional xarray, same length as x.
      */
     template<class E1, class E2, class E3>

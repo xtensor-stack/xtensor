@@ -16,3 +16,4 @@ Functions and generators
    xbuilder
    xsort
    xrandom
+   xhistogram
