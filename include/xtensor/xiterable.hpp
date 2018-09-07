@@ -403,25 +403,13 @@ namespace xt
         template <class S, layout_type L = DL>
         const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
 
-        const_storage_iterator storage_begin() const noexcept;
-        const_storage_iterator storage_end() const noexcept;
-
-        const_reverse_storage_iterator storage_rbegin() const noexcept;
-        const_reverse_storage_iterator storage_rend() const noexcept;
-
     private:
 
         derived_type& derived_cast();
         const derived_type& derived_cast() const;
-
     };
 
 #undef DL
-
-
-    /***********************
-     * Linear iterator api *
-     ***********************/
 
     /**********************************
      * xconst_iterable implementation *

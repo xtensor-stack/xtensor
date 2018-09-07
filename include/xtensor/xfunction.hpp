@@ -332,10 +332,10 @@ namespace xt
         using iterable_base::crbegin;
         using iterable_base::crend;
 
-        auto storage_begin() const noexcept;
-        auto storage_end() const noexcept;
-        auto storage_cbegin() const noexcept;
-        auto storage_cend() const noexcept;
+        const_storage_iterator storage_begin() const noexcept;
+        const_storage_iterator storage_end() const noexcept;
+        const_storage_iterator storage_cbegin() const noexcept;
+        const_storage_iterator storage_cend() const noexcept;
 
         const_reverse_storage_iterator storage_rbegin() const noexcept;
         const_reverse_storage_iterator storage_rend() const noexcept;
@@ -821,26 +821,26 @@ namespace xt
     //@}
 
     template <class F, class R, class... CT>
-    inline auto xfunction_base<F, R, CT...>::storage_begin() const noexcept
+    inline auto xfunction_base<F, R, CT...>::storage_begin() const noexcept -> const_storage_iterator
     {
         return storage_cbegin();
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_base<F, R, CT...>::storage_end() const noexcept
+    inline auto xfunction_base<F, R, CT...>::storage_end() const noexcept -> const_storage_iterator
     {
         return storage_cend();
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_base<F, R, CT...>::storage_cbegin() const noexcept
+    inline auto xfunction_base<F, R, CT...>::storage_cbegin() const noexcept -> const_storage_iterator
     {
         auto f = [](const auto& e) noexcept { return detail::trivial_begin(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class R, class... CT>
-    inline auto xfunction_base<F, R, CT...>::storage_cend() const noexcept
+    inline auto xfunction_base<F, R, CT...>::storage_cend() const noexcept -> const_storage_iterator
     {
         auto f = [](const auto& e) noexcept { return detail::trivial_end(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
