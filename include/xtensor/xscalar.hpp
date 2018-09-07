@@ -424,6 +424,16 @@ namespace xt
     bool operator<(const xdummy_iterator<is_const, CT>& lhs,
                    const xdummy_iterator<is_const, CT>& rhs) noexcept;
 
+    template <class T>
+    struct is_xdummy_iterator : std::false_type
+    {
+    };
+
+    template <bool is_const, class CT>
+    struct is_xdummy_iterator<xdummy_iterator<is_const, CT>> : std::true_type
+    {
+    };
+
     /*******************************
      * trivial_begin / trivial_end *
      *******************************/

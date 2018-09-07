@@ -1080,13 +1080,19 @@ namespace xt
     template <class F, class R, class... CT>
     inline bool xfunction_iterator<F, R, CT...>::equal(const self_type& rhs) const
     {
-        return p_f == rhs.p_f && m_it == rhs.m_it;
+        // Optimization: no need to compare each subiterator since they all
+        // are incremented decremented together.
+        constexpr std::size_t index = xtl::mpl::find_if<is_xdummy_iterator, data_type>::value;
+        return std::get<index>(m_it) == std::get<index>(rhs.m_it);
     }
 
     template <class F, class R, class... CT>
     inline bool xfunction_iterator<F, R, CT...>::less_than(const self_type& rhs) const
     {
-        return p_f == rhs.p_f && m_it < rhs.m_it;
+        // Optimization: no need to compare each subiterator since they all
+        // are incremented decremented together.
+        constexpr std::size_t index = xtl::mpl::find_if<is_xdummy_iterator, data_type>::value;
+        return std::get<index>(m_it) < std::get<index>(rhs.m_it);
     }
 
     template <class F, class R, class... CT>
