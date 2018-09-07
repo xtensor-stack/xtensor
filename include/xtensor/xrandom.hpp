@@ -79,6 +79,14 @@ namespace xt
         void shuffle(xexpression<T>& e, E& engine = random::get_default_random_engine());
 
         template <class T, class E = random::default_engine_type>
+        std::enable_if_t<std::is_integral<T>::value, xtensor<T, 1>>
+        permutation(T e, E& engine = random::get_default_random_engine());
+
+        template <class T, class E = random::default_engine_type>
+        std::enable_if_t<is_xexpression<std::decay_t<T>>::value, std::decay_t<T>>
+        permutation(T&& e, E& engine = random::get_default_random_engine());
+
+        template <class T, class E = random::default_engine_type>
         xtensor<typename T::value_type, 1> choice(const xexpression<T>& e, std::size_t n, bool replace = true,
                                                   E& engine = random::get_default_random_engine());
     }
@@ -265,7 +273,7 @@ namespace xt
                 auto first = de.begin();
                 auto last = de.end();
 
-                for (size_type i = (last - first) - 1; i > 0; --i)
+                for (size_type i = std::size_t((last - first) - 1); i > 0; --i)
                 {
                     std::uniform_int_distribution<size_type> dist(0, i);
                     auto j = dist(engine);
@@ -289,6 +297,40 @@ namespace xt
                 }
             }
         }
+
+        /**
+         * Randomly permute a sequence, or return a permuted range.
+         *
+         * If the first parameter is an integer, this function creates a new
+         * ``arange(e)`` and returns it randomly permuted. Otherwise, this
+         * function creates a copy of the input, passes it to @sa shuffle and
+         * returns the result.
+         *
+         * @param e input xexpression or integer
+         * @param engine random number engine to use (optional)
+         *
+         * @return randomly permuted copy of container or arange.
+         */
+        template <class T, class E>
+        std::enable_if_t<std::is_integral<T>::value, xtensor<T, 1>>
+        permutation(T e, E& engine)
+        {
+            xt::xtensor<T, 1> res = xt::arange<T>(e);
+            shuffle(res, engine);
+            return res;
+        }
+
+        /// @cond DOXYGEN_INCLUDE_SFINAE
+        template <class T, class E>
+        std::enable_if_t<is_xexpression<std::decay_t<T>>::value, std::decay_t<T>>
+        permutation(T&& e, E& engine)
+        {
+            using copy_type = std::decay_t<T>;
+            copy_type res = e;
+            shuffle(res, engine);
+            return res;
+        }
+        /// @endcond
 
         /**
          * Randomly select n unique elements from xexpression e.

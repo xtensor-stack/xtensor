@@ -29,3 +29,6 @@ Defined in ``xtensor/xrandom.hpp``
 
 .. doxygenfunction:: xt::random::shuffle
    :project: xtensor
+
+.. doxygenfunction:: xt::random::permutation(T, E&)
+   :project: xtensor

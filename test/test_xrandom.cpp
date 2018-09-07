@@ -127,4 +127,20 @@ namespace xt
 #endif
 
     }
+
+    TEST(xrandom, permutation)
+    {
+        xt::random::seed(123);
+        auto r1 = xt::random::permutation(12);
+        xt::random::seed(123);
+        xtensor<int, 1> a1 = arange<int>(12);
+        xtensor<int, 1> ac1 = a1;
+        xt::random::shuffle(a1);
+        EXPECT_EQ(a1, r1);
+        EXPECT_NE(r1, ac1);
+
+        xt::random::seed(123);
+        auto r2 = xt::random::permutation(ac1);
+        EXPECT_EQ(a1, r2);
+    }
 }
