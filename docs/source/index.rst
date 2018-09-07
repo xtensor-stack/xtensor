@@ -48,7 +48,7 @@ for details.
 
 .. toctree::
    :caption: INSTALLATION
-   :maxdepth: 2
+   :maxdepth: 1
 
    installation
    changelog
@@ -67,6 +67,7 @@ for details.
    view
    builder
    missing
+   file_loading
 
 .. toctree::
    :caption: API REFERENCE

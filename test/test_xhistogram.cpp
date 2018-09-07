@@ -38,4 +38,20 @@ namespace xt
             EXPECT_EQ(count[1]    , 2.);
         }
     }
+
+    TEST(xhistogram, bincount)
+    {
+        xtensor<int, 1> data = {1,2,3,1,1,1,1,2,3,2,3,3,3,3};
+        xtensor<int, 1> weights = xt::ones<int>(data.shape()) * 3;
+        xtensor<int, 1> expc = {0, 5, 3, 6};
+        auto bc = bincount(data);
+        EXPECT_EQ(bc, expc);
+
+        auto bc2 = bincount(data, weights);
+        EXPECT_EQ(bc2, expc * 3);
+
+        auto bc3 = bincount(data, 10);
+        EXPECT_EQ(bc3.size(), 10);
+        EXPECT_EQ(bc3(3), expc(3));
+    }
 }

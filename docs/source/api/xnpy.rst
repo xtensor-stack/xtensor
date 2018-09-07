@@ -4,13 +4,13 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xaccumulator
-============
+xnpy
+====
 
-Defined in ``xtensor/xaccumulator.hpp``
+Defined in ``xtensor/xnpy.hpp``
 
-.. doxygenfunction:: xt::accumulate(F&&, E&&, EVS)
+.. doxygenfunction:: xt::load_npy
    :project: xtensor
 
-.. doxygenfunction:: xt::accumulate(F&&, E&&, std::ptrdiff_t, EVS)
+.. doxygenfunction:: xt::dump_npy
    :project: xtensor
