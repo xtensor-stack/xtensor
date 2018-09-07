@@ -204,7 +204,6 @@ namespace xt
             case histogram_algorithm::automatic :
             {
                 xt::xtensor<value_type,1> bin_edges = xt::linspace<value_type>(left, right, bins+1);
-
                 return bin_edges;
             }
 
@@ -212,7 +211,6 @@ namespace xt
             case histogram_algorithm::linspace :
             {
                 xt::xtensor<value_type,1> bin_edges = xt::linspace<value_type>(left, right, bins+1);
-
                 return bin_edges;
             }
 
@@ -239,7 +237,7 @@ namespace xt
 
                 // histogram: all of equal 'height'
                 // - height
-                weights_type w = xt::sum(weights)[0]/static_cast<weights_type>(bins);
+                weights_type w = xt::sum<weights_type>(weights)[0]/static_cast<weights_type>(bins);
                 // - apply to all bins
                 xt::xtensor<weights_type,1> count = w * xt::ones<weights_type>({bins});
 
@@ -258,16 +256,20 @@ namespace xt
                 // - current bin
                 size_type ibin = 0;
                 // - loop to find interior bin-edges
-                for (size_type i = 0 ; i < weights.size() ; ++i)
+                for (size_type i = 0; i < weights.size(); ++i)
                 {
                     if (cum_weight >= count[ibin])
                     {
-                        bin_edges[ibin+1] = data[isort[i]];
+                        bin_edges[ibin + 1] = data[isort[i]];
                         ++ibin;
                     }
                     cum_weight += weights[isort[i]];
                 }
-
+                return bin_edges;
+            }
+            default:
+            {
+                xt::xtensor<value_type, 1> bin_edges = xt::linspace<value_type>(left, right, bins + 1);
                 return bin_edges;
             }
         }
