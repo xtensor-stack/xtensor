@@ -903,7 +903,7 @@ namespace xt
     inline xstrided_container<D>::xstrided_container() noexcept
         : base_type()
     {
-        m_shape = xtl::make_sequence<inner_shape_type>(base_type::dimension(), 1);
+        m_shape = xtl::make_sequence<inner_shape_type>(base_type::dimension(), 0);
         m_strides = xtl::make_sequence<inner_strides_type>(base_type::dimension(), 0);
         m_backstrides = xtl::make_sequence<inner_backstrides_type>(base_type::dimension(), 0);
     }

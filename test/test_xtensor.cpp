@@ -11,10 +11,20 @@
 #include "xtensor/xarray.hpp"
 #include "test_common.hpp"
 
+#include "xtensor/xio.hpp"
+
 namespace xt
 {
     using storage_type = std::array<std::size_t, 3>;
     using xtensor_dynamic = xtensor<int, 3, layout_type::dynamic>;
+
+    TEST(xtensor, default_constructor)
+    {
+        xtensor_dynamic a = {};
+        a.size();
+        EXPECT_EQ(a.size(), size_t(0));
+        EXPECT_EQ(a.dimension(), size_t(3));
+    }
 
     TEST(xtensor, initializer_constructor)
     {
@@ -226,8 +236,8 @@ namespace xt
 
     TEST(xtensor, zerod)
     {
-        xtensor_dynamic a;
-        EXPECT_EQ(0, a());
+        xtensor<int, 0> b;
+        EXPECT_EQ(b(), 0);
     }
 
     TEST(xtensor, xiterator)

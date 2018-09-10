@@ -227,7 +227,7 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline xtensor_container<EC, N, L, Tag>::xtensor_container()
-        : base_type(), m_storage(1, value_type())
+        : base_type(), m_storage(N == 0 ? 1 : 0, value_type())
     {
     }
 
@@ -357,11 +357,10 @@ namespace xt
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(const xexpression<E>& e)
         : base_type()
     {
+        XTENSOR_ASSERT_MSG(N == e.derived_cast().dimension(), "Cannot change dimension of xtensor.");
         // Avoids unintialized data because of (m_shape == shape) condition
-        // in resize (called by assign), which is always true when size() == 1.
-        // The condition dimension() == 0 as in xarray is not sufficient because
-        // the shape is always initialized since it has a static number of dimensions.
-        if (e.derived_cast().size() == 1)
+        // in resize (called by assign), which is always true when dimension() == 0.
+        if (e.derived_cast().dimension() == 0)
         {
             detail::resize_data_container(m_storage, std::size_t(1));
         }
