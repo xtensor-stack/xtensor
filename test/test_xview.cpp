@@ -946,16 +946,13 @@ namespace xt
         auto v = xt::view(x, all(), 0);
 
         auto it1 = v.begin();
-        auto it2 = v.storage_begin();
         auto it3 = v.rbegin();
-        auto it4 = v.storage_rbegin();
+
         for (std::size_t i = 0; i < expected.size(); ++i)
         {
             std::ptrdiff_t ix = static_cast<std::ptrdiff_t>(i);
             EXPECT_EQ(*(it1 + ix), expected[i]);
-            EXPECT_EQ(*(it2 + ix), expected[i]);
             EXPECT_EQ(*(it3 + ix), expected[expected.size() - 1 - i]);
-            EXPECT_EQ(*(it4 + ix), expected[expected.size() - 1 - i]);
         }
     }
 

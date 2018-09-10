@@ -362,6 +362,13 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
+        using storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value,
+                                                    typename xexpression_type::storage_iterator,
+                                                    typename iterable_base::storage_iterator>;
+        using const_storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value,
+                                                    typename xexpression_type::const_storage_iterator,
+                                                    typename iterable_base::const_storage_iterator>;
+
         using container_iterator = pointer;
         using const_container_iterator = const_pointer;
 
@@ -458,6 +465,30 @@ namespace xt
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
         storage() const;
+
+        template <class T = xexpression_type>
+        std::enable_if_t<has_data_interface<T>::value && is_strided_view, storage_iterator>
+        storage_begin();
+
+        template <class T = xexpression_type>
+        std::enable_if_t<has_data_interface<T>::value && is_strided_view, storage_iterator>
+        storage_end();
+
+        template <class T = xexpression_type>
+        std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
+        storage_cbegin() const;
+        
+        template <class T = xexpression_type>
+        std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
+        storage_cend() const;
+
+        template <class T = xexpression_type>
+        std::enable_if_t<!(has_data_interface<T>::value && is_strided_view), const_storage_iterator>
+        storage_cbegin() const;
+        
+        template <class T = xexpression_type>
+        std::enable_if_t<!(has_data_interface<T>::value && is_strided_view), const_storage_iterator>
+        storage_cend() const;
 
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value && is_strided_view, const inner_strides_type&>
@@ -821,7 +852,7 @@ namespace xt
     template <class E>
     inline auto xview<CT, S...>::operator=(const E& e) -> disable_xexpression<E, self_type>&
     {
-        std::fill(this->begin(), this->end(), e);
+        this->fill(e);
         return *this;
     }
 
@@ -903,7 +934,14 @@ namespace xt
     template <class T>
     inline void xview<CT, S...>::fill(const T& value)
     {
-        std::fill(this->storage_begin(), this->storage_end(), value);
+        if (layout() != layout_type::dynamic)
+        {
+            std::fill(this->storage_begin(), this->storage_end(), value);
+        }
+        else
+        {
+            std::fill(this->begin(), this->end(), value);
+        }
     }
 
     /**
@@ -1120,6 +1158,54 @@ namespace xt
         std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
     {
         return m_e.storage();
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    auto xview<CT, S...>::storage_begin()
+        -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, storage_iterator>
+    {
+        return m_e.storage_begin() + data_offset();
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    auto xview<CT, S...>::storage_end()
+        -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, storage_iterator>
+    {
+        return m_e.storage_begin() + data_offset() + size();
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    auto xview<CT, S...>::storage_cbegin() const
+        -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
+    {
+        return m_e.storage_cbegin() + data_offset();
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    auto xview<CT, S...>::storage_cend() const
+        -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
+    {
+        return m_e.storage_cbegin() + data_offset() + size();
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    auto xview<CT, S...>::storage_cbegin() const
+        -> std::enable_if_t<!(has_data_interface<T>::value && is_strided_view), const_storage_iterator>
+    {
+        return iterable_base::storage_cbegin();
+    }
+
+    template <class CT, class... S>
+    template <class T>
+    auto xview<CT, S...>::storage_cend() const
+        -> std::enable_if_t<!(has_data_interface<T>::value && is_strided_view), const_storage_iterator>
+    {
+        return iterable_base::storage_cend();
     }
 
     /**

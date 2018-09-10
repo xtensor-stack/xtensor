@@ -211,8 +211,8 @@ namespace xt
         template <class E1, class E2>
         inline bool is_trivial_broadcast(const E1& e1, const E2& e2)
         {
-            return (E1::contiguous_layout && E2::contiguous_layout && trivial_static_layout<E1, E2>())
-                    || e2.is_trivial_broadcast(e1.strides());
+            return (E1::contiguous_layout && E2::contiguous_layout && trivial_static_layout<E1, E2>()) ||
+                   (e1.layout() != layout_type::dynamic && e2.is_trivial_broadcast(e1.strides()));
         }
 
         // TODO refactor with has_simd_interface
