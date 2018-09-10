@@ -332,22 +332,14 @@ namespace xt
         using iterable_base::crbegin;
         using iterable_base::crend;
 
-        template <layout_type L = DL>
-        auto storage_begin() const noexcept;
-        template <layout_type L = DL>
-        auto storage_end() const noexcept;
-        template <layout_type L = DL>
-        auto storage_cbegin() const noexcept;
-        template <layout_type L = DL>
-        auto storage_cend() const noexcept;
+        const_storage_iterator storage_begin() const noexcept;
+        const_storage_iterator storage_end() const noexcept;
+        const_storage_iterator storage_cbegin() const noexcept;
+        const_storage_iterator storage_cend() const noexcept;
 
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_rbegin() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_rend() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_crbegin() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_crend() const noexcept;
 
         template <class S>
@@ -829,65 +821,53 @@ namespace xt
     //@}
 
     template <class F, class R, class... CT>
-    template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_begin() const noexcept
-        //  -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_begin() const noexcept -> const_storage_iterator
     {
-        return storage_cbegin<L>();
+        return storage_cbegin();
     }
 
     template <class F, class R, class... CT>
-    template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_end() const noexcept
-        //  -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_end() const noexcept -> const_storage_iterator
     {
-        return storage_cend<L>();
+        return storage_cend();
     }
 
     template <class F, class R, class... CT>
-    template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_cbegin() const noexcept
-        //  -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_cbegin() const noexcept -> const_storage_iterator
     {
         auto f = [](const auto& e) noexcept { return detail::trivial_begin(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class R, class... CT>
-    template <layout_type L>
-    inline auto xfunction_base<F, R, CT...>::storage_cend() const noexcept
-        //  -> const_storage_iterator
+    inline auto xfunction_base<F, R, CT...>::storage_cend() const noexcept -> const_storage_iterator
     {
         auto f = [](const auto& e) noexcept { return detail::trivial_end(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class R, class... CT>
-    template <layout_type L>
     inline auto xfunction_base<F, R, CT...>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
     {
-        return storage_crbegin<L>();
+        return storage_crbegin();
     }
 
     template <class F, class R, class... CT>
-    template <layout_type L>
     inline auto xfunction_base<F, R, CT...>::storage_rend() const noexcept -> const_reverse_storage_iterator
     {
-        return storage_crend<L>();
+        return storage_crend();
     }
 
     template <class F, class R, class... CT>
-    template <layout_type L>
     inline auto xfunction_base<F, R, CT...>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
     {
-        return const_reverse_storage_iterator(storage_cend<L>());
+        return const_reverse_storage_iterator(storage_cend());
     }
 
     template <class F, class R, class... CT>
-    template <layout_type L>
     inline auto xfunction_base<F, R, CT...>::storage_crend() const noexcept -> const_reverse_storage_iterator
     {
-        return const_reverse_storage_iterator(storage_cbegin<L>());
+        return const_reverse_storage_iterator(storage_cbegin());
     }
 
     template <class F, class R, class... CT>

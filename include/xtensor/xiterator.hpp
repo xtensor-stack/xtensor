@@ -404,13 +404,13 @@ namespace xt
         template <class C>
         XTENSOR_CONSTEXPR_RETURN auto trivial_begin(const C& c) noexcept
         {
-            return c.storage_begin();
+            return c.storage_cbegin();
         }
 
         template <class C>
         XTENSOR_CONSTEXPR_RETURN auto trivial_end(const C& c) noexcept
         {
-            return c.storage_end();
+            return c.storage_cend();
         }
     }
 

@@ -346,7 +346,7 @@ namespace xt
 
         using storage_type = xtl::mpl::eval_if_t<has_data_interface<xexpression_type>,
                                                  detail::expr_storage_type<xexpression_type>,
-                                                 detail::void_wrapper>;
+                                                 make_invalid_type<>>;
 
         using inner_strides_type = std::conditional_t<is_contiguous_view, 
                                                       typename detail::unwrap_offset_container<xexpression_type::static_layout, xexpression_inner_strides_type, integral_count<S...>()>::type,

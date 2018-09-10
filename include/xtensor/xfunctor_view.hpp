@@ -260,32 +260,20 @@ namespace xt
         template <class S, layout_type L = DL>
         const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
 
-        template <layout_type L = DL>
         storage_iterator storage_begin() noexcept;
-        template <layout_type L = DL>
         storage_iterator storage_end() noexcept;
 
-        template <layout_type L = DL>
         const_storage_iterator storage_begin() const noexcept;
-        template <layout_type L = DL>
         const_storage_iterator storage_end() const noexcept;
-        template <layout_type L = DL>
         const_storage_iterator storage_cbegin() const noexcept;
-        template <layout_type L = DL>
         const_storage_iterator storage_cend() const noexcept;
 
-        template <layout_type L = DL>
         reverse_storage_iterator storage_rbegin() noexcept;
-        template <layout_type L = DL>
         reverse_storage_iterator storage_rend() noexcept;
 
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_rbegin() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_rend() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_crbegin() const noexcept;
-        template <layout_type L = DL>
         const_reverse_storage_iterator storage_crend() const noexcept;
 
         template <class S>
@@ -1083,87 +1071,75 @@ namespace xt
     //@}
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_begin() noexcept -> storage_iterator
     {
-        return storage_iterator(m_e.template storage_begin<L>(), &m_functor);
+        return storage_iterator(m_e.storage_begin(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_end() noexcept -> storage_iterator
     {
-        return storage_iterator(m_e.template storage_end<L>(), &m_functor);
+        return storage_iterator(m_e.storage_end(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_begin() const noexcept -> const_storage_iterator
     {
-        return const_storage_iterator(m_e.template storage_begin<L>(), &m_functor);
+        return const_storage_iterator(m_e.storage_begin(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_end() const noexcept -> const_storage_iterator
     {
-        return const_storage_iterator(m_e.template storage_end<L>(), &m_functor);
+        return const_storage_iterator(m_e.storage_end(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_cbegin() const noexcept -> const_storage_iterator
     {
-        return const_storage_iterator(m_e.template storage_cbegin<L>(), &m_functor);
+        return const_storage_iterator(m_e.storage_cbegin(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_cend() const noexcept -> const_storage_iterator
     {
-        return const_storage_iterator(m_e.template storage_cend<L>(), &m_functor);
+        return const_storage_iterator(m_e.storage_cend(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_rbegin() noexcept -> reverse_storage_iterator
     {
-        return reverse_storage_iterator(m_e.template storage_rbegin<L>(), &m_functor);
+        return reverse_storage_iterator(m_e.storage_rbegin(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_rend() noexcept -> reverse_storage_iterator
     {
-        return reverse_storage_iterator(m_e.template storage_rend<L>(), &m_functor);
+        return reverse_storage_iterator(m_e.storage_rend(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
     {
-        return const_reverse_storage_iterator(m_e.template storage_rbegin<L>(), &m_functor);
+        return const_reverse_storage_iterator(m_e.storage_rbegin(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_rend() const noexcept -> const_reverse_storage_iterator
     {
-        return const_reverse_storage_iterator(m_e.template storage_rend<L>(), &m_functor);
+        return const_reverse_storage_iterator(m_e.storage_rend(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
     {
-        return const_reverse_storage_iterator(m_e.template storage_crbegin<L>(), &m_functor);
+        return const_reverse_storage_iterator(m_e.storage_crbegin(), &m_functor);
     }
 
     template <class F, class CT>
-    template <layout_type L>
     inline auto xfunctor_view<F, CT>::storage_crend() const noexcept -> const_reverse_storage_iterator
     {
-        return const_reverse_storage_iterator(m_e.template storage_crend<L>(), &m_functor);
+        return const_reverse_storage_iterator(m_e.storage_crend(), &m_functor);
     }
 
     /***************

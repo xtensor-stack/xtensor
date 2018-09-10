@@ -327,7 +327,7 @@ namespace xt
     template <class T>
     inline void xindex_view<CT, I>::fill(const T& value)
     {
-        std::fill(this->storage_begin(), this->storage_end(), value);
+        std::fill(this->begin(), this->end(), value);
     }
 
     /**
