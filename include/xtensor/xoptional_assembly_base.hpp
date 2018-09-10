@@ -216,9 +216,6 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
-        reference data_element(size_type i);
-        const_reference data_element(size_type i) const;
-
         value_expression& value() noexcept;
         const value_expression& value() const noexcept;
 
@@ -786,18 +783,6 @@ namespace xt
     inline auto xoptional_assembly_base<D>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
         return const_stepper(value().stepper_end(shape, l), has_value().stepper_end(shape, l));
-    }
-
-    template <class D>
-    inline auto xoptional_assembly_base<D>::data_element(size_type i) -> reference
-    {
-        return reference(value().data_element(i), has_value().data_element(i));
-    }
-
-    template <class D>
-    inline auto xoptional_assembly_base<D>::data_element(size_type i) const -> const_reference
-    {
-        return const_reference(value().data_element(i), has_value().data_element(i));
     }
 
     /**
