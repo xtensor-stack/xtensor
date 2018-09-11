@@ -25,7 +25,7 @@ namespace xt
      ***************************/
 
     /**
-     * @class xcontainer
+     * @class xoptional_assembly_base
      * @brief Base class for dense multidimensional optional assemblies.
      *
      * The xoptional_assembly_base class defines the interface for dense multidimensional

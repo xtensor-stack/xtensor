@@ -36,8 +36,6 @@ namespace xt
         using const_stepper = xstepper<const D>;
     };
 
-#define DL XTENSOR_DEFAULT_LAYOUT
-
     namespace detail
     {
         template <class T>
@@ -97,7 +95,7 @@ namespace xt
         using inner_strides_type = typename inner_types::inner_strides_type;
         using inner_backstrides_type = typename inner_types::inner_backstrides_type;
 
-        using iterable_base = xiterable<D>;
+        using iterable_base = xcontiguous_iterable<D>;
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
@@ -236,9 +234,6 @@ namespace xt
 
     private:
 
-        friend class xiterable<D>;
-        friend class xconst_iterable<D>;
-
         template <class C>
         friend class xstepper;
 
@@ -249,8 +244,6 @@ namespace xt
         inner_strides_type& mutable_strides();
         inner_backstrides_type& mutable_backstrides();
     };
-
-#undef DL
 
     /**
      * @class xstrided_container

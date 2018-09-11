@@ -110,16 +110,6 @@ namespace xt
         template <class S, layout_type L = DL>
         const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
 
-        const_storage_iterator storage_begin() const noexcept;
-        const_storage_iterator storage_end() const noexcept;
-        const_storage_iterator storage_cbegin() const noexcept;
-        const_storage_iterator storage_cend() const noexcept;
-
-        const_reverse_storage_iterator storage_rbegin() const noexcept;
-        const_reverse_storage_iterator storage_rend() const noexcept;
-        const_reverse_storage_iterator storage_crbegin() const noexcept;
-        const_reverse_storage_iterator storage_crend() const noexcept;
-
     protected:
 
         const inner_shape_type& get_shape() const;
@@ -222,12 +212,6 @@ namespace xt
         template <class S, layout_type L = DL>
         reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
 
-        storage_iterator storage_begin() noexcept;
-        storage_iterator storage_end() noexcept;
-
-        reverse_storage_iterator storage_rbegin() noexcept;
-        reverse_storage_iterator storage_rend() noexcept;
-
     private:
 
         template <layout_type L>
@@ -253,11 +237,26 @@ namespace xt
         derived_type& derived_cast();
     };
 
-    template <class T>
-    struct xcontainer_inner_types;
+    /************************
+     * xcontiguous_iterable *
+     ************************/
 
     template <class D>
-    class xcontiguous_iterable : public xiterable<D>
+    struct xcontainer_inner_types;
+
+    /**
+     * @class xcontiguous_iterable
+     * @brief Base class for multidimensional iterable expressions with
+     * contiguous storage
+     *
+     * The xcontiguous_iterable class defines the interface for multidimensional
+     * expressions with contiguous that can be iterated.
+     *
+     * @tparam D The derived type, i.e. the inheriting class for which xcontiguous_iterable
+     *           provides the interface.
+     */
+    template <class D>
+    class xcontiguous_iterable : private xiterable<D>
     {
     public:
 
@@ -265,35 +264,12 @@ namespace xt
 
         using inner_types = xcontainer_inner_types<D>;
         using storage_type = typename inner_types::storage_type;
-        // using allocator_type = allocator_type_t<std::decay_t<storage_type>>;
-        using value_type = typename storage_type::value_type;
-        using reference = std::conditional_t<std::is_const<storage_type>::value,
-                                             typename storage_type::const_reference,
-                                             typename storage_type::reference>;
-        using const_reference = typename storage_type::const_reference;
-        using pointer = typename storage_type::pointer;
-        using const_pointer = typename storage_type::const_pointer;
-        using size_type = typename storage_type::size_type;
-        using difference_type = typename storage_type::difference_type;
-        using simd_value_type = xsimd::simd_type<value_type>;
-
-        using shape_type = typename inner_types::shape_type;
-        using strides_type = typename inner_types::strides_type;
-        using backstrides_type = typename inner_types::backstrides_type;
-
-        using inner_shape_type = typename inner_types::inner_shape_type;
-        using inner_strides_type = typename inner_types::inner_strides_type;
-        using inner_backstrides_type = typename inner_types::inner_backstrides_type;
 
         using iterable_base = xiterable<D>;
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
         static constexpr layout_type static_layout = inner_types::layout;
-        static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
-        using data_alignment = xsimd::container_alignment_t<storage_type>;
-        using simd_type = xsimd::simd_type<value_type>;
-
 
 #if defined(_MSC_VER) && _MSC_VER >= 1910
         // Workaround for compiler bug in Visual Studio 2017 with respect to alias templates with non-type parameters.
@@ -407,6 +383,9 @@ namespace xt
 
         derived_type& derived_cast();
         const derived_type& derived_cast() const;
+
+        friend class xiterable<D>;
+        friend class xconst_iterable<D>;
     };
 
 #undef DL
@@ -640,54 +619,6 @@ namespace xt
     //@}
 
     template <class D>
-    inline auto xconst_iterable<D>::storage_begin() const noexcept -> const_storage_iterator
-    {
-        return this->template cbegin<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xconst_iterable<D>::storage_end() const noexcept -> const_storage_iterator
-    {
-        return this->template cend<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xconst_iterable<D>::storage_cbegin() const noexcept -> const_storage_iterator
-    {
-        return this->template cbegin<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xconst_iterable<D>::storage_cend() const noexcept -> const_storage_iterator
-    {
-        return this->template cend<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xconst_iterable<D>::storage_rbegin() const noexcept -> const_reverse_storage_iterator
-    {
-        return this->template crbegin<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xconst_iterable<D>::storage_rend() const noexcept -> const_reverse_storage_iterator
-    {
-        return this->template crend<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xconst_iterable<D>::storage_crbegin() const noexcept -> const_reverse_storage_iterator
-    {
-        return this->template crbegin<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xconst_iterable<D>::storage_crend() const noexcept -> const_reverse_storage_iterator
-    {
-        return this->template crend<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
     template <layout_type L>
     inline auto xconst_iterable<D>::get_cbegin(bool end_index) const noexcept -> const_layout_iterator<L>
     {
@@ -868,30 +799,6 @@ namespace xt
     //@}
 
     template <class D>
-    inline auto xiterable<D>::storage_begin() noexcept -> storage_iterator
-    {
-        return this->template begin<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xiterable<D>::storage_end() noexcept -> storage_iterator
-    {
-        return this->template end<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xiterable<D>::storage_rbegin() noexcept -> reverse_storage_iterator
-    {
-        return this->template rbegin<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
-    inline auto xiterable<D>::storage_rend() noexcept -> reverse_storage_iterator
-    {
-        return this->template rend<XTENSOR_DEFAULT_LAYOUT>();
-    }
-
-    template <class D>
     template <layout_type L>
     inline auto xiterable<D>::get_begin(bool end_index) noexcept -> layout_iterator<L>
     {
@@ -953,10 +860,18 @@ namespace xt
         return *static_cast<derived_type*>(this);
     }
 
-    /****************************
-     * xcontiguous iterator api *
-     ****************************/
+    /***************************************
+     * xcontiguous_iterable implementation *
+     ***************************************/
 
+     /**
+      * @name Iterators
+      */
+     //@{
+     /**
+      * Returns an iterator to the first element of the expression.
+      * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+      */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::begin() noexcept -> select_iterator<L>
@@ -970,6 +885,11 @@ namespace xt
         });
     }
 
+    /**
+     * Returns an iterator to the element following the last element
+     * of the expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::end() noexcept -> select_iterator<L>
@@ -983,6 +903,10 @@ namespace xt
         });
     }
 
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::begin() const noexcept -> select_const_iterator<L>
@@ -990,6 +914,11 @@ namespace xt
         return this->template cbegin<L>();
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::end() const noexcept -> select_const_iterator<L>
@@ -997,6 +926,10 @@ namespace xt
         return this->template cend<L>();
     }
 
+    /**
+     * Returns a constant iterator to the first element of the expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::cbegin() const noexcept -> select_const_iterator<L>
@@ -1010,6 +943,11 @@ namespace xt
         });
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::cend() const noexcept -> select_const_iterator<L>
@@ -1022,7 +960,16 @@ namespace xt
             return self(*this).iterable_base::template cend<L>();
         });
     }
+    //@}
 
+    /**
+     * @name Reverse iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the reversed expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::rbegin() noexcept -> select_reverse_iterator<L>
@@ -1036,6 +983,11 @@ namespace xt
         });
     }
 
+    /**
+     * Returns an iterator to the element following the last element
+     * of the reversed expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::rend() noexcept -> select_reverse_iterator<L>
@@ -1049,6 +1001,10 @@ namespace xt
         });
     }
 
+    /**
+     * Returns a constant iterator to the first element of the reversed expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::rbegin() const noexcept -> select_const_reverse_iterator<L>
@@ -1056,6 +1012,12 @@ namespace xt
         return this->template crbegin<L>();
     }
 
+
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the reversed expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::rend() const noexcept -> select_const_reverse_iterator<L>
@@ -1063,6 +1025,10 @@ namespace xt
         return this->template crend<L>();
     }
 
+    /**
+     * Returns a constant iterator to the first element of the reversed expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::crbegin() const noexcept -> select_const_reverse_iterator<L>
@@ -1076,6 +1042,11 @@ namespace xt
         });
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element
+     * of the reversed expression.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <layout_type L>
     inline auto xcontiguous_iterable<D>::crend() const noexcept -> select_const_reverse_iterator<L>
@@ -1088,11 +1059,19 @@ namespace xt
             return self(*this).iterable_base::template crend<L>();
         });
     }
+    //@}
 
-    /*****************************
-     * Broadcasting iterator api *
-     *****************************/
-
+    /**
+     * @name Broadcast iterators
+     */
+     /**
+      * Returns an iterator to the first element of the expression. The
+      * iteration is broadcasted to the specified shape.
+      * @param shape the shape used for broadcasting
+      * @tparam S type of the \c shape parameter.
+      * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+      */
+    //@{
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::begin(const S& shape) noexcept -> broadcast_iterator<S, L>
@@ -1100,6 +1079,13 @@ namespace xt
         return iterable_base::template begin<S, L>(shape);
     }
 
+    /**
+     * Returns an iterator to the element following the last element of the
+     * expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
@@ -1107,6 +1093,13 @@ namespace xt
         return iterable_base::template end<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the expression. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::begin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
@@ -1114,6 +1107,13 @@ namespace xt
         return iterable_base::template begin<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::end(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
@@ -1121,6 +1121,13 @@ namespace xt
         return iterable_base::template end<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the expression. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::cbegin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
@@ -1128,13 +1135,32 @@ namespace xt
         return iterable_base::template cbegin<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
     {
         return iterable_base::template cend<S, L>(shape);
     }
+    //@}
 
+    /**
+     * @name Reverse broadcast iterators
+     */
+    //@{
+    /**
+     * Returns an iterator to the first element of the reversed expression. The
+     * iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
@@ -1142,6 +1168,13 @@ namespace xt
         return iterable_base::template rbegin<S, L>(shape);
     }
 
+    /**
+     * Returns an iterator to the element following the last element of the
+     * reversed expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
@@ -1149,6 +1182,13 @@ namespace xt
         return iterable_base::template rend<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the reversed expression.
+     * The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::rbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
@@ -1156,6 +1196,13 @@ namespace xt
         return iterable_base::template rbegin<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * reversed expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::rend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
@@ -1163,6 +1210,13 @@ namespace xt
         return iterable_base::template rend<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the first element of the reversed expression.
+     * The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::crbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
@@ -1170,12 +1224,20 @@ namespace xt
         return iterable_base::template crbegin<S, L>(shape);
     }
 
+    /**
+     * Returns a constant iterator to the element following the last element of the
+     * reversed expression. The iteration is broadcasted to the specified shape.
+     * @param shape the shape used for broadcasting
+     * @tparam S type of the \c shape parameter.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     */
     template <class D>
     template <class S, layout_type L>
     inline auto xcontiguous_iterable<D>::crend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
         return iterable_base::template crend<S, L>(shape);
     }
+    //@}
 
     template <class D>
     inline auto xcontiguous_iterable<D>::derived_cast() -> derived_type&
