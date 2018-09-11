@@ -419,6 +419,8 @@ namespace xt
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
 
+        constexpr static std::size_t N = S::size();
+
         xfixed_adaptor(storage_type&& data);
         xfixed_adaptor(const storage_type& data);
 
@@ -436,6 +438,19 @@ namespace xt
 
         template <class E>
         xfixed_adaptor& operator=(const xexpression<E>& e);
+
+        template <class ST = std::array<std::size_t, N>>
+        void resize(ST&& shape, bool force = false) const;
+        template <class ST = shape_type>
+        void resize(ST&& shape, layout_type l) const;
+        template <class ST = shape_type>
+        void resize(ST&& shape, const strides_type& strides) const;
+
+        template <class ST = std::array<std::size_t, N>>
+        void reshape(ST&& shape, layout_type layout = L) const;
+
+        template <class ST>
+        bool broadcast_shape(ST& s, bool reuse_cache = false) const;
 
         constexpr layout_type layout() const noexcept;
 
@@ -777,6 +792,65 @@ namespace xt
         return semantic_base::operator=(e);
     }
     //@}
+
+    /**
+     * Note that the xfixed_adaptor **cannot** be resized. Attempting to resize with a different
+     * size throws an assert in debug mode.
+     */
+    template <class ET, class S, layout_type L, class Tag>
+    template <class ST>
+    inline void xfixed_adaptor<ET, S, L, Tag>::resize(ST&& shape, bool) const
+    {
+        (void)(shape);  // remove unused parameter warning if XTENSOR_ASSERT undefined
+        XTENSOR_ASSERT(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size());
+    }
+
+    /**
+     * Note that the xfixed_adaptor **cannot** be resized. Attempting to resize with a different
+     * size throws an assert in debug mode.
+     */
+    template <class ET, class S, layout_type L, class Tag>
+    template <class ST>
+    inline void xfixed_adaptor<ET, S, L, Tag>::resize(ST&& shape, layout_type l) const
+    {
+        (void)(shape);  // remove unused parameter warning if XTENSOR_ASSERT undefined
+        (void)(l);
+        XTENSOR_ASSERT(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size() && L == l);
+    }
+
+    /**
+     * Note that the xfixed_adaptor **cannot** be resized. Attempting to resize with a different
+     * size throws an assert in debug mode.
+     */
+    template <class ET, class S, layout_type L, class Tag>
+    template <class ST>
+    inline void xfixed_adaptor<ET, S, L, Tag>::resize(ST&& shape, const strides_type& strides) const
+    {
+        (void)(shape);  // remove unused parameter warning if XTENSOR_ASSERT undefined
+        (void)(strides);
+        XTENSOR_ASSERT(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size());
+        XTENSOR_ASSERT(std::equal(strides.begin(), strides.end(), m_strides.begin()) && strides.size() == m_strides.size());
+    }
+
+    /**
+     * Note that the xfixed_container **cannot** be reshaped to a shape different from ``S``.
+     */
+    template <class ET, class S, layout_type L, class Tag>
+    template <class ST>
+    inline void xfixed_adaptor<ET, S, L, Tag>::reshape(ST&& shape, layout_type layout) const
+    {
+        if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size() && layout == L))
+        {
+            throw std::runtime_error("Trying to reshape xtensor_fixed with different shape or layout.");
+        }
+    }
+
+    template <class ET, class S, layout_type L, class Tag>
+    template <class ST>
+    inline bool xfixed_adaptor<ET, S, L, Tag>::broadcast_shape(ST& shape, bool) const
+    {
+        return xt::broadcast_shape(m_shape, shape);
+    }
 
     template <class EC, class S, layout_type L, class Tag>
     inline auto xfixed_adaptor<EC, S, L, Tag>::storage_impl() noexcept -> storage_type&

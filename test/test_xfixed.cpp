@@ -16,6 +16,7 @@
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xnoalias.hpp"
 
 // On VS2015, when compiling in x86 mode, alignas(T) leads to C2718
 // when used for a function parameter, even indirectly. This means that
@@ -251,10 +252,22 @@ namespace xt
         truth = std::is_same<typename decltype(fx2)::shape_type, xshape<3, 2, 4, 10, 5>>::value;
         EXPECT_TRUE(truth);
 
-        // xtensor_fixed<char, xshape<   2, 1, 10, 5>> xc;
-        // auto fx3 = xa * xc;
-        // truth = std::is_same<typename decltype(fx3)::shape_type, xshape<2, 1, 10, 5>>::value;
-        // EXPECT_TRUE(truth);
+        xtensor_fixed<char, xshape<   2, 1, 10, 5>> xc;
+        auto fx3 = xa * xc;
+        truth = std::is_same<typename decltype(fx3)::shape_type, xshape<2, 1, 10, 5>>::value;
+        EXPECT_TRUE(truth);
+    }
+
+    TEST(xtensor_fixed, adaptor_function_assignment)
+    {
+        xt::xtensor<double, 4> a_Eps  = xt::zeros<double>({2, 2, 2, 2});
+        xt::xtensor<double, 4> a_Epsd = xt::zeros<double>({2, 2, 2, 2});
+        std::size_t e = 0, k = 1;
+        auto Eps  = xt::adapt(&a_Eps (e, k, 0, 0), xt::xshape<2, 2>());
+        auto Epsd = xt::adapt(&a_Epsd(e, k, 0, 0), xt::xshape<2, 2>());
+
+        xt::noalias(Eps) = Epsd * 123;
+        // Eps = Epsd * 123; <-- Enable after XTL release!
     }
 }
 
