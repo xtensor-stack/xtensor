@@ -17,3 +17,7 @@ Defined in ``xtensor/xiterable.hpp``
    :project: xtensor
    :members:
 
+.. doxygenclass:: xt::xcontiguous_iterable
+   :project: xtensor
+   :members:
+

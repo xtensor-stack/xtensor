@@ -389,28 +389,63 @@ namespace xt
 
     namespace detail
     {
+        template <class C, class = void_t<>>
+        struct has_storage_iterator : std::false_type
+        {
+        };
+
+        template <class C>
+        struct has_storage_iterator<C, void_t<decltype(std::declval<C>().storage_cbegin())>>
+            : std::true_type
+        {
+        };
+
         template <class C>
         XTENSOR_CONSTEXPR_RETURN auto trivial_begin(C& c) noexcept
         {
-            return c.storage_begin();
+            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
+            {
+                return self(c).storage_begin();
+            }, /*else*/ [&](auto self)
+            {
+                return self(c).begin();
+            });
         }
 
         template <class C>
         XTENSOR_CONSTEXPR_RETURN auto trivial_end(C& c) noexcept
         {
-            return c.storage_end();
+            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
+            {
+                return self(c).storage_end();
+            }, /*else*/ [&](auto self)
+            {
+                return self(c).end();
+            });
         }
 
         template <class C>
         XTENSOR_CONSTEXPR_RETURN auto trivial_begin(const C& c) noexcept
         {
-            return c.storage_cbegin();
+            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
+            {
+                return self(c).storage_cbegin();
+            }, /*else*/ [&](auto self)
+            {
+                return self(c).cbegin();
+            });
         }
 
         template <class C>
         XTENSOR_CONSTEXPR_RETURN auto trivial_end(const C& c) noexcept
         {
-            return c.storage_cend();
+            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
+            {
+                return self(c).storage_cend();
+            }, /*else*/ [&](auto self)
+            {
+                return self(c).cend();
+            });
         }
     }
 
