@@ -1583,7 +1583,7 @@ namespace xt
         template <class V, class T>
         inline void run_assign_temporary_impl(V& v, const T& t, std::true_type /* enable strided assign */)
         {
-            strided_assign(v, t, std::true_type{});
+            strided_loop_assigner<true>::run(v, t);
         }
 
         template <class V, class T>
