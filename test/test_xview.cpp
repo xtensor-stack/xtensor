@@ -1241,4 +1241,14 @@ namespace xt
         EXPECT_EQ(view_assign_func(input, 4), 2 * exp1);
         EXPECT_EQ(view_assign_func(input, 5), 2 * exp1);
     }
+
+    TEST(xview, view_on_strided_view)
+    {
+        // Compilation test only
+        xt::xarray<float> original = xt::xarray<float>::from_shape({ 3, 2, 5 });
+        original.fill(float(0.));
+        auto str_view = xt::strided_view(original, { 1, xt::ellipsis() }); //i is an int
+        auto result = xt::view(str_view, xt::all(), xt::all());
+        EXPECT_EQ(result(0), 0.f);
+    }
 }
