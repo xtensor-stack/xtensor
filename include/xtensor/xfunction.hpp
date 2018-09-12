@@ -321,7 +321,7 @@ namespace xt
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
-        bool is_trivial_broadcast(const S& strides) const noexcept;
+        bool has_linear_assign(const S& strides) const noexcept;
 
         using iterable_base::begin;
         using iterable_base::end;
@@ -807,15 +807,15 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the container to see whether
-     * the broadcasting is trivial.
-     * @return a boolean indicating whether the broadcasting is trivial
-     */
+    * Checks whether the xfunction_base can be linearly assigned to an expression
+    * with the specified strides.
+    * @return a boolean indicating whether a linear assign is possible
+    */
     template <class F, class R, class... CT>
     template <class S>
-    inline bool xfunction_base<F, R, CT...>::is_trivial_broadcast(const S& strides) const noexcept
+    inline bool xfunction_base<F, R, CT...>::has_linear_assign(const S& strides) const noexcept
     {
-        auto func = [&strides](bool b, auto&& e) { return b && e.is_trivial_broadcast(strides); };
+        auto func = [&strides](bool b, auto&& e) { return b && e.has_linear_assign(strides); };
         return accumulate(func, true, m_e);
     }
     //@}
@@ -835,14 +835,14 @@ namespace xt
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::storage_cbegin() const noexcept -> const_storage_iterator
     {
-        auto f = [](const auto& e) noexcept { return detail::trivial_begin(e); };
+        auto f = [](const auto& e) noexcept { return detail::linear_begin(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class R, class... CT>
     inline auto xfunction_base<F, R, CT...>::storage_cend() const noexcept -> const_storage_iterator
     {
-        auto f = [](const auto& e) noexcept { return detail::trivial_end(e); };
+        auto f = [](const auto& e) noexcept { return detail::linear_end(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 

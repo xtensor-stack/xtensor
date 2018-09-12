@@ -106,7 +106,7 @@ namespace xt
         bool broadcast_shape(O& shape, bool reuse_cache = false) const;
 
         template <class O>
-        bool is_trivial_broadcast(const O& /*strides*/) const noexcept;
+        bool has_linear_assign(const O& /*strides*/) const noexcept;
 
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
@@ -307,13 +307,13 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the container to see whether
-     * the broadcasting is trivial.
-     * @return a boolean indicating whether the broadcasting is trivial
+     * Checks whether the xgenerator can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
      */
     template <class F, class R, class S>
     template <class O>
-    inline bool xgenerator<F, R, S>::is_trivial_broadcast(const O& /*strides*/) const noexcept
+    inline bool xgenerator<F, R, S>::has_linear_assign(const O& /*strides*/) const noexcept
     {
         return false;
     }

@@ -129,7 +129,7 @@ namespace xt
         bool broadcast_shape(O& shape, bool reuse_cache = false) const;
 
         template <class O>
-        bool is_trivial_broadcast(const O& strides) const noexcept;
+        bool has_linear_assign(const O& strides) const noexcept;
 
     protected:
 
@@ -738,13 +738,13 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the view to see whether
-     * the broadcasting is trivial.
-     * @return a boolean indicating whether the broadcasting is trivial
+     * Checks whether the xstrided_view_base can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
      */
     template <class CT, class S, layout_type L, class FST>
     template <class O>
-    inline bool xstrided_view_base<CT, S, L, FST>::is_trivial_broadcast(const O& str) const noexcept
+    inline bool xstrided_view_base<CT, S, L, FST>::has_linear_assign(const O& str) const noexcept
     {
         return has_data_interface<std::decay_t<CT>>::value && str.size() == strides().size() &&
             std::equal(str.cbegin(), str.cend(), strides().begin());

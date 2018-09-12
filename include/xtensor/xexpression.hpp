@@ -525,9 +525,9 @@ namespace xt
         }
 
         template <class S>
-        bool is_trivial_broadcast(const S& strides) const noexcept
+        bool has_linear_assign(const S& strides) const noexcept
         {
-            return m_ptr->is_trivial_broadcast(strides);
+            return m_ptr->has_linear_assign(strides);
         }
 
         template <class S>

@@ -231,7 +231,7 @@ namespace xt
     namespace detail
     {
         template <class E1, class E2>
-        constexpr bool trivial_static_layout()
+        constexpr bool linear_static_layout()
         {
             // A row_major or column_major container with a dimension <= 1 is computed as
             // layout any, leading to some performance improvements, for example when
@@ -241,10 +241,10 @@ namespace xt
         }
 
         template <class E1, class E2>
-        inline bool is_trivial_broadcast(const E1& e1, const E2& e2)
+        inline bool is_linear_assign(const E1& e1, const E2& e2)
         {
-            return (E1::contiguous_layout && E2::contiguous_layout && trivial_static_layout<E1, E2>()) ||
-                   (e1.layout() != layout_type::dynamic && e2.is_trivial_broadcast(e1.strides()));
+            return (E1::contiguous_layout && E2::contiguous_layout && linear_static_layout<E1, E2>()) ||
+                   (e1.layout() != layout_type::dynamic && e2.has_linear_assign(e1.strides()));
         }
 
         // TODO refactor with has_simd_interface
@@ -345,16 +345,16 @@ namespace xt
         E1& de1 = e1.derived_cast();
         const E2& de2 = e2.derived_cast();
 
-        bool trivial_broadcast = trivial && detail::is_trivial_broadcast(de1, de2);
-
-        if (trivial_broadcast)
+        bool linear_assign = trivial && detail::is_linear_assign(de1, de2);
+        constexpr bool simd_assign = xassign_traits<E1, E2>::simd_assign();
+        constexpr bool strided_simd_assign = xassign_traits<E1, E2>::simd_strided_loop();
+        if (linear_assign)
         {
-            constexpr bool simd_assign = xassign_traits<E1, E2>::simd_assign();
             linear_assigner<simd_assign>::run(de1, de2);
         }
-        else if (constexpr bool simd_assign = xassign_traits<E1, E2>::simd_strided_loop())
+        else if (strided_simd_assign)
         {
-            strided_loop_assigner<simd_assign>::run(de1, de2);
+            strided_loop_assigner<strided_simd_assign>::run(de1, de2);
         }
         else
         {
@@ -593,8 +593,8 @@ namespace xt
     {
         using value_type = typename E1::value_type;
         using size_type = typename E1::size_type;
-        auto src = detail::trivial_begin(e2);
-        auto dst = detail::trivial_begin(e1);
+        auto src = detail::linear_begin(e2);
+        auto dst = detail::linear_begin(e1);
         size_type n = e1.size();
 
 #if defined(XTENSOR_USE_TBB)
