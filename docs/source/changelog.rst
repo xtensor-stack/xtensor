@@ -7,6 +7,70 @@
 Changelog
 =========
 
+0.17.4
+------
+
+- perfect forwarding in ``xoptional_function`` constructor
+  `#1101 <https://github.com/QuantStack/xtensor/pull/1101>`_.
+- fix issue with ``base_simd``
+  `#1103 <https://github.com/QuantStack/xtensor/pull/1103>`_.
+- ``XTENSOR_ASSERT`` fixed on Windows
+  `#1104 <https://github.com/QuantStack/xtensor/pull/1104>`_.
+- Implement ``xmasked_value``
+  `#1032 <https://github.com/QuantStack/xtensor/pull/1032>`_.
+- Added ``setdiff1d`` using stl interface
+  `#1109 <https://github.com/QuantStack/xtensor/pull/1109>`_.
+- Added test case for ``setdiff1d``
+  `#1110 <https://github.com/QuantStack/xtensor/pull/1110>`_.
+- Added missing reference to ``diff`` in ``From numpy to xtensor`` section
+  `#1116 <https://github.com/QuantStack/xtensor/pull/1116>`_.
+- Add ``amax`` and ``amin`` to the documentation
+  `#1121 <https://github.com/QuantStack/xtensor/pull/1121>`_.
+- ``histogram`` and ``histogram_bin_edges`` implementation
+  `#1108 <https://github.com/QuantStack/xtensor/pull/1108>`_.
+- Added numpy comparison for interp
+  `#1111 <https://github.com/QuantStack/xtensor/pull/1111>`_.
+- Allow multiple return type reducer functions
+  `#1113 <https://github.com/QuantStack/xtensor/pull/1113>`_.
+- Fixes ``average`` bug + adds Numpy based tests
+  `#1118 <https://github.com/QuantStack/xtensor/pull/1118>`_.
+- Static ``xfunction`` cache for fixed sizes
+  `#1105 <https://github.com/QuantStack/xtensor/pull/1105>`_.
+- Add negative reshaping axis
+  `#1120 <https://github.com/QuantStack/xtensor/pull/1120>`_.
+- Updated ``xmasked_view`` using ``xmasked_value``
+  `#1074 <https://github.com/QuantStack/xtensor/pull/1074>`_.
+- Clean documentation for views
+  `#1131 <https://github.com/QuantStack/xtensor/pull/1131>`_.
+- Build with ``xsimd`` on Windows fixed
+  `#1127 <https://github.com/QuantStack/xtensor/pull/1127>`_.
+- Implement ``mime_bundle_repr`` for ``xmasked_view``
+  `#1132 <https://github.com/QuantStack/xtensor/pull/1132>`_.
+- Modify shuffle to use identical algorithms for any number of dimensions
+  `#1135 <https://github.com/QuantStack/xtensor/pull/1135>`_.
+- Warnings removal on windows
+  `#1139 <https://github.com/QuantStack/xtensor/pull/1135>`_.
+- Add permutation function to random
+  `#1141 <https://github.com/QuantStack/xtensor/pull/1141>`_.
+- ``xfunction_iterator`` permutation
+  `#933 <https://github.com/QuantStack/xtensor/pull/933>`_.
+- Add ``bincount`` to ``xhistogram``
+  `#1140 <https://github.com/QuantStack/xtensor/pull/1140>`_.
+- Add contiguous iterable base class and remove layout param from storage iterator
+  `#1057 <https://github.com/QuantStack/xtensor/pull/1057>`_.
+- Add ``storage_iterator`` to view and strided view
+  `#1045 <https://github.com/QuantStack/xtensor/pull/1045>`_.
+- Removes ``data_element`` from ``xoptional``
+  `#1137 <https://github.com/QuantStack/xtensor/pull/1137>`_.
+- ``xtensor`` default constructor and scalar assign fixed
+  `#1148 <https://github.com/QuantStack/xtensor/pull/1148>`_.
+- Add ``resize / reshape`` to ``xfixed_container``
+  `#1147 <https://github.com/QuantStack/xtensor/pull/1147>`_.
+- Iterable refactoring
+  `#1149 <https://github.com/QuantStack/xtensor/pull/1149>`_.
+- ``inner_strides_type`` imported in ``xstrided_view``
+  `#1151 <https://github.com/QuantStack/xtensor/pull/1151>`_.
+
 0.17.3
 ------
 
