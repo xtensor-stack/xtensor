@@ -32,12 +32,12 @@ The two main requirements are the following:
 It is important for the closure type not to be a reference when the passed argument is an rvalue, which can result in dangling references.
 
 Following the conventions of the C++ standard library for naming type traits, we provide two type traits classes providing an implementation of these rules
-in the ``xutils.hpp`` header, ``closure``, and ``const_closure``. The latter adds the const qualifier even when the provided argument is not const.
+in the ``xutils.hpp`` header, ``closure_type``, and ``const_closure_type``. The latter adds the const qualifier to the reference even when the provided argument is not const.
 
 .. code:: cpp
 
     template <class S>
-    struct closure
+    struct closure_type
     {
         using underlying_type = std::conditional_t<
             std::is_const<std::remove_reference_t<S>>::value,
@@ -50,24 +50,24 @@ in the ``xutils.hpp`` header, ``closure``, and ``const_closure``. The latter add
     };
 
     template <class S>
-    using closure_t = typename closure<S>::type;
+    using closure_type_t = typename closure_type<S>::type;
 
-The implementation for ``const_closure`` is slightly shorter.
+The implementation for ``const_closure_type`` is slightly shorter.
 
 .. code:: cpp
 
     template <class S>
-    struct const_closure
+    struct const_closure_type
     {
-        using underlying_type = const std::decay_t<S>;
+        using underlying_type = std::decay_t<S>;
         using type = typename std::conditional<
             std::is_lvalue_reference<S>::value,
-            underlying_type&,
+            std::add_const_t<underlying_type>&,
             underlying_type>::type;
     };
 
     template <class S>
-    using const_closure_t = typename const_closure<S>::type;
+    using const_closure_type_t = typename const_closure_type<S>::type;
 
 Using this mechanism, we were able to
 
@@ -111,7 +111,7 @@ The `const_xclosure` follows the same scheme:
     template <class E, class EN = void>
     struct const_xclosure
     {
-        using type = const_closure_t<E>;
+        using type = const_closure_type_t<E>;
     };
 
     template <class E>
