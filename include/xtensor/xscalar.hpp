@@ -150,7 +150,7 @@ namespace xt
         bool broadcast_shape(S& shape, bool reuse_cache = false) const noexcept;
 
         template <class S>
-        bool is_trivial_broadcast(const S& strides) const noexcept;
+        bool has_linear_assign(const S& strides) const noexcept;
 
         template <layout_type L = DL>
         iterator begin() noexcept;
@@ -422,32 +422,32 @@ namespace xt
     {
     };
 
-    /*******************************
-     * trivial_begin / trivial_end *
-     *******************************/
+    /*****************************
+     * linear_begin / linear_end *
+     *****************************/
 
     namespace detail
     {
         template <class CT>
-        constexpr auto trivial_begin(xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
+        constexpr auto linear_begin(xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
         {
             return c.dummy_begin();
         }
 
         template <class CT>
-        constexpr auto trivial_end(xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
+        constexpr auto linear_end(xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
         {
             return c.dummy_end();
         }
 
         template <class CT>
-        constexpr auto trivial_begin(const xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
+        constexpr auto linear_begin(const xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
         {
             return c.dummy_begin();
         }
 
         template <class CT>
-        constexpr auto trivial_end(const xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
+        constexpr auto linear_end(const xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
         {
             return c.dummy_end();
         }
@@ -620,7 +620,7 @@ namespace xt
 
     template <class CT>
     template <class S>
-    inline bool xscalar<CT>::is_trivial_broadcast(const S&) const noexcept
+    inline bool xscalar<CT>::has_linear_assign(const S&) const noexcept
     {
         return true;
     }

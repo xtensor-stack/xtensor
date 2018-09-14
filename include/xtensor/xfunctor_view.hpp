@@ -202,7 +202,7 @@ namespace xt
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
-        bool is_trivial_broadcast(const S& strides) const;
+        bool has_linear_assign(const S& strides) const;
 
         template <layout_type L = DL>
         auto begin() noexcept;
@@ -725,15 +725,15 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the container to see whether
-     * the broadcasting is trivial.
-     * @return a boolean indicating whether the broadcasting is trivial
-     */
+    * Checks whether the xfunctor_view can be linearly assigned to an expression
+    * with the specified strides.
+    * @return a boolean indicating whether a linear assign is possible
+    */
     template <class F, class CT>
     template <class S>
-    inline bool xfunctor_view<F, CT>::is_trivial_broadcast(const S& strides) const
+    inline bool xfunctor_view<F, CT>::has_linear_assign(const S& strides) const
     {
-        return m_e.is_trivial_broadcast(strides);
+        return m_e.has_linear_assign(strides);
     }
     //@}
 

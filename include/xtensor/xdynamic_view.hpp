@@ -171,7 +171,7 @@ namespace xt
         using base_type::storage;
         using base_type::expression;
         using base_type::broadcast_shape;
-        using base_type::is_trivial_broadcast;
+        using base_type::has_linear_assign;
 
         template <class T>
         void fill(const T& value);

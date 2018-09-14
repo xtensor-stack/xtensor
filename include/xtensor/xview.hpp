@@ -428,7 +428,7 @@ namespace xt
         bool broadcast_shape(ST& shape, bool reuse_cache = false) const;
 
         template <class ST>
-        bool is_trivial_broadcast(const ST& strides) const;
+        bool has_linear_assign(const ST& strides) const;
 
         template <class ST, bool Enable = is_strided_view>
         std::enable_if_t<!Enable, stepper>
@@ -1306,13 +1306,13 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the view to see whether
-     * the broadcasting is trivial.
-     * @return a boolean indicating whether the broadcasting is trivial
+     * Checks whether the xview can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
      */
     template <class CT, class... S>
     template <class ST>
-    inline bool xview<CT, S...>::is_trivial_broadcast(const ST& str) const
+    inline bool xview<CT, S...>::has_linear_assign(const ST& str) const
     {
         return xtl::mpl::static_if<is_strided_view>([&](auto self)
         {
@@ -1583,7 +1583,7 @@ namespace xt
         template <class V, class T>
         inline void run_assign_temporary_impl(V& v, const T& t, std::true_type /* enable strided assign */)
         {
-            strided_assign(v, t, std::true_type{});
+            strided_loop_assigner<true>::run(v, t);
         }
 
         template <class V, class T>

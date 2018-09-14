@@ -179,7 +179,7 @@ namespace xt
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
         template <class S>
-        bool is_trivial_broadcast(const S& strides) const noexcept;
+        bool has_linear_assign(const S& strides) const noexcept;
 
         using iterable_base::begin;
         using iterable_base::end;
@@ -669,15 +669,15 @@ namespace xt
     }
 
     /**
-     * Compares the specified strides with those of the optional assembly to see whether
-     * the broadcasting is trivial.
-     * @return a boolean indicating whether the broadcasting is trivial
+     * Checks whether the xoptional_assembly_base can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
      */
     template <class D>
     template <class S>
-    inline bool xoptional_assembly_base<D>::is_trivial_broadcast(const S& strides) const noexcept
+    inline bool xoptional_assembly_base<D>::has_linear_assign(const S& strides) const noexcept
     {
-        return value().is_trivial_broadcast(strides) && has_value().is_trivial_broadcast(strides);
+        return value().has_linear_assign(strides) && has_value().has_linear_assign(strides);
     }
     //@}
 
