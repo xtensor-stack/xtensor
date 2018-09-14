@@ -374,8 +374,8 @@ namespace xt
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.begin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = vec.end<shape_type, layout_type::row_major>(shape);
+            auto iter = vec.begin<layout_type::row_major>(shape);
+            auto iter_end = vec.end<layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
             {
                 ++iter;
@@ -409,8 +409,8 @@ namespace xt
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.begin<shape_type, layout_type::column_major>(shape);
-            auto iter_end = vec.end<shape_type, layout_type::column_major>(shape);
+            auto iter = vec.begin<layout_type::column_major>(shape);
+            auto iter_end = vec.end<layout_type::column_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
             {
                 ++iter;
@@ -455,8 +455,8 @@ namespace xt
             shape_type shape(rm.m_shape.size() + 1);
             std::copy(rm.m_shape.begin(), rm.m_shape.end(), shape.begin() + 1);
             shape[0] = 2;
-            auto iter = vec.rbegin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = vec.rend<shape_type, layout_type::row_major>(shape);
+            auto iter = vec.rbegin<layout_type::row_major>(shape);
+            auto iter_end = vec.rend<layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
             {
                 ++iter;

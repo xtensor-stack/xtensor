@@ -100,8 +100,8 @@ namespace xt
         // shaped_xiterator
         {
             shape_type shape = {2, 2, 3};
-            auto iter = m1_broadcast.template begin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = m1_broadcast.template end<shape_type, layout_type::row_major>(shape);
+            auto iter = m1_broadcast.template begin<layout_type::row_major>(shape);
+            auto iter_end = m1_broadcast.template end<layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
             {
                 ++iter;
@@ -141,8 +141,8 @@ namespace xt
         // reverse_shaped_xiterator
         {
             shape_type shape = {2, 2, 3};
-            auto iter = m1_broadcast.template rbegin<shape_type, layout_type::row_major>(shape);
-            auto iter_end = m1_broadcast.template rend<shape_type, layout_type::row_major>(shape);
+            auto iter = m1_broadcast.template rbegin<layout_type::row_major>(shape);
+            auto iter_end = m1_broadcast.template rend<layout_type::row_major>(shape);
             for (size_t i = 0; i < 2 * nb_iter; ++i)
             {
                 ++iter;
