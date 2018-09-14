@@ -9,9 +9,10 @@
 
 #include "gtest/gtest.h"
 
-#include "xtensor/xeval.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xbuilder.hpp"
 #include "xtensor/xmanipulation.hpp"
-#include "xtensor/xio.hpp"
 
 namespace xt
 {

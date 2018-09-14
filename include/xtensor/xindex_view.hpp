@@ -105,7 +105,7 @@ namespace xt
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
-        
+
         template <class T>
         void fill(const T& value);
 
@@ -213,7 +213,7 @@ namespace xt
 
         template <class E>
         disable_xexpression<E, self_type&> operator%=(const E&);
-        
+
     private:
 
         template <class F>
@@ -234,7 +234,7 @@ namespace xt
     /**
      * Constructs an xindex_view, selecting the indices specified by \a indices.
      * The resulting xexpression has a 1D shape with a length of n for n indices.
-     * 
+     *
      * @param e the underlying xexpression for this view
      * @param indices the indices to select
      */
@@ -318,7 +318,7 @@ namespace xt
      * @name Data
      */
     //@{
-    
+
     /**
      * Fills the view with the given value.
      * @param value the value to fill the view with.
@@ -543,7 +543,7 @@ namespace xt
     //@{
     /**
      * Constructs a xfiltration on the given expression \c e, selecting
-     * the elements matching the specified \c condition. 
+     * the elements matching the specified \c condition.
      *
      * @param e the \ref xexpression to filter.
      * @param condition the filtering \ref xexpression to apply.
@@ -647,12 +647,12 @@ namespace xt
 
     /**
      * @brief creates an indexview from a container of indices.
-     *        
+     *
      * Returns a 1D view with the elements at \a indices selected.
      *
      * @param e the underlying xexpression
      * @param indices the indices to select
-     * 
+     *
      * \code{.cpp}
      * xarray<double> a = {{1,5,3}, {4,5,6}};
      * b = index_view(a, {{0, 0}, {1, 0}, {1, 1}});
@@ -690,9 +690,9 @@ namespace xt
 
     /**
      * @brief creates a view into \a e filtered by \a condition.
-     *        
+     *
      * Returns a 1D view with the elements selected where \a condition evaluates to \em true.
-     * This is equivalent to \verbatim{index_view(e, where(condition));}\endverbatim
+     * This is equivalent to \verbatim{index_view(e, argwhere(condition));}\endverbatim
      * The returned view is not optimal if you just want to assign a scalar to the filtered
      * elements. In that case, you should consider using the \ref filtration function
      * instead.
@@ -711,7 +711,7 @@ namespace xt
     template <class E, class O>
     inline auto filter(E&& e, O&& condition) noexcept
     {
-        auto indices = where(std::forward<O>(condition));
+        auto indices = argwhere(std::forward<O>(condition));
         using view_type = xindex_view<xclosure_t<E>, decltype(indices)>;
         return view_type(std::forward<E>(e), std::move(indices));
     }

@@ -19,6 +19,8 @@
 #include "xfunction.hpp"
 #include "xscalar.hpp"
 #include "xstrides.hpp"
+#include "xstrided_view.hpp"
+#include "xmanipulation.hpp"
 
 namespace xt
 {
@@ -722,28 +724,14 @@ namespace xt
         return detail::make_xfunction<detail::conditional_ternary>(std::forward<E1>(e1), std::forward<E2>(e2), std::forward<E3>(e3));
     }
 
-    /**
-     * @ingroup logical_operators
-     * @brief return vector of indices where T is not zero
-     *
-     * @param arr input array
-     * @return vector of \a index_types where arr is not equal to zero
-     */
-    template <class T>
-    inline auto nonzero(const T& arr)
-        -> std::vector<xindex_type_t<typename T::shape_type>>
+    namespace detail
     {
-        auto shape = arr.shape();
-        using index_type = xindex_type_t<typename T::shape_type>;
-        using size_type = typename T::size_type;
-
-        auto idx = xtl::make_sequence<index_type>(arr.dimension(), 0);
-        std::vector<index_type> indices;
-
-        auto next_idx = [&shape](index_type& idx) {
-            for (size_type j = shape.size(); j > 0; --j)
+        template <class S, class I>
+        inline auto next_idx(const S& shape, I& idx)
+        {
+            for (std::size_t j = shape.size(); j > 0; --j)
             {
-                size_type i = j - 1;
+                std::size_t i = j - 1;
                 if (idx[i] >= shape[i] - 1)
                 {
                     idx[i] = 0;
@@ -755,19 +743,47 @@ namespace xt
                 }
             }
             // return empty index, happens at last iteration step, but remains unused
-            return index_type();
-        };
+            return I();
+        }
+    }
+
+    /**
+     * @ingroup logical_operators
+     * @brief return vector of indices where T is not zero
+     *
+     * @param arr input array
+     * @return vector of \a index_types where arr is not equal to zero
+     */
+    template <class T>
+    inline auto nonzero(const T& arr)
+    {
+        auto shape = arr.shape();
+        using index_type = xindex_type_t<typename T::shape_type>;
+        using size_type = typename T::size_type;
+
+        auto idx = xtl::make_sequence<index_type>(arr.dimension(), 0);
+        std::vector<std::vector<size_type>> indices(arr.dimension());
 
         size_type total_size = compute_size(shape);
-        for (size_type i = 0; i < total_size; i++, next_idx(idx))
+        for (size_type i = 0; i < total_size; i++, detail::next_idx(shape, idx))
         {
             if (arr.element(std::begin(idx), std::end(idx)))
             {
-                indices.push_back(idx);
+                for (std::size_t n = 0; n < indices.size(); ++n)
+                {
+                    indices.at(n).push_back(idx[n]);
+                }
             }
         }
+
         return indices;
     }
+
+   template <layout_type L, class T>
+   inline auto flatnonzero(const T& arr)
+   {
+       return nonzero(ravel<L>(arr))[0];
+   }
 
     /**
      * @ingroup logical_operators
@@ -779,9 +795,37 @@ namespace xt
      */
     template <class T>
     inline auto where(const T& condition)
-        -> std::vector<xindex_type_t<typename T::shape_type>>
     {
         return nonzero(condition);
+    }
+
+    /**
+     * @ingroup logical_operators
+     * @brief return vector of indices where T is not zero
+     *
+     * @param arr input array
+     * @return vector of \a index_types where arr is not equal to zero
+     */
+    template <class T>
+    inline auto argwhere(const T& arr)
+    {
+        auto shape = arr.shape();
+        using index_type = xindex_type_t<typename T::shape_type>;
+        using size_type = typename T::size_type;
+
+        auto idx = xtl::make_sequence<index_type>(arr.dimension(), 0);
+        std::vector<index_type> indices;
+
+        size_type total_size = compute_size(shape);
+        for (size_type i = 0; i < total_size; i++, detail::next_idx(shape, idx))
+        {
+            if (arr.element(std::begin(idx), std::end(idx)))
+            {
+                indices.push_back(idx);
+            }
+        }
+
+        return indices;
     }
 
     /**

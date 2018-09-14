@@ -428,15 +428,15 @@ namespace xt
         using shape_type = typename container_3d::shape_type;
 
         int_container_1d a = {1, 0, 3};
-        std::vector<xindex_type_t<typename int_container_1d::shape_type>> expected = {{0}, {2}};
+        std::vector<std::vector<std::size_t>> expected = {{0, 2}};
         EXPECT_EQ(expected, nonzero(a));
 
         int_container_2d b = {{0, 2, 1}, {2, 1, 0}};
-        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_b = {{0, 1}, {0, 2}, {1, 0}, {1, 1}};
+        std::vector<std::vector<std::size_t>> expected_b = {{0, 0, 1, 1}, {1, 2, 0, 1}};
         EXPECT_EQ(expected_b, nonzero(b));
 
         auto c = equal(b, 0);
-        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_c = {{0, 0}, {1, 2}};
+        std::vector<std::vector<std::size_t>> expected_c = {{0, 1}, {0, 2}};
         EXPECT_EQ(expected_c, nonzero(c));
 
         shape_type s = {3, 3, 3};
@@ -444,16 +444,25 @@ namespace xt
         std::fill(d.begin(), d.end(), true);
 
         auto d_nz = nonzero(d);
-        EXPECT_EQ(size_t(3 * 3 * 3), d_nz.size());
-        xindex_type_t<typename container_3d::shape_type> last_idx = {2, 2, 2};
-        EXPECT_EQ(last_idx, d_nz.back());
+        EXPECT_EQ(size_t(3), d_nz.size());
+        EXPECT_EQ(size_t(27 * 27 * 27), d_nz[0].size() * d_nz[1].size() * d_nz[2].size());
+    }
+
+    TYPED_TEST(operation, flatnonzero)
+    {
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
+
+        int_container_1d a = arange(-2, 3);
+        std::vector<std::size_t> expected_a = {0, 1, 3, 4};
+        EXPECT_EQ(expected_a, flatnonzero<layout_type::row_major>(a));
     }
 
     TYPED_TEST(operation, where_only_condition)
     {
         using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
         int_container_2d a = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected = {{0, 0}, {1, 1}, {2, 2}};
+        std::vector<std::vector<std::size_t>> expected = {{0, 1, 2}, {0, 1, 2}};
         EXPECT_EQ(expected, where(a));
     }
 
@@ -481,6 +490,37 @@ namespace xt
         TypeParam b = where(equal(a, 0.0), res1, 0.0);
         TypeParam expected = { {1.2, 0., 1.2}, {0., 1.2, 0.} };
         EXPECT_EQ(b, expected);
+    }
+
+    TYPED_TEST(operation, argwhere)
+    {
+        using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
+        using container_1d = redim_container_t<TypeParam, 1>;
+        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
+        using container_3d = redim_container_t<TypeParam, 3>;
+        using bool_container = xop_test::rebind_container_t<container_3d, bool>;
+        using shape_type = typename container_3d::shape_type;
+
+        int_container_1d a = {1, 0, 3};
+        std::vector<xindex_type_t<typename int_container_1d::shape_type>> expected = {{0}, {2}};
+        EXPECT_EQ(expected, argwhere(a));
+
+        int_container_2d b = {{0, 2, 1}, {2, 1, 0}};
+        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_b = {{0, 1}, {0, 2}, {1, 0}, {1, 1}};
+        EXPECT_EQ(expected_b, argwhere(b));
+
+        auto c = equal(b, 0);
+        std::vector<xindex_type_t<typename int_container_2d::shape_type>> expected_c = {{0, 0}, {1, 2}};
+        EXPECT_EQ(expected_c, argwhere(c));
+
+        shape_type s = {3, 3, 3};
+        bool_container d(s);
+        std::fill(d.begin(), d.end(), true);
+
+        auto d_nz = argwhere(d);
+        EXPECT_EQ(size_t(3 * 3 * 3), d_nz.size());
+        xindex_type_t<typename container_3d::shape_type> last_idx = {2, 2, 2};
+        EXPECT_EQ(last_idx, d_nz.back());
     }
 
     TYPED_TEST(operation, cast)
