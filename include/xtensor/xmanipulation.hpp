@@ -608,6 +608,16 @@ namespace xt
         }
     };
 
+    /**
+     * @brief Rotate an array by 90 degrees in the plane specified by axes.
+     * Rotation direction is from the first towards the second axis.
+     *
+     * @param e the input xexpression
+     * @param axes the array is rotated in the plane defined by the axes. Axes must be different.
+     * @tparam N number of times the array is rotated by 90 degrees. Default is 1.
+     *
+     * @return returns a view with the result of the rotation
+     */
     template <std::ptrdiff_t N = 1, class E>
     inline auto rot90(E&& e, const std::array<std::ptrdiff_t, 2>& axes = {0, 1})
     {
