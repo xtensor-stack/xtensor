@@ -58,7 +58,7 @@ namespace xt
         auto av3 = xt::strided_view(py_a, {_r|-1|-4|-1, _r|-3|1|-2});
         EXPECT_EQ(av3, py_av3);
         auto av4 = xt::strided_view(py_a, {_r|-3|-5, _r|-3|10});
-        EXPECT_EQ(av4.size(), 0);
+        EXPECT_EQ(av4.size(), size_t(0));
         // py_av5 = a[-5:-2, -3:10]
         xarray<double> py_av5 = {{ 4., 5., 6.},
                                  {11.,12.,13.},

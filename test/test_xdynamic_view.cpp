@@ -208,7 +208,7 @@ namespace xt
         xkeep_slice<std::ptrdiff_t> ks({ 2, 3, -1 });
         ks.normalize(6);
         xkeep_slice<std::size_t> ku(ks);
-        EXPECT_EQ(ku.size(), 3);
+        EXPECT_EQ(ku.size(), std::size_t(3));
         EXPECT_FALSE(ku.contains(0));
         EXPECT_FALSE(ku.contains(1));
         EXPECT_TRUE(ku.contains(2));
@@ -219,7 +219,7 @@ namespace xt
         xdrop_slice<std::ptrdiff_t> ds({ 2, 3, -1 });
         ds.normalize(6);
         xdrop_slice<std::size_t> du(ds);
-        EXPECT_EQ(du.size(), 3);
+        EXPECT_EQ(du.size(), std::size_t(3));
         EXPECT_TRUE(du.contains(0));
         EXPECT_TRUE(du.contains(1));
         EXPECT_FALSE(du.contains(2));

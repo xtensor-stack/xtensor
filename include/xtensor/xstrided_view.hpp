@@ -397,25 +397,25 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::storage_begin() -> storage_iterator
     {
-        return this->storage().begin() + data_offset();
+        return this->storage().begin() + static_cast<std::ptrdiff_t>(data_offset());
     }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::storage_end() -> storage_iterator
     {
-        return this->storage().begin() + data_offset() + size();
+        return this->storage().begin() + static_cast<std::ptrdiff_t>(data_offset() + size());
     }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::storage_cbegin() const -> const_storage_iterator
     {
-        return this->storage().cbegin() + data_offset();
+        return this->storage().cbegin() + static_cast<std::ptrdiff_t>(data_offset());
     }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::storage_cend() const -> const_storage_iterator
     {
-        return this->storage().cbegin() + data_offset() + size();
+        return this->storage().cbegin() + static_cast<std::ptrdiff_t>(data_offset() + size());
     }
 
     /***************

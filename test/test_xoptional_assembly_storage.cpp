@@ -38,7 +38,7 @@ namespace xt
         storage_type v = {56, 2, 3, 5};
         flag_storage_type f = {false, true, true, true};
         auto stor = optional_assembly_storage(v, f);
-        ASSERT_EQ(stor.size(), 4);
+        ASSERT_EQ(stor.size(), std::size_t(4));
     }
 
     TEST(xoptional_assembly_storage, resize)
@@ -46,11 +46,11 @@ namespace xt
         storage_type v = {56, 2, 3, 5};
         flag_storage_type f = {false, true, true, true};
         auto stor = optional_assembly_storage(v, f);
-        ASSERT_EQ(stor.size(), 4);
-        stor.resize(5);
-        ASSERT_EQ(stor.size(), 5);
-        stor.resize(2);
-        ASSERT_EQ(stor.size(), 2);
+        ASSERT_EQ(stor.size(), std::size_t(4));
+        stor.resize(std::size_t(5));
+        ASSERT_EQ(stor.size(), std::size_t(5));
+        stor.resize(std::size_t(2));
+        ASSERT_EQ(stor.size(), std::size_t(2));
     }
 
     TEST(xoptional_assembly_storage, access)
@@ -163,8 +163,8 @@ namespace xt
         auto stor2 = optional_assembly_storage(v2, f2);
 
         stor2.swap(stor1);
-        ASSERT_EQ(stor1.size(), 0);
-        ASSERT_EQ(stor2.size(), 4);
+        ASSERT_EQ(stor1.size(), size_t(0));
+        ASSERT_EQ(stor2.size(), size_t(4));
     }
 
     TEST(xoptional_assembly_storage, operators)

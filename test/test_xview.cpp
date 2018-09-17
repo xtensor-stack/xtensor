@@ -1035,7 +1035,7 @@ namespace xt
             out_view = in_view;
         }
 
-        EXPECT_EQ(output(0, 5, 5, 2), 1);
+        EXPECT_EQ(output(0, 5, 5, 2), 1.f);
     }
 
     TEST(xview, where_operation)
@@ -1048,10 +1048,10 @@ namespace xt
         EXPECT_EQ(idx[0], exp_idx);
 
         auto idx2 = xt::where(col > size_t(0));
-        EXPECT_EQ(idx2.size(), 2);
-        exp_idx[0] = 1;
+        EXPECT_EQ(idx2.size(), std::size_t(2));
+        exp_idx[0] = std::size_t(1);
         EXPECT_EQ(idx2[0], exp_idx);
-        exp_idx[0] = 2;
+        exp_idx[0] = std::size_t(2);
         EXPECT_EQ(idx2[1], exp_idx);
     }
 
