@@ -1036,7 +1036,7 @@ namespace xt
             out_view = in_view;
         }
 
-        EXPECT_EQ(output(0, 5, 5, 2), 1);
+        EXPECT_EQ(output(0, 5, 5, 2), 1.f);
     }
 
     TEST(xview, where_operation)
@@ -1049,10 +1049,10 @@ namespace xt
         EXPECT_EQ(idx[0], exp_idx);
 
         auto idx2 = xt::where(col > size_t(0));
-        EXPECT_EQ(idx2.size(), 2);
-        exp_idx[0] = 1;
+        EXPECT_EQ(idx2.size(), std::size_t(2));
+        exp_idx[0] = std::size_t(1);
         EXPECT_EQ(idx2[0], exp_idx);
-        exp_idx[0] = 2;
+        exp_idx[0] = std::size_t(2);
         EXPECT_EQ(idx2[1], exp_idx);
     }
 
@@ -1124,11 +1124,11 @@ namespace xt
         EXPECT_EQ(vae.back(), b[4]);
         EXPECT_EQ(*vae.end(), *(a.end() - 2));
         EXPECT_TRUE(std::equal(a.begin() + 3, a.end() - 1, vae.begin()));
-        EXPECT_EQ(2, vae.size());
+        EXPECT_EQ(std::size_t(2), vae.size());
 
         auto r_iter = vae.rbegin();
-        EXPECT_EQ(std::distance(a.rbegin(), a.rend()), a.size());
-        EXPECT_EQ(std::distance(r_iter, vae.rend()), vae.size());
+        EXPECT_EQ(static_cast<std::size_t>(std::distance(a.rbegin(), a.rend())), a.size());
+        EXPECT_EQ(static_cast<std::size_t>(std::distance(r_iter, vae.rend())), vae.size());
 
         for (std::size_t i = 0; i < vae.size(); ++i)
         {
@@ -1142,11 +1142,11 @@ namespace xt
         EXPECT_EQ(vbe.back(), b[4]);
         EXPECT_EQ(*vbe.end(), *(a.end() - 2));
         EXPECT_TRUE(std::equal(a.begin() + 3, a.end() - 1, vbe.begin()));
-        EXPECT_EQ(2, vbe.size());
+        EXPECT_EQ(std::size_t(2), vbe.size());
 
         auto rb_iter = vbe.rbegin();
-        EXPECT_EQ(std::distance(a.rbegin(), a.rend()), a.size());
-        EXPECT_EQ(std::distance(rb_iter, vbe.rend()), vbe.size());
+        EXPECT_EQ(static_cast<std::size_t>(std::distance(a.rbegin(), a.rend())), a.size());
+        EXPECT_EQ(static_cast<std::size_t>(std::distance(rb_iter, vbe.rend())), vbe.size());
 
         for (std::size_t i = 0; i < vbe.size(); ++i)
         {
@@ -1168,13 +1168,13 @@ namespace xt
         EXPECT_EQ(do1, dos);
         EXPECT_EQ(ax.storage()[do1], ax(1, 1, 1, 0, 0, 0));
         auto doe = ax.strides()[0] * 1 + ax.strides()[1] * 1 + ax.strides()[2] * 1;
-        EXPECT_EQ(doe, do1);
+        EXPECT_EQ(static_cast<std::size_t>(doe), do1);
 
         auto do2 = xt::view(ax, 1, 2, newaxis(), range(1, 2), range(2, 2, 4), all()).data_offset();
         auto dos2 = xt::strided_view(ax, {1, 2, newaxis(), range(1, 2), range(2, 2, 4), all()}).data_offset();
         EXPECT_EQ(do2, dos2);
         auto doe2 = ax.strides()[0] * 1 + ax.strides()[1] * 2 + ax.strides()[2] * 1 + ax.strides()[3] * 2;
-        EXPECT_EQ(doe2, do2);
+        EXPECT_EQ(static_cast<std::size_t>(doe2), do2);
     }
 
     TEST(xview, view_simd_test)

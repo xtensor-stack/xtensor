@@ -23,7 +23,7 @@ namespace xt
         {
             xt::xtensor<double,1> count = xt::histogram(data, std::size_t(2));
 
-            EXPECT_EQ(count.size(), 2 );
+            EXPECT_EQ(count.size(), std::size_t(2) );
             EXPECT_EQ(count[0]    , 2.);
             EXPECT_EQ(count[1]    , 2.);
         }
@@ -33,7 +33,7 @@ namespace xt
                 xt::histogram_bin_edges(data, std::size_t(2), xt::histogram_algorithm::uniform)
             );
 
-            EXPECT_EQ(count.size(), 2 );
+            EXPECT_EQ(count.size(), std::size_t(2));
             EXPECT_EQ(count[0]    , 2.);
             EXPECT_EQ(count[1]    , 2.);
         }
@@ -51,7 +51,7 @@ namespace xt
         EXPECT_EQ(bc2, expc * 3);
 
         auto bc3 = bincount(data, 10);
-        EXPECT_EQ(bc3.size(), 10);
+        EXPECT_EQ(bc3.size(), std::size_t(10));
         EXPECT_EQ(bc3(3), expc(3));
     }
 }

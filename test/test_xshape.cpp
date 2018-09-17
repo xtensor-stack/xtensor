@@ -75,25 +75,25 @@ namespace xt
 
         vector_type c(10, 2);
         EXPECT_EQ(size_t(10), c.size());
-        EXPECT_EQ(2, c[2]);
+        EXPECT_EQ(size_t(2), c[2]);
 
         std::vector<std::size_t> src(10, std::size_t(1));
         vector_type d(src.cbegin(), src.cend());
         EXPECT_EQ(size_t(10), d.size());
-        EXPECT_EQ(1, d[2]);
+        EXPECT_EQ(size_t(1), d[2]);
 
         vector_type e(src);
         EXPECT_EQ(size_t(10), d.size());
-        EXPECT_EQ(1, d[2]);
+        EXPECT_EQ(size_t(1), d[2]);
         
         vector_type f = { 1, 2, 3, 4 };
         EXPECT_EQ(size_t(4), f.size());
-        EXPECT_EQ(3, f[2]);
+        EXPECT_EQ(size_t(3), f[2]);
 
         svector<std::size_t, 8> ov = { 1, 2, 3, 4, 5, 6, 7, 8 };
         vector_type g(ov);
         EXPECT_EQ(size_t(8), g.size());
-        EXPECT_EQ(3, g[2]);
+        EXPECT_EQ(size_t(3), g[2]);
     }
 
     TEST(svector, assign)
@@ -103,21 +103,21 @@ namespace xt
         vector_type src1(10, 2);
         a = src1;
         EXPECT_EQ(size_t(10), a.size());
-        EXPECT_EQ(2, a[2]);
+        EXPECT_EQ(size_t(2), a[2]);
 
         std::vector<size_t> src2(5, 1);
         a = src2;
         EXPECT_EQ(size_t(5), a.size());
-        EXPECT_EQ(1, a[2]);
+        EXPECT_EQ(size_t(1), a[2]);
 
         a = { 1, 2, 3, 4 };
         EXPECT_EQ(size_t(4), a.size());
-        EXPECT_EQ(3, a[2]);
+        EXPECT_EQ(size_t(3), a[2]);
 
         svector<std::size_t, 4> src3(10, 1);
         a = src3;
         EXPECT_EQ(size_t(10), a.size());
-        EXPECT_EQ(1, a[2]);
+        EXPECT_EQ(size_t(1), a[2]);
     }
 
     TEST(svector, resize)
@@ -137,18 +137,18 @@ namespace xt
     TEST(svector, access)
     {
         vector_type a(10);
-        a[0] = 1;
-        EXPECT_EQ(1, a[0]);
-        a[3] = 3;
-        EXPECT_EQ(3, a[3]);
-        a[5] = 2;
-        EXPECT_EQ(2, a[5]);
+        a[0] = size_t(1);
+        EXPECT_EQ(size_t(1), a[0]);
+        a[3] = size_t(3);
+        EXPECT_EQ(size_t(3), a[3]);
+        a[5] = size_t(2);
+        EXPECT_EQ(size_t(2), a[5]);
 
-        a.front() = 0;
-        EXPECT_EQ(0, a[0]);
+        a.front() = size_t(0);
+        EXPECT_EQ(size_t(0), a[0]);
 
-        a.back() = 1;
-        EXPECT_EQ(1, a[9]);
+        a.back() = size_t(1);
+        EXPECT_EQ(size_t(1), a[9]);
     }
 
     TEST(svector, iterator)
@@ -166,10 +166,10 @@ namespace xt
         fixed_shape<3, 4, 5> af;
         using cast_type = typename fixed_shape<3, 4, 5>::cast_type;
         cast_type a = af;
-        EXPECT_EQ(a[0], 3);
-        EXPECT_EQ(a[2], 5);
-        EXPECT_EQ(a.back(), 5);
-        EXPECT_EQ(a.front(), 3);
-        EXPECT_EQ(a.size(), 3);
+        EXPECT_EQ(a[0], size_t(3));
+        EXPECT_EQ(a[2], size_t(5));
+        EXPECT_EQ(a.back(), size_t(5));
+        EXPECT_EQ(a.front(), size_t(3));
+        EXPECT_EQ(a.size(), size_t(3));
     }
 }

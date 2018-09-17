@@ -112,8 +112,8 @@ namespace xt
         ex = (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major) ? 2ul : 4ul;
         EXPECT_EQ(ex, argmin(a));
 
-        EXPECT_EQ(3, argmin(b)());
-        EXPECT_EQ(3, argmin(b, 0)());
+        EXPECT_EQ(size_t(3), argmin(b)());
+        EXPECT_EQ(size_t(3), argmin(b, 0)());
 
         xarray<std::size_t> ex_2 = {1, 0, 0};
         EXPECT_EQ(ex_2, argmin(a, 0));
@@ -176,28 +176,28 @@ namespace xt
             auto m0_idx = a_s0(3, 2, 3);
             auto it0 = std::min_element(va_s0.begin(), va_s0.end());
             auto c0_idx = std::distance(va_s0.begin(), it0);
-            EXPECT_EQ(c0_idx, m0_idx);
+            EXPECT_EQ(static_cast<size_t>(c0_idx), m0_idx);
 
             auto a_s1 = argmin(a, 1);
             auto va_s1 = view(a, 3, xt::all(), 2, 3);
             auto m1_idx = a_s1(3, 2, 3);
             auto it1 = std::min_element(va_s1.begin(), va_s1.end());
             auto c1_idx = std::distance(va_s1.begin(), it1);
-            EXPECT_EQ(c1_idx, m1_idx);
+            EXPECT_EQ(static_cast<size_t>(c1_idx), m1_idx);
 
             auto a_s2 = argmin(a, 2);
             auto va_s2 = view(a, 3, 2, xt::all(), 3);
             auto m2_idx = a_s2(3, 2, 3);
             auto it2 = std::min_element(va_s2.begin(), va_s2.end());
             auto c2_idx = std::distance(va_s2.begin(), it2);
-            EXPECT_EQ(c2_idx, m2_idx);
+            EXPECT_EQ(static_cast<size_t>(c2_idx), m2_idx);
 
             auto a_s3 = argmin(a, 3);
             auto va_s3 = view(a, 3, 2, 3, xt::all());
             auto m3_idx = a_s3(3, 2, 3);
             auto it3 = std::min_element(va_s3.begin(), va_s3.end());
             auto c3_idx = std::distance(va_s3.begin(), it3);
-            EXPECT_EQ(c3_idx, m3_idx);
+            EXPECT_EQ(static_cast<size_t>(c3_idx), m3_idx);
         }
     }
 

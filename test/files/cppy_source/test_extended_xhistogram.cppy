@@ -39,9 +39,9 @@ namespace xt
 
         auto prob = xt::histogram(py_a, bin_edges, true);
 
-        EXPECT_EQ(bin_edges, py_bin_edges);
+        EXPECT_EQ(xt::cast<double>(bin_edges), py_bin_edges);
 
-        EXPECT_EQ(count, py_count);
+        EXPECT_EQ(count, xt::cast<double>(py_count));
 
         EXPECT_EQ(prob, py_prob);
     }

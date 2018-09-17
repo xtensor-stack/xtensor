@@ -141,7 +141,7 @@ namespace xt
     {
         xtensor<double, 2> m = {{1, 2}, {3, 4}};
         xarray<double> res = xt::sum(m, {0});
-        EXPECT_EQ(res.dimension(), 1);
+        EXPECT_EQ(res.dimension(), std::size_t(1));
         EXPECT_EQ(res(0), 4.0);
         EXPECT_EQ(res(1), 6.0);
     }
@@ -399,7 +399,7 @@ namespace xt
         auto b_gd_2 = sum(b, {0, 2}, evaluation_strategy::immediate());
         EXPECT_EQ(a_lz, a_gd_2);
         EXPECT_EQ(b_gd_2, a_gd_2);
-        EXPECT_EQ(a_gd_2.dimension(), 1);
+        EXPECT_EQ(a_gd_2.dimension(), std::size_t(1));
 
     #ifndef X_OLD_CLANG
         // EXPECT_TRUE(is_arr(a_gd_1.shape()));
