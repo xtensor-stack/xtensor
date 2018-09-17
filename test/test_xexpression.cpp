@@ -29,7 +29,7 @@ namespace xt
 
         auto sa = make_xshared(std::move(a));
 
-        EXPECT_EQ(sa.dimension(), 2);
+        EXPECT_EQ(sa.dimension(), std::size_t(2));
         EXPECT_EQ(sa.shape(), ca.shape());
         EXPECT_EQ(sa.strides(), ca.strides());
         EXPECT_EQ(sa(1, 3), ca(1, 3));

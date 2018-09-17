@@ -1192,8 +1192,10 @@ namespace xt
     inline xkeep_slice<T>::operator xkeep_slice<S>() const noexcept
     {
         xkeep_slice<S> ret;
-        ret.m_raw_indices.resize(size());
-        ret.m_indices.resize(size());
+        using us_type = typename container_type::size_type;
+        us_type sz = static_cast<us_type>(size());
+        ret.m_raw_indices.resize(sz);
+        ret.m_indices.resize(sz);
         std::transform(m_raw_indices.cbegin(), m_raw_indices.cend(), ret.m_raw_indices.begin(),
                        [](const T& val) { return static_cast<S>(val); });
         std::transform(m_indices.cbegin(), m_indices.cend(), ret.m_indices.begin(),
