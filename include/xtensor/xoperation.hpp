@@ -752,7 +752,8 @@ namespace xt
      * @brief return vector of indices where T is not zero
      *
      * @param arr input array
-     * @return vector of \a index_types where arr is not equal to zero
+     * @return vector of vectors, one for each dimension of arr, containing
+     * the indices of the non-zero elements in that dimension
      */
     template <class T>
     inline auto nonzero(const T& arr)
@@ -779,11 +780,19 @@ namespace xt
         return indices;
     }
 
-   template <layout_type L, class T>
-   inline auto flatnonzero(const T& arr)
-   {
-       return nonzero(ravel<L>(arr))[0];
-   }
+    /**
+     * @ingroup logical_operators
+     * @brief return indices that are non-zero in the flattened version of arr,
+     * equivalent to nonzero(ravel<layout_type>(arr))[0];
+     *
+     * @param arr input array
+     * @return indices that are non-zero in the flattened version of arr
+     */
+    template <layout_type L, class T>
+    inline auto flatnonzero(const T& arr)
+    {
+        return nonzero(ravel<L>(arr))[0];
+    }
 
     /**
      * @ingroup logical_operators
@@ -801,10 +810,10 @@ namespace xt
 
     /**
      * @ingroup logical_operators
-     * @brief return vector of indices where T is not zero
+     * @brief return vector of indices where arr is not zero
      *
      * @param arr input array
-     * @return vector of \a index_types where arr is not equal to zero
+     * @return vector of index_types where arr is not equal to zero
      */
     template <class T>
     inline auto argwhere(const T& arr)
