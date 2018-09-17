@@ -66,6 +66,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xjson.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xmanipulation.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_value.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp

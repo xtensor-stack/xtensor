@@ -15,7 +15,7 @@
 #include "xtensor/xmath.hpp"
 #include "xtensor/xreducer.hpp"
 #include "xtensor/xview.hpp"
-#include "xtensor/xstrided_view.hpp"
+#include "xtensor/xmanipulation.hpp"
 #include "xtensor/xrandom.hpp"
 
 namespace xt

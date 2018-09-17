@@ -74,6 +74,3 @@ Defined in ``xtensor/xbuilder.hpp``
 
 .. doxygenfunction:: xt::triu
    :project: xtensor
-
-.. doxygenfunction:: xt::flip
-   :project: xtensor

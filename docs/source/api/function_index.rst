@@ -14,6 +14,7 @@ Functions and generators
    xaccumulator
    xgenerator
    xbuilder
+   xmanipulation
    xsort
    xrandom
    xhistogram

@@ -15,7 +15,7 @@
 #include "xarray.hpp"
 #include "xeval.hpp"
 #include "xslice.hpp"  // for xnone
-#include "xstrided_view.hpp"
+#include "xmanipulation.hpp"
 #include "xtensor.hpp"
 
 namespace xt

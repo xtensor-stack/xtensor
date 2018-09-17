@@ -7,6 +7,21 @@
 Changelog
 =========
 
+0.18.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Moved array manipulation functions (``transpose``, ``ravel``, ``flatten``, ``trim_zeros``, ``squeeze``, ``expand_dims``, ``split``, ``atleast_Nd``, ``atleast_1d``, ``atleast_2d``, ``atleast_3d``, ``flip``) from ``xstrided_view.hpp`` to ``xmanipulation.hpp``
+  `#1153 <https://github.com/QuantStack/xtensor/pull/1153>`_.
+
+New features
+~~~~~~~~~~~~
+
+- Implement ``rot90``
+  `#1153 <https://github.com/QuantStack/xtensor/pull/1153>`_.
+
 0.17.4
 ------
 
@@ -495,7 +510,7 @@ Other changes
 0.15.5
 ------
 
-- assign functions optimized 
+- assign functions optimized
   `#650 <https://github.com/QuantStack/xtensor/pull/650>`_.
 - transposed view fixed
   `#652 <https://github.com/QuantStack/xtensor/pull/652>`_.
@@ -866,4 +881,3 @@ Other changes
 
 - Implicit conversion between signed and unsigned integers fixed.
   `#397 <https://github.com/QuantStack/xtensor/pull/397>`_.
-

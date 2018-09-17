@@ -110,6 +110,7 @@ set(XTENSOR_TESTS
     test_xiterator.cpp
     test_xio.cpp
     test_xlayout.cpp
+    test_xmanipulation.cpp
     test_xmasked_value.cpp
     test_xmasked_view.cpp
     test_xmath.cpp
