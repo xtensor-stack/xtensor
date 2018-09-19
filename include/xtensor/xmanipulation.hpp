@@ -18,6 +18,26 @@
 
 namespace xt
 {
+    template <class E>
+    auto transpose(E&& e) noexcept;
+
+    template <class E, class S, class Tag = check_policy::none>
+    auto transpose(E&& e, S&& permutation, Tag check_policy = Tag());
+
+    template <layout_type L, class E>
+    auto ravel(E&& e);
+
+    template <class E>
+    auto flatten(E&& e);
+
+    template <class E>
+    auto trim_zeros(E&& e, const std::string& direction = "fb");
+
+    template <class E>
+    auto squeeze(E&& e);
+
+    template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!std::is_integral<S>::value, int> = 0>
+    auto squeeze(E&& e, S&& axis, Tag check_policy = Tag());
 
     /****************************
      * transpose implementation *
