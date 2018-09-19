@@ -234,11 +234,11 @@ different fashions.
 | Iterating over ``a`` with a prescribed broadcasting shape      | | ``a.begin({3, 4})``                                          |
 |                                                                | | ``a.end({3, 4})``                                            |
 +----------------------------------------------------------------+----------------------------------------------------------------+
-| Iterating over ``a`` in a row-major fashion                    | | ``a.begin<layout_type::row_major>()``                        |
-|                                                                | | ``a.begin<layout_type::row_major>()``                        |
+| Iterating over ``a`` in a row-major fashion                    | | ``a.begin<xt::layout_type::row_major>()``                    |
+|                                                                | | ``a.begin<xt::layout_type::row_major>()``                    |
 +----------------------------------------------------------------+----------------------------------------------------------------+
-| Iterating over ``a`` in a column-major fashion                 | | ``a.begin<layout_type::column_major>()``                     |
-|                                                                | | ``a.end<layout_type::column_major>()``                       |
+| Iterating over ``a`` in a column-major fashion                 | | ``a.begin<xt::layout_type::column_major>()``                 |
+|                                                                | | ``a.end<xt::layout_type::column_major>()``                   |
 +----------------------------------------------------------------+----------------------------------------------------------------+
 
 Logical
