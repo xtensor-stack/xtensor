@@ -120,7 +120,7 @@ namespace xt
         EXPECT_EQ(s2[0].shape(), ds({3, 3, 3}));
 
         auto s3 = split(b, 3, 1);
-        EXPECT_EQ(s3.size(), 3);
+        EXPECT_EQ(s3.size(), std::size_t(3));
         EXPECT_EQ(s3[0].shape(), ds({3, 1, 3}));
 
         EXPECT_EQ(s3[0](0, 1), b(0, 0, 1));
@@ -216,17 +216,17 @@ namespace xt
         arr_t edb = {1, 0, 0, 1};
 
         EXPECT_EQ(trim_zeros(a), ea);
-        EXPECT_EQ(trim_zeros(b).size(), 0);
+        EXPECT_EQ(trim_zeros(b).size(), std::size_t(0));
         EXPECT_EQ(trim_zeros(c), ec);
         EXPECT_EQ(trim_zeros(d), ed);
 
         EXPECT_EQ(trim_zeros(a, "f"), eaf);
-        EXPECT_EQ(trim_zeros(b, "f").size(), 0);
+        EXPECT_EQ(trim_zeros(b, "f").size(), std::size_t(0));
         EXPECT_EQ(trim_zeros(c, "f"), ecf);
         EXPECT_EQ(trim_zeros(d, "f"), edf);
 
         EXPECT_EQ(trim_zeros(a, "b"), eab);
-        EXPECT_EQ(trim_zeros(b, "b").size(), 0);
+        EXPECT_EQ(trim_zeros(b, "b").size(), std::size_t(0));
         EXPECT_EQ(trim_zeros(c, "b"), ecb);
         EXPECT_EQ(trim_zeros(d, "b"), edb);
     }

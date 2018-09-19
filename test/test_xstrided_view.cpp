@@ -464,7 +464,7 @@ namespace xt
         t b = xt::ones<int>({ 5, 5, 5 });
         auto v2 = strided_view(b, { xt::ellipsis(), 1, 1, 1 });
         EXPECT_EQ(v2(), 1);
-        EXPECT_EQ(v2.shape().size(), 0);
+        EXPECT_EQ(v2.shape().size(), size_t(0));
 
         auto v3 = strided_view(b, { xt::ellipsis(), 1, xt::all(), 1 });
         dynamic_shape<std::size_t> v3_s{ 5 };
