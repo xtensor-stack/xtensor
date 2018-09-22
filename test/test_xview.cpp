@@ -1045,15 +1045,13 @@ namespace xt
         auto col = xt::view(I, xt::all(), 0);
         auto idx = xt::where(xt::equal(col, size_t(0)));
 
-        std::array<std::size_t, 1> exp_idx = {0};
+        std::vector<std::size_t> exp_idx = {0};
         EXPECT_EQ(idx[0], exp_idx);
 
         auto idx2 = xt::where(col > size_t(0));
-        EXPECT_EQ(idx2.size(), std::size_t(2));
-        exp_idx[0] = std::size_t(1);
-        EXPECT_EQ(idx2[0], exp_idx);
-        exp_idx[0] = std::size_t(2);
-        EXPECT_EQ(idx2[1], exp_idx);
+        std::vector<std::size_t> exp_idx2 = {1, 2};
+        EXPECT_EQ(idx2.size(), 1);
+        EXPECT_EQ(idx2[0], exp_idx2);
     }
 
     TEST(xview, contiguous)

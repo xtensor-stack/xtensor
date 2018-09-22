@@ -15,12 +15,16 @@ Breaking changes
 
 - Moved array manipulation functions (``transpose``, ``ravel``, ``flatten``, ``trim_zeros``, ``squeeze``, ``expand_dims``, ``split``, ``atleast_Nd``, ``atleast_1d``, ``atleast_2d``, ``atleast_3d``, ``flip``) from ``xstrided_view.hpp`` to ``xmanipulation.hpp``
   `#1153 <https://github.com/QuantStack/xtensor/pull/1153>`_.
+- Fixed ``where`` and ``nonzero`` function behavior to mimic the behavior from NumPy
+  `#1157 <https://github.com/QuantStack/xtensor/pull/1157>`_.
 
 New features
 ~~~~~~~~~~~~
 
 - Implement ``rot90``
   `#1153 <https://github.com/QuantStack/xtensor/pull/1153>`_.
+- Implement ``argwhere`` and ``flatnonzero``
+  `#1157 <https://github.com/QuantStack/xtensor/pull/1157>`_.
 
 0.17.4
 ------

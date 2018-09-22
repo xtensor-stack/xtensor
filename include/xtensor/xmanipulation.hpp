@@ -10,9 +10,6 @@
 #ifndef XTENSOR_MANIPULATION_HPP
 #define XTENSOR_MANIPULATION_HPP
 
-#include "xarray.hpp"
-#include "xtensor.hpp"
-#include "xbuilder.hpp"
 #include "xstrided_view.hpp"
 #include "xutils.hpp"
 
@@ -596,9 +593,11 @@ namespace xt
         template <class E>
         inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
         {
-            xtensor<ptrdiff_t, 1> axes_list = arange<std::ptrdiff_t>(0, std::ptrdiff_t(e.shape().size()));
             using std::swap;
-            swap(axes_list.at(axes[0]), axes_list.at(axes[1]));
+
+            dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
+            std::iota(axes_list.begin(), axes_list.end(), 0);
+            swap(axes_list[axes[0]], axes_list[axes[1]]);
 
             return transpose(flip(std::forward<E>(e), axes[1]), std::move(axes_list));
         }
@@ -620,9 +619,11 @@ namespace xt
         template <class E>
         inline auto operator()(E&& e, const std::array<std::size_t, 2>& axes)
         {
-            xtensor<ptrdiff_t, 1> axes_list = arange<std::ptrdiff_t>(0, std::ptrdiff_t(e.shape().size()));
             using std::swap;
-            swap(axes_list.at(axes[0]), axes_list.at(axes[1]));
+
+            dynamic_shape<std::ptrdiff_t> axes_list(e.shape().size());
+            std::iota(axes_list.begin(), axes_list.end(), 0);
+            swap(axes_list[axes[0]], axes_list[axes[1]]);
 
             return flip(transpose(std::forward<E>(e), std::move(axes_list)), axes[1]);
         }
