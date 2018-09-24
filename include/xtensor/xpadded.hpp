@@ -13,7 +13,7 @@
 
 namespace xt
 {
-    template <class ET, class S, class Tag>
+    template <class ET, class S, layout_type L, class Tag>
     class xpadded_container;
 
     namespace detail
@@ -55,34 +55,33 @@ namespace xt
         struct pad_shape<ET, L, fixed_shape<X...>> : pad_shape_impl<ET, L, std::make_index_sequence<sizeof...(X)>, X...> {};
     }
 
-    /*template <class ET, class S, class Tag>
-    struct xcontainer_inner_types<xpadded_container<ET, S, Tag>>
+    template<class ET, layout_type L, class S>
+    using pad_shape_t = typename detail::pad_shape<ET, L, S>::type;
+
+    template <class ET, class S, layout_type L, class Tag>
+    struct xcontainer_inner_types<xpadded_container<ET, S, L, Tag>>
     {
         using shape_type = S;
-        using inner_shape_type = typename S::cast_type;
-        using strides_type = get_strides_t<shape_type>;
-        using inner_strides_type = strides_type;
-        using backstrides_type = inner_strides_type;
-        using inner_backstrides_type = backstrides_type;
-
-        // NOTE: 0D (S::size() == 0) results in storage for 1 element (scalar)
-    #if defined(_MSC_VER) && _MSC_VER < 1910 && !defined(_WIN64)
-        // WORKAROUND FOR MSVC 2015 32 bit, fallback to unaligned container for 0D scalar case
-        using storage_type = std::array<ET, detail::fixed_compute_size<S>::value>;
-    #else
-        using storage_type = aligned_array<ET, detail::fixed_compute_size<S>::value>;
-    #endif
-
-        using temporary_type = xfixed_container<ET, S, L, Tag>;
+        using data_shape_type = pad_shape_t<ET, L, S>;
+        using strides_type = get_strides_t<data_shape_type>;
+        using backstrides_type = strides_type;
+        using storage_type = aligned_array<ET, detail::fixed_compute_size<data_shape_type>::value>;
+        using temporary_type = xpadded_container<ET, S, L, Tag>;
         static constexpr layout_type layout = L;
+    };
+
+    template <class ET, class S, layout_type L, class Tag>
+    struct xiterable_inner_types<xpadded_container<ET, S, L, Tag>>
+        : xcontainer_iterable_types<xpadded_container<ET, S, L, Tag>>
+    {
     };
 
     template <class ET, class S, layout_type L, class Tag>
     class xpadded_container : public xcontainer<xpadded_container<ET, S, L, Tag>>,
                               public xcontainer_semantic<xpadded_container<ET, S, L, Tag>>
     {
-        //
-    };*/
+    };
+
 }
 
 #endif
