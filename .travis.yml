@@ -131,7 +131,7 @@ install:
     - conda install xsimd -c QuantStack
     - conda install nlohmann_json -c QuantStack
     - if [[ "$ENABLE_TBB" == 1 ]]; then
-        conda install tbb -c conda-forge;
+        conda install tbb-devel -c conda-forge;
       fi
     # Testing
     - mkdir build
