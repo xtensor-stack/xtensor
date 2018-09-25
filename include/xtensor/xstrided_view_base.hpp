@@ -868,6 +868,7 @@ namespace xt
         {
             const S& m_shape;
             mutable std::size_t idx;
+            using array_type = std::array<std::ptrdiff_t, 3>;
 
             explicit slice_getter_impl(const S& shape)
                 : m_shape(shape), idx(0)
@@ -875,16 +876,28 @@ namespace xt
             }
 
             template <class T>
-            std::array<std::ptrdiff_t, 3> operator()(const T& /*t*/) const
+            array_type operator()(const T& /*t*/) const
             {
-                return std::array<std::ptrdiff_t, 3>{{0, 0, 0}};
+                return array_type{{0, 0, 0}};
             }
 
             template <class A, class B, class C>
-            std::array<std::ptrdiff_t, 3> operator()(const xrange_adaptor<A, B, C>& range) const
+            array_type operator()(const xrange_adaptor<A, B, C>& range) const
             {
                 auto sl = range.get(static_cast<std::size_t>(m_shape[idx]));
-                return std::array<std::ptrdiff_t, 3>({sl(0), sl.size(), sl.step_size()});
+                return array_type({sl(0), sl.size(), sl.step_size()});
+            }
+
+            template <class T>
+            array_type operator()(const xrange<T>& range) const
+            {
+                return array_type({ range(T(0)), range.size(), T(1) });
+            }
+
+            template <class T>
+            array_type operator()(const xstepped_range<T>& range) const
+            {
+                return array_type({ range(T(0)), range.size(), range.step_size(T(0)) });
             }
         };
 
