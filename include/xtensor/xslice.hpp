@@ -19,7 +19,6 @@
 #include "xstorage.hpp"
 #include "xutils.hpp"
 
-
 #ifndef XTENSOR_CONSTEXPR
     #if(defined(_MSC_VER) || __GNUC__ < 8)
         #define XTENSOR_CONSTEXPR inline
@@ -32,91 +31,6 @@
 
 namespace xt
 {
-    struct xall_tag {};
-    struct xnewaxis_tag {};
-    struct xellipsis_tag {};
-
-    template <class A, class B, class C>
-    struct xrange_adaptor;
-
-    namespace placeholders
-    {
-        // xtensor universal placeholder
-        struct xtuph {};
-
-        template <class... Args>
-        struct rangemaker
-        {
-            std::ptrdiff_t rng[3]; // = { 0, 0, 0 };
-        };
-
-        XTENSOR_CONSTEXPR xtuph get_tuph_or_val(std::ptrdiff_t /*val*/, std::true_type)
-        {
-            return xtuph();
-        }
-
-        XTENSOR_CONSTEXPR std::ptrdiff_t get_tuph_or_val(std::ptrdiff_t val, std::false_type)
-        {
-            return val;
-        }
-
-        template <class A, class B, class C>
-        struct rangemaker<A, B, C>
-        {
-            XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, C>()
-            {
-                return xrange_adaptor<A, B, C>({
-                    get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
-                    get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
-                    get_tuph_or_val(rng[2], std::is_same<C, xtuph>())
-                });
-            }
-
-            std::ptrdiff_t rng[3];// = { 0, 0, 0 };
-        };
-
-        template <class A, class B>
-        struct rangemaker<A, B>
-        {
-            XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, xt::placeholders::xtuph>()
-            {
-                return xrange_adaptor<A, B, xt::placeholders::xtuph>({
-                    get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
-                    get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
-                    xtuph()
-                });
-            }
-
-            std::ptrdiff_t rng[3];  // = { 0, 0, 0 };
-        };
-
-        template <class... OA>
-        XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const std::ptrdiff_t& t)
-        {
-            auto nrng = rangemaker<OA..., std::ptrdiff_t>({rng.rng[0], rng.rng[1], rng.rng[2]});
-            nrng.rng[sizeof...(OA)] = t;
-            return nrng;
-        }
-
-        template <class... OA>
-        XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const xt::placeholders::xtuph& /*t*/)
-        {
-            auto nrng = rangemaker<OA..., xt::placeholders::xtuph>({rng.rng[0], rng.rng[1], rng.rng[2]});
-            return nrng;
-        }
-
-
-        XTENSOR_GLOBAL_CONSTEXPR xtuph _{};
-        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r = rangemaker<>({0, 0, 0});
-        XTENSOR_GLOBAL_CONSTEXPR xall_tag _a{};
-        XTENSOR_GLOBAL_CONSTEXPR xnewaxis_tag _n{};
-        XTENSOR_GLOBAL_CONSTEXPR xellipsis_tag _e{};
-    }
-
-    inline auto xnone()
-    {
-        return placeholders::xtuph();
-    }
 
     /**********************
      * xslice declaration *
@@ -153,6 +67,23 @@ namespace xt
     template <class... E>
     using has_xslice = xtl::disjunction<is_xslice<E>...>;
 
+    /**************
+     * slice tags *
+     **************/
+
+#define DEFINE_TAG_CONVERSION(NAME)                 \
+    template <class T>                              \
+    XTENSOR_CONSTEXPR NAME convert() const noexcept \
+    {                                               \
+        return NAME();                              \
+    }
+
+    struct xall_tag { DEFINE_TAG_CONVERSION(xall_tag) };
+    struct xnewaxis_tag { DEFINE_TAG_CONVERSION(xnewaxis_tag) };
+    struct xellipsis_tag { DEFINE_TAG_CONVERSION(xellipsis_tag) };
+
+#undef DEFINE_TAG_CONVERSION
+
     /**********************
      * xrange declaration *
      **********************/
@@ -170,6 +101,11 @@ namespace xt
 
         template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
         operator xrange<S>() const noexcept;
+
+        // Same as implicit conversion operator but more convenient to call
+        // from a variant visitor
+        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        xrange<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -210,6 +146,11 @@ namespace xt
         template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
         operator xstepped_range<S>() const noexcept;
 
+        // Same as implicit conversion operator but more convenient to call
+        // from a variant visitor
+        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        xstepped_range<S> convert() const noexcept;
+
         size_type operator()(size_type i) const noexcept;
 
         size_type size() const noexcept;
@@ -249,6 +190,11 @@ namespace xt
 
         template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
         operator xall<S>() const noexcept;
+
+        // Same as implicit conversion operator but more convenient to call
+        // from a variant visitor
+        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        xall<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -308,11 +254,17 @@ namespace xt
     public:
 
         using size_type = T;
+        using self_type = xnewaxis<T>;
 
         xnewaxis() = default;
 
         template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
         operator xnewaxis<S>() const noexcept;
+
+        // Same as implicit conversion operator but more convenient to call
+        // from a variant visitor
+        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        xnewaxis<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
 
@@ -322,6 +274,9 @@ namespace xt
         size_type revert_index(std::size_t i) const noexcept;
 
         bool contains(size_type i) const noexcept;
+
+        bool operator==(const self_type& rhs) const noexcept;
+        bool operator!=(const self_type& rhs) const noexcept;
     };
 
     /**
@@ -378,6 +333,11 @@ namespace xt
 
         template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
         operator xkeep_slice<S>() const noexcept;
+
+        // Same as implicit conversion operator but more convenient to call
+        // from a variant visitor
+        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        xkeep_slice<S> convert() const noexcept;
 
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
@@ -496,6 +456,11 @@ namespace xt
         template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
         operator xdrop_slice<S>() const noexcept;
 
+        // Same as implicit conversion operator but more convenient to call
+        // from a variant visitor
+        template <class S, typename = std::enable_if_t<std::is_convertible<S, T>::value, void>>
+        xdrop_slice<S> convert() const noexcept;
+
         size_type operator()(size_type i) const noexcept;
         size_type size() const noexcept;
 
@@ -569,11 +534,11 @@ namespace xt
         return slice_type(std::move(tmp));
     }
 
-    /******************
-     * xrange_adaptor *
-     ******************/
+    /******************************
+     * xrange_adaptor declaration *
+     ******************************/
 
-    template <class A, class B, class C>
+    template <class A, class B = A, class C = A>
     struct xrange_adaptor
     {
         xrange_adaptor(A start_val, B stop_val, C step)
@@ -698,6 +663,89 @@ namespace xt
         C m_step;
     };
 
+    /*******************************
+     * Placeholders and rangemaker *
+     *******************************/
+
+    namespace placeholders
+    {
+        // xtensor universal placeholder
+        struct xtuph {};
+
+        template <class... Args>
+        struct rangemaker
+        {
+            std::ptrdiff_t rng[3]; // = { 0, 0, 0 };
+        };
+
+        XTENSOR_CONSTEXPR xtuph get_tuph_or_val(std::ptrdiff_t /*val*/, std::true_type)
+        {
+            return xtuph();
+        }
+
+        XTENSOR_CONSTEXPR std::ptrdiff_t get_tuph_or_val(std::ptrdiff_t val, std::false_type)
+        {
+            return val;
+        }
+
+        template <class A, class B, class C>
+        struct rangemaker<A, B, C>
+        {
+            XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, C>()
+            {
+                return xrange_adaptor<A, B, C>({
+                    get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
+                    get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
+                    get_tuph_or_val(rng[2], std::is_same<C, xtuph>())
+                });
+            }
+
+            std::ptrdiff_t rng[3];// = { 0, 0, 0 };
+        };
+
+        template <class A, class B>
+        struct rangemaker<A, B>
+        {
+            XTENSOR_CONSTEXPR operator xrange_adaptor<A, B, xt::placeholders::xtuph>()
+            {
+                return xrange_adaptor<A, B, xt::placeholders::xtuph>({
+                    get_tuph_or_val(rng[0], std::is_same<A, xtuph>()),
+                    get_tuph_or_val(rng[1], std::is_same<B, xtuph>()),
+                    xtuph()
+                });
+            }
+
+            std::ptrdiff_t rng[3];  // = { 0, 0, 0 };
+        };
+
+        template <class... OA>
+        XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const std::ptrdiff_t& t)
+        {
+            auto nrng = rangemaker<OA..., std::ptrdiff_t>({ rng.rng[0], rng.rng[1], rng.rng[2] });
+            nrng.rng[sizeof...(OA)] = t;
+            return nrng;
+        }
+
+        template <class... OA>
+        XTENSOR_CONSTEXPR auto operator|(const rangemaker<OA...>& rng, const xt::placeholders::xtuph& /*t*/)
+        {
+            auto nrng = rangemaker<OA..., xt::placeholders::xtuph>({ rng.rng[0], rng.rng[1], rng.rng[2] });
+            return nrng;
+        }
+
+
+        XTENSOR_GLOBAL_CONSTEXPR xtuph _{};
+        XTENSOR_GLOBAL_CONSTEXPR rangemaker<> _r = rangemaker<>({ 0, 0, 0 });
+        XTENSOR_GLOBAL_CONSTEXPR xall_tag _a{};
+        XTENSOR_GLOBAL_CONSTEXPR xnewaxis_tag _n{};
+        XTENSOR_GLOBAL_CONSTEXPR xellipsis_tag _e{};
+    }
+
+    inline auto xnone()
+    {
+        return placeholders::xtuph();
+    }
+
     namespace detail
     {
         template <class T, class E = void>
@@ -764,7 +812,6 @@ namespace xt
         return xrange_adaptor<detail::cast_if_integer_t<A>, detail::cast_if_integer_t<B>, detail::cast_if_integer_t<C>>(
             detail::cast_if_integer<A>{}(start_val), detail::cast_if_integer<B>{}(stop_val), detail::cast_if_integer<C>{}(step));
     }
-
 
     /******************************************************
      * homogeneous get_size for integral types and slices *
@@ -933,6 +980,13 @@ namespace xt
     }
 
     template <class T>
+    template <class S, typename>
+    inline xrange<S> xrange<T>::convert() const noexcept
+    {
+        return xrange<S>(*this);
+    }
+
+    template <class T>
     inline auto xrange<T>::operator()(size_type i) const noexcept -> size_type
     {
         return m_start + i;
@@ -986,8 +1040,10 @@ namespace xt
 
     template <class T>
     inline xstepped_range<T>::xstepped_range(size_type start_val, size_type stop_val, size_type step) noexcept
-        : m_start(start_val), m_size(size_type(std::ceil(double(stop_val - start_val) / double(step)))), m_step(step)
+        : m_start(start_val), m_size(size_type(0)), m_step(step)
     {
+        size_type n = stop_val - start_val;
+        m_size = n / step + (((n < 0) ^ (step > 0)) && (n % step));
     }
 
     template <class T>
@@ -999,6 +1055,13 @@ namespace xt
         ret.m_size = static_cast<S>(m_size);
         ret.m_step = static_cast<S>(m_step);
         return ret;
+    }
+
+    template <class T>
+    template <class S, typename>
+    inline xstepped_range<S> xstepped_range<T>::convert() const noexcept
+    {
+        return xstepped_range<S>(*this);
     }
 
     template <class T>
@@ -1067,6 +1130,13 @@ namespace xt
     }
 
     template <class T>
+    template <class S, typename>
+    inline xall<S> xall<T>::convert() const noexcept
+    {
+        return xall<S>(*this);
+    }
+
+    template <class T>
     inline auto xall<T>::operator()(size_type i) const noexcept -> size_type
     {
         return i;
@@ -1126,6 +1196,13 @@ namespace xt
     }
 
     template <class T>
+    template <class S, typename>
+    inline xnewaxis<S> xnewaxis<T>::convert() const noexcept
+    {
+        return xnewaxis<S>(*this);
+    }
+
+    template <class T>
     inline auto xnewaxis<T>::operator()(size_type) const noexcept -> size_type
     {
         return 0;
@@ -1159,6 +1236,18 @@ namespace xt
     inline bool xnewaxis<T>::contains(size_type i) const noexcept
     {
         return i == 0;
+    }
+
+    template <class T>
+    inline bool xnewaxis<T>::operator==(const self_type& /*rhs*/) const noexcept
+    {
+        return true;
+    }
+
+    template <class T>
+    inline bool xnewaxis<T>::operator!=(const self_type& /*rhs*/) const noexcept
+    {
+        return true;
     }
 
     /******************************
@@ -1201,6 +1290,13 @@ namespace xt
         std::transform(m_indices.cbegin(), m_indices.cend(), ret.m_indices.begin(),
                        [](const T& val) { return static_cast<S>(val); });
         return ret;
+    }
+
+    template <class T>
+    template <class S, typename>
+    inline xkeep_slice<S> xkeep_slice<T>::convert() const noexcept
+    {
+        return xkeep_slice<S>(*this);
     }
 
     template <class T>
@@ -1314,6 +1410,13 @@ namespace xt
             [](const auto& val) { return std::make_pair(static_cast<S>(val.first), static_cast<S>(val.second)); });
         ret.m_size = static_cast<S>(m_size);
         return ret;
+    }
+
+    template <class T>
+    template <class S, typename>
+    inline xdrop_slice<S> xdrop_slice<T>::convert() const noexcept
+    {
+        return xdrop_slice<S>(*this);
     }
 
     template <class T>

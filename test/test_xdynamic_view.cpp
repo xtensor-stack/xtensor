@@ -67,6 +67,12 @@ namespace xt
         EXPECT_EQ(view3(1, 0, 0), a(1, 1, 0));
         EXPECT_EQ(view3(1, 0, 1), a(1, 1, 2));
         EXPECT_EQ(view3(1, 0, 2), a(1, 1, 3));
+
+        auto view4 = dynamic_view(a, { 1, keep(0, 2), xrange<std::ptrdiff_t>(1, 4) });
+        EXPECT_EQ(view0, view4);
+
+        auto view5 = dynamic_view(a, { 1, keep(0, 2), xstepped_range<std::ptrdiff_t>(1, 4, 1) });
+        EXPECT_EQ(view0, view5);
     }
 
     TEST(xdynamic_view, keep_iterator)
@@ -189,21 +195,33 @@ namespace xt
         EXPECT_EQ(rs.size(), 11);
         EXPECT_EQ(rs(0), 1);
 
+        auto rs2 = ru.convert<std::ptrdiff_t>();
+        EXPECT_EQ(rs2, rs);
+
         xstepped_range<std::size_t> sru(std::size_t(1), std::size_t(5), std::size_t(2));
         xstepped_range<std::ptrdiff_t> srs = sru;
         EXPECT_EQ(srs.size(), 2);
         EXPECT_EQ(srs(0), 1);
         EXPECT_EQ(srs.step_size(), 2);
 
+        auto srs2 = sru.convert<std::ptrdiff_t>();
+        EXPECT_EQ(srs2, srs);
+
         xall<std::size_t> au(std::size_t(11));
         xall<std::ptrdiff_t> as(au);
         EXPECT_EQ(as.size(), 11);
         EXPECT_EQ(as(0), 0);
 
+        auto as2  = au.convert<std::ptrdiff_t>();
+        EXPECT_EQ(as2, as);
+
         xnewaxis<std::size_t> nau;
         xnewaxis<std::ptrdiff_t> nas(nau);
         EXPECT_EQ(nas.size(), 1);
         EXPECT_EQ(nas(0), 0);
+
+        auto nas2 = nau.convert<std::ptrdiff_t>();
+        EXPECT_EQ(nas2, nas);
 
         xkeep_slice<std::ptrdiff_t> ks({ 2, 3, -1 });
         ks.normalize(6);
@@ -216,6 +234,9 @@ namespace xt
         EXPECT_FALSE(ku.contains(4));
         EXPECT_TRUE(ku.contains(5));
 
+        auto ks2 = ku.convert<std::size_t>();
+        EXPECT_EQ(ks2, ks);
+
         xdrop_slice<std::ptrdiff_t> ds({ 2, 3, -1 });
         ds.normalize(6);
         xdrop_slice<std::size_t> du(ds);
@@ -226,5 +247,8 @@ namespace xt
         EXPECT_FALSE(du.contains(3));
         EXPECT_TRUE(du.contains(4));
         EXPECT_FALSE(du.contains(5));
+
+        auto ds2 = du.convert<std::size_t>();
+        EXPECT_EQ(ds2, ds);
     }
 }
