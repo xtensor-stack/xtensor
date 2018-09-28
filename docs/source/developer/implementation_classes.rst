@@ -68,7 +68,7 @@ totally:
 
     size_type size() const noexcept;
     size_type dimension() const noexcept;
-    const inner_shpae_type& shape() const noexcept;
+    const inner_shape_type& shape() const noexcept;
 
 **broadcasting methods**
 
