@@ -130,9 +130,9 @@ namespace xt
 
     TEST(xoptional, compilation)
     {
-        using functor_type = detail::plus<double>;
+        using functor_type = detail::plus;
         using tensor_type = xtensor_optional<double, 2>;
-        using function_type = xoptional_function<functor_type, xtl::xoptional<double>, tensor_type, tensor_type>;
+        using function_type = xoptional_function<functor_type, tensor_type, tensor_type>;
 
         tensor_type t1, t2;
         function_type f(functor_type(), t1, t2);

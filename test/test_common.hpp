@@ -304,10 +304,10 @@ namespace xt
                                         rm.m_strides[2]};
             EXPECT_EQ(vt.strides(), new_strides);
 
-            // strides_type new_backstrides = {rm.m_backstrides[1],
-            //                                 rm.m_backstrides[0],
-            //                                 rm.m_backstrides[2]};
-            // EXPECT_EQ(vt.backstrides(), new_backstrides);
+            strides_type new_backstrides = {rm.m_backstrides[1],
+                                            rm.m_backstrides[0],
+                                            rm.m_backstrides[2]};
+            EXPECT_EQ(vt.backstrides(), new_backstrides);
 
             EXPECT_EQ(vec_copy(0, 0, 0), vt(0, 0, 0));
             EXPECT_EQ(vec_copy(0, 1, 0), vt(1, 0, 0));

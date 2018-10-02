@@ -28,7 +28,7 @@ namespace xt
     public:
 
         template <class... E>
-        using xfunction_type = xfunction<F, R, xclosure_t<E>...>;
+        using xfunction_type = xfunction<F, xclosure_t<E>...>;
 
         template <class Func, class = std::enable_if_t<!std::is_same<std::decay_t<Func>, xvectorizer>::value>>
         xvectorizer(Func&& f);

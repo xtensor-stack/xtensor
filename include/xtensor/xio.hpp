@@ -583,7 +583,7 @@ namespace xt
     template <class E, class F>
     std::ostream& pretty_print(const xexpression<E>& e, F&& func, std::ostream& out = std::cout)
     {
-        xfunction<detail::custom_formatter<E>, std::string, const_xclosure_t<E>> print_fun(detail::custom_formatter<E>(std::forward<F>(func)), e);
+        xfunction<detail::custom_formatter<E>, const_xclosure_t<E>> print_fun(detail::custom_formatter<E>(std::forward<F>(func)), e);
         return pretty_print(print_fun, out);
     }
 
@@ -856,8 +856,8 @@ namespace xt
     template <class F, class R, class... CT>
     class xfunction;
 
-    template <class F, class R, class... CT>
-    xeus::xjson mime_bundle_repr(const xfunction<F, R, CT...>& expr)
+    template <class F, class... CT>
+    xeus::xjson mime_bundle_repr(const xfunction<F, CT...>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }

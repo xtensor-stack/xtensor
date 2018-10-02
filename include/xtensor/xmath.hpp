@@ -14,6 +14,7 @@
 #define XTENSOR_MATH_HPP
 
 #include <cmath>
+#include <algorithm>
 #include <array>
 #include <complex>
 #include <type_traits>
@@ -76,150 +77,80 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
 
 #define XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                  \
-    template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
-        static auto exec(const T& arg)                                            \
-        {                                                                         \
-            using math::NAME;                                                     \
-            return NAME(arg);                                                     \
-        }                                                                         \
-        template <class U, class RT>                                              \
-        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
-        using argument_type = T;                                                  \
-        using result_type = decltype(exec(std::declval<T>()));                    \
-        using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = fst_t<simd_value_type, R>;                       \
-        constexpr result_type operator()(const T& arg) const                      \
+        template <class T>                                                        \
+        constexpr auto operator()(const T& arg) const                             \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
         template <class B>                                                        \
-        constexpr fst_t<B, R>                                                     \
-        simd_apply(const B& arg) const                                            \
+        constexpr auto simd_apply(const B& arg) const                             \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
-        template <class U>                                                        \
-        struct rebind                                                             \
-        {                                                                         \
-            using type = NAME##_fun<U>;                                           \
-        };                                                                        \
     }
 
 #define XTENSOR_UNARY_MATH_FUNCTOR(NAME) XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, T)
 #define XTENSOR_UNARY_BOOL_FUNCTOR(NAME) XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
 #define XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)                         \
-    template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
-        static auto exec(const T& arg)                                            \
-        {                                                                         \
-            using math::NAME;                                                     \
-            return NAME(arg);                                                     \
-        }                                                                         \
-        template <class U, class RT>                                              \
-        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
-        using argument_type = T;                                                  \
-        using result_type = decltype(exec(std::declval<T>()));                    \
-        using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = fst_t<simd_value_type, result_type>;             \
-        constexpr result_type operator()(const T& arg) const                      \
+        template <class T>                                                        \
+        constexpr auto operator()(const T& arg) const                             \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
         template <class B>                                                        \
-        constexpr simd_result_type simd_apply(const B& arg) const                 \
+        constexpr auto simd_apply(const B& arg) const                             \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg);                                                     \
         }                                                                         \
-        template <class U>                                                        \
-        struct rebind                                                             \
-        {                                                                         \
-            using type = NAME##_fun<U>;                                           \
-        };                                                                        \
     }
 
 #define XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, R)                                 \
-    template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
-        static auto exec(const T& arg1, const T& arg2)                            \
-        {                                                                         \
-            using math::NAME;                                                     \
-            return NAME(arg1, arg2);                                              \
-        }                                                                         \
-        template <class U, class RT>                                              \
-        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
-        using first_argument_type = T;                                            \
-        using second_argument_type = T;                                           \
-        using result_type = decltype(exec(std::declval<T>(), std::declval<T>())); \
-        using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = fst_t<simd_value_type, R> ;                      \
-        constexpr result_type operator()(const T& arg1, const T& arg2) const      \
+        template <class T1, class T2>                                             \
+        constexpr auto operator()(const T1& arg1, const T2& arg2) const             \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \
         }                                                                         \
         template <class B>                                                        \
-        constexpr fst_t<B, R>                                                     \
+        constexpr auto                                                            \
         simd_apply(const B& arg1, const B& arg2) const                            \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \
         }                                                                         \
-        template <class U>                                                        \
-        struct rebind                                                             \
-        {                                                                         \
-            using type = NAME##_fun<U>;                                           \
-        };                                                                        \
     }
 
 #define XTENSOR_BINARY_MATH_FUNCTOR(NAME) XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, T)
 #define XTENSOR_BINARY_BOOL_FUNCTOR(NAME) XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
 #define XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, R)                                \
-    template <class T>                                                            \
     struct NAME##_fun                                                             \
     {                                                                             \
-        static auto exec(const T& arg1, const T& arg2, const T& arg3)             \
-        {                                                                         \
-            using math::NAME;                                                     \
-            return NAME(arg1, arg2, arg3);                                        \
-        }                                                                         \
-        template <class U, class RT>                                              \
-        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;               \
-        using first_argument_type = T;                                            \
-        using second_argument_type = T;                                           \
-        using third_argument_type = T;                                            \
-        using result_type = decltype(exec(std::declval<T>(), std::declval<T>(),   \
-                    std::declval<T>()));                                          \
-        using simd_value_type = xsimd::simd_type<T>;                              \
-        using simd_result_type = fst_t<simd_value_type, R>;                       \
-        constexpr result_type operator()(const T& arg1,                           \
-                                         const T& arg2,                           \
-                                         const T& arg3) const                     \
+        template <class T1, class T2, class T3>                                   \
+        constexpr auto operator()(const T1& arg1,                                 \
+                                  const T2& arg2,                                 \
+                                  const T3& arg3) const                           \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2, arg3);                                        \
         }                                                                         \
         template <class B>                                                        \
-        constexpr fst_t<B, R>                                                     \
-        simd_apply(const B& arg1, const B& arg2, const B& arg3) const             \
+        auto simd_apply(const B& arg1, const B& arg2, const B& arg3) const        \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2, arg3);                                        \
         }                                                                         \
-        template <class U>                                                        \
-        struct rebind                                                             \
-        {                                                                         \
-            using type = NAME##_fun<U>;                                           \
-        };                                                                        \
     }
 
 #define XTENSOR_TERNARY_MATH_FUNCTOR(NAME) XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, T)
@@ -582,57 +513,50 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     namespace math
     {
-        template <class T>
+        template <class T = void>
         struct minimum
         {
-            using result_type = T;
-            using simd_value_type = xsimd::simd_type<T>;
-
-            constexpr result_type operator()(const T& t1, const T& t2) const noexcept
+            template <class A1, class A2>
+            constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
                 return (t1 < t2) ? t1 : t2;
             }
 
-            constexpr simd_value_type simd_apply(const simd_value_type& t1, const simd_value_type& t2) const noexcept
+            template <class A1, class A2>
+            constexpr auto simd_apply(const A1& t1, const A2& t2) const noexcept
             {
                 return xsimd::select(t1 < t2, t1, t2);
             }
         };
 
-        template <class T>
+        template <class T = void>
         struct maximum
         {
-            using result_type = T;
-            using simd_value_type = xsimd::simd_type<T>;
-
-            constexpr result_type operator()(const T& t1, const T& t2) const noexcept
+            template <class A1, class A2>
+            constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
                 return (t1 > t2) ? t1 : t2;
             }
 
-            constexpr simd_value_type simd_apply(const simd_value_type& t1, const simd_value_type& t2) const noexcept
+            template <class A1, class A2>
+            constexpr auto simd_apply(const A1& t1, const A2& t2) const noexcept
             {
                 return xsimd::select(t1 > t2, t1, t2);
             }
         };
 
-        template <class T>
         struct clamp_fun
         {
-            using first_argument_type = T;
-            using second_argument_type = T;
-            using third_argument_type = T;
-            using result_type = T;
-            using simd_value_type = xsimd::simd_type<T>;
-
-            constexpr T operator()(const T& v, const T& lo, const T& hi) const
+            template <class A1, class A2, class A3>
+            constexpr auto operator()(const A1& v, const A2& lo, const A3& hi) const
             {
                 return v < lo ? lo : hi < v ? hi : v;
             }
 
-            constexpr simd_value_type simd_apply(const simd_value_type& v,
-                                                 const simd_value_type& lo,
-                                                 const simd_value_type& hi) const
+            template <class A1, class A2, class A3>
+            constexpr auto simd_apply(const A1& v,
+                                      const A2& lo,
+                                      const A3& hi) const
             {
                 return xsimd::select(v < lo, lo, xsimd::select(hi < v, hi, v));
             }
@@ -651,9 +575,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      */
     template <class E1, class E2>
     inline auto maximum(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<math::maximum, E1, E2>
+        -> detail::xfunction_type_t<math::maximum<void>, E1, E2>
     {
-        return detail::make_xfunction<math::maximum>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::maximum<void>>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -668,9 +592,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      */
     template <class E1, class E2>
     inline auto minimum(E1&& e1, E2&& e2) noexcept
-        -> detail::xfunction_type_t<math::minimum, E1, E2>
+        -> detail::xfunction_type_t<math::minimum<void>, E1, E2>
     {
-        return detail::make_xfunction<math::minimum>(std::forward<E1>(e1), std::forward<E2>(e2));
+        return detail::make_xfunction<math::minimum<void>>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
@@ -730,40 +654,34 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     namespace math
     {
-        namespace detail
+        template <class T>
+        struct sign_impl
         {
-            template <typename T>
-            constexpr std::enable_if_t<std::is_signed<T>::value, T>
-            sign_impl(T x)
+            template <class XT = T>
+            static constexpr std::enable_if_t<std::is_signed<XT>::value, T> run(T x)
             {
                 return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? T(copysign(T(0), x)) : T(copysign(T(1), x));
             }
 
-            template <typename T>
-            inline std::enable_if_t<xtl::is_complex<T>::value, T>
-            sign_impl(T x)
+            template <class XT = T>
+            static constexpr std::enable_if_t<xtl::is_complex<XT>::value, T> run(T x)
             {
-                typename T::value_type e = (x.real() != T(0)) ? x.real() : x.imag();
-                return T(sign_impl(e), 0);
+                return T(sign_impl<typename T::value_type>::run((x.real() != typename T::value_type(0)) ? x.real() : x.imag()), 0);
             }
 
-            template <typename T>
-            constexpr std::enable_if_t<std::is_unsigned<T>::value, T>
-            sign_impl(T x)
+            template <class XT = T>
+            static constexpr std::enable_if_t<std::is_unsigned<XT>::value, T> run(T x)
             {
                 return T(x > T(0));
             }
-        }
+        };
 
-        template <class T>
         struct sign_fun
         {
-            using argument_type = T;
-            using result_type = T;
-
-            constexpr T operator()(const T& x) const
+            template <class T>
+            constexpr auto operator()(const T& x) const
             {
-                return detail::sign_impl(x);
+                return sign_impl<T>::run(x);
             }
         };
     }
@@ -966,7 +884,6 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
             F m_lambda;
         };
-
     }
 
     /**
@@ -999,7 +916,6 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto make_lambda_xfunction(F&& lambda, E&&... args)
     {
         using xfunction_type = xfunction<detail::lambda_adapt<F>,
-                                         decltype(lambda(std::declval<typename std::decay_t<E>::value_type>()...)),
                                          const_xclosure_t<E>...>;
         return xfunction_type(detail::lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
     }
@@ -1667,10 +1583,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return FUNCTOR(std::get<Is>(args)...);
         }
 
-        template <template <class...> class F, class... A, class... E>
+        template <class F, class... A, class... E>
         inline auto make_xfunction(std::tuple<A...>&& f_args, E&&... e) noexcept
         {
-            using functor_type = F<common_value_type_t<std::decay_t<E>...>>;
+            using functor_type = F;
             using expression_tag = xexpression_tag_t<E...>;
             using type = select_xfunction_expression_t<expression_tag,
                                                        functor_type,
@@ -1682,7 +1598,6 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return type(std::move(functor), std::forward<E>(e)...);
         }
 
-        template <class T>
         struct isclose
         {
             using result_type = bool;
@@ -1691,9 +1606,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             {
             }
 
-            bool operator()(const T& a, const T& b) const
+            template <class A1, class A2>
+            bool operator()(const A1& a, const A2& b) const
             {
-                using internal_type = promote_type_t<T, double>;
+                using internal_type = promote_type_t<A1, A2, double>;
                 if (math::isnan(a) && math::isnan(b))
                 {
                     return m_equal_nan;
@@ -1704,14 +1620,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                     return a == b;
                 }
                 auto d = math::abs(internal_type(a) - internal_type(b));
-                return d <= m_atol || d <= m_rtol * double((std::max)(math::abs(a), math::abs(b)));
+                return d <= m_atol || d <= m_rtol * double((std::max)(math::abs(internal_type(a)), math::abs(internal_type(b))));
             }
-
-            template <class U>
-            struct rebind
-            {
-                using type = isclose<U>;
-            };
 
         private:
 
@@ -2028,27 +1938,24 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
     namespace detail
     {
-        template <class T>
         struct nan_to_num_functor
         {
-            using value_type = T;
-            using result_type = value_type;
-
-            inline result_type operator()(const value_type a) const
+            template <class A>
+            inline auto operator()(const A& a) const
             {
                 if (math::isnan(a))
                 {
-                    return 0;
+                    return A(0);
                 }
                 if (math::isinf(a))
                 {
                     if (a < 0)
                     {
-                        return std::numeric_limits<result_type>::lowest();
+                        return std::numeric_limits<A>::lowest();
                     }
                     else
                     {
-                        return (std::numeric_limits<result_type>::max)();
+                        return (std::numeric_limits<A>::max)();
                     }
                 }
                 return a;
