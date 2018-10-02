@@ -181,7 +181,7 @@ namespace xt
     template <class CT, class... S>
     class xview;
 
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     class xfunction;
 
     namespace check_policy

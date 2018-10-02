@@ -64,7 +64,7 @@ namespace xt
         CHECK_RESULT_TYPE(2 * auchar, int);
         CHECK_RESULT_TYPE(2.0 * auchar, double);
         CHECK_RESULT_TYPE(sqrt(auchar), double);
-        CHECK_RESULT_TYPE(abs(auchar), int);
+        CHECK_RESULT_TYPE(abs(auchar), unsigned char);
         CHECK_RESULT_TYPE(sum(auchar), unsigned long long);
         CHECK_RESULT_TYPE(mean(auchar), double);
         CHECK_RESULT_TYPE(minmax(auchar), ARRAY_TYPE(unsigned char));
@@ -77,7 +77,7 @@ namespace xt
         CHECK_RESULT_TYPE(2 * ashort, int);
         CHECK_RESULT_TYPE(2.0 * ashort, double);
         CHECK_RESULT_TYPE(sqrt(ashort), double);
-        CHECK_RESULT_TYPE(abs(ashort), int);
+        CHECK_RESULT_TYPE(abs(ashort), decltype(std::abs(short{})));
         CHECK_RESULT_TYPE(sum(ashort), long long);
         CHECK_RESULT_TYPE(mean(ashort), double);
         CHECK_RESULT_TYPE(minmax(ashort), ARRAY_TYPE(short));

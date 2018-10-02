@@ -25,7 +25,7 @@
 namespace xt
 {
 
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     class xoptional_function;
 
     /***********
@@ -33,32 +33,18 @@ namespace xt
      ***********/
 
 #define UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
-    template <class T>                                                          \
     struct NAME                                                                 \
     {                                                                           \
-        template <class U, class RT>                                            \
-        using fvt_t = xt::detail::functor_value_type_t<U, RT>;                  \
-        template <class U, class RT>                                            \
-        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;             \
-        using argument_type = T;                                                \
-        using result_type = fvt_t<T, R>;                                        \
-        using simd_value_type = xsimd::simd_type<T>;                            \
-        using simd_result_type = fst_t<simd_value_type, R>;                     \
-        constexpr result_type operator()(const T& arg) const                    \
+        template <class A1>                                                     \
+        constexpr auto operator()(const A1& arg) const                          \
         {                                                                       \
             return OP arg;                                                      \
         }                                                                       \
         template <class B>                                                      \
-        constexpr fst_t<B, R>                                                   \
-        simd_apply(const B& arg) const                                          \
+        constexpr auto simd_apply(const B& arg) const                           \
         {                                                                       \
             return OP arg;                                                      \
         }                                                                       \
-        template <class U>                                                      \
-        struct rebind                                                           \
-        {                                                                       \
-            using type = NAME<U>;                                               \
-        };                                                                      \
     }
 
 #define UNARY_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
@@ -71,34 +57,18 @@ namespace xt
        argument is uint64_t.
     */
 #define BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
-    template <class T>                                                           \
     struct NAME                                                                  \
     {                                                                            \
-        template <class U, class RT>                                             \
-        using fvt_t = xt::detail::functor_value_type_t<U, RT>;                   \
-        template <class U, class RT>                                             \
-        using fst_t = xt::detail::functor_batch_simd_type_t<U, RT>;              \
-        using first_argument_type = T;                                           \
-        using second_argument_type = T;                                          \
-        using result_type = fvt_t<T, R>;                                         \
-        using simd_value_type = xsimd::simd_type<T>;                             \
-        using simd_result_type = fst_t<simd_value_type, R>;                      \
         template <class T1, class T2>                                            \
-        constexpr result_type operator()(const T1& arg1, const T2& arg2) const   \
+        constexpr auto operator()(const T1& arg1, const T2& arg2) const          \
         {                                                                        \
             return (arg1 OP arg2);                                               \
         }                                                                        \
         template <class B>                                                       \
-        constexpr fst_t<B, R>                                                    \
-        simd_apply(const B& arg1, const B& arg2) const                           \
+        constexpr auto simd_apply(const B& arg1, const B& arg2) const            \
         {                                                                        \
             return (arg1 OP arg2);                                               \
         }                                                                        \
-        template <class U>                                                       \
-        struct rebind                                                            \
-        {                                                                        \
-            using type = NAME<U>;                                                \
-        };                                                                       \
     }
 
 #define BINARY_OPERATOR_FUNCTOR(NAME, OP) BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
@@ -130,18 +100,13 @@ namespace xt
         BINARY_BOOL_OPERATOR_FUNCTOR(equal_to, ==);
         BINARY_BOOL_OPERATOR_FUNCTOR(not_equal_to, !=);
 
-        template <class T>
         struct conditional_ternary
         {
-            using result_type = T;
-            using simd_value_type = xsimd::simd_type<T>;
-            using simd_bool_type = xsimd::simd_bool_type<T>;
-            using simd_result_type = simd_value_type;
-
             template <class B>
             using get_batch_bool = typename xsimd::simd_traits<typename xsimd::revert_simd_traits<B>::type>::bool_type;
 
-            constexpr result_type operator()(bool t1, const T& t2, const T& t3) const noexcept
+            template <class A1, class A2>
+            constexpr auto operator()(bool t1, const A1& t2, const A2& t3) const noexcept
             {
                 return t1 ? t2 : t3;
             }
@@ -152,24 +117,17 @@ namespace xt
             {
                 return xsimd::select(t1, t2, t3);
             }
-            template <class U>
-            struct rebind
-            {
-                using type = conditional_ternary<U>;
-            };
         };
 
         template <class R>
         struct cast
         {
-            template <class T>
             struct functor
             {
-                using argument_type = T;
                 using result_type = R;
-                using simd_value_type = xsimd::simd_type<T>;
-                using simd_result_type = xt::detail::functor_simd_type_t<T, R>;
-                constexpr result_type operator()(const T& arg) const
+
+                template <class A1>
+                constexpr result_type operator()(const A1& arg) const
                 {
                     return static_cast<R>(arg);
                 }
@@ -179,11 +137,6 @@ namespace xt
                 {
                     return static_cast<R>(arg);
                 }*/
-                template <class U>
-                struct rebind
-                {
-                    using type = functor<U>;
-                };
             };
         };
 
@@ -199,43 +152,44 @@ namespace xt
         template <class F, class... E>
         struct select_xfunction_expression<xtensor_expression_tag, F, E...>
         {
-            using type = xfunction<F, typename F::result_type, E...>;
+            using type = xfunction<F, E...>;
         };
 
         template <class F, class... E>
         struct select_xfunction_expression<xoptional_expression_tag, F, E...>
         {
-            using type = xoptional_function<F, typename F::result_type, E...>;
+            using type = xoptional_function<F, E...>;
         };
 
         template <class Tag, class F, class... E>
         using select_xfunction_expression_t = typename select_xfunction_expression<Tag, F, E...>::type;
 
-        template <class Tag, template <class...> class F, class... E>
+        template <class Tag, class F, class... E>
         struct build_functor_type;
 
-        template <template <class...> class F, class... E>
+        template <class F, class... E>
         struct build_functor_type<xscalar_expression_tag, F, E...>
         {
             using type = typename build_functor_type<xtensor_expression_tag, F, E...>::type;
         };
 
-        template <template <class...> class F, class... E>
+        template <class F, class... E>
         struct build_functor_type<xtensor_expression_tag, F, E...>
         {
-            using type = F<common_value_type_t<std::decay_t<E>...>>;
+            using xtype = decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<E>>>()...));
+            using type = F;
         };
 
-        template <template <class...> class F, class... E>
+        template <class F, class... E>
         struct build_functor_type<xoptional_expression_tag, F, E...>
         {
-            using type = F<common_value_type_t<std::decay_t<E>...>>;
+            using type = F;
         };
 
-        template <class Tag, template <class...> class F, class... E>
+        template <class Tag, class F, class... E>
         using build_functor_type_t = typename build_functor_type<Tag, F, E...>::type;
 
-        template <template <class...> class F, class... E>
+        template <class F, class... E>
         struct xfunction_type
         {
             using expression_tag = xexpression_tag_t<E...>;
@@ -245,7 +199,7 @@ namespace xt
                 const_xclosure_t<E>...>;
         };
 
-        template <template <class...> class F, class... E>
+        template <class F, class... E>
         inline auto make_xfunction(E&&... e) noexcept
         {
             using function_type = xfunction_type<F, E...>;
@@ -258,7 +212,7 @@ namespace xt
         // Wrapping the xfunction type in the xfunction_type metafunction avoids this evaluation when
         // the condition is false, since it leads to a tricky bug preventing from using operator+ and operator-
         // on vector and arrays iterators.
-        template <template <class...> class F, class... E>
+        template <class F, class... E>
         using xfunction_type_t = typename std::enable_if_t<has_xexpression<std::decay_t<E>...>::value,
                                                            xfunction_type<F, E...>>::type;
     }
@@ -888,9 +842,9 @@ namespace xt
 
     template <class R, class E>
     inline auto cast(E&& e) noexcept
-        -> detail::xfunction_type_t<detail::cast<R>::template functor, E>
+        -> detail::xfunction_type_t<typename detail::cast<R>::functor, E>
     {
-        return detail::make_xfunction<detail::cast<R>::template functor>(std::forward<E>(e));
+        return detail::make_xfunction<typename detail::cast<R>::functor>(std::forward<E>(e));
     }
 }
 
