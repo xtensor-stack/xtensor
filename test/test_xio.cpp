@@ -12,6 +12,16 @@
 #include <algorithm>
 #include <sstream>
 #include <limits>
+#include <chrono>
+
+using day_duration     = std::chrono::duration<long long, std::ratio<3600 * 24>>;
+using iwanttobeprinted = std::chrono::time_point<std::chrono::system_clock, day_duration>;
+
+std::ostream& operator<<(std::ostream& os, const iwanttobeprinted&)
+{
+    os << "thankyousomuch";
+    return os;
+}
 
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
@@ -275,5 +285,13 @@ namespace xt
         out << von;
         std::string exp = "{1, 1, 1, 1, 1}";
         EXPECT_EQ(exp, out.str());
+    }
+
+    TEST(xio, outside_operator_overload)
+    {
+        // Just check compilation
+        auto arr = xarray<iwanttobeprinted>::from_shape({5});
+        std::stringstream out;
+        out << arr;
     }
 }
