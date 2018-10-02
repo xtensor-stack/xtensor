@@ -536,6 +536,8 @@ namespace xt
 
             void update(const_reference val)
             {
+                using ::operator<<;
+
                 std::stringstream buf;
                 buf << val;
                 std::string s = buf.str();
