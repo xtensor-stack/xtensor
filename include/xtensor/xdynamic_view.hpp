@@ -246,6 +246,9 @@ namespace xt
         xrange_adaptor<T, T, T>,
         xrange_adaptor<placeholders::xtuph, placeholders::xtuph, placeholders::xtuph>,
 
+        xrange<T>,
+        xstepped_range<T>,
+
         xkeep_slice<T>,
         xdrop_slice<T>,
 
