@@ -41,4 +41,32 @@ namespace xt
         holder_a = holder_b;
         holder_b = xexpression_holder(c);
     }
+
+    TEST(xexpression_holder, to_json)
+    {
+        xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
+        xexpression_holder holder_a = xexpression_holder(a);
+
+        nlohmann::json json_out;
+        to_json(json_out, holder_a);
+
+        ASSERT_EQ(json_out[0][0], 1);
+        ASSERT_EQ(json_out[0][1], 2);
+        ASSERT_EQ(json_out[0][2], 3);
+        ASSERT_EQ(json_out[1][1], 6);
+    }
+
+    TEST(xexpression_holder, from_json)
+    {
+        xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
+        xarray<double> b = {{5,6,7,8}, {1,2,3,4}};
+
+        xexpression_holder holder_a = xexpression_holder(a);
+
+        nlohmann::json json_b;
+        to_json(json_b, b);
+        from_json(json_b, holder_a);
+
+        ASSERT_EQ(a, b);
+    }
 }
