@@ -29,6 +29,9 @@ namespace xt
     {
     };
 
+    // typedef smart_ownership
+    using smart_ownership = no_ownership;
+
     struct acquire_ownership
     {
     };
@@ -49,6 +52,7 @@ namespace xt
 
             using self_type = xbuffer_storage<CP, A>;
             using allocator_type = A;
+            using destructor_type = allocator_type;
             using value_type = typename allocator_type::value_type;
             using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
                                   typename allocator_type::const_reference,
@@ -80,6 +84,47 @@ namespace xt
             size_type m_size;
         };
 
+        template <class CP, class D>
+        class xbuffer_smart_pointer
+        {
+        public:
+
+            using self_type = xbuffer_storage<CP, D>;
+            using destructor_type = D;
+            using value_type = std::remove_pointer_t<std::remove_reference_t<CP>>;
+            using allocator_type = std::allocator<value_type>;
+            using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                                  typename allocator_type::const_reference,
+                                  typename allocator_type::reference>;
+            using const_reference = typename allocator_type::const_reference;
+            using pointer = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
+                                  typename allocator_type::const_pointer,
+                                  typename allocator_type::pointer>;
+            using const_pointer = typename allocator_type::const_pointer;
+            using size_type = typename allocator_type::size_type;
+            using difference_type = typename allocator_type::difference_type;
+
+            xbuffer_smart_pointer();
+
+            template <class P>
+            xbuffer_smart_pointer(P&& data_ptr, size_type size, const destructor_type& destruct);
+
+            size_type size() const noexcept;
+            void resize(size_type size);
+
+            pointer data() noexcept;
+            const_pointer data() const noexcept;
+
+            void swap(self_type& rhs) noexcept;
+
+        private:
+
+            pointer p_data;
+            size_type m_size;
+            destructor_type m_destruct;
+        };
+
+
         template <class CP, class A>
         class xbuffer_owner_storage
         {
@@ -87,6 +132,7 @@ namespace xt
 
             using self_type = xbuffer_owner_storage<CP, A>;
             using allocator_type = A;
+            using destructor_type = allocator_type;
             using value_type = typename allocator_type::value_type;
             using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
                                   typename allocator_type::const_reference,
@@ -142,6 +188,18 @@ namespace xt
             using type = xbuffer_owner_storage<CP, A>;
         };
 
+        template <class CP, class T>
+        struct get_buffer_storage<CP, std::shared_ptr<T>, no_ownership>
+        {
+            using type = xbuffer_smart_pointer<CP, std::shared_ptr<T>>;
+        };
+
+        template <class CP, class T>
+        struct get_buffer_storage<CP, std::unique_ptr<T>, no_ownership>
+        {
+            using type = xbuffer_smart_pointer<CP, std::shared_ptr<T>>;
+        };
+
         template <class CP, class A, class O>
         using buffer_storage_t = typename get_buffer_storage<CP, A, O>::type;
     }
@@ -154,6 +212,7 @@ namespace xt
         using base_type = detail::buffer_storage_t<CP, A, O>;
         using self_type = xbuffer_adaptor<CP, O, A>;
         using allocator_type = typename base_type::allocator_type;
+        using destructor_type = typename base_type::destructor_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
@@ -172,7 +231,7 @@ namespace xt
         xbuffer_adaptor() = default;
 
         template <class P>
-        xbuffer_adaptor(P&& data, size_type size, const allocator_type& alloc = allocator_type());
+        xbuffer_adaptor(P&& data, size_type size, const destructor_type& alloc = allocator_type());
 
         ~xbuffer_adaptor() = default;
 
@@ -428,13 +487,64 @@ namespace xt
         }
     }
 
+    /****************************************
+     * xbuffer_smart_pointer implementation *
+     ****************************************/
+
+    namespace detail
+    {
+        template <class CP, class D>
+        template <class P>
+        xbuffer_smart_pointer<CP, D>::xbuffer_smart_pointer(P&& data_ptr, size_type size,
+                                                            const destructor_type& destruct)
+            : p_data(data_ptr), m_size(size), m_destruct(destruct)
+        {
+        }
+
+        template <class CP, class D>
+        auto xbuffer_smart_pointer<CP, D>::size() const noexcept -> size_type
+        {
+            return m_size;
+        }
+
+        template <class CP, class D>
+        void xbuffer_smart_pointer<CP, D>::resize(size_type size)
+        {
+            if (m_size != size)
+            {
+                throw std::runtime_error("xbuffer_storage not resizable");
+            }
+        }
+
+        template <class CP, class D>
+        auto xbuffer_smart_pointer<CP, D>::data() noexcept -> pointer
+        {
+            return p_data;
+        }
+        template <class CP, class D>
+        auto xbuffer_smart_pointer<CP, D>::data() const noexcept -> const_pointer
+        {
+            return p_data;
+        }
+
+        template <class CP, class D>
+        void xbuffer_smart_pointer<CP, D>::swap(self_type& rhs) noexcept
+        {
+            using std::swap;
+            swap(p_data, rhs.p_data);
+            swap(m_size, rhs.m_size);
+            swap(m_destruct, rhs.m_destruct);
+
+        }
+    }
+
     /**********************************
      * xbuffer_adaptor implementation *
      **********************************/
 
     template <class CP, class O, class A>
     template <class P>
-    inline xbuffer_adaptor<CP, O, A>::xbuffer_adaptor(P&& data, size_type size, const allocator_type& alloc)
+    inline xbuffer_adaptor<CP, O, A>::xbuffer_adaptor(P&& data, size_type size, const destructor_type& alloc)
         : base_type(std::forward<P>(data), size, alloc)
     {
     }
