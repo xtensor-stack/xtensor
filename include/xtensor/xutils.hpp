@@ -804,9 +804,6 @@ namespace xt
     /**
      * @brief Abbreviation of 'typename promote_type<T>::type'.
      */
-    // template <class... T>
-    // using promote_type_t = xtl::mpl::eval_if_t<xtl::conjunction<std::is_scalar<T>...>,
-    //                                            promote_type<T...>,
     template <class... T>
     using promote_type_t = typename promote_type<T...>::type;
     /**

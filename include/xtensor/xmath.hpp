@@ -117,14 +117,13 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     struct NAME##_fun                                                             \
     {                                                                             \
         template <class T1, class T2>                                             \
-        constexpr auto operator()(const T1& arg1, const T2& arg2) const             \
+        constexpr auto operator()(const T1& arg1, const T2& arg2) const           \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \
         }                                                                         \
         template <class B>                                                        \
-        constexpr auto                                                            \
-        simd_apply(const B& arg1, const B& arg2) const                            \
+        constexpr auto simd_apply(const B& arg1, const B& arg2) const             \
         {                                                                         \
             using math::NAME;                                                     \
             return NAME(arg1, arg2);                                              \

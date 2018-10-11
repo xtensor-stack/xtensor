@@ -187,7 +187,8 @@ namespace xt
 
         template <class align, class simd>
         void store_simd(size_type i, const simd& e);
-        template <class align, class requested_type = value_type, std::ptrdiff_t N = -1>
+        template <class align, class requested_type = value_type,
+                  std::size_t N = xsimd::simd_traits<requested_type>::size>
         simd_return_type<requested_type> load_simd(size_type i) const;
 
         storage_iterator storage_begin() noexcept;
@@ -802,11 +803,11 @@ namespace xt
     }
 
     template <class D>
-    template <class alignment, class requested_type, std::ptrdiff_t N>
-    inline auto xcontainer<D>::load_simd(size_type i) const -> simd_return_type<requested_type>
+    template <class alignment, class requested_type, std::size_t N>
+    inline auto xcontainer<D>::load_simd(size_type i) const
+        -> simd_return_type<requested_type>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        using batch_type = simd_return_type<requested_type>;
         return xsimd::load_simd<value_type, requested_type>(&(storage()[i]), align_mode());
     }
 
