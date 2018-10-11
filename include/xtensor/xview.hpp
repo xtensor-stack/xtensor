@@ -549,7 +549,9 @@ namespace xt
         template <class align, class simd, class T = xexpression_type>
         enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
 
-        template <class align, class requested_type = value_type, std::ptrdiff_t N = -1, class T = xexpression_type>
+        template <class align, class requested_type = value_type,
+                  std::size_t N = xsimd::simd_traits<requested_type>::size,
+                  class T = xexpression_type>
         enable_simd_interface<T, simd_return_type<requested_type>> load_simd(size_type i) const;
 
         template <class T = xexpression_type>
@@ -1382,7 +1384,7 @@ namespace xt
     }
 
     template <class CT, class... S>
-    template <class align, class requested_type, std::ptrdiff_t N, class T>
+    template <class align, class requested_type, std::size_t N, class T>
     inline auto xview<CT, S...>::load_simd(size_type i) const -> enable_simd_interface<T, simd_return_type<requested_type>>
     {
         return m_e.template load_simd<xsimd::unaligned_mode, requested_type>(data_offset() + i);
