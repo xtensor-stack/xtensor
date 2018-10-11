@@ -378,6 +378,7 @@ namespace xt
         };
     }
 
+#ifndef X_OLD_CLANG
     TEST(xtensor_adaptor, smart_ptr)
     {
         auto data = std::vector<double>{1,2,3,4,5,6,7,8};
@@ -405,4 +406,5 @@ namespace xt
             auto obj = adapt_smart_ptr(unique_buf.get()->buf.data(), {2, 4}, std::move(unique_buf));
         }
     }
+#endif
 }
