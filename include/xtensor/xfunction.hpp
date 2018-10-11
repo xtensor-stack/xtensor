@@ -81,104 +81,6 @@ namespace xt
         template <class... Args>
         using common_difference_type_t = typename common_difference_type<Args...>::type;
 
-        /*********************
-         * common_value_type *
-         *********************/
-
-        template <class... Args>
-        struct common_value_type
-        {
-            using type = typename std::common_type<xvalue_type_t<Args>...>::type;
-        };
-
-        template <class... Args>
-        using common_value_type_t = typename common_value_type<Args...>::type;
-
-        /**********************
-         * promote_value_type *
-         **********************/
-
-        template <class... Args>
-        struct promote_value_type
-        {
-            using type = typename promote_type<xvalue_type_t<Args>...>::type;
-        };
-
-        template <class... Args>
-        using promote_value_type_t = typename promote_value_type<Args...>::type;
-
-        /**********************
-         * functor_value_type *
-         **********************/
-
-        template <class T, class R>
-        struct functor_value_type
-        {
-            using type = R;
-        };
-
-        template <class T, class R>
-        using functor_value_type_t = typename functor_value_type<T, R>::type;
-
-        /********************
-         * simd_return_type *
-         ********************/
-
-        template <class F, class CST, class R, class = void_t<>>
-        struct simd_return_type
-        {
-        };
-
-        template <class F, class CST, class R>
-        struct simd_return_type<F, CST, R, void_t<decltype(&F(std::declval<CST>()))>>
-        {
-            using type = xsimd::simd_return_type<CST, R>;
-        };
-
-        template <class F, class CST, class R>
-        using simd_return_type_t = typename simd_return_type<F, CST, R>::type;
-
-        /*********************
-         * functor_simd_type *
-         *********************/
-
-        // General case
-        template <class T, class R>
-        struct functor_simd_type
-        {
-            // Never use xsimd::simd_type<R>. A function may operates on int32_t but
-            // be asked to load arguments as batches of floating point numbers because it is part
-            // of an expression whose promote_type is a floating point number.
-            using type = xsimd::simd_type<T>;
-        };
-
-        // Comparison functions
-        template <class T>
-        struct functor_simd_type<T, bool>
-        {
-            using type = xsimd::simd_bool_type<T>;
-        };
-
-        // complex reducers (abs, args)
-        template <class T>
-        struct functor_simd_type<std::complex<T>, T>
-        {
-            using type = xsimd::simd_type<T>;
-        };
-
-        template <class T, class R>
-        using functor_simd_type_t = typename functor_simd_type<T, R>::type;
-
-        template <class B, class R>
-        struct functor_batch_simd_type
-        {
-            using batch_value_type = typename xsimd::revert_simd_traits<B>::type;
-            using type = typename functor_simd_type<batch_value_type, R>::type;
-        };
-
-        template <class B, class R>
-        using functor_batch_simd_type_t = typename functor_batch_simd_type<B, R>::type;
-
         // State storage
         template<class S, class is_shape_trivial>
         struct xfunction_cache_impl
@@ -209,6 +111,48 @@ namespace xt
             template <std::size_t... N, class is_shape_trivial>
             constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_initialized;
         #endif
+
+        template <class F, class B, class = void>
+        struct has_simd_apply : std::false_type {};
+
+        template <class F, class B>
+        struct has_simd_apply<F, B, void_t<decltype(&F::template simd_apply<B>)>>
+            : std::true_type
+        {
+        };
+
+        template <class V>
+        struct has_simd_type
+            : std::integral_constant<bool, !std::is_same<V, xsimd::simd_type<V>>::value>
+        {
+        };
+
+        template <class T>
+        struct meta_identity
+        {
+            using type = T;
+        };
+
+        // This meta struct checks wether SIMD should be activated for our 
+        // functor "F"
+        template <class V, class F, class... CT>
+        struct xsimd_meta_getter
+        {
+            using scalar_result_type = V;
+
+            // check if all arguments are supported by SIMD
+            using simd_arguments_exist = xtl::conjunction<has_simd_type<scalar_result_type>,
+                                                          has_simd_type<xvalue_type_t<std::decay_t<CT>>>...>;
+            // if yes, insert correct type here
+            using simd_value_type = xtl::mpl::eval_if_t<simd_arguments_exist,
+                                                        meta_identity<xsimd::simd_type<scalar_result_type>>,
+                                                        make_invalid_type<>>;
+            // if all types are supported, check that the functor has a working 
+            // simd_apply and all arguments have the simd interface
+            using use_xsimd = xtl::conjunction<simd_arguments_exist,
+                                               has_simd_apply<F, scalar_result_type>,
+                                               has_simd_interface<std::decay_t<CT>>...>;
+        };
     }
 
     template<class promote>
@@ -234,52 +178,6 @@ namespace xt
     /******************
      * xfunction_base *
      ******************/
-
-    namespace detail
-    {
-        template <class F, class B, class = void>
-        struct has_simd_apply : std::false_type {};
-
-        template <class F, class B>
-        struct has_simd_apply<F, B, void_t<decltype(&F::template simd_apply<B>)>>
-            : std::true_type
-        {
-        };
-
-        template <class V>
-        struct has_simd_type
-            : std::integral_constant<bool, !std::is_same<V, xsimd::simd_type<V>>::value>
-        {
-        };
-
-        // This meta struct checks wether SIMD should be activated for our 
-        // functor "F"
-        template <class V, class F, class... CT>
-        struct xsimd_meta_getter
-        {
-            using scalar_value_type = V;
-            using functor = F;
-
-            // check if all arguments are supported by SIMD
-            using simd_arguments_exist = xtl::conjunction<has_simd_type<V>, has_simd_type<xvalue_type_t<std::decay_t<CT>>>...>;
-            using simd_value_type = xtl::mpl::eval_if_t<simd_arguments_exist,
-                                                        std::common_type<xsimd::simd_type<V>>,
-                                                        make_invalid_type<> >;
-
-            using use_xsimd = xtl::conjunction<simd_arguments_exist, has_simd_apply<F, scalar_value_type>, has_simd_interface<std::decay_t<CT>>...>;
-            using simd_return_type = xsimd::simd_type<V>;
-        };
-    }
-
-    namespace detail
-    {
-        template <class T>
-        struct meta_identity
-        {
-            using type = T;
-        };
-    }
-
 
 #define DL XTENSOR_DEFAULT_LAYOUT
 
@@ -318,13 +216,10 @@ namespace xt
 
         using has_simd_interface = typename simd_meta_getter::use_xsimd;
         using simd_value_type = typename simd_meta_getter::simd_value_type;
-        using simd_argument_type = xsimd::simd_type<value_type>;
+        using simd_argument_type = simd_value_type;
 
-        template <class T>
-        using simd_return_type = typename simd_meta_getter::simd_return_type;
-
-        // template <class simd>
-        // using simd_return_type = detail::simd_return_type_t<functor_type, simd_argument_type, simd>;
+        template <class requested_type>
+        using simd_return_type = xsimd::simd_return_type<value_type, requested_type>;
 
         using iterable_base = xconst_iterable<xfunction_base<F, CT...>>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
@@ -422,8 +317,9 @@ namespace xt
         template <class UT = self_type, class = typename std::enable_if<UT::only_scalar::value>::type>
         operator value_type() const;
 
-        template <class align, class requested_type = value_type, std::ptrdiff_t N = -1>
-        auto load_simd(size_type i) const;
+        template <class align, class requested_type = value_type,
+                  std::size_t N = xsimd::simd_traits<requested_type>::size>
+        simd_return_type<requested_type> load_simd(size_type i) const;
 
         const tuple_type& arguments() const noexcept;
 
@@ -457,7 +353,7 @@ namespace xt
         template <std::size_t... I>
         const_reference data_element_impl(std::index_sequence<I...>, size_type i) const;
 
-        template <class align, class requested_type, std::ptrdiff_t N, std::size_t... I>
+        template <class align, class requested_type, std::size_t N, std::size_t... I>
         auto load_simd_impl(std::index_sequence<I...>, size_type i) const;
 
         template <class Func, std::size_t... I>
@@ -970,8 +866,9 @@ namespace xt
     }
 
     template <class F, class... CT>
-    template <class align, class requested_type, std::ptrdiff_t N>
+    template <class align, class requested_type, std::size_t N>
     inline auto xfunction_base<F, CT...>::load_simd(size_type i) const
+        -> simd_return_type<requested_type>
     {
         return load_simd_impl<align, requested_type, N>(std::make_index_sequence<sizeof...(CT)>(), i);
     }
@@ -1044,7 +941,7 @@ namespace xt
     }
 
     template <class F, class... CT>
-    template <class align, class requested_type, std::ptrdiff_t N, std::size_t... I>
+    template <class align, class requested_type, std::size_t N, std::size_t... I>
     inline auto xfunction_base<F, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const
     {
         return m_f.simd_apply((std::get<I>(m_e)

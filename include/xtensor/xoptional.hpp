@@ -27,17 +27,6 @@ namespace xt
 
     namespace detail
     {
-        template <class CT, class CB>
-        struct functor_value_type<xtl::xoptional<CT, CB>, bool>
-        {
-            using type = xtl::xoptional<bool>;
-        };
-
-        template <class CT, class CB>
-        struct functor_simd_type<xtl::xoptional<CT, CB>, bool>
-        {
-            using type = xtl::xoptional<bool>;
-        };
 
         template <class T, class Tag>
         struct split_optional_expression_impl

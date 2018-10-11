@@ -77,7 +77,7 @@ namespace xsimd
     using revert_simd_type = typename revert_simd_traits<T>::type;
 
     template <class T, class V>
-    inline simd_type<V> set_simd(const T& value)
+    inline simd_type<T> set_simd(const T& value)
     {
         return value;
     }

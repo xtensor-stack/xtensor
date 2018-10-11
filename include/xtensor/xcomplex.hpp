@@ -192,7 +192,6 @@ namespace xt
     template <class E>
     inline auto conj(E&& e) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
         using functor = math::conj_impl_fun;
         using type = xfunction<functor, const_xclosure_t<E>>;
         return type(functor(), std::forward<E>(e));
@@ -205,7 +204,6 @@ namespace xt
     template <class E>
     inline auto arg(E&& e) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
         using functor = math::arg_fun;
         using type = xfunction<functor, const_xclosure_t<E>>;
         return type(functor(), std::forward<E>(e));
@@ -237,7 +235,6 @@ namespace xt
     template <class E>
     inline auto norm(E&& e) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
         using functor = math::norm_fun;
         using type = xfunction<functor, const_xclosure_t<E>>;
         return type(functor(), std::forward<E>(e));

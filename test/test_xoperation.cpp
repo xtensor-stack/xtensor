@@ -577,6 +577,8 @@ namespace xt
             auto fsd = sd * a;
             using assign_traits_scalar_double = xassign_traits<TypeParam, decltype(fsd)>;
 #if XTENSOR_USE_XSIMD
+            auto batch = fsd.template load_simd<double>(0);
+            EXPECT_TRUE((std::is_same<decltype(batch), xsimd::simd_type<double>>::value));
             EXPECT_TRUE(assign_traits_scalar_double::convertible_types());
             EXPECT_TRUE(assign_traits_scalar_double::simd_size());
             EXPECT_FALSE(assign_traits_scalar_double::forbid_simd());
