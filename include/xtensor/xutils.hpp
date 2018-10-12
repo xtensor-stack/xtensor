@@ -23,6 +23,7 @@
 
 #include <xtl/xfunctional.hpp>
 #include <xtl/xsequence.hpp>
+#include <xtl/xmeta_utils.hpp>
 #include <xtl/xtype_traits.hpp>
 
 #include "xtensor_config.hpp"
@@ -805,7 +806,6 @@ namespace xt
      */
     template <class... T>
     using promote_type_t = typename promote_type<T...>::type;
-
     /**
      * @brief Traits class to find the biggest type of the same kind.
      *

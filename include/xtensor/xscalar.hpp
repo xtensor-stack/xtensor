@@ -246,8 +246,10 @@ namespace xt
 
         template <class align, class simd = simd_value_type>
         void store_simd(size_type i, const simd& e);
-        template <class align, class simd = simd_value_type>
-        simd load_simd(size_type i) const;
+        template <class align, class requested_type = value_type,
+                  std::size_t N = xsimd::simd_traits<requested_type>::size>
+        xsimd::simd_return_type<value_type, requested_type>
+        load_simd(size_type i) const;
 
     private:
 
@@ -941,10 +943,11 @@ namespace xt
     }
 
     template <class CT>
-    template <class align, class simd>
-    inline auto xscalar<CT>::load_simd(size_type) const -> simd
+    template <class align, class requested_type, std::size_t N>
+    inline auto xscalar<CT>::load_simd(size_type) const
+        -> xsimd::simd_return_type<value_type, requested_type>
     {
-        return xsimd::set_simd<value_type, typename simd::value_type>(m_value);
+        return xsimd::set_simd<value_type, requested_type>(m_value);
     }
 
     template <class T>

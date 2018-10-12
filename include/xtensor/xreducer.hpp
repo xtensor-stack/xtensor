@@ -87,7 +87,7 @@ namespace xt
     };
 
     template <class F, class E, class X>
-    auto reduce_immediate(F&& f, E&& e, X&& axes)
+    inline auto reduce_immediate(F&& f, E&& e, X&& axes)
     {
         using shape_type = typename xreducer_shape_type<typename std::decay_t<E>::shape_type, std::decay_t<X>>::type;
 

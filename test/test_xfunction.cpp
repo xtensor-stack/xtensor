@@ -10,6 +10,8 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
 #include "test_common.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xfixed.hpp"
 
 namespace xt
 {
@@ -332,5 +334,18 @@ namespace xt
             SCOPED_TRACE("different dimensions");
             test_xfunction_iterator_end(f.m_c, f.m_a);
         }
+    }
+
+    TEST(xfunction, xfunction_in_xfunction)
+    {
+        using Point3 = xt::xtensor_fixed<double, xshape<3>>;
+        Point3 a1({1.,2.,3.});
+        Point3 a2({3.,1.,3.});
+        Point3 a3({54.,5.,5.});
+        xtensor<Point3, 1> a({a1, a2, a3});
+        xtensor<Point3, 1> c = a + a;
+        Point3 r1({2., 4., 6.}), r2({6., 2., 6.}), r3({108., 10., 10.});
+        xtensor<Point3, 1> res{r1, r2, r3};
+        EXPECT_EQ(c, res);
     }
 }

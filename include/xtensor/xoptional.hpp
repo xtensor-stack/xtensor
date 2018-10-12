@@ -27,17 +27,6 @@ namespace xt
 
     namespace detail
     {
-        template <class CT, class CB>
-        struct functor_value_type<xtl::xoptional<CT, CB>, bool>
-        {
-            using type = xtl::xoptional<bool>;
-        };
-
-        template <class CT, class CB>
-        struct functor_simd_type<xtl::xoptional<CT, CB>, bool>
-        {
-            using type = xtl::xoptional<bool>;
-        };
 
         template <class T, class Tag>
         struct split_optional_expression_impl
@@ -354,16 +343,17 @@ namespace xt
      * @tparam R the return type of the function
      * @tparam CT the closure types for arguments of the function
      */
-    template <class F, class R, class... CT>
-    class xoptional_function : public xfunction_base<F, R, CT...>,
-                               public xexpression<xoptional_function<F, R, CT...>>
+    template <class F, class... CT>
+    class xoptional_function : public xfunction_base<F, CT...>,
+                               public xexpression<xoptional_function<F, CT...>>
     {
     public:
 
-        using self_type = xoptional_function<F, R, CT...>;
-        using base_type = xfunction_base<F, R, CT...>;
+        using self_type = xoptional_function<F, CT...>;
+        using base_type = xfunction_base<F, CT...>;
         using expression_tag = xoptional_expression_tag;
-        using value_functor = typename F::template rebind<typename R::value_type>::type;
+        // using value_functor = typename F::template rebind<typename R::value_type>::type;
+        using value_functor = F;
         using flag_functor = detail::optional_bitwise<bool>;
 
         template <class Func, class... CTA, class U = std::enable_if<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
@@ -377,13 +367,9 @@ namespace xt
         xoptional_function(xoptional_function&&) = default;
         xoptional_function& operator=(xoptional_function&&) = default;
 
-        using value_expression = xfunction<value_functor,
-                                           typename R::value_type,
-                                           detail::value_expression_t<CT>...>;
+        using value_expression = xfunction<value_functor, detail::value_expression_t<CT>...>;
 
-        using flag_expression = xfunction<flag_functor,
-                                          bool,
-                                          detail::flag_expression_t<CT>...>;
+        using flag_expression = xfunction<flag_functor, detail::flag_expression_t<CT>...>;
 
         value_expression value() const;
         flag_expression has_value() const;
@@ -409,36 +395,36 @@ namespace xt
      * @param func the function to apply
      * @param e the \ref xexpression arguments
      */
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     template <class Func, class... CTA, class U>
-    inline xoptional_function<F, R, CT...>::xoptional_function(Func&& func, CTA&&... e) noexcept
+    inline xoptional_function<F, CT...>::xoptional_function(Func&& func, CTA&&... e) noexcept
         : base_type(std::forward<Func>(func), std::forward<CTA>(e)...)
     {
     }
 
-    template <class F, class R, class... CT>
-    inline auto xoptional_function<F, R, CT...>::value() const -> value_expression
+    template <class F, class... CT>
+    inline auto xoptional_function<F, CT...>::value() const -> value_expression
     {
         return value_impl(std::make_index_sequence<sizeof...(CT)>());
     }
 
-    template <class F, class R, class... CT>
-    inline auto xoptional_function<F, R, CT...>::has_value() const -> flag_expression
+    template <class F, class... CT>
+    inline auto xoptional_function<F, CT...>::has_value() const -> flag_expression
     {
         return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
     }
 
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     template <std::size_t... I>
-    inline auto xoptional_function<F, R, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
+    inline auto xoptional_function<F, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
     {
         return value_expression(value_functor(),
             detail::split_optional_expression<CT>::value(std::get<I>(this->arguments()))...);
     }
 
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     template <std::size_t... I>
-    inline auto xoptional_function<F, R, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
+    inline auto xoptional_function<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
     {
         return flag_expression(flag_functor(),
             detail::split_optional_expression<CT>::has_value(std::get<I>(this->arguments()))...);
@@ -451,29 +437,20 @@ namespace xt
     namespace math
     {
         template <class T, class B>
-        struct sign_fun<xtl::xoptional<T, B>>
+        struct sign_impl<xtl::xoptional<T, B>>
         {
-            using argument_type = xtl::xoptional<T, B>;
-            using result_type = xtl::xoptional<std::decay_t<T>>;
-
-            constexpr result_type operator()(const xtl::xoptional<T, B>& x) const
+            static constexpr auto run(const xtl::xoptional<T, B>& x)
             {
-                return x.has_value() ? xtl::xoptional<T>(detail::sign_impl(x.value()))
-                                     : xtl::missing<std::decay_t<T>>();
+                return sign(x); // use overload declared above
             }
-
-            template <class U>
-            struct rebind
-            {
-                using type = sign_fun<U>;
-            };
         };
     }
 
     template <class T, class B>
     inline auto sign(const xtl::xoptional<T, B>& e)
     {
-        return e.has_value() ? math::detail::sign_impl(e.value()) : xtl::missing<std::decay_t<T>>();
+        using value_type = std::decay_t<T>;
+        return e.has_value() ? math::sign_impl<value_type>::run(e.value()) : xtl::missing<value_type>();
     }
 
     /******************************************

@@ -133,12 +133,10 @@ namespace xt
     }
 
 #define UNARY_COMPLEX_FUNCTOR(NS, NAME)                             \
-    template <class T>                                              \
     struct NAME##_fun                                               \
     {                                                               \
-        using argument_type = T;                                    \
-        using result_type = decltype(NS::NAME(std::declval<T>()));  \
-        constexpr result_type operator()(const T& t) const          \
+        template <class T>                                          \
+        constexpr auto operator()(const T& t) const                 \
         {                                                           \
             using NS::NAME;                                         \
             return NAME(t);                                         \
@@ -194,10 +192,8 @@ namespace xt
     template <class E>
     inline auto conj(E&& e) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
-        using functor = math::conj_impl_fun<value_type>;
-        using result_type = typename functor::result_type;
-        using type = xfunction<functor, result_type, const_xclosure_t<E>>;
+        using functor = math::conj_impl_fun;
+        using type = xfunction<functor, const_xclosure_t<E>>;
         return type(functor(), std::forward<E>(e));
     }
 
@@ -208,10 +204,8 @@ namespace xt
     template <class E>
     inline auto arg(E&& e) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
-        using functor = math::arg_fun<value_type>;
-        using result_type = typename functor::result_type;
-        using type = xfunction<functor, result_type, const_xclosure_t<E>>;
+        using functor = math::arg_fun;
+        using type = xfunction<functor, const_xclosure_t<E>>;
         return type(functor(), std::forward<E>(e));
     }
 
@@ -241,10 +235,8 @@ namespace xt
     template <class E>
     inline auto norm(E&& e) noexcept
     {
-        using value_type = typename std::decay_t<E>::value_type;
-        using functor = math::norm_fun<value_type>;
-        using result_type = typename functor::result_type;
-        using type = xfunction<functor, result_type, const_xclosure_t<E>>;
+        using functor = math::norm_fun;
+        using type = xfunction<functor, const_xclosure_t<E>>;
         return type(functor(), std::forward<E>(e));
     }
 }

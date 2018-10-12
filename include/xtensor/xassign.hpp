@@ -95,8 +95,8 @@ namespace xt
         template <class E1, class E2>
         static bool resize(E1& e1, const E2& e2);
 
-        template <class E1, class F, class R, class... CT>
-        static bool resize(E1& e1, const xfunction<F, R, CT...>& e2);
+        template <class E1, class F, class... CT>
+        static bool resize(E1& e1, const xfunction<F, CT...>& e2);
 
     };
 
@@ -247,48 +247,6 @@ namespace xt
                    (e1.layout() != layout_type::dynamic && e2.has_linear_assign(e1.strides()));
         }
 
-        // TODO refactor with has_simd_interface
-        template <class E, class = void_t<>>
-        struct forbid_simd_assign
-        {
-            static constexpr bool value = true;
-        };
-
-        // Double steps check for xfunction because the default
-        // parameter void_t of forbid_simd_assign prevents additional
-        // specializations.
-        template <class E>
-        struct xfunction_forbid_simd;
-
-        template <class E>
-        struct forbid_simd_assign<E,
-            void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
-        {
-            static constexpr bool value = false || xfunction_forbid_simd<E>::value;
-        };
-
-        template <class E>
-        struct xfunction_forbid_simd
-        {
-            static constexpr bool value = false;
-        };
-
-        template <class F, class R, class... CT>
-        struct xfunction_forbid_simd<xfunction<F, R, CT...>>
-        {
-            static constexpr bool value = xtl::disjunction<
-                std::integral_constant<bool, forbid_simd_assign<typename std::decay<CT>::type>::value>...>::value;
-        };
-
-        template <class F, class B, class = void>
-        struct has_simd_apply : std::false_type {};
-
-        template <class F, class B>
-        struct has_simd_apply<F, B, void_t<decltype(&F::template simd_apply<B>)>>
-            : std::true_type
-        {
-        };
-
         template <class E, class = void>
         struct has_step_leading : std::false_type
         {
@@ -313,12 +271,12 @@ namespace xt
             static constexpr bool value = true;
         };
 
-        template <class F, class R, class... CT>
-        struct use_strided_loop<xfunction<F, R, CT...>>
+        template <class F, class... CT>
+        struct use_strided_loop<xfunction<F, CT...>>
         {
-            using simd_arg_type = typename xfunction<F, R, CT...>::simd_argument_type;
+            using simd_arg_type = typename xfunction<F, CT...>::simd_argument_type;
             static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value &&
-                                          has_simd_apply<F, simd_arg_type>::value;
+                                          xfunction<F, CT...>::has_simd_interface::value;
         };
     }
 
@@ -332,8 +290,8 @@ namespace xt
         static constexpr bool lhs_simd_size() { return xsimd::simd_traits<typename E1::value_type>::size > 1; }
         static constexpr bool rhs_simd_size() { return xsimd::simd_traits<typename E2::value_type>::size > 1; }
         static constexpr bool simd_size() { return lhs_simd_size() && rhs_simd_size(); }
-        static constexpr bool forbid_simd() { return detail::forbid_simd_assign<E2>::value; }
-        static constexpr bool simd_assign() { return contiguous_layout() && convertible_types() && simd_size() && !forbid_simd(); }
+        static constexpr bool forbid_simd() { return !has_simd_interface<E2>::value; }
+        static constexpr bool simd_assign() { return contiguous_layout() && convertible_types() && simd_size() && has_simd_interface<E2>::value; }
         static constexpr bool simd_strided_loop() { return convertible_types() && simd_size() &&
                                                            detail::use_strided_loop<E2>::value &&
                                                            detail::use_strided_loop<E1>::value; }
@@ -453,18 +411,18 @@ namespace xt
     }
 
     template <class Tag>
-    template <class E1, class F, class R, class... CT>
-    inline bool xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, R, CT...>& e2)
+    template <class E1, class F, class... CT>
+    inline bool xexpression_assigner<Tag>::resize(E1& e1, const xfunction<F, CT...>& e2)
     {
-        return xtl::mpl::static_if<detail::is_fixed<typename xfunction<F, R, CT...>::shape_type>::value>(
+        return xtl::mpl::static_if<detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value>(
             [&](auto /*self*/) {
                 /*
                  * If the shape of the xfunction is statically known, we can compute the broadcast triviality
                  * at compile time plus we can resize right away.
                  */
                 // resize in case LHS is not a fixed size container. If it is, this is a NOP
-                e1.resize(typename xfunction<F, R, CT...>::shape_type{});
-                return detail::static_trivial_broadcast<detail::is_fixed<typename xfunction<F, R, CT...>::shape_type>::value, CT...>::value;
+                e1.resize(typename xfunction<F, CT...>::shape_type{});
+                return detail::static_trivial_broadcast<detail::is_fixed<typename xfunction<F, CT...>::shape_type>::value, CT...>::value;
             },
             /* else */ [&](auto /*self*/)
             {
@@ -563,12 +521,12 @@ namespace xt
         #if defined(XTENSOR_USE_TBB)
         tbb::parallel_for(align_begin, align_end, simd_size, [&](size_t i)
         {
-            e1.template store_simd<lhs_align_mode, simd_type>(i, e2.template load_simd<rhs_align_mode, simd_type>(i));
+            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
         });
         #else
         for (size_type i = align_begin; i < align_end; i += simd_size)
         {
-            e1.template store_simd<lhs_align_mode, simd_type>(i, e2.template load_simd<rhs_align_mode, simd_type>(i));
+            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
         }
         #endif
         for (size_type i = align_end; i < size; ++i)
@@ -716,8 +674,8 @@ namespace xt
                 return m_cut;
             }
 
-            template <class F, class R, class... CT>
-            std::size_t operator()(const xt::xfunction<F, R, CT...>& xf)
+            template <class F, class... CT>
+            std::size_t operator()(const xt::xfunction<F, CT...>& xf)
             {
                 xt::for_each(*this, xf.arguments());
                 return m_cut;

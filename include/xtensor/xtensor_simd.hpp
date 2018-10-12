@@ -76,19 +76,19 @@ namespace xsimd
     template <class T>
     using revert_simd_type = typename revert_simd_traits<T>::type;
 
-    template <class T>
+    template <class T, class V>
     inline simd_type<T> set_simd(const T& value)
     {
         return value;
     }
 
-    template <class T>
+    template <class T, class V>
     inline simd_type<T> load_simd(const T* src, aligned_mode)
     {
         return *src;
     }
 
-    template <class T>
+    template <class T, class V>
     inline simd_type<T> load_simd(const T* src, unaligned_mode)
     {
         return *src;
@@ -168,13 +168,19 @@ namespace xt
     using driven_align_mode_t = typename detail::driven_align_mode_impl<A1, A2>::type;
 
     template <class E, class = void>
-    struct has_simd_interface : std::false_type
+    struct test_simd_interface_impl : std::false_type
     {
     };
 
     template <class E>
-    struct has_simd_interface<E, void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
+    struct test_simd_interface_impl<E, void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
         : std::true_type
+    {
+    };
+
+    template <class E>
+    struct has_simd_interface
+        : test_simd_interface_impl<E>
     {
     };
 }

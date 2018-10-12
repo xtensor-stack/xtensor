@@ -187,12 +187,13 @@ namespace xt
 
         using assign_t_arg = xassign_traits<xarray<double>, decltype(cmplres)>;
 
-        #if XTENSOR_USE_XSIMD
-                EXPECT_TRUE(assign_t_arg::convertible_types());
-                EXPECT_TRUE(assign_t_arg::simd_size());
-                EXPECT_FALSE(assign_t_arg::forbid_simd());
-                EXPECT_TRUE(assign_t_arg::simd_assign());
-        #endif
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(assign_t_arg::convertible_types());
+        EXPECT_TRUE(assign_t_arg::simd_size());
+        EXPECT_FALSE(assign_t_arg::forbid_simd());
+        EXPECT_TRUE(assign_t_arg::simd_assign());
+#endif
+
     }
 
     TEST(xcomplex, conj_real)
