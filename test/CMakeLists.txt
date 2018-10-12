@@ -103,6 +103,7 @@ set(XTENSOR_TESTS
     test_xeval.cpp
     test_xexception.cpp
     test_xexpression.cpp
+    test_xexpression_holder.cpp
     test_xfunction.cpp
     test_xfixed.cpp
     test_xhistogram.cpp
