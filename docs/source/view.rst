@@ -71,7 +71,7 @@ The range function supports the placeholder ``_`` syntax:
     auto a = xt::xarray<int>::from_shape({3, 2, 4});
     auto v1 = xt::view(a, xt::range(_, 2), xt::all(), xt::range(1, _));
     // The previous line is equivalent to
-    auto v2 = xt::view(a, xt::range(0, 3), xt::all(), xt::range(1, 4));
+    auto v2 = xt::view(a, xt::range(0, 2), xt::all(), xt::range(1, 4));
 
 ``xview`` does not perform a copy of the underlying expression. This means if you modify an element of the ``xview``,
 you are actually also altering the underlying expression.
