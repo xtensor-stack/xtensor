@@ -891,6 +891,13 @@ namespace xt
         return slice;
     }
 
+    template <class E, class T>
+    inline auto get_slice_implementation(E& e, xdrop_slice<T>&& slice, std::size_t index)
+    {
+        slice.normalize(e.shape()[index]);
+        return slice;
+    }
+
     template <class E>
     inline auto get_slice_implementation(E& e, xall_tag&&, std::size_t index)
     {
@@ -1470,12 +1477,13 @@ namespace xt
     inline auto xdrop_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
     {
         // special case one-past-end step (should be removed soon)
-        if (i == static_cast<size_type>(m_indices.size()))
+        if(i == static_cast<std::size_t>(m_size))
         {
             return 1;
         }
         else
         {
+            --i;
             return (*this)(i + n) - (*this)(i);
         }
     }
