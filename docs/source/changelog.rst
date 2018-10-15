@@ -13,10 +13,16 @@ Changelog
 Breaking changes
 ~~~~~~~~~~~~~~~~
 
+- Assign and trivial_broadcast refactoring
+  `#1150 <https://github.com/QuantStack/xtensor/pull/1150>`_.
 - Moved array manipulation functions (``transpose``, ``ravel``, ``flatten``, ``trim_zeros``, ``squeeze``, ``expand_dims``, ``split``, ``atleast_Nd``, ``atleast_1d``, ``atleast_2d``, ``atleast_3d``, ``flip``) from ``xstrided_view.hpp`` to ``xmanipulation.hpp``
   `#1153 <https://github.com/QuantStack/xtensor/pull/1153>`_.
+- iterator API improved
+  `#1155 <https://github.com/QuantStack/xtensor/pull/1155>`_.
 - Fixed ``where`` and ``nonzero`` function behavior to mimic the behavior from NumPy
   `#1157 <https://github.com/QuantStack/xtensor/pull/1157>`_.
+- xsimd and functor refactoring
+  `#1173 <https://github.com/QuantStack/xtensor/pull/1173>`_.
 
 New features
 ~~~~~~~~~~~~
@@ -25,6 +31,22 @@ New features
   `#1153 <https://github.com/QuantStack/xtensor/pull/1153>`_.
 - Implement ``argwhere`` and ``flatnonzero``
   `#1157 <https://github.com/QuantStack/xtensor/pull/1157>`_.
+- Implemented ``xexpression_holder``
+  `#1164 <https://github.com/QuantStack/xtensor/pull/1164>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- Warnings removed
+  `#1159 <https://github.com/QuantStack/xtensor/pull/1159>`_.
+- Added missing include 
+  `#1162 <https://github.com/QuantStack/xtensor/pull/1162>`_.
+- Removed unused type alias in ``xmath/average``
+  `#1163 <https://github.com/QuantStack/xtensor/pull/1163>`_.
+- Slices improved
+  `#1168 <https://github.com/QuantStack/xtensor/pull/1168>`_.
+- Fixed ``xdrop_slice``
+  `#1181 <https://github.com/QuantStack/xtensor/pull/1181>`_.
 
 0.17.4
 ------
