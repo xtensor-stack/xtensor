@@ -1013,11 +1013,55 @@ namespace xt
         auto v1 = xt::view(a, keep(-2), keep(-0, -1), keep(0, -1));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
         EXPECT_EQ(v1, exp_v1);
+    }
 
-        // check compilation
-        // std::vector<std::ptrdiff_t> ixx({1,2});
-        // xt::xview v2(a, keep(ixx));
-        // EXPECT_EQ(xt::xview(a, keep({1, 2})), v2);
+    TEST(xview, drop_slice)
+    {
+        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
+                                                         { 5, 6, 7, 8}},
+                                                        {{ 9,10,11,12},
+                                                         {13,14,15,16}},
+                                                        {{17,18,19,20},
+                                                         {21,22,23,24}}};
+
+        auto v1 = xt::view(a, drop(0, 2), keep(0, 1), drop(1, 2));
+        xtensor<double, 3> exp_v1 = { { { 9, 12 },{ 13, 16 } } };
+        EXPECT_EQ(v1, exp_v1);
+        test_view_iter(v1, exp_v1);
+        
+        auto v2 = xt::view(a, drop(0, 2), xt::all(), xt::range(0, xt::xnone(), 3));
+        EXPECT_EQ(v2, v1);
+        EXPECT_EQ(v2, exp_v1);
+
+        auto v4 = xt::view(a, drop(1), drop(1));
+        xtensor<double, 3> exp_v4 = {{{ 1.,   2.,   3.,   4.}},
+                                     {{17.,  18.,  19.,  20.}}};
+        EXPECT_EQ(v4, exp_v4);
+
+        v4(0, 0) = 123;
+        v4(1, 0) = 123;
+        EXPECT_EQ(a(0, 0, 0), 123);
+        EXPECT_EQ(a(1, 0, 0), 123);
+
+        bool b = detail::is_strided_view<decltype(a), xkeep_slice<int>, int>::value;
+        EXPECT_FALSE(b);
+        b = detail::is_strided_view<decltype(a), xrange<int>, xrange<int>, int>::value;
+        EXPECT_TRUE(b);
+    }
+
+    TEST(xview, drop_negative)
+    {
+        xtensor<double, 3, layout_type::row_major> a = {{{ 1, 2, 3, 4},
+                                                         { 5, 6, 7, 8}},
+                                                        {{ 9,10,11,12},
+                                                         {13,14,15,16}},
+                                                        {{17,18,19,20},
+                                                         {21,22,23,24}}};
+
+        //auto v1 = xt::view(a, keep(-2), keep(-0, -1), keep(0, -1));
+        auto v1 = xt::view(a, drop(-3, -1), keep(0, 1), drop(-3, -2));
+        xtensor<double, 3> exp_v1 = { { { 9, 12 },{ 13, 16 } } };
+        EXPECT_EQ(v1, exp_v1);
     }
 
     TEST(xview, mixed_types)
