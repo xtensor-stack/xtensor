@@ -853,7 +853,7 @@ namespace xt
         return mime_bundle_repr_impl(expr);
     }
 
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     class xfunction;
 
     template <class F, class... CT>
