@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.18.1
+------
+
+- Fixup xio forward declaration
+  `#1185 <https://github.com/QuantStack/xtensor/pull/1185>`_.
+
 0.18.0
 ------
 
