@@ -1882,7 +1882,11 @@ namespace xt
         {
             auto func = [&dim, this](const auto& s) noexcept {
                 this->m_index_keeper[dim]++;
-                return step_size(s, this->m_index_keeper[dim], 1);
+                // index_keeper tracks index+1, this should be refactored
+                // there are some pitfalls in to_end_impl and common_reset
+                // methods
+                auto idx = this->m_index_keeper[dim] - 1;
+                return step_size(s, idx, 1);
             };
             size_type index = integral_skip<S...>(dim);
             if (!is_newaxis_slice(index))
@@ -1903,7 +1907,8 @@ namespace xt
         {
             auto func = [&dim, &n, this](const auto& s) noexcept {
                 this->m_index_keeper[dim] += n;
-                return step_size(s, this->m_index_keeper[dim], n);
+                auto idx = this->m_index_keeper[dim] - 1;
+                return step_size(s, idx, n);
             };
 
             size_type index = integral_skip<S...>(dim);
@@ -1925,7 +1930,11 @@ namespace xt
         {
             auto func = [&dim, this](const auto& s) noexcept {
                 this->m_index_keeper[dim]--;
-                return step_size(s, this->m_index_keeper[dim], 1);
+                // index_keeper tracks index+1, this should be refactored
+                // there are some pitfalls in to_end_impl and common_reset
+                // methods
+                auto idx = this->m_index_keeper[dim] - 1;
+                return step_size(s, idx, 1);
             };
             size_type index = integral_skip<S...>(dim);
             if (!is_newaxis_slice(index))
@@ -1946,7 +1955,11 @@ namespace xt
         {
             auto func = [&dim, &n, this](const auto& s) noexcept {
                 this->m_index_keeper[dim] -= n;
-                return step_size(s, this->m_index_keeper[dim], n);
+                // index_keeper tracks index+1, this should be refactored
+                // there are some pitfalls in to_end_impl and common_reset
+                // methods
+                auto idx = this->m_index_keeper[dim] - 1;
+                return step_size(s, idx, n);
             };
 
             size_type index = integral_skip<S...>(dim);

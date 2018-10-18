@@ -903,6 +903,14 @@ namespace xt
             ++iter_expv1;
         }
 
+        auto citer_expv1 = exp.template begin<layout_type::column_major>();
+        for (auto iter = v.template begin<layout_type::column_major>();
+            iter != v.template end<layout_type::column_major>(); ++iter)
+        {
+            EXPECT_EQ(*iter, *citer_expv1);
+            ++citer_expv1;
+        }
+
         auto riter_expv1 = exp.rbegin();
         for (auto iter = v.rbegin(); iter != v.rend(); ++iter)
         {
