@@ -1332,14 +1332,12 @@ namespace xt
     template <class T>
     inline auto xkeep_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
     {
-        // special case one-past-end step (should be removed soon)
-        if (i == m_indices.size())
+        if (i + 1 == m_indices.size())
         {
             return 1;
         }
         else
         {
-            --i;
             return m_indices[i + n] - m_indices[i];
         }
     }
@@ -1476,14 +1474,12 @@ namespace xt
     template <class T>
     inline auto xdrop_slice<T>::step_size(std::size_t i, std::size_t n) const noexcept -> size_type
     {
-        // special case one-past-end step (should be removed soon)
-        if(i == static_cast<std::size_t>(m_size))
+        if(i + 1 == static_cast<std::size_t>(m_size))
         {
             return 1;
         }
         else
         {
-            --i;
             return (*this)(i + n) - (*this)(i);
         }
     }
