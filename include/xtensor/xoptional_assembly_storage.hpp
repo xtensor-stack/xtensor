@@ -239,71 +239,71 @@ namespace xt
 
     template <class VE, class FE>
     inline xoptional_assembly_storage<VE, FE>::xoptional_assembly_storage(self_type&& rhs)
-        : m_value(rhs.m_value), m_has_value(rhs.m_has_value)
+        : m_value(std::move(rhs.m_value)), m_has_value(std::move(rhs.m_has_value))
     {
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::operator=(self_type&& rhs) -> self_type&
     {
-        m_value = rhs.m_value;
-        m_has_value = rhs.m_has_value;
+        m_value = std::move(rhs.m_value);
+        m_has_value = std::move(rhs.m_has_value);
         return *this;
     }
 
     template <class VE, class FE>
     inline bool xoptional_assembly_storage<VE, FE>::empty() const noexcept
     {
-        return m_value.empty();
+        return value().empty();
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::size() const noexcept -> size_type
     {
-        return m_value.size();
+        return value().size();
     }
 
     template <class VE, class FE>
     inline void xoptional_assembly_storage<VE, FE>::resize(size_type size)
     {
-        m_value.resize(size);
-        m_has_value.resize(size);
+        value().resize(size);
+        has_value().resize(size);
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::operator[](size_type i) -> reference
     {
-        return reference(m_value[i], m_has_value[i]);
+        return reference(value()[i], has_value()[i]);
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::operator[](size_type i) const -> const_reference
     {
-        return const_reference(m_value[i], m_has_value[i]);
+        return const_reference(value()[i], has_value()[i]);
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::front() -> reference
     {
-        return reference(m_value[0], m_has_value[0]);
+        return reference(value()[0], has_value()[0]);
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::front() const -> const_reference
     {
-        return const_reference(m_value[0], m_has_value[0]);
+        return const_reference(value()[0], has_value()[0]);
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::back() -> reference
     {
-        return reference(m_value[size() - 1], m_has_value[size() - 1]);
+        return reference(value()[size() - 1], has_value()[size() - 1]);
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::back() const -> const_reference
     {
-        return const_reference(m_value[size() - 1], m_has_value[size() - 1]);
+        return const_reference(value()[size() - 1], has_value()[size() - 1]);
     }
 
     template <class VE, class FE>
@@ -321,37 +321,37 @@ namespace xt
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::begin() noexcept -> iterator
     {
-        return iterator(m_value.begin(), m_has_value.begin());
+        return iterator(value().begin(), has_value().begin());
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::end() noexcept -> iterator
     {
-        return iterator(m_value.end(), m_has_value.end());
+        return iterator(value().end(), has_value().end());
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::begin() const noexcept -> const_iterator
     {
-        return const_iterator(m_value.begin(), m_has_value.begin());
+        return cbegin();
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::end() const noexcept -> const_iterator
     {
-        return const_iterator(m_value.end(), m_has_value.end());
+        return cend();
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::cbegin() const noexcept -> const_iterator
     {
-        return begin();
+        return const_iterator(value().begin(), has_value().begin());
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::cend() const noexcept -> const_iterator
     {
-        return end();
+        return const_iterator(value().end(), has_value().end());
     }
 
     template <class VE, class FE>
@@ -369,25 +369,25 @@ namespace xt
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::rbegin() const noexcept -> const_reverse_iterator
     {
-        return const_reverse_iterator(end());
+        return crbegin();
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::rend() const noexcept -> const_reverse_iterator
     {
-        return const_reverse_iterator(begin());
+        return crend();
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::crbegin() const noexcept -> const_reverse_iterator
     {
-        return rbegin();
+        return const_reverse_iterator(cend());
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::crend() const noexcept -> const_reverse_iterator
     {
-        return rend();
+        return const_reverse_iterator(cbegin());
     }
 
     template <class VE, class FE>
