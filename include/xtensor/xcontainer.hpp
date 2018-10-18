@@ -159,8 +159,8 @@ namespace xt
         storage_type& storage() noexcept;
         const storage_type& storage() const noexcept;
 
-        value_type* data() noexcept;
-        const value_type* data() const noexcept;
+        auto* data() noexcept;
+        const auto* data() const noexcept;
         const size_type data_offset() const noexcept;
 
         template <class S>
@@ -653,7 +653,7 @@ namespace xt
      * container is empty (data() is not is not dereferenceable in that case)
      */
     template <class D>
-    inline auto xcontainer<D>::data() noexcept -> value_type*
+    inline auto* xcontainer<D>::data() noexcept
     {
         return storage().data();
     }
@@ -664,7 +664,7 @@ namespace xt
     * container is empty (data() is not is not dereferenceable in that case)
     */
     template <class D>
-    inline auto xcontainer<D>::data() const noexcept -> const value_type*
+    inline const auto* xcontainer<D>::data() const noexcept
     {
         return storage().data();
     }

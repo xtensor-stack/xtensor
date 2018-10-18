@@ -91,7 +91,7 @@ namespace xt
 
             using self_type = xbuffer_storage<CP, D>;
             using destructor_type = D;
-            using value_type = std::remove_pointer_t<std::remove_reference_t<CP>>;
+            using value_type = std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<CP>>>;
             using allocator_type = std::allocator<value_type>;
             using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
                                   typename allocator_type::const_reference,
@@ -176,10 +176,24 @@ namespace xt
             allocator_type m_allocator;
         };
 
+        template <class E, class = void>
+        struct is_lambda_type : std::false_type
+        {
+        };
+
+        // check if operator() is available
+        template <class E>
+        struct is_lambda_type<E, void_t<decltype(&E::operator())>>
+            : std::true_type
+        {
+        };
+
         template <class CP, class A, class O>
         struct get_buffer_storage
         {
-            using type = xbuffer_storage<CP, A>;
+            using type = xtl::mpl::eval_if_t<is_lambda_type<A>,
+                                             meta_identity<xbuffer_smart_pointer<CP, A>>,
+                                             meta_identity<xbuffer_storage<CP, A>>>;
         };
 
         template <class CP, class A>
@@ -197,7 +211,7 @@ namespace xt
         template <class CP, class T>
         struct get_buffer_storage<CP, std::unique_ptr<T>, no_ownership>
         {
-            using type = xbuffer_smart_pointer<CP, std::shared_ptr<T>>;
+            using type = xbuffer_smart_pointer<CP, std::unique_ptr<T>>;
         };
 
         template <class CP, class A, class O>
