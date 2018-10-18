@@ -39,6 +39,12 @@ namespace xt
 
     namespace detail
     {
+        // need to have a copy of meta_identity here for MSVC
+        template <class T>
+        struct meta_identity
+        {
+            using type = T;
+        };
 
         /********************
          * common_size_type *
@@ -132,12 +138,6 @@ namespace xt
         struct has_simd_type
             : std::integral_constant<bool, !std::is_same<V, xsimd::simd_type<V>>::value>
         {
-        };
-
-        template <class T>
-        struct meta_identity
-        {
-            using type = T;
         };
 
         // This meta struct checks wether SIMD should be activated for our 
