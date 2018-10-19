@@ -492,7 +492,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline auto xdynamic_view<CT, S, L, FST>::data_offset() const noexcept -> size_type
     {
-        size_type offset = base_type::data_offset;
+        size_type offset = base_type::data_offset();
         return offset + m_slices[0](size_type(0)) * m_adj_strides[0];
     }
 

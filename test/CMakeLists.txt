@@ -103,7 +103,6 @@ set(XTENSOR_TESTS
     test_xeval.cpp
     test_xexception.cpp
     test_xexpression.cpp
-    test_xexpression_holder.cpp
     test_xfunction.cpp
     test_xfixed.cpp
     test_xhistogram.cpp
@@ -149,6 +148,7 @@ set(XTENSOR_TESTS
 
 if(nlohmann_json_FOUND)
     list(APPEND XTENSOR_TESTS test_xjson.cpp)
+    list(APPEND XTENSOR_TESTS test_xexpression_holder.cpp)
 endif()
 
 # remove xinfo tests for compilers < GCC 5

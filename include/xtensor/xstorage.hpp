@@ -1705,7 +1705,7 @@ namespace std
 
     template <class T, std::ptrdiff_t Start, std::ptrdiff_t End>
     class tuple_size<xt::sequence_view<T, Start, End>> :
-        public integral_constant<std::size_t, End - Start>
+        public integral_constant<std::size_t, std::size_t(End - Start)>
     {
     };
 
