@@ -110,7 +110,7 @@ Defined in ``xtensor/xmath.hpp`` and ``xtensor/xoperation.hpp``
    :project: xtensor
 
 .. _bitwise-not-op-ref:
-.. doxygenfunction:: operator~(E1&&, E2&&)
+.. doxygenfunction:: operator~(E&&)
    :project: xtensor
 
 .. _left-shift-op-ref:
