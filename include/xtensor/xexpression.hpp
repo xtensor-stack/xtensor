@@ -103,7 +103,7 @@ namespace xt
     //@}
 
     /* is_crtp_base_of<B, E>
-    * Resembles std::is_base_of, but adresses the problem of whether _some_ instatntiation
+    * Resembles std::is_base_of, but adresses the problem of whether _some_ instantiation
     * of a CRTP templated class B is a base of class E. A CRTP templated class is correctly
     * templated with the most derived type in the CRTP hierarchy. Using this assumption,
     * this implementation deals with either CRTP final classes (checks for inheritance
@@ -245,6 +245,12 @@ namespace xt
 
         template <class... T>
         struct expression_tag_and;
+
+        template <>
+        struct expression_tag_and<>
+        {
+            using type = xtensor_expression_tag;
+        };
 
         template <class T>
         struct expression_tag_and<T>

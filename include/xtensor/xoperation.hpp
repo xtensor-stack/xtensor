@@ -25,9 +25,6 @@
 namespace xt
 {
 
-    template <class F, class... CT>
-    class xoptional_function;
-
     /***********
      * helpers *
      ***********/
@@ -158,7 +155,7 @@ namespace xt
         template <class F, class... E>
         struct select_xfunction_expression<xoptional_expression_tag, F, E...>
         {
-            using type = xoptional_function<F, E...>;
+            using type = xfunction<F, E...>;
         };
 
         template <class Tag, class F, class... E>

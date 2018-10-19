@@ -325,109 +325,85 @@ namespace xt
         static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
     };
 
-    /**********************
-     * xoptional_function *
-     **********************/
+    /************************************************
+     * xfunction extension for optional expressions *
+     ************************************************/
 
-#define DL XTENSOR_DEFAULT_LAYOUT
-
-    /**
-     * @class xoptional_function
-     * @brief Multidimensional function operating on
-     * xoptional expressions.
-     *
-     * The xoptional_function class implements a multidimensional function
-     * operating on xoptional expressions.
-     *
-     * @tparam F the function type
-     * @tparam R the return type of the function
-     * @tparam CT the closure types for arguments of the function
-     */
-    template <class F, class... CT>
-    class xoptional_function : public xfunction_base<F, CT...>,
-                               public xexpression<xoptional_function<F, CT...>>
+    namespace extension
     {
-    public:
+        template <class F, class... CT>
+        class xfunction_optional_base
+        {
+        public:
 
-        using self_type = xoptional_function<F, CT...>;
-        using base_type = xfunction_base<F, CT...>;
-        using expression_tag = xoptional_expression_tag;
-        // using value_functor = typename F::template rebind<typename R::value_type>::type;
-        using value_functor = F;
-        using flag_functor = detail::optional_bitwise<bool>;
+            using expression_tag = xoptional_expression_tag;
+            using value_functor = F;
+            using flag_functor = detail::optional_bitwise<bool>;
+        
+            using value_expression = xfunction<value_functor, detail::value_expression_t<CT>...>;
+            using flag_expression = xfunction<flag_functor, detail::flag_expression_t<CT>...>;
 
-        template <class Func, class... CTA, class U = std::enable_if<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
-        xoptional_function(Func&& func, CTA&&... e) noexcept;
+            value_expression value() const;
+            flag_expression has_value() const;
+            
+        private:
 
-        ~xoptional_function() = default;
+            template <std::size_t... I>
+            value_expression value_impl(std::index_sequence<I...>) const;
 
-        xoptional_function(const xoptional_function&) = default;
-        xoptional_function& operator=(const xoptional_function&) = default;
+            template <std::size_t... I>
+            flag_expression has_value_impl(std::index_sequence<I...>) const;
+            
+            using derived_type = xfunction<F, CT...>;
+            const derived_type& derived_cast() const noexcept;
+        };
 
-        xoptional_function(xoptional_function&&) = default;
-        xoptional_function& operator=(xoptional_function&&) = default;
+        template <class F, class... CT>
+        struct xfunction_base_impl<xoptional_expression_tag, F, CT...>
+        {
+            using type = xfunction_optional_base<F, CT...>;
+        };
+    }
 
-        using value_expression = xfunction<value_functor, detail::value_expression_t<CT>...>;
+    /******************************************
+     * xfunction_optional_base implementation *
+     ******************************************/
 
-        using flag_expression = xfunction<flag_functor, detail::flag_expression_t<CT>...>;
+    namespace extension
+    {
+        template <class F, class... CT>
+        inline auto xfunction_optional_base<F, CT...>::value() const -> value_expression
+        {
+            return value_impl(std::make_index_sequence<sizeof...(CT)>());
+        }
 
-        value_expression value() const;
-        flag_expression has_value() const;
+        template <class F, class... CT>
+        inline auto xfunction_optional_base<F, CT...>::has_value() const -> flag_expression
+        {
+            return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
+        }
 
-    private:
-
+        template <class F, class... CT>
         template <std::size_t... I>
-        value_expression value_impl(std::index_sequence<I...>) const;
+        inline auto xfunction_optional_base<F, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
+        {
+            return value_expression(value_functor(),
+                detail::split_optional_expression<CT>::value(std::get<I>(derived_cast().arguments()))...);
+        }
 
+        template <class F, class... CT>
         template <std::size_t... I>
-        flag_expression has_value_impl(std::index_sequence<I...>) const;
-    };
+        inline auto xfunction_optional_base<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
+        {
+            return flag_expression(flag_functor(),
+                detail::split_optional_expression<CT>::has_value(std::get<I>(derived_cast().arguments()))...);
+        }
 
-#undef DL
-
-    /*************************************
-     * xoptional_function implementation *
-     *************************************/
-
-    /**
-     * Constructs an xoptional_function applying the specified function to the given
-     * arguments.
-     * @param func the function to apply
-     * @param e the \ref xexpression arguments
-     */
-    template <class F, class... CT>
-    template <class Func, class... CTA, class U>
-    inline xoptional_function<F, CT...>::xoptional_function(Func&& func, CTA&&... e) noexcept
-        : base_type(std::forward<Func>(func), std::forward<CTA>(e)...)
-    {
-    }
-
-    template <class F, class... CT>
-    inline auto xoptional_function<F, CT...>::value() const -> value_expression
-    {
-        return value_impl(std::make_index_sequence<sizeof...(CT)>());
-    }
-
-    template <class F, class... CT>
-    inline auto xoptional_function<F, CT...>::has_value() const -> flag_expression
-    {
-        return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
-    }
-
-    template <class F, class... CT>
-    template <std::size_t... I>
-    inline auto xoptional_function<F, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
-    {
-        return value_expression(value_functor(),
-            detail::split_optional_expression<CT>::value(std::get<I>(this->arguments()))...);
-    }
-
-    template <class F, class... CT>
-    template <std::size_t... I>
-    inline auto xoptional_function<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
-    {
-        return flag_expression(flag_functor(),
-            detail::split_optional_expression<CT>::has_value(std::get<I>(this->arguments()))...);
+        template <class F, class... CT>
+        inline auto xfunction_optional_base<F, CT...>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
     }
 
     /********************************
