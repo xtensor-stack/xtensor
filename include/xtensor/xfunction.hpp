@@ -173,15 +173,9 @@ namespace xt
         struct xfunction_base_impl;
 
         template <class F, class... CT>
-        struct xfunction_tensor_base
-        {
-            using expression_tag = xtensor_expression_tag;
-        };
-
-        template <class F, class... CT>
         struct xfunction_base_impl<xtensor_expression_tag, F, CT...>
         {
-            using type = xfunction_tensor_base<F, CT...>;
+            using type = xtensor_empty_base;
         };
 
         template <class F, class... CT>

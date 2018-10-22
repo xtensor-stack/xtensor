@@ -323,6 +323,14 @@ namespace xt
     {
     };
 
+    namespace extension
+    {
+        struct xtensor_empty_base
+        {
+            using expression_tag = xtensor_expression_tag;
+        };
+    }
+
     /********************************
      * xoptional_comparable concept *
      ********************************/
