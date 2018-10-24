@@ -43,6 +43,31 @@ namespace xt
     auto broadcast(E&& e, const I (&s)[L]);
 #endif
 
+    /*************************
+     * xbroadcast extensions *
+     *************************/
+
+    namespace extension
+    {
+        template <class Tag, class CT, class X>
+        struct xbroadcast_base_impl;
+
+        template <class CT, class X>
+        struct xbroadcast_base_impl<xtensor_expression_tag, CT, X>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class CT, class X>
+        struct xbroadcast_base
+            : xbroadcast_base_impl<xexpression_tag_t<CT>, CT, X>
+        {
+        };
+
+        template <class CT, class X>
+        using xbroadcast_base_t = typename xbroadcast_base<CT, X>::type;
+    }
+
     /**************
      * xbroadcast *
      **************/
@@ -74,12 +99,15 @@ namespace xt
      */
     template <class CT, class X>
     class xbroadcast : public xexpression<xbroadcast<CT, X>>,
-                       public xconst_iterable<xbroadcast<CT, X>>
+                       public xconst_iterable<xbroadcast<CT, X>>,
+                       public extension::xbroadcast_base_t<CT, X>
     {
     public:
 
         using self_type = xbroadcast<CT, X>;
         using xexpression_type = std::decay_t<CT>;
+        using extension_base = extension::xbroadcast_base_t<CT, X>;
+        using expression_tag = typename extension_base::expression_tag;
 
         using value_type = typename xexpression_type::value_type;
         using reference = typename xexpression_type::reference;
@@ -128,6 +156,8 @@ namespace xt
         template <class It>
         const_reference element(It first, It last) const;
 
+        const xexpression_type& expression() const noexcept;
+
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
@@ -141,6 +171,12 @@ namespace xt
 
         template <class E, class XCT = CT, class = std::enable_if_t<xt::is_xscalar<XCT>::value>>
         void assign_to(xexpression<E>& e) const;
+
+        template <class E>
+        using rebind_t = xbroadcast<E, X>;
+
+        template <class E>
+        rebind_t<E> build_broadcast(E&& e) const;
 
     private:
 
@@ -371,6 +407,15 @@ namespace xt
     {
         return m_e.element(last - dimension(), last);
     }
+
+    /**
+     * Returns a constant reference to the underlying expression of the broadcast expression.
+     */
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::expression() const noexcept -> const xexpression_type&
+    {
+        return m_e;
+    }
     //@}
 
     /**
@@ -428,6 +473,13 @@ namespace xt
         auto& ed = e.derived_cast();
         ed.resize(m_shape);
         std::fill(ed.begin(), ed.end(), m_e());
+    }
+
+    template <class CT, class X>
+    template <class E>
+    inline auto xbroadcast<CT, X>::build_broadcast(E&& e) const -> rebind_t<E>
+    {
+        return rebind_t<E>(std::forward<E>(e), inner_shape_type(m_shape));
     }
 }
 

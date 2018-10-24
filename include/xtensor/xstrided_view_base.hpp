@@ -702,7 +702,7 @@ namespace xt
     }
 
     /**
-     * Returns a reference to the underlying reference of the view.
+     * Returns a reference to the underlying expression of the view.
      */
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view_base<CT, S, L, FST>::expression() noexcept -> xexpression_type&
@@ -711,7 +711,7 @@ namespace xt
     }
 
     /**
-     * Returns a constant reference to the underlying reference of the view.
+     * Returns a constant reference to the underlying expression of the view.
      */
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view_base<CT, S, L, FST>::expression() const noexcept -> const xexpression_type&

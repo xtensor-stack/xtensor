@@ -53,15 +53,9 @@ namespace xt
         struct xdynamic_view_base_impl;
 
         template <class CT, class S, layout_type L, class FST>
-        struct xdynamic_view_tensor
-        {
-            using expression_tag = xtensor_expression_tag;
-        };
-
-        template <class CT, class S, layout_type L, class FST>
         struct xdynamic_view_base_impl<xtensor_expression_tag, CT, S, L, FST>
         {
-            using type = xdynamic_view_tensor<CT, S, L, FST>;
+            using type = xtensor_empty_base;
         };
 
         template <class CT, class S, layout_type L, class FST>

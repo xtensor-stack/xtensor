@@ -208,6 +208,30 @@ namespace xt
         }
     }
 
+    TEST(xoptional, broadcast)
+    {
+        xarray_optional<int> a = {{1, 2, 3},
+                                  {4, 5, 6}};
+        a(0, 1).has_value() = false;
+        a(1, 2).has_value() = false;
+
+        auto br = xt::broadcast(a, {2, 2, 3});
+        auto vbr = br.value();
+        auto hvbr = br.has_value();
+
+        for(size_t i = 0; i < br.shape()[0]; ++i)
+        {
+            for(size_t j = 0; j < br.shape()[1]; ++j)
+            {
+                for(size_t k = 0; k < br.shape()[2]; ++k)
+                {
+                    EXPECT_EQ(vbr(i, j, k), a(0, j, k).value());
+                    EXPECT_EQ(hvbr(i, j, k), a(0, j, k).has_value());
+                }
+            }
+        }
+    }
+
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                         \
     xtensor_optional<double, 2> m1{{0.25, 1}, {0.75, xtl::missing<double>()}}; \
     xtensor<double, 2> m2{{0.25, 1}, {0.75, 1}};                               \
