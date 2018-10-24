@@ -17,6 +17,7 @@
 
 #include "xarray.hpp"
 #include "xtensor.hpp"
+#include "xdynamic_view.hpp"
 
 namespace xt
 {
@@ -148,133 +149,6 @@ namespace xt
         {
         };
 
-        template <class E>
-        struct optional_containers
-        {
-            using optional_expression = std::remove_const_t<E>;
-            using optional_container = typename optional_expression::storage_type;
-            using tmp_value_container = typename optional_container::base_container_type;
-            using tmp_flag_container = typename optional_container::flag_container_type;
-            using value_container = std::conditional_t<std::is_const<E>::value, const tmp_value_container, tmp_value_container>;
-            using flag_container = std::conditional_t<std::is_const<E>::value, const tmp_flag_container, tmp_flag_container>;
-        };
-
-        template <class OA, layout_type L>
-        struct split_optional_array
-        {
-            using optional_array = OA;
-            using value_container = typename optional_containers<optional_array>::value_container;
-            using flag_container = typename optional_containers<optional_array>::flag_container;
-            using value_expression = xarray_container<value_container, L>;
-            using flag_expression = xarray_container<flag_container, L>;
-
-            static inline value_expression value(OA arg)
-            {
-                return value_expression(std::move(arg.storage().value()), arg.shape());
-            }
-
-            static inline flag_expression has_value(OA arg)
-            {
-                return flag_expression(std::move(arg.storage().has_value()), arg.shape());
-            }
-        };
-
-        template <class OA, layout_type L>
-        struct split_optional_array_ref
-        {
-            using optional_array = OA;
-            using value_container = typename optional_containers<optional_array>::value_container;
-            using flag_container = typename optional_containers<optional_array>::flag_container;
-            using value_expression = xarray_adaptor<typename optional_containers<optional_array>::value_container, L>;
-            using flag_expression = xarray_adaptor<typename optional_containers<optional_array>::flag_container, L>;
-
-            static inline value_expression value(OA& arg)
-            {
-                return value_expression(arg.storage().value(), arg.shape());
-            }
-
-            static inline flag_expression has_value(OA& arg)
-            {
-                return flag_expression(arg.storage().has_value(), arg.shape());
-            }
-        };
-
-        template <class T, layout_type L, class A, class BC, class SA>
-        struct split_optional_expression<xarray_optional<T, L, A, BC, SA>>
-            : split_optional_array<xarray_optional<T, L, A, BC, SA>, L>
-        {
-        };
-
-        template <class T, layout_type L, class A, class BC, class SA>
-        struct split_optional_expression<xarray_optional<T, L, A, BC, SA>&>
-            : split_optional_array_ref<xarray_optional<T, L, A, BC, SA>, L>
-        {
-        };
-
-        template <class T, layout_type L, class A, class BC, class SA>
-        struct split_optional_expression<const xarray_optional<T, L, A, BC, SA>&>
-            : split_optional_array_ref<const xarray_optional<T, L, A, BC, SA>, L>
-        {
-        };
-
-        template <class OT, std::size_t N, layout_type L>
-        struct split_optional_tensor
-        {
-            using optional_tensor = OT;
-            using value_container = typename optional_containers<optional_tensor>::value_container;
-            using flag_container = typename optional_containers<optional_tensor>::flag_container;
-            using value_expression = xtensor_container<value_container, N, L>;
-            using flag_expression = xtensor_container<flag_container, N, L>;
-
-            static inline value_expression value(OT arg)
-            {
-                return value_expression(std::move(arg.storage().value()), arg.shape());
-            }
-
-            static inline flag_expression has_value(OT arg)
-            {
-                return flag_expression(std::move(arg.storage().has_value()), arg.shape());
-            }
-        };
-
-        template <class OT, std::size_t N, layout_type L>
-        struct split_optional_tensor_ref
-        {
-            using optional_tensor = OT;
-            using value_container = typename optional_containers<optional_tensor>::value_container;
-            using flag_container = typename optional_containers<optional_tensor>::flag_container;
-            using value_expression = xtensor_adaptor<value_container&, N, L>;
-            using flag_expression = xtensor_adaptor<flag_container&, N, L>;
-
-            static inline value_expression value(OT& arg)
-            {
-                return value_expression(arg.storage().value(), arg.shape());
-            }
-
-            static inline flag_expression has_value(OT& arg)
-            {
-                return flag_expression(arg.storage().has_value(), arg.shape());
-            }
-        };
-
-        template <class T, std::size_t N, layout_type L, class A, class BC>
-        struct split_optional_expression<xtensor_optional<T, N, L, A, BC>>
-            : split_optional_tensor<xtensor_optional<T, N, L, A, BC>, N, L>
-        {
-        };
-
-        template <class T, std::size_t N, layout_type L, class A, class BC>
-        struct split_optional_expression<xtensor_optional<T, N, L, A, BC>&>
-            : split_optional_tensor_ref<xtensor_optional<T, N, L, A, BC>, N, L>
-        {
-        };
-
-        template <class T, std::size_t N, layout_type L, class A, class BC>
-        struct split_optional_expression<const xtensor_optional<T, N, L, A, BC>&>
-            : split_optional_tensor_ref<const xtensor_optional<T, N, L, A, BC>, N, L>
-        {
-        };
-
         template <class T>
         using value_expression_t = typename split_optional_expression<T>::value_expression;
 
@@ -325,109 +199,298 @@ namespace xt
         static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
     };
 
-    /**********************
-     * xoptional_function *
-     **********************/
-
-#define DL XTENSOR_DEFAULT_LAYOUT
-
-    /**
-     * @class xoptional_function
-     * @brief Multidimensional function operating on
-     * xoptional expressions.
-     *
-     * The xoptional_function class implements a multidimensional function
-     * operating on xoptional expressions.
-     *
-     * @tparam F the function type
-     * @tparam R the return type of the function
-     * @tparam CT the closure types for arguments of the function
-     */
-    template <class F, class... CT>
-    class xoptional_function : public xfunction_base<F, CT...>,
-                               public xexpression<xoptional_function<F, CT...>>
-    {
-    public:
-
-        using self_type = xoptional_function<F, CT...>;
-        using base_type = xfunction_base<F, CT...>;
-        using expression_tag = xoptional_expression_tag;
-        // using value_functor = typename F::template rebind<typename R::value_type>::type;
-        using value_functor = F;
-        using flag_functor = detail::optional_bitwise<bool>;
-
-        template <class Func, class... CTA, class U = std::enable_if<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
-        xoptional_function(Func&& func, CTA&&... e) noexcept;
-
-        ~xoptional_function() = default;
-
-        xoptional_function(const xoptional_function&) = default;
-        xoptional_function& operator=(const xoptional_function&) = default;
-
-        xoptional_function(xoptional_function&&) = default;
-        xoptional_function& operator=(xoptional_function&&) = default;
-
-        using value_expression = xfunction<value_functor, detail::value_expression_t<CT>...>;
-
-        using flag_expression = xfunction<flag_functor, detail::flag_expression_t<CT>...>;
-
-        value_expression value() const;
-        flag_expression has_value() const;
-
-    private:
-
-        template <std::size_t... I>
-        value_expression value_impl(std::index_sequence<I...>) const;
-
-        template <std::size_t... I>
-        flag_expression has_value_impl(std::index_sequence<I...>) const;
-    };
-
-#undef DL
-
     /*************************************
-     * xoptional_function implementation *
+     * xcontainer extention for optional *
      *************************************/
 
-    /**
-     * Constructs an xoptional_function applying the specified function to the given
-     * arguments.
-     * @param func the function to apply
-     * @param e the \ref xexpression arguments
-     */
-    template <class F, class... CT>
-    template <class Func, class... CTA, class U>
-    inline xoptional_function<F, CT...>::xoptional_function(Func&& func, CTA&&... e) noexcept
-        : base_type(std::forward<Func>(func), std::forward<CTA>(e)...)
+    namespace extension
     {
+        template <class T>
+        class xcontainer_optional_base
+        {
+        public:
+
+            using traits = T;
+            using value_expression = typename traits::value_expression;
+            using flag_expression = typename traits::flag_expression;
+            using const_value_expression = typename traits::const_value_expression;
+            using const_flag_expression = typename traits::const_flag_expression;
+            using expression_tag = xoptional_expression_tag;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+
+        private:
+
+            using derived_type = typename traits::derived_type;
+
+            derived_type& derived_cast() noexcept;
+            const derived_type& derived_cast() const noexcept;
+        };
     }
 
-    template <class F, class... CT>
-    inline auto xoptional_function<F, CT...>::value() const -> value_expression
+    /*******************************************
+     * xarray_container extension for optional *
+     *******************************************/
+
+    namespace extension
     {
-        return value_impl(std::make_index_sequence<sizeof...(CT)>());
+        template <class EC, layout_type L, class SC>
+        struct xarray_optional_traits
+        {
+            using value_container = typename EC::base_container_type;
+            using flag_container = typename EC::flag_container_type;
+            using value_expression = xarray_adaptor<value_container&, L, SC>;
+            using flag_expression = xarray_adaptor<flag_container&, L, SC>;
+            using const_value_expression = xarray_adaptor<const value_container&, L, SC>;
+            using const_flag_expression = xarray_adaptor<const flag_container&, L, SC>;
+            using derived_type = xarray_container<EC, L, SC, xoptional_expression_tag>;
+        };
+
+        template <class EC, layout_type L, class SC>
+        struct xarray_container_base<EC, L, SC, xoptional_expression_tag>
+        {
+            using traits = xarray_optional_traits<EC, L, SC>;
+            using type = xcontainer_optional_base<traits>;
+        };
     }
 
-    template <class F, class... CT>
-    inline auto xoptional_function<F, CT...>::has_value() const -> flag_expression
+    /********************************************
+     * xtensor_container extension for optional *
+     ********************************************/
+
+    namespace extension
     {
-        return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_optional_traits
+        {
+            using value_container = typename EC::base_container_type;
+            using flag_container = typename EC::flag_container_type;
+            using value_expression = xtensor_adaptor<value_container&, N, L>;
+            using flag_expression = xtensor_adaptor<flag_container&, N, L>;
+            using const_value_expression = xtensor_adaptor<const value_container&, N, L>;
+            using const_flag_expression = xtensor_adaptor<const flag_container&, N, L>;
+            using derived_type = xtensor_container<EC, N, L, xoptional_expression_tag>;
+        };
+
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_container_base<EC, N, L, xoptional_expression_tag>
+        {
+            using traits = xtensor_optional_traits<EC, N, L>;
+            using type = xcontainer_optional_base<traits>;
+        };
     }
 
-    template <class F, class... CT>
-    template <std::size_t... I>
-    inline auto xoptional_function<F, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
+    /************************************************
+     * xfunction extension for optional expressions *
+     ************************************************/
+
+    namespace extension
     {
-        return value_expression(value_functor(),
-            detail::split_optional_expression<CT>::value(std::get<I>(this->arguments()))...);
+        template <class F, class... CT>
+        class xfunction_optional_base
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using value_functor = F;
+            using flag_functor = detail::optional_bitwise<bool>;
+        
+            using value_expression = xfunction<value_functor, detail::value_expression_t<CT>...>;
+            using flag_expression = xfunction<flag_functor, detail::flag_expression_t<CT>...>;
+
+            value_expression value() const;
+            flag_expression has_value() const;
+            
+        private:
+
+            template <std::size_t... I>
+            value_expression value_impl(std::index_sequence<I...>) const;
+
+            template <std::size_t... I>
+            flag_expression has_value_impl(std::index_sequence<I...>) const;
+            
+            using derived_type = xfunction<F, CT...>;
+            const derived_type& derived_cast() const noexcept;
+        };
+
+        template <class F, class... CT>
+        struct xfunction_base_impl<xoptional_expression_tag, F, CT...>
+        {
+            using type = xfunction_optional_base<F, CT...>;
+        };
     }
 
-    template <class F, class... CT>
-    template <std::size_t... I>
-    inline auto xoptional_function<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
+    /****************************************************
+     * xdynamic_view extension for optional expressions *
+     ****************************************************/
+
+    namespace extension
     {
-        return flag_expression(flag_functor(),
-            detail::split_optional_expression<CT>::has_value(std::get<I>(this->arguments()))...);
+        template <class CT, class S, layout_type L, class FST>
+        class xdynamic_view_optional
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using uvt = typename std::decay_t<CT>::value_expression;
+            using uft = typename std::decay_t<CT>::flag_expression;
+            using ucvt = typename std::decay_t<CT>::const_value_expression;
+            using ucft = typename std::decay_t<CT>::const_flag_expression;
+            using value_expression = xdynamic_view<uvt, S, L, detail::flat_storage_type_t<uvt>>;
+            using flag_expression = xdynamic_view<uft, S, L, detail::flat_storage_type_t<uft>>;
+            using const_value_expression = xdynamic_view<ucvt, S, L, detail::flat_storage_type_t<ucvt>>;
+            using const_flag_expression = xdynamic_view<ucft, S, L, detail::flat_storage_type_t<ucft>>;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+
+        private:
+
+            using derived_type = xdynamic_view<CT, S, L, FST>;
+
+            derived_type& derived_cast() noexcept;
+            const derived_type& derived_cast() const noexcept;
+        };
+
+        template <class CT, class S, layout_type L, class FST>
+        struct xdynamic_view_base_impl<xoptional_expression_tag, CT, S, L, FST>
+        {
+            using type = xdynamic_view_optional<CT, S, L, FST>;
+        };
+    }
+
+    /*******************************************
+     * xcontainer_optional_base implementation *
+     *******************************************/
+
+    namespace extension
+    {
+        template <class T>
+        inline auto xcontainer_optional_base<T>::value() -> value_expression
+        {
+            return value_expression(derived_cast().storage().value(), derived_cast().shape());
+        }
+
+        template <class T>
+        inline auto xcontainer_optional_base<T>::value() const -> const_value_expression
+        {
+            return const_value_expression(derived_cast().storage().value(), derived_cast().shape());
+        }
+
+        template <class T>
+        inline auto xcontainer_optional_base<T>::has_value() -> flag_expression
+        {
+            return flag_expression(derived_cast().storage().has_value(), derived_cast().shape());
+        }
+
+        template <class T>
+        inline auto xcontainer_optional_base<T>::has_value() const -> const_flag_expression
+        {
+            return const_flag_expression(derived_cast().storage().has_value(), derived_cast().shape());
+        }
+
+        template <class T>
+        inline auto xcontainer_optional_base<T>::derived_cast() noexcept -> derived_type&
+        {
+            return *static_cast<derived_type*>(this);
+        }
+
+        template <class T>
+        inline auto xcontainer_optional_base<T>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
+    }
+
+    /******************************************
+     * xfunction_optional_base implementation *
+     ******************************************/
+
+    namespace extension
+    {
+        template <class F, class... CT>
+        inline auto xfunction_optional_base<F, CT...>::value() const -> value_expression
+        {
+            return value_impl(std::make_index_sequence<sizeof...(CT)>());
+        }
+
+        template <class F, class... CT>
+        inline auto xfunction_optional_base<F, CT...>::has_value() const -> flag_expression
+        {
+            return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
+        }
+
+        template <class F, class... CT>
+        template <std::size_t... I>
+        inline auto xfunction_optional_base<F, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
+        {
+            return value_expression(value_functor(),
+                detail::split_optional_expression<CT>::value(std::get<I>(derived_cast().arguments()))...);
+        }
+
+        template <class F, class... CT>
+        template <std::size_t... I>
+        inline auto xfunction_optional_base<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
+        {
+            return flag_expression(flag_functor(),
+                detail::split_optional_expression<CT>::has_value(std::get<I>(derived_cast().arguments()))...);
+        }
+
+        template <class F, class... CT>
+        inline auto xfunction_optional_base<F, CT...>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
+    }
+
+    /*****************************************
+     * xdynamic_view_optional implementation *
+     *****************************************/
+
+    namespace extension
+    {
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::value() -> value_expression
+        {
+            return derived_cast().build_view(derived_cast().expression().value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::value() const -> const_value_expression 
+        {
+            return derived_cast().build_view(derived_cast().expression().value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() -> flag_expression 
+        {
+            return derived_cast().build_view(derived_cast().expression().has_value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression 
+        {
+            return derived_cast().build_view(derived_cast().expression().has_value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::derived_cast() noexcept -> derived_type&
+        {
+            return *static_cast<derived_type*>(this);
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
     }
 
     /********************************

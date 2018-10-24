@@ -26,6 +26,21 @@ namespace xt
      * xarray_container declaration *
      ********************************/
 
+    namespace extension
+    {
+        template <class EC, layout_type L, class SC, class Tag>
+        struct xarray_container_base;
+
+        template <class EC, layout_type L, class SC>
+        struct xarray_container_base<EC, L, SC, xtensor_expression_tag>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class EC, layout_type L, class SC, class Tag>
+        using xarray_container_base_t = typename xarray_container_base<EC, L, SC, Tag>::type;
+    }
+
     template <class EC, layout_type L, class SC, class Tag>
     struct xcontainer_inner_types<xarray_container<EC, L, SC, Tag>>
     {
@@ -61,13 +76,15 @@ namespace xt
      */
     template <class EC, layout_type L, class SC, class Tag>
     class xarray_container : public xstrided_container<xarray_container<EC, L, SC, Tag>>,
-                             public xcontainer_semantic<xarray_container<EC, L, SC, Tag>>
+                             public xcontainer_semantic<xarray_container<EC, L, SC, Tag>>,
+                             public extension::xarray_container_base_t<EC, L, SC, Tag>
     {
     public:
 
         using self_type = xarray_container<EC, L, SC, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
+        using extension_base = extension::xarray_container_base_t<EC, L, SC, Tag>;
         using storage_type = typename base_type::storage_type;
         using allocator_type = typename base_type::allocator_type;
         using value_type = typename base_type::value_type;

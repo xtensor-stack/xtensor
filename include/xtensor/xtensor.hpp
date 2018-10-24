@@ -26,6 +26,21 @@ namespace xt
      * xtensor declaration *
      ***********************/
 
+    namespace extension
+    {
+        template <class EC, std::size_t N, layout_type L, class Tag>
+        struct xtensor_container_base;
+
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_container_base<EC, N, L, xtensor_expression_tag>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class EC, std::size_t N, layout_type L, class Tag>
+        using xtensor_container_base_t = typename xtensor_container_base<EC, N, L, Tag>::type;
+    }
+
     template <class EC, std::size_t N, layout_type L, class Tag>
     struct xcontainer_inner_types<xtensor_container<EC, N, L, Tag>>
     {
@@ -62,13 +77,15 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     class xtensor_container : public xstrided_container<xtensor_container<EC, N, L, Tag>>,
-                              public xcontainer_semantic<xtensor_container<EC, N, L, Tag>>
+                              public xcontainer_semantic<xtensor_container<EC, N, L, Tag>>,
+                              public extension::xtensor_container_base_t<EC, N, L, Tag>
     {
     public:
 
         using self_type = xtensor_container<EC, N, L, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
+        using extension_base = extension::xtensor_container_base_t<EC, N, L, Tag>;
         using storage_type = typename base_type::storage_type;
         using allocator_type = typename base_type::allocator_type;
         using value_type = typename base_type::value_type;

@@ -128,14 +128,84 @@ namespace xt
         ASSERT_TRUE(res(1, 1));
     }
 
-    TEST(xoptional, compilation)
+    TEST(xoptional, dynamic_view)
     {
-        using functor_type = detail::plus;
-        using tensor_type = xtensor_optional<double, 2>;
-        using function_type = xoptional_function<functor_type, tensor_type, tensor_type>;
+        xarray_optional<int> a = {{{0, 1, 2, 3},
+                                   {4, 5, 6, 7},
+                                   {8, 9, 10, 11}},
+                                  {{12, 13, 14, 15},
+                                   {16, 17, 18, 19},
+                                   {20, 21, 22, 23}}};
+        a(1, 0, 1).has_value() = false;
+        a(1, 2, 3).has_value() = false;
 
-        tensor_type t1, t2;
-        function_type f(functor_type(), t1, t2);
+        auto view0 = dynamic_view(a, xdynamic_slice_vector({ 1, keep(0, 2), range(1, 4) }));
+        auto v_view = view0.value();
+        auto hv_view = view0.has_value();
+
+        EXPECT_EQ(v_view.shape()[0], std::size_t(2));
+        EXPECT_EQ(v_view.shape()[1], std::size_t(3));
+        EXPECT_EQ(hv_view.shape()[0], std::size_t(2));
+        EXPECT_EQ(hv_view.shape()[1], std::size_t(3));
+
+        EXPECT_EQ(v_view(0, 0), 13);
+        EXPECT_EQ(v_view(0, 1), 14);
+        EXPECT_EQ(v_view(0, 2), 15);
+        EXPECT_EQ(v_view(1, 0), 21);
+        EXPECT_EQ(v_view(1, 1), 22);
+        EXPECT_EQ(v_view(1, 2), 23);
+
+        EXPECT_FALSE(hv_view(0, 0));
+        EXPECT_TRUE(hv_view(0, 1));
+        EXPECT_TRUE(hv_view(0, 2));
+        EXPECT_TRUE(hv_view(1, 0));
+        EXPECT_TRUE(hv_view(1, 1));
+        EXPECT_FALSE(hv_view(1, 2));
+    }
+
+    TEST(xoptional, function_on_view)
+    {
+        xarray_optional<int> a = {{{0, 1, 2, 3},
+                                   {4, 5, 6, 7},
+                                   {8, 9, 10, 11}},
+                                  {{12, 13, 14, 15},
+                                   {16, 17, 18, 19},
+                                   {20, 21, 22, 23}}};
+
+        a(1, 0, 1).has_value() = false;
+        a(1, 2, 3).has_value() = false;
+
+        auto va = dynamic_view(a, xdynamic_slice_vector({ 1, keep(0, 2), range(1, 4) }));
+
+        xarray_optional<int> b = {{0, 1, 2},
+                                  {3, 4, 5}};
+
+        auto f = va + b;
+        auto vf = f.value();
+        auto hvf = f.has_value();
+
+        EXPECT_EQ(vf(0,0), 13);
+        EXPECT_EQ(vf(0,1), 15);
+        EXPECT_EQ(vf(0,2), 17);
+        EXPECT_EQ(vf(1,0), 24);
+        EXPECT_EQ(vf(1,1), 26);
+        EXPECT_EQ(vf(1,2), 28);
+
+        EXPECT_FALSE(hvf(0,0));
+        EXPECT_TRUE(hvf(0,1));
+        EXPECT_TRUE(hvf(0,2));
+        EXPECT_TRUE(hvf(1,0));
+        EXPECT_TRUE(hvf(1,1));
+        EXPECT_FALSE(hvf(1,2));
+
+        xarray_optional<int> res = f;
+        for(size_t i = 0; i < f.shape()[0]; ++i)
+        {
+            for(size_t j = 0; j < f.shape()[1]; ++j)
+            {
+                EXPECT_EQ(f(i, j), res(i, j));
+            }
+        }
     }
 
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                         \
