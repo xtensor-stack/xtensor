@@ -17,6 +17,7 @@
 
 #include "xarray.hpp"
 #include "xtensor.hpp"
+#include "xdynamic_view.hpp"
 
 namespace xt
 {
@@ -323,6 +324,48 @@ namespace xt
         };
     }
 
+    /****************************************************
+     * xdynamic_view extension for optional expressions *
+     ****************************************************/
+
+    namespace extension
+    {
+        template <class CT, class S, layout_type L, class FST>
+        class xdynamic_view_optional
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using uvt = typename std::decay_t<CT>::value_expression;
+            using uft = typename std::decay_t<CT>::flag_expression;
+            using ucvt = typename std::decay_t<CT>::const_value_expression;
+            using ucft = typename std::decay_t<CT>::const_flag_expression;
+            using value_expression = xdynamic_view<uvt, S, L, detail::flat_storage_type_t<uvt>>;
+            using flag_expression = xdynamic_view<uft, S, L, detail::flat_storage_type_t<uft>>;
+            using const_value_expression = xdynamic_view<ucvt, S, L, detail::flat_storage_type_t<ucvt>>;
+            using const_flag_expression = xdynamic_view<ucft, S, L, detail::flat_storage_type_t<ucft>>;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+
+        private:
+
+            using derived_type = xdynamic_view<CT, S, L, FST>;
+
+            derived_type& derived_cast() noexcept;
+            const derived_type& derived_cast() const noexcept;
+        };
+
+        template <class CT, class S, layout_type L, class FST>
+        struct xdynamic_view_base_impl<xoptional_expression_tag, CT, S, L, FST>
+        {
+            using type = xdynamic_view_optional<CT, S, L, FST>;
+        };
+    }
+
     /*******************************************
      * xcontainer_optional_base implementation *
      *******************************************/
@@ -402,6 +445,49 @@ namespace xt
 
         template <class F, class... CT>
         inline auto xfunction_optional_base<F, CT...>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
+    }
+
+    /*****************************************
+     * xdynamic_view_optional implementation *
+     *****************************************/
+
+    namespace extension
+    {
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::value() -> value_expression
+        {
+            return derived_cast().build_view(derived_cast().expression().value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::value() const -> const_value_expression 
+        {
+            return derived_cast().build_view(derived_cast().expression().value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() -> flag_expression 
+        {
+            return derived_cast().build_view(derived_cast().expression().has_value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression 
+        {
+            return derived_cast().build_view(derived_cast().expression().has_value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::derived_cast() noexcept -> derived_type&
+        {
+            return *static_cast<derived_type*>(this);
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xdynamic_view_optional<CT, S, L, FST>::derived_cast() const noexcept -> const derived_type&
         {
             return *static_cast<const derived_type*>(this);
         }
