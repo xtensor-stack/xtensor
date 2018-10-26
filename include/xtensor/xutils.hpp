@@ -113,6 +113,16 @@ namespace xt
     template <class T, class R>
     using disable_integral_t = std::enable_if_t<!std::is_integral<T>::value, R>;
 
+    /********************************
+     * meta identity implementation *
+     ********************************/
+
+    template <class T>
+    struct meta_identity
+    {
+        using type = T;
+    };
+
     /*******************************
      * remove_class implementation *
      *******************************/

@@ -220,8 +220,8 @@ namespace xt
             {
                 auto& de = e.derived_cast();
                 value_type value = m_start;
-
-                for (auto& el : de.storage())
+                using reference = typename E::reference;
+                for (reference el : de.storage())
                 {
                     el = value;
                     value += m_step;
