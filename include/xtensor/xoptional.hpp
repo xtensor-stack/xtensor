@@ -16,6 +16,7 @@
 #include <xtl/xoptional_sequence.hpp>
 
 #include "xarray.hpp"
+#include "xbroadcast.hpp"
 #include "xdynamic_view.hpp"
 #include "xscalar.hpp"
 #include "xtensor.hpp"
@@ -360,16 +361,16 @@ namespace xt
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
-            value_expression value() const;
-            flag_expression has_value() const;
+            const_value_expression value() const;
+            const_flag_expression has_value() const;
             
         private:
 
             template <std::size_t... I>
-            value_expression value_impl(std::index_sequence<I...>) const;
+            const_value_expression value_impl(std::index_sequence<I...>) const;
 
             template <std::size_t... I>
-            flag_expression has_value_impl(std::index_sequence<I...>) const;
+            const_flag_expression has_value_impl(std::index_sequence<I...>) const;
             
             using derived_type = xfunction<F, CT...>;
             const derived_type& derived_cast() const noexcept;
@@ -421,6 +422,39 @@ namespace xt
         struct xdynamic_view_base_impl<xoptional_expression_tag, CT, S, L, FST>
         {
             using type = xdynamic_view_optional<CT, S, L, FST>;
+        };
+    }
+
+    /*************************************************
+     * xbroadcast extension for optional expressions *
+     *************************************************/
+
+    namespace extension
+    {
+        template <class CT, class X>
+        class xbroadcast_optional
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using value_expression = xbroadcast<detail::value_expression_t<CT>, X>;
+            using flag_expression = xbroadcast<detail::flag_expression_t<CT>, X>;
+            using const_value_expression = value_expression;
+            using const_flag_expression = flag_expression;
+
+            const_value_expression value() const;
+            const_flag_expression has_value() const;
+
+        private:
+
+            using derived_type = xbroadcast<CT, X>;
+            const derived_type& derived_cast() const noexcept;
+        };
+
+        template <class CT, class X>
+        struct xbroadcast_base_impl<xoptional_expression_tag, CT, X>
+        {
+            using type = xbroadcast_optional<CT, X>;
         };
     }
 
@@ -517,20 +551,20 @@ namespace xt
     namespace extension
     {
         template <class F, class... CT>
-        inline auto xfunction_optional_base<F, CT...>::value() const -> value_expression
+        inline auto xfunction_optional_base<F, CT...>::value() const -> const_value_expression
         {
             return value_impl(std::make_index_sequence<sizeof...(CT)>());
         }
 
         template <class F, class... CT>
-        inline auto xfunction_optional_base<F, CT...>::has_value() const -> flag_expression
+        inline auto xfunction_optional_base<F, CT...>::has_value() const -> const_flag_expression
         {
             return has_value_impl(std::make_index_sequence<sizeof...(CT)>());
         }
 
         template <class F, class... CT>
         template <std::size_t... I>
-        inline auto xfunction_optional_base<F, CT...>::value_impl(std::index_sequence<I...>) const -> value_expression
+        inline auto xfunction_optional_base<F, CT...>::value_impl(std::index_sequence<I...>) const -> const_value_expression
         {
             return value_expression(value_functor(),
                 detail::split_optional_expression<CT>::value(std::get<I>(derived_cast().arguments()))...);
@@ -538,7 +572,7 @@ namespace xt
 
         template <class F, class... CT>
         template <std::size_t... I>
-        inline auto xfunction_optional_base<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> flag_expression
+        inline auto xfunction_optional_base<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> const_flag_expression
         {
             return flag_expression(flag_functor(),
                 detail::split_optional_expression<CT>::has_value(std::get<I>(derived_cast().arguments()))...);
@@ -589,6 +623,31 @@ namespace xt
 
         template <class CT, class S, layout_type L, class FST>
         inline auto xdynamic_view_optional<CT, S, L, FST>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
+    }
+
+    /**************************************
+     * xbroadcast_optional implementation *
+     **************************************/
+
+    namespace extension
+    {
+        template <class CT, class X>
+        inline auto xbroadcast_optional<CT, X>::value() const -> const_value_expression
+        {
+            return derived_cast().build_broadcast(derived_cast().expression().value());
+        }
+
+        template <class CT, class X>
+        inline auto xbroadcast_optional<CT, X>::has_value() const -> const_flag_expression
+        {
+            return derived_cast().build_broadcast(derived_cast().expression().has_value());
+        }
+
+        template <class CT, class X>
+        inline auto xbroadcast_optional<CT, X>::derived_cast() const noexcept -> const derived_type&
         {
             return *static_cast<const derived_type*>(this);
         }
