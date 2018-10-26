@@ -232,6 +232,68 @@ namespace xt
         }
     }
 
+    class point
+    {
+    public:
+
+        point() = default;
+        point(int x, int y)
+            : m_x(x), m_y(y)
+        {
+        }
+
+        int& x() noexcept { return m_x; }
+        int& y() noexcept { return m_y; }
+
+        const int& x() const noexcept { return m_x; }
+        const int& y() const noexcept { return m_y; }
+
+    private:
+
+        int m_x;
+        int m_y;
+    };
+
+    struct abs_func
+    {
+        using value_type = int;
+        using reference = int&;
+        using const_reference = const int&;
+        using pointer = int*;
+        using const_pointer = const int*;
+
+        reference operator()(point& p) const noexcept { return p.x(); }
+        const_reference operator()(const point& p) const noexcept { return p.x(); }
+    };
+
+    TEST(xoptional, functor_view)
+    {
+        xarray_optional<point> a = {{point(0, 0), point(0, 1)},
+                                    {point(1, 0), point(1, 1)}};
+        a(0, 0).has_value() = false;
+        a(1, 0).has_value() = false;
+
+        xfunctor_view<abs_func, xarray_optional<point>&> fv(abs_func(), a);
+        auto vfv = fv.value();
+        auto hvfv = fv.has_value();
+
+        EXPECT_EQ(vfv(0, 0), a(0, 0).value().x());
+        EXPECT_EQ(vfv(0, 1), a(0, 1).value().x());
+        EXPECT_EQ(vfv(1, 0), a(1, 0).value().x());
+        EXPECT_EQ(vfv(1, 1), a(1, 1).value().x());
+
+        EXPECT_FALSE(hvfv(0, 0));
+        EXPECT_TRUE(hvfv(0, 1));
+        EXPECT_FALSE(hvfv(1, 0));
+        EXPECT_TRUE(hvfv(1, 1));
+
+        vfv(0, 0) = 4;
+        hvfv(0, 0) = true;
+
+        EXPECT_EQ(a(0, 0).value().x(), 4);
+        EXPECT_TRUE(a(0, 0).has_value());
+    }
+
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                         \
     xtensor_optional<double, 2> m1{{0.25, 1}, {0.75, xtl::missing<double>()}}; \
     xtensor<double, 2> m2{{0.25, 1}, {0.75, 1}};                               \
