@@ -23,20 +23,43 @@
 namespace xt
 {
 
+    /*********************
+     * xscalar extension *
+     *********************/
+
+    namespace extension
+    {
+        template <class Tag, class CT>
+        struct xscalar_base_impl;
+
+        template <class CT>
+        struct xscalar_base_impl<xtensor_expression_tag, CT>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class CT>
+        struct xscalar_base : xscalar_base_impl<xt::detail::get_expression_tag_t<std::decay_t<CT>>, CT>
+        {
+        };
+
+        template <class CT>
+        using xscalar_base_t = typename xscalar_base<CT>::type;
+    }
+
     /***********
      * xscalar *
      ***********/
 
     // xscalar is a cheap wrapper for a scalar value as an xexpression.
+    template <class CT>
+    class xscalar;
 
     template <bool is_const, class CT>
     class xscalar_stepper;
 
     template <bool is_const, class CT>
     class xdummy_iterator;
-
-    template <class CT>
-    class xscalar;
 
     template <class CT>
     struct xiterable_inner_types<xscalar<CT>>
@@ -51,11 +74,15 @@ namespace xt
 #define DL XTENSOR_DEFAULT_LAYOUT
     template <class CT>
     class xscalar : public xexpression<xscalar<CT>>,
-                    private xiterable<xscalar<CT>>
+                    private xiterable<xscalar<CT>>,
+                    public extension::xscalar_base_t<CT>
     {
     public:
 
         using self_type = xscalar<CT>;
+        using xexpression_type = std::decay_t<CT>;
+        using extension_base = extension::xscalar_base_t<CT>;
+        using expression_tag = typename extension_base::expression_tag;
 
         using value_type = std::decay_t<CT>;
         using reference = value_type&;
@@ -69,7 +96,6 @@ namespace xt
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
         using shape_type = inner_shape_type;
-        using expression_tag = xscalar_expression_tag;
 
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
@@ -145,6 +171,9 @@ namespace xt
 
         template <class It>
         const_reference element(It, It) const noexcept;
+
+        xexpression_type& expression() noexcept;
+        const xexpression_type& expression() const noexcept;
 
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const noexcept;
@@ -609,6 +638,18 @@ namespace xt
     template <class CT>
     template <class It>
     inline auto xscalar<CT>::element(It, It) const noexcept -> const_reference
+    {
+        return m_value;
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::expression() noexcept -> xexpression_type&
+    {
+        return m_value;
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::expression() const noexcept -> const xexpression_type&
     {
         return m_value;
     }

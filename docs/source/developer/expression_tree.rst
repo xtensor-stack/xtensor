@@ -112,11 +112,10 @@ This latter is responsible for setting the remaining template parameters of ``xf
     }
 
 The first line computes the ``expression_tag`` of the expression. This tag is used for selecting the right implementation
-class inheriting from ``xfunction_base``. In `xtensor`, three tags are provided, with the following mapping:
+class inheriting from ``xfunction_base``. In `xtensor`, two tags are provided, with the following mapping:
 
-- ``xscalar_expression_tag`` -> ``xfunction``
 - ``xtensor_expression_tag`` -> ``xfunction``
-- ``xoptional_expression_tag`` -> ``xoptional_function``
+- ``xoptional_expression_tag`` -> ``xfunction``
 
 Any expression may define a tag as its ``expression_tag`` inner type. If not, ``xtensor_expression_tag`` is used by default.
 Tags have different priorities so that a resulting tag can be computed for expressions involving different tag types. As we
