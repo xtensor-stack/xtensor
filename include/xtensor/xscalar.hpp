@@ -39,7 +39,7 @@ namespace xt
         };
 
         template <class CT>
-        struct xscalar_base : xscalar_base_impl<xt::detail::get_expression_tag_t<std::decay_t<CT>>, CT>
+        struct xscalar_base : xscalar_base_impl<get_expression_tag_t<std::decay_t<CT>>, CT>
         {
         };
 

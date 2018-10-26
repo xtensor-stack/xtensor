@@ -106,8 +106,8 @@ This latter is responsible for setting the remaining template parameters of ``xf
     inline auto make_xfunction(E&&... e) noexcept
     {
         using expression_tag = xexpression_tag_t<E...>;
-        using functor_type = build_functor_type_t<expression_tag, F, E...>;
-        using type = select_xfunction_expression_t<expression_tag, functor_type, const_xclosure_t<E>...>;
+        using functor_type = F;
+        using type = select_xfunction_expression_t<expression_tag, F, const_xclosure_t<E>...>;
         return type(functor_type(), std::forward<E>(e)...);
     }
 
@@ -126,13 +126,10 @@ The function class mapped to the expression tag is retrieved in the third line o
 
 .. code::
 
-    using type = select_xfunction_expression_t<expression_tag, functor_type, const_xclosure_t<E>...>;
+    using type = select_xfunction_expression_t<expression_tag, F, const_xclosure_t<E>...>;
 
 ``const_closure_t`` computes the closure type (see :ref:`closure-semantics-label`) of each argument and passes it to the function
 class to instantiate.
-
-The exact type of the functor is computed thanks to the ``build_functor_type_t`` generator. It computes the return type of the
-function according to the ``value_type`` of the arguments (most of the times, a simple type promotion is enough).
 
 Once all the types are known, ``make_xfunction`` can instantiate the right function type and returns it:
 

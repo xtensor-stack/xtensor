@@ -27,7 +27,7 @@ namespace xt
      * Metafunction for splitting xoptional expressions *
      ****************************************************/
 
-    namespace detail
+    namespace extension
     {
 
         /**************************************
@@ -39,7 +39,10 @@ namespace xt
         {
             using type = xoptional_expression_tag;
         };
+    }
 
+    namespace detail
+    {
         /*****************************
          * split_optional_expression *
          *****************************/

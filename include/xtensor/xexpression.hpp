@@ -222,7 +222,7 @@ namespace xt
     {
     };
 
-    namespace detail
+    namespace extension
     {
         template <class E, class = void_t<int>>
         struct get_expression_tag_impl
@@ -285,12 +285,17 @@ namespace xt
 
         template <class... T>
         using expression_tag_and_t = typename expression_tag_and<T...>::type;
+
+        struct xtensor_empty_base
+        {
+            using expression_tag = xtensor_expression_tag;
+        };
     }
 
     template <class... T>
     struct xexpression_tag
     {
-        using type = detail::expression_tag_and_t<detail::get_expression_tag_t<std::decay_t<const_xclosure_t<T>>>...>;
+        using type = extension::expression_tag_and_t<extension::get_expression_tag_t<std::decay_t<const_xclosure_t<T>>>...>;
     };
 
     template <class... T>
@@ -305,14 +310,6 @@ namespace xt
     struct is_xoptional_expression : std::is_same<xexpression_tag_t<E>, xoptional_expression_tag>
     {
     };
-
-    namespace extension
-    {
-        struct xtensor_empty_base
-        {
-            using expression_tag = xtensor_expression_tag;
-        };
-    }
 
     /********************************
      * xoptional_comparable concept *
