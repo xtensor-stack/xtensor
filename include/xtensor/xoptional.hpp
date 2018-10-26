@@ -16,8 +16,9 @@
 #include <xtl/xoptional_sequence.hpp>
 
 #include "xarray.hpp"
-#include "xtensor.hpp"
 #include "xdynamic_view.hpp"
+#include "xscalar.hpp"
+#include "xtensor.hpp"
 
 namespace xt
 {
@@ -28,6 +29,20 @@ namespace xt
 
     namespace detail
     {
+
+        /**************************************
+         * get_expression_tag specializations *
+         **************************************/
+
+        template <class T, class B>
+        struct get_expression_tag<xtl::xoptional<T, B>>
+        {
+            using type = xoptional_expression_tag;
+        };
+
+        /*****************************
+         * split_optional_expression *
+         *****************************/
 
         template <class T, class Tag>
         struct split_optional_expression_impl
@@ -67,68 +82,18 @@ namespace xt
             }
         };
 
-        template <class T, bool is_const, bool is_ref>
-        struct split_optional_scalar
-        {
-            using raw_value_closure = typename T::value_closure;
-            using raw_flag_closure = typename T::flag_closure;
-            using cst_value_closure = std::conditional_t<is_const,
-                                                         std::add_const_t<raw_value_closure>,
-                                                         raw_value_closure>;
-            using cst_flag_closure = std::conditional_t<is_const,
-                                                        std::add_const_t<raw_flag_closure>,
-                                                        raw_flag_closure>;
-            using value_closure = std::conditional_t<is_ref,
-                                                     std::add_lvalue_reference_t<cst_value_closure>,
-                                                     cst_value_closure>;
-            using flag_closure = std::conditional_t<is_ref,
-                                                    std::add_lvalue_reference_t<cst_flag_closure>,
-                                                    cst_flag_closure>;
-            using value_expression = xscalar<value_closure>;
-            using flag_expression = xscalar<flag_closure>;
-
-            template <class U>
-            static inline value_expression value(U&& arg)
-            {
-                return arg().value();
-            }
-
-            template <class U>
-            static inline flag_expression has_value(U&& arg)
-            {
-                return arg().has_value();
-            }
-        };
-
-        template <class T, class B, class Tag>
-        struct split_optional_expression_impl<xscalar<xtl::xoptional<T, B>>, Tag>
-            : split_optional_scalar<xtl::xoptional<T, B>, false, false>
-        {
-        };
-
-        template <class T, class B, class Tag>
-        struct split_optional_expression_impl<xscalar<xtl::xoptional<T, B>&>, Tag>
-            : split_optional_scalar<xtl::xoptional<T, B>, false, true>
-        {
-        };
-
-        template <class T, class B, class Tag>
-        struct split_optional_expression_impl<xscalar<const xtl::xoptional<T, B>&>, Tag>
-            : split_optional_scalar<xtl::xoptional<T, B>, true, true>
-        {
-        };
-
-        template <class T, class B, class Tag>
-        struct split_optional_expression_impl<xscalar<const xtl::xoptional<T, B>>, Tag>
-            : split_optional_scalar<xtl::xoptional<T, B>, true, false>
-        {
-        };
-
         template <class T>
-        struct split_optional_expression_impl<T, xoptional_expression_tag>
+        struct split_optional_expression_impl_base
         {
-            using value_expression = decltype(std::declval<T>().value());
-            using flag_expression = decltype(std::declval<T>().has_value());
+            static constexpr bool is_const = std::is_const<std::remove_reference_t<T>>::value;
+            using decay_type = std::decay_t<T>;
+
+            using value_expression = std::conditional_t<is_const,
+                                                        typename decay_type::const_value_expression,
+                                                        typename decay_type::value_expression>;
+            using flag_expression = std::conditional_t<is_const,
+                                                       typename decay_type::const_flag_expression,
+                                                       typename decay_type::flag_expression>;
 
             template <class U>
             static inline value_expression value(U&& arg)
@@ -144,6 +109,18 @@ namespace xt
         };
 
         template <class T>
+        struct split_optional_expression_impl<T, xoptional_expression_tag>
+            : split_optional_expression_impl_base<T>
+        {
+        };
+
+        template <class T>
+        struct split_optional_expression_impl<xscalar<T>, xoptional_expression_tag>
+            : split_optional_expression_impl_base<xscalar<T>>
+        {
+        };
+
+        template <class T>
         struct split_optional_expression
             : split_optional_expression_impl<T, xexpression_tag_t<std::decay_t<T>>>
         {
@@ -154,6 +131,10 @@ namespace xt
 
         template <class T>
         using flag_expression_t = typename split_optional_expression<T>::flag_expression;
+
+        /********************
+         * optional_bitwise *
+         ********************/
 
         template <class T = bool>
         struct optional_bitwise
@@ -198,6 +179,78 @@ namespace xt
         template <class E1, class E2>
         static void assign_data(xexpression<E1>& e1, const xexpression<E2>& e2, bool trivial);
     };
+
+    /**********************************
+     * xscalar extension for optional *
+     **********************************/
+
+    namespace extension
+    {
+       template <class CT>
+        struct xscalar_optional_traits
+        {
+            using closure_type = CT;
+            static constexpr bool is_ref = std::is_reference<closure_type>::value;
+            using unref_closure_type = std::remove_reference_t<closure_type>;
+            static constexpr bool is_const = std::is_const<unref_closure_type>::value;
+            using raw_closure_type = std::decay_t<CT>;
+
+            using raw_value_closure = typename raw_closure_type::value_closure;
+            using raw_flag_closure = typename raw_closure_type::flag_closure;
+            using const_raw_value_closure = std::add_const_t<raw_value_closure>;
+            using const_raw_flag_closure = std::add_const_t<raw_flag_closure>;
+
+            using value_closure = std::conditional_t<is_ref,
+                                                     std::add_lvalue_reference_t<raw_value_closure>,
+                                                     raw_value_closure>;
+            using flag_closure = std::conditional_t<is_ref,
+                                                    std::add_lvalue_reference_t<raw_flag_closure>,
+                                                    raw_flag_closure>;
+            using const_value_closure = std::conditional_t<is_ref,
+                                                           std::add_lvalue_reference_t<const_raw_value_closure>,
+                                                           raw_value_closure>;
+            using const_flag_closure = std::conditional_t<is_ref,
+                                                          std::add_lvalue_reference_t<const_raw_flag_closure>,
+                                                          raw_flag_closure>;
+
+            using value_expression = xscalar<std::conditional_t<is_const, const_value_closure, value_closure>>;
+            using flag_expression = xscalar<std::conditional_t<is_const, const_flag_closure, flag_closure>>;
+            using const_value_expression = xscalar<const_value_closure>;
+            using const_flag_expression = xscalar<const_flag_closure>;
+        };
+
+        template <class CT>
+        class xscalar_optional_base
+        {
+        public:
+
+            using traits = xscalar_optional_traits<CT>;
+            using value_expression = typename traits::value_expression;
+            using flag_expression = typename traits::flag_expression;
+            using const_value_expression = typename traits::const_value_expression;
+            using const_flag_expression = typename traits::const_flag_expression;
+            using expression_tag = xoptional_expression_tag;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+
+        private:
+
+            using derived_type = xscalar<CT>;
+
+            derived_type& derived_cast() noexcept;
+            const derived_type& derived_cast() const noexcept;
+        };
+
+        template <class CT>
+        struct xscalar_base_impl<xoptional_expression_tag, CT>
+        {
+            using type = xscalar_optional_base<CT>;
+        };
+    }
 
     /*************************************
      * xcontainer extention for optional *
@@ -301,6 +354,8 @@ namespace xt
         
             using value_expression = xfunction<value_functor, detail::value_expression_t<CT>...>;
             using flag_expression = xfunction<flag_functor, detail::flag_expression_t<CT>...>;
+            using const_value_expression = value_expression;
+            using const_flag_expression = flag_expression;
 
             value_expression value() const;
             flag_expression has_value() const;
@@ -364,6 +419,49 @@ namespace xt
         {
             using type = xdynamic_view_optional<CT, S, L, FST>;
         };
+    }
+
+    /****************************************
+     * xscalar_optional_base implementation *
+     ****************************************/
+
+    namespace extension
+    {
+        template <class CT>
+        inline auto xscalar_optional_base<CT>::value() -> value_expression
+        {
+            return derived_cast().expression().value();
+        }
+
+        template <class CT>
+        inline auto xscalar_optional_base<CT>::value() const -> const_value_expression
+        {
+            return derived_cast().expression().value();
+        }
+
+        template <class CT>
+        inline auto xscalar_optional_base<CT>::has_value() -> flag_expression
+        {
+            return derived_cast().expression().has_value();
+        }
+
+        template <class CT>
+        inline auto xscalar_optional_base<CT>::has_value() const -> const_flag_expression
+        {
+            return derived_cast().expression().has_value();
+        }
+
+        template <class CT>
+        inline auto xscalar_optional_base<CT>::derived_cast() noexcept -> derived_type&
+        {
+            return *static_cast<derived_type*>(this);
+        }
+
+        template <class CT>
+        inline auto xscalar_optional_base<CT>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
     }
 
     /*******************************************

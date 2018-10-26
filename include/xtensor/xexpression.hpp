@@ -214,10 +214,6 @@ namespace xt
      * expression tag system *
      *************************/
 
-    struct xscalar_expression_tag
-    {
-    };
-
     struct xtensor_expression_tag
     {
     };
@@ -229,15 +225,20 @@ namespace xt
     namespace detail
     {
         template <class E, class = void_t<int>>
-        struct get_expression_tag
+        struct get_expression_tag_impl
         {
             using type = xtensor_expression_tag;
         };
 
         template <class E>
-        struct get_expression_tag<E, void_t<typename std::decay_t<E>::expression_tag>>
+        struct get_expression_tag_impl<E, void_t<typename std::decay_t<E>::expression_tag>>
         {
             using type = typename std::decay_t<E>::expression_tag;
+        };
+
+        template <class E>
+        struct get_expression_tag : get_expression_tag_impl<E>
+        {
         };
 
         template <class E>
@@ -262,24 +263,6 @@ namespace xt
         struct expression_tag_and<T, T>
         {
             using type = T;
-        };
-
-        template <>
-        struct expression_tag_and<xscalar_expression_tag, xscalar_expression_tag>
-        {
-            using type = xscalar_expression_tag;
-        };
-
-        template <class T>
-        struct expression_tag_and<xscalar_expression_tag, T>
-        {
-            using type = T;
-        };
-
-        template <class T>
-        struct expression_tag_and<T, xscalar_expression_tag>
-            : expression_tag_and<xscalar_expression_tag, T>
-        {
         };
 
         template <>

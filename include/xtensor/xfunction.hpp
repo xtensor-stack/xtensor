@@ -179,12 +179,6 @@ namespace xt
         };
 
         template <class F, class... CT>
-        struct xfunction_base_impl<xscalar_expression_tag, F, CT...>
-            : xfunction_base_impl<xtensor_expression_tag, F, CT...>
-        {
-        };
-
-        template <class F, class... CT>
         struct xfunction_base
             : xfunction_base_impl<xexpression_tag_t<CT...>, F, CT...>
         {

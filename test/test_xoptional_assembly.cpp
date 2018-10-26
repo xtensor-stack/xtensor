@@ -65,7 +65,7 @@ namespace xt
             int value = 2;
             dyn_opt_ass_type ra(rm.m_shape, value, layout_type::row_major);
             compare_shape(ra, rm);
-            dyn_opt_ass_type::value_expression::storage_type vec(ra.size(), value);
+            dyn_opt_ass_type::raw_value_expression::storage_type vec(ra.size(), value);
             EXPECT_EQ(ra.value().storage(), vec);
         }
 
@@ -75,7 +75,7 @@ namespace xt
             int value = 2;
             cm_opt_ass_type ca(cm.m_shape, value);
             compare_shape(ca, cm);
-            cm_opt_ass_type::value_expression::storage_type vec(ca.size(), value);
+            cm_opt_ass_type::raw_value_expression::storage_type vec(ca.size(), value);
             EXPECT_EQ(ca.value().storage(), vec);
         }
     }
@@ -86,7 +86,7 @@ namespace xt
         int value = 2;
         dyn_opt_ass_type cma(cmr.m_shape, cmr.m_strides, value);
         compare_shape(cma, cmr);
-        dyn_opt_ass_type::value_expression::storage_type vec(cma.size(), value);
+        dyn_opt_ass_type::raw_value_expression::storage_type vec(cma.size(), value);
         EXPECT_EQ(cma.value().storage(), vec);
     }
 

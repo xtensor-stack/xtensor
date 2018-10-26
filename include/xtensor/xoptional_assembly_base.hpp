@@ -45,15 +45,15 @@ namespace xt
         using derived_type = D;
         using inner_types = xcontainer_inner_types<D>;
 
-        using value_expression = typename inner_types::value_expression;
-        using base_value_type = typename value_expression::value_type;
-        using base_reference = typename value_expression::reference;
-        using base_const_reference = typename value_expression::const_reference;
+        using raw_value_expression = typename inner_types::raw_value_expression;
+        using base_value_type = typename raw_value_expression::value_type;
+        using base_reference = typename raw_value_expression::reference;
+        using base_const_reference = typename raw_value_expression::const_reference;
 
-        using flag_expression = typename inner_types::flag_expression;
-        using flag_type = typename flag_expression::value_type;
-        using flag_reference = typename flag_expression::reference;
-        using flag_const_reference = typename flag_expression::const_reference;
+        using raw_flag_expression = typename inner_types::raw_flag_expression;
+        using flag_type = typename raw_flag_expression::value_type;
+        using flag_reference = typename raw_flag_expression::reference;
+        using flag_const_reference = typename raw_flag_expression::const_reference;
 
         using storage_type = typename inner_types::storage_type;
 
@@ -62,26 +62,30 @@ namespace xt
         using const_reference = typename storage_type::const_reference;
         using pointer = typename storage_type::pointer;
         using const_pointer = typename storage_type::const_pointer;
-        using size_type = typename value_expression::size_type;
-        using difference_type = typename value_expression::difference_type;
+        using size_type = typename raw_value_expression::size_type;
+        using difference_type = typename raw_value_expression::difference_type;
         using simd_value_type = xsimd::simd_type<value_type>;
 
-        using shape_type = typename value_expression::shape_type;
-        using strides_type = typename value_expression::strides_type;
-        using backstrides_type = typename value_expression::backstrides_type;
+        using shape_type = typename raw_value_expression::shape_type;
+        using strides_type = typename raw_value_expression::strides_type;
+        using backstrides_type = typename raw_value_expression::backstrides_type;
 
-        using inner_shape_type = typename value_expression::inner_shape_type;
-        using inner_strides_type = typename value_expression::inner_strides_type;
-        using inner_backstrides_type = typename value_expression::inner_backstrides_type;
+        using inner_shape_type = typename raw_value_expression::inner_shape_type;
+        using inner_strides_type = typename raw_value_expression::inner_strides_type;
+        using inner_backstrides_type = typename raw_value_expression::inner_backstrides_type;
 
         using iterable_base = xiterable<D>;
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
-        static constexpr layout_type static_layout = value_expression::static_layout;
-        static constexpr bool contiguous_layout = value_expression::contiguous_layout;
+        static constexpr layout_type static_layout = raw_value_expression::static_layout;
+        static constexpr bool contiguous_layout = raw_value_expression::contiguous_layout;
 
         using expression_tag = xoptional_expression_tag;
+        using value_expression = raw_value_expression&;
+        using flag_expression = raw_flag_expression&;
+        using const_value_expression = const raw_value_expression&;
+        using const_flag_expression = const raw_flag_expression&;
 
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
@@ -216,11 +220,11 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
-        value_expression& value() noexcept;
-        const value_expression& value() const noexcept;
+        value_expression value() noexcept;
+        const_value_expression value() const noexcept;
 
-        flag_expression& has_value() noexcept;
-        const flag_expression& has_value() const noexcept;
+        flag_expression has_value() noexcept;
+        const_flag_expression has_value() const noexcept;
 
     protected:
 
@@ -264,14 +268,14 @@ namespace xt
                                            typename assembly_type::pointer>;
         using size_type = typename assembly_type::size_type;
         using difference_type = typename assembly_type::difference_type;
-        using value_expression = typename assembly_type::value_expression;
-        using flag_expression = typename assembly_type::flag_expression;
+        using raw_value_expression = typename assembly_type::raw_value_expression;
+        using raw_flag_expression = typename assembly_type::raw_flag_expression;
         using value_stepper = std::conditional_t<is_const,
-                                                 typename value_expression::const_stepper,
-                                                 typename value_expression::stepper>;
+                                                 typename raw_value_expression::const_stepper,
+                                                 typename raw_value_expression::stepper>;
         using flag_stepper = std::conditional_t<is_const,
-                                                typename flag_expression::const_stepper,
-                                                typename flag_expression::stepper>;
+                                                typename raw_flag_expression::const_stepper,
+                                                typename raw_flag_expression::stepper>;
 
         xoptional_assembly_stepper(value_stepper vs, flag_stepper fs) noexcept;
 
@@ -789,7 +793,7 @@ namespace xt
      * Return an expression for the values of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::value() noexcept -> value_expression&
+    inline auto xoptional_assembly_base<D>::value() noexcept -> value_expression
     {
         return derived_cast().value_impl();
     }
@@ -798,7 +802,7 @@ namespace xt
      * Return a constant expression for the values of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::value() const noexcept -> const value_expression&
+    inline auto xoptional_assembly_base<D>::value() const noexcept -> const_value_expression
     {
         return derived_cast().value_impl();
     }
@@ -807,7 +811,7 @@ namespace xt
      * Return an expression for the missing mask of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::has_value() noexcept -> flag_expression&
+    inline auto xoptional_assembly_base<D>::has_value() noexcept -> flag_expression
     {
         return derived_cast().has_value_impl();
     }
@@ -816,7 +820,7 @@ namespace xt
      * Return a constant expression for the missing mask of the optional assembly.
      */
     template <class D>
-    inline auto xoptional_assembly_base<D>::has_value() const noexcept -> const flag_expression&
+    inline auto xoptional_assembly_base<D>::has_value() const noexcept -> const_flag_expression
     {
         return derived_cast().has_value_impl();
     }
