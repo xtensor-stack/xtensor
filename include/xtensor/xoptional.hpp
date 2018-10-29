@@ -20,6 +20,7 @@
 #include "xdynamic_view.hpp"
 #include "xfunctor_view.hpp"
 #include "xindex_view.hpp"
+#include "xreducer.hpp"
 #include "xscalar.hpp"
 #include "xtensor.hpp"
 
@@ -41,6 +42,23 @@ namespace xt
         struct get_expression_tag<xtl::xoptional<T, B>>
         {
             using type = xoptional_expression_tag;
+        };
+
+        /************************
+         * xoptional_empty_base *
+         ************************/
+
+        template <class D>
+        class xoptional_empty_base
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+
+        protected:
+
+            D& derived_cast() noexcept;
+            const D& derived_cast() const noexcept;
         };
     }
 
@@ -226,7 +244,7 @@ namespace xt
         };
 
         template <class CT>
-        class xscalar_optional_base
+        class xscalar_optional_base : public xoptional_empty_base<xscalar<CT>>
         {
         public:
 
@@ -242,13 +260,6 @@ namespace xt
 
             flag_expression has_value();
             const_flag_expression has_value() const;
-
-        private:
-
-            using derived_type = xscalar<CT>;
-
-            derived_type& derived_cast() noexcept;
-            const derived_type& derived_cast() const noexcept;
         };
 
         template <class CT>
@@ -265,7 +276,7 @@ namespace xt
     namespace extension
     {
         template <class T>
-        class xcontainer_optional_base
+        class xcontainer_optional_base : public xoptional_empty_base<typename T::derived_type>
         {
         public:
 
@@ -281,13 +292,6 @@ namespace xt
 
             flag_expression has_value();
             const_flag_expression has_value() const;
-
-        private:
-
-            using derived_type = typename traits::derived_type;
-
-            derived_type& derived_cast() noexcept;
-            const derived_type& derived_cast() const noexcept;
         };
     }
 
@@ -350,7 +354,7 @@ namespace xt
     namespace extension
     {
         template <class F, class... CT>
-        class xfunction_optional_base
+        class xfunction_optional_base : public xoptional_empty_base<xfunction<F, CT...>>
         {
         public:
 
@@ -373,9 +377,6 @@ namespace xt
 
             template <std::size_t... I>
             const_flag_expression has_value_impl(std::index_sequence<I...>) const;
-            
-            using derived_type = xfunction<F, CT...>;
-            const derived_type& derived_cast() const noexcept;
         };
 
         template <class F, class... CT>
@@ -392,7 +393,7 @@ namespace xt
     namespace extension
     {
         template <class CT, class S, layout_type L, class FST>
-        class xdynamic_view_optional
+        class xdynamic_view_optional : public xoptional_empty_base<xdynamic_view<CT, S, L, FST>>
         {
         public:
 
@@ -411,13 +412,6 @@ namespace xt
 
             flag_expression has_value();
             const_flag_expression has_value() const;
-
-        private:
-
-            using derived_type = xdynamic_view<CT, S, L, FST>;
-
-            derived_type& derived_cast() noexcept;
-            const derived_type& derived_cast() const noexcept;
         };
 
         template <class CT, class S, layout_type L, class FST>
@@ -434,7 +428,7 @@ namespace xt
     namespace extension
     {
         template <class CT, class X>
-        class xbroadcast_optional
+        class xbroadcast_optional : public xoptional_empty_base<xbroadcast<CT, X>>
         {
         public:
 
@@ -446,11 +440,6 @@ namespace xt
 
             const_value_expression value() const;
             const_flag_expression has_value() const;
-
-        private:
-
-            using derived_type = xbroadcast<CT, X>;
-            const derived_type& derived_cast() const noexcept;
         };
 
         template <class CT, class X>
@@ -467,7 +456,7 @@ namespace xt
     namespace extension
     {
         template <class F, class CT>
-        class xfunctor_view_optional
+        class xfunctor_view_optional : public xoptional_empty_base<xfunctor_view<F, CT>>
         {
         public:
 
@@ -486,13 +475,6 @@ namespace xt
 
             flag_expression has_value();
             const_flag_expression has_value() const;
-
-        private:
-
-            using derived_type = xfunctor_view<F, CT>;
-
-            derived_type& derived_cast() noexcept;
-            const derived_type& derived_cast() const noexcept;
         };
 
         template <class F, class CT>
@@ -509,7 +491,7 @@ namespace xt
     namespace extension
     {
         template <class CT, class I>
-        class xindex_view_optional
+        class xindex_view_optional : public xoptional_empty_base<xindex_view<CT, I>>
         {
         public:
 
@@ -528,13 +510,6 @@ namespace xt
 
             flag_expression has_value();
             const_flag_expression has_value() const;
-
-        private:
-
-            using derived_type = xindex_view<CT, I>;
-
-            derived_type& derived_cast() noexcept;
-            const derived_type& derived_cast() const noexcept;
         };
 
         template <class CT, class I>
@@ -542,6 +517,54 @@ namespace xt
         {
             using type = xindex_view_optional<CT, I>;
         };
+    }
+
+    /***********************************
+     * xreducer extension for optional *
+     ***********************************/
+
+    namespace extension
+    {
+        template <class F, class CT, class X>
+        class xreducer_optional : public xoptional_empty_base<xreducer<F, CT, X>>
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using value_expression = xreducer<F, detail::value_expression_t<CT>, X>;
+            using flag_reducer = xreducer_functors<detail::optional_bitwise<bool>>;
+            using flag_expression = xreducer<flag_reducer, detail::flag_expression_t<CT>, X>;
+            using const_value_expression = value_expression;
+            using const_flag_expression = flag_expression;
+
+            const_value_expression value() const;
+            const_flag_expression has_value() const;
+        };
+
+        template <class F, class CT, class X>
+        struct xreducer_base_impl<xoptional_expression_tag, F, CT, X>
+        {
+            using type = xreducer_optional<F, CT, X>;
+        };
+    }
+
+    /***************************************
+     * xoptional_empty_base implementation *
+     ***************************************/
+
+    namespace extension
+    {
+        template <class D>
+        inline D& xoptional_empty_base<D>::derived_cast() noexcept
+        {
+            return *static_cast<D*>(this);
+        }
+
+        template <class D>
+        inline const D& xoptional_empty_base<D>::derived_cast() const noexcept
+        {
+            return *static_cast<const D*>(this);
+        }
     }
 
     /****************************************
@@ -553,37 +576,25 @@ namespace xt
         template <class CT>
         inline auto xscalar_optional_base<CT>::value() -> value_expression
         {
-            return derived_cast().expression().value();
+            return this->derived_cast().expression().value();
         }
 
         template <class CT>
         inline auto xscalar_optional_base<CT>::value() const -> const_value_expression
         {
-            return derived_cast().expression().value();
+            return this->derived_cast().expression().value();
         }
 
         template <class CT>
         inline auto xscalar_optional_base<CT>::has_value() -> flag_expression
         {
-            return derived_cast().expression().has_value();
+            return this->derived_cast().expression().has_value();
         }
 
         template <class CT>
         inline auto xscalar_optional_base<CT>::has_value() const -> const_flag_expression
         {
-            return derived_cast().expression().has_value();
-        }
-
-        template <class CT>
-        inline auto xscalar_optional_base<CT>::derived_cast() noexcept -> derived_type&
-        {
-            return *static_cast<derived_type*>(this);
-        }
-
-        template <class CT>
-        inline auto xscalar_optional_base<CT>::derived_cast() const noexcept -> const derived_type&
-        {
-            return *static_cast<const derived_type*>(this);
+            return this->derived_cast().expression().has_value();
         }
     }
 
@@ -596,37 +607,25 @@ namespace xt
         template <class T>
         inline auto xcontainer_optional_base<T>::value() -> value_expression
         {
-            return value_expression(derived_cast().storage().value(), derived_cast().shape());
+            return value_expression(this->derived_cast().storage().value(), this->derived_cast().shape());
         }
 
         template <class T>
         inline auto xcontainer_optional_base<T>::value() const -> const_value_expression
         {
-            return const_value_expression(derived_cast().storage().value(), derived_cast().shape());
+            return const_value_expression(this->derived_cast().storage().value(), this->derived_cast().shape());
         }
 
         template <class T>
         inline auto xcontainer_optional_base<T>::has_value() -> flag_expression
         {
-            return flag_expression(derived_cast().storage().has_value(), derived_cast().shape());
+            return flag_expression(this->derived_cast().storage().has_value(), this->derived_cast().shape());
         }
 
         template <class T>
         inline auto xcontainer_optional_base<T>::has_value() const -> const_flag_expression
         {
-            return const_flag_expression(derived_cast().storage().has_value(), derived_cast().shape());
-        }
-
-        template <class T>
-        inline auto xcontainer_optional_base<T>::derived_cast() noexcept -> derived_type&
-        {
-            return *static_cast<derived_type*>(this);
-        }
-
-        template <class T>
-        inline auto xcontainer_optional_base<T>::derived_cast() const noexcept -> const derived_type&
-        {
-            return *static_cast<const derived_type*>(this);
+            return const_flag_expression(this->derived_cast().storage().has_value(), this->derived_cast().shape());
         }
     }
 
@@ -653,7 +652,7 @@ namespace xt
         inline auto xfunction_optional_base<F, CT...>::value_impl(std::index_sequence<I...>) const -> const_value_expression
         {
             return value_expression(value_functor(),
-                detail::split_optional_expression<CT>::value(std::get<I>(derived_cast().arguments()))...);
+                detail::split_optional_expression<CT>::value(std::get<I>(this->derived_cast().arguments()))...);
         }
 
         template <class F, class... CT>
@@ -661,13 +660,7 @@ namespace xt
         inline auto xfunction_optional_base<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> const_flag_expression
         {
             return flag_expression(flag_functor(),
-                detail::split_optional_expression<CT>::has_value(std::get<I>(derived_cast().arguments()))...);
-        }
-
-        template <class F, class... CT>
-        inline auto xfunction_optional_base<F, CT...>::derived_cast() const noexcept -> const derived_type&
-        {
-            return *static_cast<const derived_type*>(this);
+                detail::split_optional_expression<CT>::has_value(std::get<I>(this->derived_cast().arguments()))...);
         }
     }
 
@@ -680,37 +673,25 @@ namespace xt
         template <class CT, class S, layout_type L, class FST>
         inline auto xdynamic_view_optional<CT, S, L, FST>::value() -> value_expression
         {
-            return derived_cast().build_view(derived_cast().expression().value());
+            return this->derived_cast().build_view(this->derived_cast().expression().value());
         }
 
         template <class CT, class S, layout_type L, class FST>
         inline auto xdynamic_view_optional<CT, S, L, FST>::value() const -> const_value_expression 
         {
-            return derived_cast().build_view(derived_cast().expression().value());
+            return this->derived_cast().build_view(this->derived_cast().expression().value());
         }
 
         template <class CT, class S, layout_type L, class FST>
         inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() -> flag_expression 
         {
-            return derived_cast().build_view(derived_cast().expression().has_value());
+            return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
 
         template <class CT, class S, layout_type L, class FST>
         inline auto xdynamic_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression 
         {
-            return derived_cast().build_view(derived_cast().expression().has_value());
-        }
-
-        template <class CT, class S, layout_type L, class FST>
-        inline auto xdynamic_view_optional<CT, S, L, FST>::derived_cast() noexcept -> derived_type&
-        {
-            return *static_cast<derived_type*>(this);
-        }
-
-        template <class CT, class S, layout_type L, class FST>
-        inline auto xdynamic_view_optional<CT, S, L, FST>::derived_cast() const noexcept -> const derived_type&
-        {
-            return *static_cast<const derived_type*>(this);
+            return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
     }
 
@@ -723,19 +704,13 @@ namespace xt
         template <class CT, class X>
         inline auto xbroadcast_optional<CT, X>::value() const -> const_value_expression
         {
-            return derived_cast().build_broadcast(derived_cast().expression().value());
+            return this->derived_cast().build_broadcast(this->derived_cast().expression().value());
         }
 
         template <class CT, class X>
         inline auto xbroadcast_optional<CT, X>::has_value() const -> const_flag_expression
         {
-            return derived_cast().build_broadcast(derived_cast().expression().has_value());
-        }
-
-        template <class CT, class X>
-        inline auto xbroadcast_optional<CT, X>::derived_cast() const noexcept -> const derived_type&
-        {
-            return *static_cast<const derived_type*>(this);
+            return this->derived_cast().build_broadcast(this->derived_cast().expression().has_value());
         }
     }
 
@@ -748,37 +723,25 @@ namespace xt
         template <class F, class CT>
         inline auto xfunctor_view_optional<F, CT>::value() -> value_expression
         {
-            return derived_cast().build_functor_view(derived_cast().expression().value());
+            return this->derived_cast().build_functor_view(this->derived_cast().expression().value());
         }
 
         template <class F, class CT>
         inline auto xfunctor_view_optional<F, CT>::value() const -> const_value_expression
         {
-            return derived_cast().build_functor_view(derived_cast().expression().value());
+            return this->derived_cast().build_functor_view(this->derived_cast().expression().value());
         }
 
         template <class F, class CT>
         inline auto xfunctor_view_optional<F, CT>::has_value() -> flag_expression
         {
-            return derived_cast().expression().has_value();
+            return this->derived_cast().expression().has_value();
         }
 
         template <class F, class CT>
         inline auto xfunctor_view_optional<F, CT>::has_value() const -> const_flag_expression
         {
-            return derived_cast().expression().has_value();
-        }
-
-        template <class F, class CT>
-        inline auto xfunctor_view_optional<F, CT>::derived_cast() noexcept -> derived_type&
-        {
-            return *static_cast<derived_type*>(this);
-        }
-
-        template <class F, class CT>
-        inline auto xfunctor_view_optional<F, CT>::derived_cast() const noexcept -> const derived_type&
-        {
-            return *static_cast<const derived_type*>(this);
+            return this->derived_cast().expression().has_value();
         }
     }
 
@@ -791,37 +754,44 @@ namespace xt
         template <class CT, class I>
         inline auto xindex_view_optional<CT, I>::value() -> value_expression
         {
-            return derived_cast().build_index_view(derived_cast().expression().value());
+            return this->derived_cast().build_index_view(this->derived_cast().expression().value());
         };
 
         template <class CT, class I>
         inline auto xindex_view_optional<CT, I>::value() const -> const_value_expression
         {
-            return derived_cast().build_index_view(derived_cast().expression().value());
+            return this->derived_cast().build_index_view(this->derived_cast().expression().value());
         };
 
         template <class CT, class I>
         inline auto xindex_view_optional<CT, I>::has_value() -> flag_expression
         {
-            return derived_cast().build_index_view(derived_cast().expression().has_value());
+            return this->derived_cast().build_index_view(this->derived_cast().expression().has_value());
         };
 
         template <class CT, class I>
         inline auto xindex_view_optional<CT, I>::has_value() const -> const_flag_expression
         {
-            return derived_cast().build_index_view(derived_cast().expression().has_value());
+            return this->derived_cast().build_index_view(this->derived_cast().expression().has_value());
         };
+    }
 
-        template <class CT, class I>
-        inline auto xindex_view_optional<CT, I>::derived_cast() noexcept -> derived_type&
+    /************************************
+     * xreducer_optional implementation *
+     ************************************/
+
+    namespace extension
+    {
+        template <class F, class CT, class X>
+        inline auto xreducer_optional<F, CT, X>::value() const -> const_value_expression
         {
-            return *static_cast<derived_type*>(this);
+            return this->derived_cast().build_reducer(this->derived_cast().expression().value());
         }
 
-        template <class CT, class I>
-        inline auto xindex_view_optional<CT, I>::derived_cast() const noexcept -> const derived_type&
+        template <class F, class CT, class X>
+        inline auto xreducer_optional<F, CT, X>::has_value() const -> const_flag_expression
         {
-            return *static_cast<const derived_type*>(this);
+            return this->derived_cast().build_reducer(this->derived_cast().expression().has_value(), flag_reducer());
         }
     }
 

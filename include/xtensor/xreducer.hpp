@@ -316,9 +316,9 @@ namespace xt
         return result;
     }
 
-    /*************
-     * xreducer  *
-     *************/
+    /*********************
+     * xreducer functors *
+     *********************/
 
     template <class REDUCE_FUNC, class INIT_FUNC = xtl::identity, class MERGE_FUNC = REDUCE_FUNC>
     struct xreducer_functors
@@ -377,6 +377,35 @@ namespace xt
         return reducer_type(std::forward<RF>(reduce_func), std::forward<IF>(init_func), std::forward<MF>(merge_func));
     }
 
+    /**********************
+     * xreducer extension *
+     **********************/
+
+    namespace extension
+    {
+        template <class Tag, class F, class CT, class X>
+        struct xreducer_base_impl;
+
+        template <class F, class CT, class X>
+        struct xreducer_base_impl<xtensor_expression_tag, F, CT, X>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class F, class CT, class X>
+        struct xreducer_base
+            : xreducer_base_impl<xexpression_tag_t<CT>, F, CT, X>
+        {
+        };
+
+        template <class F, class CT, class X>
+        using xreducer_base_t = typename xreducer_base<F, CT, X>::type;
+    }
+
+    /************
+     * xreducer *
+     ************/
+
     template <class F, class CT, class X>
     class xreducer;
 
@@ -411,7 +440,8 @@ namespace xt
      */
     template <class F, class CT, class X>
     class xreducer : public xexpression<xreducer<F, CT, X>>,
-                     public xconst_iterable<xreducer<F, CT, X>>
+                     public xconst_iterable<xreducer<F, CT, X>>,
+                     public extension::xreducer_base_t<F, CT, X>
     {
     public:
 
@@ -421,6 +451,9 @@ namespace xt
         using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
         using xexpression_type = std::decay_t<CT>;
         using axes_type = X;
+
+        using extension_base = extension::xreducer_base_t<F, CT, X>;
+        using expression_tag = typename extension_base::expression_tag;
 
         using substepper_type = typename xexpression_type::const_stepper;
         using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
@@ -466,6 +499,8 @@ namespace xt
         template <class It>
         const_reference element(It first, It last) const;
 
+        const xexpression_type& expression() const noexcept;
+
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
@@ -476,6 +511,15 @@ namespace xt
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type) const noexcept;
+
+        template <class E, class Func = F>
+        using rebind_t = xreducer<Func, E, X>;
+
+        template <class E>
+        rebind_t<E> build_reducer(E&& e) const;
+
+        template <class E, class Func>
+        rebind_t<E, Func> build_reducer(E&& e, Func&& func) const;
 
     private:
 
@@ -918,6 +962,15 @@ namespace xt
         }
         return *stepper;
     }
+
+    /**
+     * Returns a constant reference to the underlying expression of the reducer.
+     */
+    template <class F, class CT, class X>
+    inline auto xreducer<F, CT, X>::expression() const noexcept -> const xexpression_type&
+    {
+        return m_e;
+    }
     //@}
 
     /**
@@ -964,6 +1017,20 @@ namespace xt
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(*this, offset, true, l);
+    }
+
+    template <class F, class CT, class X>
+    template <class E>
+    inline auto xreducer<F, CT, X>::build_reducer(E&& e) const -> rebind_t<E>
+    {
+        return rebind_t<E>(std::make_tuple(m_reduce, m_init, m_merge), std::forward<E>(e), axes_type(m_axes));
+    }
+
+    template <class F, class CT, class X>
+    template <class E, class Func>
+    inline auto xreducer<F, CT, X>::build_reducer(E&& e, Func&& func) const -> rebind_t<E, Func>
+    {
+        return rebind_t<E, Func>(std::forward<Func>(func), std::forward<E>(e), axes_type(m_axes));
     }
 
     /***********************************

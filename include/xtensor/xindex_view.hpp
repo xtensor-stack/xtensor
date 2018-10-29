@@ -504,12 +504,18 @@ namespace xt
         return m_e[m_indices[(*first)]];
     }
 
+    /**
+     * Returns a reference to the underlying expression of the view.
+     */
     template <class CT, class I>
     inline auto xindex_view<CT, I>::expression() noexcept -> xexpression_type&
     {
         return m_e;
     }
 
+    /**
+     * Returns a constant reference to the underlying expression of the view.
+     */
     template <class CT, class I>
     inline auto xindex_view<CT, I>::expression() const noexcept -> const xexpression_type&
     {
