@@ -24,6 +24,7 @@
 #include "xscalar.hpp"
 #include "xstrided_view.hpp"
 #include "xtensor.hpp"
+#include "xview.hpp"
 
 namespace xt
 {
@@ -584,6 +585,41 @@ namespace xt
         };
     }
 
+    /********************************************
+     * xview extension for optional expressions *
+     ********************************************/
+
+    namespace extension
+    {
+        template <class CT, class... S>
+        class xview_optional : public xoptional_empty_base<xview<CT, S...>>
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using uvt = typename std::decay_t<CT>::value_expression;
+            using uft = typename std::decay_t<CT>::flag_expression;
+            using ucvt = typename std::decay_t<CT>::const_value_expression;
+            using ucft = typename std::decay_t<CT>::const_flag_expression;
+            using value_expression = xview<uvt, S...>;
+            using flag_expression = xview<uft, S...>;
+            using const_value_expression = xview<ucvt, S...>;
+            using const_flag_expression = xview<ucft, S...>;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+        };
+
+        template <class CT, class... S>
+        struct xview_base_impl<xoptional_expression_tag, CT, S...>
+        {
+            using type = xview_optional<CT, S...>;
+        };
+    }
+
     /***************************************
      * xoptional_empty_base implementation *
      ***************************************/
@@ -857,6 +893,37 @@ namespace xt
 
         template <class CT, class S, layout_type L, class FST>
         inline auto xstrided_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression 
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().has_value());
+        }
+    }
+
+    /*********************************
+     * xview_optional implementation *
+     *********************************/
+
+    namespace extension
+    {
+        template <class CT, class... S>
+        inline auto xview_optional<CT, S...>::value() -> value_expression
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().value());
+        }
+
+        template <class CT, class... S>
+        inline auto xview_optional<CT, S...>::value() const -> const_value_expression
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().value());
+        }
+
+        template <class CT, class... S>
+        inline auto xview_optional<CT, S...>::has_value() -> flag_expression
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().has_value());
+        }
+
+        template <class CT, class... S>
+        inline auto xview_optional<CT, S...>::has_value() const -> const_flag_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
