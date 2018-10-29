@@ -333,6 +333,36 @@ namespace xt
         EXPECT_FALSE(hvred(1));
     }
 
+    TEST(xoptional, strided_view)
+    {
+        xarray_optional<int> a = {{{0, 1, 2, 3},
+                                   {4, 5, 6, 7},
+                                   {8, 9, 10, 11}},
+                                  {{12, 13, 14, 15},
+                                   {16, 17, 18, 19},
+                                   {20, 21, 22, 23}}};
+        a(1, 0, 1).has_value() = false;
+        a(1, 2, 3).has_value() = false;
+
+        auto view0 = strided_view(a, {1, range(0, 2), range(1, 4)});
+        auto v_view = view0.value();
+        auto hv_view = view0.has_value();
+
+        EXPECT_EQ(v_view.shape()[0], std::size_t(2));
+        EXPECT_EQ(v_view.shape()[1], std::size_t(3));
+        EXPECT_EQ(hv_view.shape()[0], std::size_t(2));
+        EXPECT_EQ(hv_view.shape()[1], std::size_t(3));
+
+        for(size_t i = 0; i < v_view.shape()[0]; ++i)
+        {
+            for(size_t j = 0; j < v_view.shape()[1]; ++j)
+            {
+                EXPECT_EQ(v_view(i, j), a(1, i, j+1).value());
+                EXPECT_EQ(hv_view(i, j), a(1, i, j+1).has_value());
+            }
+        }
+    }
+
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                         \
     xtensor_optional<double, 2> m1{{0.25, 1}, {0.75, xtl::missing<double>()}}; \
     xtensor<double, 2> m2{{0.25, 1}, {0.75, 1}};                               \
