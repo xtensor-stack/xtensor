@@ -19,6 +19,7 @@
 #include "xbroadcast.hpp"
 #include "xdynamic_view.hpp"
 #include "xfunctor_view.hpp"
+#include "xindex_view.hpp"
 #include "xscalar.hpp"
 #include "xtensor.hpp"
 
@@ -501,6 +502,48 @@ namespace xt
         };
     }
 
+    /**************************************************
+     * xindex_view extension for optional expressions *
+     **************************************************/
+
+    namespace extension
+    {
+        template <class CT, class I>
+        class xindex_view_optional
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using uvt = typename std::decay_t<CT>::value_expression;
+            using ucvt = typename std::decay_t<CT>::const_value_expression;
+            using uft = typename std::decay_t<CT>::flag_expression;
+            using ucft = typename std::decay_t<CT>::const_flag_expression;
+            using value_expression = xindex_view<uvt, I>;
+            using flag_expression = xindex_view<uft, I>;
+            using const_value_expression = xindex_view<ucvt, I>;
+            using const_flag_expression = xindex_view<ucft, I>;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+
+        private:
+
+            using derived_type = xindex_view<CT, I>;
+
+            derived_type& derived_cast() noexcept;
+            const derived_type& derived_cast() const noexcept;
+        };
+
+        template <class CT, class I>
+        struct xindex_view_base_impl<xoptional_expression_tag, CT, I>
+        {
+            using type = xindex_view_optional<CT, I>;
+        };
+    }
+
     /****************************************
      * xscalar_optional_base implementation *
      ****************************************/
@@ -734,6 +777,49 @@ namespace xt
 
         template <class F, class CT>
         inline auto xfunctor_view_optional<F, CT>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
+    }
+
+    /***************************************
+     * xindex_view_optional implementation *
+     ***************************************/
+
+    namespace extension
+    {
+        template <class CT, class I>
+        inline auto xindex_view_optional<CT, I>::value() -> value_expression
+        {
+            return derived_cast().build_index_view(derived_cast().expression().value());
+        };
+
+        template <class CT, class I>
+        inline auto xindex_view_optional<CT, I>::value() const -> const_value_expression
+        {
+            return derived_cast().build_index_view(derived_cast().expression().value());
+        };
+
+        template <class CT, class I>
+        inline auto xindex_view_optional<CT, I>::has_value() -> flag_expression
+        {
+            return derived_cast().build_index_view(derived_cast().expression().has_value());
+        };
+
+        template <class CT, class I>
+        inline auto xindex_view_optional<CT, I>::has_value() const -> const_flag_expression
+        {
+            return derived_cast().build_index_view(derived_cast().expression().has_value());
+        };
+
+        template <class CT, class I>
+        inline auto xindex_view_optional<CT, I>::derived_cast() noexcept -> derived_type&
+        {
+            return *static_cast<derived_type*>(this);
+        }
+
+        template <class CT, class I>
+        inline auto xindex_view_optional<CT, I>::derived_cast() const noexcept -> const derived_type&
         {
             return *static_cast<const derived_type*>(this);
         }

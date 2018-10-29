@@ -23,6 +23,35 @@
 namespace xt
 {
 
+    /*************************
+     * xindex_view extension *
+     *************************/
+
+    namespace extension
+    {
+        template <class Tag, class CT, class I>
+        struct xindex_view_base_impl;
+
+        template <class CT, class I>
+        struct xindex_view_base_impl<xtensor_expression_tag, CT, I>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class CT, class I>
+        struct xindex_view_base
+            : xindex_view_base_impl<xexpression_tag_t<CT>, CT, I>
+        {
+        };
+
+        template <class CT, class I>
+        using xindex_view_base_t = typename xindex_view_base<CT, I>::type;
+    }
+
+    /***************
+     * xindex_view *
+     ***************/
+
     template <class CT, class I>
     class xindex_view;
 
@@ -41,10 +70,6 @@ namespace xt
         using stepper = xindexed_stepper<xindex_view<CT, I>, false>;
     };
 
-    /***************
-     * xindex_view *
-     ***************/
-
     /**
      * @class xindex_view
      * @brief View of an xexpression from vector of indices.
@@ -61,13 +86,17 @@ namespace xt
      */
     template <class CT, class I>
     class xindex_view : public xview_semantic<xindex_view<CT, I>>,
-                        public xiterable<xindex_view<CT, I>>
+                        public xiterable<xindex_view<CT, I>>,
+                        public extension::xindex_view_base_t<CT, I>
     {
     public:
 
         using self_type = xindex_view<CT, I>;
         using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
+        
+        using extension_base = extension::xindex_view_base_t<CT, I>;
+        using expression_tag = typename extension_base::expression_tag;
 
         using value_type = typename xexpression_type::value_type;
         using reference = typename xexpression_type::reference;
@@ -135,6 +164,9 @@ namespace xt
         template <class It>
         const_reference element(It first, It last) const;
 
+        xexpression_type& expression() noexcept;
+        const xexpression_type& expression() const noexcept;
+
         template <class O>
         bool broadcast_shape(O& shape, bool reuse_cache = false) const;
 
@@ -150,6 +182,12 @@ namespace xt
         const_stepper stepper_begin(const ST& shape) const;
         template <class ST>
         const_stepper stepper_end(const ST& shape, layout_type) const;
+
+        template <class E>
+        using rebind_t = xindex_view<E, I>;
+
+        template <class E>
+        rebind_t<E> build_index_view(E&& e) const;
 
     private:
 
@@ -465,6 +503,18 @@ namespace xt
     {
         return m_e[m_indices[(*first)]];
     }
+
+    template <class CT, class I>
+    inline auto xindex_view<CT, I>::expression() noexcept -> xexpression_type&
+    {
+        return m_e;
+    }
+
+    template <class CT, class I>
+    inline auto xindex_view<CT, I>::expression() const noexcept -> const xexpression_type&
+    {
+        return m_e;
+    }
     //@}
 
     /**
@@ -531,6 +581,13 @@ namespace xt
     {
         size_type offset = shape.size() - dimension();
         return const_stepper(this, offset, true);
+    }
+
+    template <class CT, class I>
+    template <class E>
+    inline auto xindex_view<CT, I>::build_index_view(E&& e) const -> rebind_t<E>
+    {
+        return rebind_t<E>(std::forward<E>(e), indices_type(m_indices));
     }
 
     /******************************

@@ -294,6 +294,28 @@ namespace xt
         EXPECT_TRUE(a(0, 0).has_value());
     }
 
+    TEST(xoptional, index_view)
+    {
+        xarray_optional<int> a = {{1, 2, 3},
+                                  {4, 5, 6}};
+        a(0, 0).has_value() = false;
+        a(1, 2).has_value() = false;
+
+        auto iv = index_view(a, {{0ul,0ul}, {0ul,2ul}, {1ul,1ul}, {1ul,2ul}});
+        auto viv = iv.value();
+        auto hviv = iv.has_value();
+
+        EXPECT_EQ(viv(0), a(0, 0).value());
+        EXPECT_EQ(viv(1), a(0, 2).value());
+        EXPECT_EQ(viv(2), a(1, 1).value());
+        EXPECT_EQ(viv(3), a(1, 2).value());
+
+        EXPECT_FALSE(hviv(0));
+        EXPECT_TRUE(hviv(1));
+        EXPECT_TRUE(hviv(2));
+        EXPECT_FALSE(hviv(3));
+    }
+
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                         \
     xtensor_optional<double, 2> m1{{0.25, 1}, {0.75, xtl::missing<double>()}}; \
     xtensor<double, 2> m2{{0.25, 1}, {0.75, 1}};                               \
