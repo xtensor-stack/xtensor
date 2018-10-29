@@ -19,6 +19,7 @@
 #include "xbroadcast.hpp"
 #include "xdynamic_view.hpp"
 #include "xfunctor_view.hpp"
+#include "xgenerator.hpp"
 #include "xindex_view.hpp"
 #include "xreducer.hpp"
 #include "xscalar.hpp"
@@ -362,10 +363,10 @@ namespace xt
 
             using expression_tag = xoptional_expression_tag;
             using value_functor = F;
-            using flag_functor = detail::optional_bitwise<bool>;
+            using flag_functor = xt::detail::optional_bitwise<bool>;
         
-            using value_expression = xfunction<value_functor, detail::value_expression_t<CT>...>;
-            using flag_expression = xfunction<flag_functor, detail::flag_expression_t<CT>...>;
+            using value_expression = xfunction<value_functor, xt::detail::value_expression_t<CT>...>;
+            using flag_expression = xfunction<flag_functor, xt::detail::flag_expression_t<CT>...>;
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
@@ -404,10 +405,10 @@ namespace xt
             using uft = typename std::decay_t<CT>::flag_expression;
             using ucvt = typename std::decay_t<CT>::const_value_expression;
             using ucft = typename std::decay_t<CT>::const_flag_expression;
-            using value_expression = xdynamic_view<uvt, S, L, detail::flat_storage_type_t<uvt>>;
-            using flag_expression = xdynamic_view<uft, S, L, detail::flat_storage_type_t<uft>>;
-            using const_value_expression = xdynamic_view<ucvt, S, L, detail::flat_storage_type_t<ucvt>>;
-            using const_flag_expression = xdynamic_view<ucft, S, L, detail::flat_storage_type_t<ucft>>;
+            using value_expression = xdynamic_view<uvt, S, L, xt::detail::flat_storage_type_t<uvt>>;
+            using flag_expression = xdynamic_view<uft, S, L, xt::detail::flat_storage_type_t<uft>>;
+            using const_value_expression = xdynamic_view<ucvt, S, L, xt::detail::flat_storage_type_t<ucvt>>;
+            using const_flag_expression = xdynamic_view<ucft, S, L, xt::detail::flat_storage_type_t<ucft>>;
 
             value_expression value();
             const_value_expression value() const;
@@ -435,8 +436,8 @@ namespace xt
         public:
 
             using expression_tag = xoptional_expression_tag;
-            using value_expression = xbroadcast<detail::value_expression_t<CT>, X>;
-            using flag_expression = xbroadcast<detail::flag_expression_t<CT>, X>;
+            using value_expression = xbroadcast<xt::detail::value_expression_t<CT>, X>;
+            using flag_expression = xbroadcast<xt::detail::flag_expression_t<CT>, X>;
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
@@ -533,9 +534,9 @@ namespace xt
         public:
 
             using expression_tag = xoptional_expression_tag;
-            using value_expression = xreducer<F, detail::value_expression_t<CT>, X>;
-            using flag_reducer = xreducer_functors<detail::optional_bitwise<bool>>;
-            using flag_expression = xreducer<flag_reducer, detail::flag_expression_t<CT>, X>;
+            using value_expression = xreducer<F, xt::detail::value_expression_t<CT>, X>;
+            using flag_reducer = xreducer_functors<xt::detail::optional_bitwise<bool>>;
+            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X>;
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
@@ -566,10 +567,10 @@ namespace xt
             using uft = typename std::decay_t<CT>::flag_expression;
             using ucvt = typename std::decay_t<CT>::const_value_expression;
             using ucft = typename std::decay_t<CT>::const_flag_expression;
-            using value_expression = xstrided_view<uvt, S, L, detail::flat_storage_type_t<uvt>>;
-            using flag_expression = xstrided_view<uft, S, L, detail::flat_storage_type_t<uft>>;
-            using const_value_expression = xstrided_view<ucvt, S, L, detail::flat_storage_type_t<ucvt>>;
-            using const_flag_expression = xstrided_view<ucft, S, L, detail::flat_storage_type_t<ucft>>;
+            using value_expression = xstrided_view<uvt, S, L, xt::detail::flat_storage_type_t<uvt>>;
+            using flag_expression = xstrided_view<uft, S, L, xt::detail::flat_storage_type_t<uft>>;
+            using const_value_expression = xstrided_view<ucvt, S, L, xt::detail::flat_storage_type_t<ucvt>>;
+            using const_flag_expression = xstrided_view<ucft, S, L, xt::detail::flat_storage_type_t<ucft>>;
 
             value_expression value();
             const_value_expression value() const;
@@ -617,6 +618,100 @@ namespace xt
         struct xview_base_impl<xoptional_expression_tag, CT, S...>
         {
             using type = xview_optional<CT, S...>;
+        };
+    }
+
+    /*************************************************
+     * xgenerator extension for generator expression *
+     *************************************************/
+
+    namespace extension
+    {
+        namespace detail
+        {
+            template <class F, class = void_t<int>>
+            struct value_functor
+            {
+                using type = F;
+
+                static type get(const F& f)
+                {
+                    return f;
+                }
+            };
+
+            template <class F>
+            struct value_functor<F, void_t<typename F::value_functor_type>>
+            {
+                using type = typename F::value_functor_type;
+
+                static type get(const F& f)
+                {
+                    return f.value_functor();
+                }
+            };
+
+            template <class F>
+            using value_functor_t = typename value_functor<F>::type;
+
+            struct always_true
+            {
+                template <class... T>
+                bool operator()(T...) const
+                {
+                    return true;
+                }
+            };
+
+            template <class F, class = void_t<int>>
+            struct flag_functor
+            {
+                using type = always_true;
+
+                static type get(const F&)
+                {
+                    return type();
+                }
+            };
+
+            template <class F>
+            struct flag_functor<F, void_t<typename F::flag_functor_type>>
+            {
+                using type = typename F::flag_functor_type;
+
+                static type get(const F& f)
+                {
+                    return f.flag_functor();
+                }
+            };
+
+            template <class F>
+            using flag_functor_t = typename flag_functor<F>::type;
+        }
+
+        template <class F, class R, class S>
+        class xgenerator_optional : public xoptional_empty_base<xgenerator<F, R, S>>
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using value_closure = typename R::value_closure;
+            using flag_closure = typename R::flag_closure;
+            using value_functor = detail::value_functor_t<F>;
+            using flag_functor = detail::flag_functor_t<F>;
+            using value_expression = xgenerator<value_functor, value_closure, S>;
+            using flag_expression = xgenerator<flag_functor, flag_closure, S>;
+            using const_value_expression = value_expression;
+            using const_flag_expression = flag_expression;
+
+            const_value_expression value() const;
+            const_flag_expression has_value() const;
+        };
+
+        template <class F, class R, class S>
+        struct xgenerator_base_impl<xoptional_expression_tag, F, R, S>
+        {
+            using type = xgenerator_optional<F, R, S>;
         };
     }
 
@@ -724,7 +819,7 @@ namespace xt
         inline auto xfunction_optional_base<F, CT...>::value_impl(std::index_sequence<I...>) const -> const_value_expression
         {
             return value_expression(value_functor(),
-                detail::split_optional_expression<CT>::value(std::get<I>(this->derived_cast().arguments()))...);
+                xt::detail::split_optional_expression<CT>::value(std::get<I>(this->derived_cast().arguments()))...);
         }
 
         template <class F, class... CT>
@@ -732,7 +827,7 @@ namespace xt
         inline auto xfunction_optional_base<F, CT...>::has_value_impl(std::index_sequence<I...>) const -> const_flag_expression
         {
             return flag_expression(flag_functor(),
-                detail::split_optional_expression<CT>::has_value(std::get<I>(this->derived_cast().arguments()))...);
+                xt::detail::split_optional_expression<CT>::has_value(std::get<I>(this->derived_cast().arguments()))...);
         }
     }
 
@@ -926,6 +1021,27 @@ namespace xt
         inline auto xview_optional<CT, S...>::has_value() const -> const_flag_expression
         {
             return this->derived_cast().build_view(this->derived_cast().expression().has_value());
+        }
+    }
+
+    /**************************************
+     * xgenerator_optional implementation *
+     **************************************/
+
+    namespace extension
+    {
+        template <class F, class R, class S>
+        inline auto xgenerator_optional<F, R, S>::value() const -> const_value_expression
+        {
+            return this->derived_cast().template build_generator<value_closure>(
+                    detail::value_functor<F>::get(this->derived_cast().functor()));
+        }
+
+        template <class F, class R, class S>
+        inline auto xgenerator_optional<F, R, S>::has_value() const -> const_flag_expression
+        {
+            return this->derived_cast().template build_generator<flag_closure>(
+                    detail::flag_functor<F>::get(this->derived_cast().functor()));
         }
     }
 

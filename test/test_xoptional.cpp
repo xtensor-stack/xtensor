@@ -393,6 +393,68 @@ namespace xt
         }
     }
 
+    struct float_identity
+    {
+        template <class T>
+        int operator()(T t) const
+        {
+            return static_cast<int>(t);
+        }
+    };
+    
+    struct bool_even
+    {
+        template <class T>
+        bool operator()(T t) const
+        {
+            return t%2 == 0;
+        }
+    };
+
+    struct opt_func_tester
+    {
+        using value_functor_type = float_identity;
+        using flag_functor_type = bool_even;
+
+        value_functor_type value_functor() const
+        {
+            return m_value_functor;
+        }
+
+        flag_functor_type flag_functor() const
+        {
+            return m_flag_functor;
+        }
+
+        template <class T>
+        xtl::xoptional<int, bool> operator()(T t) const
+        {
+            return xtl::xoptional<int, bool>(m_value_functor(t),
+                                             m_flag_functor(t));
+        }
+
+        value_functor_type m_value_functor;
+        flag_functor_type m_flag_functor;
+    };
+
+    TEST(xoptional, generator)
+    {
+        using gen_type = xgenerator<opt_func_tester, xtl::xoptional<int, bool>, dynamic_shape<std::size_t>>;
+        gen_type g(opt_func_tester(), {4});
+        auto vg = g.value();
+        auto hvg = g.has_value();
+
+        EXPECT_EQ(vg(0), 0);
+        EXPECT_EQ(vg(1), 1);
+        EXPECT_EQ(vg(2), 2);
+        EXPECT_EQ(vg(3), 3);
+
+        EXPECT_TRUE(hvg(0));
+        EXPECT_FALSE(hvg(1));
+        EXPECT_TRUE(hvg(2));
+        EXPECT_FALSE(hvg(3));
+    }
+
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                         \
     xtensor_optional<double, 2> m1{{0.25, 1}, {0.75, xtl::missing<double>()}}; \
     xtensor<double, 2> m2{{0.25, 1}, {0.75, 1}};                               \

@@ -26,6 +26,30 @@
 namespace xt
 {
 
+    /************************
+     * xgenerator extension *
+     ************************/
+
+    namespace extension
+    {
+        template <class Tag, class F, class R, class S>
+        struct xgenerator_base_impl;
+
+        template <class F, class R, class S>
+        struct xgenerator_base_impl<xtensor_expression_tag, F, R, S>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class F, class R, class S>
+        struct xgenerator_base : xgenerator_base_impl<xexpression_tag_t<R>, F, R, S>
+        {
+        };
+
+        template <class F, class R, class S>
+        using xgenerator_base_t = typename xgenerator_base<F, R, S>::type;
+    }
+
     /**************
      * xgenerator *
      **************/
@@ -54,12 +78,16 @@ namespace xt
      */
     template <class F, class R, class S>
     class xgenerator : public xexpression<xgenerator<F, R, S>>,
-                       public xconst_iterable<xgenerator<F, R, S>>
+                       public xconst_iterable<xgenerator<F, R, S>>,
+                       public extension::xgenerator_base_t<F, R, S>
     {
     public:
 
         using self_type = xgenerator<F, R, S>;
         using functor_type = typename std::remove_reference<F>::type;
+
+        using extension_base = extension::xgenerator_base_t<F, R, S>;
+        using expression_tag = typename extension_base::expression_tag;
 
         using value_type = R;
         using reference = value_type;
@@ -115,6 +143,14 @@ namespace xt
 
         template <class E, class FE = F, class = std::enable_if_t<has_assign_to<E, FE>::value>>
         void assign_to(xexpression<E>& e) const noexcept;
+
+        const functor_type& functor() const noexcept;
+
+        template <class OR, class OF>
+        using rebind_t = xgenerator<OF, OR, S>;
+
+        template <class OR, class OF>
+        rebind_t<OR, OF> build_generator(OF&& func) const;
 
     private:
 
@@ -341,6 +377,19 @@ namespace xt
     {
         e.derived_cast().resize(m_shape);
         m_f.assign_to(e);
+    }
+
+    template <class F, class R, class S>
+    inline auto xgenerator<F, R, S>::functor() const noexcept -> const functor_type&
+    {
+        return m_f;
+    }
+
+    template <class F, class R, class S>
+    template <class OR, class OF>
+    inline auto xgenerator<F, R, S>::build_generator(OF&& func) const -> rebind_t<OR, OF>
+    {
+        return rebind_t<OR, OF>(std::move(func), shape_type(m_shape));
     }
 
     template <class F, class R, class S>
