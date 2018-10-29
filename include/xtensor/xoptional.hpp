@@ -22,6 +22,7 @@
 #include "xindex_view.hpp"
 #include "xreducer.hpp"
 #include "xscalar.hpp"
+#include "xstrided_view.hpp"
 #include "xtensor.hpp"
 
 namespace xt
@@ -519,9 +520,9 @@ namespace xt
         };
     }
 
-    /***********************************
-     * xreducer extension for optional *
-     ***********************************/
+    /***********************************************
+     * xreducer extension for optional expressions *
+     ***********************************************/
 
     namespace extension
     {
@@ -545,6 +546,41 @@ namespace xt
         struct xreducer_base_impl<xoptional_expression_tag, F, CT, X>
         {
             using type = xreducer_optional<F, CT, X>;
+        };
+    }
+
+    /****************************************************
+     * xstrided_view extension for optional expressions *
+     ****************************************************/
+
+    namespace extension
+    {
+        template <class CT, class S, layout_type L, class FST>
+        class xstrided_view_optional : public xoptional_empty_base<xstrided_view<CT, S, L, FST>>
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using uvt = typename std::decay_t<CT>::value_expression;
+            using uft = typename std::decay_t<CT>::flag_expression;
+            using ucvt = typename std::decay_t<CT>::const_value_expression;
+            using ucft = typename std::decay_t<CT>::const_flag_expression;
+            using value_expression = xstrided_view<uvt, S, L, detail::flat_storage_type_t<uvt>>;
+            using flag_expression = xstrided_view<uft, S, L, detail::flat_storage_type_t<uft>>;
+            using const_value_expression = xstrided_view<ucvt, S, L, detail::flat_storage_type_t<ucvt>>;
+            using const_flag_expression = xstrided_view<ucft, S, L, detail::flat_storage_type_t<ucft>>;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+        };
+
+        template <class CT, class S, layout_type L, class FST>
+        struct xstrided_view_base_impl<xoptional_expression_tag, CT, S, L, FST>
+        {
+            using type = xstrided_view_optional<CT, S, L, FST>;
         };
     }
 
@@ -792,6 +828,37 @@ namespace xt
         inline auto xreducer_optional<F, CT, X>::has_value() const -> const_flag_expression
         {
             return this->derived_cast().build_reducer(this->derived_cast().expression().has_value(), flag_reducer());
+        }
+    }
+
+    /*****************************************
+     * xstrided_view_optional implementation *
+     *****************************************/
+
+    namespace extension
+    {
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xstrided_view_optional<CT, S, L, FST>::value() -> value_expression
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xstrided_view_optional<CT, S, L, FST>::value() const -> const_value_expression 
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xstrided_view_optional<CT, S, L, FST>::has_value() -> flag_expression 
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().has_value());
+        }
+
+        template <class CT, class S, layout_type L, class FST>
+        inline auto xstrided_view_optional<CT, S, L, FST>::has_value() const -> const_flag_expression 
+        {
+            return this->derived_cast().build_view(this->derived_cast().expression().has_value());
         }
     }
 

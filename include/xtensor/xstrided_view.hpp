@@ -27,6 +27,31 @@
 
 namespace xt
 {
+    /***************************
+     * xstrided_view extension *
+     ***************************/
+
+    namespace extension
+    {
+        template <class Tag, class CT, class S, layout_type L, class FST>
+        struct xstrided_view_base_impl;
+
+        template <class CT, class S, layout_type L, class FST>
+        struct xstrided_view_base_impl<xtensor_expression_tag, CT, S, L, FST>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class CT, class S, layout_type L, class FST>
+        struct xstrided_view_base
+            : xstrided_view_base_impl<xexpression_tag_t<CT>, CT, S, L, FST>
+        {
+        };
+
+        template <class CT, class S, layout_type L, class FST>
+        using xstrided_view_base_t = typename xstrided_view_base<CT, S, L, FST>::type;
+    }
+
     namespace detail
     {
         template <class S>
@@ -103,13 +128,16 @@ namespace xt
     template <class CT, class S, layout_type L = layout_type::dynamic, class FST = typename detail::flat_storage_type<CT>::type>
     class xstrided_view : public xview_semantic<xstrided_view<CT, S, L, FST>>,
                           public xiterable<xstrided_view<CT, S, L, FST>>,
-                          private xstrided_view_base<CT, S, L, FST>
+                          private xstrided_view_base<CT, S, L, FST>,
+                          public extension::xstrided_view_base_t<CT, S, L, FST>
     {
     public:
 
         using self_type = xstrided_view<CT, S, L, FST>;
         using base_type = xstrided_view_base<CT, S, L, FST>;
         using semantic_base = xview_semantic<self_type>;
+        using extension_base = extension::xstrided_view_base_t<CT, S, L, FST>;
+        using expression_tag = typename extension_base::expression_tag;
 
         using xexpression_type = typename base_type::xexpression_type;
         using base_type::is_const;
@@ -211,6 +239,12 @@ namespace xt
                                                       typename storage_type::const_iterator,
                                                       typename storage_type::iterator>;
         using const_container_iterator = typename storage_type::const_iterator;
+
+        template <class E>
+        using rebind_t = xstrided_view<E, S, L, detail::flat_storage_type_t<E>>;
+
+        template <class E>
+        rebind_t<E> build_view(E&& e) const;
 
     private:
 
@@ -489,6 +523,15 @@ namespace xt
     inline auto xstrided_view<CT, S, L, FST>::data_xend(layout_type l) const noexcept -> const_container_iterator
     {
         return data_xend_impl(this->storage().cbegin(), l);
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    template <class E>
+    inline auto xstrided_view<CT, S, L, FST>::build_view(E&& e) const -> rebind_t<E>
+    {
+        inner_shape_type sh(this->shape());
+        inner_strides_type str(this->strides());
+        return rebind_t<E>(std::forward<E>(e), std::move(sh), std::move(str), base_type::data_offset(), this->layout());
     }
 
     /*****************************************
