@@ -41,6 +41,31 @@ namespace xt
     template <class F, class CT>
     class xfunctor_view;
 
+    /***************************
+     * xfunctor_view extension *
+     ***************************/
+
+    namespace extension
+    {
+        template <class Tag, class F, class CT>
+        struct xfunctor_view_base_impl;
+
+        template <class F, class CT>
+        struct xfunctor_view_base_impl<xtensor_expression_tag, F, CT>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class F, class CT>
+        struct xfunctor_view_base
+            : xfunctor_view_base_impl<xexpression_tag_t<CT>, F, CT>
+        {
+        };
+
+        template <class F, class CT>
+        using xfunctor_view_base_t = typename xfunctor_view_base<F, CT>::type;
+    }
+
     /********************************
      * xfunctor_view_temporary_type *
      ********************************/
@@ -91,7 +116,8 @@ namespace xt
      * @sa real, imag
      */
     template <class F, class CT>
-    class xfunctor_view : public xview_semantic<xfunctor_view<F, CT>>
+    class xfunctor_view : public xview_semantic<xfunctor_view<F, CT>>,
+                          public extension::xfunctor_view_base_t<F, CT>
     {
     public:
 
@@ -99,6 +125,9 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
         using functor_type = typename std::decay_t<F>;
+
+        using extension_base = extension::xfunctor_view_base_t<F, CT>;
+        using expression_tag = typename extension_base::expression_tag;
 
         using value_type = typename functor_type::value_type;
         using reference = typename functor_type::reference;
@@ -198,6 +227,9 @@ namespace xt
         template <class IT>
         const_reference element(IT first, IT last) const;
 
+        xexpression_type& expression() noexcept;
+        const xexpression_type& expression() const noexcept;
+
         template <class S>
         bool broadcast_shape(S& shape, bool reuse_cache = false) const;
 
@@ -284,6 +316,12 @@ namespace xt
         const_stepper stepper_begin(const S& shape) const noexcept;
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
+
+        template <class E>
+        using rebind_t = xfunctor_view<F, E>;
+
+        template <class E>
+        rebind_t<E> build_functor_view(E&& e) const;
 
     private:
 
@@ -705,6 +743,25 @@ namespace xt
         XTENSOR_TRY(check_element_index(shape(), first, last));
         return m_functor(m_e.element(first, last));
     }
+
+    /**
+     * Returns a reference to the underlying expression of the view.
+     */
+    template <class F, class CT>
+    inline auto xfunctor_view<F, CT>::expression() noexcept -> xexpression_type&
+    {
+        return m_e;
+    }
+
+    /**
+     * Returns a consttant reference to the underlying expression of the view.
+     */
+    template <class F, class CT>
+    inline auto xfunctor_view<F, CT>::expression() const noexcept -> const xexpression_type&
+    {
+        return m_e;
+    }
+
     //@}
 
     /**
@@ -1174,6 +1231,13 @@ namespace xt
     {
         const xexpression_type& const_m_e = m_e;
         return const_stepper(const_m_e.stepper_end(shape, l), &m_functor);
+    }
+
+    template <class F, class CT>
+    template <class E>
+    inline auto xfunctor_view<F, CT>::build_functor_view(E&& e) const -> rebind_t<E>
+    {
+        return rebind_t<E>(functor_type(m_functor), std::forward<E>(e));
     }
 
     /************************************

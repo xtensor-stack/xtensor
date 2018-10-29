@@ -18,6 +18,7 @@
 #include "xarray.hpp"
 #include "xbroadcast.hpp"
 #include "xdynamic_view.hpp"
+#include "xfunctor_view.hpp"
 #include "xscalar.hpp"
 #include "xtensor.hpp"
 
@@ -458,6 +459,48 @@ namespace xt
         };
     }
 
+    /***************************************************
+     * xfunctor_view extension for optional expression *
+     ***************************************************/
+
+    namespace extension
+    {
+        template <class F, class CT>
+        class xfunctor_view_optional
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using uvt = typename std::decay_t<CT>::value_expression;
+            using uft = typename std::decay_t<CT>::flag_expression;
+            using ucvt = typename std::decay_t<CT>::const_value_expression;
+            using ucft = typename std::decay_t<CT>::const_flag_expression;
+            using value_expression = xfunctor_view<F, uvt>;
+            using flag_expression = uft;
+            using const_value_expression = xfunctor_view<F, ucvt>;
+            using const_flag_expression = ucft;
+
+            value_expression value();
+            const_value_expression value() const;
+
+            flag_expression has_value();
+            const_flag_expression has_value() const;
+
+        private:
+
+            using derived_type = xfunctor_view<F, CT>;
+
+            derived_type& derived_cast() noexcept;
+            const derived_type& derived_cast() const noexcept;
+        };
+
+        template <class F, class CT>
+        struct xfunctor_view_base_impl<xoptional_expression_tag, F, CT>
+        {
+            using type = xfunctor_view_optional<F, CT>;
+        };
+    }
+
     /****************************************
      * xscalar_optional_base implementation *
      ****************************************/
@@ -648,6 +691,49 @@ namespace xt
 
         template <class CT, class X>
         inline auto xbroadcast_optional<CT, X>::derived_cast() const noexcept -> const derived_type&
+        {
+            return *static_cast<const derived_type*>(this);
+        }
+    }
+
+    /*****************************************
+     * xfunctor_view_optional implementation *
+     *****************************************/
+
+    namespace extension
+    {
+        template <class F, class CT>
+        inline auto xfunctor_view_optional<F, CT>::value() -> value_expression
+        {
+            return derived_cast().build_functor_view(derived_cast().expression().value());
+        }
+
+        template <class F, class CT>
+        inline auto xfunctor_view_optional<F, CT>::value() const -> const_value_expression
+        {
+            return derived_cast().build_functor_view(derived_cast().expression().value());
+        }
+
+        template <class F, class CT>
+        inline auto xfunctor_view_optional<F, CT>::has_value() -> flag_expression
+        {
+            return derived_cast().expression().has_value();
+        }
+
+        template <class F, class CT>
+        inline auto xfunctor_view_optional<F, CT>::has_value() const -> const_flag_expression
+        {
+            return derived_cast().expression().has_value();
+        }
+
+        template <class F, class CT>
+        inline auto xfunctor_view_optional<F, CT>::derived_cast() noexcept -> derived_type&
+        {
+            return *static_cast<derived_type*>(this);
+        }
+
+        template <class F, class CT>
+        inline auto xfunctor_view_optional<F, CT>::derived_cast() const noexcept -> const derived_type&
         {
             return *static_cast<const derived_type*>(this);
         }
