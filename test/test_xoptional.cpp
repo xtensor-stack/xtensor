@@ -316,6 +316,23 @@ namespace xt
         EXPECT_FALSE(hviv(3));
     }
 
+    TEST(xoptional, reducer)
+    {
+        xarray_optional<int> a = {{1, 2, 3},
+                                  {4, 5, 6}};
+        a(1, 2).has_value() = false;
+
+        auto red = sum(a, {1});
+        auto vred = red.value();
+        auto hvred = red.has_value();
+
+        EXPECT_EQ(vred(0), 6);
+        EXPECT_EQ(vred(1), 15);
+
+        EXPECT_TRUE(hvred(0));
+        EXPECT_FALSE(hvred(1));
+    }
+
 #define UNARY_OPTIONAL_TEST_IMPL(FUNC)                                         \
     xtensor_optional<double, 2> m1{{0.25, 1}, {0.75, xtl::missing<double>()}}; \
     xtensor<double, 2> m2{{0.25, 1}, {0.75, 1}};                               \
