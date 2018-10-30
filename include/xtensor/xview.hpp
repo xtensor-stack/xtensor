@@ -34,6 +34,30 @@
 namespace xt
 {
 
+    /*******************
+     * xview extension *
+     *******************/
+
+    namespace extension
+    {
+        template <class Tag, class CT, class... S>
+        struct xview_base_impl;
+
+        template <class CT, class... S>
+        struct xview_base_impl<xtensor_expression_tag, CT, S...>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class CT, class... S>
+        struct xview_base : xview_base_impl<xexpression_tag_t<CT>, CT, S...>
+        {
+        };
+
+        template <class CT, class... S>
+        using xview_base_t = typename xview_base<CT, S...>::type;
+    }
+
     /*********************
      * xview declaration *
      *********************/
@@ -305,7 +329,8 @@ namespace xt
      */
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,
-                  public xiterable<xview<CT, S...>>
+                  public xiterable<xview<CT, S...>>,
+                  public extension::xview_base_t<CT, S...>
     {
     public:
 
@@ -313,6 +338,9 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
+
+        using extension_base = extension::xview_base_t<CT, S...>;
+        using expression_tag = typename extension_base::expression_tag;
 
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
         using value_type = typename xexpression_type::value_type;
@@ -423,6 +451,9 @@ namespace xt
         const_reference operator[](size_type i) const;
         template <class It>
         const_reference element(It first, It last) const;
+
+        xexpression_type& expression() noexcept;
+        const xexpression_type& expression() const noexcept;
 
         template <class ST>
         bool broadcast_shape(ST& shape, bool reuse_cache = false) const;
@@ -536,6 +567,12 @@ namespace xt
                   class = std::enable_if_t<has_data_interface<T>::value && is_contiguous_view, int>>
         void assign_to(xexpression<E>& e, bool force_resize) const;
 
+        template <class E>
+        using rebind_t = xview<E, S...>;
+
+        template <class E>
+        rebind_t<E> build_view(E&& e) const;
+
         //
         // SIMD interface
         //
@@ -634,29 +671,16 @@ namespace xt
         void assign_temporary_impl(temporary_type&& tmp);
 
         template <std::size_t... I>
-        inline std::size_t data_offset_impl(std::index_sequence<I...>) const noexcept;
+        std::size_t data_offset_impl(std::index_sequence<I...>) const noexcept;
 
         template <std::size_t... I>
-        inline auto compute_strides_impl(std::index_sequence<I...>) const noexcept;
+        auto compute_strides_impl(std::index_sequence<I...>) const noexcept;
 
-        auto compute_shape(std::true_type) const
-        {
-            return inner_shape_type(m_e.shape());
-        }
+        inner_shape_type compute_shape(std::true_type) const;
+        inner_shape_type compute_shape(std::false_type) const;
 
-        auto compute_shape(std::false_type) const
-        {
-            std::size_t dim = m_e.dimension() - integral_count<S...>() + newaxis_count<S...>();
-            auto shape = xtl::make_sequence<inner_shape_type>(dim, 0);
-            auto func = [](const auto& s) noexcept { return get_size(s); };
-            for (size_type i = 0; i != dim; ++i)
-            {
-                size_type index = integral_skip<S...>(i);
-                shape[i] = index < sizeof...(S) ?
-                    apply<size_type>(index, func, m_slices) : m_e.shape()[index - newaxis_count_before<S...>(index)];
-            }
-            return shape;
-        }
+        template <class E, std::size_t... I>
+        rebind_t<E> build_view_impl(E&& e, std::index_sequence<I...>) const;
 
         friend class xview_semantic<xview<CT, S...>>;
     };
@@ -1134,6 +1158,24 @@ namespace xt
     }
 
     /**
+     * Returns a reference to the underlying expression of the view.
+     */
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::expression() noexcept -> xexpression_type&
+    {
+        return m_e;
+    }
+
+    /**
+     * Returns a const reference to the underlying expression of the view.
+     */
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::expression() const noexcept -> const xexpression_type&
+    {
+        return m_e;
+    }
+
+    /**
      * Returns the data holder of the underlying container (only if the view is on a realized
      * container). ``xt::eval`` will make sure that the underlying xexpression is
      * on a realized container.
@@ -1377,6 +1419,20 @@ namespace xt
     }
 
     template <class CT, class... S>
+    template <class E, std::size_t... I>
+    inline auto xview<CT, S...>::build_view_impl(E&& e, std::index_sequence<I...>) const -> rebind_t<E>
+    {
+        return rebind_t<E>(std::forward<E>(e), std::get<I>(m_slices)...);
+    }
+
+    template <class CT, class... S>
+    template <class E>
+    inline auto xview<CT, S...>::build_view(E&& e) const -> rebind_t<E>
+    {
+        return build_view_impl(std::forward<E>(e), std::make_index_sequence<sizeof...(S)>());
+    }
+
+    template <class CT, class... S>
     template <class align, class simd, class T>
     inline auto xview<CT, S...>::store_simd(size_type i, const simd& e) -> enable_simd_interface<T, void>
     {
@@ -1578,6 +1634,27 @@ namespace xt
             }
         }
         return index;
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::compute_shape(std::true_type) const -> inner_shape_type
+    {
+        return inner_shape_type(m_e.shape());
+    }
+
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::compute_shape(std::false_type) const -> inner_shape_type
+    {
+        std::size_t dim = m_e.dimension() - integral_count<S...>() + newaxis_count<S...>();
+        auto shape = xtl::make_sequence<inner_shape_type>(dim, 0);
+        auto func = [](const auto& s) noexcept { return get_size(s); };
+        for (size_type i = 0; i != dim; ++i)
+        {
+            size_type index = integral_skip<S...>(i);
+            shape[i] = index < sizeof...(S) ?
+                apply<size_type>(index, func, m_slices) : m_e.shape()[index - newaxis_count_before<S...>(index)];
+        }
+        return shape;
     }
 
     namespace xview_detail
