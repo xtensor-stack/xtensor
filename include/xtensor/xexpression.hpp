@@ -265,16 +265,22 @@ namespace xt
             using type = T;
         };
 
-        template <>
-        struct expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+        template <class T>
+        struct expression_tag_and<xtensor_expression_tag, T>
         {
-            using type = xoptional_expression_tag;
+            using type = T;
+        };
+
+        template <class T>
+        struct expression_tag_and<T, xtensor_expression_tag>
+            : expression_tag_and<xtensor_expression_tag, T>
+        {
         };
 
         template <>
-        struct expression_tag_and<xoptional_expression_tag, xtensor_expression_tag>
-            : expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+        struct expression_tag_and<xtensor_expression_tag, xtensor_expression_tag>
         {
+            using type = xtensor_expression_tag;
         };
 
         template <class T1, class... T>
