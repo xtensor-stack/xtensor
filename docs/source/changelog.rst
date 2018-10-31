@@ -7,6 +7,38 @@
 Changelog
 =========
 
+0.18.2
+------
+
+- expression tag system fixed
+  `#1207 <https://github.com/QuantStack/xtensor/pull/1207>`_.
+- optional extension for generator
+  `#1206 <https://github.com/QuantStack/xtensor/pull/1206>`_.
+- optional extension for ``xview``
+  `#1205 <https://github.com/QuantStack/xtensor/pull/1205>`_.
+- optional extension for ``xstrided_view``
+  `#1204 <https://github.com/QuantStack/xtensor/pull/1204>`_.
+- optional extension for reducer
+  `#1203 <https://github.com/QuantStack/xtensor/pull/1203>`_.
+- optional extension for ``xindex_view``
+  `#1202 <https://github.com/QuantStack/xtensor/pull/1202>`_.
+- optional extension for ``xfunctor_view``
+  `#1201 <https://github.com/QuantStack/xtensor/pull/1201>`_.
+- optional extension for broadcast
+  `#1198 <https://github.com/QuantStack/xtensor/pull/1198>`_.
+- extension API and code cleanup
+  `#1197 <https://github.com/QuantStack/xtensor/pull/1197>`_.
+- ``xscalar`` optional refactoring
+  `#1196 <https://github.com/QuantStack/xtensor/pull/1196>`_.
+- Extension mechanism
+  `#1192 <https://github.com/QuantStack/xtensor/pull/1192>`_.
+- Many small fixes
+  `#1191 <https://github.com/QuantStack/xtensor/pull/1191>`_.
+- Slight refactoring in ``step_size`` logic
+  `#1188 <https://github.com/QuantStack/xtensor/pull/1188>`_.
+- Fixup call of const overload in assembly storage
+  `#1187 <https://github.com/QuantStack/xtensor/pull/1187>`_.
+
 0.18.1
 ------
 
