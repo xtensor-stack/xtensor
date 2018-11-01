@@ -181,6 +181,7 @@ namespace xt
                       layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
 
         xstrided_view(const xstrided_view& rhs) = default;
+        xstrided_view& operator=(const xstrided_view& rhs);
 
         template <class E>
         self_type& operator=(const xexpression<E>& e);
@@ -340,6 +341,13 @@ namespace xt
     {
     }
     //@}
+
+    template <class CT, class S, layout_type L, class FST>
+    inline xstrided_view<CT, S, L, FST>& xstrided_view<CT, S, L, FST>::operator=(const xstrided_view<CT, S, L, FST>& rhs)
+    {
+        temporary_type tmp(rhs);
+        return this->assign_temporary(std::move(tmp));
+    }
 
     /**
      * @name Extended copy semantic

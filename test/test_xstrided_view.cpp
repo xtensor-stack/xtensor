@@ -85,6 +85,12 @@ namespace xt
         EXPECT_NO_THROW(strided_view(a, { 3, 1, newaxis() }));
     }
 
+    TEST(xstrided_view, assign)
+    {
+        xt::xarray<double> arr = { 5., 6. };
+        xt::strided_view(arr, { 0 }) = xt::strided_view(arr, { 1 });
+    }
+
     TEST(xstrided_view, three_dimensional)
     {
         view_shape_type shape = { 3, 4, 2 };
@@ -428,7 +434,7 @@ namespace xt
         EXPECT_TRUE(v8e == v8);
     }
 
-    TEST(xstrided_view, assign)
+    TEST(xstrided_view, extended_assign)
     {
         using t = xarray<int>;
         t a = { 1, 2, 3, 4, 5 };
