@@ -49,7 +49,8 @@ namespace xt
 
             for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
-                fct(ev.data() + offset, ev.data() + offset + secondary_stride);
+                size_t adj_secondary_stride = std::max(secondary_stride, std::ptrdiff_t(1));
+                fct(ev.data() + offset, ev.data() + offset + adj_secondary_stride);
             }
         }
 
