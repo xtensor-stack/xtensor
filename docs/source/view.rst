@@ -132,7 +132,7 @@ Since ``xtensor 0.16.3``, a new range syntax can be used with strided views:
     auto a = xt::xarray<int>::from_shape({3, 2, 3, 4, 5});
     auto v1 = xt::strided_view(a, {_r|0|1, 1, _r|_|2, _r|_|_|-1});
     // The previous line is equivalent to
-    auto v2 = xt::strided_view(a, {xt::range(0, 1), xt::range(_, 2), xt::range(_, _, -1)});
+    auto v2 = xt::strided_view(a, {xt::range(0, 1), 1, xt::range(_, 2), xt::range(_, _, -1)});
 
 The ``xstrided_view`` is very efficient on contigous memory (e.g. ``xtensor`` or ``xarray``) but less efficient on xexpressions.
 
@@ -359,7 +359,7 @@ of ``RHS``. However, since views *cannot be resized*, when assigning an expressi
     #include "xtensor/xview.hpp"
 
     xarray<double> a = {{0., 1., 2.}, {3., 4., 5.}};
-    double b = 1.2
+    double b = 1.2;
     auto tr = view(a, 0, all());
     tr = b;
     // => a = {{1.2, 1.2, 1.2}, {3., 4., 5.}}
