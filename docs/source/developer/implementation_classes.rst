@@ -90,6 +90,9 @@ totally:
     template <class... Args>
     const_reference at(Args... args) const;
 
+    template <class... Args>
+    const_reference unchecked(Args... args) const;
+
     template <class S>
     disable_integral_t<S, const_reference> operator[](const S& index) const;
 
@@ -108,6 +111,75 @@ See :ref:`iterating-expression-label` for more details.
 
 If the expression is mutable, it must also define the non-const counterparts of the data access
 methods, and inherits from a semantic class to provide assignment operators.
+
+List of available expression classes
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`xtensor` provides the following expression classes:
+
+**Containers**
+
+- ``xarray_container`` : N-dimensional array with dynamic shape
+- ``xarray_adaptor``   : N-dimensional array adaptor for STL-like containers or C arrays
+- ``xtensor_container``: N-dimensional array with static number of dimensions
+- ``xtensor_adaptor``  : N-dimensional tensor adaptor for STL-like containers or C arrays
+- ``xfixed_container`` : N-dimensional array with static shape
+- ``xfixed_adaptor``   : N-dimensoinal fixed tensor adaptor for STL-like containers or C arrays
+
+Most of the methods of these classes are implemented in the base class ``xcontainer``, the
+inheriting classes only provide constructors and assignment operators for the value semantic.
+
+The container classes are generally used through type aliases which set many of the template
+arguments:
+
+- ``xarray``
+- ``xtensor``
+- ``xfixed_tensor``
+
+The classes for adaptors can be instantiated through the many overloads of ``xt::adapt`` function,
+so that their templates parameters are deduced.
+
+**Scalar**
+
+`xtensor` provides the ``xscalar`` class to adapt scalar values and give them the required API.
+
+**Optional containers**
+
+- ``xoptional_assembly``        : N-dimensional array holding optional values.
+- ``xoptional_assembly_adaptor``: N-dimensional adaptor holding optional values.
+
+Most of the mehtods of these classes are defined in their base class ``xoptional_assembly_base``.
+
+**Views**
+
+- ``xview``: N-dimensional view with static number of slices, supporting all kind of slices
+- ``xstrided_view``: N-dimensional view with dynamic number of slices, supporting strided slices only (see below)
+- ``xdynamic_view``: N-dimensional view with dynamic number of slices, supporting all kind of slices
+- ``xfunctor_view``: N-dimensional view applying a functor to its underlying elements (e.g. ``imag``, ``real``)
+- ``xindex_view``  : Flat (1D) view yielding the values at the indices of its index array
+- ``xmasked_view`` : View on optional expression hiding values depending on a mask
+
+When the index of an element in the underlying expression of a view can be computed thanks to a strided scheme,
+the slice used in this view is said to be a strided slice. `xtensor` provides the following strided slices:
+
+- ``xrange``
+- ``xstepped_range``
+- ``xall``
+- ``xnewaxis``
+
+The following slices are not strided, and thus incompatible with ``xstrided_view``:
+
+- ``xkeep_slice``
+- ``xdrop_slice``
+
+**Functional expressions**
+
+Contrary to containers and views, the functional expressions are immutable.
+
+- ``xbroadcast``: Broadcasts an expression to a specific shape
+- ``xfunction`` : N-dimensional function operating on tensor expressions
+- ``xgenerator``: N-dimensional function operating on indices
+- ``xreducer``  : Reducing function operating over specified axes
 
 xarray and xtensor
 ~~~~~~~~~~~~~~~~~~
