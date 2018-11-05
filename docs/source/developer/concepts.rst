@@ -293,15 +293,9 @@ thus providing iteration methods.
 
 .. image:: xcontainer_classes.svg
 
-xfunction_base
-~~~~~~~~~~~~~~
+xfunction
+~~~~~~~~~
 
-The ``xfunction_base`` is used to model mathematical operations and functions. It provides similar
+The ``xfunction`` class is used to model mathematical operations and functions. It provides similar
 methods to the ones defined in ``xcontainer``, and embeds the functor describing the operation and
-its operands.
-
-Like other interfaces, it is a CRTP class whose template parameter must be the most derived type of
-the hierarchy. It inherits from ``xconst_iterable``, thus providing iteration methods.
-
-The fact that ``xfunction_base`` is not a final class and needs to be inherited from allows to define
-function classes that provide a richer API and have them working with already existing code.
+its operands. It inherits from ``xconst_iterable``, thus providing iteration methods.

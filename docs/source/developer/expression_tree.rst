@@ -11,22 +11,15 @@ Most of the expressions in `xtensor` are lazy-evaluated, they do not hold any va
 access or when the expression is assigned to a container. This means that `xtensor` needs somehow to keep track of
 the expression tree.
 
-xfunction_base / xfunction
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+xfunction
+~~~~~~~~~
 
 A node in the expression tree may be represented by different classes in `xtensor`; here we focus on basic arithmetic
-operations and mathematical functions, which are represented by an instance of ``xfunction_base``. This is a template
+operations and mathematical functions, which are represented by an instance of ``xfunction``. This is a template
 class whose parameters are:
 
 - a functor describing the operation of the mathematical function
-- the return type, computing from the types of the child expressions involved in the operation
 - the closures of the child expressions, i.e. the most optimal way to store each child expression
-
-Although ``xfunction_base`` provides the API required for an ``expression``, it is not the final class representing
-expression tree nodes, it is meant to be inherited. This allow to define function classes with a richer API and to
-extend `xtensor`'s expression system. The implementation class used to represent operations and mathematical functions
-in `xtensor` is ``xfunction``, it accepts the same template parameters as its base class. It contains nothing more
-than constructors and assign operators, all the magic being done in ``xfunction_base``.
 
 Consider the following code:
 
@@ -37,32 +30,32 @@ Consider the following code:
 
     auto f = (a + b);
 
-Here the type of ``f`` is ``xfunction<plus, double, const xarray<double>&, const xarray<double>&>``, and f stores constant
+Here the type of ``f`` is ``xfunction<plus, const xarray<double>&, const xarray<double>&>``, and f stores constant
 references on the arrays involved in the operation. This can be illustrated by the figure below:
 
 .. image:: xfunction_tree.svg
 
-The implementation of ``xfunction_base`` methods is quite easy: they forward the call to the nodes and apply the operation
+The implementation of ``xfunction`` methods is quite easy: they forward the call to the nodes and apply the operation
 when this makes sense. For instance, assuming that the operands are stored as ``m_first`` and ``m_second``, and the functor
 describing the operation as ``m_functor``, the implementation of ``operator()`` and ``broadcast_shape`` looks like:
 
 .. code::
 
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     template <class... Args>
-    inline auto xfunction_base<F, R, CT...>::operator()(Args... args) const -> const_reference
+    inline auto xfunction<F, CT...>::operator()(Args... args) const -> const_reference
     {
         return m_functor(m_first(args...), m_second(args...));
     }
 
-    template <class F, class R, class... CT>
+    template <class F, class... CT>
     template <class S>
-    inline bool xfunction_base<F, R, CT...>::broadcast_shape(S& shape) const
+    inline bool xfunction<F, CT...>::broadcast_shape(S& shape) const
     {
         return m_first.broadcast_shape(shape) && m_second.broadcast_shape(shape);
     }
 
-In fact, ``xfunction_base`` can handle an arbitrary number of arguments. The practical implementation is slightly more
+In fact, ``xfunction`` can handle an arbitrary number of arguments. The practical implementation is slightly more
 complicated than the code snippet above, however the principle remains the same.
 
 Holding expressions
@@ -111,11 +104,13 @@ This latter is responsible for setting the remaining template parameters of ``xf
         return type(functor_type(), std::forward<E>(e)...);
     }
 
-The first line computes the ``expression_tag`` of the expression. This tag is used for selecting the right implementation
-class inheriting from ``xfunction_base``. In `xtensor`, two tags are provided, with the following mapping:
+The first line computes the ``expression_tag`` of the expression. This tag is used for selecting the right class
+class modeling a function. In `xtensor`, two tags are provided, with the following mapping:
 
 - ``xtensor_expression_tag`` -> ``xfunction``
 - ``xoptional_expression_tag`` -> ``xfunction``
+
+In the case of ``xfunction``, the tag is also used to select a mixin base class that will extend its API.
 
 Any expression may define a tag as its ``expression_tag`` inner type. If not, ``xtensor_expression_tag`` is used by default.
 Tags have different priorities so that a resulting tag can be computed for expressions involving different tag types. As we
@@ -141,32 +136,33 @@ Plugging new function types
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As mentioned in the section above, one can define a new function class and have it used by `xtensor`'s expression system. Let's
-illustrate this with the ``xoptional_function`` class. The first thing to do is to define a new tag:
+illustrate this with an hypothetical  ``xmapped_function`` class, which provides additional mapping access operators.
+The first thing to do is to define a new tag:
 
 .. code::
 
-    struct xoptional_expression_tag
+    struct xmapped_expression_tag
     {
     };
 
-Then the tag selection rules must be updated if we want to be able to mix ``xtensor_expression_tag`` and ``xoptional_expression_tag``.
-This is done by specializing the ``expression_tag_and`` metafunction available in the namespace ``xt::detail``:
+Then the tag selection rules must be updated if we want to be able to mix ``xtensor_expression_tag`` and ``xmapped_expression_tag``.
+This is done by specializing the ``expression_tag_and`` metafunction available in the namespace ``xt::extension``:
 
 .. code::
 
     namespace xt
     {
-        namespace detail
+        namespace extension
         {
             template <>
-            struct expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+            struct expression_tag_and<xtensor_expression_tag, xmapped_expression_tag>
             {
-                using type = xoptional_expression_tag;
+                using type = xmapped_expression_tag;
             };
 
             template <>
-            struct expression_tag_and<xoptional_expression_tag, xtensor_expression_tag>
-                : expression_tag_and<xtensor_expression_tag, xoptional_expression_tag>
+            struct expression_tag_and<xmapped_expression_tag, xtensor_expression_tag>
+                : expression_tag_and<xtensor_expression_tag, xmapped_expression_tag>
             {
             };
         }
@@ -176,7 +172,7 @@ The second specialization simply forwards to the first one so we don't duplicate
 function class, these specializations can be skipped if the new function class (and its corresponding tag) is not compatible,
 and thus not supposed to be mixed, with the function classes provided by `xtensor`.
 
-The las thing required is to specialize the ``select_xfunction_expression`` metafunction, as it is shown below:
+The last requirement is to specialize the ``select_xfunction_expression`` metafunction, as it is shown below:
 
 .. code::
 
@@ -185,14 +181,14 @@ The las thing required is to specialize the ``select_xfunction_expression`` meta
         namespace detail
         {
             template <class F, class... E>
-            struct select_xfunction_expression<xoptional_expression_tag, F, E...>
+            struct select_xfunction_expression<xmapped_expression_tag, F, E...>
             {
-                using type = xoptional_function<F, typename F::result_type, E...>;
+                using type = xmapped_function<F, typename F::result_type, E...>;
             };
         }
     }
 
-In this example, ``xoptional_function`` inherits from ``xfunction_base`` and define some additional methods, so it provides a
-richer API the ``xfunction``. However it is possible to define a function class with a different API, thus not inheriting from
-``xfunction_base``. In that case, the assignment mechanics need to be customized too, this is detailed in :ref:`xtensor-assign-label`.
+In this example, ``xmapped_function`` may provide the same API as ``xfunction`` and define some additional methods unrelated to the
+assignment mechanics. However it is possible to define a function class with an API totally different from the one of ``xfunction``.
+In that case, the assignment mechanics need to be customized too, this is detailed in :ref:`xtensor-assign-label`.
 
