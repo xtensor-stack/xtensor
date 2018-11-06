@@ -230,7 +230,7 @@ namespace xt
         // TODO relax has_data_interface constraint here!
         template <class E, class... S>
         struct is_contiguous_view
-            : std::integral_constant<bool, 
+            : std::integral_constant<bool,
                 has_data_interface<E>::value &&
                 !(E::static_layout == layout_type::column_major && static_dimension<typename E::shape_type>::value != sizeof...(S)) &&
                 is_contiguous_view_impl<E::static_layout, true, false, false, xtl::mpl::vector<S...>>::value
@@ -300,7 +300,7 @@ namespace xt
         static constexpr bool is_contiguous_view = detail::is_contiguous_view<xexpression_type, S...>::value;
 
 
-        using inner_shape_type = std::conditional_t<is_contiguous_view, 
+        using inner_shape_type = std::conditional_t<is_contiguous_view,
                                                     typename detail::get_contigous_shape_type<xexpression_type, S...>::type,
                                                     typename xview_shape_type<typename xexpression_type::shape_type, S...>::type>;
 
@@ -376,7 +376,7 @@ namespace xt
                                                  detail::expr_storage_type<xexpression_type>,
                                                  make_invalid_type<>>;
 
-        using inner_strides_type = std::conditional_t<is_contiguous_view, 
+        using inner_strides_type = std::conditional_t<is_contiguous_view,
                                                       typename detail::unwrap_offset_container<xexpression_type::static_layout, xexpression_inner_strides_type, integral_count<S...>()>::type,
                                                       get_strides_t<shape_type>>;
 
@@ -508,7 +508,7 @@ namespace xt
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
         storage_cbegin() const;
-        
+
         template <class T = xexpression_type>
         std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
         storage_cend() const;
@@ -931,7 +931,7 @@ namespace xt
                 bool strides_match = do_strides_match(self(this)->shape(), self(this)->strides(), self(this)->m_e.layout());
                 return strides_match ? self(this)->m_e.layout() : layout_type::dynamic;
             }
-        }, 
+        },
         /* else */ [&](auto /*self*/)
         {
             return layout_type::dynamic;
@@ -952,14 +952,13 @@ namespace xt
     template <class T>
     inline void xview<CT, S...>::fill(const T& value)
     {
-        if (layout() != layout_type::dynamic)
+        xtl::mpl::static_if<static_layout != layout_type::dynamic>([&](auto self)
         {
-            std::fill(this->storage_begin(), this->storage_end(), value);
-        }
-        else
+            std::fill(self(this)->storage_begin(), self(this)->storage_end(), value);
+        }, /*else*/ [&](auto self)
         {
-            std::fill(this->begin(), this->end(), value);
-        }
+            std::fill(self(this)->begin(), self(this)->end(), value);
+        });
     }
 
     /**
@@ -1860,7 +1859,7 @@ namespace xt
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::step_back(size_type dim, size_type n)
     {
-        auto func = [this](size_type index, size_type offset) { 
+        auto func = [this](size_type index, size_type offset) {
             m_it.step_back(index, offset);
         };
         common_step_backward(dim, n, func);

@@ -9,7 +9,9 @@
 #include <algorithm>
 
 #include "gtest/gtest.h"
+
 #include "xtensor/xarray.hpp"
+#include "xtensor/xbuilder.hpp"
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
@@ -1036,7 +1038,7 @@ namespace xt
         xtensor<double, 3> exp_v1 = { { { 9, 12 },{ 13, 16 } } };
         EXPECT_EQ(v1, exp_v1);
         test_view_iter(v1, exp_v1);
-        
+
         auto v2 = xt::view(a, drop(0, 2), xt::all(), xt::range(0, xt::xnone(), 3));
         EXPECT_EQ(v2, v1);
         EXPECT_EQ(v2, exp_v1);
@@ -1301,5 +1303,13 @@ namespace xt
         auto str_view = xt::strided_view(original, { 1, xt::ellipsis() }); //i is an int
         auto result = xt::view(str_view, xt::all(), xt::all());
         EXPECT_EQ(result(0), 0.f);
+    }
+
+    TEST(xview, assign_scalar_to_non_contiguous_view)
+    {
+        // Compilation test only
+        xt::xtensor<int, 2> arr = xt::ones<int>({10, 10});
+        auto v = xt::view(arr, xt::keep(0, -1), xt::all());
+        v = 0;
     }
 }
