@@ -18,6 +18,7 @@
 #include "xtensor/xio.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xdynamic_view.hpp"
 #include "xtensor/xview.hpp"
 
 #include "files/xio_expected_results.hpp"
@@ -78,6 +79,17 @@ namespace xt
         std::stringstream out_4;
         out_4 << v_just_new_axis;
         EXPECT_EQ("{{1, 2, 3, 4}}", out_4.str());
+    }
+
+    TEST(xio, xdynamic_view)
+    {
+        xarray<int> e{{1, 2, 3, 4},
+                      {5, 6, 7, 8},
+                      {9, 10, 11, 12}};
+        auto v = xt::dynamic_view(e, { 1, keep(0, 2, 3)});
+        std::stringstream out;
+        out << v;
+        EXPECT_EQ("{5, 7, 8}", out.str());
     }
 
     TEST(xio, random_nan_inf)
