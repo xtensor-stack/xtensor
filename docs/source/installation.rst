@@ -75,7 +75,7 @@ source directory:
 
     mkdir build
     cd build
-    cmake -DCMAKE_INSTALL_PREFIX=/path/to/prefix ..
+    cmake -DCMAKE_INSTALL_PREFIX=path_to_prefix ..
     make install
 
 On Windows platforms, from the source directory:
@@ -84,11 +84,26 @@ On Windows platforms, from the source directory:
 
     mkdir build
     cd build
-    cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=/path/to/prefix ..
+    cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=path_to_prefix ..
     nmake
     nmake install
 
-See the section of the documentation on :doc:`build-options`, for more details
-on how to cmake options.
+``path_to_prefix`` is the absolute path to the folder where cmake searches for
+dependencies and installs libraries. ``xtensor`` installation from cmake assumes
+this folder contains ``include`` and ``lib`` subfolders.
+
+See the :doc:`build-options` section for more details about cmake options.
+
+Including xtensor in your project
+---------------------------------
+
+The different packages of ``xtensor`` are built with cmake, so whatever the
+installation mode you choose, you can add ``xtensor`` to your project using cmake:
+
+.. code::
+
+    find_package(xtensor REQUIRED)
+    target_include_directories(your_target PUBLIC ${xtensor_INCLUDE_DIRS})
+    target_link_libraries(your_target PUBLIC xtensor)
 
 .. _xtl: https://github.com/QuantStack/xtl
