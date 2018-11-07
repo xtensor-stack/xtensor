@@ -195,7 +195,12 @@ namespace xt
 
         size_type data_offset() const noexcept;
 
-        using base_type::data;
+        // Explicitly deleting data methods so has_data_interface results
+        // to false instead of having compilers complaining about not being
+        // able to call the methods from the private base
+        value_type* data() noexcept = delete;
+        const value_type* data() const noexcept = delete;
+
         using base_type::storage;
         using base_type::expression;
         using base_type::broadcast_shape;
