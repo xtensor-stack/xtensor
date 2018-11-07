@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xcsv
-====
+xcsv: read/write CSV files
+==========================
 
 Defined in ``xtensor/xcsv.hpp``
 

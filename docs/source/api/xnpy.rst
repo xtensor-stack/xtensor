@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xnpy
-====
+xnpy: read/write NPY files
+==========================
 
 Defined in ``xtensor/xnpy.hpp``
 

@@ -9,6 +9,7 @@ IO Operations
 
 .. toctree::
 
+   xio
    xnpy
    xcsv
    xjson
