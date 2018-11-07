@@ -383,6 +383,8 @@ These options determine the way floating point numbers, tensors and other xtenso
 +-----------------------------------------------+-----------------------------------------------+
 | ``np.set_printoptions(edgeitems=3)``          | ``xt::print_options::set_edgeitems(3)``       |
 +-----------------------------------------------+-----------------------------------------------+
+| ``np.set_printoptions(linewidth=100)``        | ``xt::print_options::set_line_width(100)``    |
++-----------------------------------------------+-----------------------------------------------+
 
 **Reading npy, csv file formats**
 

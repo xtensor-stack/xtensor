@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xjson
-=====
+xjson: serialize to/from JSON
+=============================
 
 Defined in ``xtensor/xjson.hpp``
 
