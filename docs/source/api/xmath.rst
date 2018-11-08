@@ -248,7 +248,7 @@ Mathematical functions
    reducing_functions
 
 +-----------------------------------------------+---------------------------------------------------------------------+
-|      :ref:`sum <sum-function-reference>`      |                   sum of elements over given axes                   |
+| :ref:`sum <sum-function-reference>`           | sum of elements over given axes                                     |
 +-----------------------------------------------+---------------------------------------------------------------------+
 | :ref:`prod <prod-function-reference>`         | product of elements over given axes                                 |
 +-----------------------------------------------+---------------------------------------------------------------------+
