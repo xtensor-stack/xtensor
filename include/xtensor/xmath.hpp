@@ -1738,7 +1738,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         return std::move(s) / static_cast<value_type>(size / s.size());
     }
 
-    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTENSOR_REQUIRE<std::is_base_of<evaluation_strategy::base, std::decay_t<EVS>>::value>>
     inline auto mean(E&& e, EVS es = EVS())
     {
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
@@ -1897,7 +1898,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
-        auto inner_mean = mean(sc, axes);
+        auto axes_copy = axes;
+        auto inner_mean = mean(sc, std::move(axes_copy));
+
         // fake keep_dims = 1
         auto keep_dim_shape = e.shape();
         for (const auto& el : axes)
