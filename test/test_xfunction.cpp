@@ -347,27 +347,27 @@ namespace xt
         auto res4 = empty_like(func);
         auto res5 = func;
 
-        auto resit1 = res1.begin();
-        for (auto it = func.begin(); it != func.end(); ++it)
+        auto resit1 = res1.template begin<XTENSOR_DEFAULT_LAYOUT>();
+        for (auto it = func.template begin<XTENSOR_DEFAULT_LAYOUT>(); it != func.template end<XTENSOR_DEFAULT_LAYOUT>(); ++it)
         {
             *(resit1++) = *it;
         }
 
-        auto resit3 = res3.rbegin();
-        for (auto it = func.rbegin(); it != func.rend(); ++it)
+        auto resit3 = res3.template rbegin<XTENSOR_DEFAULT_LAYOUT>();
+        for (auto it = func.template rbegin<XTENSOR_DEFAULT_LAYOUT>(); it != func.template rend<XTENSOR_DEFAULT_LAYOUT>(); ++it)
         {
             *(resit3++) = *it;
         }
 
         if (func.has_linear_assign(res2.strides()))
         {
-            auto resit2 = res2.begin();
+            auto resit2 = res2.template begin<XTENSOR_DEFAULT_LAYOUT>();
             for (auto it = func.storage_begin(); it != func.storage_end(); ++it)
             {
                 *(resit2++) = *it;
             }
 
-            auto resit4 = res4.rbegin();
+            auto resit4 = res4.template rbegin<XTENSOR_DEFAULT_LAYOUT>();
             for (auto it = func.storage_rbegin(); it != func.storage_rend(); ++it)
             {
                 *(resit4++) = *it;
@@ -396,7 +396,6 @@ namespace xt
         iterator_tester(5.0 + x * y * 3.0);
         iterator_tester(x * y * z);
         iterator_tester(x / y / z);
-
     }
 
     TEST(xfunction, xfunction_in_xfunction)

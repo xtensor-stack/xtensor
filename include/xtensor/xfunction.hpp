@@ -844,7 +844,14 @@ namespace xt
     template <class S>
     inline auto xfunction<F, CT...>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
-        auto f = [&shape, l](const auto& e) noexcept { return e.stepper_end(shape, l); };
+        auto f = [&shape, l](const auto& e) noexcept {
+            auto stepper = e.stepper_end(shape, l);
+            if (l == layout_type::column_major && has_data_interface<decltype(e)>::value && e.dimension() != shape.size())
+            {
+                stepper.step_back(shape.size() - e.dimension());
+            }
+            return stepper;
+        };
         return build_stepper(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
@@ -1135,7 +1142,10 @@ namespace xt
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::to_end(layout_type l)
     {
-        auto f = [l](auto& it) { it.to_end(l); };
+        // TODO broken -- REMOVE?!
+        auto f = [l, this](auto& it) {
+            it.to_end(l);
+        };
         for_each(f, m_it);
     }
 
