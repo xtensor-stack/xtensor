@@ -235,6 +235,28 @@ namespace xt
         }
     }
 
+    template <class T>
+    bool check_partition(T& arr, std::size_t pos)
+    {
+        bool res = true;
+        for (std::size_t i = 0; i < pos; ++i)
+        {
+            res = res && arr(i) < arr(pos);
+        }
+        for (std::size_t i = pos; i < arr.size(); ++i)
+        {
+            res = res && arr(i) >= arr(pos);
+        }
+        return res;
+    }
+
+    TEST(xsort, partition)
+    {
+        xt::xarray<int> a = {3, 4, 2, 1};
+        auto r1 = xt::partition(a, 2);
+        EXPECT_TRUE(check_partition(r1, 2));
+    }
+
     TEST(xsort, median)
     {
         xt::xtensor<float, 2> a = {{ 3, 4, 2, 1},
