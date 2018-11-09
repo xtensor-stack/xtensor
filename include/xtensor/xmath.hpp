@@ -325,13 +325,22 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
 #define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                      \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>> \
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value        \
+                        && !std::is_integral<X>::value, int>>                                                     \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
         return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e),                                  \
                       std::forward<X>(axes), es);                                                                 \
+    }                                                                                                             \
+                                                                                                                  \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value        \
+                        && std::is_integral<X>::value, int>>                                                      \
+    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                                \
+    {                                                                                                             \
+        return NAME(std::forward<E>(e), {axis}, es);                                                               \
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
@@ -2123,12 +2132,21 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, X>::value, int>>
+              class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, X>::value
+                                       && !std::is_integral<X>::value, int>>
     inline auto count_nonzero(E&& e, X&& axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
         return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), std::forward<X>(axes), es);
+    }
+
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+            class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, X>::value
+                                     && std::is_integral<X>::value, int>>
+    inline auto count_nonzero(E&& e, X axis, EVS es = EVS())
+    {
+        return count_nonzero(std::forward<E>(e), {axis}, es);
     }
 
 #ifdef X_OLD_CLANG
