@@ -1,0 +1,57 @@
+
+#include <algorithm>
+
+#include "gtest/gtest.h"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xmath.hpp"
+
+namespace xt
+{
+    using namespace xt::placeholders;
+
+    /*py
+    a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
+    w  = np.random.random(4*5*6*7).reshape(4,5,6,7)
+    av = np.average(a, weights=w, axis=(0,1))
+    */
+    TEST(xtest_extended_xmath, average)
+    {
+        // py_a
+        // py_w
+        // py_av
+
+        auto av = xt::average(py_a, py_w, {0,1});
+
+        EXPECT_TRUE(xt::allclose(av, py_av));
+    }
+
+    /*py
+    a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
+    vr_all = np.var(a)
+    st_all = np.std(a)
+    vr = np.var(a, axis=(0,2))
+    st = np.std(a, axis=(0,2))
+    */
+    TEST(xtest_extended_xmath, var_std)
+    {
+        // py_a
+
+        // py_vr_all
+        // py_st_all
+        // py_vr
+        // py_st
+
+        auto st_all = xt::stddev(py_a);
+        auto vr_all = xt::variance(py_a);
+
+        auto st = xt::stddev(py_a, {0, 2});
+        auto vr = xt::variance(py_a, {0, 2});
+
+        EXPECT_TRUE(xt::allclose(st_all, py_st_all));
+        EXPECT_TRUE(xt::allclose(vr_all, py_vr_all));
+        EXPECT_TRUE(xt::allclose(st, py_st));
+        EXPECT_TRUE(xt::allclose(vr, py_vr));
+    }
+
+}
