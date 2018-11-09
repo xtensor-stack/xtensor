@@ -444,12 +444,12 @@ namespace xt
                    const xdummy_iterator<is_const, CT>& rhs) noexcept;
 
     template <class T>
-    struct is_xdummy_iterator : std::false_type
+    struct is_not_xdummy_iterator : std::true_type
     {
     };
 
     template <bool is_const, class CT>
-    struct is_xdummy_iterator<xdummy_iterator<is_const, CT>> : std::true_type
+    struct is_not_xdummy_iterator<xdummy_iterator<is_const, CT>> : std::false_type
     {
     };
 
