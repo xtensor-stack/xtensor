@@ -1025,7 +1025,7 @@ namespace xt
     {
         // Optimization: no need to compare each subiterator since they all
         // are incremented decremented together.
-        constexpr std::size_t temp = xtl::mpl::find_if<is_xdummy_iterator, data_type>::value;
+        constexpr std::size_t temp = xtl::mpl::find_if<is_not_xdummy_iterator, data_type>::value;
         constexpr std::size_t index = (temp == std::tuple_size<data_type>::value) ? 0 : temp;
         return std::get<index>(m_it) == std::get<index>(rhs.m_it);
     }
@@ -1035,7 +1035,7 @@ namespace xt
     {
         // Optimization: no need to compare each subiterator since they all
         // are incremented decremented together.
-        constexpr std::size_t temp = xtl::mpl::find_if<is_xdummy_iterator, data_type>::value;
+        constexpr std::size_t temp = xtl::mpl::find_if<is_not_xdummy_iterator, data_type>::value;
         constexpr std::size_t index = (temp == std::tuple_size<data_type>::value) ? 0 : temp;
         return std::get<index>(m_it) < std::get<index>(rhs.m_it);
     }
