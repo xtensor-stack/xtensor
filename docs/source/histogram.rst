@@ -12,7 +12,7 @@ Basic usage
 
 .. note::
 
-    .. code-block::
+    .. code-block:: cpp
 
         xt::histogram(a, bins[, weights][, density])
         xt::histogram_bin_edges(a, bins[, weights][, left, right][, bins][, mode])
