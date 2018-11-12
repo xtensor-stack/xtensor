@@ -514,7 +514,7 @@ namespace xt
     template <class C>
     inline void xstepper<C>::to_end(layout_type l)
     {
-        m_it = p_c->data_xend(l);
+        m_it = p_c->data_xend(l, m_offset);
     }
 
     template <class C>

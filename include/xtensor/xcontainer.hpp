@@ -223,8 +223,8 @@ namespace xt
 
         container_iterator data_xbegin() noexcept;
         const_container_iterator data_xbegin() const noexcept;
-        container_iterator data_xend(layout_type l) noexcept;
-        const_container_iterator data_xend(layout_type l) const noexcept;
+        container_iterator data_xend(layout_type l, size_type offset) noexcept;
+        const_container_iterator data_xend(layout_type l, size_type offset) const noexcept;
 
     protected:
 
@@ -238,7 +238,7 @@ namespace xt
         friend class xstepper;
 
         template <class It>
-        It data_xend_impl(It end, layout_type l) const noexcept;
+        It data_xend_impl(It begin, layout_type l, size_type offset) const noexcept;
 
         inner_shape_type& mutable_shape();
         inner_strides_type& mutable_strides();
@@ -335,9 +335,9 @@ namespace xt
 
     template <class D>
     template <class It>
-    inline It xcontainer<D>::data_xend_impl(It end, layout_type l) const noexcept
+    inline It xcontainer<D>::data_xend_impl(It begin, layout_type l, size_type offset) const noexcept
     {
-        return strided_data_end(*this, end, l);
+        return strided_data_end(*this, begin, l, offset);
     }
 
     template <class D>
@@ -751,7 +751,7 @@ namespace xt
     inline auto xcontainer<D>::stepper_end(const S& shape, layout_type l) noexcept -> stepper
     {
         size_type offset = shape.size() - dimension();
-        return stepper(static_cast<derived_type*>(this), data_xend(l), offset);
+        return stepper(static_cast<derived_type*>(this), data_xend(l, offset), offset);
     }
 
     template <class D>
@@ -767,7 +767,7 @@ namespace xt
     inline auto xcontainer<D>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(static_cast<const derived_type*>(this), data_xend(l), offset);
+        return const_stepper(static_cast<const derived_type*>(this), data_xend(l, offset), offset);
     }
 
     template <class D>
@@ -779,19 +779,19 @@ namespace xt
     template <class D>
     inline auto xcontainer<D>::data_xbegin() const noexcept -> const_container_iterator
     {
-        return storage().begin();
+        return storage().cbegin();
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_xend(layout_type l) noexcept -> container_iterator
+    inline auto xcontainer<D>::data_xend(layout_type l, size_type offset) noexcept -> container_iterator
     {
-        return data_xend_impl(storage().end(), l);
+        return data_xend_impl(storage().begin(), l, offset);
     }
 
     template <class D>
-    inline auto xcontainer<D>::data_xend(layout_type l) const noexcept -> const_container_iterator
+    inline auto xcontainer<D>::data_xend(layout_type l, size_type offset) const noexcept -> const_container_iterator
     {
-        return data_xend_impl(storage().end(), l);
+        return data_xend_impl(storage().cbegin(), l, offset);
     }
 
     template <class D>

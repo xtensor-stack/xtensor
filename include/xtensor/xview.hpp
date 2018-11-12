@@ -537,12 +537,12 @@ namespace xt
         inline It data_xbegin_impl(It begin) const noexcept;
 
         template <class It>
-        inline It data_xend_impl(It begin, layout_type l) const noexcept;
+        inline It data_xend_impl(It begin, layout_type l, size_type offset) const noexcept;
         inline container_iterator data_xbegin() noexcept;
         inline const_container_iterator data_xbegin() const noexcept;
-        inline container_iterator data_xend(layout_type l) noexcept;
+        inline container_iterator data_xend(layout_type l, size_type offset) noexcept;
 
-        inline const_container_iterator data_xend(layout_type l) const noexcept;
+        inline const_container_iterator data_xend(layout_type l, size_type offset) const noexcept;
 
         // Conversion operator enabled for statically "scalar" views
         template <class ST = self_type, class = std::enable_if_t<is_xscalar<std::decay_t<ST>>::value, int>>
@@ -1377,10 +1377,9 @@ namespace xt
 
     template <class CT, class... S>
     template <class It>
-    inline It xview<CT, S...>::data_xend_impl(It begin, layout_type l) const noexcept
+    inline It xview<CT, S...>::data_xend_impl(It begin, layout_type l, size_type offset) const noexcept
     {
-        std::ptrdiff_t end_offset = static_cast<std::ptrdiff_t>(std::accumulate(backstrides().begin(), backstrides().end(), std::size_t(0)));
-        return strided_data_end(*this, begin + end_offset + 1, l);
+        return strided_data_end(*this, begin, l, offset);
     }
 
     template <class CT, class... S>
@@ -1396,15 +1395,15 @@ namespace xt
     }
 
     template <class CT, class... S>
-    inline auto xview<CT, S...>::data_xend(layout_type l) noexcept -> container_iterator
+    inline auto xview<CT, S...>::data_xend(layout_type l, size_type offset) noexcept -> container_iterator
     {
-        return data_xend_impl(data() + data_offset(), l);
+        return data_xend_impl(data() + data_offset(), l, offset);
     }
 
     template <class CT, class... S>
-    inline auto xview<CT, S...>::data_xend(layout_type l) const noexcept -> const_container_iterator
+    inline auto xview<CT, S...>::data_xend(layout_type l, size_type offset) const noexcept -> const_container_iterator
     {
-        return data_xend_impl(data() + data_offset(), l);
+        return data_xend_impl(data() + data_offset(), l, offset);
     }
 
     // Assign to operator enabled for contigous views
@@ -1779,7 +1778,7 @@ namespace xt
     inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) -> std::enable_if_t<Enable, stepper>
     {
         size_type offset = shape.size() - dimension();
-        return stepper(this, data_xend(l), offset);
+        return stepper(this, data_xend(l, offset), offset);
     }
 
     template <class CT, class... S>
@@ -1795,7 +1794,7 @@ namespace xt
     inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) const-> std::enable_if_t<Enable, const_stepper>
     {
         size_type offset = shape.size() - dimension();
-        return const_stepper(this, data_xend(l), offset);
+        return const_stepper(this, data_xend(l, offset), offset);
     }
 
     /********************************
