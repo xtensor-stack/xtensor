@@ -527,8 +527,8 @@ namespace xt
 
         using shape_type = typename xfunction_type::shape_type;
 
-        template <class... It>
-        xfunction_stepper(const xfunction_type* func, It&&... it) noexcept;
+        template <class... St>
+        xfunction_stepper(const xfunction_type* func, St&&... st) noexcept;
 
         void step(size_type dim);
         void step_back(size_type dim);
@@ -559,7 +559,7 @@ namespace xt
         value_type step_leading_impl(std::index_sequence<I...>);
 
         const xfunction_type* p_f;
-        std::tuple<typename std::decay_t<CT>::const_stepper...> m_it;
+        std::tuple<typename std::decay_t<CT>::const_stepper...> m_st;
     };
 
     /*********************************
@@ -1075,66 +1075,66 @@ namespace xt
      ************************************/
 
     template <class F, class... CT>
-    template <class... It>
-    inline xfunction_stepper<F, CT...>::xfunction_stepper(const xfunction_type* func, It&&... it) noexcept
-        : p_f(func), m_it(std::forward<It>(it)...)
+    template <class... St>
+    inline xfunction_stepper<F, CT...>::xfunction_stepper(const xfunction_type* func, St&&... st) noexcept
+        : p_f(func), m_st(std::forward<St>(st)...)
     {
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step(size_type dim)
     {
-        auto f = [dim](auto& it) { it.step(dim); };
-        for_each(f, m_it);
+        auto f = [dim](auto& st) { st.step(dim); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step_back(size_type dim)
     {
-        auto f = [dim](auto& it) { it.step_back(dim); };
-        for_each(f, m_it);
+        auto f = [dim](auto& st) { st.step_back(dim); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step(size_type dim, size_type n)
     {
-        auto f = [dim, n](auto& it) { it.step(dim, n); };
-        for_each(f, m_it);
+        auto f = [dim, n](auto& st) { st.step(dim, n); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::step_back(size_type dim, size_type n)
     {
-        auto f = [dim, n](auto& it) { it.step_back(dim, n); };
-        for_each(f, m_it);
+        auto f = [dim, n](auto& st) { st.step_back(dim, n); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::reset(size_type dim)
     {
-        auto f = [dim](auto& it) { it.reset(dim); };
-        for_each(f, m_it);
+        auto f = [dim](auto& st) { st.reset(dim); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::reset_back(size_type dim)
     {
-        auto f = [dim](auto& it) { it.reset_back(dim); };
-        for_each(f, m_it);
+        auto f = [dim](auto& st) { st.reset_back(dim); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::to_begin()
     {
-        auto f = [](auto& it) { it.to_begin(); };
-        for_each(f, m_it);
+        auto f = [](auto& st) { st.to_begin(); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
     inline void xfunction_stepper<F, CT...>::to_end(layout_type l)
     {
-        auto f = [l](auto& it) { it.to_end(l); };
-        for_each(f, m_it);
+        auto f = [l](auto& st) { st.to_end(l); };
+        for_each(f, m_st);
     }
 
     template <class F, class... CT>
@@ -1147,14 +1147,14 @@ namespace xt
     template <std::size_t... I>
     inline auto xfunction_stepper<F, CT...>::deref_impl(std::index_sequence<I...>) const -> reference
     {
-        return (p_f->m_f)(*std::get<I>(m_it)...);
+        return (p_f->m_f)(*std::get<I>(m_st)...);
     }
 
     template <class F, class... CT>
     template <class ST, std::size_t... I>
     inline ST xfunction_stepper<F, CT...>::step_simd_impl(std::index_sequence<I...>)
     {
-        return (p_f->m_f.simd_apply)(std::get<I>(m_it).template
+        return (p_f->m_f.simd_apply)(std::get<I>(m_st).template
             step_simd<detail::get_simd_type_t<std::tuple_element_t<I, typename xfunction_type::tuple_type>,
                                               ST,
                                               typename xfunction_type::simd_argument_type
@@ -1173,7 +1173,7 @@ namespace xt
     inline auto xfunction_stepper<F, CT...>::step_leading_impl(std::index_sequence<I...>)
         -> value_type
     {
-        return (p_f->m_f)(std::get<I>(m_it).step_leading()...);
+        return (p_f->m_f)(std::get<I>(m_st).step_leading()...);
     }
 
     template <class F, class... CT>
