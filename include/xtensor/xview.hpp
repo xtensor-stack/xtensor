@@ -1620,7 +1620,7 @@ namespace xt
         for (size_type i = 0; i != m_e.dimension(); ++i)
         {
             size_type k = newaxis_skip<S...>(i);
-            std::advance(first, k - i);
+            std::advance(first, difference_type(k - i));
             if (first != last)
             {
                 index[i] = k < sizeof...(S) ?
