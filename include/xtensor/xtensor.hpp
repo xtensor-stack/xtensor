@@ -528,7 +528,7 @@ namespace xt
     {
         if ( idx.size() == 0 )
         {
-            return empty<std::size_t>({0,0});
+            return empty<std::size_t>({std::size_t(0),std::size_t(0)});
         }
 
         xtensor<std::size_t,2> out = empty<std::size_t>({idx.size(),idx[0].size()});
