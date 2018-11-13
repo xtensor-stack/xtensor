@@ -520,24 +520,25 @@ namespace xt
     }
 
     /**
-     * Converts `std::vector<index_type>` (return e.g. from `xt::argwhere`) to a `xt::tensor<size_t,2>`
+     * Converts `std::vector<index_type>` (returned e.g. from `xt::argwhere`) to `xtensor`.
      * @param vector of indices
+     * @return `xt::tensor<typename index_type::value_type, 2>` (e.g. `xt::tensor<size_t, 2>`)
      */
     template <class T>
     inline auto from_indices(const std::vector<T> &idx)
     {
         if ( idx.size() == 0 )
         {
-            return empty<std::size_t>({std::size_t(0),std::size_t(0)});
+            return empty<typename T::value_type>({std::size_t(0),std::size_t(0)});
         }
 
-        xtensor<std::size_t,2> out = empty<std::size_t>({idx.size(),idx[0].size()});
+        xtensor<typename T::value_type, 2> out = empty<typename T::value_type>({idx.size(),idx[0].size()});
 
         for ( std::size_t i = 0 ; i < out.shape()[0] ; ++i )
         {
             for ( std::size_t j = 0 ; j < out.shape()[1] ; ++j )
             {
-                out(i,j) = static_cast<std::size_t>(idx[i][j]);
+                out(i,j) = idx[i][j];
             }
         }
 
