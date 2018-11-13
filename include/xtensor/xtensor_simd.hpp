@@ -11,7 +11,6 @@
 
 #include <vector>
 
-#include "xstorage.hpp"
 #include "xutils.hpp"
 
 #ifdef XTENSOR_USE_XSIMD

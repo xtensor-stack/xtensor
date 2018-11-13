@@ -15,6 +15,16 @@
 
 namespace xt
 {
+    namespace check_policy
+    {
+        struct none
+        {
+        };
+        struct full
+        {
+        };
+    }
+
     template <class E>
     auto transpose(E&& e) noexcept;
 

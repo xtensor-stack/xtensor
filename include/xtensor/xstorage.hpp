@@ -23,7 +23,6 @@
 
 #ifndef XTENSOR_ALIGNMENT
     #ifdef XTENSOR_USE_XSIMD
-        #include <xsimd/xsimd.hpp>
         #define XTENSOR_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
     #else
         #define XTENSOR_ALIGNMENT 0

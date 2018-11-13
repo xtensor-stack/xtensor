@@ -9,8 +9,10 @@
 #ifndef XTENSOR_LAYOUT_HPP
 #define XTENSOR_LAYOUT_HPP
 
+// Do not include anything else here.
+// xlayout.hpp is included in xtensor_forward.hpp
+// and we don't want to bring other headers to it.
 #include "xtensor_config.hpp"
-#include "xshape.hpp"
 
 namespace xt
 {
@@ -48,21 +50,6 @@ namespace xt
     constexpr layout_type compute_layout(Args... args) noexcept;
 
     constexpr layout_type default_assignable_layout(layout_type l) noexcept;
-
-    /**
-     * Compute a layout based on a layout and a shape type.
-     *
-     * The main functionality of this function is that it reduces vectors to
-     * ``layout_type::any`` so that assigning a row major 1D container to another
-     * row_major container becomes free.
-     */
-    template <layout_type L, class S>
-    struct select_layout
-    {
-        constexpr static std::ptrdiff_t static_dimension = xt::static_dimension<S>::value;
-        constexpr static bool is_any = static_dimension != -1 && static_dimension <= 1 && L != layout_type::dynamic;
-        constexpr static layout_type value = is_any ? layout_type::any : L;
-    };
 
     /******************
      * Implementation *

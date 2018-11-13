@@ -43,7 +43,7 @@
 
 #ifndef XTENSOR_DEFAULT_SHAPE_CONTAINER
 #define XTENSOR_DEFAULT_SHAPE_CONTAINER(T, EA, SA) \
-    xt::svector<typename XTENSOR_DEFAULT_DATA_CONTAINER(T, EA)::size_type, 4, SA>
+    xt::svector<typename XTENSOR_DEFAULT_DATA_CONTAINER(T, EA)::size_type, 4, SA, true>
 #endif
 
 #ifndef XTENSOR_DEFAULT_ALLOCATOR
