@@ -11,6 +11,7 @@
 #include "xtensor/xview.hpp"
 #include "test_common.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xrandom.hpp"
 #include "xtensor/xfixed.hpp"
 
 namespace xt
@@ -279,6 +280,7 @@ namespace xt
         for (size_t i = 0; i < nb_iter; ++i)
         {
             ++iter, ++itera, ++iterb;
+            EXPECT_EQ(*iter, *itera + *iterb);
         }
         EXPECT_EQ(*iter, *itera + *iterb);
     }
@@ -334,6 +336,66 @@ namespace xt
             SCOPED_TRACE("different dimensions");
             test_xfunction_iterator_end(f.m_c, f.m_a);
         }
+    }
+
+    template <class F>
+    void iterator_tester(const F& func)
+    {
+        auto res1 = empty_like(func);
+        auto res2 = empty_like(func);
+        auto res3 = empty_like(func);
+        auto res4 = empty_like(func);
+        auto res5 = func;
+
+        auto resit1 = res1.template begin<XTENSOR_DEFAULT_LAYOUT>();
+        for (auto it = func.template begin<XTENSOR_DEFAULT_LAYOUT>(); it != func.template end<XTENSOR_DEFAULT_LAYOUT>(); ++it)
+        {
+            *(resit1++) = *it;
+        }
+
+        auto resit3 = res3.template rbegin<XTENSOR_DEFAULT_LAYOUT>();
+        for (auto it = func.template rbegin<XTENSOR_DEFAULT_LAYOUT>(); it != func.template rend<XTENSOR_DEFAULT_LAYOUT>(); ++it)
+        {
+            *(resit3++) = *it;
+        }
+
+        if (func.has_linear_assign(res2.strides()))
+        {
+            auto resit2 = res2.template begin<XTENSOR_DEFAULT_LAYOUT>();
+            for (auto it = func.storage_begin(); it != func.storage_end(); ++it)
+            {
+                *(resit2++) = *it;
+            }
+
+            auto resit4 = res4.template rbegin<XTENSOR_DEFAULT_LAYOUT>();
+            for (auto it = func.storage_rbegin(); it != func.storage_rend(); ++it)
+            {
+                *(resit4++) = *it;
+            }
+
+            EXPECT_EQ(res2, res5);
+            EXPECT_EQ(res4, res5);
+        }
+
+        EXPECT_EQ(res1, res5);
+        EXPECT_EQ(res3, res5);
+        EXPECT_EQ(func, res5);
+    }
+
+
+    TEST(xfunction, all_iterators)
+    {
+        xt::xarray<double> x = xt::random::rand<double>({5, 5, 5});
+        xt::xarray<double> y = xt::random::rand<double>({5});
+        xt::xarray<double> z = xt::random::rand<double>({5, 5});
+        auto f1 = 2.0 * x;
+        auto f2 = x * 2.0 * x;
+        iterator_tester(f1);
+        iterator_tester(f2);
+        iterator_tester(x * y * 3.0);
+        iterator_tester(5.0 + x * y * 3.0);
+        iterator_tester(x * y * z);
+        iterator_tester(x / y / z);
     }
 
     TEST(xfunction, xfunction_in_xfunction)

@@ -211,6 +211,37 @@ namespace xt
         };
         */
     }
+
+    /***********************************
+     * temporary_type_t implementation *
+     ***********************************/
+
+    namespace detail
+    {
+        template <class S>
+        struct xtype_for_shape
+        {
+            template <class T, layout_type L>
+            using type = xarray<T, L>;
+        };
+
+        template <template <class, std::size_t> class S, class X, std::size_t N>
+        struct xtype_for_shape<S<X, N>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor<T, N, L>;
+        };
+
+        template <template <std::size_t...> class S, std::size_t... X>
+        struct xtype_for_shape<S<X...>>
+        {
+            template <class T, layout_type L>
+            using type = xtensor_fixed<T, xshape<X...>, L>;
+        };
+
+        template <class T, class S, layout_type L>
+        using temporary_type_t = typename xtype_for_shape<S>::template type<T, L>;
+    }
 }
 
 #endif

@@ -136,9 +136,9 @@ namespace xt
      * @param e the xexpression from which to extract shape, value type and layout.
      */
     template <class E>
-    inline typename E::temporary_type empty_like(const xexpression<E>& e)
+    inline auto empty_like(const xexpression<E>& e)
     {
-        using xtype = typename E::temporary_type;
+        using xtype = detail::temporary_type_t<typename E::value_type, typename E::shape_type, E::static_layout>;
         auto res = xtype::from_shape(e.derived_cast().shape());
         return res;
     }
@@ -151,9 +151,9 @@ namespace xt
      * @param fill_value the value used to set each element of the returned xcontainer.
      */
     template <class E>
-    inline typename E::temporary_type full_like(const xexpression<E>& e, typename E::value_type fill_value)
+    inline auto full_like(const xexpression<E>& e, typename E::value_type fill_value)
     {
-        using xtype = typename E::temporary_type;
+        using xtype = detail::temporary_type_t<typename E::value_type, typename E::shape_type, E::static_layout>;
         auto res = xtype::from_shape(e.derived_cast().shape());
         res.fill(fill_value);
         return res;
@@ -169,7 +169,7 @@ namespace xt
      * @param e the xexpression from which to extract shape, value type and layout.
      */
     template <class E>
-    inline typename E::temporary_type zeros_like(const xexpression<E>& e)
+    inline auto zeros_like(const xexpression<E>& e)
     {
         return full_like(e, typename E::value_type(0));
     }
@@ -184,7 +184,7 @@ namespace xt
      * @param e the xexpression from which to extract shape, value type and layout.
      */
     template <class E>
-    inline typename E::temporary_type ones_like(const xexpression<E>& e)
+    inline auto ones_like(const xexpression<E>& e)
     {
         return full_like(e, typename E::value_type(1));
     }
