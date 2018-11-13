@@ -61,10 +61,10 @@ namespace xt
      *****************/
 
     template <class S>
-    S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l);
+    S unravel_from_strides(typename S::value_type index, const S& strides, layout_type l=layout_type::row_major);
 
     template <class S>
-    get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l);
+    get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l=layout_type::row_major);
 
     /***********************
      * broadcast functions *
