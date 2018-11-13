@@ -527,18 +527,22 @@ namespace xt
     template <class T>
     inline auto from_indices(const std::vector<T> &idx)
     {
-        if ( idx.size() == 0 )
+        using return_type = xtensor<typename T::value_type, 2>;
+        using size_type = typename return_type::size_type;
+
+        if (idx.size() == 0)
         {
-            return empty<typename T::value_type>({std::size_t(0),std::size_t(0)});
+            return_type out = empty<typename T::value_type>({size_type(0), size_type(0)});
+            return out;
         }
 
-        xtensor<typename T::value_type, 2> out = empty<typename T::value_type>({idx.size(),idx[0].size()});
+        return_type out = empty<typename T::value_type>({idx.size(), idx[0].size()});
 
-        for ( std::size_t i = 0 ; i < out.shape()[0] ; ++i )
+        for (size_type i = 0; i < out.shape()[0]; ++i)
         {
-            for ( std::size_t j = 0 ; j < out.shape()[1] ; ++j )
+            for (size_type j = 0; j < out.shape()[1]; ++j)
             {
-                out(i,j) = idx[i][j];
+                out(i, j) = idx[i][j];
             }
         }
 
