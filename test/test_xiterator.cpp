@@ -19,6 +19,7 @@ namespace xt
     class xiterator_test : public ::testing::Test
     {
     public:
+
         using result_type = R;
     };
 
@@ -36,13 +37,16 @@ namespace xt
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
-        size_type nb_inc = L == layout_type::row_major ?
+        auto offset = shape.size() - a.dimension();
+        auto broadcasting_stride = std::accumulate(shape.cbegin(), shape.cbegin() + offset, size_type(1), std::multiplies<size_type>());
+        size_type nb_inc = (L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
-            shape.front() * shape[1] + 1;
+            broadcasting_stride * (result.shape().front() * result.shape()[1] + 1));
+
         int expected = a(1, 0, 1);
 
-        auto iter = a.template begin<L>();
-        auto iter2 = a.template begin<L>();
+        auto iter = a.template begin<L>(shape);
+        auto iter2 = a.template begin<L>(shape);
         for (size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
@@ -90,9 +94,13 @@ namespace xt
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
-        difference_type nb_inc = difference_type(L == layout_type::row_major ?
+
+        auto offset = shape.size() - a.dimension();
+        auto broadcasting_stride = std::accumulate(shape.cbegin(), shape.cbegin() + offset, difference_type(1), std::multiplies<difference_type>());
+        auto nb_inc = difference_type(L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
-            shape.front() * shape[1] + 1);
+            broadcasting_stride * difference_type(result.shape().front() * result.shape()[1] + 1));
+
         int expected = a(1, 0, 1);
 
         auto iter = a.template begin<L>();
@@ -136,17 +144,17 @@ namespace xt
         }
     }
 
-    template <layout_type L, class R>
-    void test_end(const R& result)
+    template <layout_type L, class R, class S>
+    void test_end(const R& result, const S& shape)
     {
         using size_type = typename R::size_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
-        size_type size = a.size();
-        auto iter = a.template begin<L>();
-        auto last = a.template end<L>();
+        size_type size = compute_size(shape);
+        auto iter = a.template begin<L>(shape);
+        auto last = a.template end<L>(shape);
         for (size_type i = 0; i < size; ++i)
         {
             ++iter;
@@ -161,7 +169,7 @@ namespace xt
         typename TestFixture::result_type rm;
         {
             SCOPED_TRACE("same shape - row_major iterator");
-            test_end<layout_type::row_major>(rm);
+            test_end<layout_type::row_major>(rm, rm.shape());
         }
 
         {
@@ -169,12 +177,12 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_end<layout_type::row_major>(rm);
+            test_end<layout_type::row_major>(rm, sh);
         }
 
         {
             SCOPED_TRACE("same shape - column_major iterator");
-            test_end<layout_type::column_major>(rm);
+            test_end<layout_type::column_major>(rm, rm.shape());
         }
 
         {
@@ -182,7 +190,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_end<layout_type::column_major>(rm);
+            test_end<layout_type::column_major>(rm, sh);
         }
     }
 
@@ -193,13 +201,17 @@ namespace xt
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
-        size_type nb_inc = L == layout_type::row_major ?
+
+        auto offset = shape.size() - a.dimension();
+        auto broadcasting_stride = std::accumulate(shape.cbegin(), shape.cbegin() + offset, size_type(1), std::multiplies<size_type>());
+        size_type nb_inc = (L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
-            shape.front() * shape[1] + 1;
+            broadcasting_stride * (result.shape().front() * result.shape()[1] + 1));
+
         int expected = a(1, 1, 2);
 
-        auto iter = a.template rbegin<L>();
-        auto iter2 = a.template rbegin<L>();
+        auto iter = a.template rbegin<L>(shape);
+        auto iter2 = a.template rbegin<L>(shape);
         for (size_type i = 0; i < nb_inc; ++i)
         {
             ++iter;
@@ -222,7 +234,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_decrement<layout_type::row_major>(rm, rm.shape());
+            test_decrement<layout_type::row_major>(rm, sh);
         }
 
         {
@@ -235,7 +247,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_decrement<layout_type::column_major>(rm, rm.shape());
+            test_decrement<layout_type::column_major>(rm, sh);
         }
     }
 
@@ -246,13 +258,17 @@ namespace xt
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
-        difference_type nb_inc = difference_type(L == layout_type::row_major ?
+
+        auto offset = shape.size() - a.dimension();
+        auto broadcasting_stride = std::accumulate(shape.cbegin(), shape.cbegin() + offset, difference_type(1), std::multiplies<difference_type>());
+        auto nb_inc = difference_type(L == layout_type::row_major ?
             shape.back() * shape[shape.size() - 2] + 1 :
-            shape.front() * shape[1] + 1);
+            broadcasting_stride * difference_type(result.shape().front() * result.shape()[1] + 1));
+
         int expected = a(1, 1, 2);
 
-        auto iter = a.template rbegin<L>();
-        auto iter2 = a.template rbegin<L>();
+        auto iter = a.template rbegin<L>(shape);
+        auto iter2 = a.template rbegin<L>(shape);
 
         iter += nb_inc;
         auto iter3 = iter2 + nb_inc;
@@ -274,7 +290,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_random_decrement<layout_type::row_major>(rm, rm.shape());
+            test_random_decrement<layout_type::row_major>(rm, sh);
         }
 
         {
@@ -287,21 +303,25 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_random_decrement<layout_type::column_major>(rm, rm.shape());
+            test_random_decrement<layout_type::column_major>(rm, sh);
         }
     }
 
-    template <layout_type L, class R>
-    void test_rend(const R& result)
+    template <layout_type L, class R, class S>
+    void test_rend(const R& result, const S& shape)
     {
         using size_type = typename R::size_type;
         using vector_type = typename R::vector_type;
         vector_type data = result.storage();
         xarray_adaptor<typename R::vector_type, layout_type::dynamic> a(data, result.shape(), result.strides());
 
-        size_type size = a.size();
-        auto iter = a.template rbegin<L>();
-        auto last = a.template rend<L>();
+        size_type size = compute_size(shape);
+        auto iter = a.template rbegin<L>(shape);
+        auto last = a.template rend<L>(shape);
+
+        EXPECT_EQ(*iter, data.back()) << "dereferencing rbegin does not result in last element";
+        EXPECT_EQ(*last, data.front()) << "dereferencing rend does not result in first element";
+
         for (size_type i = 0; i < size; ++i)
         {
             ++iter;
@@ -315,7 +335,7 @@ namespace xt
         typename TestFixture::result_type rm;
         {
             SCOPED_TRACE("same shape - row_major iterator");
-            test_rend<layout_type::row_major>(rm);
+            test_rend<layout_type::row_major>(rm, rm.shape());
         }
 
         {
@@ -323,12 +343,12 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_rend<layout_type::row_major>(rm);
+            test_rend<layout_type::row_major>(rm, sh);
         }
 
         {
             SCOPED_TRACE("same shape - column_major iterator");
-            test_rend<layout_type::column_major>(rm);
+            test_rend<layout_type::column_major>(rm, rm.shape());
         }
 
         {
@@ -336,7 +356,7 @@ namespace xt
             layout_result<>::shape_type sh = rm.shape();
             sh.insert(sh.begin(), 2);
             sh.insert(sh.begin(), 4);
-            test_rend<layout_type::column_major>(rm);
+            test_rend<layout_type::column_major>(rm, sh);
         }
     }
 

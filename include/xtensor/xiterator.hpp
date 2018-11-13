@@ -271,24 +271,24 @@ namespace xt
         struct LAYOUT_FORBIDEN_FOR_XITERATOR;
     }
 
-    template <class It, class S, layout_type L>
-    class xiterator : public xtl::xrandom_access_iterator_base<xiterator<It, S, L>,
-                                                               typename It::value_type,
-                                                               typename It::difference_type,
-                                                               typename It::pointer,
-                                                               typename It::reference>,
+    template <class St, class S, layout_type L>
+    class xiterator : public xtl::xrandom_access_iterator_base<xiterator<St, S, L>,
+                                                               typename St::value_type,
+                                                               typename St::difference_type,
+                                                               typename St::pointer,
+                                                               typename St::reference>,
                       private detail::shape_storage<S>
     {
     public:
 
-        using self_type = xiterator<It, S, L>;
+        using self_type = xiterator<St, S, L>;
 
-        using subiterator_type = It;
-        using value_type = typename subiterator_type::value_type;
-        using reference = typename subiterator_type::reference;
-        using pointer = typename subiterator_type::pointer;
-        using difference_type = typename subiterator_type::difference_type;
-        using size_type = typename subiterator_type::size_type;
+        using stepper_type = St;
+        using value_type = typename stepper_type::value_type;
+        using reference = typename stepper_type::reference;
+        using pointer = typename stepper_type::pointer;
+        using difference_type = typename stepper_type::difference_type;
+        using size_type = typename stepper_type::size_type;
         using iterator_category = std::random_access_iterator_tag;
 
         using private_base = detail::shape_storage<S>;
@@ -297,8 +297,9 @@ namespace xt
         using index_type = xindex_type_t<shape_type>;
 
         xiterator() = default;
+
         // end_index means either reverse_iterator && !end or !reverse_iterator && end
-        xiterator(It it, shape_param_type shape, bool end_index);
+        xiterator(St st, shape_param_type shape, bool end_index);
 
         self_type& operator++();
         self_type& operator--();
@@ -316,20 +317,20 @@ namespace xt
 
     private:
 
-        subiterator_type m_it;
+        stepper_type m_st;
         index_type m_index;
         difference_type m_linear_index;
 
         using checking_type = typename detail::LAYOUT_FORBIDEN_FOR_XITERATOR<L>::type;
     };
 
-    template <class It, class S, layout_type L>
-    bool operator==(const xiterator<It, S, L>& lhs,
-                    const xiterator<It, S, L>& rhs);
+    template <class St, class S, layout_type L>
+    bool operator==(const xiterator<St, S, L>& lhs,
+                    const xiterator<St, S, L>& rhs);
 
-    template <class It, class S, layout_type L>
-    bool operator<(const xiterator<It, S, L>& lhs,
-                   const xiterator<It, S, L>& rhs);
+    template <class St, class S, layout_type L>
+    bool operator<(const xiterator<St, S, L>& lhs,
+                   const xiterator<St, S, L>& rhs);
 
     /*********************
      * xbounded_iterator *
@@ -471,7 +472,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            using strides_value_type = decltype(p_c->strides()[0]);
+            using strides_value_type = typename std::decay_t<decltype(p_c->strides())>::value_type;
             m_it += difference_type(static_cast<strides_value_type>(n) * p_c->strides()[dim - m_offset]);
         }
     }
@@ -481,7 +482,7 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            using strides_value_type = decltype(p_c->strides()[0]);
+            using strides_value_type = typename std::decay_t<decltype(p_c->strides())>::value_type;
             m_it -= difference_type(static_cast<strides_value_type>(n) * p_c->strides()[dim - m_offset]);
         }
     }
@@ -513,7 +514,7 @@ namespace xt
     template <class C>
     inline void xstepper<C>::to_end(layout_type l)
     {
-        m_it = p_c->data_xend(l);
+        m_it = p_c->data_xend(l, m_offset);
     }
 
     template <class C>
@@ -971,9 +972,9 @@ namespace xt
         };
     }
 
-    template <class It, class S, layout_type L>
-    inline xiterator<It, S, L>::xiterator(It it, shape_param_type shape, bool end_index)
-        : private_base(shape), m_it(it),
+    template <class St, class S, layout_type L>
+    inline xiterator<St, S, L>::xiterator(St st, shape_param_type shape, bool end_index)
+        : private_base(shape), m_st(st),
           m_index(end_index ? xtl::forward_sequence<index_type, const shape_type&>(this->shape())
                             : xtl::make_sequence<index_type>(this->shape().size(), size_type(0))),
           m_linear_index(0)
@@ -992,94 +993,94 @@ namespace xt
         }
     }
 
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator++() -> self_type&
+    template <class St, class S, layout_type L>
+    inline auto xiterator<St, S, L>::operator++() -> self_type&
     {
-        stepper_tools<L>::increment_stepper(m_it, m_index, this->shape());
+        stepper_tools<L>::increment_stepper(m_st, m_index, this->shape());
         ++m_linear_index;
         return *this;
     }
 
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator--() -> self_type&
+    template <class St, class S, layout_type L>
+    inline auto xiterator<St, S, L>::operator--() -> self_type&
     {
-        stepper_tools<L>::decrement_stepper(m_it, m_index, this->shape());
+        stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape());
         --m_linear_index;
         return *this;
     }
 
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator+=(difference_type n) -> self_type&
+    template <class St, class S, layout_type L>
+    inline auto xiterator<St, S, L>::operator+=(difference_type n) -> self_type&
     {
         if (n >= 0)
         {
-            stepper_tools<L>::increment_stepper(m_it, m_index, this->shape(), static_cast<size_type>(n));
+            stepper_tools<L>::increment_stepper(m_st, m_index, this->shape(), static_cast<size_type>(n));
         }
         else
         {
-            stepper_tools<L>::decrement_stepper(m_it, m_index, this->shape(), static_cast<size_type>(-n));
+            stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape(), static_cast<size_type>(-n));
         }
         m_linear_index += n;
         return *this;
     }
 
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator-=(difference_type n) -> self_type&
+    template <class St, class S, layout_type L>
+    inline auto xiterator<St, S, L>::operator-=(difference_type n) -> self_type&
     {
         if (n >= 0)
         {
-            stepper_tools<L>::decrement_stepper(m_it, m_index, this->shape(), static_cast<size_type>(n));
+            stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape(), static_cast<size_type>(n));
         }
         else
         {
-            stepper_tools<L>::increment_stepper(m_it, m_index, this->shape(), static_cast<size_type>(-n));
+            stepper_tools<L>::increment_stepper(m_st, m_index, this->shape(), static_cast<size_type>(-n));
         }
         m_linear_index -= n;
         return *this;
     }
 
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator-(const self_type& rhs) const -> difference_type
+    template <class St, class S, layout_type L>
+    inline auto xiterator<St, S, L>::operator-(const self_type& rhs) const -> difference_type
     {
         return m_linear_index - rhs.m_linear_index;
     }
 
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator*() const -> reference
+    template <class St, class S, layout_type L>
+    inline auto xiterator<St, S, L>::operator*() const -> reference
     {
-        return *m_it;
+        return *m_st;
     }
 
-    template <class It, class S, layout_type L>
-    inline auto xiterator<It, S, L>::operator->() const -> pointer
+    template <class St, class S, layout_type L>
+    inline auto xiterator<St, S, L>::operator->() const -> pointer
     {
-        return &(*m_it);
+        return &(*m_st);
     }
 
-    template <class It, class S, layout_type L>
-    inline bool xiterator<It, S, L>::equal(const xiterator& rhs) const
+    template <class St, class S, layout_type L>
+    inline bool xiterator<St, S, L>::equal(const xiterator& rhs) const
     {
         XTENSOR_ASSERT(this->shape() == rhs.shape());
         return m_linear_index == rhs.m_linear_index;
     }
 
-    template <class It, class S, layout_type L>
-    inline bool xiterator<It, S, L>::less_than(const xiterator& rhs) const
+    template <class St, class S, layout_type L>
+    inline bool xiterator<St, S, L>::less_than(const xiterator& rhs) const
     {
         XTENSOR_ASSERT(this->shape() == rhs.shape());
         return m_linear_index < rhs.m_linear_index;
     }
 
-    template <class It, class S, layout_type L>
-    inline bool operator==(const xiterator<It, S, L>& lhs,
-                           const xiterator<It, S, L>& rhs)
+    template <class St, class S, layout_type L>
+    inline bool operator==(const xiterator<St, S, L>& lhs,
+                           const xiterator<St, S, L>& rhs)
     {
         return lhs.equal(rhs);
     }
 
-    template <class It, class S, layout_type L>
-    bool operator<(const xiterator<It, S, L>& lhs,
-                   const xiterator<It, S, L>& rhs)
+    template <class St, class S, layout_type L>
+    bool operator<(const xiterator<St, S, L>& lhs,
+                   const xiterator<St, S, L>& rhs)
     {
         return lhs.less_than(rhs);
     }

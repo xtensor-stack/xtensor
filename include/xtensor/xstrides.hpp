@@ -87,19 +87,33 @@ namespace xt
      * utility functions for strided containers *
      ********************************************/
 
-    template <class C, class It>
-    It strided_data_end(const C& c, It end, layout_type l)
+    template <class C, class It, class size_type>
+    It strided_data_end(const C& c, It begin, layout_type l, size_type offset)
     {
         using difference_type = typename std::iterator_traits<It>::difference_type;
         if (c.dimension() == 0)
         {
-            return end;
+            ++begin;
         }
         else
         {
-            auto leading_stride = (l == layout_type::row_major ? c.strides().back() : c.strides().front());
-            return end + difference_type(leading_stride - 1);
+            for (std::size_t i = 0; i != c.dimension(); ++i)
+            {
+                begin += c.strides()[i] * difference_type(c.shape()[i] - 1);
+            }
+            if (l == layout_type::row_major)
+            {
+                begin += c.strides().back();
+            }
+            else
+            {
+                if (offset == 0)
+                {
+                    begin += c.strides().front();
+                }
+            }
         }
+        return begin;
     }
 
     /******************
@@ -279,7 +293,7 @@ namespace xt
         inline std::size_t compute_strides(const shape_type& shape, layout_type l,
                                            strides_type& strides, bs_ptr bs)
         {
-            using strides_value_type = std::decay_t<decltype(strides[0])>;
+            using strides_value_type = typename std::decay_t<strides_type>::value_type;
             strides_value_type data_size = 1;
             if (L == layout_type::row_major || l == layout_type::row_major)
             {
@@ -416,8 +430,9 @@ namespace xt
     template <class S>
     inline get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l)
     {
-        get_strides_t<S> strides = xtl::make_sequence<get_strides_t<S>>(shape.size(), 0);
-        using strides_value_type = std::decay_t<decltype(strides[0])>;
+        using strides_type = get_strides_t<S>;
+        using strides_value_type = typename strides_type::value_type;
+        strides_type strides = xtl::make_sequence<strides_type>(shape.size(), 0);
         compute_strides(shape, l, strides);
         return unravel_from_strides(static_cast<strides_value_type>(index), strides, l);
     }
