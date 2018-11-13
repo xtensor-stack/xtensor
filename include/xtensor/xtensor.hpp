@@ -518,6 +518,31 @@ namespace xt
     {
         return m_storage;
     }
+
+    /**
+     * Converts `std::vector<index_type>` (return e.g. from `xt::argwhere`) to a `xt::tensor<size_t,2>`
+     * @param vector of indices
+     */
+    template <class T>
+    inline auto from_indices(const std::vector<T> &idx)
+    {
+        if ( idx.size() == 0 )
+        {
+            return empty<std::size_t>({0,0});
+        }
+
+        xtensor<std::size_t,2> out = empty<std::size_t>({idx.size(),idx[0].size()});
+
+        for ( std::size_t i = 0 ; i < out.shape()[0] ; ++i )
+        {
+            for ( std::size_t j = 0 ; j < out.shape()[1] ; ++j )
+            {
+                out(i,j) = static_cast<std::size_t>(idx[i][j]);
+            }
+        }
+
+        return out;
+    };
 }
 
 #endif
