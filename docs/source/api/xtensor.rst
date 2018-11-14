@@ -18,3 +18,6 @@ Defined in ``xtensor/xtensor.hpp``
 
 .. doxygentypedef:: xt::xtensor_optional
    :project: xtensor
+
+.. doxygentypedef:: xt::from_indices
+   :project: xtensor
