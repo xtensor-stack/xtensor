@@ -10,6 +10,7 @@
 #define XTENSOR_EVAL_HPP
 
 #include "xtensor_forward.hpp"
+#include "xshape.hpp"
 
 namespace xt
 {

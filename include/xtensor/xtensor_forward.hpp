@@ -9,25 +9,42 @@
 #ifndef XTENSOR_FORWARD_HPP
 #define XTENSOR_FORWARD_HPP
 
+// This file contains forward declarations and
+// alias types to solve the problem of circular
+// includes. It should not contain anything else
+// and should not bring additional dependencies to
+// the files that include it. So:
+// - do NOT define classes of metafunctions here
+// - do NOT include other headers
+//
+// If you need to do so, something is probably
+// going wrong (either your change, or xtensor
+// needs to be refactored).
+
 #include <memory>
 #include <vector>
 
 #include <xtl/xoptional_sequence.hpp>
 
-#include "xexpression.hpp"
 #include "xlayout.hpp"
-#include "xshape.hpp"
-#include "xstorage.hpp"
 #include "xtensor_config.hpp"
-#include "xtensor_simd.hpp"
 
 namespace xt
 {
+    struct xtensor_expression_tag;
+    struct xoptional_expression_tag;
+
     template <class C>
     struct xcontainer_inner_types;
 
     template <class D>
     class xcontainer;
+
+    template <class T, class A>
+    class uvector;
+
+    template <class T, std::size_t N, class A, bool Init>
+    class svector;
 
     template <class EC,
               layout_type L = XTENSOR_DEFAULT_LAYOUT,
@@ -183,65 +200,6 @@ namespace xt
 
     template <class F, class... CT>
     class xfunction;
-
-    namespace check_policy
-    {
-        struct none
-        {
-        };
-        struct full
-        {
-        };
-    }
-
-    namespace evaluation_strategy
-    {
-        struct base
-        {
-        };
-        struct immediate : base
-        {
-        };
-        struct lazy : base
-        {
-        };
-        /*
-        struct cached
-        {
-        };
-        */
-    }
-
-    /***********************************
-     * temporary_type_t implementation *
-     ***********************************/
-
-    namespace detail
-    {
-        template <class S>
-        struct xtype_for_shape
-        {
-            template <class T, layout_type L>
-            using type = xarray<T, L>;
-        };
-
-        template <template <class, std::size_t> class S, class X, std::size_t N>
-        struct xtype_for_shape<S<X, N>>
-        {
-            template <class T, layout_type L>
-            using type = xtensor<T, N, L>;
-        };
-
-        template <template <std::size_t...> class S, std::size_t... X>
-        struct xtype_for_shape<S<X...>>
-        {
-            template <class T, layout_type L>
-            using type = xtensor_fixed<T, xshape<X...>, L>;
-        };
-
-        template <class T, class S, layout_type L>
-        using temporary_type_t = typename xtype_for_shape<S>::template type<T, L>;
-    }
 }
 
 #endif

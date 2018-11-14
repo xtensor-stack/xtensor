@@ -6,6 +6,10 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#ifdef _MSC_VER
+#define VS_SKIP_XFIXED 1
+#endif
+
 // xfixed leads to ICE in debug mode, this provides
 // an easy way to prevent compilation
 #ifndef VS_SKIP_XFIXED

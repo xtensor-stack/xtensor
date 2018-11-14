@@ -18,7 +18,7 @@
 #include <iterator>
 #include <memory>
 
-#include "xexception.hpp"
+#include "xlayout.hpp"
 #include "xstorage.hpp"
 
 namespace xt
@@ -87,6 +87,21 @@ namespace xt
     struct static_dimension
     {
         static constexpr std::ptrdiff_t value = detail::static_dimension_impl<S>::value;
+    };
+
+    /**
+     * Compute a layout based on a layout and a shape type.
+     *
+     * The main functionality of this function is that it reduces vectors to
+     * ``layout_type::any`` so that assigning a row major 1D container to another
+     * row_major container becomes free.
+     */
+    template <layout_type L, class S>
+    struct select_layout
+    {
+        constexpr static std::ptrdiff_t static_dimension = xt::static_dimension<S>::value;
+        constexpr static bool is_any = static_dimension != -1 && static_dimension <= 1 && L != layout_type::dynamic;
+        constexpr static layout_type value = is_any ? layout_type::any : L;
     };
 
     /*************************************
