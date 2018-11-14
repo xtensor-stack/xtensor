@@ -1312,4 +1312,15 @@ namespace xt
         auto v = xt::view(arr, xt::keep(0, -1), xt::all());
         v = 0;
     }
+
+    TEST(xview, assign_scalar_to_contiguous_view_of_view)
+    {
+        xt::xarray<double> arr
+          {{0., 1., 2.},
+           {3., 4., 5.},
+           {6., 7., 8.}};
+        auto vv = xt::view(xt::view(arr, 1), 0);
+        vv = 100.0;
+        EXPECT_EQ(arr(1, 0), 100.0);
+    }
 }
