@@ -733,7 +733,9 @@ namespace xt
      * @brief return vector of indices where arr is not zero
      *
      * @param arr input array
-     * @return vector of index_types where arr is not equal to zero
+     * @return vector of index_types where arr is not equal to zero (use `xt::from_indices` to convert)
+     *
+     * @sa xt::from_indices
      */
     template <class T>
     inline auto argwhere(const T& arr)
