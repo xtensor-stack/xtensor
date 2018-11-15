@@ -72,6 +72,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_value.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xmime.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xnpy.hpp

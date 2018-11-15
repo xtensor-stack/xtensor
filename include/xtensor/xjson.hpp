@@ -139,7 +139,7 @@ namespace xt
      * serialization of user-defined types. The method is picked up by
      * argument-dependent lookup.
      *
-     * Note: for converting a JSON object to a value, nlohmann_json requiress
+     * Note: for converting a JSON object to a value, nlohmann_json requires
      * the value type to be default constructible, which is typically not the
      * case for expressions with a view semantics. In this case, from_json can
      * be called directly.
