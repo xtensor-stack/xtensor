@@ -1200,7 +1200,7 @@ namespace xt
     auto xview<CT, S...>::storage_begin()
         -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, storage_iterator>
     {
-        return m_e.storage_begin() + data_offset();
+        return m_e.storage().begin() + data_offset();
     }
 
     template <class CT, class... S>
@@ -1208,7 +1208,7 @@ namespace xt
     auto xview<CT, S...>::storage_end()
         -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, storage_iterator>
     {
-        return m_e.storage_begin() + data_offset() + size();
+        return m_e.storage().begin() + data_offset() + size();
     }
 
     template <class CT, class... S>
@@ -1216,7 +1216,7 @@ namespace xt
     auto xview<CT, S...>::storage_cbegin() const
         -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
     {
-        return m_e.storage_cbegin() + data_offset();
+        return m_e.storage().cbegin() + data_offset();
     }
 
     template <class CT, class... S>
@@ -1224,7 +1224,7 @@ namespace xt
     auto xview<CT, S...>::storage_cend() const
         -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
     {
-        return m_e.storage_cbegin() + data_offset() + size();
+        return m_e.storage().cbegin() + data_offset() + size();
     }
 
     /**
