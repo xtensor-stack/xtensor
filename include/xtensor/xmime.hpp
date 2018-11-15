@@ -20,6 +20,15 @@
 
 namespace xt
 {
+    template <class P, class T>
+    void compute_0d_table(std::stringstream& out, P& printer, const T& expr)
+    {
+        out << "<table style='border-style:solid;border-width:1px;'><tbody>";
+        out << "<tr><td style='font-family:monospace;'><pre>";
+        out << expr();
+        out << "</pre></td></tr>";
+        out << "</tbody></table>";
+    }
 
     template <class P>
     void compute_1d_row(std::stringstream& out, P& printer, const std::size_t& row_idx)
@@ -191,7 +200,11 @@ namespace xt
     void compute_nd_table(std::stringstream& out, P& printer, const T& expr,
                           const std::size_t& edgeitems)
     {
-        if (expr.dimension() == 1)
+        if (expr.dimension() == 0)
+        {
+            compute_0d_table(out, printer, expr);
+        }
+        else if (expr.dimension() == 1)
         {
             compute_1d_table(out, printer, expr, edgeitems);
         }
@@ -211,7 +224,7 @@ namespace xt
         std::size_t size = compute_size(expr.shape());
         if (size > print_options::print_options().threshold)
         {
-            edgeitems = print_options::print_options().edgeitems;
+            edgeitems = print_options::print_options().edge_items;
         }
 
         if (print_options::print_options().precision != -1)
