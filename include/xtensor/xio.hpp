@@ -744,8 +744,13 @@ namespace xt
     {
         return pretty_print(e, out);
     }
+}
 
 #ifdef __CLING__
+#include <nlohmann/json.hpp>
+
+namespace xt
+{
 
     template <class P>
     void compute_1d_row(std::stringstream& out, P& printer, const std::size_t& row_idx)
@@ -929,7 +934,7 @@ namespace xt
     }
 
     template <class E>
-    xeus::xjson mime_bundle_repr_impl(const E& expr)
+    nlohmann::json mime_bundle_repr_impl(const E& expr)
     {
         std::stringstream out;
 
@@ -953,7 +958,7 @@ namespace xt
 
         compute_nd_table(out, printer, expr, edgeitems);
 
-        auto bundle = xeus::xjson::object();
+        auto bundle = nlohmann::json::object();
         bundle["text/html"] = out.str();
         return bundle;
     }
@@ -962,7 +967,7 @@ namespace xt
     class xfunctor_view;
 
     template <class F, class CT>
-    xeus::xjson mime_bundle_repr(const xfunctor_view<F, CT>& expr)
+    nlohmann::json mime_bundle_repr(const xfunctor_view<F, CT>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -971,7 +976,7 @@ namespace xt
     class xfunction;
 
     template <class F, class... CT>
-    xeus::xjson mime_bundle_repr(const xfunction<F, CT...>& expr)
+    nlohmann::json mime_bundle_repr(const xfunction<F, CT...>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -980,7 +985,7 @@ namespace xt
     class xarray_container;
 
     template <class EC, layout_type L, class SC, class Tag>
-    xeus::xjson mime_bundle_repr(const xarray_container<EC, L, SC, Tag>& expr)
+    nlohmann::json mime_bundle_repr(const xarray_container<EC, L, SC, Tag>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -989,7 +994,7 @@ namespace xt
     class xtensor_container;
 
     template <class EC, std::size_t N, layout_type L, class Tag>
-    xeus::xjson mime_bundle_repr(const xtensor_container<EC, N, L, Tag>& expr)
+    nlohmann::json mime_bundle_repr(const xtensor_container<EC, N, L, Tag>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -998,7 +1003,7 @@ namespace xt
     class xfixed_container;
 
     template <class ET, class S, layout_type L, class Tag>
-    xeus::xjson mime_bundle_repr(const xfixed_container<ET, S, L, Tag>& expr)
+    nlohmann::json mime_bundle_repr(const xfixed_container<ET, S, L, Tag>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1007,7 +1012,7 @@ namespace xt
     class xreducer;
 
     template <class F, class CT, class X>
-    xeus::xjson mime_bundle_repr(const xreducer<F, CT, X>& expr)
+    nlohmann::json mime_bundle_repr(const xreducer<F, CT, X>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1016,7 +1021,7 @@ namespace xt
     class xoptional_assembly;
 
     template <class VE, class FE>
-    xeus::xjson mime_bundle_repr(const xoptional_assembly<VE, FE>& expr)
+    nlohmann::json mime_bundle_repr(const xoptional_assembly<VE, FE>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1025,7 +1030,7 @@ namespace xt
     class xoptional_assembly_adaptor;
 
     template <class VEC, class FEC>
-    xeus::xjson mime_bundle_repr(const xoptional_assembly_adaptor<VEC, FEC>& expr)
+    nlohmann::json mime_bundle_repr(const xoptional_assembly_adaptor<VEC, FEC>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1034,7 +1039,7 @@ namespace xt
     class xscalar;
 
     template <class CT>
-    xeus::xjson mime_bundle_repr(const xscalar<CT>& expr)
+    nlohmann::json mime_bundle_repr(const xscalar<CT>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1043,7 +1048,7 @@ namespace xt
     class xbroadcast;
 
     template <class CT, class X>
-    xeus::xjson mime_bundle_repr(const xbroadcast<CT, X>& expr)
+    nlohmann::json mime_bundle_repr(const xbroadcast<CT, X>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1052,7 +1057,7 @@ namespace xt
     class xgenerator;
 
     template <class F, class R, class S>
-    xeus::xjson mime_bundle_repr(const xgenerator<F, R, S>& expr)
+    nlohmann::json mime_bundle_repr(const xgenerator<F, R, S>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1061,7 +1066,7 @@ namespace xt
     class xview;
 
     template <class CT, class... S>
-    xeus::xjson mime_bundle_repr(const xview<CT, S...>& expr)
+    nlohmann::json mime_bundle_repr(const xview<CT, S...>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1070,7 +1075,7 @@ namespace xt
     class xstrided_view;
 
     template <class CT, class S, layout_type L, class FST>
-    xeus::xjson mime_bundle_repr(const xstrided_view<CT, S, L, FST>& expr)
+    nlohmann::json mime_bundle_repr(const xstrided_view<CT, S, L, FST>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1079,7 +1084,7 @@ namespace xt
     class xmasked_view;
 
     template <class CTD, class CTM>
-    xeus::xjson mime_bundle_repr(const xmasked_view<CTD, CTM>& expr)
+    nlohmann::json mime_bundle_repr(const xmasked_view<CTD, CTM>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
@@ -1088,16 +1093,15 @@ namespace xt
     class xmasked_value;
 
     template <class T, class B>
-    xeus::xjson mime_bundle_repr(const xmasked_value<T, B>& v)
+    nlohmann::json mime_bundle_repr(const xmasked_value<T, B>& v)
     {
-        auto bundle = xeus::xjson::object();
+        auto bundle = nlohmann::json::object();
         std::stringstream tmp;
         tmp << v;
         bundle["text/plain"] = tmp.str();
         return bundle;
     }
-
-#endif
 }
+#endif  // __CLING__
 
 #endif
