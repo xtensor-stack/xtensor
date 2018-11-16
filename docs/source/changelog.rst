@@ -7,6 +7,52 @@
 Changelog
 =========
 
+0.18.3
+------
+
+- Exporting optional dependencies
+  `#1253 <https://github.com/QuantStack/xtensor/pull/1253>`_.
+- 0-D HTML rendering
+  `#1252 <https://github.com/QuantStack/xtensor/pull/1252>`_.
+- Include nlohmann_json in xio for mime bundle repr
+  `#1251 <https://github.com/QuantStack/xtensor/pull/1251>`_.
+- Fixup xview scalar assignment
+  `#1250 <https://github.com/QuantStack/xtensor/pull/1250>`_.
+- Implemented `from_indices`
+  `#1240 <https://github.com/QuantStack/xtensor/pull/1240>`_.
+- xtensor_forward.hpp cleanup
+  `#1243 <https://github.com/QuantStack/xtensor/pull/1243>`_.
+- default layout-type for `unravel_from_strides` and `unravel_index`
+  `#1239 <https://github.com/QuantStack/xtensor/pull/1239>`_.
+- xfunction iterator fix
+  `#1241 <https://github.com/QuantStack/xtensor/pull/1241>`_.
+- xstepper fixes
+  `#1237 <https://github.com/QuantStack/xtensor/pull/1237>`_.
+- print_options io manipulators
+  `#1231 <https://github.com/QuantStack/xtensor/pull/1231>`_.
+- Add syntactic sugar for reducer on single axis
+  `#1228 <https://github.com/QuantStack/xtensor/pull/1228>`_.
+- Added view vs. adapt benchmark
+  `#1229 <https://github.com/QuantStack/xtensor/pull/1229>`_.
+- added precisions to the installation instructions
+  `#1226 <https://github.com/QuantStack/xtensor/pull/1226>`_.
+- removed data interface from dynamic view
+  `#1225 <https://github.com/QuantStack/xtensor/pull/1225>`_.
+- add xio docs
+  `#1223 <https://github.com/QuantStack/xtensor/pull/1223>`_.
+- Fixup xview assignment
+  `#1216 <https://github.com/QuantStack/xtensor/pull/1216>`_.
+- documentation updated to be consistent with last changes
+  `#1214 <https://github.com/QuantStack/xtensor/pull/1214>`_.
+- prevents macro expansion of std::max
+  `#1213 <https://github.com/QuantStack/xtensor/pull/1213>`_.
+- Fix minor typos
+  `#1212 <https://github.com/QuantStack/xtensor/pull/1212>`_.
+- Added missing assign operator in xstrided_view 
+  `#1210 <https://github.com/QuantStack/xtensor/pull/1210>`_.
+- argmax on axis with single element fixed 
+  `#1209 <https://github.com/QuantStack/xtensor/pull/1209>`_.
+
 0.18.2
 ------
 
