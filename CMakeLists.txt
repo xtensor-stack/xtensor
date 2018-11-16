@@ -30,10 +30,27 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 
 set(xtl_REQUIRED_VERSION 0.4.16)
 find_package(xtl ${xtl_REQUIRED_VERSION} REQUIRED)
-
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
 find_package(nlohmann_json 3.1.1 QUIET)
+
+# Optional dependencies
+# =====================
+
+OPTION(XTENSOR_USE_XSIMD "simd acceleration for xtensor" OFF)
+OPTION(XTENSOR_USE_TBB "enable parallelization using intel TBB" OFF)
+
+if(XTENSOR_USE_XSIMD)
+    set(xsimd_REQUIRED_VERSION 7.0.0)
+    find_package(xsimd ${xsimd_REQUIRED_VERSION} REQUIRED)
+    message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
+endif()
+
+if(XTENSOR_USE_TBB)
+    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+    find_package(TBB REQUIRED)
+    message(STATUS "Found intel TBB: ${TBB_INCLUDE_DIRS}")
+endif()
 
 # Build
 # =====
@@ -110,8 +127,6 @@ target_link_libraries(xtensor INTERFACE xtl)
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
 OPTION(XTENSOR_CHECK_DIMENSION "xtensor dimension check" OFF)
-OPTION(XTENSOR_USE_XSIMD "simd acceleration for xtensor" OFF)
-OPTION(XTENSOR_USE_TBB "enable parallelization using intel TBB" OFF)
 OPTION(BUILD_TESTS "xtensor test suite" OFF)
 OPTION(BUILD_BENCHMARK "xtensor benchmark" OFF)
 OPTION(DOWNLOAD_GTEST "build gtest from downloaded sources" OFF)
@@ -133,16 +148,11 @@ endif()
 
 if(XTENSOR_USE_XSIMD)
     add_definitions(-DXTENSOR_USE_XSIMD)
-    find_package(xsimd 7.0 REQUIRED)
-    message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
     target_link_libraries(xtensor INTERFACE xsimd)
 endif()
 
 if(XTENSOR_USE_TBB)
-    set(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH}" "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
     add_definitions(-DXTENSOR_USE_TBB)
-    find_package(TBB REQUIRED)
-    message(STATUS "Found intel TBB: ${TBB_INCLUDE_DIRS}")
     include_directories(${TBB_INCLUDE_DIRS})
     target_link_libraries(xtensor INTERFACE ${TBB_LIBRARIES})
 endif()
