@@ -18,6 +18,14 @@
 include(CMakeFindDependencyMacro)
 find_dependency(xtl @xtl_REQUIRED_VERSION@)
 
+if(XTENSOR_USE_XSIMD)
+    find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
+endif()
+
+if(XTENSOR_USE_TBB)
+    find_dependency(TBB)
+endif()
+
 if(NOT TARGET @PROJECT_NAME@)
   include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
   get_target_property(@PROJECT_NAME@_INCLUDE_DIRS xtensor INTERFACE_INCLUDE_DIRECTORIES)
