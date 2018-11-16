@@ -328,8 +328,8 @@ namespace xt
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
     template<class E1, class E2>
-    inline auto histogram_bin_edges(E1&& data, E2 left, E2 right,
-        std::size_t bins=10, histogram_algorithm mode=histogram_algorithm::automatic
+    inline auto histogram_bin_edges(E1&& data, E2 left, E2 right, std::size_t bins = 10,
+                                    histogram_algorithm mode = histogram_algorithm::automatic
     )
     {
         using value_type = typename std::decay_t<E1>::value_type;
@@ -342,12 +342,12 @@ namespace xt
 
     /**
      * Count number of occurrences of each value in array of non-negative ints.
-     * 
+     *
      * The number of bins (of size 1) is one larger than the largest value in x.
-     * If minlength is specified, there will be at least this number of bins in 
-     * the output array (though it will be longer if necessary, depending on the 
-     * contents of x). Each bin gives the number of occurrences of its index 
-     * value in x. If weights is specified the input array is weighted by it, 
+     * If minlength is specified, there will be at least this number of bins in
+     * the output array (though it will be longer if necessary, depending on the
+     * contents of x). Each bin gives the number of occurrences of its index
+     * value in x. If weights is specified the input array is weighted by it,
      * i.e. if a value ``n`` is found at position ``i``, ``out[n] += weight[i]``
      * instead of ``out[n] += 1``.
      *
