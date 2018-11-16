@@ -15,7 +15,7 @@ Basic usage
     .. code-block:: cpp
 
         xt::histogram(a, bins[, weights][, density])
-        xt::histogram_bin_edges(a, bins[, weights][, left, right][, bins][, mode])
+        xt::histogram_bin_edges(a[, weights][, left, right][, bins][, mode])
 
     Any of the options ``[...]`` can be omitted (though the order must be preserved). The defaults are:
 
