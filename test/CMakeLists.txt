@@ -115,6 +115,7 @@ set(XTENSOR_TESTS
     test_xmasked_value.cpp
     test_xmasked_view.cpp
     test_xmath.cpp
+    test_xmath_result_type.cpp
     test_xnan_functions.cpp
     test_xnoalias.cpp
     test_xnorm.cpp

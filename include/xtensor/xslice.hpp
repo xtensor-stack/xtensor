@@ -1480,7 +1480,7 @@ namespace xt
         }
         else
         {
-            return (*this)(i + n) - (*this)(i);
+            return (*this)(static_cast<size_type>(i + n)) - (*this)(static_cast<size_type>(i));
         }
     }
 

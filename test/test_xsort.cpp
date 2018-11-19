@@ -142,7 +142,7 @@ namespace xt
 
         xt::xtensor<int, 2> b = {{ 1,2 }};
         auto res = xt::eval(xt::argmax(b, 1));
-        EXPECT_EQ(res(), 0);
+        EXPECT_EQ(res(), 0u);
     }
 
     TEST(xsort, sort_large_prob)

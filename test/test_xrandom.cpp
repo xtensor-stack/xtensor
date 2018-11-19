@@ -7,7 +7,12 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include "xtensor/xrandom.hpp"
+#pragma GCC diagnostic pop
+#endif
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
 
