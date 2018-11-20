@@ -62,6 +62,12 @@ namespace xt
         ASSERT_EQ(res(0, 0).value(), 1.0);
         ASSERT_EQ(res(1, 0).value(), 6.0);
         ASSERT_FALSE(res(1, 1).has_value());
+
+        xtensor_optional<double, 2> res_neg = -m1;
+        ASSERT_EQ(res_neg(0, 0).value(), 0.0);
+        ASSERT_EQ(res_neg(0, 1).value(), -2.0);
+        ASSERT_EQ(res_neg(1, 0).value(), -3.0);
+        ASSERT_FALSE(res_neg(1, 1).has_value());
     }
 
     TEST(xoptional, bool_operation)
