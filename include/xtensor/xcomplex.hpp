@@ -222,7 +222,7 @@ namespace xt
         value_type multiplier = 1.0;
         if (deg)
         {
-            multiplier = value_type(180) / numeric_constants<value_type>::PI;
+            multiplier = value_type(180) / (numeric_constants<value_type>::PI);
         }
         return arg(std::forward<E>(e)) * std::move(multiplier);
     }
