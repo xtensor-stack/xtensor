@@ -97,9 +97,9 @@ namespace xt
 
         auto offset = shape.size() - a.dimension();
         auto broadcasting_stride = std::accumulate(shape.cbegin(), shape.cbegin() + offset, difference_type(1), std::multiplies<difference_type>());
-        auto nb_inc = difference_type(L == layout_type::row_major ?
-            shape.back() * shape[shape.size() - 2] + 1 :
-            broadcasting_stride * difference_type(result.shape().front() * result.shape()[1] + 1));
+        auto nb_inc = L == layout_type::row_major ?
+            difference_type(shape.back() * shape[shape.size() - 2] + 1) :
+            broadcasting_stride * difference_type(result.shape().front() * result.shape()[1] + 1);
 
         int expected = a(1, 0, 1);
 
@@ -261,9 +261,10 @@ namespace xt
 
         auto offset = shape.size() - a.dimension();
         auto broadcasting_stride = std::accumulate(shape.cbegin(), shape.cbegin() + offset, difference_type(1), std::multiplies<difference_type>());
-        auto nb_inc = difference_type(L == layout_type::row_major ?
-            shape.back() * shape[shape.size() - 2] + 1 :
-            broadcasting_stride * difference_type(result.shape().front() * result.shape()[1] + 1));
+        
+        auto nb_inc = L == layout_type::row_major ?
+            difference_type(shape.back() * shape[shape.size() - 2] + 1) :
+            broadcasting_stride * difference_type(result.shape().front() * result.shape()[1] + 1);
 
         int expected = a(1, 1, 2);
 

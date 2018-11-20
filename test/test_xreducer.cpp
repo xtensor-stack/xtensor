@@ -150,8 +150,8 @@ namespace xt
     {
         xarray<double> m = {{1, 0}, {3, 4}};
 
-        xarray<double> res1 = xt::count_nonzero(m, {1});
-        xarray<double> res2 = xt::count_nonzero(m, 1);
+        xarray<std::size_t> res1 = xt::count_nonzero(m, {1});
+        xarray<std::size_t> res2 = xt::count_nonzero(m, 1);
         EXPECT_EQ(res1, res2);
 
         xarray<double> res3 = xt::sum(m, {1});

@@ -47,12 +47,6 @@ namespace xt
 #define UNARY_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
 #define UNARY_BOOL_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, bool)
 
-    /* In this macro, T is assumed to be the promote_type of all arguments.
-       Nonetheless, operator() is implemented as a function template,
-       because automatic conversion of the actual argument types to T may
-       cause 'possible loss of data' warnings, e.g. when T is double and an
-       argument is uint64_t.
-    */
 #define BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
     struct NAME                                                                  \
     {                                                                            \

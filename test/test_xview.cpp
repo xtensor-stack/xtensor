@@ -1104,7 +1104,7 @@ namespace xt
 
         auto idx2 = xt::where(col > size_t(0));
         std::vector<std::size_t> exp_idx2 = {1, 2};
-        EXPECT_EQ(idx2.size(), 1);
+        EXPECT_EQ(idx2.size(), 1u);
         EXPECT_EQ(idx2[0], exp_idx2);
     }
 
