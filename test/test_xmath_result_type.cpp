@@ -10,6 +10,11 @@
 
 #include "gtest/gtest.h"
 
+// The following disables the conversion warnings. These warnings
+// are legit and we don't want to avoid them with specific cast
+// in xtensor implementation. However, we still want to check the
+// results are correct and we don't want the warnings to pollute
+// the output when building the tests suite.
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
@@ -18,6 +23,18 @@
 #include "xtensor/xmath.hpp"
 #include "xtensor/xrandom.hpp"
 #pragma GCC diagnostic pop
+#elif defined(_WIN32)
+#pragma warning(push)
+#pragma warning(disable: 4244)
+#pragma warning(disable: 4267)
+#include "xtensor/xarray.hpp"
+#include "xtensor/xmath.hpp"
+#include "xtensor/xrandom.hpp"
+#pragma warning(pop)
+#else
+#include "xtensor/xarray.hpp"
+#include "xtensor/xmath.hpp"
+#include "xtensor/xrandom.hpp"
 #endif
 
 namespace xt

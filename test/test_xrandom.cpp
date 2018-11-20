@@ -12,6 +12,8 @@
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include "xtensor/xrandom.hpp"
 #pragma GCC diagnostic pop
+#else
+#include "xtensor/xrandom.hpp"
 #endif
 #include "xtensor/xarray.hpp"
 #include "xtensor/xview.hpp"
