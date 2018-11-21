@@ -28,12 +28,12 @@ namespace xt
      * @param density If true the resulting integral is normalized to 1. [default: false]
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
-    template<class R = double, class E1, class E2, class E3>
-    inline auto histogram(E1&& data, E2&& bin_edges, E3&& weights,
-                          bool density = false)
+    template <class R = double, class E1, class E2, class E3>
+    inline auto histogram(E1&& data, E2&& bin_edges, E3&& weights, bool density = false)
     {
         // alias counter and value type
-        using size_type = detail::common_size_type_t<std::decay_t<E1>,std::decay_t<E2>,std::decay_t<E3>>;
+        using size_type
+            = detail::common_size_type_t<std::decay_t<E1>, std::decay_t<E2>, std::decay_t<E3>>;
         using value_type = typename std::decay_t<E3>::value_type;
 
         // basic checks
@@ -51,7 +51,7 @@ namespace xt
         XTENSOR_ASSERT(xt::amax(data)[0] <= bin_edges[bin_edges.size() - 1]);
 
         // initialize output
-        xt::xtensor<value_type, 1> count = xt::zeros<value_type>({bin_edges.size() - 1});
+        xt::xtensor<value_type, 1> count = xt::zeros<value_type>({ bin_edges.size() - 1 });
 
         // indices that sort "data"
         auto isort = xt::argsort(data);
@@ -63,7 +63,7 @@ namespace xt
         for (auto& idx : isort)
         {
             // - proceed to the relevant bin
-            while (data[idx] >= bin_edges[ibin+1] && ibin < bin_edges.size() - 2)
+            while (data[idx] >= bin_edges[ibin + 1] && ibin < bin_edges.size() - 2)
             {
                 ++ibin;
             }
@@ -72,7 +72,7 @@ namespace xt
         }
 
         // cast type
-        xt::xtensor<R,1> prob = xt::cast<R>(count);
+        xt::xtensor<R, 1> prob = xt::cast<R>(count);
 
         // normalize
         if (density)
@@ -80,7 +80,7 @@ namespace xt
             // - size as doubles
             R n = static_cast<R>(data.size());
             // - apply normalization
-            for (size_type i = 0 ; i < bin_edges.size() - 1 ; ++i)
+            for (size_type i = 0; i < bin_edges.size() - 1; ++i)
             {
                 prob[i] /= (static_cast<R>(bin_edges[i + 1] - bin_edges[i]) * n);
             }
@@ -98,7 +98,7 @@ namespace xt
      * @param density If true the resulting integral is normalized to 1. [default: false]
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
-    template<class E1, class E2>
+    template <class E1, class E2>
     inline auto histogram(E1&& data, E2&& bin_edges, bool density = false)
     {
         using value_type = typename std::decay_t<E1>::value_type;
@@ -107,7 +107,7 @@ namespace xt
 
         return histogram(std::forward<E1>(data),
                          std::forward<E2>(bin_edges),
-                         xt::ones<value_type>({n}),
+                         xt::ones<value_type>({ n }),
                          density);
     }
 
@@ -120,17 +120,19 @@ namespace xt
      * @param density If true the resulting integral is normalized to 1. [default: false]
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
-    template<class E1>
+    template <class E1>
     inline auto histogram(E1&& data, std::size_t bins = 10, bool density = false)
     {
         using value_type = typename std::decay_t<E1>::value_type;
 
         auto n = data.size();
 
-        auto bin_edges = histogram_bin_edges(data, xt::ones<value_type>({n}), bins);
+        auto bin_edges = histogram_bin_edges(data, xt::ones<value_type>({ n }), bins);
 
-        return histogram(std::forward<E1>(data), std::forward<E1>(bin_edges),
-                         xt::ones<value_type>({n}), density);
+        return histogram(std::forward<E1>(data),
+                         std::forward<E1>(bin_edges),
+                         xt::ones<value_type>({ n }),
+                         density);
     }
 
     /**
@@ -143,21 +145,28 @@ namespace xt
      * @param density If true the resulting integral is normalized to 1. [default: false]
      * @return An one-dimensional xarray<double>, length: bin_edges.size()-1.
      */
-    template<class E1, class E2>
-    inline auto histogram(E1&& data, std::size_t bins, E2&& weights,
-                          bool density = false)
+    template <class E1, class E2>
+    inline auto histogram(E1&& data, std::size_t bins, E2&& weights, bool density = false)
     {
         auto bin_edges = histogram_bin_edges(data, weights, bins);
 
-        return histogram(std::forward<E1>(data), std::forward<E1>(bin_edges),
-            std::forward<E2>(weights), density);
+        return histogram(std::forward<E1>(data),
+                         std::forward<E1>(bin_edges),
+                         std::forward<E2>(weights),
+                         density);
     }
 
     /**
      * @ingroup histogram
      * @brief Defines different algorithms to be used in "histogram_bin_edges"
      */
-    enum class histogram_algorithm { automatic, linspace, logspace, uniform };
+    enum class histogram_algorithm
+    {
+        automatic,
+        linspace,
+        logspace,
+        uniform
+    };
 
     /**
      * @ingroup histogram
@@ -171,13 +180,16 @@ namespace xt
      * @param mode The type of algorithm to use. [default: "auto"]
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
-    template<class E1, class E2, class E3>
-    inline auto histogram_bin_edges(E1&& data, E2&& weights, E3 left, E3 right,
+    template <class E1, class E2, class E3>
+    inline auto histogram_bin_edges(E1&& data,
+                                    E2&& weights,
+                                    E3 left,
+                                    E3 right,
                                     std::size_t bins = 10,
                                     histogram_algorithm mode = histogram_algorithm::automatic)
     {
         // counter and return type
-        using size_type = detail::common_size_type_t<std::decay_t<E1>,std::decay_t<E2>>;
+        using size_type = detail::common_size_type_t<std::decay_t<E1>, std::decay_t<E2>>;
         using value_type = typename std::decay_t<E1>::value_type;
         using weights_type = typename std::decay_t<E2>::value_type;
 
@@ -194,26 +206,29 @@ namespace xt
         XTENSOR_ASSERT(bins > std::size_t(0));
 
         // act on different modes
-        switch(mode)
+        switch (mode)
         {
             // bins of equal width
             case histogram_algorithm::automatic:
             {
-                xt::xtensor<value_type, 1> bin_edges = xt::linspace<value_type>(left, right, bins + 1);
+                xt::xtensor<value_type, 1> bin_edges
+                    = xt::linspace<value_type>(left, right, bins + 1);
                 return bin_edges;
             }
 
             // bins of equal width
             case histogram_algorithm::linspace:
             {
-                xt::xtensor<value_type, 1> bin_edges = xt::linspace<value_type>(left, right, bins + 1);
+                xt::xtensor<value_type, 1> bin_edges
+                    = xt::linspace<value_type>(left, right, bins + 1);
                 return bin_edges;
             }
 
             // bins of logarithmically increasing size
             case histogram_algorithm::logspace:
             {
-                using rhs_value_type = std::conditional_t<std::is_integral<value_type>::value, double, value_type>;
+                using rhs_value_type
+                    = std::conditional_t<std::is_integral<value_type>::value, double, value_type>;
 
                 xtensor<value_type, 1> bin_edges = xt::cast<value_type>(
                     xt::logspace<rhs_value_type>(std::log10(left), std::log10(right), bins + 1));
@@ -233,16 +248,17 @@ namespace xt
 
                 // histogram: all of equal 'height'
                 // - height
-                weights_type w = xt::sum<weights_type>(weights)[0] / static_cast<weights_type>(bins);
+                weights_type w
+                    = xt::sum<weights_type>(weights)[0] / static_cast<weights_type>(bins);
                 // - apply to all bins
-                xt::xtensor<weights_type, 1> count = w * xt::ones<weights_type>({bins});
+                xt::xtensor<weights_type, 1> count = w * xt::ones<weights_type>({ bins });
 
                 // take cumulative sum, to act as easy look-up
                 count = xt::cumsum(count);
 
                 // edges
                 // - allocate
-                std::vector<size_t> shape = {bins + 1};
+                std::vector<size_t> shape = { bins + 1 };
                 xt::xtensor<value_type, 1> bin_edges = xtensor<value_type, 1>::from_shape(shape);
                 // - first/last edge
                 bin_edges[0] = left;
@@ -265,7 +281,8 @@ namespace xt
             }
             default:
             {
-                xt::xtensor<value_type, 1> bin_edges = xt::linspace<value_type>(left, right, bins + 1);
+                xt::xtensor<value_type, 1> bin_edges
+                    = xt::linspace<value_type>(left, right, bins + 1);
                 return bin_edges;
             }
         }
@@ -281,16 +298,22 @@ namespace xt
      * @param mode The type of algorithm to use. [default: "auto"]
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
-    template<class E1, class E2>
-    inline auto histogram_bin_edges(E1&& data, E2&& weights, std::size_t bins = 10,
+    template <class E1, class E2>
+    inline auto histogram_bin_edges(E1&& data,
+                                    E2&& weights,
+                                    std::size_t bins = 10,
                                     histogram_algorithm mode = histogram_algorithm::automatic)
     {
         using value_type = typename std::decay_t<E1>::value_type;
         std::array<value_type, 2> left_right;
         left_right = xt::minmax(data)();
 
-        return histogram_bin_edges(std::forward<E1>(data), std::forward<E2>(weights),
-                                   left_right[0], left_right[1], bins, mode);
+        return histogram_bin_edges(std::forward<E1>(data),
+                                   std::forward<E2>(weights),
+                                   left_right[0],
+                                   left_right[1],
+                                   bins,
+                                   mode);
     }
 
     /**
@@ -302,8 +325,9 @@ namespace xt
      * @param mode The type of algorithm to use. [default: "auto"]
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
-    template<class E1>
-    inline auto histogram_bin_edges(E1&& data, std::size_t bins = 10,
+    template <class E1>
+    inline auto histogram_bin_edges(E1&& data,
+                                    std::size_t bins = 10,
                                     histogram_algorithm mode = histogram_algorithm::automatic)
     {
         using value_type = typename std::decay_t<E1>::value_type;
@@ -312,8 +336,12 @@ namespace xt
         std::array<value_type, 2> left_right;
         left_right = xt::minmax(data)();
 
-        return histogram_bin_edges(std::forward<E1>(data), xt::ones<value_type>({n}),
-                                   left_right[0], left_right[1], bins, mode);
+        return histogram_bin_edges(std::forward<E1>(data),
+                                   xt::ones<value_type>({ n }),
+                                   left_right[0],
+                                   left_right[1],
+                                   bins,
+                                   mode);
     }
 
     /**
@@ -327,17 +355,19 @@ namespace xt
      * @param mode The type of algorithm to use. [default: "auto"]
      * @return An one-dimensional xarray<double>, length: bins+1.
      */
-    template<class E1, class E2>
-    inline auto histogram_bin_edges(E1&& data, E2 left, E2 right, std::size_t bins = 10,
-                                    histogram_algorithm mode = histogram_algorithm::automatic
-    )
+    template <class E1, class E2>
+    inline auto histogram_bin_edges(E1&& data,
+                                    E2 left,
+                                    E2 right,
+                                    std::size_t bins = 10,
+                                    histogram_algorithm mode = histogram_algorithm::automatic)
     {
         using value_type = typename std::decay_t<E1>::value_type;
 
         auto n = data.size();
 
-        return histogram_bin_edges(std::forward<E1>(data), xt::ones<value_type>({n}),
-                                   left, right, bins, mode);
+        return histogram_bin_edges(
+            std::forward<E1>(data), xt::ones<value_type>({ n }), left, right, bins, mode);
     }
 
     /**
@@ -364,7 +394,8 @@ namespace xt
         using input_value_type = typename std::decay_t<E1>::value_type;
         using size_type = typename std::decay_t<E1>::size_type;
 
-        static_assert(std::is_integral<typename std::decay_t<E1>::value_type>::value, "Bincount data has to be integral type.");
+        static_assert(std::is_integral<typename std::decay_t<E1>::value_type>::value,
+                      "Bincount data has to be integral type.");
         XTENSOR_ASSERT(data.dimension() == 1);
         XTENSOR_ASSERT(weights.dimension() == 1);
 
@@ -373,11 +404,12 @@ namespace xt
 
         if (left_right[0] < input_value_type(0))
         {
-            throw std::runtime_error("Data argument for bincount can only contain positive integers!");
+            throw std::runtime_error(
+                "Data argument for bincount can only contain positive integers!");
         }
 
-        xt::xtensor<result_value_type, 1> res =
-            xt::zeros<result_value_type>({std::max(minlength, std::size_t(left_right[1] + 1))});
+        xt::xtensor<result_value_type, 1> res = xt::zeros<result_value_type>(
+            { (std::max)(minlength, std::size_t(left_right[1] + 1)) });
 
         for (size_type i = 0; i < data.size(); ++i)
         {
