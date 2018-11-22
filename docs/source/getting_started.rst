@@ -7,7 +7,7 @@
 Getting started
 ===============
 
-This short guide explains how to get started with `xtensor` once you haveve installed it with one of
+This short guide explains how to get started with `xtensor` once you have installed it with one of
 the methods described in the installation section.
 
 First example
