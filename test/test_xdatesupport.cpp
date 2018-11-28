@@ -20,6 +20,7 @@ namespace xt
 {
     using days            = std::chrono::duration<long long, std::ratio<3600 * 24>>;
     using days_time_point = std::chrono::time_point<std::chrono::system_clock, days>;
+    using tp = std::chrono::system_clock::time_point;
 
     std::ostream& operator<<(std::ostream& os, const days_time_point& /*rhs*/)
     {
@@ -48,5 +49,34 @@ namespace xt
         xt::xarray<bool> expected = {true, true, false, false};
 
         EXPECT_EQ((result < result2), expected);
+    }
+
+    TEST(xdate, date_arange)
+    {
+        xarray<tp> tarr = xt::arange<tp>(std::chrono::system_clock::now(),
+                                         std::chrono::system_clock::now() + std::chrono::hours(15),
+                                         std::chrono::hours(1));
+        EXPECT_TRUE(tarr.storage().back() > tarr.storage().front());
+    }
+
+    TEST(xdate, xfunction)
+    {
+        xarray<tp> tarr = { std::chrono::system_clock::now(),
+                            std::chrono::system_clock::now(),
+                            std::chrono::system_clock::now() };
+
+        auto hours = std::chrono::hours(15);
+
+        auto func = tarr + hours;
+        xarray<tp> arrpf = func;
+
+        arrpf(0) -= std::chrono::hours(200);
+
+        EXPECT_TRUE(all(equal(tarr, tarr)));
+        xarray<bool> cmp_res = {true, false, false};
+        EXPECT_EQ(cmp_res, (arrpf < tarr));
+        EXPECT_EQ(!cmp_res, (arrpf > tarr));
+        cmp_res = {false, false, false};
+        EXPECT_EQ(cmp_res, equal(tarr, arrpf));
     }
 }
