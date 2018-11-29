@@ -884,6 +884,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                 return m_lambda(args...);
             }
 
+            template <class... T>
+            auto operator()(T... args)
+            {
+                return m_lambda(args...);
+            }
+
             template <class... T, class = std::enable_if_t<detail::supports<F(T...)>::value, int>>
             auto simd_apply(T... args) const
             {
@@ -906,7 +912,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      *     auto fnct = [](auto x) -> decltype(x * x) {
      *         return x * x;
      *     };
-     *     return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
+     *     return ufuncify(std::move(fnct), std::forward<E1>(e1));
      * }
      * \endcode
      *
@@ -921,7 +927,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return lazy xfunction
      */
     template <class F, class... E>
-    inline auto make_lambda_xfunction(F&& lambda, E&&... args)
+    inline auto ufuncify(F&& lambda, E&&... args)
     {
         using xfunction_type = xfunction<detail::lambda_adapt<F>,
                                          const_xclosure_t<E>...>;
@@ -971,12 +977,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto square(E1&& e1) noexcept
     {
 #ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return make_lambda_xfunction(square_fct{}, std::forward<E1>(e1));
+        return ufuncify(square_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x) {
             return x * x;
         };
-        return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
+        return ufuncify(std::move(fnct), std::forward<E1>(e1));
 #endif
     }
 
@@ -993,12 +999,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto cube(E1&& e1) noexcept
     {
 #ifdef XTENSOR_DISABLE_LAMBDA_FCT
-        return make_lambda_xfunction(cube_fct{}, std::forward<E1>(e1));
+        return ufuncify(cube_fct{}, std::forward<E1>(e1));
 #else
         auto fnct = [](auto x) -> decltype(x * x * x) {
             return x * x * x;
         };
-        return make_lambda_xfunction(std::move(fnct), std::forward<E1>(e1));
+        return ufuncify(std::move(fnct), std::forward<E1>(e1));
 #endif
     }
 
@@ -1067,7 +1073,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto pow(E&& e) noexcept
     {
         static_assert(N > 0, "integer power cannot be negative");
-        return make_lambda_xfunction(detail::pow_impl<N>{}, std::forward<E>(e));
+        return ufuncify(detail::pow_impl<N>{}, std::forward<E>(e));
     }
 
     /**
