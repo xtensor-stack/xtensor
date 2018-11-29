@@ -330,9 +330,9 @@ namespace xt
     template <class EC, std::size_t N, layout_type L, class Tag>
     template <class SC>
     inline xtensor_container<EC, N, L, Tag>::xtensor_container(xarray_container<EC, L, SC, Tag>&& rhs)
-        : base_type(xtl::forward_sequence<inner_shape_type>(rhs.shape()),
-                    xtl::forward_sequence<inner_strides_type>(rhs.strides()),
-                    xtl::forward_sequence<inner_backstrides_type>(rhs.backstrides()),
+        : base_type(xtl::forward_sequence<inner_shape_type, decltype(rhs.shape())>(rhs.shape()),
+                    xtl::forward_sequence<inner_strides_type, decltype(rhs.strides())>(rhs.strides()),
+                    xtl::forward_sequence<inner_backstrides_type, decltype(rhs.backstrides())>(rhs.backstrides()),
                     std::move(rhs.layout())),
           m_storage(std::move(rhs.storage()))
     {
@@ -357,7 +357,7 @@ namespace xt
     inline xtensor_container<EC, N, L, Tag> xtensor_container<EC, N, L, Tag>::from_shape(S&& s)
     {
         XTENSOR_ASSERT_MSG(s.size() == N, "Cannot change dimension of xtensor.");
-        shape_type shape = xtl::forward_sequence<shape_type>(s);
+        shape_type shape = xtl::forward_sequence<shape_type, S>(s);
         return self_type(shape);
     }
     //@}

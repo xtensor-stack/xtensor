@@ -774,7 +774,8 @@ namespace xt
     template <class EC, class S, layout_type L, class Tag>
     inline auto xfixed_adaptor<EC, S, L, Tag>::operator=(temporary_type&& rhs) -> self_type&
     {
-        m_storage = xtl::forward_sequence<storage_type>(std::move(rhs.storage()));
+        using origin_type = decltype(std::move(rhs.storage()));
+        m_storage = xtl::forward_sequence<storage_type, origin_type>(std::move(rhs.storage()));
         return *this;
     }
 

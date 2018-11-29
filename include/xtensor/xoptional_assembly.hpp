@@ -456,7 +456,7 @@ namespace xt
     template <class S>
     inline xoptional_assembly<VE, FE> xoptional_assembly<VE, FE>::from_shape(S&& s)
     {
-        shape_type shape = xtl::forward_sequence<shape_type>(s);
+        shape_type shape = xtl::forward_sequence<shape_type, S>(s);
         return self_type(shape);
     }
 

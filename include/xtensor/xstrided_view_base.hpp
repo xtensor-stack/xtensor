@@ -794,7 +794,7 @@ namespace xt
         template <class CT>
         template <class FST>
         inline flat_expression_adaptor<CT>::flat_expression_adaptor(CT* e, FST&& strides, layout_type layout)
-            : m_e(e), m_strides(xtl::forward_sequence<shape_type>(strides)), m_layout(layout)
+            : m_e(e), m_strides(xtl::forward_sequence<shape_type, FST>(strides)), m_layout(layout)
         {
             resize_container(m_index, m_e->dimension());
             m_size = m_e->size();

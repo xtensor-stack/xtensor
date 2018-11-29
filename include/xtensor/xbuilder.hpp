@@ -111,7 +111,7 @@ namespace xt
     inline xtensor<T, N, L> empty(const std::array<ST, N>& shape)
     {
         using shape_type = typename xtensor<T, N>::shape_type;
-        return xtensor<T, N, L>(xtl::forward_sequence<shape_type>(shape));
+        return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 
 #ifndef X_OLD_CLANG
@@ -119,7 +119,7 @@ namespace xt
     inline xtensor<T, N, L> empty(const I(&shape)[N])
     {
         using shape_type = typename xtensor<T, N>::shape_type;
-        return xtensor<T, N, L>(xtl::forward_sequence<shape_type>(shape));
+        return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 #endif
 
@@ -572,7 +572,8 @@ namespace xt
     inline auto concatenate(std::tuple<CT...>&& t, std::size_t axis = 0)
     {
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
-        shape_type new_shape = xtl::forward_sequence<shape_type>(std::get<0>(t).shape());
+        using source_shape_type = decltype(std::get<0>(t).shape());
+        shape_type new_shape = xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape());
         auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
             return prev + arr.shape()[axis];
         };
@@ -623,7 +624,8 @@ namespace xt
     inline auto stack(std::tuple<CT...>&& t, std::size_t axis = 0)
     {
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
-        auto new_shape = detail::add_axis(xtl::forward_sequence<shape_type>(std::get<0>(t).shape()), axis, sizeof...(CT));
+        using source_shape_type = decltype(std::get<0>(t).shape());
+        auto new_shape = detail::add_axis(xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape()), axis, sizeof...(CT));
         return detail::make_xgenerator(detail::stack_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 
