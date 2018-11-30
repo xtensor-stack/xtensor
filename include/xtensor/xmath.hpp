@@ -1948,25 +1948,33 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto stddev(E&& e, const A (&axes)[N], EVS es = EVS())
     {
-        return stddev(std::forward<E>(e), xtl::forward_sequence<std::array<std::size_t, N>>(axes), es);
+        return stddev(std::forward<E>(e),
+                      xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                      es);
     }
 
     template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto variance(E&& e, const A (&axes)[N], EVS es = EVS())
     {
-        return variance(std::forward<E>(e), xtl::forward_sequence<std::array<std::size_t, N>>(axes), es);
+        return variance(std::forward<E>(e),
+                        xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                        es);
     }
 #else
     template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto stddev(E&& e, std::initializer_list<A> axes, EVS es = EVS())
     {
-        return stddev(std::forward<E>(e), xtl::forward_sequence<dynamic_shape<std::size_t>>(axes), es);
+        return stddev(std::forward<E>(e),
+                      xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                      es);
     }
 
     template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto variance(E&& e, std::initializer_list<A> axes, EVS es = EVS())
     {
-        return variance(std::forward<E>(e), xtl::forward_sequence<dynamic_shape<std::size_t>>(axes), es);
+        return variance(std::forward<E>(e),
+                        xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                        es);
     }
 #endif
     /**

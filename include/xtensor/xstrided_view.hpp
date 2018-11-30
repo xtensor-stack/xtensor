@@ -664,28 +664,28 @@ namespace xt
     inline auto reshape_view(E&& e, const I(&shape)[N], layout_type l)
     {
         using shape_type = std::array<std::size_t, N>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape), l);
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), l);
     }
 
     template <class E, class I, std::size_t N>
     inline auto reshape_view(E&& e, const I(&shape)[N])
     {
         using shape_type = std::array<std::size_t, N>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape));
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 #else
     template <class E, class I>
     inline auto reshape_view(E&& e, const std::initializer_list<I>& shape)
     {
         using shape_type = xt::dynamic_shape<std::size_t>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape));
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 
     template <class E, class I>
     inline auto reshape_view(E&& e, const std::initializer_list<I>& shape, layout_type l)
     {
         using shape_type = xt::dynamic_shape<std::size_t>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type>(shape), l);
+        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), l);
     }
 #endif
 }

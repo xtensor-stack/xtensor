@@ -425,7 +425,7 @@ namespace xt
         {
             using shape_type = std::vector<std::size_t>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
-            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type>(shape));
+            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
         }
 #else
         template <class Functor, class I, std::size_t L>
@@ -433,7 +433,7 @@ namespace xt
         {
             using shape_type = std::array<std::size_t, L>;
             using type = xgenerator<Functor, typename Functor::value_type, shape_type>;
-            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type>(shape));
+            return type(std::forward<Functor>(f), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
         }
 #endif
 

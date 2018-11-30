@@ -107,7 +107,7 @@ namespace xt
         shape_type result_shape{};
         resize_container(result_shape, e.dimension() - axes.size());
 
-        dynamic_shape<std::size_t> iter_shape = xtl::forward_sequence<dynamic_shape<std::size_t>>(e.shape());
+        dynamic_shape<std::size_t> iter_shape = xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(e.shape())>(e.shape());
         dynamic_shape<std::size_t> iter_strides(e.dimension());
 
         using result_container_type = typename xreducer_result_container<std::decay_t<E>, X, result_type>::type;
