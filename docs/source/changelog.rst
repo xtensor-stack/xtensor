@@ -7,6 +7,37 @@
 Changelog
 =========
 
+0.19.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Upgraded to ``xtl 0.5``
+  `#1275 <https://github.com/QuantStack/xtensor/pull/1275>`_.
+
+Other changes
+~~~~~~~~~~~~~
+
+- Removed type-o in docs, minor code style consistency update
+  `#1255 <https://github.com/QuantStack/xtensor/pull/1255>`_.
+- Removed most of the warnings
+  `#1261 <https://github.com/QuantStack/xtensor/pull/1261>`_.
+- Optional bitwise fixed
+  `#1263 <https://github.com/QuantStack/xtensor/pull/1263>`_.
+- Prevent macro expansion in ``std::max``
+  `#1265 <https://github.com/QuantStack/xtensor/pull/1265>`_.
+- Update numpy.rst
+  `#1267 <https://github.com/QuantStack/xtensor/pull/1267>`_.
+- Update getting_started.rst
+  `#1268 <https://github.com/QuantStack/xtensor/pull/1268>`_.
+- keep and drop ``step_size`` fixed
+  `#1270 <https://github.com/QuantStack/xtensor/pull/1270>`_.
+- Fixed typo in ``xadapt``
+  `#1277 <https://github.com/QuantStack/xtensor/pull/1277>`_.
+- Fixed typo
+  `#1278 <https://github.com/QuantStack/xtensor/pull/1278>`_.
+
 0.18.3
 ------
 
