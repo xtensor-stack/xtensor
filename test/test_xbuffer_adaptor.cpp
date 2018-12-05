@@ -61,12 +61,13 @@ namespace xt
 
         size_t size2 = 200;
         double* data2 = allocator{}.allocate(size2);
-        data2[0] = 1.2;
+        double data2_ref = 1.2;
+        data2[0] = data2_ref;
         owner_adaptor adapt2(data2, size2);
 
         adapt1 = std::move(adapt2);
         EXPECT_EQ(adapt1.size(), size2);
-        EXPECT_EQ(adapt1[0], data2[0]);
+        EXPECT_EQ(adapt1[0], data2_ref);
     }
 
     TEST(xbuffer_adaptor, owner_resize)
