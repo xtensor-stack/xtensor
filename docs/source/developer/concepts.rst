@@ -241,7 +241,7 @@ methods:
     disable_integral_t<S, const_reference> operator[](const S& index) const;
 
     template <class I>
-    const_reference operator[](std::initialize_list<I> index) const;
+    const_reference operator[](std::initializer_list<I> index) const;
 
     template <class It>
     const_reference element(It first, It last) const;
