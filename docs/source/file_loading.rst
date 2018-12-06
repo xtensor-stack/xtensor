@@ -12,14 +12,14 @@ The base xtensor package allows to save and load data in the ``.csv``, ``.json``
 format.
 Please note that many more input and output formats are available in the `xtensor-io
 <https://github.com/QuantStack/xtensor-io>`_ package.
-``xtensor-io`` offers functions to load and store from image files (``jpg``, ``gif``, ``png``...), 
-sound files (``wav``, ``ogg``...), and compressed numpy format ``npz``.
+``xtensor-io`` offers functions to load and store from image files (``jpg``, ``gif``, ``png``...),
+sound files (``wav``, ``ogg``...), HDF5 files (``h5``, ``hdf5``, ...), and compressed numpy format (``npz``).
 
 
 Loading CSV data into xtensor
 -----------------------------
 
-The following example code demonstrates how to use ``load_csv`` and ``dump_csv`` to load and 
+The following example code demonstrates how to use ``load_csv`` and ``dump_csv`` to load and
 save data in the Comma-separated value format. The reference documentation is :doc:`api/xcsv`.
 
 .. code::
@@ -39,7 +39,7 @@ save data in the Comma-separated value format. The reference documentation is :d
 
         ofstream out_file;
         out_file("out.csv");
-        
+
         xt::xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
         xt::dump_csv(out_file, a);
 
@@ -49,7 +49,7 @@ save data in the Comma-separated value format. The reference documentation is :d
 Loading NPY data into xtensor
 -----------------------------
 
-The following example demonstrates how to load and store xtensor data in the ``npy`` "NumPy" format, 
+The following example demonstrates how to load and store xtensor data in the ``npy`` "NumPy" format,
 using the ``load_npy`` and ``dump_npy`` functions.
 Reference documentation for the functions used is found here :doc:`api/xnpy`.
 
@@ -77,9 +77,9 @@ Reference documentation for the functions used is found here :doc:`api/xnpy`.
 Loading JSON data into xtensor
 ------------------------------
 
-It's possible to load and dump data to json, using the json library written by 
-``nlohmann`` (https://nlohmann.github.io/json/) which offers a convenient way 
-to handle json data in C++. Note that the library needs to be seperately installed.
+It's possible to load and dump data to json, using the json library written by
+``nlohmann`` (https://nlohmann.github.io/json/) which offers a convenient way
+to handle json data in C++. Note that the library needs to be separately installed.
 The reference documentation is found :doc:`api/xjson`.
 
 
@@ -90,7 +90,7 @@ The reference documentation is found :doc:`api/xjson`.
 
     int main()
     {
-        
+
         xt::xarray<double> t =  {{{1, 2},
                                   {3, 4}},
                                  {{1, 2},

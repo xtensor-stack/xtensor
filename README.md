@@ -349,7 +349,7 @@ expressions.
 
 The [xtensor-io](https://github.com/QuantStack/xtensor-io) project enables the
 loading of a variety of file formats into xtensor expressions, such as image
-files, sound files, as well as  NumPy npy and npz files.
+files, sound files, HDF5 files, as well as NumPy npy and npz files.
 
 ## Building and running the tests
 
