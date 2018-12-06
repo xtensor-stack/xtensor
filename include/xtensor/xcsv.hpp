@@ -53,7 +53,7 @@ namespace xt
         inline std::string lexical_cast(const std::string& cell)
         {
             size_t first = cell.find_first_not_of(' ');
-            if(first == std::string::npos)
+            if (first == std::string::npos)
                 return cell;
 
             size_t last = cell.find_last_not_of(' ');
