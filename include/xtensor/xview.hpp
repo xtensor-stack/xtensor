@@ -1616,14 +1616,20 @@ namespace xt
         auto func2 = [](const auto& s) {
             return xt::value(s, 0);
         };
+
+        auto first_copy = first;
         for (size_type i = 0; i != m_e.dimension(); ++i)
         {
             size_type k = newaxis_skip<S...>(i);
-            std::advance(first, difference_type(k - i));
-            if (first != last)
+
+            // need to advance captured `first`
+            first = first_copy;
+            std::advance(first, k - xt::integral_count_before<S...>(i));
+
+            if (first < last)
             {
                 index[i] = k < sizeof...(S) ?
-                    apply<size_type>(k, func1, m_slices) : *first++;
+                    apply<size_type>(k, func1, m_slices) : *first;
             }
             else
             {
