@@ -96,3 +96,13 @@ As of version 6, GCC detects whether the obsolete functions are present in the
 C header ``<math.h>`` and uses them if they are, avoiding the clash. However,
 this means that the function might return int instead of bool as C++11
 requires, which is a bug.
+
+GCC-8 and deleted functions
+---------------------------
+
+GCC-8 (8.2 specifically) doesn't seem to SFINAE deleted functions correctly. A
+strided view on a dynamic_view errors with a message: use of deleted function.
+It should pick the *other* implementation by SFINAE on the function
+signature, because our ``has_strides<dynamic_view>`` meta-function should return
+false. Instantiating the ``has_strides<dynamic_view>`` in the inner_types fixes the issue.
+Original issue here: https://github.com/QuantStack/xtensor/issues/1273
