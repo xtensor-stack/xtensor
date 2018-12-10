@@ -578,8 +578,13 @@ namespace xt
         std::array<std::size_t, 3> idx2 = {1, 2, 0};
         EXPECT_EQ(a(1, 2), view2.element(idx2.begin(), idx2.end()));
 
-        std::array<std::size_t, 3> idx3 = {1, 2};
+        std::array<std::size_t, 2> idx3 = {1, 2};
         EXPECT_EQ(a(1, 2), view3.element(idx3.begin(), idx3.end()));
+
+        xt::xarray<float> x5 = xt::ones<float>({1,4,16,16});
+        auto view7 = xt::view(x5, xt::all(), xt::newaxis(), xt::all(), xt::all(), xt::all());
+        std::array<std::size_t, 5> idx4 = {0, 0, 2, 14, 12};
+        EXPECT_EQ(view7.element(idx4.begin(), idx4.end()), 1);
     }
 
     TEST(xview, newaxis_iterating)
@@ -1158,7 +1163,7 @@ namespace xt
 
         EXPECT_EQ(va[0], a[3]);
         EXPECT_EQ(va[1], a[4]);
-        EXPECT_EQ(*va.end(), *a.end());
+        EXPECT_EQ(va.end(), a.end());
         EXPECT_TRUE(std::equal(a.begin() + 3, a.end(), va.begin()));
         EXPECT_EQ(a.size() - 3, va.size());
 
@@ -1206,8 +1211,6 @@ namespace xt
             ++rb_iter;
         }
         EXPECT_EQ(rb_iter, vbe.rend());
-
-
     }
 
     TEST(xview, data_offset)
