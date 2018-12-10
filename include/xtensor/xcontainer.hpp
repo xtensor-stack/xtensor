@@ -1049,7 +1049,8 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(S&& shape, layout_type layout){
+    inline void xstrided_container<D>::reshape(S&& shape, layout_type layout)
+    {
         reshape_impl(std::forward<S>(shape), std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
     }
 
