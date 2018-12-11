@@ -1124,28 +1124,35 @@ namespace xt
     template <class F, class CT, class X>
     inline auto xreducer_stepper<F, CT, X>::aggregate(size_type dim) const -> reference
     {
-        size_type index = axis(dim);
-        size_type size = shape(index);
         reference res;
-        if (dim != m_reducer->m_axes.size() - 1)
+        if(m_reducer->m_e.shape().empty())
         {
-            res = aggregate(dim + 1);
-            for (size_type i = 1; i != size; ++i)
-            {
-                m_stepper.step(index);
-                res = m_reducer->m_merge(res, aggregate(dim + 1));
-            }
+            res = m_reducer->m_init(*m_stepper);
         }
         else
         {
-            res = m_reducer->m_init(*m_stepper);
-            for (size_type i = 1; i != size; ++i)
+            size_type index = axis(dim);
+            size_type size = shape(index);
+            if (dim != m_reducer->m_axes.size() - 1)
             {
-                m_stepper.step(index);
-                res = m_reducer->m_reduce(res, *m_stepper);
+                res = aggregate(dim + 1);
+                for (size_type i = 1; i != size; ++i)
+                {
+                    m_stepper.step(index);
+                    res = m_reducer->m_merge(res, aggregate(dim + 1));
+                }
             }
+            else
+            {
+                res = m_reducer->m_init(*m_stepper);
+                for (size_type i = 1; i != size; ++i)
+                {
+                    m_stepper.step(index);
+                    res = m_reducer->m_reduce(res, *m_stepper);
+                }
+            }
+            m_stepper.reset(index);
         }
-        m_stepper.reset(index);
         return res;
     }
 
