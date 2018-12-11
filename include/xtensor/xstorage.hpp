@@ -1396,6 +1396,11 @@ namespace xt
         #endif
         }
 
+        constexpr bool empty() const noexcept
+        {
+            return size() == size_type(0);
+        }
+
         constexpr size_type size() const noexcept
         {
             return N;

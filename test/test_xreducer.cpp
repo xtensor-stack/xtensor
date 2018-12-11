@@ -501,4 +501,15 @@ namespace xt
         auto resab = forward_normalize<std::array<std::size_t, 4>>(x, sab);
         EXPECT_EQ(resab, saa);
     }
+
+    TEST(xreducer, input_0d)
+    {
+        xt::xarray<double> a;
+        EXPECT_EQ(0., xt::amin(a)[0]);
+
+        using A = std::array<double, 2>;
+        xt::xarray<double> b(1.2);
+        EXPECT_EQ(b.dimension(), 0u);
+        EXPECT_EQ(minmax(b)(), (A{1.2, 1.2}));
+    }
 }
