@@ -105,14 +105,14 @@ namespace xt
         EXPECT_EQ(norm_lp(a, 2.0)(), 3.0);
         EXPECT_EQ(norm_linf(a)(), 1);
 
-        EXPECT_EQ(norm_l0(a, evaluation_strategy::immediate())(), 9u);
-        EXPECT_EQ(norm_lp_to_p(a, 0.0, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_l1(a, evaluation_strategy::immediate())(), 9);
-        EXPECT_EQ(norm_lp(a, 1.0, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_sq(a, evaluation_strategy::immediate())(), 9);
-        EXPECT_EQ(norm_l2(a, evaluation_strategy::immediate())(), 3.0);
-        EXPECT_EQ(norm_lp(a, 2.0, evaluation_strategy::immediate())(), 3.0);
-        EXPECT_EQ(norm_linf(a, evaluation_strategy::immediate())(), 1);
+        EXPECT_EQ(norm_l0(a, evaluation_strategy::immediate)(), 9u);
+        EXPECT_EQ(norm_lp_to_p(a, 0.0, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_l1(a, evaluation_strategy::immediate)(), 9);
+        EXPECT_EQ(norm_lp(a, 1.0, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_sq(a, evaluation_strategy::immediate)(), 9);
+        EXPECT_EQ(norm_l2(a, evaluation_strategy::immediate)(), 3.0);
+        EXPECT_EQ(norm_lp(a, 2.0, evaluation_strategy::immediate)(), 3.0);
+        EXPECT_EQ(norm_linf(a, evaluation_strategy::immediate)(), 1);
     }
 
     TEST(xnorm, complex_array)
@@ -128,23 +128,23 @@ namespace xt
         EXPECT_EQ(norm_lp(a, 2.0)(), 3.0);
         EXPECT_EQ(norm_linf(a)(), 1.0);
 
-        EXPECT_EQ(norm_l0(a, {0}, evaluation_strategy::immediate())(), 9u);
-        EXPECT_EQ(norm_lp_to_p(a, 0.0, {0}, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_l1(a, {0}, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_lp(a, 1.0, {0}, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_sq(a, {0}, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_l2(a, {0}, evaluation_strategy::immediate())(), 3.0);
-        EXPECT_EQ(norm_lp(a, 2.0, {0}, evaluation_strategy::immediate())(), 3.0);
-        EXPECT_EQ(norm_linf(a, {0}, evaluation_strategy::immediate())(), 1.0);
+        EXPECT_EQ(norm_l0(a, {0}, evaluation_strategy::immediate)(), 9u);
+        EXPECT_EQ(norm_lp_to_p(a, 0.0, {0}, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_l1(a, {0}, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_lp(a, 1.0, {0}, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_sq(a, {0}, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_l2(a, {0}, evaluation_strategy::immediate)(), 3.0);
+        EXPECT_EQ(norm_lp(a, 2.0, {0}, evaluation_strategy::immediate)(), 3.0);
+        EXPECT_EQ(norm_linf(a, {0}, evaluation_strategy::immediate)(), 1.0);
 
-        EXPECT_EQ(norm_l0(a, {0}, evaluation_strategy::immediate())(), 9u);
-        EXPECT_EQ(norm_lp_to_p(a, 0.0, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_l1(a, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_lp(a, 1.0, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_sq(a, evaluation_strategy::immediate())(), 9.0);
-        EXPECT_EQ(norm_l2(a, evaluation_strategy::immediate())(), 3.0);
-        EXPECT_EQ(norm_lp(a, 2.0, evaluation_strategy::immediate())(), 3.0);
-        EXPECT_EQ(norm_linf(a, evaluation_strategy::immediate())(), 1.0);
+        EXPECT_EQ(norm_l0(a, {0}, evaluation_strategy::immediate)(), 9u);
+        EXPECT_EQ(norm_lp_to_p(a, 0.0, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_l1(a, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_lp(a, 1.0, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_sq(a, evaluation_strategy::immediate)(), 9.0);
+        EXPECT_EQ(norm_l2(a, evaluation_strategy::immediate)(), 3.0);
+        EXPECT_EQ(norm_lp(a, 2.0, evaluation_strategy::immediate)(), 3.0);
+        EXPECT_EQ(norm_linf(a, evaluation_strategy::immediate)(), 1.0);
     }
 
     TEST(xnorm, matrix)
@@ -159,11 +159,11 @@ namespace xt
         EXPECT_EQ(norm_induced_l1(a)(), 6.0);
         EXPECT_EQ(norm_induced_linf(a)(), 7.0);
 
-        EXPECT_EQ(norm_l0(a, evaluation_strategy::immediate())(), 4u);
-        EXPECT_EQ(norm_l1(a, evaluation_strategy::immediate())(), 10.0);
-        EXPECT_EQ(norm_sq(a, evaluation_strategy::immediate())(), 30.0);
-        EXPECT_EQ(norm_linf(a, evaluation_strategy::immediate())(), 4.0);
-        EXPECT_EQ(norm_induced_l1(a, evaluation_strategy::immediate())(), 6.0);
-        EXPECT_EQ(norm_induced_linf(a, evaluation_strategy::immediate())(), 7.0);
+        EXPECT_EQ(norm_l0(a, evaluation_strategy::immediate)(), 4u);
+        EXPECT_EQ(norm_l1(a, evaluation_strategy::immediate)(), 10.0);
+        EXPECT_EQ(norm_sq(a, evaluation_strategy::immediate)(), 30.0);
+        EXPECT_EQ(norm_linf(a, evaluation_strategy::immediate)(), 4.0);
+        EXPECT_EQ(norm_induced_l1(a, evaluation_strategy::immediate)(), 6.0);
+        EXPECT_EQ(norm_induced_linf(a, evaluation_strategy::immediate)(), 7.0);
     }
 }  // namespace xt
