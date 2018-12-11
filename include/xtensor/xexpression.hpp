@@ -156,29 +156,26 @@ namespace xt
      * evaluation_strategy *
      ***********************/
 
+    namespace detail
+    {
+        struct option_base {};
+    }
+
     namespace evaluation_strategy
     {
-        struct base
-        {
-        };
 
-        struct immediate : base
-        {
-        };
-        
-        struct lazy : base
-        {
-        };
-        
+        struct _immediate : xt::detail::option_base {};
+        constexpr auto immediate = std::tuple<_immediate>{};
+        struct _lazy : xt::detail::option_base {};
+        constexpr auto lazy = std::tuple<_lazy>{};
+
         /*
-        struct cached
-        {
-        };
+        struct cached {};
         */
     }
 
     template <class T>
-    struct is_evaluation_strategy : std::is_base_of<evaluation_strategy::base, std::decay_t<T>>
+    struct is_evaluation_strategy : std::is_base_of<detail::option_base, std::decay_t<T>>
     {
     };
 

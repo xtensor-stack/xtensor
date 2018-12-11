@@ -30,7 +30,7 @@ namespace xt
         {
             for (auto _ : state)
             {
-                res = sum(x, axes, evaluation_strategy::immediate());
+                res = sum(x, axes, evaluation_strategy::immediate);
                 benchmark::DoNotOptimize(res.data());
             }
         }

@@ -326,7 +326,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
 #define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                      \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, xtl::negation<std::is_integral<X>>)>         \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>         \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
@@ -336,14 +336,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, std::is_integral<X>)>                        \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>                        \
     inline auto NAME(E&& e, X axis, EVS es = EVS())                                                               \
     {                                                                                                             \
         return NAME(std::forward<E>(e), {axis}, es);                                                              \
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>                                                          \
+              XTL_REQUIRES(is_reducer_options<EVS>)>                                                          \
     inline auto NAME(E&& e, EVS es = EVS())                                                                       \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
@@ -1734,7 +1734,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an \ref xexpression
      */
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto mean(E&& e, X&& axes, EVS es = EVS())
     {
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
@@ -1746,7 +1746,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto mean(E&& e, EVS es = EVS())
     {
         using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
@@ -1787,7 +1787,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @sa mean
      */
     template <class E, class W, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>, xtl::negation<std::is_integral<X>>)>
+              XTL_REQUIRES(is_reducer_options<EVS>, xtl::negation<std::is_integral<X>>)>
     inline auto average(E&& e, W&& weights, X&& axes, EVS ev = EVS())
     {
         xindex_type_t<typename std::decay_t<E>::shape_type> broadcast_shape;
@@ -1814,7 +1814,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }
 
         auto weights_view = reshape_view(std::forward<W>(weights), std::move(broadcast_shape));
-        auto scl = sum(weights_view, ax, xt::evaluation_strategy::immediate{});
+        auto scl = sum(weights_view, ax, xt::evaluation_strategy::immediate);
         return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
 
@@ -1836,7 +1836,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #endif
 
     template <class E, class W, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto average(E&& e, W&& weights, EVS ev = EVS())
     {
         if (weights.dimension() != e.dimension() || !std::equal(weights.shape().begin(), weights.shape().end(), e.shape().begin()))
@@ -1844,7 +1844,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             throw std::runtime_error("Weights need to have the same shape as expression.");
         }
 
-        auto div = sum(weights, evaluation_strategy::immediate{})();
+        auto div = sum(weights, evaluation_strategy::immediate)();
         auto s = sum(std::forward<E>(e) * std::forward<W>(weights), ev) / std::move(div);
         return s;
     }
@@ -1867,7 +1867,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto variance(E&& e, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -1875,7 +1875,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto stddev(E&& e, EVS es = EVS())
     {
         return sqrt(variance(std::forward<E>(e), es));
@@ -1899,7 +1899,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @sa stddev, mean
      */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto variance(E&& e, X&& axes, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -1935,7 +1935,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @sa variance, mean
      */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto stddev(E&& e, X&& axes, EVS es = EVS())
     {
         return sqrt(variance(std::forward<E>(e), std::forward<X>(axes), es));
@@ -1985,7 +1985,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      *         and second element represent the minimum and maximum respectively
      */
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto minmax(E&& e, EVS es = EVS())
     {
         using std::min;
@@ -2152,7 +2152,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
 #define XTENSOR_NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                             \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>                                             \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>                                                 \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
@@ -2163,7 +2163,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>                                                          \
+              XTL_REQUIRES(is_reducer_options<EVS>)>                                                              \
     inline auto NAME(E&& e, EVS es = EVS())                                                                       \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
@@ -2247,7 +2247,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     auto merge_func = std::plus<result_type>();                                 \
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto count_nonzero(E&& e, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
@@ -2256,7 +2256,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, xtl::negation<std::is_integral<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>
     inline auto count_nonzero(E&& e, X&& axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
@@ -2265,7 +2265,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, std::is_integral<X>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>
     inline auto count_nonzero(E&& e, X axis, EVS es = EVS())
     {
         return count_nonzero(std::forward<E>(e), {axis}, es);
@@ -2292,21 +2292,21 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #undef COUNT_NON_ZEROS_CONTENT
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto count_nonnan(E&& e, EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), es);
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-             XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, xtl::negation<std::is_integral<X>>)>
+             XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>
     inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), std::forward<X>(axes), es);
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-             XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, std::is_integral<X>)>
+             XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>
     inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), {axes}, es);
@@ -2420,7 +2420,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an \ref xexpression
      */
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto nanmean(E&& e, X&& axes, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -2432,7 +2432,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto nanmean(E&& e, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);

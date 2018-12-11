@@ -741,7 +741,7 @@ namespace xt
     {
         xarray<double> a = {{1, 2, 3, 4}, {0, 0, 0, 0}, {3, 0, 1, 0}};
         std::size_t as = count_nonzero(a)();
-        std::size_t ase = count_nonzero(a, evaluation_strategy::immediate())();
+        std::size_t ase = count_nonzero(a, evaluation_strategy::immediate)();
         EXPECT_EQ(as, 6u);
         EXPECT_EQ(ase, 6u);
 
@@ -751,11 +751,11 @@ namespace xt
         EXPECT_EQ(count_nonzero(a, {0}), ea0);
         EXPECT_EQ(count_nonzero(a, {1}), ea1);
 
-        EXPECT_EQ(count_nonzero(a, {0}, evaluation_strategy::immediate()), ea0);
-        EXPECT_EQ(count_nonzero(a, {1}, evaluation_strategy::immediate()), ea1);
+        EXPECT_EQ(count_nonzero(a, {0}, evaluation_strategy::immediate), ea0);
+        EXPECT_EQ(count_nonzero(a, {1}, evaluation_strategy::immediate), ea1);
 
         a = random::randint<int>({5, 5, 5, 5, 5}, 10);
-        auto lm = count_nonzero(a, {0, 1, 3}, evaluation_strategy::immediate());
+        auto lm = count_nonzero(a, {0, 1, 3}, evaluation_strategy::immediate);
         auto lz = count_nonzero(a, {0, 1, 3});
         EXPECT_EQ(lm, lz);
     }

@@ -297,15 +297,14 @@ namespace xt
         };
 
         template <class S>
-        struct is_fixed
+        struct is_fixed : std::false_type
         {
-            static constexpr bool value = false;
         };
 
         template <std::size_t... N>
         struct is_fixed<fixed_shape<N...>>
+            : std::true_type
         {
-            static constexpr bool value = true;
         };
 
         template <class S>
