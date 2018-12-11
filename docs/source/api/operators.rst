@@ -97,6 +97,22 @@ Defined in ``xtensor/xmath.hpp`` and ``xtensor/xoperation.hpp``
 .. doxygenfunction:: not_equal(E1&&, E2&&)
    :project: xtensor
 
+.. _less-fn-ref:
+.. doxygenfunction:: less(E1&& e1, E2&& e2)
+   :project: xtensor
+
+.. _less-eq-fn-ref:
+.. doxygenfunction:: less_equal(E1&& e1, E2&& e2)
+   :project: xtensor
+
+.. _greater-fn-ref:
+.. doxygenfunction:: greater(E1&& e1, E2&& e2)
+   :project: xtensor
+
+.. _greate-eq-fn-ref:
+.. doxygenfunction:: greater_equal(E1&& e1, E2&& e2)
+   :project: xtensor
+
 .. _bitwise-and-op-ref:
 .. doxygenfunction:: operator&(E1&&, E2&&)
    :project: xtensor
