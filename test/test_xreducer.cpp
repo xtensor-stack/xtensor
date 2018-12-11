@@ -475,7 +475,7 @@ namespace xt
         double e = xt::sum(a)();
         double s1 = xt::sum(a)(0);
         EXPECT_EQ(s1, e);
-        double s2 = xt::sum(a)(0, 1, 2, 3, 4, 5);
+        double s2 = xt::sum(a)(0, 1, 2, 3, 4, 5, 0);
         EXPECT_EQ(s2, e);
 
         auto red = xt::sum(a, {0});

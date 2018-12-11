@@ -127,17 +127,33 @@ namespace xt
     inline void check_element_index(const S& shape, It first, It last)
     {
         using value_type = typename std::iterator_traits<It>::value_type;
-        auto dst = static_cast<typename S::size_type>(last - first);
+        using size_type = typename S::size_type;
+        auto dst = static_cast<size_type>(last - first);
         It efirst = last - static_cast<std::ptrdiff_t>((std::min)(shape.size(), dst));
         std::size_t axis = 0;
-        while (efirst != last)
+        
+        if(shape.empty())
         {
-            if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)
+            if(first != last && *(--last) != value_type(0))
             {
-                throw std::out_of_range("index " + std::to_string(*efirst) + " is out of bounds for axis "
-                    + std::to_string(axis) + " with size " + std::to_string(shape[axis]));
+                throw std::out_of_range("index out of bound (empty array)");
             }
-            ++efirst, ++axis;
+            else
+            {
+                return;
+            }
+        }
+        else
+        {
+            while (efirst != last)
+            {
+                if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)
+                {
+                    throw std::out_of_range("index " + std::to_string(*efirst) + " is out of bounds for axis "
+                        + std::to_string(axis) + " with size " + std::to_string(shape[axis]));
+                }
+                ++efirst, ++axis;
+            }
         }
     }
 
