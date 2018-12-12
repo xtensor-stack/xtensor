@@ -191,14 +191,15 @@ namespace xt
 
     namespace detail
     {
-        template <class T>
+        template <class T, class S = T>
         class arange_impl
         {
         public:
 
             using value_type = T;
+            using step_type = S;
 
-            arange_impl(T start, T stop, T step)
+            arange_impl(T start, T stop, S step)
                 : m_start(start), m_stop(stop), m_step(step)
             {
             }
@@ -232,7 +233,7 @@ namespace xt
 
             value_type m_start;
             value_type m_stop;
-            value_type m_step;
+            step_type m_step;
 
             template <class T1, class... Args>
             inline T access_impl(T1 t, Args...) const
@@ -351,11 +352,11 @@ namespace xt
      * @tparam T value_type of xexpression
      * @return xgenerator that generates the values on access
      */
-    template <class T>
-    inline auto arange(T start, T stop, T step = 1) noexcept
+    template <class T, class S = T>
+    inline auto arange(T start, T stop, S step = 1) noexcept
     {
         std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
-        return detail::make_xgenerator(detail::arange_impl<T>(start, stop, step), {shape});
+        return detail::make_xgenerator(detail::arange_impl<T, S>(start, stop, step), {shape});
     }
 
     /**
