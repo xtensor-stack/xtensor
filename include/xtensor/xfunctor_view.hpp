@@ -127,7 +127,7 @@ namespace xt
         using shape_type = typename xexpression_type::shape_type;
 
         static constexpr layout_type static_layout = xexpression_type::static_layout;
-        static constexpr bool contiguous_layout = false;
+        static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
 
         using stepper = xfunctor_stepper<functor_type, typename xexpression_type::stepper>;
         using const_stepper = xfunctor_stepper<const functor_type, typename xexpression_type::const_stepper>;

@@ -37,32 +37,38 @@ namespace xt
                 return xtl::forward_offset<M, I>(t);
             }
 
-            // template <class align, class requested_type, std::size_t N, class E>
-            // auto proxy_simd_load(const E& expr, std::size_t n) const
-            // {
-            //     using simd_value_type = xsimd::simd_type<value_type>;
-            //     auto v1 = xsimd::load_aligned((double*) expr.data() + n);
-            //     auto v2 = xsimd::load_aligned((double*) expr.data() + n + N);
+            template <class align, class requested_type, std::size_t N, class E,
+                      class = std::enable_if_t<(std::is_same<M, double>::value || std::is_same<M, float>::value) && I <= sizeof(M), int>>
+            auto proxy_simd_load(const E& expr, std::size_t n) const
+            {
+                using simd_value_type = xsimd::simd_type<std::complex<value_type>>;
+                // TODO refactor using shuffle only
+                auto batch = expr.template load_simd<align, requested_type, N>(n);
+                if (I == 0)
+                {
+                    return batch.real();
+                }
+                else
+                {
+                    return batch.imag();
+                }
+            }
 
-            //     if (std::is_same<M, double>::value && I == sizeof(double))
-            //     {
-            //         return simd_value_type(_mm256_permute4x64_pd(_mm256_unpackhi_pd(v1, v2), _MM_SHUFFLE(3, 1, 2, 0)));
-            //     }
-            //     else if (std::is_same<M, double>::value && I == sizeof(double))
-            //     {
-            //         return simd_value_type(_mm256_permute4x64_pd(_mm256_unpacklo_pd(v1, v2), _MM_SHUFFLE(3, 1, 2, 0)));
-            //     }
-            //     // return expr.template load_simd<align, double, N>(n);
-            // }
-
-            // template <class align, class simd, class E>
-            // auto proxy_simd_store(E& expr, std::size_t n, const simd& batch) const
-            // {
-            //     using simd_value_type = typename E::simd_value_type;
-            //     // return expr.template store_simd<align>(n, xsimd::select(batch, simd_value_type(0), simd_value_type(1)));
-            //     return 0;
-            // }
-
+            template <class align, class simd, class E,
+                      class = std::enable_if_t<(std::is_same<M, double>::value || std::is_same<M, float>::value) && I <= sizeof(M), int>>
+            auto proxy_simd_store(E& expr, std::size_t n, const simd& batch) const
+            {
+                auto x = expr.template load_simd<align, double, simd::size>(n);
+                if (I == 0)
+                {
+                    x.real() = batch;
+                }
+                else
+                {
+                    x.imag() = batch;
+                }
+                expr.template store_simd<align>(n, x);
+            }
         };
     }
 

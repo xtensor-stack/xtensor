@@ -9,17 +9,28 @@
 #include "gtest/gtest.h"
 
 #include "xtensor/xarray.hpp"
+#include "xtensor/xcomplex.hpp"
 #include "xtensor/xfunctor_view.hpp"
 #include "xtensor/xio.hpp"
 #include "xtensor/xnoalias.hpp"
 
 namespace xt
 {
+    using namespace std::complex_literals;
+
     template <class T>
     struct nooblean_proxy {
-        nooblean_proxy(T& ref) : m_ref(ref) {}
-        operator bool() { return !m_ref; };
-        nooblean_proxy& operator=(bool rhs) {
+        nooblean_proxy(T& ref) : m_ref(ref)
+        {
+        }
+
+        operator bool()
+        {
+            return !m_ref;
+        };
+
+        nooblean_proxy& operator=(bool rhs)
+        {
             m_ref = !rhs;
             return *this;
         }
@@ -56,6 +67,14 @@ namespace xt
         {
             return in;
         }
+
+        /** cant implement yet -- need to figure out bool loading in xsimd **/
+        // template <class align, class requested_type, std::size_t N, class E>
+        // auto proxy_simd_load(const E& expr, std::size_t n) const
+        // {
+        //     using simd_value_type = xsimd::simd_type<value_type>;
+        //     return !expr.template load_simd<align, requested_type, N>(n);
+        // }
     };
 
     TEST(xfunctor_adaptor, basic)
@@ -105,4 +124,39 @@ namespace xt
             EXPECT_EQ(static_cast<bool>(*it_adapt), *it_ref);
         }
     }
+
+#ifdef XTENSOR_USE_XSIMD
+    TEST(xfunctor_adaptor, simd)
+    {
+        xarray<std::complex<double>> e = {{3.0       , 1.0 + 1.0i},
+                                          {1.0 - 1.0i, 2.0       }};
+        auto iview = xt::imag(e);
+        auto loaded_batch = iview.template load_simd<xsimd::aligned_mode, double, 4>(0);
+        EXPECT_TRUE(xsimd::all(xsimd::batch<double, 4>(0, 1, -1, 0) == loaded_batch));
+        auto newbatch = loaded_batch + 5;
+
+        iview.template store_simd<xsimd::aligned_mode>(0, newbatch);
+        xarray<std::complex<double>> exp1 = {{3.0 + 5.0i, 1.0 + 6.0i},
+                                             {1.0 + 4.0i, 2.0 + 5.0i }};
+        EXPECT_EQ(exp1, e);
+
+        auto rview = xt::real(e);
+        auto loaded_batch2 = rview.template load_simd<xsimd::aligned_mode, double, 4>(0);
+        EXPECT_TRUE(xsimd::all(xsimd::batch<double, 4>(3, 1, 1, 2) == loaded_batch2));
+        newbatch = loaded_batch2 + 5;
+        rview.template store_simd<xsimd::aligned_mode>(0, newbatch);
+        xarray<std::complex<double>> exp2 = {{8.0 + 5.0i, 6.0 + 6.0i},
+                                             {6.0 + 4.0i, 7.0 + 5.0i }};
+        EXPECT_EQ(exp2, e);
+
+        auto f = xt::sin(xt::imag(e));
+        auto b = f.load_simd<xsimd::aligned_mode>(0);
+        static_cast<void>(b);
+        using assign_to_view = xassign_traits<decltype(iview), decltype(f)>;
+        EXPECT_TRUE(assign_to_view::convertible_types());
+        EXPECT_TRUE(assign_to_view::simd_size());
+        EXPECT_FALSE(assign_to_view::forbid_simd());
+        EXPECT_TRUE(assign_to_view::simd_assign());
+    }
+#endif
 }
