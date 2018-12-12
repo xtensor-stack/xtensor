@@ -26,10 +26,48 @@ namespace xt
             using pointer = M*;
             using const_pointer = const M*;
 
+            using proxy = xtl::xproxy_wrapper<M>;
+
+            template <class value_type, class requested_type>
+            using simd_return_type = xsimd::simd_return_type<value_type, requested_type>;
+
             template <class T>
             decltype(auto) operator()(T&& t) const
             {
                 return xtl::forward_offset<M, I>(t);
+            }
+
+            template <class align, class requested_type, std::size_t N, class E,
+                      class = std::enable_if_t<(std::is_same<M, double>::value || std::is_same<M, float>::value) && I <= sizeof(M), int>>
+            auto proxy_simd_load(const E& expr, std::size_t n) const
+            {
+                using simd_value_type = xsimd::simd_type<std::complex<value_type>>;
+                // TODO refactor using shuffle only
+                auto batch = expr.template load_simd<align, requested_type, N>(n);
+                if (I == 0)
+                {
+                    return batch.real();
+                }
+                else
+                {
+                    return batch.imag();
+                }
+            }
+
+            template <class align, class simd, class E,
+                      class = std::enable_if_t<(std::is_same<M, double>::value || std::is_same<M, float>::value) && I <= sizeof(M), int>>
+            auto proxy_simd_store(E& expr, std::size_t n, const simd& batch) const
+            {
+                auto x = expr.template load_simd<align, double, simd::size>(n);
+                if (I == 0)
+                {
+                    x.real() = batch;
+                }
+                else
+                {
+                    x.imag() = batch;
+                }
+                expr.template store_simd<align>(n, x);
             }
         };
     }
