@@ -51,6 +51,8 @@ namespace xt
         EXPECT_EQ((result < result2), expected);
     }
 
+// need to wait until the system clock on Windows catches up with Linux
+#ifndef _MSC_VER
     TEST(xdate, date_arange)
     {
         xarray<tp> tarr = xt::arange<tp>(std::chrono::system_clock::now(),
@@ -58,6 +60,7 @@ namespace xt
                                          std::chrono::hours(1));
         EXPECT_TRUE(tarr.storage().back() > tarr.storage().front());
     }
+#endif
 
     TEST(xdate, xfunction)
     {
