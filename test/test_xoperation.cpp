@@ -240,6 +240,8 @@ namespace xt
         bool_container expected = {1, 1, 1, 0, 0};
         bool_container b = a < 4;
         EXPECT_EQ(expected, b);
+        bool_container b2 = less(a, 4);
+        EXPECT_EQ(expected, b2);
     }
 
     TYPED_TEST(operation, less_equal)
@@ -250,6 +252,8 @@ namespace xt
         bool_container expected = {1, 1, 1, 1, 0};
         bool_container b = a <= 4;
         EXPECT_EQ(expected, b);
+        bool_container b2 = less_equal(a, 4);
+        EXPECT_EQ(expected, b2);
     }
 
     TYPED_TEST(operation, greater)
@@ -260,6 +264,8 @@ namespace xt
         bool_container expected = {0, 0, 0, 0, 1};
         bool_container b = a > 4;
         EXPECT_EQ(expected, b);
+        bool_container b2 = greater(a, 4);
+        EXPECT_EQ(expected, b2);
     }
 
     TYPED_TEST(operation, greater_equal)
@@ -270,6 +276,8 @@ namespace xt
         bool_container expected = {0, 0, 0, 1, 1};
         bool_container b = a >= 4;
         EXPECT_EQ(expected, b);
+        bool_container b2 = greater_equal(a, 4);
+        EXPECT_EQ(expected, b2);
     }
 
     TYPED_TEST(operation, negate)

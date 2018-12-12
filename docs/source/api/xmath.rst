@@ -78,6 +78,14 @@ Mathematical functions
 +-----------------------------------------+------------------------------------------+
 | :ref:`not_equal <nequal-fn-ref>`        | element-wise inequality                  |
 +-----------------------------------------+------------------------------------------+
+| :ref:`less <less-fn-ref>`               | element-wise lesser than                 |
++-----------------------------------------+------------------------------------------+
+| :ref:`less_equal <less-eq-fn-ref>`      | element-wise less or equal               |
++-----------------------------------------+------------------------------------------+
+| :ref:`greater <greater-fn-ref>`         | element-wise greater than                |
++-----------------------------------------+------------------------------------------+
+| :ref:`greater_equal <greate-eq-fn-ref>` | element-wise greater or equal            |
++-----------------------------------------+------------------------------------------+
 | :ref:`cast <cast-ref>`                  | element-wise `static_cast`               |
 +-----------------------------------------+------------------------------------------+
 | :ref:`operator& <bitwise-and-op-ref>`   | bitwise and                              |
