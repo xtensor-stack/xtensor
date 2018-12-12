@@ -125,7 +125,7 @@ namespace xt
         }
     }
 
-#ifdef XTENSOR_USE_XSIMD
+#if defined(XTENSOR_USE_XSIMD) && XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
     TEST(xfunctor_adaptor, simd)
     {
         xarray<std::complex<double>> e = {{3.0       , 1.0 + 1.0i},

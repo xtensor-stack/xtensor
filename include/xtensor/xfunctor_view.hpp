@@ -217,6 +217,20 @@ namespace xt
         template <class S>
         bool has_linear_assign(const S& strides) const;
 
+        template <class FCT = F>
+        auto data_element(size_type i)
+            -> decltype(std::declval<FCT>()(std::declval<CT>().data_element(i)))
+        {
+            return m_functor(m_e.data_element(i));
+        }
+
+        template <class FCT = F>
+        auto data_element(size_type i) const
+            -> decltype(std::declval<FCT>()(std::declval<CT>().data_element(i)))
+        {
+            return m_functor(m_e.data_element(i));
+        }
+
         // The following functions are defined inline because otherwise signatures
         // don't match on GCC.
         template <class align, class requested_type = typename xexpression_type::value_type,
