@@ -520,9 +520,11 @@ namespace xt
     }
 
     /**
-     * Converts `std::vector<index_type>` (returned e.g. from `xt::argwhere`) to `xtensor`.
-     * @param vector of indices
-     * @return `xt::tensor<typename index_type::value_type, 2>` (e.g. `xt::tensor<size_t, 2>`)
+     * Converts ``std::vector<index_type>`` (returned e.g. from ``xt::argwhere``) to ``xtensor``.
+     *
+     * @param idx vector of indices
+     *
+     * @return ``xt::xtensor<typename index_type::value_type, 2>`` (e.g. ``xt::xtensor<size_t, 2>``)
      */
     template <class T>
     inline auto from_indices(const std::vector<T> &idx)
@@ -532,11 +534,10 @@ namespace xt
 
         if (idx.size() == 0)
         {
-            return_type out = empty<typename T::value_type>({size_type(0), size_type(0)});
-            return out;
+            return return_type::from_shape({size_type(0), size_type(0)});
         }
 
-        return_type out = empty<typename T::value_type>({idx.size(), idx[0].size()});
+        return_type out = return_type::from_shape({idx.size(), idx[0].size()});
 
         for (size_type i = 0; i < out.shape()[0]; ++i)
         {
@@ -546,6 +547,99 @@ namespace xt
             }
         }
 
+        return out;
+    };
+
+    /**
+     * Converts ``std::vector<index_type>`` (returned e.g. from ``xt::argwhere``) to a flattened
+     * ``xtensor``.
+     *
+     * @param vector of indices
+     *
+     * @return ``xt::xtensor<typename index_type::value_type, 1>`` (e.g. ``xt::xtensor<size_t, 1>``)
+     */
+    template <class T>
+    inline auto flatten_indices(const std::vector<T> &idx)
+    {
+        auto n = idx.size();
+        if (n != 0)
+        {
+            n *= idx[0].size();
+        }
+
+        using return_type = xtensor<typename T::value_type, 1>;
+        return_type out = return_type::from_shape({n});
+        auto iter = out.begin();
+        for_each(idx.begin(), idx.end(), [&iter](const auto& t) { iter = std::copy(t.cbegin(), t.cend(), iter); });
+
+        return out;
+    };
+
+    struct ravel_vector_tag;
+    struct ravel_tensor_tag;
+
+    namespace detail
+    {
+        template <class C, class Tag>
+        struct ravel_return_type;
+
+        template <class C>
+        struct ravel_return_type<C, ravel_vector_tag>
+        {
+            using index_type = typename C::value_type;
+            using value_type = typename index_type::value_type;
+            using type = std::vector<value_type>;
+
+            template <class T>
+            static std::vector<value_type> init(T n)
+            {
+                return std::vector<value_type>(n);
+            }
+        };
+
+        template <class C>
+        struct ravel_return_type<C, ravel_tensor_tag>
+        {
+            using index_type = typename C::value_type;
+            using value_type = typename index_type::value_type;
+            using type = xt::xtensor<value_type, 1>;
+
+            template <class T>
+            static xt::xtensor<value_type, 1> init(T n)
+            {
+                return xtensor<value_type, 1>::from_shape({n});
+            }
+        };
+    }
+
+    template <class C, class Tag>
+    using ravel_return_type_t = typename detail::ravel_return_type<C, Tag>::type;
+
+    /**
+     * Converts ``std::vector<index_type>`` (returned e.g. from ``xt::argwhere``) to ``xtensor``
+     * whereby the indices are ravelled. For 1-d input there is no conversion.
+     *
+     * @param idx vector of indices
+     * @param shape the shape of the original array
+     * @param l the layout type (row-major or column-major)
+     *
+     * @return ``xt::xtensor<typename index_type::value_type, 1>`` (e.g. ``xt::xtensor<size_t, 1>``)
+     */
+    template <class Tag = ravel_tensor_tag, class C, class S>
+    ravel_return_type_t<C, Tag> ravel_indices(const C& idx, const S& shape, layout_type l = layout_type::row_major)
+    {
+        using return_type = typename detail::ravel_return_type<C, Tag>::type;
+        using value_type = typename detail::ravel_return_type<C, Tag>::value_type;
+        using strides_type = get_strides_t<S>;
+        strides_type strides = xtl::make_sequence<strides_type>(shape.size(), 0);
+        compute_strides(shape, l, strides);
+        return_type out = detail::ravel_return_type<C, Tag>::init(idx.size());
+        auto out_iter = out.begin();
+        auto idx_iter = idx.begin();
+        for (; out_iter != out.end(); ++out_iter, ++idx_iter)
+        {
+            *out_iter = element_offset<value_type>(strides, (*idx_iter).cbegin(), (*idx_iter).cend());
+        }
         return out;
     };
 }
