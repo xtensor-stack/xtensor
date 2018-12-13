@@ -675,6 +675,11 @@ namespace xt
 
         EXPECT_EQ(expected1, res1);
         EXPECT_EQ(expected2, res2);
+
+        xarray<int> res3 = arr << 4;
+        xarray<int> res4 = arr << arr;
+        EXPECT_EQ(expected1, res3);
+        EXPECT_EQ(expected2, res4);
     }
 
     TEST(operation, right_shift)
@@ -688,5 +693,10 @@ namespace xt
 
         EXPECT_EQ(expected1, res1);
         EXPECT_EQ(expected2, res2);
+
+        xarray<int> res3 = arr >> 4;
+        xarray<int> res4 = arr >> arr;
+        EXPECT_EQ(expected1, res3);
+        EXPECT_EQ(expected2, res4);
     }
 }

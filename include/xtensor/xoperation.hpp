@@ -469,6 +469,44 @@ namespace xt
     }
 
     /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise left shift
+     *
+     * Returns an \ref xfunction for the element-wise bitwise left shift of e1
+     * by e2.
+     * @param e1 an \ref xexpression
+     * @param e2 an \ref xexpression
+     * @return an \ref xfunction
+     * @sa left_shift
+     */
+    template <class E1, class E2>
+    inline auto operator<<(E1&& e1, E2&& e2)
+        -> std::enable_if_t<is_xexpression<std::decay_t<E1>>::value,
+                            detail::xfunction_type_t<detail::left_shift, E1, E2>>
+    {
+        return left_shift(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
+     * @ingroup bitwise_operators
+     * @brief Bitwise left shift
+     *
+     * Returns an \ref xfunction for the element-wise bitwise left shift of e1
+     * by e2.
+     * @param e1 an \ref xexpression
+     * @param e2 an \ref xexpression
+     * @return an \ref xfunction
+     * @sa right_shift
+     */
+    template <class E1, class E2>
+    inline auto operator>>(E1&& e1, E2&& e2)
+        -> std::enable_if_t<is_xexpression<std::decay_t<E1>>::value,
+                            detail::xfunction_type_t<detail::right_shift, E1, E2>>
+    {
+        return right_shift(std::forward<E1>(e1), std::forward<E2>(e2));
+    }
+
+    /**
      * @defgroup comparison_operators Comparison operators
      */
 

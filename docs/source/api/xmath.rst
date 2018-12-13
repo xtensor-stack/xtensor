@@ -92,9 +92,13 @@ Mathematical functions
 +-----------------------------------------+------------------------------------------+
 | :ref:`operator~ <bitwise-not-op-ref>`   | bitwise not                              |
 +-----------------------------------------+------------------------------------------+
-| :ref:`left_shift <left-shift-op-ref>`   | bitwise shift left                       |
+| :ref:`left_shift <left-shift-fn-ref>`   | bitwise shift left                       |
 +-----------------------------------------+------------------------------------------+
-| :ref:`right_shift <right-shift-op-ref>` | bitwise shift right                      |
+| :ref:`right_shift <right-shift-fn-ref>` | bitwise shift right                      |
++-----------------------------------------+------------------------------------------+
+| :ref:`operator\<\< <left-sh-op-ref>`    | bitwise shift left                       |
++-----------------------------------------+------------------------------------------+
+| :ref:`operator\>\> <right-sh-op-ref>`   | bitwise shift right                      |
 +-----------------------------------------+------------------------------------------+
 
 .. toctree::
