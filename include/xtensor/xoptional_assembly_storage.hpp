@@ -239,15 +239,15 @@ namespace xt
 
     template <class VE, class FE>
     inline xoptional_assembly_storage<VE, FE>::xoptional_assembly_storage(self_type&& rhs)
-        : m_value(std::move(rhs.m_value)), m_has_value(std::move(rhs.m_has_value))
+        : m_value(std::forward<VE>(rhs.m_value)), m_has_value(std::forward<FE>(rhs.m_has_value))
     {
     }
 
     template <class VE, class FE>
     inline auto xoptional_assembly_storage<VE, FE>::operator=(self_type&& rhs) -> self_type&
     {
-        m_value = std::move(rhs.m_value);
-        m_has_value = std::move(rhs.m_has_value);
+        m_value = std::forward<VE>(rhs.m_value);
+        m_has_value = std::forward<FE>(rhs.m_has_value);
         return *this;
     }
 
