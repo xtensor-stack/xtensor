@@ -42,7 +42,7 @@ Defined in ``xtensor/xbuilder.hpp``
 .. doxygenfunction:: xt::eye(std::size_t, int)
    :project: xtensor
 
-.. doxygenfunction:: xt::arange(T, T, T)
+.. doxygenfunction:: xt::arange(T, T, S)
    :project: xtensor
 
 .. doxygenfunction:: xt::arange(T)

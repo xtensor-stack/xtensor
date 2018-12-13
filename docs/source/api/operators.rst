@@ -49,14 +49,6 @@ Defined in ``xtensor/xmath.hpp`` and ``xtensor/xoperation.hpp``
 .. doxygenfunction:: where(E1&&, E2&&, E3&&)
    :project: xtensor
 
-.. _nonzero-op-ref:
-.. doxygenfunction:: nonzero(const T&)
-   :project: xtensor
-
-.. _wherec-op-ref:
-.. doxygenfunction:: where(const T&)
-   :project: xtensor
-
 .. _any-op-ref:
 .. doxygenfunction:: any(E&&)
    :project: xtensor
