@@ -590,6 +590,48 @@ namespace xt
     {
         return m_storage;
     }
+
+    /**
+     * Converts `std::vector<index_type>` (returned e.g. from `xt::argwhere`) to `xarray`.
+     * @param vector of indices
+     * @return `xt::xarray<typename index_type::value_type>` (e.g. `xt::xarray<size_t>`)
+     */
+    template <class T>
+    inline auto from_indices(const std::vector<T> &idx)
+    {
+        using return_type = xarray<typename T::value_type>;
+        using size_type = typename return_type::size_type;
+
+        if (idx.size() == 0)
+        {
+            return_type out = empty<typename T::value_type>({size_type(0), size_type(0)});
+            return out;
+        }
+
+        if (idx[0].size() == 1)
+        {
+            return_type out = empty<typename T::value_type>({idx.size()});
+
+            for (size_type i = 0; i < out.shape()[0]; ++i)
+            {
+                out(i) = idx[i][0];
+            }
+
+            return out;
+        }
+
+        return_type out = empty<typename T::value_type>({idx.size(), idx[0].size()});
+
+        for (size_type i = 0; i < out.shape()[0]; ++i)
+        {
+            for (size_type j = 0; j < out.shape()[1]; ++j)
+            {
+                out(i, j) = idx[i][j];
+            }
+        }
+
+        return out;
+    };
 }
 
 #endif

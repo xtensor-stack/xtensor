@@ -18,3 +18,6 @@ Defined in ``xtensor/xarray.hpp``
 
 .. doxygentypedef:: xt::xarray_optional
    :project: xtensor
+
+.. doxygentypedef:: xt::from_indices
+   :project: xtensor
