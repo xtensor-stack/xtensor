@@ -549,8 +549,10 @@ namespace xt
 
         using functor_type = F;
 
+        using proxy_inner = xproxy_inner_types<decltype(std::declval<F>()(*std::declval<ST>()))>;
+        using proxy = typename proxy_inner::proxy;
         using value_type = typename functor_type::value_type;
-        using reference = apply_cv_t<typename ST::reference, value_type>;
+        using reference = typename proxy_inner::reference;
         using pointer = std::remove_reference_t<reference>*;
         using size_type = typename ST::size_type;
         using difference_type = typename ST::difference_type;
