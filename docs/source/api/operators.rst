@@ -121,12 +121,20 @@ Defined in ``xtensor/xmath.hpp`` and ``xtensor/xoperation.hpp``
 .. doxygenfunction:: operator~(E&&)
    :project: xtensor
 
-.. _left-shift-op-ref:
+.. _left-shift-fn-ref:
 .. doxygenfunction:: left_shift(E1&&, E2&&)
    :project: xtensor
 
-.. _right-shift-op-ref:
+.. _right-shift-fn-ref:
 .. doxygenfunction:: right_shift(E1&&, E2&&)
+   :project: xtensor
+
+.. _left-sh-op-ref:
+.. doxygenfunction:: operator<<(E1&&, E2&&)
+   :project: xtensor
+
+.. _right-sh-op-ref:
+.. doxygenfunction:: operator>>(E1&&, E2&&)
    :project: xtensor
 
 .. _cast-ref:
