@@ -584,7 +584,7 @@ namespace xt
         xt::xarray<float> x5 = xt::ones<float>({1,4,16,16});
         auto view7 = xt::view(x5, xt::all(), xt::newaxis(), xt::all(), xt::all(), xt::all());
         std::array<std::size_t, 5> idx4 = {0, 0, 2, 14, 12};
-        EXPECT_EQ(view7.element(idx4.begin(), idx4.end()), 1);
+        EXPECT_EQ(view7.element(idx4.begin(), idx4.end()), 1.f);
     }
 
     TEST(xview, newaxis_iterating)
