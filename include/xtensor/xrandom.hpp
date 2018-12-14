@@ -120,7 +120,7 @@ namespace xt
             {
                 // Note: we're not going row/col major here
                 auto& ed = e.derived_cast();
-                for (auto& el : ed.storage())
+                for (auto&& el : ed.storage())
                 {
                     el = m_dist(m_engine);
                 }

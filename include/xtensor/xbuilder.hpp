@@ -222,7 +222,7 @@ namespace xt
                 auto& de = e.derived_cast();
                 value_type value = m_start;
 
-                for (auto& el : de.storage())
+                for (auto&& el : de.storage())
                 {
                     el = value;
                     value += m_step;
