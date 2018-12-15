@@ -65,13 +65,13 @@ namespace xt
         template <class T, class S, layout_type L, class... SL>
         struct view_temporary_type_impl
         {
-            using type = xarray<T, L>;
+            using type = xt::xarray<T, L>;
         };
 
         template <class T, class I, std::size_t N, layout_type L, class... SL>
         struct view_temporary_type_impl<T, std::array<I, N>, L, SL...>
         {
-            using type = xtensor<T, N + newaxis_count<SL...>() - integral_count<SL...>(), L>;
+            using type = xt::xtensor<T, N + newaxis_count<SL...>() - integral_count<SL...>(), L>;
         };
     }
 
