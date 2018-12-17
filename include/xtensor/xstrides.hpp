@@ -66,6 +66,9 @@ namespace xt
     template <class S>
     get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l=layout_type::row_major);
 
+    template <class S, class T>
+    std::vector<get_strides_t<S>> unravel_indices(const T& indices, const S& shape, layout_type l=layout_type::row_major);
+
     /***********************
      * broadcast functions *
      ***********************/
@@ -428,6 +431,12 @@ namespace xt
     }
 
     template <class S>
+    inline get_strides_t<S> ravel_from_strides(const S& index, const S& strides)
+    {
+        return element_offset<get_strides_t<S>>(strides, index.begin(), index.end());
+    }
+
+    template <class S>
     inline get_strides_t<S> unravel_index(typename S::value_type index, const S& shape, layout_type l)
     {
         using strides_type = get_strides_t<S>;
@@ -435,6 +444,33 @@ namespace xt
         strides_type strides = xtl::make_sequence<strides_type>(shape.size(), 0);
         compute_strides(shape, l, strides);
         return unravel_from_strides(static_cast<strides_value_type>(index), strides, l);
+    }
+
+    template <class S, class T>
+    inline std::vector<get_strides_t<S>> unravel_indices(const T& idx, const S& shape, layout_type l)
+    {
+        using strides_type = get_strides_t<S>;
+        using strides_value_type = typename strides_type::value_type;
+        strides_type strides = xtl::make_sequence<strides_type>(shape.size(), 0);
+        compute_strides(shape, l, strides);
+        std::vector<get_strides_t<S>> out(idx.size());
+        auto out_iter = out.begin();
+        auto idx_iter = idx.begin();
+        for ( ; out_iter != out.end(); ++out_iter, ++idx_iter )
+        {
+            *out_iter = unravel_from_strides(static_cast<strides_value_type>(*idx_iter), strides, l);
+        }
+        return out;
+    }
+
+    template <class S>
+    inline get_value_type<S> ravel_index(const S& index, const S& shape, layout_type l)
+    {
+        using strides_type = get_strides_t<S>;
+        using strides_value_type = typename strides_type::value_type;
+        strides_type strides = xtl::make_sequence<strides_type>(shape.size(), 0);
+        compute_strides(shape, l, strides);
+        return ravel_from_strides(static_cast<strides_value_type>(index), strides);
     }
 
     template <class S1, class S2>

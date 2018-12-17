@@ -283,4 +283,36 @@ namespace xt
         EXPECT_EQ(a.layout(), c.layout());
     }
 
+    TEST(xtensor, from_indices)
+    {
+        xt::xtensor<int, 2> a = {{1,0,0},{1,1,0},{1,1,1}};
+        xt::xtensor<size_t, 2> jdx = {{0,0},{1,0},{1,1},{2,0},{2,1},{2,2}};
+        xt::xtensor<size_t, 2> idx = xt::from_indices(xt::argwhere(xt::equal(a,1)));
+        EXPECT_TRUE(idx==jdx);
+    }
+
+    TEST(xtensor, flatten_indices)
+    {
+        xt::xtensor<int, 1> a = {1,0,0,1,1,0,1,1,1};
+        xt::xtensor<size_t, 1> jdx = {0,3,4,6,7,8};
+        xt::xtensor<size_t, 1> idx = xt::flatten_indices(xt::argwhere(xt::equal(a,1)));
+        EXPECT_TRUE(idx==jdx);
+    }
+
+    TEST(xtensor, ravel_indices)
+    {
+        xt::xtensor<int, 2> a = {{1,0,0},{1,1,0},{1,1,1}};
+        xt::xtensor<size_t, 1> jdx = {0,3,4,6,7,8};
+        xt::xtensor<size_t, 1> idx = xt::ravel_indices(xt::argwhere(xt::equal(a,1)), a.shape());
+        EXPECT_TRUE(idx==jdx);
+    }
+
+    TEST(xtensor, ravel_indices_column_major)
+    {
+        xt::xtensor<int, 2, xt::layout_type::column_major> a = {{1,0,0},{1,1,0},{1,1,1}};
+        xt::xtensor<size_t, 1> jdx = {0,1,4,2,5,8};
+        xt::xtensor<size_t, 1> idx = xt::ravel_indices(xt::argwhere(xt::equal(a,1)), a.shape(), xt::layout_type::column_major);
+        EXPECT_TRUE(idx==jdx);
+    }
+
 }
