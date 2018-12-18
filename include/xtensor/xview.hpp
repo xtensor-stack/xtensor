@@ -390,10 +390,10 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
-        using storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value,
+        using storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value && is_strided_view,
                                                     typename xexpression_type::storage_iterator,
                                                     typename iterable_base::storage_iterator>;
-        using const_storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value,
+        using const_storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value && is_strided_view,
                                                     typename xexpression_type::const_storage_iterator,
                                                     typename iterable_base::const_storage_iterator>;
 
