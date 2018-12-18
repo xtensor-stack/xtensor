@@ -31,7 +31,7 @@ namespace xt
     template <class E, class S, class Tag = check_policy::none>
     auto transpose(E&& e, S&& permutation, Tag check_policy = Tag());
 
-    template <layout_type L, class E>
+    template <layout_type L = layout_type::row_major, class E>
     auto ravel(E&& e);
 
     template <class E>
@@ -278,7 +278,8 @@ namespace xt
     /**
      * Returns a flatten view of the given expression. No copy is made.
      * @param e the input expression
-     * @tparam L the layout used to read the elements of e
+     * @tparam L the layout used to read the elements of e. If no parameter
+     * is specified, layout_type::row_major is used.
      * @tparam E the type of the expression
      */
     template <layout_type L, class E>
