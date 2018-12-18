@@ -99,6 +99,9 @@ namespace xt
 
         auto flat2 = flatten(a);
         EXPECT_EQ(flat, flat2);
+
+        auto flat3 = ravel(a);
+        EXPECT_EQ(flat, flat3);
     }
 
     TEST(xstrided_view, split)
