@@ -1327,8 +1327,6 @@ namespace xt
         EXPECT_EQ(arr(1, 0), 100.0);
     }
 
-    // TODO: fix linux build
-#ifdef _WIN64
     TEST(xview, keep_assign)
     {
         xt::xtensor<int, 2> a = { {1, 2, 3, 4},
@@ -1342,5 +1340,19 @@ namespace xt
         xt::xtensor<int, 1> exp = { 1, 5, 9, 13 };
         EXPECT_EQ(res, exp);
     }
-#endif
+
+    TEST(xview, view_view_assignment)
+    {
+        xt::xtensor<double, 4> a = xt::random::rand<double>({5, 5, 5, 5});
+
+        std::size_t sa = 0, sb = 2;
+        auto start = xt::view(a, 1); //3D
+        auto res = xt::view(start, xt::all(), xt::all(), xt::keep(sa, sb));
+
+        auto expres = xt::exp(res);
+
+        xt::xarray<double> assgment = expres;
+        auto expv = xt::exp(xt::view(a, 1, xt::all(), xt::all(), xt::range(0, 3, 2)));
+        EXPECT_EQ(assgment, expv);
+    }
 }
