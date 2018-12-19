@@ -20,7 +20,6 @@
 #include "xtensor/xview.hpp"
 #include "xtensor/xrandom.hpp"
 
-
 namespace xt
 {
     using std::size_t;
@@ -983,6 +982,7 @@ namespace xt
 
         auto v1 = xt::view(a, keep(1), keep(0, 1), keep(0, 3));
         xtensor<double, 3> exp_v1 = {{{9, 12}, {13, 16}}};
+
         EXPECT_EQ(v1, exp_v1);
 
         test_view_iter(v1, exp_v1);
@@ -1326,4 +1326,21 @@ namespace xt
         vv = 100.0;
         EXPECT_EQ(arr(1, 0), 100.0);
     }
+
+    // TODO: fix linux build
+#ifdef _WIN64
+    TEST(xview, keep_assign)
+    {
+        xt::xtensor<int, 2> a = { {1, 2, 3, 4},
+                                  {5, 6, 7, 8},
+                                  {9, 10, 11, 12},
+                                  {13, 14, 15, 16} };
+        
+        auto v = xt::view(xt::view(a, xt::all(), xt::keep(0, 1)), xt::all(), 0);
+        xt::xtensor<int, 1> res = v;
+
+        xt::xtensor<int, 1> exp = { 1, 5, 9, 13 };
+        EXPECT_EQ(res, exp);
+    }
+#endif
 }
