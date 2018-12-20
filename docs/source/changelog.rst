@@ -7,6 +7,50 @@
 Changelog
 =========
 
+0.19.1
+------
+
+- Add string specialization to ``lexical_cast``
+  `#1281 <https://github.com/QuantStack/xtensor/pull/1281>`_.
+- Added HDF5 reference for ``xtensor-io``
+  `#1284 <https://github.com/QuantStack/xtensor/pull/1284>`_.
+- Fixed view index remap issue
+  `#1288 <https://github.com/QuantStack/xtensor/pull/1288>`_.
+- Fixed gcc 8.2 deleted functions
+  `#1289 <https://github.com/QuantStack/xtensor/pull/1289>`_.
+- Fixed reducer for 0d input
+  `#1292 <https://github.com/QuantStack/xtensor/pull/1292>`_.
+- Fixed ``check_element_index``
+  `#1295 <https://github.com/QuantStack/xtensor/pull/1295>`_.
+- Added comparison functions
+  `#1297 <https://github.com/QuantStack/xtensor/pull/1297>`_.
+- Add some tests to ensure chrono works with xexpressions
+  `#1272 <https://github.com/QuantStack/xtensor/pull/1272>`_.
+- Refactor ``functor_view``
+  `#1276 <https://github.com/QuantStack/xtensor/pull/1276>`_.
+- Documentation improved
+  `#1302 <https://github.com/QuantStack/xtensor/pull/1302>`_.
+- Implementation of shift operators
+  `#1304 <https://github.com/QuantStack/xtensor/pull/1304>`_.
+- Make functor adaptor stepper work for proxy specializations 
+  `#1305 <https://github.com/QuantStack/xtensor/pull/1305>`_.
+- Replaced ``auto&`` with ``auto&&`` in ``assign_to``
+  `#1306 <https://github.com/QuantStack/xtensor/pull/1306>`_.
+- Fix namespace in ``xview_utils.hpp``
+  `#1308 <https://github.com/QuantStack/xtensor/pull/1308>`_.
+- Introducing ``flatten_indices`` and ``unravel_indices``
+  `#1300 <https://github.com/QuantStack/xtensor/pull/1300>`_.
+- Default layout parameter for ``ravel``
+  `#1311 <https://github.com/QuantStack/xtensor/pull/1311>`_.
+- Fixed ``xvie_stepper``
+  `#1317 <https://github.com/QuantStack/xtensor/pull/1317>`_.
+- Fixed assignment of view on view 
+  `#1314 <https://github.com/QuantStack/xtensor/pull/1314>`_.
+- Documented indices
+  `#1318 <https://github.com/QuantStack/xtensor/pull/1318>`_.
+- Fixed shift operators return type
+  `#1319 <https://github.com/QuantStack/xtensor/pull/1319>`_.
+
 0.19.0
 ------
 
