@@ -468,6 +468,35 @@ namespace xt
         return detail::make_xfunction<detail::right_shift>(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
+    namespace detail
+    {
+        // Shift operator is not available for all the types, so the xfunction type instantiation
+        // has to be delayed, enable_if_t is not sufficient
+        template <class F, class E1, class E2>
+        struct shift_function_getter
+        {
+            using type = xfunction_type_t<F, E1, E2>;
+        };
+
+        template <bool B, class T>
+        struct eval_enable_if
+        {
+            using type = typename T::type;
+        };
+
+        template <class T>
+        struct eval_enable_if<false, T>
+        {
+        };
+
+        template <bool B, class T>
+        using eval_enable_if_t = typename eval_enable_if<B, T>::type;
+
+        template <class F, class E1, class E2>
+        using shift_return_type_t = eval_enable_if_t<is_xexpression<std::decay_t<E1>>::value,
+                                                     shift_function_getter<F, E1, E2>>;
+    }
+
     /**
      * @ingroup bitwise_operators
      * @brief Bitwise left shift
@@ -480,18 +509,17 @@ namespace xt
      * @sa left_shift
      */
     template <class E1, class E2>
-    inline auto operator<<(E1&& e1, E2&& e2)
-        -> std::enable_if_t<is_xexpression<std::decay_t<E1>>::value,
-                            detail::xfunction_type_t<detail::left_shift, E1, E2>>
+    inline auto operator<<(E1&& e1, E2&& e2) noexcept
+        -> detail::shift_return_type_t<detail::left_shift, E1, E2>
     {
         return left_shift(std::forward<E1>(e1), std::forward<E2>(e2));
     }
 
     /**
      * @ingroup bitwise_operators
-     * @brief Bitwise left shift
+     * @brief Bitwise right shift
      *
-     * Returns an \ref xfunction for the element-wise bitwise left shift of e1
+     * Returns an \ref xfunction for the element-wise bitwise right shift of e1
      * by e2.
      * @param e1 an \ref xexpression
      * @param e2 an \ref xexpression
@@ -500,8 +528,7 @@ namespace xt
      */
     template <class E1, class E2>
     inline auto operator>>(E1&& e1, E2&& e2)
-        -> std::enable_if_t<is_xexpression<std::decay_t<E1>>::value,
-                            detail::xfunction_type_t<detail::right_shift, E1, E2>>
+        -> detail::shift_return_type_t<detail::right_shift, E1, E2>
     {
         return right_shift(std::forward<E1>(e1), std::forward<E2>(e2));
     }
