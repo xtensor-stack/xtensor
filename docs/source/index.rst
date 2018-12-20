@@ -65,6 +65,7 @@ for details.
    operator
    histogram
    view
+   indices
    builder
    missing
    file_loading

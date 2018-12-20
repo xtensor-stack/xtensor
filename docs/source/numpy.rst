@@ -269,6 +269,15 @@ where ``condition`` is falsy, and it does not evaluate ``b`` where ``condition``
 | ``np.allclose(a, b)``                         | ``xt::allclose(a, b)``                        |
 +-----------------------------------------------+-----------------------------------------------+
 
+Indices
+-------
+
++-----------------------------------------------+-----------------------------------------------+
+|            Python 3 - numpy                   |                C++ 14 - xtensor               |
++===============================================+===============================================+
+| ``np.ravel_multi_index(indices, a.shape)``    | ``xt::ravel_indices(indices, a.shape())``     |
++-----------------------------------------------+-----------------------------------------------+
+
 Comparisons
 -----------
 
@@ -349,8 +358,8 @@ Reducers
 --------
 
 Reducers accumulate values of tensor expressions along specified axes. When no axis is specified,
-values are accumulated along all axes. Reducers are lazy, meaning that returned expressons don't
-hold any values and are computed upon access or assigmnent.
+values are accumulated along all axes. Reducers are lazy, meaning that returned expressions don't
+hold any values and are computed upon access or assignment.
 
 +-----------------------------------------------+-----------------------------------------------+
 |            Python 3 - numpy                   |                C++ 14 - xtensor               |
@@ -388,7 +397,7 @@ hold any values and are computed upon access or assigmnent.
 +-----------------------------------------------+-----------------------------------------------+
 
 More generally, one can use the ``xt::reduce(function, input, axes)`` which allows the specification
-of an arbitrary binary function for the reduction. The binary function must be cummutative and
+of an arbitrary binary function for the reduction. The binary function must be commutative and
 associative up to rounding errors.
 
 I/O
@@ -539,7 +548,7 @@ xtensor universal functions are provided for a large set number of mathematical 
 Linear algebra
 --------------
 
-Many functions found in the ``numpy.linalg`` module are implemented in `xtensor-blas`_, a seperate package offering BLAS and LAPACK bindings, as well as a convenient interface replicating the ``linalg`` module.
+Many functions found in the ``numpy.linalg`` module are implemented in `xtensor-blas`_, a separate package offering BLAS and LAPACK bindings, as well as a convenient interface replicating the ``linalg`` module.
 
 Please note, however, that while we're trying to be as close to NumPy as possible, some features are not
 implemented yet. Most prominently that is broadcasting for all functions except for ``dot``.

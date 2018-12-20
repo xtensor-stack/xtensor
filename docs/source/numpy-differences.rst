@@ -12,7 +12,7 @@ Notable differences with numpy
    :align: right
 
 xtensor and numpy are very different libraries in their internal semantics. While xtensor
-is a lazy expression system, Numpy manipulates in-memory containers, however, similarities in
+is a lazy expression system, numpy manipulates in-memory containers, however, similarities in
 APIs are obvious. See e.g. the numpy to xtensor cheat sheet.
 
 And this page tracks the subtle differences of behavior between numpy and xtensor.
@@ -23,7 +23,7 @@ Zero-dimensional arrays
 With numpy, 0-D arrays are nearly indistinguishable from scalars. This led to some issues w.r.t.
 universal functions returning scalars with 0-D array inputs instead of actual arrays...
 
-In xtensor, 0-D expressions are not implicitely convertible to scalar values. Values held by 0-D
+In xtensor, 0-D expressions are not implicitly convertible to scalar values. Values held by 0-D
 expressions can be accessed in the same way as values of higher dimensional arrays, that is with
 ``operator[]``, ``operator()`` and ``element``.
 
@@ -47,7 +47,7 @@ The following code
     print 'xy:', [m.shape for m in xy]
 
 
-would return 
+would return
 
 .. code-block:: python
 
@@ -80,3 +80,8 @@ Strides
 
 Strided containers of xtensor and numpy having the same exact memory layout may have different strides when accessing them through the ``strides`` attribute.
 The reason is an optimization in xtensor, which is to set the strides to ``0`` in dimensions of length ``1``, which simplifies the implementation of broadcasting of universal functions.
+
+Array indices
+-------------
+
+Array indices are in xtensor stored as a ``std::vector`` of array indices, whereby each entry corresponds to the array indices of one item. This results in a slightly different usage of ``xt::ravel_indices`` than of ``np.ravel_multi_index``.

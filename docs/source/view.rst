@@ -185,7 +185,7 @@ Reshape views
 
 The reshape view allows to handle an expression as if it was given a new shape, however no additional memory allocation occurs,
 the original expression keeps its shape. Like any view, the underlying expression is not copied, thus assigning a value through
-the view modifies the underlying exression.
+the view modifies the underlying expression.
 
 .. code::
 

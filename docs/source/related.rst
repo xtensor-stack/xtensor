@@ -340,7 +340,7 @@ Calculate the derivative of a (discretized) field in Fourier space, e.g. a sine 
 .. code::
 
     #include <xtensor-fftw/basic.hpp>   // rfft, irfft
-    #include <xtensor-fftw/helper.hpp>  // rfftscale 
+    #include <xtensor-fftw/helper.hpp>  // rfftscale
     #include <xtensor/xarray.hpp>
     #include <xtensor/xbuilder.hpp>     // xt::arange
     #include <xtensor/xmath.hpp>        // xt::sin, cos
@@ -417,7 +417,7 @@ xtl
    :alt: xtl
 
 The xtl_ project, the only dependency of ``xtensor`` is a C++ template library
-holding the implementation of basic tools used accross the libraries in the
+holding the implementation of basic tools used across the libraries in the
 QuantStack ecosystem.
 
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
