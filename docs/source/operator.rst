@@ -48,7 +48,7 @@ and apply the lazy broadcasting rules. In addition to these element-wise
 logical operators, `xtensor` provides two reducing boolean functions:
 
 - ``any(E&& e)`` returns ``true`` if any of ``e`` elements is truthy, ``false`` otherwise.
-- ``all(E&& e)`` returns ``true`` if all alements of ``e`` are truthy, ``false`` otherwise.
+- ``all(E&& e)`` returns ``true`` if all elements of ``e`` are truthy, ``false`` otherwise.
 
 and an element-wise ternary function (similar to the ``: ?`` ternary operator):
 

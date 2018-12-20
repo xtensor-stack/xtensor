@@ -45,7 +45,7 @@ Compiling the first example
 
 `xtensor` is a header-only library, so there is no library to link with. The only constraint
 is that the compiler must be able to find the headers of `xtensor`, this is usually done
-by having the diretory containing the headers in the include path. With GCC, use the ``-I`` option
+by having the directory containing the headers in the include path. With GCC, use the ``-I`` option
 to achieve this. Assuming the first example code is located in ``example.cpp``, the compilation command
 is:
 
@@ -81,7 +81,7 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
 
     find_package(xtl REQUIRED)
     find_package(xtensor REQUIRED)
-    
+
     add_executable(first_example src/example.cpp)
     target_link_libraries(first_example xtensor)
 
@@ -146,7 +146,7 @@ Third example: index access
           {{1.0, 2.0, 3.0},
            {2.0, 5.0, 7.0},
            {2.0, 5.0, 7.0}};
-    
+
         std::cout << arr1(0, 0) << std::endl;
 
         xt::xarray<int> arr2
@@ -162,7 +162,7 @@ Outputs:
 
     1.0
     1
-     
+
 Fourth example: broadcasting
 ----------------------------
 
