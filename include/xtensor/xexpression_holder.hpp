@@ -65,8 +65,10 @@ namespace xt
      * to_json and from_json declaration *
      *************************************/
 
+    /// @cond DOXYGEN_INCLUDE_SFINAE
     void to_json(nlohmann::json& j, const xexpression_holder& o);
     void from_json(const nlohmann::json& j, xexpression_holder& o);
+    /// @endcond
 
     namespace detail
     {
@@ -227,6 +229,7 @@ namespace xt
      * to_json and from_json implementation *
      ****************************************/
 
+    /// @cond DOXYGEN_INCLUDE_SFINAE
     inline void to_json(nlohmann::json& j, const xexpression_holder& o)
     {
         o.to_json(j);
@@ -236,6 +239,7 @@ namespace xt
     {
         o.from_json(j);
     }
+    /// @endcond
 
     namespace detail
     {

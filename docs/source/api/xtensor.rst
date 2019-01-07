@@ -22,8 +22,8 @@ Defined in ``xtensor/xtensor.hpp``
 .. doxygenfunction:: xt::from_indices
    :project: xtensor
 
-.. doxygentypedef:: xt::flatten_indices
+.. doxygenfunction:: xt::flatten_indices
    :project: xtensor
 
-.. doxygentypedef:: xt::ravel_indices
+.. doxygenfunction:: xt::ravel_indices
    :project: xtensor
