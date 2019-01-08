@@ -81,4 +81,20 @@ namespace xt
         xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
         EXPECT_EQ(expr, a * a);
     }
+
+    TEST(xexpression, temporary_type)
+    {
+        using dyn_shape = xt::svector<std::size_t, 4, std::allocator<std::size_t>, true>;
+        using dyn_tmp = xt::detail::xtype_for_shape<dyn_shape>::type<int, XTENSOR_DEFAULT_LAYOUT>;
+        using dyn_exp = xt::xarray<int>;
+        constexpr bool dyn_res = std::is_same<dyn_tmp, dyn_exp>::value;
+        EXPECT_TRUE(dyn_res);
+        
+        using sta_shape = std::array<std::size_t, 4>;
+        using sta_tmp = xt::detail::xtype_for_shape<sta_shape>::type<int, XTENSOR_DEFAULT_LAYOUT>;
+        using sta_exp = xt::xtensor<int, 4>;
+        constexpr bool sta_res = std::is_same<sta_tmp, sta_exp>::value;
+        EXPECT_TRUE(sta_res);
+    }
+
 }  // namespace xt
