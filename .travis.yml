@@ -50,6 +50,22 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
+            - g++-7
+      env: COMPILER=gcc GCC=7 
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env: COMPILER=gcc GCC=7 ENABLE_CPP17=1
+    - os: linux
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
             - g++-4.9
             - clang-3.6
       env: COMPILER=clang CLANG=3.6 DISABLE_XSIMD=1 
@@ -142,6 +158,8 @@ install:
         cmake -DBUILD_TESTS=ON ..;
       elif [[ "$ENABLE_TBB" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=/home/travis/miniconda/include -DTBB_LIBRARY=/home/travis/miniconda/lib ..;
+      elif [[ "$ENABLE_CPP17" == 1 ]]; then
+        cmake -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DCPP17=ON ..;
       else
         cmake -DXTENSOR_USE_XSIMD=ON -DBUILD_TESTS=ON ..;
       fi
