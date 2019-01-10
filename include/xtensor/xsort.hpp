@@ -393,15 +393,15 @@ namespace xt
             return idx;
         }
 
-        template <class E, class F>
+        template <layout_type L, class E, class F>
         inline xtensor<std::size_t, 0> arg_func_impl(const E& e, F&& f)
         {
-            return cmp_idx(e.template begin<XTENSOR_DEFAULT_LAYOUT>(),
-                           e.template end<XTENSOR_DEFAULT_LAYOUT>(), 1,
+            return cmp_idx(e.template begin<L>(),
+                           e.template end<L>(), 1,
                            std::forward<F>(f));
         }
 
-        template <class E, class F>
+        template <layout_type L, class E, class F>
         inline typename argfunc_result_type<E>::type
         arg_func_impl(const E& e, std::size_t axis, F&& cmp)
         {
@@ -412,7 +412,7 @@ namespace xt
 
             if (e.dimension() == 1)
             {
-                return arg_func_impl(e, std::forward<F>(cmp));
+                return arg_func_impl<L>(e, std::forward<F>(cmp));
             }
 
             result_shape_type alt_shape;
@@ -460,12 +460,12 @@ namespace xt
         }
     }
 
-    template <class E>
+    template <layout_type L = layout_type::row_major, class E>
     inline auto argmin(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl(ed, std::less<value_type>());
+        return detail::arg_func_impl<L>(ed, std::less<value_type>());
     }
 
     /**
@@ -476,20 +476,20 @@ namespace xt
      *
      * @return returns xarray with positions of minimal value
      */
-    template <class E>
+    template <layout_type L = layout_type::row_major, class E>
     inline auto argmin(const xexpression<E>& e, std::size_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl(ed, axis, std::less<value_type>());
+        return detail::arg_func_impl<L>(ed, axis, std::less<value_type>());
     }
 
-    template <class E>
+    template <layout_type L = layout_type::row_major, class E>
     inline auto argmax(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl(ed, std::greater<value_type>());
+        return detail::arg_func_impl<L>(ed, std::greater<value_type>());
     }
 
     /**
@@ -500,12 +500,12 @@ namespace xt
      *
      * @return returns xarray with positions of maximal value
      */
-    template <class E>
+    template <layout_type L = layout_type::row_major, class E>
     inline auto argmax(const xexpression<E>& e, std::size_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl(ed, axis, std::greater<value_type>());
+        return detail::arg_func_impl<L>(ed, axis, std::greater<value_type>());
     }
 
     /**
