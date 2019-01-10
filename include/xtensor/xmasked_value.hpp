@@ -94,7 +94,7 @@ namespace xt
         constexpr xmasked_value(T1&& value, B1&& flag);
 
         template <class T1>
-        explicit constexpr xmasked_value(T1&& value);
+        constexpr xmasked_value(T1&& value);
 
         explicit constexpr xmasked_value();
 
