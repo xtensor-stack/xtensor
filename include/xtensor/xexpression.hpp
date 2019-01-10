@@ -249,6 +249,13 @@ namespace xt
             using type = xarray<T, L>;
         };
 
+        template <template <class, std::size_t, class, bool> class S, class X, std::size_t N, class A, bool Init>
+        struct xtype_for_shape<S<X, N, A, Init>>
+        {
+            template <class T, layout_type L>
+            using type = xarray<T, L>;
+        };
+
         template <template <class, std::size_t> class S, class X, std::size_t N>
         struct xtype_for_shape<S<X, N>>
         {
