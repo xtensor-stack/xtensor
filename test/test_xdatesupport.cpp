@@ -6,6 +6,10 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#if defined(__GNUC__) && (__GNUC__ == 7) && (__cplusplus == 201703L)
+#warning "test_xdatesupport.cpp has been deactivated because it leads to internal compiler error"
+#else
+
 #include "gtest/gtest.h"
 
 #include <chrono>
@@ -83,3 +87,6 @@ namespace xt
         EXPECT_EQ(cmp_res, equal(tarr, arrpf));
     }
 }
+
+#endif // defined(__GNUC__) && (__GNUC__ == 7) && (__cplusplus == 201703L)
+
