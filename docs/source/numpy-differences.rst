@@ -27,6 +27,23 @@ In xtensor, 0-D expressions are not implicitly convertible to scalar values. Val
 expressions can be accessed in the same way as values of higher dimensional arrays, that is with
 ``operator[]``, ``operator()`` and ``element``.
 
+Accumulators (``cumsum``, ``cumprod``) throw an exception if an axis argument is passed and the
+array argument is a 0-D argument:
+
+.. code-block::
+
+    #include <xtensor/xarray.hpp>
+    #include <xtensor/xio.hpp>
+
+    xt::xarray<double> x = 1;
+    std::cout << xt::cumsum(x, 0) << std::endl;
+    // Outputs:
+    // Standard Exception: Axis larger than expression dimension in accumulator.
+
+    std::cout << xt::cumsum(x) << std::endl;
+    //Outputs:
+    // 1
+
 Meshgrid
 --------
 
