@@ -107,9 +107,8 @@ namespace xt
         xarray<double> b = {1,3,4,-100};
         xarray<double, layout_type(int(XTENSOR_DEFAULT_LAYOUT) & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
 
-        xarray<std::size_t> ex;
+        xarray<std::size_t> ex = 2ul;
 
-        ex = (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major) ? 2ul : 4ul;
         EXPECT_EQ(ex, argmin(a));
 
         EXPECT_EQ(size_t(3), argmin(b)());
@@ -125,7 +124,6 @@ namespace xt
         EXPECT_EQ(ex, argmin(xa));
         EXPECT_EQ(ex_2, argmin(xa, 0));
         EXPECT_EQ(ex_3, argmin(xa, 1));
-
     }
 
     TEST(xsort, argmax)
