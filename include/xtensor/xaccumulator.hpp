@@ -201,11 +201,12 @@ namespace xt
             std::size_t outer_stride = 1;  // this is either going row- or column-wise (strides.back / strides.front)
             std::size_t outer_loop_size = 0;
             std::size_t inner_loop_size = 0;
+            std::size_t init_size = e.shape()[axis] != std::size_t(1) ? std::size_t(1) : std::size_t(0);
 
-            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size](auto first, auto last, std::ptrdiff_t ax) {
+            auto set_loop_sizes = [&outer_loop_size, &inner_loop_size, init_size](auto first, auto last, std::ptrdiff_t ax) {
                 outer_loop_size = std::accumulate(first,
                                                   first + ax,
-                                                  std::size_t(1), std::multiplies<std::size_t>());
+                                                  init_size, std::multiplies<std::size_t>());
 
                 inner_loop_size = std::accumulate(first + ax,
                                                   last,
@@ -227,7 +228,7 @@ namespace xt
             inner_loop_size = inner_loop_size - inner_stride;
 
             // activate the init loop if we have an init function other than identity
-            if (!std::is_same<decltype(std::get<1>(f)), xtl::identity>::value)
+            if (!std::is_same<std::decay_t<decltype(std::get<1>(f))>, xtl::identity>::value)
             {
                 accumulator_init_with_f(std::get<1>(f), result, axis);
             }
