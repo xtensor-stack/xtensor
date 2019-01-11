@@ -423,7 +423,7 @@ namespace xt
             std::copy(e.shape().cbegin() + std::ptrdiff_t(axis) + 1, e.shape().cend(), alt_shape.begin() + std::ptrdiff_t(axis));
 
             result_type result = result_type::from_shape(std::move(alt_shape));
-            auto result_iter = result.begin();
+            auto result_iter = result.template begin<L>();
 
             auto arg_func_lambda = [&result_iter, &cmp](auto begin, auto end) {
                 std::size_t idx = 0;
