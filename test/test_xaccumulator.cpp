@@ -30,6 +30,17 @@ namespace xt
         EXPECT_TRUE(all(equal(with_axis, expected)));
     }
 
+    TEST(xaccumulator, dim_one)
+    {
+        xt::xarray<double> arr = {{ 5., 6., 7. }};
+        xt::xarray<double> res = xt::cumsum(arr, 0);
+        EXPECT_EQ(res, arr);
+
+        xt::xarray<double> arr2 = xt::transpose(arr);
+        xt::xarray<double> res2 = xt::cumsum(arr2, 1);
+        EXPECT_EQ(res2, arr2);
+    }
+
     TEST(xaccumulator, four_d)
     {
         xarray<double> arg_0 = {{{{ 0., 1., 2.},
