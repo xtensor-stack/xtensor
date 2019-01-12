@@ -75,4 +75,8 @@
 #define XTENSOR_DEFAULT_LAYOUT ::xt::layout_type::row_major
 #endif
 
+#ifndef XTENSOR_DEFAULT_TRAVERSAL
+#define XTENSOR_DEFAULT_TRAVERSAL ::xt::layout_type::row_major
+#endif
+
 #endif

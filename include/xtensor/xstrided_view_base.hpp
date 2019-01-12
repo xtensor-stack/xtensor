@@ -174,8 +174,8 @@ namespace xt
             using reference = typename xexpression_type::reference;
             using const_reference = typename xexpression_type::const_reference;
 
-            using iterator = typename xexpression_type::iterator;
-            using const_iterator = typename xexpression_type::const_iterator;
+            using iterator = decltype(std::declval<std::decay_t<CT>>().template begin<XTENSOR_DEFAULT_LAYOUT>());
+            using const_iterator = decltype(std::declval<std::decay_t<CT>>().template cbegin<XTENSOR_DEFAULT_LAYOUT>());
 
             explicit flat_expression_adaptor(CT* e);
 
@@ -823,37 +823,37 @@ namespace xt
         template <class CT>
         inline auto flat_expression_adaptor<CT>::begin() -> iterator
         {
-            return m_e->begin();
+            return m_e->template begin<XTENSOR_DEFAULT_LAYOUT>();
         }
 
         template <class CT>
         inline auto flat_expression_adaptor<CT>::end() -> iterator
         {
-            return m_e->end();
+            return m_e->template end<XTENSOR_DEFAULT_LAYOUT>();
         }
 
         template <class CT>
         inline auto flat_expression_adaptor<CT>::begin() const -> const_iterator
         {
-            return m_e->cbegin();
+            return m_e->template cbegin<XTENSOR_DEFAULT_LAYOUT>();
         }
 
         template <class CT>
         inline auto flat_expression_adaptor<CT>::end() const -> const_iterator
         {
-            return m_e->cend();
+            return m_e->template cend<XTENSOR_DEFAULT_LAYOUT>();
         }
 
         template <class CT>
         inline auto flat_expression_adaptor<CT>::cbegin() const -> const_iterator
         {
-            return m_e->cbegin();
+            return m_e->template cbegin<XTENSOR_DEFAULT_LAYOUT>();
         }
 
         template <class CT>
         inline auto flat_expression_adaptor<CT>::cend() const ->const_iterator
         {
-            return m_e->cend();
+            return m_e->template cend<XTENSOR_DEFAULT_LAYOUT>();
         }
     }
 

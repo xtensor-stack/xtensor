@@ -70,7 +70,7 @@ namespace xt
      * \endcode
      *
      * @tparam T The value type of the elements.
-     * @tparam L The layout_type of the xarray_container (default: row_major).
+     * @tparam L The layout_type of the xarray_container (default: XTENSOR_DEFAULT_LAYOUT).
      * @tparam A The allocator of the container holding the elements.
      * @tparam SA The allocator of the containers holding the shape and the strides.
      */
@@ -93,7 +93,7 @@ namespace xt
      * Alias template on xarray_container for handling missing values
      *
      * @tparam T The value type of the elements.
-     * @tparam L The layout_type of the container (default: row_major).
+     * @tparam L The layout_type of the container (default: XTENSOR_DEFAULT_LAYOUT).
      * @tparam A The allocator of the container holding the elements.
      * @tparam BA The allocator of the container holding the missing flags.
      * @tparam SA The allocator of the containers holding the shape and the strides.
@@ -125,7 +125,7 @@ namespace xt
      *
      * @tparam T The value type of the elements.
      * @tparam N The dimension of the tensor.
-     * @tparam L The layout_type of the tensor (default: row_major).
+     * @tparam L The layout_type of the tensor (default: XTENSOR_DEFAULT_LAYOUT).
      * @tparam A The allocator of the containers holding the elements.
      */
     template <class T,
@@ -170,7 +170,7 @@ namespace xt
      *
      * @tparam T The value type of the elements.
      * @tparam FSH A xshape template shape.
-     * @tparam L The layout_type of the tensor (default: row_major).
+     * @tparam L The layout_type of the tensor (default: XTENSOR_DEFAULT_LAYOUT).
      * @tparam A The allocator of the containers holding the elements.
      */
     template <class T,
@@ -184,7 +184,7 @@ namespace xt
      *
      * @tparam T The value type of the elements.
      * @tparam N The dimension of the tensor.
-     * @tparam L The layout_type of the container (default: row_major).
+     * @tparam L The layout_type of the container (default: XTENSOR_DEFAULT_LAYOUT).
      * @tparam A The allocator of the containers holding the elements.
      * @tparam BA The allocator of the container holding the missing flags.
      */

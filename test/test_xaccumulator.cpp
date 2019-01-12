@@ -69,7 +69,7 @@ namespace xt
         xarray<double> expected_col = {   0.,   18.,   24.,   48.,   60.,   90.,   93.,  114.,  123.,  150.,  165.,  198.,
                                         199.,  218.,  225.,  250.,  263.,  294.,  298.,  320.,  330.,  358.,  374.,  408.,
                                         410.,  430.,  438.,  464.,  478.,  510.,  515.,  538.,  549.,  578.,  595.,  630.};
-        if (arg_0.layout() == layout_type::row_major)
+        if (XTENSOR_DEFAULT_TRAVERSAL == layout_type::row_major)
         {
             EXPECT_TRUE(allclose(expected, res));
         }
