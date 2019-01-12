@@ -18,8 +18,6 @@ namespace xt
     template <class D, bool is_const>
     class xoptional_assembly_stepper;
 
-#define DL XTENSOR_DEFAULT_LAYOUT
-
     /***************************
      * xoptional_assembly_base *
      ***************************/
@@ -245,8 +243,6 @@ namespace xt
         friend class xiterable<D>;
         friend class xconst_iterable<D>;
     };
-
-#undef DL
 
     /******************************
      * xoptional_assembly_stepper *

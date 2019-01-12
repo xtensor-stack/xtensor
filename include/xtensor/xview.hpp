@@ -732,7 +732,7 @@ namespace xt
 
         xview_stepper() = default;
         xview_stepper(view_type* view, substepper_type it,
-                      size_type offset, bool end = false, layout_type l = XTENSOR_DEFAULT_LAYOUT);
+                      size_type offset, bool end = false, layout_type l = XTENSOR_DEFAULT_TRAVERSAL);
 
         reference operator*() const;
 

@@ -102,8 +102,6 @@ namespace xt
         using temporary_type = typename xfunctor_view_temporary_type<F, xexpression_type>::type;
     };
 
-#define DL XTENSOR_DEFAULT_LAYOUT
-
     template <class F, class CT>
     class xfunctor_applier_base
     {
@@ -248,60 +246,60 @@ namespace xt
             return m_functor.template proxy_simd_store<align>(m_e, i, e);
         }
 
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto begin() noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto end() noexcept;
 
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto begin() const noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto end() const noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto cbegin() const noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto cend() const noexcept;
 
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto rbegin() noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto rend() noexcept;
 
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto rbegin() const noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto rend() const noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto crbegin() const noexcept;
-        template <layout_type L = DL>
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         auto crend() const noexcept;
 
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         broadcast_iterator<S, L> begin(const S& shape) noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         broadcast_iterator<S, L> end(const S& shape) noexcept;
 
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_broadcast_iterator<S, L> begin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_broadcast_iterator<S, L> end(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_broadcast_iterator<S, L> cbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_broadcast_iterator<S, L> cend(const S& shape) const noexcept;
 
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         reverse_broadcast_iterator<S, L> rbegin(const S& shape) noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
 
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_reverse_broadcast_iterator<S, L> rend(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = DL>
+        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
         const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
 
         storage_iterator storage_begin() noexcept;
@@ -335,7 +333,6 @@ namespace xt
         functor_type m_functor;
     };
 
-#undef DL
 
     /**
      * @class xfunctor_view
@@ -913,7 +910,7 @@ namespace xt
     //@{
     /**
      * Returns an iterator to the first element of the expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -926,7 +923,7 @@ namespace xt
     /**
      * Returns an iterator to the element following the last element
      * of the expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -938,7 +935,7 @@ namespace xt
 
     /**
      * Returns a constant iterator to the first element of the expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -950,7 +947,7 @@ namespace xt
     /**
      * Returns a constant iterator to the element following the last element
      * of the expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -961,7 +958,7 @@ namespace xt
 
     /**
      * Returns a constant iterator to the first element of the expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -974,7 +971,7 @@ namespace xt
     /**
      * Returns a constant iterator to the element following the last element
      * of the expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -994,7 +991,7 @@ namespace xt
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1008,7 +1005,7 @@ namespace xt
      * expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1022,7 +1019,7 @@ namespace xt
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1036,7 +1033,7 @@ namespace xt
      * expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1050,7 +1047,7 @@ namespace xt
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1064,7 +1061,7 @@ namespace xt
      * expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1080,7 +1077,7 @@ namespace xt
     //@{
     /**
      * Returns an iterator to the first element of the reversed expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -1093,7 +1090,7 @@ namespace xt
     /**
      * Returns an iterator to the element following the last element
      * of the reversed expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -1105,7 +1102,7 @@ namespace xt
 
     /**
      * Returns a constant iterator to the first element of the reversed expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -1117,7 +1114,7 @@ namespace xt
     /**
      * Returns a constant iterator to the element following the last element
      * of the reversed expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -1128,7 +1125,7 @@ namespace xt
 
     /**
      * Returns a constant iterator to the first element of the reversed expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -1141,7 +1138,7 @@ namespace xt
     /**
      * Returns a constant iterator to the element following the last element
      * of the reversed expression.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <layout_type L>
@@ -1160,7 +1157,7 @@ namespace xt
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1174,7 +1171,7 @@ namespace xt
      * reversed expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1188,7 +1185,7 @@ namespace xt
      * The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1202,7 +1199,7 @@ namespace xt
      * of the reversed expression.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1216,7 +1213,7 @@ namespace xt
      * The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>
@@ -1230,7 +1227,7 @@ namespace xt
      * of the reversed expression.
      * @param shape the shape used for broadcasting
      * @tparam S type of the \c shape parameter.
-     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_LAYOUT.
+     * @tparam L layout used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class F, class CT>
     template <class S, layout_type L>

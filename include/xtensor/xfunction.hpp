@@ -212,8 +212,6 @@ namespace xt
      * xfunction *
      *************/
 
-#define DL XTENSOR_DEFAULT_LAYOUT
-
     /**
      * @class xfunction
      * @brief Multidimensional function operating on
@@ -407,8 +405,6 @@ namespace xt
         friend class xfunction_stepper<F, CT...>;
         friend class xconst_iterable<self_type>;
     };
-
-#undef DL
 
     /**********************
      * xfunction_iterator *
