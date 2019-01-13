@@ -935,11 +935,12 @@ namespace xt
 
     TEST(xview, random_stepper)
     {
-        xt::xarray<double> x = xt::arange(0, 100);
-        x.reshape({5, 5, 4});
+        xt::xarray<double, layout_type::row_major> data = xt::arange(0, 100);
+        data.reshape({5, 5, 4});
+        xt::xarray<double> x = data;
 
         xt::xarray<double> expected;
-        if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
+        if (XTENSOR_DEFAULT_TRAVERSAL == layout_type::row_major)
         {
            expected = {
                0, 1, 2, 3,

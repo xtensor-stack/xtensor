@@ -168,9 +168,9 @@ Iterators
 ~~~~~~~~~
 
 - ``begin()`` and ``end()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the expression. The layout of the iteration can be specified
-  through the ``layout_type`` template parameter, accepted values are ``layout_type::row_major`` and ``layout_type::column_major``. If not specified, ``XTENSOR_DEFAULT_LAYOUT`` is used.
+  through the ``layout_type`` template parameter, accepted values are ``layout_type::row_major`` and ``layout_type::column_major``. If not specified, ``XTENSOR_DEFAULT_TRAVERSAL`` is used.
   This iterator pair permits to use algorithms of the STL with ``xexpression`` as if they were simple containers.
-- ``begin(shape)`` and ``end(shape)`` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in ``XTENSOR_DEFAULT_LAYOUT`` if no ``layout_type`` template parameter is specified. Certain dimensions are repeated to match the provided shape as per the rules described above.
+- ``begin(shape)`` and ``end(shape)`` are similar but take a *broadcasting shape* as an argument. Elements are iterated upon in ``XTENSOR_DEFAULT_TRAVERSAL`` if no ``layout_type`` template parameter is specified. Certain dimensions are repeated to match the provided shape as per the rules described above.
 - ``rbegin()`` and ``rend()`` return instances of ``xiterator`` which can be used to iterate over all the elements of the reversed expression. As ``begin()`` and ``end()``, the layout of the iteration can be specified through the ``layout_type`` parameter.
 - ``rbegin(shape)`` and ``rend(shape)`` are the reversed counterpart of ``begin(shape)`` and ``end(shape)``.
 

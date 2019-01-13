@@ -169,7 +169,6 @@ namespace xt
         template <class S>
         bool has_linear_assign(const S& strides) const noexcept;
         template <class S>
-
         stepper stepper_begin(const S& shape) noexcept;
         template <class S>
         stepper stepper_end(const S& shape, layout_type l) noexcept;

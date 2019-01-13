@@ -19,7 +19,8 @@ namespace xt
     using namespace std::complex_literals;
 
     template <class T>
-    struct nooblean_proxy {
+    struct nooblean_proxy
+    {
         nooblean_proxy(T& ref) : m_ref(ref)
         {
         }

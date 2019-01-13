@@ -870,8 +870,8 @@ namespace xt
     {
         if (end)
         {
-            // Note: the layout here doesn't matter (unused) but using default layout looks more "correct"
-            to_end(XTENSOR_DEFAULT_LAYOUT);
+            // Note: the layout here doesn't matter (unused) but using default traversal looks more "correct".
+            to_end(XTENSOR_DEFAULT_TRAVERSAL);
         }
     }
 

@@ -18,7 +18,7 @@ namespace xt
     w  = np.random.random(4*5*6*7).reshape(4,5,6,7)
     av = np.average(a, weights=w, axis=(0,1))
     */
-    TEST(xtest_extended_xmath, average)
+    TEST(extended_xmath, average)
     {
         // py_a
         xarray<double> py_a = {{{{0.3745401188473625,0.9507143064099162,0.7319939418114051,
@@ -818,7 +818,7 @@ namespace xt
     vr = np.var(a, axis=(0,2))
     st = np.std(a, axis=(0,2))
     */
-    TEST(xtest_extended_xmath, var_std)
+    TEST(extended_xmath, var_std)
     {
         // py_a
         xarray<double> py_a = {{{{0.3460997265377855,0.9756102008599149,0.640972077345332 ,

@@ -49,7 +49,7 @@ namespace xt
 
             for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
-                size_t adj_secondary_stride = static_cast<size_t>((std::max)(secondary_stride, std::ptrdiff_t(1)));
+                std::size_t adj_secondary_stride = static_cast<size_t>((std::max)(secondary_stride, std::ptrdiff_t(1)));
                 fct(ev.data() + offset, ev.data() + offset + adj_secondary_stride);
             }
         }
@@ -423,7 +423,7 @@ namespace xt
             std::copy(e.shape().cbegin() + std::ptrdiff_t(axis) + 1, e.shape().cend(), alt_shape.begin() + std::ptrdiff_t(axis));
 
             result_type result = result_type::from_shape(std::move(alt_shape));
-            auto result_iter = result.begin();
+            auto result_iter = result.template begin<L>();
 
             auto arg_func_lambda = [&result_iter, &cmp](auto begin, auto end) {
                 std::size_t idx = 0;
@@ -460,7 +460,7 @@ namespace xt
         }
     }
 
-    template <layout_type L = layout_type::row_major, class E>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmin(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
@@ -476,7 +476,7 @@ namespace xt
      *
      * @return returns xarray with positions of minimal value
      */
-    template <layout_type L = layout_type::row_major, class E>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmin(const xexpression<E>& e, std::size_t axis)
     {
         using value_type = typename E::value_type;
@@ -484,7 +484,7 @@ namespace xt
         return detail::arg_func_impl<L>(ed, axis, std::less<value_type>());
     }
 
-    template <layout_type L = layout_type::row_major, class E>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmax(const xexpression<E>& e)
     {
         using value_type = typename E::value_type;
@@ -500,7 +500,7 @@ namespace xt
      *
      * @return returns xarray with positions of maximal value
      */
-    template <layout_type L = layout_type::row_major, class E>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     inline auto argmax(const xexpression<E>& e, std::size_t axis)
     {
         using value_type = typename E::value_type;
