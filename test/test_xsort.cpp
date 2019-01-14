@@ -25,10 +25,10 @@ namespace xt
         xarray<double> a1 = {2, 3, 1};
         xarray<double, xt::layout_type::column_major> a2_c = {{2, 3, 1}, {4, 6, 5}};
         xarray<double, xt::layout_type::row_major> a2_r = {{2, 3, 1}, {4, 6, 5}};
-        xarray<float> a3 = {{{1,3,2},
-                             {4,2,1}},
-                            {{5,1,3},
-                             {4,2,6}}};
+        xarray<float> a3 = {{{1, 3, 2},
+                             {4, 2, 1}},
+                            {{5, 1, 3},
+                             {4, 2, 6}}};
 
         xarray<std::size_t> ex = {2, 0, 1};
         EXPECT_EQ(ex, argsort(a1, 0));
@@ -44,9 +44,9 @@ namespace xt
         EXPECT_EQ(ex2_1, argsort(a2_c, 1));
         EXPECT_EQ(ex2_1, argsort(a2_r, 1));
 
-        xarray<std::size_t> ex3_0 = {{{0,1,0},{0,0,0}},{{1,0,1},{1,1,1}}};
-        xarray<std::size_t> ex3_1 = {{{0,1,1},{1,0,0}},{{1,0,0},{0,1,1}}};
-        xarray<std::size_t> ex3_2 = {{{0,2,1},{2,1,0}},{{1,2,0},{1,0,2}}};
+        xarray<std::size_t> ex3_0 = {{{0, 1, 0}, {0, 0, 0}}, {{1, 0, 1}, {1, 1, 1}}};
+        xarray<std::size_t> ex3_1 = {{{0, 1, 1}, {1, 0, 0}}, {{1, 0, 0}, {0, 1, 1}}};
+        xarray<std::size_t> ex3_2 = {{{0, 2, 1}, {2, 1, 0}}, {{1, 2, 0}, {1, 0, 2}}};
 
         EXPECT_EQ(ex3_2, argsort(a3));
         EXPECT_EQ(ex3_0, argsort(a3, 0));
@@ -104,7 +104,7 @@ namespace xt
     TEST(xsort, argmin)
     {
         xarray<double> a = {{5, 3, 1}, {4, 4, 4}};
-        xarray<double> b = {1,3,4,-100};
+        xarray<double> b = {1, 3, 4, -100};
         xarray<double, layout_type(int(XTENSOR_DEFAULT_LAYOUT) & 0x03)> ar = {{5, 3, 1}, {4, 4, 4}};
 
         xarray<std::size_t> ex = 2ul;
@@ -120,7 +120,7 @@ namespace xt
         xarray<std::size_t> ex_3 = {2, 0};
         EXPECT_EQ(ex_3, argmin(a, 1));
 
-        xtensor<double, 2> xa = {{5,3,1}, {4,4,4}};
+        xtensor<double, 2> xa = {{5, 3, 1}, {4, 4, 4}};
         EXPECT_EQ(ex, argmin(xa));
         EXPECT_EQ(ex_2, argmin(xa, 0));
         EXPECT_EQ(ex_3, argmin(xa, 1));
@@ -138,7 +138,7 @@ namespace xt
         xarray<std::size_t> ex_3 = {0, 0};
         EXPECT_EQ(ex_3, argmax(a, 1));
 
-        xt::xtensor<int, 2> b = {{ 1,2 }};
+        xt::xtensor<int, 2> b = {{ 1, 2 }};
         auto res = xt::eval(xt::argmax(b, 1));
         EXPECT_EQ(res(), 0u);
     }
@@ -173,28 +173,28 @@ namespace xt
         {
             xarray<double> a = xt::random::rand<double>({5, 4, 6, 7});
 
-            auto a_s0 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 0);
+            auto a_s0 = argmin(a, 0);
             auto va_s0 = view(a, xt::all(), 3, 2, 3);
             auto m0_idx = a_s0(3, 2, 3);
             auto it0 = std::min_element(va_s0.begin(), va_s0.end());
             auto c0_idx = std::distance(va_s0.begin(), it0);
             EXPECT_EQ(static_cast<size_t>(c0_idx), m0_idx);
 
-            auto a_s1 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 1);
+            auto a_s1 = argmin(a, 1);
             auto va_s1 = view(a, 3, xt::all(), 2, 3);
             auto m1_idx = a_s1(3, 2, 3);
             auto it1 = std::min_element(va_s1.begin(), va_s1.end());
             auto c1_idx = std::distance(va_s1.begin(), it1);
             EXPECT_EQ(static_cast<size_t>(c1_idx), m1_idx);
 
-            auto a_s2 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 2);
+            auto a_s2 = argmin(a, 2);
             auto va_s2 = view(a, 3, 2, xt::all(), 3);
             auto m2_idx = a_s2(3, 2, 3);
             auto it2 = std::min_element(va_s2.begin(), va_s2.end());
             auto c2_idx = std::distance(va_s2.begin(), it2);
             EXPECT_EQ(static_cast<size_t>(c2_idx), m2_idx);
 
-            auto a_s3 = argmin<XTENSOR_DEFAULT_LAYOUT>(a, 3);
+            auto a_s3 = argmin(a, 3);
             auto va_s3 = view(a, 3, 2, 3, xt::all());
             auto m3_idx = a_s3(3, 2, 3);
             auto it3 = std::min_element(va_s3.begin(), va_s3.end());
@@ -205,32 +205,32 @@ namespace xt
 
     TEST(xsort, unique)
     {
-        xarray<double> a = {1,2,3, 5,3,2,1,2,2,2,2,2,2, 45};
+        xarray<double> a = {1, 2, 3, 5, 3, 2, 1, 2, 2, 2, 2, 2, 2, 45};
         xarray<double> ax = {1, 2, 3, 5, 45};
         EXPECT_EQ(unique(a), ax);
 
-        xarray<double> b = {{1,2,3}, {4,5,6}, {7,8,9}};
-        xarray<double> bx = {1,2,3,4,5,6,7,8,9};
+        xarray<double> b = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double> bx = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         EXPECT_EQ(unique(b), bx);
 
-        xarray<double> bb = {{1,2,3}, {7,8,9}, {4,5,6}, {7,8,9}};
-        xarray<double> bbx = {1,2,3,4,5,6,7,8,9};
+        xarray<double> bb = {{1, 2, 3}, {7, 8, 9}, {4, 5, 6}, {7, 8, 9}};
+        xarray<double> bbx = {1, 2, 3, 4, 5, 6, 7, 8, 9};
         EXPECT_EQ(unique(bb), bbx);
     }
 
     TEST(xsort, setdiff1d)
     {
         {
-            xarray<size_t> ar1 = {1,2,3,4,4,4,5};
-            xarray<size_t> ar2 = {4,5};
-            xarray<size_t> out = {1,2,3};
+            xarray<size_t> ar1 = {1, 2, 3, 4, 4, 4, 5};
+            xarray<size_t> ar2 = {4, 5};
+            xarray<size_t> out = {1, 2, 3};
             EXPECT_EQ(setdiff1d(ar1, ar2), out);
         }
 
         {
-            xarray<size_t> ar1 = {{5,6,7},{4,4,4},{1,2,3}};
-            xarray<size_t> ar2 = {4,1};
-            xarray<size_t> out = {2,3,5,6,7};
+            xarray<size_t> ar1 = {{5, 6, 7}, {4, 4, 4}, {1, 2, 3}};
+            xarray<size_t> ar2 = {4, 1};
+            xarray<size_t> out = {2, 3, 5, 6, 7};
             EXPECT_EQ(setdiff1d(ar1, ar2), out);
         }
     }
