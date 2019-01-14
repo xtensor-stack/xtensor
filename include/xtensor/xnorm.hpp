@@ -213,7 +213,7 @@ namespace xt
         auto init_func = [](value_type const& v) {                                   \
             return NAME(v);                                                          \
         };                                                                           \
-        return reduce(make_xreducer_functor(std::move(reduce_func),                  \
+        return xt::reduce(make_xreducer_functor(std::move(reduce_func),              \
                                             std::move(init_func),                    \
                                             MERGE_FUNC<result_type>()),              \
                       std::forward<E>(e), std::forward<X>(axes), es);                \
@@ -371,7 +371,7 @@ namespace xt
         auto init_func = [p](value_type const& v) {
             return norm_lp_to_p(v, p);
         };
-        return reduce(make_xreducer_functor(std::move(reduce_func), std::move(init_func), std::plus<result_type>()),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_func), std::move(init_func), std::plus<result_type>()),
                       std::forward<E>(e), std::forward<X>(axes), es);
     }
 

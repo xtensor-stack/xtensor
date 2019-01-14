@@ -331,16 +331,16 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e),                                  \
+        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e),                              \
                       std::forward<X>(axes), es);                                                                 \
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
               class = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value        \
                         && std::is_integral<X>::value, int>>                                                      \
-    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                                \
+    inline auto NAME(E&& e, X axis, EVS es = EVS())                                                               \
     {                                                                                                             \
-        return NAME(std::forward<E>(e), {axis}, es);                                                               \
+        return NAME(std::forward<E>(e), {axis}, es);                                                              \
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
@@ -349,7 +349,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), es);                             \
+        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), es);                         \
     }
 
 #define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                     \
@@ -358,7 +358,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                       \
+        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                   \
     }
 
 #define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                  \
@@ -367,7 +367,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                       \
+        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                   \
     }
 
     /*******************
@@ -2009,7 +2009,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             r[1] = (max)(r[1], s[1]);
             return r;
         };
-        return reduce(make_xreducer_functor(std::move(reduce_func),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_func),
                                             std::move(init_func),
                                             std::move(merge_func)),
                       std::forward<E>(e), arange(e.dimension()), es);
@@ -2161,7 +2161,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e),             \
+        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e),         \
                       std::forward<X>(axes), es);                                                                 \
     }                                                                                                             \
                                                                                                                   \
@@ -2172,7 +2172,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);        \
+        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);    \
     }
 
 #define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                       \
@@ -2182,7 +2182,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             using result_type = RESULT_TYPE;                                                                         \
             using functor_type = FUNCTOR<result_type>;                                                               \
             using init_functor_type = detail::nan_init<result_type, NAN>;                                            \
-            return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es); \
+            return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es); \
         }
 
 #define MODERN_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                 \
@@ -2192,7 +2192,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using result_type = RESULT_TYPE;                                                                          \
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
-        return reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es);  \
+        return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es);  \
     }
 
     /**
@@ -2254,7 +2254,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto count_nonzero(E&& e, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
-        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), es);
     }
 
@@ -2264,7 +2264,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto count_nonzero(E&& e, X&& axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
-        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), std::forward<X>(axes), es);
     }
 
@@ -2281,7 +2281,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto count_nonzero(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
-        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), axes, es);
     }
 #else
@@ -2289,7 +2289,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto count_nonzero(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
-        return reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_fct), std::move(init_fct), std::move(merge_func)),
                       std::forward<E>(e), axes, es);
     }
 #endif
