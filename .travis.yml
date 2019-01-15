@@ -142,8 +142,8 @@ install:
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
-    - conda install gtest=1.8.0 cmake -c conda-forge
-    - conda install xtl==0.5.1 xsimd nlohmann_json -c conda-forge
+    - conda install cmake -c conda-forge
+    - conda install xtl==0.5.3 xsimd nlohmann_json -c conda-forge
     - if [[ "$ENABLE_TBB" == 1 ]]; then
         conda install tbb-devel -c conda-forge;
       fi
@@ -153,15 +153,15 @@ install:
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
         cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON -DBUILD_BENCHMARK=ON ..;
       elif [[ "$COLUMN_MAJOR_LAYOUT" == 1 ]]; then
-        cmake -DBUILD_TESTS=ON -DDEFAULT_COLUMN_MAJOR=ON ..;
+        cmake -DDOWNLOAD_GTEST=ON -DDEFAULT_COLUMN_MAJOR=ON ..;
       elif [[ "$DISABLE_XSIMD" == 1 ]]; then
-        cmake -DBUILD_TESTS=ON ..;
+        cmake -DDOWNLOAD_GTEST=ON ..;
       elif [[ "$ENABLE_TBB" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=/home/travis/miniconda/include -DTBB_LIBRARY=/home/travis/miniconda/lib ..;
       elif [[ "$ENABLE_CPP17" == 1 ]]; then
-        cmake -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DCPP17=ON ..;
+        cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DCPP17=ON ..;
       else
-        cmake -DXTENSOR_USE_XSIMD=ON -DBUILD_TESTS=ON ..;
+        cmake -DXTENSOR_USE_XSIMD=ON -DDOWNLOAD_GTEST=ON ..;
       fi
     - make -j2 test_xtensor_lib
     - if [[ "$BUILD_BENCHMARK" == 1 ]]; then
