@@ -14,16 +14,12 @@
 #include <complex>
 #include <cstdlib>
 
-#include "xconcepts.hpp"
 #include "xmath.hpp"
 #include "xoperation.hpp"
 #include "xutils.hpp"
 
 namespace xt
 {
-    template <class X>
-    using disable_evaluation_strategy = std::enable_if_t<!std::is_base_of<evaluation_strategy::base, std::decay_t<X>>::value, int>;
-
     /*************************************
      * norm functions for built-in types *
      *************************************/
@@ -201,7 +197,7 @@ namespace xt
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC) \
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,               \
-              class = disable_evaluation_strategy<X>>                                \
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>                \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS()) noexcept                       \
     {                                                                                \
         using value_type = typename std::decay_t<E>::value_type;                     \
@@ -220,7 +216,7 @@ namespace xt
     }                                                                                \
                                                                                      \
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                        \
-              XTENSOR_REQUIRE<is_xexpression<E>::value>>                             \
+              XTL_REQUIRES(is_xexpression<E>)>                                       \
     inline auto NAME(E&& e, EVS es = EVS()) noexcept                                 \
     {                                                                                \
         return NAME(std::forward<E>(e), arange(e.dimension()), es);                  \
@@ -290,7 +286,8 @@ namespace xt
      *  For scalar types: implemented as <tt>abs(t)</tt><br>
      *  otherwise: implemented as <tt>sqrt(norm_sq(t))</tt>.
     */
-    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_xexpression<E>)>
     inline auto norm_l2(E&& e, EVS es = EVS()) noexcept
     {
         using std::sqrt;
@@ -308,7 +305,7 @@ namespace xt
      * @return an \ref xreducer (specifically: <tt>sqrt(norm_sq(e, axes))</tt>) (or xcontainer, depending on evaluation strategy)
     */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTENSOR_REQUIRE<is_xexpression<E>::value>, class = disable_evaluation_strategy<X>>
+              XTL_REQUIRES(is_xexpression<E>, xtl::negation<is_evaluation_strategy<X>>)>
     inline auto norm_l2(E&& e, X&& axes, EVS es = EVS()) noexcept
     {
         return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes), es));
@@ -358,7 +355,8 @@ namespace xt
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, class = disable_evaluation_strategy<X>>
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
     inline auto norm_lp_to_p(E&& e, double p, X&& axes, EVS es = EVS()) noexcept
     {
         using value_type = typename std::decay_t<E>::value_type;
@@ -375,7 +373,7 @@ namespace xt
                       std::forward<E>(e), std::forward<X>(axes), es);
     }
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_xexpression<E>)>
     inline auto norm_lp_to_p(E&& e, double p, EVS es = EVS()) noexcept
     {
         return norm_lp_to_p(std::forward<E>(e), p, arange(e.dimension()), es);
@@ -410,7 +408,8 @@ namespace xt
      * When no axes are provided, the norm is calculated over the entire array. In this case,
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS, class = disable_evaluation_strategy<X>>
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
     inline auto norm_lp(E&& e, double p, X&& axes, EVS es = EVS())
     {
         XTENSOR_PRECONDITION(p != 0,
@@ -418,7 +417,8 @@ namespace xt
         return pow(norm_lp_to_p(std::forward<E>(e), p, std::forward<X>(axes), es), 1.0 / p);
     }
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_xexpression<E>)>
     inline auto norm_lp(E&& e, double p, EVS es = EVS())
     {
         return norm_lp(std::forward<E>(e), p, arange(e.dimension()), es);
@@ -449,7 +449,8 @@ namespace xt
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      */
-    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_xexpression<E>)>
     inline auto norm_induced_l1(E&& e, EVS es = EVS())
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,
@@ -466,7 +467,8 @@ namespace xt
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @return an \ref xreducer (or xcontainer, depending on evaluation strategy)
      */
-    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_xexpression<E>)>
     inline auto norm_induced_linf(E&& e, EVS es = EVS())
     {
         XTENSOR_PRECONDITION(e.dimension() == 2,

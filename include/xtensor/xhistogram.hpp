@@ -387,7 +387,7 @@ namespace xt
      *
      * @return 1D container with the bincount
      */
-    template <class E1, class E2, XTENSOR_REQUIRE<is_xexpression<std::decay_t<E2>>::value>>
+    template <class E1, class E2, XTL_REQUIRES(is_xexpression<std::decay_t<E2>>)>
     inline auto bincount(E1&& data, E2&& weights, std::size_t minlength = 0)
     {
         using result_value_type = typename std::decay_t<E2>::value_type;

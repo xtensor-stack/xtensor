@@ -159,6 +159,11 @@ namespace xt
         */
     }
 
+    template <class T>
+    struct is_evaluation_strategy : std::is_base_of<evaluation_strategy::base, std::decay_t<T>>
+    {
+    };
+
     /************
      * xclosure *
      ************/

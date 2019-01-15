@@ -220,11 +220,11 @@ namespace xt
     template <class T, class B>
     auto sign(const xtl::xoptional<T, B>& e);
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
+    /*template <class E, XTL_REQUIRES(is_xexpression<E>)>
     detail::value_expression_t<E> value(E&&);
 
-    template <class E, XTENSOR_REQUIRE<is_xexpression<E>::value>>
-    detail::flag_expression_t<E> has_value(E&&);
+    template <class E, XTL_REQUIRES(is_xexpression<E>)>
+    detail::flag_expression_t<E> has_value(E&&);*/
 
     template <>
     class xexpression_assigner_base<xoptional_expression_tag>
@@ -1100,13 +1100,13 @@ namespace xt
      * value() and has_value() implementation *
      ******************************************/
 
-    template <class E, class>
+    template <class E, XTL_REQUIRES(is_xexpression<E>)>
     inline auto value(E&& e) -> detail::value_expression_t<E>
     {
         return detail::split_optional_expression<E>::value(std::forward<E>(e));
     }
 
-    template <class E, class>
+    template <class E, XTL_REQUIRES(is_xexpression<E>)>
     inline auto has_value(E&& e) -> detail::flag_expression_t<E>
     {
         return detail::split_optional_expression<E>::has_value(std::forward<E>(e));
