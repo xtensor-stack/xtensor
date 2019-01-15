@@ -15,7 +15,6 @@
 
 #include <xtl/xsequence.hpp>
 
-#include "xconcepts.hpp"
 #include "xexpression.hpp"
 #include "xiterator.hpp"
 #include "xstrides.hpp"
@@ -440,6 +439,17 @@ namespace xt
     /***********************************
      * stepper_assigner implementation *
      ***********************************/
+
+    template <class FROM, class TO>
+    struct is_narrowing_conversion
+    {
+        using argument_type = std::decay_t<FROM>;
+        using result_type = std::decay_t<TO>;
+
+        static const bool value = std::is_arithmetic<result_type>::value &&
+            (sizeof(result_type) < sizeof(argument_type) ||
+             (std::is_integral<result_type>::value && std::is_floating_point<argument_type>::value));
+    };
 
     template <class E1, class E2, layout_type L>
     inline stepper_assigner<E1, E2, L>::stepper_assigner(E1& e1, const E2& e2)

@@ -15,7 +15,6 @@
 
 #include <xtl/xsequence.hpp>
 
-#include "xconcepts.hpp"
 #include "xfunction.hpp"
 #include "xscalar.hpp"
 #include "xstrides.hpp"

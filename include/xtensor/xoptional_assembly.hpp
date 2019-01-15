@@ -9,7 +9,6 @@
 #ifndef XOPTIONAL_ASSEMBLY_HPP
 #define XOPTIONAL_ASSEMBLY_HPP
 
-#include "xconcepts.hpp"
 #include "xoptional.hpp"
 #include "xoptional_assembly_base.hpp"
 #include "xsemantic.hpp"
