@@ -92,7 +92,7 @@ namespace xt
         xoptional_assembly(const VE& ve);
         xoptional_assembly(VE&& ve);
 
-        template <class OVE, class OFE, XTENSOR_REQUIRE<is_xexpression<OVE>::value && is_xexpression<OFE>::value>>
+        template <class OVE, class OFE, typename = std::enable_if_t<is_xexpression<OVE>::value && is_xexpression<OFE>::value>>
         xoptional_assembly(OVE&& ove, OFE&& ofe);
 
         xoptional_assembly(const value_type& value);

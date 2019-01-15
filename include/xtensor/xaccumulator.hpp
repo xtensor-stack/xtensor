@@ -282,7 +282,7 @@ namespace xt
      * @return returns xarray<T> filled with accumulated values
      */
     template <class F, class E, class EVS = DEFAULT_STRATEGY_ACCUMULATORS,
-              typename std::enable_if_t<!std::is_integral<EVS>::value, int> = 0>
+              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
     inline auto accumulate(F&& f, E&& e, EVS evaluation_strategy = EVS())
     {
         // Note we need to check is_integral above in order to prohibit EVS = int, and not taking the std::size_t
