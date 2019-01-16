@@ -12,6 +12,8 @@
    }
    </style>
 
+.. _related-projects:
+
 Related projects
 ================
 
