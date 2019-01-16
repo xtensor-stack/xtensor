@@ -79,4 +79,20 @@
 #define XTENSOR_DEFAULT_TRAVERSAL ::xt::layout_type::row_major
 #endif
 
+#ifdef IN_DOXYGEN
+namespace xtl
+{
+    template <class... T>
+    struct conjunction
+    {
+        constexpr bool value = true;
+    };
+
+    template <class... C>
+    using check_concept = std::enable_if_t<conjunction<C...>::value, int>;
+
+#define XTL_REQUIRES(...) xtl::check_concept<__VA_ARGS__> = 0
+}
+#endif
+
 #endif

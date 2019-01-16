@@ -1,6 +1,6 @@
 PROJECT_NAME      = "xtensor"
 XML_OUTPUT        = xml
-INPUT             = ../include
+INPUT             = missing_macro.hpp ../include
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO
 GENERATE_RTF      = NO
@@ -12,3 +12,4 @@ QUIET             = YES
 JAVADOC_AUTOBRIEF = YES
 WARN_IF_UNDOCUMENTED = NO
 MACRO_EXPANSION = YES
+PREDEFINED = IN_DOXYGEN
