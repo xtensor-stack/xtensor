@@ -73,10 +73,10 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     # Add googletest directly to our build. This defines
     # the gtest and gtest_main targets.
     add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
-                     ${CMAKE_CURRENT_BINARY_DIR}/googletest-build)
+                     ${CMAKE_CURRENT_BINARY_DIR}/googletest-build EXCLUDE_FROM_ALL)
 
     set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-    set(GTEST_BOTH_LIBRARIES  gtest_main gtest)
+    set(GTEST_BOTH_LIBRARIES gtest_main gtest)
 else()
     find_package(GTest REQUIRED)
 endif()
@@ -164,8 +164,6 @@ if(("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU") AND (CMAKE_CXX_COMPILER_VERSION V
     list(REMOVE_ITEM XTENSOR_TESTS test_xinfo.cpp)
 endif()
 
-set(XTENSOR_TARGET test_xtensor_lib)
-
 # Add files for npy tests
 set(XNPY_FILES
     bool.npy
@@ -203,10 +201,10 @@ foreach(filename IN LISTS XTENSOR_TESTS)
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
 endforeach()
 
-add_executable(${XTENSOR_TARGET} ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
-    add_dependencies(${XTENSOR_TARGET} gtest_main)
+    add_dependencies(test_xtensor_lib gtest_main)
 endif()
-target_link_libraries(${XTENSOR_TARGET} xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND ${XTENSOR_TARGET} DEPENDS ${XTENSOR_TARGET})
+add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS ${XTENSOR_TARGET})
