@@ -13,6 +13,7 @@
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xdynamic_view.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xrandom.hpp"
 
 #include "xtensor/xview.hpp"
 #include "xtensor/xindex_view.hpp"
@@ -250,5 +251,13 @@ namespace xt
 
         auto ds2 = du.convert<std::size_t>();
         EXPECT_EQ(ds2, ds);
+    }
+
+    TEST(xdynamic_view, compilation_linux_issue_1349)
+    {
+        xt::xarray<float> array(xt::random::rand<float>({5, 4}));
+        auto v = xt::view(array, xt::keep(2), xt::all());
+        auto res  = xt::xarray<float>(xt::dynamic_view(v, {xt::keep(0)}));
+        EXPECT_EQ(res(1), array(2, 1));
     }
 }

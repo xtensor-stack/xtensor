@@ -329,7 +329,7 @@ namespace xt
     namespace detail
     {
         template <class T, class S>
-        auto& copy_move_storage(T& expr, S& /*storage*/)
+        auto& copy_move_storage(T& expr, const S& /*storage*/)
         {
             return expr.storage();
         }
