@@ -786,7 +786,7 @@ namespace xt
     template <std::size_t... I, class... S>
     struct xview_shape_type<fixed_shape<I...>, S...>
     {
-        using type = typename xview_shape_type<std::array<std::size_t, sizeof...(I)>>::type;
+        using type = typename xview_shape_type<std::array<std::size_t, sizeof...(I)>, S...>::type;
     };
 
     /************************

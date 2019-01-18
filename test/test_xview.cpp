@@ -1356,4 +1356,20 @@ namespace xt
         auto expv = xt::exp(xt::view(a, 1, xt::all(), xt::all(), xt::range(0, 3, 2)));
         EXPECT_EQ(assgment, expv);
     }
+
+    TEST(xview, view_on_fixed)
+    {
+        xt::xtensor_fixed<double, xt::xshape<3>> a{1./8, 1, -1./8};
+        auto v = xt::view(a, xt::all(), xt::newaxis());
+        EXPECT_EQ(v.dimension(), 2);
+        EXPECT_EQ(v.shape(), (std::array<std::size_t, 2>{3, 1}));
+
+        auto b = a * xt::view(a, xt::all(), xt::newaxis());
+
+        xt::xarray<double> exp = {{ 0.015625,  0.125   , -0.015625},
+                                  { 0.125   ,  1.      , -0.125   },
+                                  {-0.015625, -0.125   ,  0.015625}};
+
+        EXPECT_EQ(b, exp);
+    }
 }
