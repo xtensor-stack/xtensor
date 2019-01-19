@@ -58,7 +58,7 @@ namespace xt
             {
                 compute_1d_row(out, printer, row_idx);
             }
-            out << "<tr><td><center>⋮</center></td></tr>";
+            out << "<tr><td><center>\u22ee</center></td></tr>";
             for (std::size_t row_idx = dim - edgeitems; row_idx < dim; ++row_idx)
             {
                 compute_1d_row(out, printer, row_idx);
@@ -98,7 +98,7 @@ namespace xt
             {
                 compute_2d_element(out, printer, idx_str, row_idx, column_idx);
             }
-            out << "<td><center>⋯</center></td>";
+            out << "<td><center>\u22ef</center></td>";
             for (std::size_t column_idx = dim - edgeitems; column_idx < dim; ++column_idx)
             {
                 compute_2d_element(out, printer, idx_str, row_idx, column_idx);
@@ -143,11 +143,11 @@ namespace xt
             {
                 if (column_idx == edgeitems && nb_ellipsis != last_dim)
                 {
-                    out << "<td><center>⋱</center></td>";
+                    out << "<td><center>\u22f1</center></td>";
                 }
                 else
                 {
-                    out << "<td><center>⋮</center></td>";
+                    out << "<td><center>\u22ee</center></td>";
                 }
             }
             out << "</tr>";
@@ -200,7 +200,7 @@ namespace xt
                 idx2[displayed_dimension] = i;
                 compute_nd_row(out, printer, expr, edgeitems, idx2);
             }
-            out << "<tr><td><center>⋯</center></td></tr>";
+            out << "<tr><td><center>\u22ef</center></td></tr>";
             for (std::size_t i = dim - edgeitems; i < dim; ++i)
             {
                 idx2[displayed_dimension] = i;
