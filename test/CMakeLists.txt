@@ -207,4 +207,4 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
 endif()
 target_link_libraries(test_xtensor_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS ${XTENSOR_TARGET})
+add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
