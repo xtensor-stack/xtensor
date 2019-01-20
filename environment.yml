@@ -4,6 +4,6 @@ channels:
   - conda-forge
 dependencies:
   - xtensor=0.19.1
-  - xtensor-blas=0.15.0
+  - xtensor-blas=0.15.1
   - xeus-cling=0.4.10
   - notebook

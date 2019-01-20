@@ -7,6 +7,40 @@
 Changelog
 =========
 
+0.19.2
+------
+
+- Enable CI for C++17
+  `#1324 <https://github.com/QuantStack/xtensor/pull/1324>`_.
+- Fix assignment of masked views
+  `#1328 <https://github.com/QuantStack/xtensor/pull/1328>`_.
+- Set CMAKE_CXX_STANDARD instead of CMAKE_CXX_FLAGS
+  `#1330 <https://github.com/QuantStack/xtensor/pull/1330>`_.
+- Allow specifying traversal order to argmin and argmax
+  `#1331 <https://github.com/QuantStack/xtensor/pull/1331>`_.
+- Update section on differences with NumPy
+  `#1336 <https://github.com/QuantStack/xtensor/pull/1336>`_.
+- Fix accumulators for shapes containing 1
+  `#1337 <https://github.com/QuantStack/xtensor/pull/1337>`_.
+- Decouple XTENSOR_DEFAULT_LAYOUT and XTENSOR_DEFAULT_TRAVERSAL
+  `#1339 <https://github.com/QuantStack/xtensor/pull/1339>`_.
+- Prevent embiguity with `xsimd::reduce`
+  `#1343 <https://github.com/QuantStack/xtensor/pull/1343>`_.
+- Require `xtl` 0.5.3
+  `#1346 <https://github.com/QuantStack/xtensor/pull/1346>`_.
+- Use concepts instead of SFINAE
+  `#1347 <https://github.com/QuantStack/xtensor/pull/1347>`_.
+- Document good practice for xtensor-based API design
+  `#1348 <https://github.com/QuantStack/xtensor/pull/1348>`_.
+- Fix rich display of tensor expressions
+  `#1353 <https://github.com/QuantStack/xtensor/pull/1353>`_.
+- Fix xview on fixed tensor
+  `#1354 <https://github.com/QuantStack/xtensor/pull/1354>`_.
+- Fix issue with `keep_slice` in case of `dynamic_view` on `view`
+  `#1355 <https://github.com/QuantStack/xtensor/pull/1355>`_.
+- Prevent installation of gtest artifacts
+  `#1357 <https://github.com/QuantStack/xtensor/pull/1357>`_.
+
 0.19.1
 ------
 
