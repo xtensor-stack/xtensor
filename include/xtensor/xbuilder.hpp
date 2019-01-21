@@ -192,14 +192,14 @@ namespace xt
     namespace detail
     {
         template <class T, class S = T>
-        class arange_impl
+        class arange_generator
         {
         public:
 
             using value_type = T;
             using step_type = S;
 
-            arange_impl(T start, T stop, S step)
+            arange_generator(T start, T stop, S step)
                 : m_start(start), m_stop(stop), m_step(step)
             {
             }
@@ -246,6 +246,23 @@ namespace xt
                 return m_start;
             }
         };
+
+        template <class T, class S>
+        using both_integer = xtl::conjunction<std::is_integral<T>, std::is_integral<S>>;
+
+        template <class T, class S = T, XTL_REQUIRES(xtl::negation<both_integer<T, S>>)>
+        inline auto arange_impl(T start, T stop, S step = 1) noexcept
+        {
+            std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
+            return detail::make_xgenerator(detail::arange_generator<T, S>(start, stop, step), {shape});
+        }
+
+        template <class T, class S = T, XTL_REQUIRES(both_integer<T, S>)>
+        inline auto arange_impl(T start, T stop, S step = 1) noexcept
+        {
+            std::size_t shape = static_cast<std::size_t>((stop - start + step - S(1)) / step);
+            return detail::make_xgenerator(detail::arange_generator<T, S>(start, stop, step), {shape});
+        }
 
         template <class F>
         class fn_impl
@@ -355,8 +372,7 @@ namespace xt
     template <class T, class S = T>
     inline auto arange(T start, T stop, S step = 1) noexcept
     {
-        std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
-        return detail::make_xgenerator(detail::arange_impl<T, S>(start, stop, step), {shape});
+        return detail::arange_impl(start, stop, step);
     }
 
     /**
@@ -386,7 +402,7 @@ namespace xt
     {
         using fp_type = std::common_type_t<T, double>;
         fp_type step = fp_type(stop - start) / fp_type(num_samples - (endpoint ? 1 : 0));
-        return cast<T>(detail::make_xgenerator(detail::arange_impl<fp_type>(fp_type(start), fp_type(stop), step), {num_samples}));
+        return cast<T>(detail::make_xgenerator(detail::arange_generator<fp_type>(fp_type(start), fp_type(stop), step), {num_samples}));
     }
 
     /**
