@@ -106,6 +106,13 @@ namespace xt
         ASSERT_EQ(m_assigned[{0}], 10u);
         ASSERT_EQ(m_assigned[{9}], 19u);
         ASSERT_EQ(m_assigned[{2}], 12u);
+
+        auto lc = arange<char>('a', 'd');
+        decltype(lc)::shape_type expected_shape_2 = {3};
+        ASSERT_EQ(lc.shape(), expected_shape_2);
+        ASSERT_EQ(lc[{0}], 'a');
+        ASSERT_EQ(lc[{1}], 'b');
+        ASSERT_EQ(lc[{2}], 'c');
     }
 
     TEST(xbuilder, arange_min_max_step)
@@ -129,6 +136,13 @@ namespace xt
         ASSERT_EQ(l3.shape(), expected_shape_2);
         ASSERT_EQ(l3[{0}], 0.f);
         ASSERT_EQ(3.f * 0.3f, l3[{3}]);
+
+        auto l4 = arange<int>(0, 10, 3);
+        ASSERT_EQ(l4.shape(), expected_shape_2);
+        ASSERT_EQ(l4[{0}], 0);
+        ASSERT_EQ(l4[{1}], 3);
+        ASSERT_EQ(l4[{2}], 6);
+        ASSERT_EQ(l4[{3}], 9);
     }
 
     TEST(xbuilder, linspace)
