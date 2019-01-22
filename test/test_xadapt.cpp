@@ -78,6 +78,31 @@ namespace xt
         EXPECT_EQ(1, data2[2]);
     }
 
+    TEST(xarray_adaptor, c_stack_array)
+    {
+        double data[4] = { 1., 2., 3., 4. };
+        using shape_type = std::vector<vec_type::size_type>;
+        shape_type s({2, 2});
+        auto a = adapt(data, s);
+
+        EXPECT_EQ(a.size(), 4u);
+        if(XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
+        {
+            EXPECT_EQ(a(0, 1), 2.);
+            EXPECT_EQ(a(1, 0), 3.);
+        }
+        else
+        {
+            EXPECT_EQ(a(0, 1), 3.);
+            EXPECT_EQ(a(1, 0), 2.);
+        }
+        shape_type str({2, 1});
+        auto b = adapt(data, s, str);
+        EXPECT_EQ(b.size(), 4u);
+        EXPECT_EQ(b(0, 1), 2.);
+        EXPECT_EQ(b(1, 0), 3.);
+    }
+
     TEST(xarray_adaptor, no_ownership_assign)
     {
         size_t size = 1;
@@ -247,6 +272,32 @@ namespace xt
         auto a2 = adapt(std::move(data2), size, acquire_ownership(), s, str);
         a2(1, 0) = 1;
         EXPECT_EQ(1, data2[2]);
+    }
+
+    TEST(xtensor_adaptor, c_stack_array)
+    {
+        double data[4] = { 1., 2., 3., 4. };
+        using shape_type = std::array<vec_type::size_type, 2>;
+        shape_type s = {2, 2};
+        auto a = adapt(data, s);
+
+        EXPECT_EQ(a.size(), 4u);
+        if(XTENSOR_DEFAULT_LAYOUT == xt::layout_type::row_major)
+        {
+            EXPECT_EQ(a(0, 1), 2.);
+            EXPECT_EQ(a(1, 0), 3.);
+        }
+        else
+        {
+            EXPECT_EQ(a(0, 1), 3.);
+            EXPECT_EQ(a(1, 0), 2.);
+        }
+
+        shape_type str = {2, 1};
+        auto b = adapt(data, s, str);
+        EXPECT_EQ(b.size(), 4u);
+        EXPECT_EQ(b(0, 1), 2.);
+        EXPECT_EQ(b(1, 0), 3.);
     }
 
     TEST(xtensor_adaptor, no_ownership_assign)
