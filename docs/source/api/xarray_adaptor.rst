@@ -29,3 +29,9 @@ Defined in ``xtensor/xadapt.hpp``
 
 .. doxygenfunction:: xt::adapt(P&&, typename A::size_type, O, SC&&, SS&&, const A&)
    :project: xtensor
+
+.. doxygenfunction:: xt::adapt(T (&)[N], const SC&, layout_type)
+   :project: xtensor
+
+.. doxygenfunction:: xt::adapt(T (&)[N], SC&&, SS&&)
+   :project: xtensor

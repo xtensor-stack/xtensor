@@ -144,3 +144,33 @@ adaptor before calling ``compute`` and pass it to the function:
         std::cout << std::endl;
         // prints 0 1 0 2
     }
+
+Adapting stack-allocated arrays
+-------------------------------
+
+Adapting C arrays allocated on the stack is as simple as adapting ``std::vector``:
+
+.. code::
+
+    #include <cstddef>
+    #include <vector>
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xadapt.hpp"
+
+    double v[6] = {1., 2., 3., 4., 5., 6. };
+    std::vector<std::size_t> shape = { 2, 3 };
+    auto a1 = xt::adapt(v, shape);
+
+    xt::xarray<double> a2 = {{ 1., 2., 3.},
+                             { 4., 5., 6.}};
+
+    xt::xarray<double> res = a1 + a2;
+    // res = {{ 2., 4., 6. }, { 8., 10., 12. }};
+
+``v`` is not copied into ``a1``, so if you change a value in ``a1``, you're actually changing
+the corresponding value in ``v``:
+
+.. code::
+
+    a1(0, 0) = 20.;
+    // now v is { 20., 2., 3., 4., 5., 6. }

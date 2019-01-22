@@ -30,7 +30,7 @@ expressions can be accessed in the same way as values of higher dimensional arra
 Accumulators (``cumsum``, ``cumprod``) throw an exception if an axis argument is passed and the
 array argument is a 0-D argument:
 
-.. code-block::
+.. code::
 
     #include <xtensor/xarray.hpp>
     #include <xtensor/xio.hpp>

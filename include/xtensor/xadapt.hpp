@@ -138,7 +138,7 @@ namespace xt
 
     /**
      * Constructs an xarray_adaptor of the given dynamically allocated C array,
-     * with the specified shape and layout.
+     * with the specified shape and strides.
      * @param pointer the pointer to the beginning of the dynamic array
      * @param size the size of the dynamic array
      * @param ownership indicates whether the adaptor takes ownership of the array.
@@ -160,6 +160,37 @@ namespace xt
         return return_type(std::move(buf),
                            xtl::forward_sequence<typename return_type::inner_shape_type, SC>(shape),
                            xtl::forward_sequence<typename return_type::inner_strides_type, SS>(strides));
+    }
+
+    /**
+     * Contructs an xarray_adaptor of the given C array allocated on the stack, with the
+     * specified shape and layout.
+     * @param c_array the C array allocated on the stack
+     * @param shape the shape of the xarray_adaptor
+     * @param l the layout_type of the xarray_adaptor
+     */
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class T, std::size_t N, class SC,
+              XTL_REQUIRES(detail::not_an_array<std::decay_t<SC>>)>
+    inline auto adapt(T (&c_array)[N], const SC& shape, layout_type l = L)
+    {
+        return adapt(&c_array[0], N, xt::no_ownership(), shape, l);
+    }
+
+    /**
+     * Contructs an xarray_adaptor of the given C array allocated on the stack, with the
+     * specified shape and stirdes.
+     * @param c_array the C array allocated on the stack
+     * @param shape the shape of the xarray_adaptor
+     * @param strides the strides of the xarray_adaptor
+     */
+    template <class T, std::size_t N, class SC, class SS,
+             XTL_REQUIRES(detail::not_an_array<std::decay_t<SC>>,
+                          detail::not_a_layout<std::decay_t<SS>>)>
+    inline auto adapt(T (&c_array)[N], SC&& shape, SS&& strides)
+    {
+        return adapt(&c_array[0], N, xt::no_ownership(),
+                     std::forward<SC>(shape),
+                     std::forward<SS>(strides));
     }
 
     /***************************
@@ -308,7 +339,37 @@ namespace xt
                            xtl::forward_sequence<typename return_type::inner_shape_type, SC>(shape),
                            xtl::forward_sequence<typename return_type::inner_strides_type, SS>(strides));
     }
+    
+    /**
+     * Contructs an xtensor_adaptor of the given C array allocated on the stack, with the
+     * specified shape and layout.
+     * @param c_array the C array allocated on the stack
+     * @param shape the shape of the xarray_adaptor
+     * @param l the layout_type of the xarray_adaptor
+     */
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class T, std::size_t N, class SC,
+              XTL_REQUIRES(detail::is_array<std::decay_t<SC>>)>
+    inline auto adapt(T (&c_array)[N], const SC& shape, layout_type l = L)
+    {
+        return adapt(&c_array[0], N, xt::no_ownership(), shape, l);
+    }
 
+    /**
+     * Contructs an xtensor_adaptor of the given C array allocated on the stack, with the
+     * specified shape and stirdes.
+     * @param c_array the C array allocated on the stack
+     * @param shape the shape of the xarray_adaptor
+     * @param strides the strides of the xarray_adaptor
+     */
+    template <class T, std::size_t N, class SC, class SS,
+             XTL_REQUIRES(detail::is_array<std::decay_t<SC>>,
+                          detail::not_a_layout<std::decay_t<SS>>)>
+    inline auto adapt(T (&c_array)[N], SC&& shape, SS&& strides)
+    {
+        return adapt(&c_array[0], N, xt::no_ownership(),
+                     std::forward<SC>(shape),
+                     std::forward<SS>(strides));
+    }
     /**
      * Constructs an non-owning xtensor_fixed_adaptor from a pointer with the
      * specified shape and layout.
