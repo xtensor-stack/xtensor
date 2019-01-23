@@ -21,6 +21,12 @@
 #include "xstrided_view.hpp"
 #include "xmanipulation.hpp"
 
+namespace xtl
+{
+    template <class CT, class CB>
+    class xoptional;
+}
+
 namespace xt
 {
 
@@ -96,10 +102,21 @@ namespace xt
             using get_batch_bool = typename xsimd::simd_traits<typename xsimd::revert_simd_traits<B>::type>::bool_type;
 
             template <class A1, class A2>
-            constexpr auto operator()(bool t1, const A1& t2, const A2& t3) const noexcept
+            constexpr auto operator()(bool t1, const A1& t2, const A2& t3) const noexcept -> std::common_type_t<A1, A2>
             {
                 return t1 ? t2 : t3;
             }
+
+            template <class A1, class A2, class B1, class B2>
+            constexpr auto operator()(xtl::xoptional<bool> t1, const xtl::xoptional<A1, B1>& t2, const xtl::xoptional<A2, B2>& t3) const noexcept
+            {
+                using value_type = std::common_type_t<A1, A2>;
+                using return_type = xtl::xoptional<value_type>;
+                return t1.has_value() ?
+                    (t1.value() ? return_type(t2) : return_type(t3)) :
+                    xtl::missing<value_type>();
+            }
+
             template <class B>
             constexpr B simd_apply(const get_batch_bool<B>& t1,
                                    const B& t2,
@@ -686,7 +703,7 @@ namespace xt
     /**
      * @ingroup comparison_operators
      * @brief Lesser than
-     * 
+     *
      * Returns an \ref xfunction for the element-wise
      * lesser than comparison of \a e1 and \a e2. This
      * function is equivalent to operator<(E1&&, E2&&).
