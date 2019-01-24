@@ -252,5 +252,6 @@ expression:
 In that case only three copies of the shared weights exist. Notice that contrary to
 ``make_xshare``, ``share`` also accepts lvalues; this is to avoid the required ``std::move``,
 however ``share`` will turn its argument into an rvalue and will move it into the shared
-expression. Therefore ``share`` should be called on rvalue references or temporary expressions
-only.
+expression. Thus ``share`` invalidates its argument, and the only thing that can be done
+with an expression upon which ``share`` has been called is another call to ``share``. Therefore
+``share`` should be called on rvalue references or temporary expressions only.
