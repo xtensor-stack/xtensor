@@ -9,8 +9,10 @@
 #include "gtest/gtest.h"
 
 #include <cstddef>
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xoptional_assembly.hpp"
 
 namespace xt
 {
@@ -488,6 +490,17 @@ namespace xt
         auto s = func.template load_simd<xsimd::aligned_mode>(0);
         (void)s;
 #endif
+    }
+
+    TYPED_TEST(operation, where_optional)
+    {
+        using opt_type = xoptional_assembly<TypeParam, xtensor<bool, 2>>;
+        auto missing = xtl::missing<double>();
+        opt_type a = { { 1, missing, 3 },{ 0, 1, 0 },{ missing, 4, 1 } };
+        xtl::xoptional<double, bool> b = 1.0;
+        opt_type res = where(a > b, b, a);
+        opt_type expected = { { 1, missing, 1 },{ 0, 1, 0 },{ missing, 1, 1 } };
+        EXPECT_EQ(expected, res);
     }
 
     TYPED_TEST(operation, where_cast)
