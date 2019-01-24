@@ -497,10 +497,15 @@ namespace xt
         using opt_type = xoptional_assembly<TypeParam, xtensor<bool, 2>>;
         auto missing = xtl::missing<double>();
         opt_type a = { { 1, missing, 3 },{ 0, 1, 0 },{ missing, 4, 1 } };
-        xtl::xoptional<double, bool> b = 1.0;
+        double b = 1.0;
+
         opt_type res = where(a > b, b, a);
         opt_type expected = { { 1, missing, 1 },{ 0, 1, 0 },{ missing, 1, 1 } };
         EXPECT_EQ(expected, res);
+
+        opt_type res1 = where(true, a + 3, a);
+        opt_type expected1 = { { 4, missing, 6 },{ 3, 4, 3 },{ missing, 7, 4 } };
+        EXPECT_EQ(expected1, res1);
     }
 
     TYPED_TEST(operation, where_cast)
