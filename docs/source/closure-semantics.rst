@@ -222,14 +222,35 @@ But under certain circumstances it might be required, e.g. to implement a fully 
     inline auto average(E&& e, W&& weights, std::ptrdiff_t axis) noexcept
     {
         auto shared_weights = xt::make_xshared(std::move(weights));
-        auto expr = xt::sum(e * shared_weights) , {axis}) / xt::sum(shared_weights);
+        auto expr = xt::sum(e * shared_weights , {axis}) / xt::sum(shared_weights);
+        // the following line prints how often shared_weights is used
+        std::cout << shared_weights.use_count() << std::endl; // ==> 4
+        return expr;
+    }
+
+We can see that, before returning from the function, four copies of ``shared_weights``
+exist: two in the two ``xt::sum`` functions, and one is the temporary. The last one lies
+in ``weights`` itself, it is a technical requirement for the ``share`` syyntax. After
+returning from the function, only two copies of the ``xshared_expression`` will exist.
+As discussed before, ``xt::make_xshared`` has the same overhead as creating a ``std::shared_ptr``
+which is used internally by the shared expression.
+
+Another syntax can be used if you don't want to have a temporary variable for the shared
+expression:
+
+.. code:: cpp
+
+    template <class E, class W>
+    inline auto average(E&& e, W&& weights, std::ptrdiff_t axis) noexcept
+    {
+        auto expr = xt::sum(e * xt::share(weights) , {axis}) / xt::sum(xt::share(weights));
         // the following line prints how often shared_weights is used
         std::cout << shared_weights.use_count() << std::endl; // ==> 3
         return expr;
     }
-
-We can see that, before returning from the function, three copies of ``shared_weights``
-exist: two in the two ``xt::sum`` functions, and one is the temporary. After returning
-from the function, only two copies of the ``xshared_expression`` will exist.
-As discussed before, ``xt::make_xshared`` has the same overhead as creating a ``std::shared_ptr``
-which is used internally by the shared expression.
+    
+In that case only three copies of the shared weights exist. Notice that contrary to
+``make_xshare``, ``share`` also accepts lvalues; this is to avoid the required ``std::move``,
+however ``share`` will turn its argument into an rvalue and will move it into the shared
+expression. Therefore ``share`` should be called on rvalue references or temporary expressions
+only.
