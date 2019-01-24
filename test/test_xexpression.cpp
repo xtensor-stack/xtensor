@@ -41,27 +41,36 @@ namespace xt
         EXPECT_EQ(L, XTENSOR_DEFAULT_LAYOUT);
         EXPECT_EQ(contig, true);
 
-        EXPECT_EQ(sa.use_count(), 1);
-        auto cpysa = sa;
         EXPECT_EQ(sa.use_count(), 2);
+        auto cpysa = sa;
+        EXPECT_EQ(sa.use_count(), 3);
         
         std::stringstream buffer;
         buffer << sa;
         EXPECT_EQ(buffer.str(), "{{ 1.,  2.,  3.,  4.},\n { 5.,  6.,  7.,  8.}}");
     }
 
+    template <class E>
+    auto test_sum(E&& e)
+    {
+        return share(e) + share(e);
+    }
+
     TEST(xexpression, shared_xfunctions)
     {
         xarray<double> a = {{1,2,3,4}, {5,6,7,8}};
         xarray<double> ca = {{1,2,3,4}, {5,6,7,8}};
+        xarray<double> acopy(a);
 
         auto sa = make_xshared(std::move(a));
 
         auto expr1 = sa + sa;
         auto expr2 = a + a;
+        auto expr3 = test_sum(std::move(acopy));
 
-        EXPECT_EQ(sa.use_count(), 3);
+        EXPECT_EQ(sa.use_count(), 4);
         EXPECT_TRUE(all(equal(expr1, expr2)));
+        EXPECT_TRUE(all(equal(expr1, expr3)));
         std::stringstream buffer;
         buffer << expr1;
         EXPECT_EQ(buffer.str(), "{{  2.,   4.,   6.,   8.},\n { 10.,  12.,  14.,  16.}}");
