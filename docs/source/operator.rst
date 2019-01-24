@@ -191,6 +191,22 @@ You can also call the ``reduce`` generator with your own reducing function:
                                         arr,
                                         {1, 3});
 
+The reduce generator also accepts a ``xreducer_functors`` object, a tuple of three functions
+(one for reducing, one for initialization and one for merging). A generator is provided to
+build the ``xreducer_functors`` object, the last function can be omitted:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xreducer.hpp"
+
+    xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
+    xt::xarray<double> res = xt::reduce(xt::make_xreducer_functor([](double a, double b) { return a*a + b*b; },
+                                                                  [](double a) { return a * 2; })
+                                        arr,
+                                        {1, 3});
+
+
 Accumulators
 ------------
 

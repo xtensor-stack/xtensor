@@ -541,6 +541,23 @@ namespace xt
 
 #define DEFAULT_STRATEGY_REDUCERS evaluation_strategy::lazy
 
+    namespace detail
+    {
+        template <class T>
+        struct is_xreducer_functors_impl : std::false_type
+        {
+        };
+
+        template <class RF, class IF, class MF>
+        struct is_xreducer_functors_impl<xreducer_functors<RF, IF, MF>>
+            : std::true_type
+        {
+        };
+
+        template <class T>
+        using is_xreducer_functors = is_xreducer_functors_impl<std::decay_t<T>>;
+    }
+
     /**
      * @brief Returns an \ref xexpression applying the specified reducing
      * function to an expression over the given axes.
@@ -555,14 +572,24 @@ namespace xt
      */
 
     template <class F, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>,
+                           detail::is_xreducer_functors<F>)>
     inline auto reduce(F&& f, E&& e, X&& axes, EVS evaluation_strategy = EVS())
     {
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::forward<X>(axes), evaluation_strategy);
     }
 
+    template <class F, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>,
+                           xtl::negation<detail::is_xreducer_functors<F>>)>
+    inline auto reduce(F&& f, E&& e, X&& axes, EVS evaluation_strategy = EVS())
+    {
+        return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), std::forward<X>(axes), evaluation_strategy);
+    }
+
     template <class F, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_evaluation_strategy<EVS>,
+                           detail::is_xreducer_functors<F>)>
     inline auto reduce(F&& f, E&& e, EVS evaluation_strategy = EVS())
     {
         xindex_type_t<typename std::decay_t<E>::shape_type> ar;
@@ -571,8 +598,17 @@ namespace xt
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ar), evaluation_strategy);
     }
 
+    template <class F, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_evaluation_strategy<EVS>,
+                           xtl::negation<detail::is_xreducer_functors<F>>)>
+    inline auto reduce(F&& f, E&& e, EVS evaluation_strategy = EVS())
+    {
+        return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), evaluation_strategy);
+    }
+
 #ifdef X_OLD_CLANG
-    template <class F, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class F, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(detail::is_xreducer_functors<F>)>
     inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, EVS evaluation_strategy = EVS())
     {
         using axes_type = std::vector<std::size_t>;
@@ -580,13 +616,26 @@ namespace xt
         using reducer_type = xreducer<F, const_xclosure_t<E>, axes_type>;
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ax), evaluation_strategy);
     }
+    template <class F, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<detail::is_xreducer_functors<F>>)>
+    inline auto reduce(F&& f, E&& e, std::initializer_list<I> axes, EVS evaluation_strategy = EVS())
+    {
+        return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), axes, evaluation_strategy);
+    }
 #else
-    template <class F, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class F, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(detail::is_xreducer_functors<F>)>
     inline auto reduce(F&& f, E&& e, const I (&axes)[N], EVS evaluation_strategy = EVS())
     {
         using axes_type = std::array<std::size_t, N>;
         auto ax = xt::forward_normalize<axes_type>(e, axes);
         return detail::reduce_impl(std::forward<F>(f), std::forward<E>(e), std::move(ax), evaluation_strategy);
+    }
+    template <class F, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<detail::is_xreducer_functors<F>>)>
+    inline auto reduce(F&& f, E&& e, const I (&axes)[N], EVS evaluation_strategy = EVS())
+    {
+        return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), axes, evaluation_strategy);
     }
 #endif
 

@@ -56,6 +56,10 @@ namespace xt
         xt::xarray<int> expect = {6, 15};
         EXPECT_EQ(a_sums, expect);
         EXPECT_EQ(a_sums2, expect);
+
+        xt::xarray<int> a_sums3 = xt::reduce(sum, a, {1});
+        EXPECT_EQ(a_sums3, expect);
+
     }
 
     TEST(xreducer, errors)
