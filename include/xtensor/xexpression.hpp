@@ -689,7 +689,7 @@ namespace xt
         {
             expr.p_shared = std::make_shared<E>(std::move(expr).derived_cast());
         }
-        return  xshared_expression<E>(expr.p_shared);
+        return xshared_expression<E>(expr.p_shared);
     }
 
     /**
