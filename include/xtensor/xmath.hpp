@@ -921,8 +921,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class F, class... E>
     inline auto make_lambda_xfunction(F&& lambda, E&&... args)
     {
-        using xfunction_type = xfunction<detail::lambda_adapt<F>,
-                                         const_xclosure_t<E>...>;
+        using xfunction_type = typename detail::xfunction_type<detail::lambda_adapt<F>, E...>::type;
         return xfunction_type(detail::lambda_adapt<F>(std::forward<F>(lambda)), std::forward<E>(args)...);
     }
 
