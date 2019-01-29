@@ -143,6 +143,28 @@ namespace xt
         EXPECT_EQ(fdim(sa, b)(0, 0), std::fdim(sa, b(0, 0)));
     }
 
+    TEST(xmath, minimum)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a = {1, 2, 3, 4, 5, 6};
+        xarray<double> b = {6, 5, 4, 3, 2, 1};
+        xarray<double> res = {1, 2, 3, 3, 2, 1};
+
+        xarray<double> min = minimum(a, b);
+        EXPECT_EQ(res, min);
+    }
+
+    TEST(xmath, maximum)
+    {
+        shape_type shape = {3, 2};
+        xarray<double> a = {1, 2, 3, 4, 5, 6};
+        xarray<double> b = {6, 5, 4, 3, 2, 1};
+        xarray<double> res = {6, 5, 4, 4, 5, 6};
+
+        xarray<double> max = maximum(a, b);
+        EXPECT_EQ(res, max);
+    }
+
     TEST(xmath, clip)
     {
         shape_type shape = {3, 2};
