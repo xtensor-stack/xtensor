@@ -524,8 +524,20 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         {
             template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
+                -> detail::disable_at_least_one_xoptional<A1, A2, std::common_type_t<A1, A2>>
             {
                 return (t1 < t2) ? t1 : t2;
+            }
+
+            template <class A1, class A2>
+            auto operator()(const A1& t1, const A2& t2) const noexcept
+                -> detail::enable_at_least_one_xoptional<A1, A2, xtl::common_optional_t<A1, A2>>
+            {
+                using return_type = xtl::common_optional_t<A1, A2>;
+                auto diff = t1 < t2;
+                return diff.has_value() ?
+                    diff.value() ? return_type(t1) : return_type(t2) :
+                    xtl::missing<typename return_type::value_type>();
             }
 
             template <class A1, class A2>
@@ -540,8 +552,20 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         {
             template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
+                -> detail::disable_at_least_one_xoptional<A1, A2, std::common_type_t<A1, A2>>
             {
                 return (t1 > t2) ? t1 : t2;
+            }
+
+            template <class A1, class A2>
+            auto operator()(const A1& t1, const A2& t2) const noexcept
+                -> detail::enable_at_least_one_xoptional<A1, A2, xtl::common_optional_t<A1, A2>>
+            {
+                using return_type = xtl::common_optional_t<A1, A2>;
+                auto diff = t1 > t2;
+                return diff.has_value() ?
+                    diff.value() ? return_type(t1) : return_type(t2) :
+                    xtl::missing<typename return_type::value_type>();
             }
 
             template <class A1, class A2>

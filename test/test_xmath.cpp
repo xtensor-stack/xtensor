@@ -11,6 +11,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xoptional_assembly.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xrandom.hpp"
 
@@ -141,6 +142,46 @@ namespace xt
 
         double sa = 4.6;
         EXPECT_EQ(fdim(sa, b)(0, 0), std::fdim(sa, b(0, 0)));
+    }
+
+    TEST(xmath, minimum)
+    {
+        using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
+        auto missing = xtl::missing<double>();
+
+        xarray<double> a = {1, 2, 3, 4, 5, 6};
+        xarray<double> b = {6, 5, 4, 3, 2, 1};
+        opt_type opt_a = {1, missing, 3, 4,       5, missing};
+        opt_type opt_b = {6,       5, 4, 3, missing,       1};
+
+        xarray<double> res = {1, 2, 3, 3, 2, 1};
+        EXPECT_EQ(res, minimum(a, b));
+
+        opt_type res1 = {1, missing, 3, 3, 2, missing};
+        EXPECT_EQ(res1, minimum(opt_a, b));
+
+        opt_type res2 = {1, missing, 3, 3, missing, missing};
+        EXPECT_EQ(res2, minimum(opt_a, opt_b));
+    }
+
+    TEST(xmath, maximum)
+    {
+        using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
+        auto missing = xtl::missing<double>();
+
+        xarray<double> a = {1, 2, 3, 4, 5, 6};
+        xarray<double> b = {6, 5, 4, 3, 2, 1};
+        opt_type opt_a = {1, missing, 3, 4,       5, missing};
+        opt_type opt_b = {6,       5, 4, 3, missing,       1};
+
+        xarray<double> res = {6, 5, 4, 4, 5, 6};
+        EXPECT_EQ(res, maximum(a, b));
+
+        opt_type res1 = {6, missing, 4, 4, 5, missing};
+        EXPECT_EQ(res1, maximum(opt_a, b));
+
+        opt_type res2 = {6, missing, 4, 4, missing, missing};
+        EXPECT_EQ(res2, maximum(opt_a, opt_b));
     }
 
     TEST(xmath, clip)
