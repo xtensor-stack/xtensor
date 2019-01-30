@@ -186,12 +186,23 @@ namespace xt
 
     TEST(xmath, clip)
     {
-        shape_type shape = {3, 2};
-        xarray<double> a = {1, 2, 3, 4, 5, 6};
-        xarray<double> res = {2, 2, 3, 4, 4, 4};
+        using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
+        auto missing = xtl::missing<double>();
 
-        xarray<double> clipped = clip(a, 2.0, 4.0);
-        EXPECT_EQ(res, clipped);
+        xarray<double> a = {1, 2, 3, 4, 5, 6};
+        opt_type opt_a = {1, missing, 3, 4, 5, missing};
+
+        xarray<double> res = {2, 2, 3, 4, 4, 4};
+        EXPECT_EQ(res, clip(a, 2.0, 4.0));
+
+        opt_type res1 = {2, missing, 3, 4, 4, missing};
+        EXPECT_EQ(res1, clip(opt_a, 2.0, 4.0));
+
+        opt_type res2 = {missing, missing, missing, missing, missing, missing};
+        EXPECT_EQ(res2, clip(opt_a, missing, 4.0));
+        EXPECT_EQ(res2, clip(opt_a, 2.0, missing));
+        EXPECT_EQ(res2, clip(a, missing, 4.0));
+        EXPECT_EQ(res2, clip(a, 2.0, missing));
     }
 
     TEST(xmath, sign)
