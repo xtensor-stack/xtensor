@@ -85,6 +85,11 @@ namespace xt
         bool empty() const noexcept;
         size_type size() const noexcept;
         void resize(size_type size);
+        size_type max_size() const noexcept;
+        void reserve(size_type new_cap);
+        size_type capacity() const noexcept;
+        void shrink_to_fit();
+        void clear();
 
         reference operator[](size_type i);
         const_reference operator[](size_type i) const;
@@ -365,6 +370,34 @@ namespace xt
     }
 
     template <class T, class A>
+    inline auto uvector<T, A>::max_size() const noexcept -> size_type
+    {
+        return m_allocator.max_size();
+    }
+
+    template <class T, class A>
+    inline void uvector<T, A>::reserve(size_type /*new_cap*/)
+    {
+    }
+    
+    template <class T, class A>
+    inline auto uvector<T, A>::capacity() const noexcept -> size_type
+    {
+        return size();
+    }
+
+    template <class T, class A>
+    inline void uvector<T, A>::shrink_to_fit()
+    {
+    }
+
+    template <class T, class A>
+    inline void uvector<T, A>::clear()
+    {
+        resize(size_type(0));
+    }
+
+    template <class T, class A>
     inline auto uvector<T, A>::operator[](size_type i) -> reference
     {
         return p_begin[i];
@@ -623,11 +656,7 @@ namespace xt
         pointer data();
         const_pointer data() const;
 
-        void resize(size_type n);
-
-        size_type capacity() const;
         void push_back(const T& elt);
-
         void pop_back();
 
         iterator begin();
@@ -644,9 +673,14 @@ namespace xt
         const_reverse_iterator rend() const;
         const_reverse_iterator crend() const;
 
-        size_type size() const;
-
         bool empty() const;
+        size_type size() const;
+        void resize(size_type n);
+        size_type max_size() const noexcept;
+        size_type capacity() const;
+        void reserve(size_type n);
+        void shrink_to_fit();
+        void clear();
 
         reference front();
         const_reference front() const;
@@ -871,9 +905,36 @@ namespace xt
     }
 
     template <class T, std::size_t N, class A, bool Init>
+    inline auto svector<T, N, A, Init>::max_size() const noexcept -> size_type
+    {
+        return m_allocator.max_size();
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
     inline auto svector<T, N, A, Init>::capacity() const -> size_type
     {
         return static_cast<std::size_t>(m_capacity - m_begin);
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline void svector<T, N, A, Init>::reserve(size_type n)
+    {
+        if(n > N && n > capacity())
+        {
+            grow(n);
+        }
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline void svector<T, N, A, Init>::shrink_to_fit()
+    {
+        // No op for now
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline void svector<T, N, A, Init>::clear()
+    {
+        resize(size_type(0));
     }
 
     template <class T, std::size_t N, class A, bool Init>
