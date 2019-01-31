@@ -25,6 +25,28 @@ namespace xtl
 {
     template <class CT, class CB>
     class xoptional;
+
+    template <class... Args>
+    struct at_least_one_xoptional : disjunction<is_xoptional<Args>...>
+    {
+    };
+
+    template <class B, class T1, class T2, XTL_REQUIRES(negation<at_least_one_xoptional<B, T1, T2>>)>
+    inline std::common_type_t<T1, T2> select(const B& cond, const T1& v1, const T2& v2) noexcept
+    {
+        return cond ? v1 : v2;
+    }
+
+    template <class B, class T1, class T2, XTL_REQUIRES(at_least_one_xoptional<B, T1, T2>)>
+    inline common_optional_t<T1, T2> select(const B& cond, const T1& v1, const T2& v2) noexcept
+    {
+        using bool_type = common_optional_t<B>;
+        using return_type = common_optional_t<T1, T2>;
+        bool_type opt_cond(cond);
+        return opt_cond.has_value() ?
+            opt_cond.value() ? return_type(v1) : return_type(v2) :
+            missing<typename return_type::value_type>();
+    }
 }
 
 namespace xt
@@ -96,36 +118,15 @@ namespace xt
         BINARY_BOOL_OPERATOR_FUNCTOR(equal_to, ==);
         BINARY_BOOL_OPERATOR_FUNCTOR(not_equal_to, !=);
 
-        template <class... Args>
-        struct at_least_one_xoptional : xtl::disjunction<xtl::is_xoptional<Args>...>
-        {
-        };
-
         struct conditional_ternary
         {
             template <class B>
             using get_batch_bool = typename xsimd::simd_traits<typename xsimd::revert_simd_traits<B>::type>::bool_type;
 
-            template <class A2, class A3, XTL_REQUIRES(xtl::negation<at_least_one_xoptional<A2, A3>>)>
-            constexpr auto operator()(bool t1, const A2& t2, const A3& t3) const noexcept
+            template <class B, class A1, class A2>
+            constexpr auto operator()(const B& cond, const A1& v1, const A2& v2) const noexcept
             {
-                return t1 ? t2 : t3;
-            }
-
-            template <class A2, class A3, XTL_REQUIRES(at_least_one_xoptional<A2, A3>)>
-            constexpr auto operator()(bool t1, const A2& t2, const A3& t3) const noexcept
-                -> xtl::common_optional_t<A2, A3>
-            {
-                return t1 ? t2 : t3;
-            }
-
-            template <class A1, class A2, class A3>
-            constexpr auto operator()(const xtl::xoptional<A1>& t1, const A2& t2, const A3& t3) const noexcept
-            {
-                using return_type = xtl::common_optional_t<A2, A3>;
-                return t1.has_value() ?
-                    (t1.value() ? return_type(t2) : return_type(t3)) :
-                    xtl::missing<typename return_type::value_type>();
+                return xtl::select(cond, v1, v2);
             }
 
             template <class B>
