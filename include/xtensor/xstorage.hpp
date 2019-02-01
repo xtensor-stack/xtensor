@@ -94,6 +94,9 @@ namespace xt
         reference operator[](size_type i);
         const_reference operator[](size_type i) const;
 
+        reference at(size_type i);
+        const_reference at(size_type i) const;
+
         reference front();
         const_reference front() const;
 
@@ -410,6 +413,22 @@ namespace xt
     }
 
     template <class T, class A>
+    inline auto uvector<T, A>::at(size_type i) -> reference
+    {
+        if(i >= size())
+            throw std::out_of_range("Out of range in uvector access");
+        return this->operator[](i);
+    }
+
+    template <class T, class A>
+    inline auto uvector<T, A>::at(size_type i) const -> const_reference
+    {
+        if(i >= size())
+            throw std::out_of_range("Out of range in uvector access");
+        return this->operator[](i);
+    }
+
+    template <class T, class A>
     inline auto uvector<T, A>::front() -> reference
     {
         return p_begin[0];
@@ -653,6 +672,9 @@ namespace xt
         reference operator[](size_type idx);
         const_reference operator[](size_type idx) const;
 
+        reference at(size_type idx);
+        const_reference at(size_type idx) const;
+
         pointer data();
         const_pointer data() const;
 
@@ -876,6 +898,22 @@ namespace xt
     inline auto svector<T, N, A, Init>::operator[](size_type idx) const -> const_reference
     {
         return m_begin[idx];
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline auto svector<T, N, A, Init>::at(size_type idx) -> reference
+    {
+        if(idx >= size())
+            throw std::out_of_range("Out of range in svector access");
+        return this->operator[](idx);
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline auto svector<T, N, A, Init>::at(size_type idx) const -> const_reference
+    {
+        if(idx >= size())
+            throw std::out_of_range("Out of range in svector access");
+        return this->operator[](idx);
     }
 
     template <class T, std::size_t N, class A, bool Init>
