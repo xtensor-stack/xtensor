@@ -15,6 +15,10 @@ namespace xt
 {
     using vector_type = uvector<double, XTENSOR_DEFAULT_ALLOCATOR(double)>;
 
+    /***********
+     * uvector *
+     ***********/
+
     TEST(uvector, constructor)
     {
         vector_type a;
@@ -62,6 +66,9 @@ namespace xt
 
         a.back() = 1.0;
         EXPECT_EQ(1.0, a[9]);
+
+        EXPECT_EQ(a.at(5), 2.7);
+        EXPECT_ANY_THROW(a.at(12));
     }
 
     TEST(uvector, iterator)
