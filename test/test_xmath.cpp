@@ -197,12 +197,6 @@ namespace xt
 
         opt_type res1 = {2, missing, 3, 4, 4, missing};
         EXPECT_EQ(res1, clip(opt_a, 2.0, 4.0));
-
-        opt_type res2 = {missing, missing, missing, missing, missing, missing};
-        EXPECT_EQ(res2, clip(opt_a, missing, 4.0));
-        EXPECT_EQ(res2, clip(opt_a, 2.0, missing));
-        EXPECT_EQ(res2, clip(a, missing, 4.0));
-        EXPECT_EQ(res2, clip(a, 2.0, missing));
     }
 
     TEST(xmath, sign)

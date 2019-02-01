@@ -522,20 +522,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         template <class T = void>
         struct minimum
         {
-            template <class A1, class A2, XTL_REQUIRES(xtl::negation<detail::at_least_one_xoptional<A1, A2>>)>
+            template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
-                return (t1 < t2) ? t1 : t2;
-            }
-
-            template <class A1, class A2, XTL_REQUIRES(detail::at_least_one_xoptional<A1, A2>)>
-            auto operator()(const A1& t1, const A2& t2) const noexcept
-            {
-                using return_type = xtl::common_optional_t<A1, A2>;
-                auto diff = t1 < t2;
-                return diff.has_value() ?
-                    diff.value() ? return_type(t1) : return_type(t2) :
-                    xtl::missing<typename return_type::value_type>();
+                return xtl::select(t1 < t2, t1, t2);
             }
 
             template <class A1, class A2>
@@ -548,20 +538,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         template <class T = void>
         struct maximum
         {
-            template <class A1, class A2, XTL_REQUIRES(xtl::negation<detail::at_least_one_xoptional<A1, A2>>)>
+            template <class A1, class A2>
             constexpr auto operator()(const A1& t1, const A2& t2) const noexcept
             {
-                return (t1 > t2) ? t1 : t2;
-            }
-
-            template <class A1, class A2, XTL_REQUIRES(detail::at_least_one_xoptional<A1, A2>)>
-            auto operator()(const A1& t1, const A2& t2) const noexcept
-            {
-                using return_type = xtl::common_optional_t<A1, A2>;
-                auto diff = t1 > t2;
-                return diff.has_value() ?
-                    diff.value() ? return_type(t1) : return_type(t2) :
-                    xtl::missing<typename return_type::value_type>();
+                return xtl::select(t1 > t2, t1, t2);
             }
 
             template <class A1, class A2>
@@ -573,24 +553,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
         struct clamp_fun
         {
-            template <class A1, class A2, class A3, XTL_REQUIRES(xtl::negation<detail::at_least_one_xoptional<A1, A2, A3>>)>
+            template <class A1, class A2, class A3>
             constexpr auto operator()(const A1& v, const A2& lo, const A3& hi) const
             {
-                return v < lo ? lo : hi < v ? hi : v;
-            }
-
-            template <class A1, class A2, class A3, XTL_REQUIRES(detail::at_least_one_xoptional<A1, A2, A3>)>
-            auto operator()(const A1& v, const A2& lo, const A3& hi) const
-            {
-                using return_type = xtl::common_optional_t<A1, A2, A3>;
-                return_type opt_v(v);
-                return_type opt_lo(lo);
-                return_type opt_hi(hi);
-                if (!opt_v.has_value() || !opt_lo.has_value() || !opt_hi.has_value())
-                {
-                    return xtl::missing<typename return_type::value_type>();
-                }
-                return opt_v.value() < opt_lo.value() ? opt_lo : opt_hi.value() < opt_v.value() ? opt_hi : opt_v;
+                return xtl::select(v < lo, lo, xtl::select(hi < v, hi, v));
             }
 
             template <class A1, class A2, class A3>
