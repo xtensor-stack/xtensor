@@ -132,6 +132,53 @@ namespace xt
             a.resize(size2);
             EXPECT_EQ(size2, a.size());
         }
+
+        vector_type b = { 1, 3, 4 };
+        b.resize(6);
+        EXPECT_EQ(b[0], 1u);
+        EXPECT_EQ(b[1], 3u);
+        EXPECT_EQ(b[2], 4u);
+    }
+
+    TEST(svector, swap)
+    {
+        using std::swap;
+
+        {
+            vector_type a = { 1, 3, 4, 6, 7 };
+            vector_type b = {};
+            vector_type abu = a;
+            vector_type bbu = b;
+
+            swap(a, b);
+
+            EXPECT_EQ(a, bbu);
+            EXPECT_EQ(b, abu);
+        }
+
+        {
+            vector_type a = { 1, 3 ,4 };
+            vector_type b = { 2, 1, 5, 3, 9, 12 };
+            vector_type abu = a;
+            vector_type bbu = b;
+
+            swap(a, b);
+
+            EXPECT_EQ(a, bbu);
+            EXPECT_EQ(b, abu);
+        }
+
+        {
+            vector_type a = { 10, 13, 14 };
+            vector_type b = { 12, 15, 17 };
+            vector_type abu = a;
+            vector_type bbu = b;
+
+            swap(a, b);
+
+            EXPECT_EQ(a, bbu);
+            EXPECT_EQ(b, abu);
+        }
     }
 
     TEST(svector, access)

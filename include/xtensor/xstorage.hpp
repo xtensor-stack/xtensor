@@ -935,10 +935,11 @@ namespace xt
         {
             grow(n);
         }
+        size_type old_size = size();
         m_end = m_begin + n;
-        if (Init)
+        if (Init && old_size < size())
         {
-            std::fill(begin(), end(), T());
+            std::fill(begin() + old_size, end(), T());
         }
     }
 
@@ -1189,6 +1190,7 @@ namespace xt
     template <std::size_t ON, class OA, bool InitA>
     inline void svector<T, N, A, Init>::swap(svector<T, ON, OA, InitA>& rhs)
     {
+        using std::swap;
         if (this == &rhs)
         {
             return;
@@ -1197,45 +1199,43 @@ namespace xt
         // We can only avoid copying elements if neither vector is small.
         if (!this->on_stack() && !rhs.on_stack())
         {
-            std::swap(this->m_begin, rhs.m_begin);
-            std::swap(this->m_end, rhs.m_end);
-            std::swap(this->m_capacity, rhs.m_capacity);
+            swap(this->m_begin, rhs.m_begin);
+            swap(this->m_end, rhs.m_end);
+            swap(this->m_capacity, rhs.m_capacity);
             return;
         }
 
-        if (rhs.size() > this->capacity())
+        size_type rhs_old_size = rhs.size();
+        size_type old_size = this->size();
+
+        if (rhs_old_size > old_size)
         {
-            this->resize(rhs.size());
+            this->resize(rhs_old_size);
         }
-        if (this->size() > rhs.capacity())
+        else if (old_size > rhs_old_size)
         {
-            rhs.resize(this->size());
+            rhs.resize(old_size);
         }
 
         // Swap the shared elements.
-        std::size_t num_shared = (std::min)(this->size(), rhs.size());
-
-        for (size_type i = 0; i != num_shared; ++i)
+        size_type min_size = (std::min)(old_size, rhs_old_size);
+        for (size_type i = 0; i < min_size; ++i)
         {
-            std::swap((*this)[i], rhs[i]);
+            swap((*this)[i], rhs[i]);
         }
 
         // Copy over the extra elts.
-        if (this->size() > rhs.size())
+        if (old_size > rhs_old_size)
         {
-            std::size_t elements_diff = this->size() - rhs.size();
-            std::copy(this->begin() + num_shared, this->end(), rhs.end());
-            rhs.m_end = rhs.end() + elements_diff;
-            this->destroy_range(this->begin() + num_shared, this->end());
-            this->m_end = this->begin() + num_shared;
+            std::copy(this->begin() + min_size, this->end(), rhs.begin() + min_size);
+            this->destroy_range(this->begin() + min_size, this->end());
+            this->m_end = this->begin() + min_size;
         }
-        else if (rhs.size() > this->size())
+        else if (rhs_old_size > old_size)
         {
-            std::size_t elements_diff = rhs.size() - this->size();
-            std::uninitialized_copy(rhs.begin() + num_shared, rhs.end(), this->end());
-            this->m_end = this->end() + elements_diff;
-            this->destroy_range(rhs.begin() + num_shared, rhs.end());
-            rhs.m_end = rhs.begin() + num_shared;
+            std::copy(rhs.begin() + min_size, rhs.end(), this->begin() + min_size);
+            this->destroy_range(rhs.begin() + min_size, rhs.end());
+            rhs.m_end = rhs.begin() + min_size;
         }
     }
 
