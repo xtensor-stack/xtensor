@@ -7,6 +7,44 @@
 Changelog
 =========
 
+0.19.3
+------
+
+- Fix arange
+  `#1361 <https://github.com/QuantStack/xtensor/pull/1361>`_.
+- Adaptors for C stack-allocated arrays
+  `#1363 <https://github.com/QuantStack/xtensor/pull/1363>`_.
+- Add support for optionals in ``conditional_ternary``
+  `#1365 <https://github.com/QuantStack/xtensor/pull/1365>`_.
+- Add tests for ternary operator on xoptionals
+  `#1368 <https://github.com/QuantStack/xtensor/pull/1368>`_.
+- Enable ternary operation for a mix of ``xoptional<value>`` and ``value``
+  `#1370 <https://github.com/QuantStack/xtensor/pull/1370>`_.
+- ``reduce`` now accepts a single reduction function
+  `#1371 <https://github.com/QuantStack/xtensor/pull/1371>`_.
+- Implemented share method
+  `#1372 <https://github.com/QuantStack/xtensor/pull/1372>`_.
+- Documentation of shared improved
+  `#1373 <https://github.com/QuantStack/xtensor/pull/1373>`_.
+- ``make_lambda_xfunction`` more generic
+  `#1374 <https://github.com/QuantStack/xtensor/pull/1374>`_.
+- minimum/maximum for ``xoptional``
+  `#1378 <https://github.com/QuantStack/xtensor/pull/1378>`_.
+- Added missing methods in ``uvector`` and ``svector``
+  `#1379 <https://github.com/QuantStack/xtensor/pull/1379>`_.
+- Clip ``xoptional_assembly``
+  `#1380 <https://github.com/QuantStack/xtensor/pull/1380>`_.
+- Improve gtest cmake
+  `#1382 <https://github.com/QuantStack/xtensor/pull/1382>`_.
+- Implement ternary operator for scalars
+  `#1385 <https://github.com/QuantStack/xtensor/pull/1385>`_.
+- Added missing ``at`` method in ``uvector`` and ``svector``
+  `#1386 <https://github.com/QuantStack/xtensor/pull/1386>`_.
+- Fixup binder environment
+  `#1387 <https://github.com/QuantStack/xtensor/pull/1387>`_.
+- Fixed ``resize`` and ``swap`` of ``svector``
+  `#1388 <https://github.com/QuantStack/xtensor/pull/1388>`_.
+
 0.19.2
 ------
 
