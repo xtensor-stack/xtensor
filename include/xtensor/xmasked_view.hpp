@@ -10,7 +10,8 @@
 #ifndef XTENSOR_XMASKED_VIEW_HPP
 #define XTENSOR_XMASKED_VIEW_HPP
 
-#include "xmasked_value.hpp"
+#include "xtl/xmasked_value.hpp"
+
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xutils.hpp"
@@ -38,7 +39,7 @@ namespace xt
     {
         using base_value_type = typename std::decay_t<CTD>::value_type;
         using flag_type = typename std::decay_t<CTM>::value_type;
-        using temporary_type = xarray<xmasked_value<base_value_type, flag_type>>;
+        using temporary_type = xarray<xtl::xmasked_value<base_value_type, flag_type>>;
     };
 
     template <class CTD, class CTM>
@@ -99,9 +100,9 @@ namespace xt
                                                   typename mask_type::const_reference,
                                                   typename mask_type::reference>;
 
-        using value_type = xmasked_value<base_value_type, flag_type>;
-        using reference = xmasked_value<val_reference, mask_reference>;
-        using const_reference = xmasked_value<typename data_type::const_reference, typename mask_type::const_reference>;
+        using value_type = xtl::xmasked_value<base_value_type, flag_type>;
+        using reference = xtl::xmasked_value<val_reference, mask_reference>;
+        using const_reference = xtl::xmasked_value<typename data_type::const_reference, typename mask_type::const_reference>;
 
         using pointer = xtl::xclosure_pointer<reference>;
         using const_pointer = xtl::xclosure_pointer<const_reference>;
