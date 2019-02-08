@@ -44,9 +44,9 @@ namespace xt
     template <class F, class CT>
     class xfunctor_view;
 
-    /***************************
-     * xfunctor_view extension *
-     ***************************/
+    /************************************************
+     * xfunctor_view and xfunctor_adaptor extension *
+     ************************************************/
 
     namespace extension
     {
@@ -123,6 +123,7 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
 
         using shape_type = typename xexpression_type::shape_type;
+        using inner_shape_type = typename xexpression_type::inner_shape_type;
 
         static constexpr layout_type static_layout = xexpression_type::static_layout;
         static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
@@ -167,7 +168,9 @@ namespace xt
 
         size_type size() const noexcept;
         size_type dimension() const noexcept;
-        const shape_type& shape() const noexcept;
+        const inner_shape_type& shape() const noexcept;
+        const auto& strides() const noexcept;
+
         layout_type layout() const noexcept;
 
         template <class... Args>
@@ -342,6 +345,9 @@ namespace xt
      * corresponding element of an underlying expression. Unlike e.g. xgenerator, an xfunctor_view is
      * an lvalue. It is used e.g. to access real and imaginary parts of complex expressions.
      *
+     * xfunctor_view has a view semantics and can be used on any expression.
+     * For a similar feature with a container semantics, one can use \ref xfunctor_adaptor.
+     *
      * xfunctor_view is not meant to be used directly, but through helper functions such
      * as \ref real or \ref imag.
      *
@@ -396,6 +402,9 @@ namespace xt
      * @class xfunctor_adaptor
      * @brief Adapt a container with a functor, forwarding methods such as resize / reshape.
      *
+     * xfunctor_adaptor has a container semantics and can only be used with containers.
+     * For a similar feature with a view semantics, one can use \ref xfunctor_view.
+     *
      * @tparam F the functor type to be applied to the elements of specified expression.
      * @tparam CT the closure type of the \ref xexpression type underlying this view
      *
@@ -439,7 +448,7 @@ namespace xt
 
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type&& tmp);
-        friend class xview_semantic<self_type>;
+        friend class xcontainer_semantic<self_type>;
     };
 
 
@@ -634,9 +643,18 @@ namespace xt
      * Returns the shape of the expression.
      */
     template <class F, class CT>
-    inline auto xfunctor_applier_base<F, CT>::shape() const noexcept -> const shape_type&
+    inline auto xfunctor_applier_base<F, CT>::shape() const noexcept -> const inner_shape_type&
     {
         return m_e.shape();
+    }
+
+    /**
+     * Returns the strides of the expression.
+     */
+    template <class F, class CT>
+    inline const auto& xfunctor_applier_base<F, CT>::strides() const noexcept
+    {
+        return m_e.strides();
     }
 
     /**
