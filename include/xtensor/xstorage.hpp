@@ -1595,6 +1595,11 @@ namespace xt
             return m_array[idx];
         }
 
+        XTENSOR_FIXED_SHAPE_CONSTEXPR bool empty() const
+        {
+            return sizeof...(X) == 0; 
+        }
+
     private:
 
          XTENSOR_CONSTEXPR_ENHANCED_STATIC cast_type m_array = cast_type({X...});
