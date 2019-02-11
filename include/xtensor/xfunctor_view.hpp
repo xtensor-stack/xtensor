@@ -27,7 +27,6 @@
 
 namespace xt
 {
-
     /*****************************
      * xfunctor_view declaration *
      *****************************/
@@ -123,7 +122,20 @@ namespace xt
         using difference_type = typename xexpression_type::difference_type;
 
         using shape_type = typename xexpression_type::shape_type;
+        using strides_type = xtl::mpl::eval_if_t<has_strides<xexpression_type>,
+                                                 detail::expr_strides_type<xexpression_type>,
+                                                 get_strides_type<shape_type>>;
+        using backstrides_type = xtl::mpl::eval_if_t<has_strides<xexpression_type>,
+                                                     detail::expr_backstrides_type<xexpression_type>,
+                                                     get_strides_type<xexpression_type>>;
+
         using inner_shape_type = typename xexpression_type::inner_shape_type;
+        using inner_strides_type = xtl::mpl::eval_if_t<has_strides<xexpression_type>,
+                                                       detail::expr_inner_strides_type<xexpression_type>,
+                                                       get_strides_type<shape_type>>;
+        using inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<xexpression_type>,
+                                                           detail::expr_inner_backstrides_type<xexpression_type>,
+                                                           get_strides_type<shape_type>>;
 
         static constexpr layout_type static_layout = xexpression_type::static_layout;
         static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
@@ -169,7 +181,8 @@ namespace xt
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
-        const auto& strides() const noexcept;
+        const inner_strides_type& strides() const noexcept;
+        const inner_backstrides_type& backstrides() const noexcept;
 
         layout_type layout() const noexcept;
 
@@ -335,7 +348,6 @@ namespace xt
         CT m_e;
         functor_type m_functor;
     };
-
 
     /**
      * @class xfunctor_view
@@ -652,9 +664,18 @@ namespace xt
      * Returns the strides of the expression.
      */
     template <class F, class CT>
-    inline const auto& xfunctor_applier_base<F, CT>::strides() const noexcept
+    inline auto xfunctor_applier_base<F, CT>::strides() const noexcept -> const inner_strides_type&
     {
         return m_e.strides();
+    }
+
+    /**
+     * Returns the backstrides of the expression.
+     */
+    template <class F, class CT>
+    inline auto xfunctor_applier_base<F, CT>::backstrides() const noexcept -> const inner_backstrides_type&
+    {
+        return m_e.backstrides();
     }
 
     /**
@@ -889,7 +910,6 @@ namespace xt
     {
         return m_e;
     }
-
     //@}
 
     /**

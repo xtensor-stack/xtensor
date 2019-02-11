@@ -74,6 +74,10 @@ namespace xt
 
     template <class CT, class M, std::size_t I>
     using xoffset_view = xfunctor_view<detail::offset_forwarder<M, I>, CT>;
+
+    template <class CT, class M, std::size_t I>
+    using xoffset_adaptor = xfunctor_adaptor<detail::offset_forwarder<M, I>, CT>;
 }
 
 #endif
+
