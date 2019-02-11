@@ -126,6 +126,24 @@ namespace xt
         }
     }
 
+    TEST(xfunctor_adaptor, lhs_assignment)
+    {
+        using container_type = xarray<std::complex<double>>;
+        
+        container_type e = {{3.0       , 1.0 + 1.0i},
+                            {1.0 - 1.0i, 2.0       }};
+
+        // Assigning to a xfunctor_adaptor, which has a container semantics, resizes
+        // the underlying container.
+        auto radaptor = xt::xoffset_adaptor<container_type&, double, 0>(e);
+        xt::xtensor<double, 1> rhs = {4.0, 5.0};
+        radaptor = rhs;
+
+        EXPECT_EQ(e.dimension(), 1);
+        EXPECT_EQ(xtl::real(e(0)), 4.0);
+        EXPECT_EQ(xtl::real(e(1)), 5.0);
+    }
+
 #if defined(XTENSOR_USE_XSIMD) && XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION
     TEST(xfunctor_adaptor, simd)
     {
