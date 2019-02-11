@@ -16,9 +16,10 @@
 
 #include "gtest/gtest.h"
 
-#include "xtensor/xfixed.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xio.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xmanipulation.hpp"
@@ -273,6 +274,16 @@ namespace xt
 
         xt::noalias(Eps) = Epsd * 123;
         // Eps = Epsd * 123; <-- Enable after XTL release!
+    }
+
+    TEST(xtensor_fixed, print)
+    {
+        xtensor_fixed<char, xshape<2>> a = {0, 1};
+        xtensor_fixed<char, xshape<2>> b = {1, 1};
+
+        std::stringstream out;
+        out << a + b;
+        EXPECT_EQ("{1, 2}", out.str());
     }
 }
 

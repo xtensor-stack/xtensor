@@ -168,7 +168,8 @@ namespace xt
 
             using xexpression_type = std::decay_t<CT>;
             using shape_type = typename xexpression_type::shape_type;
-            using index_type = xindex_type_t<shape_type>;
+            using inner_strides_type = get_strides_t<shape_type>;
+            using index_type = inner_strides_type;
             using size_type = typename xexpression_type::size_type;
             using value_type = typename xexpression_type::value_type;
             using reference = typename xexpression_type::reference;
@@ -201,7 +202,7 @@ namespace xt
         private:
 
             mutable CT* m_e;
-            shape_type m_strides;
+            inner_strides_type m_strides;
             mutable index_type m_index;
             size_type m_size;
             layout_type m_layout;
@@ -431,7 +432,6 @@ namespace xt
      * @name Data
      */
     //@{
-
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view_base<CT, S, L, FST>::operator()() -> reference
     {
@@ -794,7 +794,7 @@ namespace xt
         template <class CT>
         template <class FST>
         inline flat_expression_adaptor<CT>::flat_expression_adaptor(CT* e, FST&& strides, layout_type layout)
-            : m_e(e), m_strides(xtl::forward_sequence<shape_type, FST>(strides)), m_layout(layout)
+            : m_e(e), m_strides(xtl::forward_sequence<inner_strides_type, FST>(strides)), m_layout(layout)
         {
             resize_container(m_index, m_e->dimension());
             m_size = m_e->size();
