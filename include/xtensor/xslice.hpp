@@ -635,16 +635,16 @@ namespace xt
 
     private:
 
-        static auto normalize(std::ptrdiff_t val,const std::size_t ssize)
+        static auto normalize(std::ptrdiff_t val, const std::size_t ssize)
         {
-            std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
+            const std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
             val = (val >= 0) ? val : val + size;
             return (std::max)(std::ptrdiff_t(0), (std::min)(size, val));
         }
 
-        static auto get_stepped_range(std::ptrdiff_t start, std::ptrdiff_t stop,const std::ptrdiff_t step,const std::size_t ssize)
+        static auto get_stepped_range(std::ptrdiff_t start, std::ptrdiff_t stop, const std::ptrdiff_t step, const std::size_t ssize)
         {
-            std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
+            const std::ptrdiff_t size = static_cast<std::ptrdiff_t>(ssize);
             start = (start >= 0) ? start : start + size;
             stop = (stop >= 0) ? stop : stop + size;
 
