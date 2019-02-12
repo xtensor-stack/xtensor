@@ -174,6 +174,18 @@ namespace xt
             allocator_type m_allocator;
         };
 
+        // Workaround for MSVC2015: using void_t results in some
+        // template instantiation caching that leads to wrong 
+        // type deduction later in xfunction.
+        template <class T>
+        struct msvc2015_void
+        {
+            using type = void;
+        };
+
+        template <class T>
+        using msvc2015_void_t = typename msvc2015_void<T>::type;
+
         template <class E, class = void>
         struct is_lambda_type : std::false_type
         {
@@ -181,17 +193,22 @@ namespace xt
 
         // check if operator() is available
         template <class E>
-        struct is_lambda_type<E, void_t<decltype(&E::operator())>>
+        struct is_lambda_type<E, msvc2015_void_t<decltype(&E::operator())>>
             : std::true_type
         {
         };
 
+        template <class T>
+        struct self_type
+        {
+            using type = T;
+        };
         template <class CP, class A, class O>
         struct get_buffer_storage
         {
-            using type = xtl::mpl::eval_if_t<is_lambda_type<A>,
-                                             meta_identity<xbuffer_smart_pointer<CP, A>>,
-                                             meta_identity<xbuffer_storage<CP, A>>>;
+            using type = xtl::mpl::eval_if_t</*std::true_type,*/is_lambda_type<A>,
+                                             self_type<xbuffer_smart_pointer<CP, A>>,
+                                             self_type<xbuffer_storage<CP, A>>>;
         };
 
         template <class CP, class A>
