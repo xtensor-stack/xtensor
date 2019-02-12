@@ -1176,7 +1176,6 @@ namespace xt
     };
 #endif
 
-
     template <class S>
     struct get_strides_type
     {
@@ -1187,8 +1186,8 @@ namespace xt
     struct get_strides_type<fixed_shape<I...>>
     {
         // TODO we could compute the strides statically here.
-        //      But we'll need full constexpr support to have a
-        //      homogenous ``compute_strides`` method
+        //  But we'll need full constexpr support to have a
+        //  homogenous ``compute_strides`` method
         using type = std::array<std::ptrdiff_t, sizeof...(I)>;
     };
 
