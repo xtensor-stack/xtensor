@@ -457,7 +457,7 @@ namespace xt
      *
      * std::cout << shared_buf.use_count() << std::endl;
      * {
-     *     auto obj = adapt_smart_ptr(shared_buf.get()->buf.data(),
+     *     auto obj = adapt_smart_ptr(shared_buf.get()->m_buf.data(),
      *                                {2, 4}, shared_buf);
      *     // Use count increased to 2
      *     std::cout << shared_buf.use_count() << std::endl;

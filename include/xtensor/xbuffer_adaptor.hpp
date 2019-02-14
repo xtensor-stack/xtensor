@@ -206,7 +206,7 @@ namespace xt
         template <class CP, class A, class O>
         struct get_buffer_storage
         {
-            using type = xtl::mpl::eval_if_t</*std::true_type,*/is_lambda_type<A>,
+            using type = xtl::mpl::eval_if_t<is_lambda_type<A>,
                                              self_type<xbuffer_smart_pointer<CP, A>>,
                                              self_type<xbuffer_storage<CP, A>>>;
         };

@@ -39,12 +39,6 @@ namespace xt
 
     namespace detail
     {
-        // need to have a copy of meta_identity here for MSVC
-        template <class T>
-        struct meta_identity
-        {
-            using type = T;
-        };
 
         /********************
          * common_size_type *
@@ -238,7 +232,7 @@ namespace xt
         using tuple_type = std::tuple<CT...>;
 
         // Added indirection for MSVC 2017 bug with the operator value_type()
-        using value_type = typename detail::meta_identity<decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
+        using value_type = typename meta_identity<decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
         using reference = value_type;
         using const_reference = value_type;
         using pointer = value_type*;
