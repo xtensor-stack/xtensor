@@ -413,11 +413,56 @@ namespace xt
         auto xb = adapt(&b[0], xshape<2, 2>());
         if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
         {
-            EXPECT_EQ(xb(1,0), 19);
+            EXPECT_EQ(xb(1, 0), 19);
         }
         else
         {
-            EXPECT_EQ(xb(1,0), 5);
+            EXPECT_EQ(xb(1, 0), 5);
         }
     }
+
+    namespace xadapt_test
+    {
+        struct Buffer {
+            std::vector<double> buf;
+            Buffer(std::vector<double>& ibuf) : buf(ibuf) {}
+        };
+    }
+
+#ifndef X_OLD_CLANG
+    TEST(xtensor_adaptor, smart_ptr)
+    {
+        auto data = std::vector<double>{1,2,3,4,5,6,7,8};
+        auto shared_buf = std::make_shared<xadapt_test::Buffer>(data);
+        auto unique_buf = std::make_unique<xadapt_test::Buffer>(data);
+
+        std::shared_ptr<double> dptr(new double[8], std::default_delete<double[]>());
+        dptr.get()[2] = 2.1;
+        auto xdptr = adapt_smart_ptr(dptr, {4, 2});
+
+        if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
+        {
+            EXPECT_EQ(xdptr(1, 0), 2.1);
+            xdptr(3, 1) = 123.;
+            EXPECT_EQ(dptr.get()[7], 123.);
+        }
+        else
+        {
+            EXPECT_EQ(xdptr(2, 0), 2.1);
+            xdptr(3, 1) = 123.;
+            EXPECT_EQ(dptr.get()[7], 123.);
+        }
+
+        EXPECT_EQ(shared_buf.use_count(), 1);
+        {
+            auto obj = adapt_smart_ptr(shared_buf.get()->buf.data(), {2, 4}, shared_buf);
+            EXPECT_EQ(shared_buf.use_count(), 2);
+        }
+        EXPECT_EQ(shared_buf.use_count(), 1);
+
+        {
+            auto obj = adapt_smart_ptr(unique_buf.get()->buf.data(), {2, 4}, std::move(unique_buf));
+        }
+    }
+#endif
 }

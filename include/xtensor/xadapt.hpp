@@ -400,6 +400,98 @@ namespace xt
         return adapt(std::forward<C>(ptr), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 #endif
+
+#ifndef X_OLD_CLANG
+    /**
+     * Adapt a smart pointer to a typed memory block (unique_ptr or shared_ptr)
+     *
+     * \code{.cpp}
+     * #include <xtensor/xadapt.hpp>
+     * #include <xtensor/xio.hpp>
+     *
+     * std::shared_ptr<double> sptr(new double[8], std::default_delete<double[]>());
+     * sptr.get()[2] = 321.;
+     * auto xptr = adapt_smart_ptr(sptr, {4, 2});
+     * xptr(1, 3) = 123.;
+     * std::cout << xptr;
+     * \endcode
+     *
+     * @param smart_ptr<T[]> a smart pointer to a memory block of T[]
+     * @param shape The desired shape
+     *
+     * @return xtensor_adaptor for memory
+     */
+    template <class P, class I, std::size_t N>
+    auto adapt_smart_ptr(P&& smart_ptr, const I(&shape)[N])
+    {
+        using buffer_adaptor = xbuffer_adaptor<decltype(smart_ptr.get()), smart_ownership,
+                                               std::decay_t<P>>;
+        std::array<std::size_t, N> fshape = xtl::forward_sequence<std::array<std::size_t, N>, decltype(shape)>(shape);
+        return xtensor_adaptor<buffer_adaptor, N>(
+            buffer_adaptor(smart_ptr.get(), compute_size(fshape),
+            std::forward<P>(smart_ptr)),
+            std::move(fshape)
+        );
+    }
+
+    /**
+     * Adapt a smart pointer (shared_ptr or unique_ptr)
+     *
+     * This function allows to automatically adapt a shared or unique pointer to
+     * a given shape and operate naturally on it. Memory will be automatically
+     * handled by the smart pointer implementation.
+     *
+     * \code{.cpp}
+     * #include <xtensor/xadapt.hpp>
+     * #include <xtensor/xio.hpp>
+     *
+     * struct Buffer {
+     *     Buffer(std::vector<double>& buf) : m_buf(buf) {}
+     *     ~Buffer() { std::cout << "deleted" << std::endl; }
+     *     std::vector<double> m_buf;
+     * };
+     *
+     * auto data = std::vector<double>{1,2,3,4,5,6,7,8};
+     * auto shared_buf = std::make_shared<Buffer>(data);
+     * auto unique_buf = std::make_unique<Buffer>(data);
+     *
+     * std::cout << shared_buf.use_count() << std::endl;
+     * {
+     *     auto obj = adapt_smart_ptr(shared_buf.get()->m_buf.data(),
+     *                                {2, 4}, shared_buf);
+     *     // Use count increased to 2
+     *     std::cout << shared_buf.use_count() << std::endl;
+     *     std::cout << obj << std::endl;
+     * }
+     * // Use count reset to 1
+     * std::cout << shared_buf.use_count() << std::endl;
+     *
+     * {
+     *     auto obj = adapt_smart_ptr(unique_buf.get()->buf.data(),
+     *                                {2, 4}, std::move(unique_buf));
+     *     std::cout << obj << std::endl;
+     * }
+     * \endcode
+     *
+     * @param A pointer to a typed data block (e.g. double*)
+     * @param shape The desired shape
+     * @param A smart pointer to move or copy, in order to manage memory
+     *
+     * @return xtensor_adaptor on the memory
+     */
+    template <class P, class I, std::size_t N, class D>
+    auto adapt_smart_ptr(P&& data_ptr, const I(&shape)[N], D&& smart_ptr)
+    {
+        using buffer_adaptor = xbuffer_adaptor<P, smart_ownership,
+                                               std::decay_t<D>>;
+        std::array<std::size_t, N> fshape = xtl::forward_sequence<std::array<std::size_t, N>, decltype(shape)>(shape);
+
+        return xtensor_adaptor<buffer_adaptor, N>(
+            buffer_adaptor(data_ptr, compute_size(fshape), std::forward<D>(smart_ptr)),
+            std::move(fshape)
+        );
+    }
+#endif
 }
 
 #endif

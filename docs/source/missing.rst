@@ -84,7 +84,7 @@ of the two expressions while the last one holds a reference on at least one of t
          { true, false }};
 
     xoptional_assembly<xarray<double>, xarray<bool>>
-    assembly(v, vh);
+    assembly(v, hv);
     std::cout << assembly << std::endl;
 
 outputs:
