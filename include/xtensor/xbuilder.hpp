@@ -322,7 +322,7 @@ namespace xt
             inline T operator()(const It& /*begin*/, const It& end) const
             {
                 using lvalue_type = typename std::iterator_traits<It>::value_type;
-                return *(end - 1) == *(end - 2) + static_cast<lvalue_type>(static_cast<unsigned int>(m_k)) ? T(1) : T(0);
+                return *(end - 1) == *(end - 2) + static_cast<lvalue_type>((m_k)) ? T(1) : T(0);
             }
 
         private:
