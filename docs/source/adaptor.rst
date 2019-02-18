@@ -121,7 +121,7 @@ adaptor before calling ``compute`` and pass it to the function:
     #include <cstddef>
     #include "xtensor/xarray.hpp"
     #include "xtensor/xadapt.hpp"
-    
+
     template <class A>
     void compute(A& a)
     {
@@ -129,7 +129,7 @@ adaptor before calling ``compute`` and pass it to the function:
         b.reshape({2, 1});
         a = a * b; // size has changed, shape is now { 2, 2 }
     }
-    
+
     int main()
     {
         std::size_t size = 2;
@@ -174,3 +174,59 @@ the corresponding value in ``v``:
 
     a1(0, 0) = 20.;
     // now v is { 20., 2., 3., 4., 5., 6. }
+
+Adapting C++ smart pointers
+---------------------------
+
+If you want to manage your data with shared or unique pointers, you can use the
+``adapt_smart_ptr`` function of xtensor. It will automatically increment the
+reference count of shared pointers upon creation, and decrement upon deletion.
+
+.. code::
+
+    #include <memory>
+    #include <xtensor/xadapt.hpp>
+    #include <xtensor/xio.hpp>
+
+    std::shared_ptr<double> sptr(new double[8], std::default_delete<double[]>());
+    sptr.get()[2] = 321.;
+    auto xptr = xt::adapt_smart_ptr(sptr, {4, 2});
+    xptr(1, 3) = 123.;
+    std::cout << xptr;
+
+Or if you operate on shared pointers that do not directly point to the underlying
+buffer, you can pass the data pointer and the smart pointer (to manage the underlying
+memory) as follows:
+
+.. code::
+
+    #include <memory>
+    #include <xtensor/xadapt.hpp>
+    #include <xtensor/xio.hpp>
+
+    struct Buffer {
+        Buffer(std::vector<double>& buf) : m_buf(buf) {}
+        ~Buffer() { std::cout << "deleted" << std::endl; }
+        std::vector<double> m_buf;
+    };
+
+    auto data = std::vector<double>{1,2,3,4,5,6,7,8};
+    auto shared_buf = std::make_shared<Buffer>(data);
+    auto unique_buf = std::make_unique<Buffer>(data);
+
+    std::cout << shared_buf.use_count() << std::endl;
+    {
+        auto obj = xt::adapt_smart_ptr(shared_buf.get()->m_buf.data(),
+                                       {2, 4}, shared_buf);
+        // Use count increased to 2
+        std::cout << shared_buf.use_count() << std::endl;
+        std::cout << obj << std::endl;
+    }
+    // Use count reset to 1
+    std::cout << shared_buf.use_count() << std::endl;
+
+    {
+        auto obj = xt::adapt_smart_ptr(unique_buf.get()->m_buf.data(),
+                                       {2, 4}, std::move(unique_buf));
+        std::cout << obj << std::endl;
+    }

@@ -416,7 +416,7 @@ namespace xt
      * std::cout << xptr;
      * \endcode
      *
-     * @param smart_ptr<T[]> a smart pointer to a memory block of T[]
+     * @param smart_ptr a smart pointer to a memory block of T[]
      * @param shape The desired shape
      *
      * @return xtensor_adaptor for memory
@@ -467,15 +467,15 @@ namespace xt
      * std::cout << shared_buf.use_count() << std::endl;
      *
      * {
-     *     auto obj = adapt_smart_ptr(unique_buf.get()->buf.data(),
+     *     auto obj = adapt_smart_ptr(unique_buf.get()->m_buf.data(),
      *                                {2, 4}, std::move(unique_buf));
      *     std::cout << obj << std::endl;
      * }
      * \endcode
      *
-     * @param A pointer to a typed data block (e.g. double*)
+     * @param data_ptr A pointer to a typed data block (e.g. double*)
      * @param shape The desired shape
-     * @param A smart pointer to move or copy, in order to manage memory
+     * @param smart_ptr A smart pointer to move or copy, in order to manage memory
      *
      * @return xtensor_adaptor on the memory
      */

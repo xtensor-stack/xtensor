@@ -35,3 +35,9 @@ Defined in ``xtensor/xadapt.hpp``
 
 .. doxygenfunction:: xt::adapt(T (&)[N], SC&&, SS&&)
    :project: xtensor
+
+.. doxygenfunction:: xt::adapt_smart_ptr(P&&, const I (&)[N])
+   :project: xtensor
+
+.. doxygenfunction:: xt::adapt_smart_ptr(P&&, const I (&)[N], D&&)
+   :project: xtensor
