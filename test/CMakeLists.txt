@@ -152,6 +152,7 @@ set(XTENSOR_TESTS
     test_extended_broadcast_view.cpp
     test_extended_xmath_reducers.cpp
     test_extended_xhistogram.cpp
+    test_extended_xsort.cpp
 )
 
 if(nlohmann_json_FOUND)

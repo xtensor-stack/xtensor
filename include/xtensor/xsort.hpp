@@ -410,11 +410,19 @@ namespace xt
         return ev;
     }
 
-    template <class E, std::size_t N, class R = typename detail::flatten_sort_result_type<E>::type>
-    inline R partition(const xexpression<E>& e, const std::size_t (&kth_container)[N], placeholders::xtuph tag)
+#ifdef X_OLD_CLANG
+    template <class E, class I, class R = typename detail::flatten_sort_result_type<E>::type>
+    inline R partition(const xexpression<E>& e, std::initializer_list<I> kth_container, placeholders::xtuph tag)
+    {
+        return partition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), tag);
+    }
+#else
+    template <class E, class I, std::size_t N, class R = typename detail::flatten_sort_result_type<E>::type>
+    inline R partition(const xexpression<E>& e, const I(&kth_container)[N], placeholders::xtuph tag)
     {
         return partition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), tag);
     }
+#endif
 
     template <class E, class R = typename detail::flatten_sort_result_type<E>::type>
     inline R partition(const xexpression<E>& e, std::size_t kth, placeholders::xtuph tag)
@@ -478,12 +486,19 @@ namespace xt
         return res;
     }
 
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto partition(const xexpression<E>& e, std::initializer_list<I> kth_container, std::ptrdiff_t axis = -1)
+    {
+        return partition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), axis);
+    }
+#else
     template <class E, class T, std::size_t N>
     inline auto partition(const xexpression<E>& e, const T(&kth_container)[N], std::ptrdiff_t axis = -1)
     {
         return partition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), axis);
     }
-
+#endif
     template <class E>
     inline auto partition(const xexpression<E>& e, std::size_t kth, std::ptrdiff_t axis = -1)
     {
@@ -550,11 +565,19 @@ namespace xt
         return ev;
     }
 
-    template <class E, std::size_t N>
-    inline auto argpartition(const xexpression<E>& e, const std::size_t (&kth_container)[N], placeholders::xtuph tag)
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto argpartition(const xexpression<E>& e, std::initializer_list<I> kth_container, placeholders::xtuph tag)
+    {
+        return argpartition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), tag);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto argpartition(const xexpression<E>& e, const I(&kth_container)[N], placeholders::xtuph tag)
     {
         return argpartition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), tag);
     }
+#endif
 
     template <class E>
     inline auto argpartition(const xexpression<E>& e, std::size_t kth, placeholders::xtuph tag)
@@ -652,7 +675,7 @@ namespace xt
 
         for (auto it = (kth_copy.rbegin() + 1); it != kth_copy.rend(); ++it)
         {
-            detail::argpartition_over_leading_axis(ev, res, *it, kth);
+            detail::argpartition_over_leading_axis(ev, res, *it, static_cast<std::ptrdiff_t>(kth));
             kth = *it;
         }
 
@@ -664,11 +687,19 @@ namespace xt
         return res;
     }
 
-    template <class E, std::size_t N>
-    inline auto argpartition(const xexpression<E>& e, const std::size_t (&kth_container)[N], std::ptrdiff_t axis = -1)
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto argpartition(const xexpression<E>& e, std::initializer_list<I> kth_container, std::ptrdiff_t axis = -1)
+    {
+        return argpartition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), axis);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto argpartition(const xexpression<E>& e, const I(&kth_container)[N], std::ptrdiff_t axis = -1)
     {
         return argpartition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), axis);
     }
+#endif
 
     template <class E>
     inline auto argpartition(const xexpression<E>& e, std::size_t kth, std::ptrdiff_t axis = -1)
@@ -720,7 +751,6 @@ namespace xt
         }
     }
 
->>>>>>> e68e9601... add partition, argpartition, and median
     namespace detail
     {
         template <class T>

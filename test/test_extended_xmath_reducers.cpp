@@ -4,7 +4,6 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
-#include "xtensor/xio.hpp"
 #include "xtensor/xmath.hpp"
 
 // This file is generated from test/files/cppy_source/test_extended_xmath_reducers.cppy by preprocess.py!
@@ -18,7 +17,7 @@ namespace xt
     w  = np.random.random(4*5*6*7).reshape(4,5,6,7)
     av = np.average(a, weights=w, axis=(0,1))
     */
-    TEST(extended_xmath, average)
+    TEST(xtest_extended_xmath, average)
     {
         // py_a
         xarray<double> py_a = {{{{0.3745401188473625,0.9507143064099162,0.7319939418114051,
@@ -818,7 +817,7 @@ namespace xt
     vr = np.var(a, axis=(0,2))
     st = np.std(a, axis=(0,2))
     */
-    TEST(extended_xmath, var_std)
+    TEST(xtest_extended_xmath, var_std)
     {
         // py_a
         xarray<double> py_a = {{{{0.3460997265377855,0.9756102008599149,0.640972077345332 ,
@@ -1244,8 +1243,8 @@ namespace xt
         auto st_all = xt::stddev(py_a);
         auto vr_all = xt::variance(py_a);
 
-        auto vr = xt::variance(py_a, {0, 2});
         auto st = xt::stddev(py_a, {0, 2});
+        auto vr = xt::variance(py_a, {0, 2});
 
         EXPECT_TRUE(xt::allclose(st_all, py_st_all));
         EXPECT_TRUE(xt::allclose(vr_all, py_vr_all));

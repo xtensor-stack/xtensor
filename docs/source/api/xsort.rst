@@ -35,3 +35,12 @@ Defined in ``xtensor/xsort.hpp``
 
 .. doxygenfunction:: xt::unique(const xexpression<E>&)
    :project: xtensor
+
+.. doxygenfunction:: xt::partition(const xexpression<E>&, const C&, placeholders::xtuph)
+   :project: xtensor
+
+.. doxygenfunction:: xt::argpartition(const xexpression<E>&, const C&, placeholders::xtuph)
+   :project: xtensor
+
+.. doxygenfunction:: xt::median(E&&, std::ptrdiff_t)
+   :project: xtensor
