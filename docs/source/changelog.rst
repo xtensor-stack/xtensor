@@ -10,6 +10,26 @@ Changelog
 0.19.3
 ------
 
+- Add missing include
+  `#1391 <https://github.com/QuantStack/xtensor/pull/1391>`_
+- Fixes in xfunctor_view
+  `#1393 <https://github.com/QuantStack/xtensor/pull/1393>`_
+- Add tests for xfunctor_view
+  `#1395 <https://github.com/QuantStack/xtensor/pull/1395>`_
+- Add `empty` method to fixed_shape
+  `#1396 <https://github.com/QuantStack/xtensor/pull/1396>`_
+- Add accessors to slice members
+  `#1401 <https://github.com/QuantStack/xtensor/pull/1401>`_
+- Allow adaptors on shared pointers
+  `#1218 <https://github.com/QuantStack/xtensor/pull/1218>`_
+- Fix `eye` with negative index
+  `#1406 <https://github.com/QuantStack/xtensor/pull/1406>`_
+- Add documentation for shared pointer adaptor
+  `#1407 <https://github.com/QuantStack/xtensor/pull/1407>`_
+
+0.19.3
+------
+
 - Fix arange
   `#1361 <https://github.com/QuantStack/xtensor/pull/1361>`_.
 - Adaptors for C stack-allocated arrays
