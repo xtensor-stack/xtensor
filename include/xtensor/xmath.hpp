@@ -2450,7 +2450,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         auto shared_axes = make_xshared(std::move(axes));
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
-        return std::move(nansum<T>(shared_e, shared_axes, es) / count_nonnan<double>(shared_e, shared_axes, es));
+        return nansum<T>(shared_e, shared_axes, es) / count_nonnan<double>(shared_e, shared_axes, es);
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -2458,7 +2458,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto nanmean(E&& e, EVS es = EVS())
     {
         auto shared_e = make_xshared(std::move(e));
-        return std::move(nansum<T>(shared_e, es) / count_nonnan<double>(shared_e, es));
+        return nansum<T>(shared_e, es) / count_nonnan<double>(shared_e, es);
     }
 
 #ifdef X_OLD_CLANG
@@ -2466,14 +2466,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto nanmean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
         auto shared_e = make_xshared(std::move(e));
-        return std::move(nansum<T>(shared_e, axes, es) / count_nonnan<double>(shared_e, axes, es));
+        return nansum<T>(shared_e, axes, es) / count_nonnan<double>(shared_e, axes, es);
     }
 #else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         auto shared_e = xt::make_xshared(std::move(e));
-        return std::move(nansum<T>(shared_e, axes, es) / count_nonnan<double>(shared_e, axes, es));
+        return nansum<T>(shared_e, axes, es) / count_nonnan<double>(shared_e, axes, es);
     }
 #endif
 
