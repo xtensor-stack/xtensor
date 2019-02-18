@@ -2304,7 +2304,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     };                                                                          \
     auto merge_func = std::plus<result_type>();                                 \
 
-    template <class T = double, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+    template <class T = std::size_t, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_evaluation_strategy<EVS>)>
     inline auto count_nonnan(E&& e, EVS es = EVS())
     {
@@ -2313,7 +2313,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                       std::forward<E>(e), es);
     }
 
-    template <class T = double, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+    template <class T = std::size_t, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, xtl::negation<std::is_integral<X>>)>
     inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
     {
@@ -2322,7 +2322,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                       std::forward<E>(e), std::forward<X>(axes), es);
     }
 
-    template <class T = double, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+    template <class T = std::size_t, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, std::is_integral<X>)>
     inline auto count_nonnan(E&& e, X axis, EVS es = EVS())
     {
@@ -2330,7 +2330,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
 #ifdef X_OLD_CLANG
-    template <class T = double, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class T = std::size_t, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto count_nonnan(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
         COUNT_NON_NAN_CONTENT;
@@ -2338,7 +2338,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                       std::forward<E>(e), axes, es);
     }
 #else
-    template <class T = double, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class T = std::size_t, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto count_nonnan(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         COUNT_NON_NAN_CONTENT;
@@ -2450,7 +2450,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         auto shared_axes = make_xshared(std::move(axes));
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
-        return std::move(nansum<T>(shared_e, shared_axes, es) / count_nonnan(shared_e, shared_axes, es));
+        return std::move(nansum<T>(shared_e, shared_axes, es) / count_nonnan<double>(shared_e, shared_axes, es));
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -2458,7 +2458,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto nanmean(E&& e, EVS es = EVS())
     {
         auto shared_e = make_xshared(std::move(e));
-        return std::move(nansum<T>(shared_e, es) / count_nonnan(shared_e, es));
+        return std::move(nansum<T>(shared_e, es) / count_nonnan<double>(shared_e, es));
     }
 
 #ifdef X_OLD_CLANG
@@ -2466,14 +2466,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto nanmean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
         auto shared_e = make_xshared(std::move(e));
-        return std::move(nansum<T>(shared_e, axes, es) / count_nonnan(shared_e, axes, es));
+        return std::move(nansum<T>(shared_e, axes, es) / count_nonnan<double>(shared_e, axes, es));
     }
 #else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
         auto shared_e = xt::make_xshared(std::move(e));
-        return std::move(nansum<T>(shared_e, axes, es) / count_nonnan(shared_e, axes, es));
+        return std::move(nansum<T>(shared_e, axes, es) / count_nonnan<double>(shared_e, axes, es));
     }
 #endif
 

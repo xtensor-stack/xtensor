@@ -29,7 +29,7 @@ namespace xt
         xarray<std::complex<double>> cN = {
             {1.0 + 1.0i, 1.0 + 1.0i, nanv      },
             {1.0 - 1.0i, 1.0       , 3.0 + 2.0i}
-        }
+        };
 
     }
 
@@ -154,7 +154,7 @@ namespace xt
         EXPECT_EQ(cse, 1.4 + 0.6i);
 
         xarray<std::complex<double>> ecN0 = {1.0 + 0.0i, 1.0+0.5i, 3.0+2.0i};
-        xarray<std::complex<double>> ecN1 = {1.0 + 1.0i, (5.0 + 1.0i) / 2.0};
+        xarray<std::complex<double>> ecN1 = {1.0 + 1.0i, (5.0 + 1.0i) / 3.0};
 
         EXPECT_EQ(nanmean(nantest::cN, {0}), ecN0);
         EXPECT_EQ(nanmean(nantest::cN, {1}), ecN1);
