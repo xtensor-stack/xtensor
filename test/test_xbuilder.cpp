@@ -235,6 +235,10 @@ namespace xt
 
         ASSERT_TRUE(e[idx2]);
         ASSERT_TRUE((e[{2, 2}]));
+
+        auto e2 = eye(5, -1);
+        EXPECT_TRUE(e2(1, 0));
+        EXPECT_FALSE(e2(0, 0));
     }
 
     TEST(xbuilder, concatenate)

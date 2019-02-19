@@ -139,7 +139,7 @@ namespace xt
         xt::xtensor<double, 1> rhs = {4.0, 5.0};
         radaptor = rhs;
 
-        EXPECT_EQ(e.dimension(), 1);
+        EXPECT_EQ(e.dimension(), 1u);
         EXPECT_EQ(xtl::real(e(0)), 4.0);
         EXPECT_EQ(xtl::real(e(1)), 5.0);
     }

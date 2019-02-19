@@ -1610,6 +1610,7 @@ namespace xt
     inline auto xview<CT, S...>::make_index(It first, It last) const -> base_index_type
     {
         auto index = xtl::make_sequence<base_index_type>(m_e.dimension(), 0);
+        using ivalue_type = typename base_index_type::value_type;
         auto func1 = [&first](const auto& s) {
             return get_slice_value(s, first);
         };
@@ -1629,12 +1630,12 @@ namespace xt
             if (first < last)
             {
                 index[i] = k < sizeof...(S) ?
-                    apply<size_type>(k, func1, m_slices) : *first;
+                    apply<size_type>(k, func1, m_slices) : static_cast<ivalue_type>(*first);
             }
             else
             {
                 index[i] = k < sizeof...(S) ?
-                    apply<size_type>(k, func2, m_slices) : 0;
+                    apply<size_type>(k, func2, m_slices) : ivalue_type(0);
             }
         }
         return index;
@@ -1982,9 +1983,9 @@ namespace xt
         if (dim >= m_offset)
         {
             auto func = [&dim, &n, this](const auto& s) noexcept {
-                size_type st_size = step_size(s, this->m_index_keeper[dim], n);
+                auto st_size = step_size(s, this->m_index_keeper[dim], n);
                 this->m_index_keeper[dim] += n;
-                return st_size;
+                return size_type(st_size);
             };
 
             size_type index = integral_skip<S...>(dim);
