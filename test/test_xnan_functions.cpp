@@ -14,6 +14,7 @@
 
 namespace xt
 {
+    using namespace std::complex_literals;
     static const double nanv = std::nan("0");
     namespace nantest
     {
@@ -24,6 +25,30 @@ namespace xt
         xarray<double> xN = {{{nanv, nanv}, {1,2}}, {{3, nanv}, {nanv, 5}}};
         xarray<double> xR = {{{0, 0}, {1,2}}, {{3, 0}, {0, 5}}};
         xarray<double> xP = {{{1, 1}, {1,2}}, {{3, 1}, {1, 5}}};
+
+        xarray<std::complex<double>> cN = {
+            {1.0 + 1.0i, 1.0 + 1.0i, nanv      },
+            {1.0 - 1.0i, 1.0       , 3.0 + 2.0i}
+        };
+
+    }
+
+    TEST(xnanfunctions, count_nonnan)
+    {
+        xarray<double> a = {{0, 1, 2, 3}, {nanv, nanv, nanv, nanv}, {3, nanv, 1, nanv}};
+        std::size_t as = count_nonnan(a)();
+        std::size_t ase = count_nonnan(a, evaluation_strategy::immediate())();
+        EXPECT_EQ(as, 6u);
+        EXPECT_EQ(ase, 6u);
+
+        xarray<std::size_t> ea0 = {2, 1, 2, 1};
+        xarray<std::size_t> ea1 = {4, 0, 2};
+
+        EXPECT_EQ(count_nonnan(a, {0}), ea0);
+        EXPECT_EQ(count_nonnan(a, {1}), ea1);
+
+        EXPECT_EQ(count_nonnan(a, {0}, evaluation_strategy::immediate()), ea0);
+        EXPECT_EQ(count_nonnan(a, {1}, evaluation_strategy::immediate()), ea1);
     }
 
     TEST(xnanfunctions, nan_to_num)
@@ -105,6 +130,37 @@ namespace xt
         EXPECT_EQ(nancumprod(nantest::xN, 0), cumprod(nantest::xP, 0));
         EXPECT_EQ(nancumprod(nantest::xN, 1), cumprod(nantest::xP, 1));
         EXPECT_EQ(nancumprod(nantest::xN, 2), cumprod(nantest::xP, 2));
+    }
+
+    TEST(xnanfunctions, nanmean)
+    {
+        auto as = nanmean(nantest::aN)();
+        auto ase = nanmean(nantest::aN, evaluation_strategy::immediate())();
+        EXPECT_EQ(as, 17.125);
+        EXPECT_EQ(ase, 17.125);
+
+        xarray<double> eaN0 = {1.0, 1.5, 123, 3};
+        xarray<double> eaN1 = {63.0, 2.0, 5.0/3.0};
+
+        EXPECT_EQ(nanmean(nantest::aN, {0}), eaN0);
+        EXPECT_EQ(nanmean(nantest::aN, {1}), eaN1);
+
+        EXPECT_EQ(nanmean(nantest::aN, {0}, evaluation_strategy::immediate()), eaN0);
+        EXPECT_EQ(nanmean(nantest::aN, {1}, evaluation_strategy::immediate()), eaN1);
+
+        auto cs = nanmean(nantest::cN)();
+        auto cse = nanmean(nantest::cN, evaluation_strategy::immediate())();
+        EXPECT_EQ(cs, 1.4 + 0.6i);
+        EXPECT_EQ(cse, 1.4 + 0.6i);
+
+        xarray<std::complex<double>> ecN0 = {1.0 + 0.0i, 1.0+0.5i, 3.0+2.0i};
+        xarray<std::complex<double>> ecN1 = {1.0 + 1.0i, (5.0 + 1.0i) / 3.0};
+
+        EXPECT_EQ(nanmean(nantest::cN, {0}), ecN0);
+        EXPECT_EQ(nanmean(nantest::cN, {1}), ecN1);
+
+        EXPECT_EQ(nanmean(nantest::cN, {0}, evaluation_strategy::immediate()), ecN0);
+        EXPECT_EQ(nanmean(nantest::cN, {1}, evaluation_strategy::immediate()), ecN1);
     }
 
 }

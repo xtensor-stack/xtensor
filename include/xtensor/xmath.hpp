@@ -2150,42 +2150,42 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
 #define XTENSOR_NAN_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, NAN)                                             \
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                                            \
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>                                              \
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>                                             \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
-        using result_type = RESULT_TYPE;                                                                          \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
         return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e),         \
                       std::forward<X>(axes), es);                                                                 \
     }                                                                                                             \
                                                                                                                   \
-    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                                     \
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
               XTL_REQUIRES(is_evaluation_strategy<EVS>)>                                                          \
     inline auto NAME(E&& e, EVS es = EVS())                                                                       \
     {                                                                                                             \
-        using result_type = RESULT_TYPE;                                                                          \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
         return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), es);    \
     }
 
 #define OLD_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                       \
-    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                                               \
+    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                               \
         inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                       \
         {                                                                                                            \
-            using result_type = RESULT_TYPE;                                                                         \
+            using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                    \
             using functor_type = FUNCTOR<result_type>;                                                               \
             using init_functor_type = detail::nan_init<result_type, NAN>;                                            \
             return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es); \
         }
 
 #define MODERN_CLANG_NAN_REDUCER(NAME, FUNCTOR, RESULT_TYPE, NAN)                                                 \
-    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>                             \
+    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
     inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
     {                                                                                                             \
-        using result_type = RESULT_TYPE;                                                                          \
+        using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
         using init_functor_type = detail::nan_init<result_type, NAN>;                                             \
         return xt::reduce(make_xreducer_functor(functor_type(), init_functor_type()), std::forward<E>(e), axes, es);  \
@@ -2290,6 +2290,41 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
 #undef COUNT_NON_ZEROS_CONTENT
 
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+    inline auto count_nonnan(E&& e, EVS es = EVS())
+    {
+        return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), es);
+    }
+
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+             XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, xtl::negation<std::is_integral<X>>)>
+    inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
+    {
+        return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), std::forward<X>(axes), es);
+    }
+
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+             XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>, std::is_integral<X>)>
+    inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
+    {
+        return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), {axes}, es);
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto count_nonnan(E&& e, std::initializer_list<I> axes, EVS es = EVS())
+    {
+        return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), axes, es);
+    }
+#else
+    template <class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto count_nonnan(E&& e, const I (&axes)[N], EVS es = EVS())
+    {
+        return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), axes, es);
+    }
+#endif
+
     /**
      * @ingroup nan_functions
      * @brief Cumulative sum, replacing nan with 0.
@@ -2372,6 +2407,51 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             }
         };
     }
+
+    /**
+     * @ingroup red_functions
+     * @brief Mean of elements over given axes, excluding nans.
+     *
+     * Returns an \ref xreducer for the mean of elements over given
+     * \em axes, excluding nans.
+     * @param e an \ref xexpression
+     * @param axes the axes along which the mean is computed (optional)
+     * @return an \ref xexpression
+     */
+    template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+    inline auto nanmean(E&& e, X&& axes, EVS es = EVS())
+    {
+        auto shared_e = make_xshared(std::move(e));
+        auto shared_axes = make_xshared(std::move(axes));
+        // sum cannot always be a double. It could be a complex number which cannot operate on
+        // std::plus<double>.
+        return nansum<T>(shared_e, shared_axes, es) / xt::cast<double>(count_nonnan(shared_e, shared_axes, es));
+    }
+
+    template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+    inline auto nanmean(E&& e, EVS es = EVS())
+    {
+        auto shared_e = make_xshared(std::move(e));
+        return nansum<T>(shared_e, es) / xt::cast<double>(count_nonnan(shared_e, es));
+    }
+
+#ifdef X_OLD_CLANG
+    template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto nanmean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
+    {
+        auto shared_e = make_xshared(std::move(e));
+        return nansum<T>(shared_e, axes, es) / xt::cast<double>(count_nonnan(shared_e, axes, es));
+    }
+#else
+    template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto nanmean(E&& e, const I (&axes)[N], EVS es = EVS())
+    {
+        auto shared_e = xt::make_xshared(std::move(e));
+        return nansum<T>(shared_e, axes, es) / xt::cast<double>(count_nonnan(shared_e, axes, es));
+    }
+#endif
 
     /**
      * @ingroup red_functions
