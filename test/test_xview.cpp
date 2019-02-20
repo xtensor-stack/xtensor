@@ -1361,7 +1361,7 @@ namespace xt
     {
         xt::xtensor_fixed<double, xt::xshape<3>> a{1./8, 1, -1./8};
         auto v = xt::view(a, xt::all(), xt::newaxis());
-        EXPECT_EQ(v.dimension(), 2);
+        EXPECT_EQ(v.dimension(), 2u);
         EXPECT_EQ(v.shape(), (std::array<std::size_t, 2>{3, 1}));
 
         auto b = a * xt::view(a, xt::all(), xt::newaxis());

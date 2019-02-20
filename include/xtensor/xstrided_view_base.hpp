@@ -809,14 +809,16 @@ namespace xt
         template <class CT>
         inline auto flat_expression_adaptor<CT>::operator[](size_type idx) -> reference
         {
-            m_index = detail::unravel_noexcept(idx, m_strides, m_layout);
+            auto i = static_cast<typename index_type::value_type>(idx);
+            m_index = detail::unravel_noexcept(i, m_strides, m_layout);
             return m_e->element(m_index.cbegin(), m_index.cend());
         }
 
         template <class CT>
         inline auto flat_expression_adaptor<CT>::operator[](size_type idx) const -> const_reference
         {
-            m_index = detail::unravel_noexcept(idx, m_strides, m_layout);
+            auto i = static_cast<typename index_type::value_type>(idx);
+            m_index = detail::unravel_noexcept(i, m_strides, m_layout);
             return m_e->element(m_index.cbegin(), m_index.cend());
         }
 
