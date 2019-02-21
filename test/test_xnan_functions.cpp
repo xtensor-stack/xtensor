@@ -37,7 +37,7 @@ namespace xt
     {
         xarray<double> a = {{0, 1, 2, 3}, {nanv, nanv, nanv, nanv}, {3, nanv, 1, nanv}};
         std::size_t as = count_nonnan(a)();
-        std::size_t ase = count_nonnan(a, evaluation_strategy::immediate())();
+        std::size_t ase = count_nonnan(a, evaluation_strategy::immediate)();
         EXPECT_EQ(as, 6u);
         EXPECT_EQ(ase, 6u);
 
@@ -47,8 +47,8 @@ namespace xt
         EXPECT_EQ(count_nonnan(a, {0}), ea0);
         EXPECT_EQ(count_nonnan(a, {1}), ea1);
 
-        EXPECT_EQ(count_nonnan(a, {0}, evaluation_strategy::immediate()), ea0);
-        EXPECT_EQ(count_nonnan(a, {1}, evaluation_strategy::immediate()), ea1);
+        EXPECT_EQ(count_nonnan(a, {0}, evaluation_strategy::immediate), ea0);
+        EXPECT_EQ(count_nonnan(a, {1}, evaluation_strategy::immediate), ea1);
     }
 
     TEST(xnanfunctions, nan_to_num)
@@ -135,7 +135,7 @@ namespace xt
     TEST(xnanfunctions, nanmean)
     {
         auto as = nanmean(nantest::aN)();
-        auto ase = nanmean(nantest::aN, evaluation_strategy::immediate())();
+        auto ase = nanmean(nantest::aN, evaluation_strategy::immediate)();
         EXPECT_EQ(as, 17.125);
         EXPECT_EQ(ase, 17.125);
 
@@ -148,11 +148,11 @@ namespace xt
         std::array<std::size_t, 1> axis{0};
         EXPECT_EQ(nanmean(nantest::aN, axis), eaN0);
 
-        EXPECT_EQ(nanmean(nantest::aN, {0}, evaluation_strategy::immediate()), eaN0);
-        EXPECT_EQ(nanmean(nantest::aN, {1}, evaluation_strategy::immediate()), eaN1);
+        EXPECT_EQ(nanmean(nantest::aN, {0}, evaluation_strategy::immediate), eaN0);
+        EXPECT_EQ(nanmean(nantest::aN, {1}, evaluation_strategy::immediate), eaN1);
 
         auto cs = nanmean(nantest::cN)();
-        auto cse = nanmean(nantest::cN, evaluation_strategy::immediate())();
+        auto cse = nanmean(nantest::cN, evaluation_strategy::immediate)();
         EXPECT_EQ(cs, 1.4 + 0.6i);
         EXPECT_EQ(cse, 1.4 + 0.6i);
 
@@ -162,8 +162,8 @@ namespace xt
         EXPECT_EQ(nanmean(nantest::cN, {0}), ecN0);
         EXPECT_EQ(nanmean(nantest::cN, {1}), ecN1);
 
-        EXPECT_EQ(nanmean(nantest::cN, {0}, evaluation_strategy::immediate()), ecN0);
-        EXPECT_EQ(nanmean(nantest::cN, {1}, evaluation_strategy::immediate()), ecN1);
+        EXPECT_EQ(nanmean(nantest::cN, {0}, evaluation_strategy::immediate), ecN0);
+        EXPECT_EQ(nanmean(nantest::cN, {1}, evaluation_strategy::immediate), ecN1);
     }
 
 
