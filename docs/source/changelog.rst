@@ -7,7 +7,7 @@
 Changelog
 =========
 
-0.19.3
+0.19.4
 ------
 
 - Add missing include
@@ -26,6 +26,8 @@ Changelog
   `#1406 <https://github.com/QuantStack/xtensor/pull/1406>`_
 - Add documentation for shared pointer adaptor
   `#1407 <https://github.com/QuantStack/xtensor/pull/1407>`_
+- Add `nanmean` function
+  `#1408 <https://github.com/QuantStack/xtensor/pull/1408>`_
 
 0.19.3
 ------
