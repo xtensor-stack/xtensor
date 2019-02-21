@@ -140,13 +140,13 @@ namespace xt
         auto part_a0 = xt::argpartition(py_a, {4, 5, 6});
         auto part_a1 = xt::argpartition(py_a, {2, 7, 12});
 
-        EXPECT_EQ(py_a[part_a0(4)], py_a[py_a0(4)]);
-        EXPECT_EQ(py_a[part_a0(5)], py_a[py_a0(5)]);
-        EXPECT_EQ(py_a[part_a0(6)], py_a[py_a0(6)]);
+        EXPECT_EQ(py_a[part_a0(4)], py_a[static_cast<std::size_t>(py_a0(4))]);
+        EXPECT_EQ(py_a[part_a0(5)], py_a[static_cast<std::size_t>(py_a0(5))]);
+        EXPECT_EQ(py_a[part_a0(6)], py_a[static_cast<std::size_t>(py_a0(6))]);
 
-        EXPECT_EQ(py_a[part_a1(2)], py_a[py_a1(2)]);
-        EXPECT_EQ(py_a[part_a1(7)], py_a[py_a1(7)]);
-        EXPECT_EQ(py_a[part_a1(12)], py_a[py_a1(12)]);
+        EXPECT_EQ(py_a[part_a1(2)], py_a[static_cast<std::size_t>(py_a1(2))]);
+        EXPECT_EQ(py_a[part_a1(7)], py_a[static_cast<std::size_t>(py_a1(7))]);
+        EXPECT_EQ(py_a[part_a1(12)], py_a[static_cast<std::size_t>(py_a1(12))]);
     }
 
     /*py

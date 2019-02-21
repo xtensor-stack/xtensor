@@ -382,7 +382,7 @@ namespace xt
      * @param kth_container a container of ``indices`` that should contain the correctly sorted value
      * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before sorting
      *
-     * @return partially sorted xexpression
+     * @return partially sorted xcontainer
      */
     template <class E, class C, class R = typename detail::flatten_sort_result_type<E>::type,
               class = std::enable_if_t<!std::is_integral<C>::value, int>>
@@ -467,7 +467,7 @@ namespace xt
             res = de;
         }
 
-        auto lambda = [&kth](auto begin, auto end) { 
+        auto lambda = [&kth](auto begin, auto end) {
             std::nth_element(begin, begin + kth, end);
         };
         detail::call_over_leading_axis(res, lambda);
@@ -528,7 +528,7 @@ namespace xt
      * @param kth_container a container of ``indices`` that should contain the correctly sorted value
      * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before sorting
      *
-     * @return partially sorted xexpression
+     * @return xcontainer with indices of partial sort of input
      */
     template <class E, class C,
               class R = typename detail::linear_argsort_result_type<typename detail::sort_eval_type<E>::type>::type,
@@ -708,15 +708,16 @@ namespace xt
     }
 
     template <class E>
-    inline double median(E&& e)
+    inline typename std::decay_t<E>::value_type median(E&& e)
     {
+        using value_type = typename std::decay_t<E>::value_type;
         auto sz = e.size();
         if (sz % 2 == 0)
         {
             std::size_t szh = sz / 2; // integer floor div
             std::array<std::size_t, 2> kth = {szh - 1, szh};
             auto values = xt::partition(xt::flatten(e), kth);
-            return (values[kth[0]] + values[kth[1]]) / 2.0;
+            return (values[kth[0]] + values[kth[1]]) / value_type(2);
         }
         else
         {
@@ -726,6 +727,18 @@ namespace xt
         }
     }
 
+    /**
+     * Find the median along the specified axis
+     *
+     * Given a vector V of length N, the median of V is the middle value of a
+     * sorted copy of V, V_sorted - i e., V_sorted[(N-1)/2], when N is odd,
+     * and the average of the two middle values of V_sorted when N is even.
+     *
+     * @param axis axis along which the medians are computed.
+     *             If not set, computes the median along a flattened version of the input.
+     * @param e input xexpression
+     * @return median value
+     */
     template <class E>
     inline auto median(E&& e, std::ptrdiff_t axis)
     {
