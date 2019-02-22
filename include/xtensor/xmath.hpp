@@ -2420,7 +2420,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an \ref xexpression
      */
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto nanmean(E&& e, X&& axes, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -2432,7 +2432,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto nanmean(E&& e, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
