@@ -22,11 +22,6 @@ namespace xt
 {
     namespace detail
     {
-        constexpr std::size_t normalize_axis(std::ptrdiff_t axis, std::size_t dim)
-        {
-            return axis >= 0 ? static_cast<std::size_t>(axis) : static_cast<std::size_t>(static_cast<std::ptrdiff_t>(dim) + axis);
-        }
-
         template <class E, class F>
         inline void call_over_leading_axis(E& ev, F&& fct)
         {
@@ -36,20 +31,20 @@ namespace xt
             {
                 n_iters = std::accumulate(ev.shape().begin(), ev.shape().end() - 1,
                                           std::size_t(1), std::multiplies<>());
-                secondary_stride = static_cast<std::ptrdiff_t>(ev.strides()[ev.dimension() - 2]);
+                secondary_stride = ev.strides()[ev.dimension() - 2];
             }
             else
             {
                 n_iters = std::accumulate(ev.shape().begin() + 1, ev.shape().end(),
                                           std::size_t(1), std::multiplies<>());
-                secondary_stride = static_cast<std::ptrdiff_t>(ev.strides()[1]);
+                secondary_stride = ev.strides()[1];
             }
 
             std::ptrdiff_t offset = 0;
 
             for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
-                std::size_t adj_secondary_stride = static_cast<size_t>((std::max)(secondary_stride, std::ptrdiff_t(1)));
+                std::ptrdiff_t adj_secondary_stride = (std::max)(secondary_stride, std::ptrdiff_t(1));
                 fct(ev.data() + offset, ev.data() + offset + adj_secondary_stride);
             }
         }
@@ -191,7 +186,7 @@ namespace xt
             return detail::flat_sort_impl<std::decay_t<decltype(de)>, eval_type>(de);
         }
 
-        std::size_t ax = detail::normalize_axis(axis, de.dimension());
+        std::size_t ax = normalize_axis(de.dimension(), axis);
 
         eval_type res;
         detail::run_lambda_over_axis(de, res, ax, [](auto begin, auto end) { std::sort(begin, end); });
@@ -260,35 +255,33 @@ namespace xt
         inline void argsort_over_leading_axis(const Ed& data, Ei& inds)
         {
             std::size_t n_iters = 1;
-            std::ptrdiff_t data_secondary_stride;
-            std::ptrdiff_t inds_secondary_stride;
+            std::ptrdiff_t data_secondary_stride, inds_secondary_stride;
+
             if (data.layout() == layout_type::row_major)
             {
                 n_iters = std::accumulate(data.shape().begin(), data.shape().end() - 1,
                                           std::size_t(1), std::multiplies<>());
-                data_secondary_stride = static_cast<std::ptrdiff_t>(data.strides()[data.dimension() - 2]);
-                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.strides()[inds.dimension() - 2]);
+                data_secondary_stride = data.strides()[data.dimension() - 2];
+                inds_secondary_stride = inds.strides()[inds.dimension() - 2];
             }
             else
             {
                 n_iters = std::accumulate(data.shape().begin() + 1, data.shape().end(),
                                           std::size_t(1), std::multiplies<>());
-                data_secondary_stride = static_cast<std::ptrdiff_t>(data.strides()[1]);
-                inds_secondary_stride = static_cast<std::ptrdiff_t>(inds.strides()[1]);
+                data_secondary_stride = data.strides()[1];
+                inds_secondary_stride = inds.strides()[1];
             }
 
-            std::ptrdiff_t data_offset = 0;
-            std::ptrdiff_t inds_offset = 0;
+            auto ptr = data.data();
+            auto indices_ptr = inds.data();
 
-            for (std::size_t i = 0; i < n_iters; ++i, data_offset += data_secondary_stride,
-                    inds_offset += inds_secondary_stride)
+            for (std::size_t i = 0; i < n_iters; ++i, ptr += data_secondary_stride, indices_ptr += inds_secondary_stride)
             {
-                auto comp = [&data, &data_offset](std::size_t x, std::size_t y) {
-                    return (*(data.data() + data_offset + x) <
-                            *(data.data() + data_offset + y));
+                auto comp = [&ptr](std::size_t x, std::size_t y) {
+                    return *(ptr + x) < *(ptr + y);
                 };
-                std::iota(inds.data() + inds_offset, inds.data() + inds_offset + inds_secondary_stride, 0);
-                std::sort(inds.data() + inds_offset, inds.data() + inds_offset + inds_secondary_stride, comp);
+                std::iota(indices_ptr, indices_ptr + inds_secondary_stride, 0);
+                std::sort(indices_ptr, indices_ptr + inds_secondary_stride, comp);
             }
         }
 
@@ -336,7 +329,7 @@ namespace xt
 
         const auto& de = e.derived_cast();
 
-        std::size_t ax = detail::normalize_axis(axis, de.dimension());
+        std::size_t ax = normalize_axis(de.dimension(), axis);
 
         if (de.dimension() == 1)
         {
@@ -359,6 +352,415 @@ namespace xt
             result_type res = result_type::from_shape(de.shape());
             detail::argsort_over_leading_axis(de, res);
             return res;
+        }
+    }
+
+    /************************************************
+     * Implementation of partition and argpartition *
+     ************************************************/
+
+    /**
+     * Partially sort xexpression
+     *
+     * Partition shuffles the xexpression in a way so that the kth element
+     * in the returned xexpression is in the place it would appear in a sorted
+     * array and all elements smaller than this entry are placed (unsorted) before.
+     *
+     * The optional third parameter can either be an axis or ``xnone()`` in which case
+     * the xexpression will be flattened.
+     *
+     * This function uses ``std::nth_element`` internally.
+     *
+     * \code{cpp}
+     * xt::xarray<float> a = {1, 10, -10, 123};
+     * std::cout << xt::partition(a, 0) << std::endl; // {-10, 1, 123, 10} the correct entry at index 0
+     * std::cout << xt::partition(a, 3) << std::endl; // {1, 10, -10, 123} the correct entry at index 3
+     * std::cout << xt::partition(a, {0, 3}) << std::endl; // {-10, 1, 10, 123} the correct entries at index 0 and 3
+     * \endcode
+     *
+     * @param e input xexpression
+     * @param kth_container a container of ``indices`` that should contain the correctly sorted value
+     * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before sorting
+     *
+     * @return partially sorted xcontainer
+     */
+    template <class E, class C, class R = typename detail::flatten_sort_result_type<E>::type,
+              class = std::enable_if_t<!std::is_integral<C>::value, int>>
+    inline R partition(const xexpression<E>& e, const C& kth_container, placeholders::xtuph /*ax*/)
+    {
+        const auto& de = e.derived_cast();
+
+        R ev = R::from_shape({ de.size() });
+        C kth_copy = kth_container;
+        if (kth_copy.size() > 1)
+        {
+            std::sort(kth_copy.begin(), kth_copy.end());
+        }
+
+        std::copy(de.storage_cbegin(), de.storage_cend(), ev.storage_begin()); // flatten
+        std::size_t k_last = kth_copy.back();
+        std::nth_element(ev.storage_begin(), ev.storage_begin() + k_last, ev.storage_end());
+
+        for (auto it = (kth_copy.rbegin() + 1); it != kth_copy.rend(); ++it)
+        {
+            std::nth_element(ev.storage_begin(), ev.storage_begin() + *it, ev.storage_begin() + k_last);
+            k_last = *it;
+        }
+
+        return ev;
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I, class R = typename detail::flatten_sort_result_type<E>::type>
+    inline R partition(const xexpression<E>& e, std::initializer_list<I> kth_container, placeholders::xtuph tag)
+    {
+        return partition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), tag);
+    }
+#else
+    template <class E, class I, std::size_t N, class R = typename detail::flatten_sort_result_type<E>::type>
+    inline R partition(const xexpression<E>& e, const I(&kth_container)[N], placeholders::xtuph tag)
+    {
+        return partition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), tag);
+    }
+#endif
+
+    template <class E, class R = typename detail::flatten_sort_result_type<E>::type>
+    inline R partition(const xexpression<E>& e, std::size_t kth, placeholders::xtuph tag)
+    {
+        return partition(e, std::array<std::size_t, 1>({kth}), tag);
+    }
+
+    template <class E, class C, class = std::enable_if_t<!std::is_integral<C>::value, int>>
+    inline auto partition(const xexpression<E>& e, const C& kth_container, std::ptrdiff_t axis = -1)
+    {
+        using eval_type = typename detail::sort_eval_type<E>::type;
+
+        const auto& de = e.derived_cast();
+
+        if (de.dimension() == 1)
+        {
+            return partition<E, C, eval_type>(de, kth_container, xnone());
+        }
+
+        C kth_copy = kth_container;
+        if (kth_copy.size() > 1)
+        {
+            std::sort(kth_copy.begin(), kth_copy.end());
+        }
+
+        std::size_t ax = normalize_axis(de.dimension(), axis);
+
+        eval_type res;
+
+        std::size_t kth = kth_copy.back();
+
+        dynamic_shape<std::size_t> permutation, reverse_permutation;
+        bool is_leading_axis = (ax == detail::leading_axis(res));
+
+        if (!is_leading_axis)
+        {
+            std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
+            res = transpose(de, permutation);
+        }
+        else
+        {
+            res = de;
+        }
+
+        auto lambda = [&kth](auto begin, auto end) {
+            std::nth_element(begin, begin + kth, end);
+        };
+        detail::call_over_leading_axis(res, lambda);
+
+        for (auto it = kth_copy.rbegin() + 1; it != kth_copy.rend(); ++it)
+        {
+            kth = *it;
+            detail::call_over_leading_axis(res, lambda);
+        }
+
+        if (!is_leading_axis)
+        {
+            res = transpose(res, reverse_permutation);
+        }
+
+        return res;
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto partition(const xexpression<E>& e, std::initializer_list<I> kth_container, std::ptrdiff_t axis = -1)
+    {
+        return partition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), axis);
+    }
+#else
+    template <class E, class T, std::size_t N>
+    inline auto partition(const xexpression<E>& e, const T(&kth_container)[N], std::ptrdiff_t axis = -1)
+    {
+        return partition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), axis);
+    }
+#endif
+    template <class E>
+    inline auto partition(const xexpression<E>& e, std::size_t kth, std::ptrdiff_t axis = -1)
+    {
+        return partition(e, std::array<std::size_t, 1>({kth}), axis);
+    }
+
+    /**
+     * Partially sort arguments
+     *
+     * Argpartition shuffles the indices to a xexpression in a way so that the index for the
+     * kth element in the returned xexpression is in the place it would appear in a sorted
+     * array and all elements smaller than this entry are placed (unsorted) before.
+     *
+     * The optional third parameter can either be an axis or ``xnone()`` in which case
+     * the xexpression will be flattened.
+     *
+     * This function uses ``std::nth_element`` internally.
+     *
+     * \code{cpp}
+     * xt::xarray<float> a = {1, 10, -10, 123};
+     * std::cout << xt::argpartition(a, 0) << std::endl; // {2, 0, 3, 1} the correct entry at index 0
+     * std::cout << xt::argpartition(a, 3) << std::endl; // {0, 1, 2, 3} the correct entry at index 3
+     * std::cout << xt::argpartition(a, {0, 3}) << std::endl; // {2, 0, 1, 3} the correct entries at index 0 and 3
+     * \endcode
+     *
+     * @param e input xexpression
+     * @param kth_container a container of ``indices`` that should contain the correctly sorted value
+     * @param axis either integer (default = -1) to sort along last axis or ``xnone()`` to flatten before sorting
+     *
+     * @return xcontainer with indices of partial sort of input
+     */
+    template <class E, class C,
+              class R = typename detail::linear_argsort_result_type<typename detail::sort_eval_type<E>::type>::type,
+              class = std::enable_if_t<!std::is_integral<C>::value, int>>
+    inline R argpartition(const xexpression<E>& e, const C& kth_container, placeholders::xtuph)
+    {
+        using eval_type = typename detail::sort_eval_type<E>::type;
+        using result_type = typename detail::linear_argsort_result_type<eval_type>::type;
+
+        const auto& de = e.derived_cast();
+
+        result_type ev = result_type::from_shape({ de.size() });
+
+        C kth_copy = kth_container;
+        if (kth_copy.size() > 1)
+        {
+            std::sort(kth_copy.begin(), kth_copy.end());
+        }
+
+        auto arg_lambda = [&de](std::size_t a, std::size_t b) {
+            return de[a] < de[b];
+        };
+
+        std::iota(ev.storage_begin(), ev.storage_end(), 0);
+        std::size_t k_last = kth_copy.back();
+        std::nth_element(ev.storage_begin(), ev.storage_begin() + k_last, ev.storage_end(), arg_lambda);
+
+        for (auto it = (kth_copy.rbegin() + 1); it != kth_copy.rend(); ++it)
+        {
+            std::nth_element(ev.storage_begin(), ev.storage_begin() + *it, ev.storage_begin() + k_last, arg_lambda);
+            k_last = *it;
+        }
+
+        return ev;
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto argpartition(const xexpression<E>& e, std::initializer_list<I> kth_container, placeholders::xtuph tag)
+    {
+        return argpartition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), tag);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto argpartition(const xexpression<E>& e, const I(&kth_container)[N], placeholders::xtuph tag)
+    {
+        return argpartition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), tag);
+    }
+#endif
+
+    template <class E>
+    inline auto argpartition(const xexpression<E>& e, std::size_t kth, placeholders::xtuph tag)
+    {
+        return argpartition(e, std::array<std::size_t, 1>({kth}), tag);
+    }
+
+    namespace detail
+    {
+        template <class Ed, class Ei>
+        inline void argpartition_over_leading_axis(const Ed& data, Ei& inds, std::size_t kth, std::ptrdiff_t last)
+        {
+            std::size_t n_iters = 1;
+            std::ptrdiff_t data_secondary_stride, inds_secondary_stride;
+
+            if (data.layout() == layout_type::row_major)
+            {
+                n_iters = std::accumulate(data.shape().begin(), data.shape().end() - 1,
+                                          std::size_t(1), std::multiplies<>());
+                data_secondary_stride = data.strides()[data.dimension() - 2];
+                inds_secondary_stride = inds.strides()[inds.dimension() - 2];
+            }
+            else
+            {
+                n_iters = std::accumulate(data.shape().begin() + 1, data.shape().end(),
+                                          std::size_t(1), std::multiplies<>());
+                data_secondary_stride = data.strides()[1];
+                inds_secondary_stride = inds.strides()[1];
+            }
+
+            auto ptr = data.data();
+            auto indices_ptr = inds.data();
+            auto comp = [&ptr](std::size_t x, std::size_t y) {
+                return *(ptr + x) < *(ptr + y);
+            };
+
+            if (last == -1) // initialize
+            {
+                for (std::size_t i = 0; i < n_iters; ++i, ptr += data_secondary_stride, indices_ptr += inds_secondary_stride)
+                {
+                    std::iota(indices_ptr, indices_ptr + inds_secondary_stride, 0);
+                    std::nth_element(indices_ptr, indices_ptr + kth, indices_ptr + inds_secondary_stride, comp);
+                }
+            }
+            else
+            {
+                for (std::size_t i = 0; i < n_iters; ++i, ptr += data_secondary_stride, indices_ptr += inds_secondary_stride)
+                {
+                    std::nth_element(indices_ptr, indices_ptr + kth, indices_ptr + last, comp);
+                }
+            }
+        }
+    }
+
+    template <class E, class C, class = std::enable_if_t<!std::is_integral<C>::value, int>>
+    inline auto argpartition(const xexpression<E>& e, const C& kth_container, std::ptrdiff_t axis = -1)
+    {
+        using eval_type = typename detail::sort_eval_type<E>::type;
+        using result_type = typename detail::argsort_result_type<eval_type>::type;
+
+        const auto& de = e.derived_cast();
+
+        std::size_t ax = normalize_axis(de.dimension(), axis);
+
+        if (de.dimension() == 1)
+        {
+            return argpartition<E, C, result_type>(e, kth_container, xnone());
+        }
+
+        C kth_copy = kth_container;
+        if (kth_copy.size() > 1)
+        {
+            std::sort(kth_copy.begin(), kth_copy.end());
+        }
+
+        eval_type ev;
+        result_type res;
+
+        dynamic_shape<std::size_t> permutation, reverse_permutation;
+        bool is_leading_axis = (ax == detail::leading_axis(res));
+
+        if (!is_leading_axis)
+        {
+            std::tie(permutation, reverse_permutation) = detail::get_permutations(de.dimension(), ax, de.layout());
+            ev = transpose(de, permutation);
+        }
+        else
+        {
+            ev = de;
+        }
+        res.resize(ev.shape());
+
+        std::size_t kth = kth_copy.back();
+        detail::argpartition_over_leading_axis(ev, res, kth, -1);
+
+        for (auto it = (kth_copy.rbegin() + 1); it != kth_copy.rend(); ++it)
+        {
+            detail::argpartition_over_leading_axis(ev, res, *it, static_cast<std::ptrdiff_t>(kth));
+            kth = *it;
+        }
+
+        if (!is_leading_axis)
+        {
+            res = transpose(res, reverse_permutation);
+        }
+
+        return res;
+    }
+
+#ifdef X_OLD_CLANG
+    template <class E, class I>
+    inline auto argpartition(const xexpression<E>& e, std::initializer_list<I> kth_container, std::ptrdiff_t axis = -1)
+    {
+        return argpartition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), axis);
+    }
+#else
+    template <class E, class I, std::size_t N>
+    inline auto argpartition(const xexpression<E>& e, const I(&kth_container)[N], std::ptrdiff_t axis = -1)
+    {
+        return argpartition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), axis);
+    }
+#endif
+
+    template <class E>
+    inline auto argpartition(const xexpression<E>& e, std::size_t kth, std::ptrdiff_t axis = -1)
+    {
+        return argpartition(e, std::array<std::size_t, 1>({kth}), axis);
+    }
+
+    template <class E>
+    inline typename std::decay_t<E>::value_type median(E&& e)
+    {
+        using value_type = typename std::decay_t<E>::value_type;
+        auto sz = e.size();
+        if (sz % 2 == 0)
+        {
+            std::size_t szh = sz / 2; // integer floor div
+            std::array<std::size_t, 2> kth = {szh - 1, szh};
+            auto values = xt::partition(xt::flatten(e), kth);
+            return (values[kth[0]] + values[kth[1]]) / value_type(2);
+        }
+        else
+        {
+            std::array<std::size_t, 1> kth = {(sz - 1) / 2};
+            auto values = xt::partition(xt::flatten(e), kth);
+            return values[kth[0]];
+        }
+    }
+
+    /**
+     * Find the median along the specified axis
+     *
+     * Given a vector V of length N, the median of V is the middle value of a
+     * sorted copy of V, V_sorted - i e., V_sorted[(N-1)/2], when N is odd,
+     * and the average of the two middle values of V_sorted when N is even.
+     *
+     * @param axis axis along which the medians are computed.
+     *             If not set, computes the median along a flattened version of the input.
+     * @param e input xexpression
+     * @return median value
+     */
+    template <class E>
+    inline auto median(E&& e, std::ptrdiff_t axis)
+    {
+        std::size_t ax = normalize_axis(e.dimension(), axis);
+        std::size_t sz = e.shape()[ax];
+        xstrided_slice_vector sv(e.dimension(), xt::all());
+
+        if (sz % 2 == 0)
+        {
+            std::size_t szh = sz / 2; // integer floor div
+            std::array<std::size_t, 2> kth = {szh - 1, szh};
+            auto values = xt::partition(std::forward<E>(e), kth, static_cast<ptrdiff_t>(ax));
+            sv[ax] = xt::range(szh - 1, szh + 1);
+            return xt::mean(xt::strided_view(std::move(values), std::move(sv)), {ax});
+        }
+        else
+        {
+            std::size_t szh = (sz - 1) / 2;
+            std::array<std::size_t, 1> kth = {(sz - 1) / 2};
+            auto values = xt::partition(std::forward<E>(e), kth, static_cast<ptrdiff_t>(ax));
+            sv[ax] = xt::range(szh, szh + 1);
+            return xt::mean(xt::strided_view(std::move(values), std::move(sv)), {ax});
         }
     }
 
@@ -477,11 +879,12 @@ namespace xt
      * @return returns xarray with positions of minimal value
      */
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
-    inline auto argmin(const xexpression<E>& e, std::size_t axis)
+    inline auto argmin(const xexpression<E>& e, std::ptrdiff_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl<L>(ed, axis, std::less<value_type>());
+        std::size_t ax = normalize_axis(ed.dimension(), axis);
+        return detail::arg_func_impl<L>(ed, ax, std::less<value_type>());
     }
 
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
@@ -501,11 +904,12 @@ namespace xt
      * @return returns xarray with positions of maximal value
      */
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
-    inline auto argmax(const xexpression<E>& e, std::size_t axis)
+    inline auto argmax(const xexpression<E>& e, std::ptrdiff_t axis)
     {
         using value_type = typename E::value_type;
         auto&& ed = eval(e.derived_cast());
-        return detail::arg_func_impl<L>(ed, axis, std::greater<value_type>());
+        std::size_t ax = normalize_axis(ed.dimension(), axis);
+        return detail::arg_func_impl<L>(ed, ax, std::greater<value_type>());
     }
 
     /**

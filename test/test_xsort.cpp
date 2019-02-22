@@ -234,4 +234,67 @@ namespace xt
             EXPECT_EQ(setdiff1d(ar1, ar2), out);
         }
     }
+
+    template <class T>
+    bool check_partition(T& arr, std::size_t pos)
+    {
+        bool res = true;
+        for (std::size_t i = 0; i < pos; ++i)
+        {
+            res = res && arr(i) < arr(pos);
+        }
+        for (std::size_t i = pos; i < arr.size(); ++i)
+        {
+            res = res && arr(i) >= arr(pos);
+        }
+        return res;
+    }
+
+    TEST(xsort, partition)
+    {
+        xt::xarray<int> a = {3, 4, 2, 1};
+        auto r1 = xt::partition(a, 2);
+        EXPECT_TRUE(check_partition(r1, 2));
+    }
+
+    template <class T, class U>
+    bool check_argpartition(T& arr, U& idxs, std::size_t pos)
+    {
+        bool res = true;
+        for (std::size_t i = 0; i < pos; ++i)
+        {
+            res = res && arr(idxs[i]) < arr(idxs[pos]);
+        }
+        for (std::size_t i = pos; i < arr.size(); ++i)
+        {
+            res = res && arr(idxs[i]) >= arr(idxs[pos]);
+        }
+        return res;
+    }
+
+    TEST(xsort, argpartition)
+    {
+        xt::xarray<int> a = {3, 4, 2, 1};
+        auto r1 = xt::argpartition(a, 2);
+        EXPECT_TRUE(check_argpartition(a, r1, 2));
+    }
+
+    TEST(xsort, median)
+    {
+        xt::xtensor<float, 2> a = {{ 3, 4, 2, 1},
+                                   { 1, 1, 3, 2},
+                                   { 9, 9, 9, 9},
+                                   {12,12,12,12},
+                                   { 5, 5, 5, 5}};
+        auto mall = median(a);
+        auto ma0 = median(a, 0);
+        auto ma1 = median(a, 1);
+
+        EXPECT_EQ(mall, 5);
+
+        xt::xtensor<float, 1> ma0_exp = {5, 5, 5, 5};
+        xt::xtensor<float, 1> ma1_exp = {2.5, 1.5, 9., 12., 5.};
+        EXPECT_EQ(ma0, ma0_exp);
+        EXPECT_EQ(ma1, ma1_exp);
+    }
 }

@@ -1,0 +1,219 @@
+/***************************************************************************
+* Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
+*                                                                          *
+* Distributed under the terms of the BSD 3-Clause License.                 *
+*                                                                          *
+* The full license is in the file LICENSE, distributed with this software. *
+****************************************************************************/
+
+#include "gtest/gtest.h"
+
+#include <xtensor/xarray.hpp>
+#include <xtensor/xio.hpp>
+#include <xtensor/xview.hpp>
+#include <xtensor/xsort.hpp>
+
+namespace xt
+{
+    using namespace xt::placeholders;
+
+    template <class T>
+    bool check_partition_equal(const T& a1, const T& a2, std::size_t kth)
+    {
+        auto p = a1[kth];
+        EXPECT_EQ(p, a2[kth]);
+
+        for (std::size_t i = 0; i < kth; ++i)
+        {
+            EXPECT_TRUE(a1[i] < p);
+            EXPECT_TRUE(a2[i] < p);
+        }
+
+        for (std::size_t i = kth + 1; i < a1.size(); ++i)
+        {
+            EXPECT_TRUE(p < a1[i]);
+            EXPECT_TRUE(p < a2[i]);
+        }
+        return true;
+    }
+
+    template <class X, class Y, class Z>
+    bool check_argpartition_equal(const X& data, const Y& a1, const Z& a2, std::size_t kth)
+    {
+        auto p = a1[kth];
+        EXPECT_EQ(p, std::size_t(a2[kth]));
+        auto el = data[static_cast<std::size_t>(a1[kth])];
+        for (std::size_t i = 0; i < kth; ++i)
+        {
+            EXPECT_TRUE(data[static_cast<std::size_t>(a1[i])] < el);
+            EXPECT_TRUE(data[static_cast<std::size_t>(a2[i])] < el);
+        }
+
+        for (std::size_t i = kth + std::size_t(1); i < a1.size(); ++i)
+        {
+            EXPECT_TRUE(el < data[static_cast<std::size_t>(a1[i])]);
+            EXPECT_TRUE(el < data[static_cast<std::size_t>(a2[i])]);
+        }
+        return true;
+    }
+
+    /*py
+    a = np.random.randint(0, 1000, size=(20,))
+    */
+    TEST(xtest_extended, partition)
+    {
+        // py_a
+        
+        // py_p5 = np.partition(a, 5)
+        // py_p0 = np.partition(a, 0)
+        // py_p13 = np.partition(a, 13)
+        // py_p19 = np.partition(a, 19)
+        
+        // py_a5 = np.argpartition(a, 5)
+        // py_a0 = np.argpartition(a, 0)
+        // py_a13 = np.argpartition(a, 13)
+        // py_a19 = np.argpartition(a, 19)
+
+        auto part_a0 = xt::partition(py_a, 0);
+
+        check_partition_equal(py_p0, part_a0, 0);
+        check_partition_equal(py_p5, xt::partition(py_a, 5), 5);
+        check_partition_equal(py_p13, xt::partition(py_a, 13), 13);
+        check_partition_equal(py_p19, xt::partition(py_a, 19), 19);
+
+        auto parta_a0 = xt::argpartition(py_a, 0);
+        check_argpartition_equal(py_a, py_a0, parta_a0, 0);
+        check_argpartition_equal(py_a, py_a5, xt::argpartition(py_a, 5), 5);
+        check_argpartition_equal(py_a, py_a13, xt::argpartition(py_a, 13), 13);
+        check_argpartition_equal(py_a, py_a19, xt::argpartition(py_a, 19), 19);
+
+        // py_median = np.median(a)
+        EXPECT_EQ(py_median, xt::median(py_a));
+    }
+
+    /*py
+    a = np.random.randint(0, 20, size=(20,))
+    */
+    TEST(xtest_extended, multi_partition)
+    {
+        // py_a
+        
+        // py_p0 = np.partition(a, (4, 5, 6))
+        // py_p1 = np.partition(a, (2, 7, 12))
+
+        auto part_p0 = xt::partition(py_a, {4, 5, 6});
+        auto part_p1 = xt::partition(py_a, {2, 7, 12});
+
+        EXPECT_EQ(part_p0(4), py_p0(4));
+        EXPECT_EQ(part_p0(5), py_p0(5));
+        EXPECT_EQ(part_p0(6), py_p0(6));
+
+        EXPECT_EQ(part_p1(2), py_p1(2));
+        EXPECT_EQ(part_p1(7), py_p1(7));
+        EXPECT_EQ(part_p1(12), py_p1(12));
+
+        // py_a0 = np.argpartition(a, (4, 5, 6))
+        // py_a1 = np.argpartition(a, (2, 7, 12))
+
+        auto part_a0 = xt::argpartition(py_a, {4, 5, 6});
+        auto part_a1 = xt::argpartition(py_a, {2, 7, 12});
+
+        EXPECT_EQ(py_a[part_a0(4)], py_a[static_cast<std::size_t>(py_a0(4))]);
+        EXPECT_EQ(py_a[part_a0(5)], py_a[static_cast<std::size_t>(py_a0(5))]);
+        EXPECT_EQ(py_a[part_a0(6)], py_a[static_cast<std::size_t>(py_a0(6))]);
+
+        EXPECT_EQ(py_a[part_a1(2)], py_a[static_cast<std::size_t>(py_a1(2))]);
+        EXPECT_EQ(py_a[part_a1(7)], py_a[static_cast<std::size_t>(py_a1(7))]);
+        EXPECT_EQ(py_a[part_a1(12)], py_a[static_cast<std::size_t>(py_a1(12))]);
+    }
+
+    /*py
+    a = np.random.rand(5, 5, 5)
+    */
+    TEST(xtest_extended, axis_median)
+    {
+        // py_a
+        // py_m = np.median(a)
+        
+        // py_m0 = np.median(a, 0)
+        // py_m1 = np.median(a, 1)
+        // py_m2 = np.median(a, 2)
+
+        EXPECT_EQ(py_m, xt::median(py_a));
+        EXPECT_EQ(py_m0, xt::median(py_a, 0));
+        EXPECT_EQ(py_m1, xt::median(py_a, 1));
+        EXPECT_EQ(py_m2, xt::median(py_a, 2));
+    }
+
+    /*py
+    a = np.random.permutation(np.arange(5 * 5 * 5)).reshape(5, 5, 5)
+    */
+    TEST(xtest_extended, axis_partition)
+    {
+        // py_a
+
+        // py_p0 = np.partition(a, 2, 0)
+        // py_p1 = np.partition(a, 4, 1)
+        // py_p2 = np.partition(a, 3, 2)
+
+        auto p0 = xt::partition(py_a, 2, 0);
+        auto p1 = xt::partition(py_a, 4, 1);
+        auto p2 = xt::partition(py_a, 3, 2);
+
+        EXPECT_EQ(xt::view(py_p0, 2, all(), all()), xt::view(p0, 2, all(), all()));
+        EXPECT_EQ(xt::view(py_p1, all(), 4, all()), xt::view(p1, all(), 4, all()));
+        EXPECT_EQ(xt::view(py_p2, all(), all(), 3), xt::view(p2, all(), all(), 3));
+
+        // py_a0 = np.argpartition(a, 2, 0)
+        // py_a1 = np.argpartition(a, 4, 1)
+        // py_a2 = np.argpartition(a, 3, 2)
+
+        auto a0 = xt::argpartition(py_a, 2, 0);
+        auto a1 = xt::argpartition(py_a, 4, 1);
+        auto a2 = xt::argpartition(py_a, 3, 2);
+
+        EXPECT_EQ(xt::view(py_a0, 2, all(), all()), xt::view(a0, 2, all(), all()));
+        EXPECT_EQ(xt::view(py_a1, all(), 4, all()), xt::view(a1, all(), 4, all()));
+        EXPECT_EQ(xt::view(py_a2, all(), all(), 3), xt::view(a2, all(), all(), 3));
+    }
+
+    /*py
+    a = np.random.permutation(np.arange(5 * 5 * 5)).reshape(5, 5, 5)
+    */
+    TEST(xtest_extended, multi_k_axis_partition)
+    {
+        // py_a
+
+        // py_p0 = np.partition(a, (1, 2), 0)
+        // py_p1 = np.partition(a, (1, 4), 1)
+        // py_p2 = np.partition(a, (1, 3), 2)
+
+        auto p0 = xt::partition(py_a, {1, 2}, 0);
+        auto p1 = xt::partition(py_a, {1, 4}, 1);
+        auto p2 = xt::partition(py_a, {1, 3}, 2);
+
+        EXPECT_EQ(xt::view(py_p0, 2, all(), all()), xt::view(p0, 2, all(), all()));
+        EXPECT_EQ(xt::view(py_p1, all(), 4, all()), xt::view(p1, all(), 4, all()));
+        EXPECT_EQ(xt::view(py_p2, all(), all(), 3), xt::view(p2, all(), all(), 3));
+
+        EXPECT_EQ(xt::view(py_p0, 1, all(), all()), xt::view(p0, 1, all(), all()));
+        EXPECT_EQ(xt::view(py_p1, all(), 1, all()), xt::view(p1, all(), 1, all()));
+        EXPECT_EQ(xt::view(py_p2, all(), all(), 1), xt::view(p2, all(), all(), 1));
+
+        // py_a0 = np.argpartition(a, (1, 2), 0)
+        // py_a1 = np.argpartition(a, (1, 4), 1)
+        // py_a2 = np.argpartition(a, (1, 3), 2)
+
+        auto a0 = xt::argpartition(py_a, {1, 2}, 0);
+        auto a1 = xt::argpartition(py_a, {1, 4}, 1);
+        auto a2 = xt::argpartition(py_a, {1, 3}, 2);
+
+        EXPECT_EQ(xt::view(py_a0, 2, all(), all()), xt::view(a0, 2, all(), all()));
+        EXPECT_EQ(xt::view(py_a1, all(), 4, all()), xt::view(a1, all(), 4, all()));
+        EXPECT_EQ(xt::view(py_a2, all(), all(), 3), xt::view(a2, all(), all(), 3));
+
+        EXPECT_EQ(xt::view(py_a0, 1, all(), all()), xt::view(a0, 1, all(), all()));
+        EXPECT_EQ(xt::view(py_a1, all(), 1, all()), xt::view(a1, all(), 1, all()));
+        EXPECT_EQ(xt::view(py_a2, all(), all(), 1), xt::view(a2, all(), all(), 1));
+    }
+}
