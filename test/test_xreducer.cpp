@@ -37,14 +37,14 @@ namespace xt
         using shape_type = xarray<double>::shape_type;
 
         using func = xreducer_functors<std::plus<double>>;
-        xreducer<func, const xarray<double>&, axes_type, std::false_type> m_red;
+        xreducer<func, const xarray<double>&, axes_type, xt::reducer_options<double, std::tuple<xt::evaluation_strategy::_lazy>>> m_red;
 
         xreducer_features();
     };
 
     xreducer_features::xreducer_features()
         : m_axes({1, 3}), m_a(ones<double>({3, 2, 4, 6, 5})),
-          m_red(func(), m_a, m_axes)
+          m_red(func(), m_a, m_axes, xt::evaluation_strategy::lazy)
     {
         for (std::size_t i = 0; i < 2; ++i)
         {
@@ -579,5 +579,24 @@ namespace xt
         EXPECT_EQ(res7.shape(), (xt::xshape<>{}));
         auto res8 = xt::sum(c, xt::keep_dims);
         EXPECT_EQ(res8.shape(), (xt::xshape<1, 1, 1, 1>{}));
+    }
+
+    TEST(xreducer, initial_value)
+    {
+        xt::xtensor<double, 4> a = xt::reshape_view(xt::arange<double>(5 * 5 * 5 * 5), {5, 5, 5, 5});
+
+        auto res = xt::sum(a, {0, 2}, xt::keep_dims | xt::evaluation_strategy::immediate | initial(5));   
+        auto reso = xt::sum(a, {0, 2}, xt::keep_dims | xt::evaluation_strategy::immediate);
+        EXPECT_EQ(res, reso + 5);
+
+        xt::xarray<double> res2 = xt::sum(a, {0, 2}, xt::keep_dims | initial(5));   
+        auto reso2 = xt::sum(a, {0, 2}, xt::keep_dims);   
+        EXPECT_EQ(res2, reso2 + 5);
+
+        auto re0 = xt::prod(a, {1, 2}, xt::keep_dims | xt::evaluation_strategy::immediate | initial(0));   
+        EXPECT_TRUE(xt::all(equal(re0, 0.)));
+
+        auto rex0 = xt::prod(a, {1, 2}, initial(0));
+        EXPECT_TRUE(xt::all(equal(rex0, 0.)));
     }
 }
