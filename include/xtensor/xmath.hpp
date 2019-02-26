@@ -324,49 +324,50 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #undef XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
 #undef XTENSOR_UNSIGNED_ABS_FUNC
 
-#define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE)                                                      \
+#define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, INIT)                                                \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>         \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>             \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e),                              \
-                      std::forward<X>(axes), es);                                                                 \
+        return xt::reduce(make_xreducer_functor(functor_type(), INIT()),                                          \
+                          std::forward<E>(e),                                                                     \
+                          std::forward<X>(axes), es);                                                             \
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>                        \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>                            \
     inline auto NAME(E&& e, X axis, EVS es = EVS())                                                               \
     {                                                                                                             \
         return NAME(std::forward<E>(e), {axis}, es);                                                              \
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,                                     \
-              XTL_REQUIRES(is_reducer_options<EVS>)>                                                          \
+              XTL_REQUIRES(is_reducer_options<EVS>)>                                                              \
     inline auto NAME(E&& e, EVS es = EVS())                                                                       \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), es);                         \
+        return xt::reduce(make_xreducer_functor(functor_type(), INIT()), std::forward<E>(e), es);                 \
     }
 
-#define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                     \
+#define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                               \
     template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>                            \
     inline auto NAME(E&& e, std::initializer_list<I> axes, EVS es = EVS())                                        \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                   \
+        return xt::reduce(make_xreducer_functor(functor_type(), INIT()), std::forward<E>(e), axes, es);           \
     }
 
-#define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE)                                                  \
+#define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                            \
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>             \
     inline auto NAME(E&& e, const I (&axes)[N], EVS es = EVS())                                                   \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        return xt::reduce(make_xreducer_functor(functor_type()), std::forward<E>(e), axes, es);                   \
+        return xt::reduce(make_xreducer_functor(functor_type(), INIT()), std::forward<E>(e), axes, es);           \
     }
 
     /*******************
@@ -615,11 +616,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type)
+    XTENSOR_REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type, xt::const_value<0>)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type)
+    XTENSOR_OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type, xt::const_value<0>)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type)
+    XTENSOR_MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type, xt::const_value<0>)
 #endif
 
     /**
@@ -633,11 +634,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type)
+    XTENSOR_REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type, xt::const_value<0>)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type)
+    XTENSOR_OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type, xt::const_value<0>)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type)
+    XTENSOR_MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type, xt::const_value<0>)
 #endif
 
     /**
@@ -1698,11 +1699,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_REDUCER_FUNCTION(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, xt::const_value<0>)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_OLD_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, xt::const_value<0>)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_MODERN_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, xt::const_value<0>)
 #endif
 
     /**
@@ -1716,11 +1717,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_REDUCER_FUNCTION(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, xt::const_value<1>)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_OLD_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, xt::const_value<1>)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, xt::const_value<1>)
 #endif
 
     /**
@@ -1974,6 +1975,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                         es);
     }
 #endif
+
     /**
      * @ingroup red_functions
      * @brief Minimum and maximum among the elements of an array or expression.
@@ -1998,8 +2000,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             r[1] = (max)(r[1], v);
             return r;
         };
-        auto init_func = [](value_type const& v) {
-            return result_type{v, v};
+        auto init_func = []() {
+            return result_type{std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::min()};
         };
         auto merge_func = [](result_type r, result_type const& s) {
             r[0] = (min)(r[0], s[0]);
@@ -2007,8 +2009,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return r;
         };
         return xt::reduce(make_xreducer_functor(std::move(reduce_func),
-                                            std::move(init_func),
-                                            std::move(merge_func)),
+                                                std::move(init_func),
+                                                std::move(merge_func)),
                       std::forward<E>(e), arange(e.dimension()), es);
     }
 
@@ -2235,9 +2237,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #define COUNT_NON_ZEROS_CONTENT                                                 \
     using result_type = std::size_t;                                            \
     using value_type = typename std::decay_t<E>::value_type;                    \
-    auto init_fct = [](value_type const& lhs) -> result_type                    \
+    auto init_fct = []() -> result_type                                         \
     {                                                                           \
-        return (lhs != value_type(0)) ? result_type(1) : result_type(0);        \
+        return 0;                                                               \
     };                                                                          \
     auto reduce_fct = [](const result_type& lhs, const value_type& rhs)         \
          -> result_type                                                         \
