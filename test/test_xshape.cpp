@@ -10,7 +10,10 @@
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xstrides.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xfixed.hpp"
+#include "xtensor/xshape.hpp"
 
 namespace xt
 {
@@ -221,5 +224,19 @@ namespace xt
         EXPECT_EQ(a.back(), size_t(5));
         EXPECT_EQ(a.front(), size_t(3));
         EXPECT_EQ(a.size(), size_t(3));
+    }
+
+    TEST(xshape, common_tensor_deduction) {
+        xt::xarray<double> a1;
+        xt::xtensor<double, 1> a2;
+        xt::xtensor_fixed<double, xt::xshape<1>> a3;
+
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(a1)>, decltype(a1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a2), decltype(a2)>, decltype(a2)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a3), decltype(a3)>, decltype(a3)>::value));
+
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(a2)>, decltype(a1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(a3)>, decltype(a1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a2), decltype(a3)>, decltype(a2)>::value));
     }
 }
