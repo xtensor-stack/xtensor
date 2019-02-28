@@ -10,7 +10,10 @@
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xstrides.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
 #include "xtensor/xfixed.hpp"
+#include "xtensor/xshape.hpp"
 
 namespace xt
 {
@@ -221,5 +224,38 @@ namespace xt
         EXPECT_EQ(a.back(), size_t(5));
         EXPECT_EQ(a.front(), size_t(3));
         EXPECT_EQ(a.size(), size_t(3));
+    }
+
+    TEST(xshape, common_tensor_deduction) {
+        xt::xarray<double> a1 {0.0, 0.0, 0.0};
+        xt::xtensor<double, 1> a2 {0.0, 0.0, 0.0};
+        xt::xtensor_fixed<double, xt::xshape<3>> a3({0.0, 0.0, 0.0});
+
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(a1)>, decltype(a1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a2), decltype(a2)>, decltype(a2)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a3), decltype(a3)>, decltype(a3)>::value));
+
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(a2)>, decltype(a1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(a3)>, decltype(a1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a2), decltype(a3)>, decltype(a2)>::value));
+
+        auto sum1 = a1 + a2;
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(sum1)>, decltype(a1)>::value));
+        auto sum2 = a1 + a3;
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a1), decltype(sum2)>, decltype(a1)>::value));
+        auto sum3 = a2 + a3;
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(a2), decltype(sum3)>, decltype(a2)>::value));
+
+        xt::xarray<double> b1 {{0.0, 0.0, 0.0},{0.0, 0.0, 0.0},{0.0, 0.0, 0.0}};
+        xt::xtensor<double, 2> b2 {{0.0, 0.0, 0.0},{0.0, 0.0, 0.0},{0.0, 0.0, 0.0}};
+        xt::xtensor_fixed<double, xt::xshape<3,3>> b3({{0.0, 0.0, 0.0},{0.0, 0.0, 0.0},{0.0, 0.0, 0.0}});
+
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(b1), decltype(b1)>, decltype(b1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(b2), decltype(b2)>, decltype(b2)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(b3), decltype(b3)>, decltype(b3)>::value));
+
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(b1), decltype(b2)>, decltype(b1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(b1), decltype(b3)>, decltype(b1)>::value));
+        EXPECT_TRUE((std::is_same<xt::common_tensor_t<decltype(b2), decltype(b3)>, decltype(b2)>::value));
     }
 }

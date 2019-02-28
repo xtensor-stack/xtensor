@@ -20,6 +20,7 @@
 
 #include "xlayout.hpp"
 #include "xstorage.hpp"
+#include "xtensor_forward.hpp"
 
 namespace xt
 {
@@ -333,6 +334,37 @@ namespace xt
 
     template <class S>
     using index_from_shape_t = typename detail::index_from_shape_impl<S>::type;
+
+    /**
+     * Deduce the common value type of underlying containers
+     */
+    template <class... C>
+    struct common_value_type {
+        using type = std::common_type_t<typename std::decay_t<C>::value_type...>;
+    };
+    template <class... C>
+    using common_value_type_t = typename common_value_type<C...>::type;
+
+    /**
+     * Deduce the common xtensor type
+     */
+    template <class T, class S>
+    struct common_tensor_impl {
+        using type = xarray<T>;
+    };
+    template <class T, class I, std::size_t N>
+    struct common_tensor_impl<T, std::array<I, N>> {
+        using type = xtensor<T, N>;
+    };
+    template <class T, std::size_t... I>
+    struct common_tensor_impl<T, fixed_shape<I...>> {
+        using type = xt::xtensor_fixed<T, xt::fixed_shape<I...>>;
+    };
+    template <class... C>
+    struct common_tensor : common_tensor_impl<common_value_type_t<C...>, promote_shape_t<typename C::shape_type...>> { };
+
+    template <class... C>
+    using common_tensor_t = typename common_tensor<std::decay_t<C>...>::type;
 }
 
 #endif
