@@ -60,7 +60,7 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using temporary_type = detail::temporary_type_t<typename xexpression_type::value_type, S, L>;
+        using temporary_type = temporary_type_t<typename xexpression_type::value_type, S, L>;
     };
 
     template <class CT, class S, layout_type L, class FST>

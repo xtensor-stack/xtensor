@@ -20,7 +20,7 @@
 #include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
 
-#include "xexpression.hpp"
+#include "xexpression_traits.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
 #include "xscalar.hpp"
@@ -40,46 +40,8 @@ namespace xt
     namespace detail
     {
 
-        /********************
-         * common_size_type *
-         ********************/
-
-        template <class... Args>
-        struct common_size_type
-        {
-            using type = std::common_type_t<typename Args::size_type...>;
-        };
-
-        template <>
-        struct common_size_type<>
-        {
-            using type = std::size_t;
-        };
-
-        template <class... Args>
-        using common_size_type_t = typename common_size_type<Args...>::type;
-
         template <bool... B>
         using conjunction_c = xtl::conjunction<std::integral_constant<bool, B>...>;
-
-        /**************************
-         * common_difference type *
-         **************************/
-
-        template <class... Args>
-        struct common_difference_type
-        {
-            using type = std::common_type_t<typename Args::difference_type...>;
-        };
-
-        template <>
-        struct common_difference_type<>
-        {
-            using type = std::ptrdiff_t;
-        };
-
-        template <class... Args>
-        using common_difference_type_t = typename common_difference_type<Args...>::type;
 
         /************************
          * xfunction_cache_impl *
@@ -237,8 +199,8 @@ namespace xt
         using const_reference = value_type;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = detail::common_size_type_t<std::decay_t<CT>...>;
-        using difference_type = detail::common_difference_type_t<std::decay_t<CT>...>;
+        using size_type = common_size_type_t<std::decay_t<CT>...>;
+        using difference_type = common_difference_type_t<std::decay_t<CT>...>;
         using simd_meta_getter = detail::xsimd_meta_getter<value_type, F, CT...>;
 
         using has_simd_interface = typename simd_meta_getter::use_xsimd;

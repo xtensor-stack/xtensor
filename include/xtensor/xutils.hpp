@@ -463,7 +463,6 @@ namespace xt
      * normalize_axis implementation *
      *********************************/
 
-
     // scalar normalize axis
     inline std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis)
     {
@@ -545,7 +544,6 @@ namespace xt
     {
         return s1.size() == s2.size() && std::equal(s1.begin(), s1.end(), s2.begin());
     }
-
 
     /******************
      * get_value_type *
@@ -693,16 +691,6 @@ namespace xt
     struct has_strides<E, void_t<decltype(std::declval<E>().strides())>>
         : std::true_type
     {
-    };
-
-    /******************
-     * enable_if_type *
-     ******************/
-
-    template <class T>
-    struct enable_if_type
-    {
-        using type = void;
     };
 
     /********************************************

@@ -13,7 +13,7 @@
 #include <utility>
 
 #include "xassign.hpp"
-#include "xexpression.hpp"
+#include "xexpression_traits.hpp"
 
 namespace xt
 {
