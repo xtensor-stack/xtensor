@@ -65,9 +65,9 @@ namespace xtl
 namespace xt
 {
 
-    /***********************************
-     * static_dimension implementation *
-     ***********************************/
+    /********************
+     * static_dimension *
+     ********************/
 
     namespace detail
     {
