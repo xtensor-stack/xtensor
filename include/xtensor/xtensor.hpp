@@ -73,7 +73,7 @@ namespace xt
      * @tparam N The dimension of the container.
      * @tparam L The layout_type of the tensor.
      * @tparam Tag The expression tag.
-     * @sa xtensor
+     * @sa xtensor, xstrided_container, xcontainer
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     class xtensor_container : public xstrided_container<xtensor_container<EC, N, L, Tag>>,
@@ -180,6 +180,7 @@ namespace xt
      * @tparam N The dimension of the adaptor.
      * @tparam L The layout_type of the adaptor.
      * @tparam Tag The expression tag.
+     * @sa xstrided_container, xcontainer
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L, Tag>>,

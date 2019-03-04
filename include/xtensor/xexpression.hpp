@@ -28,8 +28,8 @@ namespace xt
     template <class D>
     class xexpression;
 
-    template <class D>
-    auto make_xshared(xexpression<D>&&);
+    template <class E>
+    auto make_xshared(xexpression<E>&&);
 
     /***************************
      * xexpression declaration *

@@ -1044,7 +1044,14 @@ namespace xt
     }
 
     /**
-     * Reshapes the container and keeps old elements
+     * Reshapes the container and keeps old elements. The `shape` argument can have one of its value
+     * equal to `-1`, in this case the value is inferred from the number of elements in the container
+     * and the remaining values in the `shape`.
+     * \code{.cpp}
+     * xt::xarray<int> a = { 1, 2, 3, 4, 5, 6, 7, 8 };
+     * a.reshape({-1, 4});
+     * //a.shape() is {2, 4}
+     * \endcode
      * @param shape the new shape (has to have same number of elements as the original container)
      * @param layout the layout to compute the strides (defaults to static layout of the container,
      *               or for a container with dynamic layout to XTENSOR_DEFAULT_LAYOUT)

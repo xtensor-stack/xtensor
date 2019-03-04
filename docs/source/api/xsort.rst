@@ -24,13 +24,13 @@ Defined in ``xtensor/xsort.hpp``
 .. doxygenfunction:: xt::argmin(const xexpression<E>&)
    :project: xtensor
 
-.. doxygenfunction:: xt::argmin(const xexpression<E>&, std::size_t)
+.. doxygenfunction:: xt::argmin(const xexpression<E>&, std::ptrdiff_t)
    :project: xtensor
 
 .. doxygenfunction:: xt::argmax(const xexpression<E>&)
    :project: xtensor
 
-.. doxygenfunction:: xt::argmax(const xexpression<E>&, std::size_t)
+.. doxygenfunction:: xt::argmax(const xexpression<E>&, std::ptrdiff_t)
    :project: xtensor
 
 .. doxygenfunction:: xt::unique(const xexpression<E>&)

@@ -19,3 +19,9 @@ Defined in ``xtensor/xexpression.hpp``
 
 .. doxygenfunction:: make_xshared
    :project: xtensor
+
+.. doxygenfunction:: share(xexpression<E>&)
+   :project: xtensor
+
+.. doxygenfunction:: share(xexpression<E>&&)
+   :project: xtensor
