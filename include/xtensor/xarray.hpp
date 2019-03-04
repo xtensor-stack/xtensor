@@ -72,7 +72,7 @@ namespace xt
      * @tparam L The layout_type of the container.
      * @tparam SC The type of the containers holding the shape and the strides.
      * @tparam Tag The expression tag.
-     * @sa xarray
+     * @sa xarray, xstrided_container, xcontainer
      */
     template <class EC, layout_type L, class SC, class Tag>
     class xarray_container : public xstrided_container<xarray_container<EC, L, SC, Tag>>,
@@ -185,6 +185,7 @@ namespace xt
      * @tparam L The layout_type of the adaptor.
      * @tparam SC The type of the containers holding the shape and the strides.
      * @tparam Tag The expression tag.
+     * @sa xstrided_container, xcontainer
      */
     template <class EC, layout_type L, class SC, class Tag>
     class xarray_adaptor : public xstrided_container<xarray_adaptor<EC, L, SC, Tag>>,

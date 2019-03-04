@@ -99,6 +99,36 @@ other etc... They provide an augmented interface compared to other ``xexpression
 - ``resize()`` resizes the container in place, that is, if the global size of the container doesn't change, no memory allocation occurs.
 - ``strides()`` returns the strides of the container, used to compute the position of an element in the underlying buffer.
 
+Reshape
+-------
+
+The ``reshape`` method accepts any kind of 1D-container, you don't have to pass an instance of ``shape_type``. It only requires the new shape to be
+compatible with the old one, that is, the number of elements in the container must remain the same:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+
+    xt::xarray<int> a = { 1, 2, 3, 4, 5, 6, 7, 8};
+    // The following two lines ...
+    std::array<std::size_t, 2> sh1 = {2, 4};
+    a.reshape(sh1);
+    // ... are equivalent to the following two lines ...
+    xt::xarray<int>::shape_type sh2({2, 4});
+    a.reshape(sh2);
+    // ... which are equivalent to the following
+    a.reshape({2, 4});
+
+One of the values in the ``shape`` argument can be -1. In this case, the value is inferred from the number of elements in the container and the remaining
+values in the ``shape``:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    xt::xarray<int> a = { 1, 2, 3, 4, 5, 6, 7, 8};
+    a.reshape({2, -1});
+    // a.shape() return {2, 4}
+
 Performance
 -----------
 
