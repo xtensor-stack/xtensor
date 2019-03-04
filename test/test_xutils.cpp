@@ -63,6 +63,7 @@ namespace xt
         auto t = std::make_tuple(a, b, c, d);
         for_each(fn, t);
         ASSERT_TRUE(a == fn.a && b == fn.b && c == fn.c && d == fn.d);
+        EXPECT_FALSE(noexcept(for_each(fn, t)));
     }
 
     TEST(utils, accumulate)
@@ -70,6 +71,11 @@ namespace xt
         auto func = [](int i, int j) { return i + j; };
         const std::tuple<int, int, int> t(3, 4, 1);
         EXPECT_EQ(8, accumulate(func, 0, t));
+        EXPECT_FALSE(noexcept(accumulate(func, 0, t)));
+
+        auto func_ne = [](int i, int j) noexcept { return i + j; };
+        EXPECT_EQ(8, accumulate(func_ne, 0, t));
+        EXPECT_TRUE(noexcept(accumulate(func_ne, 0, t)));
     }
 
     template <class... T>
@@ -79,9 +85,18 @@ namespace xt
         return apply<int>(1, func, t);
     }
 
+    int fun(int i) noexcept{ return 2 * i; }
     TEST(utils, apply)
     {
         ASSERT_TRUE(foo(std::make_tuple(1, 2, 3)) == 2);
+        EXPECT_FALSE(noexcept(foo(std::make_tuple(1, 2, 3))));
+        auto func_ne = [](int i) noexcept { return i; };
+        auto t = std::make_tuple(1, 2, 3);
+#if (_MSC_VER >= 1910)
+        EXPECT_FALSE(noexcept(apply<int>(1, func_ne, t)));
+#else
+        EXPECT_TRUE(noexcept(apply<int>(1, func_ne, t)));
+#endif
     }
 
     TEST(utils, conditional_cast)

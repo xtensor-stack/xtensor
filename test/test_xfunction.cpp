@@ -100,6 +100,13 @@ namespace xt
         }
     }
 
+    TEST(xfunction, broadcast_shape_exception)
+    {
+        xt::xarray<double> arr1{ { 1.0, 2.0, 3.0 } };
+        xt::xarray<double> arr2{ 5.0, 6.0, 7.0, 99.0 };
+        EXPECT_ANY_THROW(xt::xarray<double> res = arr1 * arr2);
+    }
+
     TEST(xfunction, layout_type)
     {
         xarray<int, layout_type::dynamic> m_d;

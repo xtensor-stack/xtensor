@@ -28,6 +28,12 @@
 
 #include "xtensor_config.hpp"
 
+#if (_MSC_VER >= 1910)
+    #define NOEXCEPT(T)
+#else
+    #define NOEXCEPT(T) noexcept(T)
+#endif
+
 namespace xt
 {
     /****************
@@ -37,17 +43,17 @@ namespace xt
     template <class T>
     struct remove_class;
 
-    template <class F, class... T>
-    void for_each(F&& f, std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()));
+    /*template <class F, class... T>
+    void for_each(F&& f, std::tuple<T...>& t) noexcept(implementation_dependent);*/
 
-    template <class F, class R, class... T>
-    R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()));
+    /*template <class F, class R, class... T>
+    R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(implementation_dependent);*/
 
     template <std::size_t I, class... Args>
     constexpr decltype(auto) argument(Args&&... args) noexcept;
 
     template <class R, class F, class... S>
-    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()));
+    R apply(std::size_t index, F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<0>(s))));
 
     template <class T, class S>
     void nested_copy(T&& iter, const S& s);
@@ -143,13 +149,14 @@ namespace xt
     {
         template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I == sizeof...(T), void>::type
-        for_each_impl(F&& /*f*/, std::tuple<T...>& /*t*/) noexcept(noexcept(std::declval<F>()))
+        for_each_impl(F&& /*f*/, std::tuple<T...>& /*t*/) noexcept
         {
         }
 
         template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I < sizeof...(T), void>::type
-        for_each_impl(F&& f, std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+        for_each_impl(F&& f, std::tuple<T...>& t)
+            noexcept(noexcept(f(std::get<I>(t))))
         {
             f(std::get<I>(t));
             for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
@@ -157,7 +164,8 @@ namespace xt
     }
 
     template <class F, class... T>
-    inline void for_each(F&& f, std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+    inline void for_each(F&& f, std::tuple<T...>& t)
+        noexcept(noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t)))
     {
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
@@ -166,13 +174,14 @@ namespace xt
     {
         template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I == sizeof...(T), void>::type
-        for_each_impl(F&& /*f*/, const std::tuple<T...>& /*t*/) noexcept(noexcept(std::declval<F>()))
+        for_each_impl(F&& /*f*/, const std::tuple<T...>& /*t*/) noexcept
         {
         }
 
         template <std::size_t I, class F, class... T>
         inline typename std::enable_if<I < sizeof...(T), void>::type
-        for_each_impl(F&& f, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+        for_each_impl(F&& f, const std::tuple<T...>& t)
+            noexcept(noexcept(f(std::get<I>(t))))
         {
             f(std::get<I>(t));
             for_each_impl<I + 1, F, T...>(std::forward<F>(f), t);
@@ -180,7 +189,8 @@ namespace xt
     }
 
     template <class F, class... T>
-    inline void for_each(F&& f, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+    inline void for_each(F&& f, const std::tuple<T...>& t) 
+        noexcept(noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t)))
     {
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);
     }
@@ -193,14 +203,15 @@ namespace xt
     {
         template <std::size_t I, class F, class R, class... T>
         inline std::enable_if_t<I == sizeof...(T), R>
-        accumulate_impl(F&& /*f*/, R init, const std::tuple<T...>& /*t*/) noexcept(noexcept(std::declval<F>()))
+        accumulate_impl(F&& /*f*/, R init, const std::tuple<T...>& /*t*/) noexcept
         {
             return init;
         }
 
         template <std::size_t I, class F, class R, class... T>
         inline std::enable_if_t<I < sizeof...(T), R>
-        accumulate_impl(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+        accumulate_impl(F&& f, R init, const std::tuple<T...>& t)
+            noexcept(noexcept(f(init, std::get<I>(t))))
         {
             R res = f(init, std::get<I>(t));
             return accumulate_impl<I + 1, F, R, T...>(std::forward<F>(f), res, t);
@@ -208,7 +219,8 @@ namespace xt
     }
 
     template <class F, class R, class... T>
-    inline R accumulate(F&& f, R init, const std::tuple<T...>& t) noexcept(noexcept(std::declval<F>()))
+    inline R accumulate(F&& f, R init, const std::tuple<T...>& t)
+        noexcept(noexcept(detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t)))
     {
         return detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t);
     }
@@ -254,13 +266,14 @@ namespace xt
     namespace detail
     {
         template <class R, class F, std::size_t I, class... S>
-        R apply_one(F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
+        R apply_one(F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<I>(s))))
         {
             return static_cast<R>(func(std::get<I>(s)));
         }
 
         template <class R, class F, std::size_t... I, class... S>
-        R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
+        R apply(std::size_t index, F&& func, std::index_sequence<I...> /*seq*/, const std::tuple<S...>& s)
+            NOEXCEPT(noexcept(func(std::get<0>(s))))
         {
             using FT = std::add_pointer_t<R(F&&, const std::tuple<S...>&)>;
             static const std::array<FT, sizeof...(I)> ar = {{&apply_one<R, F, I, S...>...}};
@@ -269,7 +282,7 @@ namespace xt
     }
 
     template <class R, class F, class... S>
-    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s) noexcept(noexcept(std::declval<F>()))
+    inline R apply(std::size_t index, F&& func, const std::tuple<S...>& s) NOEXCEPT(noexcept(func(std::get<0>(s))))
     {
         return detail::apply<R>(index, std::forward<F>(func), std::make_index_sequence<sizeof...(S)>(), s);
     }

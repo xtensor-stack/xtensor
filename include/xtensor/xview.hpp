@@ -1611,10 +1611,10 @@ namespace xt
     {
         auto index = xtl::make_sequence<base_index_type>(m_e.dimension(), 0);
         using ivalue_type = typename base_index_type::value_type;
-        auto func1 = [&first](const auto& s) {
+        auto func1 = [&first](const auto& s) noexcept {
             return get_slice_value(s, first);
         };
-        auto func2 = [](const auto& s) {
+        auto func2 = [](const auto& s) noexcept {
             return xt::value(s, 0);
         };
 
@@ -1816,7 +1816,7 @@ namespace xt
         if (!end)
         {
             std::fill(m_index_keeper.begin(), m_index_keeper.end(), 0);
-            auto func = [](const auto& s) { return xt::value(s, 0); };
+            auto func = [](const auto& s) noexcept { return xt::value(s, 0); };
             for (size_type i = 0; i < sizeof...(S); ++i)
             {
                 if (!is_newaxis_slice(i))
@@ -1909,10 +1909,10 @@ namespace xt
     template <bool is_const, class CT, class... S>
     inline void xview_stepper<is_const, CT, S...>::to_end_impl(layout_type l)
     {
-        auto func = [](const auto& s) {
+        auto func = [](const auto& s) noexcept {
             return xt::value(s, get_size(s) - 1);
         };
-        auto size_func = [](const auto& s) {
+        auto size_func = [](const auto& s) noexcept {
             return get_size(s);
         };
 
