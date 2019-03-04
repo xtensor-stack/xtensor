@@ -32,8 +32,7 @@ namespace xt
     inline auto histogram(E1&& data, E2&& bin_edges, E3&& weights, bool density = false)
     {
         // alias counter and value type
-        using size_type
-            = detail::common_size_type_t<std::decay_t<E1>, std::decay_t<E2>, std::decay_t<E3>>;
+        using size_type = common_size_type_t<std::decay_t<E1>, std::decay_t<E2>, std::decay_t<E3>>;
         using value_type = typename std::decay_t<E3>::value_type;
 
         // basic checks
@@ -189,7 +188,7 @@ namespace xt
                                     histogram_algorithm mode = histogram_algorithm::automatic)
     {
         // counter and return type
-        using size_type = detail::common_size_type_t<std::decay_t<E1>, std::decay_t<E2>>;
+        using size_type = common_size_type_t<std::decay_t<E1>, std::decay_t<E2>>;
         using value_type = typename std::decay_t<E1>::value_type;
         using weights_type = typename std::decay_t<E2>::value_type;
 

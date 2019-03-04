@@ -2567,7 +2567,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template<class E1, class E2, class E3, typename T>
     inline auto interp(const E1 &x, const E2 &xp, const E3 &fp, T left, T right)
     {
-        using size_type = detail::common_size_type_t<E1,E2,E3>;
+        using size_type = common_size_type_t<E1,E2,E3>;
         using value_type = typename E3::value_type;
 
         // basic checks

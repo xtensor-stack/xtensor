@@ -109,6 +109,7 @@ set(XTENSOR_TESTS
     test_xeval.cpp
     test_xexception.cpp
     test_xexpression.cpp
+    test_xexpression_traits.cpp
     test_xfunction.cpp
     test_xfunctor_adaptor.cpp
     test_xfixed.cpp
