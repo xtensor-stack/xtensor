@@ -232,6 +232,11 @@ namespace xt
             vec.resize(shape);
             vec.reshape(signed_shape, layout_type::row_major);
             compare_shape(vec, rm);
+
+            vec.resize(shape);
+            vec.reshape({ 3, -1, 4 }, layout_type::row_major);
+            compare_shape(vec, rm);
+
             shape = rm.m_shape;
             shape.front() += 123;
             EXPECT_THROW(vec.reshape(shape), std::runtime_error);
