@@ -33,7 +33,30 @@ namespace xt
     template <std::size_t... X>
     class fixed_shape;
 
-    using xindex = dynamic_shape<std::size_t>;
+    using xindex = dynamic_shape<std::size_t>;    template <class S1, class S2>
+
+    bool same_shape(const S1& s1, const S2& s2) noexcept;
+
+    template <class U>
+    struct initializer_dimension;
+
+    template <class R, class T>
+    constexpr R shape(T t);
+
+    template <class S>
+    struct static_dimension;
+
+    template <layout_type L, class S>
+    struct select_layout;
+
+    template <class... S>
+    struct promote_shape;
+
+    template <class... S>
+    struct promote_strides;
+
+    template <class S>
+    struct index_from_shape;
 }
 
 namespace xtl
@@ -64,6 +87,80 @@ namespace xtl
 
 namespace xt
 {
+    /**************
+     * same_shape *
+     **************/
+
+    template <class S1, class S2>
+    inline bool same_shape(const S1& s1, const S2& s2) noexcept
+    {
+        return s1.size() == s2.size() && std::equal(s1.begin(), s1.end(), s2.begin());
+    }
+
+    /*************************
+     * initializer_dimension *
+     *************************/
+
+    namespace detail
+    {
+        template <class U>
+        struct initializer_depth_impl
+        {
+            static constexpr std::size_t value = 0;
+        };
+
+        template <class T>
+        struct initializer_depth_impl<std::initializer_list<T>>
+        {
+            static constexpr std::size_t value = 1 + initializer_depth_impl<T>::value;
+        };
+    }
+
+    template <class U>
+    struct initializer_dimension
+    {
+        static constexpr std::size_t value = detail::initializer_depth_impl<U>::value;
+    };
+
+    /*********************
+     * initializer_shape *
+     *********************/
+
+    namespace detail
+    {
+        template <std::size_t I>
+        struct initializer_shape_impl
+        {
+            template <class T>
+            static constexpr std::size_t value(T t)
+            {
+                return t.size() == 0 ? 0 : initializer_shape_impl<I - 1>::value(*t.begin());
+            }
+        };
+
+        template <>
+        struct initializer_shape_impl<0>
+        {
+            template <class T>
+            static constexpr std::size_t value(T t)
+            {
+                return t.size();
+            }
+        };
+
+        template <class R, class U, std::size_t... I>
+        constexpr R initializer_shape(U t, std::index_sequence<I...>)
+        {
+            using size_type = typename R::value_type;
+            return {size_type(initializer_shape_impl<I>::value(t))...};
+        }
+    }
+
+    template <class R, class T>
+    constexpr R shape(T t)
+    {
+        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+    }
 
     /********************
      * static_dimension *
@@ -327,13 +424,31 @@ namespace xt
     }
 
     template <class... S>
-    using promote_shape_t = typename detail::promote_index<S...>::type;
+    struct promote_shape
+    {
+        using type = typename detail::promote_index<S...>::type;
+    };
 
     template <class... S>
-    using promote_strides_t = typename detail::promote_index<S...>::type;
+    using promote_shape_t = typename promote_shape<S...>::type;
+
+    template <class... S>
+    struct promote_strides
+    {
+        using type = typename detail::promote_index<S...>::type;
+    };
+
+    template <class... S>
+    using promote_strides_t = typename promote_strides<S...>::type;
 
     template <class S>
-    using index_from_shape_t = typename detail::index_from_shape_impl<S>::type;
+    struct index_from_shape
+    {
+        using type = typename detail::index_from_shape_impl<S>::type;
+    };
+
+    template <class S>
+    using index_from_shape_t = typename index_from_shape<S>::type;
 }
 
 #endif

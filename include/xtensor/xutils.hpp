@@ -55,15 +55,6 @@ namespace xt
     template <class T, class S>
     void nested_copy(T&& iter, std::initializer_list<S> s);
 
-    template <class U>
-    struct initializer_dimension;
-
-    template <class R, class T>
-    constexpr R shape(T t);
-
-    template <class T, class S>
-    constexpr bool check_shape(T t, S first, S last);
-
     template <class C>
     bool resize_container(C& c, typename C::size_type size);
 
@@ -83,9 +74,6 @@ namespace xt
     using rebind_container_t = typename rebind_container<X, C>::type;
 
     std::size_t normalize_axis(std::size_t dim, std::ptrdiff_t axis);
-
-    template <class S1, class S2>
-    inline bool same_shape(const S1& s1, const S2& s2) noexcept;
 
     // gcc 4.9 is affected by C++14 defect CGW 1558
     // see http://open-std.org/JTC1/SC22/WG21/docs/cwg_defects.html#1558
@@ -324,118 +312,6 @@ namespace xt
         }
     }
 
-    /****************************************
-     * initializer_dimension implementation *
-     ****************************************/
-
-    namespace detail
-    {
-        template <class U>
-        struct initializer_depth_impl
-        {
-            static constexpr std::size_t value = 0;
-        };
-
-        template <class T>
-        struct initializer_depth_impl<std::initializer_list<T>>
-        {
-            static constexpr std::size_t value = 1 + initializer_depth_impl<T>::value;
-        };
-    }
-
-    template <class U>
-    struct initializer_dimension
-    {
-        static constexpr std::size_t value = detail::initializer_depth_impl<U>::value;
-    };
-
-    /************************************
-     * initializer_shape implementation *
-     ************************************/
-
-    namespace detail
-    {
-        template <std::size_t I>
-        struct initializer_shape_impl
-        {
-            template <class T>
-            static constexpr std::size_t value(T t)
-            {
-                return t.size() == 0 ? 0 : initializer_shape_impl<I - 1>::value(*t.begin());
-            }
-        };
-
-        template <>
-        struct initializer_shape_impl<0>
-        {
-            template <class T>
-            static constexpr std::size_t value(T t)
-            {
-                return t.size();
-            }
-        };
-
-        template <class R, class U, std::size_t... I>
-        constexpr R initializer_shape(U t, std::index_sequence<I...>)
-        {
-            using size_type = typename R::value_type;
-            return {size_type(initializer_shape_impl<I>::value(t))...};
-        }
-    }
-
-    template <class R, class T>
-    constexpr R shape(T t)
-    {
-        return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
-    }
-
-    /******************************
-     * check_shape implementation *
-     ******************************/
-
-    namespace detail
-    {
-        template <class T, class S>
-        struct predshape
-        {
-            constexpr predshape(S first, S last)
-                : m_first(first), m_last(last)
-            {
-            }
-
-            constexpr bool operator()(const T&) const
-            {
-                return m_first == m_last;
-            }
-
-            S m_first;
-            S m_last;
-        };
-
-        template <class T, class S>
-        struct predshape<std::initializer_list<T>, S>
-        {
-            constexpr predshape(S first, S last)
-                : m_first(first), m_last(last)
-            {
-            }
-
-            constexpr bool operator()(std::initializer_list<T> t) const
-            {
-                return *m_first == t.size() && std::all_of(t.begin(), t.end(), predshape<T, S>(m_first + 1, m_last));
-            }
-
-            S m_first;
-            S m_last;
-        };
-    }
-
-    template <class T, class S>
-    constexpr bool check_shape(T t, S first, S last)
-    {
-        return detail::predshape<decltype(t), S>(first, last)(t);
-    }
-
     /***********************************
      * resize_container implementation *
      ***********************************/
@@ -533,16 +409,6 @@ namespace xt
         static_cast<void>(expr);
         XTENSOR_ASSERT(std::all_of(std::begin(axes), std::end(axes), [&expr](auto ax_el) { return ax_el < expr.dimension(); }));
         return std::move(axes);
-    }
-
-    /*****************************
-     * same_shape implementation *
-     *****************************/
-
-    template <class S1, class S2>
-    inline bool same_shape(const S1& s1, const S2& s2) noexcept
-    {
-        return s1.size() == s2.size() && std::equal(s1.begin(), s1.end(), s2.begin());
     }
 
     /******************
