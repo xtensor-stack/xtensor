@@ -127,6 +127,26 @@ namespace xt
         }
     }
 
+    TEST(xview, stored_range)
+    {
+        view_shape_type shape = { 3, 4 };
+        xarray<double> a(shape);
+        std::vector<double> data = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+
+        auto r0 = range(1, 3);
+        auto r1 = range(0, 3);
+        auto view0 = view(a, r0, r1);
+
+        view0 += xt::ones<double>({2, 3});
+        EXPECT_EQ(a(1, 0), 6);
+        EXPECT_EQ(a(1, 1), 7);
+        EXPECT_EQ(a(1, 2), 8);
+        EXPECT_EQ(a(2, 0), 10);
+        EXPECT_EQ(a(2, 1), 11);
+        EXPECT_EQ(a(2, 2), 12);
+    }
+
     TEST(xview, copy_semantic)
     {
         view_shape_type shape = { 3, 4 };
