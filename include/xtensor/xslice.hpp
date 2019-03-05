@@ -926,7 +926,7 @@ namespace xt
         struct slice_implementation_getter<xall_tag>
         {
             template <class E, class SL>
-            inline auto operator()(E& e, SL&& tag, std::size_t index) const
+            inline auto operator()(E& e, SL&&, std::size_t index) const
             {
                 return xall<typename E::size_type>(e.shape()[index]);
             }
@@ -936,7 +936,7 @@ namespace xt
         struct slice_implementation_getter<xnewaxis_tag>
         {
             template <class E, class SL>
-            inline auto operator()(E& e, SL&& tag, std::size_t index) const
+            inline auto operator()(E&, SL&&, std::size_t) const
             {
                 return xnewaxis<typename E::size_type>();
             }
