@@ -22,6 +22,7 @@
 #include "xiterable.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
+#include "xstrided_view.hpp"
 
 namespace xt
 {
@@ -152,6 +153,9 @@ namespace xt
         template <class OR, class OF>
         rebind_t<OR, OF> build_generator(OF&& func) const;
 
+        template <class O = xt::dynamic_shape<typename shape_type::value_type>>
+        auto reshape(O&& shape) const;
+
     private:
 
         template <std::size_t dim>
@@ -173,7 +177,7 @@ namespace xt
      */
     //@{
     /**
-     * Constructs an xgenerator applying the specified function over the 
+     * Constructs an xgenerator applying the specified function over the
      * given shape.
      * @param f the function to apply
      * @param shape the shape of the xgenerator
@@ -390,6 +394,13 @@ namespace xt
     inline auto xgenerator<F, R, S>::build_generator(OF&& func) const -> rebind_t<OR, OF>
     {
         return rebind_t<OR, OF>(std::move(func), shape_type(m_shape));
+    }
+
+    template <class F, class R, class S>
+    template <class O>
+    inline auto xgenerator<F, R, S>::reshape(O&& shape) const
+    {
+        return reshape_view(*this, std::forward<xt::dynamic_shape<typename shape_type::value_type>>(shape));
     }
 
     template <class F, class R, class S>
