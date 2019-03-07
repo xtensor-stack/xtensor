@@ -43,7 +43,7 @@ namespace xt
         using inner_storage_type = FST;
         using storage_type = std::remove_reference_t<inner_storage_type>;
 
-        using shape_type = S;
+        using shape_type = std::decay_t<S>;
         using strides_type = get_strides_t<shape_type>;
         using backstrides_type = strides_type;
 
