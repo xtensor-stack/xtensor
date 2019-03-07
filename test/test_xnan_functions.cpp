@@ -145,6 +145,9 @@ namespace xt
         EXPECT_EQ(nanmean(nantest::aN, {0}), eaN0);
         EXPECT_EQ(nanmean(nantest::aN, {1}), eaN1);
 
+        std::array<std::size_t, 1> axis{0};
+        EXPECT_EQ(nanmean(nantest::aN, axis), eaN0);
+
         EXPECT_EQ(nanmean(nantest::aN, {0}, evaluation_strategy::immediate()), eaN0);
         EXPECT_EQ(nanmean(nantest::aN, {1}, evaluation_strategy::immediate()), eaN1);
 
@@ -163,4 +166,24 @@ namespace xt
         EXPECT_EQ(nanmean(nantest::cN, {1}, evaluation_strategy::immediate()), ecN1);
     }
 
+
+    TEST(xnanfunctions, nanvar)
+    {
+        auto as = nanvar(nantest::aN)();
+        auto ase = nanvar(nantest::aN, evaluation_strategy::immediate())();
+        EXPECT_EQ(as, 1602.109375);
+        EXPECT_EQ(ase, 1602.109375);
+
+        xarray<double> eaN0 = {0.0, 0.25, 0.0, 0.0};
+        xarray<double> eaN1 = {3600.0, 2.0/3.0, 8.0/9.0};
+
+        EXPECT_EQ(nanvar(nantest::aN, {0}), eaN0);
+        EXPECT_TRUE(allclose(nanvar(nantest::aN, {1}), eaN1));
+
+        std::array<std::size_t, 1> axis{0};
+        EXPECT_EQ(nanvar(nantest::aN, axis), eaN0);
+
+        EXPECT_EQ(nanvar(nantest::aN, {0}, evaluation_strategy::immediate()), eaN0);
+        EXPECT_TRUE(allclose(nanvar(nantest::aN, {1}, evaluation_strategy::immediate()), eaN1));
+    }
 }
