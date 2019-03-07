@@ -66,7 +66,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     struct xiterable_inner_types<xstrided_view<CT, S, L, FST>>
     {
-        using inner_shape_type = S;
+        using inner_shape_type = std::decay_t<S>;
         using inner_strides_type = get_strides_t<inner_shape_type>;
         using inner_backstrides_type_type = inner_strides_type;
 
