@@ -28,7 +28,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtl_REQUIRED_VERSION 0.5.3)
+set(xtl_REQUIRED_VERSION 0.6.0)
 find_package(xtl ${xtl_REQUIRED_VERSION} REQUIRED)
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
@@ -86,7 +86,6 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xjson.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmanipulation.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_value.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmime.hpp

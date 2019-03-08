@@ -14,6 +14,8 @@
 #include <complex>
 #include <cstdlib>
 
+#include <xtl/xtype_traits.hpp>
+
 #include "xmath.hpp"
 #include "xoperation.hpp"
 #include "xutils.hpp"
@@ -48,8 +50,8 @@ namespace xt
         struct norm_of_scalar_impl<T, true>
         {
             static const bool value = true;
-            using norm_type = promote_type_t<T>;
-            using squared_norm_type = promote_type_t<T>;
+            using norm_type = xtl::promote_type_t<T>;
+            using squared_norm_type = xtl::promote_type_t<T>;
         };
 
         template <class T, bool integral = std::is_integral<T>::value,
@@ -209,7 +211,7 @@ namespace xt
     inline auto                                                   \
     norm_lp_to_p(T t, double p) noexcept                          \
     {                                                             \
-        using rt = real_promote_type_t<T>;                        \
+        using rt = xtl::real_promote_type_t<T>;                        \
         return p == 0.0                                           \
             ? static_cast<rt>(t != 0)                             \
             : std::pow(static_cast<rt>(std::abs(t)),              \
@@ -242,7 +244,7 @@ namespace xt
     inline auto                                               \
     norm_lp_to_p(T t, double p) noexcept                      \
     {                                                         \
-        using rt = real_promote_type_t<T>;                    \
+        using rt = xtl::real_promote_type_t<T>;                    \
         return p == 0.0                                       \
             ? static_cast<rt>(t != 0)                         \
             : std::pow(static_cast<rt>(t),                    \
@@ -396,8 +398,8 @@ namespace xt
     XTENSOR_NORM_FUNCTION_AXES(NAME)
 
     XTENSOR_NORM_FUNCTION(norm_l0, unsigned long long, XTENSOR_EMPTY, +, std::plus)
-    XTENSOR_NORM_FUNCTION(norm_l1, big_promote_type_t<value_type>, XTENSOR_EMPTY, +, std::plus)
-    XTENSOR_NORM_FUNCTION(norm_sq, big_promote_type_t<value_type>, XTENSOR_EMPTY, +, std::plus)
+    XTENSOR_NORM_FUNCTION(norm_l1, xtl::big_promote_type_t<value_type>, XTENSOR_EMPTY, +, std::plus)
+    XTENSOR_NORM_FUNCTION(norm_sq, xtl::big_promote_type_t<value_type>, XTENSOR_EMPTY, +, std::plus)
     XTENSOR_NORM_FUNCTION(norm_linf, decltype(norm_linf(std::declval<value_type>())), (std::max<result_type>), XTENSOR_COMMA, math::maximum)
 
 #undef XTENSOR_EMPTY

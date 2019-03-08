@@ -20,6 +20,7 @@
 #include <type_traits>
 
 #include <xtl/xcomplex.hpp>
+#include <xtl/xtype_traits.hpp>
 
 #include "xaccumulator.hpp"
 #include "xoperation.hpp"
@@ -1614,7 +1615,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             template <class A1, class A2>
             bool operator()(const A1& a, const A2& b) const
             {
-                using internal_type = promote_type_t<A1, A2, double>;
+                using internal_type = xtl::promote_type_t<A1, A2, double>;
                 if (math::isnan(a) && math::isnan(b))
                 {
                     return m_equal_nan;
@@ -1697,11 +1698,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_REDUCER_FUNCTION(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_OLD_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(sum, std::plus, big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_MODERN_CLANG_REDUCER(sum, std::plus, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
 #endif
 
     /**
@@ -1715,11 +1716,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_REDUCER_FUNCTION(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_OLD_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, big_promote_type_t<typename std::decay_t<E>::value_type>)
+    XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>)
 #endif
 
     /**
@@ -2028,14 +2029,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E>
     inline auto cumsum(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::plus<result_type>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto cumsum(E&& e)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::plus<result_type>()), std::forward<E>(e));
     }
 
@@ -2052,14 +2053,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E>
     inline auto cumprod(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::multiplies<result_type>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto cumprod(E&& e)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(std::multiplies<result_type>()), std::forward<E>(e));
     }
 
@@ -2338,14 +2339,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E>
     inline auto nancumsum(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), detail::nan_init<result_type, 0>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto nancumsum(E&& e)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(detail::nan_plus<result_type>(), detail::nan_init<result_type, 0>()), std::forward<E>(e));
     }
 
@@ -2362,14 +2363,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class E>
     inline auto nancumprod(E&& e, std::ptrdiff_t axis)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), detail::nan_init<result_type, 1>()), std::forward<E>(e), axis);
     }
 
     template <class E>
     inline auto nancumprod(E&& e)
     {
-        using result_type = big_promote_type_t<typename std::decay_t<E>::value_type>;
+        using result_type = xtl::big_promote_type_t<typename std::decay_t<E>::value_type>;
         return accumulate(make_xaccumulator_functor(detail::nan_multiplies<result_type>(), detail::nan_init<result_type, 1>()), std::forward<E>(e));
     }
 

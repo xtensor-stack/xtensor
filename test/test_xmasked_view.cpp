@@ -74,7 +74,7 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
-        auto masked_value = masked<xtl::xoptional<double, bool>>();
+        auto masked_value = xtl::masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data(0, 0), 1.);
         EXPECT_EQ(masked_data(0, 1), 2.);
         EXPECT_EQ(masked_data(0, 2), xtl::missing<double>());
@@ -95,7 +95,7 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
-        auto masked_value = masked<xtl::xoptional<double, bool>>();
+        auto masked_value = xtl::masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data.at(0, 0), 1.);
         EXPECT_EQ(masked_data.at(0, 1), 2.);
         EXPECT_EQ(masked_data.at(0, 2), xtl::missing<double>());
@@ -114,7 +114,7 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
-        auto masked_value = masked<xtl::xoptional<double, bool>>();
+        auto masked_value = xtl::masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data.unchecked(0, 0), 1.);
         EXPECT_EQ(masked_data.unchecked(0, 1), 2.);
         EXPECT_EQ(masked_data.unchecked(0, 2), xtl::missing<double>());
@@ -131,7 +131,7 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
-        auto masked_value = masked<xtl::xoptional<double, bool>>();
+        auto masked_value = xtl::masked<xtl::xoptional<double, bool>>();
 
         auto val = masked_data[{0, 0}];
         EXPECT_EQ(val, 1.);
@@ -149,7 +149,7 @@ namespace xt
         auto data = make_test_data();
         auto masked_data = make_masked_data(data);
 
-        auto masked_value = masked<xtl::xoptional<double, bool>>();
+        auto masked_value = xtl::masked<xtl::xoptional<double, bool>>();
 
         auto index1 = std::array<int, 2>({0, 0});
         auto index2 = std::array<int, 2>({1, 0});
@@ -164,7 +164,7 @@ namespace xt
 
         masked_data.fill(2.);
 
-        auto masked_value = masked<xtl::xoptional<double, bool>>();
+        auto masked_value = xtl::masked<xtl::xoptional<double, bool>>();
         EXPECT_EQ(masked_data.at(0, 0), 2.);
         EXPECT_EQ(masked_data.at(0, 1), 2.);
         EXPECT_EQ(masked_data.at(0, 2), 2.);
@@ -197,7 +197,7 @@ namespace xt
 
         auto masked_data = masked_view(data, mask);
 
-        auto masked_value = masked<double>();
+        auto masked_value = xtl::masked<double>();
 
         EXPECT_EQ(masked_data(0, 0), 1.);
         EXPECT_EQ(masked_data.at(0, 1),-2.);
