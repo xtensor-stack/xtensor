@@ -154,9 +154,27 @@ namespace xt
         rebind_t<OR, OF> build_generator(OF&& func) const;
 
         template <class O = xt::dynamic_shape<typename shape_type::value_type>>
-        auto reshape(O&& shape) const;
+        auto reshape(O&& shape) const &;
+
+        template <class O = xt::dynamic_shape<typename shape_type::value_type>>
+        auto reshape(O&& shape) &&;
+
+        template <class T>
+        auto reshape(std::initializer_list<T> shape) const &;
+
+        template <class T>
+        auto reshape(std::initializer_list<T> shape) &&;
 
     private:
+
+        template <class O>
+        decltype(auto) compute_shape(O&& shape, std::false_type /*signed*/) const;
+
+        template <class O>
+        auto compute_shape(O&& shape, std::true_type /*signed*/) const;
+
+        template <class T>
+        auto compute_shape(std::initializer_list<T> shape) const;
 
         template <std::size_t dim>
         void adapt_index() const;
@@ -396,11 +414,89 @@ namespace xt
         return rebind_t<OR, OF>(std::move(func), shape_type(m_shape));
     }
 
+    /**
+     * Reshapes the generator and keeps old elements. The `shape` argument can have one of its value
+     * equal to `-1`, in this case the value is inferred from the number of elements in the generator
+     * and the remaining values in the `shape`.
+     * \code{.cpp}
+     * auto a = xt::arange<double>(50).reshape({-1, 10});
+     * //a.shape() is {5, 10}
+     * \endcode
+     * @param shape the new shape (has to have same number of elements as the original genrator)
+     */
     template <class F, class R, class S>
     template <class O>
-    inline auto xgenerator<F, R, S>::reshape(O&& shape) const
+    inline auto xgenerator<F, R, S>::reshape(O&& shape) const &
     {
-        return reshape_view(*this, std::forward<xt::dynamic_shape<typename shape_type::value_type>>(shape));
+        return reshape_view(*this, compute_shape(shape, std::is_signed<typename std::decay_t<O>::value_type>()));
+    }
+
+    template <class F, class R, class S>
+    template <class O>
+    inline auto xgenerator<F, R, S>::reshape(O&& shape) &&
+    {
+        return reshape_view(std::move(*this), compute_shape(shape, std::is_signed<typename std::decay_t<O>::value_type>()));
+    }
+
+    template <class F, class R, class S>
+    template <class T>
+    inline auto xgenerator<F, R, S>::reshape(std::initializer_list<T> shape) const &
+    {
+        return reshape_view(*this, compute_shape(shape));
+    }
+
+    template <class F, class R, class S>
+    template <class T>
+    inline auto xgenerator<F, R, S>::reshape(std::initializer_list<T> shape) &&
+    {
+        return reshape_view(std::move(*this), compute_shape(shape));
+    }
+
+    template <class F, class R, class S>
+    template <class O>
+    inline decltype(auto) xgenerator<F, R, S>::compute_shape(O&& shape, std::false_type) const
+    {
+        return xtl::forward_sequence<xt::dynamic_shape<typename shape_type::value_type>, O>(shape);
+    }
+
+    template <class F, class R, class S>
+    template <class O>
+    inline auto xgenerator<F, R, S>::compute_shape(O&& shape, std::true_type) const
+    {
+        using vtype = typename shape_type::value_type;
+        xt::dynamic_shape<vtype> sh(shape.size());
+        typename std::decay_t<O>::value_type accumulator(1);
+        std::size_t neg_idx = 0;
+        std::size_t i = 0;
+        for(std::size_t j = 0; j != shape.size(); ++j, ++i)
+        {
+            auto dim = shape[j];
+            if(dim < 0)
+            {
+                XTENSOR_ASSERT(dim == -1 && !neg_idx);
+                neg_idx = i;
+            }
+            else
+            {
+                sh[j] = static_cast<vtype>(dim);
+            }
+            accumulator *= dim;
+        }
+        if(accumulator < 0)
+        {
+            sh[neg_idx] = this->size() / static_cast<size_type>(std::abs(accumulator));
+        }
+        return sh;
+    }
+
+    template <class F, class R, class S>
+    template <class T>
+    inline auto xgenerator<F, R, S>::compute_shape(std::initializer_list<T> shape) const
+    {
+        using sh_type = xt::dynamic_shape<T>;
+        sh_type sh = xtl::make_sequence<sh_type>(shape.size());
+        std::copy(shape.begin(), shape.end(), sh.begin());
+        return compute_shape(std::move(sh), std::is_signed<T>());
     }
 
     template <class F, class R, class S>

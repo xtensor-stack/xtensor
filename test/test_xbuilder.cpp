@@ -91,6 +91,28 @@ namespace xt
         ASSERT_EQ(50, res(1, 49));
     }
 
+    TEST(xbuilder, arange_reshape)
+    {
+        auto rs0 = arange<double>(50).reshape({std::size_t(5), std::size_t(10)});
+        auto rs1 = arange<double>(50).reshape({-1, 10});
+
+        auto gen0 = arange<double>(50);
+        auto ls0 = gen0.reshape({std::size_t(5), std::size_t(10)});
+        auto gen1 = arange<double>(50);
+        auto ls1 = gen1.reshape({-1, 10});
+
+        decltype(ls0)::shape_type expected_shape = {5, 10};
+        EXPECT_EQ(rs0.shape(), expected_shape);
+        EXPECT_EQ(rs1.shape(), expected_shape);
+        EXPECT_EQ(ls0.shape(), expected_shape);
+        EXPECT_EQ(ls1.shape(), expected_shape);
+
+        EXPECT_EQ(rs0(4, 9), 49);
+        EXPECT_EQ(rs1(4, 9), 49);
+        EXPECT_EQ(ls0(4, 9), 49);
+        EXPECT_EQ(ls1(4, 9), 49);
+    }
+
     TEST(xbuilder, arange_min_max)
     {
         auto ls = arange<unsigned int>(10u, 20u);
