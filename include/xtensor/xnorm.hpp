@@ -50,8 +50,8 @@ namespace xt
         struct norm_of_scalar_impl<T, true>
         {
             static const bool value = true;
-            using norm_type = promote_type_t<T>;
-            using squared_norm_type = promote_type_t<T>;
+            using norm_type = xtl::promote_type_t<T>;
+            using squared_norm_type = xtl::promote_type_t<T>;
         };
 
         template <class T, bool integral = std::is_integral<T>::value,
