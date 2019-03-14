@@ -16,8 +16,8 @@ Tensor types
 
 .. note::
 
-   When nothing is mentioned, the methods described below are available for the three kinds of
-   containers, even if the examples show ``xarray`` usage only.
+   Except if mentioned otherwise, the methods described below are available for the
+   three kinds of containers, even if the examples show ``xarray`` usage only.
 
 Initialization
 --------------
