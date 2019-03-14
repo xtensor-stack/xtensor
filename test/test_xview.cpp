@@ -1392,4 +1392,16 @@ namespace xt
 
         EXPECT_EQ(b, exp);
     }
+
+    TEST(xview, strides_compute_out_of_bounds)
+    {
+        // check that the compute_strides_impl does not access `a` strides out
+        // of bound! Can be observed with Valgrind or MSVC debug
+        xt::xtensor<double, 1> a = {1};
+        auto v1 = xt::view(a, xt::all(), xt::newaxis());
+        EXPECT_EQ(v1.dimension(), 2ul);
+        EXPECT_EQ(v1.strides().size(), 2ul);
+        EXPECT_EQ(v1.strides()[0], 0);
+        EXPECT_EQ(v1.strides()[1], 0);
+    }
 }

@@ -1471,8 +1471,11 @@ namespace xt
     template <std::size_t... I>
     inline auto xview<CT, S...>::compute_strides_impl(std::index_sequence<I...>) const noexcept
     {
+        std::size_t original_dim = m_e.dimension();
         return std::array<std::ptrdiff_t, sizeof...(I)>({
-            (static_cast<std::ptrdiff_t>(xt::step_size(std::get<integral_skip<S...>(I)>(m_slices), 1)) * m_e.strides()[integral_skip<S...>(I) - newaxis_count_before<S...>(integral_skip<S...>(I))])...
+            (static_cast<std::ptrdiff_t>(xt::step_size(std::get<integral_skip<S...>(I)>(m_slices), 1)) *
+                ((integral_skip<S...>(I) - newaxis_count_before<S...>(integral_skip<S...>(I))) < original_dim ?
+                m_e.strides()[integral_skip<S...>(I) - newaxis_count_before<S...>(integral_skip<S...>(I))] : 1))...
         });
     }
 
