@@ -9,10 +9,12 @@
 Concepts
 ========
 
-`xtensor`'s core is built upon key concepts captured in interfaces that are put together in
-derived classes through CRTP and multiple inheritance. Interfaces and classes that model
-expressions implement *value semantic*. CRTP and value semantic achieve static polymorphism and
-avoids performance overhead of virtual methods and dynamic dispatching.
+`xtensor`'s core is built upon key concepts captured in interfaces that are put together in derived
+classes through CRTP (`Curiously Recurring Template Pattern
+<https://en.wikipedia.org/wiki/Curiously_recurring_template_pattern>`_) and multiple inheritance.
+Interfaces and classes that model expressions implement *value semantic*. CRTP and value semantic
+achieve static polymorphism and avoid performance overhead of virtual methods and dynamic
+dispatching.
 
 xexpression
 ~~~~~~~~~~~
@@ -38,8 +40,8 @@ class whose template parameter is ``A`` and should forward this parameter to ``x
     };
 
 ``xexpression`` only provides three overloads of a same function, that cast an ``xexpression``
-object to the most inheriting type, depending on the nature of the object (lvalue,
-const lvalue or rvalue):
+object to the most inheriting type, depending on the nature of the object (*lvalue*,
+*const lvalue* or *rvalue*):
 
 .. code::
 
@@ -57,8 +59,14 @@ in ``xtensor/xiterable.hpp``. ``xconst_iterable`` provides types and methods for
 constant expressions, similar to the ones provided by the STL containers. Unlike the STL, the
 methods of ``xconst_iterable`` and ``xiterable`` are templated by a layout parameter that allows
 you to iterate over a N-dimensional expression in row-major order or column-major order.
-Row-major layout means that elements that only differ by their last index are contiguous in memory.
-Column-major layout means that elements that only differ by their first index are contiguous in memory.
+
+.. note::
+
+    Row-major layout means that elements that only differ by their last index are contiguous in
+    memory. Column-major layout means that elements that only differ by their first index are
+    contiguous in memory.
+
+    .. image:: iteration.svg
 
 .. code::
 
@@ -79,8 +87,6 @@ Column-major layout means that elements that only differ by their first index ar
     const_reverse_iterator crbegin() const noexcept;
     template <class L>
     const_reverse_iterator crend() const noexcept;
-
-.. image:: iteration.svg
 
 This template parameter is defaulted to ``XTENSOR_DEFAULT_TRAVERSAL`` (see :ref:`configuration-label`), so
 that `xtensor` expressions can be used in generic code such as:
@@ -154,7 +160,7 @@ The first overload is meant for computed assignment involving a scalar; it allow
 We rely on SFINAE to remove this overload from the overload resolution set when the parameter that we want
 to assign is not a scalar, avoiding ambiguity.
 
-Operator-based method taking a general ``xexpression`` parameter don't perform a direct assignment. Instead,
+Operator-based methods taking a general ``xexpression`` parameter don't perform a direct assignment. Instead,
 the result is assigned to a temporary variable first, in order to prevent issues with aliasing. Thus, if ``a``
 and ``b`` are expressions, the following
 

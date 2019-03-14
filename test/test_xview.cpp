@@ -1354,7 +1354,7 @@ namespace xt
                                   {5, 6, 7, 8},
                                   {9, 10, 11, 12},
                                   {13, 14, 15, 16} };
-        
+
         auto v = xt::view(xt::view(a, xt::all(), xt::keep(0, 1)), xt::all(), 0);
         xt::xtensor<int, 1> res = v;
 
@@ -1391,6 +1391,17 @@ namespace xt
                                   {-0.015625, -0.125   ,  0.015625}};
 
         EXPECT_EQ(b, exp);
+    }
+
+    TEST(xview, periodic)
+    {
+        xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};
+        xt::xtensor<size_t,2> b = {{0,1,2}, {30,40,50}};
+        auto view = xt::view(a, xt::keep(1), xt::all());
+        view.periodic(-1,3) = 30;
+        view.periodic(-1,4) = 40;
+        view.periodic(-1,5) = 50;
+        EXPECT_EQ(a, b);
     }
 
     TEST(xview, strides_compute_out_of_bounds)

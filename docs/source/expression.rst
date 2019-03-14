@@ -27,12 +27,12 @@ more complex expressions:
     auto f2 = w + 2 * cos(f);
 
 The expression engine avoids the evaluation of intermediate results and their storage in temporary arrays, so you can achieve the same performance as if you had written
-a simple loop. Assuming ``x``, ``y`` and ``z`` are one-dimensional arrays of length ``n``, 
+a simple loop. Assuming ``x``, ``y`` and ``z`` are one-dimensional arrays of length ``n``,
 
 .. code::
 
     xt::xarray<double> res = x + y * sin(z)
-   
+
 will produce quite the same assembly as the following loop:
 
 .. code::
@@ -72,7 +72,7 @@ Forcing evaluation
 ------------------
 
 If you have to force the evaluation of an xexpression for some reason (for example, you want to have all results in memory to perform a sort or use external BLAS functions) then you can use ``xt::eval`` on an xexpression.
-Evaluating will either return an rvalue to a newly allocated container in the case of a xexpression, or a reference to a container in case you are evaluating a ``xarray`` or ``xtensor``. Note that, in order to avoid copies, you should use an universal reference on the lefthand side (``auto&&``). For example:
+Evaluating will either return a *rvalue* to a newly allocated container in the case of an xexpression, or a reference to a container in case you are evaluating a ``xarray`` or ``xtensor``. Note that, in order to avoid copies, you should use a universal reference on the lefthand side (``auto&&``). For example:
 
 .. code::
 
@@ -91,7 +91,7 @@ specifying the size of each dimension. We can operate on expressions of differen
 similar to those of Numpy_ and libdynd_.
 
 In an operation involving two arrays of different dimensions, the array with the lesser dimensions is broadcast across the leading dimensions of the other.
-For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, the result of a broadcasted operation with ``A`` and ``B`` has shape ``(4, 2, 3)``.
+For example, if ``A`` has shape ``(2, 3)``, and ``B`` has shape ``(4, 2, 3)``, the result of a broadcast operation with ``A`` and ``B`` has shape ``(4, 2, 3)``.
 
 .. code::
 
@@ -127,7 +127,7 @@ All ``xexpression`` s in `xtensor` provide at least the following interface:
 Shape
 ~~~~~
 
-- ``dimension()`` returns the number of dimension of the expression.
+- ``dimension()`` returns the number of dimensions of the expression.
 - ``shape()`` returns the shape of the expression.
 
 .. code::
@@ -147,10 +147,11 @@ Shape
 Element access
 ~~~~~~~~~~~~~~
 
-- ``operator()`` is an access operator which can take multiple integral arguments or none.
+- ``operator()`` is an access operator that can take multiple integral arguments or none.
 - ``at()`` is similar to ``operator()`` but checks that its number of arguments does not exceed the number of dimensions, and performs bounds checking. This should not be used where you expect ``operator()`` to perform broadcasting.
 - ``operator[]`` has two overloads: one that takes a single integral argument and is equivalent to the call of ``operator()`` with one argument, and one with a single multi-index argument, which can be of a size determined at runtime. This operator also supports braced initializer arguments.
 - ``element()`` is an access operator which takes a pair of iterators on a container of indices.
+- ``periodic()`` is the equivalent of ``operator()`` that can deal with periodic indices (for example ``-1`` for the last item along an axis).
 
 .. code::
 

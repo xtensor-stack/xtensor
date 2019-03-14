@@ -86,6 +86,13 @@ namespace xt
     template <layout_type L>
     struct check_strides_overlap;
 
+    /********************************
+     * apply periodicity to indices *
+     *******************************/
+
+    template <class S, class... Args>
+    void normalize_periodic(const S& shape, Args&... args);
+
     /********************************************
      * utility functions for strided containers *
      ********************************************/
@@ -495,7 +502,7 @@ namespace xt
             {
                 output[output_index - 1] = static_cast<value_type>(input[input_index - 1]);
             }
-            // Second case: output has been initialized to 1. Broacast is trivial
+            // Second case: output has been initialized to 1. Broadcast is trivial
             // only if input is 1 to.
             else if (output[output_index - 1] == 1)
             {
@@ -565,7 +572,7 @@ namespace xt
             size_type index = 0;
 
             // This check is necessary as column major "broadcasting" is still
-            // peformed in a row major fashion
+            // performed in a row major fashion
             if (s1.size() != s2.size())
                 return 0;
 
@@ -581,6 +588,36 @@ namespace xt
             return index;
         }
     };
+
+    namespace detail
+    {
+        template <class S, std::size_t dim>
+        inline void normalize_periodic_impl(const S&)
+        {
+        }
+
+        template <class S, std::size_t dim, class T, class... Args>
+        inline void normalize_periodic_impl(const S& shape, T& arg, Args&... args)
+        {
+            if (sizeof...(Args) + 1 > shape.size())
+            {
+                normalize_periodic_impl<S, dim>(shape, args...);
+            }
+            else
+            {
+                T n = static_cast<T>(shape[dim]);
+                arg = (n + (arg%n)) % n;
+                normalize_periodic_impl<S, dim + 1>(shape, args...);
+            }
+        }
+    }
+
+    template <class S, class... Args>
+    void normalize_periodic(const S& shape, Args&... args)
+    {
+        check_dimension(shape, args...);
+        detail::normalize_periodic_impl<S, 0>(shape, args...);
+    }
 }
 
 #endif

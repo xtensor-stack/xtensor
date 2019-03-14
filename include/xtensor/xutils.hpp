@@ -92,7 +92,7 @@ namespace xt
     template <class... T>
     using void_t = typename make_void<T...>::type;
 
-    // This is used for non existant types (e.g. storage for some expressions
+    // This is used for non existent types (e.g. storage for some expressions
     // like generators)
     struct invalid_type
     {
@@ -189,7 +189,7 @@ namespace xt
     }
 
     template <class F, class... T>
-    inline void for_each(F&& f, const std::tuple<T...>& t) 
+    inline void for_each(F&& f, const std::tuple<T...>& t)
         noexcept(noexcept(detail::for_each_impl<0, F, T...>(std::forward<F>(f), t)))
     {
         detail::for_each_impl<0, F, T...>(std::forward<F>(f), t);

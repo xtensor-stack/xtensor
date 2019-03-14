@@ -139,6 +139,12 @@ namespace xt
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
+        template <class... Args>
+        reference periodic(Args... args);
+
+        template <class... Args>
+        const_reference periodic(Args... args) const;
+
         template <class S>
         disable_integral_t<S, reference> operator[](const S& index);
         template <class I>
@@ -544,6 +550,40 @@ namespace xt
     {
         size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
         return storage()[index];
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the container,
+     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
+     * @param args a list of indices specifying the position in the container. Indices
+     * must be integers, the number of indices should be equal to the number of dimensions
+     * of the container.
+     * @exception std::out_of_range if the number of argument is greater than the
+     * number of dimensions
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::periodic(Args... args) -> reference
+    {
+        normalize_periodic(shape(), args...);
+        return this->operator()(static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the container,
+     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
+     * @param args a list of indices specifying the position in the container. Indices
+     * must be integers, the number of indices should be equal to the number of dimensions
+     * of the container.
+     * @exception std::out_of_range if the number of argument is greater than the
+     * number of dimensions
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xcontainer<D>::periodic(Args... args) const -> const_reference
+    {
+        normalize_periodic(shape(), args...);
+        return this->operator()(static_cast<size_type>(args)...);
     }
 
     /**
@@ -1107,7 +1147,7 @@ namespace xt
         {
             throw std::runtime_error("Negative axis size cannot be inferred. Shape mismatch.");
         }
-        std::decay_t<S> shape = _shape; 
+        std::decay_t<S> shape = _shape;
         value_type accumulator = 1;
         std::size_t neg_idx = 0;
         std::size_t i = 0;

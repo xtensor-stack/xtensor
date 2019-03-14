@@ -237,6 +237,28 @@ namespace xt
         }
     }
 
+    TEST(xfunction, periodic)
+    {
+        xfunction_features f;
+        size_t i = f.m_a.shape()[0];
+        size_t j = f.m_a.shape()[1];
+        size_t k = f.m_a.shape()[2];
+
+        {
+            SCOPED_TRACE("same shape");
+            int a = (f.m_a + f.m_a)(0, 0, 0);
+            int b = (f.m_a + f.m_a).periodic(i, j, k);
+            EXPECT_EQ(a, b);
+        }
+
+        {
+            SCOPED_TRACE("different shape");
+            int a = (f.m_a + f.m_b)(0, 0, 0);
+            int b = (f.m_a + f.m_b).periodic(i, j, k);
+            EXPECT_EQ(a, b);
+        }
+    }
+
     TEST(xfunction, indexed_access)
     {
         xfunction_features f;

@@ -96,7 +96,7 @@ namespace xt
         {
         };
 
-        // This meta struct checks wether SIMD should be activated for our 
+        // This meta struct checks wether SIMD should be activated for our
         // functor "F"
         template <class V, class F, class... CT>
         struct xsimd_meta_getter
@@ -110,7 +110,7 @@ namespace xt
             using simd_value_type = xtl::mpl::eval_if_t<simd_arguments_exist,
                                                         meta_identity<xsimd::simd_type<scalar_result_type>>,
                                                         make_invalid_type<>>;
-            // if all types are supported, check that the functor has a working 
+            // if all types are supported, check that the functor has a working
             // simd_apply and all arguments have the simd interface
             using use_xsimd = xtl::conjunction<simd_arguments_exist,
                                                has_simd_apply<F, scalar_result_type>,
@@ -121,7 +121,7 @@ namespace xt
     /************************
      * xfunction extensions *
      ************************/
-    
+
     namespace extension
     {
 
@@ -272,6 +272,9 @@ namespace xt
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
+
+        template <class... Args>
+        const_reference periodic(Args... args) const;
 
         template <class S>
         disable_integral_t<S, const_reference> operator[](const S& index) const;
@@ -637,7 +640,7 @@ namespace xt
      *
      * @warning This method is meant for performance, for expressions with a dynamic
      * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be prefered whenever
+     * undefined behavior (see parameters), operator() should be preferred whenever
      * it is possible.
      * @warning This method is NOT compatible with broadcasting, meaning the following
      * code has undefined behavior:
@@ -645,7 +648,7 @@ namespace xt
      * xt::xarray<double> a = {{0, 1}, {2, 3}};
      * xt::xarray<double> b = {0, 1};
      * auto fd = a + b;
-     * double res = fd.uncheked(0, 1);
+     * double res = fd.unchecked(0, 1);
      * \endcode
      */
     template <class F, class... CT>
@@ -655,6 +658,34 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return unchecked_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression,
+     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
+     * @param args a list of indices specifying the position in the expression. Indices
+     * must be integers, the number of indices must be equal to the number of
+     * dimensions of the expression, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be preferred whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.periodic(0, 1);
+     * \endcode
+     */
+    template <class F, class... CT>
+    template <class... Args>
+    inline auto xfunction<F, CT...>::periodic(Args... args) const -> const_reference
+    {
+        normalize_periodic(shape(), args...);
+        return this->operator()(static_cast<size_type>(args)...);
     }
 
     template <class F, class... CT>
