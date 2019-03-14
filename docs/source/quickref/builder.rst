@@ -72,19 +72,19 @@ filled with the specified value:
 
     xt::xarray<double> a0 = {{1., 2., 3.}, {4., 5., 6.}};
     auto b0 = xt::full_like(a0, 2.);
-    std:cout << b0 << std::endl;
+    std::cout << b0 << std::endl;
     // Outputs {{3., 3., 3.}, {3., 3., 3.}}
     // b0 is an xt::xarray<double>
 
     xt::xtensor<double, 2> a1 = {{1., 2., 3.}, {4., 5., 6.}};
     auto b1 = xt::full_like(a1, 2.);
-    std:cout << b1 << std::endl;
+    std::cout << b1 << std::endl;
     // Outputs {{3., 3., 3.}, {3., 3., 3.}}
     // b1 is an xt::xtensor<double, 2>
 
     xt::xtensor_fixed<double, xt::xshape<2, 3>> a2 = {{1., 2., 3.}, {4., 5., 6.}};
     auto b2 = xt::full_like(a2, 2.);
-    std:cout << b2 << std::endl;
+    std::cout << b2 << std::endl;
     // Outputs {{3., 3., 3.}, {3., 3., 3.}}
     // b2 is an xt::xtensor_fixed<double, xt::xshape<2, 3>>
 

@@ -76,6 +76,7 @@ for details.
 
    quickref/basic
    quickref/builder
+   quickref/operator
 
 .. toctree::
    :caption: API REFERENCE
