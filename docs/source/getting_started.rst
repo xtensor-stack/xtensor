@@ -83,6 +83,18 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
     find_package(xtensor REQUIRED)
 
     add_executable(first_example src/example.cpp)
+    
+    if(MSVC)
+        target_compile_options(first_example PRIVATE /EHsc /MP /bigobj)
+        set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+    endif()
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
+        CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
+        (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
+        target_compile_options(first_example PRIVATE -march=native -std=c++14)
+    endif()
+
     target_link_libraries(first_example xtensor)
 
 `cmake` has to know where to find the headers, this is done through the ``CMAKE_INSTALL_PREFIX``
