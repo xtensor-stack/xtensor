@@ -71,6 +71,13 @@ for details.
    file_loading
 
 .. toctree::
+   :caption: QUICK REFERENCE
+   :maxdepth: 2
+
+   quickref/basic
+   quickref/builder
+
+.. toctree::
    :caption: API REFERENCE
    :maxdepth: 2
 
