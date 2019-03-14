@@ -4,8 +4,8 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
-xtensor basics
-==============
+Basics
+======
 
 Tensor types
 ------------
@@ -16,8 +16,8 @@ Tensor types
 
 .. note::
 
-When nothing is mentioned, the methods described below are available for the three kinds of
-containers, even if the examples show ``xarray`` usage only.
+   When nothing is mentioned, the methods described below are available for the three kinds of
+   containers, even if the examples show ``xarray`` usage only.
 
 Initialization
 --------------
