@@ -79,6 +79,7 @@ for details.
    quickref/operator
    quickref/math
    quickref/reducer
+   quickref/view
 
 .. toctree::
    :caption: API REFERENCE
