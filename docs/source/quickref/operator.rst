@@ -8,7 +8,7 @@ Operators
 =========
 
 Operations and functions of ``xtensor`` are not evaluated until they are assigned.
-In the following, ``e1``, ``e2`` and ``e3`` can be arbitrary expressions.
+In the following, ``e1``, ``e2`` and ``e3`` can be arbitrary tensor expressions.
 
 Arithmetic operators
 --------------------
@@ -76,5 +76,3 @@ comparison and return a boolean:
     bool res0 = e1 == e2; // true if all elements in e1 equal those in e2
     bool res1 = e1 != e2;
 
-Basic functions
----------------
