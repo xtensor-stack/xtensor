@@ -152,6 +152,7 @@ Element access
 - ``operator[]`` has two overloads: one that takes a single integral argument and is equivalent to the call of ``operator()`` with one argument, and one with a single multi-index argument, which can be of a size determined at runtime. This operator also supports braced initializer arguments.
 - ``element()`` is an access operator which takes a pair of iterators on a container of indices.
 - ``periodic()`` is the equivalent of ``operator()`` that can deal with periodic indices (for example ``-1`` for the last item along an axis).
+- ``in_bounds()`` returns a ``bool`` that is ``true`` only if indices are valid for the array.
 
 .. code::
 
