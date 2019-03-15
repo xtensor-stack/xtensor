@@ -448,6 +448,8 @@ namespace xt
         const_reference unchecked(Args... args) const;
         template <class... Args>
         const_reference periodic(Args... args) const;
+        template <class... Args>
+        bool in_bounds(Args... args) const;
         template <class OS>
         disable_integral_t<OS, const_reference> operator[](const OS& index) const;
         template <class I>
@@ -1177,6 +1179,18 @@ namespace xt
     {
         normalize_periodic(shape(), args...);
         return this->operator()(static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns ``true`` only if the the specified position is a valid entry in the container.
+     * @param args a list of indices specifying the position in the view.
+     * @return bool
+     */
+    template <class CT, class... S>
+    template <class... Args>
+    inline bool xview<CT, S...>::in_bounds(Args... args) const
+    {
+        return check_in_bounds(shape(), args...);
     }
 
     /**

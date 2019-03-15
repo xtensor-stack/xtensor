@@ -259,6 +259,26 @@ namespace xt
         }
     }
 
+    TEST(xfunction, in_bounds)
+    {
+        xfunction_features f;
+        size_t i = f.m_a.shape()[0];
+        size_t j = f.m_a.shape()[1];
+        size_t k = f.m_a.shape()[2];
+
+        {
+            SCOPED_TRACE("same shape");
+            EXPECT_TRUE((f.m_a + f.m_a).in_bounds(0, 0, 0) == true);
+            EXPECT_TRUE((f.m_a + f.m_a).in_bounds(i, j, k) == false);
+        }
+
+        {
+            SCOPED_TRACE("different shape");
+            EXPECT_TRUE((f.m_a + f.m_b).in_bounds(0, 0, 0) == true);
+            EXPECT_TRUE((f.m_a + f.m_b).in_bounds(i, j, k) == false);
+        }
+    }
+
     TEST(xfunction, indexed_access)
     {
         xfunction_features f;

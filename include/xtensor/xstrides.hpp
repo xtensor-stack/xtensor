@@ -86,6 +86,13 @@ namespace xt
     template <layout_type L>
     struct check_strides_overlap;
 
+    /**********************************
+     * check bounds, without throwing *
+     **********************************/
+
+    template <class S, class... Args>
+    bool in_bounds(const S& shape, Args&... args);
+
     /********************************
      * apply periodicity to indices *
      *******************************/
@@ -592,6 +599,44 @@ namespace xt
     namespace detail
     {
         template <class S, std::size_t dim>
+        inline void check_in_bounds_impl(bool&, const S&)
+        {
+        }
+
+        template <class S, std::size_t dim, class T, class... Args>
+        inline void check_in_bounds_impl(bool& res, const S& shape, T& arg, Args&... args)
+        {
+            if (sizeof...(Args) + 1 > shape.size())
+            {
+                check_in_bounds_impl<S, dim>(res, shape, args...);
+            }
+            else
+            {
+                T n = static_cast<T>(shape[dim]);
+                if (arg < 0 || arg >= n)
+                {
+                    res = false;
+                }
+                check_in_bounds_impl<S, dim + 1>(res, shape, args...);
+            }
+        }
+    }
+
+    template <class S, class... Args>
+    inline bool check_in_bounds(const S& shape, Args&... args)
+    {
+        if (sizeof...(Args) > shape.size())
+        {
+            return false;
+        }
+        bool res = true;
+        detail::check_in_bounds_impl<S, 0>(res, shape, args...);
+        return res;
+    }
+
+    namespace detail
+    {
+        template <class S, std::size_t dim>
         inline void normalize_periodic_impl(const S&)
         {
         }
@@ -613,7 +658,7 @@ namespace xt
     }
 
     template <class S, class... Args>
-    void normalize_periodic(const S& shape, Args&... args)
+    inline void normalize_periodic(const S& shape, Args&... args)
     {
         check_dimension(shape, args...);
         detail::normalize_periodic_impl<S, 0>(shape, args...);

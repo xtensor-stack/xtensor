@@ -304,4 +304,11 @@ namespace xt
         a.periodic(-1,5) = 50;
         EXPECT_EQ(a, b);
     }
+
+    TEST(xarray, in_bounds)
+    {
+        xt::xarray<size_t> a = {{0,1,2}, {3,4,5}};
+        EXPECT_TRUE(a.in_bounds(0,0) == true);
+        EXPECT_TRUE(a.in_bounds(2,0) == false);
+    }
 }
