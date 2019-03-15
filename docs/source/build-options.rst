@@ -4,63 +4,24 @@
 
    The full license is in the file LICENSE, distributed with this software.
 
+.. _build-configuration:
+
 Build and configuration
 =======================
-
-Build
------
-
-``xtensor`` build supports the following options:
-
-- ``BUILD_TESTS``: enables the ``xtest`` and ``xbenchmark`` targets (see below).
-- ``DOWNLOAD_GTEST``: downloads ``gtest`` and builds it locally instead of using a binary installation.
-- ``GTEST_SRC_DIR``: indicates where to find the ``gtest`` sources instead of downloading them.
-- ``XTENSOR_ENABLE_ASSERT``: activates the assertions in ``xtensor``.
-- ``XTENSOR_CHECK_DIMENSION``: turns on ``XTENSOR_ENABLE_ASSERT`` and activates dimension checks in ``xtensor``.
-  Note that the dimensions check should not be activated if you expect ``operator()`` to perform broadcasting.
-- ``XTENSOR_USE_XSIMD``: enables simd acceleration in ``xtensor``. This requires that you have xsimd_ installed
-  on your system.
-
-All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or
-setting ``GTEST_SRC_DIR`` enables ``BUILD_TESTS``.
-
-If the ``BUILD_TESTS`` option is enabled, the following targets are available:
-
-- xtest: builds an run the test suite.
-- xbenchmark: builds and runs the benchmarks.
-
-For instance, building the test suite of ``xtensor`` with assertions enabled:
-
-.. code::
-
-    mkdir build
-    cd build
-    cmake -DBUILD_TESTS=ON -DXTENSOR_ENABLE_ASSERT=ON ../
-    make xtest
-
-Building the test suite of ``xtensor`` where the sources of ``gtest`` are
-located in e.g. ``/usr/share/gtest``:
-
-.. code::
-
-    mkdir build
-    cd build
-    cmake -DGTEST_SRC_DIR=/usr/share/gtest ../
-    make xtest
-
-.. _configuration-label:
 
 Configuration
 -------------
 
-``xtensor`` can be configured via macros, which must be defined *before*
-including any of its header. Here is a list of available macros:
+``xtensor`` can be configured via macros which must be defined *before* including
+any of its header. This can be achieved the following ways:
 
-- ``XTENSOR_ENABLE_ASSERT``: enables assertions in xtensor, such as bound check.
-- ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
-  on if you expect ``operator()`` to perform broadcasting.
-- ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in ``xtensor``. This requires that you have xsimd_ installed
-  on your system.
+- either define them in the CMakeLists of your project, with ``target_compile_definitions``
+  cmake command.
+- or create a header where you define all the macros you want and then include the headers you
+  need. Then include thi sheader whenever you need ``xtensor`` in your project.
+
+The following macros are already defined in ``xtensor`` but can be overwritten:
+
 - ``XTENSOR_DEFAULT_DATA_CONTAINER(T, A)``: defines the type used as the default data container for tensors and arrays. ``T``
   is the ``value_type`` of the container and ``A`` its ``allocator_type``.
 - ``XTENSOR_DEFAULT_SHAPE_CONTAINER(T, EA, SA)``: defines the type used as the default shape container for tensors and arrays.
@@ -69,6 +30,61 @@ including any of its header. Here is a list of available macros:
 - ``XTENSOR_DEFAULT_LAYOUT``: defines the default layout (row_major, column_major, dynamic) for tensors and arrays. We *strongly*
   discourage using this macro, which is provided for testing purpose. Prefer defining alias types on tensor and array
   containers instead.
-- ``XTENSOR_DEFAULT_TRAVERSAL``: defines the default traversal order (row_major, column_major) for algorithms and iterators on tensors and arrays. We *strongly* discourage using this macro, which is provided for testing purpose.
+- ``XTENSOR_DEFAULT_TRAVERSAL``: defines the default traversal order (row_major, column_major) for algorithms and iterators on tensors
+  and arrays. We *strongly* discourage using this macro, which is provided for testing purpose.
+
+The following macros are helpers for debugging, they are not defined by default:
+
+- ``XTENSOR_ENABLE_ASSERT``: enables assertions in xtensor, such as bound check.
+- ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
+  on if you expect ``operator()`` to perform broadcasting.
+
+The last gorup of macros is for using external libraries to achieve maximum performance (see next section for additional
+requirements):
+
+- ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in ``xtensor``. This requires that you have xsimd_ installed
+  on your system.
+- ``XTENOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
+  on your system.
+
+Build and optimization
+----------------------
+
+Windows
+~~~~~~~
+
+Windows users must activate the ``/bigobj`` flag, otherwise it's almost certain that the compilation fails. More generally,
+the following options are recommended:
+
+.. code:: cmake
+
+    target_compile_options(target_name PRIVATE /EHsc /MP /bigobj)
+    set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+
+If you defined ``XTENSOR_USE_XSIMD``, you must also specify which instruction set you target:
+
+.. code:: cmake
+
+    target_compile_options(target_name PRIVATE /arch:AVX2)
+    # OR
+    target_compile_options(target_name PRIVATE /arch:AVX)
+    # OR
+    target_compile_options(target_name PRIVATE /arch:ARMv7VE)
+
+If you build on an old system that do not support ny of these instruction set, you don't have to specify
+anything, the system will do its best to enable the most recent supported instruction set.
+
+Linux/OSX
+~~~~~~~~~
+
+Whether you enabled ``XTENSOR_USE_XSIMD`` or not, it is highly recommended to build with ``-march=native`` option:
+
+.. code:: cmake
+
+    target_compile_options(target_name PRIVATE -march=native)
+
+Notice that this option prevents building on a machine and distributing the resulting binary on another machine with
+a different architecture (i.e. not supporting the same instruction set).
 
 .. _xsimd: https://github.com/QuantStack/xsimd
+.. _tbb: https://www.threadingbuildingblocks.org

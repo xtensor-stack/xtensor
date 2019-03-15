@@ -159,7 +159,7 @@ The same operators are used for writing values:
     a(2)      = 8.;
     a[{0, 2}] = 8.;
 
-The ``at`` method is an access operator wiht bound checking:
+The ``at`` method is an access operator with bound checking:
 
 .. code::
 

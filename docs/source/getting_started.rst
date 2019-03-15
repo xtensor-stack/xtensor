@@ -113,6 +113,8 @@ the first example with cmake and then runs the program:
     make
     ./first_program
 
+See :ref:`build-configuration` for more details about the build options.
+
 Second example: reshape
 -----------------------
 
