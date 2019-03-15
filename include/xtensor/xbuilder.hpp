@@ -402,7 +402,7 @@ namespace xt
     inline auto linspace(T start, T stop, std::size_t num_samples = 50, bool endpoint = true) noexcept
     {
         using fp_type = std::common_type_t<T, double>;
-        fp_type step = fp_type(stop - start) / fp_type(num_samples - (endpoint ? 1 : 0));
+        fp_type step = fp_type(stop - start) / std::fmax(fp_type(1), fp_type(num_samples - (endpoint ? 1 : 0)));
         return cast<T>(detail::make_xgenerator(detail::arange_generator<fp_type>(fp_type(start), fp_type(stop), step), {num_samples}));
     }
 

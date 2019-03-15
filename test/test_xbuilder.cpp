@@ -187,6 +187,25 @@ namespace xt
         ASSERT_EQ(m_assigned(3), at_3);
     }
 
+    TEST(xbuilder, linspace_1_point)
+    {
+        xt::xarray<double> a = linspace<double>(0., 0., 1, false);
+        decltype(a)::shape_type expected_shape = {1};
+        EXPECT_EQ(a.dimension(), size_t(1));
+        EXPECT_EQ(a.shape(), expected_shape);
+        EXPECT_EQ(0., a(0));
+
+        xt::xarray<double> b = linspace<double>(0., 0., 1, true);
+        EXPECT_EQ(b.dimension(), size_t(1));
+        EXPECT_EQ(b.shape(), expected_shape);
+        EXPECT_EQ(0., b(0));
+
+        xt::xarray<double> c = linspace<double>(0., 2., 1, true);
+        EXPECT_EQ(c.dimension(), size_t(1));
+        EXPECT_EQ(c.shape(), expected_shape);
+        EXPECT_EQ(0., b(0));
+    }
+
     TEST(xbuilder, linspace_n_samples_endpoint)
     {
         auto ls = linspace<float>(20.f, 50.f, 100, false);
