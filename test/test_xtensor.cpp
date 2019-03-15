@@ -315,4 +315,14 @@ namespace xt
         EXPECT_TRUE(idx==jdx);
     }
 
+    TEST(xtensor, periodic)
+    {
+        xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};
+        xt::xtensor<size_t,2> b = {{0,1,2}, {30,40,50}};
+        a.periodic(-1,3) = 30;
+        a.periodic(-1,4) = 40;
+        a.periodic(-1,5) = 50;
+        EXPECT_EQ(a, b);
+    }
+
 }

@@ -93,6 +93,12 @@ namespace xt
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
+        template <class... Args>
+        reference periodic(Args... args);
+
+        template <class... Args>
+        const_reference periodic(Args... args) const;
+
         template <class OS>
         disable_integral_t<OS, reference> operator[](const OS& index);
         template <class I>
@@ -518,7 +524,7 @@ namespace xt
      *
      * @warning This method is meant for performance, for expressions with a dynamic
      * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be prefered whenever
+     * undefined behavior (see parameters), operator() should be preferred whenever
      * it is possible.
      * @warning This method is NOT compatible with broadcasting, meaning the following
      * code has undefined behavior:
@@ -545,7 +551,7 @@ namespace xt
      *
      * @warning This method is meant for performance, for expressions with a dynamic
      * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be prefered whenever
+     * undefined behavior (see parameters), operator() should be preferred whenever
      * it is possible.
      * @warning This method is NOT compatible with broadcasting, meaning the following
      * code has undefined behavior:
@@ -562,6 +568,62 @@ namespace xt
     {
         offset_type index = compute_unchecked_index(args...);
         return m_storage[static_cast<size_type>(index)];
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the view,
+     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
+     * @param args a list of indices specifying the position in the view. Indices
+     * must be integers, the number of indices must be equal to the number of
+     * dimensions of the view, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be preferred whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class CT, class S, layout_type L, class FST>
+    template <class... Args>
+    inline auto xstrided_view_base<CT, S, L, FST>::periodic(Args... args) -> reference
+    {
+        normalize_periodic(shape(), args...);
+        return this->operator()(static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the view,
+     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
+     * @param args a list of indices specifying the position in the view. Indices
+     * must be integers, the number of indices must be equal to the number of
+     * dimensions of the view, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be preferred whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class CT, class S, layout_type L, class FST>
+    template <class... Args>
+    inline auto xstrided_view_base<CT, S, L, FST>::periodic(Args... args) const -> const_reference
+    {
+        normalize_periodic(shape(), args...);
+        return this->operator()(static_cast<size_type>(args)...);
     }
 
     /**

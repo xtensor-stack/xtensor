@@ -294,4 +294,14 @@ namespace xt
         EXPECT_TRUE(std::equal(a.backstrides().begin(), a.backstrides().end(), c.backstrides().begin()) && a.backstrides().size() == c.backstrides().size());
         EXPECT_EQ(a.layout(), c.layout());
     }
+
+    TEST(xarray, periodic)
+    {
+        xt::xarray<size_t> a = {{0,1,2}, {3,4,5}};
+        xt::xarray<size_t> b = {{0,1,2}, {30,40,50}};
+        a.periodic(-1,3) = 30;
+        a.periodic(-1,4) = 40;
+        a.periodic(-1,5) = 50;
+        EXPECT_EQ(a, b);
+    }
 }

@@ -376,7 +376,7 @@ namespace xt
         : base_type()
     {
         XTENSOR_ASSERT_MSG(N == e.derived_cast().dimension(), "Cannot change dimension of xtensor.");
-        // Avoids unintialized data because of (m_shape == shape) condition
+        // Avoids uninitialized data because of (m_shape == shape) condition
         // in resize (called by assign), which is always true when dimension() == 0.
         if (e.derived_cast().dimension() == 0)
         {
