@@ -69,6 +69,7 @@ for details.
    builder
    missing
    file_loading
+   build-options
 
 .. toctree::
    :caption: QUICK REFERENCE
@@ -96,7 +97,7 @@ for details.
    :maxdepth: 2
 
    compilers
-   build-options
+   dev-build-options
    developer/xtensor_internals
    external-structures
    releasing
