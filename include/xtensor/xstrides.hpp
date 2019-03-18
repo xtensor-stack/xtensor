@@ -86,6 +86,13 @@ namespace xt
     template <layout_type L>
     struct check_strides_overlap;
 
+    /**********************************
+     * check bounds, without throwing *
+     **********************************/
+
+    template <class S, class... Args>
+    bool in_bounds(const S& shape, Args&... args);
+
     /********************************
      * apply periodicity to indices *
      *******************************/
@@ -592,6 +599,34 @@ namespace xt
     namespace detail
     {
         template <class S, std::size_t dim>
+        inline bool check_in_bounds_impl(const S&)
+        {
+            return true;
+        }
+
+        template <class S, std::size_t dim, class T, class... Args>
+        inline bool check_in_bounds_impl(const S& shape, T& arg, Args&... args)
+        {
+            if (sizeof...(Args) + 1 > shape.size())
+            {
+                return check_in_bounds_impl<S, dim>(shape, args...);
+            }
+            else
+            {
+                return arg >= T(0) && arg < static_cast<T>(shape[dim]) && check_in_bounds_impl<S, dim + 1>(shape, args...);
+            }
+        }
+    }
+
+    template <class S, class... Args>
+    inline bool check_in_bounds(const S& shape, Args&... args)
+    {
+        return detail::check_in_bounds_impl<S, 0>(shape, args...);
+    }
+
+    namespace detail
+    {
+        template <class S, std::size_t dim>
         inline void normalize_periodic_impl(const S&)
         {
         }
@@ -613,7 +648,7 @@ namespace xt
     }
 
     template <class S, class... Args>
-    void normalize_periodic(const S& shape, Args&... args)
+    inline void normalize_periodic(const S& shape, Args&... args)
     {
         check_dimension(shape, args...);
         detail::normalize_periodic_impl<S, 0>(shape, args...);

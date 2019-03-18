@@ -276,6 +276,9 @@ namespace xt
         template <class... Args>
         const_reference periodic(Args... args) const;
 
+        template <class... Args>
+        bool in_bounds(Args... args) const;
+
         template <class S>
         disable_integral_t<S, const_reference> operator[](const S& index) const;
         template <class I>
@@ -686,6 +689,18 @@ namespace xt
     {
         normalize_periodic(shape(), args...);
         return this->operator()(static_cast<size_type>(args)...);
+    }
+
+    /**
+     * Returns ``true`` only if the the specified position is a valid entry in the container.
+     * @param args a list of indices specifying the position in the expression.
+     * @return bool
+     */
+    template <class F, class... CT>
+    template <class... Args>
+    inline bool xfunction<F, CT...>::in_bounds(Args... args) const
+    {
+        return check_in_bounds(shape(), args...);
     }
 
     template <class F, class... CT>

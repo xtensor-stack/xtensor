@@ -1404,6 +1404,14 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xview, in_bounds)
+    {
+        xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};
+        auto view = xt::view(a, xt::keep(1), xt::all());
+        EXPECT_TRUE(view.in_bounds(0,0) == true);
+        EXPECT_TRUE(view.in_bounds(2,0) == false);
+    }
+
     TEST(xview, strides_compute_out_of_bounds)
     {
         // check that the compute_strides_impl does not access `a` strides out

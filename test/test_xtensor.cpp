@@ -325,4 +325,10 @@ namespace xt
         EXPECT_EQ(a, b);
     }
 
+    TEST(xtensor, in_bounds)
+    {
+        xt::xtensor<size_t,2> a = {{0,1,2}, {3,4,5}};
+        EXPECT_TRUE(a.in_bounds(0,0) == true);
+        EXPECT_TRUE(a.in_bounds(2,0) == false);
+    }
 }
