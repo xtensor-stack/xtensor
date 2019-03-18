@@ -20,6 +20,7 @@
 #include <xtl/xsequence.hpp>
 #include <xtl/xtype_traits.hpp>
 
+#include "xaccessible.hpp"
 #include "xexpression_traits.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
@@ -164,6 +165,16 @@ namespace xt
         using stepper = const_stepper;
     };
 
+    template <class F, class... CT>
+    struct xcontainer_inner_types<xfunction<F, CT...>>
+    {
+        // Added indirection for MSVC 2017 bug with the operator value_type()
+        using value_type = typename meta_identity<decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
+        using reference = value_type;
+        using const_reference = value_type;
+        using size_type = common_size_type_t<std::decay_t<CT>...>;
+    };
+
     /*************
      * xfunction *
      *************/
@@ -182,24 +193,26 @@ namespace xt
     template <class F, class... CT>
     class xfunction : private xconst_iterable<xfunction<F, CT...>>,
                       public xexpression<xfunction<F, CT...>>,
+                      private xaccessible<xfunction<F, CT...>>,
                       public extension::xfunction_base_t<F, CT...>
     {
     public:
 
         using self_type = xfunction<F, CT...>;
+        using accessible_base = xaccessible<self_type>;
         using extension_base = extension::xfunction_base_t<F, CT...>;
         using expression_tag = typename extension_base::expression_tag;
         using only_scalar = all_xscalar<CT...>;
         using functor_type = typename std::remove_reference<F>::type;
         using tuple_type = std::tuple<CT...>;
 
-        // Added indirection for MSVC 2017 bug with the operator value_type()
-        using value_type = typename meta_identity<decltype(std::declval<F>()(std::declval<xvalue_type_t<std::decay_t<CT>>>()...))>::type;
-        using reference = value_type;
-        using const_reference = value_type;
+        using inner_types = xcontainer_inner_types<self_type>;
+        using value_type = typename inner_types::value_type;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = common_size_type_t<std::decay_t<CT>...>;
+        using size_type = typename inner_types::size_type;
         using difference_type = common_difference_type_t<std::decay_t<CT>...>;
         using simd_meta_getter = detail::xsimd_meta_getter<value_type, F, CT...>;
 
@@ -265,19 +278,17 @@ namespace xt
         layout_type layout() const noexcept;
 
         template <class... Args>
-        const_reference operator()(Args... args) const;
+        reference operator()(Args... args);
 
         template <class... Args>
-        const_reference at(Args... args) const;
+        const_reference operator()(Args... args) const;
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
-        template <class... Args>
-        const_reference periodic(Args... args) const;
-
-        template <class... Args>
-        bool in_bounds(Args... args) const;
+        using accessible_base::at;
+        using accessible_base::periodic;
+        using accessible_base::in_bounds;
 
         template <class S>
         disable_integral_t<S, const_reference> operator[](const S& index) const;
@@ -366,6 +377,7 @@ namespace xt
         friend class xfunction_iterator<F, CT...>;
         friend class xfunction_stepper<F, CT...>;
         friend class xconst_iterable<self_type>;
+        friend class xaccessible<self_type>;
     };
 
     /**********************
@@ -604,6 +616,20 @@ namespace xt
      * @name Data
      */
     /**
+     * Returns a reference to the element at the specified position in the function.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the function.
+     */
+    template <class F, class... CT>
+    template <class... Args>
+    inline auto xfunction<F, CT...>::operator()(Args... args) -> reference
+    {
+        return static_cast<const self_type*>(this)->operator()(args...);
+    }
+
+
+    /**
      * Returns a constant reference to the element at the specified position in the function.
      * @param args a list of indices specifying the position in the function. Indices
      * must be unsigned integers, the number of indices should be equal or greater than
@@ -616,23 +642,6 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return access_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class F, class... CT>
-    template <class... Args>
-    inline auto xfunction<F, CT...>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
     }
 
     /**
@@ -661,46 +670,6 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return unchecked_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the expression,
-     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
-     * @param args a list of indices specifying the position in the expression. Indices
-     * must be integers, the number of indices must be equal to the number of
-     * dimensions of the expression, else the behavior is undefined.
-     *
-     * @warning This method is meant for performance, for expressions with a dynamic
-     * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be preferred whenever
-     * it is possible.
-     * @warning This method is NOT compatible with broadcasting, meaning the following
-     * code has undefined behavior:
-     * \code{.cpp}
-     * xt::xarray<double> a = {{0, 1}, {2, 3}};
-     * xt::xarray<double> b = {0, 1};
-     * auto fd = a + b;
-     * double res = fd.periodic(0, 1);
-     * \endcode
-     */
-    template <class F, class... CT>
-    template <class... Args>
-    inline auto xfunction<F, CT...>::periodic(Args... args) const -> const_reference
-    {
-        normalize_periodic(shape(), args...);
-        return this->operator()(static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns ``true`` only if the the specified position is a valid entry in the container.
-     * @param args a list of indices specifying the position in the expression.
-     * @return bool
-     */
-    template <class F, class... CT>
-    template <class... Args>
-    inline bool xfunction<F, CT...>::in_bounds(Args... args) const
-    {
-        return check_in_bounds(shape(), args...);
     }
 
     template <class F, class... CT>

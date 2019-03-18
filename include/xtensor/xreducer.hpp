@@ -24,6 +24,7 @@
 #include <xtl/xfunctional.hpp>
 #include <xtl/xsequence.hpp>
 
+#include "xaccessible.hpp"
 #include "xbuilder.hpp"
 #include "xeval.hpp"
 #include "xexpression.hpp"
@@ -403,6 +404,22 @@ namespace xt
         using stepper = const_stepper;
     };
 
+    template <class F, class CT, class X>
+    struct xcontainer_inner_types<xreducer<F, CT, X>>
+    {   
+        using xexpression_type = std::decay_t<CT>;
+        using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
+        using init_functor_type = typename std::decay_t<F>::init_functor_type;
+        using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
+        using substepper_type = typename xexpression_type::const_stepper;
+        using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
+            std::declval<init_functor_type>()(*std::declval<substepper_type>()), *std::declval<substepper_type>()))>;
+        using reference = value_type;
+        using const_reference = value_type;
+        using size_type = typename xexpression_type::size_type;
+
+    };
+
     /**
      * @class xreducer
      * @brief Reducing function operating over specified axes.
@@ -423,29 +440,30 @@ namespace xt
     template <class F, class CT, class X>
     class xreducer : public xexpression<xreducer<F, CT, X>>,
                      public xconst_iterable<xreducer<F, CT, X>>,
+                     public xaccessible<xreducer<F, CT, X>>,
                      public extension::xreducer_base_t<F, CT, X>
     {
     public:
 
         using self_type = xreducer<F, CT, X>;
-        using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
-        using init_functor_type = typename std::decay_t<F>::init_functor_type;
-        using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
-        using xexpression_type = std::decay_t<CT>;
+        using inner_types = xcontainer_inner_types<self_type>;
+        using reduce_functor_type = typename inner_types::reduce_functor_type;
+        using init_functor_type = typename inner_types::init_functor_type;
+        using merge_functor_type = typename inner_types::merge_functor_type;
+        using xexpression_type = typename inner_types::xexpression_type;
         using axes_type = X;
 
         using extension_base = extension::xreducer_base_t<F, CT, X>;
         using expression_tag = typename extension_base::expression_tag;
 
-        using substepper_type = typename xexpression_type::const_stepper;
-        using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
-            std::declval<init_functor_type>()(*std::declval<substepper_type>()), *std::declval<substepper_type>()))>;
-        using reference = value_type;
-        using const_reference = value_type;
+        using substepper_type = typename inner_types::substepper_type;
+        using value_type = typename inner_types::value_type;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = value_type*;
         using const_pointer = const value_type*;
 
-        using size_type = typename xexpression_type::size_type;
+        using size_type = typename inner_types::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
         using iterable_base = xconst_iterable<self_type>;
@@ -462,14 +480,13 @@ namespace xt
         xreducer(Func&& func, CTA&& e, AX&& axes);
 
         size_type size() const noexcept;
-        size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
 
         template <class... Args>
-        const_reference operator()(Args... args) const;
+        reference operator()(Args... args);
         template <class... Args>
-        const_reference at(Args... args) const;
+        const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference unchecked(Args... args) const;
         template <class S>
@@ -848,15 +865,6 @@ namespace xt
     }
 
     /**
-     * Returns the number of dimensions of the expression.
-     */
-    template <class F, class CT, class X>
-    inline auto xreducer<F, CT, X>::dimension() const noexcept -> size_type
-    {
-        return m_shape.size();
-    }
-
-    /**
      * Returns the shape of the expression.
      */
     template <class F, class CT, class X>
@@ -879,6 +887,19 @@ namespace xt
      * @name Data
      */
     /**
+     * Returns a reference to the element at the specified position in the reducer.
+     * @param args a list of indices specifying the position in the reducer. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the reducer.
+     */
+    template <class F, class CT, class X>
+    template <class... Args>
+    inline auto xreducer<F, CT, X>::operator()(Args... args) -> reference
+    {
+        return static_cast<const self_type*>(this)->operator()(args...);
+    }
+
+    /**
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param args a list of indices specifying the position in the reducer. Indices
      * must be unsigned integers, the number of indices should be equal or greater than
@@ -892,23 +913,6 @@ namespace xt
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         std::array<std::size_t, sizeof...(Args)> arg_array = {{static_cast<std::size_t>(args)...}};
         return element(arg_array.cbegin(), arg_array.cend());
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class F, class CT, class X>
-    template <class... Args>
-    inline auto xreducer<F, CT, X>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
     }
 
     /**
@@ -981,7 +985,7 @@ namespace xt
         auto stepper = const_stepper(*this, 0);
         size_type dim = 0;
         // drop left most elements
-        auto size = std::ptrdiff_t(dimension()) - std::distance(first, last);
+        auto size = std::ptrdiff_t(this->dimension()) - std::distance(first, last);
         auto begin = first - size;
         while (begin != last)
         {
@@ -1042,7 +1046,7 @@ namespace xt
     template <class S>
     inline auto xreducer<F, CT, X>::stepper_begin(const S& shape) const noexcept -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return const_stepper(*this, offset);
     }
 
@@ -1050,7 +1054,7 @@ namespace xt
     template <class S>
     inline auto xreducer<F, CT, X>::stepper_end(const S& shape, layout_type l) const noexcept -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return const_stepper(*this, offset, true, l);
     }
 

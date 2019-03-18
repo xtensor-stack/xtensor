@@ -56,6 +56,7 @@ endif()
 # =====
 
 set(XTENSOR_HEADERS
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xaccessible.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaccumulator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xadapt.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp

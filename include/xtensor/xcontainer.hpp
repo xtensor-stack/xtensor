@@ -17,6 +17,7 @@
 #include <xtl/xmeta_utils.hpp>
 #include <xtl/xsequence.hpp>
 
+#include "xaccessible.hpp"
 #include "xiterable.hpp"
 #include "xiterator.hpp"
 #include "xmath.hpp"
@@ -66,7 +67,8 @@ namespace xt
      *           provides the interface.
      */
     template <class D>
-    class xcontainer : public xcontiguous_iterable<D>
+    class xcontainer : public xcontiguous_iterable<D>,
+                       private xaccessible<D>
     {
     public:
 
@@ -98,6 +100,8 @@ namespace xt
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
 
+        using accessible_base = xaccessible<D>;
+
         static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
         using data_alignment = xsimd::container_alignment_t<storage_type>;
@@ -128,25 +132,15 @@ namespace xt
         const_reference operator()(Args... args) const;
 
         template <class... Args>
-        reference at(Args... args);
-
-        template <class... Args>
-        const_reference at(Args... args) const;
-
-        template <class... Args>
         reference unchecked(Args... args);
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
-        template <class... Args>
-        reference periodic(Args... args);
-
-        template <class... Args>
-        const_reference periodic(Args... args) const;
-
-        template <class... Args>
-        bool in_bounds(Args... args) const;
+        using accessible_base::shape;
+        using accessible_base::at;
+        using accessible_base::periodic;
+        using accessible_base::in_bounds;
 
         template <class S>
         disable_integral_t<S, reference> operator[](const S& index);
@@ -242,15 +236,17 @@ namespace xt
 
     private:
 
-        template <class C>
-        friend class xstepper;
-
         template <class It>
         It data_xend_impl(It begin, layout_type l, size_type offset) const noexcept;
 
         inner_shape_type& mutable_shape();
         inner_strides_type& mutable_strides();
         inner_backstrides_type& mutable_backstrides();
+
+        template <class C>
+        friend class xstepper;
+
+        friend class xaccessible<D>;
     };
 
     /**
@@ -468,40 +464,6 @@ namespace xt
     }
 
     /**
-     * Returns a reference to the element at the specified position in the container,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the container. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the container.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xcontainer<D>::at(Args... args) -> reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the container,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the container. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the container.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xcontainer<D>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    /**
      * Returns a reference to the element at the specified position in the container.
      * @param args a list of indices specifying the position in the container. Indices
      * must be unsigned integers, the number of indices must be equal to the number of
@@ -553,52 +515,6 @@ namespace xt
     {
         size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
         return storage()[index];
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the container,
-     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
-     * @param args a list of indices specifying the position in the container. Indices
-     * must be integers, the number of indices should be equal to the number of dimensions
-     * of the container.
-     * @exception std::out_of_range if the number of argument is greater than the
-     * number of dimensions
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xcontainer<D>::periodic(Args... args) -> reference
-    {
-        normalize_periodic(shape(), args...);
-        return this->operator()(static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the container,
-     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
-     * @param args a list of indices specifying the position in the container. Indices
-     * must be integers, the number of indices should be equal to the number of dimensions
-     * of the container.
-     * @exception std::out_of_range if the number of argument is greater than the
-     * number of dimensions
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xcontainer<D>::periodic(Args... args) const -> const_reference
-    {
-        normalize_periodic(shape(), args...);
-        return this->operator()(static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns ``true`` only if the the specified position is a valid entry in the container.
-     * @param args a list of indices specifying the position in the container.
-     * @return bool
-     */
-    template <class D>
-    template <class... Args>
-    inline bool xcontainer<D>::in_bounds(Args... args) const
-    {
-        return check_in_bounds(shape(), args...);
     }
 
     /**

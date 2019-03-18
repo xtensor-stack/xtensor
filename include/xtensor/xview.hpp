@@ -21,6 +21,7 @@
 #include <xtl/xmeta_utils.hpp>
 #include <xtl/xtype_traits.hpp>
 
+#include "xaccessible.hpp"
 #include "xbroadcast.hpp"
 #include "xcontainer.hpp"
 #include "xiterable.hpp"
@@ -66,6 +67,9 @@ namespace xt
     struct xcontainer_inner_types<xview<CT, S...>>
     {
         using xexpression_type = std::decay_t<CT>;
+        using reference = typename xexpression_type::reference;
+        using const_reference = typename xexpression_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
         using temporary_type = view_temporary_type_t<xexpression_type, S...>;
     };
 
@@ -330,6 +334,7 @@ namespace xt
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,
                   public xiterable<xview<CT, S...>>,
+                  public xaccessible<xview<CT, S...>>,
                   public extension::xview_base_t<CT, S...>
     {
     public:
@@ -414,8 +419,6 @@ namespace xt
         template <class E>
         disable_xexpression<E, self_type>& operator=(const E& e);
 
-        size_type dimension() const noexcept;
-
         size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
@@ -427,11 +430,7 @@ namespace xt
         template <class... Args>
         reference operator()(Args... args);
         template <class... Args>
-        reference at(Args... args);
-        template <class... Args>
         reference unchecked(Args... args);
-        template <class... Args>
-        reference periodic(Args... args);
         template <class OS>
         disable_integral_t<OS, reference> operator[](const OS& index);
         template <class I>
@@ -443,13 +442,7 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
         template <class... Args>
-        const_reference at(Args... args) const;
-        template <class... Args>
         const_reference unchecked(Args... args) const;
-        template <class... Args>
-        const_reference periodic(Args... args) const;
-        template <class... Args>
-        bool in_bounds(Args... args) const;
         template <class OS>
         disable_integral_t<OS, const_reference> operator[](const OS& index) const;
         template <class I>
@@ -896,11 +889,11 @@ namespace xt
     /**
      * Returns the number of dimensions of the view.
      */
-    template <class CT, class... S>
+    /*template <class CT, class... S>
     inline auto xview<CT, S...>::dimension() const noexcept -> size_type
     {
         return m_shape.size();
-    }
+    }*/
 
     /**
      * Returns the shape of the view.
@@ -985,23 +978,6 @@ namespace xt
     }
 
     /**
-     * Returns a reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class CT, class... S>
-    template <class... Args>
-    inline auto xview<CT, S...>::at(Args... args) -> reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    /**
      * Returns a reference to the element at the specified position in the view.
      * @param args a list of indices specifying the position in the view. Indices
      * must be unsigned integers, the number of indices must be equal to the number of
@@ -1025,34 +1001,6 @@ namespace xt
     inline auto xview<CT, S...>::unchecked(Args... args) -> reference
     {
         return unchecked_impl(make_index_sequence(args...), static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the view,
-     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
-     * @param args a list of indices specifying the position in the view. Indices
-     * must be integers, the number of indices must be equal to the number of
-     * dimensions of the view, else the behavior is undefined.
-     *
-     * @warning This method is meant for performance, for expressions with a dynamic
-     * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be preferred whenever
-     * it is possible.
-     * @warning This method is NOT compatible with broadcasting, meaning the following
-     * code has undefined behavior:
-     * \code{.cpp}
-     * xt::xarray<double> a = {{0, 1}, {2, 3}};
-     * xt::xarray<double> b = {0, 1};
-     * auto fd = a + b;
-     * double res = fd.periodic(0, 1);
-     * \endcode
-     */
-    template <class CT, class... S>
-    template <class... Args>
-    inline auto xview<CT, S...>::periodic(Args... args) -> reference
-    {
-        normalize_periodic(shape(), args...);
-        return this->operator()(static_cast<size_type>(args)...);
     }
 
     /**
@@ -1111,23 +1059,6 @@ namespace xt
     }
 
     /**
-     * Returns a constant reference to the element at the specified position in the view,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class CT, class... S>
-    template <class... Args>
-    inline auto xview<CT, S...>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    /**
      * Returns a constant reference to the element at the specified position in the view.
      * @param args a list of indices specifying the position in the view. Indices
      * must be unsigned integers, the number of indices must be equal to the number of
@@ -1151,46 +1082,6 @@ namespace xt
     inline auto xview<CT, S...>::unchecked(Args... args) const -> const_reference
     {
         return unchecked_impl(make_index_sequence(args...), static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the view,
-     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
-     * @param args a list of indices specifying the position in the view. Indices
-     * must be integers, the number of indices must be equal to the number of
-     * dimensions of the view, else the behavior is undefined.
-     *
-     * @warning This method is meant for performance, for expressions with a dynamic
-     * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be preferred whenever
-     * it is possible.
-     * @warning This method is NOT compatible with broadcasting, meaning the following
-     * code has undefined behavior:
-     * \code{.cpp}
-     * xt::xarray<double> a = {{0, 1}, {2, 3}};
-     * xt::xarray<double> b = {0, 1};
-     * auto fd = a + b;
-     * double res = fd.periodic(0, 1);
-     * \endcode
-     */
-    template <class CT, class... S>
-    template <class... Args>
-    inline auto xview<CT, S...>::periodic(Args... args) const -> const_reference
-    {
-        normalize_periodic(shape(), args...);
-        return this->operator()(static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns ``true`` only if the the specified position is a valid entry in the container.
-     * @param args a list of indices specifying the position in the view.
-     * @return bool
-     */
-    template <class CT, class... S>
-    template <class... Args>
-    inline bool xview<CT, S...>::in_bounds(Args... args) const
-    {
-        return check_in_bounds(shape(), args...);
     }
 
     /**
@@ -1556,8 +1447,8 @@ namespace xt
     template <class CT, class... S>
     inline void xview<CT, S...>::compute_strides(std::false_type) const
     {
-        m_strides = xtl::make_sequence<inner_strides_type>(dimension(), 0);
-        m_backstrides = xtl::make_sequence<inner_strides_type>(dimension(), 0);
+        m_strides = xtl::make_sequence<inner_strides_type>(this->dimension(), 0);
+        m_backstrides = xtl::make_sequence<inner_strides_type>(this->dimension(), 0);
 
         constexpr std::size_t n_strides = sizeof...(S) - integral_count<S...>();
 
@@ -1569,7 +1460,7 @@ namespace xt
             // adapt strides for shape[i] == 1 to make consistent with rest of xtensor
             detail::adapt_strides(shape(), m_strides, &m_backstrides, i);
         }
-        for (std::size_t i = n_strides; i < dimension(); ++i)
+        for (std::size_t i = n_strides; i < this->dimension(); ++i)
         {
             m_strides[i] = m_e.strides()[i + integral_count<S...>() - newaxis_count<S...>()];
             detail::adapt_strides(shape(), m_strides, &m_backstrides, i);
@@ -1593,7 +1484,7 @@ namespace xt
     template <class Arg, class... Args>
     inline auto xview<CT, S...>::access(Arg arg, Args... args) -> reference
     {
-        if (sizeof...(Args) >= dimension())
+        if (sizeof...(Args) >= this->dimension())
         {
             return access(args...);
         }
@@ -1610,7 +1501,7 @@ namespace xt
     template <class Arg, class... Args>
     inline auto xview<CT, S...>::access(Arg arg, Args... args) const -> const_reference
     {
-        if (sizeof...(Args) >= dimension())
+        if (sizeof...(Args) >= this->dimension())
         {
             return access(args...);
         }
@@ -1819,7 +1710,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_begin(const ST& shape) -> std::enable_if_t<!Enable, stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return stepper(this, m_e.stepper_begin(m_e.shape()), offset);
     }
 
@@ -1827,7 +1718,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) -> std::enable_if_t<!Enable, stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return stepper(this, m_e.stepper_end(m_e.shape(), l), offset, true, l);
     }
 
@@ -1835,7 +1726,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_begin(const ST& shape) const -> std::enable_if_t<!Enable, const_stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         const xexpression_type& e = m_e;
         return const_stepper(this, e.stepper_begin(m_e.shape()), offset);
     }
@@ -1844,7 +1735,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) const -> std::enable_if_t<!Enable, const_stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         const xexpression_type& e = m_e;
         return const_stepper(this, e.stepper_end(m_e.shape(), l), offset, true, l);
     }
@@ -1853,7 +1744,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_begin(const ST& shape) -> std::enable_if_t<Enable, stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return stepper(this, data_xbegin(), offset);
     }
 
@@ -1861,7 +1752,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) -> std::enable_if_t<Enable, stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return stepper(this, data_xend(l, offset), offset);
     }
 
@@ -1869,7 +1760,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_begin(const ST& shape) const -> std::enable_if_t<Enable, const_stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return const_stepper(this, data_xbegin(), offset);
     }
 
@@ -1877,7 +1768,7 @@ namespace xt
     template <class ST, bool Enable>
     inline auto xview<CT, S...>::stepper_end(const ST& shape, layout_type l) const-> std::enable_if_t<Enable, const_stepper>
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return const_stepper(this, data_xend(l, offset), offset);
     }
 

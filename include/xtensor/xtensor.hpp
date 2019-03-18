@@ -45,6 +45,9 @@ namespace xt
     struct xcontainer_inner_types<xtensor_container<EC, N, L, Tag>>
     {
         using storage_type = EC;
+        using reference = typename storage_type::reference;
+        using const_reference = typename storage_type::const_reference;
+        using size_type = typename storage_type::size_type;
         using shape_type = std::array<typename storage_type::size_type, N>;
         using strides_type = get_strides_t<shape_type>;
         using backstrides_type = get_strides_t<shape_type>;
@@ -150,6 +153,9 @@ namespace xt
     struct xcontainer_inner_types<xtensor_adaptor<EC, N, L, Tag>>
     {
         using storage_type = std::remove_reference_t<EC>;
+        using reference = typename storage_type::reference;
+        using const_reference = typename storage_type::const_reference;
+        using size_type = typename storage_type::size_type;
         using shape_type = std::array<typename storage_type::size_type, N>;
         using strides_type = get_strides_t<shape_type>;
         using backstrides_type = get_strides_t<shape_type>;
