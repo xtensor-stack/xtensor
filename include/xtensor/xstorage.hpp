@@ -1800,8 +1800,8 @@ namespace xt
 // clang warnings here
 
 #if defined(__clang__)
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wmismatched-tags"
+    # pragma clang diagnostic push
+    # pragma clang diagnostic ignored "-Wmismatched-tags"
 #endif
 
 namespace std
@@ -1830,7 +1830,7 @@ namespace std
 }
 
 #if defined(__clang__)
-    #pragma clang diagnostic pop
+    # pragma clang diagnostic pop
 #endif
 
 #undef XTENSOR_CONST
