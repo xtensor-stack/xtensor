@@ -114,6 +114,7 @@ set(XTENSOR_TESTS
     test_xfunctor_adaptor.cpp
     test_xfixed.cpp
     test_xhistogram.cpp
+    test_xpad.cpp
     test_xindex_view.cpp
     test_xinfo.cpp
     test_xiterator.cpp

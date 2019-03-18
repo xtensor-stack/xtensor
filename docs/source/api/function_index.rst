@@ -18,3 +18,4 @@ Functions and generators
    xsort
    xrandom
    xhistogram
+   xpad
