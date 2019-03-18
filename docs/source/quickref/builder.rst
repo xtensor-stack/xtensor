@@ -98,10 +98,10 @@ Zeros like
 
 ``zeros_like(e)`` isquivalent to ``full_like(e, 0.)``.
 
-Eyes
-----
+Eye
+---
 
-Generates an array with one son the specified diagonal:
+Generates an array with ones on the specified diagonal:
 
 .. code::
 
@@ -158,7 +158,7 @@ Concatenate
 
     xt::xarray<double> a = {{1, 2, 3}};
     xt::xarray<double> b = {{2, 3, 4}};
-    
+
     auto c0 = xt::concatenate(xt::xtuple(a, b));
     std::cout << c0 << std::endl;
     // Outputs {{1, 2, 3}, {2, 3, 4}}
