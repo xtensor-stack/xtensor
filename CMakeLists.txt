@@ -98,6 +98,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_base.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_storage.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xpad.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp

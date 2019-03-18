@@ -140,6 +140,11 @@ the same:
 
 ``resize`` is not defined for ``xtensor_fixed``.
 
+.. warning::
+
+    Contrary to STL containers like std::vector, resize do NOT
+    preserve elements.
+
 Element access
 --------------
 
