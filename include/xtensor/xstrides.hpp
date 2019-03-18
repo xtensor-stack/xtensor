@@ -599,25 +599,21 @@ namespace xt
     namespace detail
     {
         template <class S, std::size_t dim>
-        inline void check_in_bounds_impl(bool&, const S&)
+        inline bool check_in_bounds_impl(const S&)
         {
+            return true;
         }
 
         template <class S, std::size_t dim, class T, class... Args>
-        inline void check_in_bounds_impl(bool& res, const S& shape, T& arg, Args&... args)
+        inline bool check_in_bounds_impl(const S& shape, T& arg, Args&... args)
         {
             if (sizeof...(Args) + 1 > shape.size())
             {
-                check_in_bounds_impl<S, dim>(res, shape, args...);
+                return check_in_bounds_impl<S, dim>(shape, args...);
             }
             else
             {
-                T n = static_cast<T>(shape[dim]);
-                if (arg < 0 || arg >= n)
-                {
-                    res = false;
-                }
-                check_in_bounds_impl<S, dim + 1>(res, shape, args...);
+                return arg >= T(0) && arg < static_cast<T>(shape[dim]) && check_in_bounds_impl<S, dim + 1>(shape, args...);
             }
         }
     }
@@ -625,13 +621,7 @@ namespace xt
     template <class S, class... Args>
     inline bool check_in_bounds(const S& shape, Args&... args)
     {
-        if (sizeof...(Args) > shape.size())
-        {
-            return false;
-        }
-        bool res = true;
-        detail::check_in_bounds_impl<S, 0>(res, shape, args...);
-        return res;
+        return detail::check_in_bounds_impl<S, 0>(shape, args...);
     }
 
     namespace detail
