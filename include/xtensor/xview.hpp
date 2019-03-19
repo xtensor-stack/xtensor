@@ -1359,7 +1359,7 @@ namespace xt
 
         std::ptrdiff_t result = 0;
         std::size_t i = 0;
-        for (; i < std::min(sizeof...(S), m_e.strides().dimension()); ++i)
+        for (; i < std::min(sizeof...(S), m_e.strides().size()); ++i)
         {
             result += temp[i] * m_e.strides()[i - newaxis_count_before<S...>(i)];
         }
