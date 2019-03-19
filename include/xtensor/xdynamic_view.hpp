@@ -28,6 +28,9 @@ namespace xt
     struct xcontainer_inner_types<xdynamic_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
+        using reference = typename xexpression_type::reference;
+        using const_reference = typename xexpression_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
         using undecay_expression = CT;
         using shape_type = std::decay_t<S>;
         using inner_storage_type = FST;
@@ -173,12 +176,6 @@ namespace xt
         const_reference operator()(Args... args) const;
 
         template <class... Args>
-        reference at(Args... args);
-
-        template <class... Args>
-        const_reference at(Args... args) const;
-
-        template <class... Args>
         reference unchecked(Args... args);
 
         template <class... Args>
@@ -272,7 +269,8 @@ namespace xt
 
         template <class C>
         friend class xstepper;
-        friend class xview_semantic<xdynamic_view<CT, S, L, FST>>;
+        friend class xview_semantic<self_type>;
+        friend class xaccessible<self_type>;
     };
 
     /**************************
@@ -441,22 +439,6 @@ namespace xt
         offset_type offset = base_type::compute_index(args...);
         offset = adjust_offset(offset, args...);
         return base_type::storage()[static_cast<size_type>(offset)];
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    template <class... Args>
-    inline auto xdynamic_view<CT, S, L, FST>::at(Args... args) -> reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    template <class... Args>
-    inline auto xdynamic_view<CT, S, L, FST>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
     }
 
     template <class CT, class S, layout_type L, class FST>

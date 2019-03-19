@@ -15,6 +15,7 @@
 
 #include <xtl/xtype_traits.hpp>
 
+#include "xaccessible.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xlayout.hpp"
@@ -72,8 +73,18 @@ namespace xt
     };
 
     template <class CT>
+    struct xcontainer_inner_types<xscalar<CT>>
+    {
+        using value_type = std::decay_t<CT>;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+        using size_type = std::size_t;
+    };
+
+    template <class CT>
     class xscalar : public xexpression<xscalar<CT>>,
                     private xiterable<xscalar<CT>>,
+                    public xaccessible<xscalar<CT>>,
                     public extension::xscalar_base_t<CT>
     {
     public:
@@ -137,14 +148,11 @@ namespace xt
         operator const value_type&() const noexcept;
 
         size_type size() const noexcept;
-        size_type dimension() const noexcept;
         const shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
 
         template <class... Args>
         reference operator()(Args...) noexcept;
-        template <class... Args>
-        reference at(Args...);
         template <class... Args>
         reference unchecked(Args...) noexcept;
         template <class S>
@@ -155,8 +163,6 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args...) const noexcept;
-        template <class... Args>
-        const_reference at(Args...) const;
         template <class... Args>
         const_reference unchecked(Args...) const noexcept;
         template <class S>
@@ -518,12 +524,6 @@ namespace xt
     }
 
     template <class CT>
-    inline auto xscalar<CT>::dimension() const noexcept -> size_type
-    {
-        return 0;
-    }
-
-    template <class CT>
     inline auto xscalar<CT>::shape() const noexcept -> const shape_type&
     {
         static std::array<size_type, 0> zero_shape;
@@ -542,14 +542,6 @@ namespace xt
     {
         XTENSOR_CHECK_DIMENSION((std::array<int, 0>()), Args()...);
         return m_value;
-    }
-
-    template <class CT>
-    template <class... Args>
-    inline auto xscalar<CT>::at(Args... args) -> reference
-    {
-        check_dimension(shape(), args...);
-        return this->operator()(args...);
     }
 
     template <class CT>
@@ -587,14 +579,6 @@ namespace xt
     {
         XTENSOR_CHECK_DIMENSION((std::array<int, 0>()), Args()...);
         return m_value;
-    }
-
-    template <class CT>
-    template <class... Args>
-    inline auto xscalar<CT>::at(Args... args) const -> const_reference
-    {
-        check_dimension(shape(), args...);
-        return this->operator()(args...);
     }
 
     template <class CT>

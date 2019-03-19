@@ -19,6 +19,7 @@
 
 #include <xtl/xsequence.hpp>
 
+#include "xaccessible.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xscalar.hpp"
@@ -84,6 +85,15 @@ namespace xt
         using stepper = const_stepper;
     };
 
+    template <class CT, class X>
+    struct xcontainer_inner_types<xbroadcast<CT, X>>
+    {
+        using xexpression_type = std::decay_t<CT>;
+        using reference = typename xexpression_type::const_reference;
+        using const_reference = typename xexpression_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
+    };
+
     /**
      * @class xbroadcast
      * @brief Broadcasted xexpression to a specified shape.
@@ -100,6 +110,7 @@ namespace xt
     template <class CT, class X>
     class xbroadcast : public xexpression<xbroadcast<CT, X>>,
                        public xconst_iterable<xbroadcast<CT, X>>,
+                       public xaccessible<xbroadcast<CT, X>>,
                        public extension::xbroadcast_base_t<CT, X>
     {
     public:
@@ -110,9 +121,9 @@ namespace xt
         using expression_tag = typename extension_base::expression_tag;
 
         using value_type = typename xexpression_type::value_type;
-        using reference = typename xexpression_type::reference;
+        using reference = typename xexpression_type::const_reference;
         using const_reference = typename xexpression_type::const_reference;
-        using pointer = typename xexpression_type::pointer;
+        using pointer = typename xexpression_type::const_pointer;
         using const_pointer = typename xexpression_type::const_pointer;
         using size_type = typename xexpression_type::size_type;
         using difference_type = typename xexpression_type::difference_type;
@@ -134,15 +145,14 @@ namespace xt
         xbroadcast(CTA&& e, shape_type&& s);
 
         size_type size() const noexcept;
-        size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
 
         template <class... Args>
-        const_reference operator()(Args... args) const;
+        reference operator()(Args... args);
 
         template <class... Args>
-        const_reference at(Args... args) const;
+        const_reference operator()(Args... args) const;
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
@@ -281,15 +291,6 @@ namespace xt
     }
 
     /**
-     * Returns the number of dimensions of the expression.
-     */
-    template <class CT, class X>
-    inline auto xbroadcast<CT, X>::dimension() const noexcept -> size_type
-    {
-        return m_shape.size();
-    }
-
-    /**
      * Returns the shape of the expression.
      */
     template <class CT, class X>
@@ -312,6 +313,19 @@ namespace xt
      * @name Data
      */
     /**
+     * Returns a reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the expression.
+     */
+    template <class CT, class X>
+    template <class... Args>
+    inline auto xbroadcast<CT, X>::operator()(Args... args) -> reference
+    {
+        return static_cast<const self_type*>(this)->operator()(args...);
+    }
+
+    /**
      * Returns a constant reference to the element at the specified position in the expression.
      * @param args a list of indices specifying the position in the function. Indices
      * must be unsigned integers, the number of indices should be equal or greater than
@@ -322,23 +336,6 @@ namespace xt
     inline auto xbroadcast<CT, X>::operator()(Args... args) const -> const_reference
     {
         return m_e(args...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class CT, class X>
-    template <class... Args>
-    inline auto xbroadcast<CT, X>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
     }
 
     /**
@@ -405,7 +402,7 @@ namespace xt
     template <class It>
     inline auto xbroadcast<CT, X>::element(It, It last) const -> const_reference
     {
-        return m_e.element(last - dimension(), last);
+        return m_e.element(last - this->dimension(), last);
     }
 
     /**
@@ -444,7 +441,7 @@ namespace xt
     template <class S>
     inline bool xbroadcast<CT, X>::has_linear_assign(const S& strides) const noexcept
     {
-        return dimension() == m_e.dimension() &&
+        return this->dimension() == m_e.dimension() &&
             std::equal(m_shape.cbegin(), m_shape.cend(), m_e.shape().cbegin()) &&
             m_e.has_linear_assign(strides);
     }

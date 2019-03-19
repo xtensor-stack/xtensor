@@ -12,6 +12,7 @@
 
 #include "xtl/xmasked_value.hpp"
 
+#include "xaccessible.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xutils.hpp"
@@ -36,9 +37,23 @@ namespace xt
 
     template <class CTD, class CTM>
     struct xcontainer_inner_types<xmasked_view<CTD, CTM>>
-    {
-        using base_value_type = typename std::decay_t<CTD>::value_type;
-        using flag_type = typename std::decay_t<CTM>::value_type;
+    {   
+        using data_type = std::decay_t<CTD>;
+        using mask_type = std::decay_t<CTM>;
+        using base_value_type = typename data_type::value_type;
+        using flag_type = typename mask_type::value_type;
+        static constexpr bool is_val_const = std::is_const<data_type>::value;
+        static constexpr bool is_flag_const = std::is_const<mask_type>::value;
+        using val_reference = std::conditional_t<is_val_const,
+                                                 typename data_type::const_reference,
+                                                 typename data_type::reference>;
+        using mask_reference = std::conditional_t<is_flag_const,
+                                                  typename mask_type::const_reference,
+                                                  typename mask_type::reference>;
+        using value_type = xtl::xmasked_value<base_value_type, flag_type>;
+        using reference = xtl::xmasked_value<val_reference, mask_reference>;
+        using const_reference = xtl::xmasked_value<typename data_type::const_reference, typename mask_type::const_reference>;
+        using size_type = typename data_type::size_type;
         using temporary_type = xarray<xtl::xmasked_value<base_value_type, flag_type>>;
     };
 
@@ -68,46 +83,44 @@ namespace xt
      */
     template <class CTD, class CTM>
     class xmasked_view : public xview_semantic<xmasked_view<CTD, CTM>>,
+                         public xaccessible<xmasked_view<CTD, CTM>>,
                          private xiterable<xmasked_view<CTD, CTM>>
     {
     public:
 
         using self_type = xmasked_view<CTD, CTM>;
         using semantic_base = xview_semantic<xmasked_view<CTD, CTM>>;
-        using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
+        using inner_types = xcontainer_inner_types<self_type>;
+        using temporary_type = typename inner_types::temporary_type;
 
-        using data_type = std::decay_t<CTD>;
-        using mask_type = std::decay_t<CTM>;
+        using data_type = typename inner_types::data_type;
+        using mask_type = typename inner_types::mask_type;
         using value_expression = CTD;
         using mask_expression = CTM;
 
         static constexpr bool is_data_const = std::is_const<std::remove_reference_t<value_expression>>::value;
 
-        using base_value_type = typename data_type::value_type;
+        using base_value_type = typename inner_types::base_value_type;
         using base_reference = typename data_type::reference;
         using base_const_reference = typename data_type::const_reference;
 
-        using flag_type = typename mask_type::value_type;
+        using flag_type = typename inner_types::flag_type;
         using flag_reference = typename mask_type::reference;
         using flag_const_reference = typename mask_type::const_reference;
 
-        static constexpr bool is_val_const = std::is_const<data_type>::value;
-        static constexpr bool is_flag_const = std::is_const<mask_type>::value;
-        using val_reference = std::conditional_t<is_val_const,
-                                                 typename data_type::const_reference,
-                                                 typename data_type::reference>;
-        using mask_reference = std::conditional_t<is_flag_const,
-                                                  typename mask_type::const_reference,
-                                                  typename mask_type::reference>;
+        static constexpr bool is_val_const = inner_types::is_val_const;
+        static constexpr bool is_flag_const = inner_types::is_flag_const;
+        using val_reference = typename inner_types::val_reference;
+        using mask_reference = typename inner_types::mask_reference;
 
-        using value_type = xtl::xmasked_value<base_value_type, flag_type>;
-        using reference = xtl::xmasked_value<val_reference, mask_reference>;
-        using const_reference = xtl::xmasked_value<typename data_type::const_reference, typename mask_type::const_reference>;
+        using value_type = typename inner_types::value_type;
+        using reference = typename inner_types::reference;;
+        using const_reference = typename inner_types::const_reference;
 
         using pointer = xtl::xclosure_pointer<reference>;
         using const_pointer = xtl::xclosure_pointer<const_reference>;
 
-        using size_type = typename data_type::size_type;
+        using size_type = typename inner_types::size_type;
         using difference_type = typename data_type::difference_type;
 
         using shape_type = typename data_type::shape_type;
@@ -153,7 +166,6 @@ namespace xt
         xmasked_view(D&& data, M&& mask);
 
         size_type size() const noexcept;
-        constexpr size_type dimension() const noexcept;
 
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
@@ -169,12 +181,6 @@ namespace xt
 
         template <class... Args>
         const_reference operator()(Args... args) const;
-
-        template <class... Args>
-        reference at(Args... args);
-
-        template <class... Args>
-        const_reference at(Args... args) const;
 
         template <class... Args>
         reference unchecked(Args... args);
@@ -317,15 +323,6 @@ namespace xt
      */
     //@{
     /**
-     * Returns the number of dimensions of the xmasked_view.
-     */
-    template <class CTD, class CTM>
-    inline constexpr auto xmasked_view<CTD, CTM>::dimension() const noexcept -> size_type
-    {
-        return m_data.dimension();
-    }
-
-    /**
      * Returns the number of elements in the xmasked_view.
      */
     template <class CTD, class CTM>
@@ -410,40 +407,6 @@ namespace xt
     template <class... Args>
     inline auto xmasked_view<CTD, CTM>::operator()(Args... args) const -> const_reference
     {
-        return const_reference(m_data(args...), m_mask(args...));
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the xmasked_view,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the xmasked_view. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the xmasked_view.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class CTD, class CTM>
-    template <class... Args>
-    inline auto xmasked_view<CTD, CTM>::at(Args... args) -> reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return reference(m_data(args...), m_mask(args...));
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the xmasked_view,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the xmasked_view. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the xmasked_view.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class CTD, class CTM>
-    template <class... Args>
-    inline auto xmasked_view<CTD, CTM>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
         return const_reference(m_data(args...), m_mask(args...));
     }
 

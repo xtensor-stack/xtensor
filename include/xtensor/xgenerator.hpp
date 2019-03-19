@@ -18,6 +18,7 @@
 
 #include <xtl/xsequence.hpp>
 
+#include "xaccessible.hpp"
 #include "xexpression.hpp"
 #include "xiterable.hpp"
 #include "xstrides.hpp"
@@ -66,6 +67,14 @@ namespace xt
         using stepper = const_stepper;
     };
 
+    template <class C, class R, class S>
+    struct xcontainer_inner_types<xgenerator<C, R, S>>
+    {
+        using reference = R;
+        using const_reference = R;
+        using size_type = std::size_t;
+    };
+
     /**
      * @class xgenerator
      * @brief Multidimensional function operating on indices.
@@ -80,6 +89,7 @@ namespace xt
     template <class F, class R, class S>
     class xgenerator : public xexpression<xgenerator<F, R, S>>,
                        public xconst_iterable<xgenerator<F, R, S>>,
+                       public xaccessible<xgenerator<F, R, S>>,
                        public extension::xgenerator_base_t<F, R, S>
     {
     public:
@@ -112,14 +122,13 @@ namespace xt
         xgenerator(Func&& f, const S& shape) noexcept;
 
         size_type size() const noexcept;
-        size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
 
         template <class... Args>
-        const_reference operator()(Args... args) const;
+        reference operator()(Args... args);
         template <class... Args>
-        const_reference at(Args... args) const;
+        const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference unchecked(Args... args) const;
         template <class OS>
@@ -222,15 +231,6 @@ namespace xt
     }
 
     /**
-     * Returns the number of dimensions of the function.
-     */
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::dimension() const noexcept -> size_type
-    {
-        return m_shape.size();
-    }
-
-    /**
      * Returns the shape of the xgenerator.
      */
     template <class F, class R, class S>
@@ -258,28 +258,23 @@ namespace xt
      */
     template <class F, class R, class S>
     template <class... Args>
+    inline auto xgenerator<F, R, S>::operator()(Args... args) -> reference
+    {
+        return static_cast<const self_type*>(this)->operator()(args...);
+    }
+    /**
+     * Returns the evaluated element at the specified position in the function.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the function.
+     */
+    template <class F, class R, class S>
+    template <class... Args>
     inline auto xgenerator<F, R, S>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
         adapt_index<0>(args...);
         return m_f(args...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class F, class R, class S>
-    template <class... Args>
-    inline auto xgenerator<F, R, S>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), args...);
-        return this->operator()(args...);
     }
 
     /**
@@ -381,7 +376,7 @@ namespace xt
     template <class O>
     inline auto xgenerator<F, R, S>::stepper_begin(const O& shape) const noexcept -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset);
     }
 
@@ -389,7 +384,7 @@ namespace xt
     template <class O>
     inline auto xgenerator<F, R, S>::stepper_end(const O& shape, layout_type) const noexcept -> const_stepper
     {
-        size_type offset = shape.size() - dimension();
+        size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset, true);
     }
 

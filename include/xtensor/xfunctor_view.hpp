@@ -17,13 +17,14 @@
 
 #include <xtl/xproxy_wrapper.hpp>
 
-#include "xtensor/xexpression.hpp"
-#include "xtensor/xiterator.hpp"
-#include "xtensor/xsemantic.hpp"
-#include "xtensor/xutils.hpp"
+#include "xaccessible.hpp"
+#include "xexpression.hpp"
+#include "xiterator.hpp"
+#include "xsemantic.hpp"
+#include "xutils.hpp"
 
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
+#include "xarray.hpp"
+#include "xtensor.hpp"
 
 namespace xt
 {
@@ -64,7 +65,7 @@ namespace xt
     class xfunctor_stepper;
 
     template <class D>
-    class xfunctor_applier_base
+    class xfunctor_applier_base : public xaccessible<D>
     {
     public:
 
@@ -143,7 +144,6 @@ namespace xt
         xfunctor_applier_base(Func&&, E&&) noexcept;
 
         size_type size() const noexcept;
-        size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
@@ -152,9 +152,6 @@ namespace xt
 
         template <class... Args>
         reference operator()(Args... args);
-
-        template <class... Args>
-        reference at(Args... args);
 
         template <class... Args>
         reference unchecked(Args... args);
@@ -173,9 +170,6 @@ namespace xt
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class... Args>
-        const_reference at(Args... args) const;
 
         template <class S>
         disable_integral_t<S, const_reference> operator[](const S& index) const;
@@ -352,6 +346,9 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using undecay_expression = CT;
         using functor_type = std::decay_t<F>;
+        using reference = typename functor_type::reference;
+        using const_reference = typename functor_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
         using temporary_type = typename xfunctor_view_temporary_type<F, xexpression_type>::type;
     };
 
@@ -404,6 +401,7 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type&& tmp);
         friend class xview_semantic<self_type>;
+        friend class xaccessible<self_type>;
     };
 
     /********************************
@@ -419,6 +417,9 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using undecay_expression = CT;
         using functor_type = std::decay_t<F>;
+        using reference = typename functor_type::reference;
+        using const_reference = typename functor_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
         using temporary_type = typename xfunctor_view_temporary_type<F, xexpression_type>::type;
     };
 
@@ -473,10 +474,8 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         void assign_temporary_impl(temporary_type&& tmp);
         friend class xcontainer_semantic<self_type>;
+        friend class xaccessible<self_type>;
     };
-
-
-
 
     /*********************************
      * xfunctor_iterator declaration *
@@ -631,11 +630,11 @@ namespace xt
     /**
      * Returns the number of dimensions of the expression.
      */
-    template <class D>
+    /*template <class D>
     inline auto xfunctor_applier_base<D>::dimension() const noexcept -> size_type
     {
         return m_e.dimension();
-    }
+    }*/
 
     /**
      * Returns the shape of the expression.
@@ -690,23 +689,6 @@ namespace xt
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_functor(m_e(args...));
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xfunctor_applier_base<D>::at(Args... args) -> reference
-    {
-        check_access(shape(), args...);
-        return this->operator()(args...);
     }
 
     /**
@@ -791,23 +773,6 @@ namespace xt
         XTENSOR_TRY(check_index(shape(), args...));
         XTENSOR_CHECK_DIMENSION(shape(), args...);
         return m_functor(m_e(args...));
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xfunctor_applier_base<D>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), args...);
-        return this->operator()(args...);
     }
 
     /**

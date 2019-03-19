@@ -13,6 +13,7 @@
 
 #include <xtl/xsequence.hpp>
 
+#include "xaccessible.hpp"
 #include "xtensor_forward.hpp"
 #include "xslice.hpp"
 #include "xstrides.hpp"
@@ -21,10 +22,11 @@
 namespace xt
 {
     template <class D>
-    class xstrided_view_base
+    class xstrided_view_base : public xaccessible<D>
     {
     public:
 
+        using base_type = xaccessible<D>;
         using inner_types = xcontainer_inner_types<D>;
         using xexpression_type = typename inner_types::xexpression_type;
         using undecay_expression = typename inner_types::undecay_expression;
@@ -68,7 +70,6 @@ namespace xt
         xstrided_view_base(const xstrided_view_base& rhs);
 
         size_type size() const noexcept;
-        size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
@@ -84,25 +85,10 @@ namespace xt
         const_reference operator()(Args... args) const;
 
         template <class... Args>
-        reference at(Args... args);
-
-        template <class... Args>
-        const_reference at(Args... args) const;
-
-        template <class... Args>
         reference unchecked(Args... args);
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class... Args>
-        reference periodic(Args... args);
-
-        template <class... Args>
-        const_reference periodic(Args... args) const;
-
-        template <class... Args>
-        bool in_bounds(Args... args) const;
 
         template <class OS>
         disable_integral_t<OS, reference> operator[](const OS& index);
@@ -357,7 +343,8 @@ namespace xt
 
     template <class D>
     inline xstrided_view_base<D>::xstrided_view_base(xstrided_view_base&& rhs)
-        : m_e(std::forward<undecay_expression>(rhs.m_e)),
+        : base_type(std::move(rhs)),
+          m_e(std::forward<undecay_expression>(rhs.m_e)),
           m_storage(detail::copy_move_storage(m_e, rhs.m_storage)),
           m_shape(std::move(rhs.m_shape)),
           m_strides(std::move(rhs.m_strides)),
@@ -369,7 +356,8 @@ namespace xt
 
     template <class D>
     inline xstrided_view_base<D>::xstrided_view_base(const xstrided_view_base& rhs)
-        : m_e(rhs.m_e),
+        : base_type(rhs),
+          m_e(rhs.m_e),
           m_storage(detail::copy_move_storage(m_e, rhs.m_storage)),
           m_shape(rhs.m_shape),
           m_strides(rhs.m_strides),
@@ -391,15 +379,6 @@ namespace xt
     inline auto xstrided_view_base<D>::size() const noexcept -> size_type
     {
         return compute_size(shape());
-    }
-
-    /**
-     * Returns the number of dimensions of the xtrided_view_base.
-     */
-    template <class D>
-    inline auto xstrided_view_base<D>::dimension() const noexcept -> size_type
-    {
-        return m_shape.size();
     }
 
     /**
@@ -488,40 +467,6 @@ namespace xt
     }
 
     /**
-     * Returns a reference to the element at the specified position in the view,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the view. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the view.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xstrided_view_base<D>::at(Args... args) -> reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the view,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the view. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the view.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xstrided_view_base<D>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    /**
      * Returns a reference to the element at the specified position in the view.
      * @param args a list of indices specifying the position in the view. Indices
      * must be unsigned integers, the number of indices must be equal to the number of
@@ -573,74 +518,6 @@ namespace xt
     {
         offset_type index = compute_unchecked_index(args...);
         return m_storage[static_cast<size_type>(index)];
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the view,
-     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
-     * @param args a list of indices specifying the position in the view. Indices
-     * must be integers, the number of indices must be equal to the number of
-     * dimensions of the view, else the behavior is undefined.
-     *
-     * @warning This method is meant for performance, for expressions with a dynamic
-     * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be preferred whenever
-     * it is possible.
-     * @warning This method is NOT compatible with broadcasting, meaning the following
-     * code has undefined behavior:
-     * \code{.cpp}
-     * xt::xarray<double> a = {{0, 1}, {2, 3}};
-     * xt::xarray<double> b = {0, 1};
-     * auto fd = a + b;
-     * double res = fd.uncheked(0, 1);
-     * \endcode
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xstrided_view_base<D>::periodic(Args... args) -> reference
-    {
-        normalize_periodic(shape(), args...);
-        return this->operator()(static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the view,
-     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
-     * @param args a list of indices specifying the position in the view. Indices
-     * must be integers, the number of indices must be equal to the number of
-     * dimensions of the view, else the behavior is undefined.
-     *
-     * @warning This method is meant for performance, for expressions with a dynamic
-     * number of dimensions (i.e. not known at compile time). Since it may have
-     * undefined behavior (see parameters), operator() should be preferred whenever
-     * it is possible.
-     * @warning This method is NOT compatible with broadcasting, meaning the following
-     * code has undefined behavior:
-     * \code{.cpp}
-     * xt::xarray<double> a = {{0, 1}, {2, 3}};
-     * xt::xarray<double> b = {0, 1};
-     * auto fd = a + b;
-     * double res = fd.uncheked(0, 1);
-     * \endcode
-     */
-    template <class D>
-    template <class... Args>
-    inline auto xstrided_view_base<D>::periodic(Args... args) const -> const_reference
-    {
-        normalize_periodic(shape(), args...);
-        return this->operator()(static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns ``true`` only if the the specified position is a valid entry in the container.
-     * @param args a list of indices specifying the position in the view.
-     * @return bool
-     */
-    template <class D>
-    template <class... Args>
-    inline bool xstrided_view_base<D>::in_bounds(Args... args) const
-    {
-        return check_in_bounds(shape(), args...);
     }
 
     /**
