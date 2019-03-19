@@ -28,7 +28,11 @@ namespace xt
     struct xcontainer_inner_types<xdynamic_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
+        using undecay_expression = CT;
+        using shape_type = std::decay_t<S>;
+        using inner_storage_type = FST;
         using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
+        static constexpr layout_type layout = L;
     };
 
     template <class CT, class S, layout_type L, class FST>
@@ -87,12 +91,12 @@ namespace xt
     class xdynamic_view : public xview_semantic<xdynamic_view<CT, S, L, FST>>,
                           public xiterable<xdynamic_view<CT, S, L, FST>>,
                           public extension::xdynamic_view_base_t<CT, S, L, FST>,
-                          private xstrided_view_base<CT, S, L, FST>
+                          private xstrided_view_base<xdynamic_view<CT, S, L, FST>>
     {
     public:
 
         using self_type = xdynamic_view<CT, S, L, FST>;
-        using base_type = xstrided_view_base<CT, S, L, FST>;
+        using base_type = xstrided_view_base<self_type>;
         using semantic_base = xview_semantic<self_type>;
         using extension_base = extension::xdynamic_view_base_t<CT, S, L, FST>;
         using expression_tag = typename extension_base::expression_tag;
