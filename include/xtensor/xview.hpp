@@ -1354,11 +1354,16 @@ namespace xt
     inline std::size_t xview<CT, S...>::data_offset_impl(std::index_sequence<I...>) const noexcept
     {
         auto temp = std::array<std::ptrdiff_t, sizeof...(S)>({
-            (static_cast<ptrdiff_t>(xt::value(std::get<I>(m_slices), 0)) * m_e.strides()[I - newaxis_count_before<S...>(I)])...
+            (static_cast<ptrdiff_t>(xt::value(std::get<I>(m_slices), 0)))...
         });
 
         std::ptrdiff_t result = 0;
-        for (std::size_t i = 0; i < sizeof...(S); ++i)
+        std::size_t i = 0;
+        for (; i < std::min(sizeof...(S), m_e.strides().dimension()); ++i)
+        {
+            result += temp[i] * m_e.strides()[i - newaxis_count_before<S...>(i)];
+        }
+        for (; i < sizeof...(S); ++i)
         {
             result += temp[i];
         }
