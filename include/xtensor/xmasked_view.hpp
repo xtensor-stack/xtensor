@@ -42,14 +42,8 @@ namespace xt
         using mask_type = std::decay_t<CTM>;
         using base_value_type = typename data_type::value_type;
         using flag_type = typename mask_type::value_type;
-        static constexpr bool is_val_const = std::is_const<data_type>::value;
-        static constexpr bool is_flag_const = std::is_const<mask_type>::value;
-        using val_reference = std::conditional_t<is_val_const,
-                                                 typename data_type::const_reference,
-                                                 typename data_type::reference>;
-        using mask_reference = std::conditional_t<is_flag_const,
-                                                  typename mask_type::const_reference,
-                                                  typename mask_type::reference>;
+        using val_reference = inner_reference_t<CTD>;
+        using mask_reference = inner_reference_t<CTM>;
         using value_type = xtl::xmasked_value<base_value_type, flag_type>;
         using reference = xtl::xmasked_value<val_reference, mask_reference>;
         using const_reference = xtl::xmasked_value<typename data_type::const_reference, typename mask_type::const_reference>;
@@ -108,13 +102,11 @@ namespace xt
         using flag_reference = typename mask_type::reference;
         using flag_const_reference = typename mask_type::const_reference;
 
-        static constexpr bool is_val_const = inner_types::is_val_const;
-        static constexpr bool is_flag_const = inner_types::is_flag_const;
         using val_reference = typename inner_types::val_reference;
         using mask_reference = typename inner_types::mask_reference;
 
         using value_type = typename inner_types::value_type;
-        using reference = typename inner_types::reference;;
+        using reference = typename inner_types::reference;
         using const_reference = typename inner_types::const_reference;
 
         using pointer = xtl::xclosure_pointer<reference>;
@@ -187,18 +179,6 @@ namespace xt
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class S>
-        disable_integral_t<S, reference> operator[](const S& index);
-        template <class I>
-        reference operator[](std::initializer_list<I> index);
-        reference operator[](size_type i);
-
-        template <class S>
-        disable_integral_t<S, const_reference> operator[](const S& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
 
         template <class It>
         reference element(It first, It last);
@@ -460,58 +440,6 @@ namespace xt
     inline auto xmasked_view<CTD, CTM>::unchecked(Args... args) const -> const_reference
     {
         return const_reference(m_data.unchecked(args...), m_mask.unchecked(args...));
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the xmasked_view.
-     * @param index a sequence of indices specifying the position in the xmasked_view. Indices
-     * must be unsigned integers, the number of indices in the list should be equal or greater
-     * than the number of dimensions of the xmasked_view.
-     */
-    template <class CTD, class CTM>
-    template <class S>
-    inline auto xmasked_view<CTD, CTM>::operator[](const S& index) -> disable_integral_t<S, reference>
-    {
-        return disable_integral_t<S, reference>(m_data[index], m_mask[index]);
-    }
-
-    template <class CTD, class CTM>
-    template <class I>
-    inline auto xmasked_view<CTD, CTM>::operator[](std::initializer_list<I> index) -> reference
-    {
-        return reference(m_data[index], m_mask[index]);
-    }
-
-    template <class CTD, class CTM>
-    inline auto xmasked_view<CTD, CTM>::operator[](size_type i) -> reference
-    {
-        return reference(m_data[i], m_mask[i]);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the xmasked_view.
-     * @param index a sequence of indices specifying the position in the xmasked_view. Indices
-     * must be unsigned integers, the number of indices in the list should be equal or greater
-     * than the number of dimensions of the xmasked_view.
-     */
-    template <class CTD, class CTM>
-    template <class S>
-    inline auto xmasked_view<CTD, CTM>::operator[](const S& index) const -> disable_integral_t<S, const_reference>
-    {
-        return disable_integral_t<S, const_reference>(m_data[index], m_mask[index]);
-    }
-
-    template <class CTD, class CTM>
-    template <class I>
-    inline auto xmasked_view<CTD, CTM>::operator[](std::initializer_list<I> index) const -> const_reference
-    {
-        return const_reference(m_data[index], m_mask[index]);
-    }
-
-    template <class CTD, class CTM>
-    inline auto xmasked_view<CTD, CTM>::operator[](size_type i) const -> const_reference
-    {
-        return const_reference(m_data[i], m_mask[i]);
     }
 
     /**

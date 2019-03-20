@@ -78,13 +78,11 @@ namespace xt
         using storage_type = typename inner_types::storage_type;
         using allocator_type = allocator_type_t<std::decay_t<storage_type>>;
         using value_type = typename storage_type::value_type;
-        using reference = std::conditional_t<std::is_const<storage_type>::value,
-                                             typename storage_type::const_reference,
-                                             typename storage_type::reference>;
-        using const_reference = typename storage_type::const_reference;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = typename storage_type::pointer;
         using const_pointer = typename storage_type::const_pointer;
-        using size_type = typename storage_type::size_type;
+        using size_type = typename inner_types::size_type;
         using difference_type = typename storage_type::difference_type;
         using simd_value_type = xsimd::simd_type<value_type>;
 
@@ -139,20 +137,9 @@ namespace xt
 
         using accessible_base::shape;
         using accessible_base::at;
+        using accessible_base::operator[];
         using accessible_base::periodic;
         using accessible_base::in_bounds;
-
-        template <class S>
-        disable_integral_t<S, reference> operator[](const S& index);
-        template <class I>
-        reference operator[](std::initializer_list<I> index);
-        reference operator[](size_type i);
-
-        template <class S>
-        disable_integral_t<S, const_reference> operator[](const S& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
 
         template <class It>
         reference element(It first, It last);
@@ -515,60 +502,6 @@ namespace xt
     {
         size_type index = xt::unchecked_data_offset<size_type, static_layout>(strides(), static_cast<std::ptrdiff_t>(args)...);
         return storage()[index];
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the container.
-     * @param index a sequence of indices specifying the position in the container. Indices
-     * must be unsigned integers, the number of indices in the list should be equal or greater
-     * than the number of dimensions of the container.
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::operator[](const S& index)
-        -> disable_integral_t<S, reference>
-    {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class D>
-    template <class I>
-    inline auto xcontainer<D>::operator[](std::initializer_list<I> index) -> reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::operator[](size_type i) -> reference
-    {
-        return operator()(i);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the container.
-     * @param index a sequence of indices specifying the position in the container. Indices
-     * must be unsigned integers, the number of indices in the list should be equal or greater
-     * than the number of dimensions of the container.
-     */
-    template <class D>
-    template <class S>
-    inline auto xcontainer<D>::operator[](const S& index) const
-        -> disable_integral_t<S, const_reference>
-    {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class D>
-    template <class I>
-    inline auto xcontainer<D>::operator[](std::initializer_list<I> index) const -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class D>
-    inline auto xcontainer<D>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
     }
 
     /**

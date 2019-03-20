@@ -120,12 +120,13 @@ namespace xt
         using extension_base = extension::xbroadcast_base_t<CT, X>;
         using expression_tag = typename extension_base::expression_tag;
 
+        using inner_types = xcontainer_inner_types<self_type>;
         using value_type = typename xexpression_type::value_type;
-        using reference = typename xexpression_type::const_reference;
-        using const_reference = typename xexpression_type::const_reference;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = typename xexpression_type::const_pointer;
         using const_pointer = typename xexpression_type::const_pointer;
-        using size_type = typename xexpression_type::size_type;
+        using size_type = typename inner_types::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
         using iterable_base = xconst_iterable<self_type>;
@@ -157,11 +158,8 @@ namespace xt
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
-        template <class S>
-        disable_integral_t<S, const_reference> operator[](const S& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
+        template <class It>
+        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -365,30 +363,17 @@ namespace xt
     }
 
     /**
-     * Returns a constant reference to the element at the specified position in the expression.
-     * @param index a sequence of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices in the sequence should be equal or greater
-     * than the number of dimensions of the container.
+     * Returns a reference to the element at the specified position in the expression.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
+     * than the number of dimensions of the function.
      */
     template <class CT, class X>
-    template <class S>
-    inline auto xbroadcast<CT, X>::operator[](const S& index) const
-        -> disable_integral_t<S, const_reference>
+    template <class It>
+    inline auto xbroadcast<CT, X>::element(It first, It last) -> reference
     {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class CT, class X>
-    template <class I>
-    inline auto xbroadcast<CT, X>::operator[](std::initializer_list<I> index) const -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class CT, class X>
-    inline auto xbroadcast<CT, X>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
+        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**

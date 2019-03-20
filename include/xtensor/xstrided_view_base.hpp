@@ -33,15 +33,13 @@ namespace xt
         static constexpr bool is_const = std::is_const<std::remove_reference_t<undecay_expression>>::value;
 
         using value_type = typename xexpression_type::value_type;
-        using reference = std::conditional_t<is_const,
-                                             typename xexpression_type::const_reference,
-                                             typename xexpression_type::reference>;
-        using const_reference = typename xexpression_type::const_reference;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = std::conditional_t<is_const,
                                            typename xexpression_type::const_pointer,
                                            typename xexpression_type::pointer>;
         using const_pointer = typename xexpression_type::const_pointer;
-        using size_type = typename xexpression_type::size_type;
+        using size_type = typename inner_types::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
         using inner_storage_type = typename inner_types::inner_storage_type;
@@ -89,18 +87,6 @@ namespace xt
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class OS>
-        disable_integral_t<OS, reference> operator[](const OS& index);
-        template <class I>
-        reference operator[](std::initializer_list<I> index);
-        reference operator[](size_type i);
-
-        template <class OS>
-        disable_integral_t<OS, const_reference> operator[](const OS& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
 
         template <class It>
         reference element(It first, It last);
@@ -518,62 +504,6 @@ namespace xt
     {
         offset_type index = compute_unchecked_index(args...);
         return m_storage[static_cast<size_type>(index)];
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the view.
-     * @param index a sequence of indices specifying the position in the view. Indices
-     * must be unsigned integers, the number of indices in the list should be equal or greater
-     * than the number of dimensions of the view.
-     */
-    template <class D>
-    template <class OS>
-    inline auto xstrided_view_base<D>::operator[](const OS& index)
-        -> disable_integral_t<OS, reference>
-    {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class D>
-    template <class I>
-    inline auto xstrided_view_base<D>::operator[](std::initializer_list<I> index)
-        -> reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class D>
-    inline auto xstrided_view_base<D>::operator[](size_type i) -> reference
-    {
-        return operator()(i);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the view.
-     * @param index a sequence of indices specifying the position in the view. Indices
-     * must be unsigned integers, the number of indices in the list should be equal or greater
-     * than the number of dimensions of the view.
-     */
-    template <class D>
-    template <class OS>
-    inline auto xstrided_view_base<D>::operator[](const OS& index) const
-        -> disable_integral_t<OS, const_reference>
-    {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class D>
-    template <class I>
-    inline auto xstrided_view_base<D>::operator[](std::initializer_list<I> index) const
-        -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class D>
-    inline auto xstrided_view_base<D>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
     }
 
     /**

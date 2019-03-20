@@ -93,13 +93,14 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using extension_base = extension::xscalar_base_t<CT>;
         using expression_tag = typename extension_base::expression_tag;
+        using inner_types = xcontainer_inner_types<self_type>;
 
-        using value_type = std::decay_t<CT>;
-        using reference = value_type&;
-        using const_reference = const value_type&;
+        using value_type = typename inner_types::value_type;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = std::size_t;
+        using size_type = typename inner_types::size_type;
         using difference_type = std::ptrdiff_t;
         using simd_value_type = xsimd::simd_type<value_type>;
 
@@ -155,21 +156,11 @@ namespace xt
         reference operator()(Args...) noexcept;
         template <class... Args>
         reference unchecked(Args...) noexcept;
-        template <class S>
-        disable_integral_t<S, reference> operator[](const S&) noexcept;
-        template <class I>
-        reference operator[](std::initializer_list<I>) noexcept;
-        reference operator[](size_type) noexcept;
 
         template <class... Args>
         const_reference operator()(Args...) const noexcept;
         template <class... Args>
         const_reference unchecked(Args...) const noexcept;
-        template <class S>
-        disable_integral_t<S, const_reference> operator[](const S&) const noexcept;
-        template <class I>
-        const_reference operator[](std::initializer_list<I>) const noexcept;
-        const_reference operator[](size_type) const noexcept;
 
         template <class It>
         reference element(It, It) noexcept;
@@ -552,28 +543,6 @@ namespace xt
     }
 
     template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::operator[](const S&) noexcept
-        -> disable_integral_t<S, reference>
-    {
-        return m_value;
-    }
-
-    template <class CT>
-    template <class I>
-    inline auto xscalar<CT>::operator[](std::initializer_list<I>) noexcept
-        -> reference
-    {
-        return m_value;
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::operator[](size_type) noexcept -> reference
-    {
-        return m_value;
-    }
-
-    template <class CT>
     template <class... Args>
     inline auto xscalar<CT>::operator()(Args...) const noexcept -> const_reference
     {
@@ -584,28 +553,6 @@ namespace xt
     template <class CT>
     template <class... Args>
     inline auto xscalar<CT>::unchecked(Args...) const noexcept -> const_reference
-    {
-        return m_value;
-    }
-
-    template <class CT>
-    template <class S>
-    inline auto xscalar<CT>::operator[](const S&) const noexcept
-        -> disable_integral_t<S, const_reference>
-    {
-        return m_value;
-    }
-
-    template <class CT>
-    template <class I>
-    inline auto xscalar<CT>::operator[](std::initializer_list<I>) const noexcept
-        -> const_reference
-    {
-        return m_value;
-    }
-
-    template <class CT>
-    inline auto xscalar<CT>::operator[](size_type) const noexcept -> const_reference
     {
         return m_value;
     }

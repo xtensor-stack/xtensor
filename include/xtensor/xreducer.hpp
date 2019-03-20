@@ -489,11 +489,9 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference unchecked(Args... args) const;
-        template <class S>
-        disable_integral_t<S, const_reference> operator[](const S& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
+
+        template <class It>
+        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -943,31 +941,17 @@ namespace xt
     }
 
     /**
-     * Returns a constant reference to the element at the specified position in the reducer.
-     * @param index a sequence of indices specifying the position in the reducer. Indices
-     * must be unsigned integers, the number of indices in the sequence should be equal or greater
+     * Returns a reference to the element at the specified position in the reducer.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
      * than the number of dimensions of the reducer.
      */
     template <class F, class CT, class X>
-    template <class S>
-    inline auto xreducer<F, CT, X>::operator[](const S& index) const
-        -> disable_integral_t<S, const_reference>
+    template <class It>
+    inline auto xreducer<F, CT, X>::element(It first, It last) -> reference
     {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class F, class CT, class X>
-    template <class I>
-    inline auto xreducer<F, CT, X>::operator[](std::initializer_list<I> index) const
-        -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class F, class CT, class X>
-    inline auto xreducer<F, CT, X>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
+        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**

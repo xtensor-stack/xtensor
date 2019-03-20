@@ -79,11 +79,11 @@ namespace xt
         using expression_tag = typename extension_base::expression_tag;
 
         using value_type = typename functor_type::value_type;
-        using reference = typename functor_type::reference;
-        using const_reference = typename functor_type::const_reference;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = typename functor_type::pointer;
         using const_pointer = typename functor_type::const_pointer;
-        using size_type = typename xexpression_type::size_type;
+        using size_type = typename inner_types::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
         using shape_type = typename xexpression_type::shape_type;
@@ -156,12 +156,6 @@ namespace xt
         template <class... Args>
         reference unchecked(Args... args);
 
-        template <class S>
-        disable_integral_t<S, reference> operator[](const S& index);
-        template <class I>
-        reference operator[](std::initializer_list<I> index);
-        reference operator[](size_type i);
-
         template <class IT>
         reference element(IT first, IT last);
 
@@ -170,12 +164,6 @@ namespace xt
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class S>
-        disable_integral_t<S, const_reference> operator[](const S& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
 
         template <class IT>
         const_reference element(IT first, IT last) const;
@@ -719,34 +707,6 @@ namespace xt
 
     /**
      * Returns a reference to the element at the specified position in the expression.
-     * @param index a sequence of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices in the sequence should be equal or greater
-     * than the number of dimensions of the container.
-     */
-    template <class D>
-    template <class S>
-    inline auto xfunctor_applier_base<D>::operator[](const S& index)
-        -> disable_integral_t<S, reference>
-    {
-        return m_functor(m_e[index]);
-    }
-
-    template <class D>
-    template <class I>
-    inline auto xfunctor_applier_base<D>::operator[](std::initializer_list<I> index)
-        -> reference
-    {
-        return m_functor(m_e[index]);
-    }
-
-    template <class D>
-    inline auto xfunctor_applier_base<D>::operator[](size_type i) -> reference
-    {
-        return operator()(i);
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the expression.
      * @param first iterator starting the sequence of indices
      * @param last iterator ending the sequence of indices
      * The number of indices in the sequence should be equal to or greater
@@ -799,34 +759,6 @@ namespace xt
     inline auto xfunctor_applier_base<D>::unchecked(Args... args) const -> const_reference
     {
         return m_functor(m_e.unchecked(args...));
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the expression.
-     * @param index a sequence of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices in the sequence should be equal or greater
-     * than the number of dimensions of the container.
-     */
-    template <class D>
-    template <class S>
-    inline auto xfunctor_applier_base<D>::operator[](const S& index) const
-        -> disable_integral_t<S, const_reference>
-    {
-        return m_functor(m_e[index]);
-    }
-
-    template <class D>
-    template <class I>
-    inline auto xfunctor_applier_base<D>::operator[](std::initializer_list<I> index) const
-        -> const_reference
-    {
-        return m_functor(m_e[index]);
-    }
-
-    template <class D>
-    inline auto xfunctor_applier_base<D>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
     }
 
     /**
