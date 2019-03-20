@@ -2423,9 +2423,11 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto nanmean(E&& e, X&& axes, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
+        // note: forcing copy of first axes argument -- is there a better solution?
+        auto axes_copy = axes;
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
-        return nansum<T>(sc, axes, es) / xt::cast<double>(count_nonnan(sc, axes, es));
+        return nansum<T>(sc, std::forward<X>(axes), es) / xt::cast<double>(count_nonnan(sc, std::move(axes_copy), es));
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -2440,15 +2442,17 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
-        decltype(auto) sc = detail::shared_forward<E>(e);
-        return nansum<T>(sc, axes, es) / xt::cast<double>(count_nonnan(sc, axes, es));
+        return nanmean(std::forward<E>(e),
+                       xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                       es);
     }
 #else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
-        decltype(auto) sc = detail::shared_forward<E>(e);
-        return nansum<T>(sc, axes, es) / xt::cast<double>(count_nonnan(sc, axes, es));
+        return nanmean(std::forward<E>(e),
+                       xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                       es);
     }
 #endif
 
