@@ -77,13 +77,14 @@ namespace xt
      */
     template <class CTD, class CTM>
     class xmasked_view : public xview_semantic<xmasked_view<CTD, CTM>>,
-                         public xaccessible<xmasked_view<CTD, CTM>>,
+                         private xaccessible<xmasked_view<CTD, CTM>>,
                          private xiterable<xmasked_view<CTD, CTM>>
     {
     public:
 
         using self_type = xmasked_view<CTD, CTM>;
         using semantic_base = xview_semantic<xmasked_view<CTD, CTM>>;
+        using accessible_base = xaccessible<self_type>;
         using inner_types = xcontainer_inner_types<self_type>;
         using temporary_type = typename inner_types::temporary_type;
 
@@ -158,10 +159,11 @@ namespace xt
         xmasked_view(D&& data, M&& mask);
 
         size_type size() const noexcept;
-
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
+        using accessible_base::dimension;
+        using accessible_base::shape;
 
         layout_type layout() const noexcept;
 
@@ -179,6 +181,11 @@ namespace xt
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
+
+        using accessible_base::at;
+        using accessible_base::operator[];
+        using accessible_base::periodic;
+        using accessible_base::in_bounds;
 
         template <class It>
         reference element(It first, It last);
@@ -224,9 +231,11 @@ namespace xt
 
         void assign_temporary_impl(temporary_type&& tmp);
 
-        friend class xiterable<xmasked_view<CTD, CTM>>;
-        friend class xconst_iterable<xmasked_view<CTD, CTM>>;
-        friend class xview_semantic<xmasked_view<CTD, CTM>>;
+        friend class xiterable<self_type>;
+        friend class xconst_iterable<self_type>;
+        friend class xview_semantic<self_type>;
+        friend class xaccessible<self_type>;
+        friend class xconst_accessible<self_type>;
     };
 
     template <class D, bool is_const>

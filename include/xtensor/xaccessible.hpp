@@ -36,6 +36,7 @@ namespace xt
         using const_reference = typename inner_types::const_reference;
         using size_type = typename inner_types::size_type;
 
+        size_type size() const noexcept;
         size_type dimension() const noexcept;
         size_type shape(size_type index) const;
 
@@ -124,6 +125,15 @@ namespace xt
     /************************************
      * xconst_accessible implementation *
      ************************************/
+    
+    /**
+     * Returns the size of the expression.
+     */
+    template <class D>
+    inline auto xconst_accessible<D>::size() const noexcept -> size_type
+    {
+        return compute_size(derived_cast().shape());
+    }
 
     /**
      * Returns the number of dimensions of the expression.

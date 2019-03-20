@@ -272,7 +272,7 @@ namespace xt
         xfunction(xfunction&&) = default;
         xfunction& operator=(xfunction&&) = default;
 
-        size_type size() const noexcept;
+        using accessible_base::size;
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const;
         layout_type layout() const noexcept;
@@ -548,15 +548,6 @@ namespace xt
      * @name Size and shape
      */
     //@{
-    /**
-     * Returns the size of the expression.
-     */
-    template <class F, class... CT>
-    inline auto xfunction<F, CT...>::size() const noexcept -> size_type
-    {
-        return compute_size(shape());
-    }
-
     /**
      * Returns the number of dimensions of the function.
      */

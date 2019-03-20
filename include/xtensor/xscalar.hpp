@@ -84,7 +84,7 @@ namespace xt
     template <class CT>
     class xscalar : public xexpression<xscalar<CT>>,
                     private xiterable<xscalar<CT>>,
-                    public xaccessible<xscalar<CT>>,
+                    private xaccessible<xscalar<CT>>,
                     public extension::xscalar_base_t<CT>
     {
     public:
@@ -92,6 +92,7 @@ namespace xt
         using self_type = xscalar<CT>;
         using xexpression_type = std::decay_t<CT>;
         using extension_base = extension::xscalar_base_t<CT>;
+        using accessible_base = xaccessible<self_type>;
         using expression_tag = typename extension_base::expression_tag;
         using inner_types = xcontainer_inner_types<self_type>;
 
@@ -151,6 +152,8 @@ namespace xt
         size_type size() const noexcept;
         const shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
+        using accessible_base::dimension;
+        using accessible_base::shape;
 
         template <class... Args>
         reference operator()(Args...) noexcept;
@@ -161,6 +164,11 @@ namespace xt
         const_reference operator()(Args...) const noexcept;
         template <class... Args>
         const_reference unchecked(Args...) const noexcept;
+
+        using accessible_base::at;
+        using accessible_base::operator[];
+        using accessible_base::periodic;
+        using accessible_base::in_bounds;
 
         template <class It>
         reference element(It, It) noexcept;
@@ -282,6 +290,8 @@ namespace xt
 
         friend class xconst_iterable<self_type>;
         friend class xiterable<self_type>;
+        friend class xaccessible<self_type>;
+        friend class xconst_accessible<self_type>;
     };
 
     namespace detail

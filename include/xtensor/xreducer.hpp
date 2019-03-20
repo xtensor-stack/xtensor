@@ -479,7 +479,6 @@ namespace xt
         template <class Func, class CTA, class AX>
         xreducer(Func&& func, CTA&& e, AX&& axes);
 
-        size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
 
@@ -848,15 +847,7 @@ namespace xt
     /**
      * @name Size and shape
      */
-    /**
-     * Returns the size of the expression.
-     */
-    template <class F, class CT, class X>
-    inline auto xreducer<F, CT, X>::size() const noexcept -> size_type
-    {
-        return compute_size(shape());
-    }
-
+    //@{
     /**
      * Returns the shape of the expression.
      */
