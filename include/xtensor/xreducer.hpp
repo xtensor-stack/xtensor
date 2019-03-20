@@ -484,14 +484,9 @@ namespace xt
         layout_type layout() const noexcept;
 
         template <class... Args>
-        reference operator()(Args... args);
-        template <class... Args>
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class It>
-        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -885,19 +880,6 @@ namespace xt
      * @name Data
      */
     /**
-     * Returns a reference to the element at the specified position in the reducer.
-     * @param args a list of indices specifying the position in the reducer. Indices
-     * must be unsigned integers, the number of indices should be equal or greater than
-     * the number of dimensions of the reducer.
-     */
-    template <class F, class CT, class X>
-    template <class... Args>
-    inline auto xreducer<F, CT, X>::operator()(Args... args) -> reference
-    {
-        return static_cast<const self_type*>(this)->operator()(args...);
-    }
-
-    /**
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param args a list of indices specifying the position in the reducer. Indices
      * must be unsigned integers, the number of indices should be equal or greater than
@@ -938,20 +920,6 @@ namespace xt
     {
         std::array<std::size_t, sizeof...(Args)> arg_array = { { static_cast<std::size_t>(args)... } };
         return element(arg_array.cbegin(), arg_array.cend());
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the reducer.
-     * @param first iterator starting the sequence of indices
-     * @param last iterator ending the sequence of indices
-     * The number of indices in the sequence should be equal to or greater
-     * than the number of dimensions of the reducer.
-     */
-    template <class F, class CT, class X>
-    template <class It>
-    inline auto xreducer<F, CT, X>::element(It first, It last) -> reference
-    {
-        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**

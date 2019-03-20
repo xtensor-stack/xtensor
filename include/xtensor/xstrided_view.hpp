@@ -247,6 +247,7 @@ namespace xt
         friend class xstepper;
         friend class xview_semantic<self_type>;
         friend class xaccessible<self_type>;
+        friend class xconst_accessible<self_type>;
     };
 
     /**************************
