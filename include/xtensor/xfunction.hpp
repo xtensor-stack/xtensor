@@ -193,13 +193,13 @@ namespace xt
     template <class F, class... CT>
     class xfunction : private xconst_iterable<xfunction<F, CT...>>,
                       public xexpression<xfunction<F, CT...>>,
-                      private xaccessible<xfunction<F, CT...>>,
+                      private xconst_accessible<xfunction<F, CT...>>,
                       public extension::xfunction_base_t<F, CT...>
     {
     public:
 
         using self_type = xfunction<F, CT...>;
-        using accessible_base = xaccessible<self_type>;
+        using accessible_base = xconst_accessible<self_type>;
         using extension_base = extension::xfunction_base_t<F, CT...>;
         using expression_tag = typename extension_base::expression_tag;
         using only_scalar = all_xscalar<CT...>;
@@ -278,9 +278,6 @@ namespace xt
         layout_type layout() const noexcept;
 
         template <class... Args>
-        reference operator()(Args... args);
-
-        template <class... Args>
         const_reference operator()(Args... args) const;
 
         template <class... Args>
@@ -290,9 +287,6 @@ namespace xt
         using accessible_base::operator[];
         using accessible_base::periodic;
         using accessible_base::in_bounds;
-
-        template <class It>
-        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -375,7 +369,7 @@ namespace xt
         friend class xfunction_iterator<F, CT...>;
         friend class xfunction_stepper<F, CT...>;
         friend class xconst_iterable<self_type>;
-        friend class xaccessible<self_type>;
+        friend class xconst_accessible<self_type>;
     };
 
     /**********************
@@ -614,20 +608,6 @@ namespace xt
      * @name Data
      */
     /**
-     * Returns a reference to the element at the specified position in the function.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal or greater than
-     * the number of dimensions of the function.
-     */
-    template <class F, class... CT>
-    template <class... Args>
-    inline auto xfunction<F, CT...>::operator()(Args... args) -> reference
-    {
-        return static_cast<const self_type*>(this)->operator()(args...);
-    }
-
-
-    /**
      * Returns a constant reference to the element at the specified position in the function.
      * @param args a list of indices specifying the position in the function. Indices
      * must be unsigned integers, the number of indices should be equal or greater than
@@ -668,20 +648,6 @@ namespace xt
         // The static cast prevents the compiler from instantiating the template methods with signed integers,
         // leading to warning about signed/unsigned conversions in the deeper layers of the access methods
         return unchecked_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the function.
-     * @param first iterator starting the sequence of indices
-     * @param last iterator ending the sequence of indices
-     * The number of indices in the sequence should be equal to or greater
-     * than the number of dimensions of the container.
-     */
-    template <class F, class... CT>
-    template <class It>
-    inline auto xfunction<F, CT...>::element(It first, It last) -> reference
-    {
-        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**

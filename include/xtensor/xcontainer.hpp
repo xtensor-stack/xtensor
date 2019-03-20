@@ -234,6 +234,7 @@ namespace xt
         friend class xstepper;
 
         friend class xaccessible<D>;
+        friend class xconst_accessible<D>;
     };
 
     /**

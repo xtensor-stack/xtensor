@@ -110,7 +110,7 @@ namespace xt
     template <class CT, class X>
     class xbroadcast : public xexpression<xbroadcast<CT, X>>,
                        public xconst_iterable<xbroadcast<CT, X>>,
-                       public xaccessible<xbroadcast<CT, X>>,
+                       public xconst_accessible<xbroadcast<CT, X>>,
                        public extension::xbroadcast_base_t<CT, X>
     {
     public:
@@ -150,16 +150,10 @@ namespace xt
         layout_type layout() const noexcept;
 
         template <class... Args>
-        reference operator()(Args... args);
-
-        template <class... Args>
         const_reference operator()(Args... args) const;
 
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class It>
-        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -311,19 +305,6 @@ namespace xt
      * @name Data
      */
     /**
-     * Returns a reference to the element at the specified position in the expression.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal or greater than
-     * the number of dimensions of the expression.
-     */
-    template <class CT, class X>
-    template <class... Args>
-    inline auto xbroadcast<CT, X>::operator()(Args... args) -> reference
-    {
-        return static_cast<const self_type*>(this)->operator()(args...);
-    }
-
-    /**
      * Returns a constant reference to the element at the specified position in the expression.
      * @param args a list of indices specifying the position in the function. Indices
      * must be unsigned integers, the number of indices should be equal or greater than
@@ -360,20 +341,6 @@ namespace xt
     inline auto xbroadcast<CT, X>::unchecked(Args... args) const -> const_reference
     {
         return this->operator()(args...);
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the expression.
-     * @param first iterator starting the sequence of indices
-     * @param last iterator ending the sequence of indices
-     * The number of indices in the sequence should be equal to or greater
-     * than the number of dimensions of the function.
-     */
-    template <class CT, class X>
-    template <class It>
-    inline auto xbroadcast<CT, X>::element(It first, It last) -> reference
-    {
-        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**

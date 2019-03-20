@@ -89,7 +89,7 @@ namespace xt
     template <class F, class R, class S>
     class xgenerator : public xexpression<xgenerator<F, R, S>>,
                        public xconst_iterable<xgenerator<F, R, S>>,
-                       public xaccessible<xgenerator<F, R, S>>,
+                       public xconst_accessible<xgenerator<F, R, S>>,
                        public extension::xgenerator_base_t<F, R, S>
     {
     public:
@@ -127,14 +127,9 @@ namespace xt
         layout_type layout() const noexcept;
 
         template <class... Args>
-        reference operator()(Args... args);
-        template <class... Args>
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference unchecked(Args... args) const;
-
-        template <class It>
-        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -257,18 +252,6 @@ namespace xt
      */
     template <class F, class R, class S>
     template <class... Args>
-    inline auto xgenerator<F, R, S>::operator()(Args... args) -> reference
-    {
-        return static_cast<const self_type*>(this)->operator()(args...);
-    }
-    /**
-     * Returns the evaluated element at the specified position in the function.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal or greater than
-     * the number of dimensions of the function.
-     */
-    template <class F, class R, class S>
-    template <class... Args>
     inline auto xgenerator<F, R, S>::operator()(Args... args) const -> const_reference
     {
         XTENSOR_TRY(check_index(shape(), args...));
@@ -300,20 +283,6 @@ namespace xt
     inline auto xgenerator<F, R, S>::unchecked(Args... args) const -> const_reference
     {
         return m_f(args...);
-    }
-
-    /**
-     * Returns a reference to the element at the specified position in the function.
-     * @param first iterator starting the sequence of indices
-     * @param last iterator ending the sequence of indices
-     * The number of indices in the sequence should be equal to or greater
-     * than the number of dimensions of the container.
-     */
-    template <class F, class R, class S>
-    template <class It>
-    inline auto xgenerator<F, R, S>::element(It first, It last)-> reference
-    {
-        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**
