@@ -1892,7 +1892,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * Note: this function is not yet specialized for complex numbers.
      *
      * @param e an \ref xexpression
-     * @param axes the axes along which the mean is computed (optional)
+     * @param axes the axes along which the variance is computed (optional)
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @return an \ref xexpression
      *
@@ -1928,7 +1928,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * Note: this function is not yet specialized for complex numbers.
      *
      * @param e an \ref xexpression
-     * @param axes the axes along which the mean is computed (optional)
+     * @param axes the axes along which the standard deviation is computed (optional)
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @return an \ref xexpression
      *
@@ -2423,34 +2423,146 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
               XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
     inline auto nanmean(E&& e, X&& axes, EVS es = EVS())
     {
-        auto shared_e = make_xshared(std::move(e));
-        auto shared_axes = make_xshared(std::move(axes));
+        decltype(auto) sc = detail::shared_forward<E>(e);
+        // note: forcing copy of first axes argument -- is there a better solution?
+        auto axes_copy = axes;
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
-        return nansum<T>(shared_e, shared_axes, es) / xt::cast<double>(count_nonnan(shared_e, shared_axes, es));
+        return nansum<T>(sc, std::forward<X>(axes), es) / xt::cast<double>(count_nonnan(sc, std::move(axes_copy), es));
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_evaluation_strategy<EVS>)>
     inline auto nanmean(E&& e, EVS es = EVS())
     {
-        auto shared_e = make_xshared(std::move(e));
-        return nansum<T>(shared_e, es) / xt::cast<double>(count_nonnan(shared_e, es));
+        decltype(auto) sc = detail::shared_forward<E>(e);
+        return nansum<T>(sc, es) / xt::cast<double>(count_nonnan(sc, es));
     }
 
 #ifdef X_OLD_CLANG
     template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
-        auto shared_e = make_xshared(std::move(e));
-        return nansum<T>(shared_e, axes, es) / xt::cast<double>(count_nonnan(shared_e, axes, es));
+        return nanmean(std::forward<E>(e),
+                       xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                       es);
     }
 #else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
-        auto shared_e = xt::make_xshared(std::move(e));
-        return nansum<T>(shared_e, axes, es) / xt::cast<double>(count_nonnan(shared_e, axes, es));
+        return nanmean(std::forward<E>(e),
+                       xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                       es);
+    }
+#endif
+
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+    inline auto nanvar(E&& e, EVS es = EVS())
+    {
+        decltype(auto) sc = detail::shared_forward<E>(e);
+        return nanmean(square(abs(sc - nanmean(sc))), es);
+    }
+
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_evaluation_strategy<EVS>)>
+    inline auto nanstd(E&& e, EVS es = EVS())
+    {
+        return sqrt(nanvar(std::forward<E>(e), es));
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Compute the variance along the specified axes, excluding nans
+     *
+     * Returns the variance of the array elements, a measure of the spread of a
+     * distribution. The variance is computed for the flattened array by default,
+     * otherwise over the specified axes.
+     *
+     * Note: this function is not yet specialized for complex numbers.
+     *
+     * @param e an \ref xexpression
+     * @param axes the axes along which the variance is computed (optional)
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xexpression
+     *
+     * @sa nanstd, nanmean
+     */
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+    inline auto nanvar(E&& e, X&& axes, EVS es = EVS())
+    {
+        decltype(auto) sc = detail::shared_forward<E>(e);
+        // note: forcing copy of first axes argument -- is there a better solution?
+        auto axes_copy = axes;
+        auto inner_mean = nanmean(sc, std::move(axes_copy));
+
+        // fake keep_dims = 1
+        auto keep_dim_shape = e.shape();
+        for (const auto& el : axes)
+        {
+            keep_dim_shape[el] = 1;
+        }
+        auto mrv = xt::reshape_view(std::move(inner_mean), std::move(keep_dim_shape));
+        return nanmean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
+    }
+
+    /**
+     * @ingroup red_functions
+     * @brief Compute the standard deviation along the specified axis, excluding nans.
+     *
+     * Returns the standard deviation, a measure of the spread of a distribution,
+     * of the array elements. The standard deviation is computed for the flattened
+     * array by default, otherwise over the specified axis.
+     *
+     * Note: this function is not yet specialized for complex numbers.
+     *
+     * @param e an \ref xexpression
+     * @param axes the axes along which the standard deviation is computed (optional)
+     * @param es evaluation strategy to use (lazy (default), or immediate)
+     * @return an \ref xexpression
+     *
+     * @sa nanvar, nanmean
+     */
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+    inline auto nanstd(E&& e, X&& axes, EVS es = EVS())
+    {
+        return sqrt(nanvar(std::forward<E>(e), std::forward<X>(axes), es));
+    }
+
+#ifndef X_OLD_CLANG
+    template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto nanstd(E&& e, const A (&axes)[N], EVS es = EVS())
+    {
+        return nanstd(std::forward<E>(e),
+                      xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                      es);
+    }
+
+    template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto nanvar(E&& e, const A (&axes)[N], EVS es = EVS())
+    {
+        return nanvar(std::forward<E>(e),
+                      xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                      es);
+    }
+#else
+    template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto nanstd(E&& e, std::initializer_list<A> axes, EVS es = EVS())
+    {
+        return nanstd(std::forward<E>(e),
+                      xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                      es);
+    }
+
+    template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto nanvar(E&& e, std::initializer_list<A> axes, EVS es = EVS())
+    {
+        return nanvar(std::forward<E>(e),
+                      xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                      es);
     }
 #endif
 
