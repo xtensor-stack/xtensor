@@ -65,7 +65,7 @@ namespace xt
     class xfunctor_stepper;
 
     template <class D>
-    class xfunctor_applier_base : public xaccessible<D>
+    class xfunctor_applier_base : private xaccessible<D>
     {
     public:
 
@@ -74,6 +74,7 @@ namespace xt
         using xexpression_type = typename inner_types::xexpression_type;
         using undecay_expression = typename inner_types::undecay_expression;
         using functor_type = typename inner_types::functor_type;
+        using accessible_base = xaccessible<D>;
 
         using extension_base = extension::xfunctor_view_base_t<functor_type, undecay_expression>;
         using expression_tag = typename extension_base::expression_tag;
@@ -147,6 +148,8 @@ namespace xt
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
+        using accessible_base::dimension;
+        using accessible_base::shape;
 
         layout_type layout() const noexcept;
 
@@ -167,6 +170,11 @@ namespace xt
 
         template <class IT>
         const_reference element(IT first, IT last) const;
+
+        using accessible_base::at;
+        using accessible_base::operator[];
+        using accessible_base::periodic;
+        using accessible_base::in_bounds;
 
         xexpression_type& expression() noexcept;
         const xexpression_type& expression() const noexcept;
@@ -293,6 +301,11 @@ namespace xt
 
         undecay_expression m_e;
         functor_type m_functor;
+
+    private:
+
+        friend class xaccessible<D>;
+        friend class xconst_accessible<D>;
     };
 
     /********************************
@@ -614,15 +627,6 @@ namespace xt
     {
         return m_e.size();
     }
-
-    /**
-     * Returns the number of dimensions of the expression.
-     */
-    /*template <class D>
-    inline auto xfunctor_applier_base<D>::dimension() const noexcept -> size_type
-    {
-        return m_e.dimension();
-    }*/
 
     /**
      * Returns the shape of the expression.

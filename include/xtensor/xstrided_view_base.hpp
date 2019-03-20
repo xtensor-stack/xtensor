@@ -67,7 +67,6 @@ namespace xt
 
         xstrided_view_base(const xstrided_view_base& rhs);
 
-        size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
@@ -358,15 +357,6 @@ namespace xt
      * @name Size and shape
      */
     //@{
-    /**
-     * Returns the size of the xtrided_view_base.
-     */
-    template <class D>
-    inline auto xstrided_view_base<D>::size() const noexcept -> size_type
-    {
-        return compute_size(shape());
-    }
-
     /**
      * Returns the shape of the xtrided_view_base.
      */

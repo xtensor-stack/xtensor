@@ -418,7 +418,6 @@ namespace xt
         template <class E>
         disable_xexpression<E, self_type>& operator=(const E& e);
 
-        size_type size() const noexcept;
         const inner_shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
         layout_type layout() const noexcept;
@@ -867,24 +866,6 @@ namespace xt
      */
     //@{
     /**
-     * Returns the size of the expression.
-     */
-    template <class CT, class... S>
-    inline auto xview<CT, S...>::size() const noexcept -> size_type
-    {
-        return compute_size(shape());
-    }
-
-    /**
-     * Returns the number of dimensions of the view.
-     */
-    /*template <class CT, class... S>
-    inline auto xview<CT, S...>::dimension() const noexcept -> size_type
-    {
-        return m_shape.size();
-    }*/
-
-    /**
      * Returns the shape of the view.
      */
     template <class CT, class... S>
@@ -1107,7 +1088,7 @@ namespace xt
     auto xview<CT, S...>::storage_end()
         -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, storage_iterator>
     {
-        return m_e.storage().begin() + data_offset() + size();
+        return m_e.storage().begin() + data_offset() + this->size();
     }
 
     template <class CT, class... S>
@@ -1123,7 +1104,7 @@ namespace xt
     auto xview<CT, S...>::storage_cend() const
         -> std::enable_if_t<has_data_interface<T>::value && is_strided_view, const_storage_iterator>
     {
-        return m_e.storage().cbegin() + data_offset() + size();
+        return m_e.storage().cbegin() + data_offset() + this->size();
     }
 
     /**
