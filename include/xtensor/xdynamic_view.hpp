@@ -28,10 +28,10 @@ namespace xt
     struct xcontainer_inner_types<xdynamic_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using reference = typename xexpression_type::reference;
+        using undecay_expression = CT;
+        using reference = inner_reference_t<undecay_expression>;
         using const_reference = typename xexpression_type::const_reference;
         using size_type = typename xexpression_type::size_type;
-        using undecay_expression = CT;
         using shape_type = std::decay_t<S>;
         using inner_storage_type = FST;
         using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
@@ -181,17 +181,10 @@ namespace xt
         template <class... Args>
         const_reference unchecked(Args... args) const;
 
-        template <class OS>
-        disable_integral_t<OS, reference> operator[](const OS& index);
-        template <class I>
-        reference operator[](std::initializer_list<I> index);
-        reference operator[](size_type i);
-
-        template <class OS>
-        disable_integral_t<OS, const_reference> operator[](const OS& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
+        using base_type::operator[];
+        using base_type::at;
+        using base_type::periodic;
+        using base_type::in_bounds;
 
         template <class It>
         reference element(It first, It last);
@@ -457,46 +450,6 @@ namespace xt
         offset_type offset = base_type::compute_unchecked_index(args...);
         offset = adjust_offset(args...);
         return base_type::storage()[static_cast<size_type>(offset)];
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    template <class OS>
-    inline auto xdynamic_view<CT, S, L, FST>::operator[](const OS& index) -> disable_integral_t<OS, reference>
-    {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    template <class I>
-    inline auto xdynamic_view<CT, S, L, FST>::operator[](std::initializer_list<I> index) -> reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    inline auto xdynamic_view<CT, S, L, FST>::operator[](size_type i) -> reference
-    {
-        return operator()(i);
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    template <class OS>
-    inline auto xdynamic_view<CT, S, L, FST>::operator[](const OS& index) const -> disable_integral_t<OS, const_reference>
-    {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    template <class I>
-    inline auto xdynamic_view<CT, S, L, FST>::operator[](std::initializer_list<I> index) const -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    inline auto xdynamic_view<CT, S, L, FST>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
     }
 
     template <class CT, class S, layout_type L, class FST>

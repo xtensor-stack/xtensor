@@ -756,6 +756,18 @@ namespace xt
 
     template <class C>
     using get_strides_t = typename get_strides_type<C>::type;
+
+    template <class ST>
+    struct inner_reference
+    {
+        using storage_type = std::decay_t<ST>;
+        using type = std::conditional_t<std::is_const<std::remove_reference_t<ST>>::value,
+                                        typename storage_type::const_reference,
+                                        typename storage_type::reference>;
+    };
+
+    template <class ST>
+    using inner_reference_t = typename inner_reference<ST>::type;
 }
 
 #endif

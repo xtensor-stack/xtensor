@@ -60,10 +60,10 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using reference = typename xexpression_type::reference;
+        using undecay_expression = CT;
+        using reference = inner_reference_t<undecay_expression>;
         using const_reference = typename xexpression_type::const_reference;
         using size_type = typename xexpression_type::size_type;
-        using undecay_expression = CT;
         using shape_type = std::decay_t<S>;
         using inner_storage_type = FST;
         using temporary_type = temporary_type_t<typename xexpression_type::value_type, S, L>;

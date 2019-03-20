@@ -100,12 +100,13 @@ namespace xt
         using extension_base = extension::xgenerator_base_t<F, R, S>;
         using expression_tag = typename extension_base::expression_tag;
 
+        using inner_types = xcontainer_inner_types<self_type>;
         using value_type = R;
-        using reference = value_type;
-        using const_reference = value_type;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
         using pointer = value_type*;
         using const_pointer = const value_type*;
-        using size_type = std::size_t;
+        using size_type = typename inner_types::size_type;
         using difference_type = std::ptrdiff_t;
 
         using iterable_base = xconst_iterable<self_type>;
@@ -131,11 +132,9 @@ namespace xt
         const_reference operator()(Args... args) const;
         template <class... Args>
         const_reference unchecked(Args... args) const;
-        template <class OS>
-        disable_integral_t<OS, const_reference> operator[](const OS& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
+
+        template <class It>
+        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -303,26 +302,18 @@ namespace xt
         return m_f(args...);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the function.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
+     * than the number of dimensions of the container.
+     */
     template <class F, class R, class S>
-    template <class OS>
-    inline auto xgenerator<F, R, S>::operator[](const OS& index) const
-        -> disable_integral_t<OS, const_reference>
+    template <class It>
+    inline auto xgenerator<F, R, S>::element(It first, It last)-> reference
     {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class F, class R, class S>
-    template <class I>
-    inline auto xgenerator<F, R, S>::operator[](std::initializer_list<I> index) const
-        -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class F, class R, class S>
-    inline auto xgenerator<F, R, S>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
+        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**

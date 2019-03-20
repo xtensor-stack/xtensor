@@ -287,14 +287,12 @@ namespace xt
         const_reference unchecked(Args... args) const;
 
         using accessible_base::at;
+        using accessible_base::operator[];
         using accessible_base::periodic;
         using accessible_base::in_bounds;
 
-        template <class S>
-        disable_integral_t<S, const_reference> operator[](const S& index) const;
-        template <class I>
-        const_reference operator[](std::initializer_list<I> index) const;
-        const_reference operator[](size_type i) const;
+        template <class It>
+        reference element(It first, It last);
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -672,25 +670,18 @@ namespace xt
         return unchecked_impl(std::make_index_sequence<sizeof...(CT)>(), static_cast<size_type>(args)...);
     }
 
+    /**
+     * Returns a reference to the element at the specified position in the function.
+     * @param first iterator starting the sequence of indices
+     * @param last iterator ending the sequence of indices
+     * The number of indices in the sequence should be equal to or greater
+     * than the number of dimensions of the container.
+     */
     template <class F, class... CT>
-    template <class S>
-    inline auto xfunction<F, CT...>::operator[](const S& index) const
-        -> disable_integral_t<S, const_reference>
+    template <class It>
+    inline auto xfunction<F, CT...>::element(It first, It last) -> reference
     {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class F, class... CT>
-    template <class I>
-    inline auto xfunction<F, CT...>::operator[](std::initializer_list<I> index) const -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class F, class... CT>
-    inline auto xfunction<F, CT...>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
+        return static_cast<const self_type*>(this)->element(first, last);
     }
 
     /**

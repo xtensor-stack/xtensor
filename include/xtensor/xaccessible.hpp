@@ -44,6 +44,18 @@ namespace xt
         template <class... Args>
         const_reference at(Args... args) const;
 
+        template <class S>
+        disable_integral_t<S, reference> operator[](const S& index);
+        template <class I>
+        reference operator[](std::initializer_list<I> index);
+        reference operator[](size_type i);
+
+        template <class S>
+        disable_integral_t<S, const_reference> operator[](const S& index) const;
+        template <class I>
+        const_reference operator[](std::initializer_list<I> index) const;
+        const_reference operator[](size_type i) const;
+
         template <class... Args>
         reference periodic(Args... args);
 
@@ -124,6 +136,60 @@ namespace xt
     {
         check_access(derived_cast().shape(), static_cast<size_type>(args)...);
         return derived_cast().operator()(args...);
+    }
+
+    /**
+     * Returns a reference to the element at the specified position in the expression.
+     * @param index a sequence of indices specifying the position in the expression. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the expression.
+     */
+    template <class D>
+    template <class S>
+    inline auto xaccessible<D>::operator[](const S& index)
+        -> disable_integral_t<S, reference>
+    {
+        return derived_cast().element(index.cbegin(), index.cend());
+    }
+
+    template <class D>
+    template <class I>
+    inline auto xaccessible<D>::operator[](std::initializer_list<I> index) -> reference
+    {
+        return derived_cast().element(index.begin(), index.end());
+    }
+
+    template <class D>
+    inline auto xaccessible<D>::operator[](size_type i) -> reference
+    {
+        return derived_cast().operator()(i);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param index a sequence of indices specifying the position in the expression. Indices
+     * must be unsigned integers, the number of indices in the list should be equal or greater
+     * than the number of dimensions of the expression.
+     */
+    template <class D>
+    template <class S>
+    inline auto xaccessible<D>::operator[](const S& index) const
+        -> disable_integral_t<S, const_reference>
+    {
+        return derived_cast().element(index.cbegin(), index.cend());
+    }
+
+    template <class D>
+    template <class I>
+    inline auto xaccessible<D>::operator[](std::initializer_list<I> index) const -> const_reference
+    {
+        return derived_cast().element(index.begin(), index.end());
+    }
+
+    template <class D>
+    inline auto xaccessible<D>::operator[](size_type i) const -> const_reference
+    {
+        return derived_cast().operator()(i);
     }
 
     /**
