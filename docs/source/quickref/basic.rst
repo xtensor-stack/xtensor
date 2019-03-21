@@ -79,9 +79,10 @@ Shape - dimension - size
 .. code::
 
    xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
-   auto size0 = a.size();     // size0 = 6
-   auto dim0 = a.dimension(); // dim0 = 2
-   auto shape0 = a.shape();   // shape0 = {2, 3}
+   auto size = a.size();     // size = 6
+   auto dim = a.dimension(); // dim = 2
+   auto shape = a.shape();   // shape = {2, 3}
+   auto sh1 = a.shape(1);    // sh1 = 3
 
 Reshape
 -------
@@ -171,6 +172,14 @@ The ``at`` method is an access operator with bound checking:
     xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
     double d0 = a.at(0, 3);   // throws
     double d1 = a.at(3);      // throws
+
+The ``periodic`` method is an access operator that applies periodicity
+to its arguments:
+
+.. code::
+
+    xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+    double d0 = a.periodic(2, -1); // d0 is 3
 
 Fill
 ----
