@@ -14,6 +14,7 @@ xexpression API is actually implemented in ``xstrided_container`` and ``xcontain
 .. toctree::
 
    xcontainer
+   xaccessible
    xiterable
    xarray
    xarray_adaptor
