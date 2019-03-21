@@ -220,7 +220,7 @@ namespace xt
 
         using expr_value_type = typename std::decay_t<E>::value_type;
 
-        using result_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(std::declval<expr_value_type>(), std::declval<expr_value_type>()))>;
+        using result_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(std::declval<init_functor_type>()(), std::declval<expr_value_type>()))>;
 
         auto options = reducer_options<result_type, std::decay_t<O>>(raw_options);
         using options_t = decltype(options);
@@ -1288,14 +1288,14 @@ namespace xt
     template <class E>
     inline auto xreducer<F, CT, X, O>::build_reducer(E&& e) const -> rebind_t<E>
     {
-        return rebind_t<E>(std::make_tuple(m_reduce, m_init, m_merge), std::forward<E>(e), axes_type(m_axes));
+        return rebind_t<E>(std::make_tuple(m_reduce, m_init, m_merge), std::forward<E>(e), axes_type(m_axes), m_options);
     }
 
     template <class F, class CT, class X, class O>
     template <class E, class Func>
     inline auto xreducer<F, CT, X, O>::build_reducer(E&& e, Func&& func) const -> rebind_t<E, Func>
     {
-        return rebind_t<E, Func>(std::forward<Func>(func), std::forward<E>(e), axes_type(m_axes));
+        return rebind_t<E, Func>(std::forward<Func>(func), std::forward<E>(e), axes_type(m_axes), m_options);
     }
 
     /***********************************
