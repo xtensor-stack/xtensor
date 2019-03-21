@@ -115,8 +115,8 @@ namespace xt
 
         size_type size() const noexcept;
         constexpr size_type dimension() const noexcept;
-
         const inner_shape_type& shape() const noexcept;
+        size_type shape(size_type index) const;
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
 
@@ -168,10 +168,19 @@ namespace xt
         const_reference operator[](std::initializer_list<I> index) const;
         const_reference operator[](size_type i) const;
 
+        template <class... Args>
+        reference periodic(Args... args);
+
+        template <class... Args>
+        const_reference periodic(Args... args) const;
+
         template <class It>
         reference element(It first, It last);
         template <class It>
         const_reference element(It first, It last) const;
+
+        template <class... Args>
+        bool in_bounds(Args... args) const;
 
         storage_type& storage() noexcept;
         const storage_type& storage() const noexcept;
@@ -330,6 +339,15 @@ namespace xt
     inline auto xoptional_assembly_base<D>::shape() const noexcept -> const inner_shape_type&
     {
         return value().shape();
+    }
+
+    /**
+     * Returns the i-th dimension of the expression.
+     */
+    template <class D>
+    inline auto xoptional_assembly_base<D>::shape(size_type i) const -> size_type
+    {
+        return value().shape(i);
     }
 
     /**
@@ -603,6 +621,34 @@ namespace xt
     }
 
     /**
+     * Returns a reference to the element at the specified position in the optional assembly,
+     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
+     * @param args a list of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the optional assembly.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xoptional_assembly_base<D>::periodic(Args... args) -> reference
+    {
+        return reference(value().periodic(args...), has_value().periodic(args...));
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the optional assembly,
+     * after applying periodicity to the indices (negative and 'overflowing' indices are changed).
+     * @param args a list of indices specifying the position in the optional assembly. Indices
+     * must be unsigned integers, the number of indices should be equal to the number of dimensions
+     * of the optional assembly.
+     */
+    template <class D>
+    template <class... Args>
+    inline auto xoptional_assembly_base<D>::periodic(Args... args) const -> const_reference
+    {
+        return const_reference(value().periodic(args...), has_value().periodic(args...));
+    }
+
+    /**
      * Returns a reference to the element at the specified position in the optional assembly.
      * @param first iterator starting the sequence of indices
      * @param last iterator ending the sequence of indices
@@ -628,6 +674,18 @@ namespace xt
     inline auto xoptional_assembly_base<D>::element(It first, It last) const -> const_reference
     {
         return const_reference(value().element(first, last), has_value().element(first, last));
+    }
+
+    /**
+     * Returns ``true`` only if the the specified position is a valid entry in the expression.
+     * @param args a list of indices specifying the position in the expression.
+     * @return bool
+     */
+    template <class D>
+    template <class... Args>
+    inline bool xoptional_assembly_base<D>::in_bounds(Args... args) const
+    {
+        return value().in_bounds(args...) && has_value().in_bounds(args...);
     }
     //@}
 
