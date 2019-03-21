@@ -115,6 +115,9 @@ namespace xt
         using d_t = std::decay_t<T>;
 
         static constexpr std::size_t initial_val_idx = xtl::mpl::find_if<initial_tester, d_t>::value;
+        reducer_options() = default;
+        reducer_options(reducer_options&&) = default;
+        reducer_options(const reducer_options&) = default;
 
         reducer_options(const T& tpl)
         {
@@ -137,6 +140,17 @@ namespace xt
         constexpr static bool has_initial_value = initial_val_idx != std::tuple_size<d_t>::value;
 
         R initial_value;
+
+        template <class NR>
+        using rebind_t = reducer_options<NR, T>;
+
+        template <class NR>
+        auto rebind(NR initial, const reducer_options<R, T>& opts) const
+        {
+            reducer_options<NR, T> res;
+            res.initial_value = initial;
+            return res;
+        }
     };
 
     template <class T>
@@ -434,16 +448,16 @@ namespace xt
      * xreducer functors *
      *********************/
 
-    template <int N>
+    template <class T, int N>
     struct const_value
     {
-        constexpr int operator()() const
+        constexpr T operator()() const
         {
-            return N;
+            return T(N);
         }
     };
 
-    template <class REDUCE_FUNC, class INIT_FUNC = const_value<0>, class MERGE_FUNC = REDUCE_FUNC>
+    template <class REDUCE_FUNC, class INIT_FUNC = const_value<long int, 0>, class MERGE_FUNC = REDUCE_FUNC>
     struct xreducer_functors
         : public std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>
     {
@@ -656,15 +670,20 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type) const noexcept;
 
-        template <class E, class Func = F>
+        template <class E, class Func = F, class Opts = O>
         using rebind_t = xreducer<Func, E, X, O>;
 
         template <class E>
         rebind_t<E> build_reducer(E&& e) const;
 
-        template <class E, class Func>
-        rebind_t<E, Func> build_reducer(E&& e, Func&& func) const;
+        template <class E, class Func, class Opts>
+        // rebind_t<E, Func, Opts> build_reducer(E&& e, Func&& func, Opts&& opts) const;
+        auto build_reducer(E&& e, Func&& func, Opts&& opts) const;
 
+        const O& options() const
+        {
+            return m_options;
+        }
     private:
 
         CT m_e;
@@ -1292,10 +1311,10 @@ namespace xt
     }
 
     template <class F, class CT, class X, class O>
-    template <class E, class Func>
-    inline auto xreducer<F, CT, X, O>::build_reducer(E&& e, Func&& func) const -> rebind_t<E, Func>
+    template <class E, class Func, class Opts>
+    inline auto xreducer<F, CT, X, O>::build_reducer(E&& e, Func&& func, Opts&& opts) const // -> rebind_t<E, Func, Opts>
     {
-        return rebind_t<E, Func>(std::forward<Func>(func), std::forward<E>(e), axes_type(m_axes), m_options);
+        return rebind_t<E, Func, Opts>(std::forward<Func>(func), std::forward<E>(e), axes_type(m_axes), std::forward<Opts>(opts));
     }
 
     /***********************************
