@@ -264,14 +264,14 @@ namespace xt
         EXPECT_TRUE(all(equal(avg_d1, expect1)));
     }
 
-    // TEST(xreducer, minmax)
-    // {
-    //     using A = std::array<double, 2>;
+    TEST(xreducer, minmax)
+    {
+        using A = std::array<double, 2>;
 
-    //     xtensor<double, 2> input
-    //         {{-1.0, 0.0}, {1.0, 0.0}};
-    //     EXPECT_EQ(minmax(input)(), (A{-1.0, 1.0}));
-    // }
+        xtensor<double, 2> input
+            {{-1.0, 0.0}, {1.0, 0.0}};
+        EXPECT_EQ(minmax(input)(), (A{-1.0, 1.0}));
+    }
 
     TEST(xreducer, immediate)
     {
