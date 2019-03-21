@@ -61,16 +61,15 @@ namespace xt
             fn1_contents.size() == fn2_contents.size();
     }
 
-    std::string get_filename()
+    std::string get_filename(int n)
     {
-        std::string filename = std::tmpnam(nullptr);
-        filename += ".npy";
+        std::string filename = "files/xnpy_files/test_dump_" + std::to_string(n) + ".npy";
         return filename;
     }
 
     TEST(xnpy, dump)
     {
-        std::string filename = get_filename();
+        std::string filename = get_filename(0);
         xarray<bool> barr = {{{0, 0, 1},
                               {1, 1, 0},
                               {1, 0, 1}},
@@ -93,7 +92,7 @@ namespace xt
         EXPECT_TRUE(compare_binary_files(filename, compare_name));
         std::remove(filename.c_str());
 
-        filename = get_filename();
+        filename = get_filename(1);
         dump_npy(filename, ularr);
         auto ularrcpy = load_npy<uint64_t>(filename);
         EXPECT_TRUE(all(equal(ularr, ularrcpy)));

@@ -290,7 +290,7 @@ namespace xt
         auto ma0 = median(a, 0);
         auto ma1 = median(a, 1);
 
-        EXPECT_EQ(mall, 5);
+        EXPECT_EQ(mall, 5.f);
 
         xt::xtensor<float, 1> ma0_exp = {5, 5, 5, 5};
         xt::xtensor<float, 1> ma1_exp = {2.5, 1.5, 9., 12., 5.};

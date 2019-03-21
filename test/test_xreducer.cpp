@@ -16,7 +16,14 @@
 #include "xtensor/xreducer.hpp"
 #include "xtensor/xview.hpp"
 #include "xtensor/xmanipulation.hpp"
+#if (defined(__GNUC__) && !defined(__clang__))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #include "xtensor/xrandom.hpp"
+#pragma GCC diagnostic pop
+#else
+#include "xtensor/xrandom.hpp"
+#endif
 
 namespace xt
 {
@@ -119,7 +126,7 @@ namespace xt
         const xreducer_features::shape_type& s = features.m_red.shape();
         std::size_t nb_iter = 1;
         nb_iter = std::accumulate(s.cbegin(), s.cend(), nb_iter, std::multiplies<std::size_t>());
-        std::advance(iter, nb_iter);
+        std::advance(iter, static_cast<std::ptrdiff_t>(nb_iter));
         EXPECT_EQ(iter_end, iter);
     }
 

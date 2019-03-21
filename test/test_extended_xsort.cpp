@@ -42,7 +42,7 @@ namespace xt
     template <class X, class Y, class Z>
     bool check_argpartition_equal(const X& data, const Y& a1, const Z& a2, std::size_t kth)
     {
-        auto p = a1[kth];
+        auto p = static_cast<std::size_t>(a1[kth]);
         EXPECT_EQ(p, std::size_t(a2[kth]));
         auto el = data[static_cast<std::size_t>(a1[kth])];
         for (std::size_t i = 0; i < kth; ++i)
@@ -104,7 +104,7 @@ namespace xt
         check_argpartition_equal(py_a, py_a19, xt::argpartition(py_a, 19), 19);
 
         // py_median = np.median(a)
-        double py_median = 300.0;
+        long py_median = 300;
         EXPECT_EQ(py_median, xt::median(py_a));
     }
 
@@ -482,9 +482,9 @@ namespace xt
         auto a1 = xt::argpartition(py_a, 4, 1);
         auto a2 = xt::argpartition(py_a, 3, 2);
 
-        EXPECT_EQ(xt::view(py_a0, 2, all(), all()), xt::view(a0, 2, all(), all()));
-        EXPECT_EQ(xt::view(py_a1, all(), 4, all()), xt::view(a1, all(), 4, all()));
-        EXPECT_EQ(xt::view(py_a2, all(), all(), 3), xt::view(a2, all(), all(), 3));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a0, 2, all(), all())), xt::view(a0, 2, all(), all()));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a1, all(), 4, all())), xt::view(a1, all(), 4, all()));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a2, all(), all(), 3)), xt::view(a2, all(), all(), 3));
     }
 
     /*py
@@ -721,13 +721,13 @@ namespace xt
         auto a1 = xt::argpartition(py_a, {1, 4}, 1);
         auto a2 = xt::argpartition(py_a, {1, 3}, 2);
 
-        EXPECT_EQ(xt::view(py_a0, 2, all(), all()), xt::view(a0, 2, all(), all()));
-        EXPECT_EQ(xt::view(py_a1, all(), 4, all()), xt::view(a1, all(), 4, all()));
-        EXPECT_EQ(xt::view(py_a2, all(), all(), 3), xt::view(a2, all(), all(), 3));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a0, 2, all(), all())), xt::view(a0, 2, all(), all()));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a1, all(), 4, all())), xt::view(a1, all(), 4, all()));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a2, all(), all(), 3)), xt::view(a2, all(), all(), 3));
 
-        EXPECT_EQ(xt::view(py_a0, 1, all(), all()), xt::view(a0, 1, all(), all()));
-        EXPECT_EQ(xt::view(py_a1, all(), 1, all()), xt::view(a1, all(), 1, all()));
-        EXPECT_EQ(xt::view(py_a2, all(), all(), 1), xt::view(a2, all(), all(), 1));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a0, 1, all(), all())), xt::view(a0, 1, all(), all()));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a1, all(), 1, all())), xt::view(a1, all(), 1, all()));
+        EXPECT_EQ(xt::cast<std::size_t>(xt::view(py_a2, all(), all(), 1)), xt::view(a2, all(), all(), 1));
     }
 }
 

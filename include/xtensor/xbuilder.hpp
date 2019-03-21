@@ -214,7 +214,8 @@ namespace xt
             template <class It>
             inline T element(It first, It) const
             {
-                return m_start + m_step * T(*first);
+                // Avoids warning when T = char (because char + char => int!)
+                return static_cast<T>(m_start + m_step * T(*first));
             }
 
             template <class E>

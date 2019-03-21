@@ -1498,6 +1498,7 @@ namespace xt
     inline auto xview<CT, S...>::make_index(It first, It last) const -> base_index_type
     {
         auto index = xtl::make_sequence<base_index_type>(m_e.dimension(), 0);
+        using diff_type = typename std::iterator_traits<It>::difference_type;
         using ivalue_type = typename base_index_type::value_type;
         auto func1 = [&first](const auto& s) noexcept {
             return get_slice_value(s, first);
@@ -1513,7 +1514,7 @@ namespace xt
 
             // need to advance captured `first`
             first = first_copy;
-            std::advance(first, k - xt::integral_count_before<S...>(i));
+            std::advance(first, static_cast<diff_type>(k - xt::integral_count_before<S...>(i)));
 
             if (first < last)
             {

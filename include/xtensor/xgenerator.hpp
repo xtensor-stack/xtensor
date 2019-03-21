@@ -410,7 +410,8 @@ namespace xt
     {
         using vtype = typename shape_type::value_type;
         xt::dynamic_shape<vtype> sh(shape.size());
-        typename std::decay_t<O>::value_type accumulator(1);
+        using int_type = typename std::decay_t<O>::value_type;
+        int_type accumulator(1);
         std::size_t neg_idx = 0;
         std::size_t i = 0;
         for(std::size_t j = 0; j != shape.size(); ++j, ++i)
@@ -429,7 +430,7 @@ namespace xt
         }
         if(accumulator < 0)
         {
-            sh[neg_idx] = this->size() / static_cast<size_type>(std::abs(accumulator));
+            sh[neg_idx] = this->size() / static_cast<size_type>(std::make_unsigned_t<int_type>(std::abs(accumulator)));
         }
         return sh;
     }
