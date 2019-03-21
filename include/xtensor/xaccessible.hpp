@@ -203,8 +203,6 @@ namespace xt
      * @param args a list of indices specifying the position in the expression. Indices
      * must be integers, the number of indices should be equal to the number of dimensions
      * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the
-     * number of dimensions
      */
     template <class D>
     template <class... Args>
@@ -286,8 +284,6 @@ namespace xt
      * @param args a list of indices specifying the position in the expression. Indices
      * must be integers, the number of indices should be equal to the number of dimensions
      * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the
-     * number of dimensions
      */
     template <class D>
     template <class... Args>
