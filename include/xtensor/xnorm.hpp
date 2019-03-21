@@ -211,7 +211,7 @@ namespace xt
     inline auto                                                   \
     norm_lp_to_p(T t, double p) noexcept                          \
     {                                                             \
-        using rt = xtl::real_promote_type_t<T>;                        \
+        using rt = xtl::real_promote_type_t<T>;                   \
         return p == 0.0                                           \
             ? static_cast<rt>(t != 0)                             \
             : std::pow(static_cast<rt>(std::abs(t)),              \
@@ -244,7 +244,7 @@ namespace xt
     inline auto                                               \
     norm_lp_to_p(T t, double p) noexcept                      \
     {                                                         \
-        using rt = xtl::real_promote_type_t<T>;                    \
+        using rt = xtl::real_promote_type_t<T>;               \
         return p == 0.0                                       \
             ? static_cast<rt>(t != 0)                         \
             : std::pow(static_cast<rt>(t),                    \
@@ -366,7 +366,6 @@ namespace xt
     }
 #endif
 
-
 #define XTENSOR_EMPTY
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC) \
@@ -380,12 +379,10 @@ namespace xt
         auto reduce_func = [](result_type const& r, value_type const& v) {           \
             return REDUCE_EXPR(r REDUCE_OP NAME(v));                                 \
         };                                                                           \
-        auto init_func = [](value_type const& v) {                                   \
-            return NAME(v);                                                          \
-        };                                                                           \
+                                                                                     \
         return xt::reduce(make_xreducer_functor(std::move(reduce_func),              \
-                                            std::move(init_func),                    \
-                                            MERGE_FUNC<result_type>()),              \
+                                                const_value<0>(),                    \
+                                                MERGE_FUNC<result_type>()),          \
                       std::forward<E>(e), std::forward<X>(axes), es);                \
     }                                                                                \
                                                                                      \
@@ -539,11 +536,7 @@ namespace xt
         auto reduce_func = [p](result_type const& r, value_type const& v) {
             return r + norm_lp_to_p(v, p);
         };
-
-        auto init_func = [p](value_type const& v) {
-            return norm_lp_to_p(v, p);
-        };
-        return xt::reduce(make_xreducer_functor(std::move(reduce_func), std::move(init_func), std::plus<result_type>()),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_func), xt::const_value<0>(), std::plus<result_type>()),
                       std::forward<E>(e), std::forward<X>(axes), es);
     }
 

@@ -170,7 +170,7 @@ namespace xt
     TEST(xnanfunctions, nanvar)
     {
         auto as = nanvar(nantest::aN)();
-        auto ase = nanvar(nantest::aN, evaluation_strategy::immediate())();
+        auto ase = nanvar(nantest::aN, evaluation_strategy::immediate)();
         EXPECT_EQ(as, 1602.109375);
         EXPECT_EQ(ase, 1602.109375);
 
@@ -183,7 +183,7 @@ namespace xt
         std::array<std::size_t, 1> axis{0};
         EXPECT_EQ(nanvar(nantest::aN, axis), eaN0);
 
-        EXPECT_EQ(nanvar(nantest::aN, {0}, evaluation_strategy::immediate()), eaN0);
-        EXPECT_TRUE(allclose(nanvar(nantest::aN, {1}, evaluation_strategy::immediate()), eaN1));
+        EXPECT_EQ(nanvar(nantest::aN, {0}, evaluation_strategy::immediate), eaN0);
+        EXPECT_TRUE(allclose(nanvar(nantest::aN, {1}, evaluation_strategy::immediate), eaN1));
     }
 }
