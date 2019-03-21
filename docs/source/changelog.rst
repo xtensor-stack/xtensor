@@ -7,6 +7,87 @@
 Changelog
 =========
 
+0.20.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Removed ``xmasked_value`` and ``promote_type_t``
+  `#1389 <https://github.com/QuantStack/xtensor/pull/1389>`_
+- Removed deprecated type ``slice_vector``
+  `#1459 <https://github.com/QuantStack/xtensor/pull/1459>`_
+
+Other changes
+~~~~~~~~~~~~~
+
+- Add ``partition``, ``argpartition`` and ``median``
+  `#991 <https://github.com/QuantStack/xtensor/pull/991>`_
+- Fix tets on avx512
+  `#1410 <https://github.com/QuantStack/xtensor/pull/1410>`_
+- Implemented ``xcommon_tensor_t`` with tests
+  `#1412 <https://github.com/QuantStack/xtensor/pull/1412>`_
+- Code reorganization
+  `#1416 <https://github.com/QuantStack/xtensor/pull/1416>`_
+- ``reshape`` now accepts ``initializer_list`` parameter
+  `#1417 <https://github.com/QuantStack/xtensor/pull/1417>`_
+- Improved documentation
+  `#1419 <https://github.com/QuantStack/xtensor/pull/1419>`_
+- Fixed ``noexcept`` specifier
+  `#1418 <https://github.com/QuantStack/xtensor/pull/1418>`_
+- ``view`` now accepts lvalue slices
+  `#1420 <https://github.com/QuantStack/xtensor/pull/1420>`_
+- Removed warnings
+  `#1422 <https://github.com/QuantStack/xtensor/pull/1422>`_
+- Added ``reshape`` member to ``xgenerator`` to make ``arange`` more flexible
+  `#1421 <https://github.com/QuantStack/xtensor/pull/1421>`_
+- Add ``std::decay_t`` to ``shape_type`` in strided view
+  `#1425 <https://github.com/QuantStack/xtensor/pull/1425>`_
+- Generic reshape for ``xgenerator``
+  `#1426 <https://github.com/QuantStack/xtensor/pull/1426>`_
+- Fix out of bounds accessing in ``xview::compute_strides``
+  `#1437 <https://github.com/QuantStack/xtensor/pull/1437>`_
+- Added quick reference section to documentation
+  `#1438 <https://github.com/QuantStack/xtensor/pull/1438>`_
+- Improved getting started CMakeLists.txt
+  `#1440 <https://github.com/QuantStack/xtensor/pull/1440>`_
+- Added periodic indices
+  `#1430 <https://github.com/QuantStack/xtensor/pull/1430>`_
+- Added build section to narrative documentation
+  `#1442 <https://github.com/QuantStack/xtensor/pull/1442>`_
+- Fixed ``linspace`` corner case
+  `#1443 <https://github.com/QuantStack/xtensor/pull/1443>`_
+- Fixed type-o in documnetation
+  `#1446 <https://github.com/QuantStack/xtensor/pull/1446>`_
+- Added ``xt::xpad``
+  `#1441 <https://github.com/QuantStack/xtensor/pull/1441>`_
+- Added warning in ``resize`` documentation
+  `#1447 <https://github.com/QuantStack/xtensor/pull/1447>`_
+- Added ``in_bounds`` method
+  `#1444 <https://github.com/QuantStack/xtensor/pull/1444>`_
+- ``xstrided_view_base`` is now a CRTP base class
+  `#1453 <https://github.com/QuantStack/xtensor/pull/1453>`_
+- Turned ``xfunctor_applier_base`` into a CRTP base class
+  `#1455 <https://github.com/QuantStack/xtensor/pull/1455>`_
+- Removed out of bound access in ``data_offset``
+  `#1456 <https://github.com/QuantStack/xtensor/pull/1456>`_
+- Added ``xaccessible`` base class
+  `#1451 <https://github.com/QuantStack/xtensor/pull/1451>`_
+- Refactored ``operator[]``
+  `#1460 <https://github.com/QuantStack/xtensor/pull/1460>`_
+- Splitted ``xaccessible``
+  `#1461 <https://github.com/QuantStack/xtensor/pull/1461>`_
+- Refactored ``size``
+  `#1462 <https://github.com/QuantStack/xtensor/pull/1462>`_
+- Implemented ``nanvar`` and ``nanstd`` with tests
+  `#1424 <https://github.com/QuantStack/xtensor/pull/1424>`_
+- Removed warnings
+  `#1463 <https://github.com/QuantStack/xtensor/pull/1463>`_
+- Added ``periodic`` and ``in_bounds`` method to ``xoptional_assembly_base``
+  `#1464 <https://github.com/QuantStack/xtensor/pull/1464>`_
+- Updated documentation according to last changes
+  `#1465 <https://github.com/QuantStack/xtensor/pull/1465>`_
+
 0.19.4
 ------
 
