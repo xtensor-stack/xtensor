@@ -553,7 +553,7 @@ namespace xt
         using merge_functor_type = typename std::decay_t<F>::merge_functor_type;
         using substepper_type = typename xexpression_type::const_stepper;
         using value_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(
-            std::declval<init_functor_type>()(*std::declval<substepper_type>()), *std::declval<substepper_type>()))>;
+            std::declval<init_functor_type>()(), *std::declval<substepper_type>()))>;
         using reference = value_type;
         using const_reference = value_type;
         using size_type = typename xexpression_type::size_type;
@@ -1130,26 +1130,6 @@ namespace xt
     /**
      * @name Size and shape
      */
-<<<<<<< HEAD
-=======
-    /**
-     * Returns the size of the expression.
-     */
-    template <class F, class CT, class X, class O>
-    inline auto xreducer<F, CT, X, O>::size() const noexcept -> size_type
-    {
-        return compute_size(shape());
-    }
-
-    /**
-     * Returns the number of dimensions of the expression.
-     */
-    template <class F, class CT, class X, class O>
-    inline auto xreducer<F, CT, X, O>::dimension() const noexcept -> size_type
-    {
-        return m_shape.size();
-    }
->>>>>>> 41147675... get initial working
 
     /**
      * Returns the shape of the expression.
@@ -1190,26 +1170,6 @@ namespace xt
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * Returns a constant reference to the element at the specified position in the expression,
-     * after dimension and bounds checking.
-     * @param args a list of indices specifying the position in the function. Indices
-     * must be unsigned integers, the number of indices should be equal to the number of dimensions
-     * of the expression.
-     * @exception std::out_of_range if the number of argument is greater than the number of dimensions
-     * or if indices are out of bounds.
-     */
-    template <class F, class CT, class X, class O>
-    template <class... Args>
-    inline auto xreducer<F, CT, X, O>::at(Args... args) const -> const_reference
-    {
-        check_access(shape(), static_cast<size_type>(args)...);
-        return this->operator()(args...);
-    }
-
-    /**
->>>>>>> 41147675... get initial working
      * Returns a constant reference to the element at the specified position in the reducer.
      * @param args a list of indices specifying the position in the reducer. Indices
      * must be unsigned integers, the number of indices must be equal to the number of
@@ -1238,37 +1198,6 @@ namespace xt
 
     /**
      * Returns a constant reference to the element at the specified position in the reducer.
-<<<<<<< HEAD
-=======
-     * @param index a sequence of indices specifying the position in the reducer. Indices
-     * must be unsigned integers, the number of indices in the sequence should be equal or greater
-     * than the number of dimensions of the reducer.
-     */
-    template <class F, class CT, class X, class O>
-    template <class S>
-    inline auto xreducer<F, CT, X, O>::operator[](const S& index) const
-        -> disable_integral_t<S, const_reference>
-    {
-        return element(index.cbegin(), index.cend());
-    }
-
-    template <class F, class CT, class X, class O>
-    template <class I>
-    inline auto xreducer<F, CT, X, O>::operator[](std::initializer_list<I> index) const
-        -> const_reference
-    {
-        return element(index.begin(), index.end());
-    }
-
-    template <class F, class CT, class X, class O>
-    inline auto xreducer<F, CT, X, O>::operator[](size_type i) const -> const_reference
-    {
-        return operator()(i);
-    }
-
-    /**
-     * Returns a constant reference to the element at the specified position in the reducer.
->>>>>>> 41147675... get initial working
      * @param first iterator starting the sequence of indices
      * @param last iterator ending the sequence of indices
      * The number of indices in the sequence should be equal to or greater
