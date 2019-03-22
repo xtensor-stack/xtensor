@@ -671,14 +671,13 @@ namespace xt
         const_stepper stepper_end(const S& shape, layout_type) const noexcept;
 
         template <class E, class Func = F, class Opts = O>
-        using rebind_t = xreducer<Func, E, X, O>;
+        using rebind_t = xreducer<Func, E, X, Opts>;
 
         template <class E>
         rebind_t<E> build_reducer(E&& e) const;
 
         template <class E, class Func, class Opts>
-        // rebind_t<E, Func, Opts> build_reducer(E&& e, Func&& func, Opts&& opts) const;
-        auto build_reducer(E&& e, Func&& func, Opts&& opts) const;
+        rebind_t<E, Func, Opts> build_reducer(E&& e, Func&& func, Opts&& opts) const;
 
         const O& options() const
         {
@@ -1312,7 +1311,7 @@ namespace xt
 
     template <class F, class CT, class X, class O>
     template <class E, class Func, class Opts>
-    inline auto xreducer<F, CT, X, O>::build_reducer(E&& e, Func&& func, Opts&& opts) const // -> rebind_t<E, Func, Opts>
+    inline auto xreducer<F, CT, X, O>::build_reducer(E&& e, Func&& func, Opts&& opts) const -> rebind_t<E, Func, Opts>
     {
         return rebind_t<E, Func, Opts>(std::forward<Func>(func), std::forward<E>(e), axes_type(m_axes), std::forward<Opts>(opts));
     }
