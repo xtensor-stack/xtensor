@@ -562,16 +562,18 @@ namespace xt
         public:
 
             using expression_tag = xoptional_expression_tag;
+            // using optional_type = typename xcontainer_inner_types<xreducer<F, CT, X, O>>::value_type;
+            // using inner_value_type = typename optional_type::value_type;
+            // using rebound_value_expresson_reduce_options = typename O::template rebind_t<inner_value_type>;
             using value_expression = xreducer<F, xt::detail::value_expression_t<CT>, X, O>;
             using flag_reducer = xreducer_functors<xt::detail::optional_bitwise<bool>>;
-            using rebound_reduce_options = typename O::template rebind_t<bool>;
-            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X, rebound_reduce_options>;
+            using rebound_flag_reduce_options = typename O::template rebind_t<bool>;
+            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X, rebound_flag_reduce_options>;
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
             const_value_expression value() const;
-            // const_flag_expression has_value() const;
-            auto has_value() const;
+            const_flag_expression has_value() const;
         };
 
         template <class F, class CT, class X, class O>
@@ -986,10 +988,11 @@ namespace xt
         }
 
         template <class F, class CT, class X, class O>
-        inline auto xreducer_optional<F, CT, X, O>::has_value() const // -> const_flag_expression
+        inline auto xreducer_optional<F, CT, X, O>::has_value() const -> const_flag_expression
         {
             auto opts = this->derived_cast().options().rebind(this->derived_cast().options().initial_value.has_value(),
                                                               this->derived_cast().options());
+            // std::cout << "ININTIAL HAS VALUE: " << opts.initial_value << std::endl;
             return this->derived_cast().build_reducer(this->derived_cast().expression().has_value(), flag_reducer(), std::move(opts));
         }
     }
