@@ -111,25 +111,33 @@ namespace xt
         }
 
         template <class VT>
-        struct flatten_sort_result_type
+        struct flatten_sort_result_type_impl
         {
             using type = VT;
         };
 
         template <class VT, std::size_t N, layout_type L>
-        struct flatten_sort_result_type<xtensor<VT, N, L>>
+        struct flatten_sort_result_type_impl<xtensor<VT, N, L>>
         {
             using type = xtensor<VT, 1, L>;
         };
 
         template <class VT, class S, layout_type L>
-        struct flatten_sort_result_type<xtensor_fixed<VT, S, L>>
+        struct flatten_sort_result_type_impl<xtensor_fixed<VT, S, L>>
         {
             using type = xtensor_fixed<VT, xshape<fixed_compute_size<S>::value>, L>;
         };
 
+        template <class VT>
+        struct flatten_sort_result_type
+            : flatten_sort_result_type_impl<typename VT::temporary_type>
+        {
+        };
 
-        template <class E, class R = typename flatten_sort_result_type<E>::type>
+        template <class VT>
+        using flatten_sort_result_type_t = typename flatten_sort_result_type<VT>::type;
+
+        template <class E, class R = flatten_sort_result_type_t<E>>
         inline auto flat_sort_impl(const xexpression<E>& e)
         {
             const auto& de = e.derived_cast();
@@ -384,7 +392,7 @@ namespace xt
      *
      * @return partially sorted xcontainer
      */
-    template <class E, class C, class R = typename detail::flatten_sort_result_type<E>::type,
+    template <class E, class C, class R = detail::flatten_sort_result_type_t<E>,
               class = std::enable_if_t<!std::is_integral<C>::value, int>>
     inline R partition(const xexpression<E>& e, const C& kth_container, placeholders::xtuph /*ax*/)
     {
@@ -411,20 +419,20 @@ namespace xt
     }
 
 #ifdef X_OLD_CLANG
-    template <class E, class I, class R = typename detail::flatten_sort_result_type<E>::type>
+    template <class E, class I, class R = detail::flatten_sort_result_type_t<E>>
     inline R partition(const xexpression<E>& e, std::initializer_list<I> kth_container, placeholders::xtuph tag)
     {
         return partition(e, xtl::forward_sequence<std::vector<std::size_t>, decltype(kth_container)>(kth_container), tag);
     }
 #else
-    template <class E, class I, std::size_t N, class R = typename detail::flatten_sort_result_type<E>::type>
+    template <class E, class I, std::size_t N, class R = detail::flatten_sort_result_type_t<E>>
     inline R partition(const xexpression<E>& e, const I(&kth_container)[N], placeholders::xtuph tag)
     {
         return partition(e, xtl::forward_sequence<std::array<std::size_t, N>, decltype(kth_container)>(kth_container), tag);
     }
 #endif
 
-    template <class E, class R = typename detail::flatten_sort_result_type<E>::type>
+    template <class E, class R = detail::flatten_sort_result_type_t<E>>
     inline R partition(const xexpression<E>& e, std::size_t kth, placeholders::xtuph tag)
     {
         return partition(e, std::array<std::size_t, 1>({kth}), tag);
