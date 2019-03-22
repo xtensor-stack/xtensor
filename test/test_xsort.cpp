@@ -216,6 +216,10 @@ namespace xt
         xarray<double> bb = {{1,2,3}, {7,8,9}, {4,5,6}, {7,8,9}};
         xarray<double> bbx = {1,2,3,4,5,6,7,8,9};
         EXPECT_EQ(unique(bb), bbx);
+
+        auto c = view(b, range(0, 3), range(0, 3));
+        auto d = unique(c);
+        EXPECT_EQ(d, bx);
     }
 
     TEST(xsort, setdiff1d)
