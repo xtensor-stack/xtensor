@@ -331,8 +331,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type, INIT>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct()),                                \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
+        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)),                                \
                           std::forward<E>(e),                                                                     \
                           std::forward<X>(axes), es);                                                             \
     }                                                                                                             \
@@ -350,8 +350,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type, INIT>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct()), std::forward<E>(e), es);       \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
+        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)), std::forward<E>(e), es);       \
     }
 
 #define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                               \
@@ -360,8 +360,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type, INIT>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct()), std::forward<E>(e), axes, es); \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
+        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)), std::forward<E>(e), axes, es); \
     }
 
 #define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                            \
@@ -370,8 +370,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type, INIT>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct()), std::forward<E>(e), axes, es); \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
+        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)), std::forward<E>(e), axes, es); \
     }
 
     /*******************
@@ -620,11 +620,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type, 0)
+    XTENSOR_REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type,
+                             std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::min())
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type, 0)
+    XTENSOR_OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type,
+                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::min())
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type, 0)
+    XTENSOR_MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type,
+                                 std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::min())
 #endif
 
     /**
@@ -638,11 +641,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
-    XTENSOR_REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type, 0)
+    XTENSOR_REDUCER_FUNCTION(amin, math::minimum, typename std::decay_t<E>::value_type,
+                             std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::max())
 #ifdef X_OLD_CLANG
-    XTENSOR_OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type, 0)
+    XTENSOR_OLD_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type,
+                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::max())
 #else
-    XTENSOR_MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type, 0)
+    XTENSOR_MODERN_CLANG_REDUCER(amin, math::minimum, typename std::decay_t<E>::value_type,
+                                 std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::max())
 #endif
 
     /**

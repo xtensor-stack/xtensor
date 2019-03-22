@@ -381,7 +381,7 @@ namespace xt
         };                                                                           \
                                                                                      \
         return xt::reduce(make_xreducer_functor(std::move(reduce_func),              \
-                                                const_value<result_type, 0>(),                    \
+                                                const_value<result_type>(0),                    \
                                                 MERGE_FUNC<result_type>()),          \
                       std::forward<E>(e), std::forward<X>(axes), es);                \
     }                                                                                \
@@ -536,7 +536,7 @@ namespace xt
         auto reduce_func = [p](result_type const& r, value_type const& v) {
             return r + norm_lp_to_p(v, p);
         };
-        return xt::reduce(make_xreducer_functor(std::move(reduce_func), xt::const_value<result_type, 0>(), std::plus<result_type>()),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_func), xt::const_value<result_type>(0), std::plus<result_type>()),
                       std::forward<E>(e), std::forward<X>(axes), es);
     }
 

@@ -37,7 +37,7 @@ namespace xt
         using shape_type = xarray<double>::shape_type;
 
         using func = xreducer_functors<std::plus<double>>;
-        xreducer<func, const xarray<double>&, axes_type, xt::reducer_options<double, std::tuple<xt::evaluation_strategy::_lazy>>> m_red;
+        xreducer<func, const xarray<double>&, axes_type, xt::reducer_options<double, std::tuple<xt::evaluation_strategy::lazy_type>>> m_red;
 
         xreducer_features();
     };

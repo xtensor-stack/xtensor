@@ -164,10 +164,10 @@ namespace xt
     namespace evaluation_strategy
     {
 
-        struct _immediate : xt::detail::option_base {};
-        constexpr auto immediate = std::tuple<_immediate>{};
-        struct _lazy : xt::detail::option_base {};
-        constexpr auto lazy = std::tuple<_lazy>{};
+        struct immediate_type : xt::detail::option_base {};
+        constexpr auto immediate = std::tuple<immediate_type>{};
+        struct lazy_type : xt::detail::option_base {};
+        constexpr auto lazy = std::tuple<lazy_type>{};
 
         /*
         struct cached {};

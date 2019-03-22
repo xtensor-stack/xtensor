@@ -42,8 +42,8 @@ namespace xt
         return std::tuple_cat(args, rhs);
     }
 
-    struct _keep_dims : xt::detail::option_base {};
-    constexpr auto keep_dims = std::tuple<_keep_dims>{};
+    struct keep_dims_type : xt::detail::option_base {};
+    constexpr auto keep_dims = std::tuple<keep_dims_type>{};
 
     template <class T = double>
     struct xinitial : xt::detail::option_base
@@ -129,11 +129,11 @@ namespace xt
             );
         }
 
-        using evaluation_strategy = std::conditional_t<tuple_idx_of<xt::evaluation_strategy::_immediate, d_t>::value != -1,
-                                                                    xt::evaluation_strategy::_immediate,
-                                                                    xt::evaluation_strategy::_lazy>;
+        using evaluation_strategy = std::conditional_t<tuple_idx_of<xt::evaluation_strategy::immediate_type, d_t>::value != -1,
+                                                                    xt::evaluation_strategy::immediate_type,
+                                                                    xt::evaluation_strategy::lazy_type>;
 
-        using keep_dims = std::conditional_t<tuple_idx_of<xt::_keep_dims, d_t>::value != -1,
+        using keep_dims = std::conditional_t<tuple_idx_of<xt::keep_dims_type, d_t>::value != -1,
                                              std::true_type,
                                              std::false_type>;
 
@@ -172,7 +172,7 @@ namespace xt
      * reduce *
      **********/
 
-#define DEFAULT_STRATEGY_REDUCERS std::tuple<evaluation_strategy::_lazy>
+#define DEFAULT_STRATEGY_REDUCERS std::tuple<evaluation_strategy::lazy_type>
 
     template <class ST, class X, class KD = std::false_type>
     struct xreducer_shape_type;
@@ -182,11 +182,11 @@ namespace xt
 
     namespace detail
     {
-        template <class KD, class RS, class R, class E, class AX>
+        template <class O, class RS, class R, class E, class AX>
         inline void shape_computation(RS& result_shape, R& result, E& expr,
                                       const AX& axes, std::enable_if_t<!detail::is_fixed<RS>::value, int> = 0)
         {
-            if (KD())
+            if (typename O::keep_dims())
             {
                 resize_container(result_shape, expr.dimension());
                 for (std::size_t i = 0; i < expr.dimension(); ++i)
@@ -219,7 +219,7 @@ namespace xt
         }
 
         // skip shape computation if already done at compile time
-        template <class KD, class RS, class R,class S, class AX>
+        template <class O, class RS, class R,class S, class AX>
         inline void shape_computation(RS&, R&, const S&,
                                       const AX&, std::enable_if_t<detail::is_fixed<RS>::value, int> = 0)
         {
@@ -231,13 +231,12 @@ namespace xt
     {
         using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
         using init_functor_type = typename std::decay_t<F>::init_functor_type;
-
         using expr_value_type = typename std::decay_t<E>::value_type;
-
         using result_type = std::decay_t<decltype(std::declval<reduce_functor_type>()(std::declval<init_functor_type>()(), std::declval<expr_value_type>()))>;
 
-        auto options = reducer_options<result_type, std::decay_t<O>>(raw_options);
-        using options_t = decltype(options);
+        using options_t = reducer_options<result_type, std::decay_t<O>>;
+        options_t options(raw_options);
+
         using shape_type = typename xreducer_shape_type<typename std::decay_t<E>::shape_type, std::decay_t<X>, typename options_t::keep_dims>::type;
 
         // retrieve functors from triple struct
@@ -262,7 +261,7 @@ namespace xt
             throw std::runtime_error("Axis " + std::to_string(axes[axes.size() - 1]) + " out of bounds for reduction.");
         }
 
-        detail::shape_computation<typename options_t::keep_dims>(result_shape, result, e, axes);
+        detail::shape_computation<options_t>(result_shape, result, e, axes);
 
         // Fast track for complete reduction
         if (e.dimension() == axes.size())
@@ -448,16 +447,25 @@ namespace xt
      * xreducer functors *
      *********************/
 
-    template <class T, int N>
+    template <class T>
     struct const_value
     {
+        constexpr const_value() = default;
+
+        constexpr const_value(T t)
+            : m_value(t)
+        {
+        }
+
         constexpr T operator()() const
         {
-            return T(N);
+            return m_value;
         }
+
+        T m_value;
     };
 
-    template <class REDUCE_FUNC, class INIT_FUNC = const_value<long int, 0>, class MERGE_FUNC = REDUCE_FUNC>
+    template <class REDUCE_FUNC, class INIT_FUNC = const_value<long int>, class MERGE_FUNC = REDUCE_FUNC>
     struct xreducer_functors
         : public std::tuple<REDUCE_FUNC, INIT_FUNC, MERGE_FUNC>
     {
@@ -704,7 +712,7 @@ namespace xt
     namespace detail
     {
         template <class F, class E, class X, class O>
-        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::_lazy, O&& options)
+        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::lazy_type, O&& options)
         {
             decltype(auto) normalized_axes = normalize_axis(e, std::forward<X>(axes));
 
@@ -720,7 +728,7 @@ namespace xt
 
 
         template <class F, class E, class X, class O>
-        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::_immediate, O&& options)
+        inline auto reduce_impl(F&& f, E&& e, X&& axes, evaluation_strategy::immediate_type, O&& options)
         {
             decltype(auto) normalized_axes = normalize_axis(e, std::forward<X>(axes));
             return reduce_immediate(std::forward<F>(f),
@@ -731,7 +739,7 @@ namespace xt
         }
     }
 
-#define DEFAULT_STRATEGY_REDUCERS std::tuple<evaluation_strategy::_lazy>
+#define DEFAULT_STRATEGY_REDUCERS std::tuple<evaluation_strategy::lazy_type>
 
     namespace detail
     {
