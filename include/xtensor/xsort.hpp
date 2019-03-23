@@ -130,7 +130,7 @@ namespace xt
 
         template <class VT>
         struct flatten_sort_result_type
-            : flatten_sort_result_type_impl<typename VT::temporary_type>
+            : flatten_sort_result_type_impl<common_tensor_type_t<VT>>
         {
         };
 

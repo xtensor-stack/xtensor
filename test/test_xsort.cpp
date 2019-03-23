@@ -220,6 +220,10 @@ namespace xt
         auto c = view(b, range(0, 3), range(0, 3));
         auto d = unique(c);
         EXPECT_EQ(d, bx);
+
+        auto e = xt::unique(xt::where(xt::greater(b,2), 1, 0)); 
+        xarray<double> ex = {0, 1};
+        EXPECT_EQ(e, ex);
     }
 
     TEST(xsort, setdiff1d)
