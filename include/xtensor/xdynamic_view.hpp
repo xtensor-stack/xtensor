@@ -33,6 +33,7 @@ namespace xt
         using const_reference = typename xexpression_type::const_reference;
         using size_type = typename xexpression_type::size_type;
         using shape_type = std::decay_t<S>;
+        using undecay_shape = S;
         using inner_storage_type = FST;
         using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
         static constexpr layout_type layout = L;

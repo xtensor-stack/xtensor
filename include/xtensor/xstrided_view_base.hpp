@@ -53,14 +53,16 @@ namespace xt
         using inner_strides_type = strides_type;
         using inner_backstrides_type = backstrides_type;
 
+        using undecay_shape = typename inner_types::undecay_shape;
+
         static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic && xexpression_type::contiguous_layout;
 
         template <class CTA>
-        xstrided_view_base(CTA&& e, shape_type&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
+        xstrided_view_base(CTA&& e, undecay_shape&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
 
         template <class CTA, class FLS>
-        xstrided_view_base(CTA&& e, shape_type&& shape, strides_type&& strides, size_type offset,
+        xstrided_view_base(CTA&& e, undecay_shape&& shape, strides_type&& strides, size_type offset,
                            layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
 
         xstrided_view_base(xstrided_view_base&& rhs);
@@ -281,7 +283,7 @@ namespace xt
      */
     template <class D>
     template <class CTA>
-    inline xstrided_view_base<D>::xstrided_view_base(CTA&& e, shape_type&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept
+    inline xstrided_view_base<D>::xstrided_view_base(CTA&& e, undecay_shape&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept
         : m_e(std::forward<CTA>(e)),
           m_storage(detail::get_flat_storage<undecay_expression>(m_e)),
           m_shape(std::move(shape)),
@@ -295,7 +297,7 @@ namespace xt
 
     template <class D>
     template <class CTA, class FLS>
-    inline xstrided_view_base<D>::xstrided_view_base(CTA&& e, shape_type&& shape, strides_type&& strides,
+    inline xstrided_view_base<D>::xstrided_view_base(CTA&& e, undecay_shape&& shape, strides_type&& strides,
                                                      size_type offset, layout_type layout,
                                                      FLS&& flatten_strides, layout_type flatten_layout) noexcept
         : m_e(std::forward<CTA>(e)),
