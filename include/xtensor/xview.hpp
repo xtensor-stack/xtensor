@@ -376,15 +376,26 @@ namespace xt
                                                                    detail::expr_inner_strides_type<xexpression_type>,
                                                                    get_strides_type<shape_type>>;
 
+        using xexpression_inner_backstrides_type = xtl::mpl::eval_if_t<has_strides<xexpression_type>,
+                                                                       detail::expr_inner_backstrides_type<xexpression_type>,
+                                                                       get_strides_type<shape_type>>;
+
         using storage_type = xtl::mpl::eval_if_t<has_data_interface<xexpression_type>,
                                                  detail::expr_storage_type<xexpression_type>,
                                                  make_invalid_type<>>;
 
         using inner_strides_type = std::conditional_t<is_contiguous_view,
-                                                      typename detail::unwrap_offset_container<xexpression_type::static_layout, xexpression_inner_strides_type, integral_count<S...>()>::type,
+                                                      typename detail::unwrap_offset_container<xexpression_type::static_layout,
+                                                                                               xexpression_inner_strides_type,
+                                                                                               integral_count<S...>()>::type,
                                                       get_strides_t<shape_type>>;
 
-        using inner_backstrides_type = inner_strides_type;
+        using inner_backstrides_type = std::conditional_t<is_contiguous_view,
+                                                          typename detail::unwrap_offset_container<xexpression_type::static_layout,
+                                                                                                   xexpression_inner_backstrides_type,
+                                                                                                   integral_count<S...>()>::type,
+                                                          get_strides_t<shape_type>>;
+
         using strides_type = get_strides_t<shape_type>;
         using back_strides_type = strides_type;
 
