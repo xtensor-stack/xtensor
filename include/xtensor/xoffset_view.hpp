@@ -41,7 +41,6 @@ namespace xt
                       class = std::enable_if_t<(std::is_same<M, double>::value || std::is_same<M, float>::value) && I <= sizeof(M), int>>
             auto proxy_simd_load(const E& expr, std::size_t n) const
             {
-                using simd_value_type = xsimd::simd_type<std::complex<value_type>>;
                 // TODO refactor using shuffle only
                 auto batch = expr.template load_simd<align, requested_type, N>(n);
                 if (I == 0)
