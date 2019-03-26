@@ -349,8 +349,10 @@ namespace xt
         return detail::compute_strides<L>(shape, l, strides, &backstrides);
     }
 
+    // base_stride is the stride value used when shape is 1
     template <class shape_type, class strides_type>
-    inline bool do_strides_match(const shape_type& shape, const strides_type& strides, layout_type l)
+    inline bool do_strides_match(const shape_type& shape, const strides_type& strides,
+                                 layout_type l, typename strides_type::value_type base_stride)
     {
         using value_type = typename strides_type::value_type;
         value_type data_size = 1;
@@ -358,7 +360,7 @@ namespace xt
         {
             for (std::size_t i = strides.size(); i != 0; --i)
             {
-                if ((shape[i - 1] == 1 && strides[i - 1] != 0) || (shape[i - 1] != 1 && strides[i - 1] != data_size))
+                if ((shape[i - 1] == 1 && strides[i - 1] != base_stride) || (shape[i - 1] != 1 && strides[i - 1] != data_size))
                 {
                     return false;
                 }
@@ -370,7 +372,7 @@ namespace xt
         {
             for (std::size_t i = 0; i < strides.size(); ++i)
             {
-                if ((shape[i] != 1 && strides[i] != data_size) || (shape[i] == 1 && strides[i] != 0))
+                if ((shape[i] != 1 && strides[i] != data_size) || (shape[i] == 1 && strides[i] != base_stride))
                 {
                     return false;
                 }

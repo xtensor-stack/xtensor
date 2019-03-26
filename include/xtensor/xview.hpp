@@ -897,7 +897,7 @@ namespace xt
             }
             else
             {
-                bool strides_match = do_strides_match(self(this)->shape(), self(this)->strides(), self(this)->m_e.layout());
+                bool strides_match = do_strides_match(self(this)->shape(), self(this)->strides(), self(this)->m_e.layout(), 0);
                 return strides_match ? self(this)->m_e.layout() : layout_type::dynamic;
             }
         },
