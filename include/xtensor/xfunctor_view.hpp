@@ -314,7 +314,7 @@ namespace xt
 
     namespace detail
     {
-        // TODO replace with xexpression_for_shape ... 
+        // TODO replace with xexpression_for_shape ...
         template <class F, class S, layout_type L>
         struct functorview_temporary_type_impl
         {
@@ -337,7 +337,7 @@ namespace xt
     /*****************************
      * xfunctor_view declaration *
      *****************************/
-    
+
     template <class F, class CT>
     class xfunctor_view;
 
@@ -1316,7 +1316,6 @@ namespace xt
     template <class E>
     inline auto xfunctor_view<F, CT>::build_functor_view(E&& e) const -> rebind_t<E>
     {
-        using functor_type = typename xfunctor_applier_base<self_type>::functor_type;
         return rebind_t<E>((this->m_functor), std::forward<E>(e));
     }
 
