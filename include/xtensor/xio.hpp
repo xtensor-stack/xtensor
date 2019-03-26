@@ -440,7 +440,7 @@ namespace xt
             void init()
             {
                 m_it = m_cache.cbegin();
-                m_width = 1 + std::streamsize(std::log10(m_max)) + m_sign;
+                m_width = 1 + std::streamsize((m_max > 0) ? std::log10(m_max) : 0) + m_sign;
             }
 
             std::ostream& print_next(std::ostream& out)
