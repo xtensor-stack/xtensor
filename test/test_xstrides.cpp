@@ -77,4 +77,22 @@ namespace xt
             EXPECT_TRUE(std::equal(unrav_index.cbegin(), unrav_index.cend(), index.cbegin()));
         }
     }
+
+    TEST(xstrids, do_match_strides)
+    {
+        using vector_type = std::vector<std::size_t>;
+        vector_type shape = { 2, 1, 4 };
+
+        vector_type strides_0 = { 4, 0, 1 };
+        EXPECT_TRUE(xt::do_strides_match(shape, strides_0, xt::layout_type::row_major, 0));
+
+        vector_type strides_1 = { 4, 1, 1 };
+        EXPECT_TRUE(xt::do_strides_match(shape, strides_1, xt::layout_type::row_major, 1));
+
+        vector_type strides_2 = { 1, 0, 2 };
+        EXPECT_TRUE(xt::do_strides_match(shape, strides_2, xt::layout_type::column_major, 0));
+
+        vector_type strides_3 = { 1, 1, 2 };
+        EXPECT_TRUE(xt::do_strides_match(shape, strides_3, xt::layout_type::column_major, 1));
+    }
 }
