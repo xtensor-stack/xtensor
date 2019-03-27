@@ -103,21 +103,19 @@ namespace xt
     struct reducer_options
     {
         template <class X>
-        struct initial_tester : std::false_type {
-            using type = double;
-        };
+        struct initial_tester : std::false_type {};
 
         template <class X>
-        struct initial_tester<xinitial<X>> : std::true_type {
-            using type = X;
-        };
+        struct initial_tester<xinitial<X>> : std::true_type {};
+
+        // Workaround for Apple because tuple_cat is buggy!
+        template <class X>
+        struct initial_tester<const xinitial<X>> : std::true_type {};
 
         using d_t = std::decay_t<T>;
 
         static constexpr std::size_t initial_val_idx = xtl::mpl::find_if<initial_tester, d_t>::value;
         reducer_options() = default;
-        reducer_options(reducer_options&&) = default;
-        reducer_options(const reducer_options&) = default;
 
         reducer_options(const T& tpl)
         {
@@ -145,7 +143,7 @@ namespace xt
         using rebind_t = reducer_options<NR, T>;
 
         template <class NR>
-        auto rebind(NR initial, const reducer_options<R, T>& opts) const
+        auto rebind(NR initial, const reducer_options<R, T>&) const
         {
             reducer_options<NR, T> res;
             res.initial_value = initial;
@@ -380,7 +378,7 @@ namespace xt
             {
                 // for unknown reasons it's much faster to use a temporary variable and
                 // std::accumulate here -- probably some cache behavior
-                result_type tmp = options_t::has_initial_value ? options.initial_value : init_fct();
+                result_type tmp = init_fct();
                 tmp = std::accumulate(begin , begin + outer_loop_size, tmp, reduce_fct);
 
                 // use merge function if necessary
@@ -413,7 +411,7 @@ namespace xt
                                     return merge ?
                                         reduce_fct(v1, v2) :
                                         // cast because return type of identity function is not upcasted
-                                        reduce_fct(static_cast<result_type>(options_t::has_initial_value ? options.initial_value : init_fct()), v2);
+                                        reduce_fct(static_cast<result_type>(init_fct()), v2);
                                });
 
                 begin += inner_stride;
@@ -439,7 +437,11 @@ namespace xt
                 }
             };
         }
-
+        if (options_t::has_initial_value)
+        {
+            std::transform(result.data(), result.data() + result.size(), result.data(),
+                           [&reduce_fct, &options](auto&& v) { return reduce_fct(static_cast<result_type>(v), options.initial_value); });
+        }
         return result;
     }
 
@@ -893,8 +895,9 @@ namespace xt
 
     private:
 
-        reference aggregate(size_type dim, /*keep_dims=*/ std::false_type) const;
-        reference aggregate(size_type dim, /*keep_dims=*/ std::true_type) const;
+        reference aggregate(size_type dim) const;
+        reference aggregate_impl(size_type dim, /*keep_dims=*/ std::false_type) const;
+        reference aggregate_impl(size_type dim, /*keep_dims=*/ std::true_type) const;
 
         substepper_type get_substepper_begin() const;
         size_type get_dim(size_type dim) const noexcept;
@@ -1342,7 +1345,7 @@ namespace xt
     template <class F, class CT, class X, class O>
     inline auto xreducer_stepper<F, CT, X, O>::operator*() const -> reference
     {
-        reference r = aggregate(0, typename O::keep_dims());
+        reference r = aggregate(0);
         return r;
     }
 
@@ -1426,30 +1429,70 @@ namespace xt
     }
 
     template <class F, class CT, class X, class O>
-    inline auto xreducer_stepper<F, CT, X, O>::aggregate(size_type dim, std::false_type) const -> reference
+    inline auto xreducer_stepper<F, CT, X, O>::aggregate(size_type dim) const -> reference
     {
-        reference res;
-        if(m_reducer->m_e.shape().empty())
+        if (m_reducer->m_e.shape().empty())
         {
-            res = m_reducer->m_reduce(O::has_initial_value ? m_reducer->m_options.initial_value : m_reducer->m_init(), *m_stepper);
+            reference res =
+                m_reducer->m_reduce(static_cast<reference>(O::has_initial_value ? m_reducer->m_options.initial_value : m_reducer->m_init()),
+                                    *m_stepper);
             return res;
         }
         else
         {
-            size_type index = axis(dim);
-            size_type size = shape(index);
-            if (dim != m_reducer->m_axes.size() - 1)
+            reference res = aggregate_impl(dim, typename O::keep_dims());
+            if (O::has_initial_value && dim == 0)
             {
-                res = aggregate(dim + 1, typename O::keep_dims());
-                if (O::has_initial_value && dim == 0)
-                {
-                    res = m_reducer->m_merge(m_reducer->m_options.initial_value, res);
-                }
+                res = m_reducer->m_merge(m_reducer->m_options.initial_value, res);
+            }
+            return res;
+        }
+    }
 
+    template <class F, class CT, class X, class O>
+    inline auto xreducer_stepper<F, CT, X, O>::aggregate_impl(size_type dim, std::false_type) const -> reference
+    {
+        reference res;
+        size_type index = axis(dim);
+        size_type size = shape(index);
+        if (dim != m_reducer->m_axes.size() - 1)
+        {
+            res = aggregate_impl(dim + 1, typename O::keep_dims());
+            for (size_type i = 1; i != size; ++i)
+            {
+                m_stepper.step(index);
+                res = m_reducer->m_merge(res, aggregate_impl(dim + 1, typename O::keep_dims()));
+            }
+        }
+        else
+        {
+            res = m_reducer->m_init();
+            for (size_type i = 0; i != size; ++i, m_stepper.step(index))
+            {
+                res = m_reducer->m_reduce(res, *m_stepper);
+            }
+            m_stepper.step_back(index);
+        }
+        m_stepper.reset(index);
+        return res;
+    }
+
+    template <class F, class CT, class X, class O>
+    inline auto xreducer_stepper<F, CT, X, O>::aggregate_impl(size_type dim, std::true_type) const -> reference
+    {
+        reference res(0);
+        auto ax_it = std::find(m_reducer->m_axes.begin(), m_reducer->m_axes.end(), dim);
+        if (ax_it != m_reducer->m_axes.end())
+        {
+            size_type index = dim;
+            size_type size = m_reducer->m_e.shape()[index];
+            if (ax_it != m_reducer->m_axes.end() - 1)
+            {
+                res = aggregate_impl(dim + 1, typename O::keep_dims());
                 for (size_type i = 1; i != size; ++i)
                 {
                     m_stepper.step(index);
-                    res = m_reducer->m_merge(res, aggregate(dim + 1, typename O::keep_dims()));
+                    res = m_reducer->m_merge(res, aggregate_impl(dim + 1, typename O::keep_dims()));
                 }
             }
             else
@@ -1463,59 +1506,13 @@ namespace xt
             }
             m_stepper.reset(index);
         }
-        return res;
-    }
-
-    template <class F, class CT, class X, class O>
-    inline auto xreducer_stepper<F, CT, X, O>::aggregate(size_type dim, std::true_type) const -> reference
-    {
-        reference res(0);
-        if(m_reducer->m_e.shape().empty())
-        {
-            res = m_reducer->m_reduce(O::has_initial_value ? m_reducer->m_options.initial_value : m_reducer->m_init(), *m_stepper);
-            return res;
-        }
         else
         {
-            auto ax_it = std::find(m_reducer->m_axes.begin(), m_reducer->m_axes.end(), dim);
-            if (ax_it != m_reducer->m_axes.end())
+            if  (dim < m_reducer->m_e.dimension())
             {
-                size_type index = dim;
-                size_type size = m_reducer->m_e.shape()[index];
-                if (ax_it != m_reducer->m_axes.end() - 1)
-                {
-                    res = aggregate(dim + 1, typename O::keep_dims());
-                    if (O::has_initial_value && ax_it == m_reducer->m_axes.begin())
-                    {
-                        res = m_reducer->m_merge(m_reducer->m_options.initial_value, res);
-                    }
-
-                    for (size_type i = 1; i != size; ++i)
-                    {
-                        m_stepper.step(index);
-                        res = m_reducer->m_merge(res, aggregate(dim + 1, typename O::keep_dims()));
-                    }
-                }
-                else
-                {
-                    res = m_reducer->m_init();
-                    for (size_type i = 0; i != size; ++i, m_stepper.step(index))
-                    {
-                        res = m_reducer->m_reduce(res, *m_stepper);
-                    }
-                    m_stepper.step_back(index);
-                }
-                m_stepper.reset(index);
-            }
-            else
-            {
-                if  (dim < m_reducer->m_e.dimension())
-                {
-                    res = aggregate(dim + 1, typename O::keep_dims());
-                }
+                res = aggregate_impl(dim + 1, typename O::keep_dims());
             }
         }
-
         return res;
     }
 
