@@ -888,19 +888,19 @@ namespace xt
         struct slice_implementation_getter
         {
             template <class E, class SL>
-            inline auto operator()(E&, SL&& slice, std::size_t) const
+            inline decltype(auto) operator()(E&, SL&& slice, std::size_t) const
             {
-                return slice;
+                return std::forward<SL>(slice);
             }
         };
 
         struct keep_drop_getter
         {
             template <class E, class SL>
-            inline auto operator()(E& e, SL&& slice, std::size_t index) const
+            inline decltype(auto) operator()(E& e, SL&& slice, std::size_t index) const
             {
                 slice.normalize(e.shape()[index]);
-                return slice;
+                return std::forward<SL>(slice);
             }
 
             template <class E, class SL>
