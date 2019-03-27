@@ -21,7 +21,7 @@
 namespace xt
 {
 
-#define DEFAULT_STRATEGY_ACCUMULATORS evaluation_strategy::immediate
+#define DEFAULT_STRATEGY_ACCUMULATORS evaluation_strategy::immediate_type
 
     /**************
      * accumulate *
@@ -73,13 +73,13 @@ namespace xt
         template <class F, class E, class EVS>
         xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, std::size_t, EVS)
         {
-            static_assert(!std::is_same<evaluation_strategy::lazy, EVS>::value, "Lazy accumulators not yet implemented.");
+            static_assert(!std::is_same<evaluation_strategy::lazy_type, EVS>::value, "Lazy accumulators not yet implemented.");
         }
 
         template <class F, class E, class EVS>
         xarray<typename std::decay_t<E>::value_type> accumulator_impl(F&&, E&&, EVS)
         {
-            static_assert(!std::is_same<evaluation_strategy::lazy, EVS>::value, "Lazy accumulators not yet implemented.");
+            static_assert(!std::is_same<evaluation_strategy::lazy_type, EVS>::value, "Lazy accumulators not yet implemented.");
         }
 
         template <class T, class R>
@@ -184,7 +184,7 @@ namespace xt
         }
 
         template <class F, class E>
-        inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate)
+        inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate_type)
         {
             using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
             using function_return_type = typename accumulate_functor::result_type;
@@ -248,7 +248,7 @@ namespace xt
         }
 
         template <class F, class E>
-        inline auto accumulator_impl(F&& f, E&& e, evaluation_strategy::immediate)
+        inline auto accumulator_impl(F&& f, E&& e, evaluation_strategy::immediate_type)
         {
             using accumulate_functor = std::decay_t<decltype(std::get<0>(f))>;
             using T = typename accumulate_functor::result_type;

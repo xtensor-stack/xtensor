@@ -556,15 +556,16 @@ namespace xt
 
     namespace extension
     {
-        template <class F, class CT, class X>
-        class xreducer_optional : public xoptional_empty_base<xreducer<F, CT, X>>
+        template <class F, class CT, class X, class O>
+        class xreducer_optional : public xoptional_empty_base<xreducer<F, CT, X, O>>
         {
         public:
 
             using expression_tag = xoptional_expression_tag;
-            using value_expression = xreducer<F, xt::detail::value_expression_t<CT>, X>;
-            using flag_reducer = xreducer_functors<xt::detail::optional_bitwise<bool>>;
-            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X>;
+            using value_expression = xreducer<F, xt::detail::value_expression_t<CT>, X, O>;
+            using flag_reducer = xreducer_functors<xt::detail::optional_bitwise<bool>, xt::const_value<bool>>;
+            using rebound_flag_reduce_options = typename O::template rebind_t<bool>;
+            using flag_expression = xreducer<flag_reducer, xt::detail::flag_expression_t<CT>, X, rebound_flag_reduce_options>;
             using const_value_expression = value_expression;
             using const_flag_expression = flag_expression;
 
@@ -572,10 +573,10 @@ namespace xt
             const_flag_expression has_value() const;
         };
 
-        template <class F, class CT, class X>
-        struct xreducer_base_impl<xoptional_expression_tag, F, CT, X>
+        template <class F, class CT, class X, class O>
+        struct xreducer_base_impl<xoptional_expression_tag, F, CT, X, O>
         {
-            using type = xreducer_optional<F, CT, X>;
+            using type = xreducer_optional<F, CT, X, O>;
         };
     }
 
@@ -977,16 +978,21 @@ namespace xt
 
     namespace extension
     {
-        template <class F, class CT, class X>
-        inline auto xreducer_optional<F, CT, X>::value() const -> const_value_expression
+        template <class F, class CT, class X, class O>
+        inline auto xreducer_optional<F, CT, X, O>::value() const -> const_value_expression
         {
             return this->derived_cast().build_reducer(this->derived_cast().expression().value());
         }
 
-        template <class F, class CT, class X>
-        inline auto xreducer_optional<F, CT, X>::has_value() const -> const_flag_expression
+        template <class F, class CT, class X, class O>
+        inline auto xreducer_optional<F, CT, X, O>::has_value() const -> const_flag_expression
         {
-            return this->derived_cast().build_reducer(this->derived_cast().expression().has_value(), flag_reducer());
+            auto opts = this->derived_cast().options().rebind(this->derived_cast().options().initial_value.has_value(),
+                                                              this->derived_cast().options());
+
+            return this->derived_cast().build_reducer(this->derived_cast().expression().has_value(),
+                                                        make_xreducer_functor(xt::detail::optional_bitwise<bool>(),
+                                                                              xt::const_value<bool>(true)), std::move(opts));
         }
     }
 

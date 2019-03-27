@@ -211,7 +211,7 @@ namespace xt
     inline auto                                                   \
     norm_lp_to_p(T t, double p) noexcept                          \
     {                                                             \
-        using rt = xtl::real_promote_type_t<T>;                        \
+        using rt = xtl::real_promote_type_t<T>;                   \
         return p == 0.0                                           \
             ? static_cast<rt>(t != 0)                             \
             : std::pow(static_cast<rt>(std::abs(t)),              \
@@ -244,7 +244,7 @@ namespace xt
     inline auto                                               \
     norm_lp_to_p(T t, double p) noexcept                      \
     {                                                         \
-        using rt = xtl::real_promote_type_t<T>;                    \
+        using rt = xtl::real_promote_type_t<T>;               \
         return p == 0.0                                       \
             ? static_cast<rt>(t != 0)                         \
             : std::pow(static_cast<rt>(t),                    \
@@ -366,12 +366,11 @@ namespace xt
     }
 #endif
 
-
 #define XTENSOR_EMPTY
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC) \
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,               \
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>                \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>                    \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS()) noexcept                       \
     {                                                                                \
         using value_type = typename std::decay_t<E>::value_type;                     \
@@ -380,12 +379,10 @@ namespace xt
         auto reduce_func = [](result_type const& r, value_type const& v) {           \
             return REDUCE_EXPR(r REDUCE_OP NAME(v));                                 \
         };                                                                           \
-        auto init_func = [](value_type const& v) {                                   \
-            return NAME(v);                                                          \
-        };                                                                           \
+                                                                                     \
         return xt::reduce(make_xreducer_functor(std::move(reduce_func),              \
-                                            std::move(init_func),                    \
-                                            MERGE_FUNC<result_type>()),              \
+                                                const_value<result_type>(0),                    \
+                                                MERGE_FUNC<result_type>()),          \
                       std::forward<E>(e), std::forward<X>(axes), es);                \
     }                                                                                \
                                                                                      \
@@ -479,7 +476,7 @@ namespace xt
      * @return an \ref xreducer (specifically: <tt>sqrt(norm_sq(e, axes))</tt>) (or xcontainer, depending on evaluation strategy)
     */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_xexpression<E>, xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(is_xexpression<E>, xtl::negation<is_reducer_options<X>>)>
     inline auto norm_l2(E&& e, X&& axes, EVS es = EVS()) noexcept
     {
         return sqrt(norm_sq(std::forward<E>(e), std::forward<X>(axes), es));
@@ -530,7 +527,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto norm_lp_to_p(E&& e, double p, X&& axes, EVS es = EVS()) noexcept
     {
         using value_type = typename std::decay_t<E>::value_type;
@@ -539,11 +536,7 @@ namespace xt
         auto reduce_func = [p](result_type const& r, value_type const& v) {
             return r + norm_lp_to_p(v, p);
         };
-
-        auto init_func = [p](value_type const& v) {
-            return norm_lp_to_p(v, p);
-        };
-        return xt::reduce(make_xreducer_functor(std::move(reduce_func), std::move(init_func), std::plus<result_type>()),
+        return xt::reduce(make_xreducer_functor(std::move(reduce_func), xt::const_value<result_type>(0), std::plus<result_type>()),
                       std::forward<E>(e), std::forward<X>(axes), es);
     }
 
@@ -583,7 +576,7 @@ namespace xt
      * the reducer represents a scalar result, otherwise an array of appropriate dimension.
      */
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_evaluation_strategy<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto norm_lp(E&& e, double p, X&& axes, EVS es = EVS())
     {
         XTENSOR_PRECONDITION(p != 0,
