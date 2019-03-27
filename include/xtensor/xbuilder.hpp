@@ -192,12 +192,12 @@ namespace xt
 
     namespace detail
     {
-        template <class T, class S = T>
+        template <class T, class R = T, class S = T>
         class arange_generator
         {
         public:
 
-            using value_type = T;
+            using value_type = R;
             using step_type = S;
 
             arange_generator(T start, T stop, S step)
@@ -206,46 +206,46 @@ namespace xt
             }
 
             template <class... Args>
-            inline T operator()(Args... args) const
+            inline R operator()(Args... args) const
             {
                 return access_impl(args...);
             }
 
             template <class It>
-            inline T element(It first, It) const
+            inline R element(It first, It) const
             {
                 // Avoids warning when T = char (because char + char => int!)
-                return static_cast<T>(m_start + m_step * T(*first));
+                return static_cast<R>(m_start + m_step * T(*first));
             }
 
             template <class E>
             inline void assign_to(xexpression<E>& e) const noexcept
             {
                 auto& de = e.derived_cast();
-                value_type value = m_start;
+                T value = m_start;
 
                 for (auto&& el : de.storage())
                 {
-                    el = value;
+                    el = static_cast<R>(value);
                     value += m_step;
                 }
             }
 
         private:
 
-            value_type m_start;
-            value_type m_stop;
+            T m_start;
+            T m_stop;
             step_type m_step;
 
             template <class T1, class... Args>
-            inline T access_impl(T1 t, Args...) const
+            inline R access_impl(T1 t, Args...) const
             {
-                return m_start + m_step * T(t);
+                return static_cast<R>(m_start + m_step * T(t));
             }
 
-            inline T access_impl() const
+            inline R access_impl() const
             {
-                return m_start;
+                return static_cast<R>(m_start);
             }
         };
 
@@ -256,14 +256,14 @@ namespace xt
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
             std::size_t shape = static_cast<std::size_t>(std::ceil((stop - start) / step));
-            return detail::make_xgenerator(detail::arange_generator<T, S>(start, stop, step), {shape});
+            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
         }
 
         template <class T, class S = T, XTL_REQUIRES(both_integer<T, S>)>
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
             std::size_t shape = static_cast<std::size_t>((stop - start + step - S(1)) / step);
-            return detail::make_xgenerator(detail::arange_generator<T, S>(start, stop, step), {shape});
+            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
         }
 
         template <class F>
@@ -404,7 +404,7 @@ namespace xt
     {
         using fp_type = std::common_type_t<T, double>;
         fp_type step = fp_type(stop - start) / std::fmax(fp_type(1), fp_type(num_samples - (endpoint ? 1 : 0)));
-        return cast<T>(detail::make_xgenerator(detail::arange_generator<fp_type>(fp_type(start), fp_type(stop), step), {num_samples}));
+        return detail::make_xgenerator(detail::arange_generator<fp_type, T>(fp_type(start), fp_type(stop), step), {num_samples});
     }
 
     /**
@@ -420,7 +420,7 @@ namespace xt
     template <class T>
     inline auto logspace(T start, T stop, std::size_t num_samples, T base = 10, bool endpoint = true) noexcept
     {
-        return cast<T>(pow(std::move(base), linspace(start, stop, num_samples, endpoint)));
+        return pow(std::move(base), linspace(start, stop, num_samples, endpoint));
     }
 
     namespace detail
