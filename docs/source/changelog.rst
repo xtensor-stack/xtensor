@@ -17,6 +17,12 @@ Breaking changes
   `#1389 <https://github.com/QuantStack/xtensor/pull/1389>`_
 - Removed deprecated type ``slice_vector``
   `#1459 <https://github.com/QuantStack/xtensor/pull/1459>`_
+- Upgraded to ``xtl`` 0.6.1
+  `#1468 <https://github.com/QuantStack/xtensor/pull/1465>`_
+- Added ``keep_dims`` option to reducers
+  `#1474 <https://github.com/QuantStack/xtensor/pull/1474>`_
+- ``do_strides_match`` now accept an addition base stride value
+  `#1479 <https://github.com/QuantStack/xtensor/pull/1479>`_
 
 Other changes
 ~~~~~~~~~~~~~
@@ -57,7 +63,7 @@ Other changes
   `#1442 <https://github.com/QuantStack/xtensor/pull/1442>`_
 - Fixed ``linspace`` corner case
   `#1443 <https://github.com/QuantStack/xtensor/pull/1443>`_
-- Fixed type-o in documnetation
+- Fixed type-o in documentation
   `#1446 <https://github.com/QuantStack/xtensor/pull/1446>`_
 - Added ``xt::xpad``
   `#1441 <https://github.com/QuantStack/xtensor/pull/1441>`_
@@ -87,6 +93,22 @@ Other changes
   `#1464 <https://github.com/QuantStack/xtensor/pull/1464>`_
 - Updated documentation according to last changes
   `#1465 <https://github.com/QuantStack/xtensor/pull/1465>`_
+- Fixed ``flatten_sort_result_type``
+  `#1470 <https://github.com/QuantStack/xtensor/pull/1470>`_
+- Fixed ``unique`` with expressions not defining ``temporary_type``
+  `#1472 <https://github.com/QuantStack/xtensor/pull/1472>`_
+- Fixed ``xstrided_view_base`` constructor
+  `#1473 <https://github.com/QuantStack/xtensor/pull/1473>`_
+- Avoid signed integer overflow in integer printer
+  `#1475 <https://github.com/QuantStack/xtensor/pull/1475>`_
+- Fixed ``xview::inner_backstrides_type``
+  `#1480 <https://github.com/QuantStack/xtensor/pull/1480>`_
+- Fixed compiler warnings
+  `#1481 <https://github.com/QuantStack/xtensor/pull/1481>`_
+- ``slice_implementation_getter`` now forwards its lice argument
+  `#1486 <https://github.com/QuantStack/xtensor/pull/1486>`_
+- ``linspace`` can now be reshaped
+  `#1488 <https://github.com/QuantStack/xtensor/pull/1488>`_
 
 0.19.4
 ------
