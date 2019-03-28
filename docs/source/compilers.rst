@@ -106,3 +106,10 @@ It should pick the *other* implementation by SFINAE on the function
 signature, because our ``has_strides<dynamic_view>`` meta-function should return
 false. Instantiating the ``has_strides<dynamic_view>`` in the inner_types fixes the issue.
 Original issue here: https://github.com/QuantStack/xtensor/issues/1273
+
+Apple LLVM version >= 8.0.0
+---------------------------
+
+``tuple_cat`` is bugged and propagates the constness of its tuple arguments to the types
+inside the tuple. When checking if the resulting tuple contains a given type, the const
+qualified type also needs to be checked.
