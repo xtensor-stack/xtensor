@@ -440,10 +440,11 @@ namespace xt
         if (options_t::has_initial_value)
         {
             std::transform(result.data(), result.data() + result.size(), result.data(),
-                           [&reduce_fct, &options](auto&& v) { return reduce_fct(static_cast<result_type>(v), options.initial_value); });
+                           [&merge_fct, &options](auto&& v) { return merge_fct(v, options.initial_value); });
         }
         return result;
     }
+
 
     /*********************
      * xreducer functors *
@@ -1434,7 +1435,7 @@ namespace xt
         if (m_reducer->m_e.shape().empty())
         {
             reference res =
-                m_reducer->m_reduce(static_cast<reference>(O::has_initial_value ? m_reducer->m_options.initial_value : m_reducer->m_init()),
+                m_reducer->m_reduce(O::has_initial_value ? m_reducer->m_options.initial_value : static_cast<reference>(m_reducer->m_init()),
                                     *m_stepper);
             return res;
         }
@@ -1466,7 +1467,7 @@ namespace xt
         }
         else
         {
-            res = m_reducer->m_init();
+            res = static_cast<reference>(m_reducer->m_init());
             for (size_type i = 0; i != size; ++i, m_stepper.step(index))
             {
                 res = m_reducer->m_reduce(res, *m_stepper);
