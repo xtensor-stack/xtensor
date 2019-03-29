@@ -1423,4 +1423,36 @@ namespace xt
         EXPECT_EQ(v1.strides()[0], 0);
         EXPECT_EQ(v1.strides()[1], 0);
     }
+
+    template <class E>
+    auto transform(E& x) {
+      x += 2;
+    }
+
+    TEST(xview, nontrivial_strides)
+    {
+        using farray = xt::xtensor<float, 2, xt::layout_type::column_major>;
+        const farray x_orig = xt::random::randn<float>({2, 2});
+
+        using namespace xt::placeholders;
+
+        farray x_view = x_orig;
+
+        auto x1 = xt::view(x_view, xt::all(), xt::range(_, 1));
+        auto x2 = xt::view(x_view, xt::all(), xt::range(1, _));
+
+        transform(x1);
+        transform(x2);
+        EXPECT_TRUE(xt::allclose(x_view, 2 + x_orig));
+
+        for (auto it = x1.begin(); it != x1.end(); ++it)
+        {
+            *it += 5;
+        }
+        for (auto it = x2.begin(); it != x2.end(); ++it)
+        {
+            *it += 5;
+        }
+        EXPECT_TRUE(xt::allclose(x_view, 7 + x_orig));
+    }
 }
