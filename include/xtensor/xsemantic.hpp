@@ -665,6 +665,21 @@ namespace xt
         return this->derived_cast();
     }
 
+    namespace xview_semantic_detail
+    {
+        template <class D>
+        auto get_begin(D&& lhs, std::true_type)
+        {
+            return lhs.storage_begin();
+        }
+
+        template <class D>
+        auto get_begin(D&& lhs, std::false_type)
+        {
+            return lhs.begin();
+        }
+    }
+
     template <class D>
     template <class E, class F>
     inline auto xview_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
@@ -672,23 +687,11 @@ namespace xt
         D& d = this->derived_cast();
 
         using size_type = typename D::size_type;
-        if (d.is_contiguous_view)
+        auto dst = xview_semantic_detail::get_begin(d, std::integral_constant<bool, D::contiguous_layout>());
+        for (size_type i = d.size(); i > 0; --i)
         {
-            auto dst = d.storage_begin();
-            for (size_type i = d.size(); i > 0; --i)
-            {
-                *dst = f(*dst, e);
-                ++dst;
-            }
-        }
-        else
-        {
-            auto dst = d.template begin<D::static_layout>();
-            for (size_type i = d.size(); i > 0; --i)
-            {
-                *dst = f(*dst, e);
-                ++dst;
-            }
+            *dst = f(*dst, e);
+            ++dst;
         }
         return this->derived_cast();
     }
