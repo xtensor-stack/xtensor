@@ -158,6 +158,7 @@ set(XTENSOR_TESTS
 
 if(nlohmann_json_FOUND)
     list(APPEND XTENSOR_TESTS test_xjson.cpp)
+    list(APPEND XTENSOR_TESTS test_xmime.cpp)
     list(APPEND XTENSOR_TESTS test_xexpression_holder.cpp)
 endif()
 
