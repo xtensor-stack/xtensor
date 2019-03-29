@@ -672,11 +672,23 @@ namespace xt
         D& d = this->derived_cast();
 
         using size_type = typename D::size_type;
-        auto dst = d.begin();
-        for (size_type i = d.size(); i > 0; --i)
+        if (d.is_contiguous_view)
         {
-            *dst = f(*dst, e);
-            ++dst;
+            auto dst = d.storage_begin();
+            for (size_type i = d.size(); i > 0; --i)
+            {
+                *dst = f(*dst, e);
+                ++dst;
+            }
+        }
+        else
+        {
+            auto dst = d.template begin<D::static_layout>();
+            for (size_type i = d.size(); i > 0; --i)
+            {
+                *dst = f(*dst, e);
+                ++dst;
+            }
         }
         return this->derived_cast();
     }
