@@ -7,6 +7,14 @@
 Changelog
 =========
 
+0.20.1
+------
+
+- Add a test for mimetype rendering and fix forward declaration
+  `#1490 <https://github.com/QuantStack/xtensor/pull/1490>`_
+- Fix special case of view iteration
+  `#1491 <https://github.com/QuantStack/xtensor/pull/1491>`_
+
 0.20.0
 ------
 
