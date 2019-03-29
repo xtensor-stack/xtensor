@@ -303,7 +303,6 @@ namespace xt
         static constexpr bool is_strided_view = detail::is_strided_view<xexpression_type, S...>::value;
         static constexpr bool is_contiguous_view = detail::is_contiguous_view<xexpression_type, S...>::value;
 
-
         using inner_shape_type = std::conditional_t<is_contiguous_view,
                                                     typename detail::get_contigous_shape_type<xexpression_type, S...>::type,
                                                     typename xview_shape_type<typename xexpression_type::shape_type, S...>::type>;
@@ -384,13 +383,14 @@ namespace xt
                                                  detail::expr_storage_type<xexpression_type>,
                                                  make_invalid_type<>>;
 
-        using inner_strides_type = std::conditional_t<is_contiguous_view,
+        static constexpr bool has_trivial_strides = is_contiguous_view && !xtl::disjunction<detail::is_xrange<S>...>::value;
+        using inner_strides_type = std::conditional_t<has_trivial_strides,
                                                       typename detail::unwrap_offset_container<xexpression_type::static_layout,
                                                                                                xexpression_inner_strides_type,
                                                                                                integral_count<S...>()>::type,
                                                       get_strides_t<shape_type>>;
 
-        using inner_backstrides_type = std::conditional_t<is_contiguous_view,
+        using inner_backstrides_type = std::conditional_t<has_trivial_strides,
                                                           typename detail::unwrap_offset_container<xexpression_type::static_layout,
                                                                                                    xexpression_inner_backstrides_type,
                                                                                                    integral_count<S...>()>::type,
@@ -809,7 +809,7 @@ namespace xt
     template <class CTA, class FSL, class... SL>
     xview<CT, S...>::xview(CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
         : xview(
-            std::integral_constant<bool, is_contiguous_view>{},
+            std::integral_constant<bool, has_trivial_strides>{},
             std::forward<CTA>(e),
             std::forward<FSL>(first_slice),
             std::forward<SL>(slices)...
@@ -817,7 +817,7 @@ namespace xt
     {
     }
 
-    // contigous initializer
+    // trivial strides initializer
     template <class CT, class... S>
     template <class CTA, class FSL, class... SL>
     xview<CT, S...>::xview(std::true_type, CTA&& e, FSL&& first_slice, SL&&... slices) noexcept
@@ -1128,7 +1128,7 @@ namespace xt
     {
         if (!m_strides_computed)
         {
-            compute_strides(std::integral_constant<bool, is_contiguous_view>{});
+            compute_strides(std::integral_constant<bool, has_trivial_strides>{});
             m_strides_computed = true;
         }
         return m_strides;
@@ -1141,7 +1141,7 @@ namespace xt
     {
         if (!m_strides_computed)
         {
-            compute_strides(std::integral_constant<bool, is_contiguous_view>{});
+            compute_strides(std::integral_constant<bool, has_trivial_strides>{});
             m_strides_computed = true;
         }
         return m_backstrides;
@@ -1197,7 +1197,7 @@ namespace xt
     {
         if (!m_strides_computed)
         {
-            compute_strides(std::integral_constant<bool, is_contiguous_view>{});
+            compute_strides(std::integral_constant<bool, has_trivial_strides>{});
         }
         return m_data_offset;
     }
