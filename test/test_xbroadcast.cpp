@@ -155,4 +155,18 @@ namespace xt
             EXPECT_EQ(iter, iter_end);
         }
     }
+
+    TEST(xbroadcast, same_shape)
+    {
+        xt::xarray<double, xt::layout_type::column_major> arr
+            {{ 0.0,  1.0,  2.0},
+             {10.0, 11.0, 12.0}};
+
+        auto t = xt::broadcast(arr, {2, 3});
+
+        xt::xarray<double, xt::layout_type::column_major> cm_arr = t;
+        xt::xarray<double, xt::layout_type::row_major> rm_arr = t;
+        
+        EXPECT_TRUE(xt::allclose(rm_arr, cm_arr));
+    }
 }
