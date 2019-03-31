@@ -94,6 +94,37 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
     };
 
+    /*****************************
+     * linear_begin / linear_end *
+     *****************************/
+
+    namespace detail
+    {
+        template <class CT, class X>
+        constexpr auto linear_begin(xbroadcast<CT, X>& c) noexcept
+        {
+            return linear_begin(c.m_e);
+        }
+
+        template <class CT, class X>
+        constexpr auto linear_end(xbroadcast<CT, X>& c) noexcept
+        {
+            return linear_end(c.m_e);
+        }
+
+        template <class CT, class X>
+        constexpr auto linear_begin(const xbroadcast<CT, X>& c) noexcept
+        {
+            return linear_begin(c.m_e);
+        }
+
+        template <class CT, class X>
+        constexpr auto linear_end(const xbroadcast<CT, X>& c) noexcept
+        {
+            return linear_end(c.m_e);
+        }
+    }
+
     /**
      * @class xbroadcast
      * @brief Broadcasted xexpression to a specified shape.
@@ -184,46 +215,11 @@ namespace xt
         CT m_e;
         inner_shape_type m_shape;
 
-        template <class CCT, class CX>
-        friend constexpr auto ::xt::detail::linear_begin(xbroadcast<CCT, CX>&) noexcept;
-        template <class CCT, class CX>
-        friend constexpr auto ::xt::detail::linear_end(xbroadcast<CCT, CX>&) noexcept;
-        template <class CCT, class CX>
-        friend constexpr auto ::xt::detail::linear_begin(const xbroadcast<CCT, CX>&) noexcept;
-        template <class CCT, class CX>
-        friend constexpr auto ::xt::detail::linear_end(const xbroadcast<CCT, CX>&) noexcept;
+        friend constexpr auto ::xt::detail::linear_begin<>(self_type&) noexcept;
+        friend constexpr auto ::xt::detail::linear_end<>(self_type&) noexcept;
+        friend constexpr auto ::xt::detail::linear_begin<>(const self_type&) noexcept;
+        friend constexpr auto ::xt::detail::linear_end<>(const self_type&) noexcept;
     };
-
-    /*****************************
-     * linear_begin / linear_end *
-     *****************************/
-
-    namespace detail
-    {
-        template <class CT, class X>
-        constexpr auto linear_begin(xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_begin(c.m_e);
-        }
-
-        template <class CT, class X>
-        constexpr auto linear_end(xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_end(c.m_e);
-        }
-
-        template <class CT, class X>
-        constexpr auto linear_begin(const xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_begin(c.m_e);
-        }
-
-        template <class CT, class X>
-        constexpr auto linear_end(const xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_end(c.m_e);
-        }
-    }
 
     /****************************
      * broadcast implementation *
