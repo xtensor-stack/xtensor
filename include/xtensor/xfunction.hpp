@@ -376,39 +376,6 @@ namespace xt
      * xfunction_iterator *
      **********************/
 
-    template <class CT>
-    class xscalar;
-
-    namespace detail
-    {
-        template <class C>
-        struct get_iterator_impl
-        {
-            using type = typename C::storage_iterator;
-        };
-
-        template <class C>
-        struct get_iterator_impl<const C>
-        {
-            using type = typename C::const_storage_iterator;
-        };
-
-        template <class CT>
-        struct get_iterator_impl<xscalar<CT>>
-        {
-            using type = typename xscalar<CT>::dummy_iterator;
-        };
-
-        template <class CT>
-        struct get_iterator_impl<const xscalar<CT>>
-        {
-            using type = typename xscalar<CT>::const_dummy_iterator;
-        };
-    }
-
-    template <class C>
-    using get_iterator = typename detail::get_iterator_impl<C>::type;
-
     template <class F, class... CT>
     class xfunction_iterator : public xtl::xrandom_access_iterator_base<xfunction_iterator<F, CT...>,
                                                                         typename xfunction<F, CT...>::value_type,
@@ -446,7 +413,7 @@ namespace xt
 
     private:
 
-        using data_type = std::tuple<get_iterator<const std::decay_t<CT>>...>;
+        using data_type = std::tuple<decltype(detail::linear_begin(std::declval<const std::decay_t<CT>>()))...>;
 
         template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;

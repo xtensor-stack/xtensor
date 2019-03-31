@@ -185,13 +185,13 @@ namespace xt
         inner_shape_type m_shape;
 
         template <class CCT, class CX>
-        friend auto ::xt::detail::linear_begin(xbroadcast<CCT, CX>&) noexcept;
+        friend constexpr auto ::xt::detail::linear_begin(xbroadcast<CCT, CX>&) noexcept;
         template <class CCT, class CX>
-        friend auto ::xt::detail::linear_end(xbroadcast<CCT, CX>&) noexcept;
+        friend constexpr auto ::xt::detail::linear_end(xbroadcast<CCT, CX>&) noexcept;
         template <class CCT, class CX>
-        friend auto ::xt::detail::linear_begin(const xbroadcast<CCT, CX>&) noexcept;
+        friend constexpr auto ::xt::detail::linear_begin(const xbroadcast<CCT, CX>&) noexcept;
         template <class CCT, class CX>
-        friend auto ::xt::detail::linear_end(const xbroadcast<CCT, CX>&) noexcept;
+        friend constexpr auto ::xt::detail::linear_end(const xbroadcast<CCT, CX>&) noexcept;
     };
 
     /*****************************
@@ -201,25 +201,25 @@ namespace xt
     namespace detail
     {
         template <class CT, class X>
-        auto linear_begin(xbroadcast<CT, X>& c) noexcept
+        constexpr auto linear_begin(xbroadcast<CT, X>& c) noexcept
         {
             return linear_begin(c.m_e);
         }
 
         template <class CT, class X>
-        auto linear_end(xbroadcast<CT, X>& c) noexcept
+        constexpr auto linear_end(xbroadcast<CT, X>& c) noexcept
         {
             return linear_end(c.m_e);
         }
 
         template <class CT, class X>
-        auto linear_begin(const xbroadcast<CT, X>& c) noexcept
+        constexpr auto linear_begin(const xbroadcast<CT, X>& c) noexcept
         {
             return linear_begin(c.m_e);
         }
 
         template <class CT, class X>
-        auto linear_end(const xbroadcast<CT, X>& c) noexcept
+        constexpr auto linear_end(const xbroadcast<CT, X>& c) noexcept
         {
             return linear_end(c.m_e);
         }
