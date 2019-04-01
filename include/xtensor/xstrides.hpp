@@ -349,10 +349,16 @@ namespace xt
         return detail::compute_strides<L>(shape, l, strides, &backstrides);
     }
 
-    // base_stride is the stride value used when shape is 1
+    template <class T1, class T2>
+    inline bool stride_match_condition(const T1& stride, const T2& shape, const T1& data_size, bool zero_strides)
+    {
+        return (shape == T2(1) && stride == T1(0) && zero_strides) || (stride == data_size);
+    }
+
+    // zero_strides should be true when strides are set to 0 if the corresponding dimensions are 1
     template <class shape_type, class strides_type>
     inline bool do_strides_match(const shape_type& shape, const strides_type& strides,
-                                 layout_type l, typename strides_type::value_type base_stride)
+                                 layout_type l, bool zero_strides)
     {
         using value_type = typename strides_type::value_type;
         value_type data_size = 1;
@@ -360,7 +366,7 @@ namespace xt
         {
             for (std::size_t i = strides.size(); i != 0; --i)
             {
-                if ((shape[i - 1] == 1 && strides[i - 1] != base_stride) || (shape[i - 1] != 1 && strides[i - 1] != data_size))
+                if (!stride_match_condition(strides[i - 1], shape[i - 1], data_size, zero_strides))
                 {
                     return false;
                 }
@@ -372,7 +378,7 @@ namespace xt
         {
             for (std::size_t i = 0; i < strides.size(); ++i)
             {
-                if ((shape[i] != 1 && strides[i] != data_size) || (shape[i] == 1 && strides[i] != base_stride))
+                if (!stride_match_condition(strides[i], shape[i], data_size, zero_strides))
                 {
                     return false;
                 }
