@@ -99,27 +99,27 @@ namespace xt
      *****************************/
 
     template <class CT, class X>
-    constexpr auto linear_begin(xbroadcast<CT, X>& c) noexcept
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(xbroadcast<CT, X>& c) noexcept
     {
-        return linear_begin(c.m_e);
+        return linear_begin(c.expression());
     }
 
     template <class CT, class X>
-    constexpr auto linear_end(xbroadcast<CT, X>& c) noexcept
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(xbroadcast<CT, X>& c) noexcept
     {
-        return linear_end(c.m_e);
+        return linear_end(c.expression());
     }
 
     template <class CT, class X>
-    constexpr auto linear_begin(const xbroadcast<CT, X>& c) noexcept
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(const xbroadcast<CT, X>& c) noexcept
     {
-        return linear_begin(c.m_e);
+        return linear_begin(c.expression());
     }
 
     template <class CT, class X>
-    constexpr auto linear_end(const xbroadcast<CT, X>& c) noexcept
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(const xbroadcast<CT, X>& c) noexcept
     {
-        return linear_end(c.m_e);
+        return linear_end(c.expression());
     }
 
     /**
@@ -211,11 +211,6 @@ namespace xt
 
         CT m_e;
         inner_shape_type m_shape;
-
-        friend constexpr auto ::xt::linear_begin<>(self_type&) noexcept;
-        friend constexpr auto ::xt::linear_end<>(self_type&) noexcept;
-        friend constexpr auto ::xt::linear_begin<>(const self_type&) noexcept;
-        friend constexpr auto ::xt::linear_end<>(const self_type&) noexcept;
     };
 
     /****************************

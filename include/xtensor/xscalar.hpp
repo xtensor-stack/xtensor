@@ -463,25 +463,25 @@ namespace xt
      *****************************/
 
     template <class CT>
-    constexpr auto linear_begin(xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
     {
         return c.dummy_begin();
     }
 
     template <class CT>
-    constexpr auto linear_end(xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
     {
         return c.dummy_end();
     }
 
     template <class CT>
-    constexpr auto linear_begin(const xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(const xscalar<CT>& c) noexcept -> decltype(c.dummy_begin())
     {
         return c.dummy_begin();
     }
 
     template <class CT>
-    constexpr auto linear_end(const xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(const xscalar<CT>& c) noexcept -> decltype(c.dummy_end())
     {
         return c.dummy_end();
     }
