@@ -168,5 +168,12 @@ namespace xt
         xt::xarray<double, xt::layout_type::row_major> rm_arr = t;
         
         EXPECT_TRUE(xt::allclose(rm_arr, cm_arr));
+
+        EXPECT_EQ(cm_arr(0, 0),  0.0);
+        EXPECT_EQ(cm_arr(0, 1),  1.0);
+        EXPECT_EQ(cm_arr(0, 2),  2.0);
+        EXPECT_EQ(cm_arr(1, 0), 10.0);
+        EXPECT_EQ(cm_arr(1, 1), 11.0);
+        EXPECT_EQ(cm_arr(1, 2), 12.0);
     }
 }
