@@ -78,21 +78,35 @@ namespace xt
         }
     }
 
-    TEST(xstrids, do_match_strides)
+    TEST(xstrides, do_match_strides)
     {
         using vector_type = std::vector<std::size_t>;
-        vector_type shape = { 2, 1, 4 };
+        vector_type shape_0 = { 2, 1, 4 };
 
         vector_type strides_0 = { 4, 0, 1 };
-        EXPECT_TRUE(xt::do_strides_match(shape, strides_0, xt::layout_type::row_major, 0));
+        EXPECT_TRUE(xt::do_strides_match(shape_0, strides_0, xt::layout_type::row_major, true));
 
-        vector_type strides_1 = { 4, 1, 1 };
-        EXPECT_TRUE(xt::do_strides_match(shape, strides_1, xt::layout_type::row_major, 1));
+        vector_type strides_1 = { 4, 4, 1 };
+        EXPECT_TRUE(xt::do_strides_match(shape_0, strides_1, xt::layout_type::row_major, false));
 
         vector_type strides_2 = { 1, 0, 2 };
-        EXPECT_TRUE(xt::do_strides_match(shape, strides_2, xt::layout_type::column_major, 0));
+        EXPECT_TRUE(xt::do_strides_match(shape_0, strides_2, xt::layout_type::column_major, true));
 
-        vector_type strides_3 = { 1, 1, 2 };
-        EXPECT_TRUE(xt::do_strides_match(shape, strides_3, xt::layout_type::column_major, 1));
+        vector_type strides_3 = { 1, 2, 2 };
+        EXPECT_TRUE(xt::do_strides_match(shape_0, strides_3, xt::layout_type::column_major, false));
+
+        vector_type shape_1 = { 2, 1, 2, 4 };
+        vector_type strides_4 = { 8, 8, 4, 1 };
+        EXPECT_TRUE(xt::do_strides_match(shape_1, strides_4, xt::layout_type::row_major, false));
+
+        vector_type strides_5 = { 8, 1, 8, 1 };
+        EXPECT_FALSE(xt::do_strides_match(shape_1, strides_5, xt::layout_type::row_major, false));
+
+        vector_type shape_2 = { 2, 2, 1, 4 };
+        vector_type strides_6 = { 1, 2, 4, 4 };
+        EXPECT_TRUE(xt::do_strides_match(shape_2, strides_6, xt::layout_type::column_major, false));
+
+        vector_type strides_7 = { 1, 2, 1, 4 };
+        EXPECT_FALSE(xt::do_strides_match(shape_2, strides_7, xt::layout_type::column_major, false));
     }
 }

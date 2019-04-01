@@ -906,7 +906,7 @@ namespace xt
                     base_type::set_fake_slice(idx);
                 }
 
-                new_layout = do_strides_match(new_shape, new_strides, layout, 0) ? layout : layout_type::dynamic;
+                new_layout = do_strides_match(new_shape, new_strides, layout, true) ? layout : layout_type::dynamic;
             }
 
             using shape_type = dynamic_shape<std::size_t>;
