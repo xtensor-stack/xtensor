@@ -413,7 +413,7 @@ namespace xt
 
     private:
 
-        using data_type = std::tuple<decltype(detail::linear_begin(std::declval<const std::decay_t<CT>>()))...>;
+        using data_type = std::tuple<decltype(linear_begin(std::declval<const std::decay_t<CT>>()))...>;
 
         template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
@@ -679,14 +679,14 @@ namespace xt
     template <class F, class... CT>
     inline auto xfunction<F, CT...>::storage_cbegin() const noexcept -> const_storage_iterator
     {
-        auto f = [](const auto& e) noexcept { return detail::linear_begin(e); };
+        auto f = [](const auto& e) noexcept { return linear_begin(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class... CT>
     inline auto xfunction<F, CT...>::storage_cend() const noexcept -> const_storage_iterator
     {
-        auto f = [](const auto& e) noexcept { return detail::linear_end(e); };
+        auto f = [](const auto& e) noexcept { return linear_end(e); };
         return build_iterator(f, std::make_index_sequence<sizeof...(CT)>());
     }
 

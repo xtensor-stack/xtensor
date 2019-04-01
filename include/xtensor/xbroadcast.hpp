@@ -98,31 +98,28 @@ namespace xt
      * linear_begin / linear_end *
      *****************************/
 
-    namespace detail
+    template <class CT, class X>
+    constexpr auto linear_begin(xbroadcast<CT, X>& c) noexcept
     {
-        template <class CT, class X>
-        constexpr auto linear_begin(xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_begin(c.m_e);
-        }
+        return linear_begin(c.m_e);
+    }
 
-        template <class CT, class X>
-        constexpr auto linear_end(xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_end(c.m_e);
-        }
+    template <class CT, class X>
+    constexpr auto linear_end(xbroadcast<CT, X>& c) noexcept
+    {
+        return linear_end(c.m_e);
+    }
 
-        template <class CT, class X>
-        constexpr auto linear_begin(const xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_begin(c.m_e);
-        }
+    template <class CT, class X>
+    constexpr auto linear_begin(const xbroadcast<CT, X>& c) noexcept
+    {
+        return linear_begin(c.m_e);
+    }
 
-        template <class CT, class X>
-        constexpr auto linear_end(const xbroadcast<CT, X>& c) noexcept
-        {
-            return linear_end(c.m_e);
-        }
+    template <class CT, class X>
+    constexpr auto linear_end(const xbroadcast<CT, X>& c) noexcept
+    {
+        return linear_end(c.m_e);
     }
 
     /**
@@ -215,10 +212,10 @@ namespace xt
         CT m_e;
         inner_shape_type m_shape;
 
-        friend constexpr auto ::xt::detail::linear_begin<>(self_type&) noexcept;
-        friend constexpr auto ::xt::detail::linear_end<>(self_type&) noexcept;
-        friend constexpr auto ::xt::detail::linear_begin<>(const self_type&) noexcept;
-        friend constexpr auto ::xt::detail::linear_end<>(const self_type&) noexcept;
+        friend constexpr auto ::xt::linear_begin<>(self_type&) noexcept;
+        friend constexpr auto ::xt::linear_end<>(self_type&) noexcept;
+        friend constexpr auto ::xt::linear_begin<>(const self_type&) noexcept;
+        friend constexpr auto ::xt::linear_end<>(const self_type&) noexcept;
     };
 
     /****************************

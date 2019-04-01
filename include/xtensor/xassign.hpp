@@ -561,8 +561,8 @@ namespace xt
     {
         using value_type = typename E1::value_type;
         using size_type = typename E1::size_type;
-        auto src = detail::linear_begin(e2);
-        auto dst = detail::linear_begin(e1);
+        auto src = linear_begin(e2);
+        auto dst = linear_begin(e1);
         size_type n = e1.size();
 
 #if defined(XTENSOR_USE_TBB)
