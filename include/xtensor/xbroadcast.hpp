@@ -94,6 +94,34 @@ namespace xt
         using size_type = typename xexpression_type::size_type;
     };
 
+    /*****************************
+     * linear_begin / linear_end *
+     *****************************/
+
+    template <class CT, class X>
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(xbroadcast<CT, X>& c) noexcept
+    {
+        return linear_begin(c.expression());
+    }
+
+    template <class CT, class X>
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(xbroadcast<CT, X>& c) noexcept
+    {
+        return linear_end(c.expression());
+    }
+
+    template <class CT, class X>
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(const xbroadcast<CT, X>& c) noexcept
+    {
+        return linear_begin(c.expression());
+    }
+
+    template <class CT, class X>
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(const xbroadcast<CT, X>& c) noexcept
+    {
+        return linear_end(c.expression());
+    }
+
     /**
      * @class xbroadcast
      * @brief Broadcasted xexpression to a specified shape.

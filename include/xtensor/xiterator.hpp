@@ -401,54 +401,54 @@ namespace xt
             : std::true_type
         {
         };
+    }
 
-        template <class C>
-        XTENSOR_CONSTEXPR_RETURN auto linear_begin(C& c) noexcept
+    template <class C>
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(C& c) noexcept
+    {
+        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
         {
-            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
-            {
-                return self(c).storage_begin();
-            }, /*else*/ [&](auto self)
-            {
-                return self(c).begin();
-            });
-        }
+            return self(c).storage_begin();
+        }, /*else*/ [&](auto self)
+        {
+            return self(c).begin();
+        });
+    }
 
-        template <class C>
-        XTENSOR_CONSTEXPR_RETURN auto linear_end(C& c) noexcept
+    template <class C>
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(C& c) noexcept
+    {
+        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
         {
-            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
-            {
-                return self(c).storage_end();
-            }, /*else*/ [&](auto self)
-            {
-                return self(c).end();
-            });
-        }
+            return self(c).storage_end();
+        }, /*else*/ [&](auto self)
+        {
+            return self(c).end();
+        });
+    }
 
-        template <class C>
-        XTENSOR_CONSTEXPR_RETURN auto linear_begin(const C& c) noexcept
+    template <class C>
+    XTENSOR_CONSTEXPR_RETURN auto linear_begin(const C& c) noexcept
+    {
+        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
         {
-            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
-            {
-                return self(c).storage_cbegin();
-            }, /*else*/ [&](auto self)
-            {
-                return self(c).cbegin();
-            });
-        }
+            return self(c).storage_cbegin();
+        }, /*else*/ [&](auto self)
+        {
+            return self(c).cbegin();
+        });
+    }
 
-        template <class C>
-        XTENSOR_CONSTEXPR_RETURN auto linear_end(const C& c) noexcept
+    template <class C>
+    XTENSOR_CONSTEXPR_RETURN auto linear_end(const C& c) noexcept
+    {
+        return xtl::mpl::static_if<detail::has_storage_iterator<C>::value>([&](auto self)
         {
-            return xtl::mpl::static_if<has_storage_iterator<C>::value>([&](auto self)
-            {
-                return self(c).storage_cend();
-            }, /*else*/ [&](auto self)
-            {
-                return self(c).cend();
-            });
-        }
+            return self(c).storage_cend();
+        }, /*else*/ [&](auto self)
+        {
+            return self(c).cend();
+        });
     }
 
     /***************************
