@@ -407,7 +407,7 @@ namespace xt
             while (idx_res.first != true)
             {
                 std::transform(out, out + inner_loop_size, begin, out,
-                               [merge, &init_fct, &reduce_fct, &options](auto&& v1, auto&& v2) {
+                               [merge, &init_fct, &reduce_fct](auto&& v1, auto&& v2) {
                                     return merge ?
                                         reduce_fct(v1, v2) :
                                         // cast because return type of identity function is not upcasted
@@ -571,7 +571,7 @@ namespace xt
 
     template <class F, class CT, class X, class O>
     struct xcontainer_inner_types<xreducer<F, CT, X, O>>
-    {   
+    {
         using xexpression_type = std::decay_t<CT>;
         using reduce_functor_type = typename std::decay_t<F>::reduce_functor_type;
         using init_functor_type = typename std::decay_t<F>::init_functor_type;
@@ -793,7 +793,7 @@ namespace xt
                            xtl::negation<detail::is_xreducer_functors<F>>)>
     inline auto reduce(F&& f, E&& e, X&& axes, EVS&& options = EVS())
     {
-        return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e), 
+        return reduce(make_xreducer_functor(std::forward<F>(f)), std::forward<E>(e),
                       std::forward<X>(axes), std::forward<EVS>(options));
     }
 
@@ -1391,11 +1391,11 @@ namespace xt
     {
         if (dim >= m_offset)
         {
-            // Because the reducer uses `reset` to reset the non-reducing axes, 
+            // Because the reducer uses `reset` to reset the non-reducing axes,
             // we need to prevent that here for the KD case where.
             if (typename O::keep_dims() && std::binary_search(m_reducer->m_axes.begin(), m_reducer->m_axes.end(), dim - m_offset))
             {
-                // If keep dim activated, and dim is in the axes, do nothing! 
+                // If keep dim activated, and dim is in the axes, do nothing!
                 return;
             }
             m_stepper.reset(get_dim(dim - m_offset));
@@ -1410,7 +1410,7 @@ namespace xt
             // Note that for *not* KD this is not going to do anything
             if (typename O::keep_dims() && std::binary_search(m_reducer->m_axes.begin(), m_reducer->m_axes.end(), dim - m_offset))
             {
-                // If keep dim activated, and dim is in the axes, do nothing! 
+                // If keep dim activated, and dim is in the axes, do nothing!
                 return;
             }
             m_stepper.reset_back(get_dim(dim - m_offset));
