@@ -13,6 +13,7 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xview.hpp"
 
 namespace xt
 {
@@ -103,6 +104,21 @@ namespace xt
         auto flat3 = ravel(a);
         EXPECT_EQ(flat, flat3);
     }
+
+    /*TEST(xstrided_view, flatten)
+    {
+        xtensor<double, 3> a = linspace<double>(1., 100., 100).reshape({2, 5, 10});
+        auto v = view(a, range(0, 2), range(0, 3), range(0, 3));
+        xtensor<double, 1> fl = flatten(v);
+        xtensor<double, 1> expected = {  1.,  2., 3., 11., 12., 13., 21., 22., 23.,
+                                        51., 52., 53, 61., 62., 63., 71., 72., 73. };
+
+        EXPECT_EQ(fl, expected);
+
+        auto v2 = strided_view(a, {range(0, 2), range(0, 3), range(0, 3)});
+        xtensor<double, 1> fl2 = flatten(v2);
+        EXPECT_EQ(fl2, expected);
+    }*/
 
     TEST(xstrided_view, split)
     {
@@ -240,12 +256,12 @@ namespace xt
         xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::flip(e, 0);
         xarray<double> expected = {{7, 8, 9}, {4, 5, 6}, {1, 2, 3}};
-        ASSERT_EQ(expected, t);
+        EXPECT_EQ(expected, t);
 
         xindex idx = {0, 0};
-        ASSERT_EQ(7, t[idx]);
-        ASSERT_EQ(2, t(2, 1));
-        ASSERT_EQ(7, t.element(idx.begin(), idx.end()));
+        EXPECT_EQ(7, t[idx]);
+        EXPECT_EQ(2, t(2, 1));
+        EXPECT_EQ(7, t.element(idx.begin(), idx.end()));
 
         xarray<double> f = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
 
@@ -254,7 +270,7 @@ namespace xt
         {9, 10, 11}},
         {{0, 1, 2},
         {3, 4, 5}}};
-        ASSERT_EQ(expected_2, ft);
+        EXPECT_EQ(expected_2, ft);
     }
 
     TEST(xstrided_view, fliplr)
@@ -262,12 +278,12 @@ namespace xt
         xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::flip(e, 1);
         xarray<double> expected = {{3, 2, 1}, {6, 5, 4}, {9, 8, 7}};
-        ASSERT_EQ(expected, t);
+        EXPECT_EQ(expected, t);
 
         xindex idx = {0, 0};
-        ASSERT_EQ(3, t[idx]);
-        ASSERT_EQ(8, t(2, 1));
-        ASSERT_EQ(3, t.element(idx.begin(), idx.end()));
+        EXPECT_EQ(3, t[idx]);
+        EXPECT_EQ(8, t(2, 1));
+        EXPECT_EQ(3, t.element(idx.begin(), idx.end()));
 
         xarray<double> f = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
 
@@ -278,7 +294,7 @@ namespace xt
             {{9, 10, 11},
             {6, 7, 8}}};
 
-        ASSERT_EQ(expected_2, ft);
+        EXPECT_EQ(expected_2, ft);
     }
 
     TEST(xstrided_view, rot90)
@@ -296,22 +312,22 @@ namespace xt
         axes = {56, 58};
         ASSERT_ANY_THROW(xt::rot90(e, axes));
 
-        ASSERT_EQ(e, xt::rot90<0>(e));
-        ASSERT_EQ(e, xt::rot90<4>(e));
-        ASSERT_EQ(e, xt::rot90<-4>(e));
+        EXPECT_EQ(e, xt::rot90<0>(e));
+        EXPECT_EQ(e, xt::rot90<4>(e));
+        EXPECT_EQ(e, xt::rot90<-4>(e));
 
         xarray<double> expected2 = {{2, 4}, {1, 3}};
-        ASSERT_EQ(expected2, xt::rot90(e2));
-        ASSERT_EQ(expected2, xt::rot90(e2, {-2, -1}));
+        EXPECT_EQ(expected2, xt::rot90(e2));
+        EXPECT_EQ(expected2, xt::rot90(e2, {-2, -1}));
 
         xarray<double> expected3 = {{9, 8, 7}, {6, 5, 4}, {3, 2, 1}};
-        ASSERT_EQ(expected3, xt::rot90<2>(e));
+        EXPECT_EQ(expected3, xt::rot90<2>(e));
 
         xarray<double> expected4 = {{3, 1}, {4, 2}};
-        ASSERT_EQ(expected4, xt::rot90<3>(e2));
-        ASSERT_EQ(expected4, xt::rot90<-1>(e2));
+        EXPECT_EQ(expected4, xt::rot90<3>(e2));
+        EXPECT_EQ(expected4, xt::rot90<-1>(e2));
 
         xarray<double> expected5 = {{{1, 3}, {0, 2}}, {{5, 7}, {4, 6}}};
-        ASSERT_EQ(expected5, xt::rot90(e3, {1, 2}));
+        EXPECT_EQ(expected5, xt::rot90(e3, {1, 2}));
     }
 }

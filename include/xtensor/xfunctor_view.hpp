@@ -72,11 +72,11 @@ namespace xt
         using self_type = xfunctor_applier_base<D>;
         using inner_types = xcontainer_inner_types<D>;
         using xexpression_type = typename inner_types::xexpression_type;
-        using undecay_expression = typename inner_types::undecay_expression;
+        using inner_closure_type = typename inner_types::inner_closure_type;
         using functor_type = typename inner_types::functor_type;
         using accessible_base = xaccessible<D>;
 
-        using extension_base = extension::xfunctor_view_base_t<functor_type, undecay_expression>;
+        using extension_base = extension::xfunctor_view_base_t<functor_type, inner_closure_type>;
         using expression_tag = typename extension_base::expression_tag;
 
         using value_type = typename functor_type::value_type;
@@ -139,7 +139,7 @@ namespace xt
         using reverse_iterator = xfunctor_iterator<functor_type, typename xexpression_type::reverse_iterator>;
         using const_reverse_iterator = xfunctor_iterator<const functor_type, typename xexpression_type::const_reverse_iterator>;
 
-        explicit xfunctor_applier_base(undecay_expression) noexcept;
+        explicit xfunctor_applier_base(inner_closure_type) noexcept;
 
         template <class Func, class E>
         xfunctor_applier_base(Func&&, E&&) noexcept;
@@ -187,14 +187,14 @@ namespace xt
 
         template <class FCT = functor_type>
         auto data_element(size_type i)
-            -> decltype(std::declval<FCT>()(std::declval<undecay_expression>().data_element(i)))
+            -> decltype(std::declval<FCT>()(std::declval<inner_closure_type>().data_element(i)))
         {
             return m_functor(m_e.data_element(i));
         }
 
         template <class FCT = functor_type>
         auto data_element(size_type i) const
-            -> decltype(std::declval<FCT>()(std::declval<undecay_expression>().data_element(i)))
+            -> decltype(std::declval<FCT>()(std::declval<inner_closure_type>().data_element(i)))
         {
             return m_functor(m_e.data_element(i));
         }
@@ -204,14 +204,14 @@ namespace xt
         template <class align, class requested_type = typename xexpression_type::value_type,
                   std::size_t N = xsimd::simd_traits<requested_type>::size, class FCT = functor_type>
         auto load_simd(size_type i) const
-            -> decltype(std::declval<FCT>().template proxy_simd_load<align, requested_type, N>(std::declval<undecay_expression>(), i))
+            -> decltype(std::declval<FCT>().template proxy_simd_load<align, requested_type, N>(std::declval<inner_closure_type>(), i))
         {
             return m_functor.template proxy_simd_load<align, requested_type, N>(m_e, i);
         }
 
         template <class align, class simd, class FCT = functor_type>
         auto store_simd(size_type i, const simd& e)
-            -> decltype(std::declval<FCT>().template proxy_simd_store<align>(std::declval<undecay_expression>(), i, e))
+            -> decltype(std::declval<FCT>().template proxy_simd_store<align>(std::declval<inner_closure_type>(), i, e))
         {
             return m_functor.template proxy_simd_store<align>(m_e, i, e);
         }
@@ -299,7 +299,7 @@ namespace xt
 
     protected:
 
-        undecay_expression m_e;
+        inner_closure_type m_e;
         functor_type m_functor;
 
     private:
@@ -345,7 +345,7 @@ namespace xt
     struct xcontainer_inner_types<xfunctor_view<F, CT>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using undecay_expression = CT;
+        using inner_closure_type = CT;
         using functor_type = std::decay_t<F>;
         using reference = typename functor_type::reference;
         using const_reference = typename functor_type::const_reference;
@@ -416,7 +416,7 @@ namespace xt
     struct xcontainer_inner_types<xfunctor_adaptor<F, CT>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using undecay_expression = CT;
+        using inner_closure_type = CT;
         using functor_type = std::decay_t<F>;
         using reference = typename functor_type::reference;
         using const_reference = typename functor_type::const_reference;
@@ -597,7 +597,7 @@ namespace xt
      * @param e the underlying expression
      */
     template <class D>
-    inline xfunctor_applier_base<D>::xfunctor_applier_base(undecay_expression e) noexcept
+    inline xfunctor_applier_base<D>::xfunctor_applier_base(inner_closure_type e) noexcept
         : m_e(e), m_functor(functor_type())
     {
     }

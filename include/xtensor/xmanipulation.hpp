@@ -206,75 +206,6 @@ namespace xt
      * ravel and flatten views *
      ***************************/
 
-    namespace detail
-    {
-        template <class E>
-        inline auto build_ravel_view(E&& e)
-        {
-            using shape_type = static_shape<std::size_t, 1>;
-            using view_type = xstrided_view<xclosure_t<E>, shape_type>;
-
-            shape_type new_shape;
-            get_strides_t<shape_type> new_strides;
-            new_shape[0] = e.size();
-            new_strides[0] = std::size_t(1);
-            std::size_t offset = detail::get_offset(e);
-
-            return view_type(std::forward<E>(e),
-                             std::move(new_shape),
-                             std::move(new_strides),
-                             offset,
-                             layout_type::dynamic);
-        }
-
-        template <class E, class S>
-        inline auto build_ravel_view(E&& e, S&& flatten_strides, layout_type l)
-        {
-            using shape_type = static_shape<std::size_t, 1>;
-            using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_expression_adaptor<std::remove_reference_t<E>>>;
-
-            shape_type new_shape;
-            get_strides_t<shape_type> new_strides;
-            new_shape[0] = e.size();
-            new_strides[0] = std::size_t(1);
-            std::size_t offset = detail::get_offset(e);
-
-            return view_type(std::forward<E>(e),
-                             std::move(new_shape),
-                             std::move(new_strides),
-                             offset,
-                             layout_type::dynamic,
-                             std::move(flatten_strides),
-                             l);
-        }
-
-        template <bool same_layout>
-        struct ravel_impl
-        {
-            template <class E>
-            inline static auto run(E&& e)
-            {
-                return build_ravel_view(std::forward<E>(e));
-            }
-        };
-
-        template <>
-        struct ravel_impl<false>
-        {
-            template <class E>
-            inline static auto run(E&& e)
-            {
-                // Case where the static layout is either row_major or column major.
-                using shape_type = xindex_type_t<typename std::decay_t<E>::shape_type>;
-                get_strides_t<shape_type> strides;
-                resize_container(strides, e.shape().size());
-                layout_type l = detail::transpose_layout(e.layout());
-                compute_strides(e.shape(), l, strides);
-                return build_ravel_view(std::forward<E>(e), std::move(strides), l);
-            }
-        };
-    }
-
     /**
      * Returns a flatten view of the given expression. No copy is made.
      * @param e the input expression
@@ -285,7 +216,20 @@ namespace xt
     template <layout_type L, class E>
     inline auto ravel(E&& e)
     {
-        return detail::ravel_impl<std::decay_t<E>::static_layout == L>::run(std::forward<E>(e));
+        using shape_type = static_shape<std::size_t, 1>;
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_storage<std::remove_reference_t<E>, L>>;
+
+        shape_type new_shape;
+        get_strides_t<shape_type> new_strides;
+        new_shape[0] = e.size();
+        new_strides[0] = std::size_t(1);
+        std::size_t offset = detail::get_offset(e);
+
+        return view_type(std::forward<E>(e),
+                         std::move(new_shape),
+                         std::move(new_strides),
+                         offset,
+                         layout_type::dynamic);
     }
 
     /**

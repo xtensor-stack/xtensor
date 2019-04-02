@@ -64,6 +64,9 @@ namespace xt
             using size_type = typename allocator_type::size_type;
             using difference_type = typename allocator_type::difference_type;
 
+            using data_type = CP;
+            using const_data_type = const CP;
+
             xbuffer_storage();
 
             template <class P>
@@ -72,14 +75,14 @@ namespace xt
             size_type size() const noexcept;
             void resize(size_type size);
 
-            pointer data() noexcept;
-            const_pointer data() const noexcept;
+            data_type data() noexcept;
+            const_data_type data() const noexcept;
 
             void swap(self_type& rhs) noexcept;
 
         private:
 
-            pointer p_data;
+            data_type p_data;
             size_type m_size;
         };
 
@@ -387,13 +390,13 @@ namespace xt
         }
 
         template <class CP, class A>
-        inline auto xbuffer_storage<CP, A>::data() noexcept -> pointer
+        inline auto xbuffer_storage<CP, A>::data() noexcept -> data_type
         {
             return p_data;
         }
 
         template <class CP, class A>
-        inline auto xbuffer_storage<CP, A>::data() const noexcept -> const_pointer
+        inline auto xbuffer_storage<CP, A>::data() const noexcept -> const_data_type
         {
             return p_data;
         }

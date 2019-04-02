@@ -60,13 +60,14 @@ namespace xt
     struct xcontainer_inner_types<xstrided_view<CT, S, L, FST>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using undecay_expression = CT;
-        using reference = inner_reference_t<undecay_expression>;
+        using inner_closure_type = CT;
+        using reference = inner_reference_t<inner_closure_type>;
         using const_reference = typename xexpression_type::const_reference;
         using size_type = typename xexpression_type::size_type;
         using shape_type = std::decay_t<S>;
         using undecay_shape = S;
-        using inner_storage_type = FST;
+        using flat_storage = FST;
+        using inner_storage_type = typename FST::type;
         using temporary_type = temporary_type_t<typename xexpression_type::value_type, S, L>;
         static constexpr layout_type layout = L;
     };
@@ -107,7 +108,7 @@ namespace xt
      *
      * @sa strided_view, transpose
      */
-    template <class CT, class S, layout_type L = layout_type::dynamic, class FST = typename detail::flat_storage_type<CT>::type>
+    template <class CT, class S, layout_type L = layout_type::dynamic, class FST = detail::flat_storage<CT>>
     class xstrided_view : public xview_semantic<xstrided_view<CT, S, L, FST>>,
                           public xiterable<xstrided_view<CT, S, L, FST>>,
                           private xstrided_view_base<xstrided_view<CT, S, L, FST>>,
@@ -122,6 +123,7 @@ namespace xt
         using expression_tag = typename extension_base::expression_tag;
 
         using xexpression_type = typename base_type::xexpression_type;
+        using inner_closure_type = typename base_type::inner_closure_type;
         using base_type::is_const;
 
         using value_type = typename base_type::value_type;
@@ -158,10 +160,6 @@ namespace xt
 
         template <class CTA>
         xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
-
-        template <class CTA, class FLS>
-        xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset,
-                      layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept;
 
         xstrided_view(const xstrided_view& rhs) = default;
         xstrided_view& operator=(const xstrided_view& rhs);
@@ -225,7 +223,7 @@ namespace xt
         using const_container_iterator = typename storage_type::const_iterator;
 
         template <class E>
-        using rebind_t = xstrided_view<E, S, L, detail::flat_storage_type_t<E>>;
+        using rebind_t = xstrided_view<E, S, L, detail::flat_storage<E>>;
 
         template <class E>
         rebind_t<E> build_view(E&& e) const;
@@ -312,14 +310,6 @@ namespace xt
     template <class CTA>
     inline xstrided_view<CT, S, L, FST>::xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept
         : base_type(std::forward<CTA>(e), std::move(shape), std::move(strides), offset, layout)
-    {
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    template <class CTA, class FLS>
-    inline xstrided_view<CT, S, L, FST>::xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset,
-                                                       layout_type layout, FLS&& flatten_strides, layout_type flatten_layout) noexcept
-        : base_type(std::forward<CTA>(e), std::move(shape), std::move(strides), offset, layout, std::forward<FLS>(flatten_strides), flatten_layout)
     {
     }
     //@}

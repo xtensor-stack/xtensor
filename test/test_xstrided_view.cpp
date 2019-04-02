@@ -496,7 +496,20 @@ namespace xt
         EXPECT_THROW(noalias(v) = b, broadcast_error);
     }
 
-    TEST(xstrided_view, view_on_view)
+    TEST(xstrided_view, strided_view_on_view)
+    {
+        xarray<int> a = xt::ones<int>({ 3, 4, 5 });
+        auto v1 = view(a, 1, all(), all());
+        auto vv1 = strided_view(v1, { 1, all() });
+        vv1 = vv1 * 5;
+        EXPECT_EQ(a(0, 0, 0), 1);
+        EXPECT_EQ(a(1, 1, 0), 5);
+        EXPECT_EQ(a(1, 1, 4), 5);
+        EXPECT_EQ(a(1, 2, 4), 1);
+        EXPECT_EQ(v1(1, 4), 5);
+    }
+
+    TEST(xstrided_view, strided_view_on_strided_view)
     {
         xarray<int> a = xt::ones<int>({ 3, 4, 5 });
         auto v1 = strided_view(a, { 1, all(), all() });

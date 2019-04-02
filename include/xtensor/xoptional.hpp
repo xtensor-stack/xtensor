@@ -483,10 +483,10 @@ namespace xt
             using uft = typename std::decay_t<CT>::flag_expression;
             using ucvt = typename std::decay_t<CT>::const_value_expression;
             using ucft = typename std::decay_t<CT>::const_flag_expression;
-            using value_expression = xdynamic_view<uvt, S, L, xt::detail::flat_storage_type_t<uvt>>;
-            using flag_expression = xdynamic_view<uft, S, L, xt::detail::flat_storage_type_t<uft>>;
-            using const_value_expression = xdynamic_view<ucvt, S, L, xt::detail::flat_storage_type_t<ucvt>>;
-            using const_flag_expression = xdynamic_view<ucft, S, L, xt::detail::flat_storage_type_t<ucft>>;
+            using value_expression = xdynamic_view<uvt, S, L, xt::detail::flat_storage<uvt>>;
+            using flag_expression = xdynamic_view<uft, S, L, xt::detail::flat_storage<uft>>;
+            using const_value_expression = xdynamic_view<ucvt, S, L, xt::detail::flat_storage<ucvt>>;
+            using const_flag_expression = xdynamic_view<ucft, S, L, xt::detail::flat_storage<ucft>>;
 
             value_expression value();
             const_value_expression value() const;
@@ -646,10 +646,10 @@ namespace xt
             using uft = typename std::decay_t<CT>::flag_expression;
             using ucvt = typename std::decay_t<CT>::const_value_expression;
             using ucft = typename std::decay_t<CT>::const_flag_expression;
-            using value_expression = xstrided_view<uvt, S, L, xt::detail::flat_storage_type_t<uvt>>;
-            using flag_expression = xstrided_view<uft, S, L, xt::detail::flat_storage_type_t<uft>>;
-            using const_value_expression = xstrided_view<ucvt, S, L, xt::detail::flat_storage_type_t<ucvt>>;
-            using const_flag_expression = xstrided_view<ucft, S, L, xt::detail::flat_storage_type_t<ucft>>;
+            using value_expression = xstrided_view<uvt, S, L, xt::detail::flat_storage<uvt>>;
+            using flag_expression = xstrided_view<uft, S, L, xt::detail::flat_storage<uft>>;
+            using const_value_expression = xstrided_view<ucvt, S, L, xt::detail::flat_storage<ucvt>>;
+            using const_flag_expression = xstrided_view<ucft, S, L, xt::detail::flat_storage<ucft>>;
 
             value_expression value();
             const_value_expression value() const;

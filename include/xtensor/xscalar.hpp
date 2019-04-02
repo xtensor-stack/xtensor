@@ -360,6 +360,8 @@ namespace xt
         using size_type = typename storage_type::size_type;
         using difference_type = typename storage_type::difference_type;
 
+        using shape_type = typename xscalar<CT>::shape_type;
+
         xscalar_stepper(storage_type* c) noexcept;
 
         reference operator*() const noexcept;

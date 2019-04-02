@@ -341,6 +341,7 @@ namespace xt
         using self_type = xview<CT, S...>;
         using inner_types = xcontainer_inner_types<self_type>;
         using xexpression_type = std::decay_t<CT>;
+        using inner_closure_type = CT;
         using semantic_base = xview_semantic<self_type>;
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
 
