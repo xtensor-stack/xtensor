@@ -305,6 +305,18 @@ namespace xt
         bool_container b_2 = equal(a, other);
         bool_container expected_2 = {1, 1, 1, 0, 0};
         EXPECT_EQ(expected_2, b_2);
+
+        auto expr = equal(a, a);
+        using assign_traits = xassign_traits<xarray<bool>, decltype(expr)>;
+
+#if XTENSOR_USE_XSIMD
+        EXPECT_TRUE(has_simd_interface<decltype(expr)>());
+
+        EXPECT_TRUE(assign_traits::convertible_types());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
+#endif
     }
 
     TYPED_TEST(operation, not_equal)
@@ -478,7 +490,7 @@ namespace xt
 
     TYPED_TEST(operation, where)
     {
-        TypeParam a = { { 1, 2, 3 },{ 0, 1, 0 },{ 0, 4, 1 } };
+        TypeParam a = {{ 1, 2, 3 }, { 0, 1, 0 }, { 0, 4, 1 }};
         double b = 1.0;
         TypeParam res = where(a > b, b, a);
         TypeParam expected = { { 1, 1, 1 },{ 0, 1, 0 },{ 0, 1, 1 } };
@@ -487,8 +499,16 @@ namespace xt
 #ifdef XTENSOR_USE_XSIMD
         // This will fail to compile if simd is broken for conditional_ternary
         auto func = where(a > b, b, a);
+        EXPECT_TRUE(has_simd_interface<decltype(func)>());
         auto s = func.template load_simd<xsimd::aligned_mode>(0);
         (void)s;
+
+        using assign_traits = xassign_traits<TypeParam, decltype(func)>;
+
+        EXPECT_TRUE(assign_traits::convertible_types());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
 #endif
     }
 

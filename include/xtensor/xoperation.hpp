@@ -101,8 +101,8 @@ namespace xt
                 return xtl::select(cond, v1, v2);
             }
 
-            template <class B>
-            constexpr B simd_apply(const get_batch_bool<B>& t1,
+            template <class BB, class B>
+            constexpr B simd_apply(const BB& t1,
                                    const B& t2,
                                    const B& t3) const noexcept
             {

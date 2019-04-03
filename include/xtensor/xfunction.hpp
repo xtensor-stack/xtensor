@@ -93,7 +93,7 @@ namespace xt
 
         template <class V>
         struct has_simd_type
-            : std::integral_constant<bool, !std::is_same<V, xsimd::simd_type<V>>::value>
+            : std::integral_constant<bool, !std::is_same<V, xsimd::simd_type<V>>::value || std::is_same<bool, V>::value>
         {
         };
 
@@ -326,7 +326,11 @@ namespace xt
         template <class UT = self_type, class = typename std::enable_if<UT::only_scalar::value>::type>
         operator value_type() const;
 
-        template <class align, class requested_type = value_type,
+        using simd_request_type = xtl::mpl::eval_if_t<std::is_same<bool, value_type>, 
+                                                     common_value_type<std::decay_t<CT>...>,
+                                                     xt::meta_identity<value_type>>;
+
+        template <class align, class requested_type = simd_request_type,
                   std::size_t N = xsimd::simd_traits<requested_type>::size>
         simd_return_type<requested_type> load_simd(size_type i) const;
 
