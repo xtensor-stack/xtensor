@@ -858,6 +858,62 @@ namespace xt
             EXPECT_EQ(iter, iter_end);
         }
     }
+
+    // C: container type (xarray<int>, xtensor<int>)
+    // SIT: storage iterator (int*, std::vector<int>::iterator)
+    // SCIT: storage const iterator (const int*, std::vector<int>::const_iterator)
+    template <class C, class SIT, class SCIT>
+    void test_iterator_types()
+    {   
+        using stepper = xstepper<C>;
+        using const_stepper = xstepper<const C>;
+        using shape_type = typename C::shape_type;
+
+        using rm_layout_iterator = typename C::template layout_iterator<layout_type::row_major>;
+        using rm_const_layout_iterator = typename C::template const_layout_iterator<layout_type::row_major>;
+        using rm_reverse_layout_iterator = typename C::template reverse_layout_iterator<layout_type::row_major>;
+        using rm_const_reverse_layout_iterator = typename C::template const_reverse_layout_iterator<layout_type::row_major>;
+        
+        using exp_rm_layout_iterator = xiterator<stepper, shape_type*, layout_type::row_major>;
+        using exp_rm_const_layout_iterator = xiterator<const_stepper, shape_type*, layout_type::row_major>;
+        using exp_rm_reverse_layout_iterator = std::reverse_iterator<rm_layout_iterator>;
+        using exp_rm_const_reverse_layout_iterator = std::reverse_iterator<rm_const_layout_iterator>;
+
+        EXPECT_TRUE((std::is_same<rm_layout_iterator, exp_rm_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<rm_const_layout_iterator, exp_rm_const_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<rm_reverse_layout_iterator, exp_rm_reverse_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<rm_const_reverse_layout_iterator, exp_rm_const_reverse_layout_iterator>::value));
+
+        using cm_layout_iterator = typename C::template layout_iterator<layout_type::column_major>;
+        using cm_const_layout_iterator = typename C::template const_layout_iterator<layout_type::column_major>;
+        using cm_reverse_layout_iterator = typename C::template reverse_layout_iterator<layout_type::column_major>;
+        using cm_const_reverse_layout_iterator = typename C::template const_reverse_layout_iterator<layout_type::column_major>;     
+        
+        using exp_cm_layout_iterator = xiterator<stepper, shape_type*, layout_type::column_major>;
+        using exp_cm_const_layout_iterator = xiterator<const_stepper, shape_type*, layout_type::column_major>;
+        using exp_cm_reverse_layout_iterator = std::reverse_iterator<cm_layout_iterator>;
+        using exp_cm_const_reverse_layout_iterator = std::reverse_iterator<cm_const_layout_iterator>;
+
+        EXPECT_TRUE((std::is_same<cm_layout_iterator, exp_cm_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<cm_const_layout_iterator, exp_cm_const_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<cm_reverse_layout_iterator, exp_cm_reverse_layout_iterator>::value));
+        EXPECT_TRUE((std::is_same<cm_const_reverse_layout_iterator, exp_cm_const_reverse_layout_iterator>::value));
+
+        using storage_iterator = typename C::storage_iterator;
+        using const_storage_iterator = typename C::const_storage_iterator;
+        using reverse_storage_iterator = typename C::reverse_storage_iterator;
+        using const_reverse_storage_iterator = typename C::const_reverse_storage_iterator;
+
+        using exp_storage_iterator = SIT;
+        using exp_const_storage_iterator = SCIT;
+        using exp_reverse_storage_iterator = std::reverse_iterator<SIT>;
+        using exp_const_reverse_storage_iterator = std::reverse_iterator<SCIT>;
+
+        EXPECT_TRUE((std::is_same<storage_iterator, exp_storage_iterator>::value));
+        EXPECT_TRUE((std::is_same<const_storage_iterator, exp_const_storage_iterator>::value));
+        EXPECT_TRUE((std::is_same<reverse_storage_iterator, exp_reverse_storage_iterator>::value));
+        EXPECT_TRUE((std::is_same<const_reverse_storage_iterator, exp_const_reverse_storage_iterator>::value));
+    }
 }
 
 #endif

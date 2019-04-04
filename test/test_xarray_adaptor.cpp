@@ -185,4 +185,16 @@ namespace xt
         ad = ad * 2;
         EXPECT_EQ(ad(1, 1), 10.);
     }
+
+    TEST(xarray_adaptor, iterator_types)
+    {
+        using vec_type = std::vector<int>;
+        using array_type = xarray_adaptor<vec_type>;
+        using const_array_type = xarray_adaptor<const vec_type>;
+        using iterator = vec_type::iterator;
+        using const_iterator = vec_type::const_iterator;
+
+        test_iterator_types<array_type, iterator, const_iterator>();
+        test_iterator_types<const_array_type, const_iterator, const_iterator>();
+    }
 }

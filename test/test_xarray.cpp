@@ -311,4 +311,10 @@ namespace xt
         EXPECT_TRUE(a.in_bounds(0,0) == true);
         EXPECT_TRUE(a.in_bounds(2,0) == false);
     }
+
+    TEST(xarray, iterator_types)
+    {
+        using array_type = xarray<int>;
+        test_iterator_types<array_type, int*, const int*>();
+    }
 }
