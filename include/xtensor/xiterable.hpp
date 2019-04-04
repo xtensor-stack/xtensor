@@ -242,6 +242,27 @@ namespace xt
     template <class D>
     struct xcontainer_inner_types;
 
+    namespace detail
+    {
+        template <class C>
+        struct storage_iterator_traits
+        {
+            using iterator = typename C::iterator;
+            using const_iterator = typename C::const_iterator;
+            using reverse_iterator = typename C::reverse_iterator;
+            using const_reverse_iterator = typename C::const_reverse_iterator;
+        };
+
+        template <class C>
+        struct storage_iterator_traits<const C>
+        {
+            using iterator = typename C::const_iterator;
+            using const_iterator = iterator;
+            using reverse_iterator = typename C::const_reverse_iterator;
+            using const_reverse_iterator = reverse_iterator;
+        };
+    }
+
     /**
      * @class xcontiguous_iterable
      * @brief Base class for multidimensional iterable expressions with
@@ -299,10 +320,11 @@ namespace xt
         template <class S, layout_type L>
         using const_reverse_broadcast_iterator = typename iterable_base::template const_reverse_broadcast_iterator<S, L>;
 
-        using storage_iterator = typename storage_type::iterator;
-        using const_storage_iterator = typename storage_type::const_iterator;
-        using reverse_storage_iterator = typename storage_type::reverse_iterator;
-        using const_reverse_storage_iterator = typename storage_type::const_reverse_iterator;
+        using storage_traits = detail::storage_iterator_traits<storage_type>;
+        using storage_iterator = typename storage_traits::iterator;
+        using const_storage_iterator = typename storage_traits::const_iterator;
+        using reverse_storage_iterator = typename storage_traits::reverse_iterator;
+        using const_reverse_storage_iterator = typename storage_traits::const_reverse_iterator;
 
         template <layout_type L, class It1, class It2>
         using select_iterator_impl = std::conditional_t<L == static_layout, It1, It2>;

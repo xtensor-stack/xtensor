@@ -105,10 +105,10 @@ namespace xt
         using data_alignment = xsimd::container_alignment_t<storage_type>;
         using simd_type = xsimd::simd_type<value_type>;
 
-        using storage_iterator = typename storage_type::iterator;
-        using const_storage_iterator = typename storage_type::const_iterator;
-        using reverse_storage_iterator = typename storage_type::reverse_iterator;
-        using const_reverse_storage_iterator = typename storage_type::const_reverse_iterator;
+        using storage_iterator = typename iterable_base::storage_iterator;
+        using const_storage_iterator = typename iterable_base::const_storage_iterator;
+        using reverse_storage_iterator = typename iterable_base::reverse_storage_iterator;
+        using const_reverse_storage_iterator = typename iterable_base::const_reverse_storage_iterator;
 
         static_assert(static_layout != layout_type::any, "Container layout can never be layout_type::any!");
 

@@ -331,4 +331,10 @@ namespace xt
         EXPECT_TRUE(a.in_bounds(0,0) == true);
         EXPECT_TRUE(a.in_bounds(2,0) == false);
     }
+
+    TEST(xtensor, iterator_types)
+    {
+        using tensor_type = xtensor<int, 2>;
+        test_iterator_types<tensor_type, int*, const int*>();
+    }
 }
