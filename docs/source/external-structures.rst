@@ -169,7 +169,7 @@ The last two methods are extended copy constructor and assign operator. They all
     using tensor_type = raw_tensor_adaptor<double>;
     tensor_type a, b, c;
     // .... init a, b and c
-    tnesor_type d = a + b - c;
+    tensor_type d = a + b - c;
 
 Implement the resize methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
