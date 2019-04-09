@@ -301,7 +301,7 @@ namespace xt
     }
 
     /*************************************
-     * xcontainer extention for optional *
+     * xcontainer extension for optional *
      *************************************/
 
     namespace extension
@@ -335,19 +335,44 @@ namespace xt
         template <class EC, layout_type L, class SC>
         struct xarray_optional_traits
         {
-            using value_container = typename EC::base_container_type;
-            using flag_container = typename EC::flag_container_type;
+            using value_container = typename std::remove_reference_t<EC>::base_container_type;
+            using flag_container = typename std::remove_reference_t<EC>::flag_container_type;
             using value_expression = xarray_adaptor<value_container&, L, SC>;
             using flag_expression = xarray_adaptor<flag_container&, L, SC>;
             using const_value_expression = xarray_adaptor<const value_container&, L, SC>;
             using const_flag_expression = xarray_adaptor<const flag_container&, L, SC>;
+        };
+
+        template <class EC, layout_type L, class SC>
+        struct xarray_container_optional_traits : xarray_optional_traits<EC, L, SC>
+        {
             using derived_type = xarray_container<EC, L, SC, xoptional_expression_tag>;
         };
 
         template <class EC, layout_type L, class SC>
         struct xarray_container_base<EC, L, SC, xoptional_expression_tag>
         {
-            using traits = xarray_optional_traits<EC, L, SC>;
+            using traits = xarray_container_optional_traits<EC, L, SC>;
+            using type = xcontainer_optional_base<traits>;
+        };
+    }
+
+    /*****************************************
+     * xarray_adaptor extension for optional *
+     *****************************************/
+
+    namespace extension
+    {
+        template <class EC, layout_type L, class SC>
+        struct xarray_adaptor_optional_traits : xarray_optional_traits<EC, L, SC>
+        {
+            using derived_type = xarray_adaptor<EC, L, SC, xoptional_expression_tag>;
+        };
+
+        template <class EC, layout_type L, class SC>
+        struct xarray_adaptor_base<EC, L, SC, xoptional_expression_tag>
+        {
+            using traits = xarray_adaptor_optional_traits<EC, L, SC>;
             using type = xcontainer_optional_base<traits>;
         };
     }
@@ -361,19 +386,44 @@ namespace xt
         template <class EC, std::size_t N, layout_type L>
         struct xtensor_optional_traits
         {
-            using value_container = typename EC::base_container_type;
-            using flag_container = typename EC::flag_container_type;
+            using value_container = typename std::remove_reference_t<EC>::base_container_type;
+            using flag_container = typename std::remove_reference_t<EC>::flag_container_type;
             using value_expression = xtensor_adaptor<value_container&, N, L>;
             using flag_expression = xtensor_adaptor<flag_container&, N, L>;
             using const_value_expression = xtensor_adaptor<const value_container&, N, L>;
             using const_flag_expression = xtensor_adaptor<const flag_container&, N, L>;
+        };
+
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_container_optional_traits : xtensor_optional_traits<EC, N, L>
+        {
             using derived_type = xtensor_container<EC, N, L, xoptional_expression_tag>;
         };
 
         template <class EC, std::size_t N, layout_type L>
         struct xtensor_container_base<EC, N, L, xoptional_expression_tag>
         {
-            using traits = xtensor_optional_traits<EC, N, L>;
+            using traits = xtensor_container_optional_traits<EC, N, L>;
+            using type = xcontainer_optional_base<traits>;
+        };
+    }
+
+    /******************************************
+     * xtensor_adaptor extension for optional *
+     ******************************************/
+
+    namespace extension
+    {
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_adaptor_optional_traits : xtensor_optional_traits<EC, N, L>
+        {
+            using derived_type = xtensor_adaptor<EC, N, L, xoptional_expression_tag>;
+        };
+
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_adaptor_base<EC, N, L, xoptional_expression_tag>
+        {
+            using traits = xtensor_adaptor_optional_traits<EC, N, L>;
             using type = xcontainer_optional_base<traits>;
         };
     }

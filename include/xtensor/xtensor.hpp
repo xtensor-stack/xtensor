@@ -149,6 +149,21 @@ namespace xt
      * xtensor_container_adaptor declaration *
      *****************************************/
 
+    namespace extension
+    {
+        template <class EC, std::size_t N, layout_type L, class Tag>
+        struct xtensor_adaptor_base;
+
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_adaptor_base<EC, N, L, xtensor_expression_tag>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class EC, std::size_t N, layout_type L, class Tag>
+        using xtensor_adaptor_base_t = typename xtensor_adaptor_base<EC, N, L, Tag>::type;
+    }
+
     template <class EC, std::size_t N, layout_type L, class Tag>
     struct xcontainer_inner_types<xtensor_adaptor<EC, N, L, Tag>>
     {
@@ -166,9 +181,9 @@ namespace xt
         static constexpr layout_type layout = L;
     };
 
-    template <class EC, std::size_t N, layout_type L>
-    struct xiterable_inner_types<xtensor_adaptor<EC, N, L>>
-        : xcontainer_iterable_types<xtensor_adaptor<EC, N, L>>
+    template <class EC, std::size_t N, layout_type L, class Tag>
+    struct xiterable_inner_types<xtensor_adaptor<EC, N, L, Tag>>
+        : xcontainer_iterable_types<xtensor_adaptor<EC, N, L, Tag>>
     {
     };
 
@@ -190,7 +205,8 @@ namespace xt
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     class xtensor_adaptor : public xstrided_container<xtensor_adaptor<EC, N, L, Tag>>,
-                            public xcontainer_semantic<xtensor_adaptor<EC, N, L, Tag>>
+                            public xcontainer_semantic<xtensor_adaptor<EC, N, L, Tag>>,
+                            public extension::xtensor_container_base_t<EC, N, L, Tag>
     {
     public:
 
@@ -199,6 +215,7 @@ namespace xt
         using self_type = xtensor_adaptor<EC, N, L, Tag>;
         using base_type = xstrided_container<self_type>;
         using semantic_base = xcontainer_semantic<self_type>;
+        using extension_base = extension::xtensor_adaptor_base_t<EC, N, L, Tag>;
         using storage_type = typename base_type::storage_type;
         using allocator_type = typename base_type::allocator_type;
         using shape_type = typename base_type::shape_type;
