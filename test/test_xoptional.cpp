@@ -30,6 +30,30 @@ namespace xt
         ASSERT_EQ((m[{0, 0}].value()), 1.0);
     }
 
+    TEST(xoptional, adaptor)
+    {
+        using vtype = xtl::xoptional_vector<double>;
+        vtype v(4, 0.);
+        v[0] = 1.;
+        v[1] = 2.;
+        v[2] = 3.;
+        v[3] = xtl::missing<double>();
+
+        using tadaptor = xtensor_adaptor<vtype&, 2, layout_type::row_major, xoptional_expression_tag>;
+        tadaptor ta(v, {2, 2});
+        ASSERT_EQ(ta(0, 0).value(), 1.0);
+        ASSERT_EQ(ta(1, 0).value(), 3.0);
+        ASSERT_FALSE(ta(1, 1).has_value());
+        ASSERT_EQ((ta[{0, 0}].value()), 1.0);
+
+        using aadaptor = xarray_adaptor<vtype&, layout_type::row_major, dynamic_shape<std::size_t>, xoptional_expression_tag>;
+        aadaptor aa(v, {2, 2});
+        ASSERT_EQ(aa(0, 0).value(), 1.0);
+        ASSERT_EQ(aa(1, 0).value(), 3.0);
+        ASSERT_FALSE(aa(1, 1).has_value());
+        ASSERT_EQ((aa[{0, 0}].value()), 1.0);
+    }
+
     TEST(xoptional, operation)
     {
         xtensor_optional<double, 2> m1
