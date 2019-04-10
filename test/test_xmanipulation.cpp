@@ -65,8 +65,8 @@ namespace xt
         EXPECT_EQ(fun(1, 1), tr(1, 1));
         EXPECT_EQ(fun(1, 2), tr(2, 1));
 
-        xarray<int, layout_type::column_major> a2 = { { 0, 1, 2 },{ 3, 4, 5 } };
-        xarray<int, layout_type::column_major> b2 = { { 0, 1, 2 },{ 3, 4, 5 } };
+        xarray<int, layout_type::column_major> a2 = { { 0, 1, 2 }, { 3, 4, 5 } };
+        xarray<int, layout_type::column_major> b2 = { { 0, 1, 2 }, { 3, 4, 5 } };
         auto fun2 = a2 + b2;
         auto tr2 = transpose(fun2);
         EXPECT_EQ(fun2(0, 0), tr2(0, 0));
@@ -79,7 +79,7 @@ namespace xt
 
     TEST(xstrided_view, ravel)
     {
-        xarray<int, layout_type::row_major> a = { { 0, 1, 2 },{ 3, 4, 5 } };
+        xarray<int, layout_type::row_major> a = { { 0, 1, 2 }, { 3, 4, 5 } };
 
         auto flat = ravel<layout_type::row_major>(a);
         EXPECT_EQ(flat(0), a(0, 0));
