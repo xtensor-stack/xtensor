@@ -695,12 +695,25 @@ namespace xt
 
     TEST(xstrided_view, on_xview)
     {
-        xarray<double> a = {0,1,2,3,4,5,6,7,8};
+        xarray<double> a = {0, 1, 2, 3, 4, 5, 6, 7, 8};
         auto v = view(a, keep(3, 5, 6));
         auto v2 = strided_view(v, {2});
         EXPECT_EQ(v2(0), 6);
         auto v3 = strided_view(v, {all()});
         EXPECT_EQ(v3(0), 3);
         EXPECT_EQ(v3(1), 5);
+    }
+
+    TEST(xstrided_view, on_xbroadcast)
+    {
+        xarray<double, layout_type::column_major> a = 
+          {{  0.0,  1.0,  2.0},
+           { 10.0, 11.0, 12.0}};
+
+        auto bc = broadcast(a, {2, 3});
+        auto v = strided_view(bc, {0});
+        EXPECT_EQ(v(0), 0.0);
+        EXPECT_EQ(v(1), 1.0);
+        EXPECT_EQ(v(2), 2.0);
     }
 }
