@@ -13,6 +13,9 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xview.hpp"
+
+#include "xtensor/xio.hpp"
 
 namespace xt
 {
@@ -102,6 +105,26 @@ namespace xt
 
         auto flat3 = ravel(a);
         EXPECT_EQ(flat, flat3);
+    }
+    
+    TEST(xstrided_view, flatten)
+    {
+        xtensor<double, 3> a = linspace<double>(1., 100., 100).reshape({2, 5, 10});
+        std::cout << a << std::endl;
+        auto v = view(a, range(0, 2), range(0, 3), range(0, 3));
+        std::cout << v << std::endl;
+        xtensor<double, 1> fl = flatten<XTENSOR_DEFAULT_LAYOUT>(v);
+        std::cout << fl << std::endl;
+        xtensor<double, 1> expected_rm = {  1.,  2., 3., 11., 12., 13., 21., 22., 23.,
+                                           51., 52., 53, 61., 62., 63., 71., 72., 73. };
+        xtensor<double, 1> expected_cm = { 1.,  2.,  3.,  4.,  5.,  6.,
+                                          11., 12., 13., 14., 15., 16.,
+                                          21., 22., 23., 24., 25., 26.};
+        xtensor<double, 1> expected = XTENSOR_DEFAULT_LAYOUT==layout_type::row_major ? expected_rm : expected_cm;
+        EXPECT_EQ(fl, expected);
+        auto v2 = strided_view(a, {range(0, 2), range(0, 3), range(0, 3)});
+        xtensor<double, 1> fl2 = flatten<XTENSOR_DEFAULT_LAYOUT>(v2);
+        EXPECT_EQ(fl2, expected);
     }
 
     TEST(xmanipulation, split)
