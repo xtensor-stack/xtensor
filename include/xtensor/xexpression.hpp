@@ -350,45 +350,45 @@ namespace xt
     {
     };
 
-#define XTENSOR_FORWARD_CONST_METHOD(name)                          \
-    auto name() const                                               \
-        -> decltype(std::declval<xtl::constify_t<E>>().name())      \
-    {                                                               \
-        return m_ptr->name();                                       \
+#define XTENSOR_FORWARD_CONST_METHOD(name)                                      \
+    auto name() const                                                           \
+        -> decltype(std::declval<xtl::constify_t<E>>().name())                  \
+    {                                                                           \
+        return m_ptr->name();                                                   \
     }
 
-#define XTENSOR_FORWARD_METHOD(name)                                \
-    auto name() -> decltype(std::declval<E>().name())               \
-    {                                                               \
-        return m_ptr->name();                                       \
+#define XTENSOR_FORWARD_METHOD(name)                                            \
+    auto name() -> decltype(std::declval<E>().name())                           \
+    {                                                                           \
+        return m_ptr->name();                                                   \
     }
 
-#define XTENSOR_FORWARD_CONST_ITERATOR_METHOD(name)                 \
-    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>            \
-    auto name() const noexcept                                      \
-        -> decltype(std::declval<xtl::constify_t<E>>().name())      \
-    {                                                               \
-        return m_ptr->name();                                       \
-    }                                                               \
-    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>   \
-    auto name(const S& shape) const noexcept                        \
-        -> decltype(std::declval<xtl::constify_t<E>>().name(shape)) \
-    {                                                               \
-        return m_ptr->name();                                       \
+#define XTENSOR_FORWARD_CONST_ITERATOR_METHOD(name)                             \
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>                        \
+    auto name() const noexcept                                                  \
+        -> decltype(std::declval<xtl::constify_t<E>>().template name<L>())      \
+    {                                                                           \
+        return m_ptr->template name<L>();                                       \
+    }                                                                           \
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>               \
+    auto name(const S& shape) const noexcept                                    \
+        -> decltype(std::declval<xtl::constify_t<E>>().template name<L>(shape)) \
+    {                                                                           \
+        return m_ptr->template name<L>();                                       \
     }
 
-#define XTENSOR_FORWARD_ITERATOR_METHOD(name)                       \
-    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>   \
-    auto name(const S& shape) noexcept                              \
-        -> decltype(std::declval<E>().name(shape))                  \
-    {                                                               \
-        return m_ptr->name();                                       \
-    }                                                               \
-    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>            \
-    auto name() noexcept -> decltype(std::declval<E>().name())      \
-    {                                                               \
-        return m_ptr->name();                                       \
-    }                                                               \
+#define XTENSOR_FORWARD_ITERATOR_METHOD(name)                                   \
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>               \
+    auto name(const S& shape) noexcept                                          \
+        -> decltype(std::declval<E>().template name<L>(shape))                  \
+    {                                                                           \
+        return m_ptr->template name<L>();                                       \
+    }                                                                           \
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>                        \
+    auto name() noexcept -> decltype(std::declval<E>().template name<L>())      \
+    {                                                                           \
+        return m_ptr->template name<L>();                                       \
+    }                                                                           \
 
     namespace detail
     {
