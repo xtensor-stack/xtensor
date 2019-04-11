@@ -707,6 +707,10 @@ namespace xt
       return !(a == b);
     }
 
+    /*****************
+     * has_assign_to *
+     *****************/
+
     template <class E1, class E2, class = void>
     struct has_assign_to : std::false_type
     {
@@ -717,6 +721,10 @@ namespace xt
         : std::true_type
     {
     };
+
+    /********************
+     * rebind_container *
+     ********************/
 
     template <class X, template <class, class> class C, class T, class A>
     struct rebind_container<X, C<T, A>>
@@ -739,6 +747,10 @@ namespace xt
     };
 #endif
 
+    /********************
+     * get_strides_type *
+     ********************/
+
     template <class S>
     struct get_strides_type
     {
@@ -756,6 +768,10 @@ namespace xt
 
     template <class C>
     using get_strides_t = typename get_strides_type<C>::type;
+
+    /*******************
+     * inner_reference *
+     *******************/
 
     template <class ST>
     struct inner_reference

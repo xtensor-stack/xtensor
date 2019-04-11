@@ -1443,7 +1443,7 @@ namespace xt
 
         transform(x1);
         transform(x2);
-        EXPECT_TRUE(xt::allclose(x_view, 2 + x_orig));
+        EXPECT_TRUE(xt::allclose(x_view, float(2) + x_orig));
 
         for (auto it = x1.begin(); it != x1.end(); ++it)
         {
@@ -1453,6 +1453,6 @@ namespace xt
         {
             *it += 5;
         }
-        EXPECT_TRUE(xt::allclose(x_view, 7 + x_orig));
+        EXPECT_TRUE(xt::allclose(x_view, float(7) + x_orig));
     }
 }

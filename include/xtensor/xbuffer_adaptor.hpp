@@ -21,9 +21,6 @@
 
 namespace xt
 {
-    /******************************
-     * xbuffer_adator declaration *
-     ******************************/
 
     struct no_ownership
     {
@@ -38,9 +35,9 @@ namespace xt
     template <class CP, class O = no_ownership, class A = std::allocator<std::remove_pointer_t<std::remove_reference_t<CP>>>>
     class xbuffer_adaptor;
 
-    /*********************************
-     * xbuffer_adator implementation *
-     *********************************/
+    /********************
+     * buffer_storage_t *
+     ********************/
 
     namespace detail
     {
@@ -233,29 +230,147 @@ namespace xt
         using buffer_storage_t = typename get_buffer_storage<CP, A, O>::type;
     }
 
-    template <class CP, class O, class A>
-    class xbuffer_adaptor : private detail::buffer_storage_t<CP, A, O>
+    /************************
+     * xbuffer_adaptor_base *
+     ************************/
+
+    template <class D>
+    struct buffer_inner_types;
+
+    template <class D>
+    class xbuffer_adaptor_base
     {
     public:
 
+        using self_type = xbuffer_adaptor_base<D>;
+        using derived_type = D;
+        using inner_types = buffer_inner_types<D>;
+        using value_type = typename inner_types::value_type;
+        using reference = typename inner_types::reference;
+        using const_reference = typename inner_types::const_reference;
+        using pointer = typename inner_types::pointer;
+        using const_pointer = typename inner_types::const_pointer;
+        using size_type = typename inner_types::size_type;
+        using difference_type = typename inner_types::difference_type;
+        using iterator = typename inner_types::iterator;
+        using const_iterator = typename inner_types::const_iterator;
+        using reverse_iterator = typename inner_types::reverse_iterator;
+        using const_reverse_iterator = typename inner_types::const_reverse_iterator;
+        using index_type = typename inner_types::index_type;
+
+        bool empty() const noexcept;
+
+        reference operator[](size_type i);
+        const_reference operator[](size_type i) const;
+
+        reference front();
+        const_reference front() const;
+
+        reference back();
+        const_reference back() const;
+
+        iterator begin() noexcept;
+        iterator end() noexcept;
+
+        const_iterator begin() const noexcept;
+        const_iterator end() const noexcept;
+        const_iterator cbegin() const noexcept;
+        const_iterator cend() const noexcept;
+
+        reverse_iterator rbegin() noexcept;
+        reverse_iterator rend() noexcept;
+
+        const_reverse_iterator rbegin() const noexcept;
+        const_reverse_iterator rend() const noexcept;
+        const_reverse_iterator crbegin() const noexcept;
+        const_reverse_iterator crend() const noexcept;
+
+    protected:
+
+        xbuffer_adaptor_base() = default;
+        ~xbuffer_adaptor_base() = default;
+
+        xbuffer_adaptor_base(const self_type&) = default;
+        self_type& operator=(const self_type&) = default;
+
+        xbuffer_adaptor_base(self_type&&) = default;
+        self_type& operator=(self_type&&) = default;
+
+    private:
+
+        derived_type& derived_cast() noexcept;
+        const derived_type& derived_cast() const noexcept;
+    };
+
+    template <class D>
+    bool operator==(const xbuffer_adaptor_base<D>& lhs,
+                    const xbuffer_adaptor_base<D>& rhs);
+
+    template <class D>
+    bool operator!=(const xbuffer_adaptor_base<D>& lhs,
+                    const xbuffer_adaptor_base<D>& rhs);
+
+    template <class D>
+    bool operator<(const xbuffer_adaptor_base<D>& lhs,
+                   const xbuffer_adaptor_base<D>& rhs);
+
+    template <class D>
+    bool operator<=(const xbuffer_adaptor_base<D>& lhs,
+                    const xbuffer_adaptor_base<D>& rhs);
+
+    template <class D>
+    bool operator>(const xbuffer_adaptor_base<D>& lhs,
+                   const xbuffer_adaptor_base<D>& rhs);
+
+    template <class D>
+    bool operator>=(const xbuffer_adaptor_base<D>& lhs,
+                    const xbuffer_adaptor_base<D>& rhs);
+
+    /*******************
+     * xbuffer_adaptor *
+     *******************/
+
+    template <class CP, class O, class A>
+    struct buffer_inner_types<xbuffer_adaptor<CP, O, A>>
+    {
         using base_type = detail::buffer_storage_t<CP, A, O>;
-        using self_type = xbuffer_adaptor<CP, O, A>;
-        using allocator_type = typename base_type::allocator_type;
-        using destructor_type = typename base_type::destructor_type;
         using value_type = typename base_type::value_type;
         using reference = typename base_type::reference;
         using const_reference = typename base_type::const_reference;
         using pointer = typename base_type::pointer;
         using const_pointer = typename base_type::const_pointer;
-        using temporary_type = uvector<value_type, allocator_type>;
-
         using size_type = typename base_type::size_type;
         using difference_type = typename base_type::difference_type;
-
         using iterator = pointer;
         using const_iterator = const_pointer;
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using index_type = size_type;
+    };
+
+    template <class CP, class O, class A>
+    class xbuffer_adaptor : private detail::buffer_storage_t<CP, A, O>,
+                            public xbuffer_adaptor_base<xbuffer_adaptor<CP, O, A>>
+    {
+    public:
+
+        using self_type = xbuffer_adaptor<CP, O, A>;
+        using base_type = detail::buffer_storage_t<CP, A, O>;
+        using buffer_base_type = xbuffer_adaptor_base<self_type>;
+        using allocator_type = typename base_type::allocator_type;
+        using destructor_type = typename base_type::destructor_type;
+        using value_type = typename buffer_base_type::value_type;
+        using reference = typename buffer_base_type::reference;
+        using const_reference = typename buffer_base_type::const_reference;
+        using pointer = typename buffer_base_type::pointer;
+        using const_pointer = typename buffer_base_type::const_pointer;
+        using size_type = typename buffer_base_type::size_type;
+        using difference_type = typename buffer_base_type::difference_type;
+        using iterator = typename buffer_base_type::iterator;
+        using const_iterator = typename buffer_base_type::const_iterator;
+        using reverse_iterator = typename buffer_base_type::reverse_iterator;
+        using const_reverse_iterator = typename buffer_base_type::const_reverse_iterator;
+        using temporary_type = uvector<value_type, allocator_type>;
 
         xbuffer_adaptor() = default;
 
@@ -272,66 +387,89 @@ namespace xt
 
         self_type& operator=(temporary_type&&);
 
-        bool empty() const noexcept;
         using base_type::size;
         using base_type::resize;
-
-        reference operator[](size_type i);
-        const_reference operator[](size_type i) const;
-
-        reference front();
-        const_reference front() const;
-
-        reference back();
-        const_reference back() const;
-
-        iterator begin();
-        iterator end();
-
-        const_iterator begin() const;
-        const_iterator end() const;
-        const_iterator cbegin() const;
-        const_iterator cend() const;
-
-        reverse_iterator rbegin();
-        reverse_iterator rend();
-
-        const_reverse_iterator rbegin() const;
-        const_reverse_iterator rend() const;
-        const_reverse_iterator crbegin() const;
-        const_reverse_iterator crend() const;
-
         using base_type::data;
         using base_type::swap;
     };
 
     template <class CP, class O, class A>
-    bool operator==(const xbuffer_adaptor<CP, O, A>& lhs,
-                    const xbuffer_adaptor<CP, O, A>& rhs);
-
-    template <class CP, class O, class A>
-    bool operator!=(const xbuffer_adaptor<CP, O, A>& lhs,
-                    const xbuffer_adaptor<CP, O, A>& rhs);
-
-    template <class CP, class O, class A>
-    bool operator<(const xbuffer_adaptor<CP, O, A>& lhs,
-                   const xbuffer_adaptor<CP, O, A>& rhs);
-
-    template <class CP, class O, class A>
-    bool operator<=(const xbuffer_adaptor<CP, O, A>& lhs,
-                    const xbuffer_adaptor<CP, O, A>& rhs);
-
-    template <class CP, class O, class A>
-    bool operator>(const xbuffer_adaptor<CP, O, A>& lhs,
-                   const xbuffer_adaptor<CP, O, A>& rhs);
-
-    template <class CP, class O, class A>
-    bool operator>=(const xbuffer_adaptor<CP, O, A>& lhs,
-                    const xbuffer_adaptor<CP, O, A>& rhs);
-
-    template <class CP, class O, class A>
     void swap(xbuffer_adaptor<CP, O, A>& lhs,
               xbuffer_adaptor<CP, O, A>& rhs) noexcept;
+
+    /*********************
+     * xiterator_adaptor *
+     *********************/
+
+    template <class I, class CI>
+    class xiterator_adaptor;
+
+    template <class I, class CI>
+    struct buffer_inner_types<xiterator_adaptor<I, CI>>
+    {
+        using traits = std::iterator_traits<I>;
+        using const_traits = std::iterator_traits<CI>;
+
+        using value_type = std::common_type_t<typename traits::value_type,
+                                              typename const_traits::value_type>;
+        using reference = typename traits::reference;
+        using const_reference = typename const_traits::reference;
+        using pointer = typename traits::pointer;
+        using const_pointer = typename const_traits::pointer;
+        using difference_type = std::common_type_t<typename traits::difference_type,
+                                                   typename const_traits::difference_type>;
+        using size_type = std::make_unsigned_t<difference_type>;
+        
+        using iterator = I;
+        using const_iterator = CI;
+        using reverse_iterator = std::reverse_iterator<iterator>;
+        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        using index_type = difference_type;
+    };
+
+    template <class I, class CI>
+    class xiterator_adaptor : public xbuffer_adaptor_base<xiterator_adaptor<I, CI>>
+    {
+    public:
+
+        using self_type = xiterator_adaptor<I, CI>;
+        using base_type = xbuffer_adaptor_base<self_type>;
+        using value_type = typename base_type::value_type;
+        using allocator_type = std::allocator<value_type>;
+        using size_type = typename base_type::size_type;
+        using iterator = typename base_type::iterator;
+        using const_iterator = typename base_type::const_iterator; 
+        using temporary_type = uvector<value_type, allocator_type>;
+
+        xiterator_adaptor() = default;
+        xiterator_adaptor(I it, CI cit, size_type size);
+
+        ~xiterator_adaptor() = default;
+
+        xiterator_adaptor(const self_type&) = default;
+        xiterator_adaptor& operator=(const self_type&) = default;
+
+        xiterator_adaptor(self_type&&) = default;
+        xiterator_adaptor& operator=(self_type&&) = default;
+
+        size_type size() const noexcept;
+        void resize(size_type size);
+        
+        iterator data() noexcept;
+        const_iterator data() const noexcept;
+
+        void swap(self_type& rhs) noexcept;
+    
+    private:
+
+        I m_it;
+        CI m_cit;
+        size_type m_size;
+    };
+
+    template <class I, class CI>
+    void swap(xiterator_adaptor<I, CI>& lhs,
+              xiterator_adaptor<I, CI>& rhs) noexcept;
 
     /************************************
      * temporary_container metafunction *
@@ -347,6 +485,12 @@ namespace xt
     struct temporary_container<xbuffer_adaptor<CP, O, A>>
     {
         using type = typename xbuffer_adaptor<CP, O, A>::temporary_type;
+    };
+
+    template <class I, class CI>
+    struct temporary_container<xiterator_adaptor<I, CI>>
+    {
+        using type = typename xiterator_adaptor<I, CI>::temporary_type;
     };
 
     template <class C>
@@ -565,6 +709,186 @@ namespace xt
         }
     }
 
+    /***************************************
+     * xbuffer_adaptor_base implementation *
+     ***************************************/
+
+    template <class D>
+    inline bool xbuffer_adaptor_base<D>::empty() const noexcept
+    {
+        return derived_cast().size() != size_type(0);
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::operator[](size_type i) -> reference
+    {
+        return derived_cast().data()[static_cast<index_type>(i)];
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::operator[](size_type i) const -> const_reference
+    {
+        return derived_cast().data()[static_cast<index_type>(i)];
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::front() -> reference
+    {
+        return this->operator[](0);
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::front() const -> const_reference
+    {
+        return this->operator[](0);
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::back() -> reference
+    {
+        return this->operator[](derived_cast().size() - 1);
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::back() const -> const_reference
+    {
+        return this->operator[](derived_cast().size() - 1);
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::begin() noexcept -> iterator
+    {
+        return derived_cast().data();
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::end() noexcept-> iterator
+    {
+        return derived_cast().data() + static_cast<index_type>(derived_cast().size());
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::begin() const noexcept -> const_iterator
+    {
+        return derived_cast().data();
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::end() const noexcept -> const_iterator
+    {
+        return derived_cast().data() + static_cast<index_type>(derived_cast().size());
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::cbegin() const noexcept -> const_iterator
+    {
+        return begin();
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::cend() const noexcept -> const_iterator
+    {
+        return end();
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::rbegin() noexcept-> reverse_iterator
+    {
+        return reverse_iterator(end());
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::rend() noexcept -> reverse_iterator
+    {
+        return reverse_iterator(begin());
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::rbegin() const noexcept -> const_reverse_iterator
+    {
+        return const_reverse_iterator(end());
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::rend() const noexcept -> const_reverse_iterator
+    {
+        return const_reverse_iterator(begin());
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::crbegin() const noexcept -> const_reverse_iterator
+    {
+        return rbegin();
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::crend() const noexcept -> const_reverse_iterator
+    {
+        return rend();
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::derived_cast() noexcept -> derived_type&
+    {
+        return *static_cast<derived_type*>(this);
+    }
+
+    template <class D>
+    inline auto xbuffer_adaptor_base<D>::derived_cast() const noexcept -> const derived_type&
+    {
+        return *static_cast<const derived_type*>(this);
+    }
+
+    template <class D>
+    inline bool operator==(const xbuffer_adaptor_base<D>& lhs,
+                           const xbuffer_adaptor_base<D>& rhs)
+    {
+        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+    }
+
+    template <class D>
+    inline bool operator!=(const xbuffer_adaptor_base<D>& lhs,
+                           const xbuffer_adaptor_base<D>& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    template <class D>
+    inline bool operator<(const xbuffer_adaptor_base<D>& lhs,
+                          const xbuffer_adaptor_base<D>& rhs)
+    {
+        return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                            rhs.begin(), rhs.end(),
+                                            std::less<typename D::value_type>());
+    }
+
+    template <class D>
+    inline bool operator<=(const xbuffer_adaptor_base<D>& lhs,
+                           const xbuffer_adaptor_base<D>& rhs)
+    {
+        return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                            rhs.begin(), rhs.end(),
+                                            std::less_equal<typename D::value_type>());
+    }
+
+    template <class D>
+    inline bool operator>(const xbuffer_adaptor_base<D>& lhs,
+                          const xbuffer_adaptor_base<D>& rhs)
+    {
+        return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                            rhs.begin(), rhs.end(),
+                                            std::greater<typename D::value_type>());
+    }
+
+    template <class D>
+    inline bool operator>=(const xbuffer_adaptor_base<D>& lhs,
+                           const xbuffer_adaptor_base<D>& rhs)
+    {
+        return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                            rhs.begin(), rhs.end(),
+                                            std::greater_equal<typename D::value_type>());
+    }
+
     /**********************************
      * xbuffer_adaptor implementation *
      **********************************/
@@ -580,177 +904,66 @@ namespace xt
     inline auto xbuffer_adaptor<CP, O, A>::operator=(temporary_type&& tmp) -> self_type&
     {
         base_type::resize(tmp.size());
-        std::copy(tmp.cbegin(), tmp.cend(), begin());
+        std::copy(tmp.cbegin(), tmp.cend(), this->begin());
         return *this;
-    }
-
-    template <class CP, class O, class A>
-    bool xbuffer_adaptor<CP, O, A>::empty() const noexcept
-    {
-        return size() == 0;
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::operator[](size_type i) -> reference
-    {
-        return data()[i];
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::operator[](size_type i) const -> const_reference
-    {
-        return data()[i];
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::front() -> reference
-    {
-        return data()[0];
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::front() const -> const_reference
-    {
-        return data()[0];
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::back() -> reference
-    {
-        return data()[size() - 1];
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::back() const -> const_reference
-    {
-        return data()[size() - 1];
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::begin() -> iterator
-    {
-        return data();
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::end() -> iterator
-    {
-        return data() + size();
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::begin() const -> const_iterator
-    {
-        return data();
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::end() const -> const_iterator
-    {
-        return data() + size();
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::cbegin() const -> const_iterator
-    {
-        return begin();
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::cend() const -> const_iterator
-    {
-        return end();
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::rbegin() -> reverse_iterator
-    {
-        return reverse_iterator(end());
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::rend() -> reverse_iterator
-    {
-        return reverse_iterator(begin());
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::rbegin() const -> const_reverse_iterator
-    {
-        return const_reverse_iterator(end());
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::rend() const -> const_reverse_iterator
-    {
-        return const_reverse_iterator(begin());
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::crbegin() const -> const_reverse_iterator
-    {
-        return rbegin();
-    }
-
-    template <class CP, class O, class A>
-    inline auto xbuffer_adaptor<CP, O, A>::crend() const -> const_reverse_iterator
-    {
-        return rend();
-    }
-
-    template <class CP, class O, class A>
-    inline bool operator==(const xbuffer_adaptor<CP, O, A>& lhs,
-                           const xbuffer_adaptor<CP, O, A>& rhs)
-    {
-        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
-    }
-
-    template <class CP, class O, class A>
-    inline bool operator!=(const xbuffer_adaptor<CP, O, A>& lhs,
-                           const xbuffer_adaptor<CP, O, A>& rhs)
-    {
-        return !(lhs == rhs);
-    }
-
-    template <class CP, class O, class A>
-    inline bool operator<(const xbuffer_adaptor<CP, O, A>& lhs,
-                          const xbuffer_adaptor<CP, O, A>& rhs)
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::less<typename A::value_type>());
-    }
-
-    template <class CP, class O, class A>
-    inline bool operator<=(const xbuffer_adaptor<CP, O, A>& lhs,
-                           const xbuffer_adaptor<CP, O, A>& rhs)
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::less_equal<typename A::value_type>());
-    }
-
-    template <class CP, class O, class A>
-    inline bool operator>(const xbuffer_adaptor<CP, O, A>& lhs,
-                          const xbuffer_adaptor<CP, O, A>& rhs)
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::greater<typename A::value_type>());
-    }
-
-    template <class CP, class O, class A>
-    inline bool operator>=(const xbuffer_adaptor<CP, O, A>& lhs,
-                           const xbuffer_adaptor<CP, O, A>& rhs)
-    {
-        return std::lexicographical_compare(lhs.begin(), lhs.end(),
-                                            rhs.begin(), rhs.end(),
-                                            std::greater_equal<typename A::value_type>());
     }
 
     template <class CP, class O, class A>
     inline void swap(xbuffer_adaptor<CP, O, A>& lhs,
                      xbuffer_adaptor<CP, O, A>& rhs) noexcept
+    {
+        lhs.swap(rhs);
+    }
+
+    /************************************
+     * xiterator_adaptor implementation *
+     ************************************/
+    
+    template <class I, class CI>
+    inline xiterator_adaptor<I, CI>::xiterator_adaptor(I it, CI cit, size_type size)
+        : m_it(it), m_cit(cit), m_size(size)
+    {
+    }
+
+    template <class I, class CI>
+    inline auto xiterator_adaptor<I, CI>::size() const noexcept -> size_type
+    {
+        return m_size;
+    }
+
+    template <class I, class CI>
+    inline void xiterator_adaptor<I, CI>::resize(size_type size)
+    {
+        if (m_size != size)
+        {
+            throw std::runtime_error("xiterator_adaptor not resizable");
+        }
+    }
+
+    template <class I, class CI>
+    inline auto xiterator_adaptor<I, CI>::data() noexcept -> iterator
+    {
+        return m_it;
+    }
+
+    template <class I, class CI>
+    inline auto xiterator_adaptor<I, CI>::data() const noexcept -> const_iterator
+    {
+        return m_cit;
+    }
+
+    template <class I, class CI>
+    inline void xiterator_adaptor<I, CI>::swap(self_type& rhs) noexcept
+    {
+        using std::swap;
+        swap(m_it, rhs.m_it);
+        swap(m_cit, rhs.m_cit);
+        swap(m_size, rhs.m_size);
+    }
+    
+    template <class I, class CI>
+    inline void swap(xiterator_adaptor<I, CI>& lhs,
+                     xiterator_adaptor<I, CI>& rhs) noexcept
     {
         lhs.swap(rhs);
     }
