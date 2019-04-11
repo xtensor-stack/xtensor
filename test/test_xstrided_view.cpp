@@ -508,9 +508,6 @@ namespace xt
         EXPECT_EQ(a(1, 2, 4), 1);
         EXPECT_EQ(v1(1, 4), 5);
 
-        bool st = std::is_same<decltype(v1), decltype(vv1)>::value;
-        EXPECT_TRUE(st);
-
         a = xt::ones<int>({ 3, 4, 5 });
         auto v2 = strided_view(a, { all(), 1, all() });
         auto vv2 = strided_view(v2, { all(), 2 });
