@@ -23,8 +23,8 @@ instantiated directly, but though the ``view`` helper function.
 Slices can be specified in the following ways:
 
 - selection in a dimension by specifying an index (unsigned integer)
-- ``range(min, max)``, a slice representing an interval
-- ``range(min, max, step)``, a slice representing a stepped interval
+- ``range(min, max)``, a slice representing the interval [min, max)
+- ``range(min, max, step)``, a slice representing the stepped interval [min, max)
 - ``all()``, a slice representing all the elements of a dimension
 - ``newaxis()``, a slice representing an additional dimension of length one
 - ``keep(i0, i1, i2, ...)`` a slice selecting non-contiguous indices to keep on the underlying expression
