@@ -614,24 +614,6 @@ namespace xt
         return view_type(std::forward<E>(e), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
     }
 
-    template <class CT, class S, layout_type L, class FST>
-    auto strided_view(const xstrided_view<CT, S, L, FST>& e, const xstrided_slice_vector& slices)
-    {
-        detail::strided_view_args<detail::no_adj_strides_policy> args;
-        args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
-        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, decltype(args.new_shape)>;
-        return view_type(e.expression(), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
-    }
-
-    template <class CT, class S, layout_type L, class FST>
-    auto strided_view(xstrided_view<CT, S, L, FST>& e, const xstrided_slice_vector& slices)
-    {
-        detail::strided_view_args<detail::no_adj_strides_policy> args;
-        args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
-        using view_type = xstrided_view<xclosure_t<decltype(e.expression())>, decltype(args.new_shape)>;
-        return view_type(e.expression(), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
-    }
-
     template <class E, class S>
     inline auto reshape_view(E&& e, S&& shape)
     {
@@ -639,7 +621,7 @@ namespace xt
         get_strides_t<shape_type> strides;
 
         xt::resize_container(strides, shape.size());
-        compute_strides(shape, default_assignable_layout(std::decay_t<E>::static_layout), strides);
+        compute_strides(shape, XTENSOR_DEFAULT_LAYOUT, strides);
         return strided_view<std::decay_t<E>::static_layout>(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0);
     }
 

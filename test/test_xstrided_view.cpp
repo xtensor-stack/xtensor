@@ -7,12 +7,14 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xmanipulation.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
-#include "xtensor/xfixed.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xview.hpp"
 
@@ -508,9 +510,6 @@ namespace xt
         EXPECT_EQ(a(1, 2, 4), 1);
         EXPECT_EQ(v1(1, 4), 5);
 
-        bool st = std::is_same<decltype(v1), decltype(vv1)>::value;
-        EXPECT_TRUE(st);
-
         a = xt::ones<int>({ 3, 4, 5 });
         auto v2 = strided_view(a, { all(), 1, all() });
         auto vv2 = strided_view(v2, { all(), 2 });
@@ -695,12 +694,37 @@ namespace xt
 
     TEST(xstrided_view, on_xview)
     {
-        xarray<double> a = {0,1,2,3,4,5,6,7,8};
+        xarray<double> a = {0, 1, 2, 3, 4, 5, 6, 7, 8};
         auto v = view(a, keep(3, 5, 6));
         auto v2 = strided_view(v, {2});
         EXPECT_EQ(v2(0), 6);
         auto v3 = strided_view(v, {all()});
         EXPECT_EQ(v3(0), 3);
         EXPECT_EQ(v3(1), 5);
+    }
+
+    TEST(xstrided_view, on_xbroadcast)
+    {
+        xarray<double, layout_type::column_major> a = 
+          {{  0.0,  1.0,  2.0},
+           { 10.0, 11.0, 12.0}};
+
+        auto b = broadcast(a, {2, 3});
+        auto v = strided_view(b, {0});
+        EXPECT_EQ(v(0), 0.0);
+        EXPECT_EQ(v(1), 1.0);
+        EXPECT_EQ(v(2), 2.0);
+    }
+
+    TEST(xstrided_view, on_transpose)
+    {
+        xt::xarray<double> arr
+          {{ 0.0,  1.0,  2.0},
+           {10.0, 11.0, 12.0}};
+
+        auto t = xt::transpose(arr + arr);
+        auto v = xt::strided_view(t, {0});
+        EXPECT_EQ(v(0), 0.0);
+        EXPECT_EQ(v(1), 20.0);
     }
 }
