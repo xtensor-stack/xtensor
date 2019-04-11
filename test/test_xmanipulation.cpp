@@ -16,7 +16,7 @@
 
 namespace xt
 {
-    TEST(xstrided_view, transpose_assignment)
+    TEST(xmanipulation, transpose_assignment)
     {
         xarray<double> e = xt::arange<double>(24);
         e.resize({2, 2, 6});
@@ -30,7 +30,7 @@ namespace xt
         EXPECT_ANY_THROW(vt.at(0, 0, 0, 0));
     }
 
-    TEST(xstrided_view, transpose_layout_swap)
+    TEST(xmanipulation, transpose_layout_swap)
     {
         xarray<double, layout_type::row_major> a = xt::ones<double>({5, 5});
 
@@ -52,7 +52,7 @@ namespace xt
         EXPECT_EQ(cbw3.layout(), layout_type::dynamic);
     }
 
-    TEST(xstrided_view, transpose_function)
+    TEST(xmanipulation, transpose_function)
     {
         xarray<int, layout_type::row_major> a = { { 0, 1, 2 }, { 3, 4, 5 } };
         xarray<int, layout_type::row_major> b = { { 0, 1, 2 }, { 3, 4, 5 } };
@@ -77,7 +77,7 @@ namespace xt
         EXPECT_EQ(fun2(1, 2), tr2(2, 1));
     }
 
-    TEST(xstrided_view, ravel)
+    TEST(xmanipulation, ravel)
     {
         xarray<int, layout_type::row_major> a = { { 0, 1, 2 }, { 3, 4, 5 } };
 
@@ -104,7 +104,7 @@ namespace xt
         EXPECT_EQ(flat, flat3);
     }
 
-    TEST(xstrided_view, split)
+    TEST(xmanipulation, split)
     {
         auto b = xt::xarray<double>::from_shape({3, 3, 3});
         using ds = xt::dynamic_shape<std::size_t>;
@@ -132,7 +132,7 @@ namespace xt
         EXPECT_EQ(s3[2](0, 1), b(0, 2, 1));
     }
 
-    TEST(xstrided_view, squeeze)
+    TEST(xmanipulation, squeeze)
     {
         auto b = xt::xarray<double>::from_shape({3, 3, 1, 1, 2, 1, 3});
         std::iota(b.begin(), b.end(), 0);
@@ -153,7 +153,7 @@ namespace xt
         EXPECT_EQ(sq3(2, 2, 0, 1, 0, 2), b(2, 2, 0, 0, 1, 0, 2));
     }
 
-    TEST(xstrided_view, expand_dims)
+    TEST(xmanipulation, expand_dims)
     {
         auto b = xt::xarray<double>::from_shape({3, 3});
         std::iota(b.begin(), b.end(), 0);
@@ -169,7 +169,7 @@ namespace xt
         EXPECT_EQ(ex1(2, 0, 1), b(2, 1));
     }
 
-    TEST(xstrided_view, atleast_nd)
+    TEST(xmanipulation, atleast_nd)
     {
         xt::xarray<char> d0 = 123;
         auto d1 = xt::xarray<char>::from_shape({3});
@@ -199,7 +199,7 @@ namespace xt
         EXPECT_EQ(d2d1.shape(), ds({1, 3}));
     }
 
-    TEST(xstrided_view, trim_zeros)
+    TEST(xmanipulation, trim_zeros)
     {
         using arr_t = xarray<int>;
         arr_t a = {0, 0, 0, 1, 3, 0};
@@ -235,7 +235,7 @@ namespace xt
         EXPECT_EQ(trim_zeros(d, "b"), edb);
     }
 
-    TEST(xstrided_view, flipud)
+    TEST(xmanipulation, flipud)
     {
         xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::flip(e, 0);
@@ -257,7 +257,7 @@ namespace xt
         ASSERT_EQ(expected_2, ft);
     }
 
-    TEST(xstrided_view, fliplr)
+    TEST(xmanipulation, fliplr)
     {
         xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> t = xt::flip(e, 1);
@@ -281,7 +281,7 @@ namespace xt
         ASSERT_EQ(expected_2, ft);
     }
 
-    TEST(xstrided_view, rot90)
+    TEST(xmanipulation, rot90)
     {
         xarray<double> e = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
         xarray<double> e2 = {{1, 2}, {3, 4}};
