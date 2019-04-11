@@ -779,14 +779,14 @@ namespace xt
     }
 
     /**
-     * Select a range from start_val to stop_val.
+     * Select a range from start_val to stop_val (excluded).
      * You can use the shorthand `_` syntax to select from the start or until the end.
      *
      * \code{.cpp}
      * using namespace xt::placeholders;  // to enable _ syntax
      *
      * range(3, _)  // select from index 3 to the end
-     * range(_, 5)  // select from index o to 5
+     * range(_, 5)  // select from index 0 to 5 (excluded)
      * range(_, _)  // equivalent to `all()`
      * \endcode
      *
@@ -800,7 +800,7 @@ namespace xt
     }
 
     /**
-     * Select a range from start_val to stop_val with step
+     * Select a range from start_val to stop_val (excluded) with step
      * You can use the shorthand `_` syntax to select from the start or until the end.
      *
      * \code{.cpp}
