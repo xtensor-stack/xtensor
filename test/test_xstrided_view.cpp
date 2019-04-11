@@ -10,6 +10,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xmanipulation.hpp"
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xfixed.hpp"
@@ -702,5 +703,17 @@ namespace xt
         auto v3 = strided_view(v, {all()});
         EXPECT_EQ(v3(0), 3);
         EXPECT_EQ(v3(1), 5);
+    }
+
+    TEST(xstrided_view, on_transpose)
+    {
+        xt::xarray<double> arr
+          {{ 0.0,  1.0,  2.0},
+           {10.0, 11.0, 12.0}};
+
+        auto t = xt::transpose(arr + arr);
+        auto v = xt::strided_view(t, {0});
+        EXPECT_EQ(v(0), 0.0);
+        EXPECT_EQ(v(1), 20.0);
     }
 }
