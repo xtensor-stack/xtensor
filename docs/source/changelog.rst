@@ -7,6 +7,43 @@
 Changelog
 =========
 
+0.20.2
+------
+
+- Fixed broadcast linear assign
+  `#1493 <https://github.com/QuantStack/xtensor/pull/1493>`_
+- Fixed ``do_stirdes_match``
+  `#1497 <https://github.com/QuantStack/xtensor/pull/1497>`_
+- Removed unused capture
+  `#1499 <https://github.com/QuantStack/xtensor/pull/1499>`_
+- Upgraded to ``xtl`` 0.6.2
+  `#1502 <https://github.com/QuantStack/xtensor/pull/1502>`_
+- Added missing methods in ``xshared_expression``
+  `#1503 <https://github.com/QuantStack/xtensor/pull/1503>`_
+- Fixed iterator types of ``xcontainer``
+  `#1504 <https://github.com/QuantStack/xtensor/pull/1504>`_
+- Typo correction in external-structure.rst
+  `#1505 <https://github.com/QuantStack/xtensor/pull/1505>`_
+- Added extension base to adaptors
+  `#1507 <https://github.com/QuantStack/xtensor/pull/1507>`_
+- Fixed shared expression iterator methods
+  `#1509 <https://github.com/QuantStack/xtensor/pull/1509>`_
+- Strided view fixes
+  `#1512 <https://github.com/QuantStack/xtensor/pull/1512>`_
+- Improved range documentation
+  `#1515 <https://github.com/QuantStack/xtensor/pull/1515>`_
+- Fixed ``ravel`` and ``flatten`` implementation
+  `#1511 <https://github.com/QuantStack/xtensor/pull/1511>`_
+- Fixed ``xfixed_adaptor`` temporary assign
+  `#1516 <https://github.com/QuantStack/xtensor/pull/1516>`_
+- Changed struct -> class in ``xiterator_adaptor``
+  `#1513 <https://github.com/QuantStack/xtensor/pull/1513>`_
+- Fxed ``argmax`` for expressions with strides 0
+  `#1519 <https://github.com/QuantStack/xtensor/pull/1519>`_
+- Add ``has_linear_assign`` to ``sdynamic_view``
+  `#1520 <https://github.com/QuantStack/xtensor/pull/1520>`_
+
+
 0.20.1
 ------
 
