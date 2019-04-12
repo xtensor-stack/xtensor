@@ -210,7 +210,7 @@ namespace xt
      ***************************/
 
     template <class I, class CI>
-    struct xiterator_adaptor;
+    class xiterator_adaptor;
 
     /**
      * Returns a flatten view of the given expression. No copy is made.
