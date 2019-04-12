@@ -163,6 +163,14 @@ namespace xt
         EXPECT_EQ(a[0], 2);
     }
 
+    TEST(xtensor_fixed, buffer_adaptor)
+    {
+        xtensor_fixed<double, xshape<3>> a;
+        xtensor<double, 2> b = zeros<double>({3, 3});
+        auto c = adapt(&b(0, 0), xshape<3>());
+        c *= a;
+    }
+
     TEST(xtensor_fixed, layout)
     {
         xtensor_fixed<double, xshape<2, 2>, layout_type::row_major> a;

@@ -781,7 +781,8 @@ namespace xt
     inline auto xfixed_adaptor<EC, S, L, Tag>::operator=(temporary_type&& rhs) -> self_type&
     {
         using origin_type = decltype(std::move(rhs.storage()));
-        m_storage = xtl::forward_sequence<storage_type, origin_type>(std::move(rhs.storage()));
+        m_storage.resize(rhs.storage().size());
+        std::copy(rhs.storage().cbegin(), rhs.storage().cend(), m_storage.begin());
         return *this;
     }
 
