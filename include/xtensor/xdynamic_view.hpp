@@ -35,7 +35,7 @@ namespace xt
         using shape_type = std::decay_t<S>;
         using undecay_shape = S;
         using inner_storage_type = FST;
-        using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>>;
+        using temporary_type = xarray<std::decay_t<typename xexpression_type::value_type>, xexpression_type::static_layout>;
         static constexpr layout_type layout = L;
     };
 
@@ -204,7 +204,9 @@ namespace xt
         using base_type::storage;
         using base_type::expression;
         using base_type::broadcast_shape;
-        using base_type::has_linear_assign;
+
+        template <class O>
+        bool has_linear_assign(const O& str) const noexcept;
 
         template <class T>
         void fill(const T& value);
@@ -434,6 +436,13 @@ namespace xt
         offset_type offset = base_type::compute_index(args...);
         offset = adjust_offset(offset, args...);
         return base_type::storage()[static_cast<size_type>(offset)];
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    template <class O>
+    inline bool xdynamic_view<CT, S, L, FST>::has_linear_assign(const O&) const noexcept
+    {
+        return false;
     }
 
     template <class CT, class S, layout_type L, class FST>
