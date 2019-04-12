@@ -260,4 +260,18 @@ namespace xt
         auto res  = xt::xarray<float>(xt::dynamic_view(v, {xt::keep(0)}));
         EXPECT_EQ(res(1), array(2, 1));
     }
+
+    TEST(xdynamic_view, assignment)
+    {
+        xt::xarray<double, xt::layout_type::column_major> x = {{1, 4}, {2, 5}, {3, 6}};
+
+        xt::xdynamic_slice_vector sv({});
+        sv.push_back(xt::all());
+        sv.push_back(xt::all());
+
+        auto res = xt::dynamic_view(x, sv);
+        xt::xarray<double, xt::layout_type::column_major> xrs = res;
+        EXPECT_EQ(x, res);
+    }
+
 }
