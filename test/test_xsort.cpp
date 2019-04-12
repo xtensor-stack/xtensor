@@ -138,9 +138,20 @@ namespace xt
         xarray<std::size_t> ex_3 = {0, 0};
         EXPECT_EQ(ex_3, argmax(a, 1));
 
-        xt::xtensor<int, 2> b = {{ 1,2 }};
+        xtensor<int, 2> b = {{ 1,2 }};
         auto res = xt::eval(xt::argmax(b, 1));
-        EXPECT_EQ(res(), 0u);
+        EXPECT_EQ(res(), 1u);
+
+        xtensor<int, 3> c = {{{1, 2, 3, 4}},
+                             {{4, 3, 2, 1}}};
+        xtensor<std::size_t, 2> ex_4 = {{3}, {0}};
+        EXPECT_EQ(ex_4, argmax(c, 2));
+
+        xtensor<std::size_t, 2> ex_5 = {{1, 1, 0, 0}};
+        EXPECT_EQ(ex_5, argmax(c, 0));
+
+        xtensor<std::size_t, 2> ex_6 = {{0, 0, 0, 0}, {0, 0, 0, 0}};
+        EXPECT_EQ(ex_6, argmax(c, 1));
     }
 
     TEST(xsort, sort_large_prob)

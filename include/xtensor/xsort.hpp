@@ -22,30 +22,38 @@ namespace xt
 {
     namespace detail
     {
+        template <class T>
+        std::ptrdiff_t adjust_secondary_stride(std::ptrdiff_t stride, T shape)
+        {
+            return stride != 0 ? stride : static_cast<std::ptrdiff_t>(shape);
+        }
+
         template <class E, class F>
         inline void call_over_leading_axis(E& ev, F&& fct)
         {
             std::size_t n_iters = 1;
             std::ptrdiff_t secondary_stride;
+
             if (ev.layout() == layout_type::row_major)
             {
                 n_iters = std::accumulate(ev.shape().begin(), ev.shape().end() - 1,
                                           std::size_t(1), std::multiplies<>());
-                secondary_stride = ev.strides()[ev.dimension() - 2];
+                secondary_stride = adjust_secondary_stride(ev.strides()[ev.dimension() - 2],
+                                                           *(ev.shape().end() - 1));
             }
             else
             {
                 n_iters = std::accumulate(ev.shape().begin() + 1, ev.shape().end(),
                                           std::size_t(1), std::multiplies<>());
-                secondary_stride = ev.strides()[1];
+                secondary_stride = adjust_secondary_stride(ev.strides()[1],
+                                                           *(ev.shape().begin()));
             }
 
             std::ptrdiff_t offset = 0;
 
             for (std::size_t i = 0; i < n_iters; ++i, offset += secondary_stride)
             {
-                std::ptrdiff_t adj_secondary_stride = (std::max)(secondary_stride, std::ptrdiff_t(1));
-                fct(ev.data() + offset, ev.data() + offset + adj_secondary_stride);
+                fct(ev.data() + offset, ev.data() + offset + secondary_stride);
             }
         }
 
