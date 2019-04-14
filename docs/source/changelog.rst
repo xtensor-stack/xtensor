@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.20.3
+------
+
+- Fix xbuffer adaptor 
+  `#1523 <https://github.com/QuantStack/xtensor/pull/1523>`_
+
 0.20.2
 ------
 
