@@ -370,10 +370,7 @@ namespace xt
         using const_reverse_iterator = typename buffer_base_type::const_reverse_iterator;
         using temporary_type = uvector<value_type, allocator_type>;
 
-        xbuffer_adaptor() = default;
-
-        template <class P, class AT = allocator_type>
-        xbuffer_adaptor(P&& data, size_type size, AT&& alloc = allocator_type());
+        using base_type::base_type;
 
         ~xbuffer_adaptor() = default;
 
@@ -714,7 +711,7 @@ namespace xt
     template <class D>
     inline bool xbuffer_adaptor_base<D>::empty() const noexcept
     {
-        return derived_cast().size() != size_type(0);
+        return derived_cast().size() == size_type(0);
     }
 
     template <class D>
@@ -890,13 +887,6 @@ namespace xt
     /**********************************
      * xbuffer_adaptor implementation *
      **********************************/
-
-    template <class CP, class O, class A>
-    template <class P, class AT>
-    inline xbuffer_adaptor<CP, O, A>::xbuffer_adaptor(P&& data, size_type size, AT&& alloc)
-        : base_type(std::forward<P>(data), size, std::forward<AT>(alloc))
-    {
-    }
 
     template <class CP, class O, class A>
     inline auto xbuffer_adaptor<CP, O, A>::operator=(temporary_type&& tmp) -> self_type&
