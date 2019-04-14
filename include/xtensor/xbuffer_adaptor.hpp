@@ -285,6 +285,9 @@ namespace xt
         const_reverse_iterator crbegin() const noexcept;
         const_reverse_iterator crend() const noexcept;
 
+        derived_type& derived_cast() noexcept;
+        const derived_type& derived_cast() const noexcept;
+
     protected:
 
         xbuffer_adaptor_base() = default;
@@ -295,11 +298,6 @@ namespace xt
 
         xbuffer_adaptor_base(self_type&&) = default;
         self_type& operator=(self_type&&) = default;
-
-    private:
-
-        derived_type& derived_cast() noexcept;
-        const derived_type& derived_cast() const noexcept;
     };
 
     template <class D>
@@ -843,7 +841,7 @@ namespace xt
     inline bool operator==(const xbuffer_adaptor_base<D>& lhs,
                            const xbuffer_adaptor_base<D>& rhs)
     {
-        return lhs.size() == rhs.size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
+        return lhs.derived_cast().size() == rhs.derived_cast().size() && std::equal(lhs.begin(), lhs.end(), rhs.begin());
     }
 
     template <class D>
