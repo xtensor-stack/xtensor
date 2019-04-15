@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.20.4
+------
+
+- Buffer adaptor default constructor
+  `#1524 <https://github.com/QuantStack/xtensor/pull/1524>`_
+
 0.20.3
 ------
 
@@ -48,7 +54,6 @@ Changelog
   `#1519 <https://github.com/QuantStack/xtensor/pull/1519>`_
 - Add ``has_linear_assign`` to ``sdynamic_view``
   `#1520 <https://github.com/QuantStack/xtensor/pull/1520>`_
-
 
 0.20.1
 ------
