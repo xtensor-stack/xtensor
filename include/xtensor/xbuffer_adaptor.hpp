@@ -370,6 +370,8 @@ namespace xt
         using const_reverse_iterator = typename buffer_base_type::const_reverse_iterator;
         using temporary_type = uvector<value_type, allocator_type>;
 
+        xbuffer_adaptor() = default;
+
         using base_type::base_type;
 
         ~xbuffer_adaptor() = default;
