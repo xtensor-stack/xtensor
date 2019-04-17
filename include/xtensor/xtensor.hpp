@@ -572,7 +572,7 @@ namespace xt
         }
 
         return out;
-    };
+    }
 
     /**
      * Converts ``std::vector<index_type>`` (returned e.g. from ``xt::argwhere``) to a flattened
@@ -597,7 +597,7 @@ namespace xt
         for_each(idx.begin(), idx.end(), [&iter](const auto& t) { iter = std::copy(t.cbegin(), t.cend(), iter); });
 
         return out;
-    };
+    }
 
     struct ravel_vector_tag;
     struct ravel_tensor_tag;
@@ -665,7 +665,7 @@ namespace xt
             *out_iter = element_offset<value_type>(strides, (*idx_iter).cbegin(), (*idx_iter).cend());
         }
         return out;
-    };
+    }
 }
 
 #endif
