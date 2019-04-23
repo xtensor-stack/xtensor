@@ -30,7 +30,6 @@
 #include "xexpression.hpp"
 #include "xgenerator.hpp"
 #include "xiterable.hpp"
-#include "xreducer.hpp"
 #include "xutils.hpp"
 
 namespace xt
