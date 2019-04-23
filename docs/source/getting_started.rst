@@ -81,6 +81,8 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
 
     find_package(xtl REQUIRED)
     find_package(xtensor REQUIRED)
+    # if xtensor was built with xsimd support:
+    # find_package(xsimd REQUIRED)
 
     add_executable(first_example src/example.cpp)
     
