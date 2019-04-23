@@ -621,13 +621,13 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      * @return an \ref xreducer
      */
     XTENSOR_REDUCER_FUNCTION(amax, math::maximum, typename std::decay_t<E>::value_type,
-                             std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::min())
+                             std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::lowest())
 #ifdef X_OLD_CLANG
     XTENSOR_OLD_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type,
-                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::min())
+                              std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::lowest())
 #else
     XTENSOR_MODERN_CLANG_REDUCER(amax, math::maximum, typename std::decay_t<E>::value_type,
-                                 std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::min())
+                                 std::numeric_limits<xvalue_type_t<std::decay_t<E>>>::lowest())
 #endif
 
     /**
@@ -2011,7 +2011,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return r;
         };
         auto init_func = []() {
-            return result_type{std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::min()};
+            return result_type{std::numeric_limits<value_type>::max(), std::numeric_limits<value_type>::lowest()};
         };
         auto merge_func = [](result_type r, result_type const& s) {
             r[0] = (min)(r[0], s[0]);

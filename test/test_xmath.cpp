@@ -144,6 +144,29 @@ namespace xt
         EXPECT_EQ(fdim(sa, b)(0, 0), std::fdim(sa, b(0, 0)));
     }
 
+    TEST(xmath, amin_amax)
+    {
+        xarray<double> a{-10.0};
+        EXPECT_EQ(amin(a)[0], -10.0);
+        EXPECT_EQ(amax(a)[0], -10.0);
+
+        xarray<double> b{-10.0, -20.0};
+        EXPECT_EQ(amin(b)[0], -20.0);
+        EXPECT_EQ(amax(b)[0], -10.0);
+
+        xarray<double> c{-10.0, +20.0};
+        EXPECT_EQ(amin(c)[0], -10.0);
+        EXPECT_EQ(amax(c)[0], +20.0);
+
+        xarray<double> d{+10.0, +20.0};
+        EXPECT_EQ(amin(d)[0], +10.0);
+        EXPECT_EQ(amax(d)[0], +20.0);
+
+        xarray<double> e{+10.0};
+        EXPECT_EQ(amin(e)[0], +10.0);
+        EXPECT_EQ(amax(e)[0], +10.0);
+    }
+
     TEST(xmath, minimum)
     {
         using opt_type = xoptional_assembly<xarray<double>, xarray<bool>>;
