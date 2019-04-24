@@ -375,7 +375,7 @@ namespace xt
         template <class R>
         R step_simd();
 
-        value_type step_leading();
+        void step_leading();
 
     private:
 
@@ -993,10 +993,8 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    inline auto xscalar_stepper<is_const, CT>::step_leading()
-        -> value_type
+    inline void xscalar_stepper<is_const, CT>::step_leading()
     {
-        return p_c->operator()();
     }
 
     /**********************************

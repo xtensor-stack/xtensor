@@ -129,7 +129,7 @@ namespace xt
         template <class R>
         R step_simd();
 
-        value_type step_leading();
+        void step_leading();
 
         template <class R>
         void store_simd(const R& vec);
@@ -536,10 +536,9 @@ namespace xt
     }
 
     template <class C>
-    auto xstepper<C>::step_leading() -> value_type
+    void xstepper<C>::step_leading()
     {
         ++m_it;
-        return *m_it;
     }
 
     template <>
