@@ -474,7 +474,7 @@ namespace xt
         template <class ST>
         ST step_simd();
 
-        value_type step_leading();
+        void step_leading();
 
     private:
 
@@ -483,9 +483,6 @@ namespace xt
 
         template <class ST, std::size_t... I>
         ST step_simd_impl(std::index_sequence<I...>);
-
-        template <std::size_t... I>
-        value_type step_leading_impl(std::index_sequence<I...>);
 
         const xfunction_type* p_f;
         std::tuple<typename std::decay_t<CT>::const_stepper...> m_st;
@@ -1053,18 +1050,10 @@ namespace xt
     }
 
     template <class F, class... CT>
-    template <std::size_t... I>
-    inline auto xfunction_stepper<F, CT...>::step_leading_impl(std::index_sequence<I...>)
-        -> value_type
+    inline void xfunction_stepper<F, CT...>::step_leading()
     {
-        return (p_f->m_f)(std::get<I>(m_st).step_leading()...);
-    }
-
-    template <class F, class... CT>
-    inline auto xfunction_stepper<F, CT...>::step_leading()
-        -> value_type
-    {
-        return step_leading_impl(std::make_index_sequence<sizeof...(CT)>());
+        auto step_leading_lambda = [](auto&& st) { st.step_leading(); };
+        for_each(step_leading_lambda, m_st);
     }
 }
 
