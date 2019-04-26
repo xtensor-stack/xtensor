@@ -70,6 +70,22 @@ namespace xt
         }
     }
 
+    TEST(xsort, flatten_argsort)
+    {
+        {
+            xarray<int, layout_type::row_major> a = {{1, 2, 3}, {4, 5, 6}};
+            xarray<std::size_t, layout_type::row_major> res = argsort(a, placeholders::xtuph());
+            xarray<std::size_t, layout_type::row_major> expected = {0, 1, 2, 3, 4, 5};
+            EXPECT_EQ(res, expected);
+        }
+        {
+            xarray<int, layout_type::column_major> a = {{1, 2, 3}, {4, 5, 6}};
+            xarray<std::size_t, layout_type::column_major> res = argsort(a, placeholders::xtuph());
+            xarray<std::size_t, layout_type::column_major> expected = {0, 1, 2, 3, 4, 5};
+            EXPECT_EQ(res, expected);
+        }
+    }
+
     TEST(xsort, sort_easy)
     {
         xarray<double> a = {{5, 3, 1}, {4, 4, 4}};
