@@ -304,14 +304,17 @@ namespace xt
         template <class E, class R = typename detail::linear_argsort_result_type<E>::type>
         inline auto flatten_argsort_impl(const xexpression<E>& e)
         {
-            using result_type = R;
-
             const auto& de = e.derived_cast();
 
+            auto cit = de.template begin<layout_type::row_major>();
+            using const_iterator = decltype(cit);
+            auto ad = xiterator_adaptor<const_iterator, const_iterator>(cit, cit, de.size());
+
+            using result_type = R;
             result_type result;
             result.resize({de.size()});
-            auto comp = [&de](std::size_t x, std::size_t y) {
-                return de[x] < de[y];
+            auto comp = [&ad](std::size_t x, std::size_t y) {
+                return ad[x] < ad[y];
             };
             std::iota(result.begin(), result.end(), 0);
             std::sort(result.begin(), result.end(), comp);
