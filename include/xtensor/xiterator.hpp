@@ -111,7 +111,7 @@ namespace xt
         using difference_type = typename subiterator_traits::difference_type;
         using size_type = typename storage_type::size_type;
         using shape_type = typename storage_type::shape_type;
-        using simd_type = xsimd::simd_type<value_type>;
+        using simd_type = xt_simd::simd_type<value_type>;
 
         xstepper() = default;
         xstepper(storage_type* c, subiterator_type it, size_type offset) noexcept;
@@ -523,7 +523,7 @@ namespace xt
     {
         R reg;
         reg.load_unaligned(&(*m_it));
-        m_it += xsimd::revert_simd_traits<R>::size;
+        m_it += xt_simd::revert_simd_traits<R>::size;
         return reg;
     }
 
@@ -532,7 +532,7 @@ namespace xt
     inline void xstepper<C>::store_simd(const R& vec)
     {
         vec.store_unaligned(&(*m_it));
-        m_it += xsimd::revert_simd_traits<R>::size;;
+        m_it += xt_simd::revert_simd_traits<R>::size;;
     }
 
     template <class C>

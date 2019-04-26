@@ -93,7 +93,7 @@ namespace xt
         struct conditional_ternary
         {
             template <class B>
-            using get_batch_bool = typename xsimd::simd_traits<typename xsimd::revert_simd_traits<B>::type>::bool_type;
+            using get_batch_bool = typename xt_simd::simd_traits<typename xt_simd::revert_simd_traits<B>::type>::bool_type;
 
             template <class B, class A1, class A2>
             constexpr auto operator()(const B& cond, const A1& v1, const A2& v2) const noexcept
@@ -106,7 +106,7 @@ namespace xt
                                    const B& t2,
                                    const B& t3) const noexcept
             {
-                return xsimd::select(t1, t2, t3);
+                return xt_simd::select(t1, t2, t3);
             }
         };
 

@@ -349,7 +349,7 @@ namespace xt
 
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
         using value_type = typename xexpression_type::value_type;
-        using simd_value_type = xsimd::simd_type<value_type>;
+        using simd_value_type = xt_simd::simd_type<value_type>;
         using reference = typename inner_types::reference;
         using const_reference = typename inner_types::const_reference;
         using pointer = std::conditional_t<is_const,
@@ -576,7 +576,7 @@ namespace xt
         //
 
         template <class requested_type>
-        using simd_return_type = xsimd::simd_return_type<value_type, requested_type>;
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
         template <class T, class R>
         using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && is_strided_view, R>;
@@ -585,7 +585,7 @@ namespace xt
         enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
 
         template <class align, class requested_type = value_type,
-                  std::size_t N = xsimd::simd_traits<requested_type>::size,
+                  std::size_t N = xt_simd::simd_traits<requested_type>::size,
                   class T = xexpression_type>
         enable_simd_interface<T, simd_return_type<requested_type>> load_simd(size_type i) const;
 
@@ -1330,14 +1330,14 @@ namespace xt
     template <class align, class simd, class T>
     inline auto xview<CT, S...>::store_simd(size_type i, const simd& e) -> enable_simd_interface<T, void>
     {
-        return m_e.template store_simd<xsimd::unaligned_mode>(data_offset() + i, e);
+        return m_e.template store_simd<xt_simd::unaligned_mode>(data_offset() + i, e);
     }
 
     template <class CT, class... S>
     template <class align, class requested_type, std::size_t N, class T>
     inline auto xview<CT, S...>::load_simd(size_type i) const -> enable_simd_interface<T, simd_return_type<requested_type>>
     {
-        return m_e.template load_simd<xsimd::unaligned_mode, requested_type>(data_offset() + i);
+        return m_e.template load_simd<xt_simd::unaligned_mode, requested_type>(data_offset() + i);
     }
 
     template <class CT, class... S>

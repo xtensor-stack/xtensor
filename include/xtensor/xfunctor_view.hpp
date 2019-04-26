@@ -202,7 +202,7 @@ namespace xt
         // The following functions are defined inline because otherwise signatures
         // don't match on GCC.
         template <class align, class requested_type = typename xexpression_type::value_type,
-                  std::size_t N = xsimd::simd_traits<requested_type>::size, class FCT = functor_type>
+                  std::size_t N = xt_simd::simd_traits<requested_type>::size, class FCT = functor_type>
         auto load_simd(size_type i) const
             -> decltype(std::declval<FCT>().template proxy_simd_load<align, requested_type, N>(std::declval<undecay_expression>(), i))
         {

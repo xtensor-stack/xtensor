@@ -537,7 +537,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             template <class A1, class A2>
             constexpr auto simd_apply(const A1& t1, const A2& t2) const noexcept
             {
-                return xsimd::select(t1 < t2, t1, t2);
+                return xt_simd::select(t1 < t2, t1, t2);
             }
         };
 
@@ -553,7 +553,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             template <class A1, class A2>
             constexpr auto simd_apply(const A1& t1, const A2& t2) const noexcept
             {
-                return xsimd::select(t1 > t2, t1, t2);
+                return xt_simd::select(t1 > t2, t1, t2);
             }
         };
 
@@ -570,7 +570,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                                       const A2& lo,
                                       const A3& hi) const
             {
-                return xsimd::select(v < lo, lo, xsimd::select(hi < v, hi, v));
+                return xt_simd::select(v < lo, lo, xt_simd::select(hi < v, hi, v));
             }
         };
     }

@@ -286,8 +286,8 @@ namespace xt
         // scope of these data members (since they are odr-used).
         static constexpr bool contiguous_layout() { return E1::contiguous_layout && E2::contiguous_layout; }
         static constexpr bool convertible_types() { return std::is_convertible<typename E2::value_type, typename E1::value_type>::value; }
-        static constexpr bool lhs_simd_size() { return xsimd::simd_traits<typename E1::value_type>::size > 1; }
-        static constexpr bool rhs_simd_size() { return xsimd::simd_traits<typename E2::value_type>::size > 1; }
+        static constexpr bool lhs_simd_size() { return xt_simd::simd_traits<typename E1::value_type>::size > 1; }
+        static constexpr bool rhs_simd_size() { return xt_simd::simd_traits<typename E2::value_type>::size > 1; }
         static constexpr bool simd_size() { return lhs_simd_size() && rhs_simd_size(); }
         static constexpr bool forbid_simd() { return !has_simd_interface<E2>::value; }
         static constexpr bool simd_assign() { return contiguous_layout() && convertible_types() && simd_size() && has_simd_interface<E2>::value; }
@@ -511,16 +511,16 @@ namespace xt
     template <class E1, class E2>
     inline void linear_assigner<simd_assign>::run(E1& e1, const E2& e2)
     {
-        using lhs_align_mode = xsimd::container_alignment_t<E1>;
+        using lhs_align_mode = xt_simd::container_alignment_t<E1>;
         constexpr bool is_aligned = std::is_same<lhs_align_mode, aligned_mode>::value;
         using rhs_align_mode = std::conditional_t<is_aligned, inner_aligned_mode, unaligned_mode>;
         using value_type = std::common_type_t<typename E1::value_type, typename E2::value_type>;
-        using simd_type = xsimd::simd_type<value_type>;
+        using simd_type = xt_simd::simd_type<value_type>;
         using size_type = typename E1::size_type;
         size_type size = e1.size();
         constexpr size_type simd_size = simd_type::size;
 
-        size_type align_begin = is_aligned ? 0 : xsimd::get_alignment_offset(e1.data(), size, simd_size);
+        size_type align_begin = is_aligned ? 0 : xt_simd::get_alignment_offset(e1.data(), size, simd_size);
         size_type align_end = align_begin + ((size - align_begin) & ~(simd_size - 1));
 
         for (size_type i = 0; i < align_begin; ++i)
@@ -791,7 +791,7 @@ namespace xt
         // add this when we have std::array index!
         // std::fill(idx.begin(), idx.end(), 0);
         using value_type = std::common_type_t<typename E1::value_type, typename E2::value_type>;
-        using simd_type = xsimd::simd_type<value_type>;
+        using simd_type = xt_simd::simd_type<value_type>;
 
         std::size_t simd_size = inner_loop_size / simd_type::size;
         std::size_t simd_rest = inner_loop_size % simd_type::size;

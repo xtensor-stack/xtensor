@@ -17,9 +17,60 @@
 
 #include <xsimd/xsimd.hpp>
 
+namespace xt_simd
+{
+    template <class T, std::size_t A>
+    using aligned_allocator = xsimd::aligned_allocator<T, A>;
+
+    using aligned_mode = xsimd::aligned_mode;
+    using unaligned_mode = xsimd::unaligned_mode;
+
+    template <class A>
+    using allocator_alignment = xsimd::allocator_alignment<A>;
+
+    template <class A>
+    using allocator_alignment_t = xsimd::allocator_alignment_t<A>;
+
+    template <class C>
+    using container_alignment = xsimd::container_alignment<C>;
+
+    template <class C>
+    using container_alignment_t = xsimd::container_alignment_t<C>;
+
+    template <class T>
+    using simd_traits = xsimd::simd_traits<T>;
+
+    template <class T>
+    using revert_simd_traits = xsimd::revert_simd_traits<T>;
+
+    template <class T>
+    using simd_type = xsimd::simd_type<T>;
+
+    template <class T>
+    using simd_bool_type = xsimd::simd_bool_type<T>;
+
+    template <class T>
+    using revert_simd_type = xsimd::revert_simd_type<T>;
+
+    using xsimd::set_simd;
+    using xsimd::load_simd;
+    using xsimd::store_simd;
+    using xsimd::select;
+    using xsimd::get_alignment_offset;
+
+    template <class T1, class T2>
+    using simd_return_type = xsimd::simd_return_type<T1, T2>;
+
+    template <class V>
+    using is_batch_bool = xsimd::is_batch_bool<V>;
+
+    template <class V>
+    using is_batch_complex = xsimd::is_batch_complex<V>;
+}
+
 #else  // XTENSOR_USE_XSIMD
 
-namespace xsimd
+namespace xt_simd
 {
     template <class T, std::size_t A>
     class aligned_allocator;
@@ -135,8 +186,8 @@ namespace xsimd
 
 namespace xt
 {
-    using xsimd::aligned_mode;
-    using xsimd::unaligned_mode;
+    using xt_simd::aligned_mode;
+    using xt_simd::unaligned_mode;
 
     struct inner_aligned_mode
     {
@@ -147,7 +198,7 @@ namespace xt
         template <class A1, class A2>
         struct driven_align_mode_impl
         {
-            using type = std::conditional_t<std::is_same<A1, A2>::value, A1, ::xsimd::unaligned_mode>;
+            using type = std::conditional_t<std::is_same<A1, A2>::value, A1, ::xt_simd::unaligned_mode>;
         };
 
         template <class A>

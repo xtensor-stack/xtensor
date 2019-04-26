@@ -601,7 +601,7 @@ namespace xt
         };
 
         template <class T, std::size_t A>
-        struct allocator_alignment<xsimd::aligned_allocator<T, A>>
+        struct allocator_alignment<xt_simd::aligned_allocator<T, A>>
         {
             constexpr static std::size_t value = A;
         };
@@ -1346,7 +1346,7 @@ namespace xt
         // Note: this is for alignment detection. The allocator serves no other purpose than
         //       that of a trait here.
         using allocator_type = std::conditional_t<Align != 0,
-                                                  xsimd::aligned_allocator<T, Align>,
+                                                  xt_simd::aligned_allocator<T, Align>,
                                                   std::allocator<T>>;
     };
 
