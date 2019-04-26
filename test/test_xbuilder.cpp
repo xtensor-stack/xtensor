@@ -552,4 +552,11 @@ namespace xt
         b = std::is_same<decltype(ed3), xarray<double>>::value;
         EXPECT_TRUE(b);
     }
+
+    TEST(xbuilder, linspace_double)
+    {
+        xt::xarray<double> a = xt::linspace(0., 100.);
+        auto b = xt::linspace(0., 100.);
+        EXPECT_EQ(a, b);
+    }
 }

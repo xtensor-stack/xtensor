@@ -14,6 +14,7 @@
 #define XTENSOR_BUILDER_HPP
 
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <functional>
@@ -192,6 +193,21 @@ namespace xt
 
     namespace detail
     {
+        template <class T, class S>
+        struct get_mult_type_impl
+        {
+            using type = T;
+        };
+
+        template <class T, class R, class P>
+        struct get_mult_type_impl<T, std::chrono::duration<R, P>>
+        {
+            using type = R;
+        };
+
+        template <class T, class S>
+        using get_mult_type = typename get_mult_type_impl<T, S>::type;
+
         template <class T, class R = T, class S = T>
         class arange_generator
         {
@@ -215,20 +231,14 @@ namespace xt
             inline R element(It first, It) const
             {
                 // Avoids warning when T = char (because char + char => int!)
-                return static_cast<R>(m_start + m_step * T(*first));
+                using mult_type = get_mult_type<T, S>;
+                return static_cast<R>(m_start + m_step * mult_type(*first));
             }
 
             template <class E>
             inline void assign_to(xexpression<E>& e) const noexcept
             {
-                auto& de = e.derived_cast();
-                T value = m_start;
-
-                for (auto&& el : de.storage())
-                {
-                    el = static_cast<R>(value);
-                    value += m_step;
-                }
+                assign_to_impl(e, m_start, m_step);
             }
 
         private:
@@ -240,12 +250,37 @@ namespace xt
             template <class T1, class... Args>
             inline R access_impl(T1 t, Args...) const
             {
-                return static_cast<R>(m_start + m_step * T(t));
+                using mult_type = get_mult_type<T, S>;
+                return static_cast<R>(m_start + m_step * mult_type(t));
             }
 
             inline R access_impl() const
             {
                 return static_cast<R>(m_start);
+            }
+
+            template <class E, class U, class X, XTL_REQUIRES(std::is_integral<X>)>
+            inline void assign_to_impl(xexpression<E>& e, U start, X step) const noexcept
+            {
+                auto& de = e.derived_cast();
+                T value = start;
+
+                for (auto&& el : de.storage())
+                {
+                    el = static_cast<R>(value);
+                    value += step;
+                }
+            }
+
+            template <class E, class U, class X, XTL_REQUIRES(xtl::negation<std::is_integral<X>>)>
+            inline void assign_to_impl(xexpression<E>& e, U /*start*/, X /*step*/) const noexcept
+            {
+                auto& buf = e.derived_cast().storage();
+                using size_type = decltype(buf.size());
+                for(size_type i = 0; i < buf.size(); ++i)
+                {
+                    buf[i] = access_impl(i);
+                }
             }
         };
 
