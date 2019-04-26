@@ -43,7 +43,7 @@ However, this requires to carefully compute the strides to avoid buffer overflow
     #include "xtensor/xarray.hpp"
 
     std::vector<size_t> shape = { 3, 2, 4 };
-    xt::xarray<double, xt::layout_type::dynamic> a(shape, xt::layout::row_major);
+    xt::xarray<double, xt::layout_type::dynamic> a(shape, xt::layout_type::row_major);
 
 If the layout of the array can be fixed at compile time, we can make it even simpler:
 
