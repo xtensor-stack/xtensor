@@ -42,7 +42,7 @@ jobs:
                         gtest ^
                         ninja ^
                         nlohmann_json ^
-                        xtl==0.6.2 ^
+                        xtl==0.6.4 ^
                         xsimd ^
                         python=3.6
           conda list
@@ -67,7 +67,7 @@ jobs:
                 -DCMAKE_C_COMPILER=clang-cl ^
                 -DCMAKE_CXX_COMPILER=clang-cl ^
                 -DBUILD_TESTS=ON ^
-                #-DXTENSOR_USE_XSIMD=ON ^
+                -DXTENSOR_USE_XSIMD=ON ^
                 $(Build.SourcesDirectory)
         displayName: "Configure xtensor"
         workingDirectory: $(Build.BinariesDirectory)
