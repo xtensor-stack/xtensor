@@ -39,10 +39,11 @@ jobs:
       # Note: conda activate doesn't work here, because it creates a new shell!
       - script: |
           conda install cmake ^
-                        xtl==0.6.2 ^
-                        xsimd ^
+                        gtest ^
                         ninja ^
                         nlohmann_json ^
+                        xtl==0.6.2 ^
+                        xsimd ^
                         python=3.6
           conda list
         displayName: "Install conda packages"
@@ -65,8 +66,8 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Release ^
                 -DCMAKE_C_COMPILER=clang-cl ^
                 -DCMAKE_CXX_COMPILER=clang-cl ^
-                -DXTENSOR_USE_XSIMD=ON ^
-                -DDOWNLOAD_GTEST=ON ^
+                -DBUILD_TESTS=ON ^
+                #-DXTENSOR_USE_XSIMD=ON ^
                 $(Build.SourcesDirectory)
         displayName: "Configure xtensor"
         workingDirectory: $(Build.BinariesDirectory)
@@ -76,6 +77,15 @@ jobs:
           call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
           cmake --build . ^
                 --config Release ^
+                --target test_xtensor_lib ^
                 -- -v
         displayName: "Build xtensor"
         workingDirectory: $(Build.BinariesDirectory)/build
+
+      # Test
+      - script: |
+          setlocal EnableDelayedExpansion
+          cd test
+          .\test_xtensor_lib
+        displayName: "Test xtensor"
+        workingDirectory: $(Build.BinariesDirectory)/build/test
