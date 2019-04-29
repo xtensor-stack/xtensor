@@ -93,7 +93,7 @@ namespace xt
                                                  get_strides_type<shape_type>>;
         using backstrides_type = xtl::mpl::eval_if_t<has_strides<xexpression_type>,
                                                      detail::expr_backstrides_type<xexpression_type>,
-                                                     get_strides_type<xexpression_type>>;
+                                                     get_strides_type<shape_type>>;
 
         using inner_shape_type = typename xexpression_type::inner_shape_type;
         using inner_strides_type = xtl::mpl::eval_if_t<has_strides<xexpression_type>,
@@ -347,8 +347,8 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using undecay_expression = CT;
         using functor_type = std::decay_t<F>;
-        using reference = typename functor_type::reference;
-        using const_reference = typename functor_type::const_reference;
+        using reference = decltype(std::declval<F>()(std::declval<xexpression_type>()()));
+        using const_reference = decltype(std::declval<F>()(std::declval<const xexpression_type>()()));
         using size_type = typename xexpression_type::size_type;
         using temporary_type = typename xfunctor_view_temporary_type<F, xexpression_type>::type;
     };
@@ -482,28 +482,38 @@ namespace xt
      * xfunctor_iterator declaration *
      *********************************/
 
-    template <class DT>
+    template <class R>
     struct xproxy_inner_types
     {
-        using proxy = xtl::xproxy_wrapper<DT>;
-        using pointer = typename proxy::pointer;
-        using reference = typename proxy::reference;
+        using reference = R;
+        using pointer = std::add_pointer_t<std::remove_reference_t<R>>;
     };
+
+    namespace detail
+    {
+        template <class F, class IT>
+        struct xfunctor_invoker
+        {
+            using type = decltype(std::declval<F>()(*(std::declval<IT>())));
+        };
+
+        template <class F, class IT>
+        using xfunctor_invoker_t = typename xfunctor_invoker<F, IT>::type;
+    }
 
     template <class F, class IT>
     class xfunctor_iterator : public xtl::xrandom_access_iterator_base<xfunctor_iterator<F, IT>,
                                                                        typename std::decay_t<F>::value_type,
                                                                        typename std::iterator_traits<IT>::difference_type,
-                                                                       typename xproxy_inner_types<decltype(std::declval<F>()(*(IT())))>::pointer,
-                                                                       typename xproxy_inner_types<decltype(std::declval<F>()(*(IT())))>::reference>
+                                                                       typename xproxy_inner_types<detail::xfunctor_invoker_t<F, IT>>::pointer,
+                                                                       typename xproxy_inner_types<detail::xfunctor_invoker_t<F, IT>>::reference>
     {
     public:
 
         using functor_type = F;
         using subiterator_traits = std::iterator_traits<IT>;
 
-        using proxy_inner = xproxy_inner_types<decltype(std::declval<F>()(*(IT())))>;
-        using proxy = typename proxy_inner::proxy;
+        using proxy_inner = xproxy_inner_types<detail::xfunctor_invoker_t<F, IT>>;
         using value_type = typename functor_type::value_type;
         using reference = typename proxy_inner::reference;
         using pointer = typename proxy_inner::pointer;
@@ -553,8 +563,7 @@ namespace xt
 
         using functor_type = F;
 
-        using proxy_inner = xproxy_inner_types<decltype(std::declval<F>()(*std::declval<ST>()))>;
-        using proxy = typename proxy_inner::proxy;
+        using proxy_inner = xproxy_inner_types<detail::xfunctor_invoker_t<F, ST>>;
         using value_type = typename functor_type::value_type;
         using reference = typename proxy_inner::reference;
         using pointer = std::remove_reference_t<reference>*;

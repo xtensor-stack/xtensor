@@ -34,7 +34,7 @@ namespace xt
             template <class T>
             decltype(auto) operator()(T&& t) const
             {
-                return xtl::forward_offset<M, I>(t);
+                return xtl::forward_offset<M, I>(std::forward<T>(t));
             }
 
             template <class align, class requested_type, std::size_t N, class E,

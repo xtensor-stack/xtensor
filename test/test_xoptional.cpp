@@ -294,6 +294,12 @@ namespace xt
 
         reference operator()(point& p) const noexcept { return p.x(); }
         const_reference operator()(const point& p) const noexcept { return p.x(); }
+
+        // Compilation trick: a functor view on xarray_optional<point> expects the functor
+        // to provide operator() accepting reference and const_reference from xarray_optional<point>
+        // Since we never use these overloads, no need to declare the right one, nor to provide
+        // any implementation.
+        template <class T> T&& operator()(T&&) const noexcept;
     };
 
     TEST(xoptional, functor_view)

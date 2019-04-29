@@ -60,7 +60,7 @@ namespace xt
             template <class E>
             static inline decltype(auto) real(E&& e) noexcept
             {
-                return e;
+                return std::forward<E>(e);
             }
 
             template <class E>
@@ -74,15 +74,15 @@ namespace xt
         struct complex_expression_helper
         {
             template <class E>
-            static inline auto real(E&& e) noexcept
+            static inline decltype(auto) real(E&& e) noexcept
             {
-                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::real(e);
+                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::real(std::forward<E>(e));
             }
 
             template <class E>
-            static inline auto imag(E&& e) noexcept
+            static inline decltype(auto) imag(E&& e) noexcept
             {
-                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::imag(e);
+                return detail::complex_helper<xtl::is_complex<typename std::decay_t<E>::value_type>::value>::imag(std::forward<E>(e));
             }
         };
 
