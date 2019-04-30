@@ -256,4 +256,16 @@ namespace xt
         EXPECT_TRUE(isclose(c_t(5, 5), c_t(5, -5))() == false);
 
     }
+
+    TEST(xcomplex, real_expression)
+    {
+        using cpx = std::complex<double>;
+        xtensor<cpx, 2> a = {{ cpx(1, 1), cpx(-1, 1), cpx(-2, -2) },
+                             { cpx(-1, 0), cpx(0, 1), cpx(2, 2) }};
+
+        xtensor<double, 2> exp = {{2, -2, -4},
+                                  {-2, 0, 4}};
+        xtensor<double, 2> res = real(a + a);
+        EXPECT_EQ(res, exp);
+    }
 }
