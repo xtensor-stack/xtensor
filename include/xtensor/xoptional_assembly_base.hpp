@@ -62,7 +62,7 @@ namespace xt
         using const_pointer = typename storage_type::const_pointer;
         using size_type = typename raw_value_expression::size_type;
         using difference_type = typename raw_value_expression::difference_type;
-        using simd_value_type = xsimd::simd_type<value_type>;
+        using simd_value_type = xt_simd::simd_type<value_type>;
 
         using shape_type = typename raw_value_expression::shape_type;
         using strides_type = typename raw_value_expression::strides_type;

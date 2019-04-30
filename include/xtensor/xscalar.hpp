@@ -103,7 +103,7 @@ namespace xt
         using const_pointer = const value_type*;
         using size_type = typename inner_types::size_type;
         using difference_type = std::ptrdiff_t;
-        using simd_value_type = xsimd::simd_type<value_type>;
+        using simd_value_type = xt_simd::simd_type<value_type>;
 
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
@@ -280,8 +280,8 @@ namespace xt
         template <class align, class simd = simd_value_type>
         void store_simd(size_type i, const simd& e);
         template <class align, class requested_type = value_type,
-                  std::size_t N = xsimd::simd_traits<requested_type>::size>
-        xsimd::simd_return_type<value_type, requested_type>
+                  std::size_t N = xt_simd::simd_traits<requested_type>::size>
+        xt_simd::simd_return_type<value_type, requested_type>
         load_simd(size_type i) const;
 
     private:
@@ -922,9 +922,9 @@ namespace xt
     template <class CT>
     template <class align, class requested_type, std::size_t N>
     inline auto xscalar<CT>::load_simd(size_type) const
-        -> xsimd::simd_return_type<value_type, requested_type>
+        -> xt_simd::simd_return_type<value_type, requested_type>
     {
-        return xsimd::set_simd<value_type, requested_type>(m_value);
+        return xt_simd::set_simd<value_type, requested_type>(m_value);
     }
 
     template <class T>

@@ -29,7 +29,7 @@ namespace xt
             using proxy = xtl::xproxy_wrapper<M>;
 
             template <class value_type, class requested_type>
-            using simd_return_type = xsimd::simd_return_type<value_type, requested_type>;
+            using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
             template <class T>
             decltype(auto) operator()(T&& t) const

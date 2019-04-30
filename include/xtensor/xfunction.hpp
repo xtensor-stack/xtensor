@@ -93,7 +93,7 @@ namespace xt
 
         template <class V>
         struct has_simd_type
-            : std::integral_constant<bool, !std::is_same<V, xsimd::simd_type<V>>::value>
+            : std::integral_constant<bool, !std::is_same<V, xt_simd::simd_type<V>>::value>
         {
         };
 
@@ -109,7 +109,7 @@ namespace xt
                                                           has_simd_type<xvalue_type_t<std::decay_t<CT>>>...>;
             // if yes, insert correct type here
             using simd_value_type = xtl::mpl::eval_if_t<simd_arguments_exist,
-                                                        meta_identity<xsimd::simd_type<scalar_result_type>>,
+                                                        meta_identity<xt_simd::simd_type<scalar_result_type>>,
                                                         make_invalid_type<>>;
             // if all types are supported, check that the functor has a working
             // simd_apply and all arguments have the simd interface
@@ -221,7 +221,7 @@ namespace xt
         using simd_argument_type = simd_value_type;
 
         template <class requested_type>
-        using simd_return_type = xsimd::simd_return_type<value_type, requested_type>;
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
         using iterable_base = xconst_iterable<xfunction<F, CT...>>;
         using inner_shape_type = typename iterable_base::inner_shape_type;
@@ -327,7 +327,7 @@ namespace xt
         operator value_type() const;
 
         template <class align, class requested_type = value_type,
-                  std::size_t N = xsimd::simd_traits<requested_type>::size>
+                  std::size_t N = xt_simd::simd_traits<requested_type>::size>
         simd_return_type<requested_type> load_simd(size_type i) const;
 
         const tuple_type& arguments() const noexcept;
@@ -801,9 +801,9 @@ namespace xt
         struct get_simd_type
         {
             using simd_value_type = typename std::decay_t<T>::simd_value_type;
-            static constexpr bool is_arg_bool = ::xsimd::is_batch_bool<simd_value_type>::value;
-            static constexpr bool is_res_bool = ::xsimd::is_batch_bool<simd>::value;
-            static constexpr bool is_arg_cplx = ::xsimd::is_batch_complex<simd_value_type>::value;
+            static constexpr bool is_arg_bool = ::xt_simd::is_batch_bool<simd_value_type>::value;
+            static constexpr bool is_res_bool = ::xt_simd::is_batch_bool<simd>::value;
+            static constexpr bool is_arg_cplx = ::xt_simd::is_batch_complex<simd_value_type>::value;
             using type = std::conditional_t<is_res_bool,
                                             common_simd,
                                             std::conditional_t<is_arg_bool || is_arg_cplx,

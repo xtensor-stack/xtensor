@@ -57,7 +57,7 @@ namespace xt
         using const_pointer = bool*;
 
         template <class value_type, class requested_type>
-        using simd_return_type = xsimd::simd_return_type<value_type, requested_type>;
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
         const_reference operator()(const bool& in) const
         {
@@ -150,26 +150,26 @@ namespace xt
         xarray<std::complex<double>> e = {{3.0       , 1.0 + 1.0i},
                                           {1.0 - 1.0i, 2.0       }};
         auto iview = xt::imag(e);
-        auto loaded_batch = iview.template load_simd<xsimd::aligned_mode, double, 4>(0);
+        auto loaded_batch = iview.template load_simd<xt_simd::aligned_mode, double, 4>(0);
         EXPECT_TRUE(xsimd::all(xsimd::batch<double, 4>(0, 1, -1, 0) == loaded_batch));
         auto newbatch = loaded_batch + 5;
 
-        iview.template store_simd<xsimd::aligned_mode>(0, newbatch);
+        iview.template store_simd<xt_simd::aligned_mode>(0, newbatch);
         xarray<std::complex<double>> exp1 = {{3.0 + 5.0i, 1.0 + 6.0i},
                                              {1.0 + 4.0i, 2.0 + 5.0i }};
         EXPECT_EQ(exp1, e);
 
         auto rview = xt::real(e);
-        auto loaded_batch2 = rview.template load_simd<xsimd::aligned_mode, double, 4>(0);
+        auto loaded_batch2 = rview.template load_simd<xt_simd::aligned_mode, double, 4>(0);
         EXPECT_TRUE(xsimd::all(xsimd::batch<double, 4>(3, 1, 1, 2) == loaded_batch2));
         newbatch = loaded_batch2 + 5;
-        rview.template store_simd<xsimd::aligned_mode>(0, newbatch);
+        rview.template store_simd<xt_simd::aligned_mode>(0, newbatch);
         xarray<std::complex<double>> exp2 = {{8.0 + 5.0i, 6.0 + 6.0i},
                                              {6.0 + 4.0i, 7.0 + 5.0i }};
         EXPECT_EQ(exp2, e);
 
         auto f = xt::sin(xt::imag(e));
-        auto b = f.load_simd<xsimd::aligned_mode>(0);
+        auto b = f.load_simd<xt_simd::aligned_mode>(0);
         static_cast<void>(b);
         using assign_to_view = xassign_traits<decltype(iview), decltype(f)>;
         EXPECT_TRUE(assign_to_view::convertible_types());
