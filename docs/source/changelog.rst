@@ -7,6 +7,28 @@
 Changelog
 =========
 
+0.20.5
+------
+
+- Fixed ``conj``
+  `#1556 <https://github.com/QuantStack/xtensor/pull/1556>`_
+- Fixed ``real``, ``imag``, and ``functor_view``
+  `#1554 <https://github.com/QuantStack/xtensor/pull/1554>`_
+- Allows to include ``xsimd`` without defining ``XTENSOR_USE_XSIMD``
+  `#1548 <https://github.com/QuantStack/xtensor/pull/1548>`_
+- Fixed ``argsort`` in column major
+  `#1547 <https://github.com/QuantStack/xtensor/pull/1547>`_
+- Fixed ``assign_to`` for ``arange`` on ``double``
+  `#1541 <https://github.com/QuantStack/xtensor/pull/1541>`_
+- Fix example code in container.rst
+  `#1544 <https://github.com/QuantStack/xtensor/pull/1544>`_
+- Removed return value from ``step_leading``
+  `#1536 <https://github.com/QuantStack/xtensor/pull/1536>`_
+- Bugfix: amax
+  `#1533 <https://github.com/QuantStack/xtensor/pull/1533>`_
+- Removed extra ;
+  `#1527 <https://github.com/QuantStack/xtensor/pull/1527>`_
+
 0.20.4
 ------
 
