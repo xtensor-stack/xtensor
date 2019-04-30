@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software. #
 ############################################################################
 
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.1)
 
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xtensor-test)
@@ -22,44 +22,51 @@ include(CheckCXXCompilerFlag)
 
 string(TOUPPER "${CMAKE_BUILD_TYPE}" U_CMAKE_BUILD_TYPE)
 
-# Set C++ standard
-# C++14 is the earliest standard needed to compile
-set(CMAKE_CXX_STANDARD 14)
+include(set_compiler_flag.cmake)
+
 if(CPP17)
   # User requested C++17, but compiler might not oblige.
-  # Thus, we check availability of the flag.
-  CHECK_CXX_COMPILER_FLAG("-std=c++17" nonwin_HAS_CPP17_FLAG)
-  CHECK_CXX_COMPILER_FLAG("/std:c++17" win_HAS_CPP17_FLAG)
-  if(win_HAS_CPP17_FLAG OR nonwin_HAS_CPP17_FLAG)
+  set_compiler_flag(
+    _cxx_std_flag CXX
+    "-std=c++17"  # this should work with GNU, Intel, PGI
+    "/std:c++17"  # this should work with MSVC
+  )
+  if(_cxx_std_flag)
     message(STATUS "Building with C++17")
-    set(CMAKE_CXX_STANDARD 17)
-  else()
-    message(STATUS "Building with C++14")
   endif()
+else()
+  set_compiler_flag(
+    _cxx_std_flag CXX REQUIRED
+    "-std=c++14"  # this should work with GNU, Intel, PGI
+    "/std:c++14"  # this should work with MSVC
+  )
+  message(STATUS "Building with C++14")
 endif()
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+
+if(NOT _cxx_std_flag)
+  message(FATAL_ERROR "xtensor-blas needs a C++14-compliant compiler.")
+endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable")
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /EHsc /MP /bigobj")
   set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
   add_definitions(-D_CRT_SECURE_NO_WARNINGS)
   add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   if(NOT WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} -march=native -Wunused-parameter -Wextra -Wreorder -Wconversion -Wsign-conversion")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wold-style-cast -Wunused-variable")
   else() # We are using clang-cl
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /EHsc /MP /bigobj")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${_cxx_std_flag} /EHsc /MP /bigobj")
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
     add_definitions(-D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
   endif()
 else()
-  message(FATAL_ERROR "Unsupported compiler -- xtensor requires C++14 support!")
+  message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
