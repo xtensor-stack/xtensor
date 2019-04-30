@@ -268,4 +268,16 @@ namespace xt
         xtensor<double, 2> res = real(a + a);
         EXPECT_EQ(res, exp);
     }
+
+    TEST(xcomplex, conj)
+    {
+        using cpx = std::complex<double>;
+        xtensor<cpx, 2> a = {{ cpx(1, 1), cpx(-1, 1), cpx(-2, -2) },
+                             { cpx(-1, 0), cpx(0, 1), cpx(2, 2) }};
+        xtensor<cpx, 2> res = conj(a);
+        xtensor<cpx, 2> exp = {{ cpx(1, -1), cpx(-1, -1), cpx(-2, 2) },
+                             { cpx(-1, 0), cpx(0, -1), cpx(2, -2) }};
+
+        EXPECT_EQ(res, exp);
+    }
 }
