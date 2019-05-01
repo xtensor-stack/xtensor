@@ -443,6 +443,30 @@ namespace xt
     template <class T>
     using get_value_type_t = typename get_value_type<T>::type;
 
+    /**********************
+     * get implementation *
+     **********************/
+
+    // When subclassing from std::tuple not all compilers are able to correctly instantiate get
+    // See here: https://stackoverflow.com/a/37188019/2528668
+    template <std::size_t I, template <typename... Args> class T, typename ...Args>
+    decltype(auto) get(T<Args...>&& v)
+    {
+      return std::get<I>(static_cast<std::tuple<Args...>&&>(v));
+    }
+
+    template <std::size_t I, template <typename... Args> class T, typename ...Args>
+    decltype(auto) get(T<Args...>& v)
+    {
+      return std::get<I>(static_cast<std::tuple<Args...>&>(v));
+    }
+
+    template <std::size_t I, template <typename... Args> class T, typename ...Args>
+    decltype(auto) get(const T<Args...> & v)
+    {
+      return std::get<I>(static_cast<const std::tuple<Args...> &>(v));
+    }
+
     /***************************
      * apply_cv implementation *
      ***************************/

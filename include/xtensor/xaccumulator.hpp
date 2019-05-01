@@ -68,24 +68,6 @@ namespace xt
         return accumulator_type(std::forward<RF>(accumulate_func), std::forward<IF>(init_func));
     }
 
-    template <std::size_t I, typename ...T>
-    decltype(auto) get(xaccumulator_functor<T...>&& v)
-    {
-        return std::get<I>(static_cast<std::tuple<T...>&&>(v));
-    }
-
-    template <std::size_t I, typename ...T>
-    decltype(auto) get(xaccumulator_functor<T...>& v)
-    {
-        return std::get<I>(static_cast<std::tuple<T...>&>(v));
-    }
-
-    template <std::size_t I, typename ...T>
-    decltype(auto) get(xaccumulator_functor<T...> const& v)
-    {
-        return std::get<I>(static_cast<std::tuple<T...> const&>(v));
-    }
-
     namespace detail
     {
         template <class F, class E, class EVS>
@@ -204,7 +186,7 @@ namespace xt
         template <class F, class E>
         inline auto accumulator_impl(F&& f, E&& e, std::size_t axis, evaluation_strategy::immediate_type)
         {
-            using accumulate_functor = std::decay_t<decltype(get<0>(f))>;
+            using accumulate_functor = std::decay_t<decltype(xt::get<0>(f))>;
             using function_return_type = typename accumulate_functor::result_type;
             using result_type = xaccumulator_return_type_t<std::decay_t<E>, function_return_type>;
 
@@ -246,9 +228,9 @@ namespace xt
             inner_loop_size = inner_loop_size - inner_stride;
 
             // activate the init loop if we have an init function other than identity
-            if (!std::is_same<std::decay_t<decltype(get<1>(f))>, xtl::identity>::value)
+            if (!std::is_same<std::decay_t<decltype(xt::get<1>(f))>, xtl::identity>::value)
             {
-                accumulator_init_with_f(get<1>(f), result, axis);
+                accumulator_init_with_f(xt::get<1>(f), result, axis);
             }
 
             pos = 0;
@@ -256,7 +238,7 @@ namespace xt
             {
                 for (std::size_t j = 0; j < inner_loop_size; ++j)
                 {
-                    result.storage()[pos + inner_stride] = get<0>(f)(result.storage()[pos],
+                    result.storage()[pos + inner_stride] = xt::get<0>(f)(result.storage()[pos],
                                                                           result.storage()[pos + inner_stride]);
                     pos += outer_stride;
                 }
@@ -268,7 +250,7 @@ namespace xt
         template <class F, class E>
         inline auto accumulator_impl(F&& f, E&& e, evaluation_strategy::immediate_type)
         {
-            using accumulate_functor = std::decay_t<decltype(get<0>(f))>;
+            using accumulate_functor = std::decay_t<decltype(xt::get<0>(f))>;
             using T = typename accumulate_functor::result_type;
 
             using result_type = xaccumulator_linear_return_type_t<std::decay_t<E>, T>;
@@ -277,12 +259,12 @@ namespace xt
 
             auto it = e.template begin<XTENSOR_DEFAULT_TRAVERSAL>();
 
-            result.storage()[0] = get<1>(f)(*it);
+            result.storage()[0] = xt::get<1>(f)(*it);
             ++it;
 
             for (std::size_t idx = 0; it != e.template end<XTENSOR_DEFAULT_TRAVERSAL>(); ++it)
             {
-                result.storage()[idx + 1] = get<0>(f)(result.storage()[idx], *it);
+                result.storage()[idx + 1] = xt::get<0>(f)(result.storage()[idx], *it);
                 ++idx;
             }
             return result;
