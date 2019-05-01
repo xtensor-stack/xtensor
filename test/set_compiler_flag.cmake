@@ -39,20 +39,20 @@ function(set_compiler_flag _result _lang)
   # loop over all flags, try to find the first which works
   foreach(flag IN ITEMS ${_list_of_flags})
 
-    unset(_flag_works CACHE)
+    unset(_${flag}_works CACHE)
     if(_lang STREQUAL "C")
-      check_c_compiler_flag("${flag}" _flag_works)
+      check_c_compiler_flag("${flag}" _${flag}_works)
     elseif(_lang STREQUAL "CXX")
-      check_cxx_compiler_flag("${flag}" _flag_works)
+      check_cxx_compiler_flag("${flag}" _${flag}_works)
     elseif(_lang STREQUAL "Fortran")
-      check_Fortran_compiler_flag("${flag}" _flag_works)
+      check_Fortran_compiler_flag("${flag}" _${flag}_works)
     else()
       message(FATAL_ERROR "Unknown language in set_compiler_flag: ${_lang}")
     endif()
 
     # if the flag works, use it, and exit
     # otherwise try next flag
-    if(_flag_works)
+    if(_${flag}_works)
       set(${_result} "${flag}" PARENT_SCOPE)
       set(_flag_found TRUE)
       break()
