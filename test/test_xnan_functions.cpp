@@ -153,8 +153,8 @@ namespace xt
 
         auto cs = nanmean(nantest::cN)();
         auto cse = nanmean(nantest::cN, evaluation_strategy::immediate)();
-        EXPECT_EQ(cs, 1.4 + 0.6i);
-        EXPECT_EQ(cse, 1.4 + 0.6i);
+        EXPECT_EQ(cs, std::complex<double>(1.4, 0.6));
+        EXPECT_EQ(cse, std::complex<double>(1.4, 0.6));
 
         xarray<std::complex<double>> ecN0 = {1.0 + 0.0i, 1.0+0.5i, 3.0+2.0i};
         xarray<std::complex<double>> ecN1 = {1.0 + 1.0i, (5.0 + 1.0i) / 3.0};

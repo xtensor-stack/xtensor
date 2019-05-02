@@ -238,9 +238,9 @@ namespace xt
         using shape_type = typename xreducer_shape_type<typename std::decay_t<E>::shape_type, std::decay_t<X>, typename options_t::keep_dims>::type;
 
         // retrieve functors from triple struct
-        auto reduce_fct = std::get<0>(f);
-        auto init_fct = std::get<1>(f);
-        auto merge_fct = std::get<2>(f);
+        auto reduce_fct = xt::get<0>(f);
+        auto init_fct = xt::get<1>(f);
+        auto merge_fct = xt::get<2>(f);
 
         shape_type result_shape{};
 
@@ -1129,9 +1129,9 @@ namespace xt
     template <class Func, class CTA, class AX, class OX>
     inline xreducer<F, CT, X, O>::xreducer(Func&& func, CTA&& e, AX&& axes, OX&& options)
         : m_e(std::forward<CTA>(e))
-        , m_reduce(std::get<0>(func))
-        , m_init(std::get<1>(func))
-        , m_merge(std::get<2>(func))
+        , m_reduce(xt::get<0>(func))
+        , m_init(xt::get<1>(func))
+        , m_merge(xt::get<2>(func))
         , m_axes(std::forward<AX>(axes))
         , m_shape(xtl::make_sequence<inner_shape_type>(typename O::keep_dims() ? m_e.dimension() : m_e.dimension() - m_axes.size(), 0))
         , m_dim_mapping(xtl::make_sequence<dim_mapping_type>(typename O::keep_dims() ? m_e.dimension() : m_e.dimension() - m_axes.size(), 0))
