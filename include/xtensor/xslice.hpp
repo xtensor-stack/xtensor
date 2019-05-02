@@ -17,6 +17,7 @@
 #include <xtl/xtype_traits.hpp>
 
 #include "xstorage.hpp"
+#include "xtensor_config.hpp"
 #include "xutils.hpp"
 
 #ifndef XTENSOR_CONSTEXPR

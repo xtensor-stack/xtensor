@@ -13,8 +13,9 @@
 #ifndef XTENSOR_HISTOGRAM_HPP
 #define XTENSOR_HISTOGRAM_HPP
 
-#include "xtensor.hpp"
 #include "xsort.hpp"
+#include "xtensor.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {

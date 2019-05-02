@@ -11,7 +11,10 @@
 
 #include <array>
 
+#include "xarray.hpp"
 #include "xslice.hpp"
+#include "xtensor.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {

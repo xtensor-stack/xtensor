@@ -16,6 +16,7 @@
 #include <nlohmann/json.hpp>
 
 #include "xstrided_view.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {

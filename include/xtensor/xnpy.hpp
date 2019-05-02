@@ -31,6 +31,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xeval.hpp"
 #include "xtensor/xstrides.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {

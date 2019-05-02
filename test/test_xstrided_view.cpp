@@ -6,6 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include "xtensor/xstrided_view.hpp"
+
 #include "gtest/gtest.h"
 
 #include "xtensor/xarray.hpp"
@@ -16,7 +18,10 @@
 #include "xtensor/xnoalias.hpp"
 #include "xtensor/xstrided_view.hpp"
 #include "xtensor/xtensor.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor/xview.hpp"
+#include "test_common_macros.hpp"
+
 
 namespace xt
 {

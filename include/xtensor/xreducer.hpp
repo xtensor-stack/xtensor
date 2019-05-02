@@ -31,6 +31,7 @@
 #include "xgenerator.hpp"
 #include "xiterable.hpp"
 #include "xreducer.hpp"
+#include "xtensor_config.hpp"
 #include "xutils.hpp"
 
 namespace xt

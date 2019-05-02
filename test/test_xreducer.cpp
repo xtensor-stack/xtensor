@@ -6,6 +6,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include "xtensor/xreducer.hpp"
+
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
@@ -13,9 +15,11 @@
 #include "xtensor/xfixed.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xmath.hpp"
-#include "xtensor/xreducer.hpp"
 #include "xtensor/xview.hpp"
 #include "xtensor/xmanipulation.hpp"
+#include "xtensor/xio.hpp"
+#include "test_common_macros.hpp"
+
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -25,7 +29,6 @@
 #include "xtensor/xrandom.hpp"
 #endif
 
-#include "xtensor/xio.hpp"
 
 namespace xt
 {

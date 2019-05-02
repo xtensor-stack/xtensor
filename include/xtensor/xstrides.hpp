@@ -15,6 +15,7 @@
 
 #include "xexception.hpp"
 #include "xshape.hpp"
+#include "xtensor_config.hpp"
 #include "xtensor_forward.hpp"
 
 namespace xt
