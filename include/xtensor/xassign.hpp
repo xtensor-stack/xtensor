@@ -471,7 +471,7 @@ namespace xt
         for (size_type i = 0; i < s; ++i)
         {
             *m_lhs = conditional_cast<is_narrowing, result_type>(*m_rhs);
-            stepper_tools<L>::increment_stepper(*this, m_index, m_e1.shape());
+            stepper_tools<L>::increment_stepper(*this, m_index, m_e1.shape(), L);
         }
     }
 

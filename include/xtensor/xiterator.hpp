@@ -151,24 +151,28 @@ namespace xt
         template <class S, class IT, class ST>
         static void increment_stepper(S& stepper,
                                       IT& index,
-                                      const ST& shape);
+                                      const ST& shape,
+                                      layout_type l);
 
         template <class S, class IT, class ST>
         static void decrement_stepper(S& stepper,
                                       IT& index,
-                                      const ST& shape);
+                                      const ST& shape,
+                                      layout_type l);
 
         template <class S, class IT, class ST>
         static void increment_stepper(S& stepper,
                                       IT& index,
                                       const ST& shape,
-                                      typename S::size_type n);
+                                      typename S::size_type n,
+                                      layout_type l);
 
         template <class S, class IT, class ST>
         static void decrement_stepper(S& stepper,
                                       IT& index,
                                       const ST& shape,
-                                      typename S::size_type n);
+                                      typename S::size_type n,
+                                      layout_type l);
     };
 
     /********************
@@ -266,9 +270,6 @@ namespace xt
 
             const S* p_shape;
         };
-
-        template <layout_type L>
-        struct LAYOUT_FORBIDEN_FOR_XITERATOR;
     }
 
     template <class St, class S, layout_type L>
@@ -299,7 +300,7 @@ namespace xt
         xiterator() = default;
 
         // end_index means either reverse_iterator && !end or !reverse_iterator && end
-        xiterator(St st, shape_param_type shape, bool end_index);
+        xiterator(St st, shape_param_type shape, bool end_index, layout_type l);
 
         self_type& operator++();
         self_type& operator--();
@@ -320,8 +321,7 @@ namespace xt
         stepper_type m_st;
         index_type m_index;
         difference_type m_linear_index;
-
-        using checking_type = typename detail::LAYOUT_FORBIDEN_FOR_XITERATOR<L>::type;
+        layout_type m_layout;
     };
 
     template <class St, class S, layout_type L>
@@ -545,7 +545,8 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::row_major>::increment_stepper(S& stepper,
                                                                   IT& index,
-                                                                  const ST& shape)
+                                                                  const ST& shape,
+                                                                  layout_type)
     {
         using size_type = typename S::size_type;
         size_type i = index.size();
@@ -579,7 +580,8 @@ namespace xt
     void stepper_tools<layout_type::row_major>::increment_stepper(S& stepper,
                                                                   IT& index,
                                                                   const ST& shape,
-                                                                  typename S::size_type n)
+                                                                  typename S::size_type n,
+                                                                  layout_type)
     {
         using size_type = typename S::size_type;
         size_type i = index.size();
@@ -624,7 +626,8 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::row_major>::decrement_stepper(S& stepper,
                                                                   IT& index,
-                                                                  const ST& shape)
+                                                                  const ST& shape,
+                                                                  layout_type)
     {
         using size_type = typename S::size_type;
         size_type i = index.size();
@@ -657,7 +660,8 @@ namespace xt
     void stepper_tools<layout_type::row_major>::decrement_stepper(S& stepper,
                                                                   IT& index,
                                                                   const ST& shape,
-                                                                  typename S::size_type n)
+                                                                  typename S::size_type n,
+                                                                  layout_type)
     {
         using size_type = typename S::size_type;
         size_type i = index.size();
@@ -701,7 +705,8 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::column_major>::increment_stepper(S& stepper,
                                                                      IT& index,
-                                                                     const ST& shape)
+                                                                     const ST& shape,
+                                                                     layout_type)
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
@@ -736,7 +741,8 @@ namespace xt
     void stepper_tools<layout_type::column_major>::increment_stepper(S& stepper,
                                                                      IT& index,
                                                                      const ST& shape,
-                                                                     typename S::size_type n)
+                                                                     typename S::size_type n,
+                                                                     layout_type)
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
@@ -783,7 +789,8 @@ namespace xt
     template <class S, class IT, class ST>
     void stepper_tools<layout_type::column_major>::decrement_stepper(S& stepper,
                                                                      IT& index,
-                                                                     const ST& shape)
+                                                                     const ST& shape,
+                                                                     layout_type)
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
@@ -817,7 +824,8 @@ namespace xt
     void stepper_tools<layout_type::column_major>::decrement_stepper(S& stepper,
                                                                      IT& index,
                                                                      const ST& shape,
-                                                                     typename S::size_type n)
+                                                                     typename S::size_type n,
+                                                                     layout_type)
     {
         using size_type = typename S::size_type;
         size_type size = index.size();
@@ -856,6 +864,80 @@ namespace xt
         if (i == size)
         {
             stepper.to_begin();
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::dynamic>::increment_stepper(S& stepper,
+                                                                IT& index,
+                                                                const ST& shape,
+                                                                layout_type l)
+    {
+        XTENSOR_ASSERT(l == layout_type::row_major || l == layout_type::column_major);
+        if(l == layout_type::row_major)
+        {
+            stepper_tools<layout_type::row_major>::increment_stepper(stepper, index, shape, l);
+        }
+        else
+        {
+            stepper_tools<layout_type::column_major>::increment_stepper(stepper, index, shape, l);
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::dynamic>::increment_stepper(S& stepper,
+                                                                IT& index,
+                                                                const ST& shape,
+                                                                typename S::size_type n,
+                                                                layout_type l)
+    {
+        XTENSOR_ASSERT(l == layout_type::row_major || l == layout_type::column_major);
+        if(l == layout_type::row_major)
+        {
+            stepper_tools<layout_type::row_major>::increment_stepper(stepper, index, shape, n, l);
+        }
+        else
+        {
+            stepper_tools<layout_type::column_major>::increment_stepper(stepper, index, shape, n, l);
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::dynamic>::decrement_stepper(S& stepper,
+                                                                IT& index,
+                                                                const ST& shape,
+                                                                layout_type l)
+    {
+        XTENSOR_ASSERT(l == layout_type::row_major || l == layout_type::column_major);
+        if(l == layout_type::row_major)
+        {
+            stepper_tools<layout_type::row_major>::decrement_stepper(stepper, index, shape, l);
+        }
+        else
+        {
+            stepper_tools<layout_type::column_major>::decrement_stepper(stepper, index, shape, l);
+        }
+    }
+
+    template <>
+    template <class S, class IT, class ST>
+    void stepper_tools<layout_type::dynamic>::decrement_stepper(S& stepper,
+                                                                IT& index,
+                                                                const ST& shape,
+                                                                typename S::size_type n,
+                                                                layout_type l)
+    {
+        XTENSOR_ASSERT(l == layout_type::row_major || l == layout_type::column_major);
+        if(l == layout_type::row_major)
+        {
+            stepper_tools<layout_type::row_major>::decrement_stepper(stepper, index, shape, n, l);
+        }
+        else
+        {
+            stepper_tools<layout_type::column_major>::decrement_stepper(stepper, index, shape, n, l);
         }
     }
 
@@ -957,27 +1039,18 @@ namespace xt
         {
             return *p_shape;
         }
-
-        template <>
-        struct LAYOUT_FORBIDEN_FOR_XITERATOR<layout_type::row_major>
-        {
-            using type = int;
-        };
-
-        template <>
-        struct LAYOUT_FORBIDEN_FOR_XITERATOR<layout_type::column_major>
-        {
-            using type = int;
-        };
     }
 
     template <class St, class S, layout_type L>
-    inline xiterator<St, S, L>::xiterator(St st, shape_param_type shape, bool end_index)
-        : private_base(shape), m_st(st),
-          m_index(end_index ? xtl::forward_sequence<index_type, const shape_type&>(this->shape())
-                            : xtl::make_sequence<index_type>(this->shape().size(), size_type(0))),
-          m_linear_index(0)
+    inline xiterator<St, S, L>::xiterator(St st, shape_param_type shape, bool end_index, layout_type l)
+        : private_base(shape)
+        , m_st(st)
+        , m_index(end_index ? xtl::forward_sequence<index_type, const shape_type&>(this->shape())
+                            : xtl::make_sequence<index_type>(this->shape().size(), size_type(0)))
+        , m_linear_index(0)
+        , m_layout(l)
     {
+        XTENSOR_ASSERT(l == layout_type::row_major || l == layout_type::column_major);
         // end_index means either reverse_iterator && !end or !reverse_iterator && end
         if (end_index)
         {
@@ -995,7 +1068,7 @@ namespace xt
     template <class St, class S, layout_type L>
     inline auto xiterator<St, S, L>::operator++() -> self_type&
     {
-        stepper_tools<L>::increment_stepper(m_st, m_index, this->shape());
+        stepper_tools<L>::increment_stepper(m_st, m_index, this->shape(), m_layout);
         ++m_linear_index;
         return *this;
     }
@@ -1003,7 +1076,7 @@ namespace xt
     template <class St, class S, layout_type L>
     inline auto xiterator<St, S, L>::operator--() -> self_type&
     {
-        stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape());
+        stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape(), m_layout);
         --m_linear_index;
         return *this;
     }
@@ -1013,11 +1086,11 @@ namespace xt
     {
         if (n >= 0)
         {
-            stepper_tools<L>::increment_stepper(m_st, m_index, this->shape(), static_cast<size_type>(n));
+            stepper_tools<L>::increment_stepper(m_st, m_index, this->shape(), static_cast<size_type>(n), m_layout);
         }
         else
         {
-            stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape(), static_cast<size_type>(-n));
+            stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape(), static_cast<size_type>(-n), m_layout);
         }
         m_linear_index += n;
         return *this;
@@ -1028,11 +1101,11 @@ namespace xt
     {
         if (n >= 0)
         {
-            stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape(), static_cast<size_type>(n));
+            stepper_tools<L>::decrement_stepper(m_st, m_index, this->shape(), static_cast<size_type>(n), m_layout);
         }
         else
         {
-            stepper_tools<L>::increment_stepper(m_st, m_index, this->shape(), static_cast<size_type>(-n));
+            stepper_tools<L>::increment_stepper(m_st, m_index, this->shape(), static_cast<size_type>(-n), m_layout);
         }
         m_linear_index -= n;
         return *this;
@@ -1060,7 +1133,7 @@ namespace xt
     inline bool xiterator<St, S, L>::equal(const xiterator& rhs) const
     {
         XTENSOR_ASSERT(this->shape() == rhs.shape());
-        return m_linear_index == rhs.m_linear_index;
+        return m_linear_index == rhs.m_linear_index && m_layout == rhs.m_layout;
     }
 
     template <class St, class S, layout_type L>
