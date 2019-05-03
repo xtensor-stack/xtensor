@@ -217,60 +217,60 @@ namespace xt
         }
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto begin() noexcept;
+        auto begin(layout_type l = L) noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto end() noexcept;
+        auto end(layout_type l = L) noexcept;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto begin() const noexcept;
+        auto begin(layout_type l = L) const noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto end() const noexcept;
+        auto end(layout_type l = L) const noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto cbegin() const noexcept;
+        auto cbegin(layout_type l = L) const noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto cend() const noexcept;
+        auto cend(layout_type l = L) const noexcept;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rbegin() noexcept;
+        auto rbegin(layout_type l = L) noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rend() noexcept;
+        auto rend(layout_type l = L) noexcept;
 
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rbegin() const noexcept;
+        auto rbegin(layout_type l = L) const noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto rend() const noexcept;
+        auto rend(layout_type l = L) const noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto crbegin() const noexcept;
+        auto crbegin(layout_type l = L) const noexcept;
         template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        auto crend() const noexcept;
+        auto crend(layout_type l = L) const noexcept;
 
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        broadcast_iterator<S, L> begin(const S& shape) noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        broadcast_iterator<S, L> end(const S& shape) noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        broadcast_iterator<S, L> begin(const S& shape, layout_type l = L) noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        broadcast_iterator<S, L> end(const S& shape, layout_type l = L) noexcept;
 
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> begin(const S& shape) const noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> end(const S& shape) const noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> cbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_broadcast_iterator<S, L> cend(const S& shape) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_broadcast_iterator<S, L> begin(const S& shape, layout_type l = L) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_broadcast_iterator<S, L> end(const S& shape, layout_type l = L) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_broadcast_iterator<S, L> cbegin(const S& shape, layout_type l = L) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_broadcast_iterator<S, L> cend(const S& shape, layout_type l = L) const noexcept;
 
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        reverse_broadcast_iterator<S, L> rbegin(const S& shape) noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        reverse_broadcast_iterator<S, L> rend(const S& shape) noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        reverse_broadcast_iterator<S, L> rbegin(const S& shape, layout_type l = L) noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        reverse_broadcast_iterator<S, L> rend(const S& shape, layout_type l = L) noexcept;
 
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> rend(const S& shape) const noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape) const noexcept;
-        template <class S, layout_type L = XTENSOR_DEFAULT_TRAVERSAL>
-        const_reverse_broadcast_iterator<S, L> crend(const S& shape) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_reverse_broadcast_iterator<S, L> rbegin(const S& shape, layout_type l = L) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_reverse_broadcast_iterator<S, L> rend(const S& shape, layout_type l = L) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_reverse_broadcast_iterator<S, L> crbegin(const S& shape, layout_type l = L) const noexcept;
+        template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class S>
+        const_reverse_broadcast_iterator<S, L> crend(const S& shape, layout_type l = L) const noexcept;
 
         storage_iterator storage_begin() noexcept;
         storage_iterator storage_end() noexcept;
@@ -844,75 +844,81 @@ namespace xt
     //@{
     /**
      * Returns an iterator to the first element of the expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::begin() noexcept
+    inline auto xfunctor_applier_base<D>::begin(layout_type l) noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template begin<L>())>
-            (m_e.template begin<L>(), &m_functor);
+        return xfunctor_iterator<functor_type, decltype(m_e.template begin<L>(l))>
+            (m_e.template begin<L>(l), &m_functor);
     }
 
     /**
      * Returns an iterator to the element following the last element
      * of the expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::end() noexcept
+    inline auto xfunctor_applier_base<D>::end(layout_type l) noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template end<L>())>
-            (m_e.template end<L>(), &m_functor);
+        return xfunctor_iterator<functor_type, decltype(m_e.template end<L>(l))>
+            (m_e.template end<L>(l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the first element of the expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::begin() const noexcept
+    inline auto xfunctor_applier_base<D>::begin(layout_type l) const noexcept
     {
-        return this->template cbegin<L>();
+        return this->template cbegin<L>(l);
     }
 
     /**
      * Returns a constant iterator to the element following the last element
      * of the expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::end() const noexcept
+    inline auto xfunctor_applier_base<D>::end(layout_type l) const noexcept
     {
-        return this->template cend<L>();
+        return this->template cend<L>(l);
     }
 
     /**
      * Returns a constant iterator to the first element of the expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::cbegin() const noexcept
+    inline auto xfunctor_applier_base<D>::cbegin(layout_type l) const noexcept
     {
-        return xfunctor_iterator<const functor_type, decltype(m_e.template cbegin<L>())>
-            (m_e.template cbegin<L>(), &m_functor);
+        return xfunctor_iterator<const functor_type, decltype(m_e.template cbegin<L>(l))>
+            (m_e.template cbegin<L>(l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the element following the last element
      * of the expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::cend() const noexcept
+    inline auto xfunctor_applier_base<D>::cend(layout_type l) const noexcept
     {
-        return xfunctor_iterator<const functor_type, decltype(m_e.template cend<L>())>
-            (m_e.template cend<L>(), &m_functor);
+        return xfunctor_iterator<const functor_type, decltype(m_e.template cend<L>(l))>
+            (m_e.template cend<L>(l), &m_functor);
     }
     //@}
 
@@ -924,84 +930,90 @@ namespace xt
      * Returns a constant iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::begin(const S& shape) noexcept -> broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::begin(const S& shape, layout_type l) noexcept -> broadcast_iterator<S, L>
     {
-        return broadcast_iterator<S, L>(m_e.template begin<S, L>(shape), &m_functor);
+        return broadcast_iterator<S, L>(m_e.template begin<L, S>(shape, l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the element following the last element of the
      * expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::end(const S& shape) noexcept -> broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::end(const S& shape, layout_type l) noexcept -> broadcast_iterator<S, L>
     {
-        return broadcast_iterator<S, L>(m_e.template end<S, L>(shape), &m_functor);
+        return broadcast_iterator<S, L>(m_e.template end<L, S>(shape, l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::begin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::begin(const S& shape, layout_type l) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return cbegin<S, L>(shape);
+        return cbegin<L, S>(shape, l);
     }
 
     /**
      * Returns a constant iterator to the element following the last element of the
      * expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::end(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::end(const S& shape, layout_type l) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return cend<S, L>(shape);
+        return cend<L, S>(shape, l);
     }
 
     /**
      * Returns a constant iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::cbegin(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::cbegin(const S& shape, layout_type l) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return const_broadcast_iterator<S, L>(m_e.template cbegin<S, L>(shape), &m_functor);
+        return const_broadcast_iterator<S, L>(m_e.template cbegin<L, S>(shape, l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the element following the last element of the
      * expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::cend(const S& shape) const noexcept -> const_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::cend(const S& shape, layout_type l) const noexcept -> const_broadcast_iterator<S, L>
     {
-        return const_broadcast_iterator<S, L>(m_e.template cend<S, L>(shape), &m_functor);
+        return const_broadcast_iterator<S, L>(m_e.template cend<L, S>(shape, l), &m_functor);
     }
     //@}
 
@@ -1011,75 +1023,81 @@ namespace xt
     //@{
     /**
      * Returns an iterator to the first element of the reversed expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin() noexcept
+    inline auto xfunctor_applier_base<D>::rbegin(layout_type l) noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template rbegin<L>())>
-            (m_e.template rbegin<L>(), &m_functor);
+        return xfunctor_iterator<functor_type, decltype(m_e.template rbegin<L>(l))>
+            (m_e.template rbegin<L>(l), &m_functor);
     }
 
     /**
      * Returns an iterator to the element following the last element
      * of the reversed expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rend() noexcept
+    inline auto xfunctor_applier_base<D>::rend(layout_type l) noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template rend<L>())>
-            (m_e.template rend<L>(), &m_functor);
+        return xfunctor_iterator<functor_type, decltype(m_e.template rend<L>(l))>
+            (m_e.template rend<L>(l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the first element of the reversed expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin() const noexcept
+    inline auto xfunctor_applier_base<D>::rbegin(layout_type l) const noexcept
     {
-        return this->template crbegin<L>();
+        return this->template crbegin<L>(l);
     }
 
     /**
      * Returns a constant iterator to the element following the last element
      * of the reversed expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::rend() const noexcept
+    inline auto xfunctor_applier_base<D>::rend(layout_type l) const noexcept
     {
-        return this->template crend<L>();
+        return this->template crend<L>(l);
     }
 
     /**
      * Returns a constant iterator to the first element of the reversed expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::crbegin() const noexcept
+    inline auto xfunctor_applier_base<D>::crbegin(layout_type l) const noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template rbegin<L>())>
-            (m_e.template rbegin<L>(), &m_functor);
+        return xfunctor_iterator<functor_type, decltype(m_e.template rbegin<L>(l))>
+            (m_e.template rbegin<L>(l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the element following the last element
      * of the reversed expression.
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
     template <layout_type L>
-    inline auto xfunctor_applier_base<D>::crend() const noexcept
+    inline auto xfunctor_applier_base<D>::crend(layout_type l) const noexcept
     {
-        return xfunctor_iterator<functor_type, decltype(m_e.template rend<L>())>
-            (m_e.template rend<L>(), &m_functor);
+        return xfunctor_iterator<functor_type, decltype(m_e.template rend<L>(l))>
+            (m_e.template rend<L>(l), &m_functor);
     }
     //@}
 
@@ -1090,84 +1108,90 @@ namespace xt
      * Returns an iterator to the first element of the expression. The
      * iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::rbegin(const S& shape, layout_type l) noexcept -> reverse_broadcast_iterator<S, L>
     {
-        return reverse_broadcast_iterator<S, L>(m_e.template rbegin<S, L>(shape), &m_functor);
+        return reverse_broadcast_iterator<S, L>(m_e.template rbegin<L, S>(shape, l), &m_functor);
     }
 
     /**
      * Returns an iterator to the element following the last element of the
      * reversed expression. The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rend(const S& shape) noexcept -> reverse_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::rend(const S& shape, layout_type l) noexcept -> reverse_broadcast_iterator<S, L>
     {
-        return reverse_broadcast_iterator<S, L>(m_e.template rend<S, L>(shape), &m_functor);
+        return reverse_broadcast_iterator<S, L>(m_e.template rend<L, S>(shape, l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the first element of the reversed expression.
      * The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rbegin(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::rbegin(const S& shape, layout_type l) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
-        return crbegin<S, L>(shape);
+        return crbegin<L, S>(shape, l);
     }
 
     /**
      * Returns a constant iterator to the element following the last element
      * of the reversed expression.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::rend(const S& /*shape*/) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::rend(const S& shape, layout_type l) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
-        return crend<S, L>();
+        return crend<L, S>(shape, l);
     }
 
     /**
      * Returns a constant iterator to the first element of the reversed expression.
      * The iteration is broadcasted to the specified shape.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::crbegin(const S& /*shape*/) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::crbegin(const S& shape, layout_type l) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
-        return const_reverse_broadcast_iterator<S, L>(m_e.template crbegin<S, L>(), &m_functor);
+        return const_reverse_broadcast_iterator<S, L>(m_e.template crbegin<L, S>(shape, l), &m_functor);
     }
 
     /**
      * Returns a constant iterator to the element following the last element
      * of the reversed expression.
      * @param shape the shape used for broadcasting
+     * @param l dynamic layout used for the traversal, default value is \c L.
      * @tparam S type of the \c shape parameter.
      * @tparam L order used for the traversal. Default value is \c XTENSOR_DEFAULT_TRAVERSAL.
      */
     template <class D>
-    template <class S, layout_type L>
-    inline auto xfunctor_applier_base<D>::crend(const S& shape) const noexcept -> const_reverse_broadcast_iterator<S, L>
+    template <layout_type L, class S>
+    inline auto xfunctor_applier_base<D>::crend(const S& shape, layout_type l) const noexcept -> const_reverse_broadcast_iterator<S, L>
     {
-        return const_reverse_broadcast_iterator<S, L>(m_e.template crend<S, L>(shape), &m_functor);
+        return const_reverse_broadcast_iterator<S, L>(m_e.template crend<L, S>(shape, l), &m_functor);
     }
     //@}
 
