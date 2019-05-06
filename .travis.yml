@@ -136,6 +136,14 @@ install:
       elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         MINCONDA_OS=$MINCONDA_OSX;
       fi
+    # download & install coverity tool
+    - if [[ "$COVERITY_SCAN" == 1 ]]; then
+        wget https://scan.coverity.com/download/linux64 --post-data "token=dhiOJUHtbFzXmULLZQCwiQ&project=xTensor" -O coverity_tool.tgz
+        tar xaf coverity_tool.tgz
+        rm coverity_tool.tgz
+        mv cov-analysis-linux64-* cov-analysis-linux64
+        export PATH="${PATH}:${PWD}/cov-analysis-linux64/bin"
+      fi
     - wget "http://repo.continuum.io/miniconda/Miniconda3-$MINCONDA_VERSION-$MINCONDA_OS.sh" -O miniconda.sh;
     - bash miniconda.sh -b -p $HOME/miniconda
     - export PATH="$HOME/miniconda/bin:$PATH"
@@ -146,14 +154,6 @@ install:
     - conda install xtl==0.6.4 xsimd nlohmann_json -c conda-forge
     - if [[ "$ENABLE_TBB" == 1 ]]; then
         conda install tbb-devel -c conda-forge;
-      fi
-    # download & install coverity tool
-    - if [[ "$COVERITY_SCAN" == 1 ]]; then
-        wget https://scan.coverity.com/download/linux64 --post-data "token=dhiOJUHtbFzXmULLZQCwiQ&project=xTensor" -O coverity_tool.tgz
-        tar xaf coverity_tool.tgz
-        rm coverity_tool.tgz
-        mv cov-analysis-linux64-* cov-analysis-linux64
-        export PATH="${PATH}:${PWD}/cov-analysis-linux64/bin"
       fi
     # Testing
     - mkdir build
