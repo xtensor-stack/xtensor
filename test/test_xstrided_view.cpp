@@ -740,4 +740,36 @@ namespace xt
         EXPECT_EQ(v(0), 0.0);
         EXPECT_EQ(v(1), 20.0);
     }
+
+    TEST(xstrided_view, reshape_strided)
+    {
+        xtensor<int, 2> a = {{  1,  2,  3,  4,  5,  6,  7,  8 },
+                             { 11, 12, 13, 14, 15, 16, 17, 18 }};
+
+        auto v1 = view(a, all(), range(0, 4));
+        auto rv1 = reshape_view(v1, {2, 2 ,2});
+        if(XTENSOR_DEFAULT_LAYOUT==xt::layout_type::row_major)
+        {
+            xtensor<int, 3> expected = {{{1, 2}, {3, 4}}, {{11, 12}, {13, 14}}};
+            EXPECT_EQ(expected, rv1);
+        }
+        else
+        {
+            xtensor<int, 3> expected = {{{1, 3}, {2, 4}}, {{11, 13}, {12, 14}}};
+            EXPECT_EQ(expected, rv1);
+        }
+
+        auto rv2 = reshape_view(a, {2, 2, 4});
+        auto v2 = strided_view(rv2, {0, 0, all()});
+        if(XTENSOR_DEFAULT_LAYOUT==xt::layout_type::row_major)
+        {
+            xtensor<int, 1> expected2 = {1, 2, 3 ,4};
+            EXPECT_EQ(expected2, v2);
+        }
+        else
+        {
+            xtensor<int, 1> expected2 = {1, 3, 5 ,7};
+            EXPECT_EQ(expected2, v2);
+        }
+    }
 }

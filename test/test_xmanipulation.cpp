@@ -107,14 +107,11 @@ namespace xt
         EXPECT_EQ(flat, flat3);
     }
     
-    TEST(xstrided_view, flatten)
+    TEST(xmanipulation, flatten)
     {
         xtensor<double, 3> a = linspace<double>(1., 100., 100).reshape({2, 5, 10});
-        std::cout << a << std::endl;
         auto v = view(a, range(0, 2), range(0, 3), range(0, 3));
-        std::cout << v << std::endl;
         xtensor<double, 1> fl = flatten<XTENSOR_DEFAULT_LAYOUT>(v);
-        std::cout << fl << std::endl;
         xtensor<double, 1> expected_rm = {  1.,  2., 3., 11., 12., 13., 21., 22., 23.,
                                            51., 52., 53, 61., 62., 63., 71., 72., 73. };
         xtensor<double, 1> expected_cm = { 1.,  2.,  3.,  4.,  5.,  6.,
