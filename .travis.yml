@@ -176,11 +176,6 @@ install:
     - if [[ "$COVERITY_SCAN" == 1]]; then
         cov-build --dir cov-int make -j2 test_xtensor_lib;
         tar czvf cov-int.tgz cov-int;
-        curl --form token=dhiOJUHtbFzXmULLZQCwiQ
-             --form email=jaeho.kim@siemens-healthineers.com
-             --form file=@cov-int.tgz
-             --form version="CoverityBranch"
-             --form description="Automatic Coverity Scan build from Coverity branch" https://scan.coverity.com/builds?project=xTensor;
       else
         make -j2 test_xtensor_lib
       fi
