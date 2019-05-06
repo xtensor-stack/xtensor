@@ -148,7 +148,7 @@ install:
         conda install tbb-devel -c conda-forge;
       fi
     # download & install coverity tool
-    -|
+    - |
      if [[ "$COVERITY_SCAN" == 1 ]]; then
         wget https://scan.coverity.com/download/linux64 --post-data "token=dhiOJUHtbFzXmULLZQCwiQ&project=xTensor" -O coverity_tool.tgz
         tar xaf coverity_tool.tgz
