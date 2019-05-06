@@ -74,7 +74,7 @@ install:
       fi
 
     # build & prepare tarball with coverity scanner
-    - if [[ "$COVERITY_SCAN" == 1]]; then
+    - if [[ "$COVERITY_SCAN" == 1 ]]; then
         cov-build --dir cov-int make -j2 test_xtensor_lib;
         tar czvf cov-int.tgz cov-int;
       else
