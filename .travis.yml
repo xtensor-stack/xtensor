@@ -51,7 +51,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
-      env: COMPILER=gcc GCC=7 
+      env: COMPILER=gcc GCC=7 COVERITY_SCAN=1
     - os: linux
       addons:
         apt:
@@ -147,6 +147,14 @@ install:
     - if [[ "$ENABLE_TBB" == 1 ]]; then
         conda install tbb-devel -c conda-forge;
       fi
+    # download & install coverity tool
+    - if [[ "$COVERITY_SCAN" == 1 ]]; then
+        wget https://scan.coverity.com/download/linux64 --post-data "token=dhiOJUHtbFzXmULLZQCwiQ&project=xTensor" -O coverity_tool.tgz
+        tar xaf coverity_tool.tgz
+        rm coverity_tool.tgz
+        mv cov-analysis-linux64-* cov-analysis-linux64
+        export PATH="${PATH}:${PWD}/cov-analysis-linux64/bin"
+      fi
     # Testing
     - mkdir build
     - cd build
@@ -163,7 +171,20 @@ install:
       else
         cmake -DXTENSOR_USE_XSIMD=ON -DDOWNLOAD_GTEST=ON ..;
       fi
-    - make -j2 test_xtensor_lib
+
+    # build & prepare tarball with coverity scanner
+    - if [[ "$COVERITY_SCAN" == 1]]; then
+        cov-build --dir cov-int make -j2 test_xtensor_lib
+        tar czvf cov-int.tgz cov-int
+        curl --form token=dhiOJUHtbFzXmULLZQCwiQ \
+             --form email=jaeho.kim@siemens-healthineers.com \
+             --form file=@cov-int.tgz \
+             --form version="CoverityBranch" \
+             --form description="Automatic Coverity Scan build from Coverity branch" https://scan.coverity.com/builds?project=xTensor
+      else
+        make -j2 test_xtensor_lib
+      fi
+
     - if [[ "$BUILD_BENCHMARK" == 1 ]]; then
         make -j2 benchmark_xtensor ;
       fi
