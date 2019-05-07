@@ -105,14 +105,10 @@ find_package(Threads)
 
 include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 
+# for unit test and coverity scan
 set(COMMON_BASE
-    main.cpp
     test_common.hpp
     test_xsemantic.hpp
-)
-
-# for coverity scan
-set(XTENSOR_TESTS_CORE
     test_xarray.cpp
     test_xbroadcast.cpp
     test_xeval.cpp
@@ -132,8 +128,8 @@ set(XTENSOR_TESTS_CORE
     test_xutils.cpp
 )
 
-join(XTENSOR_TESTS
-    ${XTENSOR_TESTS_CORE}
+set(XTENSOR_TESTS
+    main.cpp
     test_xaccumulator.cpp
     test_xadapt.cpp
     test_xadaptor_semantic.cpp
@@ -230,16 +226,15 @@ foreach(filename IN LISTS XTENSOR_TESTS)
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
 endforeach()
 
-add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
-add_executable(coverity_lib ${COMMON_BASE} ${XTENSOR_TESTS_CORE} ${XTENSOR_HEADERS})
+add_library(test_xtensor_core_lib ${COMMON_BASE} ${XTENSOR_HEADERS})
+add_executable(test_xtensor_lib ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
-target_include_directories(coverity_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
-    add_dependencies(test_xtensor_lib gtest_main)
-	add_dependencies(coverity_lib gtest_main)
+    add_dependencies(test_xtensor_lib test_xtensor_core_lib gtest_main)
 endif()
-target_link_libraries(test_xtensor_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(coverity_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_core_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_lib xtensor test_xtensor_core_lib ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
-add_custom_target(xtest COMMAND coverity_lib DEPENDS coverity_lib)
+add_custom_target(xtest COMMAND coverity_scan DEPENDS test_xtensor_core_lib)
