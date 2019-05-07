@@ -149,12 +149,17 @@ install:
       fi
     # download & install coverity tool
     - |
-     if [[ "$COVERITY_SCAN" == 1 ]]; then
+      if [[ "$COVERITY_SCAN" == 1 ]]; then
         wget https://scan.coverity.com/download/linux64 --post-data "token=dhiOJUHtbFzXmULLZQCwiQ&project=xTensor" -O coverity_tool.tgz
         tar xaf coverity_tool.tgz
         rm coverity_tool.tgz
         mv cov-analysis-linux64-* cov-analysis-linux64
         export PATH="${PATH}:${PWD}/cov-analysis-linux64/bin"
+        if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+          if [[ "$COMPILER" == "gcc" ]]; then
+            cov-configure --gcc
+          fi
+        fi
       fi
     # Testing
     - mkdir build
@@ -183,7 +188,7 @@ install:
              --form file=@cov-int.tgz \
              --form version="CoverityBranch" \
              --form description="Automatic Coverity Scan build from Coverity branch" \
-             https://scan.coverity.com/builds?project=xTensor 
+             https://scan.coverity.com/builds?project=xTensor
       else
         make -j2 test_xtensor_lib
       fi
