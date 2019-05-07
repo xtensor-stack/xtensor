@@ -115,8 +115,7 @@ namespace xt
                 new_layout = transpose_layout_noexcept(e.layout());
             }
 
-            using view_type = typename select_strided_view<std::decay_t<E>>::template type<xclosure_t<E>, shape_type>;
-            return view_type(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), get_offset(e), new_layout);
+            return strided_view(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), get_offset(e), new_layout);
         }
 
         template <class E, class S>
@@ -171,8 +170,7 @@ namespace xt
 
         layout_type new_layout = detail::transpose_layout_noexcept(e.layout());
 
-        using view_type = typename select_strided_view<std::decay_t<E>>::template type<xclosure_t<E>, shape_type>;
-        return view_type(std::forward<E>(e), std::move(shape), std::move(strides), detail::get_offset(e), new_layout);
+        return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), detail::get_offset(e), new_layout);
     }
 
     /**
@@ -296,8 +294,7 @@ namespace xt
         std::copy_if(old_strides.cbegin(), old_strides.cend(), std::back_inserter(new_strides),
                      [](std::ptrdiff_t i) { return i != 0; });
 
-        using view_type = xstrided_view<xclosure_t<E>, dynamic_shape<std::size_t>>;
-        return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
+        return strided_view(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
     }
 
     namespace detail
@@ -320,8 +317,7 @@ namespace xt
                 }
             }
 
-            using view_type = xstrided_view<xclosure_t<E>, dynamic_shape<std::size_t>>;
-            return view_type(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
+            return strided_view(std::forward<E>(e), std::move(new_shape), std::move(new_strides), 0, e.layout());
         }
 
         template <class E, class S>
