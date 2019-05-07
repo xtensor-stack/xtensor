@@ -11,7 +11,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: COMPILER=gcc GCC=4.9 COVERITY_SCAN=1
+      env: COMPILER=gcc GCC=4.9
     - os: linux
       addons:
         apt:
