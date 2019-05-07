@@ -181,7 +181,7 @@ install:
     # build & prepare tarball with coverity scanner
     - |
       if [[ "$COVERITY_SCAN" == 1 ]]; then
-        cov-build --dir cov-int make -j2 coverity_lib
+        cov-build --dir cov-int make -j2 coverity_scan
         tar czvf cov-int.tgz cov-int
         curl --form token=dhiOJUHtbFzXmULLZQCwiQ \
              --form email=jaeho.kim@siemens-healthineers.com \
@@ -199,7 +199,7 @@ install:
     - cd test
 script:
     - if [[ "$COVERITY_SCAN" == 1 ]]; then
-        ./coverity_lib;
+        echo "Coverity scan";
       else
         ./test_xtensor_lib;
       fi
