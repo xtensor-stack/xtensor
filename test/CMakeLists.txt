@@ -236,5 +236,4 @@ endif()
 target_link_libraries(test_xtensor_core_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 target_link_libraries(test_xtensor_lib xtensor test_xtensor_core_lib ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
-add_custom_target(xtest COMMAND coverity_scan DEPENDS test_xtensor_core_lib)
+add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib
