@@ -56,9 +56,9 @@ endif()
 # =====
 
 set(XTENSOR_HEADERS
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xaccessible.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xaccumulator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xadapt.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xaccessible.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xaccumulator.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xadapt.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xarray.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_iterator.hpp
@@ -67,7 +67,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcomplex.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xcontainer.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xcsv.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xdynamic_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xeval.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xexception.hpp
@@ -78,29 +78,29 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunction.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xfunctor_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xgenerator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xhistogram.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xhistogram.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xindex_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xinfo.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterable.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xjson.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xjson.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xlayout.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmanipulation.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_view.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xmasked_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xmath.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xmime.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xnpy.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoffset_view.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xmime.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xnoalias.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xnorm.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xnpy.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xoffset_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xoperation.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_base.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_storage.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xpad.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xoptional.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_base.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xoptional_assembly_storage.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xpad.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
@@ -114,11 +114,11 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_config.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_forward.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_simd.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xtensor_simd.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xutils.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
+    #${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
 )
 
 add_library(xtensor INTERFACE)
