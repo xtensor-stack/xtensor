@@ -197,8 +197,5 @@ install:
       fi
     - cd test
 script:
-    - if [[ "$COVERITY_SCAN" == 1 ]]; then
-        echo "Coverity scan";
-      else
-        ./test_xtensor_lib;
-      fi
+    - ./test_xtensor_lib
+    
