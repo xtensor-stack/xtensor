@@ -105,7 +105,9 @@ find_package(Threads)
 
 include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 
-# for unit test and coverity scan
+# For unit test and coverity scan. 
+# The Coverity scanner takes time and it could cause build timeout(10mins) in Travis CI. 
+# Therefore, we need keep this small but complete for analysis.
 set(COMMON_BASE
     test_common.hpp
     test_xsemantic.hpp
