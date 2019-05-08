@@ -280,4 +280,16 @@ namespace xt
 
         EXPECT_EQ(res, exp);
     }
+
+    TEST(xcomplex, exp)
+    {
+        xt::xarray<float> ph = {274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f};
+        xt::xarray<std::complex<float>> input = ph * std::complex<float>(0, 1.f);
+        xt::xarray<std::complex<float>> res = xt::exp(input);
+        auto expected = xt::xarray<std::complex<float>>::from_shape({ size_t(8) });
+        std::transform(input.cbegin(), input.cend(), expected.begin(), [](const std::complex<float>& arg) {
+            return std::exp(arg);
+        });
+        EXPECT_EQ(expected, res);
+    }
 }
