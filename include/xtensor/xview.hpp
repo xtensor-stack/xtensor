@@ -1518,7 +1518,8 @@ namespace xt
             return xt::value(s, 0);
         };
 
-        auto first_copy = first;
+        auto s = static_cast<diff_type>((std::min)(static_cast<size_type>(std::distance(first, last)), this->dimension()));
+        auto first_copy = last - s;
         for (size_type i = 0; i != m_e.dimension(); ++i)
         {
             size_type k = newaxis_skip<S...>(i);

@@ -1455,4 +1455,13 @@ namespace xt
         }
         EXPECT_TRUE(xt::allclose(x_view, float(7) + x_orig));
     }
+
+    TEST(xview, element)
+    {
+        xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
+        auto v = view(a, 0);
+        std::array<std::size_t, 2> idx = { 0, 1 };
+        int res = v.element(idx.cbegin(), idx.cend());
+        EXPECT_EQ(res, 2);
+    }
 }
