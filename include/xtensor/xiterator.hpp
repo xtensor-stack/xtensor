@@ -613,7 +613,7 @@ namespace xt
                 }
             }
         }
-        if (i == 0)
+        if (i == 0 && n != 0)
         {
             std::copy(shape.cbegin(), shape.cend(), index.begin());
             stepper.to_end(layout_type::row_major);
@@ -691,7 +691,7 @@ namespace xt
                 }
             }
         }
-        if (i == 0)
+        if (i == 0 && n != 0)
         {
             stepper.to_begin();
         }
@@ -772,7 +772,7 @@ namespace xt
             }
             ++i;
         }
-        if (i == size)
+        if (i == size && n != 0)
         {
             std::copy(shape.cbegin(), shape.cend(), index.begin());
             stepper.to_end(layout_type::column_major);
@@ -853,7 +853,7 @@ namespace xt
             }
             ++i;
         }
-        if (i == size)
+        if (i == size && n != 0)
         {
             stepper.to_begin();
         }

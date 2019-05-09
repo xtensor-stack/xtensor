@@ -772,4 +772,19 @@ namespace xt
             EXPECT_EQ(expected2, v2);
         }
     }
+
+    TEST(xstrided_view, zerod_view_iterator)
+    {
+        xt::xarray<int> a{ { { 1, 2 },{ 3, 4 },{ 5, 6 } },{ { 7, 8 },{ 9, 10 },{ 11, 12 } } };
+        xt::xstrided_slice_vector sl = { 1, 0, 1 };
+
+        auto vi = xt::strided_view(a, sl);
+        auto it0 = vi.cbegin<layout_type::row_major>();
+        auto it1 = it0 + 0;
+        EXPECT_EQ(*it0, *it1);
+
+        auto it2 = vi.cbegin<layout_type::column_major>();
+        auto it3 = it2 + 0;
+        EXPECT_EQ(*it2, *it3);
+    }
 }
