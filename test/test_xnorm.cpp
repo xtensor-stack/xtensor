@@ -119,14 +119,32 @@ namespace xt
     {
         xarray<std::complex<double>> a = -ones<std::complex<double>>({9});
 
-        EXPECT_EQ(norm_l0(a)(), 9u);
-        EXPECT_EQ(norm_lp_to_p(a, 0.0)(), 9.0);
-        EXPECT_EQ(norm_l1(a)(), 9.0);
-        EXPECT_EQ(norm_lp(a, 1.0)(), 9.0);
-        EXPECT_EQ(norm_sq(a)(), 9.0);
-        EXPECT_EQ(norm_l2(a)(), 3.0);
-        EXPECT_EQ(norm_lp(a, 2.0)(), 3.0);
-        EXPECT_EQ(norm_linf(a)(), 1.0);
+        auto l0_res = norm_l0(a)();
+        auto lp_to_p_res = norm_lp_to_p(a, 0.0)();
+        auto l1_res = norm_l1(a)();
+        auto lp_res1 = norm_lp(a, 1.0)();
+        auto sq_res = norm_sq(a)();
+        auto l2_res = norm_l2(a)();
+        auto lp_res2 = norm_lp(a, 2.0)();
+        auto linf_res = norm_linf(a)();
+
+        EXPECT_TRUE((std::is_same<decltype(l0_res), long long unsigned int>::value));
+        EXPECT_TRUE((std::is_same<decltype(lp_to_p_res), double>::value));
+        EXPECT_TRUE((std::is_same<decltype(l1_res), double>::value));
+        EXPECT_TRUE((std::is_same<decltype(lp_res1), double>::value));
+        EXPECT_TRUE((std::is_same<decltype(sq_res), double>::value));
+        EXPECT_TRUE((std::is_same<decltype(l2_res), double>::value));
+        EXPECT_TRUE((std::is_same<decltype(lp_res2), double>::value));
+        EXPECT_TRUE((std::is_same<decltype(linf_res), double>::value));
+
+        EXPECT_EQ(l0_res, 9u);
+        EXPECT_EQ(lp_to_p_res, 9.0);
+        EXPECT_EQ(l1_res, 9.0);
+        EXPECT_EQ(lp_res1, 9.0);
+        EXPECT_EQ(sq_res, 9.0);
+        EXPECT_EQ(l2_res, 3.0);
+        EXPECT_EQ(lp_res2, 3.0);
+        EXPECT_EQ(linf_res, 1.0);
 
         EXPECT_EQ(norm_l0(a, {0}, evaluation_strategy::immediate)(), 9u);
         EXPECT_EQ(norm_lp_to_p(a, 0.0, {0}, evaluation_strategy::immediate)(), 9.0);

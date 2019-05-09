@@ -13,6 +13,7 @@
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xnorm.hpp"
 
 namespace xt
 {

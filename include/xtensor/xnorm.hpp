@@ -305,7 +305,8 @@ namespace xt
     template <class T>
     inline auto norm_sq(const std::complex<T>& t) noexcept
     {
-        return std::norm(t);
+        // Does not use std::norm since it returns a std::complex on OSX
+        return t.real() * t.real() + t.imag() * t.imag();
     }
 
     /**
@@ -366,6 +367,24 @@ namespace xt
     }
 #endif
 
+    namespace detail
+    {
+        template <class T>
+        struct norm_value_type
+        {
+            using type = T;
+        };
+
+        template <class T>
+        struct norm_value_type<std::complex<T>>
+        {
+            using type = T;
+        };
+
+        template <class T>
+        using norm_value_type_t = typename norm_value_type<T>::type;
+    }
+
 #define XTENSOR_EMPTY
 #define XTENSOR_COMMA ,
 #define XTENSOR_NORM_FUNCTION(NAME, RESULT_TYPE, REDUCE_EXPR, REDUCE_OP, MERGE_FUNC) \
@@ -374,7 +393,7 @@ namespace xt
     inline auto NAME(E&& e, X&& axes, EVS es = EVS()) noexcept                       \
     {                                                                                \
         using value_type = typename std::decay_t<E>::value_type;                     \
-        using result_type = RESULT_TYPE;                                             \
+        using result_type = detail::norm_value_type_t<RESULT_TYPE>;                  \
                                                                                      \
         auto reduce_func = [](result_type const& r, value_type const& v) {           \
             return REDUCE_EXPR(r REDUCE_OP NAME(v));                                 \
