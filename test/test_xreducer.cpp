@@ -599,4 +599,17 @@ namespace xt
         auto rex0 = xt::prod(a, {1, 2}, initial(0));
         EXPECT_TRUE(xt::all(equal(rex0, 0.)));
     }
+
+    TEST(xreducer, ones_first)
+    {
+        auto a = xt::ones<int>(std::vector<int>({ 1,1,2,4 }));
+        std::vector<int> arraxis = { 1 };
+        auto result = xt::sum(a, arraxis, xt::keep_dims | xt::evaluation_strategy::immediate);
+        EXPECT_EQ(a, result);
+
+        std::vector<int> arraxis2 = { 1, 2 };
+        auto res2 = xt::sum(a, arraxis2, xt::keep_dims | xt::evaluation_strategy::immediate);
+        xt::xarray<int> expected = { {{{2, 2, 2, 2}}} };
+        EXPECT_EQ(expected, res2);
+    }
 }
