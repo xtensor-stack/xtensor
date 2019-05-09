@@ -11,7 +11,10 @@
 
 #include <cstddef>
 #include <functional>
+#include <limits>
 #include <numeric>
+
+#include <xtl/xsequence.hpp>
 
 #include "xexception.hpp"
 #include "xshape.hpp"
@@ -73,6 +76,9 @@ namespace xt
     /***********************
      * broadcast functions *
      ***********************/
+
+    template <class S, class size_type>
+    S uninitialized_shape(size_type size);
 
     template <class S1, class S2>
     bool broadcast_shape(const S1& input, S2& output);
@@ -496,6 +502,14 @@ namespace xt
         return ravel_from_strides(static_cast<strides_value_type>(index), strides);
     }
 
+    template <class S, class stype>
+    inline S uninitialized_shape(stype size)
+    {
+        using value_type = typename S::value_type;
+        using size_type = typename S::size_type;
+        return xtl::make_sequence<S>(static_cast<size_type>(size), std::numeric_limits<value_type>::max());
+    }
+
     template <class S1, class S2>
     inline bool broadcast_shape(const S1& input, S2& output)
     {
@@ -511,10 +525,10 @@ namespace xt
         }
         for (; input_index != 0; --input_index, --output_index)
         {
-            // First case: output = (0, 0, ...., 0)
+            // First case: output = (MAX, MAX, ...., MAX)
             // output is a new shape that has not been through
             // the broadcast process yet; broadcast is trivial
-            if (output[output_index - 1] == 0)
+            if (output[output_index - 1] == std::numeric_limits<value_type>::max())
             {
                 output[output_index - 1] = static_cast<value_type>(input[input_index - 1]);
             }

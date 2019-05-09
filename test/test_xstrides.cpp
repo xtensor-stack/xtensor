@@ -12,6 +12,43 @@
 
 namespace xt
 {
+    TEST(xstrides, broadcast_shape)
+    {
+        using shape_type = std::vector<std::size_t>;
+        shape_type s1 = { 2, 4, 3 };
+        shape_type s2 = { 2, 1, 3 };
+        shape_type s3 = { 2, 0, 3 };
+        shape_type s4 = uninitialized_shape<shape_type>(3);
+
+        shape_type s5 = s2;
+        bool t1 = broadcast_shape(s1, s5);
+        EXPECT_EQ(s5, s1);
+        EXPECT_FALSE(t1);
+
+        shape_type s6 = s2;
+        bool t2 = broadcast_shape(s3, s6);
+        EXPECT_EQ(s6, s3);
+        EXPECT_FALSE(t2);
+
+        shape_type s7 = s3;
+        EXPECT_ANY_THROW(broadcast_shape(s1, s7));
+
+        shape_type s8 = s4;
+        bool t3 = broadcast_shape(s1, s8);
+        EXPECT_EQ(s8, s1);
+        EXPECT_TRUE(t3);
+
+        shape_type s9 = s4;
+        bool t4 = broadcast_shape(s2, s9);
+        EXPECT_EQ(s9, s2);
+        EXPECT_TRUE(t4);
+
+        shape_type s10 = s4;
+        bool t5 = broadcast_shape(s3, s10);
+        EXPECT_EQ(s10, s3);
+        EXPECT_TRUE(t5);
+    }
+
     TEST(xstrides, unravel_from_strides)
     {
         {

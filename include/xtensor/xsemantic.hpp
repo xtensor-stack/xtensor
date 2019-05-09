@@ -641,7 +641,7 @@ namespace xt
             using index_type = xindex_type_t<typename xfunction<F, R, CT...>::shape_type>;
             using size_type = typename index_type::size_type;
             size_type size = rhs.dimension();
-            index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
+            index_type shape = uninitialized_shape<index_type>(size);
             bool trivial_broadcast = rhs.broadcast_shape(shape, true);
             return trivial_broadcast;
         }

@@ -77,7 +77,7 @@ namespace xt
 
         {
             SCOPED_TRACE("same shape");
-            shape_type sh(3, size_t(0));
+            shape_type sh = uninitialized_shape<shape_type>(3);
             bool trivial = (f.m_a + f.m_a).broadcast_shape(sh);
             EXPECT_EQ(sh, f.m_a.shape());
             ASSERT_TRUE(trivial);
@@ -85,7 +85,7 @@ namespace xt
 
         {
             SCOPED_TRACE("different shape");
-            shape_type sh(3, size_t(0));
+            shape_type sh = uninitialized_shape<shape_type>(3);
             bool trivial = (f.m_a + f.m_b).broadcast_shape(sh);
             EXPECT_EQ(sh, f.m_a.shape());
             ASSERT_FALSE(trivial);
@@ -93,7 +93,7 @@ namespace xt
 
         {
             SCOPED_TRACE("different dimensions");
-            shape_type sh(4, size_t(0));
+            shape_type sh = uninitialized_shape<shape_type>(4);
             bool trivial = (f.m_a + f.m_c).broadcast_shape(sh);
             EXPECT_EQ(sh, f.m_c.shape());
             ASSERT_FALSE(trivial);
