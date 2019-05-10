@@ -612,4 +612,15 @@ namespace xt
         xt::xarray<int> expected = { {{{2, 2, 2, 2}}} };
         EXPECT_EQ(expected, res2);
     }
+
+    TEST(xreducer, empty_axes)
+    {
+        xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
+        std::vector<std::size_t> axes = {};
+        auto res0 = xt::sum(a, axes);
+        auto res1 = xt::sum(a, axes, xt::keep_dims | xt::evaluation_strategy::immediate);
+
+        EXPECT_EQ(res0, a);
+        EXPECT_EQ(res1, a);
+    }
 }
