@@ -787,4 +787,13 @@ namespace xt
         auto it3 = it2 + 0;
         EXPECT_EQ(*it2, *it3);
     }
+
+    TEST(xstrided_view, view_on_const)
+    {
+        const xtensor<int, 1> a = {1, 2, 3, 4};
+        auto v = strided_view(a, {all()});
+        auto d = v.data();
+        EXPECT_TRUE((std::is_same<decltype(d), const int*>::value));
+        EXPECT_EQ(d[0], 1);
+    }
 }

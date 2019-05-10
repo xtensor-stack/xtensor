@@ -162,10 +162,10 @@ namespace xt
         const storage_type& storage() const noexcept;
 
         template <class E = xexpression_type, class ST = storage_type>
-        std::enable_if_t<detail::provides_data_interface<E, ST>::value, value_type*>
+        std::enable_if_t<detail::provides_data_interface<E, ST>::value, pointer>
         data() noexcept;
         template <class E = xexpression_type, class ST = storage_type>
-        std::enable_if_t<detail::provides_data_interface<E, ST>::value, const value_type*>
+        std::enable_if_t<detail::provides_data_interface<E, ST>::value, const_pointer>
         data() const noexcept;
         size_type data_offset() const noexcept;
 
@@ -554,7 +554,7 @@ namespace xt
     template <class D>
     template <class E, class ST>
     inline auto xstrided_view_base<D>::data() noexcept ->
-        std::enable_if_t<detail::provides_data_interface<E, ST>::value, value_type*>
+        std::enable_if_t<detail::provides_data_interface<E, ST>::value, pointer>
     {
         return m_e.data();
     }
@@ -566,7 +566,7 @@ namespace xt
     template <class D>
     template <class E, class ST>
     inline auto xstrided_view_base<D>::data() const noexcept ->
-        std::enable_if_t<detail::provides_data_interface<E, ST>::value, const value_type*>
+        std::enable_if_t<detail::provides_data_interface<E, ST>::value, const_pointer>
     {
         return m_e.data();
     }
