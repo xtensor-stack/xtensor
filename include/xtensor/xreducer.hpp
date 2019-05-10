@@ -274,19 +274,25 @@ namespace xt
         options_t options(raw_options);
 
         using shape_type = typename xreducer_shape_type<typename std::decay_t<E>::shape_type, std::decay_t<X>, typename options_t::keep_dims>::type;
+        using result_container_type = typename detail::xtype_for_shape<shape_type>::template type<result_type, std::decay_t<E>::static_layout>;
+        result_container_type result;
 
         // retrieve functors from triple struct
         auto reduce_fct = xt::get<0>(f);
         auto init_fct = xt::get<1>(f);
         auto merge_fct = xt::get<2>(f);
 
-        shape_type result_shape{};
+        if (axes.size() == 0)
+        {
+            result.resize(e.shape(), e.layout());
+            auto cpf = [&reduce_fct, &init_fct](const auto& v) {return reduce_fct(static_cast<result_type>(init_fct()), v); };
+            copy_to_reduced(cpf, e, result);
+            return result;
+        }
 
+        shape_type result_shape{};
         dynamic_shape<std::size_t> iter_shape = xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(e.shape())>(e.shape());
         dynamic_shape<std::size_t> iter_strides(e.dimension());
-
-        using result_container_type = typename detail::xtype_for_shape<shape_type>::template type<result_type, std::decay_t<E>::static_layout>;
-        result_container_type result;
 
         if (!std::is_sorted(axes.cbegin(), axes.cend()))
         {
@@ -1479,7 +1485,7 @@ namespace xt
     template <class F, class CT, class X, class O>
     inline auto xreducer_stepper<F, CT, X, O>::aggregate(size_type dim) const -> reference
     {
-        if (m_reducer->m_e.shape().empty())
+        if (m_reducer->m_e.shape().empty() || m_reducer->m_axes.size() == 0)
         {
             reference res =
                 m_reducer->m_reduce(O::has_initial_value ? m_reducer->m_options.initial_value : static_cast<reference>(m_reducer->m_init()),
