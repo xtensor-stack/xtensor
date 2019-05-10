@@ -224,6 +224,44 @@ namespace xt
         }
     }
 
+    template <class F, class E, class R,
+              XTL_REQUIRES(std::is_convertible<typename E::value_type, typename R::value_type>)>
+    inline void copy_to_reduced(F&, const E& e, R& result)
+    {
+        if (e.layout() == layout_type::row_major)
+        {
+            std::copy(e.template cbegin<layout_type::row_major>(),
+                      e.template cend<layout_type::row_major>(),
+                      result.data());
+        }
+        else
+        {
+            std::copy(e.template cbegin<layout_type::column_major>(),
+                      e.template cend<layout_type::column_major>(),
+                      result.data());
+        }
+    }
+
+    template <class F, class E, class R,
+              XTL_REQUIRES(xtl::negation<std::is_convertible<typename E::value_type, typename R::value_type>>)>
+    inline void copy_to_reduced(F& f, const E& e, R& result)
+    {
+        if (e.layout() == layout_type::row_major)
+        {
+            std::transform(e.template cbegin<layout_type::row_major>(),
+                           e.template cend<layout_type::row_major>(),
+                           result.data(),
+                           f);
+        }
+        else
+        {
+            std::transform(e.template cbegin<layout_type::column_major>(),
+                           e.template cend<layout_type::column_major>(),
+                           result.data(),
+                           f);
+        }
+    }
+
     template <class F, class E, class X, class O>
     inline auto reduce_immediate(F&& f, E&& e, X&& axes, O&& raw_options)
     {
@@ -273,11 +311,20 @@ namespace xt
         auto strides_finder = e.strides().begin() + static_cast<std::ptrdiff_t>(leading_ax);
         // The computed strides contain "0" where the shape is 1 -- therefore find the next none-zero number
         std::size_t inner_stride = static_cast<std::size_t>(*strides_finder);
-        while (inner_stride == 0)
+        auto iter_bound = e.layout() == layout_type::row_major ? e.strides().begin() : (e.strides().end() - 1);
+        while (inner_stride == 0 && strides_finder != iter_bound)
         {
             (e.layout() == layout_type::row_major) ? --strides_finder : ++strides_finder;
             inner_stride = static_cast<std::size_t>(*strides_finder);
         }
+
+        if (inner_stride == 0)
+        {
+            auto cpf = [&reduce_fct, &init_fct](const auto& v) {return reduce_fct(static_cast<result_type>(init_fct()), v); };
+            copy_to_reduced(cpf, e, result);
+            return result;
+        }
+
         std::size_t inner_loop_size = static_cast<std::size_t>(inner_stride);
         std::size_t outer_loop_size = e.shape()[leading_ax];
 
