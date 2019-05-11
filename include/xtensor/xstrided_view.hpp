@@ -588,7 +588,6 @@ namespace xt
     inline auto strided_view(E&& e, const xstrided_slice_vector& slices)
     {
         detail::strided_view_args<detail::no_adj_strides_policy> args;
-        using storage_getter = detail::flat_storage_getter<xclosure_t<E>>;
         args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<E>, decltype(args.new_shape)>;
         return view_type(std::forward<E>(e), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
