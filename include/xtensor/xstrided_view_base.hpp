@@ -125,8 +125,8 @@ namespace xt
         static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic && xexpression_type::contiguous_layout;
 
-        template <class CTA>
-        xstrided_view_base(CTA&& e, undecay_shape&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
+        template <class CTA, class SA>
+        xstrided_view_base(CTA&& e, SA&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept;
 
         xstrided_view_base(xstrided_view_base&& rhs);
 
@@ -298,12 +298,12 @@ namespace xt
      * @param layout the layout of the view
      */
     template <class D>
-    template <class CTA>
-    inline xstrided_view_base<D>::xstrided_view_base(CTA&& e, undecay_shape&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept
+    template <class CTA, class SA>
+    inline xstrided_view_base<D>::xstrided_view_base(CTA&& e, SA&& shape, strides_type&& strides, size_type offset, layout_type layout) noexcept
         : m_e(std::forward<CTA>(e)),
           //m_storage(detail::get_flat_storage<undecay_expression>(m_e)),
           m_storage(storage_getter::get_flat_storage(m_e)),
-          m_shape(std::move(shape)),
+          m_shape(std::forward<SA>(shape)),
           m_strides(std::move(strides)),
           m_offset(offset),
           m_layout(layout)

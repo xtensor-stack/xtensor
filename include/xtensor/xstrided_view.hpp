@@ -157,8 +157,8 @@ namespace xt
 
         using simd_value_type = xt_simd::simd_type<value_type>;
 
-        template <class CTA>
-        xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
+        template <class CTA, class SA>
+        xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
 
         xstrided_view(const xstrided_view& rhs) = default;
         xstrided_view& operator=(const xstrided_view& rhs);
@@ -306,9 +306,9 @@ namespace xt
      * @param layout the layout of the view
      */
     template <class CT, class S, layout_type L, class FST>
-    template <class CTA>
-    inline xstrided_view<CT, S, L, FST>::xstrided_view(CTA&& e, S&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept
-        : base_type(std::forward<CTA>(e), std::move(shape), std::move(strides), offset, layout)
+    template <class CTA, class SA>
+    inline xstrided_view<CT, S, L, FST>::xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept
+        : base_type(std::forward<CTA>(e), std::forward<SA>(shape), std::move(strides), offset, layout)
     {
     }
     //@}

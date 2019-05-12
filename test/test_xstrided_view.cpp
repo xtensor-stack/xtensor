@@ -703,6 +703,21 @@ namespace xt
         truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
     #endif
+
+        xarray<int> xa = {{1, 2, 3}, {4, 5, 6}};
+        std::vector<std::size_t> new_shape = {3, 2};
+        auto xrv = reshape_view(xa, new_shape);
+
+        if(XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
+        {
+            xarray<int> xres = {{1, 2}, {3, 4}, {5, 6}};
+            EXPECT_EQ(xrv, xres);
+        }
+        else
+        {
+            xarray<int> xres = {{1, 5}, {4, 3}, {2, 6}};
+            EXPECT_EQ(xrv, xres);
+        }
     }
 
     TEST(xstrided_view, on_xview)
