@@ -143,8 +143,8 @@ namespace xt
         using slice_type = xtl::variant<detail::xfake_slice<strides_vt>, xkeep_slice<strides_vt>, xdrop_slice<strides_vt>>;
         using slice_vector_type = std::vector<slice_type>;
 
-        template <class CTA>
-        xdynamic_view(CTA&& e, S&& shape, get_strides_t<S>&& strides, std::size_t offset, layout_type layout,
+        template <class CTA, class SA>
+        xdynamic_view(CTA&& e, SA&& shape, get_strides_t<S>&& strides, std::size_t offset, layout_type layout,
                       slice_vector_type&& slices, get_strides_t<S>&& adj_strides) noexcept;
 
         template <class E>
@@ -364,11 +364,11 @@ namespace xt
      ********************************/
 
     template <class CT, class S, layout_type L, class FST>
-    template <class CTA>
-    inline xdynamic_view<CT, S, L, FST>::xdynamic_view(CTA&& e, S&& shape, get_strides_t<S>&& strides,
+    template <class CTA, class SA>
+    inline xdynamic_view<CT, S, L, FST>::xdynamic_view(CTA&& e, SA&& shape, get_strides_t<S>&& strides,
                                                        std::size_t offset, layout_type layout,
                                                        slice_vector_type&& slices, get_strides_t<S>&& adj_strides) noexcept
-        : base_type(std::forward<CTA>(e), std::move(shape), std::move(strides), offset, layout),
+        : base_type(std::forward<CTA>(e), std::forward<SA>(shape), std::move(strides), offset, layout),
           m_slices(std::move(slices)), m_adj_strides(std::move(adj_strides))
     {
     }
