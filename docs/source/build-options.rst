@@ -39,7 +39,7 @@ The following macros are helpers for debugging, they are not defined by default:
 - ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
   on if you expect ``operator()`` to perform broadcasting.
 
-The last gorup of macros is for using external libraries to achieve maximum performance (see next section for additional
+The last group of macros is for using external libraries to achieve maximum performance (see next section for additional
 requirements):
 
 - ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in ``xtensor``. This requires that you have xsimd_ installed
