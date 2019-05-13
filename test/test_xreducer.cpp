@@ -623,4 +623,26 @@ namespace xt
         EXPECT_EQ(res0, a);
         EXPECT_EQ(res1, a);
     }
+
+    TEST(xreducer, zero_shape)
+    {
+        xt::xarray<int> x = xt::zeros<int>({ 0, 1 });
+        
+        auto res0 = xt::sum(x, { 0 }, xt::keep_dims);
+        EXPECT_EQ(res0.shape()[0], size_t(1));
+        EXPECT_EQ(res0.shape()[1], size_t(1));
+        int zzz = res0(0, 0);
+        EXPECT_EQ(res0(0, 0), 0);
+
+        auto res1 = xt::sum(x, { 1 }, xt::keep_dims);
+        EXPECT_EQ(res1.shape()[0], size_t(0));
+        EXPECT_EQ(res1.shape()[1], size_t(1));
+        EXPECT_EQ(res1.size(), size_t(0));
+
+        auto res2 = xt::sum(x, xt::keep_dims);
+        EXPECT_EQ(res2.shape()[0], 1);
+        EXPECT_EQ(res2.shape()[1], 1);
+        int xxx = res2(0, 0);
+        EXPECT_EQ(res2(0, 0), 0);
+    }
 }
