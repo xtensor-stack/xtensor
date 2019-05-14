@@ -44,6 +44,9 @@ namespace xt
     template <class R, class T>
     constexpr R shape(T t);
 
+    template<class R = std::size_t, class T, std::size_t N>
+    xt::static_shape<R, N> shape(const T(&aList)[N]);
+
     template <class S>
     struct static_dimension;
 
@@ -161,6 +164,14 @@ namespace xt
     constexpr R shape(T t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+    }
+
+    /** @brief Generate an xt::static_shape of the given size. */
+    template<class R, class T, std::size_t N>
+    xt::static_shape<R, N> shape(const T(&list)[N]) {
+        xt::static_shape<R, N> shape;
+        std::copy(std::begin(list), std::end(list), std::begin(shape));
+        return shape;
     }
 
     /********************
