@@ -15,8 +15,12 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
 
-message(STATUS "Forcing tests build type to Release")
-set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Setting tests build type to Release")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+else()
+    message(STATUS "Tests build type is ${CMAKE_BUILD_TYPE}")
+endif()
 
 include(CheckCXXCompilerFlag)
 
