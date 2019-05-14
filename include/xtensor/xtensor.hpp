@@ -70,7 +70,7 @@ namespace xt
      * dimension.
      *
      * The xtensor_container class implements a dense multidimensional container
-     * with tensor semantic and fixed dimension
+     * with tensor semantics and fixed dimension
      *
      * @tparam EC The type of the container holding the elements.
      * @tparam N The dimension of the container.
@@ -189,11 +189,11 @@ namespace xt
 
     /**
      * @class xtensor_adaptor
-     * @brief Dense multidimensional container adaptor with tensor semantic
-     * and fixed dimension.
+     * @brief Dense multidimensional container adaptor with tensor
+     * semantics and fixed dimension.
      *
      * The xtensor_adaptor class implements a dense multidimensional
-     * container adaptor with tensor semantic and fixed dimension. It
+     * container adaptor with tensor semantics and fixed dimension. It
      * is used to provide a multidimensional container semantic and a
      * tensor semantic to stl-like containers.
      *
@@ -264,7 +264,7 @@ namespace xt
      */
     //@{
     /**
-     * Allocates an uninitialized xtensor_container that holds 0 element.
+     * Allocates an uninitialized xtensor_container that holds 0 elements.
      */
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline xtensor_container<EC, N, L, Tag>::xtensor_container()
