@@ -1515,7 +1515,44 @@ namespace xt
 #undef GCC4_FALLBACK
 
 
-// Workaround for rebind_container problems on GCC 8  with C++17 enabled
+    template <class T, std::size_t N>
+    inline bool operator==(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator!=(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator<(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                            rhs.begin(), rhs.end());
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator<=(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return !(lhs > rhs);
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator>(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return rhs < lhs;
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator>=(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return !(lhs < rhs);
+    }
+
+// Workaround for rebind_container problems on GCC 8 with C++17 enabled
 #if defined(__GNUC__) && __GNUC__ > 6 && !defined(__clang__) && __cplusplus >= 201703L
     template <class X, class T, std::size_t N>
     struct rebind_container<X, aligned_array<T, N>>
