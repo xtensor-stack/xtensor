@@ -1540,7 +1540,7 @@ namespace xt
         {
             size_type index = dim;
             size_type size = m_reducer->m_e.shape()[index];
-            if (ax_it != m_reducer->m_axes.end() - 1)
+            if (ax_it != m_reducer->m_axes.end() - 1 && size != 0)
             {
                 res = aggregate_impl(dim + 1, typename O::keep_dims());
                 for (size_type i = 1; i != size; ++i)
