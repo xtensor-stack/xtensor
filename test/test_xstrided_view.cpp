@@ -189,11 +189,14 @@ namespace xt
 
     TEST(xstrided_view, xstrided_view_on_xfunction)
     {
-        xarray<int> a = { { 1, 2, 3, 4 },{ 5, 6, 7, 8 },{ 9, 10, 11, 12 } };
+        xarray<int> a = {{ 1,  2,  3,  4 },
+                         { 5,  6,  7,  8 },
+                         { 9, 10, 11, 12 } };
         xarray<int> b = { 1, 2, 3, 4 };
 
         auto sum = a + b;
         auto func = strided_view(sum, xstrided_slice_vector({ 1, range(1, 4) }));
+
         auto iter = func.template begin<layout_type::row_major>();
         auto iter_end = func.template end<layout_type::row_major>();
 
@@ -667,20 +670,18 @@ namespace xt
     TEST(xstrided_view, reshape_view)
     {
         xarray<double> a = xt::arange<double>(9);
-        auto av = xt::reshape_view(a, {3, 3});
-        auto xv = xt::reshape_view(a, xshape<3, 3>());
+        auto av = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(a, {3, 3});
+        auto xv = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(a, xshape<3, 3>());
 
-
-        xtensor<double, 2> e = xt::reshape_view(xt::arange(9), {3, 3});
-        xtensor<double, 2> es = xt::reshape_view(a, {3, 3});
+        xtensor<double, 2> e = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(xt::arange(9), {3, 3});
+        xtensor<double, 2> es = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(a, {3, 3});
 
         a.reshape({3, 3});
         for (std::size_t i = 0; i < 100; ++i)
         {
-            xtensor<double, 2> par = xt::reshape_view(xt::arange(9), {3, 3});
+            xtensor<double, 2> par = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(xt::arange(9), {3, 3});
             EXPECT_EQ(a, par);
         }
-
         using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
 
 #if XTENSOR_USE_XSIMD
@@ -697,27 +698,30 @@ namespace xt
         truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>>>();
         EXPECT_TRUE(truthy);
 
-    #if !defined(X_OLD_CLANG)
+#if !defined(X_OLD_CLANG)
         truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2>>();
         EXPECT_TRUE(truthy);
         truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
-    #endif
+#endif
 
         xarray<int> xa = {{1, 2, 3}, {4, 5, 6}};
         std::vector<std::size_t> new_shape = {3, 2};
         auto xrv = reshape_view(xa, new_shape);
 
-        if(XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
-        {
-            xarray<int> xres = {{1, 2}, {3, 4}, {5, 6}};
-            EXPECT_EQ(xrv, xres);
-        }
-        else
-        {
-            xarray<int> xres = {{1, 5}, {4, 3}, {2, 6}};
-            EXPECT_EQ(xrv, xres);
-        }
+        xarray<int> xres = {{1, 2}, {3, 4}, {5, 6}};
+        EXPECT_EQ(xrv, xres);
+    }
+
+    TEST(xstrided_view, reshape_view_assign)
+    {
+        xarray<int, layout_type::column_major> xa = {{1, 2, 3}, {4, 5, 6}};
+        xarray<int, layout_type::column_major> exp = {{1, 2},
+                                                      {3, 4},
+                                                      {5, 6}};
+        auto v = reshape_view(xa, {3, 2});
+        xarray<int, layout_type::column_major> res = v;
+        EXPECT_EQ(res, exp);
     }
 
     TEST(xstrided_view, on_xview)
@@ -763,29 +767,13 @@ namespace xt
 
         auto v1 = view(a, all(), range(0, 4));
         auto rv1 = reshape_view(v1, {2, 2 ,2});
-        if(XTENSOR_DEFAULT_LAYOUT==xt::layout_type::row_major)
-        {
-            xtensor<int, 3> expected = {{{1, 2}, {3, 4}}, {{11, 12}, {13, 14}}};
-            EXPECT_EQ(expected, rv1);
-        }
-        else
-        {
-            xtensor<int, 3> expected = {{{1, 3}, {2, 4}}, {{11, 13}, {12, 14}}};
-            EXPECT_EQ(expected, rv1);
-        }
+        xtensor<int, 3> expected = {{{1, 2}, {3, 4}}, {{11, 12}, {13, 14}}};
+        EXPECT_EQ(expected, rv1);
 
         auto rv2 = reshape_view(a, {2, 2, 4});
         auto v2 = strided_view(rv2, {0, 0, all()});
-        if(XTENSOR_DEFAULT_LAYOUT==xt::layout_type::row_major)
-        {
-            xtensor<int, 1> expected2 = {1, 2, 3 ,4};
-            EXPECT_EQ(expected2, v2);
-        }
-        else
-        {
-            xtensor<int, 1> expected2 = {1, 3, 5 ,7};
-            EXPECT_EQ(expected2, v2);
-        }
+        xtensor<int, 1> expected2 = {1, 2, 3 ,4};
+        EXPECT_EQ(expected2, v2);
     }
 
     TEST(xstrided_view, zerod_view_iterator)

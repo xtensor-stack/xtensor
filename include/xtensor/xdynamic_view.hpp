@@ -92,7 +92,7 @@ namespace xt
         class xfake_slice;
     }
 
-    template <class CT, class S, layout_type L = layout_type::dynamic, class FST = detail::flat_storage_getter<CT>>
+    template <class CT, class S, layout_type L = layout_type::dynamic, class FST = detail::flat_storage_getter<CT, XTENSOR_DEFAULT_TRAVERSAL>>
     class xdynamic_view : public xview_semantic<xdynamic_view<CT, S, L, FST>>,
                           public xiterable<xdynamic_view<CT, S, L, FST>>,
                           public extension::xdynamic_view_base_t<CT, S, L, FST>,
@@ -693,7 +693,7 @@ namespace xt
         using slice_vector = typename view_type::slice_vector_type;
         using policy = detail::adj_strides_policy<slice_vector>;
         detail::strided_view_args<policy> args;
-        args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        args.fill_args(e.shape(), detail::get_strides<XTENSOR_DEFAULT_TRAVERSAL>(e), detail::get_offset<XTENSOR_DEFAULT_TRAVERSAL>(e), e.layout(), slices);
         return view_type(std::forward<E>(e), std::move(args.new_shape), std::move(args.new_strides), args.new_offset,
                          args.new_layout, std::move(args.new_slices), std::move(args.new_adj_strides));
     }

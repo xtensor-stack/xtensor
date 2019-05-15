@@ -111,16 +111,16 @@ namespace xt
     {
         xtensor<double, 3> a = linspace<double>(1., 100., 100).reshape({2, 5, 10});
         auto v = view(a, range(0, 2), range(0, 3), range(0, 3));
-        xtensor<double, 1> fl = flatten<XTENSOR_DEFAULT_LAYOUT>(v);
+        xtensor<double, 1> fl = flatten<XTENSOR_DEFAULT_TRAVERSAL>(v);
         xtensor<double, 1> expected_rm = {  1.,  2., 3., 11., 12., 13., 21., 22., 23.,
                                            51., 52., 53, 61., 62., 63., 71., 72., 73. };
         xtensor<double, 1> expected_cm = { 1.,  2.,  3.,  4.,  5.,  6.,
                                           11., 12., 13., 14., 15., 16.,
                                           21., 22., 23., 24., 25., 26.};
-        xtensor<double, 1> expected = XTENSOR_DEFAULT_LAYOUT==layout_type::row_major ? expected_rm : expected_cm;
+        xtensor<double, 1> expected = XTENSOR_DEFAULT_TRAVERSAL==layout_type::row_major ? expected_rm : expected_cm;
         EXPECT_EQ(fl, expected);
         auto v2 = strided_view(a, {range(0, 2), range(0, 3), range(0, 3)});
-        xtensor<double, 1> fl2 = flatten<XTENSOR_DEFAULT_LAYOUT>(v2);
+        xtensor<double, 1> fl2 = flatten<XTENSOR_DEFAULT_TRAVERSAL>(v2);
         EXPECT_EQ(fl2, expected);
     }
 

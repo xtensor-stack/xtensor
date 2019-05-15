@@ -108,7 +108,7 @@ namespace xt
      *
      * @sa strided_view, transpose
      */
-    template <class CT, class S, layout_type L = layout_type::dynamic, class FST = detail::flat_storage_getter<CT>>
+    template <class CT, class S, layout_type L = layout_type::dynamic, class FST = detail::flat_storage_getter<CT, XTENSOR_DEFAULT_TRAVERSAL>>
     class xstrided_view : public xview_semantic<xstrided_view<CT, S, L, FST>>,
                           public xiterable<xstrided_view<CT, S, L, FST>>,
                           private xstrided_view_base<xstrided_view<CT, S, L, FST>>,
@@ -588,20 +588,20 @@ namespace xt
     inline auto strided_view(E&& e, const xstrided_slice_vector& slices)
     {
         detail::strided_view_args<detail::no_adj_strides_policy> args;
-        args.fill_args(e.shape(), detail::get_strides(e), detail::get_offset(e), e.layout(), slices);
+        args.fill_args(e.shape(), detail::get_strides<XTENSOR_DEFAULT_TRAVERSAL>(e), detail::get_offset<XTENSOR_DEFAULT_TRAVERSAL>(e), e.layout(), slices);
         using view_type = xstrided_view<xclosure_t<E>, decltype(args.new_shape)>;
         return view_type(std::forward<E>(e), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
     }
 
-    template <class E, class S>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class S>
     inline auto reshape_view(E&& e, S&& shape)
     {
         using shape_type = std::decay_t<S>;
         get_strides_t<shape_type> strides;
 
         xt::resize_container(strides, shape.size());
-        compute_strides(shape, XTENSOR_DEFAULT_LAYOUT, strides);
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, std::decay_t<E>::static_layout, detail::flat_adaptor_getter<xclosure_t<E>>>;
+        compute_strides(shape, L, strides);
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, L, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
         return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, e.layout());
     }
 
@@ -613,50 +613,49 @@ namespace xt
      *
      * @param e xexpression to reshape
      * @param shape new shape
-     * @param layout new layout (optional)
+     * @param order traversal order (optional)
      *
      * @return view on xexpression with new shape
      */
-    template <class E, class S>
-    inline auto reshape_view(E&& e, S&& shape, layout_type layout)
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class S>
+    inline auto reshape_view(E&& e, S&& shape, layout_type /*order*/)
     {
         using shape_type = std::decay_t<S>;
         get_strides_t<shape_type> strides;
 
         xt::resize_container(strides, shape.size());
-        compute_strides(shape, layout, strides);
-
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_adaptor_getter<xclosure_t<E>>>;
+        compute_strides(shape, L, strides);
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
         return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, layout_type::dynamic);
     }
 
 #if !defined(X_OLD_CLANG)
-    template <class E, class I, std::size_t N>
-    inline auto reshape_view(E&& e, const I(&shape)[N], layout_type l)
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I, std::size_t N>
+    inline auto reshape_view(E&& e, const I(&shape)[N], layout_type order)
     {
         using shape_type = std::array<std::size_t, N>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), l);
+        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), order);
     }
 
-    template <class E, class I, std::size_t N>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I, std::size_t N>
     inline auto reshape_view(E&& e, const I(&shape)[N])
     {
         using shape_type = std::array<std::size_t, N>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
+        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 #else
-    template <class E, class I>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I>
     inline auto reshape_view(E&& e, const std::initializer_list<I>& shape)
     {
         using shape_type = xt::dynamic_shape<std::size_t>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
+        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 
-    template <class E, class I>
-    inline auto reshape_view(E&& e, const std::initializer_list<I>& shape, layout_type l)
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class I>
+    inline auto reshape_view(E&& e, const std::initializer_list<I>& shape, layout_type order)
     {
         using shape_type = xt::dynamic_shape<std::size_t>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), l);
+        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), order);
     }
 #endif
 }

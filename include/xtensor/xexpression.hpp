@@ -585,12 +585,12 @@ namespace xt
         }
 
         template <class It>
-        auto element(It first, It last) {
+        decltype(auto) element(It first, It last) {
             return m_ptr->element(first, last);
         }
 
         template <class It>
-        auto element(It first, It last) const {
+        decltype(auto) element(It first, It last) const {
             return m_ptr->element(first, last);
         }
 

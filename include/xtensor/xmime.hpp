@@ -21,7 +21,7 @@
 namespace xt
 {
     template <class P, class T>
-    void compute_0d_table(std::stringstream& out, P& printer, const T& expr)
+    void compute_0d_table(std::stringstream& out, P& /*printer*/, const T& expr)
     {
         out << "<table style='border-style:solid;border-width:1px;'><tbody>";
         out << "<tr><td style='font-family:monospace;'><pre>";
