@@ -61,14 +61,22 @@
     #endif
 #else
     #ifdef XTENSOR_USE_XSIMD
-    #include <xsimd/xsimd.hpp>
-    #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-        xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
+        #include <xsimd/xsimd.hpp>
+        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+            xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
     #else
-    #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-        std::allocator<T>
+        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+            std::allocator<T>
     #endif
 #endif
+#endif
+
+#ifndef XTENSOR_DEFAULT_ALIGNMENT
+    #ifdef XTENSOR_USE_XSIMD
+        #define XTENSOR_DEFAULT_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
+    #else
+        #define XTENSOR_DEFAULT_ALIGNMENT 0
+    #endif
 #endif
 
 #ifndef XTENSOR_DEFAULT_LAYOUT

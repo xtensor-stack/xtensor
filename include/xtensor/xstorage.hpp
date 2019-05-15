@@ -21,14 +21,6 @@
 #include "xtensor_simd.hpp"
 #include "xutils.hpp"
 
-#ifndef XTENSOR_ALIGNMENT
-    #ifdef XTENSOR_USE_XSIMD
-        #define XTENSOR_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
-    #else
-        #define XTENSOR_ALIGNMENT 0
-    #endif
-#endif
-
 namespace xt
 {
 
@@ -1325,7 +1317,7 @@ namespace xt
         lhs.swap(rhs);
     }
 
-    #define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
+    #define XTENSOR_SELECT_ALIGN (XTENSOR_DEFAULT_ALIGNMENT != 0 ? XTENSOR_DEFAULT_ALIGNMENT : alignof(T))
 
     template <class X, class T, std::size_t N, class A, bool B>
     struct rebind_container<X, svector<T, N, A, B>>
@@ -1871,7 +1863,6 @@ namespace std
 #endif
 
 #undef XTENSOR_CONST
-#undef XTENSOR_ALIGNMENT
 #undef XTENSOR_SELECT_ALIGN
 
 #endif
