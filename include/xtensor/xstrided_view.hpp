@@ -593,15 +593,15 @@ namespace xt
         return view_type(std::forward<E>(e), std::move(args.new_shape), std::move(args.new_strides), args.new_offset, args.new_layout);
     }
 
-    template <class E, class S>
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class E, class S>
     inline auto reshape_view(E&& e, S&& shape)
     {
         using shape_type = std::decay_t<S>;
         get_strides_t<shape_type> strides;
 
         xt::resize_container(strides, shape.size());
-        compute_strides(shape, XTENSOR_DEFAULT_LAYOUT, strides);
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, std::decay_t<E>::static_layout, detail::flat_adaptor_getter<xclosure_t<E>>>;
+        compute_strides(shape, L, strides);
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, XTENSOR_DEFAULT_LAYOUT, detail::flat_adaptor_getter<xclosure_t<E>>>;
         return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, e.layout());
     }
 
@@ -638,18 +638,18 @@ namespace xt
         return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape), l);
     }
 
-    template <class E, class I, std::size_t N>
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class E, class I, std::size_t N>
     inline auto reshape_view(E&& e, const I(&shape)[N])
     {
         using shape_type = std::array<std::size_t, N>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
+        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 #else
-    template <class E, class I>
+    template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class E, class I>
     inline auto reshape_view(E&& e, const std::initializer_list<I>& shape)
     {
         using shape_type = xt::dynamic_shape<std::size_t>;
-        return reshape_view(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
+        return reshape_view<L>(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
 
     template <class E, class I>
