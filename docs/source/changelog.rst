@@ -7,6 +7,46 @@
 Changelog
 =========
 
+0.20.6
+------
+
+- Added XTENSOR_DEFAULT_ALIGNMENT macro
+  `#1597 <https://github.com/QuantStack/xtensor/pull/1597>`_
+- Added missing comparison operators for const_array
+  `#1596 <https://github.com/QuantStack/xtensor/pull/1596>`_
+- Fixed reducer for expression with shape containing 0
+  `#1595 <https://github.com/QuantStack/xtensor/pull/1595>`_
+- Very minor spelling checks in comments
+  `#1591 <https://github.com/QuantStack/xtensor/pull/1591>`_
+- tests can be built in debug mode
+  `#1589 <https://github.com/QuantStack/xtensor/pull/1589>`_
+- strided views constructors forward shape argument
+  `#1587 <https://github.com/QuantStack/xtensor/pull/1587>`_
+- Remove unused type alias
+  `#1585 <https://github.com/QuantStack/xtensor/pull/1585>`_
+- Fixed reducers with empty list of axes
+  `#1582 <https://github.com/QuantStack/xtensor/pull/1582>`_
+- Fix typo in builder docs
+  `#1581 <https://github.com/QuantStack/xtensor/pull/1581>`_
+- Fixed return type of data in xstrided_view
+  `#1580 <https://github.com/QuantStack/xtensor/pull/1580>`_
+- Fixed reducers on expression with shape containing 1 as first elements
+  `#1579 <https://github.com/QuantStack/xtensor/pull/1579>`_
+- Fixed xview::element for range with more elements than view's dimension
+  `#1578 <https://github.com/QuantStack/xtensor/pull/1578>`_
+- Fixed broadcasting of shape containing 0-sized dimensions
+  `#1575 <https://github.com/QuantStack/xtensor/pull/1575>`_
+- Fixed norm return type for complex
+  `#1574 <https://github.com/QuantStack/xtensor/pull/1574>`_
+- Fixed iterator incremented or decremented by 0
+  `#1572 <https://github.com/QuantStack/xtensor/pull/1572>`_
+- Added complex exponential test
+  `#1571 <https://github.com/QuantStack/xtensor/pull/1571>`_
+- Strided views refactoring
+  `#1569 <https://github.com/QuantStack/xtensor/pull/1569>`_
+- Add clang-cl support
+  `#1559 <https://github.com/QuantStack/xtensor/pull/1559>`_
+
 0.20.5
 ------
 
