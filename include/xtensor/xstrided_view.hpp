@@ -601,11 +601,12 @@ namespace xt
 
         xt::resize_container(strides, shape.size());
         compute_strides(shape, L, strides);
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, L, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
         return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, e.layout());
     }
 
     /**
+     * @deprecated
      * @brief Return a view on a container with a new shape
      *
      * Note: if you resize the underlying container, this view becomes
@@ -620,13 +621,7 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class S>
     inline auto reshape_view(E&& e, S&& shape, layout_type /*order*/)
     {
-        using shape_type = std::decay_t<S>;
-        get_strides_t<shape_type> strides;
-
-        xt::resize_container(strides, shape.size());
-        compute_strides(shape, L, strides);
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
-        return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, layout_type::dynamic);
+        return reshape_view<L>(std::forward<E>(e), std::forward<S>(shape));
     }
 
 #if !defined(X_OLD_CLANG)

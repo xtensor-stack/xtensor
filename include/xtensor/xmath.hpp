@@ -1824,7 +1824,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
         }
 
-        auto weights_view = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::forward<W>(weights), std::move(broadcast_shape), XTENSOR_DEFAULT_LAYOUT);
+        constexpr layout_type L = default_assignable_layout(std::decay_t<W>::static_layout);
+        auto weights_view = reshape_view<L>(std::forward<W>(weights), std::move(broadcast_shape), L);
         auto scl = sum(weights_view, ax, xt::evaluation_strategy::immediate);
         return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }

@@ -695,11 +695,11 @@ namespace xt
         EXPECT_EQ(av, a);
 
         bool truthy;
-        truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>>>();
+        truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>, layout_type::dynamic>>();
         EXPECT_TRUE(truthy);
 
 #if !defined(X_OLD_CLANG)
-        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2>>();
+        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2, layout_type::dynamic>>();
         EXPECT_TRUE(truthy);
         truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
@@ -798,5 +798,108 @@ namespace xt
         auto d = v.data();
         EXPECT_TRUE((std::is_same<decltype(d), const int*>::value));
         EXPECT_EQ(d[0], 1);
+    }
+
+    namespace test
+    {
+        template <class E1, class E2>
+        void check_reshaped_1d(const E1& e1, const E2& e2)
+        {
+            EXPECT_EQ(e1(0, 0), e2(0, 0));
+            EXPECT_EQ(e1(0, 1), e2(0, 1));
+            EXPECT_EQ(e1(1, 0), e2(1, 0));
+            EXPECT_EQ(e1(1, 1), e2(1, 1));
+            EXPECT_EQ(e1(2, 0), e2(2, 0));
+            EXPECT_EQ(e1(2, 1), e2(2, 1));
+
+            auto iter1 = e1.template cbegin<layout_type::row_major>();
+            auto iter2 = e2.template cbegin<layout_type::row_major>();
+            EXPECT_EQ(*iter1, e1(0, 0));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(0, 1));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(1, 0));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(1, 1));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(2, 0));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(2, 1));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(iter1, e1.template cend<layout_type::row_major>());
+            EXPECT_EQ(iter2, e2.template cend<layout_type::row_major>());
+        }
+
+        template <class E1, class E2>
+        void check_reshaped_2d_rm(const E1& e1, const E2& e2)
+        {
+            check_reshaped_1d(e1, e2);
+            EXPECT_EQ(e1(0, 0), 1);
+            EXPECT_EQ(e1(0, 1), 2);
+            EXPECT_EQ(e1(1, 0), 3);
+            EXPECT_EQ(e1(1, 1), 4);
+            EXPECT_EQ(e1(2, 0), 5);
+            EXPECT_EQ(e1(2, 1), 6);
+        }
+
+        template <class E1, class E2>
+        void check_reshaped_2d_cm(const E1& e1, const E2& e2)
+        {
+            check_reshaped_1d(e1, e2);
+            EXPECT_EQ(e1(0, 0), 1);
+            EXPECT_EQ(e1(0, 1), 5);
+            EXPECT_EQ(e1(1, 0), 4);
+            EXPECT_EQ(e1(1, 1), 3);
+            EXPECT_EQ(e1(2, 0), 2);
+            EXPECT_EQ(e1(2, 1), 6);
+        }
+    }
+
+    TEST(xstrided_view, reshape_view_1d)
+    {
+        xarray<int> a = { 1, 2, 3, 4, 5, 6 };
+
+        auto var = reshape_view<layout_type::row_major>(a, { 3, 2 });
+        xarray<int> rvar = var;
+        test::check_reshaped_1d(rvar, var);
+        EXPECT_EQ(rvar(0, 0), 1);
+        EXPECT_EQ(rvar(0, 1), 2);
+        EXPECT_EQ(rvar(1, 0), 3);
+        EXPECT_EQ(rvar(1, 1), 4);
+        EXPECT_EQ(rvar(2, 0), 5);
+        EXPECT_EQ(rvar(2, 1), 6);
+
+        auto vac = reshape_view<layout_type::column_major>(a, { 3, 2 });
+        xarray<int> rvac = vac;
+        test::check_reshaped_1d(rvac, vac);
+        EXPECT_EQ(rvac(0, 0), 1);
+        EXPECT_EQ(rvac(0, 1), 4);
+        EXPECT_EQ(rvac(1, 0), 2);
+        EXPECT_EQ(rvac(1, 1), 5);
+        EXPECT_EQ(rvac(2, 0), 3);
+        EXPECT_EQ(rvac(2, 1), 6);
+    }
+
+    TEST(xstrided_view, reshape_view_2d)
+    {
+        xarray<int, layout_type::row_major> ra = { {1, 2, 3}, {4, 5, 6} };
+
+        auto vrar = reshape_view<layout_type::row_major>(ra, { 3, 2 });
+        xarray<int> rvrar = vrar;
+        test::check_reshaped_2d_rm(rvrar, vrar);
+
+        auto vrac = reshape_view<layout_type::column_major>(ra, { 3, 2 });
+        xarray<int> rvrac = vrac;
+        test::check_reshaped_2d_cm(rvrac, vrac);
+
+        xarray<int, layout_type::column_major> ca = { { 1, 2, 3 },{ 4, 5, 6 } };
+
+        auto vcar = reshape_view<layout_type::row_major>(ca, { 3, 2 });
+        xarray<int> rvcar = vcar;
+        test::check_reshaped_2d_rm(rvcar, vcar);
+
+        auto vcac = reshape_view<layout_type::column_major>(ca, { 3, 2 });
+        xarray<int> rvcac = vcac;
+        test::check_reshaped_2d_cm(rvcac, vcac);
     }
 }
