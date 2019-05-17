@@ -144,6 +144,25 @@ namespace xt
         EXPECT_EQ(xtl::real(e(1)), 5.0);
     }
 
+    TEST(xfunctor_view, nobroadcast)
+    {
+        xt::xarray<bool> a = {{1,0,1},
+                             {0,1,0}};
+        xfunctor_view<nooblean, xt::xarray<bool>&> v(nooblean(), a);
+
+        EXPECT_EQ(v.shape(), v.unbroadcasted_shape());
+    }
+
+    TEST(xfunctor_adaptor, nobroadcast)
+    {
+        using nooblean_adaptor = xt::xfunctor_adaptor<nooblean, xarray<bool>&>;
+        xarray<bool> a = { {1, 1, 1, 0, 0}, {1, 0, 1, 0, 1} };
+
+        nooblean_adaptor a_adaptor(a);
+        
+        EXPECT_EQ(a_adaptor.shape(), a_adaptor.unbroadcasted_shape());
+    }
+
 #if defined(XTENSOR_USE_XSIMD) && XSIMD_X86_INSTR_SET >= XSIMD_X86_AVX_VERSION && XSIMD_X86_INSTR_SET < XSIMD_X86_AVX512_VERSION
     TEST(xfunctor_adaptor, simd)
     {

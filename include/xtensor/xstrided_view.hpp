@@ -227,6 +227,8 @@ namespace xt
         template <class E>
         rebind_t<E> build_view(E&& e) const;
 
+        using base_type::unbroadcasted_shape;
+
     private:
 
         container_iterator data_xbegin() noexcept;

@@ -1464,4 +1464,11 @@ namespace xt
         int res = v.element(idx.cbegin(), idx.cend());
         EXPECT_EQ(res, 2);
     }
+    TEST(xview, nobroadcast)
+    {
+        xt::xarray<int> a = { {1,2,3}, 
+                              {4,5,6} };
+        auto v = view(a, 0);
+        EXPECT_EQ(v.shape(), v.unbroadcasted_shape());
+    }
 }

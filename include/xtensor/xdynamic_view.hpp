@@ -228,6 +228,8 @@ namespace xt
         template <class E>
         rebind_t<E> build_view(E&& e) const;
 
+        using base_type::unbroadcasted_shape;
+
     private:
 
         using offset_type = typename base_type::offset_type;

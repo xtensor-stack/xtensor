@@ -332,6 +332,8 @@ namespace xt
 
         const tuple_type& arguments() const noexcept;
 
+        inner_shape_type unbroadcasted_shape() const;
+
     private:
 
         template <std::size_t... I>
@@ -752,6 +754,28 @@ namespace xt
     inline auto xfunction<F, CT...>::arguments() const noexcept -> const tuple_type&
     {
         return m_e;
+    }
+
+    template <class F, class... CT>
+    inline auto xfunction<F, CT...>::unbroadcasted_shape() const -> inner_shape_type
+    {
+        auto res = uninitialized_shape<xindex_type_t<inner_shape_type>>(compute_dimension());
+        bool init = false;
+
+        auto l = [&res, &init](const auto& arg)
+        {
+            if (!init)
+            {
+                const auto& sh = arg.unbroadcasted_shape();
+                if (sh.size() != 0)
+                {
+                    std::copy(sh.cbegin(), sh.cend(), res.begin());
+                    init = true;
+                }
+            }
+        };
+        for_each(l, m_e);
+        return res;
     }
 
     template <class F, class... CT>

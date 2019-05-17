@@ -89,6 +89,9 @@ namespace xt
         template <class E1, class E2>
         static void assert_compatible_shape(const xexpression<E1>& e1, const xexpression<E2>& e2);
 
+        template <class E1, class E2>
+        static void resize_no_broadcast(E1& e1, const E2& e2);
+
     private:
 
         template <class E1, class E2>
@@ -96,7 +99,6 @@ namespace xt
 
         template <class E1, class F, class... CT>
         static bool resize(E1& e1, const xfunction<F, CT...>& e2);
-
     };
 
     /********************
@@ -396,6 +398,13 @@ namespace xt
         {
             static constexpr bool value = false;
         };
+    }
+
+    template <class Tag>
+    template <class E1, class E2>
+    inline void xexpression_assigner<Tag>::resize_no_broadcast(E1& e1, const E2& e2)
+    {
+        e1.resize(e2.unbroadcasted_shape());
     }
 
     template <class Tag>

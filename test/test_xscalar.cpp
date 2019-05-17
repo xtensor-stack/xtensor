@@ -129,4 +129,10 @@ namespace xt
         auto fa = all_xscalar<xscalar<double>, xarray<int>>::value;
         EXPECT_FALSE(fa);
     }
+
+    TEST(xscalar, nobroadcast)
+    {
+        xscalar<int> k = 4;
+        EXPECT_EQ(k.shape(), k.unbroadcasted_shape());
+    }
 }
