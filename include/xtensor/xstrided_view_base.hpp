@@ -23,7 +23,7 @@ namespace xt
 {
     namespace detail
     {
-        template <class CT>
+        template <class CT, layout_type L>
         class flat_expression_adaptor
         {
         public:
@@ -34,16 +34,18 @@ namespace xt
             using index_type = inner_strides_type;
             using size_type = typename xexpression_type::size_type;
             using value_type = typename xexpression_type::value_type;
-            using reference = typename xexpression_type::reference;
             using const_reference = typename xexpression_type::const_reference;
+            using reference = std::conditional_t<std::is_const<std::remove_reference_t<CT>>::value,
+                                                 typename xexpression_type::const_reference,
+                                                 typename xexpression_type::reference>;
 
-            using iterator = decltype(std::declval<std::decay_t<CT>>().template begin<XTENSOR_DEFAULT_LAYOUT>());
-            using const_iterator = decltype(std::declval<std::decay_t<CT>>().template cbegin<XTENSOR_DEFAULT_LAYOUT>());
+            using iterator = decltype(std::declval<std::remove_reference_t<CT>>().template begin<L>());
+            using const_iterator = decltype(std::declval<std::decay_t<CT>>().template cbegin<L>());
 
             explicit flat_expression_adaptor(CT* e);
 
             template <class FST>
-            flat_expression_adaptor(CT* e, FST&& strides, layout_type layout);
+            flat_expression_adaptor(CT* e, FST&& strides);
 
             void update_pointer(CT* ptr) const
             {
@@ -67,7 +69,6 @@ namespace xt
             inner_strides_type m_strides;
             mutable index_type m_index;
             size_type m_size;
-            layout_type m_layout;
         };
 
         template <class T>
@@ -75,8 +76,8 @@ namespace xt
         {
         };
 
-        template <class CT>
-        struct is_flat_expression_adaptor<flat_expression_adaptor<CT>> : std::true_type
+        template <class CT, layout_type L>
+        struct is_flat_expression_adaptor<flat_expression_adaptor<CT, L>> : std::true_type
         {
         };
 
@@ -233,14 +234,14 @@ namespace xt
             }
         };
 
-        template <class CT>
+        template <class CT, layout_type L>
         struct flat_adaptor_getter
         {
-            using type = flat_expression_adaptor<std::remove_reference_t<CT>>;
+            using type = flat_expression_adaptor<std::remove_reference_t<CT>, L>;
             using reference = std::add_lvalue_reference_t<CT>;
 
             template <class E>
-            using rebind_t = flat_adaptor_getter<E>;
+            using rebind_t = flat_adaptor_getter<E, L>;
 
             static type get_flat_storage(reference e)
             {
@@ -257,26 +258,26 @@ namespace xt
             {
                 dynamic_shape<std::ptrdiff_t> strides;
                 strides.resize(e.shape().size());
-                compute_strides(e.shape(), XTENSOR_DEFAULT_LAYOUT, strides);
+                compute_strides(e.shape(), L, strides);
                 return strides;
             }
         };
 
-        template <class CT>
+        template <class CT, layout_type L>
         using flat_storage_getter = std::conditional_t<has_data_interface<std::decay_t<CT>>::value,
                                                        inner_storage_getter<CT>,
-                                                       flat_adaptor_getter<CT>>;
+                                                       flat_adaptor_getter<CT, L>>;
 
-        template <class E>
+        template <layout_type L, class E>
         inline auto get_offset(E& e)
         {
-            return flat_storage_getter<E>::get_offset(e);
+            return flat_storage_getter<E, L>::get_offset(e);
         }
 
-        template <class E>
+        template <layout_type L, class E>
         inline decltype(auto) get_strides(E& e)
         {
-            return flat_storage_getter<E>::get_strides(e);
+            return flat_storage_getter<E, L>::get_strides(e);
         }
     }
 
@@ -320,10 +321,10 @@ namespace xt
             return expr.storage();
         }
 
-        template <class T, class E>
-        auto copy_move_storage(T& expr, const detail::flat_expression_adaptor<E>& storage)
+        template <class T, class E, layout_type L>
+        auto copy_move_storage(T& expr, const detail::flat_expression_adaptor<E, L>& storage)
         {
-            detail::flat_expression_adaptor<E> new_storage = storage; // copy storage
+            detail::flat_expression_adaptor<E, L> new_storage = storage; // copy storage
             new_storage.update_pointer(std::addressof(expr));
             return new_storage;
         }
@@ -657,82 +658,82 @@ namespace xt
 
     namespace detail
     {
-        template <class CT>
-        inline flat_expression_adaptor<CT>::flat_expression_adaptor(CT* e)
+        template <class CT, layout_type L>
+        inline flat_expression_adaptor<CT, L>::flat_expression_adaptor(CT* e)
             : m_e(e)
         {
             resize_container(m_index, m_e->dimension());
             resize_container(m_strides, m_e->dimension());
             m_size = compute_size(m_e->shape());
-            m_layout = XTENSOR_DEFAULT_LAYOUT;
-            compute_strides(m_e->shape(), m_layout, m_strides);
+            compute_strides(m_e->shape(), L, m_strides);
         }
 
-        template <class CT>
+        template <class CT, layout_type L>
         template <class FST>
-        inline flat_expression_adaptor<CT>::flat_expression_adaptor(CT* e, FST&& strides, layout_type layout)
-            : m_e(e), m_strides(xtl::forward_sequence<inner_strides_type, FST>(strides)), m_layout(layout)
+        inline flat_expression_adaptor<CT, L>::flat_expression_adaptor(CT* e, FST&& strides)
+            : m_e(e), m_strides(xtl::forward_sequence<inner_strides_type, FST>(strides))
         {
             resize_container(m_index, m_e->dimension());
             m_size = m_e->size();
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::size() const -> size_type
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::size() const -> size_type
         {
             return m_size;
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::operator[](size_type idx) -> reference
+
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::operator[](size_type idx) -> reference
         {
             auto i = static_cast<typename index_type::value_type>(idx);
-            m_index = detail::unravel_noexcept(i, m_strides, m_layout);
+            m_index = detail::unravel_noexcept(i, m_strides, L);
             return m_e->element(m_index.cbegin(), m_index.cend());
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::operator[](size_type idx) const -> const_reference
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::operator[](size_type idx) const -> const_reference
         {
             auto i = static_cast<typename index_type::value_type>(idx);
-            m_index = detail::unravel_noexcept(i, m_strides, m_layout);
+            m_index = detail::unravel_noexcept(i, m_strides, L);
             return m_e->element(m_index.cbegin(), m_index.cend());
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::begin() -> iterator
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::begin() -> iterator
         {
-            return m_e->template begin<XTENSOR_DEFAULT_LAYOUT>();
+            return m_e->template begin<L>();
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::end() -> iterator
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::end() -> iterator
         {
-            return m_e->template end<XTENSOR_DEFAULT_LAYOUT>();
+            return m_e->template end<L>();
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::begin() const -> const_iterator
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::begin() const -> const_iterator
         {
-            return m_e->template cbegin<XTENSOR_DEFAULT_LAYOUT>();
+            return m_e->template cbegin<L>();
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::end() const -> const_iterator
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::end() const -> const_iterator
         {
-            return m_e->template cend<XTENSOR_DEFAULT_LAYOUT>();
+            return m_e->template cend<L>();
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::cbegin() const -> const_iterator
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::cbegin() const -> const_iterator
         {
-            return m_e->template cbegin<XTENSOR_DEFAULT_LAYOUT>();
+            return m_e->template cbegin<L>();
         }
 
-        template <class CT>
-        inline auto flat_expression_adaptor<CT>::cend() const ->const_iterator
+        template <class CT, layout_type L>
+        inline auto flat_expression_adaptor<CT, L>::cend() const ->const_iterator
         {
-            return m_e->template cend<XTENSOR_DEFAULT_LAYOUT>();
+            return m_e->template cend<L>();
         }
     }
 

@@ -115,7 +115,7 @@ namespace xt
                 new_layout = transpose_layout_noexcept(e.layout());
             }
 
-            return strided_view(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), get_offset(e), new_layout);
+            return strided_view(std::forward<E>(e), std::move(temp_shape), std::move(temp_strides), get_offset<XTENSOR_DEFAULT_LAYOUT>(e), new_layout);
         }
 
         template <class E, class S>
@@ -145,9 +145,9 @@ namespace xt
         inline void compute_transposed_strides(E&&, const S& shape, X& strides)
         {
             // In the case where E does not have a data interface, the transposition
-            // makes use of a flat storage adaptor that has layout XTENSOR_DEFAULT_LAYOUT
+            // makes use of a flat storage adaptor that has layout XTENSOR_DEFAULT_TRAVERSAL
             // which should be the one inverted.
-            layout_type l = transpose_layout(XTENSOR_DEFAULT_LAYOUT);
+            layout_type l = transpose_layout(XTENSOR_DEFAULT_TRAVERSAL);
             compute_strides(shape, l, strides);
         }
     }
@@ -170,7 +170,7 @@ namespace xt
 
         layout_type new_layout = detail::transpose_layout_noexcept(e.layout());
 
-        return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), detail::get_offset(e), new_layout);
+        return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), detail::get_offset<XTENSOR_DEFAULT_TRAVERSAL>(e), new_layout);
     }
 
     /**
@@ -290,7 +290,7 @@ namespace xt
         dynamic_shape<std::ptrdiff_t> new_strides;
         std::copy_if(e.shape().cbegin(), e.shape().cend(), std::back_inserter(new_shape),
                      [](std::size_t i) { return i != 1; });
-        decltype(auto) old_strides = detail::get_strides(e);
+        decltype(auto) old_strides = detail::get_strides<XTENSOR_DEFAULT_LAYOUT>(e);
         std::copy_if(old_strides.cbegin(), old_strides.cend(), std::back_inserter(new_strides),
                      [](std::ptrdiff_t i) { return i != 0; });
 
@@ -306,7 +306,7 @@ namespace xt
             dynamic_shape<std::size_t> new_shape(new_dim);
             dynamic_shape<std::ptrdiff_t> new_strides(new_dim);
 
-            decltype(auto) old_strides = detail::get_strides(e);
+            decltype(auto) old_strides = detail::get_strides<XTENSOR_DEFAULT_LAYOUT>(e);
 
             for (std::size_t i = 0, ix = 0; i < e.dimension(); ++i)
             {
@@ -517,7 +517,7 @@ namespace xt
         std::copy(e.shape().cbegin(), e.shape().cend(), shape.begin());
 
         get_strides_t<shape_type> strides;
-        decltype(auto) old_strides = detail::get_strides(e);
+        decltype(auto) old_strides = detail::get_strides<XTENSOR_DEFAULT_LAYOUT>(e);
         resize_container(strides, old_strides.size());
         std::copy(old_strides.cbegin(), old_strides.cend(), strides.begin());
 

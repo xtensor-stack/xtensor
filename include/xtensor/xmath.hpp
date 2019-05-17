@@ -1824,7 +1824,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
         }
 
-        auto weights_view = reshape_view(std::forward<W>(weights), std::move(broadcast_shape));
+        constexpr layout_type L = default_assignable_layout(std::decay_t<W>::static_layout);
+        auto weights_view = reshape_view<L>(std::forward<W>(weights), std::move(broadcast_shape), L);
         auto scl = sum(weights_view, ax, xt::evaluation_strategy::immediate);
         return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
@@ -1924,7 +1925,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         {
             keep_dim_shape[el] = 1;
         }
-        auto mrv = xt::reshape_view(std::move(inner_mean), std::move(keep_dim_shape));
+
+        auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape), XTENSOR_DEFAULT_LAYOUT);
         return mean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
     }
 
@@ -2516,7 +2518,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         {
             keep_dim_shape[el] = 1;
         }
-        auto mrv = xt::reshape_view(std::move(inner_mean), std::move(keep_dim_shape));
+        auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape), XTENSOR_DEFAULT_LAYOUT);
         return nanmean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
     }
 
