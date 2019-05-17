@@ -297,6 +297,8 @@ namespace xt
         template <class S>
         const_stepper stepper_end(const S& shape, layout_type l) const noexcept;
 
+        const inner_shape_type& unbroadcasted_shape() const noexcept;
+
     protected:
 
         undecay_expression m_e;
@@ -1277,6 +1279,11 @@ namespace xt
         return const_stepper(const_m_e.stepper_end(shape, l), &m_functor);
     }
 
+    template <class D>
+    inline auto xfunctor_applier_base<D>::unbroadcasted_shape() const noexcept -> const inner_shape_type&
+    {
+        return shape();
+    }
 
     /********************************
      * xfunctor_view implementation *

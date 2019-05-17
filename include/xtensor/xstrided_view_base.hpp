@@ -179,6 +179,8 @@ namespace xt
         template <class O>
         bool has_linear_assign(const O& strides) const noexcept;
 
+        const inner_shape_type& unbroadcasted_shape() const noexcept;
+
     protected:
 
         using offset_type = typename strides_type::value_type;
@@ -630,6 +632,12 @@ namespace xt
             std::equal(str.cbegin(), str.cend(), strides().begin());
     }
     //@}
+
+    template<class D>
+    inline auto xstrided_view_base<D>::unbroadcasted_shape() const noexcept -> const inner_shape_type&
+    {
+        return shape();
+    }
 
     template <class D>
     template <class... Args>

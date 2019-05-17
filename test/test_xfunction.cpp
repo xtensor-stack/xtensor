@@ -465,4 +465,22 @@ namespace xt
         xtensor<Point3, 1> res{r1, r2, r3};
         EXPECT_EQ(c, res);
     }
+
+    TEST(xfunction, nobroadcast)
+    {
+        xt::xarray<int> a = { 1,2,3 };
+        xt::xtensor<int, 1> b = { 4,5,6 };
+        auto arrays_sum = a + b;
+        EXPECT_EQ(arrays_sum.shape(), arrays_sum.unbroadcasted_shape());
+
+        int k = 3;
+        auto scalar_right = a + k;
+        EXPECT_EQ(scalar_right.shape(), scalar_right.unbroadcasted_shape());
+
+        auto scalar_left = k + a;
+        EXPECT_EQ(scalar_left.shape(), scalar_left.unbroadcasted_shape());
+
+        auto scalar_both_sides = k + a + k;
+        EXPECT_EQ(scalar_both_sides.shape(), scalar_both_sides.unbroadcasted_shape());
+    }
 }

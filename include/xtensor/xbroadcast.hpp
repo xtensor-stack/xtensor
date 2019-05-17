@@ -207,6 +207,8 @@ namespace xt
         template <class E>
         rebind_t<E> build_broadcast(E&& e) const;
 
+        const inner_shape_type& unbroadcasted_shape() const noexcept;
+
     private:
 
         CT m_e;
@@ -448,6 +450,12 @@ namespace xt
     inline auto xbroadcast<CT, X>::build_broadcast(E&& e) const -> rebind_t<E>
     {
         return rebind_t<E>(std::forward<E>(e), inner_shape_type(m_shape));
+    }
+
+    template <class CT, class X>
+    inline auto xbroadcast<CT,X>::unbroadcasted_shape() const noexcept -> const inner_shape_type&
+    {
+        return shape();
     }
 }
 
