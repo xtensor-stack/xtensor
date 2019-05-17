@@ -7,6 +7,12 @@
 Changelog
 =========
 
+0.20.7
+------
+
+- Fix reshape view assignment and allow setting traversal order
+  `#1598 <https://github.com/QuantStack/xtensor/pull/1598>`_
+
 0.20.6
 ------
 
