@@ -122,12 +122,35 @@ namespace xt
             constexpr static std::ptrdiff_t value = calculate_stride_row_major<sizeof...(X) - I - 1, X...>::value;
         };
 
+        namespace workaround
+        {
+            template <layout_type L, size_t I, class SEQ>
+            struct computed_strides;
+
+            template <layout_type L, size_t I, size_t... X>
+            struct computed_strides<L, I, std::index_sequence<X...>>
+            {
+                constexpr static std::ptrdiff_t value = calculate_stride<L, I, X...>::value;
+            };
+
+            template <layout_type L, size_t I, class SEQ >
+            constexpr std::ptrdiff_t get_computed_strides(bool cond)
+            {
+                return cond ? 0 : computed_strides<L, I, SEQ>::value;
+            }
+        }
+
         template <layout_type L, class R, std::size_t... X, std::size_t... I>
         constexpr R get_strides_impl(const xt::fixed_shape<X...>& shape, std::index_sequence<I...>)
         {
             static_assert((L == layout_type::row_major) || (L == layout_type::column_major),
                           "Layout not supported for fixed array");
-            return R({shape[I] == 1 ? 0 : calculate_stride<L, I, X...>::value...});
+#if (_MSC_VER >= 1910)
+            using temp_type = std::index_sequence<X...>;
+            return R({ workaround::get_computed_strides<L, I, temp_type>(shape[I] == 1)... });
+#else
+            return R({ shape[I] == 1 ? 0 : calculate_stride<L, I, X...>::value... });
+#endif
         }
 
         template <class S, class T, std::size_t... I>
