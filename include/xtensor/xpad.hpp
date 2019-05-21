@@ -93,21 +93,28 @@ namespace xt
                 {
                     XTENSOR_ASSERT(nb <= out.shape()[axis]);
                     XTENSOR_ASSERT(ne <= out.shape()[axis]);
-                    sv_bgn[axis] = xt::range(out.shape()[axis]-ne, out.shape()[axis]);
-                    sv_end[axis] = xt::range(0, nb);
+                    sv_bgn[axis] = xt::range(out.shape()[axis]-nb, out.shape()[axis]);
+                    sv_end[axis] = xt::range(0, ne);
                 }
                 else if (mode == pad_mode::symmetric)
                 {
                     XTENSOR_ASSERT(nb <= out.shape()[axis]);
                     XTENSOR_ASSERT(ne <= out.shape()[axis]);
-                    sv_bgn[axis] = xt::range(nb, _, -1);
+                    if (nb == (size_type)0)
+                    {
+                        sv_bgn[axis] = xt::range(0, 0, -1);
+                    }
+                    else
+                    {
+                        sv_bgn[axis] = xt::range(nb-1, _, -1);
+                    }
                     if (ne == out.shape()[axis])
                     {
                         sv_end[axis] = xt::range(out.shape()[axis], _, -1);
                     }
                     else
                     {
-                        sv_end[axis] = xt::range(out.shape()[axis], out.shape()[axis]-ne, -1);
+                        sv_end[axis] = xt::range(out.shape()[axis], out.shape()[axis]-ne-1, -1);
                     }
                 }
 
