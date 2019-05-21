@@ -595,6 +595,8 @@ namespace xt
         template <class T = xexpression_type>
         enable_simd_interface<T, const_reference> data_element(size_type i) const;
 
+        const inner_shape_type& unbroadcasted_shape() const noexcept;
+
     private:
 
         // VS 2015 workaround (yes, really)
@@ -1352,6 +1354,12 @@ namespace xt
     inline auto xview<CT, S...>::data_element(size_type i) const -> enable_simd_interface<T, const_reference>
     {
         return m_e.data_element(data_offset() + i);
+    }
+
+    template<class CT, class... S>
+    inline auto xview<CT, S...>::unbroadcasted_shape() const noexcept -> const inner_shape_type&
+    {
+        return shape();
     }
 
     template <class CT, class... S>

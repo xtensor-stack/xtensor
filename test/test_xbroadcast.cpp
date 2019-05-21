@@ -9,6 +9,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xio.hpp"
 
 namespace xt
 {
@@ -175,5 +176,12 @@ namespace xt
         EXPECT_EQ(cm_arr(1, 0), 10.0);
         EXPECT_EQ(cm_arr(1, 1), 11.0);
         EXPECT_EQ(cm_arr(1, 2), 12.0);
+    }
+    TEST(xbroadcast, nobroadcast)
+    {
+        xt::xarray<int> a = { 1,2,3 };
+        auto a_broadcast = broadcast(a, { 2,3 });
+        
+        EXPECT_EQ(a_broadcast.shape(), a_broadcast.unbroadcasted_shape());
     }
 }

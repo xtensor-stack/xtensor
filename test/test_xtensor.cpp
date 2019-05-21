@@ -337,4 +337,10 @@ namespace xt
         using tensor_type = xtensor<int, 2>;
         test_iterator_types<tensor_type, int*, const int*>();
     }
+
+    TEST(xtensor, no_broadcast)
+    {
+        xt::xtensor<int, 2> a = { { 1,2,3 }, {4, 5, 6} };
+        EXPECT_EQ(a.shape(), a.unbroadcasted_shape());
+    }
 }

@@ -284,6 +284,8 @@ namespace xt
         xt_simd::simd_return_type<value_type, requested_type>
         load_simd(size_type i) const;
 
+        const shape_type& unbroadcasted_shape() const noexcept;
+
     private:
 
         CT m_value;
@@ -925,6 +927,12 @@ namespace xt
         -> xt_simd::simd_return_type<value_type, requested_type>
     {
         return xt_simd::set_simd<value_type, requested_type>(m_value);
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::unbroadcasted_shape() const noexcept -> const shape_type&
+    {
+        return shape();
     }
 
     template <class T>

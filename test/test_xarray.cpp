@@ -317,4 +317,10 @@ namespace xt
         using array_type = xarray<int>;
         test_iterator_types<array_type, int*, const int*>();
     }
+
+    TEST(xarray, nobroadcast)
+    {
+        xt::xarray<int> a = { 1,2,3 };
+        EXPECT_EQ(a.shape(), a.unbroadcasted_shape());
+    }
 }

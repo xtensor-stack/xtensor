@@ -273,5 +273,12 @@ namespace xt
         xt::xarray<double, xt::layout_type::column_major> xrs = res;
         EXPECT_EQ(x, res);
     }
+    TEST(xdynamic_view, nobroadcast)
+    {
+        xt::xarray<float> a(xt::random::rand<float>({ 5, 4 }));
+        auto v = xt::view(a, xt::keep(2,3), xt::all());
+        auto res = xt::xarray<float>(xt::dynamic_view(v, { xt::keep(0) }));
 
+        EXPECT_EQ(res.shape(), res.unbroadcasted_shape());
+    }
 }

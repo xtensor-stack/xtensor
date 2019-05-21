@@ -199,6 +199,8 @@ namespace xt
         using container_iterator = storage_iterator;
         using const_container_iterator = const_storage_iterator;
 
+        XTENSOR_CONSTEXPR_RETURN const inner_shape_type& unbroadcasted_shape() const noexcept;
+
     protected:
 
         xcontainer() = default;
@@ -788,6 +790,12 @@ namespace xt
     inline auto xcontainer<D>::storage_crend() const noexcept -> const_reverse_storage_iterator
     {
         return storage().crend();
+    }
+
+    template <class D>
+	XTENSOR_CONSTEXPR_RETURN auto xcontainer<D>::unbroadcasted_shape() const noexcept -> const inner_shape_type&
+    {
+        return shape();
     }
 
     template <class D>

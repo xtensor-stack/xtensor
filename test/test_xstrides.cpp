@@ -9,10 +9,11 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "test_common.hpp"
+#include "xtensor/xio.hpp"
 
 namespace xt
 {
-    TEST(xstrides, broadcast_shape)
+    /*TEST(xstrides, broadcast_shape)
     {
         using shape_type = std::vector<std::size_t>;
         shape_type s1 = { 2, 4, 3 };
@@ -145,5 +146,12 @@ namespace xt
 
         vector_type strides_7 = { 1, 2, 1, 4 };
         EXPECT_FALSE(xt::do_strides_match(shape_2, strides_7, xt::layout_type::column_major, false));
+    }*/
+
+    TEST(xstrides, nobroadcast)
+    {
+        xt::xarray<int> a = {{0,1,2,3,4},{5,6,7,8,9},{10,11,12,13,14},{15,16,17,18,19},{20,21,22,23,24}};
+        auto a_strided_view = xt::strided_view(a, { xt::range(0, 5, 2), xt::range(0, 5, 2) });
+        EXPECT_EQ(a_strided_view.shape(), a_strided_view.unbroadcasted_shape());
     }
 }
