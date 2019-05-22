@@ -123,6 +123,12 @@ namespace xt
         using shape_type = typename xtensor<T, N>::shape_type;
         return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
+#else
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class I>
+    inline xarray<T, L> empty(const std::initializer_list<I>& init)
+    {
+        return xarray<T, L>::from_shape(init);
+    }
 #endif
 
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, std::size_t... N>
