@@ -32,7 +32,7 @@ namespace xt
     class xshared_expression;
 
     template <class E>
-    auto make_xshared(xexpression<E>&&);
+    xshared_expression<E> make_xshared(xexpression<E>&&);
 
     /***************************
      * xexpression declaration *
@@ -76,7 +76,7 @@ namespace xt
 
         std::shared_ptr<D> p_shared;
 
-        friend inline xshared_expression<D> make_xshared<D>(xexpression<D>&&);
+        friend xshared_expression<D> make_xshared<D>(xexpression<D>&&);
     };
 
     /******************************
@@ -668,7 +668,7 @@ namespace xt
      * @return xshared expression
      */
     template <class E>
-    inline auto make_xshared(xexpression<E>&& expr)
+    inline xshared_expression<E> make_xshared(xexpression<E>&& expr)
     {
         if(expr.p_shared == nullptr)
         {
