@@ -73,7 +73,7 @@ namespace xt
 
         std::shared_ptr<D> p_shared;
 
-        friend auto make_xshared<D>(xexpression<D>&&);
+        friend inline auto make_xshared<D>(xexpression<D>&&);
     };
 
     /******************************
