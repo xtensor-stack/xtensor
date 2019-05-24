@@ -20,14 +20,118 @@
 
 namespace xt
 {
-	TEST(xnobroadcast, A)
+	TEST(xnobroadcast, assign)
 	{
-		xt::xarray<int> a = { 1, 2 , 3 };
-		xt::xarray<int> b = { 4, 5 , 6 };
+		xarray<int> a = { 1, 2 , 3 };
+		xarray<int> b = { 4, 5 , 6 };
 
-		xt::xarray<int> res = a + b;
-	
-		auto res2 = nobroadcast(a);
-		res2 = b;
+        xarray<int> arrays_sum = a + b;
+        xarray<int> br_arrays_sum;
+        nobroadcast(br_arrays_sum) = a + b;
+
+        EXPECT_EQ(br_arrays_sum, arrays_sum);
+
+        xscalar<int> k = 3;
+
+        xarray<int> scalar_sum = a + k;
+        xarray<int> br_scalar_sum;
+        nobroadcast(br_scalar_sum) = a + k;
+
+        EXPECT_EQ(br_scalar_sum, scalar_sum);
 	}
+    TEST(xnobroadcast, a_plus_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a += a;
+        nobroadcast(nobr_a) += nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
+
+    TEST(xnobroadcast, a_minus_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a -= a;
+        nobroadcast(nobr_a) -= nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
+
+    TEST(xnobroadcast, a_times_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a *= a;
+        nobroadcast(nobr_a) *= nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
+
+    TEST(xnobroadcast, a_divide_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a /= a;
+        nobroadcast(nobr_a) /= nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
+
+    TEST(xnobroadcast, a_modulus_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a %= a;
+        nobroadcast(nobr_a) %= nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
+
+    TEST(xnobroadcast, a_bit_and_assign_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a &= a;
+        nobroadcast(nobr_a) &= nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
+
+    TEST(xnobroadcast, a_bit_or_assign_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a |= a;
+        nobroadcast(nobr_a) |= nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
+
+    TEST(xnobroadcast, a_bit_xor_assign_equal_b)
+    {
+        xarray<int> a = { 1,2,3 };
+        xarray<int> nobr_a;
+        nobroadcast(nobr_a) = a;
+
+        a ^= a;
+        nobroadcast(nobr_a) ^= nobr_a;
+
+        EXPECT_EQ(nobr_a, a);
+    }
 }
