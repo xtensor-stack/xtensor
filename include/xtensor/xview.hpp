@@ -66,16 +66,6 @@ namespace xt
      * xview declaration *
      *********************/
 
-    template <class CT, class... S>
-    struct xcontainer_inner_types<xview<CT, S...>>
-    {
-        using xexpression_type = std::decay_t<CT>;
-        using reference = inner_reference_t<CT>;
-        using const_reference = typename xexpression_type::const_reference;
-        using size_type = typename xexpression_type::size_type;
-        using temporary_type = view_temporary_type_t<xexpression_type, S...>;
-    };
-
     template <bool is_const, class CT, class... S>
     class xview_stepper;
 
@@ -299,6 +289,20 @@ namespace xt
     }
 
     template <class CT, class... S>
+    struct xcontainer_inner_types<xview<CT, S...>>
+    {
+        using xexpression_type = std::decay_t<CT>;
+        using reference = inner_reference_t<CT>;
+        using const_reference = typename xexpression_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
+        using temporary_type = view_temporary_type_t<xexpression_type, S...>;
+        using storage_type = typename xexpression_type::storage_type;
+        static constexpr layout_type layout =
+            detail::is_contiguous_view<xexpression_type, S...>::value ?
+                xexpression_type::static_layout : layout_type::dynamic;
+    };
+
+    template <class CT, class... S>
     struct xiterable_inner_types<xview<CT, S...>>
     {
         using xexpression_type = std::decay_t<CT>;
@@ -335,7 +339,10 @@ namespace xt
      */
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,
-                  public xiterable<xview<CT, S...>>,
+                  public std::conditional_t<
+                    detail::is_contiguous_view<std::decay_t<CT>, S...>::value,
+                    xcontiguous_iterable<xview<CT, S...>>,
+                    xiterable<xview<CT, S...>>>,
                   public xaccessible<xview<CT, S...>>,
                   public extension::xview_base_t<CT, S...>
     {
@@ -364,9 +371,7 @@ namespace xt
         using size_type = typename inner_types::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        static constexpr layout_type static_layout = detail::is_contiguous_view<xexpression_type, S...>::value ?
-                                                                                xexpression_type::static_layout :
-                                                                                layout_type::dynamic;
+        static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
         static constexpr bool is_strided_view = detail::is_strided_view<xexpression_type, S...>::value;
