@@ -136,7 +136,7 @@ which print the indices and the selection (which are in this case identical):
 From flat indices to array indices
 ----------------------------------
 
-To convert *flat indices* to *array_indices* the function ``xt::ravel_indices`` can be used. For example
+To convert *flat indices* to *array_indices* the function ``xt::unravel_indices`` can be used. For example
 
 .. code-block:: cpp
 
