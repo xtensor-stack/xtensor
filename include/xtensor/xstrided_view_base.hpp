@@ -41,6 +41,8 @@ namespace xt
 
             using iterator = decltype(std::declval<std::remove_reference_t<CT>>().template begin<L>());
             using const_iterator = decltype(std::declval<std::decay_t<CT>>().template cbegin<L>());
+            using reverse_iterator = decltype(std::declval<std::remove_reference_t<CT>>().template rbegin<L>());
+            using const_reverse_iterator = decltype(std::declval<std::decay_t<CT>>().template crbegin<L>());
 
             explicit flat_expression_adaptor(CT* e);
 

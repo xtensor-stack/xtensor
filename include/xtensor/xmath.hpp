@@ -1917,7 +1917,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
         auto axes_copy = axes;
-        auto inner_mean = mean(sc, std::move(axes_copy));
+        // always eval to prevent repeated evaluations in the next calls
+        auto inner_mean = eval(mean(sc, std::move(axes_copy), evaluation_strategy::immediate));
 
         // fake keep_dims = 1
         auto keep_dim_shape = e.shape();
@@ -1925,6 +1926,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         {
             keep_dim_shape[el] = 1;
         }
+
         auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
         return mean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
     }
