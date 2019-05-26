@@ -693,11 +693,11 @@ namespace xt
         EXPECT_EQ(av, a);
 
         bool truthy;
-        truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>, layout_type::dynamic>>();
+        truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>, XTENSOR_DEFAULT_LAYOUT>>();
         EXPECT_TRUE(truthy);
 
 #if !defined(X_OLD_CLANG)
-        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2, layout_type::dynamic>>();
+        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2, XTENSOR_DEFAULT_LAYOUT>>();
         EXPECT_TRUE(truthy);
         truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
