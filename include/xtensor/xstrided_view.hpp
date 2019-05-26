@@ -82,7 +82,7 @@ namespace xt
         using storage_getter = FST;
         using inner_storage_type = typename storage_getter::type;
         using temporary_type = temporary_type_t<typename xexpression_type::value_type, S, L>;
-        using storage_type = inner_storage_type;
+        using storage_type = std::remove_reference_t<inner_storage_type>;
         static constexpr layout_type layout = L;
     };
 
@@ -237,7 +237,7 @@ namespace xt
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
         template <class T, class R>
-        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && contiguous_layout, R>;
+        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && L != layout_type::dynamic, R>;
 
         template <class align, class simd, class T = xexpression_type>
         enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
@@ -668,7 +668,7 @@ namespace xt
         xt::resize_container(strides, shape.size());
         compute_strides(shape, L, strides);
         constexpr auto computed_layout = std::decay_t<E>::static_layout == L ? L : layout_type::dynamic;
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, computed_layout, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, computed_layout, detail::flat_storage_getter<xclosure_t<E>, L>>;
         return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, e.layout());
     }
 

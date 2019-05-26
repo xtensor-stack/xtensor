@@ -273,7 +273,7 @@ namespace xt
         };
 
         template <class CT, layout_type L>
-        using flat_storage_getter = std::conditional_t<has_data_interface<std::decay_t<CT>>::value,
+        using flat_storage_getter = std::conditional_t<has_data_interface<std::decay_t<CT>>::value && std::decay_t<CT>::static_layout == L,
                                                        inner_storage_getter<CT>,
                                                        flat_adaptor_getter<CT, L>>;
 
