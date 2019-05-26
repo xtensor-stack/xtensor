@@ -236,11 +236,15 @@ namespace xt
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
-        template <class align, class simd>
-        void store_simd(size_type i, const simd& e);
+        template <class T, class R>
+        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && contiguous_layout, R>;
+
+        template <class align, class simd, class T = xexpression_type>
+        enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
         template <class align, class requested_type = value_type,
-                  std::size_t N = xt_simd::simd_traits<requested_type>::size>
-        simd_return_type<requested_type> load_simd(size_type i) const;
+                  std::size_t N = xt_simd::simd_traits<requested_type>::size,
+                  class T = xexpression_type>
+        enable_simd_interface<T, simd_return_type<requested_type>> load_simd(size_type i) const;
 
         reference data_element(size_type i);
         const_reference data_element(size_type i) const;
@@ -546,17 +550,18 @@ namespace xt
     }
 
     template <class CT, class S, layout_type L, class FST>
-    template <class alignment, class simd>
-    inline void xstrided_view<CT, S, L, FST>::store_simd(size_type i, const simd& e)
+    template <class alignment, class simd, class T>
+    inline auto xstrided_view<CT, S, L, FST>::store_simd(size_type i, const simd& e)
+        -> enable_simd_interface<T, void>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         xt_simd::store_simd<value_type, typename simd::value_type>(&(storage()[i]), e, align_mode());
     }
 
     template <class CT, class S, layout_type L, class FST>
-    template <class alignment, class requested_type, std::size_t N>
+    template <class alignment, class requested_type, std::size_t N, class T>
     inline auto xstrided_view<CT, S, L, FST>::load_simd(size_type i) const
-        -> simd_return_type<requested_type>
+        -> enable_simd_interface<T, simd_return_type<requested_type>>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         return xt_simd::load_simd<value_type, requested_type>(&(storage()[i]), align_mode());
