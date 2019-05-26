@@ -237,7 +237,7 @@ namespace xt
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
         template <class T, class R>
-        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && contiguous_layout, R>;
+        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && L != layout_type::dynamic, R>;
 
         template <class align, class simd, class T = xexpression_type>
         enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
