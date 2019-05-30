@@ -798,7 +798,7 @@ namespace xt
 	inline auto filter_rows(E&& e, O&& condition) noexcept
 	{
 		auto row_indices = rowwhere(std::forward<O>(condition));
-		return xt::view(e, xt::keep(row_indices), xt::all());
+		return view(e, keep(row_indices), all());
 	}
 
 	

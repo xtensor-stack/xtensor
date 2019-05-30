@@ -157,7 +157,7 @@ namespace xt
     {
 		xarray<int> a = { { 0, 1, 2, 3 },{ 4, 5, 6, 7 },{ 8, 9, 10, 11 } };
 		xarray<int> res = { {8, 9, 10, 11} };
-		auto filter = xt::filter_row(a, xt::view(a, xt::all(), 0) > 4);
+		auto filter = filter_rows(a, view(a, all(), 0) > 4);
 		
         EXPECT_EQ(filter, res);
     }
