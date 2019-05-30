@@ -2593,6 +2593,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     auto diff(const xexpression<T>& a, std::size_t n = 1, std::ptrdiff_t axis = -1)
     {
         auto ad = a.derived_cast();
+        XTENSOR_ASSERT(n <= ad.size());
         std::size_t saxis = normalize_axis(ad.dimension(), axis);
 
         if (n == 0)
