@@ -430,6 +430,7 @@ namespace xt
         disable_xexpression<E, self_type>& operator=(const E& e);
 
         const inner_shape_type& shape() const noexcept;
+        size_type shape(size_type index) const;
         const slice_type& slices() const noexcept;
         layout_type layout() const noexcept;
 
@@ -883,6 +884,20 @@ namespace xt
     inline auto xview<CT, S...>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
+    }
+
+    /**
+     * @name Size and shape
+     */
+    //@{
+    /**
+     * Returns the i-th dimension of the view.
+     */
+    template <class CT, class... S>
+    inline auto xview<CT, S...>::shape(size_type index) const -> size_type
+    {
+        XTENSOR_ASSERT(index < m_shape.size());
+        return m_shape[index];
     }
 
     /**
