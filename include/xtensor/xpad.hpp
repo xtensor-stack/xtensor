@@ -100,7 +100,7 @@ namespace xt
                 {
                     XTENSOR_ASSERT(nb <= out.shape()[axis]);
                     XTENSOR_ASSERT(ne <= out.shape()[axis]);
-                    if (nb == (size_type)0)
+                    if (nb == size_type(0))
                     {
                         sv_bgn[axis] = xt::range(0, 0, -1);
                     }

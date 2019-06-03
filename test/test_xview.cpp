@@ -78,17 +78,17 @@ namespace xt
         EXPECT_EQ(a(0, 0), view0(0));
         EXPECT_EQ(a(0, 1), view0(1));
         EXPECT_EQ(size_t(1), view0.dimension());
-        EXPECT_EQ(size_t(3), view0.shape()[0]);
+        EXPECT_EQ(size_t(3), view0.shape(0));
 
         auto view2 = view(a, range(0, 2), 2);
         EXPECT_EQ(a(0, 2), view2(0));
         EXPECT_EQ(a(1, 2), view2(1));
         EXPECT_EQ(size_t(1), view2.dimension());
-        EXPECT_EQ(size_t(2), view2.shape()[0]);
+        EXPECT_EQ(size_t(2), view2.shape(0));
 
         auto view4 = view(a, 1);
         EXPECT_EQ(size_t(1), view4.dimension());
-        EXPECT_EQ(size_t(4), view4.shape()[0]);
+        EXPECT_EQ(size_t(4), view4.shape(0));
 
         auto view5 = view(view4, 1);
         EXPECT_EQ(size_t(0), view5.dimension());
