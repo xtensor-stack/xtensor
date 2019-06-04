@@ -428,13 +428,14 @@ xframe
 .. image:: xframe.svg
    :alt: xframe
 
-The xframe_ project proves a dataframe for C++, based on ``xtensor`` and ``xtl``.
+The xframe_ project provides multi-dimensional labeled arrays and a data frame for C++,
+based on ``xtensor`` and ``xtl``.
 
 `xframe` provides
 
 - an extensible expression system enabling lazy broadcasting.
 - an API following the idioms of the C++ standard library.
-- tools to manipulate n-dimensional labelled tensor expressions.
+- tools to manipulate n-dimensional labeled tensor expressions.
 
 The API of xframe is inspired by xarray_, a Python package implementing labelled multi-dimensional arrays and datasets.
 
