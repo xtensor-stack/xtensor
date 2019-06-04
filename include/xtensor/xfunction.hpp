@@ -276,6 +276,7 @@ namespace xt
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const;
         layout_type layout() const noexcept;
+        using accessible_base::shape;
 
         template <class... Args>
         const_reference operator()(Args... args) const;

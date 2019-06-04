@@ -107,6 +107,17 @@ namespace xt
         EXPECT_ANY_THROW(xt::xarray<double> res = arr1 * arr2);
     }
 
+    TEST(xfunction, shape)
+    {
+        xfunction_features f;
+        auto func = f.m_a + f.m_c;
+        const auto& sh = func.shape();
+        for(std::size_t i = 0; i < sh.size(); ++i)
+        {
+            EXPECT_EQ(sh[i], func.shape(i));
+        }
+    }
+
     TEST(xfunction, layout_type)
     {
         xarray<int, layout_type::dynamic> m_d;
