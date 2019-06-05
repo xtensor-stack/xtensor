@@ -70,3 +70,27 @@ in the returned expression.
 Replacing ``auto tmp`` with ``xt::xarray<double> tmp`` does not change anything, ``tmp``
 is still an lvalue and thus captured by reference.
 
+Random numbers not consistent
+-----------------------------
+
+Using a random number function from xtensor actually returns a lazy 
+generator. That means, accessing the same element of a random number
+generator does not give the same random number if called twice.
+
+.. code::
+
+    auto gen = xt::random::rand<double>({10, 10});
+    auto a0 = gen(0, 0);
+    auto a1 = gen(0, 0);
+
+    // a0 != a1 !!!
+
+You need to explicitly assign or eval a random number generator, 
+like so:
+
+.. code::
+
+    xt::xarray<double> xr = xt::random::rand<double>({10, 10});
+    auto xr2 = eval(xt::random::rand<double>({10, 10}));
+
+    // now xr(0, 0) == xr(0, 0) is true.

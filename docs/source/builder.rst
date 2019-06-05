@@ -35,6 +35,8 @@ Joining expressions
 Random distributions
 --------------------
 
+.. warning:: xtensor uses a lazy generator for random numbers. You need to assign them or use ``eval`` to keep the generated values consistent.
+
 - ``rand(shape, lower, upper)``: generates an expression of the specified shape, containing uniformly
   distributed random numbers in the half-open interval [lower, upper).
 - ``randint(shape, lower, upper)``: generates an expression of the specified shape, containing uniformly

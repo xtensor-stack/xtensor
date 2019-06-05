@@ -9,6 +9,8 @@ xrandom
 
 Defined in ``xtensor/xrandom.hpp``
 
+.. warning:: xtensor uses a lazy generator for random numbers. You need to assign them or use ``eval`` to keep the generated values consistent.
+
 .. doxygenfunction:: xt::random::get_default_random_engine
    :project: xtensor
 
