@@ -306,7 +306,13 @@ namespace xt
         template <class T, class S = T, XTL_REQUIRES(both_integer<T, S>)>
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
-            std::size_t shape = static_cast<std::size_t>((stop - start + step - S(1)) / step);
+            bool empty_cond = (stop - start) / step <= 0;
+            std::size_t shape = 0;
+            if(!empty_cond)
+            {
+                shape = stop > start ? static_cast<std::size_t>((stop - start + step - S(1)) / step)
+                                     : static_cast<std::size_t>((start - stop - step - S(1)) / -step);
+            }
             return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
         }
 
