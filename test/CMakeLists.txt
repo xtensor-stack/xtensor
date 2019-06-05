@@ -73,6 +73,9 @@ else()
   message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=thread -g")
+
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     if(DOWNLOAD_GTEST)
         # Download and unpack googletest at configure time
@@ -237,6 +240,9 @@ foreach(filename IN LISTS XTENSOR_TESTS)
         COMMAND ${targetname}
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
 endforeach()
+
+add_executable(mainiac mainiac.cpp ${XTENSOR_HEADERS})
+target_link_libraries(mainiac xtensor)
 
 add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 if(XTENSOR_USE_XSIMD)
