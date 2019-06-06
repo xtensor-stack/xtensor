@@ -1194,6 +1194,14 @@ namespace xt
         EXPECT_TRUE(std::equal(b.begin() + 3, b.end(), vb.begin()));
         EXPECT_EQ(b.size() - 3, vb.size());
 
+        vector_type cvta = va;
+        std::array<int, 4> cvtb = vb;
+        vector_type cvta_expected = { 3, 4, 5, 6 };
+        std::array<int, 4> cvtb_expected = { 3, 4, 5, 6};
+
+        EXPECT_EQ(cvta, cvta_expected);
+        EXPECT_EQ(cvtb, cvtb_expected);
+
         auto vae = sequence_view<vector_type, 3, 5>(a);
         auto vbe = sequence_view<array_type, 3, 5>(b);
 
