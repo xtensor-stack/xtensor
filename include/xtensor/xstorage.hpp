@@ -1665,6 +1665,9 @@ namespace xt
         template <std::ptrdiff_t OS, std::ptrdiff_t OE>
         explicit sequence_view(const sequence_view<E, OS, OE>& other);
 
+        template <class T, class R = decltype(std::declval<T>().begin())>
+        operator T() const;
+
         bool empty() const;
         size_type size() const;
         const_reference operator[](std::size_t idx) const;
@@ -1685,6 +1688,7 @@ namespace xt
         const E& storage() const;
 
     private:
+
         const E& m_sequence;
     };
 
@@ -1699,6 +1703,15 @@ namespace xt
     sequence_view<E, Start, End>::sequence_view(const sequence_view<E, OS, OE>& other)
         : m_sequence(other.storage())
     {
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    template <class T, class R>
+    sequence_view<E, Start, End>::operator T() const
+    {
+        T ret = xtl::make_sequence<T>(this->size());
+        std::copy(this->cbegin(), this->cend(), ret.begin());
+        return ret;
     }
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
