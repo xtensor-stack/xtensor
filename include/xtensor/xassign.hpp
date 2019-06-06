@@ -240,10 +240,16 @@ namespace xt
         }
 
         template <class E1, class E2>
-        inline bool is_linear_assign(const E1& e1, const E2& e2)
+        inline auto is_linear_assign(const E1& e1, const E2& e2) -> std::enable_if_t<has_strides<E1>::value, bool>
         {
             return (E1::contiguous_layout && E2::contiguous_layout && linear_static_layout<E1, E2>()) ||
                    (e1.layout() != layout_type::dynamic && e2.has_linear_assign(e1.strides()));
+        }
+
+        template <class E1, class E2>
+        inline auto is_linear_assign(const E1&, const E2&) -> std::enable_if_t<!has_strides<E1>::value, bool>
+        {
+            return false;
         }
 
         template <class E, class = void>
