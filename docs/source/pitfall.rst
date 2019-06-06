@@ -64,7 +64,7 @@ be tempted to simplify it a bit:
 Unfortunately, you introduced a bug; indeed, expressions in ``xtensor`` are not evaluated
 immediately, they capture their arguments by reference or copy depending on their nature,
 for future evaluation. Since ``tmp`` is an lvalue, it is captured by reference in the last
-statement; when the function returns, ̀``tmp`` is destroyed, leading to a dangling reference
+statement; when the function returns, ``tmp`` is destroyed, leading to a dangling reference
 in the returned expression.
 
 Replacing ``auto tmp`` with ``xt::xarray<double> tmp`` does not change anything, ``tmp``
