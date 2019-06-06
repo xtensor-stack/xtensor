@@ -167,6 +167,33 @@ namespace xt
         ASSERT_EQ(l4[{3}], 9);
     }
 
+    TEST(xbuilder, arange_reverse)
+    {
+        auto a0 = arange(6, 5, -1);
+        EXPECT_EQ(a0.dimension(), size_t(1));
+        decltype(a0)::shape_type expected_shape0 = {1};
+        EXPECT_EQ(a0.shape(), expected_shape0);
+        EXPECT_EQ(a0(0), 6);
+
+        auto a1 = arange(8, 5, -1);
+        EXPECT_EQ(a1.dimension(), size_t(1));
+        decltype(a1)::shape_type expected_shape1 = {3};
+        EXPECT_EQ(a1.shape(), expected_shape1);
+        EXPECT_EQ(a1(0), 8);
+        EXPECT_EQ(a1(1), 7);
+        EXPECT_EQ(a1(2), 6);
+
+        auto a2 = arange(5, 6, -1);
+        EXPECT_EQ(a2.dimension(), size_t(1));
+        decltype(a2)::shape_type expected_shape2 = {0};
+        EXPECT_EQ(a2.shape(), expected_shape2);
+
+        auto a3 = arange(8, 5, 1);
+        EXPECT_EQ(a3.dimension(), size_t(1));
+        decltype(a3)::shape_type expected_shape3 = {0};
+        EXPECT_EQ(a3.shape(), expected_shape3);
+    }
+
     TEST(xbuilder, linspace)
     {
         auto ls = linspace<float>(20.f, 50.f);
