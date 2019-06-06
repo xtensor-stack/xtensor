@@ -1464,4 +1464,14 @@ namespace xt
         int res = v.element(idx.cbegin(), idx.cend());
         EXPECT_EQ(res, 2);
     }
+
+    TEST(xview, view_reshape_view)
+    {
+        xtensor<int, 1> a = { 0, 1, 2 };
+        xtensor<int, 1> b = { 2, 3, 4 };
+        auto tmp = reshape_view(a, {3});
+        auto res = view(std::move(tmp), xt::all());
+        noalias(view(reshape_view(a, {3}), xt::all())) = b;
+        EXPECT_EQ(tmp, res);
+    }
 }
