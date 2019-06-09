@@ -44,7 +44,7 @@ requirements):
 
 - ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in ``xtensor``. This requires that you have xsimd_ installed
   on your system.
-- ``XTENOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
+- ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
 
 Build and optimization
