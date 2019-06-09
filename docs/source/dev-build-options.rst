@@ -20,7 +20,7 @@ Build
   Note that the dimensions check should not be activated if you expect ``operator()`` to perform broadcasting.
 - ``XTENSOR_USE_XSIMD``: enables simd acceleration in ``xtensor``. This requires that you have xsimd_ installed
   on your system.
-- ``XTENOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
+- ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
 
 All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or
@@ -63,7 +63,7 @@ including any of its header. Here is a list of available macros:
   on if you expect ``operator()`` to perform broadcasting.
 - ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in ``xtensor``. This requires that you have xsimd_ installed
   on your system.
-- ``XTENOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
+- ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
 - ``XTENSOR_DEFAULT_DATA_CONTAINER(T, A)``: defines the type used as the default data container for tensors and arrays. ``T``
   is the ``value_type`` of the container and ``A`` its ``allocator_type``.
