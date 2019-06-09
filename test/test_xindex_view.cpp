@@ -153,6 +153,15 @@ namespace xt
         EXPECT_EQ(expected, a);
     }
 
+	TEST(xindex_view, filter_row)
+    {
+		xarray<int> a = { { 0, 1, 2, 3 },{ 4, 5, 6, 7 },{ 8, 9, 10, 11 } };
+		xarray<int> res = { {8, 9, 10, 11} };
+		auto filter = filter_rows(a, view(a, all(), 0) > 4);
+		
+        EXPECT_EQ(filter, res);
+    }
+	
     TEST(xindex_view, const_adapt_filter)
     {
         const std::vector<double> av({1,2,3,4,5,6});

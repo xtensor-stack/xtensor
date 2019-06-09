@@ -890,6 +890,37 @@ namespace xt
         return indices;
     }
 
+	/**
+     * @ingroup logical_operators
+     * @brief return vector of row indices where arr is not zero
+     *
+     * @param arr input array
+     * @return vector of size_types where arr is not equal to zero
+     */
+	template <class T>
+    inline auto rowwhere(const T& arr)
+    {
+        auto shape = arr.shape();
+        using index_type = xindex_type_t<typename T::shape_type>;
+        using size_type = typename T::size_type;
+
+        auto idx = xtl::make_sequence<index_type>(arr.dimension(), 0);
+        std::vector<size_type> indices;
+
+        size_type total_size = compute_size(shape);
+        for (size_type i = 0; i < total_size; i++, detail::next_idx(shape, idx))
+        {
+            if (arr.element(std::begin(idx), std::end(idx)))
+            {
+                indices.push_back(i);
+            }
+        }
+
+        return indices;
+    }
+
+
+	
     /**
     * @ingroup logical_operators
     * @brief Any

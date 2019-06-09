@@ -780,6 +780,29 @@ namespace xt
         return view_type(std::forward<E>(e), std::move(indices));
     }
 
+	/**
+     * @brief creates a view into \a e filtered by \a condition.
+     *
+     * Returns an xt::view (2D view) with the rows selected where \a condition evaluates to \em true.
+     *
+     * @param e the underlying xexpression
+     * @param condition xexpression with shape of \a e which selects rows
+     *
+     * \code{.cpp}
+	 * xarray<int> a = { { 0, 1, 2, 3 }, { 4, 5, 6, 7 }, { 8, 9, 10, 11 } };
+	 * auto filter = xt::filter_rows(a, xt::view(a, xt::all(), 0) > 4);
+	 * std::cout << filter << std:endl; // { {8, 9, 10, 11} }
+     * \endcode
+     */
+	template <class E, class O>
+	inline auto filter_rows(E&& e, O&& condition) noexcept
+	{
+		auto row_indices = rowwhere(std::forward<O>(condition));
+		return view(e, keep(row_indices), all());
+	}
+
+	
+	
     /**
      * @brief creates a filtration of \c e filtered by \a condition.
      *
