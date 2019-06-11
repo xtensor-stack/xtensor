@@ -18,11 +18,11 @@
 include(CMakeFindDependencyMacro)
 find_dependency(xtl @xtl_REQUIRED_VERSION@)
 
-if(XTENSOR_USE_XSIMD)
+if(@XTENSOR_USE_XSIMD@)
     find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
 endif()
 
-if(XTENSOR_USE_TBB)
+if(@XTENSOR_USE_TBB@)
     find_dependency(TBB)
 endif()
 
