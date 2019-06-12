@@ -7,15 +7,15 @@
 
 namespace xt
 {
-	template<class A>
-	class nobroadcast_proxy 
-	{
-	public :
+    template<class A>
+    class nobroadcast_proxy
+    {
+    public :
 
-		nobroadcast_proxy(A a) noexcept;
+        nobroadcast_proxy(A a) noexcept;
 
-		template<class E>
-		A operator=(const xexpression<E> & e);
+        template<class E>
+        A operator=(const xexpression<E> & e);
 
         template <class E>
         A operator+=(const xexpression<E>& e);
@@ -41,25 +41,25 @@ namespace xt
         template<class E>
         A operator^=(const xexpression<E>& e);
 
-	private :
-		A m_array;
-	};
+    private :
+        A m_array;
+    };
 
 
-	template <class A>
-	inline nobroadcast_proxy<A>::nobroadcast_proxy(A a) noexcept
-		: m_array(std::forward<A>(a))
-	{
-	}
+    template <class A>
+    inline nobroadcast_proxy<A>::nobroadcast_proxy(A a) noexcept
+        : m_array(std::forward<A>(a))
+    {
+    }
 
-	template <class A>
-	template <class E>
-	inline A nobroadcast_proxy<A>::operator=(const xexpression<E> & e)
-	{
-		/*resize_no_broadcast(m_array, e);
-		assign_data(m_array, e);
-		std::cout << m_array << std::endl;
-		return m_array;*/
+    template <class A>
+    template <class E>
+    inline A nobroadcast_proxy<A>::operator=(const xexpression<E> & e)
+    {
+        /*resize_no_broadcast(m_array, e);
+        assign_data(m_array, e);
+        std::cout << m_array << std::endl;
+        return m_array;*/
         //m_array.assign(e);
         //xexpression_assigner<tag>::assign_xexpression(e1, e2);
 
@@ -70,7 +70,7 @@ namespace xt
         base_type::assign_data(m_array, e, true);
 
         return m_array;
-	}
+    }
 
     template <class A>
     template <class E>
@@ -78,7 +78,7 @@ namespace xt
     {
         //return m_array.plus_assign(e);
         //-------------------------------------
-        
+
         //xexpression_assigner<tag>::computed_assign(e1, e2);
         //-------------------------------------
 
@@ -176,12 +176,12 @@ namespace xt
         return m_array;
     }
 
-	template <class A>
-	inline nobroadcast_proxy<xtl::closure_type_t<A>>
-		nobroadcast(A&& a) noexcept
-	{
-		return nobroadcast_proxy<xtl::closure_type_t<A>>(a);
-	}
+    template <class A>
+    inline nobroadcast_proxy<xtl::closure_type_t<A>>
+        nobroadcast(A&& a) noexcept
+    {
+        return nobroadcast_proxy<xtl::closure_type_t<A>>(a);
+    }
 }
 
 #endif
