@@ -18,7 +18,7 @@ any of its header. This can be achieved the following ways:
 - either define them in the CMakeLists of your project, with ``target_compile_definitions``
   cmake command.
 - or create a header where you define all the macros you want and then include the headers you
-  need. Then include thi sheader whenever you need ``xtensor`` in your project.
+  need. Then include this header whenever you need ``xtensor`` in your project.
 
 The following macros are already defined in ``xtensor`` but can be overwritten:
 
@@ -39,6 +39,9 @@ The following macros are helpers for debugging, they are not defined by default:
 - ``XTENSOR_ENABLE_CHECK_DIMENSION``: enables the dimensions check in ``xtensor``. Note that this option should not be turned
   on if you expect ``operator()`` to perform broadcasting.
 
+External dependencies
+---------------------
+
 The last group of macros is for using external libraries to achieve maximum performance (see next section for additional
 requirements):
 
@@ -46,6 +49,19 @@ requirements):
   on your system.
 - ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
+
+Defining these macros in the CMakeLists of your project before searching for ``xtensor`` will trigger automatic finding
+of dependencies, so you don't have to include the ``find_package(xsimd)`` and ``find_package(TBB)`` commands in your
+CMakeLists:
+
+.. code:: cmake
+
+    set(XTENSOR_USE_XSIMD 1)
+    set(XTENSOR_USE_TBB 1)
+    # xsimd and TBB dependencies are automatically
+    # searched when the following is executed
+    find_package(xtensor REQUIRED)
+
 
 Build and optimization
 ----------------------
