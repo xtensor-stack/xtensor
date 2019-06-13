@@ -88,7 +88,7 @@ namespace xt
     template <class S1, class S2>
     [[noreturn]] void throw_broadcast_error(const S1& lhs, const S2& rhs)
     {
-        std::string msg = detial::shape_error_message(lhs, rhs);
+        std::string msg = detail::shape_error_message(lhs, rhs);
         throw broadcast_error(msg.c_str());
     }
 #endif
@@ -108,7 +108,7 @@ namespace xt
     template <class S1, class S2>
     [[noreturn]] void throw_concatenate_error(const S1& lhs, const S2& rhs)
     {
-        std::string msg = detial::shape_error_message(lhs, rhs);
+        std::string msg = detail::shape_error_message(lhs, rhs);
         throw concatenate_error(msg.c_str());
     }
 #endif
