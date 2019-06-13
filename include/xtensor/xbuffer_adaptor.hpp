@@ -449,6 +449,9 @@ namespace xt
         xiterator_adaptor(self_type&&) = default;
         xiterator_adaptor& operator=(self_type&&) = default;
 
+        xiterator_adaptor& operator=(const temporary_type& rhs);
+        xiterator_adaptor& operator=(temporary_type&& rhs);
+
         size_type size() const noexcept;
         void resize(size_type size);
         
@@ -915,6 +918,20 @@ namespace xt
     {
     }
 
+    template <class I, class CI>
+    inline auto xiterator_adaptor<I, CI>::operator=(const temporary_type& rhs) -> self_type&
+    {
+        resize(rhs.size());
+        std::copy(rhs.cbegin(), rhs.cend(), m_it);
+        return *this;
+    }
+
+    template <class I, class CI>
+    inline auto xiterator_adaptor<I, CI>::operator=(temporary_type&& rhs) -> self_type&
+    {
+        return (*this = rhs);
+    }
+    
     template <class I, class CI>
     inline auto xiterator_adaptor<I, CI>::size() const noexcept -> size_type
     {
