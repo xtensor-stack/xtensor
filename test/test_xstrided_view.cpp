@@ -902,4 +902,13 @@ namespace xt
         xarray<int> rvcac = vcac;
         test::check_reshaped_2d_cm(rvcac, vcac);
     }
+
+    TEST(xstrided_view, flatten)
+    {
+        xt::xarray<int> x = {{1, 2, 3}, {4, 5, 6}};
+        auto x_view = xt::strided_view(x, {xt::range(0, 1), xt::range(0, 1)});
+        auto x_flat = xt::flatten<xt::layout_type::column_major>(x_view);
+        x_flat = {10};
+        EXPECT_EQ(x(0, 0), 10);
+    }
 }
