@@ -346,6 +346,14 @@ namespace xt
 
         auto t = concatenate(xtuple(arange(2), arange(2, 5), arange(5, 8)));
         ASSERT_TRUE(arange(8) == t);
+
+        
+        xt::xarray<double> fa = xt::ones<double>({ 3, 4, 5, 0 });
+        xt::xarray<double> sa = xt::ones<double>({ 3, 4, 5 });
+        xt::xarray<double> ta = xt::ones<double>({ 3, 4, 5, 3 });
+
+        EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, sa)));
+        EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, ta)));
     }
 
     TEST(xbuilder, access)
