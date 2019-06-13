@@ -33,8 +33,9 @@ namespace xt
     template <std::size_t... X>
     class fixed_shape;
 
-    using xindex = dynamic_shape<std::size_t>;    template <class S1, class S2>
-
+    using xindex = dynamic_shape<std::size_t>;
+    
+    template <class S1, class S2>
     bool same_shape(const S1& s1, const S2& s2) noexcept;
 
     template <class U>
