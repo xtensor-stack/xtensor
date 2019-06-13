@@ -908,7 +908,19 @@ namespace xt
         xt::xarray<int> x = {{1, 2, 3}, {4, 5, 6}};
         auto x_view = xt::strided_view(x, {xt::range(0, 1), xt::range(0, 1)});
         auto x_flat = xt::flatten<xt::layout_type::column_major>(x_view);
-        x_flat = {10};
-        EXPECT_EQ(x(0, 0), 10);
+        x_flat = 10;
+        xt::xarray<int> exp = {{10, 2, 3}, {4, 5, 6}};
+        EXPECT_EQ(x, exp);
+
+        auto x_view2 = xt::strided_view(x, {xt::range(0, 1), xt::range(0, 2)});
+        auto x_flat2 = xt::flatten<xt::layout_type::column_major>(x_view2);
+        x_flat2 = 15;
+        xt::xarray<int> exp2 = {{15, 15, 3}, {4, 5, 6}};
+        EXPECT_EQ(x, exp2);
+
+        xt::xarray<int> b = {20, 25};
+        x_flat2 = b;
+        xt::xarray<int> exp3 = {{20, 25, 3}, {4, 5, 6}};
+        EXPECT_EQ(x, exp3);
     }
 }

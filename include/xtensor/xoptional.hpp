@@ -428,6 +428,26 @@ namespace xt
         };
     }
 
+    /***************************************
+     * xtensor_view extension for optional *
+     ***************************************/
+
+    namespace extension
+    {
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_view_optional_traits : xtensor_optional_traits<EC, N, L>
+        {
+            using derived_type = xtensor_view<EC, N, L, xoptional_expression_tag>;
+        };
+
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_view_base<EC, N, L, xoptional_expression_tag>
+        {
+            using traits = xtensor_view_optional_traits<EC, N, L>;
+            using type = xcontainer_optional_base<traits>;
+        };
+    }
+
     /************************************************
      * xfunction extension for optional expressions *
      ************************************************/

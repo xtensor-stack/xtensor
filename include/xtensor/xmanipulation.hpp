@@ -224,7 +224,7 @@ namespace xt
         using const_iterator = decltype(e.template cbegin<L>());
         using adaptor_type = xiterator_adaptor<iterator, const_iterator>;
         constexpr layout_type layout = std::is_pointer<iterator>::value ? L : layout_type::dynamic;
-        using type = xtensor_adaptor<adaptor_type, 1, layout, extension::get_expression_tag_t<E>>;
+        using type = xtensor_view<adaptor_type, 1, layout, extension::get_expression_tag_t<E>>;
         return type(adaptor_type(e.template begin<L>(), e.template cbegin<L>(), e.size()), { e.size() });
     }
 
