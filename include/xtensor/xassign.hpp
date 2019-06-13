@@ -535,8 +535,10 @@ namespace xt
         }
 
         #if defined(XTENSOR_USE_TBB)
+        // std::cout << "PARLL" << std::endl;
         tbb::parallel_for(align_begin, align_end, simd_size, [&](size_t i)
         {
+            // std::cout << i << std::endl;
             e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
         });
         #else
@@ -572,6 +574,8 @@ namespace xt
         size_type n = e1.size();
 
 #if defined(XTENSOR_USE_TBB)
+        std::cout << "SLOW LOW PARLL" << std::endl;
+
         tbb::parallel_for(std::ptrdiff_t(0), static_cast<std::ptrdiff_t>(n), [&](std::ptrdiff_t i)
         {
             *(dst + i) = static_cast<value_type>(*(src + i));
