@@ -248,6 +248,22 @@ with the ``index_view`` helper function.
     b += 100;
     // => a = {{101, 5, 3}, {104, 105, 6}}
 
+The type used for representing indices can be any 1-D container providing an std::vector-like API. The same stands for the type
+of the list of indices:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtenosr/xindex_view.hpp"
+
+    xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
+    using index_type = std::array<std::size_t, 2>;
+    std::vector<index_type> indices = {{0, 0}, {1, 0}, {0, 1}};
+    auto b = xt::index_view(a, indices);
+    // => b = { 1, 4, 5 }
+    b += 100;
+    // => a = {{101, 5, 3}, {104, 105, 6}}
+
 Filter views
 ------------
 
