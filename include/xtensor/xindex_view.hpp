@@ -761,6 +761,7 @@ namespace xt
      * elements. In that case, you should consider using the \ref filtration function
      * instead.
      *
+     * @tparam L the traversal order
      * @param e the underlying xexpression
      * @param condition xexpression with shape of \a e which selects indices
      *
@@ -772,10 +773,10 @@ namespace xt
      *
      * \sa filtration
      */
-    template <class E, class O>
+    template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class O>
     inline auto filter(E&& e, O&& condition) noexcept
     {
-        auto indices = argwhere(std::forward<O>(condition));
+        auto indices = argwhere<L>(std::forward<O>(condition));
         using view_type = xindex_view<xclosure_t<E>, decltype(indices)>;
         return view_type(std::forward<E>(e), std::move(indices));
     }
