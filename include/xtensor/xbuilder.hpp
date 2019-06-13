@@ -643,10 +643,26 @@ namespace xt
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         using source_shape_type = decltype(std::get<0>(t).shape());
         shape_type new_shape = xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape());
+        
+        auto check_shape = [&axis, &new_shape](auto& arr) {
+            std::size_t s = new_shape.size();
+            bool res = s == arr.dimension();
+            for(std::size_t i = 0; i < s; ++i)
+            {
+                res = res && (i == axis || new_shape[i] == arr.shape(i));
+            }
+            if(!res)
+            {
+                throw_concatenate_error(new_shape, arr.shape());
+            }
+        };
+        for_each(check_shape, t);
+
         auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
             return prev + arr.shape()[axis];
         };
         new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
+        
         return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 

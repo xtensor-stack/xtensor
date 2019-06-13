@@ -137,6 +137,7 @@ namespace xt
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
         layout_type layout() const noexcept;
+        using base_type::shape;
 
         reference operator()();
         const_reference operator()() const;
