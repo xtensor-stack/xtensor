@@ -17,6 +17,7 @@
 
 #include "xexpression.hpp"
 #include "xiterable.hpp"
+#include "xoperation.hpp"
 #include "xsemantic.hpp"
 #include "xstrides.hpp"
 #include "xutils.hpp"
@@ -95,7 +96,7 @@ namespace xt
         using self_type = xindex_view<CT, I>;
         using xexpression_type = std::decay_t<CT>;
         using semantic_base = xview_semantic<self_type>;
-        
+
         using extension_base = extension::xindex_view_base_t<CT, I>;
         using expression_tag = typename extension_base::expression_tag;
 
