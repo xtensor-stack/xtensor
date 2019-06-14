@@ -2,6 +2,6 @@ name: xtensor
 channels:
   - conda-forge
 dependencies:
-  - xtensor=0.20.7
+  - xtensor=0.20.8
   - xtensor-blas=0.16.1
   - xeus-cling=0.5.1
