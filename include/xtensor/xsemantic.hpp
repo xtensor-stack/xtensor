@@ -127,6 +127,15 @@ namespace xt
         derived_type& operator=(const xexpression<E>&);
     };
 
+    template <class E>
+    using is_assignable = is_crtp_base_of<xsemantic_base, E>;
+
+    template <class E, class R = void>
+    using enable_assignable = typename std::enable_if<is_assignable<E>::value, R>::type;
+
+    template <class E, class R = void>
+    using disable_assignable = typename std::enable_if<!is_assignable<E>::value, R>::type;
+
     /**
      * @class xcontainer_semantic
      * @brief Implementation of the xsemantic_base interface
