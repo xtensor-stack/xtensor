@@ -218,11 +218,20 @@ add_custom_target(
 foreach(filename IN LISTS XTENSOR_TESTS)
     string(REPLACE ".cpp" "" targetname ${filename})
     add_executable(${targetname} ${COMMON_BASE} ${filename} ${XTENSOR_HEADERS})
-    target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
-    target_link_libraries(${targetname} xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+    if(XTENSOR_USE_XSIMD)
+        target_compile_definitions(${targetname} PRIVATE XTENSOR_USE_XSIMD)
+        target_link_libraries(${targetname} PRIVATE xsimd)
+    endif()
+    if(XTENSOR_USE_TBB)
+        target_compile_definitions(${targetname} PRIVATE XTENSOR_USE_TBB)
+        target_include_directories(${targetname} PRIVATE ${TBB_INCLUDE_DIRS})
+        target_link_libraries(${targetname} PRIVATE ${TBB_LIBRARIES})
+    endif()
     if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
         add_dependencies(${targetname} gtest_main)
     endif()
+    target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
+    target_link_libraries(${targetname} PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
     add_custom_target(
         x${targetname}
         COMMAND ${targetname}
@@ -230,10 +239,22 @@ foreach(filename IN LISTS XTENSOR_TESTS)
 endforeach()
 
 add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
-target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
+if(XTENSOR_USE_XSIMD)
+    target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_XSIMD)
+    target_link_libraries(test_xtensor_lib PRIVATE xsimd)
+endif()
+if(XTENSOR_USE_TBB)
+    target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_TBB)
+    target_include_directories(test_xtensor_lib PRIVATE ${TBB_INCLUDE_DIRS})
+    target_link_libraries(test_xtensor_lib PRIVATE ${TBB_LIBRARIES})
+endif()
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(test_xtensor_lib gtest_main)
 endif()
-target_link_libraries(test_xtensor_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
+target_link_libraries(test_xtensor_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
+add_custom_target(
+    xtest
+    COMMAND test_xtensor_lib
+    DEPENDS test_xtensor_lib)
