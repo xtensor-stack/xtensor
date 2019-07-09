@@ -29,7 +29,7 @@ namespace xt
     using xcsv_tensor = xtensor_container<std::vector<T, A>, 2, layout_type::row_major>;
 
     template <class T, class A = std::allocator<T>>
-    xcsv_tensor<T, A> load_csv(std::istream& stream);
+    xcsv_tensor<T, A> load_csv(std::istream& stream, const std::string comments = "#", const char delimiter = ',', const unsigned long skip_rows = 0, const long long max_rows = -1);
 
     template <class E>
     void dump_csv(std::ostream& stream, const xexpression<E>& e);
@@ -88,10 +88,10 @@ namespace xt
         inline unsigned long long lexical_cast<unsigned long long>(const std::string& cell) { return std::stoull(cell); }
 
         template <class ST, class T, class OI>
-        ST load_csv_row(std::istream& row_stream, OI output, std::string cell)
+        ST load_csv_row(std::istream& row_stream, OI output, std::string cell, const char delimiter = ',')
         {
             ST length = 0;
-            while (std::getline(row_stream, cell, ','))
+            while (std::getline(row_stream, cell, delimiter))
             {
                 *output++ = lexical_cast<T>(cell);
                 ++length;
@@ -105,9 +105,13 @@ namespace xt
      * 
      * Returns an \ref xexpression for the parsed CSV
      * @param stream the input stream containing the CSV encoded values
+     * @param comments the string used to indicate the start of a comment. [default: "#"]
+     * @param delimiter the character used to separate values. [default: ',']
+     * @param skip the first skip_rows lines. [default: 0]
+     * @param read max_rows lines of content after skip_rows lines; the default is to read all the lines. [default: -1]
      */
     template <class T, class A>
-    xcsv_tensor<T, A> load_csv(std::istream& stream)
+    xcsv_tensor<T, A> load_csv(std::istream& stream, const std::string comments, const char delimiter, const unsigned long skip_rows, const long long max_rows)
     {
         using tensor_type = xcsv_tensor<T, A>;
         using storage_type = typename tensor_type::storage_type;
@@ -117,14 +121,23 @@ namespace xt
         using output_iterator = std::back_insert_iterator<storage_type>;
 
         storage_type data;
-        size_type nbrow = 0, nbcol = 0;
+        size_type nbrow = 0, nbcol = 0, nhead = 0;
         {
             output_iterator output(data);
             std::string row, cell;
             while (std::getline(stream, row))
             {
+                if (nhead < skip_rows) 
+                {
+                    ++nhead;
+                    continue;
+                }
+                if (std::equal(comments.begin(), comments.end(), row.begin())) 
+                    continue;
+                if (0 < max_rows && max_rows <= static_cast<const long long>(nbrow))
+                    break;
                 std::stringstream row_stream(row);
-                nbcol = detail::load_csv_row<size_type, T, output_iterator>(row_stream, output, cell);
+                nbcol = detail::load_csv_row<size_type, T, output_iterator>(row_stream, output, cell, delimiter);
                 ++nbrow;
             }
         }
