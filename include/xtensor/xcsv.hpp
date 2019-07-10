@@ -29,7 +29,7 @@ namespace xt
     using xcsv_tensor = xtensor_container<std::vector<T, A>, 2, layout_type::row_major>;
 
     template <class T, class A = std::allocator<T>>
-    xcsv_tensor<T, A> load_csv(std::istream& stream, const std::string comments = "#", const char delimiter = ',', const std::size_t skip_rows = 0, const ptrdiff_t max_rows = -1);
+    xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter = ',', const std::size_t skip_rows = 0, const ptrdiff_t max_rows = -1, const std::string comments = "#");
 
     template <class E>
     void dump_csv(std::ostream& stream, const xexpression<E>& e);
@@ -105,13 +105,13 @@ namespace xt
      * 
      * Returns an \ref xexpression for the parsed CSV
      * @param stream the input stream containing the CSV encoded values
-     * @param comments the string used to indicate the start of a comment. [default: "#"]
      * @param delimiter the character used to separate values. [default: ',']
      * @param skip the first skip_rows lines. [default: 0]
      * @param read max_rows lines of content after skip_rows lines; the default is to read all the lines. [default: -1]
+     * @param comments the string used to indicate the start of a comment. [default: "#"]
      */
     template <class T, class A>
-    xcsv_tensor<T, A> load_csv(std::istream& stream, const std::string comments, const char delimiter, const std::size_t skip_rows, const std::ptrdiff_t max_rows)
+    xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter, const std::size_t skip_rows, const std::ptrdiff_t max_rows, const std::string comments)
     {
         using tensor_type = xcsv_tensor<T, A>;
         using storage_type = typename tensor_type::storage_type;

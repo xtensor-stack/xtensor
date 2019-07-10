@@ -45,7 +45,7 @@ namespace xt
 
         std::stringstream source_stream(source);
 
-        auto res = load_csv<double>(source_stream, "#", ' ', 1, 2);
+        auto res = load_csv<double>(source_stream, ' ', 1, 2, "#");
 
         xtensor<double, 2> exp
             {{ 1.0,  2.0,  3.0,  4.0},
