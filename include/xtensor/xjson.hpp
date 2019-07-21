@@ -23,15 +23,15 @@ namespace xt
      * to_json and from_json declaration *
      *************************************/
 
-    template <class E>
-    enable_xexpression<E> to_json(nlohmann::json&, const E&);
+    template <template <typename U, typename V, typename... Args> class M, class E>
+    enable_xexpression<E> to_json(nlohmann::basic_json<M>&, const E&);
 
-    template <class E>
-    enable_xcontainer_semantics<E> from_json(const nlohmann::json&, E&);
+    template <template <typename U, typename V, typename... Args> class M, class E>
+    enable_xcontainer_semantics<E> from_json(const nlohmann::basic_json<M>&, E&);
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-    template <class E>
-    enable_xview_semantics<E> from_json(const nlohmann::json&, E&);
+    template <template <typename U, typename V, typename... Args> class M, class E>
+    enable_xview_semantics<E> from_json(const nlohmann::basic_json<M>&, E&);
     /// @endcond
 
     /****************************************
@@ -40,8 +40,9 @@ namespace xt
 
     namespace detail
     {
-        template <class D>
-        void to_json_impl(nlohmann::json& j, const xexpression<D>& e, xstrided_slice_vector& slices)
+        template <template <typename U, typename V, typename... Args> class M, class D>
+        void to_json_impl(nlohmann::basic_json<M>& j, const xexpression<D>& e,
+                          xstrided_slice_vector& slices)
         {
             const auto view = strided_view(e.derived_cast(), slices);
             if (view.dimension() == 0)
@@ -50,13 +51,13 @@ namespace xt
             }
             else
             {
-                j = nlohmann::json::array();
+                j = nlohmann::basic_json<M>::array();
                 using size_type = typename D::size_type;
                 size_type nrows = view.shape()[0];
                 for (size_type i = 0; i != nrows; ++i)
                 {
                     slices.push_back(i);
-                    nlohmann::json k;
+                    nlohmann::basic_json<M> k;
                     to_json_impl(k, e, slices);
                     j.push_back(std::move(k));
                     slices.pop_back();
@@ -64,8 +65,9 @@ namespace xt
             }
         }
 
-        template <class D>
-        inline void from_json_impl(const nlohmann::json& j, xexpression<D>& e, xstrided_slice_vector& slices)
+        template <template <typename U, typename V, typename... Args> class M, class D>
+        inline void from_json_impl(const nlohmann::basic_json<M>& j, xexpression<D>& e,
+                                   xstrided_slice_vector& slices)
         {
             auto view = strided_view(e.derived_cast(), slices);
 
@@ -80,14 +82,15 @@ namespace xt
                 for (size_type i = 0; i != nrows; ++i)
                 {
                     slices.push_back(i);
-                    const nlohmann::json& k = j[i];
+                    const nlohmann::basic_json<M>& k = j[i];
                     from_json_impl(k, e, slices);
                     slices.pop_back();
                 }
             }
         }
 
-        inline unsigned int json_dimension(const nlohmann::json& j)
+        template <template <typename U, typename V, typename... Args> class M>
+        inline unsigned int json_dimension(const nlohmann::basic_json<M>& j)
         {
             if (j.is_array() && j.size())
             {
@@ -99,8 +102,8 @@ namespace xt
             }
         }
 
-        template <class S>
-        inline void json_shape(const nlohmann::json& j, S& s, std::size_t pos = 0)
+        template <template <typename U, typename V, typename... Args> class M, class S>
+        inline void json_shape(const nlohmann::basic_json<M>& j, S& s, std::size_t pos = 0)
         {
             if (j.is_array())
             {
@@ -124,8 +127,8 @@ namespace xt
      * @param j a JSON object
      * @param e a const \ref xexpression
      */
-    template <class E>
-    inline enable_xexpression<E> to_json(nlohmann::json& j, const E& e)
+    template <template <typename U, typename V, typename... Args> class M, class E>
+    inline enable_xexpression<E> to_json(nlohmann::basic_json<M>& j, const E& e)
     {
         auto sv = xstrided_slice_vector();
         detail::to_json_impl(j, e, sv);
@@ -147,8 +150,8 @@ namespace xt
      * @param j a const JSON object
      * @param e an \ref xexpression
      */
-    template <class E>
-    inline enable_xcontainer_semantics<E> from_json(const nlohmann::json& j, E& e)
+    template <template <typename U, typename V, typename... Args> class M, class E>
+    inline enable_xcontainer_semantics<E> from_json(const nlohmann::basic_json<M>& j, E& e)
     {
         auto dimension = detail::json_dimension(j);
         auto s = xtl::make_sequence<typename E::shape_type>(dimension);
@@ -162,8 +165,8 @@ namespace xt
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-    template <class E>
-    inline enable_xview_semantics<E> from_json(const nlohmann::json& j, E& e)
+    template <template <typename U, typename V, typename... Args> class M, class E>
+    inline enable_xview_semantics<E> from_json(const nlohmann::basic_json<M>& j, E& e)
     {
         typename E::shape_type s;
         detail::json_shape(j, s);
