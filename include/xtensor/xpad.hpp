@@ -26,6 +26,7 @@ namespace xt
     {
         constant,
         symmetric,
+        symmetric_101,
         periodic
     };
 
@@ -115,6 +116,18 @@ namespace xt
                     else
                     {
                         sv_end[axis] = xt::range(out.shape()[axis], out.shape()[axis]-ne-1, -1);
+                    }
+                }
+                else if (mode == pad_mode::symmetric_101) {
+                    XTENSOR_ASSERT(out.shape()[axis]>1);
+                    XTENSOR_ASSERT(nb <= out.shape()[axis]-1);
+                    XTENSOR_ASSERT(ne <= out.shape()[axis]-1);
+                    sv_bgn[axis] = xt::range(nb, 0, -1);
+                    if (ne == out.shape()[axis]-1) {
+                        sv_end[axis] = xt::range(out.shape()[axis]-2, _, -1);
+                    }
+                    else {
+                        sv_end[axis] = xt::range(out.shape()[axis]-2, out.shape()[axis]-ne-2, -1);
                     }
                 }
 
