@@ -85,7 +85,7 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
     # find_package(xsimd REQUIRED)
 
     add_executable(first_example src/example.cpp)
-    
+
     if(MSVC)
         target_compile_options(first_example PRIVATE /EHsc /MP /bigobj)
         set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -152,6 +152,15 @@ When compiled and run, this produces the following output:
     {{1, 2, 3},
      {4, 5, 6},
      {7, 8, 9}}
+
+.. tip::
+
+  To print the shape to the standard output you can use
+
+  .. code-block:: cpp
+
+      const auto& s = arr.shape();
+      std::copy(s.cbegin(), s.cend(), std::ostream_iterator<double>(std::cout, " "));
 
 Third example: index access
 ---------------------------
