@@ -187,4 +187,60 @@ namespace xt
 
         EXPECT_EQ(b, c);
     }
+
+    TEST(xpad, symmetric_101_a)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2},
+                                    {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {{5, 4, 3, 4, 5, 4, 3},
+                                    {2, 1, 0, 1, 2, 1, 0},
+                                    {5, 4, 3, 4, 5, 4, 3},
+                                    {2, 1, 0, 1, 2, 1, 0}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, {{1,1}, {2,2}}, xt::pad_mode::symmetric_101);
+
+        EXPECT_EQ(b, c);
+    }
+
+    TEST(xpad, symmetric_101_b)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2},
+                                    {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {{0, 1, 2},
+                                    {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, 0, xt::pad_mode::symmetric_101);
+
+        EXPECT_EQ(b, c);
+    }
+
+    TEST(xpad, symmetric_101_c)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2},
+                                    {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {{0, 1, 2, 1, 0},
+                                    {3, 4, 5, 4, 3},
+                                    {0, 1, 2, 1, 0}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, {{0,1}, {0,2}}, xt::pad_mode::symmetric_101);
+
+        EXPECT_EQ(b, c);
+    }
+
+    TEST(xpad, symmetric_101_d)
+    {
+        xt::xtensor<size_t, 2> a = {{0, 1, 2},
+                                    {3, 4, 5}};
+
+        xt::xtensor<size_t, 2> b = {{5, 4, 3, 4, 5},
+                                    {2, 1, 0, 1, 2},
+                                    {5, 4, 3, 4, 5}};
+
+        xt::xtensor<size_t, 2> c = xt::pad(a, {{1,0}, {2,0}}, xt::pad_mode::symmetric_101);
+
+        EXPECT_EQ(b, c);
+    }
 }
