@@ -73,7 +73,7 @@ namespace xt
 
             if (view.dimension() == 0)
             {
-                view() = j.get<std::remove_reference_t<decltype(view())>>();
+                view() = j.template get<std::remove_reference_t<decltype(view())>>();
             }
             else
             {
