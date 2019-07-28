@@ -489,7 +489,7 @@ namespace xt
             {
                 if (m_buffer != nullptr)
                 {
-                    delete m_buffer;
+                    std::allocator<char>{}.deallocate(m_buffer, m_n_bytes);
                 }
             }
 
