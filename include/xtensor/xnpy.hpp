@@ -317,8 +317,6 @@ namespace xt
                     dim_s = shape_s.substr(pos);
                 }
 
-                pop_char(dim_s, ',');
-
                 if (dim_s.length() == 0)
                 {
                     if (pos_next != std::string::npos)

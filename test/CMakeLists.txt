@@ -197,6 +197,7 @@ set(XNPY_FILES
     bool_fortran.npy
     double.npy
     double_fortran.npy
+    int.npy
     unsignedlong.npy
     unsignedlong_fortran.npy
 )

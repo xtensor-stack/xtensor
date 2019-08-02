@@ -38,6 +38,8 @@ namespace xt
                               { 1, 1, 1},
                               { 0, 0, 0}}};
 
+        xarray<int> iarr1d = {3, 4, 5, 6, 7};
+
         auto darr_loaded = load_npy<double>("files/xnpy_files/double.npy");
         EXPECT_TRUE(all(isclose(darr, darr_loaded)));
 
@@ -46,6 +48,9 @@ namespace xt
 
         auto dfarr_loaded = load_npy<double, layout_type::column_major>("files/xnpy_files/double_fortran.npy");
         EXPECT_TRUE(all(isclose(darr, dfarr_loaded)));
+
+        auto iarr1d_loaded = load_npy<int>("files/xnpy_files/int.npy");
+        EXPECT_TRUE(all(equal(iarr1d, iarr1d_loaded)));
     }
 
     bool compare_binary_files(std::string fn1, std::string fn2)
