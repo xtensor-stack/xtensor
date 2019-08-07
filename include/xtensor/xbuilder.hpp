@@ -649,7 +649,7 @@ namespace xt
             bool res = s == arr.dimension();
             for(std::size_t i = 0; i < s; ++i)
             {
-                res = res && (i == axis || new_shape[i] == arr.shape()[i]);
+                res = res && (i == axis || new_shape[i] == arr.shape(i));
             }
             if(!res)
             {

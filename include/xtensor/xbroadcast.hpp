@@ -174,6 +174,7 @@ namespace xt
         xbroadcast(CTA&& e, shape_type&& s);
 
         const inner_shape_type& shape() const noexcept;
+        size_type shape(size_type i) const noexcept;
         layout_type layout() const noexcept;
 
         template <class... Args>
@@ -308,6 +309,15 @@ namespace xt
     inline auto xbroadcast<CT, X>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
+    }
+
+    /**
+     * Returns the shape of the expression.
+     */
+    template <class CT, class X>
+    inline auto xbroadcast<CT, X>::shape(size_type i) const noexcept -> size_type
+    {
+        return m_shape[i];
     }
 
     /**
