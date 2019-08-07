@@ -585,6 +585,18 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                 return a * xt::numeric_constants<long double>::PI / 180.0;
             }
         };
+
+        struct rad2deg {
+            template <class A>
+            constexpr auto operator()(const A& a) const noexcept {
+                return a * 180.0 / xt::numeric_constants<A>::PI;
+            }
+
+            template <class A>
+            constexpr auto simd_apply(const A& a) const noexcept {
+                return a * 180.0 / xt::numeric_constants<A>::PI;
+            }
+        };
     }
 
     /**
@@ -615,6 +627,21 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto radians(E&& e) noexcept
         -> detail::xfunction_type_t<math::deg2rad, E> {
         return detail::make_xfunction<math::deg2rad>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Convert angles from radians to degrees.
+     *
+     * Returns an \ref xfunction for the element-wise corresponding
+     * angle in degrees of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto rad2deg(E&& e) noexcept
+        -> detail::xfunction_type_t<math::rad2deg, E> {
+        return detail::make_xfunction<math::rad2deg>(std::forward<E>(e));
     }
 
     /**
