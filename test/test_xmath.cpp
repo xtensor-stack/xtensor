@@ -282,6 +282,16 @@ namespace xt
         EXPECT_TRUE(all(equal(expected, xt::isnan(arr))));
     }
 
+    TEST(xmath, deg2rad)
+    {
+        xarray<double> arr
+            {-180, -135, -90, -45, 0, 45, 90, 135, 180};
+        xarray<double> expected
+            {-3.141593, -2.356194, -1.570796, -0.785398,  0.,
+              0.785398,  1.570796,  2.356194,  3.141593};
+        EXPECT_TRUE(all(isclose(expected, xt::deg2rad(arr))));
+    }
+
     /*************************
      * Exponential functions *
      *************************/
