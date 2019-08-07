@@ -573,6 +573,33 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                 return xt_simd::select(v < lo, lo, xt_simd::select(hi < v, hi, v));
             }
         };
+
+        struct deg2rad {
+            template <class A>
+            constexpr auto operator()(const A& a) const noexcept {
+                return a * xt::numeric_constants<A>::PI / 180.0;
+            }
+
+            template <class A>
+            constexpr auto simd_apply(const A& a) const noexcept {
+                return a * xt::numeric_constants<long double>::PI / 180.0;
+            }
+        };
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Convert angles from degrees to radians.
+     *
+     * Returns an \ref xfunction for the element-wise corresponding
+     * angle in radians of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto deg2rad(E&& e) noexcept
+        -> detail::xfunction_type_t<math::deg2rad, E> {
+        return detail::make_xfunction<math::deg2rad>(std::forward<E>(e));
     }
 
     /**
