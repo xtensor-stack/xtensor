@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
 *                                                                          *
 * Distributed under the terms of the BSD 3-Clause License.                 *
@@ -640,6 +640,21 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
      */
     template <class E>
     inline auto rad2deg(E&& e) noexcept
+        -> detail::xfunction_type_t<math::rad2deg, E> {
+        return detail::make_xfunction<math::rad2deg>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Convert angles from radians to degrees.
+     *
+     * Returns an \ref xfunction for the element-wise corresponding
+     * angle in degrees of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto degrees(E&& e) noexcept
         -> detail::xfunction_type_t<math::rad2deg, E> {
         return detail::make_xfunction<math::rad2deg>(std::forward<E>(e));
     }
