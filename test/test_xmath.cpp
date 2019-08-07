@@ -302,6 +302,16 @@ namespace xt
         EXPECT_TRUE(all(isclose(expected, xt::radians(arr))));
     }
 
+    TEST(xmath, rad2deg)
+    {
+        xarray<double> arr
+            {-3.141593, -2.356194, -1.570796, -0.785398,  0.,
+             0.785398,  1.570796,  2.356194,  3.141593};
+        xarray<double> expected
+            {-180, -135, -90, -45, 0, 45, 90, 135, 180};
+        EXPECT_TRUE(all(isclose(expected, xt::rad2deg(arr))));
+    }
+
     /*************************
      * Exponential functions *
      *************************/
