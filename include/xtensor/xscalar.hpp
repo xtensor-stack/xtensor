@@ -151,6 +151,7 @@ namespace xt
 
         size_type size() const noexcept;
         const shape_type& shape() const noexcept;
+        size_type shape(size_type i) const noexcept;
         layout_type layout() const noexcept;
         using accessible_base::dimension;
         using accessible_base::shape;
@@ -526,6 +527,12 @@ namespace xt
     {
         static std::array<size_type, 0> zero_shape;
         return zero_shape;
+    }
+
+    template <class CT>
+    inline auto xscalar<CT>::shape(size_type) const noexcept -> size_type
+    {
+        return 0;
     }
 
     template <class CT>
