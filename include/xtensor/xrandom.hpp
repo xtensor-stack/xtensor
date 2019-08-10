@@ -48,6 +48,10 @@ namespace xt
         auto randn(const S& shape, T mean = 0, T std_dev = 1,
                    E& engine = random::get_default_random_engine());
 
+        template <class T, class S, class D = double, class E = random::default_engine_type>
+        auto binomial(const S& shape, T trials = 1, D prob = 0.5,
+                      E& engine = random::get_default_random_engine());
+
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -59,8 +63,14 @@ namespace xt
                      E& engine = random::get_default_random_engine());
 
         template <class T, class I, class E = random::default_engine_type>
-        auto randn(std::initializer_list<I>, T mean = 0, T std_dev = 1,
+        auto randn(std::initializer_list<I> shape, 
+                   T mean = 0, T std_dev = 1,
                    E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class D = double, class E = random::default_engine_type>
+        auto binomial(std::initializer_list<I> shape, 
+                      T trials = 1, D prob = 0.5,
+                      E& engine = random::get_default_random_engine());
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -73,6 +83,10 @@ namespace xt
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto randn(const I (&shape)[L], T mean = 0, T std_dev = 1,
                    E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
+        auto binomial(const I (&shape)[L], T trials = 1, D prob = 0.5,
+                      E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -211,6 +225,25 @@ namespace xt
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * the binomial random number distribution for @p trials trials with
+         * probability of success equal to @p prob.
+         *
+         * Numbers are drawn from @c std::binomial_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param trials number of Bernoulli trials
+         * @param prob probability of success of each trial
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class D, class E>
+        inline auto binomial(const S& shape, T trials, D prob, E& engine)
+        {
+            std::binomial_distribution<T> dist(trials, prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #ifdef X_OLD_CLANG
         template <class T, class I, class E>
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
@@ -232,6 +265,13 @@ namespace xt
             std::normal_distribution<T> dist(mean, std_dev);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        template <class T, class I, class D, class E>
+        inline auto binomial(std::initializer_list<I> shape, T trials, D prob, E& engine)
+        {
+            std::binomial_distribution<T> dist(trials, prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -251,6 +291,13 @@ namespace xt
         inline auto randn(const I (&shape)[L], T mean, T std_dev, E& engine)
         {
             std::normal_distribution<T> dist(mean, std_dev);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class D, class E>
+        inline auto binomial(const I (&shape)[L], T trials, D prob, E& engine)
+        {
+            std::binomial_distribution<T> dist(trials, prob);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #endif
