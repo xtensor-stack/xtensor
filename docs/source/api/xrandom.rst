@@ -29,6 +29,9 @@ Defined in ``xtensor/xrandom.hpp``
 .. doxygenfunction:: xt::random::binomial(const S&, T, D, E&)
    :project: xtensor
 
+.. doxygenfunction:: xt::random::geometric(const S&, D, E&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::random::choice
    :project: xtensor
 

@@ -52,6 +52,9 @@ namespace xt
         auto binomial(const S& shape, T trials = 1, D prob = 0.5,
                       E& engine = random::get_default_random_engine());
 
+        template <class T, class S, class D = double, class E = random::default_engine_type>
+        auto geometric(const S& shape, D prob = 0.5, 
+                       E& engine = random::get_default_random_engine()); 
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -71,6 +74,10 @@ namespace xt
         auto binomial(std::initializer_list<I> shape, 
                       T trials = 1, D prob = 0.5,
                       E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto geometric(std::initializer_list<I> shape, D prob = 0.5, 
+                      E& engine = random::get_default_random_engine());
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -87,6 +94,10 @@ namespace xt
         template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
         auto binomial(const I (&shape)[L], T trials = 1, D prob = 0.5,
                       E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
+        auto geometric(const I (&shape)[L], D prob=0.5, 
+                       E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -244,6 +255,25 @@ namespace xt
             std::binomial_distribution<T> dist(trials, prob);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+         /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * a gemoetric random number distribution with
+         * probability of success equal to @p prob for each of the Bernoulli trials.
+         *
+         * Numbers are drawn from @c std::geometric_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param prob probability of success of each trial
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class D, class E>
+        inline auto geometric(const S& shape, D prob, E& engine)
+        {
+            std::geometric_distribution<T> dist(prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #ifdef X_OLD_CLANG
         template <class T, class I, class E>
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
@@ -272,6 +302,13 @@ namespace xt
             std::binomial_distribution<T> dist(trials, prob);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        template <class T, class I, class D, class E>
+        inline auto geometric(std::initializer_list<I> shape, D prob, E& engine)
+        {
+            std::geometric_distribution<T> dist(prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -298,6 +335,13 @@ namespace xt
         inline auto binomial(const I (&shape)[L], T trials, D prob, E& engine)
         {
             std::binomial_distribution<T> dist(trials, prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class D, class E>
+        inline auto geometric(const I (&shape)[L], D prob, E& engine)
+        {
+            std::geometric_distribution<T> dist(prob);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #endif

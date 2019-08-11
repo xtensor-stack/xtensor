@@ -45,6 +45,8 @@ Random distributions
   sampled from the Normal random number distribution.
 - ``binomial(shape, trials, prob, std_dev)``: generates an expression of the specified shape, containing numbers
   sampled from the binomial random number distribution.
+- ``geometric(shape, prob, std_dev)``: generates an expression of the specified shape, containing numbers
+  sampled from the geometric random number distribution.
 
 Meshes
 ------

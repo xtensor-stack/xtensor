@@ -47,6 +47,7 @@ namespace xt
         // check that it compiles
         xarray<int> q = random::randint<int>({3, 3});
         xarray<int> binom = random::binomial<int>({3, 3});
+        xarray<int> geom = random::geometric<int>({3, 3});
 
         // checking if internal state needs reset
         auto n_dist = random::randn<double>({3, 3});
