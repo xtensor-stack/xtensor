@@ -51,8 +51,10 @@ Random distributions
   sampled from the negative binomial random number distribution.
 - ``poisson(shape, rate)``: generates an expression of the specified shape, containing numbers
   sampled from the Poisson random number distribution.
-- ``poisson(shape, rate)``: generates an expression of the specified shape, containing numbers
+- ``exponential(shape, rate)``: generates an expression of the specified shape, containing numbers
   sampled from the exponential random number distribution.
+- ``gamma(shape, alpha, beta)``: generates an expression of the specified shape, containing numbers
+  sampled from the gamma random number distribution.
 
 Meshes
 ------
