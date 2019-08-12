@@ -50,6 +50,7 @@ namespace xt
         xarray<int> geom = random::geometric<int>({3, 3});
         xarray<int> neg_binom = random::negative_binomial<int>({3, 3});
         xarray<int> poisson = random::poisson<int>({3, 3});
+        xarray<int> exp = random::exponential<int>({3, 3});
 
         // checking if internal state needs reset
         auto n_dist = random::randn<double>({3, 3});

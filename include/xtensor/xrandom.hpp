@@ -63,6 +63,10 @@ namespace xt
         template <class T, class S, class D = double, class E = random::default_engine_type>
         auto poisson(const S& shape, D rate = 1.0,
                      E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto exponential(const S& shape, T rate = 1.0,
+                         E& engine = random::get_default_random_engine());
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -94,6 +98,10 @@ namespace xt
         template <class T, class I, class D = double, class E = random::default_engine_type>
         auto poisson(std::initializer_list<I> shape, D rate = 1.0, 
                      E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto exponential(std::initializer_list<I> shape, T rate = 1.0, 
+                         E& engine = random::get_default_random_engine());
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -122,6 +130,10 @@ namespace xt
         template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
         auto poisson(const I (&shape)[L], D rate = 1.0, 
                      E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto exponential(const I (&shape)[L], T rate = 1.0, 
+                         E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -324,7 +336,7 @@ namespace xt
          * xexpression with specified @p shape containing numbers sampled from
          * a Poisson random number distribution with rate @p rate
          * 
-         * Numbers are drawn from @c std::negative_binomial_distribution.
+         * Numbers are drawn from @c std::poisson_distribution.
          *
          * @param shape shape of resulting xexpression
          * @param rate rate of Poisson distribution
@@ -335,6 +347,24 @@ namespace xt
         inline auto poisson(const S& shape, D rate, E& engine)
         {
             std::poisson_distribution<T> dist(rate);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+        }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * a exponential random number distribution with rate @p rate
+         * 
+         * Numbers are drawn from @c std::exponential_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param rate rate of exponential distribution
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class E>
+        inline auto exponential(const S& shape, T rate, E& engine)
+        {
+            std::exponential_distribution<T> dist(rate);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
         }
 #ifdef X_OLD_CLANG
@@ -386,6 +416,13 @@ namespace xt
             std::poisson_distribution<T> dist(rate);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
         }
+
+        template <class T, class I, class E>
+        inline auto exponential(std::initializer_list<I> shape, T rate, E& engine)
+        {
+            std::exponential_distribution<T> dist(rate);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -433,6 +470,13 @@ namespace xt
         inline auto poisson(const I (&shape)[L], D rate, E& engine)
         {
             std::poisson_distribution<T> dist(rate);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto exponential(const I (&shape)[L], T rate, E& engine)
+        {
+            std::exponential_distribution<T> dist(rate);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
         }
 #endif

@@ -38,6 +38,9 @@ Defined in ``xtensor/xrandom.hpp``
 .. doxygenfunction:: xt::random::poisson(const S&, D, E&)
    :project: xtensor
 
+.. doxygenfunction:: xt::random::exponential(const S&, T, E&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::random::choice
    :project: xtensor
 
