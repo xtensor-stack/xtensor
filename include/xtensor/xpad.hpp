@@ -119,11 +119,11 @@ namespace xt
                     }
                 }
                 else if (mode == pad_mode::symmetric_101) {
-                    XTENSOR_ASSERT(out.shape()[axis]>1);
-                    XTENSOR_ASSERT(nb <= out.shape()[axis]-1);
-                    XTENSOR_ASSERT(ne <= out.shape()[axis]-1);
+                    XTENSOR_ASSERT(out.shape()[axis] > 1);
+                    XTENSOR_ASSERT(nb <= out.shape()[axis] - 1);
+                    XTENSOR_ASSERT(ne <= out.shape()[axis] - 1);
                     sv_bgn[axis] = xt::range(nb, 0, -1);
-                    if (ne == out.shape()[axis]-1) {
+                    if (ne == out.shape()[axis] - 1) {
                         sv_end[axis] = xt::range(out.shape()[axis]-2, _, -1);
                     }
                     else {
