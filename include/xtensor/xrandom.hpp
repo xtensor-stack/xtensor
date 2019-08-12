@@ -54,7 +54,15 @@ namespace xt
 
         template <class T, class S, class D = double, class E = random::default_engine_type>
         auto geometric(const S& shape, D prob = 0.5, 
-                       E& engine = random::get_default_random_engine()); 
+                       E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class D = double, class E = random::default_engine_type>
+        auto negative_binomial(const S& shape, T k = 1, D prob = 0.5,
+                               E& engine = random::get_default_random_engine()); 
+
+        template <class T, class S, class D = double, class E = random::default_engine_type>
+        auto poisson(const S& shape, D rate = 1.0,
+                     E& engine = random::get_default_random_engine());
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -78,6 +86,14 @@ namespace xt
         template <class T, class I, class E = random::default_engine_type>
         auto geometric(std::initializer_list<I> shape, D prob = 0.5, 
                       E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class D = double, class E = random::default_engine_type>
+        auto negative_binomial(std::initializer_list<I> shape, T k = 1, D prob = 0.5,
+                               E& engine = random::get_default_random_engine()); 
+
+        template <class T, class I, class D = double, class E = random::default_engine_type>
+        auto poisson(std::initializer_list<I> shape, D rate = 1.0, 
+                     E& engine = random::get_default_random_engine());
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -98,6 +114,14 @@ namespace xt
         template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
         auto geometric(const I (&shape)[L], D prob=0.5, 
                        E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
+        auto negative_binomial(const I (&shape)[L], T k = 1, D prob = 0.5,
+                               E& engine = random::get_default_random_engine()); 
+        
+        template <class T, class I, std::size_t L, class D = double, class E = random::default_engine_type>
+        auto poisson(const I (&shape)[L], D rate = 1.0, 
+                     E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -274,6 +298,45 @@ namespace xt
             std::geometric_distribution<T> dist(prob);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * a negative binomial random number distribution (also known as Pascal distribution)
+         * that returns the number of successes before @p k trials with probability of success 
+         * equal to @p prob for each of the Bernoulli trials.
+         * 
+         * Numbers are drawn from @c std::negative_binomial_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param k number of unsuccessful trials
+         * @param prob probability of success of each trial
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class D, class E>
+        inline auto negative_binomial(const S& shape, T k, D prob, E& engine)
+        {
+            std::negative_binomial_distribution<T> dist(k, prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+        }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * a Poisson random number distribution with rate @p rate
+         * 
+         * Numbers are drawn from @c std::negative_binomial_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param rate rate of Poisson distribution
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class D, class E>
+        inline auto poisson(const S& shape, D rate, E& engine)
+        {
+            std::poisson_distribution<T> dist(rate);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+        }
 #ifdef X_OLD_CLANG
         template <class T, class I, class E>
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
@@ -309,6 +372,20 @@ namespace xt
             std::geometric_distribution<T> dist(prob);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+        
+        template <class T, class I, class D, class E>
+        inline auto negative_binomial(std::initializer_list<I> shape, T k, D prob, E& engine)
+        {
+            std::negative_binomial_distribution<T> dist(k, prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+        }
+
+        template <class T, class I, class D, class E>
+        inline auto poisson(std::initializer_list<I> shape, D rate, E& engine)
+        {
+            std::poisson_distribution<T> dist(rate);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -343,6 +420,20 @@ namespace xt
         {
             std::geometric_distribution<T> dist(prob);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class D , class E>
+        inline auto negative_binomial(const I (&shape)[L], T k, D prob, E& engine)
+        {
+            std::negative_binomial_distribution<T> dist(k, prob);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class D, class E>
+        inline auto poisson(const I (&shape)[L], D rate, E& engine)
+        {
+            std::poisson_distribution<T> dist(rate);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);   
         }
 #endif
 

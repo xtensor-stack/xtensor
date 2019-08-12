@@ -43,10 +43,14 @@ Random distributions
   distributed random integers in the half-open interval [lower, upper).
 - ``randn(shape, mean, std_dev)``: generates an expression of the specified shape, containing numbers
   sampled from the Normal random number distribution.
-- ``binomial(shape, trials, prob, std_dev)``: generates an expression of the specified shape, containing numbers
+- ``binomial(shape, trials, prob)``: generates an expression of the specified shape, containing numbers
   sampled from the binomial random number distribution.
-- ``geometric(shape, prob, std_dev)``: generates an expression of the specified shape, containing numbers
+- ``geometric(shape, prob)``: generates an expression of the specified shape, containing numbers
   sampled from the geometric random number distribution.
+- ``negative_binomial(shape, k, prob)``: generates an expression of the specified shape, containing numbers
+  sampled from the negative binomial random number distribution.
+- ``poisson(shape, rate)``: generates an expression of the specified shape, containing numbers
+  sampled from the Poisson random number distribution.
 
 Meshes
 ------
