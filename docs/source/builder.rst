@@ -59,6 +59,8 @@ Random distributions
   sampled from the Weibull random number distribution.
 - ``extreme_value(shape, a, b)``: generates an expression of the specified shape, containing numbers
   sampled from the extreme value random number distribution.
+- ``lognormal(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the Log-Normal random number distribution.
 
 Meshes
 ------

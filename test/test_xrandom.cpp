@@ -54,6 +54,7 @@ namespace xt
         xarray<double> gamma = random::gamma<double>({3, 3});
         xarray<double> weibull = random::weibull<double>({3, 3});
         xarray<double> extreme_val = random::extreme_value<double>({3, 3});
+        xarray<double> lnormal = random::lognormal<double>({3, 3});
 
         // checking if internal state needs reset
         auto n_dist = random::randn<double>({3, 3});

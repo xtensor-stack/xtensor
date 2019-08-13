@@ -79,6 +79,10 @@ namespace xt
         template <class T, class S, class E = random::default_engine_type>
         auto extreme_value(const S& shape, T a = 0.0, T b = 1.0, 
                            E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto lognormal(const S& shape, T mean = 0, T std_dev = 1,
+                       E& engine = random::get_default_random_engine());
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -126,6 +130,11 @@ namespace xt
         template <class T, class I, class E = random::default_engine_type>
         auto extreme_value(std::initializer_list<I> shape, T a = 0.0, T b = 1.0,
                            E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto lognormal(std::initializer_list<I> shape, 
+                       T mean = 0, T std_dev = 1,
+                       E& engine = random::get_default_random_engine());
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -170,6 +179,10 @@ namespace xt
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto extreme_value(const I (&shape)[L], T a = 0.0, T b = 1.0,
                            E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto lognormal(const I (&shape)[L], T mean = 0, T std_dev = 1,
+                       E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -460,6 +473,26 @@ namespace xt
             std::extreme_value_distribution<T> dist(a, b);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * the Log-Normal random number distribution with mean @p mean and
+         * standard deviation @p std_dev.
+         *
+         * Numbers are drawn from @c std::lognormal_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param mean mean of normal distribution
+         * @param std_dev standard deviation of normal distribution
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class E>
+        inline auto lognormal(const S& shape, T mean, T std_dev, E& engine)
+        {
+            std::lognormal_distribution<T> dist(mean, std_dev);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #ifdef X_OLD_CLANG
         template <class T, class I, class E>
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
@@ -537,6 +570,13 @@ namespace xt
             std::extreme_value_distribution<T> dist(a, b);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        template <class T, class I, class E>
+        inline auto lognormal(std::initializer_list<I> shape, T mean, T std_dev, E& engine)
+        {
+            std::lognormal_distribution<T> dist(mean, std_dev);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -612,6 +652,13 @@ namespace xt
         inline auto extreme_value(const I (&shape)[L], T a, T b, E& engine)
         {
             std::extreme_value_distribution<T> dist(a, b);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto lognormal(const I (&shape)[L], T mean, T std_dev, E& engine)
+        {
+            std::lognormal_distribution<T> dist(mean, std_dev);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #endif

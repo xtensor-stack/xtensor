@@ -50,6 +50,9 @@ Defined in ``xtensor/xrandom.hpp``
 .. doxygenfunction:: xt::random::extreme_value(const S&, T, T, E&)
    :project: xtensor
 
+.. doxygenfunction:: xt::random::lognormal(const S&, T, T, E&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::random::choice
    :project: xtensor
 
