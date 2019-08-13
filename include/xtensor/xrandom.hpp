@@ -69,8 +69,12 @@ namespace xt
                          E& engine = random::get_default_random_engine());
 
         template <class T, class S, class E = random::default_engine_type>
-        auto gamma(const S& shape,T alpha = 1.0, T beta = 1.0,
+        auto gamma(const S& shape, T alpha = 1.0, T beta = 1.0,
                    E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto weibull(const S& shape, T a = 1.0, T b = 1.0, 
+                     E& engine = random::get_default_random_engine());
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -110,6 +114,10 @@ namespace xt
         template <class T, class I, class E = random::default_engine_type>
         auto gamma(std::initializer_list<I> shape, T alpha = 1.0, T beta = 1.0,
                    E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto weibull(std::initializer_list<I> shape, T a = 1.0, T b = 1.0,
+                     E& engine = random::get_default_random_engine());
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -146,6 +154,10 @@ namespace xt
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto gamma(const I (&shape)[L], T alpha = 1.0, T beta = 1.0,
                    E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto weibull(const I (&shape)[L], T a = 1.0, T b = 1.0,
+                     E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -382,7 +394,7 @@ namespace xt
 
         /**
          * xexpression with specified @p shape containing numbers sampled from
-         * a gammal random number distribution with shape @p alpha and scale @p beta
+         * a gamma random number distribution with shape @p alpha and scale @p beta
          * 
          * Numbers are drawn from @c std::gamma_distribution.
          *
@@ -396,6 +408,25 @@ namespace xt
         inline auto gamma(const S& shape, T alpha, T beta, E& engine)
         {
             std::gamma_distribution<T> dist(alpha, beta);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * a Weibull random number distribution with shape @p a and scale @p b
+         * 
+         * Numbers are drawn from @c std::weibull_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param a shape of the weibull distribution
+         * @param b scale of the weibull distribution
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class E>
+        inline auto weibull(const S& shape, T a, T b, E& engine)
+        {
+            std::gamma_distribution<T> dist(a, b);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #ifdef X_OLD_CLANG
@@ -461,6 +492,13 @@ namespace xt
             std::gamma_distribution<T> dist(alpha, beta);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        template <class T, class I, class E>
+        inline auto weibull(std::initializer_list<I> shape, T a, T b, E& engine)
+        {
+            std::weibull_distribution<T> dist(a, b);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -522,6 +560,13 @@ namespace xt
         inline auto gamma(const I (&shape)[L], T alpha, T beta, E& engine)
         {
             std::gamma_distribution<T> dist(alpha, beta);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto weibull(const I (&shape)[L], T a, T b, E& engine)
+        {
+            std::weibull_distribution<T> dist(a, b);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #endif

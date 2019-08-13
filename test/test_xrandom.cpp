@@ -52,6 +52,7 @@ namespace xt
         xarray<int> poisson = random::poisson<int>({3, 3});
         xarray<double> exp = random::exponential<double>({3, 3});
         xarray<double> gamma = random::gamma<double>({3, 3});
+        xarray<double> weibull = random::weibull<double>({3, 3});
 
         // checking if internal state needs reset
         auto n_dist = random::randn<double>({3, 3});

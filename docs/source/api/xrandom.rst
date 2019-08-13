@@ -44,6 +44,9 @@ Defined in ``xtensor/xrandom.hpp``
 .. doxygenfunction:: xt::random::gamma(const S&, T, T, E&)
    :project: xtensor
 
+.. doxygenfunction:: xt::random::weibull(const S&, T, T, E&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::random::choice
    :project: xtensor
 

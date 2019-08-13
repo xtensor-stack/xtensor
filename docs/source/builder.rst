@@ -55,6 +55,8 @@ Random distributions
   sampled from the exponential random number distribution.
 - ``gamma(shape, alpha, beta)``: generates an expression of the specified shape, containing numbers
   sampled from the gamma random number distribution.
+- ``weibull(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the Weibull random number distribution.
 
 Meshes
 ------
