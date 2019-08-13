@@ -83,6 +83,10 @@ namespace xt
         template <class T, class S, class E = random::default_engine_type>
         auto lognormal(const S& shape, T mean = 0, T std_dev = 1,
                        E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto chi_squared(const S& shape, T deg = 1.0,
+                         E& engine = random::get_default_random_engine());
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -133,8 +137,34 @@ namespace xt
 
         template <class T, class I, class E = random::default_engine_type>
         auto lognormal(std::initializer_list<I> shape, 
-                       T mean = 0, T std_dev = 1,
+                       T mean = 0, T std_dev = 1.0,
                        E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto chi_squared(std::initializer_list<I> shape, T deg = 1.0,
+                         E& engine = random::get_default_random_engine();  
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto cauchy(std::initializer_list<I> shape, T a = 0.0, T b = 1.0,
+                    E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto fisher_f(std::initializer_list<I> shape, T m = 1.0, T n = 1.0,
+                      E& engine = random::get_default_random_engine());
+
+        template < class T, class I, class E = random::default_engine_type>
+        auto student_t(std::initializer_list<I> shape, T n = 1.0,
+                       E& engine = random::get_default_random_engine());
+
+        template <class T, class I, class E = random::default_engine_type>
+        auto chi_squared(std::initializer_list<I> shape, T deg = 1.0,
+                         E& engine = random::get_default_random_engine();  
+>>>>>>> 2fd7590... implement chi-squared distribution (with docs and test)
+=======
+>>>>>>> 94701e9... implement chi-squared distribution (with docs and test)
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -181,8 +211,28 @@ namespace xt
                            E& engine = random::get_default_random_engine());
 
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
-        auto lognormal(const I (&shape)[L], T mean = 0, T std_dev = 1,
+        auto lognormal(const I (&shape)[L], T mean = 0.0, T std_dev = 1.0,
                        E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto chi_squared(const I (&shape)[L], T deg = 1.0,
+                         E& engine = random::get_default_random_engine());
+                         
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto cauchy(const I (&shape)[L], T a = 0.0, T b = 1.0,
+                    E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto fisher_f(const I (&shape)[L], T m = 1.0, T n = 1.0,
+                      E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto student_t(const I (&shape)[L], T n = 1.0,
+                       E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto chi_squared(const I (&shape)[L], T deg = 1.0,
+                         E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -493,6 +543,24 @@ namespace xt
             std::lognormal_distribution<T> dist(mean, std_dev);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * the chi-squared random number distribution with @p deg degrees of freedom.
+         *
+         * Numbers are drawn from @c std::chi_squared_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param deg degrees of freedom
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class E>
+        inline auto chi_squared(const S& shape, T deg, E& engine)
+        {
+            std::chi_squared_distribution<T> dist(deg);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #ifdef X_OLD_CLANG
         template <class T, class I, class E>
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
@@ -577,6 +645,13 @@ namespace xt
             std::lognormal_distribution<T> dist(mean, std_dev);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        template <class T, class I, class E>
+        inline auto chi_squared(std::initializer_list<I> shape, T deg, E& engine)
+        {
+            std::chi_squared_distribution<T> dist(deg);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -659,6 +734,13 @@ namespace xt
         inline auto lognormal(const I (&shape)[L], T mean, T std_dev, E& engine)
         {
             std::lognormal_distribution<T> dist(mean, std_dev);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto chi_squared(const I (&shape)[L], T deg, E& engine)
+        {
+            std::chi_squared_distribution<T> dist(deg);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #endif
