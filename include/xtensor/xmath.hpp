@@ -582,7 +582,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
               return a * xt::numeric_constants<double>::PI / 180.0;
             }
 
-            template <class A, std::enable_if_t<!std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
             constexpr auto operator()(const A& a) const noexcept
             {
               return a * xt::numeric_constants<A>::PI / 180.0;
@@ -594,7 +594,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
               return a * xt::numeric_constants<double>::PI / 180.0;
             }
 
-            template <class A, std::enable_if_t<!std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
             constexpr auto simd_apply(const A& a) const noexcept
             {
               return a * xt::numeric_constants<A>::PI / 180.0;
@@ -609,7 +609,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
               return a * 180.0 / xt::numeric_constants<double>::PI;
             }
 
-            template <class A, std::enable_if_t<!std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
             constexpr auto operator()(const A& a) const noexcept
             {
               return a * 180.0 / xt::numeric_constants<A>::PI;
@@ -621,7 +621,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
               return a * 180.0 / xt::numeric_constants<double>::PI;
             }
 
-            template <class A, std::enable_if_t<!std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
             constexpr auto simd_apply(const A& a) const noexcept
             {
               return a * 180.0 / xt::numeric_constants<A>::PI;
