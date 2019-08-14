@@ -582,7 +582,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
             template <class A>
             constexpr auto simd_apply(const A& a) const noexcept {
-                return a * xt::numeric_constants<long double>::PI / 180.0;
+                return a * xt::numeric_constants<A>::PI / 180.0;
             }
         };
 
