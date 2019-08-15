@@ -20,12 +20,27 @@ using namespace xt::placeholders;  // to enable _ syntax
 namespace xt
 {
     /**
-     * @brief Defines different algorithms to be used in ``xt::pad``
+     * @brief Defines different algorithms to be used in ``xt::pad``:
+     * - ``constant``: Pads with a constant value.
+     * - ``symmetric``: Pads with the reflection of the vector mirrored along the edge of the array.
+     * - ``reflect``: Pads with the reflection of the vector mirrored on the first and last values
+     *   of the vector along each axis.
+     * - ``wrap``: Pads with the wrap of the vector along the axis. The first values are used to pad
+     *   the end and the end values are used to pad the beginning.
+     * - ``periodic`` : ``== wrap`` (pads with periodic repetitions of the vector).
+     *
+     * OpenCV to xtensor:
+     * - ``BORDER_CONSTANT == constant``
+     * - ``BORDER_REFLECT == symmetric``
+     * - ``BORDER_REFLECT_101 == reflect``
+     * - ``BORDER_WRAP == wrap``
      */
     enum class pad_mode
     {
         constant,
         symmetric,
+        reflect,
+        wrap,
         periodic
     };
 
@@ -89,7 +104,7 @@ namespace xt
                 xt::xstrided_slice_vector sv_bgn(e.shape().size(), xt::all());
                 xt::xstrided_slice_vector sv_end(e.shape().size(), xt::all());
 
-                if (mode == pad_mode::periodic)
+                if (mode == pad_mode::wrap || mode == pad_mode::periodic)
                 {
                     XTENSOR_ASSERT(nb <= out.shape()[axis]);
                     XTENSOR_ASSERT(ne <= out.shape()[axis]);
@@ -115,6 +130,21 @@ namespace xt
                     else
                     {
                         sv_end[axis] = xt::range(out.shape()[axis], out.shape()[axis]-ne-1, -1);
+                    }
+                }
+                else if (mode == pad_mode::reflect)
+                {
+                    XTENSOR_ASSERT(out.shape()[axis] > 1);
+                    XTENSOR_ASSERT(nb <= out.shape()[axis] - 1);
+                    XTENSOR_ASSERT(ne <= out.shape()[axis] - 1);
+                    sv_bgn[axis] = xt::range(nb, 0, -1);
+                    if (ne == out.shape()[axis] - 1)
+                    {
+                        sv_end[axis] = xt::range(out.shape()[axis]-2, _, -1);
+                    }
+                    else
+                    {
+                        sv_end[axis] = xt::range(out.shape()[axis]-2, out.shape()[axis]-ne-2, -1);
                     }
                 }
 
