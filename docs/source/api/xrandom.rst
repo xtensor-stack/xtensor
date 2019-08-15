@@ -62,6 +62,9 @@ Defined in ``xtensor/xrandom.hpp``
 .. doxygenfunction:: xt::random::fisher_f(const S&, T, T, E&)
    :project: xtensor
 
+.. doxygenfunction:: xt::random::student_t(const S&, T, E&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::random::choice
    :project: xtensor
 

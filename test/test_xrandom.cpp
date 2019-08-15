@@ -58,6 +58,7 @@ namespace xt
         xarray<double> xsqr = random::chi_squared<double>({3, 3});
         xarray<double> cauchy = random::cauchy<double>({3, 3});
         xarray<double> fisher_f = random::fisher_f<double>({3, 3});
+        xarray<double> student_t = random::student_t<double>({3, 3});
 
         // checking if internal state needs reset
         auto n_dist = random::randn<double>({3, 3});

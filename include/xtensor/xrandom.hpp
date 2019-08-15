@@ -95,6 +95,10 @@ namespace xt
         template <class T, class S, class E = random::default_engine_type>
         auto fisher_f(const S& shape, T m = 1.0, T n = 1.0,
                       E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto student_t(const S& shape, T n = 1.0,
+                       E& engine = random::get_default_random_engine());
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -115,7 +119,7 @@ namespace xt
                       T trials = 1, D prob = 0.5,
                       E& engine = random::get_default_random_engine());
 
-        template <class T, class I, class E = random::default_engine_type>
+        template <class T, class I, class D = double, class E = random::default_engine_type>
         auto geometric(std::initializer_list<I> shape, D prob = 0.5, 
                       E& engine = random::get_default_random_engine());
 
@@ -150,7 +154,7 @@ namespace xt
 
         template <class T, class I, class E = random::default_engine_type>
         auto chi_squared(std::initializer_list<I> shape, T deg = 1.0,
-                         E& engine = random::get_default_random_engine();  
+                         E& engine = random::get_default_random_engine());  
 
         template <class T, class I, class E = random::default_engine_type>
         auto cauchy(std::initializer_list<I> shape, T a = 0.0, T b = 1.0,
@@ -159,6 +163,10 @@ namespace xt
         template <class T, class I, class E = random::default_engine_type>
         auto fisher_f(std::initializer_list<I> shape, T m = 1.0, T n = 1.0,
                       E& engine = random::get_default_random_engine());
+
+        template < class T, class I, class E = random::default_engine_type>
+        auto student_t(std::initializer_list<I> shape, T n = 1.0,
+                       E& engine = random::get_default_random_engine());
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -223,18 +231,6 @@ namespace xt
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto student_t(const I (&shape)[L], T n = 1.0,
                        E& engine = random::get_default_random_engine());
-
-        template <class T, class I, std::size_t L, class E = random::default_engine_type>
-        auto chi_squared(const I (&shape)[L], T deg = 1.0,
-                         E& engine = random::get_default_random_engine());
-
-        template <class T, class I, std::size_t L, class E = random::default_engine_type>
-        auto cauchy(const I (&shape)[L], T a = 0.0, T b = 1.0,
-                    E& engine = random::get_default_random_engine());
-
-        template <class T, class I, std::size_t L, class E = random::default_engine_type>
-        auto fisher_f(const I (&shape)[L], T m = 1.0, T n = 1.0,
-                      E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -602,6 +598,25 @@ namespace xt
             std::fisher_f_distribution<T> dist(m, n);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * a Student-t random number distribution with degrees of 
+         * freedom equal to @p n 
+         * 
+         * Numbers are drawn from @c std::student_t_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param n degrees of freedom
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class E>
+        inline auto student_t(const S& shape, T n, E& engine)
+        {
+            std::student_t_distribution<T> dist(n);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #ifdef X_OLD_CLANG
         template <class T, class I, class E>
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
@@ -707,6 +722,13 @@ namespace xt
             std::fisher_f_distribution<T> dist(m, n);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        template <class T, class I, class E>
+        inline auto student_t(std::initializer_list<I> shape, T n, E& engine)
+        {
+            std::student_t_distribution<T> dist(n);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -810,6 +832,13 @@ namespace xt
         inline auto fisher_f(const I (&shape)[L], T m, T n, E& engine)
         {
             std::fisher_f_distribution<T> dist(m, n);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto student_t(const I (&shape)[L], T n, E& engine)
+        {
+            std::student_t_distribution<T> dist(n);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #endif

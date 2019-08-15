@@ -67,6 +67,8 @@ Random distributions
   sampled from the Cauchy random number distribution.
 - ``fisher_f(shape, m, n)``: generates an expression of the specified shape, containing numbers
   sampled from the Fisher-f random number distribution.
+- ``student_t(shape, n)``: generates an expression of the specified shape, containing numbers
+  sampled from the Student-t random number distribution.
 
 Meshes
 ------
