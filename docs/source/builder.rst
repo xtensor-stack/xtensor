@@ -65,6 +65,8 @@ Random distributions
   sampled from the chi-squared random number distribution.
 - ``cauchy(shape, a, b)``: generates an expression of the specified shape, containing numbers
   sampled from the Cauchy random number distribution.
+- ``fisher_f(shape, m, n)``: generates an expression of the specified shape, containing numbers
+  sampled from the Fisher-f random number distribution.
 
 Meshes
 ------
