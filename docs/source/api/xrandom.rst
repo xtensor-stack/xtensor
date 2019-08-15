@@ -56,6 +56,9 @@ Defined in ``xtensor/xrandom.hpp``
 .. doxygenfunction:: xt::random::lognormal(const S&, T, E&)
    :project: xtensor
 
+.. doxygenfunction:: xt::random::cauchy(const S&, T, T, E&)
+   :project: xtensor
+
 .. doxygenfunction:: xt::random::choice
    :project: xtensor
 

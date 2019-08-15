@@ -63,6 +63,8 @@ Random distributions
   sampled from the Log-Normal random number distribution.
 - ``chi_squared(shape, a, b)``: generates an expression of the specified shape, containing numbers
   sampled from the chi-squared random number distribution.
+- ``cauchy(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the Cauchy random number distribution.
 
 Meshes
 ------

@@ -87,6 +87,10 @@ namespace xt
         template <class T, class S, class E = random::default_engine_type>
         auto chi_squared(const S& shape, T deg = 1.0,
                          E& engine = random::get_default_random_engine());
+
+        template <class T, class S, class E = random::default_engine_type>
+        auto cauchy(const S& shape, T a = 0.0, T b = 1.0, 
+                           E& engine = random::get_default_random_engine());
 #ifdef X_OLD_CLANG
         template <class T, class I, class E = random::default_engine_type>
         auto rand(std::initializer_list<I> shape, T lower = 0, T upper = 1,
@@ -145,11 +149,19 @@ namespace xt
                          E& engine = random::get_default_random_engine();  
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> d0fbda9... implement Cauchy distribution (with docs and tests)
+=======
+>>>>>>> e8329f5... implement Cauchy distribution (with docs and tests)
 
         template <class T, class I, class E = random::default_engine_type>
         auto cauchy(std::initializer_list<I> shape, T a = 0.0, T b = 1.0,
                     E& engine = random::get_default_random_engine());
+<<<<<<< HEAD
+<<<<<<< HEAD
 
         template <class T, class I, class E = random::default_engine_type>
         auto fisher_f(std::initializer_list<I> shape, T m = 1.0, T n = 1.0,
@@ -165,6 +177,10 @@ namespace xt
 >>>>>>> 2fd7590... implement chi-squared distribution (with docs and test)
 =======
 >>>>>>> 94701e9... implement chi-squared distribution (with docs and test)
+=======
+>>>>>>> d0fbda9... implement Cauchy distribution (with docs and tests)
+=======
+>>>>>>> e8329f5... implement Cauchy distribution (with docs and tests)
 #else
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto rand(const I (&shape)[L], T lower = 0, T upper = 1,
@@ -233,6 +249,10 @@ namespace xt
         template <class T, class I, std::size_t L, class E = random::default_engine_type>
         auto chi_squared(const I (&shape)[L], T deg = 1.0,
                          E& engine = random::get_default_random_engine());
+
+        template <class T, class I, std::size_t L, class E = random::default_engine_type>
+        auto cauchy(const I (&shape)[L], T a = 0.0, T b = 1.0,
+                    E& engine = random::get_default_random_engine());
 #endif
 
         template <class T, class E = random::default_engine_type>
@@ -561,6 +581,25 @@ namespace xt
             std::chi_squared_distribution<T> dist(deg);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        /**
+         * xexpression with specified @p shape containing numbers sampled from
+         * a Cauchy random number distribution with peak @p a and scale @p b
+         * 
+         * Numbers are drawn from @c std::cauchy_distribution.
+         *
+         * @param shape shape of resulting xexpression
+         * @param a peak of the Cauchy distribution
+         * @param b scale of the Cauchy distribution
+         * @param engine random number engine
+         * @tparam T number type to use
+         */
+        template <class T, class S, class E>
+        inline auto cauchy(const S& shape, T a, T b, E& engine)
+        {
+            std::cauchy_distribution<T> dist(a, b);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #ifdef X_OLD_CLANG
         template <class T, class I, class E>
         inline auto rand(std::initializer_list<I> shape, T lower, T upper, E& engine)
@@ -652,6 +691,13 @@ namespace xt
             std::chi_squared_distribution<T> dist(deg);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
+
+        template <class T, class I, class E>
+        inline auto cauchy(std::initializer_list<I> shape, T a, T b, E& engine)
+        {
+            std::cauchy_distribution<T> dist(a, b);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
 #else
         template <class T, class I, std::size_t L, class E>
         inline auto rand(const I (&shape)[L], T lower, T upper, E& engine)
@@ -741,6 +787,13 @@ namespace xt
         inline auto chi_squared(const I (&shape)[L], T deg, E& engine)
         {
             std::chi_squared_distribution<T> dist(deg);
+            return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
+        }
+
+        template <class T, class I, std::size_t L, class E>
+        inline auto cauchy(const I (&shape)[L], T a, T b, E& engine)
+        {
+            std::cauchy_distribution<T> dist(a, b);
             return detail::make_xgenerator(detail::random_impl<T, E, decltype(dist)>(engine, std::move(dist)), shape);
         }
 #endif
