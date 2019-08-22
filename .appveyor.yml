@@ -1,5 +1,9 @@
 build: false
 
+branches:
+  only:
+    - master
+
 platform:
   - x64
 

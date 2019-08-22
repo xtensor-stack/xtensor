@@ -5,6 +5,16 @@ matrix:
   fast_finish: true
   include:
     - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-4.9
+      env: COMPILER=gcc GCC=4.9
+    - os: linux
+      if: branch = coverity
       addons:
         apt:
           sources:
@@ -13,6 +23,7 @@ matrix:
             - g++-4.9
       env: COMPILER=gcc GCC=4.9 COVERITY_SCAN=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -21,6 +32,7 @@ matrix:
             - g++-5
       env: COMPILER=gcc GCC=5 DISABLE_XSIMD=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -29,6 +41,7 @@ matrix:
             - g++-6
       env: COMPILER=gcc GCC=6 ENABLE_TBB=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -37,6 +50,7 @@ matrix:
             - g++-6
       env: COMPILER=gcc GCC=6 BOUND_CHECKS=1 BUILD_BENCHMARK=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -45,6 +59,7 @@ matrix:
             - g++-6
       env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -53,6 +68,7 @@ matrix:
             - g++-7
       env: COMPILER=gcc GCC=7
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -61,6 +77,7 @@ matrix:
             - g++-7
       env: COMPILER=gcc GCC=7 ENABLE_CPP17=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -70,6 +87,7 @@ matrix:
             - clang-3.6
       env: COMPILER=clang CLANG=3.6 DISABLE_XSIMD=1 
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -80,6 +98,7 @@ matrix:
             - clang-3.9
       env: COMPILER=clang CLANG=3.9
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -90,6 +109,7 @@ matrix:
             - clang-4.0
       env: COMPILER=clang CLANG=4.0 DISABLE_XSIMD=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -100,6 +120,7 @@ matrix:
             - clang-5.0
       env: COMPILER=clang CLANG=5.0 ENABLE_TBB=1 DISABLE_XSIMD=1
     - os: linux
+      if: branch = master
       addons:
         apt:
           sources:
@@ -109,6 +130,7 @@ matrix:
             - clang-6.0
       env: COMPILER=clang CLANG=6.0
     - os: osx
+      if: branch = master
       osx_image: xcode8
       compiler: clang
 env:
