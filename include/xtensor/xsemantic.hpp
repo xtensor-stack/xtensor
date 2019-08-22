@@ -127,6 +127,15 @@ namespace xt
         derived_type& operator=(const xexpression<E>&);
     };
 
+    template <class E>
+    using is_assignable = is_crtp_base_of<xsemantic_base, E>;
+
+    template <class E, class R = void>
+    using enable_assignable = typename std::enable_if<is_assignable<E>::value, R>::type;
+
+    template <class E, class R = void>
+    using disable_assignable = typename std::enable_if<!is_assignable<E>::value, R>::type;
+
     /**
      * @class xcontainer_semantic
      * @brief Implementation of the xsemantic_base interface
@@ -641,7 +650,7 @@ namespace xt
             using index_type = xindex_type_t<typename xfunction<F, R, CT...>::shape_type>;
             using size_type = typename index_type::size_type;
             size_type size = rhs.dimension();
-            index_type shape = xtl::make_sequence<index_type>(size, size_type(0));
+            index_type shape = uninitialized_shape<index_type>(size);
             bool trivial_broadcast = rhs.broadcast_shape(shape, true);
             return trivial_broadcast;
         }

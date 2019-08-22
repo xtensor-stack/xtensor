@@ -13,6 +13,7 @@
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xcomplex.hpp"
 #include "xtensor/xio.hpp"
+#include "xtensor/xnorm.hpp"
 
 namespace xt
 {
@@ -279,5 +280,32 @@ namespace xt
                              { cpx(-1, 0), cpx(0, -1), cpx(2, -2) }};
 
         EXPECT_EQ(res, exp);
+    }
+
+    TEST(xcomplex, exp)
+    {
+        xt::xarray<float> ph = {274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f, 274.7323f, 276.3974f};
+        xt::xarray<std::complex<float>> input = ph * std::complex<float>(0, 1.f);
+        xt::xarray<std::complex<float>> res = xt::exp(input);
+        auto expected = xt::xarray<std::complex<float>>::from_shape({ size_t(8) });
+        std::transform(input.cbegin(), input.cend(), expected.begin(), [](const std::complex<float>& arg) {
+            return std::exp(arg);
+        });
+        EXPECT_EQ(expected, res);
+    }
+
+    TEST(xcomplex, longdouble)
+    {
+        using cmplx = std::complex<long double>;
+        xt::xtensor<cmplx, 2> a = xt::empty<cmplx>({5, 5});
+        xt::real(a) = 123.321;
+        xt::imag(a) = -123.321;
+
+        EXPECT_EQ(a(4, 4), cmplx(123.321, -123.321));
+
+        xt::real(a) = xt::imag(a);
+
+        EXPECT_EQ(a(0, 0), cmplx(-123.321, -123.321));
+        EXPECT_EQ(a(4, 4), cmplx(-123.321, -123.321));
     }
 }

@@ -224,6 +224,44 @@ namespace xt
         }
     }
 
+    template <class F, class E, class R,
+              XTL_REQUIRES(std::is_convertible<typename E::value_type, typename R::value_type>)>
+    inline void copy_to_reduced(F&, const E& e, R& result)
+    {
+        if (e.layout() == layout_type::row_major)
+        {
+            std::copy(e.template cbegin<layout_type::row_major>(),
+                      e.template cend<layout_type::row_major>(),
+                      result.data());
+        }
+        else
+        {
+            std::copy(e.template cbegin<layout_type::column_major>(),
+                      e.template cend<layout_type::column_major>(),
+                      result.data());
+        }
+    }
+
+    template <class F, class E, class R,
+              XTL_REQUIRES(xtl::negation<std::is_convertible<typename E::value_type, typename R::value_type>>)>
+    inline void copy_to_reduced(F& f, const E& e, R& result)
+    {
+        if (e.layout() == layout_type::row_major)
+        {
+            std::transform(e.template cbegin<layout_type::row_major>(),
+                           e.template cend<layout_type::row_major>(),
+                           result.data(),
+                           f);
+        }
+        else
+        {
+            std::transform(e.template cbegin<layout_type::column_major>(),
+                           e.template cend<layout_type::column_major>(),
+                           result.data(),
+                           f);
+        }
+    }
+
     template <class F, class E, class X, class O>
     inline auto reduce_immediate(F&& f, E&& e, X&& axes, O&& raw_options)
     {
@@ -236,19 +274,25 @@ namespace xt
         options_t options(raw_options);
 
         using shape_type = typename xreducer_shape_type<typename std::decay_t<E>::shape_type, std::decay_t<X>, typename options_t::keep_dims>::type;
+        using result_container_type = typename detail::xtype_for_shape<shape_type>::template type<result_type, std::decay_t<E>::static_layout>;
+        result_container_type result;
 
         // retrieve functors from triple struct
         auto reduce_fct = xt::get<0>(f);
         auto init_fct = xt::get<1>(f);
         auto merge_fct = xt::get<2>(f);
 
-        shape_type result_shape{};
+        if (axes.size() == 0)
+        {
+            result.resize(e.shape(), e.layout());
+            auto cpf = [&reduce_fct, &init_fct](const auto& v) {return reduce_fct(static_cast<result_type>(init_fct()), v); };
+            copy_to_reduced(cpf, e, result);
+            return result;
+        }
 
+        shape_type result_shape{};
         dynamic_shape<std::size_t> iter_shape = xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(e.shape())>(e.shape());
         dynamic_shape<std::size_t> iter_strides(e.dimension());
-
-        using result_container_type = typename detail::xtype_for_shape<shape_type>::template type<result_type, std::decay_t<E>::static_layout>;
-        result_container_type result;
 
         if (!std::is_sorted(axes.cbegin(), axes.cend()))
         {
@@ -273,11 +317,20 @@ namespace xt
         auto strides_finder = e.strides().begin() + static_cast<std::ptrdiff_t>(leading_ax);
         // The computed strides contain "0" where the shape is 1 -- therefore find the next none-zero number
         std::size_t inner_stride = static_cast<std::size_t>(*strides_finder);
-        while (inner_stride == 0)
+        auto iter_bound = e.layout() == layout_type::row_major ? e.strides().begin() : (e.strides().end() - 1);
+        while (inner_stride == 0 && strides_finder != iter_bound)
         {
             (e.layout() == layout_type::row_major) ? --strides_finder : ++strides_finder;
             inner_stride = static_cast<std::size_t>(*strides_finder);
         }
+
+        if (inner_stride == 0)
+        {
+            auto cpf = [&reduce_fct, &init_fct](const auto& v) {return reduce_fct(static_cast<result_type>(init_fct()), v); };
+            copy_to_reduced(cpf, e, result);
+            return result;
+        }
+
         std::size_t inner_loop_size = static_cast<std::size_t>(inner_stride);
         std::size_t outer_loop_size = e.shape()[leading_ax];
 
@@ -1432,7 +1485,7 @@ namespace xt
     template <class F, class CT, class X, class O>
     inline auto xreducer_stepper<F, CT, X, O>::aggregate(size_type dim) const -> reference
     {
-        if (m_reducer->m_e.shape().empty())
+        if (m_reducer->m_e.shape().empty() || m_reducer->m_axes.size() == 0)
         {
             reference res =
                 m_reducer->m_reduce(O::has_initial_value ? m_reducer->m_options.initial_value : static_cast<reference>(m_reducer->m_init()),
@@ -1487,7 +1540,7 @@ namespace xt
         {
             size_type index = dim;
             size_type size = m_reducer->m_e.shape()[index];
-            if (ax_it != m_reducer->m_axes.end() - 1)
+            if (ax_it != m_reducer->m_axes.end() - 1 && size != 0)
             {
                 res = aggregate_impl(dim + 1, typename O::keep_dims());
                 for (size_type i = 1; i != size; ++i)

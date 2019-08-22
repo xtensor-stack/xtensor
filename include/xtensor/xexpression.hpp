@@ -27,9 +27,12 @@ namespace xt
 
     template <class D>
     class xexpression;
+    
+    template <class E>
+    class xshared_expression;
 
     template <class E>
-    auto make_xshared(xexpression<E>&&);
+    xshared_expression<E> make_xshared(xexpression<E>&&);
 
     /***************************
      * xexpression declaration *
@@ -73,7 +76,7 @@ namespace xt
 
         std::shared_ptr<D> p_shared;
 
-        friend auto make_xshared<D>(xexpression<D>&&);
+        friend xshared_expression<D> make_xshared<D>(xexpression<D>&&);
     };
 
     /******************************
@@ -185,9 +188,6 @@ namespace xt
 
     template <class T>
     class xscalar;
-
-    template <class E>
-    class xshared_expression;
 
     template <class E, class EN = void>
     struct xclosure
@@ -585,12 +585,12 @@ namespace xt
         }
 
         template <class It>
-        auto element(It first, It last) {
+        reference element(It first, It last) {
             return m_ptr->element(first, last);
         }
 
         template <class It>
-        auto element(It first, It last) const {
+        const_reference element(It first, It last) const {
             return m_ptr->element(first, last);
         }
 
@@ -668,7 +668,7 @@ namespace xt
      * @return xshared expression
      */
     template <class E>
-    inline auto make_xshared(xexpression<E>&& expr)
+    inline xshared_expression<E> make_xshared(xexpression<E>&& expr)
     {
         if(expr.p_shared == nullptr)
         {

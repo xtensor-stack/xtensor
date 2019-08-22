@@ -11,7 +11,7 @@
 
 #define XTENSOR_VERSION_MAJOR 0
 #define XTENSOR_VERSION_MINOR 20
-#define XTENSOR_VERSION_PATCH 5
+#define XTENSOR_VERSION_PATCH 8
 
 // DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
 #ifdef __clang__
@@ -61,14 +61,22 @@
     #endif
 #else
     #ifdef XTENSOR_USE_XSIMD
-    #include <xsimd/xsimd.hpp>
-    #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-        xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
+        #include <xsimd/xsimd.hpp>
+        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+            xsimd::aligned_allocator<T, XSIMD_DEFAULT_ALIGNMENT>
     #else
-    #define XTENSOR_DEFAULT_ALLOCATOR(T) \
-        std::allocator<T>
+        #define XTENSOR_DEFAULT_ALLOCATOR(T) \
+            std::allocator<T>
     #endif
 #endif
+#endif
+
+#ifndef XTENSOR_DEFAULT_ALIGNMENT
+    #ifdef XTENSOR_USE_XSIMD
+        #define XTENSOR_DEFAULT_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
+    #else
+        #define XTENSOR_DEFAULT_ALIGNMENT 0
+    #endif
 #endif
 
 #ifndef XTENSOR_DEFAULT_LAYOUT

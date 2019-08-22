@@ -599,4 +599,48 @@ namespace xt
         auto rex0 = xt::prod(a, {1, 2}, initial(0));
         EXPECT_TRUE(xt::all(equal(rex0, 0.)));
     }
+
+    TEST(xreducer, ones_first)
+    {
+        auto a = xt::ones<int>(std::vector<int>({ 1,1,2,4 }));
+        std::vector<int> arraxis = { 1 };
+        auto result = xt::sum(a, arraxis, xt::keep_dims | xt::evaluation_strategy::immediate);
+        EXPECT_EQ(a, result);
+
+        std::vector<int> arraxis2 = { 1, 2 };
+        auto res2 = xt::sum(a, arraxis2, xt::keep_dims | xt::evaluation_strategy::immediate);
+        xt::xarray<int> expected = { {{{2, 2, 2, 2}}} };
+        EXPECT_EQ(expected, res2);
+    }
+
+    TEST(xreducer, empty_axes)
+    {
+        xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
+        std::vector<std::size_t> axes = {};
+        auto res0 = xt::sum(a, axes);
+        auto res1 = xt::sum(a, axes, xt::keep_dims | xt::evaluation_strategy::immediate);
+
+        EXPECT_EQ(res0, a);
+        EXPECT_EQ(res1, a);
+    }
+
+    TEST(xreducer, zero_shape)
+    {
+        xt::xarray<int> x = xt::zeros<int>({ 0, 1 });
+        
+        auto res0 = xt::sum(x, { 0 }, xt::keep_dims);
+        EXPECT_EQ(res0.shape()[0], size_t(1));
+        EXPECT_EQ(res0.shape()[1], size_t(1));
+        EXPECT_EQ(res0(0, 0), 0);
+
+        auto res1 = xt::sum(x, { 1 }, xt::keep_dims);
+        EXPECT_EQ(res1.shape()[0], size_t(0));
+        EXPECT_EQ(res1.shape()[1], size_t(1));
+        EXPECT_EQ(res1.size(), size_t(0));
+
+        auto res2 = xt::sum(x, xt::keep_dims);
+        EXPECT_EQ(res2.shape()[0], size_t(1));
+        EXPECT_EQ(res2.shape()[1], size_t(1));
+        EXPECT_EQ(res2(0, 0), 0);
+    }
 }

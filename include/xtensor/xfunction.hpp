@@ -276,6 +276,7 @@ namespace xt
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const;
         layout_type layout() const noexcept;
+        using accessible_base::shape;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -527,7 +528,7 @@ namespace xt
     {
         static_assert(!detail::is_fixed<shape_type>::value, "Calling compute_cached_shape on fixed!");
 
-        m_cache.shape = xtl::make_sequence<xindex_type_t<inner_shape_type>>(compute_dimension(), size_type(0));
+        m_cache.shape = uninitialized_shape<xindex_type_t<inner_shape_type>>(compute_dimension());
         m_cache.is_trivial = broadcast_shape(m_cache.shape, false);
         m_cache.is_initialized = true;
     }

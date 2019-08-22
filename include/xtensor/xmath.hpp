@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 * Copyright (c) 2016, Johan Mabille, Sylvain Corlay and Wolf Vollprecht    *
 *                                                                          *
 * Distributed under the terms of the BSD 3-Clause License.                 *
@@ -573,6 +573,120 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
                 return xt_simd::select(v < lo, lo, xt_simd::select(hi < v, hi, v));
             }
         };
+
+        struct deg2rad
+        {
+            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            constexpr double operator()(const A& a) const noexcept
+            {
+              return a * xt::numeric_constants<double>::PI / 180.0;
+            }
+
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
+            constexpr auto operator()(const A& a) const noexcept
+            {
+              return a * xt::numeric_constants<A>::PI / A(180.0);
+            }
+
+            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            constexpr double simd_apply(const A& a) const noexcept
+            {
+              return a * xt::numeric_constants<double>::PI / 180.0;
+            }
+
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
+            constexpr auto simd_apply(const A& a) const noexcept
+            {
+              return a * xt::numeric_constants<A>::PI / A(180.0);
+            }
+        };
+
+        struct rad2deg
+        {
+            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            constexpr double operator()(const A& a) const noexcept
+            {
+              return a * 180.0 / xt::numeric_constants<double>::PI;
+            }
+
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
+            constexpr auto operator()(const A& a) const noexcept
+            {
+              return a * A(180.0) / xt::numeric_constants<A>::PI;
+            }
+
+            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            constexpr double simd_apply(const A& a) const noexcept
+            {
+              return a * 180.0 / xt::numeric_constants<double>::PI;
+            }
+
+            template <class A, std::enable_if_t<std::is_floating_point<A>::value, int> = 0>
+            constexpr auto simd_apply(const A& a) const noexcept
+            {
+              return a * A(180.0) / xt::numeric_constants<A>::PI;
+            }
+        };
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Convert angles from degrees to radians.
+     *
+     * Returns an \ref xfunction for the element-wise corresponding
+     * angle in radians of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto deg2rad(E&& e) noexcept
+        -> detail::xfunction_type_t<math::deg2rad, E> {
+        return detail::make_xfunction<math::deg2rad>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Convert angles from degrees to radians.
+     *
+     * Returns an \ref xfunction for the element-wise corresponding
+     * angle in radians of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto radians(E&& e) noexcept
+        -> detail::xfunction_type_t<math::deg2rad, E> {
+        return detail::make_xfunction<math::deg2rad>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Convert angles from radians to degrees.
+     *
+     * Returns an \ref xfunction for the element-wise corresponding
+     * angle in degrees of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto rad2deg(E&& e) noexcept
+        -> detail::xfunction_type_t<math::rad2deg, E> {
+        return detail::make_xfunction<math::rad2deg>(std::forward<E>(e));
+    }
+
+    /**
+     * @ingroup basic_functions
+     * @brief Convert angles from radians to degrees.
+     *
+     * Returns an \ref xfunction for the element-wise corresponding
+     * angle in degrees of \em e.
+     * @param e an \ref xexpression
+     * @return an \ref xfunction
+     */
+    template <class E>
+    inline auto degrees(E&& e) noexcept
+        -> detail::xfunction_type_t<math::rad2deg, E> {
+        return detail::make_xfunction<math::rad2deg>(std::forward<E>(e));
     }
 
     /**
@@ -1824,7 +1938,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
         }
 
-        auto weights_view = reshape_view(std::forward<W>(weights), std::move(broadcast_shape));
+        constexpr layout_type L = default_assignable_layout(std::decay_t<W>::static_layout);
+        auto weights_view = reshape_view<L>(std::forward<W>(weights), std::move(broadcast_shape));
         auto scl = sum(weights_view, ax, xt::evaluation_strategy::immediate);
         return sum(std::forward<E>(e) * std::move(weights_view), std::move(ax), ev) / std::move(scl);
     }
@@ -1924,7 +2039,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         {
             keep_dim_shape[el] = 1;
         }
-        auto mrv = xt::reshape_view(std::move(inner_mean), std::move(keep_dim_shape));
+        auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
         return mean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
     }
 
@@ -2516,7 +2631,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         {
             keep_dim_shape[el] = 1;
         }
-        auto mrv = xt::reshape_view(std::move(inner_mean), std::move(keep_dim_shape));
+        auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
         return nanmean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
     }
 
@@ -2592,6 +2707,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     auto diff(const xexpression<T>& a, std::size_t n = 1, std::ptrdiff_t axis = -1)
     {
         auto ad = a.derived_cast();
+        XTENSOR_ASSERT(n <= ad.size());
         std::size_t saxis = normalize_axis(ad.dimension(), axis);
 
         if (n == 0)

@@ -97,6 +97,7 @@ namespace xt
         using self_type = xgenerator<F, R, S>;
         using functor_type = typename std::remove_reference<F>::type;
 
+        using accessible_base = xconst_accessible<self_type>;
         using extension_base = extension::xgenerator_base_t<F, R, S>;
         using expression_tag = typename extension_base::expression_tag;
 
@@ -124,6 +125,7 @@ namespace xt
 
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
+        using accessible_base::shape;
 
         template <class... Args>
         const_reference operator()(Args... args) const;

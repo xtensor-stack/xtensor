@@ -137,6 +137,9 @@ namespace xt
     template <class EC, std::size_t N, layout_type L = XTENSOR_DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
     class xtensor_adaptor;
 
+    template <class EC, std::size_t N, layout_type L = XTENSOR_DEFAULT_LAYOUT, class Tag = xtensor_expression_tag>
+    class xtensor_view;
+
     template <std::size_t... N>
     class fixed_shape;
 

@@ -33,8 +33,9 @@ namespace xt
     template <std::size_t... X>
     class fixed_shape;
 
-    using xindex = dynamic_shape<std::size_t>;    template <class S1, class S2>
-
+    using xindex = dynamic_shape<std::size_t>;
+    
+    template <class S1, class S2>
     bool same_shape(const S1& s1, const S2& s2) noexcept;
 
     template <class U>
@@ -42,6 +43,9 @@ namespace xt
 
     template <class R, class T>
     constexpr R shape(T t);
+
+    template<class R = std::size_t, class T, std::size_t N>
+    xt::static_shape<R, N> shape(const T(&aList)[N]);
 
     template <class S>
     struct static_dimension;
@@ -160,6 +164,14 @@ namespace xt
     constexpr R shape(T t)
     {
         return detail::initializer_shape<R, decltype(t)>(t, std::make_index_sequence<initializer_dimension<decltype(t)>::value>());
+    }
+
+    /** @brief Generate an xt::static_shape of the given size. */
+    template<class R, class T, std::size_t N>
+    xt::static_shape<R, N> shape(const T(&list)[N]) {
+        xt::static_shape<R, N> shape;
+        std::copy(std::begin(list), std::end(list), std::begin(shape));
+        return shape;
     }
 
     /********************

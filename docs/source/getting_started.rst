@@ -81,9 +81,11 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
 
     find_package(xtl REQUIRED)
     find_package(xtensor REQUIRED)
+    # if xtensor was built with xsimd support:
+    # find_package(xsimd REQUIRED)
 
     add_executable(first_example src/example.cpp)
-    
+
     if(MSVC)
         target_compile_options(first_example PRIVATE /EHsc /MP /bigobj)
         set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -96,6 +98,12 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
     endif()
 
     target_link_libraries(first_example xtensor)
+
+.. note::
+
+    `xsimd <https://github.com/QuantStack/xsimd>`_ is an optional dependency of xtensor that enable simd
+    acceleration, i.e. executing a same operation on a batch of data in a single CPU instruction. This
+    is well-suited to improve performance when operating on tensors.
 
 `cmake` has to know where to find the headers, this is done through the ``CMAKE_INSTALL_PREFIX``
 variable. Note that ``CMAKE_INSTALL_PREFIX`` is usually the path to a folder containing the following
@@ -144,6 +152,15 @@ When compiled and run, this produces the following output:
     {{1, 2, 3},
      {4, 5, 6},
      {7, 8, 9}}
+
+.. tip::
+
+  To print the shape to the standard output you can use
+
+  .. code-block:: cpp
+
+      const auto& s = arr.shape();
+      std::copy(s.cbegin(), s.cend(), std::ostream_iterator<double>(std::cout, " "));
 
 Third example: index access
 ---------------------------

@@ -153,6 +153,20 @@ namespace xt
         EXPECT_EQ(expected, a);
     }
 
+    TEST(xindex_view, filter_column_major)
+    {
+        xarray<int> a = {{{1, 3}, {2, 4}}, {{5, 7}, {6, 8}}};
+        xarray<bool> cond = {{{true, true}, {false, false}}, {{true, true}, {false, false}}};
+        
+        xarray<int> resc = xt::filter<xt::layout_type::column_major>(a, cond);
+        xarray<int> expc = {1, 5 ,3, 7};
+        EXPECT_EQ(resc, expc);
+
+        xarray<int> resr = xt::filter(a, cond);
+        xarray<int> expr = {1, 3 ,5, 7};
+        EXPECT_EQ(resr, expr);
+    }
+
     TEST(xindex_view, const_adapt_filter)
     {
         const std::vector<double> av({1,2,3,4,5,6});

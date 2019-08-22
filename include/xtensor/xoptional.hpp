@@ -428,6 +428,26 @@ namespace xt
         };
     }
 
+    /***************************************
+     * xtensor_view extension for optional *
+     ***************************************/
+
+    namespace extension
+    {
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_view_optional_traits : xtensor_optional_traits<EC, N, L>
+        {
+            using derived_type = xtensor_view<EC, N, L, xoptional_expression_tag>;
+        };
+
+        template <class EC, std::size_t N, layout_type L>
+        struct xtensor_view_base<EC, N, L, xoptional_expression_tag>
+        {
+            using traits = xtensor_view_optional_traits<EC, N, L>;
+            using type = xcontainer_optional_base<traits>;
+        };
+    }
+
     /************************************************
      * xfunction extension for optional expressions *
      ************************************************/
@@ -483,10 +503,10 @@ namespace xt
             using uft = typename std::decay_t<CT>::flag_expression;
             using ucvt = typename std::decay_t<CT>::const_value_expression;
             using ucft = typename std::decay_t<CT>::const_flag_expression;
-            using value_expression = xdynamic_view<uvt, S, L, xt::detail::flat_storage_type_t<uvt>>;
-            using flag_expression = xdynamic_view<uft, S, L, xt::detail::flat_storage_type_t<uft>>;
-            using const_value_expression = xdynamic_view<ucvt, S, L, xt::detail::flat_storage_type_t<ucvt>>;
-            using const_flag_expression = xdynamic_view<ucft, S, L, xt::detail::flat_storage_type_t<ucft>>;
+            using value_expression = xdynamic_view<uvt, S, L, typename FST::template rebind_t<uvt>>;
+            using flag_expression = xdynamic_view<uft, S, L, typename FST::template rebind_t<uft>>;
+            using const_value_expression = xdynamic_view<ucvt, S, L, typename FST::template rebind_t<ucvt>>;
+            using const_flag_expression = xdynamic_view<ucft, S, L, typename FST::template rebind_t<ucft>>;
 
             value_expression value();
             const_value_expression value() const;
@@ -646,10 +666,10 @@ namespace xt
             using uft = typename std::decay_t<CT>::flag_expression;
             using ucvt = typename std::decay_t<CT>::const_value_expression;
             using ucft = typename std::decay_t<CT>::const_flag_expression;
-            using value_expression = xstrided_view<uvt, S, L, xt::detail::flat_storage_type_t<uvt>>;
-            using flag_expression = xstrided_view<uft, S, L, xt::detail::flat_storage_type_t<uft>>;
-            using const_value_expression = xstrided_view<ucvt, S, L, xt::detail::flat_storage_type_t<ucvt>>;
-            using const_flag_expression = xstrided_view<ucft, S, L, xt::detail::flat_storage_type_t<ucft>>;
+            using value_expression = xstrided_view<uvt, S, L, typename FST::template rebind_t<uvt>>;
+            using flag_expression = xstrided_view<uft, S, L, typename FST::template rebind_t<uft>>;
+            using const_value_expression = xstrided_view<ucvt, S, L, typename FST::template rebind_t<ucvt>>;
+            using const_flag_expression = xstrided_view<ucft, S, L, typename FST::template rebind_t<ucft>>;
 
             value_expression value();
             const_value_expression value() const;

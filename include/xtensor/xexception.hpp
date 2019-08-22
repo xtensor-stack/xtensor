@@ -34,9 +34,48 @@ namespace xt
     template <class S1, class S2>
     [[noreturn]] void throw_broadcast_error(const S1& lhs, const S2& rhs);
 
+    /*********************
+     * concatenate_error *
+     *********************/
+
+    class concatenate_error : public std::runtime_error
+    {
+    public:
+
+        explicit concatenate_error(const char* msg)
+            : std::runtime_error(msg)
+        {
+        }
+    };
+
+    template <class S1, class S2>
+    [[noreturn]] void throw_concatenate_error(const S1& lhs, const S2& rhs);
+
     /**********************************
      * broadcast_error implementation *
      **********************************/
+
+    namespace detail
+    {
+        template <class S1, class S2>
+        inline std::string shape_error_message(const S1& lhs, const S2& rhs)
+        {
+            std::ostringstream buf("Incompatible dimension of arrays:", std::ios_base::ate);
+
+            buf << "\n LHS shape = (";
+            using size_type1 = typename S1::value_type;
+            std::ostream_iterator<size_type1> iter1(buf, ", ");
+            std::copy(lhs.cbegin(), lhs.cend(), iter1);
+
+            buf << ")\n RHS shape = (";
+            using size_type2 = typename S2::value_type;
+            std::ostream_iterator<size_type2> iter2(buf, ", ");
+            std::copy(rhs.cbegin(), rhs.cend(), iter2);
+            buf << ")";
+
+            return buf.str();
+        }
+    }
 
 #ifdef NDEBUG
     // Do not inline this function
@@ -49,20 +88,28 @@ namespace xt
     template <class S1, class S2>
     [[noreturn]] void throw_broadcast_error(const S1& lhs, const S2& rhs)
     {
-        std::ostringstream buf("Incompatible dimension of arrays:", std::ios_base::ate);
+        std::string msg = detail::shape_error_message(lhs, rhs);
+        throw broadcast_error(msg.c_str());
+    }
+#endif
 
-        buf << "\n LHS shape = (";
-        using size_type1 = typename S1::value_type;
-        std::ostream_iterator<size_type1> iter1(buf, ", ");
-        std::copy(lhs.cbegin(), lhs.cend(), iter1);
+    /************************************
+     * concatenate_error implementation *
+     ************************************/
 
-        buf << ")\n RHS shape = (";
-        using size_type2 = typename S2::value_type;
-        std::ostream_iterator<size_type2> iter2(buf, ", ");
-        std::copy(rhs.cbegin(), rhs.cend(), iter2);
-        buf << ")";
-
-        throw broadcast_error(buf.str().c_str());
+#ifdef NDEBUG
+    // Do not inline this function
+    template <class S1, class S2>
+    [[noreturn]] void throw_concatenate_error(const S1&, const S2&)
+    {
+        throw concatenate_error("Incompatible dimension of arrays, compile in DEBUG for more info");
+    }
+#else
+    template <class S1, class S2>
+    [[noreturn]] void throw_concatenate_error(const S1& lhs, const S2& rhs)
+    {
+        std::string msg = detail::shape_error_message(lhs, rhs);
+        throw concatenate_error(msg.c_str());
     }
 #endif
 

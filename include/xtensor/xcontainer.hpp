@@ -889,7 +889,7 @@ namespace xt
     /**
      * Resizes the container.
      * @warning Contrary to STL containers like std::vector, resize
-     * do NOT preserve the container elements.
+     * does NOT preserve the container elements.
      * @param shape the new shape
      * @param force force reshaping, even if the shape stays the same (default: false)
      */
@@ -915,7 +915,7 @@ namespace xt
     /**
      * Resizes the container.
      * @warning Contrary to STL containers like std::vector, resize
-     * do NOT preserve the container elements.
+     * does NOT preserve the container elements.
      * @param shape the new shape
      * @param l the new layout_type
      */
@@ -934,7 +934,7 @@ namespace xt
     /**
      * Resizes the container.
      * @warning Contrary to STL containers like std::vector, resize
-     * do NOT preserve the container elements.
+     * does NOT preserve the container elements.
      * @param shape the new shape
      * @param strides the new strides
      */

@@ -422,6 +422,33 @@ The xtl_ project, the only dependency of ``xtensor`` is a C++ template library
 holding the implementation of basic tools used across the libraries in the
 QuantStack ecosystem.
 
+xframe
+------
+
+.. image:: xframe.svg
+   :alt: xframe
+
+The xframe_ project provides multi-dimensional labeled arrays and a data frame for C++,
+based on ``xtensor`` and ``xtl``.
+
+`xframe` provides
+
+- an extensible expression system enabling lazy broadcasting.
+- an API following the idioms of the C++ standard library.
+- tools to manipulate n-dimensional labeled tensor expressions.
+
+The API of xframe is inspired by xarray_, a Python package implementing labelled multi-dimensional arrays and datasets.
+
+z5
+--
+
+The z5_ project implements the zarr_ and n5_ storage specifications in C++.
+Both specifications describe chunked nd-array storage similar to HDF5, but
+use the filesystem to store chunks. This design allows for parallel write access
+and efficient cloud based storage, crucial requirements in modern big data applications.
+The project uses ``xtensor`` to represent arrays in memory
+and also provides a python wrapper based on ``xtensor-python``.
+
 .. _xtensor-python: https://github.com/QuantStack/xtensor-python
 .. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
 .. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
@@ -433,3 +460,8 @@ QuantStack ecosystem.
 .. _xtensor-ros: https://github.com/wolfv/xtensor_ros
 .. _xsimd: https://github.com/QuantStack/xsimd
 .. _xtl: https://github.com/QuantStack/xtl
+.. _xframe: https://github.com/QuantStack/xframe
+.. _z5: https://github.com/constantinpape/z5
+.. _zarr: https://github.com/zarr-developers/zarr
+.. _n5: https://github.com/saalfeldlab/n5i
+.. _xarray: http://xarray.pydata.org

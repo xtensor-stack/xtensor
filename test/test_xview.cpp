@@ -78,17 +78,17 @@ namespace xt
         EXPECT_EQ(a(0, 0), view0(0));
         EXPECT_EQ(a(0, 1), view0(1));
         EXPECT_EQ(size_t(1), view0.dimension());
-        EXPECT_EQ(size_t(3), view0.shape()[0]);
+        EXPECT_EQ(size_t(3), view0.shape(0));
 
         auto view2 = view(a, range(0, 2), 2);
         EXPECT_EQ(a(0, 2), view2(0));
         EXPECT_EQ(a(1, 2), view2(1));
         EXPECT_EQ(size_t(1), view2.dimension());
-        EXPECT_EQ(size_t(2), view2.shape()[0]);
+        EXPECT_EQ(size_t(2), view2.shape(0));
 
         auto view4 = view(a, 1);
         EXPECT_EQ(size_t(1), view4.dimension());
-        EXPECT_EQ(size_t(4), view4.shape()[0]);
+        EXPECT_EQ(size_t(4), view4.shape(0));
 
         auto view5 = view(view4, 1);
         EXPECT_EQ(size_t(0), view5.dimension());
@@ -1194,6 +1194,14 @@ namespace xt
         EXPECT_TRUE(std::equal(b.begin() + 3, b.end(), vb.begin()));
         EXPECT_EQ(b.size() - 3, vb.size());
 
+        vector_type cvta = va;
+        std::array<int, 4> cvtb = vb;
+        vector_type cvta_expected = { 3, 4, 5, 6 };
+        std::array<int, 4> cvtb_expected = { 3, 4, 5, 6};
+
+        EXPECT_EQ(cvta, cvta_expected);
+        EXPECT_EQ(cvtb, cvtb_expected);
+
         auto vae = sequence_view<vector_type, 3, 5>(a);
         auto vbe = sequence_view<array_type, 3, 5>(b);
 
@@ -1454,5 +1462,24 @@ namespace xt
             *it += 5;
         }
         EXPECT_TRUE(xt::allclose(x_view, float(7) + x_orig));
+    }
+
+    TEST(xview, element)
+    {
+        xarray<int> a = { {1, 2, 3}, {4, 5, 6} };
+        auto v = view(a, 0);
+        std::array<std::size_t, 2> idx = { 0, 1 };
+        int res = v.element(idx.cbegin(), idx.cend());
+        EXPECT_EQ(res, 2);
+    }
+
+    TEST(xview, view_reshape_view)
+    {
+        xtensor<int, 1> a = { 0, 1, 2 };
+        xtensor<int, 1> b = { 2, 3, 4 };
+        auto tmp = reshape_view(a, {3});
+        auto res = view(std::move(tmp), xt::all());
+        noalias(view(reshape_view(a, {3}), xt::all())) = b;
+        EXPECT_EQ(tmp, res);
     }
 }

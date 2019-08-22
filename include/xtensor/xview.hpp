@@ -344,6 +344,7 @@ namespace xt
         using semantic_base = xview_semantic<self_type>;
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
 
+        using accessible_base = xaccessible<self_type>;
         using extension_base = extension::xview_base_t<CT, S...>;
         using expression_tag = typename extension_base::expression_tag;
 
@@ -432,6 +433,7 @@ namespace xt
         const inner_shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
         layout_type layout() const noexcept;
+        using accessible_base::shape;
 
         template <class T>
         void fill(const T& value);
@@ -1518,7 +1520,8 @@ namespace xt
             return xt::value(s, 0);
         };
 
-        auto first_copy = first;
+        auto s = static_cast<diff_type>((std::min)(static_cast<size_type>(std::distance(first, last)), this->dimension()));
+        auto first_copy = last - s;
         for (size_type i = 0; i != m_e.dimension(); ++i)
         {
             size_type k = newaxis_skip<S...>(i);

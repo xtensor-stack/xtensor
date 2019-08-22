@@ -317,8 +317,6 @@ namespace xt
                     dim_s = shape_s.substr(pos);
                 }
 
-                pop_char(dim_s, ',');
-
                 if (dim_s.length() == 0)
                 {
                     if (pos_next != std::string::npos)
@@ -489,7 +487,7 @@ namespace xt
             {
                 if (m_buffer != nullptr)
                 {
-                    delete m_buffer;
+                    std::allocator<char>{}.deallocate(m_buffer, m_n_bytes);
                 }
             }
 

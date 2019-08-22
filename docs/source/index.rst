@@ -70,6 +70,7 @@ for details.
    missing
    file_loading
    build-options
+   pitfall
 
 .. toctree::
    :caption: QUICK REFERENCE

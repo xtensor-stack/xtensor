@@ -21,14 +21,6 @@
 #include "xtensor_simd.hpp"
 #include "xutils.hpp"
 
-#ifndef XTENSOR_ALIGNMENT
-    #ifdef XTENSOR_USE_XSIMD
-        #define XTENSOR_ALIGNMENT XSIMD_DEFAULT_ALIGNMENT
-    #else
-        #define XTENSOR_ALIGNMENT 0
-    #endif
-#endif
-
 namespace xt
 {
 
@@ -1325,7 +1317,7 @@ namespace xt
         lhs.swap(rhs);
     }
 
-    #define XTENSOR_SELECT_ALIGN (XTENSOR_ALIGNMENT != 0 ? XTENSOR_ALIGNMENT : alignof(T))
+    #define XTENSOR_SELECT_ALIGN (XTENSOR_DEFAULT_ALIGNMENT != 0 ? XTENSOR_DEFAULT_ALIGNMENT : alignof(T))
 
     template <class X, class T, std::size_t N, class A, bool B>
     struct rebind_container<X, svector<T, N, A, B>>
@@ -1515,7 +1507,44 @@ namespace xt
 #undef GCC4_FALLBACK
 
 
-// Workaround for rebind_container problems on GCC 8  with C++17 enabled
+    template <class T, std::size_t N>
+    inline bool operator==(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator!=(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return !(lhs == rhs);
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator<(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return std::lexicographical_compare(lhs.begin(), lhs.end(),
+                                            rhs.begin(), rhs.end());
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator<=(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return !(lhs > rhs);
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator>(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return rhs < lhs;
+    }
+
+    template <class T, std::size_t N>
+    inline bool operator>=(const const_array<T, N>& lhs, const const_array<T, N>& rhs)
+    {
+        return !(lhs < rhs);
+    }
+
+// Workaround for rebind_container problems on GCC 8 with C++17 enabled
 #if defined(__GNUC__) && __GNUC__ > 6 && !defined(__clang__) && __cplusplus >= 201703L
     template <class X, class T, std::size_t N>
     struct rebind_container<X, aligned_array<T, N>>
@@ -1636,6 +1665,9 @@ namespace xt
         template <std::ptrdiff_t OS, std::ptrdiff_t OE>
         explicit sequence_view(const sequence_view<E, OS, OE>& other);
 
+        template <class T, class R = decltype(std::declval<T>().begin())>
+        operator T() const;
+
         bool empty() const;
         size_type size() const;
         const_reference operator[](std::size_t idx) const;
@@ -1656,6 +1688,7 @@ namespace xt
         const E& storage() const;
 
     private:
+
         const E& m_sequence;
     };
 
@@ -1670,6 +1703,15 @@ namespace xt
     sequence_view<E, Start, End>::sequence_view(const sequence_view<E, OS, OE>& other)
         : m_sequence(other.storage())
     {
+    }
+
+    template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
+    template <class T, class R>
+    sequence_view<E, Start, End>::operator T() const
+    {
+        T ret = xtl::make_sequence<T>(this->size());
+        std::copy(this->cbegin(), this->cend(), ret.begin());
+        return ret;
     }
 
     template <class E, std::ptrdiff_t Start, std::ptrdiff_t End>
@@ -1834,7 +1876,6 @@ namespace std
 #endif
 
 #undef XTENSOR_CONST
-#undef XTENSOR_ALIGNMENT
 #undef XTENSOR_SELECT_ALIGN
 
 #endif

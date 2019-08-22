@@ -148,17 +148,6 @@ if(XTENSOR_CHECK_DIMENSION)
     add_definitions(-DXTENSOR_ENABLE_CHECK_DIMENSION)
 endif()
 
-if(XTENSOR_USE_XSIMD)
-    add_definitions(-DXTENSOR_USE_XSIMD)
-    target_link_libraries(xtensor INTERFACE xsimd)
-endif()
-
-if(XTENSOR_USE_TBB)
-    add_definitions(-DXTENSOR_USE_TBB)
-    include_directories(${TBB_INCLUDE_DIRS})
-    target_link_libraries(xtensor INTERFACE ${TBB_LIBRARIES})
-endif()
-
 if(DEFAULT_COLUMN_MAJOR)
     add_definitions(-DXTENSOR_DEFAULT_LAYOUT=layout_type::column_major)
 endif()

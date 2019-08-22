@@ -7,6 +7,100 @@
 Changelog
 =========
 
+0.20.8
+------
+
+- Added traversal order to ``argwhere`` and ``filter``
+  `#1672 <https://github.com/QuantStack/xtensor/pull/1672>`_
+- ``flatten`` now returns the new type ``xtensor_view``
+  `#1671 <https://github.com/QuantStack/xtensor/pull/1671>`_
+- Error case handling in ``concatenate``
+  `#1669 <https://github.com/QuantStack/xtensor/pull/1669>`_
+- Added assign operator from ``temporary_type`` in ``xiterator_adaptor``
+  `#1668 <https://github.com/QuantStack/xtensor/pull/1668>`_
+- Improved ``index_view`` examples
+  `#1667 <https://github.com/QuantStack/xtensor/pull/1667>`_
+- Updated build option section of the documentation
+  `#1666 <https://github.com/QuantStack/xtensor/pull/1666>`_
+- Made ``xsequence_view`` convertible to arbitrary sequence type providing  iterators
+  `#1657 <https://github.com/QuantStack/xtensor/pull/1657>`_
+- Added overload of ``is_linear`` for expressions without ``strides`` method
+  `#1655 <https://github.com/QuantStack/xtensor/pull/1655>`_
+- Fixed reverse ``arange``
+  `#1653 <https://github.com/QuantStack/xtensor/pull/1653>`_
+- Add warnings for random number generation
+  `#1652 <https://github.com/QuantStack/xtensor/pull/1652>`_
+- Added common pitfalls section in the documentation
+  `#1649 <https://github.com/QuantStack/xtensor/pull/1649>`_
+- Added missing ``shape`` overload in ``xfunction``
+  `#1650 <https://github.com/QuantStack/xtensor/pull/1650>`_
+- Made ``xconst_accessible::shape(std::size_t)`` visible in ``xview``
+  `#1645 <https://github.com/QuantStack/xtensor/pull/1645>`_
+- Diff: added bounds-check on maximal recursion
+  `#1640 <https://github.com/QuantStack/xtensor/pull/1640>`_
+- Add ``xframe`` to related projects
+  `#1635 <https://github.com/QuantStack/xtensor/pull/1635>`_
+- Update ``indice.rst``
+  `#1626 <https://github.com/QuantStack/xtensor/pull/1626>`_
+- Remove unecessary arguments
+  `#1624 <https://github.com/QuantStack/xtensor/pull/1624>`_
+- Replace ``auto`` with explicit return type in ``make_xshared``
+  `#1621 <https://github.com/QuantStack/xtensor/pull/1621>`_
+- Add `z5` to related projects
+  `#1620 <https://github.com/QuantStack/xtensor/pull/1620>`_
+- Fixed long double complex offset views
+  `#1614 <https://github.com/QuantStack/xtensor/pull/1614>`_
+- Fixed ``xpad`` bugs
+  `#1607 <https://github.com/QuantStack/xtensor/pull/1602>`_
+- Workaround for annoying bug in VS2017
+  `#1602 <https://github.com/QuantStack/xtensor/pull/1607>`_
+
+0.20.7
+------
+
+- Fix reshape view assignment and allow setting traversal order
+  `#1598 <https://github.com/QuantStack/xtensor/pull/1598>`_
+
+0.20.6
+------
+
+- Added XTENSOR_DEFAULT_ALIGNMENT macro
+  `#1597 <https://github.com/QuantStack/xtensor/pull/1597>`_
+- Added missing comparison operators for const_array
+  `#1596 <https://github.com/QuantStack/xtensor/pull/1596>`_
+- Fixed reducer for expression with shape containing 0
+  `#1595 <https://github.com/QuantStack/xtensor/pull/1595>`_
+- Very minor spelling checks in comments
+  `#1591 <https://github.com/QuantStack/xtensor/pull/1591>`_
+- tests can be built in debug mode
+  `#1589 <https://github.com/QuantStack/xtensor/pull/1589>`_
+- strided views constructors forward shape argument
+  `#1587 <https://github.com/QuantStack/xtensor/pull/1587>`_
+- Remove unused type alias
+  `#1585 <https://github.com/QuantStack/xtensor/pull/1585>`_
+- Fixed reducers with empty list of axes
+  `#1582 <https://github.com/QuantStack/xtensor/pull/1582>`_
+- Fix typo in builder docs
+  `#1581 <https://github.com/QuantStack/xtensor/pull/1581>`_
+- Fixed return type of data in xstrided_view
+  `#1580 <https://github.com/QuantStack/xtensor/pull/1580>`_
+- Fixed reducers on expression with shape containing 1 as first elements
+  `#1579 <https://github.com/QuantStack/xtensor/pull/1579>`_
+- Fixed xview::element for range with more elements than view's dimension
+  `#1578 <https://github.com/QuantStack/xtensor/pull/1578>`_
+- Fixed broadcasting of shape containing 0-sized dimensions
+  `#1575 <https://github.com/QuantStack/xtensor/pull/1575>`_
+- Fixed norm return type for complex
+  `#1574 <https://github.com/QuantStack/xtensor/pull/1574>`_
+- Fixed iterator incremented or decremented by 0
+  `#1572 <https://github.com/QuantStack/xtensor/pull/1572>`_
+- Added complex exponential test
+  `#1571 <https://github.com/QuantStack/xtensor/pull/1571>`_
+- Strided views refactoring
+  `#1569 <https://github.com/QuantStack/xtensor/pull/1569>`_
+- Add clang-cl support
+  `#1559 <https://github.com/QuantStack/xtensor/pull/1559>`_
+
 0.20.5
 ------
 

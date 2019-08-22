@@ -123,6 +123,12 @@ namespace xt
         using shape_type = typename xtensor<T, N>::shape_type;
         return xtensor<T, N, L>(xtl::forward_sequence<shape_type, decltype(shape)>(shape));
     }
+#else
+    template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class I>
+    inline xarray<T, L> empty(const std::initializer_list<I>& init)
+    {
+        return xarray<T, L>::from_shape(init);
+    }
 #endif
 
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, std::size_t... N>
@@ -300,7 +306,13 @@ namespace xt
         template <class T, class S = T, XTL_REQUIRES(both_integer<T, S>)>
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
-            std::size_t shape = static_cast<std::size_t>((stop - start + step - S(1)) / step);
+            bool empty_cond = (stop - start) / step <= 0;
+            std::size_t shape = 0;
+            if(!empty_cond)
+            {
+                shape = stop > start ? static_cast<std::size_t>((stop - start + step - S(1)) / step)
+                                     : static_cast<std::size_t>((start - stop - step - S(1)) / -step);
+            }
             return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
         }
 
@@ -631,10 +643,26 @@ namespace xt
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         using source_shape_type = decltype(std::get<0>(t).shape());
         shape_type new_shape = xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape());
+
+        auto check_shape = [&axis, &new_shape](auto& arr) {
+            std::size_t s = new_shape.size();
+            bool res = s == arr.dimension();
+            for(std::size_t i = 0; i < s; ++i)
+            {
+                res = res && (i == axis || new_shape[i] == arr.shape(i));
+            }
+            if(!res)
+            {
+                throw_concatenate_error(new_shape, arr.shape());
+            }
+        };
+        for_each(check_shape, t);
+
         auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
             return prev + arr.shape()[axis];
         };
         new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
+
         return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 

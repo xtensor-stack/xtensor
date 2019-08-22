@@ -2,7 +2,7 @@
 
 [![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
-[![Azure](https://dev.azure.com/robertodr/xtensor/_apis/build/status/robertodr.xtensor?branchName=clang-cl)](https://dev.azure.com/robertodr/xtensor/_build/latest?definitionId=5&branchName=clang-cl)
+[![Azure](https://dev.azure.com/johanmabille/johanmabille/_apis/build/status/QuantStack.xtensor?branchName=master)](https://dev.azure.com/johanmabille/johanmabille/_build/latest?definitionId=3&branchName=master)
 [![Coverity](https://scan.coverity.com/projects/18335/badge.svg)](https://scan.coverity.com/projects/xtensor)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
 [![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
@@ -75,7 +75,10 @@ library:
 
 | `xtensor` | `xtl`   |`xsimd` (optional) |
 |-----------|---------|-------------------|
-|  master   | ^0.6.4  |       ^7.2.1      |
+|  master   | ^0.6.4  |       ^7.2.3      |
+|  0.20.8   | ^0.6.4  |       ^7.2.3      |
+|  0.20.7   | ^0.6.4  |       ^7.2.3      |
+|  0.20.6   | ^0.6.4  |       ^7.2.3      |
 |  0.20.5   | ^0.6.4  |       ^7.2.1      |
 |  0.20.4   | ^0.6.2  |       ^7.0.0      |
 |  0.20.3   | ^0.6.2  |       ^7.0.0      |

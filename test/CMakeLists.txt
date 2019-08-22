@@ -15,8 +15,12 @@ if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
 
-message(STATUS "Forcing tests build type to Release")
-set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+if(NOT CMAKE_BUILD_TYPE)
+    message(STATUS "Setting tests build type to Release")
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
+else()
+    message(STATUS "Tests build type is ${CMAKE_BUILD_TYPE}")
+endif()
 
 include(CheckCXXCompilerFlag)
 
@@ -196,6 +200,7 @@ set(XNPY_FILES
     bool_fortran.npy
     double.npy
     double_fortran.npy
+    int.npy
     unsignedlong.npy
     unsignedlong_fortran.npy
 )
@@ -217,11 +222,20 @@ add_custom_target(
 foreach(filename IN LISTS XTENSOR_TESTS)
     string(REPLACE ".cpp" "" targetname ${filename})
     add_executable(${targetname} ${COMMON_BASE} ${filename} ${XTENSOR_HEADERS})
-    target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
-    target_link_libraries(${targetname} xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+    if(XTENSOR_USE_XSIMD)
+        target_compile_definitions(${targetname} PRIVATE XTENSOR_USE_XSIMD)
+        target_link_libraries(${targetname} PRIVATE xsimd)
+    endif()
+    if(XTENSOR_USE_TBB)
+        target_compile_definitions(${targetname} PRIVATE XTENSOR_USE_TBB)
+        target_include_directories(${targetname} PRIVATE ${TBB_INCLUDE_DIRS})
+        target_link_libraries(${targetname} PRIVATE ${TBB_LIBRARIES})
+    endif()
     if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
         add_dependencies(${targetname} gtest_main)
     endif()
+    target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
+    target_link_libraries(${targetname} PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
     add_custom_target(
         x${targetname}
         COMMAND ${targetname}
@@ -230,13 +244,24 @@ endforeach()
 
 add_library(test_xtensor_core_lib ${COMMON_BASE} ${XTENSOR_HEADERS})
 add_executable(test_xtensor_lib ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
-target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
-target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
+
+target_include_directories(test_xtensor_core_lib PUBLIC ${XTENSOR_INCLUDE_DIR})
+if(XTENSOR_USE_XSIMD)
+    target_compile_definitions(test_xtensor_core_lib PUBLIC XTENSOR_USE_XSIMD)
+    target_link_libraries(test_xtensor_core_lib PUBLIC xsimd)
+endif()
+if(XTENSOR_USE_TBB)
+    target_compile_definitions(test_xtensor_core_lib PUBLIC XTENSOR_USE_TBB)
+    target_include_directories(test_xtensor_core_lib PUBLIC ${TBB_INCLUDE_DIRS})
+    target_link_libraries(test_xtensor_core_lib PUBLIC ${TBB_LIBRARIES})
+endif()
+
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(test_xtensor_lib test_xtensor_core_lib gtest_main)
 endif()
-target_link_libraries(test_xtensor_core_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(test_xtensor_lib xtensor test_xtensor_core_lib ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+
+target_link_libraries(test_xtensor_core_lib PUBLIC xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_lib PRIVATE test_xtensor_core_lib)
 
 add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
 add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)

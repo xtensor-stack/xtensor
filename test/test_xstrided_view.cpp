@@ -189,11 +189,14 @@ namespace xt
 
     TEST(xstrided_view, xstrided_view_on_xfunction)
     {
-        xarray<int> a = { { 1, 2, 3, 4 },{ 5, 6, 7, 8 },{ 9, 10, 11, 12 } };
+        xarray<int> a = {{ 1,  2,  3,  4 },
+                         { 5,  6,  7,  8 },
+                         { 9, 10, 11, 12 } };
         xarray<int> b = { 1, 2, 3, 4 };
 
         auto sum = a + b;
         auto func = strided_view(sum, xstrided_slice_vector({ 1, range(1, 4) }));
+
         auto iter = func.template begin<layout_type::row_major>();
         auto iter_end = func.template end<layout_type::row_major>();
 
@@ -667,20 +670,18 @@ namespace xt
     TEST(xstrided_view, reshape_view)
     {
         xarray<double> a = xt::arange<double>(9);
-        auto av = xt::reshape_view(a, {3, 3});
-        auto xv = xt::reshape_view(a, xshape<3, 3>());
+        auto av = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(a, {3, 3});
+        auto xv = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(a, xshape<3, 3>());
 
-
-        xtensor<double, 2> e = xt::reshape_view(xt::arange(9), {3, 3});
-        xtensor<double, 2> es = xt::reshape_view(a, {3, 3});
+        xtensor<double, 2> e = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(xt::arange(9), {3, 3});
+        xtensor<double, 2> es = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(a, {3, 3});
 
         a.reshape({3, 3});
         for (std::size_t i = 0; i < 100; ++i)
         {
-            xtensor<double, 2> par = xt::reshape_view(xt::arange(9), {3, 3});
+            xtensor<double, 2> par = xt::reshape_view<XTENSOR_DEFAULT_LAYOUT>(xt::arange(9), {3, 3});
             EXPECT_EQ(a, par);
         }
-
         using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
 
 #if XTENSOR_USE_XSIMD
@@ -694,15 +695,33 @@ namespace xt
         EXPECT_EQ(av, a);
 
         bool truthy;
-        truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>>>();
+        truthy = std::is_same<typename decltype(xv)::temporary_type, xtensor_fixed<double, xshape<3, 3>, layout_type::dynamic>>();
         EXPECT_TRUE(truthy);
 
-    #if !defined(X_OLD_CLANG)
-        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2>>();
+#if !defined(X_OLD_CLANG)
+        truthy = std::is_same<typename decltype(av)::temporary_type, xtensor<double, 2, layout_type::dynamic>>();
         EXPECT_TRUE(truthy);
         truthy = std::is_same<typename decltype(av)::shape_type, typename decltype(e)::shape_type>::value;
         EXPECT_TRUE(truthy);
-    #endif
+#endif
+
+        xarray<int> xa = {{1, 2, 3}, {4, 5, 6}};
+        std::vector<std::size_t> new_shape = {3, 2};
+        auto xrv = reshape_view(xa, new_shape);
+
+        xarray<int> xres = {{1, 2}, {3, 4}, {5, 6}};
+        EXPECT_EQ(xrv, xres);
+    }
+
+    TEST(xstrided_view, reshape_view_assign)
+    {
+        xarray<int, layout_type::column_major> xa = {{1, 2, 3}, {4, 5, 6}};
+        xarray<int, layout_type::column_major> exp = {{1, 2},
+                                                      {3, 4},
+                                                      {5, 6}};
+        auto v = reshape_view(xa, {3, 2});
+        xarray<int, layout_type::column_major> res = v;
+        EXPECT_EQ(res, exp);
     }
 
     TEST(xstrided_view, on_xview)
@@ -739,5 +758,169 @@ namespace xt
         auto v = xt::strided_view(t, {0});
         EXPECT_EQ(v(0), 0.0);
         EXPECT_EQ(v(1), 20.0);
+    }
+
+    TEST(xstrided_view, reshape_strided)
+    {
+        xtensor<int, 2> a = {{  1,  2,  3,  4,  5,  6,  7,  8 },
+                             { 11, 12, 13, 14, 15, 16, 17, 18 }};
+
+        auto v1 = view(a, all(), range(0, 4));
+        auto rv1 = reshape_view(v1, {2, 2 ,2});
+        xtensor<int, 3> expected = {{{1, 2}, {3, 4}}, {{11, 12}, {13, 14}}};
+        EXPECT_EQ(expected, rv1);
+
+        auto rv2 = reshape_view(a, {2, 2, 4});
+        auto v2 = strided_view(rv2, {0, 0, all()});
+        xtensor<int, 1> expected2 = {1, 2, 3 ,4};
+        EXPECT_EQ(expected2, v2);
+    }
+
+    TEST(xstrided_view, zerod_view_iterator)
+    {
+        xt::xarray<int> a{ { { 1, 2 },{ 3, 4 },{ 5, 6 } },{ { 7, 8 },{ 9, 10 },{ 11, 12 } } };
+        xt::xstrided_slice_vector sl = { 1, 0, 1 };
+
+        auto vi = xt::strided_view(a, sl);
+        auto it0 = vi.cbegin<layout_type::row_major>();
+        auto it1 = it0 + 0;
+        EXPECT_EQ(*it0, *it1);
+
+        auto it2 = vi.cbegin<layout_type::column_major>();
+        auto it3 = it2 + 0;
+        EXPECT_EQ(*it2, *it3);
+    }
+
+    TEST(xstrided_view, view_on_const)
+    {
+        const xtensor<int, 1> a = {1, 2, 3, 4};
+        auto v = strided_view(a, {all()});
+        auto d = v.data();
+        EXPECT_TRUE((std::is_same<decltype(d), const int*>::value));
+        EXPECT_EQ(d[0], 1);
+    }
+
+    namespace test
+    {
+        template <class E1, class E2>
+        void check_reshaped_1d(const E1& e1, const E2& e2)
+        {
+            EXPECT_EQ(e1(0, 0), e2(0, 0));
+            EXPECT_EQ(e1(0, 1), e2(0, 1));
+            EXPECT_EQ(e1(1, 0), e2(1, 0));
+            EXPECT_EQ(e1(1, 1), e2(1, 1));
+            EXPECT_EQ(e1(2, 0), e2(2, 0));
+            EXPECT_EQ(e1(2, 1), e2(2, 1));
+
+            auto iter1 = e1.template cbegin<layout_type::row_major>();
+            auto iter2 = e2.template cbegin<layout_type::row_major>();
+            EXPECT_EQ(*iter1, e1(0, 0));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(0, 1));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(1, 0));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(1, 1));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(2, 0));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(*iter1, e1(2, 1));
+            EXPECT_EQ(*iter1++, *iter2++);
+            EXPECT_EQ(iter1, e1.template cend<layout_type::row_major>());
+            EXPECT_EQ(iter2, e2.template cend<layout_type::row_major>());
+        }
+
+        template <class E1, class E2>
+        void check_reshaped_2d_rm(const E1& e1, const E2& e2)
+        {
+            check_reshaped_1d(e1, e2);
+            EXPECT_EQ(e1(0, 0), 1);
+            EXPECT_EQ(e1(0, 1), 2);
+            EXPECT_EQ(e1(1, 0), 3);
+            EXPECT_EQ(e1(1, 1), 4);
+            EXPECT_EQ(e1(2, 0), 5);
+            EXPECT_EQ(e1(2, 1), 6);
+        }
+
+        template <class E1, class E2>
+        void check_reshaped_2d_cm(const E1& e1, const E2& e2)
+        {
+            check_reshaped_1d(e1, e2);
+            EXPECT_EQ(e1(0, 0), 1);
+            EXPECT_EQ(e1(0, 1), 5);
+            EXPECT_EQ(e1(1, 0), 4);
+            EXPECT_EQ(e1(1, 1), 3);
+            EXPECT_EQ(e1(2, 0), 2);
+            EXPECT_EQ(e1(2, 1), 6);
+        }
+    }
+
+    TEST(xstrided_view, reshape_view_1d)
+    {
+        xarray<int> a = { 1, 2, 3, 4, 5, 6 };
+
+        auto var = reshape_view<layout_type::row_major>(a, { 3, 2 });
+        xarray<int> rvar = var;
+        test::check_reshaped_1d(rvar, var);
+        EXPECT_EQ(rvar(0, 0), 1);
+        EXPECT_EQ(rvar(0, 1), 2);
+        EXPECT_EQ(rvar(1, 0), 3);
+        EXPECT_EQ(rvar(1, 1), 4);
+        EXPECT_EQ(rvar(2, 0), 5);
+        EXPECT_EQ(rvar(2, 1), 6);
+
+        auto vac = reshape_view<layout_type::column_major>(a, { 3, 2 });
+        xarray<int> rvac = vac;
+        test::check_reshaped_1d(rvac, vac);
+        EXPECT_EQ(rvac(0, 0), 1);
+        EXPECT_EQ(rvac(0, 1), 4);
+        EXPECT_EQ(rvac(1, 0), 2);
+        EXPECT_EQ(rvac(1, 1), 5);
+        EXPECT_EQ(rvac(2, 0), 3);
+        EXPECT_EQ(rvac(2, 1), 6);
+    }
+
+    TEST(xstrided_view, reshape_view_2d)
+    {
+        xarray<int, layout_type::row_major> ra = { {1, 2, 3}, {4, 5, 6} };
+
+        auto vrar = reshape_view<layout_type::row_major>(ra, { 3, 2 });
+        xarray<int> rvrar = vrar;
+        test::check_reshaped_2d_rm(rvrar, vrar);
+
+        auto vrac = reshape_view<layout_type::column_major>(ra, { 3, 2 });
+        xarray<int> rvrac = vrac;
+        test::check_reshaped_2d_cm(rvrac, vrac);
+
+        xarray<int, layout_type::column_major> ca = { { 1, 2, 3 },{ 4, 5, 6 } };
+
+        auto vcar = reshape_view<layout_type::row_major>(ca, { 3, 2 });
+        xarray<int> rvcar = vcar;
+        test::check_reshaped_2d_rm(rvcar, vcar);
+
+        auto vcac = reshape_view<layout_type::column_major>(ca, { 3, 2 });
+        xarray<int> rvcac = vcac;
+        test::check_reshaped_2d_cm(rvcac, vcac);
+    }
+
+    TEST(xstrided_view, flatten)
+    {
+        xt::xarray<int> x = {{1, 2, 3}, {4, 5, 6}};
+        auto x_view = xt::strided_view(x, {xt::range(0, 1), xt::range(0, 1)});
+        auto x_flat = xt::flatten<xt::layout_type::column_major>(x_view);
+        x_flat = 10;
+        xt::xarray<int> exp = {{10, 2, 3}, {4, 5, 6}};
+        EXPECT_EQ(x, exp);
+
+        auto x_view2 = xt::strided_view(x, {xt::range(0, 1), xt::range(0, 2)});
+        auto x_flat2 = xt::flatten<xt::layout_type::column_major>(x_view2);
+        x_flat2 = 15;
+        xt::xarray<int> exp2 = {{15, 15, 3}, {4, 5, 6}};
+        EXPECT_EQ(x, exp2);
+
+        xt::xarray<int> b = {20, 25};
+        x_flat2 = b;
+        xt::xarray<int> exp3 = {{20, 25, 3}, {4, 5, 6}};
+        EXPECT_EQ(x, exp3);
     }
 }
