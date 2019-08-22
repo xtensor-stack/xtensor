@@ -109,20 +109,38 @@ find_package(Threads)
 
 include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 
+# For unit test and coverity scan. 
+# The Coverity scanner takes time and it could cause build timeout(10mins) in Travis CI. 
+# Therefore, we need keep this small but complete for analysis.
 set(COMMON_BASE
-    main.cpp
     test_common.hpp
     test_xsemantic.hpp
+    test_xarray.cpp
+    test_xbroadcast.cpp
+    test_xeval.cpp
+    test_xexception.cpp
+    test_xexpression.cpp
+    test_xexpression_traits.cpp
+    test_xiterator.cpp
+    test_xmath.cpp
+    test_xoperation.cpp
+    test_xreducer.cpp
+    test_xscalar.cpp
+    test_xshape.cpp
+    test_xstorage.cpp
+    test_xstrides.cpp
+    test_xtensor.cpp
+    test_xview.cpp
+    test_xutils.cpp
 )
 
 set(XTENSOR_TESTS
+    main.cpp
     test_xaccumulator.cpp
     test_xadapt.cpp
     test_xadaptor_semantic.cpp
-    test_xarray.cpp
     test_xarray_adaptor.cpp
     test_xaxis_iterator.cpp
-    test_xbroadcast.cpp
     test_xbuffer_adaptor.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
@@ -130,10 +148,6 @@ set(XTENSOR_TESTS
     test_xcsv.cpp
     test_xdatesupport.cpp
     test_xdynamic_view.cpp
-    test_xeval.cpp
-    test_xexception.cpp
-    test_xexpression.cpp
-    test_xexpression_traits.cpp
     test_xfunction.cpp
     test_xfunctor_adaptor.cpp
     test_xfixed.cpp
@@ -141,38 +155,27 @@ set(XTENSOR_TESTS
     test_xpad.cpp
     test_xindex_view.cpp
     test_xinfo.cpp
-    test_xiterator.cpp
     test_xio.cpp
     test_xlayout.cpp
     test_xmanipulation.cpp
     test_xmasked_view.cpp
-    test_xmath.cpp
     test_xmath_result_type.cpp
     test_xnan_functions.cpp
     test_xnoalias.cpp
     test_xnorm.cpp
     test_xnpy.cpp
-    test_xoperation.cpp
     test_xoptional.cpp
     test_xoptional_assembly.cpp
     test_xoptional_assembly_adaptor.cpp
     test_xoptional_assembly_storage.cpp
     test_xrandom.cpp
-    test_xreducer.cpp
-    test_xscalar.cpp
     test_xscalar_semantic.cpp
-    test_xshape.cpp
     test_xsort.cpp
-    test_xstorage.cpp
     test_xstrided_view.cpp
-    test_xstrides.cpp
-    test_xtensor.cpp
     test_xtensor_adaptor.cpp
     test_xtensor_semantic.cpp
     test_xvectorize.cpp
-    test_xview.cpp
     test_xview_semantic.cpp
-    test_xutils.cpp
     test_extended_xmath_interp.cpp
     test_extended_broadcast_view.cpp
     test_extended_xmath_reducers.cpp
@@ -249,13 +252,26 @@ if(XTENSOR_USE_TBB)
     target_include_directories(test_xtensor_lib PRIVATE ${TBB_INCLUDE_DIRS})
     target_link_libraries(test_xtensor_lib PRIVATE ${TBB_LIBRARIES})
 endif()
+
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(test_xtensor_lib gtest_main)
 endif()
+
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 target_link_libraries(test_xtensor_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
-add_custom_target(
-    xtest
-    COMMAND test_xtensor_lib
-    DEPENDS test_xtensor_lib)
+add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
+
+# Some files will be compiled twice, however compiling common files in a static
+# library and linking test_xtensor_lib with it removes half of the tests at
+# runtime.
+add_library(test_xtensor_core_lib ${COMMON_BASE} ${XTENSOR_HEADERS})
+target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
+
+if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
+    add_dependencies(test_xtensor_core_lib gtest_main)
+endif()
+
+target_link_libraries(test_xtensor_core_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)
+
