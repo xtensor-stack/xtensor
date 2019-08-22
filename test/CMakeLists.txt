@@ -118,9 +118,6 @@ set(COMMON_BASE
     test_xadaptor_semantic.cpp
     test_xarray_adaptor.cpp
     test_xarray.cpp
-)
-
-set(XTENSOR_TESTS
     test_xbroadcast.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
@@ -146,6 +143,9 @@ set(XTENSOR_TESTS
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
+)
+
+set(XTENSOR_TESTS
     main.cpp
     test_xaccumulator.cpp
     test_xadapt.cpp
