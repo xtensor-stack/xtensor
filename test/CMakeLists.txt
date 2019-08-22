@@ -180,7 +180,7 @@ set(XTENSOR_TESTS
     test_extended_broadcast_view.cpp
     test_extended_xmath_reducers.cpp
     test_extended_xhistogram.cpp
-	test_extended_xsort.cpp
+    test_extended_xsort.cpp
 )
 
 if(nlohmann_json_FOUND)
@@ -242,26 +242,36 @@ foreach(filename IN LISTS XTENSOR_TESTS)
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
 endforeach()
 
-add_library(test_xtensor_core_lib ${COMMON_BASE} ${XTENSOR_HEADERS})
-add_executable(test_xtensor_lib ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
-
-target_include_directories(test_xtensor_core_lib PUBLIC ${XTENSOR_INCLUDE_DIR})
+add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
 if(XTENSOR_USE_XSIMD)
-    target_compile_definitions(test_xtensor_core_lib PUBLIC XTENSOR_USE_XSIMD)
-    target_link_libraries(test_xtensor_core_lib PUBLIC xsimd)
+    target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_XSIMD)
+    target_link_libraries(test_xtensor_lib PRIVATE xsimd)
 endif()
 if(XTENSOR_USE_TBB)
-    target_compile_definitions(test_xtensor_core_lib PUBLIC XTENSOR_USE_TBB)
-    target_include_directories(test_xtensor_core_lib PUBLIC ${TBB_INCLUDE_DIRS})
-    target_link_libraries(test_xtensor_core_lib PUBLIC ${TBB_LIBRARIES})
+    target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_TBB)
+    target_include_directories(test_xtensor_lib PRIVATE ${TBB_INCLUDE_DIRS})
+    target_link_libraries(test_xtensor_lib PRIVATE ${TBB_LIBRARIES})
 endif()
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
-    add_dependencies(test_xtensor_lib test_xtensor_core_lib gtest_main)
+    add_dependencies(test_xtensor_lib gtest_main)
 endif()
 
-target_link_libraries(test_xtensor_core_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(test_xtensor_lib xtensor test_xtensor_core_lib ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
+target_link_libraries(test_xtensor_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
+
+# Some files will be compiled twice, however compiling common files in a static
+# library and linking test_xtensor_lib with it removes half of the tests at
+# runtime.
+add_library(test_xtensor_core_lib ${COMMON_BASE} ${XTENSOR_HEADERS})
+target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
+
+if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
+    add_dependencies(test_xtensor_core_lib gtest_main)
+endif()
+
+target_link_libraries(test_xtensor_core_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)
+
