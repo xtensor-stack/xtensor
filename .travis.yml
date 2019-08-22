@@ -20,8 +20,8 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-4.9
-      env: COMPILER=gcc GCC=4.9 COVERITY_SCAN=1
+            - g++-7
+      env: COMPILER=gcc GCC=7 COVERITY_SCAN=1
     - os: linux
       if: branch = master
       addons:
