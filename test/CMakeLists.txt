@@ -113,7 +113,12 @@ include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 # The Coverity scanner takes time and it could cause build timeout(10mins) in Travis CI. 
 # Therefore, we need keep this small but complete for analysis.
 set(COMMON_BASE
+    test_common.hpp
+    test_xsemantic.hpp
     test_xadaptor_semantic.cpp
+)
+
+set(XTENSOR_TESTS
     test_xarray_adaptor.cpp
     test_xarray.cpp
     test_xbroadcast.cpp
@@ -141,11 +146,6 @@ set(COMMON_BASE
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
-)
-
-set(XTENSOR_TESTS
-    test_common.hpp
-    test_xsemantic.hpp
     main.cpp
     test_xaccumulator.cpp
     test_xadapt.cpp
