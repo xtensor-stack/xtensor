@@ -115,32 +115,13 @@ include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 set(COMMON_BASE
     test_common.hpp
     test_xsemantic.hpp
-    test_xarray.cpp
-    test_xbroadcast.cpp
-    test_xeval.cpp
-    test_xexception.cpp
-    test_xexpression.cpp
-    test_xexpression_traits.cpp
-    test_xiterator.cpp
-    test_xmath.cpp
-    test_xoperation.cpp
-    test_xreducer.cpp
-    test_xscalar.cpp
-    test_xshape.cpp
-    test_xstorage.cpp
-    test_xstrides.cpp
-    test_xtensor.cpp
-    test_xview.cpp
-    test_xutils.cpp
-)
-
-set(XTENSOR_TESTS
-    main.cpp
     test_xaccumulator.cpp
     test_xadapt.cpp
     test_xadaptor_semantic.cpp
+    test_xarray.cpp
     test_xarray_adaptor.cpp
     test_xaxis_iterator.cpp
+    test_xbroadcast.cpp
     test_xbuffer_adaptor.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
@@ -148,34 +129,53 @@ set(XTENSOR_TESTS
     test_xcsv.cpp
     test_xdatesupport.cpp
     test_xdynamic_view.cpp
+    test_xeval.cpp
+    test_xexception.cpp
+    test_xexpression.cpp
+    test_xexpression_traits.cpp
     test_xfunction.cpp
     test_xfunctor_adaptor.cpp
     test_xfixed.cpp
     test_xhistogram.cpp
-    test_xpad.cpp
     test_xindex_view.cpp
     test_xinfo.cpp
     test_xio.cpp
+    test_xiterator.cpp
     test_xlayout.cpp
     test_xmanipulation.cpp
     test_xmasked_view.cpp
+    test_xmath.cpp
     test_xmath_result_type.cpp
     test_xnan_functions.cpp
     test_xnoalias.cpp
     test_xnorm.cpp
     test_xnpy.cpp
+    test_xoperation.cpp
     test_xoptional.cpp
     test_xoptional_assembly.cpp
     test_xoptional_assembly_adaptor.cpp
     test_xoptional_assembly_storage.cpp
+    test_xpad.cpp
     test_xrandom.cpp
+    test_xreducer.cpp
+    test_xscalar.cpp
     test_xscalar_semantic.cpp
+    test_xshape.cpp
     test_xsort.cpp
+    test_xstorage.cpp
     test_xstrided_view.cpp
+    test_xstrides.cpp
+    test_xtensor.cpp
     test_xtensor_adaptor.cpp
     test_xtensor_semantic.cpp
     test_xvectorize.cpp
+    test_xview.cpp
     test_xview_semantic.cpp
+    test_xutils.cpp
+)
+
+set(XTENSOR_TESTS
+    main.cpp
     test_extended_xmath_interp.cpp
     test_extended_broadcast_view.cpp
     test_extended_xmath_reducers.cpp
