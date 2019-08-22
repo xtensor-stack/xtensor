@@ -260,8 +260,8 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(test_xtensor_lib test_xtensor_core_lib gtest_main)
 endif()
 
-target_link_libraries(test_xtensor_core_lib PUBLIC xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
-target_link_libraries(test_xtensor_lib PRIVATE test_xtensor_core_lib)
+target_link_libraries(test_xtensor_core_lib xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_lib xtensor test_xtensor_core_lib ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
 add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)
