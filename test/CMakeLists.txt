@@ -116,11 +116,11 @@ set(COMMON_BASE
     test_common.hpp
     test_xsemantic.hpp
     test_xadaptor_semantic.cpp
+    test_xarray_adaptor.cpp
+    test_xarray.cpp
 )
 
 set(XTENSOR_TESTS
-    test_xarray_adaptor.cpp
-    test_xarray.cpp
     test_xbroadcast.cpp
     test_xbuilder.cpp
     test_xcontainer_semantic.cpp
