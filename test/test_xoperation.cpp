@@ -682,6 +682,21 @@ namespace xt
         }
     }
 
+    TEST(operation, mixed_assign)
+    {
+        xt::xarray<double> asrc = { 1., 2. };
+        xt::xarray<std::size_t> bsrc = { std::size_t(3), std::size_t(4) };
+
+        xt::xarray<double> a(asrc);
+        xt::xarray<double> aexp = { 3., 4. };
+        a = bsrc;
+
+        xt::xarray<std::size_t> b(bsrc);
+        xt::xarray<std::size_t> bexp = { std::size_t(1), std::size_t(2) };
+        b = asrc;
+        EXPECT_EQ(b, bexp);
+    }
+
     TEST(operation, left_shift)
     {
         xarray<int> arr({5,1, 1000});
