@@ -457,6 +457,25 @@ namespace xt
              (std::is_integral<result_type>::value && std::is_floating_point<argument_type>::value));
     };
 
+    template <class FROM, class TO>
+    struct has_sign_conversion
+    {
+        using argument_type = std::decay_t<FROM>;
+        using result_type = std::decay_t<TO>;
+
+        static const bool value = std::is_signed<argument_type>::value != std::is_signed<result_type>::value;
+    };
+
+    template <class FROM, class TO>
+    struct has_assign_conversion
+    {
+        using argument_type = std::decay_t<FROM>;
+        using result_type = std::decay_t<TO>;
+
+        static const bool value = is_narrowing_conversion<argument_type, result_type>::value ||
+                                  has_sign_conversion<argument_type, result_type>::value;
+    };
+
     template <class E1, class E2, layout_type L>
     inline stepper_assigner<E1, E2, L>::stepper_assigner(E1& e1, const E2& e2)
         : m_e1(e1), m_lhs(e1.stepper_begin(e1.shape())),
@@ -471,12 +490,12 @@ namespace xt
         using size_type = typename E1::size_type;
         using argument_type = std::decay_t<decltype(*m_rhs)>;
         using result_type = std::decay_t<decltype(*m_lhs)>;
-        constexpr bool is_narrowing = is_narrowing_conversion<argument_type, result_type>::value;
+        constexpr bool needs_cast = has_assign_conversion<argument_type, result_type>::value;
 
         size_type s = m_e1.size();
         for (size_type i = 0; i < s; ++i)
         {
-            *m_lhs = conditional_cast<is_narrowing, result_type>(*m_rhs);
+            *m_lhs = conditional_cast<needs_cast, result_type>(*m_rhs);
             stepper_tools<L>::increment_stepper(*this, m_index, m_e1.shape());
         }
     }
@@ -520,18 +539,21 @@ namespace xt
         using lhs_align_mode = xt_simd::container_alignment_t<E1>;
         constexpr bool is_aligned = std::is_same<lhs_align_mode, aligned_mode>::value;
         using rhs_align_mode = std::conditional_t<is_aligned, inner_aligned_mode, unaligned_mode>;
-        using value_type = std::common_type_t<typename E1::value_type, typename E2::value_type>;
+        using e1_value_type = typename E1::value_type;
+        using e2_value_type = typename E2::value_type;
+        using value_type = std::common_type_t<e1_value_type, e2_value_type>;
         using simd_type = xt_simd::simd_type<value_type>;
         using size_type = typename E1::size_type;
         size_type size = e1.size();
         constexpr size_type simd_size = simd_type::size;
+        constexpr bool needs_cast = has_assign_conversion<e1_value_type, e2_value_type>::value;
 
         size_type align_begin = is_aligned ? 0 : xt_simd::get_alignment_offset(e1.data(), size, simd_size);
         size_type align_end = align_begin + ((size - align_begin) & ~(simd_size - 1));
 
         for (size_type i = 0; i < align_begin; ++i)
         {
-            e1.data_element(i) = e2.data_element(i);
+            e1.data_element(i) = conditional_cast<needs_cast, e1_value_type>(e2.data_element(i));
         }
 
         #if defined(XTENSOR_USE_TBB)
@@ -547,7 +569,7 @@ namespace xt
         #endif
         for (size_type i = align_end; i < size; ++i)
         {
-            e1.data_element(i) = e2.data_element(i);
+            e1.data_element(i) = conditional_cast<needs_cast, e1_value_type>(e2.data_element(i));
         }
     }
 
@@ -796,7 +818,10 @@ namespace xt
 
         // add this when we have std::array index!
         // std::fill(idx.begin(), idx.end(), 0);
-        using value_type = std::common_type_t<typename E1::value_type, typename E2::value_type>;
+        using e1_value_type = typename E1::value_type;
+        using e2_value_type = typename E2::value_type;
+        constexpr bool needs_cast = has_assign_conversion<e1_value_type, e2_value_type>::value;
+        using value_type = std::common_type_t<e1_value_type, e2_value_type>;
         using simd_type = xt_simd::simd_type<value_type>;
 
         std::size_t simd_size = inner_loop_size / simd_type::size;
@@ -821,7 +846,7 @@ namespace xt
             }
             for (std::size_t i = 0; i < simd_rest; ++i)
             {
-                *(res_stepper) = *(fct_stepper);
+                *(res_stepper) = conditional_cast<needs_cast, e1_value_type>(*(fct_stepper));
                 res_stepper.step_leading();
                 fct_stepper.step_leading();
             }
