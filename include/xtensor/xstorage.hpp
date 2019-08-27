@@ -31,21 +31,21 @@ namespace xt
                                                                                std::input_iterator_tag>::value>::type;
     }
 
-    template <class T, class Allocator = std::allocator<T>>
+    template <class T, class A = std::allocator<T>>
     class uvector
     {
     public:
 
-        using allocator_type = Allocator;
+        using allocator_type = A;
 
-        using value_type = typename allocator_type::value_type;
-        using reference = typename allocator_type::reference;
-        using const_reference = typename allocator_type::const_reference;
-        using pointer = typename allocator_type::pointer;
-        using const_pointer = typename allocator_type::const_pointer;
+        using value_type = typename std::allocator_traits<A>::value_type;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+        using pointer = typename std::allocator_traits<A>::pointer;
+        using const_pointer = typename std::allocator_traits<A>::const_pointer;
 
-        using size_type = typename allocator_type::size_type;
-        using difference_type = typename allocator_type::difference_type;
+        using size_type = typename std::allocator_traits<A>::size_type;
+        using difference_type = typename std::allocator_traits<A>::difference_type;
 
         using iterator = pointer;
         using const_iterator = const_pointer;
@@ -161,10 +161,11 @@ namespace xt
     namespace detail
     {
         template <class A>
-        inline typename A::pointer safe_init_allocate(A& alloc, typename A::size_type size)
+        inline typename std::allocator_traits<A>::pointer
+        safe_init_allocate(A& alloc, typename std::allocator_traits<A>::size_type size)
         {
-            using pointer = typename A::pointer;
-            using value_type = typename A::value_type;
+            using pointer = typename std::allocator_traits<A>::pointer;
+            using value_type = typename std::allocator_traits<A>::value_type;
             pointer res = alloc.allocate(size);
             if (!xtrivially_default_constructible<value_type>::value)
             {
@@ -177,10 +178,11 @@ namespace xt
         }
 
         template <class A>
-        inline void safe_destroy_deallocate(A& alloc, typename A::pointer ptr, typename A::size_type size)
+        inline void safe_destroy_deallocate(A& alloc, typename std::allocator_traits<A>::pointer ptr,
+                                            typename std::allocator_traits<A>::size_type size)
         {
-            using pointer = typename A::pointer;
-            using value_type = typename A::value_type;
+            using pointer = typename std::allocator_traits<A>::pointer;
+            using value_type = typename std::allocator_traits<A>::value_type;
             if (ptr != nullptr)
             {
                 if (!xtrivially_default_constructible<value_type>::value)
@@ -606,13 +608,13 @@ namespace xt
 
         using self_type = svector<T, N, A, Init>;
         using allocator_type = A;
-        using size_type = typename A::size_type;
-        using value_type = typename A::value_type;
-        using pointer = typename A::pointer;
-        using const_pointer = typename A::const_pointer;
-        using reference = typename A::reference;
-        using const_reference = typename A::const_reference;
-        using difference_type = typename A::difference_type;
+        using size_type = typename std::allocator_traits<A>::size_type;
+        using value_type = typename std::allocator_traits<A>::value_type;
+        using pointer = typename std::allocator_traits<A>::pointer;
+        using const_pointer = typename std::allocator_traits<A>::const_pointer;
+        using reference = value_type&;
+        using const_reference = const value_type&;
+        using difference_type = typename std::allocator_traits<A>::difference_type;
 
         using iterator = pointer;
         using const_iterator = const_pointer;
