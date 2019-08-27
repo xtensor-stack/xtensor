@@ -310,4 +310,15 @@ namespace xt
         std::string exp = "{1, 1, 1, 1, 1}";
         EXPECT_EQ(exp, out.str());
     }
+
+    TEST(xio, flags_reset)
+    {
+        xt::xarray<double> aod = {123400000., 123400000.};
+        std::stringstream out;
+        out << aod;
+        double d = 2.119;
+        out << '\n' << d;
+        std::string exp = "{ 1.234000e+08,  1.234000e+08}\n2.119";
+        EXPECT_EQ(exp, out.str());
+    }
 }
