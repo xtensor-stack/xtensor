@@ -22,6 +22,7 @@
 #include <xtl/xtype_traits.hpp>
 
 #include "xaccessible.hpp"
+#include "xarray.hpp"
 #include "xbroadcast.hpp"
 #include "xcontainer.hpp"
 #include "xiterable.hpp"
