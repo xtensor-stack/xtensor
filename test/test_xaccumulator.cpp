@@ -223,4 +223,17 @@ namespace xt
         truth = std::is_same<typename decltype(res_0)::shape_type, xshape<4, 3>>::value;
         EXPECT_TRUE(truth);
     }
+
+    TEST(xaccumulator, empty_array)
+    {
+        xt::xarray<double> a = xt::ones<double>({ 3, 4, 0 });
+
+        auto result0 = xt::cumsum(a);
+        auto expected0 = xt::xarray<double>::from_shape({ 0 });
+        EXPECT_EQ(result0, expected0);
+
+        auto result1 = xt::cumsum(a, 2);
+        auto expected1 = xt::xarray<double>::from_shape({ 3, 4, 0 });
+        EXPECT_EQ(result1, expected1);
+    }
 }
