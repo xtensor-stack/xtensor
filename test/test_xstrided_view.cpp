@@ -748,6 +748,13 @@ namespace xt
         EXPECT_EQ(v(2), 2.0);
     }
 
+    TEST(xstrided_view, on_broadcasted_scalar)
+    {
+        xarray<double> expected = { 1, 1, 1, 1, 1, 1, 1, 1 };
+        xarray<double> a = xt::squeeze(xt::ones<double>({8, 1}));
+        EXPECT_EQ(a, expected);
+    }
+
     TEST(xstrided_view, on_transpose)
     {
         xt::xarray<double> arr
