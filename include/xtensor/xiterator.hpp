@@ -35,6 +35,9 @@ namespace xt
     template <class CT>
     class xscalar;
 
+    template <bool is_const, class CT>
+    class xscalar_stepper;
+
     namespace detail
     {
         template <class C>
@@ -517,12 +520,36 @@ namespace xt
         m_it = p_c->data_xend(l, m_offset);
     }
 
+    namespace detail
+    {
+        template <class It>
+        struct step_simd_invoker
+        {
+            template <class R>
+            static R apply(const It& it)
+            {
+                R reg;
+                reg.load_unaligned(&(*it));
+                return reg;
+            }
+        };
+
+        template <bool is_const, class T, class S, layout_type L>
+        struct step_simd_invoker<xiterator<xscalar_stepper<is_const, T>, S, L>>
+        {
+            template <class R>
+            static R apply(const xiterator<xscalar_stepper<is_const, T>, S, L>& it)
+            {
+                return R(*it);
+            }
+        };
+    }
+
     template <class C>
     template <class R>
     inline R xstepper<C>::step_simd()
     {
-        R reg;
-        reg.load_unaligned(&(*m_it));
+        R reg = detail::step_simd_invoker<subiterator_type>::template apply<R>(m_it);
         m_it += xt_simd::revert_simd_traits<R>::size;
         return reg;
     }
