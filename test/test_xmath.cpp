@@ -11,6 +11,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
+#include "xtensor/xadapt.hpp"
 #include "xtensor/xoptional_assembly.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xrandom.hpp"
@@ -842,6 +843,12 @@ namespace xt
         EXPECT_EQ(xt::diff(c, 1), expected6);
         xt::xarray<bool> expected7({2, 1}, false);
         EXPECT_EQ(xt::diff(c, 2), expected7);
+
+        std::vector<int> d = { 1, 2, 4, 7, 0 };
+        xt::xarray<int> orig = { 1, 2, 4, 7, 0 };
+        auto ad = xt::adapt(d);
+        EXPECT_EQ(xt::diff(ad), expected1);
+        EXPECT_EQ(ad, orig);
     }
 
     TEST(xmath, trapz)
