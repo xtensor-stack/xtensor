@@ -1848,6 +1848,18 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     XTENSOR_MODERN_CLANG_REDUCER(prod, std::multiplies, xtl::big_promote_type_t<typename std::decay_t<E>::value_type>, 1)
 #endif
 
+    namespace detail
+    {
+        template <class T, class S, class ST>
+        inline auto mean_division(S&& s, ST e_size)
+        {
+            using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
+            // Avoids floating point exception when s.size is 0
+            value_type div = s.size() != ST(0) ? static_cast<value_type>(e_size / s.size()) : value_type(0);
+            return std::move(s) / std::move(div);
+        }
+    }
+
     /**
      * @ingroup red_functions
      * @brief Mean of elements over given axes.
@@ -1862,12 +1874,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
               XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto mean(E&& e, X&& axes, EVS es = EVS())
     {
-        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-        auto size = e.size();
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
         auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes), es);
-        return std::move(s) / static_cast<value_type>(size / s.size());
+        return detail::mean_division<T>(std::move(s), e.size());
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -1883,19 +1893,15 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto mean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
-        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-        auto size = e.size();
         auto s = sum<T>(std::forward<E>(e), axes, es);
-        return std::move(s) / static_cast<value_type>(size / s.size());
+        return detail::mean_division<T>(std::move(s), e.size());
     }
 #else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto mean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
-        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-        auto size = e.size();
         auto s = sum<T>(std::forward<E>(e), axes, es);
-        return std::move(s) / static_cast<value_type>(size / s.size());
+        return detail::mean_division<T>(std::move(s), e.size());
     }
 #endif
 

@@ -643,4 +643,21 @@ namespace xt
         EXPECT_EQ(res2.shape()[1], size_t(1));
         EXPECT_EQ(res2(0, 0), 0);
     }
+
+    TEST(xreducer, empty_array)
+    {
+        xt::xarray<double> a = xt::ones<double>({ 1, 2, 0, 1 });
+        double result0 = xt::mean(a)();
+        EXPECT_TRUE(std::isnan(result0));
+
+        auto result1 = xt::mean(a, { 1 });
+        auto expected1 = xt::xarray<double>::from_shape({1, 0, 1});
+        EXPECT_EQ(result1, expected1);
+       
+        auto result2 = xt::mean(a, { 2 });
+        auto expected2 = xt::xarray<double>::from_shape({1, 2, 1});
+        EXPECT_EQ(result2.shape(), expected2.shape());
+        EXPECT_TRUE(std::isnan(result2(0, 0, 0)));
+        EXPECT_TRUE(std::isnan(result2(0, 1, 0)));
+    }
 }
