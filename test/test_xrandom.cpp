@@ -44,8 +44,90 @@ namespace xt
 
         ASSERT_EQ(same_a, same_b);
 
-        // check that it compiles
+        // check that it compiles and generates same random numbers for the same seed
+        random::seed(0);
         xarray<int> q = random::randint<int>({3, 3});
+        random::seed(0);
+        xarray<int> same_q = random::randint<int>({3, 3});
+        ASSERT_EQ(q, same_q);
+
+        random::seed(0);
+        xarray<int> binom = random::binomial<int>({3, 3});
+        random::seed(0);
+        xarray<int> same_binom = random::binomial<int>({3, 3});
+        ASSERT_EQ(binom, same_binom);
+
+        random::seed(0);
+        xarray<int> geom = random::geometric<int>({3, 3});
+        random::seed(0);
+        xarray<int> same_geom = random::geometric<int>({3, 3});
+        ASSERT_EQ(geom, same_geom);
+
+        random::seed(0);
+        xarray<int> neg_binom = random::negative_binomial<int>({3, 3});
+        random::seed(0);
+        xarray<int> same_neg_binom = random::negative_binomial<int>({3, 3});
+        ASSERT_EQ(neg_binom, same_neg_binom);
+
+        random::seed(0);
+        xarray<int> poisson = random::poisson<int>({3, 3});
+        random::seed(0);
+        xarray<int> same_poisson = random::poisson<int>({3, 3});
+        ASSERT_EQ(poisson, same_poisson);
+
+        random::seed(0);
+        xarray<double> exp = random::exponential<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_exp = random::exponential<double>({3, 3});
+        ASSERT_EQ(exp, same_exp);
+
+        random::seed(0);
+        xarray<double> gamma = random::gamma<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_gamma = random::gamma<double>({3, 3});
+        ASSERT_EQ(gamma, same_gamma);
+
+        random::seed(0);
+        xarray<double> weibull = random::weibull<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_weibull = random::weibull<double>({3, 3});
+        ASSERT_EQ(weibull, same_weibull);
+
+        random::seed(0);
+        xarray<double> extreme_val = random::extreme_value<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_extreme_val = random::extreme_value<double>({3, 3});
+        ASSERT_EQ(extreme_val, same_extreme_val);
+
+        random::seed(0);
+        xarray<double> lnormal = random::lognormal<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_lnormal = random::lognormal<double>({3, 3});
+        ASSERT_EQ(lnormal, same_lnormal);
+
+        random::seed(0);
+        xarray<double> xsqr = random::chi_squared<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_xsqr = random::chi_squared<double>({3, 3});
+        ASSERT_EQ(xsqr, same_xsqr);
+
+        random::seed(0);
+        xarray<double> cauchy = random::cauchy<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_cauchy = random::cauchy<double>({3, 3});
+        ASSERT_EQ(cauchy, same_cauchy);
+
+        random::seed(0);
+        xarray<double> fisher_f = random::fisher_f<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_fisher_f = random::fisher_f<double>({3, 3});
+        ASSERT_EQ(fisher_f, same_fisher_f);
+
+        random::seed(0);
+        xarray<double> student_t = random::student_t<double>({3, 3});
+        random::seed(0);
+        xarray<double> same_student_t = random::student_t<double>({3, 3});
+        ASSERT_EQ(student_t, same_student_t);
 
         // checking if internal state needs reset
         auto n_dist = random::randn<double>({3, 3});

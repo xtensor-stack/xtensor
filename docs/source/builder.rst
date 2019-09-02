@@ -43,6 +43,32 @@ Random distributions
   distributed random integers in the half-open interval [lower, upper).
 - ``randn(shape, mean, std_dev)``: generates an expression of the specified shape, containing numbers
   sampled from the Normal random number distribution.
+- ``binomial(shape, trials, prob)``: generates an expression of the specified shape, containing numbers
+  sampled from the binomial random number distribution.
+- ``geometric(shape, prob)``: generates an expression of the specified shape, containing numbers
+  sampled from the geometric random number distribution.
+- ``negative_binomial(shape, k, prob)``: generates an expression of the specified shape, containing numbers
+  sampled from the negative binomial random number distribution.
+- ``poisson(shape, rate)``: generates an expression of the specified shape, containing numbers
+  sampled from the Poisson random number distribution.
+- ``exponential(shape, rate)``: generates an expression of the specified shape, containing numbers
+  sampled from the exponential random number distribution.
+- ``gamma(shape, alpha, beta)``: generates an expression of the specified shape, containing numbers
+  sampled from the gamma random number distribution.
+- ``weibull(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the Weibull random number distribution.
+- ``extreme_value(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the extreme value random number distribution.
+- ``lognormal(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the Log-Normal random number distribution.
+- ``chi_squared(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the chi-squared random number distribution.
+- ``cauchy(shape, a, b)``: generates an expression of the specified shape, containing numbers
+  sampled from the Cauchy random number distribution.
+- ``fisher_f(shape, m, n)``: generates an expression of the specified shape, containing numbers
+  sampled from the Fisher-f random number distribution.
+- ``student_t(shape, n)``: generates an expression of the specified shape, containing numbers
+  sampled from the Student-t random number distribution.
 
 Meshes
 ------
