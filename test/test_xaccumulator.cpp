@@ -233,7 +233,10 @@ namespace xt
         EXPECT_EQ(result0, expected0);
 
         auto result1 = xt::cumsum(a, 2);
-        auto expected1 = xt::xarray<double>::from_shape({ 3, 4, 0 });
-        EXPECT_EQ(result1, expected1);
+        auto expected = xt::xarray<double>::from_shape({ 3, 4, 0 });
+        EXPECT_EQ(result1, expected);
+
+        auto result2 = xt::cumsum(a, 1);
+        EXPECT_EQ(result2, expected);
     }
 }
