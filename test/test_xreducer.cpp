@@ -660,4 +660,10 @@ namespace xt
         EXPECT_TRUE(std::isnan(result2(0, 0, 0)));
         EXPECT_TRUE(std::isnan(result2(0, 1, 0)));
     }
+
+    TEST(xreducer, double_axis)
+    {
+        xt::xarray<int> a = xt::ones<int>({ 3, 2});
+        EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
+    }
 }

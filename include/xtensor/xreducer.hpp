@@ -294,9 +294,13 @@ namespace xt
         dynamic_shape<std::size_t> iter_shape = xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(e.shape())>(e.shape());
         dynamic_shape<std::size_t> iter_strides(e.dimension());
 
-        if (!std::is_sorted(axes.cbegin(), axes.cend()))
+        // using std::less_equal is counter-intuitive, but as the standard says (24.4.5):
+        // A sequence is sorted with respect to a comparator comp if for any iterator i pointing to the sequence and any non-negative integer n
+        // such that i + n is a valid iterator pointing to an element of the sequence, comp(*(i + n), *i) == false.
+        // Therefore less_equal is required to detect duplicates.
+        if (!std::is_sorted(axes.cbegin(), axes.cend(), std::less_equal<>()))
         {
-            throw std::runtime_error("Reducing axes should be sorted");
+            throw std::runtime_error("Reducing axes should be sorted and should not contain duplicates");
         }
         if (axes.size() != 0 && axes[axes.size() - 1] > e.dimension() - 1)
         {
@@ -1191,9 +1195,13 @@ namespace xt
         , m_dim_mapping(xtl::make_sequence<dim_mapping_type>(typename O::keep_dims() ? m_e.dimension() : m_e.dimension() - m_axes.size(), 0))
         , m_options(std::forward<OX>(options))
     {
-        if (!std::is_sorted(m_axes.cbegin(), m_axes.cend()))
+        // using std::less_equal is counter-intuitive, but as the standard says (24.4.5):
+        // A sequence is sorted with respect to a comparator comp if for any iterator i pointing to the sequence and any non-negative integer n
+        // such that i + n is a valid iterator pointing to an element of the sequence, comp(*(i + n), *i) == false.
+        // Therefore less_equal is required to detect duplicates.
+        if (!std::is_sorted(m_axes.cbegin(), m_axes.cend(), std::less_equal<>()))
         {
-            throw std::runtime_error("Reducing axes should be sorted");
+            throw std::runtime_error("Reducing axes should be sorted and should not contain duplicates");
         }
         if (m_axes.size() != 0 && m_axes[m_axes.size() - 1] > m_e.dimension() - 1)
         {
