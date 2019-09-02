@@ -28,7 +28,7 @@ namespace xt
      *           provides the interface.
      */
     template <class D>
-    class xsemantic_base : public xexpression<D>
+    class xsemantic_base : public xsharable_expression<D>
     {
     public:
 

@@ -192,7 +192,7 @@ namespace xt
      */
     template <class F, class... CT>
     class xfunction : private xconst_iterable<xfunction<F, CT...>>,
-                      public xexpression<xfunction<F, CT...>>,
+                      public xsharable_expression<xfunction<F, CT...>>,
                       private xconst_accessible<xfunction<F, CT...>>,
                       public extension::xfunction_base_t<F, CT...>
     {

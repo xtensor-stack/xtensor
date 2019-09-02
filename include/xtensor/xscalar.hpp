@@ -82,7 +82,7 @@ namespace xt
     };
 
     template <class CT>
-    class xscalar : public xexpression<xscalar<CT>>,
+    class xscalar : public xsharable_expression<xscalar<CT>>,
                     private xiterable<xscalar<CT>>,
                     private xaccessible<xscalar<CT>>,
                     public extension::xscalar_base_t<CT>

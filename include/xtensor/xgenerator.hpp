@@ -87,7 +87,7 @@ namespace xt
      * @tparam S the shape type of the generator
      */
     template <class F, class R, class S>
-    class xgenerator : public xexpression<xgenerator<F, R, S>>,
+    class xgenerator : public xsharable_expression<xgenerator<F, R, S>>,
                        public xconst_iterable<xgenerator<F, R, S>>,
                        public xconst_accessible<xgenerator<F, R, S>>,
                        public extension::xgenerator_base_t<F, R, S>
