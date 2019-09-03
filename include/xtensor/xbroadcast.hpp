@@ -136,7 +136,7 @@ namespace xt
      * @sa broadcast
      */
     template <class CT, class X>
-    class xbroadcast : public xexpression<xbroadcast<CT, X>>,
+    class xbroadcast : public xsharable_expression<xbroadcast<CT, X>>,
                        public xconst_iterable<xbroadcast<CT, X>>,
                        public xconst_accessible<xbroadcast<CT, X>>,
                        public extension::xbroadcast_base_t<CT, X>

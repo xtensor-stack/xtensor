@@ -671,7 +671,7 @@ namespace xt
      * @sa reduce
      */
     template <class F, class CT, class X, class O>
-    class xreducer : public xexpression<xreducer<F, CT, X, O>>,
+    class xreducer : public xsharable_expression<xreducer<F, CT, X, O>>,
                      public xconst_iterable<xreducer<F, CT, X, O>>,
                      public xaccessible<xreducer<F, CT, X, O>>,
                      public extension::xreducer_base_t<F, CT, X, O>

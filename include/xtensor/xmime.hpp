@@ -295,11 +295,11 @@ namespace xt
         return mime_bundle_repr_impl(expr);
     }
 
-    template <class ET, class S, layout_type L, class Tag>
+    template <class ET, class S, layout_type L, bool SH, class Tag>
     class xfixed_container;
 
-    template <class ET, class S, layout_type L, class Tag>
-    nlohmann::json mime_bundle_repr(const xfixed_container<ET, S, L, Tag>& expr)
+    template <class ET, class S, layout_type L, bool SH, class Tag>
+    nlohmann::json mime_bundle_repr(const xfixed_container<ET, S, L, SH, Tag>& expr)
     {
         return mime_bundle_repr_impl(expr);
     }
