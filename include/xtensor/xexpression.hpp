@@ -183,13 +183,13 @@ namespace xt
     using has_xexpression = xtl::disjunction<is_xexpression<E>...>;
 
     template <class E>
-    using is_xsharable = is_crtp_base_of<xsharable_expression, E>;
+    using is_xsharable_expression = is_crtp_base_of<xsharable_expression, E>;
 
     template <class E, class R = void>
-    using enable_xsharable = typename std::enable_if<is_xsharable<E>::value, R>::type;
+    using enable_xsharable_expression = typename std::enable_if<is_xsharable_expression<E>::value, R>::type;
 
     template <class E, class R = void>
-    using disable_xsharable = typename std::enable_if<!is_xsharable<E>::value, R>::type;
+    using disable_xsharable_expression = typename std::enable_if<!is_xsharable_expression<E>::value, R>::type;
 
     /***********************
      * evaluation_strategy *
@@ -719,7 +719,7 @@ namespace xt
     template <class E>
     inline xshared_expression<E> make_xshared(xexpression<E>&& expr)
     {
-        static_assert(is_xsharable<E>::value, "make_shared requires E to inherit from xsharable_expression");
+        static_assert(is_xsharable_expression<E>::value, "make_shared requires E to inherit from xsharable_expression");
         return detail::make_xshared_impl(std::move(expr.derived_cast()));
     }
 

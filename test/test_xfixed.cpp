@@ -293,6 +293,13 @@ namespace xt
         out << a + b;
         EXPECT_EQ("{1, 2}", out.str());
     }
+
+    TEST(xtensor_fixed, unsharable)
+    {
+        using fixed_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, true>;
+        using tiny_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, false>;
+        EXPECT_GT(sizeof(fixed_tensor), sizeof(tiny_tensor)); 
+    }
 }
 
 #endif
