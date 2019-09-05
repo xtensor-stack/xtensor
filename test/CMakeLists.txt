@@ -112,9 +112,11 @@ include_directories(${GTEST_INCLUDE_DIRS} SYSTEM)
 # For unit test and coverity scan. 
 # The Coverity scanner takes time and it could cause build timeout(10mins) in Travis CI. 
 # Therefore, we need keep this small but complete for analysis.
-set(COMMON_BASE
+set(TEST_HEADERS
     test_common.hpp
     test_xsemantic.hpp
+)
+set(COMMON_BASE
     test_xadaptor_semantic.cpp
     test_xarray_adaptor.cpp
     test_xarray.cpp
@@ -219,9 +221,9 @@ add_custom_target(
     DEPENDS ${XTENSOR_PREPROCESS_FILES}
 )
 
-foreach(filename IN LISTS XTENSOR_TESTS)
+foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
     string(REPLACE ".cpp" "" targetname ${filename})
-    add_executable(${targetname} ${COMMON_BASE} ${filename} ${XTENSOR_HEADERS})
+    add_executable(${targetname} ${filename} ${TEST_HEADERS} ${XTENSOR_HEADERS})
     if(XTENSOR_USE_XSIMD)
         target_compile_definitions(${targetname} PRIVATE XTENSOR_USE_XSIMD)
         target_link_libraries(${targetname} PRIVATE xsimd)
@@ -242,7 +244,7 @@ foreach(filename IN LISTS XTENSOR_TESTS)
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
 endforeach()
 
-add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${XTENSOR_HEADERS})
+add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 if(XTENSOR_USE_XSIMD)
     target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_XSIMD)
     target_link_libraries(test_xtensor_lib PRIVATE xsimd)
@@ -265,7 +267,7 @@ add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
 # Some files will be compiled twice, however compiling common files in a static
 # library and linking test_xtensor_lib with it removes half of the tests at
 # runtime.
-add_library(test_xtensor_core_lib ${COMMON_BASE} ${XTENSOR_HEADERS})
+add_library(test_xtensor_core_lib ${COMMON_BASE} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 target_include_directories(test_xtensor_core_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)

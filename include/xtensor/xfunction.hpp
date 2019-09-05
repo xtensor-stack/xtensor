@@ -32,12 +32,6 @@
 
 namespace xt
 {
-    template <class F, class... CT>
-    struct has_simd_interface<xfunction<F, CT...>>
-        : xfunction<F, CT...>::has_simd_interface
-    {
-    };
-
     namespace detail
     {
 
@@ -77,46 +71,6 @@ namespace xt
             template <std::size_t... N, class is_shape_trivial>
             constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_initialized;
         #endif
-
-        /**********************
-         * simd metafunctions *
-         **********************/
-
-        template <class F, class B, class = void>
-        struct has_simd_apply : std::false_type {};
-
-        template <class F, class B>
-        struct has_simd_apply<F, B, void_t<decltype(&F::template simd_apply<B>)>>
-            : std::true_type
-        {
-        };
-
-        template <class V>
-        struct has_simd_type
-            : std::integral_constant<bool, !std::is_same<V, xt_simd::simd_type<V>>::value>
-        {
-        };
-
-        // This meta struct checks wether SIMD should be activated for our
-        // functor "F"
-        template <class V, class F, class... CT>
-        struct xsimd_meta_getter
-        {
-            using scalar_result_type = V;
-
-            // check if all arguments are supported by SIMD
-            using simd_arguments_exist = xtl::conjunction<has_simd_type<scalar_result_type>,
-                                                          has_simd_type<xvalue_type_t<std::decay_t<CT>>>...>;
-            // if yes, insert correct type here
-            using simd_value_type = xtl::mpl::eval_if_t<simd_arguments_exist,
-                                                        meta_identity<xt_simd::simd_type<scalar_result_type>>,
-                                                        make_invalid_type<>>;
-            // if all types are supported, check that the functor has a working
-            // simd_apply and all arguments have the simd interface
-            using use_xsimd = xtl::conjunction<simd_arguments_exist,
-                                               has_simd_apply<F, scalar_result_type>,
-                                               has_simd_interface<std::decay_t<CT>>...>;
-        };
     }
 
     /************************
@@ -175,6 +129,14 @@ namespace xt
         using size_type = common_size_type_t<std::decay_t<CT>...>;
     };
 
+    template <class T, class F, class... CT>
+    struct has_simd_interface<xfunction<F, CT...>, T>
+        : xtl::conjunction<has_simd_type<T>,
+                           has_simd_apply<F, xt_simd::simd_type<T>>,
+                           has_simd_interface<std::decay_t<CT>, T>...>
+    {
+    };
+                            
     /*************
      * xfunction *
      *************/
@@ -214,11 +176,8 @@ namespace xt
         using const_pointer = const value_type*;
         using size_type = typename inner_types::size_type;
         using difference_type = common_difference_type_t<std::decay_t<CT>...>;
-        using simd_meta_getter = detail::xsimd_meta_getter<value_type, F, CT...>;
 
-        using has_simd_interface = typename simd_meta_getter::use_xsimd;
-        using simd_value_type = typename simd_meta_getter::simd_value_type;
-        using simd_argument_type = simd_value_type;
+        using simd_value_type = typename xt_simd::simd_type<value_type>;
 
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;

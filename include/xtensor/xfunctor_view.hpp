@@ -308,6 +308,14 @@ namespace xt
         friend class xconst_accessible<D>;
     };
 
+    template <class D, class T>
+    struct has_simd_interface<xfunctor_applier_base<D>, T>
+        : xtl::conjunction<has_simd_type<T>,
+                           has_simd_interface<typename xfunctor_applier_base<D>::xexpression_type>,
+                           detail::has_simd_interface_impl<xfunctor_applier_base<D>, T>>
+    {
+    };
+
     /********************************
      * xfunctor_view_temporary_type *
      ********************************/
@@ -351,6 +359,12 @@ namespace xt
         using const_reference = decltype(std::declval<F>()(std::declval<const xexpression_type>()()));
         using size_type = typename xexpression_type::size_type;
         using temporary_type = typename xfunctor_view_temporary_type<F, xexpression_type>::type;
+    };
+
+    template <class F, class CT, class T>
+    struct has_simd_interface<xfunctor_view<F, CT>, T>
+        : has_simd_interface<xfunctor_applier_base<xfunctor_view<F, CT>>, T>
+    {
     };
 
     /**
@@ -422,6 +436,12 @@ namespace xt
         using const_reference = typename functor_type::const_reference;
         using size_type = typename xexpression_type::size_type;
         using temporary_type = typename xfunctor_view_temporary_type<F, xexpression_type>::type;
+    };
+
+    template <class F, class CT, class T>
+    struct has_simd_interface<xfunctor_adaptor<F, CT>, T>
+        : has_simd_interface<xfunctor_applier_base<xfunctor_adaptor<F, CT>>, T>
+    {
     };
 
     /**

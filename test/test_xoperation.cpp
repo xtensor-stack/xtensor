@@ -489,6 +489,13 @@ namespace xt
         auto func = where(a > b, b, a);
         auto s = func.template load_simd<xsimd::aligned_mode>(0);
         (void)s;
+
+        using assign_traits = xassign_traits<TypeParam, decltype(func)>;
+
+        EXPECT_TRUE(assign_traits::convertible_types());
+        EXPECT_TRUE(assign_traits::simd_size());
+        EXPECT_FALSE(assign_traits::forbid_simd());
+        EXPECT_TRUE(assign_traits::simd_assign());
 #endif
     }
 
@@ -669,8 +676,8 @@ namespace xt
 #if XTENSOR_USE_XSIMD
             EXPECT_TRUE(assign_traits_char_double::convertible_types());
             EXPECT_TRUE(assign_traits_char_double::simd_size());
-            EXPECT_TRUE(assign_traits_char_double::forbid_simd());
-            EXPECT_FALSE(assign_traits_char_double::simd_assign());
+            EXPECT_FALSE(assign_traits_char_double::forbid_simd());
+            EXPECT_TRUE(assign_traits_char_double::simd_assign());
 #else
             using return_type = decltype(fdc.template load_simd<aligned_mode>(std::size_t(0)));
             EXPECT_TRUE(assign_traits_char_double::convertible_types());
@@ -678,6 +685,48 @@ namespace xt
             EXPECT_TRUE(assign_traits_char_double::forbid_simd());
             EXPECT_FALSE(assign_traits_char_double::simd_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
+#endif
+        }
+
+        {
+            SCOPED_TRACE("xarray<double> > xarray<double>");
+            auto fgt = a > b;
+            using bool_container_t = xop_test::rebind_container_t<TypeParam, bool>;
+            using assign_traits_gt = xassign_traits<bool_container_t, decltype(fgt)>;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_gt::convertible_types());
+            EXPECT_FALSE(assign_traits_gt::simd_size());
+            EXPECT_TRUE(assign_traits_gt::forbid_simd());
+            EXPECT_FALSE(assign_traits_gt::simd_assign());
+#else
+            using return_type = decltype(fgt.template load_simd<aligned_mode>(std::size_t(0)));
+            EXPECT_TRUE(assign_traits_gt::convertible_types());
+            EXPECT_FALSE(assign_traits_gt::simd_size());
+            EXPECT_TRUE(assign_traits_gt::forbid_simd());
+            EXPECT_FALSE(assign_traits_gt::simd_assign());
+            EXPECT_TRUE((std::is_same<return_type, bool>::value));
+#endif
+        }
+
+        {
+            SCOPED_TRACE("xarray<bool> || xarray<bool>");
+            using bool_container_t = xop_test::rebind_container_t<TypeParam, bool>;
+            bool_container_t b0 = {{true, false, true}, {false, false, true}};
+            bool_container_t b1 = {{true, true, false}, {false, true, true}};
+            auto fb = b0 || b1;
+            using assign_traits_bool_bool = xassign_traits<bool_container_t, decltype(fb)>;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_bool_bool::convertible_types());
+            EXPECT_FALSE(assign_traits_bool_bool::simd_size());
+            EXPECT_TRUE(assign_traits_bool_bool::forbid_simd());
+            EXPECT_FALSE(assign_traits_bool_bool::simd_assign());
+#else
+            using return_type = decltype(fb.template load_simd<aligned_mode>(std::size_t(0)));
+            EXPECT_TRUE(assign_traits_bool_bool::convertible_types());
+            EXPECT_FALSE(assign_traits_bool_bool::simd_size());
+            EXPECT_TRUE(assign_traits_bool_bool::forbid_simd());
+            EXPECT_FALSE(assign_traits_bool_bool::simd_assign());
+            EXPECT_TRUE((std::is_same<return_type, bool>::value));
 #endif
         }
     }
