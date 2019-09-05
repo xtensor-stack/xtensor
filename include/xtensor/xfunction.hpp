@@ -457,6 +457,9 @@ namespace xt
 
         using shape_type = typename xfunction_type::shape_type;
 
+        template <class requested_type>
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
+
         template <class... St>
         xfunction_stepper(const xfunction_type* func, St&&... st) noexcept;
 
@@ -472,8 +475,8 @@ namespace xt
 
         reference operator*() const;
 
-        template <class ST>
-        ST step_simd();
+        template <class T>
+        simd_return_type<T> step_simd();
 
         void step_leading();
 
@@ -482,8 +485,8 @@ namespace xt
         template <std::size_t... I>
         reference deref_impl(std::index_sequence<I...>) const;
 
-        template <class ST, std::size_t... I>
-        ST step_simd_impl(std::index_sequence<I...>);
+        template <class T, std::size_t... I>
+        simd_return_type<T> step_simd_impl(std::index_sequence<I...>);
 
         const xfunction_type* p_f;
         std::tuple<typename std::decay_t<CT>::const_stepper...> m_st;
@@ -793,29 +796,6 @@ namespace xt
         return m_f((std::get<I>(m_e).data_element(i))...);
     }
 
-    namespace detail
-    {
-        // This metafunction avoids loading boolean values as batches of floating points and
-        // reciprocally. However, we cannot always load data as batches of their scalar type
-        // since this prevents mixed arithmetic.
-        template <class T, class simd, class common_simd>
-        struct get_simd_type
-        {
-            using simd_value_type = typename std::decay_t<T>::simd_value_type;
-            static constexpr bool is_arg_bool = ::xt_simd::is_batch_bool<simd_value_type>::value;
-            static constexpr bool is_res_bool = ::xt_simd::is_batch_bool<simd>::value;
-            static constexpr bool is_arg_cplx = ::xt_simd::is_batch_complex<simd_value_type>::value;
-            using type = std::conditional_t<is_res_bool,
-                                            common_simd,
-                                            std::conditional_t<is_arg_bool || is_arg_cplx,
-                                                               simd_value_type,
-                                                               simd>>;
-        };
-
-        template <class T, class simd, class common_simd>
-        using get_simd_type_t = typename get_simd_type<T, simd, common_simd>::type;
-    }
-
     template <class F, class... CT>
     template <class align, class requested_type, std::size_t N, std::size_t... I>
     inline auto xfunction<F, CT...>::load_simd_impl(std::index_sequence<I...>, size_type i) const
@@ -1033,21 +1013,17 @@ namespace xt
     }
 
     template <class F, class... CT>
-    template <class ST, std::size_t... I>
-    inline ST xfunction_stepper<F, CT...>::step_simd_impl(std::index_sequence<I...>)
+    template <class T, std::size_t... I>
+    inline auto xfunction_stepper<F, CT...>::step_simd_impl(std::index_sequence<I...>) -> simd_return_type<T>
     {
-        return (p_f->m_f.simd_apply)(std::get<I>(m_st).template
-            step_simd<detail::get_simd_type_t<std::tuple_element_t<I, typename xfunction_type::tuple_type>,
-                                              ST,
-                                              typename xfunction_type::simd_argument_type
-                                              >>()...);
+        return (p_f->m_f.simd_apply)(std::get<I>(m_st). template step_simd<T>()...);
     }
 
     template <class F, class... CT>
-    template <class ST>
-    inline ST xfunction_stepper<F, CT...>::step_simd()
+    template <class T>
+    inline auto xfunction_stepper<F, CT...>::step_simd() -> simd_return_type<T>
     {
-        return step_simd_impl<ST>(std::make_index_sequence<sizeof...(CT)>());
+        return step_simd_impl<T>(std::make_index_sequence<sizeof...(CT)>());
     }
 
     template <class F, class... CT>

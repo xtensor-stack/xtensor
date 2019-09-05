@@ -279,7 +279,7 @@ namespace xt
         template <class F, class... CT>
         struct use_strided_loop<xfunction<F, CT...>>
         {
-            using simd_arg_type = typename xfunction<F, CT...>::simd_argument_type;
+            //using simd_arg_type = typename xfunction<F, CT...>::simd_argument_type;
             static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value &&
                                           xfunction<F, CT...>::has_simd_interface::value;
         };
@@ -842,7 +842,7 @@ namespace xt
         {
             for (std::size_t i = 0; i < simd_size; ++i)
             {
-                res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<simd_type>());
+                res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<value_type>());
             }
             for (std::size_t i = 0; i < simd_rest; ++i)
             {

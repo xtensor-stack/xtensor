@@ -361,6 +361,9 @@ namespace xt
         using size_type = typename storage_type::size_type;
         using difference_type = typename storage_type::difference_type;
 
+        template <class requested_type>
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
+
         xscalar_stepper(storage_type* c) noexcept;
 
         reference operator*() const noexcept;
@@ -373,8 +376,8 @@ namespace xt
         void to_begin() noexcept;
         void to_end(layout_type l) noexcept;
 
-        template <class R>
-        R step_simd();
+        template <class T>
+        simd_return_type<T> step_simd();
 
         void step_leading();
 
@@ -993,10 +996,10 @@ namespace xt
     }
 
     template <bool is_const, class CT>
-    template <class R>
-    inline R xscalar_stepper<is_const, CT>::step_simd()
+    template <class T>
+    inline auto xscalar_stepper<is_const, CT>::step_simd() -> simd_return_type<T>
     {
-        return R(p_c->operator()());
+        return simd_return_type<T>(p_c->operator()());
     }
 
     template <bool is_const, class CT>
