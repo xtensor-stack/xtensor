@@ -41,7 +41,7 @@ OPTION(XTENSOR_USE_XSIMD "simd acceleration for xtensor" OFF)
 OPTION(XTENSOR_USE_TBB "enable parallelization using intel TBB" OFF)
 
 if(XTENSOR_USE_XSIMD)
-    set(xsimd_REQUIRED_VERSION 7.2.6)
+    set(xsimd_REQUIRED_VERSION 7.3.1)
     find_package(xsimd ${xsimd_REQUIRED_VERSION} REQUIRED)
     message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
 endif()
