@@ -564,7 +564,7 @@ namespace xt
         #else
         #if defined(XTENSOR_USE_OPENMP)
         #pragma omp parallel for default(none) shared(\
-          aligh_begin, align_end, simd_size, e1, e2 \
+          aligh_begin, align_end, simd_size, e1, e2\
           )
         #endif
         for (size_type i = align_begin; i < align_end; i += simd_size)
@@ -604,11 +604,8 @@ namespace xt
             *(dst + i) = static_cast<value_type>(*(src + i));
         });
 #else
-
         #if defined(XTENSOR_USE_OPENMP)
-        #pragma omp parallel for default(none) shared(\
-          src, dst
-          )
+        #pragma omp parallel for default(none) shared(src, dst)
         #endif
         for (; n > size_type(0); --n)
         {
