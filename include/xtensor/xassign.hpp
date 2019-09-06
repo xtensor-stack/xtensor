@@ -556,22 +556,23 @@ namespace xt
             e1.data_element(i) = conditional_cast<needs_cast, e1_value_type>(e2.data_element(i));
         }
 
-        #if defined(XTENSOR_USE_TBB)
+#if defined(XTENSOR_USE_TBB)
         tbb::parallel_for(align_begin, align_end, simd_size, [&](size_t i)
-        {
+          {
             e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
-        });
-        #else
-        #if defined(XTENSOR_USE_OPENMP)
-        #pragma omp parallel for default(none) shared(\
-          aligh_begin, align_end, simd_size, e1, e2\
-          )
-        #endif
+          });
+#elif defined(XTENSOR_USE_OPENMP)
+        #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
         for (size_type i = align_begin; i < align_end; i += simd_size)
         {
-            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+          e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
         }
-        #endif
+#else
+        for (size_type i = align_begin; i < align_end; i += simd_size)
+        {
+          e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+        }
+#endif
         for (size_type i = align_end; i < size; ++i)
         {
             e1.data_element(i) = conditional_cast<needs_cast, e1_value_type>(e2.data_element(i));
@@ -603,10 +604,13 @@ namespace xt
         {
             *(dst + i) = static_cast<value_type>(*(src + i));
         });
+#elif defined(XTENSOR_USE_OPENMP)
+        #pragma omp parallel for default(none) shared(src, dst, n)
+        for (std::ptrdiff_t i = std::ptrdiff_t(0); i < static_cast<std::ptrdiff_t>(n) ; i++)
+        {
+            *(dst + i) = static_cast<value_type>(*(src + i));
+        }
 #else
-        #if defined(XTENSOR_USE_OPENMP)
-        #pragma omp parallel for default(none) shared(src, dst)
-        #endif
         for (; n > size_type(0); --n)
         {
             *dst = static_cast<value_type>(*src);

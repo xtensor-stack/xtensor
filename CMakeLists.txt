@@ -62,6 +62,26 @@ endif()
 if(XTENSOR_USE_OPENMP)
     find_package(OpenMP REQUIRED)
     if (OPENMP_FOUND)
+        # Set openmp variables now
+
+        # Create private target just for this lib
+        # https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
+        # Probably not safe for cmake < 3.4 ..
+        find_package(Threads REQUIRED)
+        add_library(OpenMP::OpenMP_CXX_xtensor IMPORTED INTERFACE)
+        set_property(
+            TARGET 
+            OpenMP::OpenMP_CXX_xtensor
+            PROPERTY 
+            INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS}
+        )
+        # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
+        set_property(
+            TARGET 
+            OpenMP::OpenMP_CXX_xtensor
+            PROPERTY 
+            INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
+
         message(STATUS "OpenMP Found")
     else()
         message(FATAL "Failed to locate OpenMP")
