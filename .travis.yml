@@ -215,7 +215,7 @@ install:
       elif [[ "$ENABLE_TBB" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=/home/travis/miniconda/include -DTBB_LIBRARY=/home/travis/miniconda/lib ..;
       elif [[ "$ENABLE_OPENMP" == 1 ]]; then
-        cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_OPENMP=ON;
+        cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_OPENMP=ON ..;
       elif [[ "$ENABLE_CPP17" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DCPP17=ON ..;
       else
