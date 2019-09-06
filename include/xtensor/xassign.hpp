@@ -562,6 +562,11 @@ namespace xt
             e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
         });
         #else
+        #if defined(XTENSOR_USE_OPENMP)
+        #pragma omp parallel for default(none) shared(\
+          aligh_begin, align_end, simd_size, e1, e2 \
+          )
+        #endif
         for (size_type i = align_begin; i < align_end; i += simd_size)
         {
             e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
@@ -599,6 +604,12 @@ namespace xt
             *(dst + i) = static_cast<value_type>(*(src + i));
         });
 #else
+
+        #if defined(XTENSOR_USE_OPENMP)
+        #pragma omp parallel for default(none) shared(\
+          src, dst
+          )
+        #endif
         for (; n > size_type(0); --n)
         {
             *dst = static_cast<value_type>(*src);
