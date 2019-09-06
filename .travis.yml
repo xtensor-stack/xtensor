@@ -48,6 +48,15 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+      env: COMPILER=gcc GCC=6 ENABLE_OPENMP=1
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
       env: COMPILER=gcc GCC=6 BOUND_CHECKS=1 BUILD_BENCHMARK=1
     - os: linux
       if: branch = master
@@ -125,6 +134,17 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
+            - llvm-toolchain-trusty-5.0
+          packages:
+            - g++-4.9
+            - clang-5.0
+      env: COMPILER=clang CLANG=5.0 ENABLE_OPENMP=1 DISABLE_XSIMD=1
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
             - llvm-toolchain-trusty-6.0
           packages:
             - clang-6.0
@@ -194,6 +214,8 @@ install:
         cmake -DDOWNLOAD_GTEST=ON ..;
       elif [[ "$ENABLE_TBB" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_TBB=ON -DTBB_INCLUDE_DIR=/home/travis/miniconda/include -DTBB_LIBRARY=/home/travis/miniconda/lib ..;
+      elif [[ "$ENABLE_OPENMP" == 1 ]]; then
+        cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_OPENMP=ON;
       elif [[ "$ENABLE_CPP17" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DCPP17=ON ..;
       else
