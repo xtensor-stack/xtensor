@@ -200,6 +200,11 @@ if(BUILD_BENCHMARK)
     add_subdirectory(benchmark)
 endif()
 
+if(XTENSOR_USE_OPENMP)
+    # Link xtensor itself to OpenMP to propagate to user projects
+    target_link_libraries(xtensor INTERFACE OpenMP::OpenMP_CXX_xtensor)
+endif()
+
 # Installation
 # ============
 
