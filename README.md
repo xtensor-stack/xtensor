@@ -5,7 +5,7 @@
 [![Azure](https://dev.azure.com/johanmabille/johanmabille/_apis/build/status/QuantStack.xtensor?branchName=master)](https://dev.azure.com/johanmabille/johanmabille/_build/latest?definitionId=3&branchName=master)
 [![Coverity](https://scan.coverity.com/projects/18335/badge.svg)](https://scan.coverity.com/projects/xtensor)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://img.shields.io/badge/launch-binder-brightgreen.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
@@ -71,14 +71,17 @@ make install
 
 ## Trying it online
 
-To try out xtensor interactively in your web browser, just click on the binder
-link:
+You can play with `xtensor` interactively in a Jupyter notebook right now! Just click on the binder link below:
 
 [![Binder](docs/source/binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
 
+The C++ support in Jupyter is powered by the [xeus-cling](https://github.com/QuantStack/xeus-cling) C++ kernel. Together with xeus-cling, xtensor enables a similar workflow to that of NumPy with the IPython Jupyter kernel.
+
+![xeus-cling](docs/source/xeus-cling-screenshot.png)
+
 ## Documentation
 
-To get started with using `xtensor`, check out the full documentation
+For more information on using `xtensor`, check out the reference documentation
 
 http://xtensor.readthedocs.io/
 
