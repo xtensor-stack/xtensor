@@ -217,20 +217,45 @@ namespace xt
     template <class A1, class A2>
     using driven_align_mode_t = typename detail::driven_align_mode_impl<A1, A2>::type;
 
-    template <class E, class = void>
-    struct test_simd_interface_impl : std::false_type
+    namespace detail
+    {
+        template <class E, class T, class = void>
+        struct has_simd_interface_impl : std::false_type
+        {
+        };
+
+        template <class E, class T>
+        struct has_simd_interface_impl<E, T, void_t<decltype(std::declval<E>().template load_simd<aligned_mode, T>(typename E::size_type(0)))>>
+            : std::true_type
+        {
+        };
+    }
+
+    template <class E, class T = typename std::decay_t<E>::value_type>
+    struct has_simd_interface : detail::has_simd_interface_impl<E, T>
     {
     };
 
-    template <class E>
-    struct test_simd_interface_impl<E, void_t<decltype(std::declval<E>().template load_simd<aligned_mode>(typename E::size_type(0)))>>
-        : std::true_type
+    template <class T>
+    struct has_simd_type
+        : std::integral_constant<bool, !std::is_same<T, xt_simd::simd_type<T>>::value>
     {
     };
 
-    template <class E>
-    struct has_simd_interface
-        : test_simd_interface_impl<E>
+    namespace detail
+    {
+        template <class F, class B, class = void>
+        struct has_simd_apply_impl : std::false_type {};
+
+        template <class F, class B>
+        struct has_simd_apply_impl<F, B, void_t<decltype(&F::template simd_apply<B>)>>
+            : std::true_type
+        {
+        };
+    }
+
+    template <class F, class B>
+    struct has_simd_apply : detail::has_simd_apply_impl<F, B>
     {
     };
 }

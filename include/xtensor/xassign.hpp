@@ -279,9 +279,7 @@ namespace xt
         template <class F, class... CT>
         struct use_strided_loop<xfunction<F, CT...>>
         {
-            //using simd_arg_type = typename xfunction<F, CT...>::simd_argument_type;
-            static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value &&
-                                          xfunction<F, CT...>::has_simd_interface::value;
+            static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value;
         };
     }
 
@@ -299,7 +297,8 @@ namespace xt
         static constexpr bool simd_assign() { return contiguous_layout() && convertible_types() && simd_size() && has_simd_interface<E2>::value; }
         static constexpr bool simd_strided_loop() { return convertible_types() && simd_size() &&
                                                            detail::use_strided_loop<E2>::value &&
-                                                           detail::use_strided_loop<E1>::value; }
+                                                           detail::use_strided_loop<E1>::value &&
+                                                           has_simd_interface<E2>::value; }
     };
 
     template <class E1, class E2>
