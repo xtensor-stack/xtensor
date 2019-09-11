@@ -11,7 +11,7 @@ Assignment
 ----------
 
 In ``xtensor``, scalars are handled as if they were 0-dimensional expressions. This means that when assigning
-a scalar value to an ``xarray``, this last one is **not filled** with that value, but resized to become a 0-D
+a scalar value to an ``xarray``, the array is **not filled** with that value, but resized to become a 0-D
 array containing the scalar value:
 
 .. code::
@@ -92,7 +92,7 @@ Then, somewhere in your program:
     // ...
     // later
     eval_mean(a, b);
-    // Now b is a 0-D container holding 21.
+    // Now b is a 0-D container holding 3.5.
 
 After that, ``b`` is a 0-dimensional array containing the mean of the elements of ``a``. Indeed, ``sum(a) / e1.size()`` is a
 0-D expression, thus when assigned to ``b``, this latter is resized. Later, you realize that you also need the sum of the elements

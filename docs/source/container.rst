@@ -132,7 +132,7 @@ values in the ``shape``:
 Performance
 -----------
 
-The dynamic dimensionality of ``xarray`` comes at a cost. Since the dimension is unknown at build time, the sequences holding shape and strides of ``xarray`` instances are heap-allocated, which makes it significantly more expansive than ``xtensor``. Shape and strides of ``xtensor`` are stack-allocated which makes them more efficient.
+The dynamic dimensionality of ``xarray`` comes at a cost. Since the dimension is unknown at build time, the sequences holding shape and strides of ``xarray`` instances are heap-allocated, which makes it significantly more expensive than ``xtensor``. Shape and strides of ``xtensor`` are stack-allocated which makes them more efficient.
 
 More generally, the library implements a ``promote_shape`` mechanism at build time to determine the optimal sequence type to hold the shape of an expression. The shape type of a broadcasting expression whose members have a dimensionality determined at compile time will have a stack-allocated shape. If a single member of a broadcasting expression has a dynamic dimension (for example an ``xarray``), it bubbles up to the entire broadcasting expression which will have a heap-allocated shape. The same hold for views, broadcast expressions, etc...
 
