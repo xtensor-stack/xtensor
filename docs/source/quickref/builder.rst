@@ -91,12 +91,12 @@ filled with the specified value:
 Ones like
 ---------
 
-``ones_like(e)`` isquivalent to ``full_like(e, 1.)``.
+``ones_like(e)`` is equivalent to ``full_like(e, 1.)``.
 
 Zeros like
 ----------
 
-``zeros_like(e)`` isquivalent to ``full_like(e, 0.)``.
+``zeros_like(e)`` is equivalent to ``full_like(e, 0.)``.
 
 Eye
 ---
@@ -120,7 +120,7 @@ Generates an array with ones on the specified diagonal:
 Arange
 ------
 
-Generates numbers evenly spaced:
+Generates evenly spaced numbers:
 
 .. code::
 
@@ -128,8 +128,8 @@ Generates numbers evenly spaced:
     std::cout << e << std::endl;
     // Outputs {0., 2., 4., 6., 8.}
 
-A common pattern is to used ``arange`` followed by reshape to initialize
-tensor with arbitrary number of dimensions:
+A common pattern is to use ``arange`` followed by reshape to initialize
+a tensor with an arbitrary number of dimensions:
 
 .. code::
 
@@ -144,7 +144,7 @@ Linspace
 
     auto a = xt::linspace<double>(0., 10., 5);
     std::cout << a << std::endl;
-    // Ouputs {0., 2.5, 5., 7.5, 10.}
+    // Outputs {0., 2.5, 5., 7.5, 10.}
 
 Logspace
 --------
@@ -170,7 +170,7 @@ Concatenate
 Stack
 -----
 
-``stack`` always create a new dimension along which elements are stacked:
+``stack`` always creates a new dimension along which elements are stacked:
 
 .. code::
 

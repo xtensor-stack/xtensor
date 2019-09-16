@@ -13,7 +13,7 @@ Configuration
 -------------
 
 ``xtensor`` can be configured via macros which must be defined *before* including
-any of its header. This can be achieved the following ways:
+any of its headers. This can be achieved the following ways:
 
 - either define them in the CMakeLists of your project, with ``target_compile_definitions``
   cmake command.
@@ -47,9 +47,9 @@ requirements):
 
 - ``XTENSOR_USE_XSIMD``: enables SIMD acceleration in ``xtensor``. This requires that you have xsimd_ installed
   on your system.
-- ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
+- ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have tbb_ installed
   on your system.
-- ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is avaliable on your system.
+- ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is available on your system.
 
 Defining these macros in the CMakeLists of your project before searching for ``xtensor`` will trigger automatic finding
 of dependencies, so you don't have to include the ``find_package(xsimd)`` and ``find_package(TBB)`` commands in your
@@ -88,7 +88,7 @@ If you defined ``XTENSOR_USE_XSIMD``, you must also specify which instruction se
     # OR
     target_compile_options(target_name PRIVATE /arch:ARMv7VE)
 
-If you build on an old system that do not support ny of these instruction set, you don't have to specify
+If you build on an old system that does not support any of these instruction sets, you don't have to specify
 anything, the system will do its best to enable the most recent supported instruction set.
 
 Linux/OSX

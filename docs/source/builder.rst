@@ -17,7 +17,7 @@ Ones and zeros
 - ``zeros(shape)``: generates an expression containing zeros of the specified shape.
 - ``ones(shape)``: generates an expression containing ones of the specified shape.
 - ``eye(shape, k=0)``: generates an expression of the specified shape, with ones on the k-th diagonal.
-- ``eye(n, k = 0)``: generates an expression with ones on the k-th diagonal.
+- ``eye(n, k = 0)``: generates an expression of shape ``(n, n)`` with ones on the k-th diagonal.
 
 Numerical ranges
 ----------------

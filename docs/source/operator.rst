@@ -52,8 +52,8 @@ logical operators, `xtensor` provides two reducing boolean functions:
 
 and an element-wise ternary function (similar to the ``: ?`` ternary operator):
 
-- ``where(E&& b, E1&& e&, E2&& e2)`` returns an ``xexpression`` whose elements
-  are those of ``e1`` when corresponding elements of ``b`` are thruthy, and
+- ``where(E&& b, E1&& e1, E2&& e2)`` returns an ``xexpression`` whose elements
+  are those of ``e1`` when corresponding elements of ``b`` are truthy, and
   those of ``e2`` otherwise.
 
 .. code::

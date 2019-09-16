@@ -66,7 +66,7 @@ which prints
      {2, 2},
      {2, 3}}
 
-Here we observe that to work print we need to convert the ``std::vector`` to a ``xt::xtensor<size_t, 2>`` array, which is done using ``xt::from_indices``.
+To print the ``std::vector``, it is converted to a ``xt::xtensor<size_t, 2>`` array, which is done using ``xt::from_indices``.
 
 From array indices to flat indices
 ----------------------------------

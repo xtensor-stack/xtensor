@@ -44,7 +44,7 @@ the corresponding value in ``v``:
 Adapting C-style arrays
 -----------------------
 
-`xtensor` provides two ways for adapting C-style array; the first one does not take the
+`xtensor` provides two ways for adapting a C-style array; the first one does not take the
 ownership of the array:
 
 .. code::

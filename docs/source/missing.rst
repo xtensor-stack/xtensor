@@ -7,7 +7,7 @@
 Missing values
 ==============
 
-``xtensor`` handles missing values and comprises specialized container types for an optimized support of missing values.
+``xtensor`` handles missing values and provides specialized container types for an optimized support of missing values.
 
 Optional expressions
 --------------------
@@ -83,8 +83,7 @@ of the two expressions while the last one holds a reference on at least one of t
         {{ true, true  },
          { true, false }};
 
-    xoptional_assembly<xarray<double>, xarray<bool>>
-    assembly(v, hv);
+    xoptional_assembly<xarray<double>, xarray<bool>> assembly(v, hv);
     std::cout << assembly << std::endl;
 
 outputs:
