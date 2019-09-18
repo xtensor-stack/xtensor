@@ -120,6 +120,8 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
 
+        using bool_load_type = typename xexpression_type::bool_load_type;
+
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 

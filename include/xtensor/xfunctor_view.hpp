@@ -103,6 +103,8 @@ namespace xt
                                                            detail::expr_inner_backstrides_type<xexpression_type>,
                                                            get_strides_type<shape_type>>;
 
+        using bool_load_type = xt::bool_load_type<value_type>;
+
         static constexpr layout_type static_layout = xexpression_type::static_layout;
         static constexpr bool contiguous_layout = xexpression_type::contiguous_layout;
 

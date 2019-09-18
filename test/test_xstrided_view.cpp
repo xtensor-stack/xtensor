@@ -685,10 +685,7 @@ namespace xt
         using assign_traits = xassign_traits<xarray<double>, decltype(av)>;
 
 #if XTENSOR_USE_XSIMD
-        EXPECT_TRUE(assign_traits::convertible_types());
-        EXPECT_TRUE(assign_traits::simd_size());
-        EXPECT_TRUE(assign_traits::forbid_simd());
-        EXPECT_FALSE(assign_traits::simd_assign());
+        EXPECT_FALSE(assign_traits::simd_linear_assign());
 #endif
 
         EXPECT_EQ(av, e);

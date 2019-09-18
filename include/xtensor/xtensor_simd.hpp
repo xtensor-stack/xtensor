@@ -10,6 +10,7 @@
 #define XTENSOR_SIMD_HPP
 
 #include <vector>
+#include <xtl/xdynamic_bitset.hpp>
 
 #include "xutils.hpp"
 
@@ -258,6 +259,43 @@ namespace xt
     struct has_simd_apply : detail::has_simd_apply_impl<F, B>
     {
     };
+
+    template <class T>
+    using bool_load_type = std::conditional_t<std::is_same<T, bool>::value, uint8_t, T>;
+
+    template <class T>
+    struct forbid_simd : std::false_type
+    {
+    };
+
+    template <class A>
+    struct forbid_simd<std::vector<bool, A>> : std::true_type
+    {
+    };
+
+    template <class A>
+    struct forbid_simd<const std::vector<bool, A>> : std::true_type
+    {
+    };
+
+    template <class B, class A>
+    struct forbid_simd<xtl::xdynamic_bitset<B, A>> : std::true_type
+    {
+    };
+
+    template <class B, class A>
+    struct forbid_simd<const xtl::xdynamic_bitset<B, A>> : std::true_type
+    {
+    };
+
+    template <class C, class T1, class T2>
+    struct container_simd_return_type
+        : std::enable_if<!forbid_simd<C>::value, xt_simd::simd_return_type<T1, T2>>
+    {
+    };
+
+    template <class C, class T1, class T2>
+    using container_simd_return_type_t = typename container_simd_return_type<C, T1, T2>::type;
 }
 
 #endif

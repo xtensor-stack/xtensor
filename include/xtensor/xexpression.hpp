@@ -525,6 +525,8 @@ namespace xt
         using storage_iterator = typename E::storage_iterator;
         using const_storage_iterator = typename E::const_storage_iterator;
 
+        using bool_load_type = typename E::bool_load_type;
+
         static constexpr layout_type static_layout = E::static_layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 

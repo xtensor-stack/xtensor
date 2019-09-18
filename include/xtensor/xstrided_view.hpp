@@ -155,7 +155,8 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
 
-        using simd_value_type = xt_simd::simd_type<value_type>;
+        using simd_value_type = typename base_type::simd_value_type;
+        using bool_load_type = typename base_type::bool_load_type;
 
         template <class CTA, class SA>
         xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
@@ -361,7 +362,7 @@ namespace xt
     template <class CT, class S, layout_type L, class FST>
     inline void xstrided_view<CT, S, L, FST>::assign_temporary_impl(temporary_type&& tmp)
     {
-        constexpr bool fast_assign = xassign_traits<xstrided_view<CT, S, L, FST>, temporary_type>::simd_strided_loop();
+        constexpr bool fast_assign = xassign_traits<xstrided_view<CT, S, L, FST>, temporary_type>::simd_strided_assign();
         xstrided_view_detail::run_assign_temporary_impl(*this, tmp, std::integral_constant<bool, fast_assign>{});
     }
 

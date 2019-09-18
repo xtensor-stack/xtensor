@@ -104,6 +104,7 @@ namespace xt
         using size_type = typename inner_types::size_type;
         using difference_type = std::ptrdiff_t;
         using simd_value_type = xt_simd::simd_type<value_type>;
+        using bool_load_type = xt::bool_load_type<value_type>;
 
         using iterable_base = xiterable<self_type>;
         using inner_shape_type = typename iterable_base::inner_shape_type;

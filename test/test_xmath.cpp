@@ -44,10 +44,7 @@ namespace xt
         using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
 
 #if XTENSOR_USE_XSIMD
-        EXPECT_TRUE(assign_traits::convertible_types());
-        EXPECT_TRUE(assign_traits::simd_size());
-        EXPECT_FALSE(assign_traits::forbid_simd());
-        EXPECT_TRUE(assign_traits::simd_assign());
+        EXPECT_TRUE(assign_traits::simd_linear_assign());
 #endif
     }
 
@@ -337,18 +334,12 @@ namespace xt
             auto fexp = exp(a);
             using assign_traits = xassign_traits<array_type, decltype(fexp)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits::convertible_types());
-            EXPECT_TRUE(assign_traits::simd_size());
-            EXPECT_FALSE(assign_traits::forbid_simd());
-            EXPECT_TRUE(assign_traits::simd_assign());
+            EXPECT_TRUE(assign_traits::simd_linear_assign());
 #else
             // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
             // triggers the same error as the one caught by mingw.
             using return_type = decltype(fexp.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits::convertible_types());
-            EXPECT_FALSE(assign_traits::simd_size());
-            EXPECT_TRUE(assign_traits::forbid_simd());
-            EXPECT_FALSE(assign_traits::simd_assign());
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -358,18 +349,12 @@ namespace xt
             auto fpow = pow(a, a);
             using assign_traits = xassign_traits<array_type, decltype(fpow)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits::convertible_types());
-            EXPECT_TRUE(assign_traits::simd_size());
-            EXPECT_FALSE(assign_traits::forbid_simd());
-            EXPECT_TRUE(assign_traits::simd_assign());
+            EXPECT_TRUE(assign_traits::simd_linear_assign());
 #else
             // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
             // triggers the same error as the one caught by mingw.
             using return_type = decltype(fpow.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits::convertible_types());
-            EXPECT_FALSE(assign_traits::simd_size());
-            EXPECT_TRUE(assign_traits::forbid_simd());
-            EXPECT_FALSE(assign_traits::simd_assign());
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -379,18 +364,12 @@ namespace xt
             auto ffma = xt::fma(a, a, a);
             using assign_traits = xassign_traits<array_type, decltype(ffma)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits::convertible_types());
-            EXPECT_TRUE(assign_traits::simd_size());
-            EXPECT_FALSE(assign_traits::forbid_simd());
-            EXPECT_TRUE(assign_traits::simd_assign());
+            EXPECT_TRUE(assign_traits::simd_linear_assign());
 #else
             // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
             // triggers the same error as the one caught by mingw.
             using return_type = decltype(ffma.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits::convertible_types());
-            EXPECT_FALSE(assign_traits::simd_size());
-            EXPECT_TRUE(assign_traits::forbid_simd());
-            EXPECT_FALSE(assign_traits::simd_assign());
+            EXPECT_FALSE(assign_traits::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -476,10 +455,7 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
         using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
-        EXPECT_TRUE(assign_traits::convertible_types());
-        EXPECT_TRUE(assign_traits::simd_size());
-        EXPECT_FALSE(assign_traits::forbid_simd());
-        EXPECT_TRUE(assign_traits::simd_assign());
+        EXPECT_TRUE(assign_traits::simd_linear_assign());
 #endif
     }
 
@@ -515,10 +491,7 @@ namespace xt
 
 #if XTENSOR_USE_XSIMD
         using assign_traits = xassign_traits<xarray<double>, decltype(f)>;
-        EXPECT_TRUE(assign_traits::convertible_types());
-        EXPECT_TRUE(assign_traits::simd_size());
-        EXPECT_FALSE(assign_traits::forbid_simd());
-        EXPECT_TRUE(assign_traits::simd_assign());
+        EXPECT_TRUE(assign_traits::simd_linear_assign());
 #endif
 
     }

@@ -138,7 +138,9 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
 
-        using simd_value_type = xt_simd::simd_type<value_type>;
+        using simd_value_type = typename base_type::simd_value_type;
+        using bool_load_type = typename base_type::bool_load_type;
+
         using strides_vt = typename strides_type::value_type;
         using slice_type = xtl::variant<detail::xfake_slice<strides_vt>, xkeep_slice<strides_vt>, xdrop_slice<strides_vt>>;
         using slice_vector_type = std::vector<slice_type>;
