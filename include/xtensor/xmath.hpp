@@ -2559,9 +2559,10 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
         auto axes_copy = axes;
+        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
         // sum cannot always be a double. It could be a complex number which cannot operate on
         // std::plus<double>.
-        return nansum<T>(sc, std::forward<X>(axes), es) / xt::cast<double>(count_nonnan(sc, std::move(axes_copy), es));
+        return nansum<T>(sc, std::forward<X>(axes), es) / xt::cast<value_type>(count_nonnan(sc, std::move(axes_copy), es));
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -2569,7 +2570,8 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     inline auto nanmean(E&& e, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
-        return nansum<T>(sc, es) / xt::cast<double>(count_nonnan(sc, es));
+        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
+        return nansum<T>(sc, es) / xt::cast<value_type>(count_nonnan(sc, es));
     }
 
 #ifdef X_OLD_CLANG
