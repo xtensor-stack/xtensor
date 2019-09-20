@@ -18,6 +18,14 @@
 
 #include <xsimd/xsimd.hpp>
 
+#if defined(_MSV_VER) && (_MSV_VER < 1910)
+template <class T, std::size_t N>
+inline xsimd::batch_bool<T, N> isnan(const xsimd::batch<T, N>& b)
+{
+    return xsimd::isnan(b);
+}
+#endif
+
 namespace xt_simd
 {
     template <class T, std::size_t A>

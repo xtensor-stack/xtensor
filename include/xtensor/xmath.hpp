@@ -223,11 +223,31 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         using std::pow;
 
         using std::fma;
-
-        using std::isnan;
-        using std::isinf;
-        using std::isfinite;
         using std::fpclassify;
+
+        // Overload isinf, isnan and isfinite because glibc implementation
+        // might return int instead of bool and the SIMD detection requires
+        // bool return type.
+        template <class T>
+        inline std::enable_if_t<std::is_arithmetic<T>::value, bool>
+        isinf(const T& t)
+        {
+            return bool(std::isinf(t));
+        }
+
+        template <class T>
+        inline std::enable_if_t<std::is_arithmetic<T>::value, bool>
+        isnan(const T& t)
+        {
+            return bool(std::isnan(t));
+        }
+
+        template <class T>
+        inline std::enable_if_t<std::is_arithmetic<T>::value, bool>
+        isfinite(const T& t)
+        {
+            return bool(std::isfinite(t));
+        }
 
         // Overload isinf, isnan and isfinite for complex datatypes,
         // following the Python specification:
@@ -249,6 +269,25 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return !isinf(c) && !isnan(c);
         }
 
+        // VS2015 STL defines isnan, isinf and isfinite as template
+        // functions, breaking ADL. 
+#if defined(_WIN32) && defined(XTENSOR_USE_XSIMD)
+        template <class T, std::size_t N>
+        inline xsimd::batch_bool<T, N> isinf(const xsimd::batch<T, N>& b)
+        {
+            return xsimd::isinf(b);
+        }
+        template <class T, std::size_t N>
+        inline xsimd::batch_bool<T, N> isnan(const xsimd::batch<T, N>& b)
+        {
+            return xsimd::isnan(b);
+        }
+        template <class T, std::size_t N>
+        inline xsimd::batch_bool<T, N> isfinite(const xsimd::batch<T, N>& b)
+        {
+            return xsimd::isfinite(b);
+        }
+#endif
         // The following specializations are needed to avoid 'ambiguous overload' errors,
         // whereas 'unsigned char' and 'unsigned short' are automatically converted to 'int'.
         // we're still adding those functions to silence warnings
