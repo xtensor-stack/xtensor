@@ -54,7 +54,7 @@ namespace xt
 
         std::ifstream bstream("files/xnpy_files/bool.npy");
         auto barr_loaded_stream = load_npy<bool>(bstream);
-        EXPECT_TRUE(all(isclose(barr, barr_loaded_stream)))
+        EXPECT_TRUE(all(equal(barr, barr_loaded_stream)))
             << "Loading boolean numpy array from stream failed";
         bstream.close();
 
@@ -86,7 +86,7 @@ namespace xt
 
     std::string read_file(const std::string& name)
     {
-        return (std::stringstream() << std::ifstream(name).rdbuf()).str();
+        return static_cast<std::stringstream const&>(std::stringstream() << std::ifstream(name).rdbuf()).str();
     }
 
     TEST(xnpy, dump)
