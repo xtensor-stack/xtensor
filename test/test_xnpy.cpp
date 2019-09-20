@@ -43,8 +43,20 @@ namespace xt
         auto darr_loaded = load_npy<double>("files/xnpy_files/double.npy");
         EXPECT_TRUE(all(isclose(darr, darr_loaded)));
 
+        std::ifstream dstream("files/xnpy_files/double.npy");
+        auto darr_loaded_stream = load_npy<double>(dstream);
+        EXPECT_TRUE(all(isclose(darr, darr_loaded_stream)))
+            << "Loading double numpy array from stream failed";
+        dstream.close();
+
         auto barr_loaded = load_npy<bool>("files/xnpy_files/bool.npy");
         EXPECT_TRUE(all(equal(barr, barr_loaded)));
+
+        std::ifstream bstream("files/xnpy_files/bool.npy");
+        auto barr_loaded_stream = load_npy<bool>(bstream);
+        EXPECT_TRUE(all(isclose(barr, barr_loaded_stream)))
+            << "Loading boolean numpy array from stream failed";
+        bstream.close();
 
         auto dfarr_loaded = load_npy<double, layout_type::column_major>("files/xnpy_files/double_fortran.npy");
         EXPECT_TRUE(all(isclose(darr, dfarr_loaded)));
@@ -72,6 +84,11 @@ namespace xt
         return filename;
     }
 
+    std::string read_file(const std::string& name)
+    {
+        return (std::stringstream() << std::ifstream(name).rdbuf()).str();
+    }
+
     TEST(xnpy, dump)
     {
         std::string filename = get_filename(0);
@@ -95,6 +112,11 @@ namespace xt
         }
 
         EXPECT_TRUE(compare_binary_files(filename, compare_name));
+
+        std::string barr_str = dump_npy(barr);
+        std::string barr_disk = read_file(compare_name);
+        EXPECT_EQ(barr_str, barr_disk) << "Dumping boolean numpy file to string failed";
+
         std::remove(filename.c_str());
 
         filename = get_filename(1);
@@ -109,6 +131,11 @@ namespace xt
         }
 
         EXPECT_TRUE(compare_binary_files(filename, compare_name));
+
+        std::string ularr_str = dump_npy(ularr);
+        std::string ularr_disk = read_file(compare_name);
+        EXPECT_EQ(ularr_str, ularr_disk) << "Dumping boolean numpy file to string failed";
+
         std::remove(filename.c_str());
     }
 
