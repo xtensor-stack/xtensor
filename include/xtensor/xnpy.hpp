@@ -674,6 +674,36 @@ namespace xt
     }
 
     /**
+     * Save xexpression to NumPy npy format in a string
+     *
+     * @param e the xexpression
+     */
+    template <typename E>
+    inline std::string dump_npy(const xexpression<E>& e)
+    {
+        std::stringstream stream;
+        detail::dump_npy_stream(stream, e);
+        return stream.str();
+    }
+
+    /**
+     * Loads a npy file (the numpy storage format)
+     *
+     * @param stream An input stream from which to load the file
+     * @tparam T select the type of the npy file (note: currently there is
+     *           no dynamic casting if types do not match)
+     * @tparam L select layout_type::column_major if you stored data in
+     *           Fortran format
+     * @return xarray with contents from npy file
+     */
+    template <typename T, layout_type L = layout_type::dynamic>
+    inline auto load_npy(std::istream& stream)
+    {
+        detail::npy_file file = detail::load_npy_file(stream);
+        return std::move(file).cast<T, L>();
+    }
+
+    /**
      * Loads a npy file (the numpy storage format)
      *
      * @param filename The filename or path to the file
@@ -691,8 +721,7 @@ namespace xt
         {
             throw std::runtime_error("io error: failed to open a file.");
         }
-        detail::npy_file file = detail::load_npy_file(stream);
-        return std::move(file).cast<T, L>();
+        return load_npy<T, L>(stream);
     }
 
 }  // namespace xt
