@@ -352,6 +352,7 @@ namespace xt
         static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
         using value_type = typename xexpression_type::value_type;
         using simd_value_type = xt_simd::simd_type<value_type>;
+        using bool_load_type = typename xexpression_type::bool_load_type;
         using reference = typename inner_types::reference;
         using const_reference = typename inner_types::const_reference;
         using pointer = std::conditional_t<is_const,
@@ -1585,7 +1586,7 @@ namespace xt
     inline void xview<CT, S...>::assign_temporary_impl(temporary_type&& tmp)
     {
         constexpr bool fast_assign = detail::is_strided_view<xexpression_type, S...>::value && \
-                                     xassign_traits<xview<CT, S...>, temporary_type>::simd_strided_loop();
+                                     xassign_traits<xview<CT, S...>, temporary_type>::simd_strided_assign();
         xview_detail::run_assign_temporary_impl(*this, tmp, std::integral_constant<bool, fast_assign>{});
     }
 

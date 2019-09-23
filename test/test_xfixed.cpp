@@ -294,7 +294,7 @@ namespace xt
         EXPECT_EQ("{1, 2}", out.str());
     }
 
-    TEST(xtensor_fixed, unsharable)
+    TEST(xtensor_fixed, nonsharable)
     {
         using fixed_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, true>;
         using tiny_tensor = xtensor_fixed<double, xshape<2>, layout_type::row_major, false>;

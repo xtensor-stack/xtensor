@@ -172,10 +172,7 @@ namespace xt
         auto b = f.load_simd<xt_simd::aligned_mode>(0);
         static_cast<void>(b);
         using assign_to_view = xassign_traits<decltype(iview), decltype(f)>;
-        EXPECT_TRUE(assign_to_view::convertible_types());
-        EXPECT_TRUE(assign_to_view::simd_size());
-        EXPECT_FALSE(assign_to_view::forbid_simd());
-        EXPECT_TRUE(assign_to_view::simd_assign());
+        EXPECT_TRUE(assign_to_view::simd_linear_assign());
     }
 #endif
 }

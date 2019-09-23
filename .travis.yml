@@ -185,7 +185,7 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda install cmake -c conda-forge
-    - conda install xtl==0.6.6 xsimd nlohmann_json -c conda-forge
+    - conda install xtl==0.6.7 xsimd nlohmann_json -c conda-forge
     - if [[ "$ENABLE_TBB" == 1 ]]; then
         conda install tbb-devel -c conda-forge;
       fi

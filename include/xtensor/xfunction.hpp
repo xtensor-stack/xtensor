@@ -177,7 +177,8 @@ namespace xt
         using size_type = typename inner_types::size_type;
         using difference_type = common_difference_type_t<std::decay_t<CT>...>;
 
-        using simd_value_type = typename xt_simd::simd_type<value_type>;
+        using simd_value_type = xt_simd::simd_type<value_type>;
+        using bool_load_type = xtl::promote_type_t<typename std::decay_t<CT>::bool_load_type...>;
 
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;

@@ -181,10 +181,10 @@ namespace xt
                 return apply_impl(args...);
             }
 
-            template <class... Args>
-            constexpr simd_result_type simd_apply(const Args&... args) const
+            template <class B, class... Args>
+            constexpr B simd_apply(const B& b, const Args&... args) const
             {
-                return simd_apply_impl(args...);
+                return simd_apply_impl(b, args...);
             }
 
         private:
@@ -200,15 +200,17 @@ namespace xt
                 return t & apply_impl(args...);
             }
 
-            constexpr simd_result_type simd_apply_impl() const
+
+            template <class B>
+            constexpr B simd_apply_impl(const B& b) const
             {
-                return simd_result_type(true);
+                return b;
             }
 
-            template <class U, class... Args>
-            constexpr simd_result_type simd_apply_impl(const U& t, const Args&... args) const
+            template <class B1, class B2, class... Args>
+            constexpr B1 simd_apply_impl(const B1& b1, const B2& b2, const Args&... args) const
             {
-                return t & simd_apply_impl(args...);
+                return b1 & simd_apply_impl(b2, args...);
             }
         };
     }

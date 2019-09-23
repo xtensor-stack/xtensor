@@ -1280,19 +1280,13 @@ namespace xt
             using assign_traits = xassign_traits<decltype(vxt), decltype(b)>;
 
     #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits::convertible_types());
-            EXPECT_TRUE(assign_traits::simd_size());
-            EXPECT_FALSE(assign_traits::forbid_simd());
-            EXPECT_TRUE(assign_traits::simd_assign());
+            EXPECT_TRUE(assign_traits::simd_linear_assign());
     #endif
 
             using assign_traits2 = xassign_traits<decltype(b), decltype(vxa)>;
 
     #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits2::convertible_types());
-            EXPECT_TRUE(assign_traits2::simd_size());
-            EXPECT_TRUE(assign_traits2::forbid_simd());
-            EXPECT_FALSE(assign_traits2::simd_assign());
+            EXPECT_FALSE(assign_traits2::simd_linear_assign());
     #endif
         }
     }

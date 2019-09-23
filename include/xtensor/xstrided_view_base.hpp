@@ -123,6 +123,9 @@ namespace xt
 
         using undecay_shape = typename inner_types::undecay_shape;
 
+        using simd_value_type = xt_simd::simd_type<value_type>;
+        using bool_load_type = typename xexpression_type::bool_load_type;
+
         static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic && xexpression_type::contiguous_layout;
 

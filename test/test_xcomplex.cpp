@@ -127,10 +127,7 @@ namespace xt
         using assign_t_angle = xassign_traits<xarray<double>, decltype(cmplres_angle)>;
 
 #if XTENSOR_USE_XSIMD
-        EXPECT_TRUE(assign_t_angle::convertible_types());
-        EXPECT_TRUE(assign_t_angle::simd_size());
-        EXPECT_FALSE(assign_t_angle::forbid_simd());
-        EXPECT_TRUE(assign_t_angle::simd_assign());
+        EXPECT_TRUE(assign_t_angle::simd_linear_assign());
 #endif
 
         auto cmplres_conj = xt::conj(cmplarg_0);
@@ -146,10 +143,7 @@ namespace xt
         auto b2 = cmplres_conj.template load_simd<xsimd::aligned_mode>(0);
         static_cast<void>(b1);
         static_cast<void>(b2);
-        EXPECT_TRUE(assign_t_conj::convertible_types());
-        EXPECT_TRUE(assign_t_conj::simd_size());
-        EXPECT_FALSE(assign_t_conj::forbid_simd());
-        EXPECT_TRUE(assign_t_conj::simd_assign());
+        EXPECT_TRUE(assign_t_conj::simd_linear_assign());
 #endif
 
         auto cmplres_norm = xt::norm(cmplarg_0);
@@ -160,10 +154,7 @@ namespace xt
         using assign_t_norm = xassign_traits<xarray<double>, decltype(cmplres_norm)>;
 
 #if XTENSOR_USE_XSIMD
-        EXPECT_TRUE(assign_t_norm::convertible_types());
-        EXPECT_TRUE(assign_t_norm::simd_size());
-        EXPECT_FALSE(assign_t_norm::forbid_simd());
-        EXPECT_TRUE(assign_t_norm::simd_assign());
+        EXPECT_TRUE(assign_t_norm::simd_linear_assign());
 #endif
 
         EXPECT_TRUE(allclose(fieldnorm, cmplres_norm));
@@ -189,10 +180,7 @@ namespace xt
         using assign_t_arg = xassign_traits<xarray<double>, decltype(cmplres)>;
 
 #if XTENSOR_USE_XSIMD
-        EXPECT_TRUE(assign_t_arg::convertible_types());
-        EXPECT_TRUE(assign_t_arg::simd_size());
-        EXPECT_FALSE(assign_t_arg::forbid_simd());
-        EXPECT_TRUE(assign_t_arg::simd_assign());
+        EXPECT_TRUE(assign_t_arg::simd_linear_assign());
 #endif
 
     }

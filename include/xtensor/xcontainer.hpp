@@ -54,7 +54,6 @@ namespace xt
     template <class T>
     using allocator_type_t = typename detail::allocator_type_impl<T>::type;
 
-
     /**
      * @class xcontainer
      * @brief Base class for dense multidimensional containers.
@@ -85,6 +84,7 @@ namespace xt
         using size_type = typename inner_types::size_type;
         using difference_type = typename storage_type::difference_type;
         using simd_value_type = xt_simd::simd_type<value_type>;
+        using bool_load_type = xt::bool_load_type<value_type>;
 
         using shape_type = typename inner_types::shape_type;
         using strides_type = typename inner_types::strides_type;
@@ -178,7 +178,8 @@ namespace xt
         void store_simd(size_type i, const simd& e);
         template <class align, class requested_type = value_type,
                   std::size_t N = xt_simd::simd_traits<requested_type>::size>
-        simd_return_type<requested_type> load_simd(size_type i) const;
+        container_simd_return_type_t<storage_type, value_type, requested_type>
+        /*simd_return_type<requested_type>*/ load_simd(size_type i) const;
 
         storage_iterator storage_begin() noexcept;
         storage_iterator storage_end() noexcept;
@@ -712,7 +713,8 @@ namespace xt
     template <class D>
     template <class alignment, class requested_type, std::size_t N>
     inline auto xcontainer<D>::load_simd(size_type i) const
-        -> simd_return_type<requested_type>
+        -> container_simd_return_type_t<storage_type, value_type, requested_type>
+        //-> simd_return_type<requested_type>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
         return xt_simd::load_simd<value_type, requested_type>(&(storage()[i]), align_mode());

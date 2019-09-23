@@ -492,10 +492,7 @@ namespace xt
 
         using assign_traits = xassign_traits<TypeParam, decltype(func)>;
 
-        EXPECT_TRUE(assign_traits::convertible_types());
-        EXPECT_TRUE(assign_traits::simd_size());
-        EXPECT_FALSE(assign_traits::forbid_simd());
-        EXPECT_TRUE(assign_traits::simd_assign());
+        EXPECT_TRUE(assign_traits::simd_linear_assign());
 #endif
     }
 
@@ -588,18 +585,12 @@ namespace xt
             auto fd = a + b;
             using assign_traits_double = xassign_traits<TypeParam, decltype(fd)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits_double::convertible_types());
-            EXPECT_TRUE(assign_traits_double::simd_size());
-            EXPECT_FALSE(assign_traits_double::forbid_simd());
-            EXPECT_TRUE(assign_traits_double::simd_assign());
+            EXPECT_TRUE(assign_traits_double::simd_linear_assign());
 #else
             // SFINAE on load_simd is broken on mingw when xsimd is disabled. This using
             // triggers the same error as the one caught by mingw.
             using return_type = decltype(fd.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits_double::convertible_types());
-            EXPECT_FALSE(assign_traits_double::simd_size());
-            EXPECT_TRUE(assign_traits_double::forbid_simd());
-            EXPECT_FALSE(assign_traits_double::simd_assign());
+            EXPECT_FALSE(assign_traits_double::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -611,17 +602,10 @@ namespace xt
             using assign_traits_scalar_double = xassign_traits<TypeParam, decltype(fsd)>;
 #if XTENSOR_USE_XSIMD
             auto batch = fsd.template load_simd<double>(0);
-            EXPECT_TRUE((std::is_same<decltype(batch), xsimd::simd_type<double>>::value));
-            EXPECT_TRUE(assign_traits_scalar_double::convertible_types());
-            EXPECT_TRUE(assign_traits_scalar_double::simd_size());
-            EXPECT_FALSE(assign_traits_scalar_double::forbid_simd());
-            EXPECT_TRUE(assign_traits_scalar_double::simd_assign());
+            EXPECT_TRUE(assign_traits_scalar_double::simd_linear_assign());
 #else
             using return_type = decltype(fsd.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits_scalar_double::convertible_types());
-            EXPECT_FALSE(assign_traits_scalar_double::simd_size());
-            EXPECT_TRUE(assign_traits_scalar_double::forbid_simd());
-            EXPECT_FALSE(assign_traits_scalar_double::simd_assign());
+            EXPECT_FALSE(assign_traits_scalar_double::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -633,16 +617,10 @@ namespace xt
             auto fm = a + c;
             using assign_traits_mixed = xassign_traits<TypeParam, decltype(fm)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits_mixed::convertible_types());
-            EXPECT_TRUE(assign_traits_mixed::simd_size());
-            EXPECT_FALSE(assign_traits_mixed::forbid_simd());
-            EXPECT_TRUE(assign_traits_mixed::simd_assign());
+            EXPECT_TRUE(assign_traits_mixed::simd_linear_assign());
 #else
             using return_type = decltype(fm.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits_mixed::convertible_types());
-            EXPECT_FALSE(assign_traits_mixed::simd_size());
-            EXPECT_TRUE(assign_traits_mixed::forbid_simd());
-            EXPECT_FALSE(assign_traits_mixed::simd_assign());
+            EXPECT_FALSE(assign_traits_mixed::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -653,16 +631,10 @@ namespace xt
             auto fsm = si * a;
             using assign_traits_scalar_mixed = xassign_traits<TypeParam, decltype(fsm)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits_scalar_mixed::convertible_types());
-            EXPECT_TRUE(assign_traits_scalar_mixed::simd_size());
-            EXPECT_FALSE(assign_traits_scalar_mixed::forbid_simd());
-            EXPECT_TRUE(assign_traits_scalar_mixed::simd_assign());
+            EXPECT_TRUE(assign_traits_scalar_mixed::simd_linear_assign());
 #else
             using return_type = decltype(fsm.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits_scalar_mixed::convertible_types());
-            EXPECT_FALSE(assign_traits_scalar_mixed::simd_size());
-            EXPECT_TRUE(assign_traits_scalar_mixed::forbid_simd());
-            EXPECT_FALSE(assign_traits_scalar_mixed::simd_assign());
+            EXPECT_FALSE(assign_traits_scalar_mixed::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -674,16 +646,10 @@ namespace xt
             auto fdc = a + d;
             using assign_traits_char_double = xassign_traits<TypeParam, decltype(fdc)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits_char_double::convertible_types());
-            EXPECT_TRUE(assign_traits_char_double::simd_size());
-            EXPECT_FALSE(assign_traits_char_double::forbid_simd());
-            EXPECT_TRUE(assign_traits_char_double::simd_assign());
+            EXPECT_TRUE(assign_traits_char_double::simd_linear_assign());
 #else
             using return_type = decltype(fdc.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits_char_double::convertible_types());
-            EXPECT_FALSE(assign_traits_char_double::simd_size());
-            EXPECT_TRUE(assign_traits_char_double::forbid_simd());
-            EXPECT_FALSE(assign_traits_char_double::simd_assign());
+            EXPECT_FALSE(assign_traits_char_double::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
@@ -694,16 +660,10 @@ namespace xt
             using bool_container_t = xop_test::rebind_container_t<TypeParam, bool>;
             using assign_traits_gt = xassign_traits<bool_container_t, decltype(fgt)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits_gt::convertible_types());
-            EXPECT_FALSE(assign_traits_gt::simd_size());
-            EXPECT_TRUE(assign_traits_gt::forbid_simd());
-            EXPECT_FALSE(assign_traits_gt::simd_assign());
+            EXPECT_TRUE(assign_traits_gt::simd_linear_assign());
 #else
             using return_type = decltype(fgt.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits_gt::convertible_types());
-            EXPECT_FALSE(assign_traits_gt::simd_size());
-            EXPECT_TRUE(assign_traits_gt::forbid_simd());
-            EXPECT_FALSE(assign_traits_gt::simd_assign());
+            EXPECT_FALSE(assign_traits_gt::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, bool>::value));
 #endif
         }
@@ -716,16 +676,10 @@ namespace xt
             auto fb = b0 || b1;
             using assign_traits_bool_bool = xassign_traits<bool_container_t, decltype(fb)>;
 #if XTENSOR_USE_XSIMD
-            EXPECT_TRUE(assign_traits_bool_bool::convertible_types());
-            EXPECT_FALSE(assign_traits_bool_bool::simd_size());
-            EXPECT_TRUE(assign_traits_bool_bool::forbid_simd());
-            EXPECT_FALSE(assign_traits_bool_bool::simd_assign());
+            EXPECT_TRUE(assign_traits_bool_bool::simd_linear_assign());
 #else
             using return_type = decltype(fb.template load_simd<aligned_mode>(std::size_t(0)));
-            EXPECT_TRUE(assign_traits_bool_bool::convertible_types());
-            EXPECT_FALSE(assign_traits_bool_bool::simd_size());
-            EXPECT_TRUE(assign_traits_bool_bool::forbid_simd());
-            EXPECT_FALSE(assign_traits_bool_bool::simd_assign());
+            EXPECT_FALSE(assign_traits_bool_bool::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, bool>::value));
 #endif
         }
