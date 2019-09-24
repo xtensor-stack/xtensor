@@ -1,5 +1,7 @@
 /***************************************************************************
-* Copyright (c) 2017, Ullrich Koethe                                       *
+* Copyright (c) Johan Mabille, Sylvain Corlay and Wolf Vollprecht          *
+* Copyright (c) Ullrich Koethe
+* Copyright (c) QuantStack                                                 *
 *                                                                          *
 * Distributed under the terms of the BSD 3-Clause License.                 *
 *                                                                          *
