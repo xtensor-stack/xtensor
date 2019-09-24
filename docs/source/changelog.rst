@@ -7,6 +7,86 @@
 Changelog
 =========
 
+0.20.9
+------
+
+- Added alias to check if type is ``xsemantic_base``
+  `#1673 <https://github.com/QuantStack/xtensor/pull/1673>`_
+- Added missing include ``xoperation.hpp``
+  `#1674 <https://github.com/QuantStack/xtensor/pull/1674>`_
+- Moved XSIMD and TBB dependencies to tests only
+  `#1676 <https://github.com/QuantStack/xtensor/pull/1676>`_
+- Added missing coma
+  `#1680 <https://github.com/QuantStack/xtensor/pull/1680>`_
+- Added Numpy-like parameter in ``load_csv``
+  `#1682 <https://github.com/QuantStack/xtensor/pull/1682>`_
+- Added ``shape()`` method to ``xshape.hpp``
+  `#1592 <https://github.com/QuantStack/xtensor/pull/1592>`_
+- Added shape print tip to docs
+  `#1693 <https://github.com/QuantStack/xtensor/pull/1693>`_
+- Fix lvalue npy_file heap corruption in MSVC
+  `#1697 <https://github.com/QuantStack/xtensor/pull/1697>`_
+- Fix UB when parsing 1-dimension npy
+  `#1696 <https://github.com/QuantStack/xtensor/pull/1696>`_
+- Fixed compiler error (missing ``shape`` method in ``xbroadcast`` and ``xscalar``)
+  `#1699 <https://github.com/QuantStack/xtensor/pull/1699>`_
+- Added: deg2rad, rad2deg, degrees, radians
+  `#1700 <https://github.com/QuantStack/xtensor/pull/1700>`_
+- Despecialized xt::to_json and xt::from_json
+  `#1691 <https://github.com/QuantStack/xtensor/pull/1691>`_
+- Added coverity
+  `#1577 <https://github.com/QuantStack/xtensor/pull/1577>`_
+- Additional configuration for future coverity branch
+  `#1712 <https://github.com/QuantStack/xtensor/pull/1712>`_
+- More tests for coverity
+  `#1714 <https://github.com/QuantStack/xtensor/pull/1714>`_
+- Update README.md for Conan installation instructions
+  `#1717 <https://github.com/QuantStack/xtensor/pull/1717>`_
+- Reset stream's flags after output operation
+  `#1718 <https://github.com/QuantStack/xtensor/pull/1718>`_
+- Added missing include in ``xview.hpp``
+  `#1719 <https://github.com/QuantStack/xtensor/pull/1719>`_
+- Removed usage of allocator's members that are deprecated in C++17
+  `#1720 <https://github.com/QuantStack/xtensor/pull/1720>`_
+- Added tests for mixed assignment
+  `#1721 <https://github.com/QuantStack/xtensor/pull/1721>`_
+- Fixed ``step_simd`` when underlying iterator holds an ``xscalar_stepper``
+  `#1724 <https://github.com/QuantStack/xtensor/pull/1724>`_
+- Fixed accumulator for empty arrays
+  `#1725 <https://github.com/QuantStack/xtensor/pull/1725>`_
+- Use ``temporary_type`` in implementation of ``xt::diff``
+  `#1727 <https://github.com/QuantStack/xtensor/pull/1727>`_
+- CMakeLists.txt: bumped up xsimd required version to 7.2.6
+  `#1728 <https://github.com/QuantStack/xtensor/pull/1728>`_
+- Fixed reducers on empty arrays
+  `#1729 <https://github.com/QuantStack/xtensor/pull/1729>`_
+- Implemented additional random distributions
+  `#1708 <https://github.com/QuantStack/xtensor/pull/1708>`_
+- Fixed reducers: passing the same axis many times now throws
+  `#1730 <https://github.com/QuantStack/xtensor/pull/1730>`_
+- Made ``xfixed_container`` optionally sharable
+  `#1733 <https://github.com/QuantStack/xtensor/pull/1733>`_
+- ``step_simd`` template parameter is now the value type instead of the simd type
+  `#1736 <https://github.com/QuantStack/xtensor/pull/1736>`_
+- Implemented OpenMP Parallelization.
+  `#1739 <https://github.com/QuantStack/xtensor/pull/1739>`_
+- Readme improvements
+  `#1741 <https://github.com/QuantStack/xtensor/pull/1741>`_
+- Vectorized ``xt::where``
+  `#1738 <https://github.com/QuantStack/xtensor/pull/1738>`_
+- Fix typos and wording in documentation
+  `#1745 <https://github.com/QuantStack/xtensor/pull/1745>`_
+- Upgraded to xtl 0.6.6. and xsimd 7.4.0
+  `#1747 <https://github.com/QuantStack/xtensor/pull/1747>`_
+- Improve return value type for ``nanmean``
+  `#1749 <https://github.com/QuantStack/xtensor/pull/1749>`_
+- Allows (de)serialization of xexpressions in NumPy formatted strings and streams
+  `#1751 <https://github.com/QuantStack/xtensor/pull/1751>`_
+- Enabled vectorization of boolean operations
+  `#1748 <https://github.com/QuantStack/xtensor/pull/1748>`_
+- Added the list of contributors
+  `#1755 <https://github.com/QuantStack/xtensor/pull/1755>`_
+
 0.20.8
 ------
 
