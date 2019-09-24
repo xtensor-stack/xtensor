@@ -78,7 +78,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long);          
 XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);       \
 
 
-#define XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, R)                                  \
+#define XTENSOR_UNARY_MATH_FUNCTOR(NAME)                                          \
     struct NAME##_fun                                                             \
     {                                                                             \
         template <class T>                                                        \
@@ -94,9 +94,6 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg);                                                     \
         }                                                                         \
     }
-
-#define XTENSOR_UNARY_MATH_FUNCTOR(NAME) XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, T)
-#define XTENSOR_UNARY_BOOL_FUNCTOR(NAME) XTENSOR_UNARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
 #define XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING(NAME)                         \
     struct NAME##_fun                                                             \
@@ -115,7 +112,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }                                                                         \
     }
 
-#define XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, R)                                 \
+#define XTENSOR_BINARY_MATH_FUNCTOR(NAME)                                         \
     struct NAME##_fun                                                             \
     {                                                                             \
         template <class T1, class T2>                                             \
@@ -132,10 +129,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }                                                                         \
     }
 
-#define XTENSOR_BINARY_MATH_FUNCTOR(NAME) XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, T)
-#define XTENSOR_BINARY_BOOL_FUNCTOR(NAME) XTENSOR_BINARY_MATH_FUNCTOR_IMPL(NAME, bool)
-
-#define XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, R)                                \
+#define XTENSOR_TERNARY_MATH_FUNCTOR(NAME)                                        \
     struct NAME##_fun                                                             \
     {                                                                             \
         template <class T1, class T2, class T3>                                   \
@@ -153,9 +147,6 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
             return NAME(arg1, arg2, arg3);                                        \
         }                                                                         \
     }
-
-#define XTENSOR_TERNARY_MATH_FUNCTOR(NAME) XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, T)
-#define XTENSOR_TERNARY_BOOL_FUNCTOR(NAME) XTENSOR_TERNARY_MATH_FUNCTOR_IMPL(NAME, bool)
 
     namespace math
     {
@@ -347,20 +338,14 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         XTENSOR_UNARY_MATH_FUNCTOR(round);
         XTENSOR_UNARY_MATH_FUNCTOR(nearbyint);
         XTENSOR_UNARY_MATH_FUNCTOR(rint);
-        XTENSOR_UNARY_BOOL_FUNCTOR(isfinite);
-        XTENSOR_UNARY_BOOL_FUNCTOR(isinf);
-        XTENSOR_UNARY_BOOL_FUNCTOR(isnan);
+        XTENSOR_UNARY_MATH_FUNCTOR(isfinite);
+        XTENSOR_UNARY_MATH_FUNCTOR(isinf);
+        XTENSOR_UNARY_MATH_FUNCTOR(isnan);
     }
 
 #undef XTENSOR_UNARY_MATH_FUNCTOR
-#undef XTENSOR_UNARY_BOOL_FUNCTOR
-#undef XTENSOR_UNARY_MATH_FUNCTOR_IMPL
 #undef XTENSOR_BINARY_MATH_FUNCTOR
-#undef XTENSOR_BINARY_BOOL_FUNCTOR
-#undef XTENSOR_BINARY_MATH_FUNCTOR_IMPL
 #undef XTENSOR_TERNARY_MATH_FUNCTOR
-#undef XTENSOR_TERNARY_BOOL_FUNCTOR
-#undef XTENSOR_TERNARY_MATH_FUNCTOR_IMPL
 #undef XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
 #undef XTENSOR_UNSIGNED_ABS_FUNC
 
