@@ -29,7 +29,7 @@ namespace xt
      * helpers *
      ***********/
 
-#define UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
+#define UNARY_OPERATOR_FUNCTOR(NAME, OP)                                        \
     struct NAME                                                                 \
     {                                                                           \
         template <class A1>                                                     \
@@ -44,10 +44,7 @@ namespace xt
         }                                                                       \
     }
 
-#define UNARY_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
-#define UNARY_BOOL_OPERATOR_FUNCTOR(NAME, OP) UNARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, bool)
-
-#define BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, R)                                \
+#define BINARY_OPERATOR_FUNCTOR(NAME, OP)                                        \
     struct NAME                                                                  \
     {                                                                            \
         template <class T1, class T2>                                            \
@@ -62,9 +59,6 @@ namespace xt
         }                                                                        \
     }
 
-#define BINARY_OPERATOR_FUNCTOR(NAME, OP) BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, T)
-#define BINARY_BOOL_OPERATOR_FUNCTOR(NAME, OP) BINARY_OPERATOR_FUNCTOR_IMPL(NAME, OP, bool)
-
     namespace detail
     {
 
@@ -75,21 +69,21 @@ namespace xt
         BINARY_OPERATOR_FUNCTOR(multiplies, *);
         BINARY_OPERATOR_FUNCTOR(divides, /);
         BINARY_OPERATOR_FUNCTOR(modulus, %);
-        BINARY_BOOL_OPERATOR_FUNCTOR(logical_or, ||);
-        BINARY_BOOL_OPERATOR_FUNCTOR(logical_and, &&);
-        UNARY_BOOL_OPERATOR_FUNCTOR(logical_not, !);
+        BINARY_OPERATOR_FUNCTOR(logical_or, ||);
+        BINARY_OPERATOR_FUNCTOR(logical_and, &&);
+        UNARY_OPERATOR_FUNCTOR(logical_not, !);
         BINARY_OPERATOR_FUNCTOR(bitwise_or, |);
         BINARY_OPERATOR_FUNCTOR(bitwise_and, &);
         BINARY_OPERATOR_FUNCTOR(bitwise_xor, ^);
         UNARY_OPERATOR_FUNCTOR(bitwise_not, ~);
         BINARY_OPERATOR_FUNCTOR(left_shift, <<);
         BINARY_OPERATOR_FUNCTOR(right_shift, >>);
-        BINARY_BOOL_OPERATOR_FUNCTOR(less, <);
-        BINARY_BOOL_OPERATOR_FUNCTOR(less_equal, <=);
-        BINARY_BOOL_OPERATOR_FUNCTOR(greater, >);
-        BINARY_BOOL_OPERATOR_FUNCTOR(greater_equal, >=);
-        BINARY_BOOL_OPERATOR_FUNCTOR(equal_to, ==);
-        BINARY_BOOL_OPERATOR_FUNCTOR(not_equal_to, !=);
+        BINARY_OPERATOR_FUNCTOR(less, <);
+        BINARY_OPERATOR_FUNCTOR(less_equal, <=);
+        BINARY_OPERATOR_FUNCTOR(greater, >);
+        BINARY_OPERATOR_FUNCTOR(greater_equal, >=);
+        BINARY_OPERATOR_FUNCTOR(equal_to, ==);
+        BINARY_OPERATOR_FUNCTOR(not_equal_to, !=);
 
         struct conditional_ternary
         {
@@ -179,11 +173,7 @@ namespace xt
     }
 
 #undef UNARY_OPERATOR_FUNCTOR
-#undef UNARY_BOOL_OPERATOR_FUNCTOR
-#undef UNARY_OPERATOR_FUNCTOR_IMPL
 #undef BINARY_OPERATOR_FUNCTOR
-#undef BINARY_BOOL_OPERATOR_FUNCTOR
-#undef BINARY_OPERATOR_FUNCTOR_IMPL
 
     /*************
      * operators *
