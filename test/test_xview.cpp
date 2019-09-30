@@ -1477,4 +1477,15 @@ namespace xt
         noalias(view(reshape_view(a, {3}), xt::all())) = b;
         EXPECT_EQ(tmp, res);
     }
+
+    TEST(xview, view_on_bool)
+    {
+        xt::xarray<bool> a { { false, false }, { false, false } };
+        xt::xarray<bool> b { {  true,  true }, {  true,  true } };
+        xt::view( a, 0 ) = xt::view( b, 0 );
+        EXPECT_TRUE(a(0, 0));
+        EXPECT_TRUE(a(0, 1));
+        EXPECT_FALSE(a(1, 0));
+        EXPECT_FALSE(a(1, 1));
+    }
 }
