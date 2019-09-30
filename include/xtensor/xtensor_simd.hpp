@@ -299,7 +299,7 @@ namespace xt
 
     template <class C, class T1, class T2>
     struct container_simd_return_type
-        : std::enable_if<!forbid_simd<C>::value, xt_simd::simd_return_type<T1, T2>>
+        : std::enable_if<!forbid_simd<C>::value, xt_simd::simd_return_type<T1, bool_load_type<T2>>>
     {
     };
 
