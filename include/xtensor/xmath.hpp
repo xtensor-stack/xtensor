@@ -351,12 +351,12 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 
 namespace detail {
     template <class R, class T>
-    std::enable_if_t<std::is_arithmetic<R>::value, R> fill_init(T init) {
+    std::enable_if_t<!has_iterator_interface<R>::value, R> fill_init(T init) {
         return R(init);
     }
 
     template <class R, class T>
-    std::enable_if_t<!std::is_arithmetic<R>::value, R> fill_init(T init) {
+    std::enable_if_t<has_iterator_interface<R>::value, R> fill_init(T init) {
         R result;
         std::fill(std::begin(result), std::end(result), init);
         return result;

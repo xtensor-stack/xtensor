@@ -597,6 +597,17 @@ namespace xt
     {
     };
 
+    template <class E, class = void>
+    struct has_iterator_interface : std::false_type
+    {
+    };
+
+    template <class E>
+    struct has_iterator_interface<E, void_t<decltype(std::declval<E>().begin())>>
+        : std::true_type
+    {
+    };
+
     /********************************************
      * xtrivial_default_construct implemenation *
      ********************************************/
