@@ -667,4 +667,12 @@ namespace xt
         xt::xarray<int> a = xt::ones<int>({ 3, 2});
         EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
     }
+
+    TEST(xreducer, sum_xtensor_of_fixed)
+    {
+        xt::xtensor_fixed<float, xt::xshape<3>> a = {1, 2, 3}, b = {1, 2, 3};
+        xt::xtensor<xt::xtensor_fixed<float, xt::xshape<3>>, 1> c = {a, b};
+        auto res = xt::sum(c)();
+        EXPECT_EQ(res, a * 2);
+    }
 }

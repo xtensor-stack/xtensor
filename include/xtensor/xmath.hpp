@@ -349,6 +349,20 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
 #undef XTENSOR_UNARY_MATH_FUNCTOR_COMPLEX_REDUCING
 #undef XTENSOR_UNSIGNED_ABS_FUNC
 
+namespace detail {
+    template <class R, class T>
+    std::enable_if_t<!has_iterator_interface<R>::value, R> fill_init(T init) {
+        return R(init);
+    }
+
+    template <class R, class T>
+    std::enable_if_t<has_iterator_interface<R>::value, R> fill_init(T init) {
+        R result;
+        std::fill(std::begin(result), std::end(result), init);
+        return result;
+    }
+}
+
 #define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, INIT)                                                \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
               XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>             \
@@ -356,8 +370,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)),                                \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
+                          init_value_fct(detail::fill_init<result_type>(INIT))),                                  \
                           std::forward<E>(e),                                                                     \
                           std::forward<X>(axes), es);                                                             \
     }                                                                                                             \
@@ -375,8 +390,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)), std::forward<E>(e), es);       \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
+                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), es);         \
     }
 
 #define XTENSOR_OLD_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                               \
@@ -385,8 +401,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)), std::forward<E>(e), axes, es); \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
+                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
     }
 
 #define XTENSOR_MODERN_CLANG_REDUCER(NAME, FUNCTOR, RESULT_TYPE, INIT)                                            \
@@ -395,8 +412,9 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
         using functor_type = FUNCTOR<result_type>;                                                                \
-        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                                \
-        return xt::reduce(make_xreducer_functor(functor_type(), init_value_fct(INIT)), std::forward<E>(e), axes, es); \
+        using init_value_fct = xt::const_value<result_type/*, INIT*/>;                                            \
+        return xt::reduce(make_xreducer_functor(functor_type(),                                                   \
+                          init_value_fct(detail::fill_init<result_type>(INIT))), std::forward<E>(e), axes, es);   \
     }
 
     /*******************
