@@ -177,6 +177,7 @@ namespace xt
         using base_type::strides;
         using base_type::backstrides;
         using base_type::layout;
+        using base_type::is_contiguous;
 
         using base_type::operator();
         using base_type::at;

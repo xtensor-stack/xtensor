@@ -136,6 +136,7 @@ namespace xt
         void reshape(std::initializer_list<T> shape, layout_type layout = static_layout);
 
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
         template <class T>
         void fill(const T& value);
@@ -439,6 +440,12 @@ namespace xt
     inline layout_type xoptional_assembly_base<D>::layout() const noexcept
     {
         return value().layout();
+    }
+
+    template <class D>
+    inline bool xoptional_assembly_base<D>::is_contiguous() const noexcept
+    {
+        return value().is_contiguous();
     }
 
     /**

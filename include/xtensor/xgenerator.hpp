@@ -128,6 +128,7 @@ namespace xt
 
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
         using accessible_base::shape;
 
         template <class... Args>
@@ -232,6 +233,12 @@ namespace xt
     inline layout_type xgenerator<F, R, S>::layout() const noexcept
     {
         return static_layout;
+    }
+
+    template <class F, class R, class S>
+    inline bool xgenerator<F, R, S>::is_contiguous() const noexcept
+    {
+        return false;
     }
 
     //@}

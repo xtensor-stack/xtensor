@@ -141,6 +141,7 @@ namespace xt
         const inner_strides_type& strides() const noexcept;
         const inner_backstrides_type& backstrides() const noexcept;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
         using base_type::shape;
 
         reference operator()();
@@ -401,6 +402,13 @@ namespace xt
     {
         return m_layout;
     }
+
+    template <class D>
+    inline bool xstrided_view_base<D>::is_contiguous() const noexcept
+    {
+        return m_layout != layout_type::dynamic && m_e.is_contiguous();
+    }
+
     //@}
 
     /**

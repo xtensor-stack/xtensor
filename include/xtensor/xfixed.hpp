@@ -353,6 +353,7 @@ namespace xt
         bool broadcast_shape(ST& s, bool reuse_cache = false) const;
 
         constexpr layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
     private:
 
@@ -485,6 +486,7 @@ namespace xt
         bool broadcast_shape(ST& s, bool reuse_cache = false) const;
 
         constexpr layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
     private:
 
@@ -717,6 +719,15 @@ namespace xt
     }
 
     template <class ET, class S, layout_type L, bool SH, class Tag>
+    inline bool xfixed_container<ET, S, L, SH, Tag>::is_contiguous() const noexcept
+    {
+        using str_type = typename inner_strides_type::value_type;
+        return m_strides.empty()
+            || (layout() == layout_type::row_major && m_strides.back() == str_type(1))
+            || (layout() == layout_type::column_major && m_strides.front() == str_type(1));
+    }
+
+    template <class ET, class S, layout_type L, bool SH, class Tag>
     inline auto xfixed_container<ET, S, L, SH, Tag>::storage_impl() noexcept -> storage_type&
     {
         return m_storage;
@@ -901,6 +912,15 @@ namespace xt
     constexpr layout_type xfixed_adaptor<EC, S, L, SH, Tag>::layout() const noexcept
     {
         return base_type::static_layout;
+    }
+
+    template <class EC, class S, layout_type L, bool SH, class Tag>
+    inline bool xfixed_adaptor<EC, S, L, SH, Tag>::is_contiguous() const noexcept
+    {
+        using str_type = typename inner_strides_type::value_type;
+        return m_strides.empty()
+            || (layout() == layout_type::row_major && m_strides.back() == str_type(1))
+            || (layout() == layout_type::column_major && m_strides.front() == str_type(1));
     }
 
     template <class EC, class S, layout_type L, bool SH, class Tag>

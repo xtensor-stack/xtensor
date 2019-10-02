@@ -253,6 +253,14 @@ namespace xt
             return false;
         }
 
+        template <class E1, class E2>
+        inline bool linear_dynamic_layout(const E1& e1, const E2& e2)
+        {
+            return e1.is_contiguous()
+                && e2.is_contiguous()
+                && compute_layout(e1.layout(), e2.layout()) != layout_type::dynamic;
+        }
+
         template <class E, class = void>
         struct has_step_leading : std::false_type
         {
@@ -304,17 +312,20 @@ namespace xt
         static constexpr bool simd_size_impl() { return xt_simd::simd_traits<T>::size > 1 || (is_bool<T>::value && use_xsimd()); }
         static constexpr bool simd_size() { return simd_size_impl<e1_value_type>() && simd_size_impl<e2_value_type>(); }
         static constexpr bool simd_interface() { return has_simd_interface<E2, requested_value_type>(); }
-        static constexpr bool simd_assign() { return convertible_types() && simd_size() && simd_interface(); }
-    
+
     public:
         
         // constexpr methods instead of constexpr data members avoid the need of definitions at namespace
         // scope of these data members (since they are odr-used).
 
+        static constexpr bool simd_assign() { return convertible_types() && simd_size() && simd_interface(); }
         static constexpr bool linear_assign(const E1& e1, const E2& e2, bool trivial) { return trivial && detail::is_linear_assign(e1, e2); }
         static constexpr bool strided_assign() { return detail::use_strided_loop<E1>::value && detail::use_strided_loop<E2>::value; }
         static constexpr bool simd_linear_assign() { return contiguous_layout() && simd_assign(); }
         static constexpr bool simd_strided_assign() { return strided_assign() && simd_assign(); }
+
+        static constexpr bool simd_linear_assign(const E1& e1, const E2& e2) { return simd_assign()
+                                                                                && detail::linear_dynamic_layout(e1, e2); }
 
         using requested_value_type = std::conditional_t<is_bool<e2_value_type>::value,
                                                         typename E2::bool_load_type,
@@ -330,11 +341,24 @@ namespace xt
         using traits = xassign_traits<E1, E2>;
 
         bool linear_assign = traits::linear_assign(de1, de2, trivial);
+        constexpr bool simd_assign = traits::simd_linear_assign();
         constexpr bool simd_linear_assign = traits::simd_linear_assign();
         constexpr bool simd_strided_assign = traits::simd_strided_assign();
         if (linear_assign)
         {
-            linear_assigner<simd_linear_assign>::run(de1, de2);
+            if(simd_linear_assign || traits::simd_linear_assign(de1, de2))
+            {
+                // Do not use linear_assigner<true> here since it will make the compiler
+                // instantiate this branch even if the runtime condition is false, resulting
+                // in compilation error for expressions that do not provide a SIMD interface.
+                // simd_assign is true if simd_linear_assign() or simd_linear_assign(de1, de2)
+                // is true.
+                linear_assigner<simd_assign>::run(de1, de2);
+            }
+            else
+            {
+                linear_assigner<false>::run(de1, de2);
+            }
         }
         else if (simd_strided_assign)
         {

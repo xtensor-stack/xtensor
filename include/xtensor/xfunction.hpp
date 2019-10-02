@@ -192,7 +192,7 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
 
         static constexpr layout_type static_layout = compute_layout(std::decay_t<CT>::static_layout...);
-        static constexpr bool contiguous_layout = detail::conjunction_c<std::decay_t<CT>::contiguous_layout...>::value;
+        static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
         template <layout_type L>
         using layout_iterator = typename iterable_base::template layout_iterator<L>;
@@ -237,6 +237,7 @@ namespace xt
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
         using accessible_base::shape;
 
         template <class... Args>
@@ -522,6 +523,13 @@ namespace xt
     {
         return layout_impl(std::make_index_sequence<sizeof...(CT)>());
     }
+
+    template <class F, class... CT>
+    inline bool xfunction<F, CT...>::is_contiguous() const noexcept
+    {
+        return layout() != layout_type::dynamic && accumulate([](bool r, const auto& exp) { return r && exp.is_contiguous(); }, true, m_e);
+    }
+
     //@}
 
     /**

@@ -139,6 +139,7 @@ namespace xt
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
         template <class T>
         void fill(const T& value);
@@ -353,6 +354,12 @@ namespace xt
     inline layout_type xindex_view<CT, I>::layout() const noexcept
     {
         return static_layout;
+    }
+
+    template <class CT, class I>
+    inline bool xindex_view<CT, I>::is_contiguous() const noexcept
+    {
+        return false;
     }
 
     //@}

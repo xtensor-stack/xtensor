@@ -155,6 +155,7 @@ namespace xt
         using accessible_base::shape;
 
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
         template <class... Args>
         reference operator()(Args... args);
@@ -694,6 +695,12 @@ namespace xt
     inline layout_type xfunctor_applier_base<D>::layout() const noexcept
     {
         return m_e.layout();
+    }
+
+    template <class D>
+    inline bool xfunctor_applier_base<D>::is_contiguous() const noexcept
+    {
+        return m_e.is_contiguous();
     }
     //@}
 
