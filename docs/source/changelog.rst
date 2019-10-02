@@ -7,6 +7,16 @@
 Changelog
 =========
 
+0.20.10
+-------
+
+- Simplified functors definition
+  `#1756 <https://github.com/QuantStack/xtensor/pull/1756>`_
+- Fixed ``container_simd_return_type``
+  `#1759 <https://github.com/QuantStack/xtensor/pull/1759>`_
+- Fixed reducer init for ``xtensor_fixed`` value type
+  `#1761 <https://github.com/QuantStack/xtensor/pull/1761>`_
+
 0.20.9
 ------
 
