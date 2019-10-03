@@ -179,6 +179,7 @@ namespace xt
         const inner_shape_type& shape() const noexcept;
         size_type shape(size_type i) const noexcept;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -331,6 +332,13 @@ namespace xt
     {
         return m_e.layout();
     }
+
+    template <class CT, class X>
+    inline bool xbroadcast<CT, X>::is_contiguous() const noexcept
+    {
+        return false;
+    }
+
     //@}
 
     /**

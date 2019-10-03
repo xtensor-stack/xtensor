@@ -284,6 +284,7 @@ namespace xt
         void reshape(std::initializer_list<T> shape, layout_type layout = base_type::static_layout);
 
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
     protected:
 
@@ -313,10 +314,7 @@ namespace xt
         template <class S = shape_type>
         void reshape_impl(S&& shape, std::false_type, layout_type layout = base_type::static_layout);
 
-        layout_type& mutable_layout() noexcept
-        {
-            return m_layout;
-        }
+        layout_type& mutable_layout() noexcept;
 
     private:
 
@@ -867,9 +865,18 @@ namespace xt
      * @return layout_type of the container
      */
     template <class D>
-    layout_type xstrided_container<D>::layout() const noexcept
+    inline layout_type xstrided_container<D>::layout() const noexcept
     {
         return m_layout;
+    }
+
+    template <class D>
+    inline bool xstrided_container<D>::is_contiguous() const noexcept
+    {
+        using str_type = typename inner_strides_type::value_type;
+        return m_strides.empty()
+            || (m_layout == layout_type::row_major && m_strides.back() == str_type(1))
+            || (m_layout == layout_type::column_major && m_strides.front() == str_type(1));
     }
 
     namespace detail
@@ -1009,6 +1016,7 @@ namespace xt
         resize_container(m_backstrides, m_shape.size());
         compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
     }
+
     template <class D>
     template <class S>
     inline void xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
@@ -1041,6 +1049,12 @@ namespace xt
         resize_container(m_strides, m_shape.size());
         resize_container(m_backstrides, m_shape.size());
         compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
+    }
+    
+    template <class D>
+    inline auto xstrided_container<D>::mutable_layout() noexcept -> layout_type&
+    {
+        return m_layout;
     }
 }
 

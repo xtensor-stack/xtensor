@@ -701,6 +701,51 @@ namespace xt
         EXPECT_EQ(b, bexp);
     }
 
+    TEST(operation, dynamic_simd_assign)
+    {
+        using array_type = xt::xarray<double, layout_type::dynamic>;
+        array_type a({2, 3}, layout_type::row_major);
+        array_type b({2, 3}, layout_type::column_major);
+
+        auto frr = a + a;
+        auto frc = a + b;
+        auto fcc = b + b;
+
+        using frr_traits = xassign_traits<array_type, decltype(frr)>;
+        using frc_traits = xassign_traits<array_type, decltype(frc)>;
+        using fcc_traits = xassign_traits<array_type, decltype(fcc)>;
+
+        EXPECT_FALSE(frr_traits::simd_linear_assign());
+        EXPECT_FALSE(frc_traits::simd_linear_assign());
+        EXPECT_FALSE(fcc_traits::simd_linear_assign());
+
+        {
+            SCOPED_TRACE("row_major + row_major");
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(frr_traits::simd_linear_assign(a, frr));
+#else
+            EXPECT_FALSE(frr_traits::simd_linear_assign(a, frr));
+#endif
+            EXPECT_FALSE(frr_traits::simd_linear_assign(b, frr));
+        }
+
+        {
+            SCOPED_TRACE("row_major + column_major");
+            EXPECT_FALSE(frc_traits::simd_linear_assign(a, frc));
+            EXPECT_FALSE(frc_traits::simd_linear_assign(b, frc));
+        }
+
+        {
+            SCOPED_TRACE("row_major + column_major");
+            EXPECT_FALSE(fcc_traits::simd_linear_assign(a, fcc));
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(fcc_traits::simd_linear_assign(b, fcc));
+#else
+            EXPECT_FALSE(fcc_traits::simd_linear_assign(b, fcc));
+#endif
+        }
+    }
+
     TEST(operation, left_shift)
     {
         xarray<int> arr({5,1, 1000});

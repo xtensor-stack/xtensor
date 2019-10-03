@@ -436,6 +436,7 @@ namespace xt
         const inner_shape_type& shape() const noexcept;
         const slice_type& slices() const noexcept;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
         using accessible_base::shape;
 
         template <class T>
@@ -922,6 +923,13 @@ namespace xt
             return layout_type::dynamic;
         });
     }
+
+    template <class CT, class... S>
+    inline bool xview<CT, S...>::is_contiguous() const noexcept
+    {
+        return layout() != layout_type::dynamic;
+    }
+
     //@}
 
     /**

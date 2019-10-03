@@ -166,6 +166,7 @@ namespace xt
         using accessible_base::shape;
 
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
         template <class T>
         void fill(const T& value);
@@ -356,6 +357,12 @@ namespace xt
     inline layout_type xmasked_view<CTD, CTM>::layout() const noexcept
     {
         return m_data.layout();
+    }
+
+    template <class CTD, class CTM>
+    inline bool xmasked_view<CTD, CTM>::is_contiguous() const noexcept
+    {
+        return false;
     }
 
     /**

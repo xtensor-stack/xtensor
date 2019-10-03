@@ -718,6 +718,7 @@ namespace xt
 
         const inner_shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -1242,6 +1243,13 @@ namespace xt
     {
         return static_layout;
     }
+
+    template <class F, class CT, class X, class O>
+    inline bool xreducer<F, CT, X, O>::is_contiguous() const noexcept
+    {
+        return false;
+    }
+
     //@}
 
     /**

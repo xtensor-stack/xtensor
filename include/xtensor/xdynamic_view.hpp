@@ -159,6 +159,7 @@ namespace xt
         using base_type::dimension;
         using base_type::shape;
         using base_type::layout;
+        using base_type::is_contiguous;
 
         // Explicitly deleting strides method to avoid compilers complaining
         // about not being able to call the strides method from xstrided_view_base

@@ -155,6 +155,7 @@ namespace xt
         const shape_type& shape() const noexcept;
         size_type shape(size_type i) const noexcept;
         layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
         using accessible_base::dimension;
         using accessible_base::shape;
 
@@ -544,6 +545,12 @@ namespace xt
     inline layout_type xscalar<CT>::layout() const noexcept
     {
         return static_layout;
+    }
+
+    template <class CT>
+    inline bool xscalar<CT>::is_contiguous() const noexcept
+    {
+        return true;
     }
 
     template <class CT>
