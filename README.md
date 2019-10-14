@@ -1,11 +1,11 @@
 # ![xtensor](docs/source/xtensor.svg)
 
-[![Travis](https://travis-ci.org/QuantStack/xtensor.svg?branch=master)](https://travis-ci.org/QuantStack/xtensor)
-[![Appveyor](https://ci.appveyor.com/api/projects/status/quf1hllkedr0rxbk?svg=true)](https://ci.appveyor.com/project/QuantStack/xtensor)
-[![Azure](https://dev.azure.com/johanmabille/johanmabille/_apis/build/status/QuantStack.xtensor?branchName=master)](https://dev.azure.com/johanmabille/johanmabille/_build/latest?definitionId=3&branchName=master)
+[![Travis](https://travis-ci.org/xtensor-stack/xtensor.svg?branch=master)](https://travis-ci.org/xtensor-stack/xtensor)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/dljjg79povwgncuf?svg=true)](https://ci.appveyor.com/project/xtensor-stack/xtensor)
+[![Azure](https://dev.azure.com/xtensor-stack/xtensor-stack/_apis/build/status/xtensor-stack.xtensor?branchName=master)](https://dev.azure.com/xtensor-stack/xtensor-stack/_build/latest?definitionId=4&branchName=master)
 [![Coverity](https://scan.coverity.com/projects/18335/badge.svg)](https://scan.coverity.com/projects/xtensor)
 [![Documentation](http://readthedocs.org/projects/xtensor/badge/?version=latest)](https://xtensor.readthedocs.io/en/latest/?badge=latest)
-[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
+[![Binder](https://mybinder.org/badge.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks%2Fxtensor.ipynb)
 [![Join the Gitter Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/QuantStack/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Multi-dimensional arrays with broadcasting and lazy computing.
