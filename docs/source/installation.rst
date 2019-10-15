@@ -106,4 +106,4 @@ installation mode you choose, you can add ``xtensor`` to your project using cmak
     target_include_directories(your_target PUBLIC ${xtensor_INCLUDE_DIRS})
     target_link_libraries(your_target PUBLIC xtensor)
 
-.. _xtl: https://github.com/QuantStack/xtl
+.. _xtl: https://github.com/xtensor-stack/xtl

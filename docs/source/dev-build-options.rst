@@ -78,5 +78,5 @@ including any of its header. Here is a list of available macros:
 - ``XTENSOR_DEFAULT_TRAVERSAL``: defines the default traversal order (row_major, column_major) for algorithms and iterators on tensors
   and arrays. We *strongly* discourage using this macro, which is provided for testing purpose.
 
-.. _xsimd: https://github.com/QuantStack/xsimd
+.. _xsimd: https://github.com/xtensor-stack/xsimd
 .. _tbb: https://www.threadingbuildingblocks.org

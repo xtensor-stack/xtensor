@@ -11,7 +11,7 @@ File input and output
 The base xtensor package allows to save and load data in the ``.csv``, ``.json`` and ``.npy``
 format.
 Please note that many more input and output formats are available in the `xtensor-io
-<https://github.com/QuantStack/xtensor-io>`_ package.
+<https://github.com/xtensor-stack/xtensor-io>`_ package.
 ``xtensor-io`` offers functions to load and store from image files (``jpg``, ``gif``, ``png``...),
 sound files (``wav``, ``ogg``...), HDF5 files (``h5``, ``hdf5``, ...), and compressed numpy format (``npz``).
 
