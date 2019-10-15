@@ -459,7 +459,7 @@ and also provides a python wrapper based on ``xtensor-python``.
 .. _xtensor-ros: https://github.com/wolfv/xtensor_ros
 .. _xsimd: https://github.com/xtensor-stack/xsimd
 .. _xtl: https://github.com/xtensor-stack/xtl
-.. _xframe: https://github.com/QuantStack/xframe
+.. _xframe: https://github.com/xtensor-stack/xframe
 .. _z5: https://github.com/constantinpape/z5
 .. _zarr: https://github.com/zarr-developers/zarr
 .. _n5: https://github.com/saalfeldlab/n5i
