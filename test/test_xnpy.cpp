@@ -142,7 +142,7 @@ namespace xt
 
     TEST(xnpy, xfunction_cast)
     {
-        // compilation test, cf: https://github.com/QuantStack/xtensor/issues/1070
+        // compilation test, cf: https://github.com/xtensor-stack/xtensor/issues/1070
         auto dc = cast<char>(load_npy<double>("files/xnpy_files/double.npy"));
         EXPECT_EQ(dc(0, 0), 0);
         xarray<char> adc = dc;

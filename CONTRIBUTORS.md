@@ -79,5 +79,5 @@ We are currently looking for contributors for the following:
 - Improving the tests
 - Increasing Numpy API coverage
 
-See the [Newcomer friendly project](https://github.com/QuantStack/xtensor/projects/1) for more detail.
+See the [Newcomer friendly project](https://github.com/xtensor-stack/xtensor/projects/1) for more detail.
 

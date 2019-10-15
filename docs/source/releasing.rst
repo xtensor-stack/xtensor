@@ -13,7 +13,7 @@ Releasing a new version
 From the master branch of xtensor
 
 - Make sure that you are in sync with the master branch of the upstream remote.
-- Update the `changelog <https://github.com/QuantStack/xtensor/blob/master/docs/source/changelog.rst>`_.
+- Update the `changelog <https://github.com/xtensor-stack/xtensor/blob/master/docs/source/changelog.rst>`_.
 - In file ``xtensor_config.hpp``, set the macros for ``XTENSOR_VERSION_MAJOR``, ``XTENSOR_VERSION_MINOR`` and ``XTENSOR_VERSION_PATCH`` to the desired values.
 - In file ``CMakeLists.txt``, update the version of the dependencies and the corresponding variables, e.g. ``xtl_REQUIRED_VERSION``.
 - In file ``environment.yml``, update the version of the dependencies including ``xtensor``.

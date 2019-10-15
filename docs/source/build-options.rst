@@ -103,5 +103,5 @@ Whether you enabled ``XTENSOR_USE_XSIMD`` or not, it is highly recommended to bu
 Notice that this option prevents building on a machine and distributing the resulting binary on another machine with
 a different architecture (i.e. not supporting the same instruction set).
 
-.. _xsimd: https://github.com/QuantStack/xsimd
+.. _xsimd: https://github.com/xtensor-stack/xsimd
 .. _tbb: https://www.threadingbuildingblocks.org

@@ -112,7 +112,7 @@ strided view on a dynamic_view errors with a message: use of deleted function.
 It should pick the *other* implementation by SFINAE on the function
 signature, because our ``has_strides<dynamic_view>`` meta-function should return
 false. Instantiating the ``has_strides<dynamic_view>`` in the inner_types fixes the issue.
-Original issue here: https://github.com/QuantStack/xtensor/issues/1273
+Original issue here: https://github.com/xtensor-stack/xtensor/issues/1273
 
 Apple LLVM version >= 8.0.0
 ---------------------------

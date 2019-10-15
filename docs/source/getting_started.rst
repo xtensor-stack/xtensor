@@ -101,7 +101,7 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
 
 .. note::
 
-    `xsimd <https://github.com/QuantStack/xsimd>`_ is an optional dependency of xtensor that enable simd
+    `xsimd <https://github.com/xtensor-stack/xsimd>`_ is an optional dependency of xtensor that enable simd
     acceleration, i.e. executing a same operation on a batch of data in a single CPU instruction. This
     is well-suited to improve performance when operating on tensors.
 

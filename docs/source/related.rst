@@ -419,8 +419,7 @@ xtl
    :alt: xtl
 
 The xtl_ project, the only dependency of ``xtensor`` is a C++ template library
-holding the implementation of basic tools used across the libraries in the
-QuantStack ecosystem.
+holding the implementation of basic tools used across the libraries in the ecosystem.
 
 xframe
 ------
@@ -449,17 +448,17 @@ and efficient cloud based storage, crucial requirements in modern big data appli
 The project uses ``xtensor`` to represent arrays in memory
 and also provides a python wrapper based on ``xtensor-python``.
 
-.. _xtensor-python: https://github.com/QuantStack/xtensor-python
-.. _xtensor-python-cookiecutter: https://github.com/QuantStack/xtensor-python-cookiecutter
-.. _xtensor-julia: https://github.com/QuantStack/xtensor-julia
-.. _xtensor-julia-cookiecutter: https://github.com/QuantStack/xtensor-julia-cookiecutter
-.. _xtensor-r: https://github.com/QuantStack/xtensor-r
-.. _xtensor-blas: https://github.com/QuantStack/xtensor-blas
-.. _xtensor-io: https://github.com/QuantStack/xtensor-io
+.. _xtensor-python: https://github.com/xtensor-stack/xtensor-python
+.. _xtensor-python-cookiecutter: https://github.com/xtensor-stack/xtensor-python-cookiecutter
+.. _xtensor-julia: https://github.com/xtensor-stack/xtensor-julia
+.. _xtensor-julia-cookiecutter: https://github.com/xtensor-stack/xtensor-julia-cookiecutter
+.. _xtensor-r: https://github.com/xtensor-stack/xtensor-r
+.. _xtensor-blas: https://github.com/xtensor-stack/xtensor-blas
+.. _xtensor-io: https://github.com/xtensor-stack/xtensor-io
 .. _xtensor-fftw: https://github.com/egpbos/xtensor-fftw
 .. _xtensor-ros: https://github.com/wolfv/xtensor_ros
-.. _xsimd: https://github.com/QuantStack/xsimd
-.. _xtl: https://github.com/QuantStack/xtl
+.. _xsimd: https://github.com/xtensor-stack/xsimd
+.. _xtl: https://github.com/xtensor-stack/xtl
 .. _xframe: https://github.com/QuantStack/xframe
 .. _z5: https://github.com/constantinpape/z5
 .. _zarr: https://github.com/zarr-developers/zarr

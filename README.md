@@ -28,9 +28,9 @@ be plugged into our expression system can easily be written.
 In fact, `xtensor` can be used to **process NumPy data structures inplace**
 using Python's [buffer protocol](https://docs.python.org/3/c-api/buffer.html).
 Similarly, we can operate on Julia and R arrays. For more details on the NumPy,
-Julia and R bindings, check out the [xtensor-python](https://github.com/QuantStack/xtensor-python),
-[xtensor-julia](https://github.com/QuantStack/Xtensor.jl) and
-[xtensor-r](https://github.com/QuantStack/xtensor-r) projects respectively.
+Julia and R bindings, check out the [xtensor-python](https://github.com/xtensor-stack/xtensor-python),
+[xtensor-julia](https://github.com/xtensor-stack/Xtensor.jl) and
+[xtensor-r](https://github.com/xtensor-stack/xtensor-r) projects respectively.
 
 `xtensor` requires a modern C++ compiler supporting C++14. The following C++
 compilers are supported:
@@ -73,7 +73,7 @@ make install
 
 You can play with `xtensor` interactively in a Jupyter notebook right now! Just click on the binder link below:
 
-[![Binder](docs/source/binder-logo.svg)](https://mybinder.org/v2/gh/QuantStack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
+[![Binder](docs/source/binder-logo.svg)](https://mybinder.org/v2/gh/xtensor-stack/xtensor/stable?filepath=notebooks/xtensor.ipynb)
 
 The C++ support in Jupyter is powered by the [xeus-cling](https://github.com/QuantStack/xeus-cling) C++ kernel. Together with xeus-cling, xtensor enables a similar workflow to that of NumPy with the IPython Jupyter kernel.
 
@@ -87,8 +87,8 @@ http://xtensor.readthedocs.io/
 
 ## Dependencies
 
-`xtensor` depends on the [xtl](https://github.com/QuantStack/xtl) library and
-has an optional dependency on the [xsimd](https://github.com/QuantStack/xsimd)
+`xtensor` depends on the [xtl](https://github.com/xtensor-stack/xtl) library and
+has an optional dependency on the [xsimd](https://github.com/xtensor-stack/xsimd)
 library:
 
 | `xtensor` | `xtl`   |`xsimd` (optional) |
@@ -308,9 +308,9 @@ Besides, two access operators are provided:
 Xtensor operations make use of SIMD acceleration depending on what instruction
 sets are available on the platform at hand (SSE, AVX, AVX512, Neon).
 
-### [![xsimd](docs/source/xsimd-small.svg)](https://github.com/QuantStack/xsimd)
+### [![xsimd](docs/source/xsimd-small.svg)](https://github.com/xtensor-stack/xsimd)
 
-The [xsimd](https://github.com/QuantStack/xsimd) project underlies the
+The [xsimd](https://github.com/xtensor-stack/xsimd) project underlies the
 detection of the available instruction sets, and provides generic high-level
 wrappers and memory allocators for client libraries such as xtensor.
 
@@ -338,9 +338,9 @@ performance of the application.
 
 ## Language bindings
 
-### [![xtensor-python](docs/source/xtensor-python-small.svg)](https://github.com/QuantStack/xtensor-python)
+### [![xtensor-python](docs/source/xtensor-python-small.svg)](https://github.com/xtensor-stack/xtensor-python)
 
-The [xtensor-python](https://github.com/QuantStack/xtensor-python) project
+The [xtensor-python](https://github.com/xtensor-stack/xtensor-python) project
 provides the implementation of two `xtensor` containers, `pyarray` and
 `pytensor` which effectively wrap NumPy arrays, allowing inplace modification,
 including reshapes.
@@ -348,9 +348,9 @@ including reshapes.
 Utilities to automatically generate NumPy-style universal functions, exposed to
 Python from scalar functions are also provided.
 
-### [![xtensor-julia](docs/source/xtensor-julia-small.svg)](https://github.com/QuantStack/xtensor-julia)
+### [![xtensor-julia](docs/source/xtensor-julia-small.svg)](https://github.com/xtensor-stack/xtensor-julia)
 
-The [xtensor-julia](https://github.com/QuantStack/xtensor-julia) project
+The [xtensor-julia](https://github.com/xtensor-stack/xtensor-julia) project
 provides the implementation of two `xtensor` containers, `jlarray` and
 `jltensor` which effectively wrap julia arrays, allowing inplace modification,
 including reshapes.
@@ -358,9 +358,9 @@ including reshapes.
 Like in the Python case, utilities to generate NumPy-style universal functions
 are provided.
 
-### [![xtensor-r](docs/source/xtensor-r-small.svg)](https://github.com/QuantStack/xtensor-r)
+### [![xtensor-r](docs/source/xtensor-r-small.svg)](https://github.com/xtensor-stack/xtensor-r)
 
-The [xtensor-r](https://github.com/QuantStack/xtensor-r) project provides the
+The [xtensor-r](https://github.com/xtensor-stack/xtensor-r) project provides the
 implementation of two `xtensor` containers, `rarray` and `rtensor` which
 effectively wrap R arrays, allowing inplace modification, including reshapes.
 
@@ -369,15 +369,15 @@ universal functions are provided.
 
 ## Library bindings
 
-### [![xtensor-blas](docs/source/xtensor-blas-small.svg)](https://github.com/QuantStack/xtensor-blas)
+### [![xtensor-blas](docs/source/xtensor-blas-small.svg)](https://github.com/xtensor-stack/xtensor-blas)
 
-The [xtensor-blas](https://github.com/QuantStack/xtensor-blas) project provides
+The [xtensor-blas](https://github.com/xtensor-stack/xtensor-blas) project provides
 bindings to BLAS libraries, enabling linear-algebra operations on xtensor
 expressions.
 
-### [![xtensor-io](docs/source/xtensor-io-small.svg)](https://github.com/QuantStack/xtensor-io)
+### [![xtensor-io](docs/source/xtensor-io-small.svg)](https://github.com/xtensor-stack/xtensor-io)
 
-The [xtensor-io](https://github.com/QuantStack/xtensor-io) project enables the
+The [xtensor-io](https://github.com/xtensor-stack/xtensor-io) project enables the
 loading of a variety of file formats into xtensor expressions, such as image
 files, sound files, HDF5 files, as well as NumPy npy and npz files.
 

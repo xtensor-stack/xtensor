@@ -657,4 +657,4 @@ implemented yet. Most prominently that is broadcasting for all functions except 
 +--------------------------------+--------------------------------+
 
 
-.. _`xtensor-blas`: https://github.com/QuantStack/xtensor-blas
+.. _`xtensor-blas`: https://github.com/xtensor-stack/xtensor-blas
