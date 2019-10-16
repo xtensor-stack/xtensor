@@ -656,6 +656,21 @@ namespace xt
         }
 
         {
+            SCOPED_TRACE("xarray<long> + xarray<double>");
+            using long_container_t = xop_test::rebind_container_t<TypeParam, long>;
+            long_container_t d = { { 0, 1, 2 },{ 3, 4, 5 } };
+            auto fdl = a + d;
+            using assign_traits_long_double = xassign_traits<TypeParam, decltype(fdl)>;
+#if XTENSOR_USE_XSIMD
+            EXPECT_TRUE(assign_traits_long_double::simd_linear_assign());
+#else
+            using return_type = decltype(fdl.template load_simd<aligned_mode>(std::size_t(0)));
+            EXPECT_FALSE(assign_traits_long_double::simd_linear_assign());
+            EXPECT_TRUE((std::is_same<return_type, double>::value));
+#endif
+        }
+
+        {
             SCOPED_TRACE("xarray<double> > xarray<double>");
             auto fgt = a > b;
             using bool_container_t = xop_test::rebind_container_t<TypeParam, bool>;
