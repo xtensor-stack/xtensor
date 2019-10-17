@@ -76,6 +76,9 @@ namespace xt_simd
 
     template <class V>
     using is_batch_complex = xsimd::is_batch_complex<V>;
+
+    template <class T1, class T2>
+    using simd_condition = xsimd::detail::simd_condition<T1, T2>;
 }
 
 #else  // XTENSOR_USE_XSIMD
@@ -190,6 +193,11 @@ namespace xt_simd
     struct is_batch_complex : std::false_type
     {
     };
+
+    template <class T1, class T2>
+    struct simd_condition : std::true_type
+    {
+    };
 }
 
 #endif  // XTENSOR_USE_XSIMD
@@ -230,13 +238,23 @@ namespace xt
     namespace detail
     {
         template <class E, class T, class = void>
-        struct has_simd_interface_impl : std::false_type
+        struct has_load_simd : std::false_type
         {
         };
 
         template <class E, class T>
-        struct has_simd_interface_impl<E, T, void_t<decltype(std::declval<E>().template load_simd<aligned_mode, T>(typename E::size_type(0)))>>
+        struct has_load_simd<E, T, void_t<decltype(std::declval<E>().template load_simd<aligned_mode, T>(typename E::size_type(0)))>>
             : std::true_type
+        {
+        };
+
+        template <class E, class T, bool B = xt_simd::simd_condition<typename E::value_type, T>::value>
+        struct has_simd_interface_impl : has_load_simd<E, T>
+        {
+        };
+
+        template <class E, class T>
+        struct has_simd_interface_impl<E, T, false> : std::false_type
         {
         };
     }

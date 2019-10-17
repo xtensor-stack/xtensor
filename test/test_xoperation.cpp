@@ -53,6 +53,29 @@ namespace xt
         using rebind_container_t = typename rebind_container<C, T>::type;
     }
 
+    class my_double
+    {
+    public:
+
+        my_double(double d = 0.) : m_value(d) {}
+
+        double& operator+=(double rhs)
+        {
+            m_value += rhs;
+            return m_value;
+        }
+
+    private:
+
+        double m_value;
+    };
+
+    double operator+(double rhs, my_double lhs)
+    {
+        my_double tmp(lhs);
+        return tmp += rhs;
+    }
+
     template <class C>
     class operation : public ::testing::Test
     {
@@ -651,6 +674,21 @@ namespace xt
 #else
             using return_type = decltype(fdc.template load_simd<aligned_mode>(std::size_t(0)));
             EXPECT_FALSE(assign_traits_char_double::simd_linear_assign());
+            EXPECT_TRUE((std::is_same<return_type, double>::value));
+#endif
+        }
+
+        {
+            SCOPED_TRACE("xarray<double> + xarray<my_double>");
+            using md_container_t = xop_test::rebind_container_t<TypeParam, my_double>;
+            md_container_t d =  { { 0, 1, 2 },{ 3, 4, 5 } };
+            auto fdm = a + d;
+            using assign_traits_md_double = xassign_traits<TypeParam, decltype(fdm)>;
+#if XTENSOR_USE_XSIMD
+            EXPECT_FALSE(assign_traits_md_double::simd_linear_assign());
+#else
+            using return_type = decltype(fdm.template load_simd<aligned_mode>(std::size_t(0)));
+            EXPECT_FALSE(assign_traits_md_double::simd_linear_assign());
             EXPECT_TRUE((std::is_same<return_type, double>::value));
 #endif
         }
