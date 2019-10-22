@@ -168,6 +168,8 @@ The random module provides simple ways to create random tensor expressions, lazi
 | ``np.random.permutation(30)``                 | ``xt::random::permutation(30)``               |
 +-----------------------------------------------+-----------------------------------------------+
 
+See :ref:`random`.
+
 Concatenation, splitting, squeezing
 -----------------------------------
 

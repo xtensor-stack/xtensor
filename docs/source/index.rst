@@ -63,11 +63,12 @@ for details.
    scalar
    adaptor
    operator
-   histogram
    view
    indices
    builder
    missing
+   histogram
+   random
    file_loading
    build-options
    pitfall
