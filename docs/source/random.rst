@@ -19,7 +19,7 @@ Produces (an array of) random positive floating-point values, distributed accord
 
     P(x) = x^{\alpha-1} \frac{e^{-x / \beta}}{\beta^\alpha \; \Gamma(\alpha)}
 
-where :math:`\alpha` is the shape (also known as :math:`k` or *shape*) and :math:`\beta` the scale (also known as :math:`\theta` or *scale*), and :math:`\Gamma` is the Gamma function.
+where :math:`\alpha` is the shape (also known as :math:`k`) and :math:`\beta` the scale (also known as :math:`\theta`), and :math:`\Gamma` is the Gamma function.
 
 .. note::
 
