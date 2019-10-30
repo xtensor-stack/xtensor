@@ -262,7 +262,7 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         }
 
         // VS2015 STL defines isnan, isinf and isfinite as template
-        // functions, breaking ADL. 
+        // functions, breaking ADL.
 #if defined(_WIN32) && defined(XTENSOR_USE_XSIMD)
         template <class T, std::size_t N>
         inline xsimd::batch_bool<T, N> isinf(const xsimd::batch<T, N>& b)
@@ -2022,6 +2022,12 @@ namespace detail {
         auto div = sum(weights, evaluation_strategy::immediate)();
         auto s = sum(std::forward<E>(e) * std::forward<W>(weights), ev) / std::move(div);
         return s;
+    }
+
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS, XTL_REQUIRES(is_reducer_options<EVS>)>
+    inline auto average(E&& e, EVS ev = EVS())
+    {
+        return mean(e, ev);
     }
 
     namespace detail
