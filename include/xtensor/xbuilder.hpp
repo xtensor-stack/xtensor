@@ -667,6 +667,53 @@ namespace xt
         return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 
+    namespace detail {
+        // `bool_pack` source: https://stackoverflow.com/a/36934374/1306230
+        template <bool... values> struct bool_pack;
+        template <bool... values>
+        using all_true = xtl::conjunction<std::integral_constant<bool, values>...>;
+
+        template <class X, class Y, size_t axis, class AxesSequence> 
+        struct concat_shape_impl;
+
+        template <class X, class Y, size_t axis, size_t... Is>
+        struct concat_shape_impl<X, Y, axis, std::index_sequence<Is...>> 
+        {
+            static_assert(X::size() == Y::size(), "Concatenation requires equisized shapes");
+            static_assert(axis < X::size(), "Concatenation requires a valid axis");
+            static_assert(all_true<(axis == Is || X::template get<Is>() == Y::template get<Is>())...>::value,
+                          "Concatenation requires compatible shapes and axis");
+
+            using type = fixed_shape<(axis == Is ? X::template get<Is>() + Y::template get<Is>()
+                                                 : X::template get<Is>())...>;
+        };
+
+        template <size_t axis, class X, class Y, class... Rest> 
+        struct concat_shape;
+
+        template <size_t axis, class X, class Y> 
+        struct concat_shape<axis, X, Y> 
+        {
+            using type = typename concat_shape_impl<X, Y, axis, std::make_index_sequence<X::size()>>::type;
+        };
+
+        template <size_t axis, class X, class Y, class... Rest> 
+        struct concat_shape 
+        {
+            using type = typename concat_shape<axis, X, typename concat_shape<axis, Y, Rest...>::type>::type;
+        };
+
+        template <size_t axis, class... Args>
+        using concat_shape_t = typename concat_shape<axis, Args...>::type;
+    } // namespace detail
+
+    template <std::size_t axis = 0, class... CT,
+              typename = std::enable_if_t<detail::all_fixed<typename std::decay_t<CT>::shape_type...>::value>>
+    inline auto concatenate_fixed(std::tuple<CT...> &&t) {
+        using shape_type = detail::concat_shape_t<axis, typename std::decay_t<CT>::shape_type...>;
+        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), shape_type{});
+    }
+
     namespace detail
     {
         template <class T, std::size_t N>

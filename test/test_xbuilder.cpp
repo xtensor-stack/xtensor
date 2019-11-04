@@ -7,6 +7,10 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#ifdef _MSC_VER
+#define VS_SKIP_CONCATENATE_FIXED 1
+#endif
+
 #include "gtest/gtest.h"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xarray.hpp"
@@ -356,6 +360,49 @@ namespace xt
         EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, sa)));
         EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, ta)));
     }
+
+    template <std::size_t... I, std::size_t... J>
+    bool operator==(fixed_shape<I...>, fixed_shape<J...>)
+    {
+        std::array<std::size_t, sizeof...(I)> ix = {I...};
+        std::array<std::size_t, sizeof...(J)> jx = {J...};
+        return sizeof...(J) == sizeof...(I) && std::equal(ix.begin(), ix.end(), jx.begin());
+    }
+
+#ifndef VS_SKIP_CONCATENATE_FIXED
+    // This test mimics the relevant parts of `TEST(xbuilder, concatenate)`
+    TEST(xbuilder, concatenate_fixed)
+    {
+        xtensor_fixed<double, fixed_shape<2, 2, 3>> a = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
+
+        auto c = concatenate_fixed<2>(xtuple(a, a, a));
+
+        using expected_shape_c_t = fixed_shape<2, 2, 9>;
+        ASSERT_EQ(expected_shape_c_t{}, c.shape());
+        ASSERT_EQ(c(1, 1, 2), c(1, 1, 5));
+        ASSERT_EQ(11, c(1, 1, 2));
+        ASSERT_EQ(11, c(1, 1, 5));
+
+        xtensor_fixed<double, fixed_shape<1, 3>> e = {{1, 2, 3}}, f = {{2, 3, 4}};
+        auto k = concatenate_fixed<0>(xtuple(e, f));
+        auto l = concatenate_fixed<1>(xtuple(e, f));
+
+        using expected_shape_k_t = fixed_shape<2, 3>;
+        using expected_shape_l_t = fixed_shape<1, 6>;
+        ASSERT_EQ(expected_shape_k_t{}, k.shape());
+        ASSERT_EQ(expected_shape_l_t{}, l.shape());
+        ASSERT_EQ(4, k(1, 2));
+        ASSERT_EQ(3, l(0, 2));
+        ASSERT_EQ(3, l(0, 4));
+
+        xtensor_fixed<double, fixed_shape<2>> x = arange(2);
+        xtensor_fixed<double, fixed_shape<3>> y = arange(2, 5);
+        xtensor_fixed<double, fixed_shape<3>> z = arange(5, 8);
+        auto w = concatenate_fixed(xtuple(x, y, z));
+
+        ASSERT_TRUE(arange(8) == w);
+    }
+#endif
 
     TEST(xbuilder, access)
     {
