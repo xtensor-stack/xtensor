@@ -340,6 +340,9 @@ namespace xt
         using only_fixed = std::integral_constant<bool, xtl::disjunction<is_fixed<S>...>::value &&
                                                         xtl::conjunction<xtl::disjunction<is_fixed<S>, is_scalar_shape<S>>...>::value>;
 
+        template <class... S>
+        using all_fixed = xtl::conjunction<is_fixed<S>...>;
+
         // The promote_index meta-function returns std::vector<promoted_value_type> in the
         // general case and an array of the promoted value type and maximal size if all
         // arguments are of type std::array

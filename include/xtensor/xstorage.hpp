@@ -1581,10 +1581,18 @@ namespace xt
 #endif
         using value_type = std::size_t;
         using size_type = std::size_t;
+        using const_iterator = typename cast_type::const_iterator;
 
         constexpr static std::size_t size()
         {
             return sizeof...(X);
+        }
+
+        template <std::size_t idx>
+        constexpr static auto get()
+        {
+            using cast_type = std::array<std::size_t, sizeof...(X)>;
+            return std::get<idx>(cast_type{X...});
         }
 
         XTENSOR_FIXED_SHAPE_CONSTEXPR operator cast_type() const
