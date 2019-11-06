@@ -16,7 +16,7 @@
 #ifndef VS_SKIP_XFIXED
 
 #include "gtest/gtest.h"
-
+#include "test_common_macros.hpp"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xfixed.hpp"
@@ -85,13 +85,13 @@ namespace xt
 #endif
 
 #ifdef XTENSOR_ENABLE_ASSERT
-        EXPECT_THROW(a.resize({2, 2}), std::runtime_error);
+        XT_EXPECT_THROW(a.resize({2, 2}), std::runtime_error);
 #endif
         // reshaping fixed container
-        EXPECT_THROW(a.reshape({{1, 9}}), std::runtime_error);
-        EXPECT_NO_THROW(a.reshape({3, 4}));
-        EXPECT_NO_THROW(a.reshape({3, 4}, XTENSOR_DEFAULT_LAYOUT));
-        EXPECT_THROW(a.reshape({3, 4}, layout_type::any), std::runtime_error);
+        XT_EXPECT_THROW(a.reshape({{1, 9}}), std::runtime_error);
+        XT_EXPECT_NO_THROW(a.reshape({3, 4}));
+        XT_EXPECT_NO_THROW(a.reshape({3, 4}, XTENSOR_DEFAULT_LAYOUT));
+        XT_EXPECT_THROW(a.reshape({3, 4}, layout_type::any), std::runtime_error);
     }
 
     TEST(xtensor_fixed, strides)
@@ -216,10 +216,10 @@ namespace xt
         T a = {{1,2,3,4}, {5,6,7,8}, {9,10,11,12}};
 
     #ifdef XTENSOR_ENABLE_ASSERT
-        EXPECT_THROW(T{{1}}, std::runtime_error);
-        EXPECT_THROW(check_shape_a(), std::runtime_error);
-        EXPECT_THROW(check_shape_b(), std::runtime_error);
-        EXPECT_THROW(check_shape_c(), std::runtime_error);
+        XT_EXPECT_THROW(T{{1}}, std::runtime_error);
+        XT_EXPECT_THROW(check_shape_a(), std::runtime_error);
+        XT_EXPECT_THROW(check_shape_b(), std::runtime_error);
+        XT_EXPECT_THROW(check_shape_c(), std::runtime_error);
     #endif
     }
 

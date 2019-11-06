@@ -111,12 +111,14 @@ namespace xt
         test_reshape(a);
     }
 
+#if !(defined(XTENSOR_ENABLE_ASSERT) && defined(XTENSOR_DISABLE_EXCEPTIONS))
     TEST(xarray_adaptor, access)
     {
         vec_type v;
         adaptor_type a(v);
         test_access(a);
     }
+#endif
 
     TEST(xarray_adaptor, unchecked)
     {

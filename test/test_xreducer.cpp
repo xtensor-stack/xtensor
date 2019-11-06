@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xutils.hpp"
@@ -75,10 +76,10 @@ namespace xt
     TEST(xreducer, errors)
     {
         xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}};
-        EXPECT_THROW(xt::sum(a, {1, 0}), std::runtime_error);
-        EXPECT_THROW(xt::sum(a, {0, 2}), std::runtime_error);
-        EXPECT_THROW(xt::sum(a, {1, 0}, evaluation_strategy::immediate), std::runtime_error);
-        EXPECT_THROW(xt::sum(a, {0, 2}, evaluation_strategy::immediate), std::runtime_error);
+        XT_EXPECT_THROW(xt::sum(a, {1, 0}), std::runtime_error);
+        XT_EXPECT_THROW(xt::sum(a, {0, 2}), std::runtime_error);
+        XT_EXPECT_THROW(xt::sum(a, {1, 0}, evaluation_strategy::immediate), std::runtime_error);
+        XT_EXPECT_THROW(xt::sum(a, {0, 2}, evaluation_strategy::immediate), std::runtime_error);
     }
 
     TEST(xreducer, shape)
@@ -117,8 +118,8 @@ namespace xt
         xreducer_features features;
         EXPECT_EQ(12, features.m_red.at(0, 0, 0));
         EXPECT_EQ(24, features.m_red.at(1, 1, 1));
-        EXPECT_ANY_THROW(features.m_red.at(10, 10, 10));
-        EXPECT_ANY_THROW(features.m_red.at(0, 0, 0, 0));
+        XT_EXPECT_ANY_THROW(features.m_red.at(10, 10, 10));
+        XT_EXPECT_ANY_THROW(features.m_red.at(0, 0, 0, 0));
     }
 
     TEST(xreducer, iterator)
@@ -665,7 +666,7 @@ namespace xt
     TEST(xreducer, double_axis)
     {
         xt::xarray<int> a = xt::ones<int>({ 3, 2});
-        EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
+        XT_EXPECT_ANY_THROW(xt::sum(a, {1, 1}));
     }
 
     TEST(xreducer, sum_xtensor_of_fixed)

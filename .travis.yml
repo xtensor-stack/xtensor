@@ -48,6 +48,15 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
+      env: COMPILER=gcc GCC=6 DISABLE_EXCEPTION=1
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-6
       env: COMPILER=gcc GCC=6 ENABLE_OPENMP=1
     - os: linux
       if: branch = master
@@ -94,7 +103,7 @@ matrix:
           packages:
             - g++-4.9
             - clang-3.6
-      env: COMPILER=clang CLANG=3.6 DISABLE_XSIMD=1 
+      env: COMPILER=clang CLANG=3.6 DISABLE_XSIMD=1
     - os: linux
       if: branch = master
       addons:
@@ -218,6 +227,8 @@ install:
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_OPENMP=ON ..;
       elif [[ "$ENABLE_CPP17" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DCPP17=ON ..;
+      elif [[ "$DISABLE_EXCEPTION" == 1 ]]; then
+        cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_DISABLE_EXCEPTIONS=ON ..;
       else
         cmake -DXTENSOR_USE_XSIMD=ON -DDOWNLOAD_GTEST=ON ..;
       fi

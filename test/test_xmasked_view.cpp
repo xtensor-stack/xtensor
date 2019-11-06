@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-
+#include "test_common_macros.hpp"
 #include "xtensor/xoptional_assembly.hpp"
 #include "xtensor/xmasked_view.hpp"
 #include "xtensor/xio.hpp"
@@ -85,8 +85,10 @@ namespace xt
         EXPECT_EQ(masked_data(2, 1), 8.);
         EXPECT_EQ(masked_data(2, 2), 9.);
 
-#ifdef XTENSOR_ENABLE_ASSERT
-        EXPECT_ANY_THROW(masked_data(3, 3));
+#if defined(XTENSOR_ENABLE_ASSERT)
+#if !defined(XTENSOR_DISABLE_EXCEPTIONS)
+        XT_EXPECT_ANY_THROW(masked_data(3, 3));
+#endif
 #endif
     }
 
@@ -106,7 +108,7 @@ namespace xt
         EXPECT_EQ(masked_data.at(2, 1), 8.);
         EXPECT_EQ(masked_data.at(2, 2), 9.);
 
-        EXPECT_ANY_THROW(masked_data.at(3, 3));
+        XT_EXPECT_ANY_THROW(masked_data.at(3, 3));
     }
 
     TEST(xmasked_view, unchecked)

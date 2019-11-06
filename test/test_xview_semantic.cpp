@@ -460,6 +460,6 @@ namespace xt
         container_2d res = { { 11, 12, 13 }, { 4, 5, 6 } };
 
         auto viewa = view(a, 0, all());
-        EXPECT_ANY_THROW(viewa = b);
+        XT_EXPECT_ANY_THROW(viewa = b);
     }
 }

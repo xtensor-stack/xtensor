@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xtensor_config.hpp"
 #include "xtensor/xstorage.hpp"
 #include <numeric>
@@ -69,7 +70,7 @@ namespace xt
         EXPECT_EQ(1.0, a[9]);
 
         EXPECT_EQ(a.at(5), 2.7);
-        EXPECT_ANY_THROW(a.at(12));
+        XT_EXPECT_ANY_THROW(a.at(12));
     }
 
     TEST(uvector, iterator)
@@ -270,7 +271,7 @@ namespace xt
         EXPECT_EQ(size_t(1), a[9]);
 
         EXPECT_EQ(a.at(5), size_t(2));
-        EXPECT_ANY_THROW(a.at(12));
+        XT_EXPECT_ANY_THROW(a.at(12));
     }
 
     TEST(svector, iterator)

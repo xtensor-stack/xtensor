@@ -7,12 +7,13 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#include "gtest/gtest.h"
 #include <initializer_list>
 #include <type_traits>
 #include <tuple>
 #include <complex>
 
+#include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xfixed.hpp"
@@ -198,12 +199,12 @@ namespace xt
         arr_t a = {{1,2,3}, {5,6,7}};
 
         alloc_tracking::enable();
-        EXPECT_THROW(arr_t b = a + 123, std::runtime_error);
-        EXPECT_NO_THROW(a.resize({2, 3}));
-        EXPECT_NO_THROW(a.resize({3, 2}));
-        EXPECT_THROW(a.resize({3, 15}), std::runtime_error);
+        XT_EXPECT_THROW(arr_t b = a + 123, std::runtime_error);
+        XT_EXPECT_NO_THROW(a.resize({2, 3}));
+        XT_EXPECT_NO_THROW(a.resize({3, 2}));
+        XT_EXPECT_THROW(a.resize({3, 15}), std::runtime_error);
         alloc_tracking::disable();
-        EXPECT_NO_THROW(arr_t c = a);
+        XT_EXPECT_NO_THROW(arr_t c = a);
     }
 
     TEST(utils, static_dimension)

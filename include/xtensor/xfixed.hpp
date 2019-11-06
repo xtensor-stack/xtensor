@@ -20,6 +20,7 @@
 #include "xstrides.hpp"
 #include "xstorage.hpp"
 #include "xsemantic.hpp"
+#include "xtensor_config.hpp"
 
 namespace xtl
 {
@@ -549,7 +550,8 @@ namespace xt
     {
         if (this->size() != 1)
         {
-            throw std::runtime_error("wrong shape for scalar assignment (has to be xshape<>).");
+            XTENSOR_THROW(std::runtime_error,
+                          "wrong shape for scalar assignment (has to be xshape<>).");
         }
         m_storage[0] = v;
     }
@@ -701,7 +703,7 @@ namespace xt
     {
         if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size() && layout == L))
         {
-            throw std::runtime_error("Trying to reshape xtensor_fixed with different shape or layout.");
+            XTENSOR_THROW(std::runtime_error, "Trying to reshape xtensor_fixed with different shape or layout.");
         }
     }
 
@@ -885,7 +887,7 @@ namespace xt
     {
         if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size() && layout == L))
         {
-            throw std::runtime_error("Trying to reshape xtensor_fixed with different shape or layout.");
+            XTENSOR_THROW(std::runtime_error, "Trying to reshape xtensor_fixed with different shape or layout.");
         }
     }
 

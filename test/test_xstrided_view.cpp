@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-
+#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xfixed.hpp"
@@ -81,11 +81,11 @@ namespace xt
         EXPECT_EQ(a(1, 2), view7(1));
         EXPECT_EQ(a(2, 2), view7(2));
 
-        EXPECT_THROW(strided_view(a, { all(), all(), 1 }), std::runtime_error);
-        EXPECT_THROW(strided_view(a, { all(), all(), all() }), std::runtime_error);
-        EXPECT_NO_THROW(strided_view(a, { all(), newaxis(), all() }));
-        EXPECT_NO_THROW(strided_view(a, { 3, newaxis(), 1 }));
-        EXPECT_NO_THROW(strided_view(a, { 3, 1, newaxis() }));
+        XT_EXPECT_THROW(strided_view(a, { all(), all(), 1 }), std::runtime_error);
+        XT_EXPECT_THROW(strided_view(a, { all(), all(), all() }), std::runtime_error);
+        XT_EXPECT_NO_THROW(strided_view(a, { all(), newaxis(), all() }));
+        XT_EXPECT_NO_THROW(strided_view(a, { 3, newaxis(), 1 }));
+        XT_EXPECT_NO_THROW(strided_view(a, { 3, 1, newaxis() }));
     }
 
     TEST(xstrided_view, assign)
@@ -471,7 +471,7 @@ namespace xt
         EXPECT_EQ(strided_view(a, { 2, 2, xt::ellipsis() }), strided_view(a, { 2, 2, xt::all(), xt::all(), xt::all(), xt::all() }));
         EXPECT_EQ(strided_view(a, { 2, xt::ellipsis(), 0, 2 }), strided_view(a, { 2, xt::all(), xt::all(), xt::all(), 0, 2 }));
 
-        EXPECT_THROW(strided_view(a, { xt::ellipsis(), 0, xt::ellipsis() }), std::runtime_error);
+        XT_EXPECT_THROW(strided_view(a, { xt::ellipsis(), 0, xt::ellipsis() }), std::runtime_error);
 
         t b = xt::ones<int>({ 5, 5, 5 });
         auto v2 = strided_view(b, { xt::ellipsis(), 1, 1, 1 });
@@ -483,7 +483,7 @@ namespace xt
         EXPECT_EQ(v3.shape(), v3_s);
 
 
-        EXPECT_THROW(strided_view(b, { xt::ellipsis(), 1, 1, 1, 1 }), std::runtime_error);
+        XT_EXPECT_THROW(strided_view(b, { xt::ellipsis(), 1, 1, 1, 1 }), std::runtime_error);
     }
 
     TEST(xstrided_view, incompatible_shape)
@@ -496,10 +496,10 @@ namespace xt
 
         EXPECT_FALSE(broadcastable(v.shape(), b.shape()));
         EXPECT_FALSE(broadcastable(b.shape(), v.shape()));
-        EXPECT_THROW(assert_compatible_shape(b, v), broadcast_error);
-        EXPECT_THROW(assert_compatible_shape(v, b), broadcast_error);
-        EXPECT_THROW(v = b, broadcast_error);
-        EXPECT_THROW(noalias(v) = b, broadcast_error);
+        XT_EXPECT_THROW(assert_compatible_shape(b, v), broadcast_error);
+        XT_EXPECT_THROW(assert_compatible_shape(v, b), broadcast_error);
+        XT_EXPECT_THROW(v = b, broadcast_error);
+        XT_EXPECT_THROW(noalias(v) = b, broadcast_error);
     }
 
     TEST(xstrided_view, strided_view_on_view)

@@ -12,6 +12,7 @@
 #endif
 
 #include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
@@ -357,8 +358,8 @@ namespace xt
         xt::xarray<double> sa = xt::ones<double>({ 3, 4, 5 });
         xt::xarray<double> ta = xt::ones<double>({ 3, 4, 5, 3 });
 
-        EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, sa)));
-        EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, ta)));
+        XT_EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, sa)));
+        XT_EXPECT_ANY_THROW(xt::concatenate(xt::xtuple(fa, ta)));
     }
 
     template <std::size_t... I, std::size_t... J>

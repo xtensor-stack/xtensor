@@ -112,12 +112,14 @@ namespace xt
         test_reshape<adaptor_type, storage_type>(a);
     }
 
+#if !(defined(XTENSOR_ENABLE_ASSERT) && defined(XTENSOR_DISABLE_EXCEPTIONS))
     TEST(xtensor_adaptor, access)
     {
         vec_type v;
         adaptor_type a(v);
         test_access<adaptor_type, storage_type>(a);
     }
+#endif
 
     TEST(xtensor_adaptor, unchecked)
     {

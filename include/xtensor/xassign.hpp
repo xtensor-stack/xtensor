@@ -19,6 +19,7 @@
 #include "xexpression.hpp"
 #include "xiterator.hpp"
 #include "xstrides.hpp"
+#include "xtensor_config.hpp"
 #include "xtensor_forward.hpp"
 #include "xutils.hpp"
 #include "xfunction.hpp"
@@ -848,7 +849,7 @@ namespace xt
         }
         else
         {
-            throw std::runtime_error("Illegal layout set (layout_type::any?).");
+            XTENSOR_THROW(std::runtime_error, "Illegal layout set (layout_type::any?).");
         }
 
         std::size_t inner_loop_size, outer_loop_size, cut;

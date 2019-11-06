@@ -32,7 +32,7 @@ namespace xt
         EXPECT_FALSE(t2);
 
         shape_type s7 = s3;
-        EXPECT_ANY_THROW(broadcast_shape(s1, s7));
+        XT_EXPECT_ANY_THROW(broadcast_shape(s1, s7));
 
         shape_type s8 = s4;
         bool t3 = broadcast_shape(s1, s8);

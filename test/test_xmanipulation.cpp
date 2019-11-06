@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
-
+#include "test_common_macros.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
@@ -29,8 +29,8 @@ namespace xt
         EXPECT_EQ(123, e(1, 0, 0));
         auto val = vt[{1, 0, 1}];
         EXPECT_EQ(e(1, 0, 1), val);
-        EXPECT_ANY_THROW(vt.at(10, 10, 10));
-        EXPECT_ANY_THROW(vt.at(0, 0, 0, 0));
+        XT_EXPECT_ANY_THROW(vt.at(10, 10, 10));
+        XT_EXPECT_ANY_THROW(vt.at(0, 0, 0, 0));
     }
 
     TEST(xmanipulation, transpose_layout_swap)
@@ -136,8 +136,8 @@ namespace xt
         EXPECT_EQ(s1[1](0, 0), b(1, 0, 0));
         EXPECT_EQ(s1[2](0, 0), b(2, 0, 0));
 
-        EXPECT_THROW(split(b, 4), std::runtime_error);
-        EXPECT_THROW(split(b, 2), std::runtime_error);
+        XT_EXPECT_THROW(split(b, 4), std::runtime_error);
+        XT_EXPECT_THROW(split(b, 2), std::runtime_error);
 
         auto s2 = split(b, 1);
         EXPECT_EQ(s2.size(), 1u);
@@ -161,8 +161,8 @@ namespace xt
 
         EXPECT_EQ(sq.shape(), ds({3, 3, 2, 3}));
         EXPECT_EQ(sq(1, 1, 1, 1), b(1, 1, 0, 0, 1, 0, 1));
-        EXPECT_THROW(squeeze(b, 1, check_policy::full()), std::runtime_error);
-        EXPECT_THROW(squeeze(b, 10, check_policy::full()), std::runtime_error);
+        XT_EXPECT_THROW(squeeze(b, 1, check_policy::full()), std::runtime_error);
+        XT_EXPECT_THROW(squeeze(b, 10, check_policy::full()), std::runtime_error);
 
         auto sq2 = squeeze(b, {2, 3}, check_policy::full());
         EXPECT_EQ(sq2.shape(), ds({3, 3, 2, 1, 3}));
@@ -308,13 +308,13 @@ namespace xt
         xarray<double> e3 = {{{0, 1}, {2, 3}}, {{4, 5}, {6, 7}}};
 
         std::array<std::ptrdiff_t, 2> axes = {0, 0};
-        ASSERT_ANY_THROW(xt::rot90(e, axes));
+        XT_ASSERT_ANY_THROW(xt::rot90(e, axes));
         axes = {1, 1};
-        ASSERT_ANY_THROW(xt::rot90(e, axes));
+        XT_ASSERT_ANY_THROW(xt::rot90(e, axes));
         axes = {0, 2};
-        ASSERT_ANY_THROW(xt::rot90(e, axes));
+        XT_ASSERT_ANY_THROW(xt::rot90(e, axes));
         axes = {56, 58};
-        ASSERT_ANY_THROW(xt::rot90(e, axes));
+        XT_ASSERT_ANY_THROW(xt::rot90(e, axes));
 
         ASSERT_EQ(e, xt::rot90<0>(e));
         ASSERT_EQ(e, xt::rot90<4>(e));

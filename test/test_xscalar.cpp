@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xscalar.hpp"
 #include "xtensor/xarray.hpp"
 
@@ -58,7 +59,7 @@ namespace xt
     TEST(xscalar, at)
     {
         xscalar<int> x(2);
-        EXPECT_ANY_THROW(x.at(0));
+        XT_EXPECT_ANY_THROW(x.at(0));
     }
 
     TEST(xscalar, dimension)

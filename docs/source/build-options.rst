@@ -49,6 +49,7 @@ requirements):
   on your system.
 - ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have tbb_ installed
   on your system.
+- ``XTENSOR_DISABLE_EXCEPTIONS``: disables c++ exceptions.
 - ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is available on your system.
 
 Defining these macros in the CMakeLists of your project before searching for ``xtensor`` will trigger automatic finding
