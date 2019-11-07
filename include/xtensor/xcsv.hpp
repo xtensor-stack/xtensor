@@ -18,6 +18,7 @@
 #include <utility>
 
 #include "xtensor.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -152,7 +153,7 @@ namespace xt
         // Sanity check for data size.
         if (data.size() != data_size)
         {
-            throw std::runtime_error("Inconsistent row lengths in CSV");
+            XTENSOR_THROW(std::runtime_error, "Inconsistent row lengths in CSV");
         }
         return tensor_type(std::move(data), std::move(shape), std::move(strides));
     }
@@ -170,7 +171,7 @@ namespace xt
         const E& ex = e.derived_cast();
         if (ex.dimension() != 2)
         {
-            throw std::runtime_error("Only 2-D expressions can be serialized to CSV");
+            XTENSOR_THROW(std::runtime_error, "Only 2-D expressions can be serialized to CSV");
         }
         size_type nbrows = ex.shape()[0], nbcols = ex.shape()[1];
         auto st = ex.stepper_begin(ex.shape());

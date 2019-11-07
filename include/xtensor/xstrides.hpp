@@ -19,6 +19,7 @@
 
 #include "xexception.hpp"
 #include "xshape.hpp"
+#include "xtensor_config.hpp"
 #include "xtensor_forward.hpp"
 
 namespace xt
@@ -455,7 +456,7 @@ namespace xt
     {
         if (l != layout_type::row_major && l != layout_type::column_major)
         {
-            throw std::runtime_error("unravel_index: dynamic layout not supported");
+            XTENSOR_THROW(std::runtime_error, "unravel_index: dynamic layout not supported");
         }
         return detail::unravel_noexcept(index, strides, l);
     }

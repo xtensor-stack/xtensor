@@ -184,11 +184,13 @@ namespace xt
         test_transpose<xtensor_dynamic, storage_type>(a);
     }
 
+#if !(defined(XTENSOR_ENABLE_ASSERT) && defined(XTENSOR_DISABLE_EXCEPTIONS))
     TEST(xtensor, access)
     {
         xtensor_dynamic a;
         test_access<xtensor_dynamic, storage_type>(a);
     }
+#endif
 
     TEST(xtensor, unchecked)
     {
@@ -202,11 +204,13 @@ namespace xt
         test_at<xtensor_dynamic, storage_type>(a);
     }
 
+#if !(defined(XTENSOR_ENABLE_ASSERT) && defined(XTENSOR_DISABLE_EXCEPTIONS))
     TEST(xtensor, element)
     {
         xtensor_dynamic a;
         test_element<xtensor_dynamic, storage_type>(a);
     }
+#endif
 
     TEST(xtensor, indexed_access)
     {

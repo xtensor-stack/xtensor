@@ -18,6 +18,7 @@
 #include "xslice.hpp"  // for xnone
 #include "xmanipulation.hpp"
 #include "xtensor.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -69,7 +70,7 @@ namespace xt
             {
                 return 0;
             }
-            throw std::runtime_error("Layout not supported.");
+            XTENSOR_THROW(std::runtime_error, "Layout not supported.");
         }
 
         // get permutations to transpose and reverse-transpose array

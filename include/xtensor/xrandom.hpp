@@ -21,6 +21,7 @@
 #include "xbuilder.hpp"
 #include "xgenerator.hpp"
 #include "xtensor.hpp"
+#include "xtensor_config.hpp"
 #include "xview.hpp"
 
 namespace xt
@@ -938,11 +939,11 @@ namespace xt
             const auto& de = e.derived_cast();
             if (de.dimension() != 1)
             {
-                throw std::runtime_error("Sample expression must be 1 dimensional");
+                XTENSOR_THROW(std::runtime_error, "Sample expression must be 1 dimensional");
             }
             if (de.size() < n && !replace)
             {
-                throw std::runtime_error("If replace is false, then the sample expression's size must be > n");
+                XTENSOR_THROW(std::runtime_error, "If replace is false, then the sample expression's size must be > n");
             }
             using result_type = xtensor<typename T::value_type, 1>;
             using size_type = typename result_type::size_type;

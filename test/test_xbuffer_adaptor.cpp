@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #include "xtensor/xbuffer_adaptor.hpp"
 
 namespace xt
@@ -199,7 +200,7 @@ namespace xt
         buffer_adaptor adapt(data1, size1);
 
         size_t size2 = 50;
-        EXPECT_THROW(adapt.resize(size2), std::runtime_error);
+        XT_EXPECT_THROW(adapt.resize(size2), std::runtime_error);
         EXPECT_EQ(adapt.size(), size1);
     }
 

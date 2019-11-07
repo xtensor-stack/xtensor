@@ -17,6 +17,7 @@
 
 #include "xarray.hpp"
 #include "xjson.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -167,7 +168,7 @@ namespace xt
     {
         if (!j.is_array())
         {
-            throw std::runtime_error("Received a JSON that does not contain a tensor");
+            XTENSOR_THROW(std::runtime_error, "Received a JSON that does not contain a tensor");
         }
 
         if (p_holder == nullptr)
@@ -202,14 +203,14 @@ namespace xt
             p_holder.reset(new detail::xexpression_wrapper<xt::xarray<std::string>>(std::move(empty_arr)));
         }
 
-        throw std::runtime_error("Received a JSON with a tensor that contains unsupported data type");
+        XTENSOR_THROW(std::runtime_error, "Received a JSON with a tensor that contains unsupported data type");
     }
 
     inline void xexpression_holder::check_holder() const
     {
         if (p_holder == nullptr)
         {
-            throw std::runtime_error("The holder does not contain an expression");
+            XTENSOR_THROW(std::runtime_error, "The holder does not contain an expression");
         }
     }
 

@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include "test_common_macros.hpp"
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
@@ -160,10 +161,10 @@ namespace xt
 
         xarray<double> b = {-1, 1};
         xt::random::seed(42);
-        ASSERT_THROW(xt::random::choice(b, 5, false), std::runtime_error);
-        ASSERT_NO_THROW(xt::random::choice(b, 5, true));
+        XT_ASSERT_THROW(xt::random::choice(b, 5, false), std::runtime_error);
+        XT_ASSERT_NO_THROW(xt::random::choice(b, 5, true));
         xarray<double> multidim_input = { {1,2,3}, {3,4,5} };
-        ASSERT_THROW(xt::random::choice(multidim_input, 5, true), std::runtime_error);
+        XT_ASSERT_THROW(xt::random::choice(multidim_input, 5, true), std::runtime_error);
     }
 
     TEST(xrandom, shuffle)

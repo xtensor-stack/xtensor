@@ -17,6 +17,7 @@
 
 #include "xexpression.hpp"
 #include "xstrides.hpp"
+#include "xtensor_config.hpp"
 #include "xtensor_forward.hpp"
 
 namespace xt
@@ -193,7 +194,7 @@ namespace xt
 
             if (axis >= e.dimension())
             {
-                throw std::runtime_error("Axis larger than expression dimension in accumulator.");
+                XTENSOR_THROW(std::runtime_error, "Axis larger than expression dimension in accumulator.");
             }
 
             result_type result = e;  // assign + make a copy, we need it anyways

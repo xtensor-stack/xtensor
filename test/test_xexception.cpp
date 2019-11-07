@@ -15,9 +15,19 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/xexception.hpp"
+#include "test_common_macros.hpp"
 
 namespace xt
 {
+
+    TEST(xexception, macros)
+    {
+        XT_EXPECT_THROW(XTENSOR_ASSERT_MSG(false, "Intentional error"), std::runtime_error);
+        XT_EXPECT_THROW(XTENSOR_PRECONDITION(false, "Intentional error"), std::runtime_error);
+    }
+
+
+#if !defined(XTENSOR_DISABLE_EXCEPTIONS)
     TEST(xexception, assert)
     {
         try
@@ -43,4 +53,6 @@ namespace xt
             EXPECT_TRUE(0 == expected.compare(message.substr(0, expected.size())));
         }
     }
+#endif
+
 }  // namespace xt

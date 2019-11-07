@@ -24,11 +24,12 @@
 #include <xtl/xtype_traits.hpp>
 
 #include "xaccumulator.hpp"
+#include "xeval.hpp"
 #include "xoperation.hpp"
 #include "xreducer.hpp"
 #include "xslice.hpp"
 #include "xstrided_view.hpp"
-#include "xeval.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -1971,7 +1972,7 @@ namespace detail {
         {
             if (weights.size() != e.shape()[ax[0]])
             {
-                throw std::runtime_error("Weights need to have the same shape as expression at axes.");
+                XTENSOR_THROW(std::runtime_error, "Weights need to have the same shape as expression at axes.");
             }
 
             std::fill(broadcast_shape.begin(), broadcast_shape.end(), std::size_t(1));
@@ -1981,7 +1982,7 @@ namespace detail {
         {
             if (!same_shape(e.shape(), weights.shape()))
             {
-                throw std::runtime_error("Weights with dim > 1 need to have the same shape as expression.");
+                XTENSOR_THROW(std::runtime_error, "Weights with dim > 1 need to have the same shape as expression.");
             }
 
             std::copy(e.shape().begin(), e.shape().end(), broadcast_shape.begin());
@@ -2016,7 +2017,7 @@ namespace detail {
     {
         if (weights.dimension() != e.dimension() || !std::equal(weights.shape().begin(), weights.shape().end(), e.shape().begin()))
         {
-            throw std::runtime_error("Weights need to have the same shape as expression.");
+            XTENSOR_THROW(std::runtime_error, "Weights need to have the same shape as expression.");
         }
 
         auto div = sum(weights, evaluation_strategy::immediate)();

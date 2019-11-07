@@ -201,7 +201,7 @@ namespace xt
         {
             SCOPED_TRACE("incompatible shapes");
             shape_type s4 = {2, 1, 3, 2};
-            EXPECT_THROW(a.broadcast_shape(s4), broadcast_error);
+            XT_EXPECT_THROW(a.broadcast_shape(s4), broadcast_error);
         }
 
         {

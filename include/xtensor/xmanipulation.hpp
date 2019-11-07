@@ -12,6 +12,7 @@
 
 #include "xstrided_view.hpp"
 #include "xutils.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -70,7 +71,7 @@ namespace xt
         {
             if (l != layout_type::row_major && l != layout_type::column_major)
             {
-                throw transpose_error("cannot compute transposed layout of dynamic layout");
+                XTENSOR_THROW(transpose_error, "cannot compute transposed layout of dynamic layout");
             }
             return transpose_layout_noexcept(l);
         }
@@ -80,7 +81,7 @@ namespace xt
         {
             if (sequence_size(permutation) != e.dimension())
             {
-                throw transpose_error("Permutation does not have the same size as shape");
+                XTENSOR_THROW(transpose_error, "Permutation does not have the same size as shape");
             }
 
             // permute stride and shape
@@ -97,7 +98,7 @@ namespace xt
             {
                 if (std::size_t(permutation[i]) >= e.dimension())
                 {
-                    throw transpose_error("Permutation contains wrong axis");
+                    XTENSOR_THROW(transpose_error, "Permutation contains wrong axis");
                 }
                 size_type perm = static_cast<size_type>(permutation[i]);
                 temp_shape[i] = e.shape()[perm];
@@ -128,7 +129,7 @@ namespace xt
                 {
                     if (permutation[i] == permutation[j])
                     {
-                        throw transpose_error("Permutation contains axis more than once");
+                        XTENSOR_THROW(transpose_error, "Permutation contains axis more than once");
                     }
                 }
             }
@@ -327,11 +328,11 @@ namespace xt
             {
                 if (static_cast<std::size_t>(ix) > e.dimension())
                 {
-                    throw std::runtime_error("Axis argument to squeeze > dimension of expression");
+                    XTENSOR_THROW(std::runtime_error, "Axis argument to squeeze > dimension of expression");
                 }
                 if (e.shape()[static_cast<std::size_t>(ix)] != 1)
                 {
-                    throw std::runtime_error("Trying to squeeze axis != 1");
+                    XTENSOR_THROW(std::runtime_error, "Trying to squeeze axis != 1");
                 }
             }
             return squeeze_impl(std::forward<E>(e), std::forward<S>(axis), check_policy::none());
@@ -475,7 +476,7 @@ namespace xt
     {
         if (axis >= e.dimension())
         {
-            throw std::runtime_error("Split along axis > dimension.");
+            XTENSOR_THROW(std::runtime_error, "Split along axis > dimension.");
         }
 
         std::size_t ax_sz = e.shape()[axis];
@@ -485,7 +486,7 @@ namespace xt
 
         if (rest)
         {
-            throw std::runtime_error("Split does not result in equal division.");
+            XTENSOR_THROW(std::runtime_error, "Split does not result in equal division.");
         }
 
         std::vector<decltype(strided_view(e, sv))> result;
@@ -599,7 +600,7 @@ namespace xt
 
         if (axes[0] == axes[1] || std::abs(axes[0] - axes[1]) == ndim)
         {
-            throw std::runtime_error("Axes must be different");
+            XTENSOR_THROW(std::runtime_error, "Axes must be different");
         }
 
         auto norm_axes = forward_normalize<std::array<std::size_t, 2>>(e, axes);

@@ -404,7 +404,7 @@ namespace xt
 
         if (left_right[0] < input_value_type(0))
         {
-            throw std::runtime_error(
+            XTENSOR_THROW(std::runtime_error,
                 "Data argument for bincount can only contain positive integers!");
         }
 

@@ -714,7 +714,9 @@ namespace xt
                 }
                 else if (P == alloc_tracking::assert)
                 {
-                    throw std::runtime_error("xtensor allocation of " + std::to_string(n) + " elements detected");
+                    XTENSOR_THROW(std::runtime_error,
+                                  "xtensor allocation of " + std::to_string(n) +
+                                  " elements detected");
                 }
             }
             return base_type::allocate(n);

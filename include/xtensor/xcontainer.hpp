@@ -24,6 +24,7 @@
 #include "xmath.hpp"
 #include "xoperation.hpp"
 #include "xstrides.hpp"
+#include "xtensor_config.hpp"
 #include "xtensor_forward.hpp"
 
 namespace xt
@@ -935,7 +936,7 @@ namespace xt
     {
         if (base_type::static_layout != layout_type::dynamic && l != base_type::static_layout)
         {
-            throw std::runtime_error("Cannot change layout_type if template parameter not layout_type::dynamic.");
+            XTENSOR_THROW(std::runtime_error, "Cannot change layout_type if template parameter not layout_type::dynamic.");
         }
         m_layout = l;
         resize(std::forward<S>(shape), true);
@@ -954,7 +955,8 @@ namespace xt
     {
         if (base_type::static_layout != layout_type::dynamic)
         {
-            throw std::runtime_error("Cannot resize with custom strides when layout() is != layout_type::dynamic.");
+            XTENSOR_THROW(std::runtime_error,
+                          "Cannot resize with custom strides when layout() is != layout_type::dynamic.");
         }
         m_shape = xtl::forward_sequence<shape_type, S>(shape);
         m_strides = strides;
@@ -1000,7 +1002,7 @@ namespace xt
     {
         if (compute_size(shape) != this->size())
         {
-            throw std::runtime_error("Cannot reshape with incorrect number of elements. Do you mean to resize?");
+            XTENSOR_THROW(std::runtime_error, "Cannot reshape with incorrect number of elements. Do you mean to resize?");
         }
         if (D::static_layout == layout_type::dynamic && layout == layout_type::dynamic)
         {
@@ -1008,7 +1010,7 @@ namespace xt
         }
         if (D::static_layout != layout_type::dynamic && layout != D::static_layout)
         {
-            throw std::runtime_error("Cannot reshape with different layout if static layout != dynamic.");
+            XTENSOR_THROW(std::runtime_error, "Cannot reshape with different layout if static layout != dynamic.");
         }
         m_layout = layout;
         m_shape = xtl::forward_sequence<shape_type, S>(shape);
@@ -1024,7 +1026,7 @@ namespace xt
         using value_type = typename std::decay_t<S>::value_type;
         if (this->size() % compute_size(_shape))
         {
-            throw std::runtime_error("Negative axis size cannot be inferred. Shape mismatch.");
+            XTENSOR_THROW(std::runtime_error, "Negative axis size cannot be inferred. Shape mismatch.");
         }
         std::decay_t<S> shape = _shape;
         value_type accumulator = 1;

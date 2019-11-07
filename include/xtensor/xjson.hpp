@@ -17,6 +17,7 @@
 #include <nlohmann/json.hpp>
 
 #include "xstrided_view.hpp"
+#include "xtensor_config.hpp"
 
 namespace xt
 {
@@ -175,7 +176,7 @@ namespace xt
         // In the case of a view, we check the size of the container.
         if (!std::equal(s.cbegin(), s.cend(), e.shape().cbegin()))
         {
-            throw std::runtime_error("Shape mismatch when deserializing JSON to view");
+            XTENSOR_THROW(std::runtime_error, "Shape mismatch when deserializing JSON to view");
         }
 
         auto sv = xstrided_slice_vector();

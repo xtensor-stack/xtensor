@@ -174,11 +174,13 @@ namespace xt
         EXPECT_EQ(res(3, 0), 1.f);
     }
 
+#if !(defined(XTENSOR_ENABLE_ASSERT) && defined(XTENSOR_DISABLE_EXCEPTIONS))
     TEST(xarray, access)
     {
         xarray_dynamic a;
         test_access(a);
     }
+#endif
 
     TEST(xarray, unchecked)
     {
@@ -192,11 +194,13 @@ namespace xt
         test_at(a);
     }
 
+#if !(defined(XTENSOR_ENABLE_ASSERT) && defined(XTENSOR_DISABLE_EXCEPTIONS))
     TEST(xarray, element)
     {
         xarray_dynamic a;
         test_element(a);
     }
+#endif
 
     TEST(xarray, indexed_access)
     {
