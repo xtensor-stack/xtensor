@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <fstream>
 #include <iostream>
+#include <memory>
 #include <regex>
 #include <sstream>
 #include <stdexcept>
@@ -75,8 +76,8 @@ namespace xt
                                unsigned char* v_major,
                                unsigned char* v_minor)
         {
-            char* buf = new char[magic_string_length + 2];
-            istream.read(buf, magic_string_length + 2);
+            std::unique_ptr<char[]> buf(new char[magic_string_length + 2]);
+            istream.read(buf.get(), magic_string_length + 2);
 
             if (!istream)
             {
@@ -93,7 +94,6 @@ namespace xt
 
             *v_major = static_cast<unsigned char>(buf[magic_string_length]);
             *v_minor = static_cast<unsigned char>(buf[magic_string_length + 1]);
-            delete[] buf;
         }
 
         template <class T>
@@ -440,10 +440,9 @@ namespace xt
                 // TODO: display warning
             }
 
-            char* buf = new char[header_length];
-            istream.read(buf, header_length);
-            std::string header(buf, header_length);
-            delete[] buf;
+            std::unique_ptr<char[]> buf(new char[header_length]);
+            istream.read(buf.get(), header_length);
+            std::string header(buf.get(), header_length);
 
             return header;
         }
@@ -462,10 +461,9 @@ namespace xt
                 // TODO: display warning
             }
 
-            char* buf = new char[header_length];
-            istream.read(buf, header_length);
-            std::string header(buf, header_length);
-            delete[] buf;
+            std::unique_ptr<char[]> buf(new char[header_length]);
+            istream.read(buf.get(), header_length);
+            std::string header(buf.get(), header_length);
 
             return header;
         }

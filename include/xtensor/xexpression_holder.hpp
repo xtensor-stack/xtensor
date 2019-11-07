@@ -11,6 +11,7 @@
 #define XTENSOR_XEXPRESSION_HOLDER_HPP
 
 #include <nlohmann/json.hpp>
+#include <memory>
 
 #include "xtl/xany.hpp"
 
@@ -34,7 +35,7 @@ namespace xt
 
         using implementation_type = detail::xexpression_holder_impl;
 
-        xexpression_holder();
+        xexpression_holder() = default;
 
         template <class E>
         xexpression_holder(E&& expr);
@@ -51,14 +52,12 @@ namespace xt
         void to_json(nlohmann::json&) const;
         void from_json(const nlohmann::json&);
 
-        ~xexpression_holder();
-
     private:
 
         void init_pointer_from_json(const nlohmann::json&);
         void check_holder() const;
 
-        implementation_type* p_holder;
+        std::unique_ptr<implementation_type> p_holder;
     };
 
     /*************************************
@@ -116,11 +115,6 @@ namespace xt
         };
     }
 
-    inline xexpression_holder::xexpression_holder()
-        : p_holder(nullptr)
-    {
-    }
-
     template <class E>
     inline xexpression_holder::xexpression_holder(E&& expr)
         : p_holder(new detail::xexpression_wrapper<E>(std::forward<E>(expr)))
@@ -138,9 +132,8 @@ namespace xt
     }
 
     inline xexpression_holder::xexpression_holder(xexpression_holder&& holder)
-        : p_holder(holder.p_holder)
+        : p_holder(std::move(holder.p_holder))
     {
-        holder.p_holder = nullptr;
     }
 
     inline xexpression_holder& xexpression_holder::operator=(const xexpression_holder& holder)
@@ -194,19 +187,19 @@ namespace xt
         if (j.is_number())
         {
             xt::xarray<double> empty_arr;
-            p_holder = new detail::xexpression_wrapper<xt::xarray<double>>(std::move(empty_arr));
+            p_holder.reset(new detail::xexpression_wrapper<xt::xarray<double>>(std::move(empty_arr)));
         }
 
         if (j.is_boolean())
         {
             xt::xarray<bool> empty_arr;
-            p_holder = new detail::xexpression_wrapper<xt::xarray<bool>>(std::move(empty_arr));
+            p_holder.reset(new detail::xexpression_wrapper<xt::xarray<bool>>(std::move(empty_arr)));
         }
 
         if (j.is_string())
         {
             xt::xarray<std::string> empty_arr;
-            p_holder = new detail::xexpression_wrapper<xt::xarray<std::string>>(std::move(empty_arr));
+            p_holder.reset(new detail::xexpression_wrapper<xt::xarray<std::string>>(std::move(empty_arr)));
         }
 
         throw std::runtime_error("Received a JSON with a tensor that contains unsupported data type");
@@ -218,11 +211,6 @@ namespace xt
         {
             throw std::runtime_error("The holder does not contain an expression");
         }
-    }
-
-    inline xexpression_holder::~xexpression_holder()
-    {
-        delete p_holder;
     }
 
     /****************************************
