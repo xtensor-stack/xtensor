@@ -89,6 +89,11 @@ namespace xt
             size_type nb = static_cast<size_type>(pad_width[axis][0]);
             size_type ne = static_cast<size_type>(pad_width[axis][1]);
 
+            if (nb == (size_type)(0) && ne == (size_type)(0))
+            {
+                continue;
+            }
+
             if (mode == pad_mode::constant)
             {
                 auto shape_bgn = out.shape();
