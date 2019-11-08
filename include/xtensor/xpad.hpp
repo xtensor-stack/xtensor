@@ -113,70 +113,57 @@ namespace xt
                 continue;
             }
 
-            if (mode == pad_mode::constant)
+            xt::xstrided_slice_vector sv_bgn(e.shape().size(), xt::all());
+            xt::xstrided_slice_vector sv_end(e.shape().size(), xt::all());
+
+            if (mode == pad_mode::wrap || mode == pad_mode::periodic)
             {
-                auto shape_bgn = out.shape();
-                auto shape_end = out.shape();
-                shape_bgn[axis] = nb;
-                shape_end[axis] = ne;
-                auto bgn = constant_value * xt::ones<value_type>(shape_bgn);
-                auto end = constant_value * xt::ones<value_type>(shape_end);
-                out = xt::concatenate(xt::xtuple(bgn, out, end), axis);
+                XTENSOR_ASSERT(nb <= out.shape()[axis]);
+                XTENSOR_ASSERT(ne <= out.shape()[axis]);
+                sv_bgn[axis] = xt::range(out.shape()[axis]-nb, out.shape()[axis]);
+                sv_end[axis] = xt::range(0, ne);
             }
-            else
+            else if (mode == pad_mode::symmetric)
             {
-                xt::xstrided_slice_vector sv_bgn(e.shape().size(), xt::all());
-                xt::xstrided_slice_vector sv_end(e.shape().size(), xt::all());
-
-                if (mode == pad_mode::wrap || mode == pad_mode::periodic)
+                XTENSOR_ASSERT(nb <= out.shape()[axis]);
+                XTENSOR_ASSERT(ne <= out.shape()[axis]);
+                if (nb == size_type(0))
                 {
-                    XTENSOR_ASSERT(nb <= out.shape()[axis]);
-                    XTENSOR_ASSERT(ne <= out.shape()[axis]);
-                    sv_bgn[axis] = xt::range(out.shape()[axis]-nb, out.shape()[axis]);
-                    sv_end[axis] = xt::range(0, ne);
+                    sv_bgn[axis] = xt::range(0, 0, -1);
                 }
-                else if (mode == pad_mode::symmetric)
+                else
                 {
-                    XTENSOR_ASSERT(nb <= out.shape()[axis]);
-                    XTENSOR_ASSERT(ne <= out.shape()[axis]);
-                    if (nb == size_type(0))
-                    {
-                        sv_bgn[axis] = xt::range(0, 0, -1);
-                    }
-                    else
-                    {
-                        sv_bgn[axis] = xt::range(nb-1, _, -1);
-                    }
-                    if (ne == out.shape()[axis])
-                    {
-                        sv_end[axis] = xt::range(out.shape()[axis], _, -1);
-                    }
-                    else
-                    {
-                        sv_end[axis] = xt::range(out.shape()[axis], out.shape()[axis]-ne-1, -1);
-                    }
+                    sv_bgn[axis] = xt::range(nb-1, _, -1);
                 }
-                else if (mode == pad_mode::reflect)
+                if (ne == out.shape()[axis])
                 {
-                    XTENSOR_ASSERT(out.shape()[axis] > 1);
-                    XTENSOR_ASSERT(nb <= out.shape()[axis] - 1);
-                    XTENSOR_ASSERT(ne <= out.shape()[axis] - 1);
-                    sv_bgn[axis] = xt::range(nb, 0, -1);
-                    if (ne == out.shape()[axis] - 1)
-                    {
-                        sv_end[axis] = xt::range(out.shape()[axis]-2, _, -1);
-                    }
-                    else
-                    {
-                        sv_end[axis] = xt::range(out.shape()[axis]-2, out.shape()[axis]-ne-2, -1);
-                    }
+                    sv_end[axis] = xt::range(out.shape()[axis], _, -1);
                 }
-
-                auto bgn = xt::strided_view(out, sv_bgn);
-                auto end = xt::strided_view(out, sv_end);
-
-                out = xt::concatenate(xt::xtuple(bgn, out, end), axis);
+                else
+                {
+                    sv_end[axis] = xt::range(out.shape()[axis], out.shape()[axis]-ne-1, -1);
+                }
             }
+            else if (mode == pad_mode::reflect)
+            {
+                XTENSOR_ASSERT(out.shape()[axis] > 1);
+                XTENSOR_ASSERT(nb <= out.shape()[axis] - 1);
+                XTENSOR_ASSERT(ne <= out.shape()[axis] - 1);
+                sv_bgn[axis] = xt::range(nb, 0, -1);
+                if (ne == out.shape()[axis] - 1)
+                {
+                    sv_end[axis] = xt::range(out.shape()[axis]-2, _, -1);
+                }
+                else
+                {
+                    sv_end[axis] = xt::range(out.shape()[axis]-2, out.shape()[axis]-ne-2, -1);
+                }
+            }
+
+            auto bgn = xt::strided_view(out, sv_bgn);
+            auto end = xt::strided_view(out, sv_end);
+
+            out = xt::concatenate(xt::xtuple(bgn, out, end), axis);
         }
 
         return out;
