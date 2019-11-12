@@ -352,7 +352,6 @@ namespace xt
 
         auto t = concatenate(xtuple(arange(2), arange(2, 5), arange(5, 8)));
         ASSERT_TRUE(arange(8) == t);
-
         
         xt::xarray<double> fa = xt::ones<double>({ 3, 4, 5, 0 });
         xt::xarray<double> sa = xt::ones<double>({ 3, 4, 5 });
@@ -376,7 +375,7 @@ namespace xt
     {
         xtensor_fixed<double, fixed_shape<2, 2, 3>> a = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
 
-        auto c = concatenate_fixed<2>(xtuple(a, a, a));
+        auto c = concatenate<2>(xtuple(a, a, a));
 
         using expected_shape_c_t = fixed_shape<2, 2, 9>;
         ASSERT_EQ(expected_shape_c_t{}, c.shape());
@@ -385,8 +384,8 @@ namespace xt
         ASSERT_EQ(11, c(1, 1, 5));
 
         xtensor_fixed<double, fixed_shape<1, 3>> e = {{1, 2, 3}}, f = {{2, 3, 4}};
-        auto k = concatenate_fixed<0>(xtuple(e, f));
-        auto l = concatenate_fixed<1>(xtuple(e, f));
+        auto k = concatenate<0>(xtuple(e, f));
+        auto l = concatenate<1>(xtuple(e, f));
 
         using expected_shape_k_t = fixed_shape<2, 3>;
         using expected_shape_l_t = fixed_shape<1, 6>;
@@ -399,9 +398,12 @@ namespace xt
         xtensor_fixed<double, fixed_shape<2>> x = arange(2);
         xtensor_fixed<double, fixed_shape<3>> y = arange(2, 5);
         xtensor_fixed<double, fixed_shape<3>> z = arange(5, 8);
-        auto w = concatenate_fixed(xtuple(x, y, z));
 
-        ASSERT_TRUE(arange(8) == w);
+        auto w1 = concatenate<0>(xtuple(x, y, z));
+        auto w2 = concatenate(xtuple(x, y, z), 0);
+
+        ASSERT_TRUE(arange(8) == w1);
+        ASSERT_TRUE(w1 == w2);
     }
 #endif
 
