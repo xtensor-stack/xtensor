@@ -81,6 +81,7 @@ namespace xt
 
         using size_type = typename std::decay_t<E>::size_type;
         using value_type = typename std::decay_t<E>::value_type;
+        using type = typename std::remove_reference<E&>::type;
 
         if (mode == pad_mode::constant)
         {
@@ -95,8 +96,7 @@ namespace xt
                 sv.push_back(xt::range(nb, nb + e.shape(axis)));
             }
 
-            typename std::remove_reference<E &>::type conc_out =
-                constant_value * xt::ones<value_type>(new_shape);
+            type conc_out = constant_value * xt::ones<value_type>(new_shape);
             xt::strided_view(conc_out, sv) = e;
             return conc_out;
         }
