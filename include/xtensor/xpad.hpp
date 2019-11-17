@@ -82,8 +82,6 @@ namespace xt
         using size_type = typename std::decay_t<E>::size_type;
         using value_type = typename std::decay_t<E>::value_type;
 
-        auto out = e;
-
         if (mode == pad_mode::constant)
         {
             auto new_shape = e.shape();
@@ -102,6 +100,8 @@ namespace xt
             xt::strided_view(conc_out, sv) = e;
             return conc_out;
         }
+
+        auto out = e;
 
         for (size_type axis = 0; axis < e.shape().size(); ++axis)
         {
