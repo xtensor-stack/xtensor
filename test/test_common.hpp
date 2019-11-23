@@ -239,9 +239,12 @@ namespace xt
             vec.reshape({ 3, -1, 4 }, layout_type::row_major);
             compare_shape(vec, rm);
 
+            auto & vec_ref = vec.reshape({ 3, -1, 4 }, layout_type::row_major);
+            compare_shape(vec_ref, rm);
+
             shape = rm.m_shape;
             shape.front() += 123;
-            XT_EXPECT_THROW(vec.reshape(shape), std::runtime_error);
+            XT_EXPECT_THROW(vec_ref.reshape(shape), std::runtime_error);
         }
     }
 
