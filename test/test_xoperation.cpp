@@ -739,6 +739,16 @@ namespace xt
         EXPECT_EQ(b, bexp);
     }
 
+    TEST(operation, mixed_bool_assign)
+    {
+        xt::xarray<double> a = { 1., 6. };
+        xt::xarray<double> b = { 2., 3. };
+        using uchar = unsigned char;
+        xt::xarray<uchar> res = a > b;
+        xt::xarray<uchar> exp = { uchar(0), uchar(1) };
+        EXPECT_EQ(res, exp);
+    }
+
     TEST(operation, dynamic_simd_assign)
     {
         using array_type = xt::xarray<double, layout_type::dynamic>;
