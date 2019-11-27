@@ -334,4 +334,37 @@ namespace xt
         xarray<double> expected5 = {{{1, 3}, {0, 2}}, {{5, 7}, {4, 6}}};
         ASSERT_EQ(expected5, xt::rot90(e3, {1, 2}));
     }
+
+    TEST(xmanipulation, roll)
+    {
+        xarray<double> e1 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+
+        ASSERT_EQ(e1, xt::roll(e1, 0));
+
+        xarray<double> expected1 = {{2, 3, 4}, {5, 6, 7}, {8, 9, 1}};
+        ASSERT_EQ(expected1, xt::roll(e1, -1));
+
+        xarray<double> expected2 = {{8, 9, 1}, {2, 3, 4}, {5, 6, 7}};
+        ASSERT_EQ(expected2, xt::roll(e1, 2));
+
+        xarray<double> expected3 = {{8, 9, 1}, {2, 3, 4}, {5, 6, 7}};
+        ASSERT_EQ(expected3, xt::roll(e1, 11));
+
+        xarray<double> expected4 = {{7, 8, 9}, {1, 2, 3}, {4, 5, 6}};
+        ASSERT_EQ(expected4, xt::roll(e1, 1, /*axis*/0));
+
+        xarray<double> expected5 = {{3, 1, 2}, {6, 4, 5}, {9, 7, 8}};
+        ASSERT_EQ(expected5, xt::roll(e1, 1, /*axis*/1));
+
+        xarray<double> e2 = {{{1, 2, 3}}, {{4, 5, 6}}, {{7, 8, 9}}};
+
+        xarray<double> expected6 = {{{4, 5, 6}}, {{7, 8, 9}}, {{1, 2, 3}}};
+        ASSERT_EQ(expected6, xt::roll(e2, 2, /*axis*/0));
+
+        xarray<double> expected7 = {{{1, 2, 3}}, {{4, 5, 6}}, {{7, 8, 9}}};
+        ASSERT_EQ(expected7, xt::roll(e2, -2, /*axis*/1));
+
+        xarray<double> expected8 = {{{3, 1, 2}}, {{6, 4, 5}}, {{9, 7, 8}}};
+        ASSERT_EQ(expected8, xt::roll(e2, -2, /*axis*/2));
+    }
 }
