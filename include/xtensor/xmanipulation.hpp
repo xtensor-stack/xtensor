@@ -10,6 +10,7 @@
 #ifndef XTENSOR_MANIPULATION_HPP
 #define XTENSOR_MANIPULATION_HPP
 
+#include "xbuilder.hpp"
 #include "xstrided_view.hpp"
 #include "xutils.hpp"
 #include "xtensor_config.hpp"
@@ -596,7 +597,7 @@ namespace xt
     template <std::ptrdiff_t N = 1, class E>
     inline auto rot90(E&& e, const std::array<std::ptrdiff_t, 2>& axes = {0, 1})
     {
-        auto ndim = std::ptrdiff_t(e.shape().size());
+        auto ndim = static_cast<std::ptrdiff_t>(e.shape().size());
 
         if (axes[0] == axes[1] || std::abs(axes[0] - axes[1]) == ndim)
         {
@@ -607,6 +608,106 @@ namespace xt
         constexpr std::ptrdiff_t n = (4 + (N % 4)) % 4;
 
         return rot90_impl<n>()(std::forward<E>(e), norm_axes);
+    }
+
+    template<class E>
+    inline auto roll(E&& e, std::ptrdiff_t shift)
+    {
+      auto cpy = empty_like(e);
+      auto flat_size = std::accumulate(cpy.shape().begin(), cpy.shape().end(), 1L, std::multiplies<std::size_t>());
+      while(shift < 0)
+      {
+        shift += flat_size;
+      }
+
+      shift %= flat_size;
+      std::copy(e.begin(), e.end() - shift,
+                std::copy(e.end() - shift, e.end(), cpy.begin()));
+
+      return cpy;
+    }
+
+    namespace detail
+    {
+      /* algorithm adapted from pythran/pythonic/numpy/roll.hpp
+       */
+
+      template < class To, class From, class S>
+      To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, S const& shape, std::size_t M)
+      {
+        std::ptrdiff_t dim = std::ptrdiff_t(shape[M]);
+        std::ptrdiff_t offset = std::accumulate(shape.begin() + M + 1, shape.end(), std::ptrdiff_t(1), std::multiplies<std::ptrdiff_t>());
+        if(shape.size() == M + 1)
+        {
+          if (axis == M)
+          {
+            const auto split = from + (dim - shift) * offset;
+            for(auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
+            {
+              *to = *iter;
+            }
+            for(auto iter = from, end = split; iter != end; iter += offset, ++to)
+            {
+              *to = *iter;
+            }
+          }
+          else
+          {
+            for (auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
+            {
+              *to = *iter;
+            }
+          }
+        }
+        else
+        {
+          if (axis == M)
+          {
+            const auto split = from + (dim - shift) * offset;
+            for(auto iter = split, end = from + dim * offset; iter != end; iter += offset)
+            {
+              to = roll(to, iter, shift, axis, shape, M + 1);
+            }
+            for(auto iter = from, end = split; iter != end; iter += offset)
+            {
+              to = roll(to, iter, shift, axis, shape, M + 1);
+            }
+          }
+          else
+          {
+            for (auto iter = from, end = from + dim * offset; iter != end; iter += offset)
+            {
+              to = roll(to, iter, shift, axis, shape, M + 1);
+            }
+          }
+        }
+        return to;
+      }
+    }
+
+    template<class E>
+    inline auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis)
+    {
+      auto cpy = empty_like(e);
+      auto const& shape = cpy.shape();
+      if(axis < 0)
+      {
+        axis += std::ptrdiff_t(cpy.dimension());
+      }
+
+      if(std::size_t(axis) >= cpy.dimension() || axis < 0)
+      {
+        XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
+      }
+
+      const auto axis_dim = std::ptrdiff_t(shape[axis]);
+      while(shift < 0)
+      {
+        shift += axis_dim;
+      }
+
+      detail::roll(cpy.begin(), e.begin(), shift, std::size_t(axis), shape, 0);
+      return cpy;
     }
 }
 
