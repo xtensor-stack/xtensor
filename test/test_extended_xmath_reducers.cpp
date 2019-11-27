@@ -814,7 +814,6 @@ namespace xt
                                  0.423361164166236 }};
 
         auto av = xt::average(py_a, py_w, {0,1});
-
         EXPECT_TRUE(xt::allclose(av, py_av));
     }
 

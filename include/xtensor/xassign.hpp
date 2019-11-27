@@ -605,7 +605,7 @@ namespace xt
         }
 
 #if defined(XTENSOR_USE_TBB)
-        tbb::parallel_for(align_begin, align_end, simd_size, [&](size_t i)
+        tbb::parallel_for(align_begin, align_end, simd_size, [&e1, &e2](size_t i)
           {
             e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
           });

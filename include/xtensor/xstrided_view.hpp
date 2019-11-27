@@ -172,6 +172,7 @@ namespace xt
         using data_alignment = xt_simd::container_alignment_t<storage_type>;
         using simd_type = xt_simd::simd_type<value_type>;
         using simd_value_type = xt_simd::simd_type<value_type>;
+        using bool_load_type = typename base_type::bool_load_type;
 
         template <class CTA, class SA>
         xstrided_view(CTA&& e, SA&& shape, strides_type&& strides, std::size_t offset, layout_type layout) noexcept;
@@ -668,7 +669,7 @@ namespace xt
         xt::resize_container(strides, shape.size());
         compute_strides(shape, L, strides);
         constexpr auto computed_layout = std::decay_t<E>::static_layout == L ? L : layout_type::dynamic;
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, computed_layout, detail::flat_storage_getter<xclosure_t<E>, L>>;
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, computed_layout, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
         return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, e.layout());
     }
 
