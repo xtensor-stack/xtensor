@@ -304,8 +304,10 @@ namespace xt
         template <class T>
         using is_bool = std::is_same<T, bool>;
 
+        static constexpr bool is_bool_conversion() { return is_bool<e2_value_type>::value && !is_bool<e1_value_type>::value; }
         static constexpr bool contiguous_layout() { return E1::contiguous_layout && E2::contiguous_layout; }
-        static constexpr bool convertible_types() { return std::is_convertible<e2_value_type, e1_value_type>::value; }
+        static constexpr bool convertible_types() { return std::is_convertible<e2_value_type, e1_value_type>::value 
+                                                        && !is_bool_conversion(); }
 
         static constexpr bool use_xsimd() { return xt_simd::simd_traits<int8_t>::size > 1; }
 
