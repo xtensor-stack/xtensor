@@ -66,16 +66,6 @@ namespace xt
      * xview declaration *
      *********************/
 
-    template <class CT, class... S>
-    struct xcontainer_inner_types<xview<CT, S...>>
-    {
-        using xexpression_type = std::decay_t<CT>;
-        using reference = inner_reference_t<CT>;
-        using const_reference = typename xexpression_type::const_reference;
-        using size_type = typename xexpression_type::size_type;
-        using temporary_type = view_temporary_type_t<xexpression_type, S...>;
-    };
-
     template <bool is_const, class CT, class... S>
     class xview_stepper;
 
@@ -299,6 +289,27 @@ namespace xt
     }
 
     template <class CT, class... S>
+    struct xcontainer_inner_types<xview<CT, S...>>
+    {
+        using xexpression_type = std::decay_t<CT>;
+        using reference = inner_reference_t<CT>;
+        using const_reference = typename xexpression_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
+        using temporary_type = view_temporary_type_t<xexpression_type, S...>;
+
+        static constexpr layout_type layout =
+            detail::is_contiguous_view<xexpression_type, S...>::value ?
+                xexpression_type::static_layout : layout_type::dynamic;
+
+        static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
+
+        using extract_storage_type = xtl::mpl::eval_if_t<has_data_interface<xexpression_type>,
+                                                         detail::expr_storage_type<xexpression_type>,
+                                                         make_invalid_type<>>;
+        using storage_type = std::conditional_t<is_const, const extract_storage_type, extract_storage_type>;
+    };
+
+    template <class CT, class... S>
     struct xiterable_inner_types<xview<CT, S...>>
     {
         using xexpression_type = std::decay_t<CT>;
@@ -335,7 +346,10 @@ namespace xt
      */
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,
-                  public xiterable<xview<CT, S...>>,
+                  public std::conditional_t<
+                    detail::is_contiguous_view<std::decay_t<CT>, S...>::value,
+                    xcontiguous_iterable<xview<CT, S...>>,
+                    xiterable<xview<CT, S...>>>,
                   public xaccessible<xview<CT, S...>>,
                   public extension::xview_base_t<CT, S...>
     {
@@ -364,9 +378,7 @@ namespace xt
         using size_type = typename inner_types::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        static constexpr layout_type static_layout = detail::is_contiguous_view<xexpression_type, S...>::value ?
-                                                                                xexpression_type::static_layout :
-                                                                                layout_type::dynamic;
+        static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
         static constexpr bool is_strided_view = detail::is_strided_view<xexpression_type, S...>::value;
@@ -384,9 +396,7 @@ namespace xt
                                                                        detail::expr_inner_backstrides_type<xexpression_type>,
                                                                        get_strides_type<shape_type>>;
 
-        using storage_type = xtl::mpl::eval_if_t<has_data_interface<xexpression_type>,
-                                                 detail::expr_storage_type<xexpression_type>,
-                                                 make_invalid_type<>>;
+        using storage_type = typename inner_types::storage_type;
 
         static constexpr bool has_trivial_strides = is_contiguous_view && !xtl::disjunction<detail::is_xrange<S>...>::value;
         using inner_strides_type = std::conditional_t<has_trivial_strides,
@@ -411,11 +421,13 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
 
         using storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value && is_strided_view,
-                                                    typename xexpression_type::storage_iterator,
+                                                    std::conditional_t<is_const,
+                                                        typename xexpression_type::const_storage_iterator,
+                                                        typename xexpression_type::storage_iterator>,
                                                     typename iterable_base::storage_iterator>;
         using const_storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value && is_strided_view,
-                                                    typename xexpression_type::const_storage_iterator,
-                                                    typename iterable_base::const_storage_iterator>;
+                                                          typename xexpression_type::const_storage_iterator,
+                                                          typename iterable_base::const_storage_iterator>;
 
         using container_iterator = pointer;
         using const_container_iterator = const_pointer;
@@ -495,11 +507,11 @@ namespace xt
         stepper_end(const ST& shape, layout_type l) const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, storage_type&>
         storage();
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, const storage_type&>
         storage() const;
 
         template <class T = xexpression_type>
@@ -1087,7 +1099,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::storage() ->
-        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, storage_type&>
     {
         return m_e.storage();
     }
@@ -1095,7 +1107,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::storage() const ->
-        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, const storage_type&>
     {
         return m_e.storage();
     }

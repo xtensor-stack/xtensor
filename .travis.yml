@@ -39,25 +39,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 ENABLE_TBB=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
       env: COMPILER=gcc GCC=6 DISABLE_EXCEPTION=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-      env: COMPILER=gcc GCC=6 ENABLE_OPENMP=1
     - os: linux
       if: branch = master
       addons:
@@ -85,6 +67,24 @@ matrix:
           packages:
             - g++-7
       env: COMPILER=gcc GCC=7
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env: COMPILER=gcc GCC=7 ENABLE_TBB=1
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env: COMPILER=gcc GCC=7 ENABLE_OPENMP=1
     - os: linux
       if: branch = master
       addons:
