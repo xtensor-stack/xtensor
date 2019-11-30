@@ -297,4 +297,13 @@ namespace xt
         EXPECT_EQ(a(0, 0), cmplx(-123.321, -123.321));
         EXPECT_EQ(a(4, 4), cmplx(-123.321, -123.321));
     }
+
+    TEST(xcomplex, build_from_double)
+    {
+        xt::xarray<double> r = { 1., 2., 3. };
+        xt::xarray<std::complex<double>> rc(r);
+        EXPECT_EQ(rc(0).real(), r(0));
+        EXPECT_EQ(rc(1).real(), r(1));
+        EXPECT_EQ(rc(2).real(), r(2));
+    }
 }
