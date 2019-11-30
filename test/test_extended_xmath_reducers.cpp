@@ -20,6 +20,10 @@ namespace xt
 {
     using namespace xt::placeholders;
 
+// Tmporary disabling for TBB and OPENMP due to a potential
+// race conditoin that must be identified
+
+#if !defined(XTENSOR_USE_TBB) && !defined(XTENSOR_USE_OPENMP)
     /*py
     a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
     w  = np.random.random(4*5*6*7).reshape(4,5,6,7)
@@ -816,6 +820,7 @@ namespace xt
         auto av = xt::average(py_a, py_w, {0,1});
         EXPECT_TRUE(xt::allclose(av, py_av));
     }
+#endif
 
     /*py
     a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
