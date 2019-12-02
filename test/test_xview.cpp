@@ -497,6 +497,7 @@ namespace xt
         EXPECT_EQ(v2, 3);
 
         auto it = a2.begin();
+        EXPECT_EQ(*it, v2);
     }
 
     TEST(xview, trivial_iterating)

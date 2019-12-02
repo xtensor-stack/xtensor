@@ -613,101 +613,102 @@ namespace xt
     template<class E>
     inline auto roll(E&& e, std::ptrdiff_t shift)
     {
-      auto cpy = empty_like(e);
-      auto flat_size = std::accumulate(cpy.shape().begin(), cpy.shape().end(), 1L, std::multiplies<std::size_t>());
-      while(shift < 0)
-      {
-        shift += flat_size;
-      }
+        auto cpy = empty_like(e);
+        auto flat_size = std::accumulate(cpy.shape().begin(), cpy.shape().end(), 1L, std::multiplies<std::size_t>());
+        while(shift < 0)
+        {
+            shift += flat_size;
+        }
 
-      shift %= flat_size;
-      std::copy(e.begin(), e.end() - shift,
-                std::copy(e.end() - shift, e.end(), cpy.begin()));
+        shift %= flat_size;
+        std::copy(e.begin(), e.end() - shift,
+                  std::copy(e.end() - shift, e.end(), cpy.begin()));
 
-      return cpy;
+        return cpy;
     }
 
     namespace detail
     {
-      /* algorithm adapted from pythran/pythonic/numpy/roll.hpp
-       */
+        /**
+         * Algorithm adapted from pythran/pythonic/numpy/roll.hpp
+         */
 
-      template < class To, class From, class S>
-      To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, S const& shape, std::size_t M)
-      {
-        std::ptrdiff_t dim = std::ptrdiff_t(shape[M]);
-        std::ptrdiff_t offset = std::accumulate(shape.begin() + M + 1, shape.end(), std::ptrdiff_t(1), std::multiplies<std::ptrdiff_t>());
-        if(shape.size() == M + 1)
+        template < class To, class From, class S>
+        To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, S const& shape, std::size_t M)
         {
-          if (axis == M)
-          {
-            const auto split = from + (dim - shift) * offset;
-            for(auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
+            std::ptrdiff_t dim = std::ptrdiff_t(shape[M]);
+            std::ptrdiff_t offset = std::accumulate(shape.begin() + M + 1, shape.end(), std::ptrdiff_t(1), std::multiplies<std::ptrdiff_t>());
+            if(shape.size() == M + 1)
             {
-              *to = *iter;
+                if (axis == M)
+                {
+                    const auto split = from + (dim - shift) * offset;
+                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                    for(auto iter = from, end = split; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                }
+                else
+                {
+                    for(auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                }
             }
-            for(auto iter = from, end = split; iter != end; iter += offset, ++to)
+            else
             {
-              *to = *iter;
+                if (axis == M)
+                {
+                    const auto split = from + (dim - shift) * offset;
+                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset)
+                    {
+                        to = roll(to, iter, shift, axis, shape, M + 1);
+                    }
+                    for(auto iter = from, end = split; iter != end; iter += offset)
+                    {
+                        to = roll(to, iter, shift, axis, shape, M + 1);
+                    }
+                }
+                else
+                {
+                    for (auto iter = from, end = from + dim * offset; iter != end; iter += offset)
+                    {
+                        to = roll(to, iter, shift, axis, shape, M + 1);
+                    }
+                }
             }
-          }
-          else
-          {
-            for (auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
-            {
-              *to = *iter;
-            }
-          }
+            return to;
         }
-        else
-        {
-          if (axis == M)
-          {
-            const auto split = from + (dim - shift) * offset;
-            for(auto iter = split, end = from + dim * offset; iter != end; iter += offset)
-            {
-              to = roll(to, iter, shift, axis, shape, M + 1);
-            }
-            for(auto iter = from, end = split; iter != end; iter += offset)
-            {
-              to = roll(to, iter, shift, axis, shape, M + 1);
-            }
-          }
-          else
-          {
-            for (auto iter = from, end = from + dim * offset; iter != end; iter += offset)
-            {
-              to = roll(to, iter, shift, axis, shape, M + 1);
-            }
-          }
-        }
-        return to;
-      }
     }
 
     template<class E>
     inline auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis)
     {
-      auto cpy = empty_like(e);
-      auto const& shape = cpy.shape();
-      if(axis < 0)
-      {
-        axis += std::ptrdiff_t(cpy.dimension());
-      }
+        auto cpy = empty_like(e);
+        auto const& shape = cpy.shape();
+        if(axis < 0)
+        {
+            axis += std::ptrdiff_t(cpy.dimension());
+        }
 
-      if(std::size_t(axis) >= cpy.dimension() || axis < 0)
-      {
-        XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
-      }
+        if(std::size_t(axis) >= cpy.dimension() || axis < 0)
+        {
+            XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
+        }
 
-      const auto axis_dim = std::ptrdiff_t(shape[axis]);
-      while(shift < 0)
-      {
-        shift += axis_dim;
-      }
+        const auto axis_dim = static_cast<std::ptrdiff_t>(shape[axis]);
+        while(shift < 0)
+        {
+            shift += axis_dim;
+        }
 
-      detail::roll(cpy.begin(), e.begin(), shift, std::size_t(axis), shape, 0);
-      return cpy;
+        detail::roll(cpy.begin(), e.begin(), shift, std::size_t(axis), shape, 0);
+        return cpy;
     }
 }
 
