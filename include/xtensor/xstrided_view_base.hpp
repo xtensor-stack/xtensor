@@ -51,10 +51,7 @@ namespace xt
             template <class FST>
             flat_expression_adaptor(CT* e, FST&& strides);
 
-            void update_pointer(CT* ptr) const
-            {
-                m_e = ptr;
-            }
+            void update_pointer(CT* ptr) const;
 
             size_type size() const;
             reference operator[](size_type idx);
@@ -71,9 +68,12 @@ namespace xt
 
             mutable CT* m_e;
             inner_strides_type m_strides;
-            mutable index_type m_index;
+            thread_local static index_type m_index;
             size_type m_size;
         };
+
+        template <class CT, layout_type L>
+        thread_local typename flat_expression_adaptor<CT, L>::index_type flat_expression_adaptor<CT, L>::m_index;
 
         template <class T>
         struct is_flat_expression_adaptor : std::false_type
@@ -693,6 +693,12 @@ namespace xt
             m_size = m_e->size();
         }
 
+        template <class CT, layout_type L>
+        inline void flat_expression_adaptor<CT, L>::update_pointer(CT* ptr) const
+        {
+            m_e = ptr;
+        }
+        
         template <class CT, layout_type L>
         inline auto flat_expression_adaptor<CT, L>::size() const -> size_type
         {
