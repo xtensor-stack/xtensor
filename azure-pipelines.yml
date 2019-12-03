@@ -42,7 +42,7 @@ jobs:
                         gtest ^
                         ninja ^
                         nlohmann_json ^
-                        xtl==0.6.7 ^
+                        xtl==0.6.9 ^
                         xsimd ^
                         python=3.6
           conda list
