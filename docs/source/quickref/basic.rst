@@ -78,11 +78,20 @@ Shape - dimension - size
 
 .. code::
 
-   xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
-   auto size = a.size();     // size = 6
-   auto dim = a.dimension(); // dim = 2
-   auto shape = a.shape();   // shape = {2, 3}
-   auto sh1 = a.shape(1);    // sh1 = 3
+    xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+    auto size = a.size();     // size = 6
+    auto dim = a.dimension(); // dim = 2
+    auto shape = a.shape();   // shape = {2, 3}
+    auto sh1 = a.shape(1);    // sh1 = 3
+
+Print the shape
+---------------
+
+.. code::
+
+    xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+    auto shape = a.shape();
+    std::cout << xt::adapt(shape) << std::endl;
 
 Reshape
 -------
