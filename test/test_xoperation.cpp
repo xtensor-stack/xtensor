@@ -626,6 +626,7 @@ namespace xt
             using assign_traits_scalar_double = xassign_traits<TypeParam, decltype(fsd)>;
 #if XTENSOR_USE_XSIMD
             auto batch = fsd.template load_simd<double>(0);
+            (void)batch;
             EXPECT_TRUE(assign_traits_scalar_double::simd_linear_assign());
 #else
             using return_type = decltype(fsd.template load_simd<aligned_mode>(std::size_t(0)));
