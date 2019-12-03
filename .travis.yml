@@ -215,6 +215,9 @@ install:
     # Testing
     - mkdir build
     - cd build
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        cat /proc/cpuinfo;
+      fi
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
         cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON -DBUILD_BENCHMARK=ON ..;
       elif [[ "$COLUMN_MAJOR_LAYOUT" == 1 ]]; then
