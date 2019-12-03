@@ -45,6 +45,24 @@ namespace xt
     using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
     TYPED_TEST_CASE(adaptor_semantic, testing_types);
 
+    TYPED_TEST(adaptor_semantic, xsimd_info)
+    {
+#if defined(XTENSOR_USE_XSIMD)
+        std::cout << "Built with XSIMD" << std::endl;
+    #if defined(XSIMD_X86_INSTR_SET)
+        std::cout << "Using X86 Instruction set: " << XSIMD_INSTR_SET << std::endl;
+    #elif defined(XSIMD_X86_AMD_INSTR_SET)
+        std::cout << "Using AMD Instruction set: " << XSIMD_INSTR_SET << std::endl;
+    #elif defined(XSIMD_ARM_INSTR_SET)
+        std::cout << "Using ARM Instruction set: " << XSIMD_INSTR_SET << std::endl;
+    #else
+        std::cout << "Using unknown Instruction set: " << XSIMD_INSTR_SET << std::endl;
+    #endif
+#else
+        std::cout << "Built without XSIMD" << std::endl;
+#endif
+    }
+
     TYPED_TEST(adaptor_semantic, a_plus_b)
     {
         operation_tester<std::plus<>, TypeParam> tester;
