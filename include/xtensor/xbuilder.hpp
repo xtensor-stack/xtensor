@@ -794,6 +794,51 @@ namespace xt
         return detail::make_xgenerator(detail::stack_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
     }
 
+    /**
+     * @brief Stack xexpressions in sequence horizontally (column wise).
+     * This is equivalent to concatenation along the second axis, except for 1-D
+     * xexpressions where it concatenate along the firts axis.
+     *
+     * @param t \ref xtuple of xexpressions to stack
+     * @return xgenerator evaluating to ctacked elements
+     */
+    template <class... CT>
+    inline auto hstack(std::tuple<CT...>&& t)
+    {
+        auto dim = std::get<0>(t).dimension();
+        std::size_t axis = dim > std::size_t(1) ? 1 : 0;
+        return concatenate(std::move(t), axis);
+    }
+
+    namespace detail
+    {
+        template <class S, class... CT>
+        inline auto vstack_shape(std::tuple<CT...>& t, const S& shape)
+        {
+            using size_type = typename S::value_type;
+            auto res = shape.size() == size_type(1) ?
+                S({sizeof...(CT), shape[0]}) :
+                concat_shape_builder_t::build(std::move(t), size_type(0));
+            return res;
+        }
+
+        template <class T, class... CT>
+        inline auto vstack_shape(const std::tuple<CT...>& t, std::array<T, 1> shape)
+        {
+            std::array<T, 2> res = { sizeof...(CT), shape[0] };
+            return res;
+        }
+    }
+
+    template <class... CT>
+    inline auto vstack(std::tuple<CT...>&& t)
+    {
+        using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
+        using source_shape_type = decltype(std::get<0>(t).shape());
+        auto new_shape = detail::vstack_shape(t, xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape()));
+        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::decay_t<decltype(t)>>(t), size_t(0)), new_shape);
+    }
+
     namespace detail
     {
 
