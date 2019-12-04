@@ -709,6 +709,9 @@ namespace xt
 
         xarray<int> xres = {{1, 2}, {3, 4}, {5, 6}};
         EXPECT_EQ(xrv, xres);
+
+xt::xarray<double> input = xt::zeros<double>({ 2,2 });
+xt::xarray<double> output = xt::reshape_view(input, {4});
     }
 
     TEST(xstrided_view, reshape_view_assign)
