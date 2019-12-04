@@ -452,6 +452,52 @@ namespace xt
         ASSERT_TRUE(t == ar);
     }
 
+    TEST(xbuilder, hstack)
+    {
+        xarray<int> a0 = {1, 2, 3};
+        xarray<int> b0 = {2, 3, 4};
+        xarray<int> e0 = {1, 2, 3, 2, 3, 4};
+        auto c0 = hstack(xtuple(a0, b0));
+        EXPECT_EQ(c0, e0);
+
+        xarray<int> a1 = a0;
+        a1.reshape({3, 1});
+        xarray<int> b1 = b0;
+        b1.reshape({3, 1});
+        xarray<int> e1 = {{1, 2}, {2, 3}, {3, 4}};
+        auto c1 = hstack(xtuple(a1, b1));
+        EXPECT_EQ(c1, e1);
+
+        xarray<int> a2 = {{1, 2, 3}, {4, 5 ,6}};
+        xarray<int> b2 = {{7, 8}, {9, 10}};
+        xarray<int> e2 = {{1, 2, 3, 7, 8}, {4, 5, 6, 9, 10}};
+        auto c2 = hstack(xtuple(a2, b2));
+    }
+
+    TEST(xbuilder, vstack)
+    {
+        xarray<int> a0 = {1, 2, 3};
+        xarray<int> b0 = {2, 3, 4};
+        xarray<int> e0 = {{1, 2, 3}, {2, 3, 4}};
+        auto c0 = vstack(xtuple(a0, b0));
+        EXPECT_EQ(c0, e0);
+
+        xarray<int> a1 = a0;
+        a1.reshape({3, 1});
+        xarray<int> b1 = b0;
+        b1.reshape({3, 1});
+        xarray<int> e1 = e0;
+        e1.reshape({6, 1});
+        auto c1 = vstack(xtuple(a1, b1));
+        EXPECT_EQ(c1, e1);
+
+        xarray<int> a2 = {{1, 2, 3}, {4, 5 ,6}, {7, 8, 9}};
+        xarray<int> b2 = {{10, 11, 12}};
+        xarray<int> e2 = {{1, 2, 3}, {4, 5 ,6}, {7, 8, 9}, {10, 11, 12}};
+        auto c2 = vstack(xtuple(a2, b2));
+        EXPECT_EQ(c2, e2);
+    }
+
     TEST(xbuilder, meshgrid)
     {
         auto mesh = meshgrid(linspace<double>(0.0, 1.0, 3), linspace<double>(0.0, 1.0, 2));
