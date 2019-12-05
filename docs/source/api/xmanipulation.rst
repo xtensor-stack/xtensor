@@ -45,6 +45,12 @@ Defined in ``xtensor/xmanipulation.hpp``
 .. doxygenfunction:: xt::split
   :project: xtensor
 
+.. doxygenfunction:: xt::hsplit
+  :project: xtensor
+
+.. doxygenfunction:: xt::vsplit
+  :project: xtensor
+
 .. doxygenfunction:: xt::squeeze(E&&)
   :project: xtensor
 

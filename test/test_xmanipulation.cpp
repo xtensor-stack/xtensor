@@ -152,6 +152,22 @@ namespace xt
         EXPECT_EQ(s3[2](0, 1), b(0, 2, 1));
     }
 
+    TEST(xmanipulation, hsplit)
+    {
+        xt::xarray<int> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+        auto res = xt::hsplit(a, 2);
+        auto e = xt::split(a, 2, 1);
+        EXPECT_EQ(e, res);
+    }
+
+    TEST(xmanipulation, vsplit)
+    {
+        xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}};
+        auto res = xt::vsplit(a, 2);
+        auto e = xt::split(a, 2, 0);
+        EXPECT_EQ(e, res);
+    }
+
     TEST(xmanipulation, squeeze)
     {
         auto b = xt::xarray<double>::from_shape({3, 3, 1, 1, 2, 1, 3});
