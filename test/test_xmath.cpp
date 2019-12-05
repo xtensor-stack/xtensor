@@ -823,6 +823,11 @@ namespace xt
         auto ad = xt::adapt(d);
         EXPECT_EQ(xt::diff(ad), expected1);
         EXPECT_EQ(ad, orig);
+
+        xt::xarray<int> e = {1, 2};
+        auto expected8 = xt::xarray<int>::from_shape({0});
+        EXPECT_EQ(xt::diff(e, 2), expected8);
+        EXPECT_EQ(xt::diff(e, 5), expected8);
     }
 
     TEST(xmath, trapz)

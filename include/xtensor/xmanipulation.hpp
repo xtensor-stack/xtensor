@@ -811,23 +811,24 @@ namespace xt
     {
         auto cpy = empty_like(e);
         auto const& shape = cpy.shape();
+        std::size_t saxis = static_cast<std::size_t>(axis);
         if(axis < 0)
         {
             axis += std::ptrdiff_t(cpy.dimension());
         }
 
-        if(std::size_t(axis) >= cpy.dimension() || axis < 0)
+        if(saxis >= cpy.dimension() || axis < 0)
         {
             XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
         }
 
-        const auto axis_dim = static_cast<std::ptrdiff_t>(shape[axis]);
+        const auto axis_dim = static_cast<std::ptrdiff_t>(shape[saxis]);
         while(shift < 0)
         {
             shift += axis_dim;
         }
 
-        detail::roll(cpy.begin(), e.begin(), shift, std::size_t(axis), shape, 0);
+        detail::roll(cpy.begin(), e.begin(), shift, saxis, shape, 0);
         return cpy;
     }
 }
