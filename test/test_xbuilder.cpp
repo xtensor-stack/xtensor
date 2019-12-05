@@ -486,7 +486,7 @@ namespace xt
         a1.reshape({3, 1});
         xarray<int> b1 = b0;
         b1.reshape({3, 1});
-        xarray<int> e1 = e0;
+        xarray<int> e1 = { 1, 2, 3, 2, 3, 4 };
         e1.reshape({6, 1});
         auto c1 = vstack(xtuple(a1, b1));
         EXPECT_EQ(c1, e1);
