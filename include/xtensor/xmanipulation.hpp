@@ -67,6 +67,12 @@ namespace xt
     auto split(E& e, std::size_t n, std::size_t axis = 0);
 
     template <class E>
+    auto hsplit(E& e, std::size_t n);
+
+    template <class E>
+    auto vsplit(E& e, std::size_t n);
+
+    template <class E>
     auto flip(E&& e, std::size_t axis);
 
     template <std::ptrdiff_t N = 1, class E>
@@ -547,6 +553,34 @@ namespace xt
             result.emplace_back(strided_view(e, sv));
         }
         return result;
+    }
+
+    /**
+     * @brief Split an xexpression into subexpressions horizontally (column-wise)
+     *
+     * This method is equivalent to ``split(e, n, 1)``. 
+     *
+     * @param e input xexpression
+     * @param n number of elements to return
+     */
+    template <class E>
+    inline auto hsplit(E& e, std::size_t n)
+    {
+        return split(e, n, std::size_t(1));
+    }
+
+    /**
+     * @brief Split an xexpression into subexpressions vertically (row-wise)
+     *
+     * This method is equivalent to ``split(e, n, 0)``.
+     *
+     * @param e input xexpression
+     * @param n number of elements to return
+     */
+    template <class E>
+    inline auto vsplit(E& e, std::size_t n)
+    {
+        return split(e, n, std::size_t(0));
     }
 
     /***********************
