@@ -2767,17 +2767,25 @@ namespace detail {
     auto diff(const xexpression<T>& a, std::size_t n = 1, std::ptrdiff_t axis = -1)
     {
         typename std::decay_t<T>::temporary_type ad = a.derived_cast();
-        XTENSOR_ASSERT(n <= ad.size());
         std::size_t saxis = normalize_axis(ad.dimension(), axis);
-
-        if (n != std::size_t(0))
+        if(n <= ad.size())
         {
-            xstrided_slice_vector slice1(ad.dimension(), all());
-            xstrided_slice_vector slice2(ad.dimension(), all());
-            slice1[saxis] = range(1, xnone());
 
-            detail::diff_impl<typename T::value_type> impl;
-            impl(ad, n, slice1, slice2, saxis);
+            if (n != std::size_t(0))
+            {
+                xstrided_slice_vector slice1(ad.dimension(), all());
+                xstrided_slice_vector slice2(ad.dimension(), all());
+                slice1[saxis] = range(1, xnone());
+
+                detail::diff_impl<typename T::value_type> impl;
+                impl(ad, n, slice1, slice2, saxis);
+            }
+        }
+        else
+        {
+            auto shape = ad.shape();
+            shape[saxis] = std::size_t(0);
+            ad.resize(shape);
         }
         return ad;
     }
