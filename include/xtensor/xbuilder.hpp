@@ -829,7 +829,7 @@ namespace xt
      * xexpressions where it concatenate along the firts axis.
      *
      * @param t \ref xtuple of xexpressions to stack
-     * @return xgenerator evaluating to ctacked elements
+     * @return xgenerator evaluating to stacked elements
      */
     template <class... CT>
     inline auto hstack(std::tuple<CT...>&& t)
@@ -859,6 +859,14 @@ namespace xt
         }
     }
 
+    /**
+     * @brief Stack xexpressions in sequence vertically (row wise).
+     * This is equivalent to concatenation along the first axis after
+     * 1-D arrays of shape (N) have been reshape to (1, N).
+     *
+     * @param t \ref xtuple of xexpressions to stack
+     * @return xgenerator evaluating to stacked elements
+     */
     template <class... CT>
     inline auto vstack(std::tuple<CT...>&& t)
     {

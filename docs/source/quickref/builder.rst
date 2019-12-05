@@ -185,6 +185,40 @@ Stack
     std::cout << s1 << std::endl;
     // Outputs {{1, 5}, {2, 6}, {3, 7}}
 
+HStack
+------
+
+.. code::
+
+    xt::xarray<double> a0 = {{1, 2, 3}, {4, 5, 6}};
+    xt::xarray<double> b0 = {{7, 8}, {9, 10}};
+    auto c0 = xt::hstack(xt::xtuple(a0, b0));
+    std::cout << c0 << std:endl;
+    // Outputs {{1, 2, 3, 7, 8}, {4, 5, 6, 0, 10}}
+
+    xt::xarray<double> a1 = {1, 2, 3};
+    xt::xarray<double> b1 = {2, 3 ,4};
+    auto c1 = xt::hastack(xt::xtuple(a1, b1));
+    std::cout << c1 << std::endl;
+    // Outputs {1, 2, 3, 2, 3, 4}
+
+VStack
+------
+
+.. code::
+
+    xt::xarray<double> a0 = {1, 2, 3};
+    xt::xarray<double> b0 = {2, 3, 4};
+    auto c0 = xt::vstack(xt::xtuple(a0, b0));
+    std::cout << c0 << std::endl;
+    // Outputs {{1, 2, 3}, {2, 3 ,4}}
+
+    xt::xarray<double> a1 = {{1, 2, 3}, {4, 5 ,6}, {7, 8, 9}};
+    xt::xarray<double> b1 = {{10, 11, 12}};
+    auto c1 = xt::vstack(xt::xtuple(a1, b1));
+    std::cout << c1 << std::endl;
+    // Outputs {{1, 2, 3}, {4, 5 ,6}, {7, 8, 9}, {10, 11, 12}}
+
 Diag
 ----
 
