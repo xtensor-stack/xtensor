@@ -80,6 +80,26 @@ split
     auto s0 = xt::split(a, 3);
     auto s1 = xt::split(a, 3, 1);
 
+hsplit
+------
+
+.. code::
+
+    #include "xmanipulation.hpp"
+
+    xt::xarray<int> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+    auto res = xt::hsplit(a, 2);
+    
+vsplit
+------
+
+.. code::
+
+    #include "xmanipulation.hpp"
+
+    xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}};
+    auto res = xt::vsplit(a, 2);
+
 squeeze
 -------
 
