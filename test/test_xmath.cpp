@@ -871,4 +871,13 @@ namespace xt
             EXPECT_EQ(f[i], x[i]);
         }
     }
+
+    TEST(xmath, cov)
+    {
+        xt::xarray<double> x = {0.0, 1.0, 2.0};
+        xt::xarray<double> y = {2.0, 1.0, 0.0};
+        xt::xarray<double> expected = {{1.0, -1.0}, {-1.0, 1.0}};
+
+        EXPECT_EQ(expected, xt::cov(x, y));
+    }
 }
