@@ -107,6 +107,10 @@
 #define XTENSOR_DEFAULT_TRAVERSAL ::xt::layout_type::row_major
 #endif
 
+#ifndef XTENSOR_OPENMP_TRESHOLD
+#define XTENSOR_OPENMP_TRESHOLD 0
+#endif
+
 #ifdef IN_DOXYGEN
 namespace xtl
 {
