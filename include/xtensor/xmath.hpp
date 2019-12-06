@@ -2961,27 +2961,46 @@ namespace detail {
     /**
      * @brief Returns the covariance matrix
      * 
-     * @param x Source matrix
+     * @param x one or two dimensional array
+     * @param y optional one-dimensional array to build covariance to x
      */
     template <class E1>
-    inline auto cov(const E1 &x)
+    inline auto cov(const E1 &x, const E1 &y = E1())
     {
         using value_type = typename E1::value_type;
 
-        XTENSOR_ASSERT( x.dimension() == 2 );
-
-        auto s = x.shape();
-        auto covar = eval(zeros<value_type>({s[1], s[1]}));
-
-        for (auto i = 0; i < s[1]; i++)
+        if (y.dimension() == 0)
         {
-            auto xi = strided_view(x, { all(), range(i, i + 1) });
-            for (auto j = i; j < s[1]; j++) {
-                auto xj = strided_view(x, { all(), range(j, j + 1) });            
-                covar(j, i) = std::inner_product(xi.begin(), xi.end(), xj.begin(), 0.0) / (s[0] - 1);
+            auto s = x.shape();
+            if (x.dimension() == 1)
+            {
+                auto covar = eval(zeros<value_type>({ 1, 1 }));
+                auto x_norm = x - eval(mean(x));
+                covar(0, 0) = std::inner_product(x_norm.begin(), x_norm.end(), x_norm.begin(), 0.0) / (s[0] - 1);
+                return covar;
             }
+            
+            XTENSOR_ASSERT( x.dimension() == 2 );
+
+            auto covar = eval(zeros<value_type>({ s[0], s[0] }));
+            auto m = eval(mean(x, {1}));
+            m.reshape({m.shape()[0],1});
+            auto x_norm = x - m;
+            for (auto i = 0; i < s[0]; i++)
+            {
+                auto xi = strided_view(x_norm, { range(i, i + 1), all() });
+                for (auto j = i; j < s[0]; j++)
+                {
+                    auto xj = strided_view(x_norm, { range(j, j + 1), all() });            
+                    covar(j, i) = std::inner_product(xi.begin(), xi.end(), xj.begin(), 0.0) / (s[1] - 1);
+                }
+            }
+            return eval(covar + transpose(covar) - diag(diagonal(covar)));
+        } 
+        else
+        {
+            return cov(eval(stack(xtuple(x, y))));
         }
-        return eval(covar + transpose(covar) - diag(diagonal(covar)));
     }
 }
 
