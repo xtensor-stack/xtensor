@@ -2958,6 +2958,31 @@ namespace detail {
         return interp(x, xp, fp, fp[0], fp[fp.size() - 1]);
     }
 
+    /**
+     * @brief Returns the covariance matrix
+     * 
+     * @param x Source matrix
+     */
+    template <class E1>
+    inline auto cov(const E1 &x)
+    {
+        using value_type = typename E1::value_type;
+
+        XTENSOR_ASSERT( x.dimension() == 2 );
+
+        auto s = x.shape();
+        auto covar = eval(zeros<value_type>({s[1], s[1]}));
+
+        for (auto i = 0; i < s[1]; i++)
+        {
+            auto xi = strided_view(x, { all(), range(i, i + 1) });
+            for (auto j = i; j < s[1]; j++) {
+                auto xj = strided_view(x, { all(), range(j, j + 1) });            
+                covar(j, i) = std::inner_product(xi.begin(), xi.end(), xj.begin(), 0.0) / (s[0] - 1);
+            }
+        }
+        return eval(covar + transpose(covar) - diag(diagonal(covar)));
+    }
 }
 
 #endif
