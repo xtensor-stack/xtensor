@@ -19,12 +19,20 @@
 include(CMakeFindDependencyMacro)
 find_dependency(xtl @xtl_REQUIRED_VERSION@)
 
+if(XTENSOR_USE_XSIMD AND XTENSOR_USE_TBB)
+    find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
+    find_dependency(TBB)
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_XSIMD XTENSOR_USE_TBB)
+endif()
+
 if(XTENSOR_USE_XSIMD)
     find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_XSIMD)
 endif()
 
 if(XTENSOR_USE_TBB)
     find_dependency(TBB)
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_TBB)
 endif()
 
 if(NOT TARGET @PROJECT_NAME@)
