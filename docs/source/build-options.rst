@@ -64,7 +64,7 @@ CMakeLists:
     # searched when the following is executed
     find_package(xtensor REQUIRED)
 
-    # the target include the proper defines (e.g. "XTENSOR_USE_XSIMD")
+    # the target now sets the proper defines (e.g. "XTENSOR_USE_XSIMD")
     target_link_libraries(... xtensor)
 
 
