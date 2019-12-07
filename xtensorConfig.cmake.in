@@ -19,20 +19,25 @@
 include(CMakeFindDependencyMacro)
 find_dependency(xtl @xtl_REQUIRED_VERSION@)
 
-if(XTENSOR_USE_XSIMD)
-    find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
-endif()
-
-if(XTENSOR_USE_TBB)
-    find_dependency(TBB)
-endif()
-
 if(NOT TARGET @PROJECT_NAME@)
     include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
     get_target_property(@PROJECT_NAME@_INCLUDE_DIRS @PROJECT_NAME@ INTERFACE_INCLUDE_DIRECTORIES)
     if(${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.8)
         target_compile_features(@PROJECT_NAME@ INTERFACE cxx_std_14)
     endif()
+endif()
+
+if(XTENSOR_USE_XSIMD AND XTENSOR_USE_TBB)
+    find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
+    find_dependency(TBB)
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_XSIMD XTENSOR_USE_TBB)
+elseif(XTENSOR_USE_XSIMD)
+    find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_XSIMD)
+    target_link_libraries(@PROJECT_NAME@ INTERFACE xsimd)
+elseif(XTENSOR_USE_TBB)
+    find_dependency(TBB)
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_TBB)
 endif()
 
 if(NOT TARGET xtensor::optimize)
