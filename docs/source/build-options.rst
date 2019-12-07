@@ -64,6 +64,9 @@ CMakeLists:
     # searched when the following is executed
     find_package(xtensor REQUIRED)
 
+    # the target include the proper defines (e.g. "XTENSOR_USE_XSIMD")
+    target_link_libraries(... xtensor)
+
 
 Build and optimization
 ----------------------
@@ -75,6 +78,11 @@ Windows users must activate the ``/bigobj`` flag, otherwise it's almost certain 
 the following options are recommended:
 
 .. code:: cmake
+
+    target_link_libraries(... xtensor xtensor::optimize)
+    set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
+
+    # OR
 
     target_compile_options(target_name PRIVATE /EHsc /MP /bigobj)
     set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
@@ -98,6 +106,10 @@ Linux/OSX
 Whether you enabled ``XTENSOR_USE_XSIMD`` or not, it is highly recommended to build with ``-march=native`` option:
 
 .. code:: cmake
+
+    target_link_libraries(... xtensor xtensor::optimize)
+
+    # OR
 
     target_compile_options(target_name PRIVATE -march=native)
 
