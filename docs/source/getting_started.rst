@@ -81,29 +81,37 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
 
     find_package(xtl REQUIRED)
     find_package(xtensor REQUIRED)
-    # if xtensor was built with xsimd support:
-    # find_package(xsimd REQUIRED)
 
     add_executable(first_example src/example.cpp)
 
     if(MSVC)
-        target_compile_options(first_example PRIVATE /EHsc /MP /bigobj)
         set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
     endif()
 
-    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR
-        CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR
-        (CMAKE_CXX_COMPILER_ID MATCHES "Intel" AND NOT WIN32))
-        target_compile_options(first_example PRIVATE -march=native -std=c++14)
-    endif()
-
-    target_link_libraries(first_example xtensor)
+    target_link_libraries(first_example xtensor xtensor::optimize xtensor::xsimd)
 
 .. note::
 
-    `xsimd <https://github.com/xtensor-stack/xsimd>`_ is an optional dependency of xtensor that enable simd
-    acceleration, i.e. executing a same operation on a batch of data in a single CPU instruction. This
-    is well-suited to improve performance when operating on tensors.
+    .. code:: cmake
+
+        target_link_libraries(... xtensor::optimize)
+
+    set the following compiler flags:
+
+    *   Unix: ``-march=native``;
+    *   Windows: ``/EHsc /MP /bigobj``.
+
+    This may speed-up your code, but renders it hardware dependent.
+
+.. note::
+
+    .. code:: cmake
+
+        target_link_libraries(... xtensor::xsimd)
+
+    enables `xsimd <https://github.com/xtensor-stack/xsimd>`_: an optional dependency of xtensor that enables simd acceleration,
+    i.e. executing a same operation on a batch of data in a single CPU instruction.
+    This is well-suited to improve performance when operating on tensors, but renders it hardware dependent.
 
 `cmake` has to know where to find the headers, this is done through the ``CMAKE_INSTALL_PREFIX``
 variable. Note that ``CMAKE_INSTALL_PREFIX`` is usually the path to a folder containing the following
