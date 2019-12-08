@@ -29,7 +29,7 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtl_REQUIRED_VERSION 0.6.7)
+set(xtl_REQUIRED_VERSION 0.6.9)
 find_package(xtl ${xtl_REQUIRED_VERSION} REQUIRED)
 message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
 
@@ -49,7 +49,7 @@ if(XTENSOR_USE_TBB AND XTENSOR_USE_OPENMP)
 endif()
 
 if(XTENSOR_USE_XSIMD)
-    set(xsimd_REQUIRED_VERSION 7.4.0)
+    set(xsimd_REQUIRED_VERSION 7.4.2)
     find_package(xsimd ${xsimd_REQUIRED_VERSION} REQUIRED)
     message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
 endif()

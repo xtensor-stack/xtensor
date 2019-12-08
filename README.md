@@ -93,7 +93,8 @@ library:
 
 | `xtensor` | `xtl`   |`xsimd` (optional) |
 |-----------|---------|-------------------|
-|  master   | ^0.6.7  |       ^7.4.0      |
+|  master   | ^0.6.9  |       ^7.4.2      |
+|  0.21.0   | ^0.6.9  |       ^7.4.2      |
 |  0.20.10  | ^0.6.7  |       ^7.4.0      |
 |  0.20.9   | ^0.6.7  |       ^7.4.0      |
 |  0.20.8   | ^0.6.4  |       ^7.2.3      |
@@ -110,9 +111,6 @@ library:
 |  0.19.2   | ^0.5.3  |       ^7.0.0      |
 |  0.19.1   | ^0.5.1  |       ^7.0.0      |
 |  0.19.0   | ^0.5.1  |       ^7.0.0      |
-|  0.18.2   | ^0.4.16 |       ^7.0.0      |
-|  0.18.1   | ^0.4.16 |       ^7.0.0      |
-|  0.18.0   | ^0.4.16 |       ^7.0.0      |
 
 The dependency on `xsimd` is required if you want to enable SIMD acceleration
 in `xtensor`. This can be done by defining the macro `XTENSOR_USE_XSIMD`
