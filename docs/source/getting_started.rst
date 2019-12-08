@@ -88,7 +88,7 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
         set(CMAKE_EXE_LINKER_FLAGS /MANIFEST:NO)
     endif()
 
-    target_link_libraries(first_example xtensor xtensor::optimize xtensor::xsimd)
+    target_link_libraries(first_example xtensor xtensor::optimize xtensor::use_xsimd)
 
 .. note::
 
@@ -107,7 +107,7 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
 
     .. code:: cmake
 
-        target_link_libraries(... xtensor::xsimd)
+        target_link_libraries(... xtensor::use_xsimd)
 
     enables `xsimd <https://github.com/xtensor-stack/xsimd>`_: an optional dependency of xtensor that enables simd acceleration,
     i.e. executing a same operation on a batch of data in a single CPU instruction.
