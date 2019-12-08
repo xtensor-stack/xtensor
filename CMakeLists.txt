@@ -43,7 +43,7 @@ OPTION(XTENSOR_USE_TBB "enable parallelization using intel TBB" OFF)
 OPTION(XTENSOR_USE_OPENMP "enable parallelization using OpenMP" OFF)
 if(XTENSOR_USE_TBB AND XTENSOR_USE_OPENMP)
     message(
-        FATAL 
+        FATAL
         "XTENSOR_USE_TBB and XTENSOR_USE_OPENMP cannot both be active at once"
     )
 endif()
@@ -71,16 +71,16 @@ if(XTENSOR_USE_OPENMP)
         find_package(Threads REQUIRED)
         add_library(OpenMP::OpenMP_CXX_xtensor IMPORTED INTERFACE)
         set_property(
-            TARGET 
+            TARGET
             OpenMP::OpenMP_CXX_xtensor
-            PROPERTY 
+            PROPERTY
             INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS}
         )
         # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
         set_property(
-            TARGET 
+            TARGET
             OpenMP::OpenMP_CXX_xtensor
-            PROPERTY 
+            PROPERTY
             INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
 
         message(STATUS "OpenMP Found")
@@ -159,8 +159,13 @@ set(XTENSOR_HEADERS
 )
 
 add_library(xtensor INTERFACE)
-target_include_directories(xtensor INTERFACE $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
-                                             $<INSTALL_INTERFACE:include>)
+
+target_include_directories(xtensor INTERFACE
+    $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>)
+
+target_compile_features(xtensor INTERFACE cxx_std_14)
+
 target_link_libraries(xtensor INTERFACE xtl)
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
