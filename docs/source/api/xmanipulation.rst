@@ -27,6 +27,9 @@ Defined in ``xtensor/xmanipulation.hpp``
 .. doxygenfunction:: xt::flatten
    :project: xtensor
 
+.. doxygenfunction:: xt::flatnonzero
+   :project: xtensor
+
 .. doxygenfunction:: xt::flip
    :project: xtensor
 

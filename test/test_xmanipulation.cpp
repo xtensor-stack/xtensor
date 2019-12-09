@@ -124,6 +124,18 @@ namespace xt
         EXPECT_EQ(fl2, expected);
     }
 
+    TEST(xmanipulation, flatnonzero)
+    {
+        xt::xtensor<int, 1> a = arange(-2, 3);
+        std::vector<std::size_t> expected_a = {0, 1, 3, 4};
+        EXPECT_EQ(expected_a, flatnonzero<layout_type::row_major>(a));
+
+        xt::xarray<int> b = arange(-2, 3);
+        std::vector<std::size_t> expected_b = {0, 1, 3, 4};
+        EXPECT_EQ(expected_b, flatnonzero<layout_type::row_major>(b));
+
+    }
+
     TEST(xmanipulation, split)
     {
         auto b = xt::xarray<double>::from_shape({3, 3, 3});

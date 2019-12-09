@@ -12,6 +12,7 @@
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xbuilder.hpp"
+#include "xtensor/xmanipulation.hpp"
 #include "xtensor/xmath.hpp"
 #include "xtensor/xrandom.hpp"
 #include "xtensor/xfixed.hpp"
