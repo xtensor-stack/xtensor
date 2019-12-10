@@ -39,6 +39,9 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     auto flatten(E&& e);
 
+    template <layout_type L, class T>
+    auto flatnonzero(const T& arr);
+
     template <class E>
     auto trim_zeros(E&& e, const std::string& direction = "fb");
 
@@ -51,7 +54,7 @@ namespace xt
     template <class E>
     auto expand_dims(E&& e, std::size_t axis);
 
-    template <class E>
+    template <std::size_t N, class E>
     auto atleast_Nd(E&& e);
 
     template <class E>
@@ -280,6 +283,19 @@ namespace xt
     inline auto flatten(E&& e)
     {
         return ravel<L>(std::forward<E>(e));
+    }
+
+    /**
+     * @brief return indices that are non-zero in the flattened version of arr,
+     * equivalent to nonzero(ravel<layout_type>(arr))[0];
+     *
+     * @param arr input array
+     * @return indices that are non-zero in the flattened version of arr
+     */
+    template <layout_type L, class T>
+    inline auto flatnonzero(const T& arr)
+    {
+        return nonzero(ravel<L>(arr))[0];
     }
 
     /*****************************

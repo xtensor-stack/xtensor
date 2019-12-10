@@ -482,16 +482,6 @@ namespace xt
         EXPECT_EQ(size_t(27 * 27 * 27), d_nz[0].size() * d_nz[1].size() * d_nz[2].size());
     }
 
-    TYPED_TEST(operation, flatnonzero)
-    {
-        using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
-
-        int_container_1d a = arange(-2, 3);
-        std::vector<std::size_t> expected_a = {0, 1, 3, 4};
-        EXPECT_EQ(expected_a, flatnonzero<layout_type::row_major>(a));
-    }
-
     TYPED_TEST(operation, where_only_condition)
     {
         using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
