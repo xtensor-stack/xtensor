@@ -7,6 +7,14 @@
 Changelog
 =========
 
+0.21.1
+------
+
+- Added circular includes check
+  `#1853 <https://github.com/xtensor-stack/xtensor/pull/1853>`_
+- Removed cricular dependencies
+  `#1854 <https://github.com/xtensor-stack/xtensor/pull/1854>`_
+
 0.21.0
 ------
 
