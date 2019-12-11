@@ -24,30 +24,15 @@ if(NOT TARGET @PROJECT_NAME@)
     get_target_property(@PROJECT_NAME@_INCLUDE_DIRS @PROJECT_NAME@ INTERFACE_INCLUDE_DIRECTORIES)
 endif()
 
-get_target_property(_@PROJECT_NAME@_libs @PROJECT_NAME@ INTERFACE_LINK_LIBRARIES)
-set(_@PROJECT_NAME@_defines "")
-
 if(XTENSOR_USE_XSIMD)
     find_dependency(xsimd @xsimd_REQUIRED_VERSION@)
-    get_target_property(_@PROJECT_NAME@_tmp @PROJECT_NAME@ INTERFACE_COMPILE_DEFINITIONS)
-    set(_@PROJECT_NAME@_defines "${_@PROJECT_NAME@_defines}" XTENSOR_USE_XSIMD)
-    set(_@PROJECT_NAME@_libs "${_@PROJECT_NAME@_libs}" xsimd)
+    target_link_libraries(@PROJECT_NAME@ INTERFACE xsimd)
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_XSIMD)
 endif()
 
 if(XTENSOR_USE_TBB)
     find_dependency(TBB)
-    get_target_property(_@PROJECT_NAME@_tmp @PROJECT_NAME@ INTERFACE_COMPILE_DEFINITIONS)
-    set(_@PROJECT_NAME@_defines "${_@PROJECT_NAME@_defines}" XTENSOR_USE_TBB)
-endif()
-
-if(XTENSOR_USE_XSIMD OR XTENSOR_USE_TBB)
-    set_target_properties(@PROJECT_NAME@ PROPERTIES
-        INTERFACE_COMPILE_DEFINITIONS "${_@PROJECT_NAME@_defines}")
-endif()
-
-if(XTENSOR_USE_XSIMD)
-    set_target_properties(@PROJECT_NAME@ PROPERTIES
-        INTERFACE_LINK_LIBRARIES "${_@PROJECT_NAME@_libs}")
+    target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_TBB)
 endif()
 
 if(NOT TARGET xtensor::optimize)
