@@ -42,6 +42,7 @@ matrix:
       env: COMPILER=gcc GCC=6 DISABLE_EXCEPTION=1
     - os: linux
       if: branch = master
+      dist: xenial
       addons:
         apt:
           sources:
@@ -51,6 +52,7 @@ matrix:
       env: COMPILER=gcc GCC=6 BOUND_CHECKS=1 BUILD_BENCHMARK=1
     - os: linux
       if: branch = master
+      dist: xenial
       addons:
         apt:
           sources:
@@ -60,6 +62,7 @@ matrix:
       env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
     - os: linux
       if: branch = master
+      dist: xenial
       addons:
         apt:
           sources:
@@ -78,6 +81,7 @@ matrix:
       env: COMPILER=gcc GCC=7 ENABLE_TBB=1
     - os: linux
       if: branch = master
+      dist: xenial
       addons:
         apt:
           sources:
@@ -87,6 +91,7 @@ matrix:
       env: COMPILER=gcc GCC=7 ENABLE_OPENMP=1
     - os: linux
       if: branch = master
+      dist: xenial
       addons:
         apt:
           sources:
@@ -96,6 +101,7 @@ matrix:
       env: COMPILER=gcc GCC=7 ENABLE_CPP17=1
     - os: linux
       if: branch = master
+      dist: xenial
       addons:
         apt:
           sources:
