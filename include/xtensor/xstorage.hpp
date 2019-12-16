@@ -166,14 +166,15 @@ namespace xt
         inline typename std::allocator_traits<A>::pointer
         safe_init_allocate(A& alloc, typename std::allocator_traits<A>::size_type size)
         {
-            using pointer = typename std::allocator_traits<A>::pointer;
-            using value_type = typename std::allocator_traits<A>::value_type;
+            using traits = std::allocator_traits<A>;
+            using pointer = typename traits::pointer;
+            using value_type = typename traits::value_type;
             pointer res = alloc.allocate(size);
             if (!xtrivially_default_constructible<value_type>::value)
             {
                 for (pointer p = res; p != res + size; ++p)
                 {
-                    alloc.construct(p, value_type());
+                    traits::construct(alloc, p, value_type());
                 }
             }
             return res;
@@ -183,18 +184,19 @@ namespace xt
         inline void safe_destroy_deallocate(A& alloc, typename std::allocator_traits<A>::pointer ptr,
                                             typename std::allocator_traits<A>::size_type size)
         {
-            using pointer = typename std::allocator_traits<A>::pointer;
-            using value_type = typename std::allocator_traits<A>::value_type;
+            using traits = std::allocator_traits<A>;
+            using pointer = typename traits::pointer;
+            using value_type = typename traits::value_type;
             if (ptr != nullptr)
             {
                 if (!xtrivially_default_constructible<value_type>::value)
                 {
                     for (pointer p = ptr; p != ptr + size; ++p)
                     {
-                        alloc.destroy(p);
+                        traits::destroy(alloc, p);
                     }
                 }
-                alloc.deallocate(ptr, size);
+                traits::deallocate(alloc, ptr, size);
             }
         }
     }

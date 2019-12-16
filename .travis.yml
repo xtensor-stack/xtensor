@@ -114,7 +114,7 @@ matrix:
           packages:
             - g++-4.9
             - clang-3.9
-      env: COMPILER=clang CLANG=3.9
+      env: COMPILER=clang CLANG=3.9 DISABLE_XSIMD=1
     - os: linux
       if: branch = master
       addons:
@@ -125,7 +125,7 @@ matrix:
           packages:
             - g++-4.9
             - clang-4.0
-      env: COMPILER=clang CLANG=4.0 DISABLE_XSIMD=1
+      env: COMPILER=clang CLANG=4.0 
     - os: linux
       if: branch = master
       addons:
