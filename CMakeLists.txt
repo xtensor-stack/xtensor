@@ -49,7 +49,7 @@ if(XTENSOR_USE_TBB AND XTENSOR_USE_OPENMP)
 endif()
 
 if(XTENSOR_USE_XSIMD)
-    set(xsimd_REQUIRED_VERSION 7.4.2)
+    set(xsimd_REQUIRED_VERSION 7.4.4)
     find_package(xsimd ${xsimd_REQUIRED_VERSION} REQUIRED)
     message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
 endif()

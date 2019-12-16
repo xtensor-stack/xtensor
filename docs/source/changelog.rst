@@ -7,6 +7,16 @@
 Changelog
 =========
 
+0.21.2
+------
+
+- Upgraded to gtest 1.10.0
+  `#1859 <https://github.com/xtensor-stack/xtensor/pull/1859>`_
+- Upgraded to xsimd 7.4.4
+  `#1864 <https://github.com/xtensor-stack/xtensor/pull/1864>`_
+- Removed allocator deprecated calls
+  `#1862 <https://github.com/xtensor-stack/xtensor/pull/1862>`_
+
 0.21.1
 ------
 
