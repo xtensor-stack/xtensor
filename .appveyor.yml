@@ -32,7 +32,7 @@ install:
   - conda update -q conda
   - conda info -a
   - conda install gtest=1.8.0 cmake -c conda-forge
-  - conda install xtl==0.6.9 xsimd nlohmann_json -c conda-forge
+  - conda install xtl==0.6.9 xsimd==7.4.4 nlohmann_json -c conda-forge
   - ps: if($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") {
         cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DCMAKE_BUILD_TYPE=RELEASE .
         }
