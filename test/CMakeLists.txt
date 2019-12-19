@@ -93,10 +93,10 @@ endif()
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     if(DOWNLOAD_GTEST)
         # Download and unpack googletest at configure time
-        configure_file(downloadGTest.cmake.in googletest-download/CMakeLists.txt)
+        include(downloadGTest.cmake)
     else()
         # Copy local source of googletest at configure time
-        configure_file(copyGTest.cmake.in googletest-download/CMakeLists.txt)
+        include(copyGTest.cmake)
     endif()
     execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
                     RESULT_VARIABLE result
