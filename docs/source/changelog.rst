@@ -7,6 +7,15 @@
 Changelog
 =========
 
+0.21.3-dev
+----------
+
+- Allow use of cmake add_subdirectory(xtensor) by checking for xtl target
+  `#1865 <https://github.com/xtensor-stack/xtensor/pull/1865>`_
+- Simplifying CMake config
+  `#1856 <https://github.com/xtensor-stack/xtensor/pull/1856>`_
+
+
 0.21.2
 ------
 
