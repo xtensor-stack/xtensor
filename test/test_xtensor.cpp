@@ -176,6 +176,9 @@ namespace xt
     {
         xtensor_dynamic a;
         test_reshape<xtensor_dynamic, storage_type>(a);
+
+        xtensor<int, 1> b;
+        test_throwing_reshape(b);
     }
 
     TEST(xtensor, transpose)

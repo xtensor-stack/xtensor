@@ -1,10 +1,9 @@
-* **Please check if your PR fulfills these requirements**
+**Please check if your PR fulfills these requirements**
 
 - The title and the commit message(s) are descriptive
 - Small commits made to fix your PR have been squashed to avoid history pollution
 - Tests have been added for new features or bug fixes
 - API of new functions and classes are documented
-- An entry for your PR has been added in docs/source/changelog.rst
 - If you PR introduces backward incompatible changes, update the version number
 in both docs/source/changelog.rst and include/xtensor/xtensor_config.hpp according
 to the following rules:
