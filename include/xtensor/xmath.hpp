@@ -25,6 +25,7 @@
 
 #include "xaccumulator.hpp"
 #include "xeval.hpp"
+#include "xmanipulation.hpp"
 #include "xoperation.hpp"
 #include "xreducer.hpp"
 #include "xslice.hpp"
