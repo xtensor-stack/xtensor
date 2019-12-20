@@ -1026,7 +1026,8 @@ namespace xt
     inline void xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
     {
         using value_type = typename std::decay_t<S>::value_type;
-        if (this->size() % compute_size(_shape))
+        auto new_size = compute_size(_shape);
+        if (this->size() % new_size)
         {
             XTENSOR_THROW(std::runtime_error, "Negative axis size cannot be inferred. Shape mismatch.");
         }
@@ -1047,6 +1048,10 @@ namespace xt
         if(accumulator < 0)
         {
             shape[neg_idx] = static_cast<value_type>(this->size()) / std::abs(accumulator);
+        }
+        else if(this->size() != new_size)
+        {
+            XTENSOR_THROW(std::runtime_error, "Cannot reshape with incorrect number of elements. Do you mean to resize?");
         }
         m_layout = layout;
         m_shape = xtl::forward_sequence<shape_type, S>(shape);

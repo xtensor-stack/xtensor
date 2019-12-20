@@ -248,6 +248,16 @@ namespace xt
         }
     }
 
+    template <class V>
+    void test_throwing_reshape(V& vec)
+    {
+        {
+            SCOPED_TRACE("throwing reshape");
+            vec = xt::arange(6);
+            XT_EXPECT_THROW(vec.reshape({2}), std::runtime_error);
+        }
+    }
+
     template <class V, class C = std::vector<std::size_t>>
     void test_transpose(V& vec)
     {
