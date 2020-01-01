@@ -705,6 +705,12 @@ namespace xt
     template <class E, class... S>
     auto view(E&& e, S&&... slices);
 
+    template <class E>
+    auto row(E&& e, const int index);
+
+    template <class E>
+    auto col(E&& e, const int index);
+
     /*****************************
      * xview_stepper declaration *
      *****************************/
@@ -1659,6 +1665,75 @@ namespace xt
     inline auto view(E&& e, S&&... slices)
     {
         return detail::make_view_impl(std::forward<E>(e), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
+    }
+
+    namespace detail
+    {
+        class RowImpl
+        {
+        public:
+            template<class E>
+            static inline auto make(E&& e, const int index)
+            {
+                check_dimension(e.shape());
+                return view(e, index, xt::all());
+            }
+
+        private:
+            template<class S>
+            static inline void check_dimension(const S& shape)
+            {
+                if (shape.size() != 2)
+                {
+                    XTENSOR_THROW(std::invalid_argument, "A row can only be accessed on an expression with exact two dimensions");
+                }
+            }
+
+            template<class T, int N>
+            static inline void check_dimension(const std::array<T, N>&)
+            {
+                static_assert(N == 2, "A row can only be accessed on an expression with exact two dimensions");
+            }
+        };
+
+        class ColumnImpl
+        {
+        public:
+            template<class E>
+            static inline auto make(E&& e, const int index)
+            {
+                check_dimension(e.shape());
+                return view(e, xt::all(), index);
+            }
+
+        private:
+            template<class S>
+            static inline void check_dimension(const S& shape)
+            {
+                if (shape.size() != 2)
+                {
+                    XTENSOR_THROW(std::invalid_argument, "A column can only be accessed on an expression with exact two dimensions");
+                }
+            }
+
+            template<class T, int N>
+            static inline void check_dimension(const std::array<T, N>&)
+            {
+                static_assert(N == 2, "A column can only be accessed on an expression with exact two dimensions");
+            }
+        };
+    }
+
+    template <class E>
+    inline auto row(E&& e, const int index)
+    {
+        return detail::RowImpl::make(e, index);
+    }
+
+    template <class E>
+    inline auto col(E&& e, const int index)
+    {
+        return detail::ColumnImpl::make(e, index);
     }
 
     /***************

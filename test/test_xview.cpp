@@ -1489,4 +1489,136 @@ namespace xt
         EXPECT_FALSE(a(1, 0));
         EXPECT_FALSE(a(1, 1));
     }
+
+    TEST(xview, row_on_2dim_xarray)
+    {
+        xt::xarray<int> array{
+            { 1, 2 },
+            { 3, 4 },
+        };
+
+        const auto row0 = xt::row(array, 0);
+        const auto row1 = xt::row(array, 1);
+
+        EXPECT_EQ(row0(0), 1);
+        EXPECT_EQ(row0(1), 2);
+        EXPECT_EQ(row1(0), 3);
+        EXPECT_EQ(row1(1), 4);
+    }
+
+    TEST(xiew, row_on_2dim_xtensor)
+    {
+        xt::xtensor<int, 2> tensor{
+            { 1, 2 },
+            { 3, 4 },
+        };
+
+        std::cout << tensor.shape().size() << std::endl;
+
+        const auto row0 = xt::row(tensor, 0);
+        const auto row1 = xt::row(tensor, 1);
+
+        EXPECT_EQ(row0(0), 1);
+        EXPECT_EQ(row0(1), 2);
+        EXPECT_EQ(row1(0), 3);
+        EXPECT_EQ(row1(1), 4);
+    }
+
+    TEST(xiew, row_on_2dim_xtensor_fixed)
+    {
+        xt::xtensor_fixed<int, xshape<2, 2>> tensor_fixed{
+            { 1, 2 },
+            { 3, 4 },
+        };
+
+        const auto row0 = xt::row(tensor_fixed, 0);
+        const auto row1 = xt::row(tensor_fixed, 1);
+
+        EXPECT_EQ(row0(0), 1);
+        EXPECT_EQ(row0(1), 2);
+        EXPECT_EQ(row1(0), 3);
+        EXPECT_EQ(row1(1), 4);
+    }
+
+    TEST(xview, row_on_3dim_array)
+    {
+        xt::xarray<int> arr{
+            { { 1, 2 }, { 3, 4 } },
+            { { 5, 6 }, { 7, 8 } },
+        };
+
+        ASSERT_THROW(
+            const auto row = xt::row(arr, 0),
+            std::invalid_argument
+        );
+    }
+
+    TEST(xview, col_on_2dim_xarray)
+    {
+        xt::xarray<int> array{
+            { 1, 2 },
+            { 3, 4 },
+        };
+
+        const auto col0 = xt::col(array, 0);
+        const auto col1 = xt::col(array, 1);
+
+        EXPECT_EQ(col0(0), 1);
+        EXPECT_EQ(col0(1), 3);
+        EXPECT_EQ(col1(0), 2);
+        EXPECT_EQ(col1(1), 4);
+    }
+
+    TEST(xview, col_on_2dim_xtensor)
+    {
+        xt::xtensor<int, 2> tensor{
+            { 1, 2 },
+            { 3, 4 },
+        };
+
+        const auto col0 = xt::col(tensor, 0);
+        const auto col1 = xt::col(tensor, 1);
+
+        EXPECT_EQ(col0(0), 1);
+        EXPECT_EQ(col0(1), 3);
+        EXPECT_EQ(col1(0), 2);
+        EXPECT_EQ(col1(1), 4);
+    }
+
+    TEST(xview, col_on_2dim_xtensor_fixed)
+    {
+        xt::xtensor_fixed<int, xshape<2, 2>> tensor_fixed{
+            { 1, 2 },
+            { 3, 4 },
+        };
+
+        const auto col0 = xt::col(tensor_fixed, 0);
+        const auto col1 = xt::col(tensor_fixed, 1);
+
+        EXPECT_EQ(col0(0), 1);
+        EXPECT_EQ(col0(1), 3);
+        EXPECT_EQ(col1(0), 2);
+        EXPECT_EQ(col1(1), 4);
+    }
+
+    TEST(xview, col_on_3dim_array)
+    {
+        xt::xarray<int> arr{
+            { { 1, 2 }, { 3, 4 } },
+            { { 5, 6 }, { 7, 8 } },
+        };
+
+        ASSERT_THROW(
+            const auto col = xt::col(arr, 0),
+            std::invalid_argument
+        );
+    }
+
+    // This code should not compile!
+    //TEST(xview, col_on_3dim_xtensor)
+    //{
+    //    xt::xtensor<int, 3> tensor;
+    //    xt::row(tensor, 0);
+    //    xt::col(tensor, 0);
+    //}
 }
