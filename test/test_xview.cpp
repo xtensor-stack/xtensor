@@ -1547,7 +1547,7 @@ namespace xt
             { { 5, 6 }, { 7, 8 } },
         };
 
-        ASSERT_THROW(
+        XT_ASSERT_THROW(
             const auto row = xt::row(arr, 0),
             std::invalid_argument
         );
@@ -1608,7 +1608,7 @@ namespace xt
             { { 5, 6 }, { 7, 8 } },
         };
 
-        ASSERT_THROW(
+        XT_ASSERT_THROW(
             const auto col = xt::col(arr, 0),
             std::invalid_argument
         );
