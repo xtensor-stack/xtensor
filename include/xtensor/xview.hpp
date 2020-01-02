@@ -1669,7 +1669,7 @@ namespace xt
 
     namespace detail
     {
-        class RowImpl
+        class row_impl
         {
         public:
             template<class E>
@@ -1696,7 +1696,7 @@ namespace xt
             }
         };
 
-        class ColumnImpl
+        class column_impl
         {
         public:
             template<class E>
@@ -1724,16 +1724,32 @@ namespace xt
         };
     }
 
+    /**
+     * Constructs and returns a row (sliced view) on the specified expression.
+     * Users should not directly construct the slices but call helper functions
+     * instead. This function is only allowed on expressions with two dimensions.
+     * @param e the xexpression to adapt
+     * @param index 0-based index of the row
+     * @throws std::invalid_argument if the expression has more than 2 dimensions.
+     */
     template <class E>
-    inline auto row(E&& e, const int index)
+    inline auto row(E&& e, int index)
     {
-        return detail::RowImpl::make(e, index);
+        return detail::row_impl::make(e, index);
     }
 
+    /**
+     * Constructs and returns a column (sliced view) on the specified expression.
+     * Users should not directly construct the slices but call helper functions
+     * instead. This function is only allowed on expressions with two dimensions.
+     * @param e the xexpression to adapt
+     * @param index 0-based index of the column
+     * @throws std::invalid_argument if the expression has more than 2 dimensions.
+     */
     template <class E>
-    inline auto col(E&& e, const int index)
+    inline auto col(E&& e, int index)
     {
-        return detail::ColumnImpl::make(e, index);
+        return detail::column_impl::make(e, index);
     }
 
     /***************
