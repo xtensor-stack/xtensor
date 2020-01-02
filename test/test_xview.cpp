@@ -1490,20 +1490,37 @@ namespace xt
         EXPECT_FALSE(a(1, 1));
     }
 
-    TEST(xview, row_on_2dim_xarray)
+    TEST(xview, first_rows_on_2dim_xarray)
     {
         xt::xarray<int> array{
             { 1, 2 },
             { 3, 4 },
         };
 
-        const auto row0 = xt::row(array, 0);
-        const auto row1 = xt::row(array, 1);
+        const auto first_row = xt::row(array, 0);
+        const auto second_row = xt::row(array, 1);
 
-        EXPECT_EQ(row0(0), 1);
-        EXPECT_EQ(row0(1), 2);
-        EXPECT_EQ(row1(0), 3);
-        EXPECT_EQ(row1(1), 4);
+        EXPECT_EQ(first_row(0), 1);
+        EXPECT_EQ(first_row(1), 2);
+        EXPECT_EQ(second_row(0), 3);
+        EXPECT_EQ(second_row(1), 4);
+    }
+
+    TEST(xview, last_rows_on_2dim_xarray)
+    {
+        xt::xarray<int> array{
+            { 1, 2 },
+            { 3, 4 },
+            { 5, 6 },
+        };
+
+        const auto last_row = xt::row(array, -1);
+        const auto second_last_row = xt::row(array, -2);
+
+        EXPECT_EQ(last_row(0), 5);
+        EXPECT_EQ(last_row(1), 6);
+        EXPECT_EQ(second_last_row(0), 3);
+        EXPECT_EQ(second_last_row(1), 4);
     }
 
     TEST(xiew, row_on_2dim_xtensor)
@@ -1553,20 +1570,36 @@ namespace xt
         );
     }
 
-    TEST(xview, col_on_2dim_xarray)
+    TEST(xview, first_cols_on_2dim_xarray)
     {
         xt::xarray<int> array{
             { 1, 2 },
             { 3, 4 },
         };
 
-        const auto col0 = xt::col(array, 0);
-        const auto col1 = xt::col(array, 1);
+        const auto first_col = xt::col(array, 0);
+        const auto second_col = xt::col(array, 1);
 
-        EXPECT_EQ(col0(0), 1);
-        EXPECT_EQ(col0(1), 3);
-        EXPECT_EQ(col1(0), 2);
-        EXPECT_EQ(col1(1), 4);
+        EXPECT_EQ(first_col(0), 1);
+        EXPECT_EQ(first_col(1), 3);
+        EXPECT_EQ(second_col(0), 2);
+        EXPECT_EQ(second_col(1), 4);
+    }
+
+    TEST(xview, last_cols_on_2dim_xarray)
+    {
+        xt::xarray<int> array{
+            { 1, 2, 3 },
+            { 4, 5, 6 },
+        };
+
+        const auto last_col = xt::col(array, -1);
+        const auto second_last_col = xt::col(array, -2);
+
+        EXPECT_EQ(last_col(0), 3);
+        EXPECT_EQ(last_col(1), 6);
+        EXPECT_EQ(second_last_col(0), 2);
+        EXPECT_EQ(second_last_col(1), 5);
     }
 
     TEST(xview, col_on_2dim_xtensor)

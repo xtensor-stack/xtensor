@@ -1675,8 +1675,10 @@ namespace xt
             template<class E>
             static inline auto make(E&& e, const int index)
             {
-                check_dimension(e.shape());
-                return view(e, index, xt::all());
+                const auto shape = e.shape();
+                check_dimension(shape);
+                const int non_negative_index = index < 0 ? static_cast<int>(index + shape[0]) : index;
+                return view(e, non_negative_index, xt::all());
             }
 
         private:
@@ -1702,8 +1704,10 @@ namespace xt
             template<class E>
             static inline auto make(E&& e, const int index)
             {
-                check_dimension(e.shape());
-                return view(e, xt::all(), index);
+                const auto shape = e.shape();
+                check_dimension(shape);
+                const int non_negative_index = index < 0 ? static_cast<int>(index + shape[1]) : index;
+                return view(e, xt::all(), non_negative_index);
             }
 
         private:
@@ -1729,7 +1733,8 @@ namespace xt
      * Users should not directly construct the slices but call helper functions
      * instead. This function is only allowed on expressions with two dimensions.
      * @param e the xexpression to adapt
-     * @param index 0-based index of the row
+     * @param index 0-based index of the row, negative indices will return the
+     * last rows in reverse order.
      * @throws std::invalid_argument if the expression has more than 2 dimensions.
      */
     template <class E>
@@ -1743,7 +1748,8 @@ namespace xt
      * Users should not directly construct the slices but call helper functions
      * instead. This function is only allowed on expressions with two dimensions.
      * @param e the xexpression to adapt
-     * @param index 0-based index of the column
+     * @param index 0-based index of the column, negative indices will return the
+     * last columns in reverse order.
      * @throws std::invalid_argument if the expression has more than 2 dimensions.
      */
     template <class E>
