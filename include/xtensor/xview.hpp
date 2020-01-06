@@ -705,6 +705,12 @@ namespace xt
     template <class E, class... S>
     auto view(E&& e, S&&... slices);
 
+    template <class E>
+    auto row(E&& e, const int index);
+
+    template <class E>
+    auto col(E&& e, const int index);
+
     /*****************************
      * xview_stepper declaration *
      *****************************/
@@ -1659,6 +1665,97 @@ namespace xt
     inline auto view(E&& e, S&&... slices)
     {
         return detail::make_view_impl(std::forward<E>(e), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
+    }
+
+    namespace detail
+    {
+        class row_impl
+        {
+        public:
+            template<class E>
+            static inline auto make(E&& e, const int index)
+            {
+                const auto shape = e.shape();
+                check_dimension(shape);
+                const int non_negative_index = index < 0 ? static_cast<int>(index + shape[0]) : index;
+                return view(e, non_negative_index, xt::all());
+            }
+
+        private:
+            template<class S>
+            static inline void check_dimension(const S& shape)
+            {
+                if (shape.size() != 2)
+                {
+                    XTENSOR_THROW(std::invalid_argument, "A row can only be accessed on an expression with exact two dimensions");
+                }
+            }
+
+            template<class T, int N>
+            static inline void check_dimension(const std::array<T, N>&)
+            {
+                static_assert(N == 2, "A row can only be accessed on an expression with exact two dimensions");
+            }
+        };
+
+        class column_impl
+        {
+        public:
+            template<class E>
+            static inline auto make(E&& e, const int index)
+            {
+                const auto shape = e.shape();
+                check_dimension(shape);
+                const int non_negative_index = index < 0 ? static_cast<int>(index + shape[1]) : index;
+                return view(e, xt::all(), non_negative_index);
+            }
+
+        private:
+            template<class S>
+            static inline void check_dimension(const S& shape)
+            {
+                if (shape.size() != 2)
+                {
+                    XTENSOR_THROW(std::invalid_argument, "A column can only be accessed on an expression with exact two dimensions");
+                }
+            }
+
+            template<class T, int N>
+            static inline void check_dimension(const std::array<T, N>&)
+            {
+                static_assert(N == 2, "A column can only be accessed on an expression with exact two dimensions");
+            }
+        };
+    }
+
+    /**
+     * Constructs and returns a row (sliced view) on the specified expression.
+     * Users should not directly construct the slices but call helper functions
+     * instead. This function is only allowed on expressions with two dimensions.
+     * @param e the xexpression to adapt
+     * @param index 0-based index of the row, negative indices will return the
+     * last rows in reverse order.
+     * @throws std::invalid_argument if the expression has more than 2 dimensions.
+     */
+    template <class E>
+    inline auto row(E&& e, int index)
+    {
+        return detail::row_impl::make(e, index);
+    }
+
+    /**
+     * Constructs and returns a column (sliced view) on the specified expression.
+     * Users should not directly construct the slices but call helper functions
+     * instead. This function is only allowed on expressions with two dimensions.
+     * @param e the xexpression to adapt
+     * @param index 0-based index of the column, negative indices will return the
+     * last columns in reverse order.
+     * @throws std::invalid_argument if the expression has more than 2 dimensions.
+     */
+    template <class E>
+    inline auto col(E&& e, int index)
+    {
+        return detail::column_impl::make(e, index);
     }
 
     /***************
