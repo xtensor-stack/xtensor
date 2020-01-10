@@ -1,5 +1,5 @@
 language: cpp
-dist: trusty
+dist: xenial
 env:
 matrix:
   fast_finish: true
@@ -12,7 +12,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-4.9
-      env: COMPILER=gcc GCC=4.9
+      env: COMPILER=gcc GCC=4.9 CHECK_CYCLIC_INCLUDES=1
     - os: linux
       if: branch = coverity
       addons:
@@ -39,25 +39,7 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 ENABLE_TBB=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
       env: COMPILER=gcc GCC=6 DISABLE_EXCEPTION=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
-      env: COMPILER=gcc GCC=6 ENABLE_OPENMP=1
     - os: linux
       if: branch = master
       addons:
@@ -93,6 +75,24 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-7
+      env: COMPILER=gcc GCC=7 ENABLE_TBB=1
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
+      env: COMPILER=gcc GCC=7 ENABLE_OPENMP=1
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-7
       env: COMPILER=gcc GCC=7 ENABLE_CPP17=1
     - os: linux
       if: branch = master
@@ -100,39 +100,18 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-            - clang-3.6
-      env: COMPILER=clang CLANG=3.6 DISABLE_XSIMD=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-3.9
-          packages:
-            - g++-4.9
-            - clang-3.9
-      env: COMPILER=clang CLANG=3.9
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-4.0
+            - llvm-toolchain-xenial-4.0
           packages:
             - g++-4.9
             - clang-4.0
-      env: COMPILER=clang CLANG=4.0 DISABLE_XSIMD=1
+      env: COMPILER=clang CLANG=4.0 
     - os: linux
       if: branch = master
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
+            - llvm-toolchain-xenial-5.0
           packages:
             - g++-4.9
             - clang-5.0
@@ -143,7 +122,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-5.0
+            - llvm-toolchain-xenial-5.0
           packages:
             - g++-4.9
             - clang-5.0
@@ -154,7 +133,7 @@ matrix:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-trusty-6.0
+            - llvm-toolchain-xenial-6.0
           packages:
             - clang-6.0
       env: COMPILER=clang CLANG=6.0
@@ -194,7 +173,17 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda install cmake -c conda-forge
-    - conda install xtl==0.6.7 xsimd nlohmann_json -c conda-forge
+    - conda install xtl==0.6.9 xsimd==7.4.4 nlohmann_json -c conda-forge
+    - |
+      if [[ "$CHECK_CYCLIC_INCLUDES"  == 1 ]]; then
+        set -e
+        conda install networkx -c conda-forge
+        cd tools
+        chmod +x check_circular.py
+        ./check_circular.py
+        cd ..
+        set +e
+      fi
     - if [[ "$ENABLE_TBB" == 1 ]]; then
         conda install tbb-devel -c conda-forge;
       fi
@@ -215,6 +204,10 @@ install:
     # Testing
     - mkdir build
     - cd build
+    - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        cat /proc/cpuinfo;
+        ldd --version;
+      fi
     - if [[ "$BOUND_CHECKS" == 1 ]]; then
         cmake -DXTENSOR_ENABLE_ASSERT=ON -DDOWNLOAD_GTEST=ON -DBUILD_BENCHMARK=ON ..;
       elif [[ "$COLUMN_MAJOR_LAYOUT" == 1 ]]; then

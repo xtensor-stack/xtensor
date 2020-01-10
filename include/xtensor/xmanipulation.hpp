@@ -10,6 +10,7 @@
 #ifndef XTENSOR_MANIPULATION_HPP
 #define XTENSOR_MANIPULATION_HPP
 
+#include "xbuilder.hpp"
 #include "xstrided_view.hpp"
 #include "xutils.hpp"
 #include "xtensor_config.hpp"
@@ -38,6 +39,9 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E>
     auto flatten(E&& e);
 
+    template <layout_type L, class T>
+    auto flatnonzero(const T& arr);
+
     template <class E>
     auto trim_zeros(E&& e, const std::string& direction = "fb");
 
@@ -46,6 +50,42 @@ namespace xt
 
     template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!std::is_integral<S>::value, int> = 0>
     auto squeeze(E&& e, S&& axis, Tag check_policy = Tag());
+
+    template <class E>
+    auto expand_dims(E&& e, std::size_t axis);
+
+    template <std::size_t N, class E>
+    auto atleast_Nd(E&& e);
+
+    template <class E>
+    auto atleast_1d(E&& e);
+
+    template <class E>
+    auto atleast_2d(E&& e);
+
+    template <class E>
+    auto atleast_3d(E&& e);
+
+    template <class E>
+    auto split(E& e, std::size_t n, std::size_t axis = 0);
+
+    template <class E>
+    auto hsplit(E& e, std::size_t n);
+
+    template <class E>
+    auto vsplit(E& e, std::size_t n);
+
+    template <class E>
+    auto flip(E&& e, std::size_t axis);
+
+    template <std::ptrdiff_t N = 1, class E>
+    auto rot90(E&& e, const std::array<std::ptrdiff_t, 2>& axes = {0, 1});
+
+    template<class E>
+    auto roll(E&& e, std::ptrdiff_t shift);
+
+    template<class E>
+    auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis);
 
     /****************************
      * transpose implementation *
@@ -204,9 +244,9 @@ namespace xt
 #endif
     /// @endcond
 
-    /***************************
-     * ravel and flatten views *
-     ***************************/
+    /************************************
+     * ravel and flatten implementation *
+     ************************************/
 
     template <class I, class CI>
     class xiterator_adaptor;
@@ -246,6 +286,23 @@ namespace xt
     }
 
     /**
+     * @brief return indices that are non-zero in the flattened version of arr,
+     * equivalent to nonzero(ravel<layout_type>(arr))[0];
+     *
+     * @param arr input array
+     * @return indices that are non-zero in the flattened version of arr
+     */
+    template <layout_type L, class T>
+    inline auto flatnonzero(const T& arr)
+    {
+        return nonzero(ravel<L>(arr))[0];
+    }
+
+    /*****************************
+     * trim_zeros implementation *
+     *****************************/
+
+    /**
      * Trim zeros at beginning, end or both of 1D sequence.
      *
      * @param e input xexpression
@@ -276,6 +333,10 @@ namespace xt
 
         return strided_view(std::forward<E>(e), { range(begin, end) });
     }
+
+    /**************************
+     * squeeze implementation *
+     **************************/
 
     /**
      * Returns a squeeze view of the given expression. No copy is made.
@@ -378,6 +439,10 @@ namespace xt
     }
     /// @endcond
 
+    /******************************
+     * expand_dims implementation *
+     ******************************/
+
     /**
      * @brief Expand the shape of an xexpression.
      *
@@ -389,12 +454,16 @@ namespace xt
      * @return returns a ``strided_view`` with expanded dimension
      */
     template <class E>
-    auto expand_dims(E&& e, std::size_t axis)
+    inline auto expand_dims(E&& e, std::size_t axis)
     {
         xstrided_slice_vector sv(e.dimension() + 1, all());
         sv[axis] = newaxis();
         return strided_view(std::forward<E>(e), std::move(sv));
     }
+
+    /*****************************
+     * atleast_Nd implementation *
+     *****************************/
 
     /**
      * Expand dimensions of xexpression to at least `N`
@@ -409,7 +478,7 @@ namespace xt
      * @return ``strided_view`` with expanded dimensions
      */
     template <std::size_t N, class E>
-    auto atleast_Nd(E&& e)
+    inline auto atleast_Nd(E&& e)
     {
         xstrided_slice_vector sv((std::max)(e.dimension(), N), all());
         if (e.dimension() < N)
@@ -434,7 +503,7 @@ namespace xt
      * @sa atleast_Nd
      */
     template <class E>
-    auto atleast_1d(E&& e)
+    inline auto atleast_1d(E&& e)
     {
         return atleast_Nd<1>(std::forward<E>(e));
     }
@@ -444,7 +513,7 @@ namespace xt
      * @sa atleast_Nd
      */
     template <class E>
-    auto atleast_2d(E&& e)
+    inline auto atleast_2d(E&& e)
     {
         return atleast_Nd<2>(std::forward<E>(e));
     }
@@ -454,10 +523,14 @@ namespace xt
      * @sa atleast_Nd
      */
     template <class E>
-    auto atleast_3d(E&& e)
+    inline auto atleast_3d(E&& e)
     {
         return atleast_Nd<3>(std::forward<E>(e));
     }
+
+    /************************
+     * split implementation *
+     ************************/
 
     /**
      * @brief Split xexpression along axis into subexpressions
@@ -472,7 +545,7 @@ namespace xt
      * @param axis axis along which to split the expression
      */
     template <class E>
-    auto split(E& e, std::size_t n, std::size_t axis = 0)
+    inline auto split(E& e, std::size_t n, std::size_t axis)
     {
         if (axis >= e.dimension())
         {
@@ -497,6 +570,38 @@ namespace xt
         }
         return result;
     }
+
+    /**
+     * @brief Split an xexpression into subexpressions horizontally (column-wise)
+     *
+     * This method is equivalent to ``split(e, n, 1)``. 
+     *
+     * @param e input xexpression
+     * @param n number of elements to return
+     */
+    template <class E>
+    inline auto hsplit(E& e, std::size_t n)
+    {
+        return split(e, n, std::size_t(1));
+    }
+
+    /**
+     * @brief Split an xexpression into subexpressions vertically (row-wise)
+     *
+     * This method is equivalent to ``split(e, n, 0)``.
+     *
+     * @param e input xexpression
+     * @param n number of elements to return
+     */
+    template <class E>
+    inline auto vsplit(E& e, std::size_t n)
+    {
+        return split(e, n, std::size_t(0));
+    }
+
+    /***********************
+     * flip implementation *
+     ***********************/
 
     /**
      * @brief Reverse the order of elements in an xexpression along the given axis.
@@ -527,6 +632,10 @@ namespace xt
 
         return strided_view(std::forward<E>(e), std::move(shape), std::move(strides), offset);
     }
+
+    /************************
+     * rot90 implementation *
+     ************************/
 
     template <std::ptrdiff_t N>
     struct rot90_impl;
@@ -593,10 +702,10 @@ namespace xt
      *
      * @return returns a view with the result of the rotation
      */
-    template <std::ptrdiff_t N = 1, class E>
-    inline auto rot90(E&& e, const std::array<std::ptrdiff_t, 2>& axes = {0, 1})
+    template <std::ptrdiff_t N, class E>
+    inline auto rot90(E&& e, const std::array<std::ptrdiff_t, 2>& axes)
     {
-        auto ndim = std::ptrdiff_t(e.shape().size());
+        auto ndim = static_cast<std::ptrdiff_t>(e.shape().size());
 
         if (axes[0] == axes[1] || std::abs(axes[0] - axes[1]) == ndim)
         {
@@ -607,6 +716,136 @@ namespace xt
         constexpr std::ptrdiff_t n = (4 + (N % 4)) % 4;
 
         return rot90_impl<n>()(std::forward<E>(e), norm_axes);
+    }
+
+    /***********************
+     * roll implementation *
+     ***********************/
+
+    /**
+     * @brief Roll an expression.
+     * The expression is flatten before shifting, after which the original
+     * shape is restore. Elements that roll beyond the last position are
+     * re-introduced at the first. This function does not change the input
+     * expression.
+     *
+     * @param e the input xexpression
+     * @param shift the number of places by which elements are shifted
+     * @param axis the axis along which elements are shifted.
+     *
+     * @return a roll of the input expression
+     */
+    template<class E>
+    inline auto roll(E&& e, std::ptrdiff_t shift)
+    {
+        auto cpy = empty_like(e);
+        auto flat_size = std::accumulate(cpy.shape().begin(), cpy.shape().end(), 1L, std::multiplies<std::size_t>());
+        while(shift < 0)
+        {
+            shift += flat_size;
+        }
+
+        shift %= flat_size;
+        std::copy(e.begin(), e.end() - shift,
+                  std::copy(e.end() - shift, e.end(), cpy.begin()));
+
+        return cpy;
+    }
+
+    namespace detail
+    {
+        /**
+         * Algorithm adapted from pythran/pythonic/numpy/roll.hpp
+         */
+
+        template < class To, class From, class S>
+        To roll(To to, From from, std::ptrdiff_t shift, std::size_t axis, S const& shape, std::size_t M)
+        {
+            std::ptrdiff_t dim = std::ptrdiff_t(shape[M]);
+            std::ptrdiff_t offset = std::accumulate(shape.begin() + M + 1, shape.end(), std::ptrdiff_t(1), std::multiplies<std::ptrdiff_t>());
+            if(shape.size() == M + 1)
+            {
+                if (axis == M)
+                {
+                    const auto split = from + (dim - shift) * offset;
+                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                    for(auto iter = from, end = split; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                }
+                else
+                {
+                    for(auto iter = from, end = from + dim * offset; iter != end; iter += offset, ++to)
+                    {
+                        *to = *iter;
+                    }
+                }
+            }
+            else
+            {
+                if (axis == M)
+                {
+                    const auto split = from + (dim - shift) * offset;
+                    for(auto iter = split, end = from + dim * offset; iter != end; iter += offset)
+                    {
+                        to = roll(to, iter, shift, axis, shape, M + 1);
+                    }
+                    for(auto iter = from, end = split; iter != end; iter += offset)
+                    {
+                        to = roll(to, iter, shift, axis, shape, M + 1);
+                    }
+                }
+                else
+                {
+                    for (auto iter = from, end = from + dim * offset; iter != end; iter += offset)
+                    {
+                        to = roll(to, iter, shift, axis, shape, M + 1);
+                    }
+                }
+            }
+            return to;
+        }
+    }
+
+    /**
+     * @brief Roll an expression along a given axis.
+     * Elements that roll beyond the last position are re-introduced at the first.
+     * This function does not change the input expression.
+     *
+     * @param e the input xexpression
+     * @param shift the number of places by which elements are shifted
+     * @param axis the axis along which elements are shifted.
+     *
+     * @return a roll of the input expression
+     */
+    template<class E>
+    inline auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis)
+    {
+        auto cpy = empty_like(e);
+        auto const& shape = cpy.shape();
+        std::size_t saxis = static_cast<std::size_t>(axis);
+        if(axis < 0)
+        {
+            axis += std::ptrdiff_t(cpy.dimension());
+        }
+
+        if(saxis >= cpy.dimension() || axis < 0)
+        {
+            XTENSOR_THROW(std::runtime_error, "axis is no within shape dimension.");
+        }
+
+        const auto axis_dim = static_cast<std::ptrdiff_t>(shape[saxis]);
+        while(shift < 0)
+        {
+            shift += axis_dim;
+        }
+
+        detail::roll(cpy.begin(), e.begin(), shift, saxis, shape, 0);
+        return cpy;
     }
 }
 

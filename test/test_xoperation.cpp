@@ -482,16 +482,6 @@ namespace xt
         EXPECT_EQ(size_t(27 * 27 * 27), d_nz[0].size() * d_nz[1].size() * d_nz[2].size());
     }
 
-    TYPED_TEST(operation, flatnonzero)
-    {
-        using container_1d = redim_container_t<TypeParam, 1>;
-        using int_container_1d = xop_test::rebind_container_t<container_1d, int>;
-
-        int_container_1d a = arange(-2, 3);
-        std::vector<std::size_t> expected_a = {0, 1, 3, 4};
-        EXPECT_EQ(expected_a, flatnonzero<layout_type::row_major>(a));
-    }
-
     TYPED_TEST(operation, where_only_condition)
     {
         using int_container_2d = xop_test::rebind_container_t<TypeParam, int>;
@@ -626,6 +616,7 @@ namespace xt
             using assign_traits_scalar_double = xassign_traits<TypeParam, decltype(fsd)>;
 #if XTENSOR_USE_XSIMD
             auto batch = fsd.template load_simd<double>(0);
+            (void)batch;
             EXPECT_TRUE(assign_traits_scalar_double::simd_linear_assign());
 #else
             using return_type = decltype(fsd.template load_simd<aligned_mode>(std::size_t(0)));
@@ -737,6 +728,16 @@ namespace xt
         xt::xarray<std::size_t> bexp = { std::size_t(1), std::size_t(2) };
         b = asrc;
         EXPECT_EQ(b, bexp);
+    }
+
+    TEST(operation, mixed_bool_assign)
+    {
+        xt::xarray<double> a = { 1., 6. };
+        xt::xarray<double> b = { 2., 3. };
+        using uchar = unsigned char;
+        xt::xarray<uchar> res = a > b;
+        xt::xarray<uchar> exp = { uchar(0), uchar(1) };
+        EXPECT_EQ(res, exp);
     }
 
     TEST(operation, dynamic_simd_assign)

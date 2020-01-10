@@ -123,7 +123,7 @@ expression, etc...) in the expression, and can then be used to browse the expres
 
 .. image:: stepper_basic.svg
 
-In this diagram, the data is stored in row-major order, and we step in the second dimension (dimension index starts at 0).
+In this diagram, the data is stored in row-major order, and we step in the first dimension (dimension index starts at 0).
 The positions of the stepper are represented by the red dots.
 
 The ``to_end`` method takes a layout parameter, because the ending positions of a stepper depend on the layout used to iterate.
@@ -155,7 +155,7 @@ method would be:
         m_it += n * p_c->strides()[dim];
     }
 
-where ``m_it`` is an itrator on the underlying buffer, and ``p_c`` a pointer to the container_based expression.
+where ``m_it`` is an iterator on the underlying buffer, and ``p_c`` a pointer to the container-based expression.
 
 However, this implementation fails when broadcasting is involved. Consider the following expression:
 
@@ -187,7 +187,7 @@ avoid that, a broadcasting offset is added to the stepper:
     }
 
 This implementation takes into account that the broadcasting is done on the last dimension and dimensions are stored in ascending
-order; here dimension 1 of ``a`` correpsonds to dimension 0 of ``b``.
+order; here dimension 1 of ``a`` corresponds to dimension 0 of ``b``.
 
 This implementation ensures that a step in dimension 0 of the function updates the stepper of ``a`` while the stepper of ``b``
 remains unchanged; on the other hand, stepping in dimension 1 will update both steppers, as illustrated below:
@@ -204,7 +204,7 @@ Iterators
 upon the steppers. Whereas the steppers are tied to the expression they refer to, ``xiterator`` is generic enough to work with any
 kind of stepper.
 
-An iterator holds a stepper an multi-dimensional index. A call to ``operator++`` increases the index and calls the ``step`` method
+An iterator holds a stepper and a multi-dimensional index. A call to ``operator++`` increases the index and calls the ``step`` method
 of the stepper accordingly. The way the index is increased depends on the layout used for iterating. For a row-major order iteration
 over a container with shape ``{3, 4}``, the index iterating sequence is:
 
@@ -224,7 +224,7 @@ over a container with shape ``{3, 4}``, the index iterating sequence is:
     {2, 3}
 
 When a member of an index reaches its maximum value, it is reset to 0 and the member in the next dimension is increased. This translates
-in the calls of two methods of the stepper, first ``reset`` and then ``step``. This is illustrated by the following picture:
+into the calls of two methods of the stepper, first ``reset`` and then ``step``. This is illustrated by the following picture:
 
 .. image:: stepper_iterating.svg
 

@@ -124,6 +124,18 @@ namespace xt
         EXPECT_EQ(fl2, expected);
     }
 
+    TEST(xmanipulation, flatnonzero)
+    {
+        xt::xtensor<int, 1> a = arange(-2, 3);
+        std::vector<std::size_t> expected_a = {0, 1, 3, 4};
+        EXPECT_EQ(expected_a, flatnonzero<layout_type::row_major>(a));
+
+        xt::xarray<int> b = arange(-2, 3);
+        std::vector<std::size_t> expected_b = {0, 1, 3, 4};
+        EXPECT_EQ(expected_b, flatnonzero<layout_type::row_major>(b));
+
+    }
+
     TEST(xmanipulation, split)
     {
         auto b = xt::xarray<double>::from_shape({3, 3, 3});
@@ -150,6 +162,22 @@ namespace xt
         EXPECT_EQ(s3[0](0, 1), b(0, 0, 1));
         EXPECT_EQ(s3[1](0, 1), b(0, 1, 1));
         EXPECT_EQ(s3[2](0, 1), b(0, 2, 1));
+    }
+
+    TEST(xmanipulation, hsplit)
+    {
+        xt::xarray<int> a = {{1, 2, 3, 4}, {5, 6, 7, 8}, {9, 10, 11, 12}};
+        auto res = xt::hsplit(a, 2);
+        auto e = xt::split(a, 2, 1);
+        EXPECT_EQ(e, res);
+    }
+
+    TEST(xmanipulation, vsplit)
+    {
+        xt::xarray<int> a = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}, {10, 11, 12}};
+        auto res = xt::vsplit(a, 2);
+        auto e = xt::split(a, 2, 0);
+        EXPECT_EQ(e, res);
     }
 
     TEST(xmanipulation, squeeze)
@@ -333,5 +361,38 @@ namespace xt
 
         xarray<double> expected5 = {{{1, 3}, {0, 2}}, {{5, 7}, {4, 6}}};
         ASSERT_EQ(expected5, xt::rot90(e3, {1, 2}));
+    }
+
+    TEST(xmanipulation, roll)
+    {
+        xarray<double> e1 = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+
+        ASSERT_EQ(e1, xt::roll(e1, 0));
+
+        xarray<double> expected1 = {{2, 3, 4}, {5, 6, 7}, {8, 9, 1}};
+        ASSERT_EQ(expected1, xt::roll(e1, -1));
+
+        xarray<double> expected2 = {{8, 9, 1}, {2, 3, 4}, {5, 6, 7}};
+        ASSERT_EQ(expected2, xt::roll(e1, 2));
+
+        xarray<double> expected3 = {{8, 9, 1}, {2, 3, 4}, {5, 6, 7}};
+        ASSERT_EQ(expected3, xt::roll(e1, 11));
+
+        xarray<double> expected4 = {{7, 8, 9}, {1, 2, 3}, {4, 5, 6}};
+        ASSERT_EQ(expected4, xt::roll(e1, 1, /*axis*/0));
+
+        xarray<double> expected5 = {{3, 1, 2}, {6, 4, 5}, {9, 7, 8}};
+        ASSERT_EQ(expected5, xt::roll(e1, 1, /*axis*/1));
+
+        xarray<double> e2 = {{{1, 2, 3}}, {{4, 5, 6}}, {{7, 8, 9}}};
+
+        xarray<double> expected6 = {{{4, 5, 6}}, {{7, 8, 9}}, {{1, 2, 3}}};
+        ASSERT_EQ(expected6, xt::roll(e2, 2, /*axis*/0));
+
+        xarray<double> expected7 = {{{1, 2, 3}}, {{4, 5, 6}}, {{7, 8, 9}}};
+        ASSERT_EQ(expected7, xt::roll(e2, -2, /*axis*/1));
+
+        xarray<double> expected8 = {{{3, 1, 2}}, {{6, 4, 5}}, {{9, 7, 8}}};
+        ASSERT_EQ(expected8, xt::roll(e2, -2, /*axis*/2));
     }
 }

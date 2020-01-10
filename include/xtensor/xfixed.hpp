@@ -348,7 +348,7 @@ namespace xt
         void resize(ST&& shape, const strides_type& strides) const;
 
         template <class ST = std::array<std::size_t, N>>
-        void reshape(ST&& shape, layout_type layout = L) const;
+        auto const& reshape(ST&& shape, layout_type layout = L) const;
 
         template <class ST>
         bool broadcast_shape(ST& s, bool reuse_cache = false) const;
@@ -481,7 +481,7 @@ namespace xt
         void resize(ST&& shape, const strides_type& strides) const;
 
         template <class ST = std::array<std::size_t, N>>
-        void reshape(ST&& shape, layout_type layout = L) const;
+        const auto& reshape(ST&& shape, layout_type layout = L) const;
 
         template <class ST>
         bool broadcast_shape(ST& s, bool reuse_cache = false) const;
@@ -699,12 +699,13 @@ namespace xt
      */
     template <class ET, class S, layout_type L, bool SH, class Tag>
     template <class ST>
-    inline void xfixed_container<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
+    inline auto const& xfixed_container<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
     {
         if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size() && layout == L))
         {
             XTENSOR_THROW(std::runtime_error, "Trying to reshape xtensor_fixed with different shape or layout.");
         }
+        return *this;
     }
 
     template <class ET, class S, layout_type L, bool SH, class Tag>
@@ -883,12 +884,13 @@ namespace xt
      */
     template <class ET, class S, layout_type L, bool SH, class Tag>
     template <class ST>
-    inline void xfixed_adaptor<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
+    inline auto const& xfixed_adaptor<ET, S, L, SH, Tag>::reshape(ST&& shape, layout_type layout) const
     {
         if (!(std::equal(shape.begin(), shape.end(), m_shape.begin()) && shape.size() == m_shape.size() && layout == L))
         {
             XTENSOR_THROW(std::runtime_error, "Trying to reshape xtensor_fixed with different shape or layout.");
         }
+        return *this;
     }
 
     template <class ET, class S, layout_type L, bool SH, class Tag>

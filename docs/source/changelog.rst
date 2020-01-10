@@ -7,6 +7,98 @@
 Changelog
 =========
 
+0.21.3-dev
+----------
+
+- Allow use of cmake add_subdirectory(xtensor) by checking for xtl target
+  `#1865 <https://github.com/xtensor-stack/xtensor/pull/1865>`_
+- Simplifying CMake config
+  `#1856 <https://github.com/xtensor-stack/xtensor/pull/1856>`_
+
+
+0.21.2
+------
+
+- Upgraded to gtest 1.10.0
+  `#1859 <https://github.com/xtensor-stack/xtensor/pull/1859>`_
+- Upgraded to xsimd 7.4.4
+  `#1864 <https://github.com/xtensor-stack/xtensor/pull/1864>`_
+- Removed allocator deprecated calls
+  `#1862 <https://github.com/xtensor-stack/xtensor/pull/1862>`_
+
+0.21.1
+------
+
+- Added circular includes check
+  `#1853 <https://github.com/xtensor-stack/xtensor/pull/1853>`_
+- Removed cricular dependencies
+  `#1854 <https://github.com/xtensor-stack/xtensor/pull/1854>`_
+
+0.21.0
+------
+
+Breaking changes
+~~~~~~~~~~~~~~~~
+
+- Dynamic SIMD assign
+  `#1762 <https://github.com/xtensor-stack/xtensor/pull/1762>`_
+
+Other changes
+~~~~~~~~~~~~~
+
+- Updated links to other projects
+  `#1773 <https://github.com/xtensor-stack/xtensor/pull/1773>`_
+- Updated license
+  `#1774 <https://github.com/xtensor-stack/xtensor/pull/1774>`_
+- Updated related projects
+  `#1775 <https://github.com/xtensor-stack/xtensor/pull/1775>`_
+- Fixed ``has_simd_interface`` for non existing ``simd_return_type``
+  `#1779 <https://github.com/xtensor-stack/xtensor/pull/1779>`_
+- Added average overload for default equal weights
+  `#1789 <https://github.com/xtensor-stack/xtensor/pull/1789>`_
+- Implemented concatenation of ``fixed_shape`` tensors
+  `#1793 <https://github.com/xtensor-stack/xtensor/pull/1793>`_
+- Replaced ``new`` with ``unique_ptr`` in headers
+  `#1800 <https://github.com/xtensor-stack/xtensor/pull/1800>`_
+- Fixed reallocation when an ``xbuffer`` is copied over
+  `#1799 <https://github.com/xtensor-stack/xtensor/pull/1799>`_
+- Added hte ability to use the library with ``-fnoexception``
+  `#1801 <https://github.com/xtensor-stack/xtensor/pull/1801>`_
+- Minor efficiency improvement
+  `#1807 <https://github.com/xtensor-stack/xtensor/pull/1807>`_
+- Unified ``xt::concatenate`` and ``xt::concatenate_fixed``
+  `#1805 <https://github.com/xtensor-stack/xtensor/pull/1805>`_
+- Have ``reshape`` method return a reference to self
+  `#1813 <https://github.com/xtensor-stack/xtensor/pull/1813>`_
+- Enabling tests of ``xtensor_fixed`` on Windows with clang.
+  `#1815 <https://github.com/xtensor-stack/xtensor/pull/1815>`_
+- Disabled SIMD assignment when bool conversion occurs
+  `#1818 <https://github.com/xtensor-stack/xtensor/pull/1818>`_
+- Speed up views, added SIMD interface to strided views
+  `#1627 <https://github.com/xtensor-stack/xtensor/pull/1627>`_
+- Fixed assignment of scalar to complex
+  `#1828 <https://github.com/xtensor-stack/xtensor/pull/1828>`_
+- Fixed concurrency issue in ``flat_expression_adaptor``
+  `#1831 <https://github.com/xtensor-stack/xtensor/pull/1831>`_
+- Implemented an equivalent to ``numpy.roll``
+  `#1823 <https://github.com/xtensor-stack/xtensor/pull/1823>`_
+- Upgraded to ``xtl 0.6.9``
+  `#1839 <https://github.com/xtensor-stack/xtensor/pull/1839>`_
+- Fixed type of OpenMP's index variable on Windows
+  `#1838 <https://github.com/xtensor-stack/xtensor/pull/1838>`_
+- Implemented ``hstack`` and ``vstack``
+  `#1841 <https://github.com/xtensor-stack/xtensor/pull/1841>`_
+- Implemented ``hsplit`` and ``vsplit``
+  `#1842 <https://github.com/xtensor-stack/xtensor/pull/1842>`_
+- Fixed behavior of ``diff`` when ``n`` is greater thant the number of elements
+  `#1843 <https://github.com/xtensor-stack/xtensor/pull/1843>`_
+- Added treshold to OpenMP parallelization
+  `#1849 <https://github.com/xtensor-stack/xtensor/pull/1849>`_
+- Added missing assign operator in ``xmasked_view``
+  `#1850 <https://github.com/xtensor-stack/xtensor/pull/1850>`_
+- Updated CMake target
+  `#1851 <https://github.com/xtensor-stack/xtensor/pull/1851>`_
+
 0.20.10
 -------
 

@@ -42,8 +42,8 @@ jobs:
                         gtest ^
                         ninja ^
                         nlohmann_json ^
-                        xtl==0.6.7 ^
-                        xsimd ^
+                        xtl==0.6.9 ^
+                        xsimd==7.4.4 ^
                         python=3.6
           conda list
         displayName: "Install conda packages"

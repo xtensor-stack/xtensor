@@ -20,7 +20,6 @@
 #include "xscalar.hpp"
 #include "xstrides.hpp"
 #include "xstrided_view.hpp"
-#include "xmanipulation.hpp"
 
 namespace xt
 {
@@ -857,20 +856,6 @@ namespace xt
         }
 
         return indices;
-    }
-
-    /**
-     * @ingroup logical_operators
-     * @brief return indices that are non-zero in the flattened version of arr,
-     * equivalent to nonzero(ravel<layout_type>(arr))[0];
-     *
-     * @param arr input array
-     * @return indices that are non-zero in the flattened version of arr
-     */
-    template <layout_type L, class T>
-    inline auto flatnonzero(const T& arr)
-    {
-        return nonzero(ravel<L>(arr))[0];
     }
 
     /**

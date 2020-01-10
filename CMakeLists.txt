@@ -29,9 +29,19 @@ message(STATUS "Building xtensor v${${PROJECT_NAME}_VERSION}")
 # Dependencies
 # ============
 
-set(xtl_REQUIRED_VERSION 0.6.7)
-find_package(xtl ${xtl_REQUIRED_VERSION} REQUIRED)
-message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
+set(xtl_REQUIRED_VERSION 0.6.9)
+if(TARGET xtl)
+    set(xtl_VERSION ${XTL_VERSION_MAJOR}.${XTL_VERSION_MINOR}.${XTL_VERSION_PATCH})
+    # Note: This is not SEMVER compatible comparison
+    if( NOT ${xtl_VERSION} VERSION_GREATER_EQUAL ${xtl_REQUIRED_VERSION})
+        message(ERROR "Mismatch xtl versions. Found '${xtl_VERSION}' but requires: '${xtl_REQUIRED_VERSION}'")
+    else()
+        message(STATUS "Found xtl v${xtl_VERSION}")
+    endif()
+else(TARGET xtl)
+    find_package(xtl ${xtl_REQUIRED_VERSION} REQUIRED)
+    message(STATUS "Found xtl: ${xtl_INCLUDE_DIRS}/xtl")
+endif(TARGET xtl)
 
 find_package(nlohmann_json 3.1.1 QUIET)
 
@@ -43,13 +53,13 @@ OPTION(XTENSOR_USE_TBB "enable parallelization using intel TBB" OFF)
 OPTION(XTENSOR_USE_OPENMP "enable parallelization using OpenMP" OFF)
 if(XTENSOR_USE_TBB AND XTENSOR_USE_OPENMP)
     message(
-        FATAL 
+        FATAL
         "XTENSOR_USE_TBB and XTENSOR_USE_OPENMP cannot both be active at once"
     )
 endif()
 
 if(XTENSOR_USE_XSIMD)
-    set(xsimd_REQUIRED_VERSION 7.4.0)
+    set(xsimd_REQUIRED_VERSION 7.4.4)
     find_package(xsimd ${xsimd_REQUIRED_VERSION} REQUIRED)
     message(STATUS "Found xsimd: ${xsimd_INCLUDE_DIRS}/xsimd")
 endif()
@@ -71,16 +81,16 @@ if(XTENSOR_USE_OPENMP)
         find_package(Threads REQUIRED)
         add_library(OpenMP::OpenMP_CXX_xtensor IMPORTED INTERFACE)
         set_property(
-            TARGET 
+            TARGET
             OpenMP::OpenMP_CXX_xtensor
-            PROPERTY 
+            PROPERTY
             INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS}
         )
         # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
         set_property(
-            TARGET 
+            TARGET
             OpenMP::OpenMP_CXX_xtensor
-            PROPERTY 
+            PROPERTY
             INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
 
         message(STATUS "OpenMP Found")
@@ -159,8 +169,13 @@ set(XTENSOR_HEADERS
 )
 
 add_library(xtensor INTERFACE)
-target_include_directories(xtensor INTERFACE $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
-                                             $<INSTALL_INTERFACE:include>)
+
+target_include_directories(xtensor INTERFACE
+    $<BUILD_INTERFACE:${XTENSOR_INCLUDE_DIR}>
+    $<INSTALL_INTERFACE:include>)
+
+target_compile_features(xtensor INTERFACE cxx_std_14)
+
 target_link_libraries(xtensor INTERFACE xtl)
 
 OPTION(XTENSOR_ENABLE_ASSERT "xtensor bound check" OFF)
@@ -173,6 +188,7 @@ OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
 OPTION(DISABLE_VS2017 "disables the compilation of some test with Visual Studio 2017" OFF)
 OPTION(CPP17 "enables C++17" OFF)
 OPTION(XTENSOR_DISABLE_EXCEPTIONS "Disable C++ exceptions" OFF)
+OPTION(DISABLE_MSVC_ITERATOR_CHECK "Disable the MVSC iterator check" ON)
 
 if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     set(BUILD_TESTS ON)
@@ -192,6 +208,10 @@ endif()
 
 if(DISABLE_VS2017)
     add_definitions(-DDISABLE_VS2017)
+endif()
+
+if(MSVC AND DISABLE_MSVC_ITERATOR_CHECK)
+    add_compile_definitions($<$<CONFIG:Debug>:_ITERATOR_DEBUG_LEVEL=0>)
 endif()
 
 if(BUILD_TESTS)

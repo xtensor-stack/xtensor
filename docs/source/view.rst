@@ -254,7 +254,7 @@ of the list of indices:
 .. code::
 
     #include "xtensor/xarray.hpp"
-    #include "xtenosr/xindex_view.hpp"
+    #include "xtensor/xindex_view.hpp"
 
     xt::xarray<double> a = {{1, 5, 3}, {4, 5, 6}};
     using index_type = std::array<std::size_t, 2>;

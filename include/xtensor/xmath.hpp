@@ -25,6 +25,7 @@
 
 #include "xaccumulator.hpp"
 #include "xeval.hpp"
+#include "xmanipulation.hpp"
 #include "xoperation.hpp"
 #include "xreducer.hpp"
 #include "xslice.hpp"
@@ -2087,7 +2088,8 @@ namespace detail {
         decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
         auto axes_copy = axes;
-        auto inner_mean = mean(sc, std::move(axes_copy));
+        // always eval to prevent repeated evaluations in the next calls
+        auto inner_mean = eval(mean(sc, std::move(axes_copy), evaluation_strategy::immediate));
 
         // fake keep_dims = 1
         auto keep_dim_shape = e.shape();
@@ -2095,6 +2097,7 @@ namespace detail {
         {
             keep_dim_shape[el] = 1;
         }
+
         auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
         return mean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
     }
@@ -2765,17 +2768,25 @@ namespace detail {
     auto diff(const xexpression<T>& a, std::size_t n = 1, std::ptrdiff_t axis = -1)
     {
         typename std::decay_t<T>::temporary_type ad = a.derived_cast();
-        XTENSOR_ASSERT(n <= ad.size());
         std::size_t saxis = normalize_axis(ad.dimension(), axis);
-
-        if (n != std::size_t(0))
+        if(n <= ad.size())
         {
-            xstrided_slice_vector slice1(ad.dimension(), all());
-            xstrided_slice_vector slice2(ad.dimension(), all());
-            slice1[saxis] = range(1, xnone());
 
-            detail::diff_impl<typename T::value_type> impl;
-            impl(ad, n, slice1, slice2, saxis);
+            if (n != std::size_t(0))
+            {
+                xstrided_slice_vector slice1(ad.dimension(), all());
+                xstrided_slice_vector slice2(ad.dimension(), all());
+                slice1[saxis] = range(1, xnone());
+
+                detail::diff_impl<typename T::value_type> impl;
+                impl(ad, n, slice1, slice2, saxis);
+            }
+        }
+        else
+        {
+            auto shape = ad.shape();
+            shape[saxis] = std::size_t(0);
+            ad.resize(shape);
         }
         return ad;
     }
@@ -2948,6 +2959,50 @@ namespace detail {
         return interp(x, xp, fp, fp[0], fp[fp.size() - 1]);
     }
 
+    /**
+     * @brief Returns the covariance matrix
+     * 
+     * @param x one or two dimensional array
+     * @param y optional one-dimensional array to build covariance to x
+     */
+    template <class E1>
+    inline auto cov(const E1 &x, const E1 &y = E1())
+    {
+        using value_type = typename E1::value_type;
+
+        if (y.dimension() == 0)
+        {
+            auto s = x.shape();
+            if (x.dimension() == 1)
+            {
+                auto covar = eval(zeros<value_type>({ 1, 1 }));
+                auto x_norm = x - eval(mean(x));
+                covar(0, 0) = std::inner_product(x_norm.begin(), x_norm.end(), x_norm.begin(), 0.0) / (s[0] - 1);
+                return covar;
+            }
+            
+            XTENSOR_ASSERT( x.dimension() == 2 );
+
+            auto covar = eval(zeros<value_type>({ s[0], s[0] }));
+            auto m = eval(mean(x, {1}));
+            m.reshape({m.shape()[0],1});
+            auto x_norm = x - m;
+            for (auto i = 0; i < s[0]; i++)
+            {
+                auto xi = strided_view(x_norm, { range(i, i + 1), all() });
+                for (auto j = i; j < s[0]; j++)
+                {
+                    auto xj = strided_view(x_norm, { range(j, j + 1), all() });            
+                    covar(j, i) = std::inner_product(xi.begin(), xi.end(), xj.begin(), 0.0) / (s[1] - 1);
+                }
+            }
+            return eval(covar + transpose(covar) - diag(diagonal(covar)));
+        } 
+        else
+        {
+            return cov(eval(stack(xtuple(x, y))));
+        }
+    }
 }
 
 #endif

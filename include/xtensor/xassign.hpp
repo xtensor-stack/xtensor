@@ -14,6 +14,7 @@
 #include <type_traits>
 #include <utility>
 
+#include <xtl/xcomplex.hpp>
 #include <xtl/xsequence.hpp>
 
 #include "xexpression.hpp"
@@ -291,6 +292,33 @@ namespace xt
         {
             static constexpr bool value = xtl::conjunction<use_strided_loop<std::decay_t<CT>>...>::value;
         };
+
+        /**
+         * Considering the assigment LHS = RHS, if the requested value type used for
+         * loading simd form RHS is not complex while LHS value_type is complex,
+         * the assignment fails. The reason is that SIMD batches of complex values cannot
+         * be implicitly instanciated from batches of scalar values.
+         * Making the constructor implicit does not fix the issue since in the end,
+         * the assignment is done with vec.store(buffer) where vec is a batch of scalars
+         * and buffer an array of complex. SIMD batches of scalars do not provide overloads
+         * of store that accept buffer of commplex values and that SHOULD NOT CHANGE.
+         * Load and store overloads must accept SCALAR BUFFERS ONLY.
+         * Therefore, the solution is to explicitly force the instantiation of complex
+         * batches in the assignment mechanism. A common situation tthat triggers this
+         * issue is:
+         * xt::xarray<double> rhs = { 1, 2, 3 };
+         * xt::xarray<std::complex<double>> lhs = rhs;
+         */
+        template <class T1, class T2>
+        struct conditional_promote_to_complex
+        {
+            static constexpr bool cond = xtl::is_gen_complex<T1>::value && !xtl::is_gen_complex<T2>::value;
+            // Alternative: use std::complex<T2> or xcomplex<T2, T2, bool> depending on T1
+            using type = std::conditional_t<cond, T1, T2>;
+        };
+
+        template <class T1, class T2>
+        using conditional_promote_to_complex_t = typename conditional_promote_to_complex<T1, T2>::type;
     }
 
     template <class E1, class E2>
@@ -304,8 +332,10 @@ namespace xt
         template <class T>
         using is_bool = std::is_same<T, bool>;
 
+        static constexpr bool is_bool_conversion() { return is_bool<e2_value_type>::value && !is_bool<e1_value_type>::value; }
         static constexpr bool contiguous_layout() { return E1::contiguous_layout && E2::contiguous_layout; }
-        static constexpr bool convertible_types() { return std::is_convertible<e2_value_type, e1_value_type>::value; }
+        static constexpr bool convertible_types() { return std::is_convertible<e2_value_type, e1_value_type>::value 
+                                                        && !is_bool_conversion(); }
 
         static constexpr bool use_xsimd() { return xt_simd::simd_traits<int8_t>::size > 1; }
 
@@ -328,9 +358,11 @@ namespace xt
         static constexpr bool simd_linear_assign(const E1& e1, const E2& e2) { return simd_assign()
                                                                                 && detail::linear_dynamic_layout(e1, e2); }
 
-        using requested_value_type = std::conditional_t<is_bool<e2_value_type>::value,
-                                                        typename E2::bool_load_type,
-                                                        e2_value_type>;
+        using e2_requested_value_type = std::conditional_t<is_bool<e2_value_type>::value,
+                                                           typename E2::bool_load_type,
+                                                           e2_value_type>;
+        using requested_value_type = detail::conditional_promote_to_complex_t<e1_value_type,
+                                                                              e2_requested_value_type>;
 
     };
 
@@ -603,20 +635,39 @@ namespace xt
         }
 
 #if defined(XTENSOR_USE_TBB)
-        tbb::parallel_for(align_begin, align_end, simd_size, [&](size_t i)
-          {
-            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
-          });
-#elif defined(XTENSOR_USE_OPENMP)
-        #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
-        for (size_type i = align_begin; i < align_end; i += simd_size)
+        tbb::parallel_for(align_begin, align_end, simd_size, [&e1, &e2](size_t i)
         {
-          e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+        });
+#elif defined(XTENSOR_USE_OPENMP)
+        if (size >= XTENSOR_OPENMP_TRESHOLD)
+        {
+            #pragma omp parallel for default(none) shared(align_begin, align_end, e1, e2)
+    #ifndef _WIN32
+            for (size_type i = align_begin; i < align_end; i += simd_size)
+            {
+                e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+            }
+    #else
+            for(auto i = static_cast<std::ptrdiff_t>(align_begin); i < static_cast<std::ptrdiff_t>(align_end);
+                i += static_cast<std::ptrdiff_t>(simd_size))
+            {
+                size_type ui = static_cast<size_type>(i);
+                e1.template store_simd<lhs_align_mode>(ui, e2.template load_simd<rhs_align_mode, value_type>(ui));
+            }
+    #endif
+        }
+        else
+        {
+            for (size_type i = align_begin; i < align_end; i += simd_size)
+            {
+                e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+            }
         }
 #else
         for (size_type i = align_begin; i < align_end; i += simd_size)
         {
-          e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
+            e1.template store_simd<lhs_align_mode>(i, e2.template load_simd<rhs_align_mode, value_type>(i));
         }
 #endif
         for (size_type i = align_end; i < size; ++i)

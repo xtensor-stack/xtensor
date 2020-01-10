@@ -477,74 +477,104 @@ namespace xt
     namespace detail
     {
         template <class... CT>
-        class concatenate_impl
+        class concatenate_access
         {
         public:
 
+            using tuple_type = std::tuple<CT...>;
             using size_type = std::size_t;
             using value_type = xtl::promote_type_t<typename std::decay_t<CT>::value_type...>;
 
-            inline concatenate_impl(std::tuple<CT...>&& t, size_type axis)
-                : m_t(t), m_axis(axis)
+            template <class S>
+            inline value_type access(const tuple_type& t, size_type axis, S index) const
             {
-            }
-
-            template <class... Args>
-            inline value_type operator()(Args... args) const
-            {
-                // TODO: avoid memory allocation
-                return access_impl(xindex({static_cast<size_type>(args)...}));
-            }
-
-            template <class It>
-            inline value_type element(It first, It last) const
-            {
-                // TODO: avoid memory allocation
-                return access_impl(xindex(first, last));
-            }
-
-        private:
-
-            inline value_type access_impl(xindex idx) const
-            {
-                auto match = [this, &idx](auto& arr) {
-                    if (idx[this->m_axis] >= arr.shape()[this->m_axis])
+                auto match = [&index, axis](auto& arr)
+                {
+                    if (index[axis] >= arr.shape()[axis])
                     {
-                        idx[this->m_axis] -= arr.shape()[this->m_axis];
+                        index[axis] -= arr.shape()[axis];
                         return false;
                     }
                     return true;
                 };
 
-                auto get = [&idx](auto& arr) {
-                    return arr[idx];
+                auto get = [&index](auto& arr)
+                {
+                    return arr[index];
                 };
 
                 size_type i = 0;
                 for (; i < sizeof...(CT); ++i)
                 {
-                    if (apply<bool>(i, match, m_t))
+                    if (apply<bool>(i, match, t))
                     {
                         break;
                     }
                 }
-                return apply<value_type>(i, get, m_t);
+                return apply<value_type>(i, get, t);
             }
-
-            std::tuple<CT...> m_t;
-            size_type m_axis;
         };
 
         template <class... CT>
-        class stack_impl
+        class stack_access
         {
         public:
 
+            using tuple_type = std::tuple<CT...>;
             using size_type = std::size_t;
             using value_type = xtl::promote_type_t<typename std::decay_t<CT>::value_type...>;
 
-            inline stack_impl(std::tuple<CT...>&& t, size_type axis)
-                : m_t(t), m_axis(axis)
+            template <class S>
+            inline value_type access(const tuple_type& t, size_type axis, S index) const
+            {
+                auto get_item = [&index](auto& arr)
+                {
+                    return arr[index];
+                };
+                size_type i = index[axis];
+                index.erase(index.begin() + std::ptrdiff_t(axis));
+                return apply<value_type>(i, get_item, t);
+            }
+        };
+
+        template <class... CT>
+        class vstack_access : private concatenate_access<CT...>,
+                              private stack_access<CT...>
+        {
+        public:
+
+            using tuple_type = std::tuple<CT...>;
+            using size_type = std::size_t;
+            using value_type = xtl::promote_type_t<typename std::decay_t<CT>::value_type...>;
+
+            using concatenate_base = concatenate_access<CT...>;
+            using stack_base = stack_access<CT...>;
+
+            template <class S>
+            inline value_type access(const tuple_type& t, size_type axis, S index) const
+            {
+                if (std::get<0>(t).dimension() == 1)
+                {
+                    return stack_base::access(t, axis, index);
+                }
+                else
+                {
+                    return concatenate_base::access(t, axis, index);
+                }
+            }
+        };
+
+        template <template <class...> class F, class... CT>
+        class concatenate_invoker : private F<CT...>
+        {
+        public:
+
+            using tuple_type = std::tuple<CT...>;
+            using size_type = std::size_t;
+            using value_type = xtl::promote_type_t<typename std::decay_t<CT>::value_type...>;
+
+            inline concatenate_invoker(tuple_type&& t, size_type axis)
+                : m_t(std::move(t)), m_axis(axis)
             {
             }
 
@@ -552,31 +582,30 @@ namespace xt
             inline value_type operator()(Args... args) const
             {
                 // TODO: avoid memory allocation
-                return access_impl(xindex({static_cast<size_type>(args)...}));
+                return this->access(m_t, m_axis, xindex({static_cast<size_type>(args)...}));
             }
 
             template <class It>
             inline value_type element(It first, It last) const
             {
                 // TODO: avoid memory allocation
-                return access_impl(xindex(first, last));
+                return this->access(m_t, m_axis, xindex(first, last));
             }
 
         private:
 
-            inline value_type access_impl(xindex idx) const
-            {
-                auto get_item = [&idx](auto& arr) {
-                    return arr[idx];
-                };
-                size_type i = idx[m_axis];
-                idx.erase(idx.begin() + std::ptrdiff_t(m_axis));
-                return apply<value_type>(i, get_item, m_t);
-            }
-
-            const std::tuple<CT...> m_t;
-            const size_type m_axis;
+            tuple_type m_t;
+            size_type m_axis;
         };
+
+        template <class... CT>
+        using concatenate_impl = concatenate_invoker<concatenate_access, CT...>;
+
+        template <class... CT>
+        using stack_impl = concatenate_invoker<stack_access, CT...>;
+
+        template <class... CT>
+        using vstack_impl = concatenate_invoker<vstack_access, CT...>;
 
         template <class CT>
         class repeat_impl
@@ -623,6 +652,100 @@ namespace xt
         return std::tuple<xtl::const_closure_type_t<Types>...>(std::forward<Types>(args)...);
     }
 
+    namespace detail {
+        template <bool... values>
+        using all_true = xtl::conjunction<std::integral_constant<bool, values>...>;
+
+        template <class X, class Y, std::size_t axis, class AxesSequence> 
+        struct concat_fixed_shape_impl;
+
+        template <class X, class Y, std::size_t axis, std::size_t... Is>
+        struct concat_fixed_shape_impl<X, Y, axis, std::index_sequence<Is...>> 
+        {
+            static_assert(X::size() == Y::size(), "Concatenation requires equisized shapes");
+            static_assert(axis < X::size(), "Concatenation requires a valid axis");
+            static_assert(all_true<(axis == Is || X::template get<Is>() == Y::template get<Is>())...>::value,
+                          "Concatenation requires compatible shapes and axis");
+
+            using type = fixed_shape<(axis == Is ? X::template get<Is>() + Y::template get<Is>()
+                                                 : X::template get<Is>())...>;
+        };
+
+        template <std::size_t axis, class X, class Y, class... Rest> 
+        struct concat_fixed_shape;
+
+        template <std::size_t axis, class X, class Y> 
+        struct concat_fixed_shape<axis, X, Y> 
+        {
+            using type = typename concat_fixed_shape_impl<X, Y, axis, std::make_index_sequence<X::size()>>::type;
+        };
+
+        template <std::size_t axis, class X, class Y, class... Rest> 
+        struct concat_fixed_shape 
+        {
+            using type = typename concat_fixed_shape<axis, X, typename concat_fixed_shape<axis, Y, Rest...>::type>::type;
+        };
+
+        template <std::size_t axis, class... Args>
+        using concat_fixed_shape_t = typename concat_fixed_shape<axis, Args...>::type;
+
+        template <class... CT>
+        using all_fixed_shapes = detail::all_fixed<typename std::decay_t<CT>::shape_type...>;
+
+        struct concat_shape_builder_t
+        {
+            template <class Shape, bool = detail::is_fixed<Shape>::value>
+            struct concat_shape;
+
+            template <class Shape>
+            struct concat_shape<Shape, true>
+            {
+                // Convert `fixed_shape` to `static_shape` to allow runtime dimension calculation.
+                using type = static_shape<typename Shape::value_type, Shape::size()>;
+            };
+
+            template <class Shape>
+            struct concat_shape<Shape, false>
+            {
+                using type = Shape;
+            };
+
+            template <class... Args>
+            static auto build(const std::tuple<Args...>& t, std::size_t axis)
+            {
+                using shape_type = promote_shape_t<typename concat_shape<typename std::decay_t<Args>::shape_type>::type...>;
+                using source_shape_type = decltype(std::get<0>(t).shape());
+                shape_type new_shape = xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape());
+
+                auto check_shape = [&axis, &new_shape](auto& arr) {
+                    std::size_t s = new_shape.size();
+                    bool res = s == arr.dimension();
+                    for(std::size_t i = 0; i < s; ++i)
+                    {
+                        res = res && (i == axis || new_shape[i] == arr.shape(i));
+                    }
+                    if(!res)
+                    {
+                        throw_concatenate_error(new_shape, arr.shape());
+                    }
+                };
+                for_each(check_shape, t);
+
+                auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
+                    return prev + arr.shape()[axis];
+                };
+                new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
+
+                return new_shape;
+            }
+        };
+
+    } // namespace detail
+
+    /***************
+     * concatenate *
+     ***************/
+
     /**
      * @brief Concatenates xexpressions along \em axis.
      *
@@ -641,77 +764,15 @@ namespace xt
     template <class... CT>
     inline auto concatenate(std::tuple<CT...>&& t, std::size_t axis = 0)
     {
-        using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
-        using source_shape_type = decltype(std::get<0>(t).shape());
-        shape_type new_shape = xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape());
-
-        auto check_shape = [&axis, &new_shape](auto& arr) {
-            std::size_t s = new_shape.size();
-            bool res = s == arr.dimension();
-            for(std::size_t i = 0; i < s; ++i)
-            {
-                res = res && (i == axis || new_shape[i] == arr.shape(i));
-            }
-            if(!res)
-            {
-                throw_concatenate_error(new_shape, arr.shape());
-            }
-        };
-        for_each(check_shape, t);
-
-        auto shape_at_axis = [&axis](std::size_t prev, auto& arr) -> std::size_t {
-            return prev + arr.shape()[axis];
-        };
-        new_shape[axis] += accumulate(shape_at_axis, std::size_t(0), t) - new_shape[axis];
-
-        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
+        const auto shape = detail::concat_shape_builder_t::build(t, axis);
+        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::move(t), axis), shape);
     }
 
-    namespace detail {
-        // `bool_pack` source: https://stackoverflow.com/a/36934374/1306230
-        template <bool... values> struct bool_pack;
-        template <bool... values>
-        using all_true = xtl::conjunction<std::integral_constant<bool, values>...>;
-
-        template <class X, class Y, size_t axis, class AxesSequence> 
-        struct concat_shape_impl;
-
-        template <class X, class Y, size_t axis, size_t... Is>
-        struct concat_shape_impl<X, Y, axis, std::index_sequence<Is...>> 
-        {
-            static_assert(X::size() == Y::size(), "Concatenation requires equisized shapes");
-            static_assert(axis < X::size(), "Concatenation requires a valid axis");
-            static_assert(all_true<(axis == Is || X::template get<Is>() == Y::template get<Is>())...>::value,
-                          "Concatenation requires compatible shapes and axis");
-
-            using type = fixed_shape<(axis == Is ? X::template get<Is>() + Y::template get<Is>()
-                                                 : X::template get<Is>())...>;
-        };
-
-        template <size_t axis, class X, class Y, class... Rest> 
-        struct concat_shape;
-
-        template <size_t axis, class X, class Y> 
-        struct concat_shape<axis, X, Y> 
-        {
-            using type = typename concat_shape_impl<X, Y, axis, std::make_index_sequence<X::size()>>::type;
-        };
-
-        template <size_t axis, class X, class Y, class... Rest> 
-        struct concat_shape 
-        {
-            using type = typename concat_shape<axis, X, typename concat_shape<axis, Y, Rest...>::type>::type;
-        };
-
-        template <size_t axis, class... Args>
-        using concat_shape_t = typename concat_shape<axis, Args...>::type;
-    } // namespace detail
-
-    template <std::size_t axis = 0, class... CT,
-              typename = std::enable_if_t<detail::all_fixed<typename std::decay_t<CT>::shape_type...>::value>>
-    inline auto concatenate_fixed(std::tuple<CT...> &&t) {
-        using shape_type = detail::concat_shape_t<axis, typename std::decay_t<CT>::shape_type...>;
-        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), shape_type{});
+    template <std::size_t axis, class... CT, typename = std::enable_if_t<detail::all_fixed_shapes<CT...>::value>>
+    inline auto concatenate(std::tuple<CT...> &&t) 
+    {
+        using shape_type = detail::concat_fixed_shape_t<axis, typename std::decay_t<CT>::shape_type...>;
+        return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::move(t), axis), shape_type{});
     }
 
     namespace detail
@@ -759,7 +820,60 @@ namespace xt
         using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
         using source_shape_type = decltype(std::get<0>(t).shape());
         auto new_shape = detail::add_axis(xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape()), axis, sizeof...(CT));
-        return detail::make_xgenerator(detail::stack_impl<CT...>(std::forward<std::tuple<CT...>>(t), axis), new_shape);
+        return detail::make_xgenerator(detail::stack_impl<CT...>(std::move(t), axis), new_shape);
+    }
+
+    /**
+     * @brief Stack xexpressions in sequence horizontally (column wise).
+     * This is equivalent to concatenation along the second axis, except for 1-D
+     * xexpressions where it concatenate along the firts axis.
+     *
+     * @param t \ref xtuple of xexpressions to stack
+     * @return xgenerator evaluating to stacked elements
+     */
+    template <class... CT>
+    inline auto hstack(std::tuple<CT...>&& t)
+    {
+        auto dim = std::get<0>(t).dimension();
+        std::size_t axis = dim > std::size_t(1) ? 1 : 0;
+        return concatenate(std::move(t), axis);
+    }
+
+    namespace detail
+    {
+        template <class S, class... CT>
+        inline auto vstack_shape(std::tuple<CT...>& t, const S& shape)
+        {
+            using size_type = typename S::value_type;
+            auto res = shape.size() == size_type(1) ?
+                S({sizeof...(CT), shape[0]}) :
+                concat_shape_builder_t::build(std::move(t), size_type(0));
+            return res;
+        }
+
+        template <class T, class... CT>
+        inline auto vstack_shape(const std::tuple<CT...>& t, std::array<T, 1> shape)
+        {
+            std::array<T, 2> res = { sizeof...(CT), shape[0] };
+            return res;
+        }
+    }
+
+    /**
+     * @brief Stack xexpressions in sequence vertically (row wise).
+     * This is equivalent to concatenation along the first axis after
+     * 1-D arrays of shape (N) have been reshape to (1, N).
+     *
+     * @param t \ref xtuple of xexpressions to stack
+     * @return xgenerator evaluating to stacked elements
+     */
+    template <class... CT>
+    inline auto vstack(std::tuple<CT...>&& t)
+    {
+        using shape_type = promote_shape_t<typename std::decay_t<CT>::shape_type...>;
+        using source_shape_type = decltype(std::get<0>(t).shape());
+        auto new_shape = detail::vstack_shape(t, xtl::forward_sequence<shape_type, source_shape_type>(std::get<0>(t).shape()));
+        return detail::make_xgenerator(detail::vstack_impl<CT...>(std::move(t), size_t(0)), new_shape);
     }
 
     namespace detail

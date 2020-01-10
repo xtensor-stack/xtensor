@@ -242,4 +242,20 @@ namespace xt
                                     { 0.7, 8. , 0.9}};
         EXPECT_EQ(data, expected1);
     }
+
+    TEST(xmasked_view, view)
+    {
+	xt::xarray<size_t> data = {{0,1}, {2,3}, {4,5}};
+	xt::xarray<size_t> data_new = xt::zeros<size_t>(data.shape());
+	xt::xarray<bool> col_mask = {false, true};
+
+	auto row_masked = xt::masked_view(xt::view(data, 0, xt::all()), col_mask);
+        auto new_row_masked = xt::masked_view(xt::view(data_new, 0, xt::all()), col_mask);
+
+        row_masked += 10;
+        new_row_masked = row_masked;
+
+        EXPECT_EQ(data_new(0, 0), size_t(0));
+        EXPECT_EQ(data_new(0, 1), size_t(11));
+    }
 }

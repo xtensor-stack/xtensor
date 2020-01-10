@@ -352,7 +352,6 @@ namespace xt
 
         auto t = concatenate(xtuple(arange(2), arange(2, 5), arange(5, 8)));
         ASSERT_TRUE(arange(8) == t);
-
         
         xt::xarray<double> fa = xt::ones<double>({ 3, 4, 5, 0 });
         xt::xarray<double> sa = xt::ones<double>({ 3, 4, 5 });
@@ -376,7 +375,7 @@ namespace xt
     {
         xtensor_fixed<double, fixed_shape<2, 2, 3>> a = {{{0, 1, 2}, {3, 4, 5}}, {{6, 7, 8}, {9, 10, 11}}};
 
-        auto c = concatenate_fixed<2>(xtuple(a, a, a));
+        auto c = concatenate<2>(xtuple(a, a, a));
 
         using expected_shape_c_t = fixed_shape<2, 2, 9>;
         ASSERT_EQ(expected_shape_c_t{}, c.shape());
@@ -385,8 +384,8 @@ namespace xt
         ASSERT_EQ(11, c(1, 1, 5));
 
         xtensor_fixed<double, fixed_shape<1, 3>> e = {{1, 2, 3}}, f = {{2, 3, 4}};
-        auto k = concatenate_fixed<0>(xtuple(e, f));
-        auto l = concatenate_fixed<1>(xtuple(e, f));
+        auto k = concatenate<0>(xtuple(e, f));
+        auto l = concatenate<1>(xtuple(e, f));
 
         using expected_shape_k_t = fixed_shape<2, 3>;
         using expected_shape_l_t = fixed_shape<1, 6>;
@@ -399,9 +398,12 @@ namespace xt
         xtensor_fixed<double, fixed_shape<2>> x = arange(2);
         xtensor_fixed<double, fixed_shape<3>> y = arange(2, 5);
         xtensor_fixed<double, fixed_shape<3>> z = arange(5, 8);
-        auto w = concatenate_fixed(xtuple(x, y, z));
 
-        ASSERT_TRUE(arange(8) == w);
+        auto w1 = concatenate<0>(xtuple(x, y, z));
+        auto w2 = concatenate(xtuple(x, y, z), 0);
+
+        ASSERT_TRUE(arange(8) == w1);
+        ASSERT_TRUE(w1 == w2);
     }
 #endif
 
@@ -448,6 +450,52 @@ namespace xt
         auto t = stack(xtuple(arange(3), arange(3, 6), arange(6, 9)));
         xarray<double> ar = {{0, 1, 2}, {3, 4, 5}, {6, 7, 8}};
         ASSERT_TRUE(t == ar);
+    }
+
+    TEST(xbuilder, hstack)
+    {
+        xarray<int> a0 = {1, 2, 3};
+        xarray<int> b0 = {2, 3, 4};
+        xarray<int> e0 = {1, 2, 3, 2, 3, 4};
+        auto c0 = hstack(xtuple(a0, b0));
+        EXPECT_EQ(c0, e0);
+
+        xarray<int> a1 = a0;
+        a1.reshape({3, 1});
+        xarray<int> b1 = b0;
+        b1.reshape({3, 1});
+        xarray<int> e1 = {{1, 2}, {2, 3}, {3, 4}};
+        auto c1 = hstack(xtuple(a1, b1));
+        EXPECT_EQ(c1, e1);
+
+        xarray<int> a2 = {{1, 2, 3}, {4, 5 ,6}};
+        xarray<int> b2 = {{7, 8}, {9, 10}};
+        xarray<int> e2 = {{1, 2, 3, 7, 8}, {4, 5, 6, 9, 10}};
+        auto c2 = hstack(xtuple(a2, b2));
+    }
+
+    TEST(xbuilder, vstack)
+    {
+        xarray<int> a0 = {1, 2, 3};
+        xarray<int> b0 = {2, 3, 4};
+        xarray<int> e0 = {{1, 2, 3}, {2, 3, 4}};
+        auto c0 = vstack(xtuple(a0, b0));
+        EXPECT_EQ(c0, e0);
+
+        xarray<int> a1 = a0;
+        a1.reshape({3, 1});
+        xarray<int> b1 = b0;
+        b1.reshape({3, 1});
+        xarray<int> e1 = { 1, 2, 3, 2, 3, 4 };
+        e1.reshape({6, 1});
+        auto c1 = vstack(xtuple(a1, b1));
+        EXPECT_EQ(c1, e1);
+
+        xarray<int> a2 = {{1, 2, 3}, {4, 5 ,6}, {7, 8, 9}};
+        xarray<int> b2 = {{10, 11, 12}};
+        xarray<int> e2 = {{1, 2, 3}, {4, 5 ,6}, {7, 8, 9}, {10, 11, 12}};
+        auto c2 = vstack(xtuple(a2, b2));
+        EXPECT_EQ(c2, e2);
     }
 
     TEST(xbuilder, meshgrid)

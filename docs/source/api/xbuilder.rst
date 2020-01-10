@@ -60,6 +60,12 @@ Defined in ``xtensor/xbuilder.hpp``
 .. doxygenfunction:: xt::stack
    :project: xtensor
 
+.. doxygenfunction:: xt::hstack
+   :project: xtensor
+
+.. doxygenfunction:: xt::vstack
+   :project: xtensor
+
 .. doxygenfunction:: xt::meshgrid
    :project: xtensor
 

@@ -54,6 +54,18 @@ namespace xt
         using xstrided_view_base_t = typename xstrided_view_base<CT, S, L, FST>::type;
     }
 
+    template <layout_type L1, layout_type L2, class T>
+    struct select_iterable_base
+    {
+        using type = std::conditional_t<L1 == L2 && L1 != layout_type::dynamic,
+                                        xcontiguous_iterable<T>,
+                                        xiterable<T>>;
+    };
+
+    template <layout_type L1, layout_type L2, class T>
+    using select_iterable_base_t = typename select_iterable_base<L1, L2, T>::type;
+
+
     template <class CT, class S, layout_type L, class FST>
     class xstrided_view;
 
@@ -70,6 +82,7 @@ namespace xt
         using storage_getter = FST;
         using inner_storage_type = typename storage_getter::type;
         using temporary_type = temporary_type_t<typename xexpression_type::value_type, S, L>;
+        using storage_type = std::remove_reference_t<inner_storage_type>;
         static constexpr layout_type layout = L;
     };
 
@@ -111,7 +124,7 @@ namespace xt
      */
     template <class CT, class S, layout_type L = layout_type::dynamic, class FST = detail::flat_storage_getter<CT, XTENSOR_DEFAULT_TRAVERSAL>>
     class xstrided_view : public xview_semantic<xstrided_view<CT, S, L, FST>>,
-                          public xiterable<xstrided_view<CT, S, L, FST>>,
+                          public select_iterable_base_t<L, std::decay_t<CT>::static_layout, xstrided_view<CT, S, L, FST>>,
                           private xstrided_view_base<xstrided_view<CT, S, L, FST>>,
                           public extension::xstrided_view_base_t<CT, S, L, FST>
     {
@@ -139,8 +152,8 @@ namespace xt
         using storage_iterator = typename storage_type::iterator;
         using const_storage_iterator = typename storage_type::const_iterator;
 
-        using iterable_base = xiterable<self_type>;
-        using inner_shape_type = typename iterable_base::inner_shape_type;
+        using iterable_base = select_iterable_base_t<L, xexpression_type::static_layout, self_type>;
+        using inner_shape_type = typename base_type::inner_shape_type;
         using inner_strides_type = typename base_type::inner_strides_type;
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
         using shape_type = typename base_type::shape_type;
@@ -156,7 +169,9 @@ namespace xt
         using temporary_type = typename xcontainer_inner_types<self_type>::temporary_type;
         using base_index_type = xindex_type_t<shape_type>;
 
-        using simd_value_type = typename base_type::simd_value_type;
+        using data_alignment = xt_simd::container_alignment_t<storage_type>;
+        using simd_type = xt_simd::simd_type<value_type>;
+        using simd_value_type = xt_simd::simd_type<value_type>;
         using bool_load_type = typename base_type::bool_load_type;
 
         template <class CTA, class SA>
@@ -218,6 +233,22 @@ namespace xt
         template <class ST, class STEP = const_stepper>
         std::enable_if_t<is_indexed_stepper<STEP>::value, STEP>
         stepper_end(const ST& shape, layout_type l) const;
+
+        template <class requested_type>
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
+
+        template <class T, class R>
+        using enable_simd_interface = std::enable_if_t<has_simd_interface<T>::value && L != layout_type::dynamic, R>;
+
+        template <class align, class simd, class T = xexpression_type>
+        enable_simd_interface<T, void> store_simd(size_type i, const simd& e);
+        template <class align, class requested_type = value_type,
+                  std::size_t N = xt_simd::simd_traits<requested_type>::size,
+                  class T = xexpression_type>
+        enable_simd_interface<T, simd_return_type<requested_type>> load_simd(size_type i) const;
+
+        reference data_element(size_type i);
+        const_reference data_element(size_type i) const;
 
         using container_iterator = std::conditional_t<is_const,
                                                       typename storage_type::const_iterator,
@@ -393,6 +424,19 @@ namespace xt
     //@}
 
     template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::data_element(size_type i) -> reference
+    {
+        return storage()[i];
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::data_element(size_type i) const -> const_reference
+    {
+        return storage()[i];
+    }
+
+
+    template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::storage_begin() -> storage_iterator
     {
         return this->storage().begin() + static_cast<std::ptrdiff_t>(data_offset());
@@ -507,6 +551,24 @@ namespace xt
     }
 
     template <class CT, class S, layout_type L, class FST>
+    template <class alignment, class simd, class T>
+    inline auto xstrided_view<CT, S, L, FST>::store_simd(size_type i, const simd& e)
+        -> enable_simd_interface<T, void>
+    {
+        using align_mode = driven_align_mode_t<alignment, data_alignment>;
+        xt_simd::store_simd<value_type, typename simd::value_type>(&(storage()[i]), e, align_mode());
+    }
+
+    template <class CT, class S, layout_type L, class FST>
+    template <class alignment, class requested_type, std::size_t N, class T>
+    inline auto xstrided_view<CT, S, L, FST>::load_simd(size_type i) const
+        -> enable_simd_interface<T, simd_return_type<requested_type>>
+    {
+        using align_mode = driven_align_mode_t<alignment, data_alignment>;
+        return xt_simd::load_simd<value_type, requested_type>(&(storage()[i]), align_mode());
+    }
+
+    template <class CT, class S, layout_type L, class FST>
     template <class E>
     inline auto xstrided_view<CT, S, L, FST>::build_view(E&& e) const -> rebind_t<E>
     {
@@ -599,12 +661,15 @@ namespace xt
     template <layout_type L = XTENSOR_DEFAULT_TRAVERSAL, class E, class S>
     inline auto reshape_view(E&& e, S&& shape)
     {
+        static_assert(L == layout_type::row_major || L == layout_type::column_major, "traversal has to be row or column major");
+
         using shape_type = std::decay_t<S>;
         get_strides_t<shape_type> strides;
 
         xt::resize_container(strides, shape.size());
         compute_strides(shape, L, strides);
-        using view_type = xstrided_view<xclosure_t<E>, shape_type, layout_type::dynamic, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
+        constexpr auto computed_layout = std::decay_t<E>::static_layout == L ? L : layout_type::dynamic;
+        using view_type = xstrided_view<xclosure_t<E>, shape_type, computed_layout, detail::flat_adaptor_getter<xclosure_t<E>, L>>;
         return view_type(std::forward<E>(e), std::forward<S>(shape), std::move(strides), 0, e.layout());
     }
 

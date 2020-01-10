@@ -66,16 +66,6 @@ namespace xt
      * xview declaration *
      *********************/
 
-    template <class CT, class... S>
-    struct xcontainer_inner_types<xview<CT, S...>>
-    {
-        using xexpression_type = std::decay_t<CT>;
-        using reference = inner_reference_t<CT>;
-        using const_reference = typename xexpression_type::const_reference;
-        using size_type = typename xexpression_type::size_type;
-        using temporary_type = view_temporary_type_t<xexpression_type, S...>;
-    };
-
     template <bool is_const, class CT, class... S>
     class xview_stepper;
 
@@ -299,6 +289,27 @@ namespace xt
     }
 
     template <class CT, class... S>
+    struct xcontainer_inner_types<xview<CT, S...>>
+    {
+        using xexpression_type = std::decay_t<CT>;
+        using reference = inner_reference_t<CT>;
+        using const_reference = typename xexpression_type::const_reference;
+        using size_type = typename xexpression_type::size_type;
+        using temporary_type = view_temporary_type_t<xexpression_type, S...>;
+
+        static constexpr layout_type layout =
+            detail::is_contiguous_view<xexpression_type, S...>::value ?
+                xexpression_type::static_layout : layout_type::dynamic;
+
+        static constexpr bool is_const = std::is_const<std::remove_reference_t<CT>>::value;
+
+        using extract_storage_type = xtl::mpl::eval_if_t<has_data_interface<xexpression_type>,
+                                                         detail::expr_storage_type<xexpression_type>,
+                                                         make_invalid_type<>>;
+        using storage_type = std::conditional_t<is_const, const extract_storage_type, extract_storage_type>;
+    };
+
+    template <class CT, class... S>
     struct xiterable_inner_types<xview<CT, S...>>
     {
         using xexpression_type = std::decay_t<CT>;
@@ -335,7 +346,10 @@ namespace xt
      */
     template <class CT, class... S>
     class xview : public xview_semantic<xview<CT, S...>>,
-                  public xiterable<xview<CT, S...>>,
+                  public std::conditional_t<
+                    detail::is_contiguous_view<std::decay_t<CT>, S...>::value,
+                    xcontiguous_iterable<xview<CT, S...>>,
+                    xiterable<xview<CT, S...>>>,
                   public xaccessible<xview<CT, S...>>,
                   public extension::xview_base_t<CT, S...>
     {
@@ -364,9 +378,7 @@ namespace xt
         using size_type = typename inner_types::size_type;
         using difference_type = typename xexpression_type::difference_type;
 
-        static constexpr layout_type static_layout = detail::is_contiguous_view<xexpression_type, S...>::value ?
-                                                                                xexpression_type::static_layout :
-                                                                                layout_type::dynamic;
+        static constexpr layout_type static_layout = inner_types::layout;
         static constexpr bool contiguous_layout = static_layout != layout_type::dynamic;
 
         static constexpr bool is_strided_view = detail::is_strided_view<xexpression_type, S...>::value;
@@ -384,9 +396,7 @@ namespace xt
                                                                        detail::expr_inner_backstrides_type<xexpression_type>,
                                                                        get_strides_type<shape_type>>;
 
-        using storage_type = xtl::mpl::eval_if_t<has_data_interface<xexpression_type>,
-                                                 detail::expr_storage_type<xexpression_type>,
-                                                 make_invalid_type<>>;
+        using storage_type = typename inner_types::storage_type;
 
         static constexpr bool has_trivial_strides = is_contiguous_view && !xtl::disjunction<detail::is_xrange<S>...>::value;
         using inner_strides_type = std::conditional_t<has_trivial_strides,
@@ -411,11 +421,13 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
 
         using storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value && is_strided_view,
-                                                    typename xexpression_type::storage_iterator,
+                                                    std::conditional_t<is_const,
+                                                        typename xexpression_type::const_storage_iterator,
+                                                        typename xexpression_type::storage_iterator>,
                                                     typename iterable_base::storage_iterator>;
         using const_storage_iterator = std::conditional_t<has_data_interface<xexpression_type>::value && is_strided_view,
-                                                    typename xexpression_type::const_storage_iterator,
-                                                    typename iterable_base::const_storage_iterator>;
+                                                          typename xexpression_type::const_storage_iterator,
+                                                          typename iterable_base::const_storage_iterator>;
 
         using container_iterator = pointer;
         using const_container_iterator = const_pointer;
@@ -495,11 +507,11 @@ namespace xt
         stepper_end(const ST& shape, layout_type l) const;
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, storage_type&>
         storage();
 
         template <class T = xexpression_type>
-        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, const storage_type&>
         storage() const;
 
         template <class T = xexpression_type>
@@ -692,6 +704,12 @@ namespace xt
 
     template <class E, class... S>
     auto view(E&& e, S&&... slices);
+
+    template <class E>
+    auto row(E&& e, const int index);
+
+    template <class E>
+    auto col(E&& e, const int index);
 
     /*****************************
      * xview_stepper declaration *
@@ -1087,7 +1105,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::storage() ->
-        std::enable_if_t<has_data_interface<T>::value, typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, storage_type&>
     {
         return m_e.storage();
     }
@@ -1095,7 +1113,7 @@ namespace xt
     template <class CT, class... S>
     template <class T>
     inline auto xview<CT, S...>::storage() const ->
-        std::enable_if_t<has_data_interface<T>::value, const typename T::storage_type&>
+        std::enable_if_t<has_data_interface<T>::value, const storage_type&>
     {
         return m_e.storage();
     }
@@ -1647,6 +1665,97 @@ namespace xt
     inline auto view(E&& e, S&&... slices)
     {
         return detail::make_view_impl(std::forward<E>(e), std::make_index_sequence<sizeof...(S)>(), std::forward<S>(slices)...);
+    }
+
+    namespace detail
+    {
+        class row_impl
+        {
+        public:
+            template<class E>
+            static inline auto make(E&& e, const int index)
+            {
+                const auto shape = e.shape();
+                check_dimension(shape);
+                const int non_negative_index = index < 0 ? static_cast<int>(index + shape[0]) : index;
+                return view(e, non_negative_index, xt::all());
+            }
+
+        private:
+            template<class S>
+            static inline void check_dimension(const S& shape)
+            {
+                if (shape.size() != 2)
+                {
+                    XTENSOR_THROW(std::invalid_argument, "A row can only be accessed on an expression with exact two dimensions");
+                }
+            }
+
+            template<class T, int N>
+            static inline void check_dimension(const std::array<T, N>&)
+            {
+                static_assert(N == 2, "A row can only be accessed on an expression with exact two dimensions");
+            }
+        };
+
+        class column_impl
+        {
+        public:
+            template<class E>
+            static inline auto make(E&& e, const int index)
+            {
+                const auto shape = e.shape();
+                check_dimension(shape);
+                const int non_negative_index = index < 0 ? static_cast<int>(index + shape[1]) : index;
+                return view(e, xt::all(), non_negative_index);
+            }
+
+        private:
+            template<class S>
+            static inline void check_dimension(const S& shape)
+            {
+                if (shape.size() != 2)
+                {
+                    XTENSOR_THROW(std::invalid_argument, "A column can only be accessed on an expression with exact two dimensions");
+                }
+            }
+
+            template<class T, int N>
+            static inline void check_dimension(const std::array<T, N>&)
+            {
+                static_assert(N == 2, "A column can only be accessed on an expression with exact two dimensions");
+            }
+        };
+    }
+
+    /**
+     * Constructs and returns a row (sliced view) on the specified expression.
+     * Users should not directly construct the slices but call helper functions
+     * instead. This function is only allowed on expressions with two dimensions.
+     * @param e the xexpression to adapt
+     * @param index 0-based index of the row, negative indices will return the
+     * last rows in reverse order.
+     * @throws std::invalid_argument if the expression has more than 2 dimensions.
+     */
+    template <class E>
+    inline auto row(E&& e, int index)
+    {
+        return detail::row_impl::make(e, index);
+    }
+
+    /**
+     * Constructs and returns a column (sliced view) on the specified expression.
+     * Users should not directly construct the slices but call helper functions
+     * instead. This function is only allowed on expressions with two dimensions.
+     * @param e the xexpression to adapt
+     * @param index 0-based index of the column, negative indices will return the
+     * last columns in reverse order.
+     * @throws std::invalid_argument if the expression has more than 2 dimensions.
+     */
+    template <class E>
+    inline auto col(E&& e, int index)
+    {
+        return detail::column_impl::make(e, index);
     }
 
     /***************

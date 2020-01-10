@@ -50,5 +50,8 @@ docs/*.tmp
 # Jupyter artefacts
 .ipynb_checkpoints/
 
+# Pytho artefacts
+__pycache__
+
 # Generated files
 *.pc

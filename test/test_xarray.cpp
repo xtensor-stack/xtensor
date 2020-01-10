@@ -153,6 +153,7 @@ namespace xt
     {
         xarray_dynamic a;
         test_reshape(a);
+        test_throwing_reshape(a);
     }
 
     TEST(xarray, transpose)

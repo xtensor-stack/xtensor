@@ -279,10 +279,10 @@ namespace xt
         void resize(S&& shape, const strides_type& strides);
 
         template <class S = shape_type>
-        void reshape(S&& shape, layout_type layout = base_type::static_layout);
+        auto& reshape(S&& shape, layout_type layout = base_type::static_layout) &;
 
         template <class T>
-        void reshape(std::initializer_list<T> shape, layout_type layout = base_type::static_layout);
+        auto& reshape(std::initializer_list<T> shape, layout_type layout = base_type::static_layout) &;
 
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
@@ -981,19 +981,21 @@ namespace xt
      */
     template <class D>
     template <class S>
-    inline void xstrided_container<D>::reshape(S&& shape, layout_type layout)
+    inline auto& xstrided_container<D>::reshape(S&& shape, layout_type layout) &
     {
         reshape_impl(std::forward<S>(shape), std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
+        return *this;
     }
 
     template <class D>
     template <class T>
-    inline void xstrided_container<D>::reshape(std::initializer_list<T> shape, layout_type layout)
+    inline auto& xstrided_container<D>::reshape(std::initializer_list<T> shape, layout_type layout) &
     {
         using sh_type = rebind_container_t<T, shape_type>;
         sh_type sh = xtl::make_sequence<sh_type>(shape.size());
         std::copy(shape.begin(), shape.end(), sh.begin());
         reshape_impl(std::move(sh), std::is_signed<T>(), std::forward<layout_type>(layout));
+        return *this;
     }
 
     template <class D>
@@ -1024,7 +1026,8 @@ namespace xt
     inline void xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
     {
         using value_type = typename std::decay_t<S>::value_type;
-        if (this->size() % compute_size(_shape))
+        auto new_size = compute_size(_shape);
+        if (this->size() % new_size)
         {
             XTENSOR_THROW(std::runtime_error, "Negative axis size cannot be inferred. Shape mismatch.");
         }
@@ -1045,6 +1048,10 @@ namespace xt
         if(accumulator < 0)
         {
             shape[neg_idx] = static_cast<value_type>(this->size()) / std::abs(accumulator);
+        }
+        else if(this->size() != new_size)
+        {
+            XTENSOR_THROW(std::runtime_error, "Cannot reshape with incorrect number of elements. Do you mean to resize?");
         }
         m_layout = layout;
         m_shape = xtl::forward_sequence<shape_type, S>(shape);

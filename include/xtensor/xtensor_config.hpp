@@ -11,8 +11,8 @@
 #define XTENSOR_CONFIG_HPP
 
 #define XTENSOR_VERSION_MAJOR 0
-#define XTENSOR_VERSION_MINOR 20
-#define XTENSOR_VERSION_PATCH 10
+#define XTENSOR_VERSION_MINOR 21
+#define XTENSOR_VERSION_PATCH 3-dev
 
 // DETECT 3.6 <= clang < 3.8 for compiler bug workaround.
 #ifdef __clang__
@@ -105,6 +105,10 @@
 
 #ifndef XTENSOR_DEFAULT_TRAVERSAL
 #define XTENSOR_DEFAULT_TRAVERSAL ::xt::layout_type::row_major
+#endif
+
+#ifndef XTENSOR_OPENMP_TRESHOLD
+#define XTENSOR_OPENMP_TRESHOLD 0
 #endif
 
 #ifdef IN_DOXYGEN
