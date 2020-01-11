@@ -323,4 +323,15 @@ namespace xt
         using array_type = xarray<int>;
         test_iterator_types<array_type, int*, const int*>();
     }
+
+    auto test_reshape_compile() {
+        xt::xarray<double> a = xt::zeros<double>({5, 5});
+        return a.reshape({1, 25});
+    }
+
+    TEST(xarray, reshape_return)
+    {
+        auto a = test_reshape_compile();
+        EXPECT_EQ(a.shape(), std::vector<std::size_t>({1, 25}));
+    }
 }
