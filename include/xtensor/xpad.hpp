@@ -209,6 +209,64 @@ namespace xt
 
         return pad(e, pw, mode, constant_value);
     }
+
+    /**
+     * @brief Tile an array.
+     *
+     * @param e The array.
+     * @param reps The number of repetitions of A along each axis.
+     * @return The tiled array.
+     */
+    template <class E, class S = typename std::decay_t<E>::size_type>
+    inline auto tile(E&& e, const std::vector<S>& reps)
+    {
+        using size_type = typename std::decay_t<E>::size_type;
+        using value_type = typename std::decay_t<E>::value_type;
+        using return_type = temporary_type_t<value_type,
+                                             typename std::decay_t<E>::shape_type,
+                                             std::decay_t<E>::static_layout>;
+
+        XTENSOR_ASSERT(e.shape().size() == reps.size());
+
+        auto new_shape = e.shape();
+        xt::xstrided_slice_vector sv;
+        for (size_type axis = 0; axis < e.shape().size(); ++axis)
+        {
+            new_shape[axis] = e.shape(axis) * reps[axis];
+            sv.push_back(xt::range(0, e.shape(axis)));
+        }
+        return_type out(new_shape);
+        xt::strided_view(out, sv) = e;
+
+        for (size_type axis = 0; axis < e.shape().size(); ++axis)
+        {
+            for (size_type i = 1; i < reps[axis]; ++i)
+            {
+                xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
+                xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
+                svs[axis] = xt::range(0, e.shape(axis));
+                svt[axis] = xt::range(i * e.shape(axis), (i + 1) * e.shape(axis));
+                xt::strided_view(out, svt) = xt::strided_view(out, svs);
+            }
+        }
+
+        return out;
+    }
+
+    /**
+     * @brief Tile an array.
+     *
+     * @param e The array.
+     * @param reps The number of repetitions of A along the first axis.
+     * @return The tiled array.
+     */
+    template <class E, class S = typename std::decay_t<E>::size_type>
+    inline auto tile(E&& e, S reps)
+    {
+        std::vector<S> tw(e.shape().size(), static_cast<S>(1));
+        tw[0] = static_cast<S>(reps);
+        return tile(e, tw);
+    }
 }
 
 #endif
