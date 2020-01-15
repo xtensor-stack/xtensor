@@ -215,6 +215,8 @@ namespace xt
         const_storage_iterator storage_cbegin() const;
         const_storage_iterator storage_cend() const;
 
+        void set_offset(size_type offset);
+
         template <class ST>
         stepper stepper_begin(const ST& shape);
         template <class ST>
@@ -282,6 +284,7 @@ namespace xt
         friend class xaccessible<self_type>;
         friend class xconst_accessible<self_type>;
     };
+
 
     /**************************
      * xstrided_view builders *
@@ -422,6 +425,12 @@ namespace xt
         }
     }
     //@}
+
+    template <class CT, class S, layout_type L, class FST>
+    inline auto xstrided_view<CT, S, L, FST>::set_offset(size_type offset) -> void
+    {
+        base_type::set_offset(offset);
+    }
 
     template <class CT, class S, layout_type L, class FST>
     inline auto xstrided_view<CT, S, L, FST>::data_element(size_type i) -> reference
