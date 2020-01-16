@@ -146,12 +146,22 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using value_type = typename xexpression_type::value_type;
         using shape_type = typename xexpression_type::shape_type;
+
+        using container_type = xcontainer_inner_types<xrepeat<CT>>;
+        using reference = typename container_type::reference;
+        using const_reference = typename container_type::const_reference;
+        using size_type = typename container_type::size_type;
+        using temporary_type = typename container_type::temporary_type;
+
         static constexpr layout_type static_layout = xexpression_type::static_layout;
         using bool_load_type = typename xexpression_type::bool_load_type;
         using pointer = typename xexpression_type::pointer;
         using const_pointer = typename xexpression_type::const_pointer;
         using difference_type = typename xexpression_type::difference_type;
-        using stepper = xiterable<xrepeat<CT>>::stepper;
+
+        using iterable_type = xiterable<xrepeat<CT>>;
+        using stepper = typename iterable_type::stepper;
+        using const_stepper = typename iterable_type::stepper;
 
         template<class CTA>
         explicit xrepeat(CTA&& e,
@@ -164,7 +174,7 @@ namespace xt
         template <class... Args>
         const_reference operator()(Args... args) const;
 
-        const inner_shape_type& shape() const noexcept;
+        const shape_type& shape() const noexcept;
 
         template <class It>
         reference element(It first, It last);
@@ -179,7 +189,7 @@ namespace xt
     private:
         CT m_e;
         std::vector<std::ptrdiff_t> m_repeat_lookup;
-        inner_shape_type m_shape;
+        shape_type m_shape;
 
         reference access();
 
@@ -257,7 +267,7 @@ namespace xt
     }
 
     template <class CT>
-    inline auto xrepeat<CT>::shape() const noexcept -> const inner_shape_type&
+    inline auto xrepeat<CT>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
     }
