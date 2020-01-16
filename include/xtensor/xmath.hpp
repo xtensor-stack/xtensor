@@ -1903,6 +1903,41 @@ namespace detail {
             value_type div = s.size() != ST(0) ? static_cast<value_type>(e_size / s.size()) : value_type(0);
             return std::move(s) / std::move(div);
         }
+
+        template <class T, class E, class X, class D, class EVS,
+                  XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<D>)>
+        inline auto mean(E&& e, X&& axes, D const& ddof, EVS es)
+        {
+            // sum cannot always be a double. It could be a complex number which cannot operate on
+            // std::plus<double>.
+            auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes), es);
+            return mean_division<T>(std::move(s), e.size() - ddof);
+        }
+
+#ifdef X_OLD_CLANG
+        template <class T, class E, class I, class D, class EVS>
+        inline auto mean(E&& e, std::initializer_list<I> axes, D const& ddof, EVS es)
+        {
+            auto s = sum<T>(std::forward<E>(e), axes, es);
+            return detail::mean_division<T>(std::move(s), e.size() - ddof);
+        }
+#else
+        template <class T, class E, class I, std::size_t N, class D, class EVS>
+        inline auto mean(E&& e, const I (&axes)[N], D const& ddof, EVS es)
+        {
+            auto s = sum<T>(std::forward<E>(e), axes, es);
+            return detail::mean_division<T>(std::move(s), e.size() - ddof);
+        }
+#endif
+
+        template <class T, class E, class D, class EVS,
+                  XTL_REQUIRES(is_reducer_options<EVS>, std::is_integral<D>)>
+        inline auto mean_noaxis(E&& e, D const& ddof, EVS es)
+        {
+            using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
+            auto size = e.size();
+            return sum<T>(std::forward<E>(e), es) / static_cast<value_type>(size - ddof);
+        }
     }
 
     /**
@@ -1919,34 +1954,27 @@ namespace detail {
               XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
     inline auto mean(E&& e, X&& axes, EVS es = EVS())
     {
-        // sum cannot always be a double. It could be a complex number which cannot operate on
-        // std::plus<double>.
-        auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes), es);
-        return detail::mean_division<T>(std::move(s), e.size());
+        return detail::mean<T>(std::forward<E>(e), std::forward<X>(axes), 0u, es);
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto mean(E&& e, EVS es = EVS())
     {
-        using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-        auto size = e.size();
-        return sum<T>(std::forward<E>(e), es) / static_cast<value_type>(size);
+        return detail::mean_noaxis<T>(std::forward<E>(e), 0u, es);
     }
 
 #ifdef X_OLD_CLANG
     template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto mean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
-        auto s = sum<T>(std::forward<E>(e), axes, es);
-        return detail::mean_division<T>(std::move(s), e.size());
+        return detail::mean<T>(std::move(s), e.size());
     }
 #else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto mean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
-        auto s = sum<T>(std::forward<E>(e), axes, es);
-        return detail::mean_division<T>(std::move(s), e.size());
+        return detail::mean<T>(std::forward<E>(e), axes, 0, es);
     }
 #endif
 
@@ -2049,12 +2077,19 @@ namespace detail {
         }
     }
 
-    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
+    template <class E, class D, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_reducer_options<EVS>, std::is_integral<D>)>
+    inline auto variance(E&& e, D const& ddof, EVS es = EVS())
+    {
+        decltype(auto) sc = detail::shared_forward<E>(e);
+        return detail::mean_noaxis<void>(square(abs(sc - mean(sc, es))), ddof, es);
+    }
+
+    template <class E, class D=int, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto variance(E&& e, EVS es = EVS())
     {
-        decltype(auto) sc = detail::shared_forward<E>(e);
-        return mean(square(abs(sc - mean(sc, es))), es);
+        return variance(std::forward<E>(e), 0u, es);
     }
 
     template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -2076,14 +2111,15 @@ namespace detail {
      *
      * @param e an \ref xexpression
      * @param axes the axes along which the variance is computed (optional)
+     * @param ddof delta degrees of freedom (optional)
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @return an \ref xexpression
      *
      * @sa stddev, mean
      */
-    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>)>
-    inline auto variance(E&& e, X&& axes, EVS es = EVS())
+    template <class E, class X, class D, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<D>)>
+    inline auto variance(E&& e, X&& axes, D const& ddof, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
@@ -2095,11 +2131,18 @@ namespace detail {
         auto keep_dim_shape = e.shape();
         for (const auto& el : axes)
         {
-            keep_dim_shape[el] = 1;
+            keep_dim_shape[el] = 1u;
         }
 
         auto mrv = reshape_view<XTENSOR_DEFAULT_LAYOUT>(std::move(inner_mean), std::move(keep_dim_shape));
-        return mean(square(abs(sc - std::move(mrv))), std::forward<X>(axes), es);
+        return detail::mean<void>(square(abs(sc - std::move(mrv))), std::forward<X>(axes), ddof, es);
+    }
+
+    template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<std::decay_t<X>>>, xtl::negation<std::is_integral<EVS>>)>
+    inline auto variance(E&& e, X&& axes, EVS es = EVS())
+    {
+      return variance(std::forward<E>(e), std::forward<X>(axes), 0u, es);
     }
 
     /**

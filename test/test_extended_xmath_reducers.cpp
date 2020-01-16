@@ -824,8 +824,10 @@ namespace xt
     a  = np.random.random(4*5*6*7).reshape(4,5,6,7)
     vr_all = np.var(a)
     st_all = np.std(a)
+    vr_all_ddof = np.var(a, ddof=1)
     vr = np.var(a, axis=(0,2))
     st = np.std(a, axis=(0,2))
+    vr_ddof = np.var(a, axis=(0,2), ddof=1)
     */
     TEST(xtest_extended_xmath, var_std)
     {
@@ -1215,6 +1217,8 @@ namespace xt
 
         // py_vr_all
         double py_vr_all = 0.08257307738009954;
+        // py_vr_all_ddof
+        double py_vr_all_ddof = 0.08267149582751325;
         // py_st_all
         double py_st_all = 0.2873553155591515;
         // py_vr
@@ -1233,6 +1237,17 @@ namespace xt
                                 {0.072189495809687 ,0.0720540674148998,0.0922003312160627,
                                  0.0762240153024691,0.0845913536241975,0.0819087439628765,
                                  0.0894375580083343}};
+        // py_vr_ddof
+        xarray<double> py_vr_ddof = {{0.08891148, 0.08839767, 0.06947427, 0.10903093,
+                                      0.10375136, 0.06545346, 0.10283867},
+                                     {0.06667108, 0.07973733, 0.07441828, 0.06940026,
+                                      0.07520572, 0.08607668, 0.06691591},
+                                     {0.11243408, 0.07297399, 0.10511975, 0.11647158,
+                                      0.05646425, 0.09405099, 0.06935457},
+                                     {0.09180797, 0.0812563, 0.06370912, 0.10690023,
+                                      0.055978, 0.05262839, 0.08073249},
+                                     {0.07532817, 0.07518685, 0.09620904, 0.0795381,
+                                      0.08826924, 0.08546999, 0.09332615}};
         // py_st
         xarray<double> py_st = {{0.2919020913125989,0.2910574427841431,0.2580300593953858,
                                  0.3232459987390728,0.3153226776575547,0.2504520617236133,
@@ -1252,14 +1267,18 @@ namespace xt
 
         auto st_all = xt::stddev(py_a);
         auto vr_all = xt::variance(py_a);
+        auto vr_all_ddof = xt::variance(py_a, {0, 1, 2, 3}, 1);
 
         auto st = xt::stddev(py_a, {0, 2});
         auto vr = xt::variance(py_a, {0, 2});
+        auto vr_ddof = xt::variance(py_a, {0, 2}, 1);
 
         EXPECT_TRUE(xt::allclose(st_all, py_st_all));
         EXPECT_TRUE(xt::allclose(vr_all, py_vr_all));
+        EXPECT_TRUE(xt::allclose(vr_all_ddof, py_vr_all_ddof));
         EXPECT_TRUE(xt::allclose(st, py_st));
         EXPECT_TRUE(xt::allclose(vr, py_vr));
+        EXPECT_TRUE(xt::allclose(vr_ddof, py_vr_ddof));
     }
 
 }
