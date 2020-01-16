@@ -159,6 +159,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xpad.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xrandom.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xreducer.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xrepeat.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xshape.hpp

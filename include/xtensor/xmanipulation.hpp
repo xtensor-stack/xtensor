@@ -14,6 +14,7 @@
 #include "xstrided_view.hpp"
 #include "xutils.hpp"
 #include "xtensor_config.hpp"
+#include "xrepeat.hpp"
 
 namespace xt
 {
@@ -86,6 +87,15 @@ namespace xt
 
     template<class E>
     auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis);
+
+    template<class E>
+    auto repeat(E&& e, std::ptrdiff_t repeats);
+
+    template<class E>
+    auto repeat(E&& e, std::ptrdiff_t repeats, std::vector<std::ptrdiff_t>&& axes);
+
+    template<class E>
+    auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::vector<std::ptrdiff_t>&& axes);
 
     /****************************
      * transpose implementation *
@@ -846,6 +856,55 @@ namespace xt
 
         detail::roll(cpy.begin(), e.begin(), shift, saxis, shape, 0);
         return cpy;
+    }
+
+    /****************************
+     * repeat implementation    *
+     ****************************/
+
+    template <class E>
+    inline auto repeat(E&& e, std::ptrdiff_t repeats)
+    {
+        std::vector<std::ptrdiff_t> axes(e.dimension());
+        std::iota(axes.begin(), axes.end(), 0);
+        return repeat(
+            std::forward<E>(e),
+            repeats,
+            std::forward<std::vector<std::ptrdiff_t>>(axes)
+        );
+    }
+
+    template <class E>
+    inline auto repeat(E&& e, std::ptrdiff_t repeats, std::vector<std::ptrdiff_t>&& axes)
+    {
+        if (axes.size() > 0)
+        {
+            std::vector<std::ptrdiff_t> broadcasted_repeats(axes.size());
+            std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
+            return repeat(
+                std::forward<E>(e),
+                std::forward<std::vector<std::ptrdiff_t>>(broadcasted_repeats),
+                std::forward<std::vector<std::ptrdiff_t>>(axes)
+            );
+        }
+        else
+        {
+            return repeat(std::forward<E>(e), repeats);
+        }
+    }
+
+    template <class E>
+    inline auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::vector<std::ptrdiff_t>&& axes)
+    {
+        if (axes.size() > 0 && repeats.size() != axes.size())
+        {
+            XTENSOR_THROW(std::invalid_argument, "repeats and axes must have the same size");
+        }
+        return xrepeat<E>(
+            std::forward<E>(e),
+            std::forward<std::vector<std::ptrdiff_t>>(repeats),
+            std::forward<std::vector<std::ptrdiff_t>>(axes)
+        );
     }
 }
 
