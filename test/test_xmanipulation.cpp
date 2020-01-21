@@ -396,55 +396,53 @@ namespace xt
         ASSERT_EQ(expected8, xt::roll(e2, -2, /*axis*/2));
     }
 
-    TEST(xmanipulation, repeat_axis0_2times)
+    TEST(xmanipulation, repeat_axis0_of_int_array_2times)
     {
-        xarray<double> array = {
+        xarray<int> array = {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9},
         };
-        const auto repeated_array = xt::repeat(array, 2, { 0 });
+        const auto repeated_array = xt::repeat(array, 2, {0});
         const auto result = xt::view(repeated_array, xt::all());
-        
-        xarray<double>::shape_type expected_shape{ 6, 3 };
-        xarray<double> expected_array = {
-            { 1, 2, 3 },
-            { 1, 2, 3 },
-            { 4, 5, 6 },
-            { 4, 5, 6 },
-            { 7, 8, 9 },
-            { 7, 8, 9 },
-        };
-        const auto expected = xt::view(expected_array, xt::all());
-        ASSERT_EQ(expected_shape, repeated_array.shape());
-        ASSERT_EQ(expected, result);
-    }
 
-    TEST(xmanipulation, repeat_axis1_2times)
-    {
-        xarray<double> array = {
+        xarray<int>::shape_type expected_shape{6, 3};
+        const auto expected = xt::view(xarray<int>{
+            {1, 2, 3},
             {1, 2, 3},
             {4, 5, 6},
+            {4, 5, 6},
             {7, 8, 9},
-        };
-
-        const auto repeated_array = xt::repeat(array, 2, { 1 });
-        const auto result = xt::view(repeated_array, xt::all());
-
-        xarray<double>::shape_type expected_shape{ 3, 6 };
-        xarray<double> expected_array = {
-            {1, 1, 2, 2, 3, 3},
-            {4, 4, 5, 5, 6, 6},
-            {7, 7, 8, 8, 9, 9},
-        };
-        const auto expected = xt::view(expected_array, xt::all());
+            {7, 8, 9},
+        }, xt::all());
         ASSERT_EQ(expected_shape, repeated_array.shape());
         ASSERT_EQ(expected, result);
     }
 
-    TEST(xmanipulation, repeat_allaxis_2times)
+    TEST(xmanipulation, repeat_axis1_of_double_array_2times)
     {
         xarray<double> array = {
+            {1.0, 2.0, 3.0},
+            {4.0, 5.0, 6.0},
+            {7.0, 8.0, 9.0},
+        };
+
+        const auto repeated_array = xt::repeat(array, 2, {1});
+        const auto result = xt::view(repeated_array, xt::all());
+
+        xarray<double>::shape_type expected_shape{3, 6};
+        const auto expected = xt::view(xarray<double>{
+            {1.0, 1.0, 2.0, 2.0, 3.0, 3.0},
+            {4.0, 4.0, 5.0, 5.0, 6.0, 6.0},
+            {7.0, 7.0, 8.0, 8.0, 9.0, 9.0},
+        }, xt::all());
+        ASSERT_EQ(expected_shape, repeated_array.shape());
+        ASSERT_EQ(expected, result);
+    }
+
+    TEST(xmanipulation, repeat_allaxis_of_size_t_array_2times)
+    {
+        xarray<size_t> array = {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9},
@@ -453,16 +451,15 @@ namespace xt
         const auto repeated_array = xt::repeat(array, 2, {});
         const auto result = xt::view(repeated_array, xt::all());
 
-        xarray<double>::shape_type expected_shape{ 6, 6 };
-        xarray<double> expected_array = {
+        xarray<size_t>::shape_type expected_shape{6, 6};
+        const auto expected = xt::view(xarray<size_t>{
             {1, 1, 2, 2, 3, 3},
             {1, 1, 2, 2, 3, 3},
             {4, 4, 5, 5, 6, 6},
             {4, 4, 5, 5, 6, 6},
             {7, 7, 8, 8, 9, 9},
             {7, 7, 8, 8, 9, 9},
-        };
-        const auto expected = xt::view(expected_array, xt::all());
+        }, xt::all());
         ASSERT_EQ(expected_shape, repeated_array.shape());
         ASSERT_EQ(expected, result);
     }
