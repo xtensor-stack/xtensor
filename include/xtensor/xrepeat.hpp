@@ -48,6 +48,11 @@ namespace xt
         using const_stepper = xrepeat_stepper<typename xexpression_type::stepper>;
     };
 
+    namespace detail
+    {
+        template<class T> struct repeated_index;
+    }
+
     template <class S>
     class xrepeat_stepper
     {
@@ -86,55 +91,9 @@ namespace xt
         template <class R>
         void store_simd(const R& vec);
 
-        struct repeated_index
-        {
-            repeated_index(const std::ptrdiff_t repeats)
-                : m_repeats(repeats)
-                , m_index(0)
-            {}
-
-            size_type step(const size_type steps)
-            {
-                m_index += steps;
-                size_type inner_steps{ 0 };
-                while (m_index >= m_repeats)
-                {
-                    ++inner_steps;
-                    m_index -= m_repeats;
-                }
-                return inner_steps;
-            }
-
-            size_type step_back(const size_type steps)
-            {
-                m_index = m_index - steps;
-                size_type inner_steps{ 0 };
-                while (m_index < 0)
-                {
-                    ++inner_steps;
-                    m_index += m_repeats;
-                }
-                return inner_steps;
-            }
-
-            void reset()
-            {
-                m_index = 0;
-            }
-
-            void reset_back()
-            {
-                m_index = m_repeats - 1;
-            }
-
-        private:
-            const std::ptrdiff_t m_repeats;
-            std::ptrdiff_t m_index;
-        };
-
     private:
         S m_substepper;
-        std::vector<repeated_index> m_indicies;
+        std::vector<detail::repeated_index<size_type>> m_indicies;
     };
 
     template <class CT>
@@ -204,7 +163,6 @@ namespace xt
         template<typename std::decay_t<CT>::size_type I>
         struct access_impl
         {
-
             template<class Arg, class... Args>
             inline const_reference operator()(stepper& s, Arg arg, Args... args) const
             {
@@ -235,6 +193,56 @@ namespace xt
         access_impl<0> m_access_impl;
     };
 
+    namespace detail
+    {
+        template<class T>
+        struct repeated_index
+        {
+            repeated_index(const std::ptrdiff_t repeats)
+                : m_repeats(repeats)
+                , m_index(0)
+            {}
+
+            T step(const T steps)
+            {
+                m_index += steps;
+                T inner_steps{0};
+                while (m_index >= m_repeats)
+                {
+                    ++inner_steps;
+                    m_index -= m_repeats;
+                }
+                return inner_steps;
+            }
+
+            T step_back(const T steps)
+            {
+                m_index = m_index - steps;
+                T inner_steps{0};
+                while (m_index < 0)
+                {
+                    ++inner_steps;
+                    m_index += m_repeats;
+                }
+                return inner_steps;
+            }
+
+            void reset()
+            {
+                m_index = 0;
+            }
+
+            void reset_back()
+            {
+                m_index = m_repeats - 1;
+            }
+
+        private:
+            const std::ptrdiff_t m_repeats;
+            std::ptrdiff_t m_index;
+        };
+    }
+
     template <class CT>
     template <class CTA>
     xrepeat<CT>::xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, std::vector<std::ptrdiff_t>&& axes)
@@ -245,10 +253,10 @@ namespace xt
         std::fill(m_repeat_lookup.begin(), m_repeat_lookup.end(), 1);
         for (auto index = 0; index < axes.size(); ++index)
         {
-            const auto axis = axes.at(index);
-            const auto number_of_repeats = repeats.at(index);
-            m_repeat_lookup.at(axis) = number_of_repeats;
-            m_shape.at(axis) *= number_of_repeats;
+            const auto axis = axes[index];
+            const auto number_of_repeats = repeats[index];
+            m_repeat_lookup[axis] = number_of_repeats;
+            m_shape[axis] *= number_of_repeats;
         }
     }
 
@@ -387,14 +395,14 @@ namespace xt
     template<class S>
     inline void xrepeat_stepper<S>::step(size_type dim, size_type n)
     {
-        size_type substeps = m_indicies.at(dim).step(n);
+        size_type substeps = m_indicies[dim].step(n);
         m_substepper.step(dim, substeps);
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::step_back(size_type dim, size_type n)
     {
-        size_type substeps = m_indicies.at(dim).step_back(n);
+        size_type substeps = m_indicies[dim].step_back(n);
         m_substepper.step_back(dim, substeps);
     }
 
@@ -402,14 +410,14 @@ namespace xt
     inline void xrepeat_stepper<S>::reset(size_type dim)
     {
         m_substepper.reset(dim);
-        m_indicies.at(dim).reset();
+        m_indicies[dim].reset();
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::reset_back(size_type dim)
     {
         m_substepper.reset_back(dim);
-        m_indicies.at(dim).reset_back();
+        m_indicies[dim].reset_back();
     }
 
     template<class S>
