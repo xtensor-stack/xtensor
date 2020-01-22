@@ -89,6 +89,7 @@ namespace xt
 
         auto new_shape = e.shape();
         xt::xstrided_slice_vector sv;
+        sv.reserve(e.shape().size());
         for (size_type axis = 0; axis < e.shape().size(); ++axis)
         {
             size_type nb = static_cast<size_type>(pad_width[axis][0]);
