@@ -81,83 +81,106 @@ namespace xt
 
         using size_type = typename std::decay_t<E>::size_type;
         using value_type = typename std::decay_t<E>::value_type;
+        using return_type = temporary_type_t<value_type,
+                                             typename std::decay_t<E>::shape_type,
+                                             std::decay_t<E>::static_layout>;
 
-        auto out = e;
+        // place the original array in the center
+
+        auto new_shape = e.shape();
+        xt::xstrided_slice_vector sv;
+        sv.reserve(e.shape().size());
+        for (size_type axis = 0; axis < e.shape().size(); ++axis)
+        {
+            size_type nb = static_cast<size_type>(pad_width[axis][0]);
+            size_type ne = static_cast<size_type>(pad_width[axis][1]);
+            size_type ns = nb + e.shape(axis) + ne;
+            new_shape[axis] = ns;
+            sv.push_back(xt::range(nb, nb + e.shape(axis)));
+        }
+
+        if (mode == pad_mode::constant)
+        {
+            return_type out(new_shape, constant_value);
+            xt::strided_view(out, sv) = e;
+            return out;
+        }
+
+        return_type out(new_shape);
+        xt::strided_view(out, sv) = e;
+
+        // construct padded regions based on original image
+
+        xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
+        xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
 
         for (size_type axis = 0; axis < e.shape().size(); ++axis)
         {
             size_type nb = static_cast<size_type>(pad_width[axis][0]);
             size_type ne = static_cast<size_type>(pad_width[axis][1]);
 
-            if (nb == size_type(0) && ne == size_type(0))
+            if (nb > static_cast<size_type>(0))
             {
-                continue;
-            }
-
-            if (mode == pad_mode::constant)
-            {
-                auto shape_bgn = out.shape();
-                auto shape_end = out.shape();
-                shape_bgn[axis] = nb;
-                shape_end[axis] = ne;
-                auto bgn = constant_value * xt::ones<value_type>(shape_bgn);
-                auto end = constant_value * xt::ones<value_type>(shape_end);
-                out = xt::concatenate(xt::xtuple(bgn, out, end), axis);
-            }
-            else
-            {
-                xt::xstrided_slice_vector sv_bgn(e.shape().size(), xt::all());
-                xt::xstrided_slice_vector sv_end(e.shape().size(), xt::all());
+                svt[axis] = xt::range(0, nb);
 
                 if (mode == pad_mode::wrap || mode == pad_mode::periodic)
                 {
-                    XTENSOR_ASSERT(nb <= out.shape()[axis]);
-                    XTENSOR_ASSERT(ne <= out.shape()[axis]);
-                    sv_bgn[axis] = xt::range(out.shape()[axis]-nb, out.shape()[axis]);
-                    sv_end[axis] = xt::range(0, ne);
+                    XTENSOR_ASSERT(nb <= e.shape(axis));
+                    svs[axis] = xt::range(e.shape(axis), nb+e.shape(axis));
                 }
                 else if (mode == pad_mode::symmetric)
                 {
-                    XTENSOR_ASSERT(nb <= out.shape()[axis]);
-                    XTENSOR_ASSERT(ne <= out.shape()[axis]);
-                    if (nb == size_type(0))
+                    XTENSOR_ASSERT(nb <= e.shape(axis));
+                    svs[axis] = xt::range(2*nb-1, nb-1, -1);
+                }
+                else if (mode == pad_mode::reflect)
+                {
+                    XTENSOR_ASSERT(nb <= e.shape(axis) - 1);
+                    svs[axis] = xt::range(2*nb, nb, -1);
+                }
+
+                xt::strided_view(out, svt) = xt::strided_view(out, svs);
+            }
+
+            if (ne > static_cast<size_type>(0))
+            {
+                svt[axis] = xt::range(out.shape(axis)-ne, out.shape(axis));
+
+                if (mode == pad_mode::wrap || mode == pad_mode::periodic)
+                {
+                    XTENSOR_ASSERT(ne <= e.shape(axis));
+                    svs[axis] = xt::range(nb, nb+ne);
+                }
+                else if (mode == pad_mode::symmetric)
+                {
+                    XTENSOR_ASSERT(ne <= e.shape(axis));
+                    if (ne == nb + e.shape(axis))
                     {
-                        sv_bgn[axis] = xt::range(0, 0, -1);
+                        svs[axis] = xt::range(nb+e.shape(axis)-1, _, -1);
                     }
                     else
                     {
-                        sv_bgn[axis] = xt::range(nb-1, _, -1);
-                    }
-                    if (ne == out.shape()[axis])
-                    {
-                        sv_end[axis] = xt::range(out.shape()[axis], _, -1);
-                    }
-                    else
-                    {
-                        sv_end[axis] = xt::range(out.shape()[axis], out.shape()[axis]-ne-1, -1);
+                        svs[axis] = xt::range(nb+e.shape(axis)-1, nb+e.shape(axis)-ne-1, -1);
                     }
                 }
                 else if (mode == pad_mode::reflect)
                 {
-                    XTENSOR_ASSERT(out.shape()[axis] > 1);
-                    XTENSOR_ASSERT(nb <= out.shape()[axis] - 1);
-                    XTENSOR_ASSERT(ne <= out.shape()[axis] - 1);
-                    sv_bgn[axis] = xt::range(nb, 0, -1);
-                    if (ne == out.shape()[axis] - 1)
+                    XTENSOR_ASSERT(ne <= e.shape(axis) - 1);
+                    if (ne == nb + e.shape(axis) - 1)
                     {
-                        sv_end[axis] = xt::range(out.shape()[axis]-2, _, -1);
+                        svs[axis] = xt::range(nb+e.shape(axis)-2, _, -1);
                     }
                     else
                     {
-                        sv_end[axis] = xt::range(out.shape()[axis]-2, out.shape()[axis]-ne-2, -1);
+                        svs[axis] = xt::range(nb+e.shape(axis)-2, nb+e.shape(axis)-ne-2, -1);
                     }
                 }
 
-                auto bgn = xt::strided_view(out, sv_bgn);
-                auto end = xt::strided_view(out, sv_end);
-
-                out = xt::concatenate(xt::xtuple(bgn, out, end), axis);
+                xt::strided_view(out, svt) = xt::strided_view(out, svs);
             }
+
+            svs[axis] = xt::all();
+            svt[axis] = xt::all();
         }
 
         return out;
