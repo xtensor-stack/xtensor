@@ -110,6 +110,9 @@ namespace xt
 
         // construct padded regions based on original image
 
+        xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
+        xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
+
         for (size_type axis = 0; axis < e.shape().size(); ++axis)
         {
             size_type nb = static_cast<size_type>(pad_width[axis][0]);
@@ -117,9 +120,6 @@ namespace xt
 
             if (nb > static_cast<size_type>(0))
             {
-                xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
-                xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
-
                 svt[axis] = xt::range(0, nb);
 
                 if (mode == pad_mode::wrap || mode == pad_mode::periodic)
@@ -143,9 +143,6 @@ namespace xt
 
             if (ne > static_cast<size_type>(0))
             {
-                xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
-                xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
-
                 svt[axis] = xt::range(out.shape(axis)-ne, out.shape(axis));
 
                 if (mode == pad_mode::wrap || mode == pad_mode::periodic)
@@ -180,6 +177,9 @@ namespace xt
 
                 xt::strided_view(out, svt) = xt::strided_view(out, svs);
             }
+
+            svs[axis] = xt::all();
+            svt[axis] = xt::all();
         }
 
         return out;
