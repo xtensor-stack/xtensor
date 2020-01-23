@@ -7,14 +7,35 @@
 Changelog
 =========
 
-0.21.3-dev
-----------
+0.21.3
+------
 
 - Allow use of cmake add_subdirectory(xtensor) by checking for xtl target
   `#1865 <https://github.com/xtensor-stack/xtensor/pull/1865>`_
 - Simplifying CMake config
   `#1856 <https://github.com/xtensor-stack/xtensor/pull/1856>`_
-
+- Fixed ``reshape`` with signed integers
+  `#1867 <https://github.com/xtensor-stack/xtensor/pull/1867>`_
+- Disabled MSVC iterator checks
+  `#1874 <https://github.com/xtensor-stack/xtensor/pull/1874>`_
+- Added covariance function
+  `#1847 <https://github.com/xtensor-stack/xtensor/pull/1847>`_
+- Fix for older cmake
+  `#1880 <https://github.com/xtensor-stack/xtensor/pull/1880>`_
+- Added row and col facade for 2-D contianers
+  `#1876 <https://github.com/xtensor-stack/xtensor/pull/1876>`_
+- Implementation of ``xt::tile``
+  `#1888 <https://github.com/xtensor-stack/xtensor/pull/1888>`_
+- Fixed ``reshape`` return
+  `#1886 <https://github.com/xtensor-stack/xtensor/pull/1886>`_
+- Enabled ``add_subdirectory`` for ``xsimd``
+  `#1889 <https://github.com/xtensor-stack/xtensor/pull/1889>`_
+- Support ``ddof`` argument for ``xt::variance``
+  `#1893 <https://github.com/xtensor-stack/xtensor/pull/1893>`_
+- Set -march=native only if the user did not set another -march already
+  `#1899 <https://github.com/xtensor-stack/xtensor/pull/1899>`_
+- Assemble new container in ``xpad``
+  `#1808 <https://github.com/xtensor-stack/xtensor/pull/1808>`_
 
 0.21.2
 ------
