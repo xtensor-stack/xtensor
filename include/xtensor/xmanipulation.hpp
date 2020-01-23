@@ -89,13 +89,10 @@ namespace xt
     auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis);
 
     template<class E>
-    auto repeat(E&& e, std::ptrdiff_t repeats);
+    auto repeat(E&& e, std::ptrdiff_t repeats, std::ptrdiff_t axis);
 
     template<class E>
-    auto repeat(E&& e, std::ptrdiff_t repeats, std::vector<std::ptrdiff_t>&& axes);
-
-    template<class E>
-    auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::vector<std::ptrdiff_t>&& axes);
+    auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis);
 
     /****************************
      * transpose implementation *
@@ -861,50 +858,22 @@ namespace xt
     /****************************
      * repeat implementation    *
      ****************************/
-
     template <class E>
-    inline auto repeat(E&& e, std::ptrdiff_t repeats)
+    inline auto repeat(E&& e, std::ptrdiff_t repeats, std::ptrdiff_t axis)
     {
-        std::vector<std::ptrdiff_t> axes(e.dimension());
-        std::iota(axes.begin(), axes.end(), 0);
-        return repeat(
-            std::forward<E>(e),
-            repeats,
-            std::forward<std::vector<std::ptrdiff_t>>(axes)
-        );
+        std::vector<std::ptrdiff_t> broadcasted_repeats(e.shape(axis));
+        std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
+        return repeat(std::forward<E>(e), std::forward<std::vector<std::ptrdiff_t>>(broadcasted_repeats), axis);
     }
 
     template <class E>
-    inline auto repeat(E&& e, std::ptrdiff_t repeats, std::vector<std::ptrdiff_t>&& axes)
+    inline auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis)
     {
-        if (axes.size() > 0)
-        {
-            std::vector<std::ptrdiff_t> broadcasted_repeats(axes.size());
-            std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
-            return repeat(
-                std::forward<E>(e),
-                std::forward<std::vector<std::ptrdiff_t>>(broadcasted_repeats),
-                std::forward<std::vector<std::ptrdiff_t>>(axes)
-            );
-        }
-        else
-        {
-            return repeat(std::forward<E>(e), repeats);
-        }
-    }
-
-    template <class E>
-    inline auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::vector<std::ptrdiff_t>&& axes)
-    {
-        if (axes.size() > 0 && repeats.size() != axes.size())
+        if (repeats.size() != e.shape(axis))
         {
             XTENSOR_THROW(std::invalid_argument, "repeats and axes must have the same size");
         }
-        return xrepeat<E>(
-            std::forward<E>(e),
-            std::forward<std::vector<std::ptrdiff_t>>(repeats),
-            std::forward<std::vector<std::ptrdiff_t>>(axes)
-        );
+        return xrepeat<E>(std::forward<E>(e), std::forward<std::vector<std::ptrdiff_t>>(repeats), axis);
     }
 }
 

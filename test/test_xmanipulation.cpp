@@ -396,14 +396,14 @@ namespace xt
         ASSERT_EQ(expected8, xt::roll(e2, -2, /*axis*/2));
     }
 
-    TEST(xmanipulation, repeat_axis0_of_int_array_2times)
+    TEST(xmanipulation, repeat_all_elements_of_axis_0_of_int_array_2_times)
     {
         xarray<int> array = {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9},
         };
-        const auto repeated_array = xt::repeat(array, 2, {0});
+        const auto repeated_array = xt::repeat(array, 2, 0);
         const auto result = xt::view(repeated_array, xt::all());
 
         xarray<int>::shape_type expected_shape{6, 3};
@@ -419,7 +419,7 @@ namespace xt
         ASSERT_EQ(expected, result);
     }
 
-    TEST(xmanipulation, repeat_axis1_of_double_array_2times)
+    TEST(xmanipulation, repeat_all_elements_of_axis_1_of_double_array_2_times)
     {
         xarray<double> array = {
             {1.0, 2.0, 3.0},
@@ -427,7 +427,7 @@ namespace xt
             {7.0, 8.0, 9.0},
         };
 
-        const auto repeated_array = xt::repeat(array, 2, {1});
+        const auto repeated_array = xt::repeat(array, 2, 1);
         const auto result = xt::view(repeated_array, xt::all());
 
         xarray<double>::shape_type expected_shape{3, 6};
@@ -440,7 +440,7 @@ namespace xt
         ASSERT_EQ(expected, result);
     }
 
-    TEST(xmanipulation, repeat_allaxis_of_size_t_array_2times)
+    TEST(xmanipulation, repeat_every_element_of_axis_0_123)
     {
         xarray<size_t> array = {
             {1, 2, 3},
@@ -448,17 +448,17 @@ namespace xt
             {7, 8, 9},
         };
 
-        const auto repeated_array = xt::repeat(array, 2, {});
+        const auto repeated_array = xt::repeat(array, {1, 2, 3}, 0);
         const auto result = xt::view(repeated_array, xt::all());
 
-        xarray<size_t>::shape_type expected_shape{6, 6};
+        xarray<size_t>::shape_type expected_shape{6, 3};
         const auto expected = xt::view(xarray<size_t>{
-            {1, 1, 2, 2, 3, 3},
-            {1, 1, 2, 2, 3, 3},
-            {4, 4, 5, 5, 6, 6},
-            {4, 4, 5, 5, 6, 6},
-            {7, 7, 8, 8, 9, 9},
-            {7, 7, 8, 8, 9, 9},
+            {1, 2, 3},
+            {4, 5, 6},
+            {4, 5, 6},
+            {7, 8, 9},
+            {7, 8, 9},
+            {7, 8, 9},
         }, xt::all());
         ASSERT_EQ(expected_shape, repeated_array.shape());
         ASSERT_EQ(expected, result);

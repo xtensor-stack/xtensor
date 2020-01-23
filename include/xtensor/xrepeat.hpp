@@ -48,11 +48,6 @@ namespace xt
         using const_stepper = xrepeat_stepper<typename xexpression_type::stepper>;
     };
 
-    namespace detail
-    {
-        template<class T> struct repeated_index;
-    }
-
     template <class S>
     class xrepeat_stepper
     {
@@ -71,7 +66,7 @@ namespace xt
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
-        xrepeat_stepper(S&& s, const std::vector<std::ptrdiff_t>& repeats);
+        xrepeat_stepper(S&& s, const std::vector<std::ptrdiff_t>& repeats, const size_type& axis);
 
         reference operator*() const;
 
@@ -93,7 +88,12 @@ namespace xt
 
     private:
         S m_substepper;
-        std::vector<detail::repeated_index<size_type>> m_indicies;
+
+        std::ptrdiff_t m_steps;
+        size_type m_substeps;
+
+        const size_type& m_axis;
+        const std::vector<std::ptrdiff_t>& m_repeats;
     };
 
     template <class CT>
@@ -123,9 +123,7 @@ namespace xt
         using const_stepper = typename iterable_type::stepper;
 
         template<class CTA>
-        explicit xrepeat(CTA&& e,
-            std::vector<std::ptrdiff_t>&& repeats,
-            std::vector<std::ptrdiff_t>&& axes);
+        explicit xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis);
 
         template <class... Args>
         reference operator()(Args... args);
@@ -147,7 +145,8 @@ namespace xt
 
     private:
         CT m_e;
-        std::vector<std::ptrdiff_t> m_repeat_lookup;
+        const size_type m_axis;
+        const std::vector<std::ptrdiff_t> m_repeats;
         shape_type m_shape;
 
         reference access();
@@ -193,71 +192,15 @@ namespace xt
         access_impl<0> m_access_impl;
     };
 
-    namespace detail
-    {
-        template<class T>
-        struct repeated_index
-        {
-            repeated_index(const std::ptrdiff_t repeats)
-                : m_repeats(repeats)
-                , m_index(0)
-            {}
-
-            T step(const T steps)
-            {
-                m_index += steps;
-                T inner_steps{0};
-                while (m_index >= m_repeats)
-                {
-                    ++inner_steps;
-                    m_index -= m_repeats;
-                }
-                return inner_steps;
-            }
-
-            T step_back(const T steps)
-            {
-                m_index = m_index - steps;
-                T inner_steps{0};
-                while (m_index < 0)
-                {
-                    ++inner_steps;
-                    m_index += m_repeats;
-                }
-                return inner_steps;
-            }
-
-            void reset()
-            {
-                m_index = 0;
-            }
-
-            void reset_back()
-            {
-                m_index = m_repeats - 1;
-            }
-
-        private:
-            const std::ptrdiff_t m_repeats;
-            std::ptrdiff_t m_index;
-        };
-    }
-
     template <class CT>
     template <class CTA>
-    xrepeat<CT>::xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, std::vector<std::ptrdiff_t>&& axes)
+    xrepeat<CT>::xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis)
         : m_e(std::forward<CTA>(e))
-        , m_repeat_lookup(e.dimension())
+        , m_axis(static_cast<size_type>(axis))
+        , m_repeats(std::forward<std::vector<std::ptrdiff_t>>(repeats))
         , m_shape(e.shape())
     {
-        std::fill(m_repeat_lookup.begin(), m_repeat_lookup.end(), 1);
-        for (auto index = 0; index < axes.size(); ++index)
-        {
-            const auto axis = axes[index];
-            const auto number_of_repeats = repeats[index];
-            m_repeat_lookup[axis] = number_of_repeats;
-            m_shape[axis] *= number_of_repeats;
-        }
+        m_shape[axis] = std::accumulate(m_repeats.begin(), m_repeats.end(), 0);
     }
 
     template <class CT>
@@ -365,26 +308,25 @@ namespace xt
     template <class CT>
     inline auto xrepeat<CT>::stepper_begin(const shape_type& s) const -> stepper
     {
-        return stepper(m_e.stepper_begin(s), m_repeat_lookup);
+        return stepper(m_e.stepper_begin(s), m_repeats, m_axis);
     }
 
     template <class CT>
     inline auto xrepeat<CT>::stepper_end(const shape_type& s, const layout_type l) const -> stepper
     {
-        auto st = stepper(m_e.stepper_begin(s), m_repeat_lookup);
+        auto st = stepper(m_e.stepper_begin(s), m_repeats, m_axis);
         st.to_end(l);
         return st;
     }
 
     template<class S>
-    xrepeat_stepper<S>::xrepeat_stepper(S&& s, const std::vector<std::ptrdiff_t>& repeats)
+    xrepeat_stepper<S>::xrepeat_stepper(S&& s, const std::vector<std::ptrdiff_t>& repeats, const size_type& axis)
         : m_substepper(std::forward<S>(s))
-    {
-        for (auto number_of_repeat : repeats)
-        {
-            m_indicies.emplace_back(number_of_repeat);
-        }
-    }
+        , m_steps(0)
+        , m_substeps(0)
+        , m_repeats(repeats)
+        , m_axis(axis)
+    {}
 
     template<class S>
     inline auto xrepeat_stepper<S>::operator*() const -> reference
@@ -395,49 +337,81 @@ namespace xt
     template<class S>
     inline void xrepeat_stepper<S>::step(size_type dim, size_type n)
     {
-        size_type substeps = m_indicies[dim].step(n);
-        m_substepper.step(dim, substeps);
+        if (dim == m_axis)
+        {
+            size_type substeps = m_substeps;
+            m_steps += n;
+            while (m_steps >= m_repeats[substeps])
+            {
+                m_steps -= m_repeats[substeps];
+                ++substeps;
+            }
+            m_substepper.step(dim, substeps - m_substeps);
+            m_substeps = substeps;
+        }
+        else
+        {
+            m_substepper.step(dim, n);
+        }
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::step_back(size_type dim, size_type n)
     {
-        size_type substeps = m_indicies[dim].step_back(n);
-        m_substepper.step_back(dim, substeps);
+        if (dim == m_axis)
+        {
+            size_type substeps = m_substeps;
+            m_steps -= n;
+            while (m_steps < 0)
+            {
+                --substeps;
+                m_steps += m_repeats[substeps];
+            }
+            m_substepper.step_back(dim, m_substeps - substeps);
+            m_substeps = substeps;
+        }
+        else
+        {
+            m_substepper.step_back(dim, n);
+        }
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::reset(size_type dim)
     {
         m_substepper.reset(dim);
-        m_indicies[dim].reset();
+        if (dim == m_axis)
+        {
+            m_steps = 0;
+            m_substeps = 0;
+        }
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::reset_back(size_type dim)
     {
         m_substepper.reset_back(dim);
-        m_indicies[dim].reset_back();
+        if (dim == m_axis)
+        {
+            m_substeps = m_repeats.size() - 1;
+            m_steps = m_repeats[m_substeps] - 1;
+        }
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::to_begin()
     {
         m_substepper.to_begin();
-        for (auto index : m_indicies)
-        {
-            index.reset();
-        }
+        m_steps = 0;
+        m_substeps = 0;
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::to_end(layout_type l)
     {
         m_substepper.to_end(l);
-        for (auto index : m_indicies)
-        {
-            index.reset_back();
-        }
+        m_substeps = m_repeats.size() - 1;
+        m_steps = m_repeats[m_substeps] - 1;
     }
 
     template<class S>
