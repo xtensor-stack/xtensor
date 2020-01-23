@@ -35,32 +35,45 @@ if(XTENSOR_USE_TBB)
     target_compile_definitions(@PROJECT_NAME@ INTERFACE XTENSOR_USE_TBB)
 endif()
 
-if (${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION} VERSION_GREATER_EQUAL 3.11)
-    if(NOT TARGET xtensor::optimize)
-        add_library(xtensor::optimize INTERFACE IMPORTED)
-        # Microsoft compiler
-        if(CMAKE_${COMPILER_LANGUAGE}_COMPILER_IS_MSVC)
-            target_compile_options(xtensor::optimize INTERFACE /EHsc /MP /bigobj)
-        # gcc, clang, ...
-        else()
-            target_compile_options(xtensor::optimize INTERFACE -march=native)
-        endif()
+if(NOT TARGET xtensor::optimize)
+    add_library(xtensor::optimize INTERFACE IMPORTED)
+    # Microsoft compiler
+    if(CMAKE_${COMPILER_LANGUAGE}_COMPILER_IS_MSVC)
+        set_property(
+            TARGET xtensor::optimize
+            PROPERTY INTERFACE_COMPILE_OPTIONS
+            /EHsc /MP /bigobj)
+    # gcc, clang, ...
+    else()
+        set_property(
+            TARGET xtensor::optimize
+            PROPERTY INTERFACE_COMPILE_OPTIONS
+            -march=native)
     endif()
+endif()
 
-    if(NOT TARGET xtensor::use_xsimd)
-        find_package(xsimd QUIET)
-        if (xsimd_FOUND)
-            add_library(xtensor::use_xsimd INTERFACE IMPORTED)
-            target_link_libraries(xtensor::use_xsimd INTERFACE xsimd)
-            target_compile_definitions(xtensor::use_xsimd INTERFACE XTENSOR_USE_XSIMD)
-        endif()
+if(NOT TARGET xtensor::use_xsimd)
+    find_package(xsimd QUIET)
+    if (xsimd_FOUND)
+        add_library(xtensor::use_xsimd INTERFACE IMPORTED)
+        set_property(
+            TARGET xtensor::use_xsimd
+            PROPERTY INTERFACE_LINK_LIBRARIES
+            xsimd)
+        set_property(
+            TARGET xtensor::use_xsimd
+            PROPERTY INTERFACE_COMPILE_DEFINITIONS
+            XTENSOR_USE_XSIMD)
     endif()
+endif()
 
-    if(NOT TARGET xtensor::use_TBB)
-        find_package(TBB QUIET)
-        if (TBB_FOUND)
-            add_library(xtensor::use_TBB INTERFACE IMPORTED)
-            target_compile_definitions(xtensor::use_TBB INTERFACE XTENSOR_USE_TBB)
-        endif()
+if(NOT TARGET xtensor::use_TBB)
+    find_package(TBB QUIET)
+    if (TBB_FOUND)
+        add_library(xtensor::use_TBB INTERFACE IMPORTED)
+        set_property(
+            TARGET xtensor::use_TBB
+            PROPERTY INTERFACE_COMPILE_DEFINITIONS
+            XTENSOR_USE_TBB)
     endif()
 endif()
