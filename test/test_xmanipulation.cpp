@@ -440,7 +440,7 @@ namespace xt
         ASSERT_EQ(expected, result);
     }
 
-    TEST(xmanipulation, repeat_every_element_of_axis_0_123)
+    TEST(xmanipulation, repeat_elements_of_axis_0_123)
     {
         xarray<size_t> array = {
             {1, 2, 3},
@@ -462,5 +462,23 @@ namespace xt
         }, xt::all());
         ASSERT_EQ(expected_shape, repeated_array.shape());
         ASSERT_EQ(expected, result);
+    }
+
+    TEST(xmanipulation, repeat_and_access_various_elements)
+    {
+        xarray<size_t> array = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9},
+        };
+
+        const auto repeated_array = xt::repeat(array, {1, 2, 3}, 0);
+
+        ASSERT_EQ(1, repeated_array(0, 0));
+        ASSERT_EQ(4, repeated_array(1, 0));
+        ASSERT_EQ(5, repeated_array(2, 1));
+        ASSERT_EQ(7, repeated_array(3, 0));
+        ASSERT_EQ(8, repeated_array(3, 1));
+        ASSERT_EQ(9, repeated_array(3, 2));
     }
 }

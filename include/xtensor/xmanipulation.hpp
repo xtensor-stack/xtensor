@@ -861,7 +861,8 @@ namespace xt
     template <class E>
     inline auto repeat(E&& e, std::ptrdiff_t repeats, std::ptrdiff_t axis)
     {
-        std::vector<std::ptrdiff_t> broadcasted_repeats(e.shape(axis));
+        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+        std::vector<std::ptrdiff_t> broadcasted_repeats(e.shape(casted_axis));
         std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
         return repeat(std::forward<E>(e), std::forward<std::vector<std::ptrdiff_t>>(broadcasted_repeats), axis);
     }
@@ -869,11 +870,12 @@ namespace xt
     template <class E>
     inline auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis)
     {
-        if (repeats.size() != e.shape(axis))
+        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+        if (repeats.size() != e.shape(casted_axis))
         {
-            XTENSOR_THROW(std::invalid_argument, "repeats and axes must have the same size");
+            XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
         }
-        return xrepeat<E>(std::forward<E>(e), std::forward<std::vector<std::ptrdiff_t>>(repeats), axis);
+        return xrepeat<E>(std::forward<E>(e), std::forward<std::vector<std::ptrdiff_t>>(repeats), casted_axis);
     }
 }
 

@@ -123,7 +123,7 @@ namespace xt
         using const_stepper = typename iterable_type::stepper;
 
         template<class CTA>
-        explicit xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis);
+        explicit xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, size_type axis);
 
         template <class... Args>
         reference operator()(Args... args);
@@ -159,48 +159,43 @@ namespace xt
         template <class Arg, class... Args>
         const_reference access(Arg arg, Args... args) const;
 
-        template<typename std::decay_t<CT>::size_type I>
-        struct access_impl
+        template<size_type I, class Arg, class... Args>
+        inline const_reference access_impl(stepper&& s, Arg arg, Args... args) const
         {
-            template<class Arg, class... Args>
-            inline const_reference operator()(stepper& s, Arg arg, Args... args) const
-            {
-                s.step(I, arg);
-                const access_impl<I + 1> access_next_dimension;
-                return access_next_dimension(s, args...);
-            }
+            s.step(I, static_cast<size_type>(arg));
+            return access_impl<I+1>(std::forward<stepper>(s), args...);
+        }
 
-            inline const_reference operator()(stepper& s) const
-            {
-                return *s;
-            }
+        template<size_type I>
+        inline const_reference access_impl(stepper&& s) const
+        {
+            return *s;
+        }
 
-            template<class Arg, class... Args>
-            inline reference operator()(stepper& s, Arg arg, Args... args)
-            {
-                s.step(I, arg);
-                access_impl<I + 1> access_next_dimension;
-                return access_next_dimension(s, args...);
-            }
+        template<size_type I, class Arg, class... Args>
+        inline reference access_impl(stepper&& s, Arg arg, Args... args)
+        {
+            s.step(I, static_cast<size_type>(arg));
+            return access_impl<I+1>(std::forward<stepper>(s), args...);
+        }
 
-            inline reference operator()(stepper& s)
-            {
-                return *s;
-            }
-        };
-
-        access_impl<0> m_access_impl;
+        template<size_type I>
+        inline reference access_impl(stepper&& s)
+        {
+            return *s;
+        }
     };
 
     template <class CT>
     template <class CTA>
-    xrepeat<CT>::xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis)
+    xrepeat<CT>::xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, size_type axis)
         : m_e(std::forward<CTA>(e))
-        , m_axis(static_cast<size_type>(axis))
+        , m_axis(axis)
         , m_repeats(std::forward<std::vector<std::ptrdiff_t>>(repeats))
         , m_shape(e.shape())
     {
-        m_shape[axis] = std::accumulate(m_repeats.begin(), m_repeats.end(), 0);
+        using value_type = typename shape_type::value_type;
+        m_shape[axis] = static_cast<value_type>(std::accumulate(m_repeats.begin(), m_repeats.end(), 0));
     }
 
     template <class CT>
@@ -243,7 +238,7 @@ namespace xt
             ++dimension;
             ++first;
         }
-        return m_access_impl(stepper);
+        return access_impl<0>(stepper);
     }
 
     /**
@@ -259,20 +254,20 @@ namespace xt
     {
         auto stepper = stepper_begin(m_e.shape());
         auto dimension = 0;
-        It iter = first;
+        auto iter = first;
         while (iter != last)
         {
             stepper.step(dimension, *iter);
             ++dimension;
             ++iter;
         }
-        return m_access_impl(stepper);
+        return access_impl<0>(stepper);
     }
 
     template <class CT>
     inline auto xrepeat<CT>::access() -> reference
     {
-        return m_access_impl(stepper_begin(m_e.shape()));
+        return access_impl<0>(stepper_begin(m_e.shape()));
     }
 
     template <class CT>
@@ -284,13 +279,13 @@ namespace xt
         {
             return access(args...);
         }
-        return m_access_impl(stepper_begin(m_e.shape()), arg, args...);
+        return access_impl<0>(stepper_begin(m_e.shape()), arg, args...);
     }
 
     template <class CT>
     inline auto xrepeat<CT>::access() const -> const_reference
     {
-        return m_access_impl(stepper_begin(m_e.shape()));
+        return access_impl<0>(stepper_begin(m_e.shape()));
     }
 
     template <class CT>
@@ -302,7 +297,7 @@ namespace xt
         {
             return access(args...);
         }
-        return m_access_impl(stepper_begin(m_e.shape()), arg, args...);
+        return access_impl<0>(stepper_begin(m_e.shape()), arg, args...);
     }
 
     template <class CT>
@@ -324,8 +319,8 @@ namespace xt
         : m_substepper(std::forward<S>(s))
         , m_steps(0)
         , m_substeps(0)
-        , m_repeats(repeats)
         , m_axis(axis)
+        , m_repeats(repeats)
     {}
 
     template<class S>
@@ -340,7 +335,7 @@ namespace xt
         if (dim == m_axis)
         {
             size_type substeps = m_substeps;
-            m_steps += n;
+            m_steps += static_cast<std::ptrdiff_t>(n);
             while (m_steps >= m_repeats[substeps])
             {
                 m_steps -= m_repeats[substeps];
@@ -361,7 +356,7 @@ namespace xt
         if (dim == m_axis)
         {
             size_type substeps = m_substeps;
-            m_steps -= n;
+            m_steps -= static_cast<std::ptrdiff_t>(n);;
             while (m_steps < 0)
             {
                 --substeps;
