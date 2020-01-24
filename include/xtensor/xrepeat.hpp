@@ -66,7 +66,7 @@ namespace xt
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
 
-        xrepeat_stepper(S&& s, const std::vector<std::ptrdiff_t>& repeats, const size_type& axis);
+        xrepeat_stepper(S&& s, const shape_type& shape, const std::vector<std::ptrdiff_t>& repeats, const size_type& axis);
 
         reference operator*() const;
 
@@ -88,12 +88,20 @@ namespace xt
 
     private:
         S m_substepper;
+        const shape_type& m_shape;
 
-        std::ptrdiff_t m_steps;
-        size_type m_substeps;
+        std::ptrdiff_t m_repeating_steps;
+        std::vector<size_type> m_positions;
+        size_type m_subposition;
 
-        const size_type& m_axis;
+        const size_type& m_repeating_axis;
         const std::vector<std::ptrdiff_t>& m_repeats;
+
+        void make_step(size_type dim, size_type n);
+        void make_step_back(size_type dim, size_type n);
+
+        std::vector<size_type> get_next_positions(const size_type dim, const size_type steps_to_go) const;
+        std::vector<size_type> get_next_positions_back(const size_type dim, const size_type steps_to_go) const;
     };
 
     template <class CT>
@@ -139,13 +147,17 @@ namespace xt
         template <class It>
         const_reference element(It first, It last) const;
 
+        stepper stepper_begin() const;
+
         stepper stepper_begin(const shape_type& s) const;
+
+        stepper stepper_end(const layout_type l) const;
 
         stepper stepper_end(const shape_type& s, const layout_type l) const;
 
     private:
         CT m_e;
-        const size_type m_axis;
+        const size_type m_repeating_axis;
         const std::vector<std::ptrdiff_t> m_repeats;
         shape_type m_shape;
 
@@ -190,7 +202,7 @@ namespace xt
     template <class CTA>
     xrepeat<CT>::xrepeat(CTA&& e, std::vector<std::ptrdiff_t>&& repeats, size_type axis)
         : m_e(std::forward<CTA>(e))
-        , m_axis(axis)
+        , m_repeating_axis(axis)
         , m_repeats(std::forward<std::vector<std::ptrdiff_t>>(repeats))
         , m_shape(e.shape())
     {
@@ -252,16 +264,16 @@ namespace xt
     template <class It>
     inline auto xrepeat<CT>::element(It first, It last) const -> const_reference
     {
-        auto stepper = stepper_begin(m_e.shape());
+        auto s = stepper_begin(m_e.shape());
         auto dimension = 0;
         auto iter = first;
         while (iter != last)
         {
-            stepper.step(dimension, *iter);
+            s.step(dimension, *iter);
             ++dimension;
             ++iter;
         }
-        return access_impl<0>(stepper);
+        return access_impl<0>(std::forward<stepper>(s));
     }
 
     template <class CT>
@@ -301,25 +313,39 @@ namespace xt
     }
 
     template <class CT>
+    inline auto xrepeat<CT>::stepper_begin() const -> stepper
+    {
+        return stepper_begin(m_e.shape());
+    }
+
+    template <class CT>
     inline auto xrepeat<CT>::stepper_begin(const shape_type& s) const -> stepper
     {
-        return stepper(m_e.stepper_begin(s), m_repeats, m_axis);
+        return stepper(m_e.stepper_begin(s), m_shape, m_repeats, m_repeating_axis);
+    }
+
+    template <class CT>
+    inline auto xrepeat<CT>::stepper_end(const layout_type l) const -> stepper
+    {
+        return stepper_end(m_e.shape(), l);
     }
 
     template <class CT>
     inline auto xrepeat<CT>::stepper_end(const shape_type& s, const layout_type l) const -> stepper
     {
-        auto st = stepper(m_e.stepper_begin(s), m_repeats, m_axis);
+        auto st = stepper(m_e.stepper_begin(s), m_shape, m_repeats, m_repeating_axis);
         st.to_end(l);
         return st;
     }
 
     template<class S>
-    xrepeat_stepper<S>::xrepeat_stepper(S&& s, const std::vector<std::ptrdiff_t>& repeats, const size_type& axis)
+    xrepeat_stepper<S>::xrepeat_stepper(S&& s, const shape_type& shape, const std::vector<std::ptrdiff_t>& repeats, const size_type& axis)
         : m_substepper(std::forward<S>(s))
-        , m_steps(0)
-        , m_substeps(0)
-        , m_axis(axis)
+        , m_shape(shape)
+        , m_repeating_steps(0)
+        , m_positions(shape.size())
+        , m_subposition(0)
+        , m_repeating_axis(axis)
         , m_repeats(repeats)
     {}
 
@@ -330,44 +356,52 @@ namespace xt
     }
 
     template<class S>
-    inline void xrepeat_stepper<S>::step(size_type dim, size_type n)
+    inline void xrepeat_stepper<S>::step(size_type dim, size_type steps_to_go)
     {
-        if (dim == m_axis)
+        if (m_positions[dim] + steps_to_go >= m_shape[dim])
         {
-            size_type substeps = m_substeps;
-            m_steps += static_cast<std::ptrdiff_t>(n);
-            while (m_steps >= m_repeats[substeps])
+            const auto next_positions = get_next_positions(dim, steps_to_go);
+            if (next_positions[dim] > m_positions[dim])
             {
-                m_steps -= m_repeats[substeps];
-                ++substeps;
+                make_step(dim, next_positions[dim] - m_positions[dim]);
             }
-            m_substepper.step(dim, substeps - m_substeps);
-            m_substeps = substeps;
+            else
+            {
+                make_step_back(dim, m_positions[dim] - next_positions[dim]);
+            }
+            for (size_type d = 0; d < dim; ++d)
+            {
+                make_step(d, next_positions[d] - m_positions[d]);
+            }
         }
         else
         {
-            m_substepper.step(dim, n);
+            make_step(dim, steps_to_go);
         }
     }
 
     template<class S>
-    inline void xrepeat_stepper<S>::step_back(size_type dim, size_type n)
+    inline void xrepeat_stepper<S>::step_back(size_type dim, size_type steps_to_go)
     {
-        if (dim == m_axis)
+        if (m_positions[dim] < steps_to_go)
         {
-            size_type substeps = m_substeps;
-            m_steps -= static_cast<std::ptrdiff_t>(n);;
-            while (m_steps < 0)
+            const auto next_positions = get_next_positions_back(dim, steps_to_go);
+            if (next_positions[dim] < m_positions[dim])
             {
-                --substeps;
-                m_steps += m_repeats[substeps];
+                make_step_back(dim, m_positions[dim] - next_positions[dim]);
             }
-            m_substepper.step_back(dim, m_substeps - substeps);
-            m_substeps = substeps;
+            else
+            {
+                make_step(dim, next_positions[dim] - m_positions[dim]);
+            }
+            for (size_type d = 0; d < dim; ++d)
+            {
+                make_step_back(d, m_positions[d] - next_positions[d]);
+            }
         }
         else
         {
-            m_substepper.step_back(dim, n);
+            make_step_back(dim, steps_to_go);
         }
     }
 
@@ -375,10 +409,11 @@ namespace xt
     inline void xrepeat_stepper<S>::reset(size_type dim)
     {
         m_substepper.reset(dim);
-        if (dim == m_axis)
+        m_positions[dim] = 0;
+        if (dim == m_repeating_axis)
         {
-            m_steps = 0;
-            m_substeps = 0;
+            m_subposition = 0;
+            m_repeating_steps = 0;
         }
     }
 
@@ -386,10 +421,11 @@ namespace xt
     inline void xrepeat_stepper<S>::reset_back(size_type dim)
     {
         m_substepper.reset_back(dim);
-        if (dim == m_axis)
+        m_positions[dim] = m_shape[dim] - 1;
+        if (dim == m_repeating_axis)
         {
-            m_substeps = m_repeats.size() - 1;
-            m_steps = m_repeats[m_substeps] - 1;
+            m_subposition = m_repeats.size() - 1;
+            m_repeating_steps = m_repeats.back() - 1;
         }
     }
 
@@ -397,22 +433,132 @@ namespace xt
     inline void xrepeat_stepper<S>::to_begin()
     {
         m_substepper.to_begin();
-        m_steps = 0;
-        m_substeps = 0;
+        std::fill(m_positions.begin(), m_positions.end(), 0);
+        m_subposition = 0;
+        m_repeating_steps = 0;
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::to_end(layout_type l)
     {
         m_substepper.to_end(l);
-        m_substeps = m_repeats.size() - 1;
-        m_steps = m_repeats[m_substeps] - 1;
+        std::transform(m_shape.begin(), m_shape.end(), m_positions.begin(), [](auto value) {
+            return value - 1;
+        });
+        if (layout_type::row_major == l)
+        {
+            ++m_positions.front();
+        }
+        else
+        {
+            ++m_positions.back();
+        }
+        m_subposition = m_repeats.size();
+        m_repeating_steps = 0;
     }
 
     template<class S>
     inline void xrepeat_stepper<S>::step_leading()
     {
-        m_substepper.step_leading();
+        step(m_shape.size() - 1, 1);
+    }
+
+    template<class S>
+    inline void xrepeat_stepper<S>::make_step(size_type dim, size_type steps_to_go)
+    {
+        if (steps_to_go > 0)
+        {
+            if (dim == m_repeating_axis)
+            {
+                size_type subposition = m_subposition;
+                m_repeating_steps += static_cast<std::ptrdiff_t>(steps_to_go);
+                while (m_repeating_steps >= m_repeats[subposition])
+                {
+                    m_repeating_steps -= m_repeats[subposition];
+                    ++subposition;
+                }
+                m_substepper.step(dim, subposition - m_subposition);
+                m_subposition = subposition;
+            }
+            else
+            {
+                m_substepper.step(dim, steps_to_go);
+            }
+            m_positions[dim] += steps_to_go;
+        }
+    }
+
+    template<class S>
+    inline void xrepeat_stepper<S>::make_step_back(size_type dim, size_type steps_to_go)
+    {
+        if (steps_to_go > 0)
+        {
+            if (dim == m_repeating_axis)
+            {
+                size_type subposition = m_subposition;
+                m_repeating_steps -= static_cast<std::ptrdiff_t>(steps_to_go);
+                while (m_repeating_steps < 0)
+                {
+                    --subposition;
+                    m_repeating_steps += m_repeats[subposition];
+                }
+                m_substepper.step_back(dim, m_subposition - subposition);
+                m_subposition = subposition;
+            }
+            else
+            {
+                m_substepper.step_back(dim, steps_to_go);
+            }
+            m_positions[dim] -= steps_to_go;
+        }
+    }
+
+    template<class S>
+    inline auto xrepeat_stepper<S>::get_next_positions(const size_type dim, const size_type steps_to_go) const -> std::vector<size_type>
+    {
+        size_type next_position_for_dim = m_positions[dim] + steps_to_go;
+        if (dim > 0)
+        {
+            size_type steps_in_previous_dim = 0;
+            while (next_position_for_dim >= m_shape[dim])
+            {
+                next_position_for_dim -= m_shape[dim];
+                ++steps_in_previous_dim;
+            }
+            if (steps_in_previous_dim > 0)
+            {
+                auto next_positions = get_next_positions(dim - 1, steps_in_previous_dim);
+                next_positions[dim] = next_position_for_dim;
+                return next_positions;
+            }
+        }
+        std::vector<size_type> next_positions = m_positions;
+        next_positions[dim] = next_position_for_dim;
+        return next_positions;
+    }
+
+    template<class S>
+    inline auto xrepeat_stepper<S>::get_next_positions_back(const size_type dim, const size_type steps_to_go) const -> std::vector<size_type>
+    {
+        size_type next_position_for_dim = m_positions[dim] - steps_to_go;
+        if (dim > 0)
+        {
+            size_type steps_in_previous_dim = 0;
+            while (next_position_for_dim >= m_shape[dim])
+            {
+                next_position_for_dim += m_shape[dim];
+                ++steps_in_previous_dim;
+            }
+            if (steps_in_previous_dim > 0)
+            {
+                auto next_positions = get_next_positions_back(dim - 1, steps_in_previous_dim);
+                next_positions[dim] = static_cast<size_type>(next_position_for_dim);
+                return next_positions;
+            }
+        }
+        std::vector<size_type> next_positions = m_positions;
+        next_positions[dim] = next_position_for_dim;
+        return next_positions;
     }
 }
 

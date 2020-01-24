@@ -193,6 +193,7 @@ set(XTENSOR_TESTS
     test_xoptional_assembly_adaptor.cpp
     test_xoptional_assembly_storage.cpp
     test_xrandom.cpp
+    test_xrepeat.cpp
     test_xsort.cpp
     test_xvectorize.cpp
     test_extended_xmath_interp.cpp
