@@ -36,3 +36,6 @@ pygments_style = 'sphinx'
 todo_include_todos = False
 htmlhelp_basename = 'xtensordoc'
 
+html_js_files = [
+    'goatcounter.js'
+]
