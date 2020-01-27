@@ -199,6 +199,8 @@ namespace xt
         template <class It>
         offset_type compute_element_index(It first, It last) const;
 
+        void set_offset(size_type offset);
+
     private:
 
         undecay_expression m_e;
@@ -664,6 +666,12 @@ namespace xt
     inline auto xstrided_view_base<D>::compute_element_index(It first, It last) const -> offset_type
     {
         return static_cast<offset_type>(m_offset) + xt::element_offset<offset_type>(strides(), first, last);
+    }
+
+    template <class D>
+    void xstrided_view_base<D>::set_offset(size_type offset)
+    {
+        m_offset = offset;
     }
 
     /******************************************

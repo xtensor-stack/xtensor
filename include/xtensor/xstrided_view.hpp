@@ -276,11 +276,15 @@ namespace xt
 
         void assign_temporary_impl(temporary_type&& tmp);
 
+        using base_type::set_offset;
+
         template <class C>
         friend class xstepper;
         friend class xview_semantic<self_type>;
         friend class xaccessible<self_type>;
         friend class xconst_accessible<self_type>;
+        template <class D>
+        friend class xaxis_iterator;
     };
 
     /**************************
