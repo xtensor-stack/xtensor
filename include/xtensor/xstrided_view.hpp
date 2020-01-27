@@ -283,7 +283,7 @@ namespace xt
         friend class xview_semantic<self_type>;
         friend class xaccessible<self_type>;
         friend class xconst_accessible<self_type>;
-        template <class CT>
+        template <class D>
         friend class xaxis_iterator;
     };
 

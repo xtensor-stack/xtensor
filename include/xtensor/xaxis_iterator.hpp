@@ -108,8 +108,8 @@ namespace xt
             auto nxt_strides = std::copy(e_strides.cbegin(), e_strides.cbegin() + axis, strides.begin());
             std::copy(e_strides.cbegin() + axis + 1, e_strides.end(), nxt_strides);
 
-            return strided_view(std::forward<CT>(e), std::forward<shape_type>(std::move(shape)),
-                std::forward<strides_type>(std::move(strides)), offset, e.layout());
+            return strided_view(std::forward<CT>(e), std::move(shape),
+                std::move(strides), offset, e.layout());
         }
     }
 
