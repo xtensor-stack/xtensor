@@ -285,6 +285,8 @@ namespace xt
         friend class xconst_accessible<self_type>;
         template <class D>
         friend class xaxis_iterator;
+        template <class D>
+        friend class xaxis_slice_iterator;
     };
 
     /**************************
