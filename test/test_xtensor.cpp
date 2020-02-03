@@ -11,6 +11,7 @@
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xarray.hpp"
 #include "test_common.hpp"
+#include <type_traits>
 
 #include "xtensor/xio.hpp"
 
@@ -344,5 +345,27 @@ namespace xt
     {
         using tensor_type = xtensor<int, 2>;
         test_iterator_types<tensor_type, int*, const int*>();
+    }
+
+    TEST(xtensor, type_traits)
+    {
+        using tensor_type = xt::xtensor<double, 3>;
+        EXPECT_TRUE(std::is_constructible<tensor_type>::value);
+        EXPECT_TRUE(std::is_constructible<tensor_type>::value);
+
+        EXPECT_TRUE(std::is_default_constructible<tensor_type>::value);
+
+        EXPECT_TRUE(std::is_copy_constructible<tensor_type>::value);
+
+        EXPECT_TRUE(std::is_move_constructible<tensor_type>::value);
+        EXPECT_TRUE(std::is_nothrow_move_constructible<tensor_type>::value);
+
+        EXPECT_TRUE(std::is_copy_assignable<tensor_type>::value);
+
+        EXPECT_TRUE(std::is_move_assignable<tensor_type>::value);
+        EXPECT_TRUE(std::is_nothrow_move_assignable<tensor_type>::value);
+
+        EXPECT_TRUE(std::is_destructible<tensor_type>::value);
+        EXPECT_TRUE(std::is_nothrow_destructible<tensor_type>::value);
     }
 }
