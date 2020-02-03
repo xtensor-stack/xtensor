@@ -13,6 +13,7 @@
 #include "xtensor/xmanipulation.hpp"
 #include "xtensor/xio.hpp"
 #include "test_common.hpp"
+#include <type_traits>
 
 namespace xt
 {
@@ -333,5 +334,26 @@ namespace xt
     {
         auto a = test_reshape_compile();
         EXPECT_EQ(a.shape(), std::vector<std::size_t>({1, 25}));
+    }
+
+    TEST(xarray, type_traits)
+    {
+        using array_type = xt::xarray<double>;
+        EXPECT_TRUE(std::is_constructible<array_type>::value);
+
+        EXPECT_TRUE(std::is_default_constructible<array_type>::value);
+
+        EXPECT_TRUE(std::is_copy_constructible<array_type>::value);
+
+        EXPECT_TRUE(std::is_move_constructible<array_type>::value);
+        EXPECT_TRUE(std::is_nothrow_move_constructible<array_type>::value);
+
+        EXPECT_TRUE(std::is_copy_assignable<array_type>::value);
+
+        EXPECT_TRUE(std::is_move_assignable<array_type>::value);
+        EXPECT_TRUE(std::is_nothrow_move_assignable<array_type>::value);
+
+        EXPECT_TRUE(std::is_destructible<array_type>::value);
+        EXPECT_TRUE(std::is_nothrow_destructible<array_type>::value);
     }
 }
