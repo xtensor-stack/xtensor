@@ -89,10 +89,13 @@ namespace xt
     auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis);
 
     template<class E>
-    auto repeat(E&& e, std::ptrdiff_t repeats, std::ptrdiff_t axis);
+    auto repeat(E&& e, std::size_t repeats, std::size_t axis);
 
     template<class E>
-    auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis);
+    auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis);
+
+    template<class E>
+    auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis);
 
     /****************************
      * transpose implementation *
@@ -858,24 +861,44 @@ namespace xt
     /****************************
      * repeat implementation    *
      ****************************/
-    template <class E>
-    inline auto repeat(E&& e, std::ptrdiff_t repeats, std::ptrdiff_t axis)
+    namespace detail
     {
-        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
-        std::vector<std::ptrdiff_t> broadcasted_repeats(e.shape(casted_axis));
-        std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
-        return repeat(std::forward<E>(e), std::forward<std::vector<std::ptrdiff_t>>(broadcasted_repeats), axis);
+        template<class E, class R>
+        inline auto make_xrepeat(E&& e, R&& r, typename std::decay_t<E>::size_type axis)
+        {
+            return xrepeat<E, R>(std::forward<E>(e), std::forward<R>(r), axis);
+        }
     }
 
     template <class E>
-    inline auto repeat(E&& e, std::vector<std::ptrdiff_t>&& repeats, std::ptrdiff_t axis)
+    inline auto repeat(E&& e, std::size_t repeats, std::size_t axis)
+    {
+        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+        std::vector<std::size_t> broadcasted_repeats(e.shape(casted_axis));
+        std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
+        return repeat(std::forward<E>(e), std::move(broadcasted_repeats), axis);
+    }
+
+    template <class E>
+    inline auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis)
     {
         const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
         if (repeats.size() != e.shape(casted_axis))
         {
             XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
         }
-        return xrepeat<E>(std::forward<E>(e), std::forward<std::vector<std::ptrdiff_t>>(repeats), casted_axis);
+        return detail::make_xrepeat(std::forward<E>(e), repeats, casted_axis);
+    }
+
+    template <class E>
+    inline auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis)
+    {
+        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+        if (repeats.size() != e.shape(casted_axis))
+        {
+            XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
+        }
+        return detail::make_xrepeat(std::forward<E>(e), std::move(repeats), casted_axis);
     }
 }
 

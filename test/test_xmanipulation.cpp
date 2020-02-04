@@ -472,7 +472,8 @@ namespace xt
             {7, 8, 9},
         };
 
-        const auto repeated_array = xt::repeat(array, {1, 2, 3}, 0);
+        const std::vector<std::size_t> repeats{1, 2, 3};
+        const auto repeated_array = xt::repeat(array, repeats, 0);
 
         ASSERT_EQ(1, repeated_array(0, 0));
         ASSERT_EQ(4, repeated_array(1, 0));
