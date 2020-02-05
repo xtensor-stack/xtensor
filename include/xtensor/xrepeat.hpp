@@ -92,7 +92,7 @@ namespace xt
         S m_substepper;
         const shape_type& m_shape;
 
-        size_type m_repeating_steps;
+        std::ptrdiff_t m_repeating_steps;
         std::vector<size_type> m_positions;
         size_type m_subposition;
 
@@ -428,7 +428,7 @@ namespace xt
         if (dim == m_repeating_axis)
         {
             m_subposition = m_repeats.size() - 1;
-            m_repeating_steps = m_repeats.back() - 1;
+            m_repeating_steps = static_cast<std::ptrdiff_t>(m_repeats.back()) - 1;
         }
     }
 
@@ -474,10 +474,10 @@ namespace xt
             if (dim == m_repeating_axis)
             {
                 size_type subposition = m_subposition;
-                m_repeating_steps += steps_to_go;
-                while (m_repeating_steps >= m_repeats[subposition])
+                m_repeating_steps += static_cast<std::ptrdiff_t>(steps_to_go);
+                while (m_repeating_steps >= static_cast<ptrdiff_t>(m_repeats[subposition]))
                 {
-                    m_repeating_steps -= m_repeats[subposition];
+                    m_repeating_steps -= static_cast<ptrdiff_t>(m_repeats[subposition]);
                     ++subposition;
                 }
                 m_substepper.step(dim, subposition - m_subposition);
@@ -499,11 +499,11 @@ namespace xt
             if (dim == m_repeating_axis)
             {
                 size_type subposition = m_subposition;
-                m_repeating_steps -= steps_to_go;
-                while (m_repeating_steps > m_repeats[subposition])
+                m_repeating_steps -= static_cast<std::ptrdiff_t>(steps_to_go);
+                while (m_repeating_steps < 0)
                 {
                     --subposition;
-                    m_repeating_steps += m_repeats[subposition];
+                    m_repeating_steps += static_cast<ptrdiff_t>(m_repeats[subposition]);
                 }
                 m_substepper.step_back(dim, m_subposition - subposition);
                 m_subposition = subposition;
@@ -543,13 +543,13 @@ namespace xt
     template<class S, class R>
     inline auto xrepeat_stepper<S, R>::get_next_positions_back(const size_type dim, const size_type steps_to_go) const -> std::vector<size_type>
     {
-        size_type next_position_for_dim = m_positions[dim] - steps_to_go;
+        auto next_position_for_dim = static_cast<std::ptrdiff_t>(m_positions[dim] - steps_to_go);
         if (dim > 0)
         {
             size_type steps_in_previous_dim = 0;
-            while (next_position_for_dim >= m_shape[dim])
+            while (next_position_for_dim < 0)
             {
-                next_position_for_dim += m_shape[dim];
+                next_position_for_dim += static_cast<std::ptrdiff_t>(m_shape[dim]);
                 ++steps_in_previous_dim;
             }
             if (steps_in_previous_dim > 0)
@@ -560,7 +560,7 @@ namespace xt
             }
         }
         std::vector<size_type> next_positions = m_positions;
-        next_positions[dim] = next_position_for_dim;
+        next_positions[dim] = static_cast<size_type>(next_position_for_dim);
         return next_positions;
     }
 }
