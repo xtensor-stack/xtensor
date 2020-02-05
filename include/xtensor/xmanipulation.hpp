@@ -14,6 +14,7 @@
 #include "xstrided_view.hpp"
 #include "xutils.hpp"
 #include "xtensor_config.hpp"
+#include "xrepeat.hpp"
 
 namespace xt
 {
@@ -86,6 +87,15 @@ namespace xt
 
     template<class E>
     auto roll(E&& e, std::ptrdiff_t shift, std::ptrdiff_t axis);
+
+    template<class E>
+    auto repeat(E&& e, std::size_t repeats, std::size_t axis);
+
+    template<class E>
+    auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis);
+
+    template<class E>
+    auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis);
 
     /****************************
      * transpose implementation *
@@ -846,6 +856,49 @@ namespace xt
 
         detail::roll(cpy.begin(), e.begin(), shift, saxis, shape, 0);
         return cpy;
+    }
+
+    /****************************
+     * repeat implementation    *
+     ****************************/
+    namespace detail
+    {
+        template<class E, class R>
+        inline auto make_xrepeat(E&& e, R&& r, typename std::decay_t<E>::size_type axis)
+        {
+            return xrepeat<E, R>(std::forward<E>(e), std::forward<R>(r), axis);
+        }
+    }
+
+    template <class E>
+    inline auto repeat(E&& e, std::size_t repeats, std::size_t axis)
+    {
+        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+        std::vector<std::size_t> broadcasted_repeats(e.shape(casted_axis));
+        std::fill(broadcasted_repeats.begin(), broadcasted_repeats.end(), repeats);
+        return repeat(std::forward<E>(e), std::move(broadcasted_repeats), axis);
+    }
+
+    template <class E>
+    inline auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis)
+    {
+        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+        if (repeats.size() != e.shape(casted_axis))
+        {
+            XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
+        }
+        return detail::make_xrepeat(std::forward<E>(e), repeats, casted_axis);
+    }
+
+    template <class E>
+    inline auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis)
+    {
+        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+        if (repeats.size() != e.shape(casted_axis))
+        {
+            XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
+        }
+        return detail::make_xrepeat(std::forward<E>(e), std::move(repeats), casted_axis);
     }
 }
 
