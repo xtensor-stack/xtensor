@@ -15,10 +15,15 @@
 namespace xt
 {
 
-    /************************
-     * xaxis_slice_iterator *
-     ************************/
-
+    /**
+     * @class xaxis_slice_iterator
+     * @brief Class for iteration over one dimensional slices
+     *
+     * The xaxis_slice_iterator iterates over one dimensional slices
+     * oriented along the specified axis
+     *
+     * @param CT the closure type of the \ref xexpression
+     */
     template <class CT>
     class xaxis_slice_iterator
     {
@@ -110,6 +115,15 @@ namespace xt
         return e;
     }
 
+    /**
+     * @name Constructors
+     */
+     //@{
+    /**
+     * Constructs xaxis_slice_iterator
+     *
+     * @param axis the axis to iterate over taking one dimensional slices
+     */
     template <class CT>
     template <class CTA>
     inline xaxis_slice_iterator<CT>::xaxis_slice_iterator(CTA&& e, size_type axis)
@@ -117,6 +131,13 @@ namespace xt
     {
     }
 
+    /**
+     * Constructs xaxis_slice_iterator starting at specified index and initializes
+     *
+     * @param axis the axis to iterate over taking one dimensional slices
+     * @param index the starting index for the iterator
+     * @param offset the starting offset for the iterator
+     */
     template <class CT>
     template <class CTA>
     inline xaxis_slice_iterator<CT>::xaxis_slice_iterator(CTA&& e, size_type axis, size_type index, size_type offset) :
@@ -129,19 +150,27 @@ namespace xt
         if (e.layout() == layout_type::row_major)
         {
             m_is_target_axis = axis == e.dimension() - 1;
-            m_lower_shape = std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), static_cast<size_t>(1), std::multiplies<>());
-            m_iter_size = std::accumulate(e.shape().begin() + 1, e.shape().end(), static_cast<size_t>(1), std::multiplies<>());
+            m_lower_shape = std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), size_t(1), std::multiplies<>());
+            m_iter_size = std::accumulate(e.shape().begin() + 1, e.shape().end(), size_t(1), std::multiplies<>());
 
         }
         else
         {
             m_is_target_axis = axis == 0;
-            m_lower_shape = std::accumulate(e.shape().begin(), e.shape().begin() + axis, static_cast<size_t>(1), std::multiplies<>());
-            m_iter_size = std::accumulate(e.shape().begin(), e.shape().end() - 1, static_cast<size_t>(1), std::multiplies<>());
+            m_lower_shape = std::accumulate(e.shape().begin(), e.shape().begin() + axis, size_t(1), std::multiplies<>());
+            m_iter_size = std::accumulate(e.shape().begin(), e.shape().end() - 1, size_t(1), std::multiplies<>());
         }
         m_upper_shape = m_lower_shape + m_axis_stride;
     }
+    //@}
 
+    /**
+     * @name Increment
+     */
+     //@{
+    /**
+     * Increments the index and offset to the next iterator position
+     */
     template <class CT>
     inline auto xaxis_slice_iterator<CT>::operator++() -> self_type&
     {
@@ -162,7 +191,17 @@ namespace xt
         ++(*this);
         return tmp;
     }
+    //@}
 
+    /**
+     * @name Reference
+     */
+    //@{
+    /**
+     * Returns the strided view at the current iteration position
+     *
+     * @return strided_view
+     */
     template <class CT>
     inline auto xaxis_slice_iterator<CT>::operator*() const -> reference
     {
@@ -174,7 +213,17 @@ namespace xt
     {
         return xtl::closure_pointer(operator*());
     }
+    //@}
 
+    /*
+     * @name Comparisons
+     */
+    //@{
+    /**
+     * Checks equality of the expression
+     *
+     * @return bool equality
+     */
     template <class CT>
     inline bool xaxis_slice_iterator<CT>::equal(const self_type& rhs) const
     {
@@ -187,12 +236,24 @@ namespace xt
         return lhs.equal(rhs);
     }
 
+    /**
+     * Checks inequality of the expressions
+     * @return bool inequality
+     */
     template <class CT>
     inline bool operator!=(const xaxis_slice_iterator<CT>& lhs, const xaxis_slice_iterator<CT>& rhs)
     {
         return !(lhs == rhs);
     }
+    //@}
 
+    /**
+     * @name Iterators
+     */
+    //@{
+    /**
+     * @return an iterator to the first element of the expression for axis 0
+     */
     template <class E>
     inline auto xaxis_slice_begin(E&& e)
     {
@@ -200,6 +261,10 @@ namespace xt
         return return_type(std::forward<E>(e), 0);
     }
 
+    /**
+     * @return an iterator to the first element of the expression for the specified axis
+     * @param axis the axis to iterate over
+     */
     template <class E>
     inline auto xaxis_slice_begin(E&& e, typename std::decay_t<E>::size_type axis)
     {
@@ -207,20 +272,29 @@ namespace xt
         return return_type(std::forward<E>(e), axis, 0, e.data_offset());
     }
 
+    /**
+     * @return Returns an iterator to the element following the last element of
+     * the expression for axis 0
+     */
     template <class E>
     inline auto xaxis_slice_end(E&& e)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
-        return return_type(std::forward<E>(e), 0, std::accumulate(e.shape().begin() + 1, e.shape().end(), static_cast<size_t>(1), std::multiplies<>()), e.size());
+        return return_type(std::forward<E>(e), 0, std::accumulate(e.shape().begin() + 1, e.shape().end(), size_t(1), std::multiplies<>()), e.size());
     }
 
+    /**
+     * @return Returns an iterator to the element following the last element of
+     * the expression for the specified axis
+     */
     template <class E>
     inline auto xaxis_slice_end(E&& e, typename std::decay_t<E>::size_type axis)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
-        auto index_sum = std::accumulate(e.shape().begin(), e.shape().begin() + axis, static_cast<size_t>(1), std::multiplies<>());
+        auto index_sum = std::accumulate(e.shape().begin(), e.shape().begin() + axis, size_t(1), std::multiplies<>());
         return return_type(std::forward<E>(e), axis, std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), index_sum, std::multiplies<>()), e.size() + axis);
     }
+    //@}
 }
 
 #endif
