@@ -612,7 +612,7 @@ namespace xt
      * xtrivial_default_construct implemenation *
      ********************************************/
 
-#if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(_GLIBCXX_USE_CXX11_ABI)
+#if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || (defined(_GLIBCXX_USE_CXX11_ABI) && _GLIBCXX_USE_CXX11_ABI)
 
     template <class T>
     using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
