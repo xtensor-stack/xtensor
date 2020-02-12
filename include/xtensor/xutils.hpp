@@ -612,7 +612,13 @@ namespace xt
      * xtrivial_default_construct implemenation *
      ********************************************/
 
-#if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || (defined(_GLIBCXX_USE_CXX11_ABI) && _GLIBCXX_USE_CXX11_ABI)
+#if defined(_GLIBCXX_USE_CXX11_ABI)
+#if _GLIBCXX_USE_CXX11_ABI || (defined(_GLIBCXX_USE_DUAL_ABI) && !_GLIBCXX_USE_DUAL_ABI)
+#define XTENSOR_GLIBCXX_USE_CXX11_ABI 1
+#endif
+#endif
+
+#if !defined(__GNUG__) || defined(_LIBCPP_VERSION) || defined(XTENSOR_GLIBCXX_USE_CXX11_ABI)
 
     template <class T>
     using xtrivially_default_constructible = std::is_trivially_default_constructible<T>;
@@ -623,6 +629,7 @@ namespace xt
     using xtrivially_default_constructible = std::has_trivial_default_constructor<T>;
 
 #endif
+#undef XTENSOR_GLIBCXX_USE_CXX11_ABI
 
     /*************************
      * conditional type cast *
