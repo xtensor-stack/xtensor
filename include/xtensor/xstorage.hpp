@@ -1164,10 +1164,10 @@ namespace xt
 
         // Update ref if element moved
         const T* elt_ptr = &elt;
-        if (it <= elt_ptr && elt_ptr < m_end)
-        {
-            ++elt_ptr;
-        }
+        bool cond = it <= elt_ptr && elt_ptr < m_end;
+        // More complicated than incrementing elt_ptr, but this avoids
+        // false positive array-bounds warning on GCC 10
+        const T* src_ptr = cond ? it + (elt_ptr - it) + std::ptrdiff_t(1) : elt_ptr;
         *it = *elt_ptr;
         return it;
     }
