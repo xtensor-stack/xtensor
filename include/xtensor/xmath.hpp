@@ -1916,26 +1916,28 @@ namespace detail {
 
 #ifdef X_OLD_CLANG
         template <class T, class E, class I, class D, class EVS>
-        inline auto mean(E&& e, std::initializer_list<I> axes, D const& ddof, EVS es)
+        inline auto mean(E&& e, std::initializer_list<I> axes, const D& ddof, EVS es)
         {
             auto s = sum<T>(std::forward<E>(e), axes, es);
             return detail::mean_division<T>(std::move(s), e.size() - ddof);
         }
 #else
         template <class T, class E, class I, std::size_t N, class D, class EVS>
-        inline auto mean(E&& e, const I (&axes)[N], D const& ddof, EVS es)
+        inline auto mean(E&& e, const I (&axes)[N], const D& ddof, EVS es)
         {
             auto s = sum<T>(std::forward<E>(e), axes, es);
+            using size_type = typename std::decay_t<E>::size_type;
             return detail::mean_division<T>(std::move(s), e.size() - ddof);
         }
 #endif
 
         template <class T, class E, class D, class EVS,
                   XTL_REQUIRES(is_reducer_options<EVS>, std::is_integral<D>)>
-        inline auto mean_noaxis(E&& e, D const& ddof, EVS es)
+        inline auto mean_noaxis(E&& e, const D& ddof, EVS es)
         {
             using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
             auto size = e.size();
+            using size_type = decltype(size);
             return sum<T>(std::forward<E>(e), es) / static_cast<value_type>(size - ddof);
         }
     }
@@ -1974,7 +1976,7 @@ namespace detail {
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto mean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
-        return detail::mean<T>(std::forward<E>(e), axes, 0, es);
+        return detail::mean<T>(std::forward<E>(e), axes, 0u, es);
     }
 #endif
 
@@ -3016,11 +3018,12 @@ namespace detail {
         if (y.dimension() == 0)
         {
             auto s = x.shape();
+            using size_type = std::decay_t<decltype(s[0])>;
             if (x.dimension() == 1)
             {
                 auto covar = eval(zeros<value_type>({ 1, 1 }));
                 auto x_norm = x - eval(mean(x));
-                covar(0, 0) = std::inner_product(x_norm.begin(), x_norm.end(), x_norm.begin(), 0.0) / (s[0] - 1);
+                covar(0, 0) = std::inner_product(x_norm.begin(), x_norm.end(), x_norm.begin(), 0.0) / value_type(s[0] - 1);
                 return covar;
             }
             
@@ -3030,13 +3033,13 @@ namespace detail {
             auto m = eval(mean(x, {1}));
             m.reshape({m.shape()[0],1});
             auto x_norm = x - m;
-            for (auto i = 0; i < s[0]; i++)
+            for (size_type i = 0; i < s[0]; i++)
             {
                 auto xi = strided_view(x_norm, { range(i, i + 1), all() });
-                for (auto j = i; j < s[0]; j++)
+                for (size_type j = i; j < s[0]; j++)
                 {
                     auto xj = strided_view(x_norm, { range(j, j + 1), all() });            
-                    covar(j, i) = std::inner_product(xi.begin(), xi.end(), xj.begin(), 0.0) / (s[1] - 1);
+                    covar(j, i) = std::inner_product(xi.begin(), xi.end(), xj.begin(), 0.0) / value_type(s[1] - 1);
                 }
             }
             return eval(covar + transpose(covar) - diag(diagonal(covar)));

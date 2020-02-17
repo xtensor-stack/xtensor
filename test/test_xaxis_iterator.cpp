@@ -57,8 +57,8 @@ namespace xt
     TEST(xaxis_iterator, end)
     {
         xarray<int> a = get_test_array();
-        auto iter_begin = axis_begin(a, 1);
-        auto iter_end = axis_end(a, 1);
+        auto iter_begin = axis_begin(a, 1u);
+        auto iter_end = axis_end(a, 1u);
         auto dist = std::distance(iter_begin, iter_end);
         EXPECT_EQ(3, dist);
     }
@@ -72,8 +72,8 @@ namespace xt
         EXPECT_EQ(iter_begin, iter_end);
 
         xarray<int> b = get_test_array();
-        auto iter_begin_row = axis_begin(b, 2);
-        auto iter_end_row = axis_end(b, 2);
+        auto iter_begin_row = axis_begin(b, 2u);
+        auto iter_end_row = axis_end(b, 2u);
         ++iter_begin_row; ++iter_begin_row; ++iter_begin_row; ++iter_begin_row;
         EXPECT_EQ(iter_begin_row, iter_end_row);
     }
@@ -143,7 +143,7 @@ namespace xt
     TEST(xaxis_iterator, axis_1)
     {
         xarray<int> a = get_test_array();
-        auto iter = axis_begin(a, 1);
+        auto iter = axis_begin(a, 1u);
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0, 0));
         EXPECT_EQ(a(0, 0, 1), (*iter)(0, 1));
@@ -176,7 +176,7 @@ namespace xt
     TEST(xaxis_iterator, axis_2)
     {
         xarray<int> a = get_test_array();
-        auto iter = axis_begin(a, 2);
+        auto iter = axis_begin(a, 2u);
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0, 0));
         EXPECT_EQ(a(0, 1, 0), (*iter)(0, 1));

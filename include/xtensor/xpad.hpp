@@ -262,7 +262,7 @@ namespace xt
 
             for (size_type axis = 0; axis < e.shape().size(); ++axis)
             {
-                for (size_type i = 1; i < reps[axis]; ++i)
+                for (size_type i = 1; i < static_cast<size_type>(reps[axis]); ++i)
                 {
                     xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
                     xt::xstrided_slice_vector svt(e.shape().size(), xt::all());

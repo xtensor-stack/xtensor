@@ -139,7 +139,10 @@ namespace xt
     template <class CT>
     template <class CTA>
     inline xaxis_iterator<CT>::xaxis_iterator(CTA&& e, size_type axis, size_type index, size_type offset)
-        : p_expression(get_storage_init<storing_type>(std::forward<CTA>(e))), m_index(index), m_add_offset(e.strides()[axis]), m_sv(detail::derive_xstrided_view<CTA>(std::forward<CTA>(e), axis, offset))
+        : p_expression(get_storage_init<storing_type>(std::forward<CTA>(e)))
+        , m_index(index)
+        , m_add_offset(static_cast<size_type>(e.strides()[axis]))
+        , m_sv(detail::derive_xstrided_view<CTA>(std::forward<CTA>(e), axis, offset))
     {
     }
 
@@ -206,15 +209,17 @@ namespace xt
     template <class E>
     inline auto axis_end(E&& e)
     {
+        using size_type = typename std::decay_t<E>::size_type;
         using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
-        return return_type(std::forward<E>(e), 0, e.shape()[0], e.strides()[0]*e.shape()[0]);
+        return return_type(std::forward<E>(e), 0, e.shape()[0], static_cast<size_type>(e.strides()[0])*e.shape()[0]);
     }
 
     template <class E>
     inline auto axis_end(E&& e, typename std::decay_t<E>::size_type axis)
     {
+        using size_type = typename std::decay_t<E>::size_type;
         using return_type = xaxis_iterator<xtl::closure_type_t<E>>;
-        return return_type(std::forward<E>(e), axis, e.shape()[axis], e.strides()[axis]*e.shape()[axis]);
+        return return_type(std::forward<E>(e), axis, e.shape()[axis], static_cast<size_type>(e.strides()[axis])*e.shape()[axis]);
     }
 }
 
