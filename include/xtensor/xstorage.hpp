@@ -1168,7 +1168,7 @@ namespace xt
         // More complicated than incrementing elt_ptr, but this avoids
         // false positive array-bounds warning on GCC 10
         const T* src_ptr = cond ? it + (elt_ptr - it) + std::ptrdiff_t(1) : elt_ptr;
-        *it = *elt_ptr;
+        *it = *src_ptr;
         return it;
     }
 

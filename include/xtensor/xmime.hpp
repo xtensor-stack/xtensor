@@ -237,9 +237,9 @@ namespace xt
 
         std::size_t edgeitems = 0;
         std::size_t size = compute_size(expr.shape());
-        if (size > print_options::print_options().threshold)
+        if (size > static_cast<std::size_t>(print_options::print_options().threshold))
         {
-            edgeitems = print_options::print_options().edge_items;
+            edgeitems = static_cast<std::size_t>(print_options::print_options().edge_items);
         }
 
         if (print_options::print_options().precision != -1)
