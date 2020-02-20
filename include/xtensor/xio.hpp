@@ -335,7 +335,7 @@ namespace xt
                     buf << std::fixed;
                     buf.precision(m_precision);
                     buf << (*m_it);
-                    if (!m_required_precision)
+                    if (!m_required_precision && !std::isinf(*m_it) && !std::isnan(*m_it))
                     {
                         buf << '.';
                     }
