@@ -48,15 +48,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 BOUND_CHECKS=1 BUILD_BENCHMARK=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
       env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
     - os: linux
       if: branch = master
@@ -92,8 +83,17 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
-      env: COMPILER=gcc GCC=7 ENABLE_CPP17=1
+            - g++-8
+      env: COMPILER=gcc GCC=8 BOUND_CHECKS=1 BUILD_BENCHMARK=1
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-8
+      env: COMPILER=gcc GCC=8 ENABLE_CPP17=1
     - os: linux
       if: branch = master
       addons:

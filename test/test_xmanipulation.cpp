@@ -19,7 +19,17 @@
 
 namespace xt
 {
-    TEST(xmanipulation, transpose_assignment)
+    TEST(xmanipulation, bug)
+    {
+        xt::xarray<float> a = xt::arange<float>(100., 127.).reshape({3,3,3});
+        auto v = xt::view(a, xt::range(1,3), xt::range(1,3), xt::range(1,3));
+        auto view = xt::flatten(xt::view(a, xt::range(1,3), xt::range(1,3), xt::range(1,3)));
+        std::cout << v << std::endl;
+        std::cout << "=========================" << std::endl;
+        std::cout << view << std::endl;
+    }
+
+    /*TEST(xmanipulation, transpose_assignment)
     {
         xarray<double> e = xt::arange<double>(24);
         e.resize({2, 2, 6});
@@ -361,7 +371,7 @@ namespace xt
 
         xarray<double> expected5 = {{{1, 3}, {0, 2}}, {{5, 7}, {4, 6}}};
         ASSERT_EQ(expected5, xt::rot90(e3, {1, 2}));
-    }
+    }*/
 
     TEST(xmanipulation, roll)
     {
@@ -396,7 +406,7 @@ namespace xt
         ASSERT_EQ(expected8, xt::roll(e2, -2, /*axis*/2));
     }
 
-    TEST(xmanipulation, repeat_all_elements_of_axis_0_of_int_array_2_times)
+    /*TEST(xmanipulation, repeat_all_elements_of_axis_0_of_int_array_2_times)
     {
         xarray<int> array = {
             {1, 2, 3},
@@ -481,5 +491,5 @@ namespace xt
         ASSERT_EQ(7, repeated_array(3, 0));
         ASSERT_EQ(8, repeated_array(3, 1));
         ASSERT_EQ(9, repeated_array(3, 2));
-    }
+    }*/
 }
