@@ -32,7 +32,7 @@ First example
 
         xt::xarray<double> res = xt::view(arr1, 1) + arr2;
 
-        std::cout << res;
+        std::cout << res << std::endl;
 
         return 0;
     }
@@ -44,14 +44,17 @@ Compiling the first example
 ---------------------------
 
 `xtensor` is a header-only library, so there is no library to link with. The only constraint
-is that the compiler must be able to find the headers of `xtensor`, this is usually done
-by having the directory containing the headers in the include path. With GCC, use the ``-I`` option
+is that the compiler must be able to find the headers of `xtensor` (and `xtl`), this is usually done
+by having the directory containing the headers in the include path. With G++, use the ``-I`` option
 to achieve this. Assuming the first example code is located in ``example.cpp``, the compilation command
 is:
 
 .. code:: bash
 
-    gcc -I /path/to/xtensor/ example.cpp -o example
+    g++ -I /path/to/xtensor/ -I /path/to/xtl/ example.cpp -o example
+
+Note that if you installed `xtensor` and `xtl` with `cmake`, their headers will be located in the same
+directory, so you will need to provide only one path with the ``-I`` option.
 
 When you run the program, it produces the following output:
 
