@@ -464,6 +464,33 @@ namespace xt
 
     template <class S>
     using index_from_shape_t = typename index_from_shape<S>::type;
+
+    /**********************
+     * filter_fixed_shape *
+     **********************/
+
+    namespace detail
+    {
+        template <class S>
+        struct filter_fixed_shape_impl
+        {
+            using type = S;
+        };
+
+        template <std::size_t... N>
+        struct filter_fixed_shape_impl<fixed_shape<N...>>
+        {
+            using type = std::array<std::size_t, sizeof...(N)>;
+        };
+    }
+
+    template <class S>
+    struct filter_fixed_shape : detail::filter_fixed_shape_impl<S>
+    {
+    };
+
+    template <class S>
+    using filter_fixed_shape_t = typename filter_fixed_shape<S>::type;
 }
 
 #endif

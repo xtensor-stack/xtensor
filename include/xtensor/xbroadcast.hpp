@@ -236,8 +236,9 @@ namespace xt
     template <class E, class S>
     inline auto broadcast(E&& e, const S& s)
     {
-        using broadcast_type = xbroadcast<const_xclosure_t<E>, S>;
-        return broadcast_type(std::forward<E>(e), s);
+        using shape_type = filter_fixed_shape_t<std::decay_t<S>>;
+        using broadcast_type = xbroadcast<const_xclosure_t<E>, shape_type>;
+        return broadcast_type(std::forward<E>(e), xtl::forward_sequence<shape_type, decltype(s)>(s));
     }
 
 #ifdef X_OLD_CLANG
