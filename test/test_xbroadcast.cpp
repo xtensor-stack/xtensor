@@ -38,6 +38,18 @@ namespace xt
         ASSERT_EQ(5.0, m1_assigned(0, 1, 1));
     }
 
+    TEST(xbroadcast, fixed_shape)
+    {
+        xarray<double> m = {{1, 2, 3}, {4, 5, 6}};
+        auto m_br = broadcast(m, xt::fixed_shape<1, 2, 3>());
+        ASSERT_EQ(1.0, m_br(0, 0, 0));
+        ASSERT_EQ(4.0, m_br(0, 1, 0));
+        ASSERT_EQ(5.0, m_br(0, 1, 1));
+        ASSERT_EQ(m_br.layout(), m.layout());
+        XT_EXPECT_ANY_THROW(m_br.at(0, 0, 0, 0));
+        XT_EXPECT_ANY_THROW(m_br.at(10, 10, 10));
+    }
+
     TEST(xbroadcast, element)
     {
         xarray<double> m1
