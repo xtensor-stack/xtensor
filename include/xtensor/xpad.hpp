@@ -249,26 +249,29 @@ namespace xt
             using new_shape_type = typename return_type::shape_type;
             auto new_shape = xtl::make_sequence<new_shape_type>(e.shape().size());
 
-            xt::xstrided_slice_vector sv;
+            xt::xstrided_slice_vector sv(reps.size());
 
             for (size_type axis = 0; axis < reps.size(); ++axis)
             {
                 new_shape[axis] = e.shape(axis) * reps[axis];
-                sv.push_back(xt::range(0, e.shape(axis)));
+                sv[axis] = xt::range(0, e.shape(axis));
             }
             return_type out(new_shape);
 
             xt::strided_view(out, sv) = e;
 
+            xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
+            xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
+            
             for (size_type axis = 0; axis < e.shape().size(); ++axis)
             {
                 for (size_type i = 1; i < static_cast<size_type>(reps[axis]); ++i)
                 {
-                    xt::xstrided_slice_vector svs(e.shape().size(), xt::all());
-                    xt::xstrided_slice_vector svt(e.shape().size(), xt::all());
                     svs[axis] = xt::range(0, e.shape(axis));
                     svt[axis] = xt::range(i * e.shape(axis), (i + 1) * e.shape(axis));
                     xt::strided_view(out, svt) = xt::strided_view(out, svs);
+                    svs[axis] = xt::all();
+                    svt[axis] = xt::all();
                 }
             }
 
