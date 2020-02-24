@@ -26,6 +26,14 @@
 
 namespace xt
 {
+    TEST(xio, xarray_size_t)
+    {
+        xt::xarray<size_t> a = xt::arange<size_t>(5);
+        std::stringstream out;
+        out << e;
+        EXPECT_EQ("{0, 1, 2, 3, 4}", out.str());
+    }
+
     TEST(xio, xtensor_one_d)
     {
         xtensor<double, 1> e = xt::arange<double>(1, 6);
