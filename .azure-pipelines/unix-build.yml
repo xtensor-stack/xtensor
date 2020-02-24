@@ -2,11 +2,11 @@ steps:
   - script: |
       conda config --set always_yes yes --set changeps1 no
       conda update -q conda
-      conda install cmake -c conda-forge
-      conda install xtl==0.6.9 xsimd==7.4.4 nlohmann_json -c conda-forge
+      conda env create --file environment-dev.yml
     displayName: Install dependencies
 
   - script: |
+      source activate xtensor
       mkdir build
       cd build
       cmake -DXTENSOR_USE_XSIMD=ON -DDOWNLOAD_GTEST=ON $(Build.SourcesDirectory)
@@ -14,11 +14,13 @@ steps:
     workingDirectory: $(Build.BinariesDirectory)
       
   - script: |
+      source activate xtensor
       make -j2 test_xtensor_lib
     displayName: Build xtensor
     workingDirectory: $(Build.BinariesDirectory)/build
           
   - script: |
+      source activate xtensor
       cd test
       ./test_xtensor_lib
     displayName: Test xtensor

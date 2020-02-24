@@ -2,7 +2,7 @@ jobs:
   - job: 'Linux'
     strategy:
       matrix:
-        clang_4:
+        clang_6:
           llvm_version: '6.0'
           CC: clang-$(llvm_version)
           CXX: clang++-$(llvm_version)
