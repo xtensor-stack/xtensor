@@ -1,0 +1,42 @@
+jobs:
+  - job: 'Linux'
+    strategy:
+      matrix:
+        clang_4:
+          llvm_version: '4.0'
+        clang_5:
+          llvm_version: '5.0'
+        clang_6:
+          llvm_version: '6.0'
+        clang_7:
+          llvm_version: '7'
+        clang_8:
+          llvm_version: '8'
+        clang_9:
+          llvm_version: '9'
+    pool:
+      vmImage: ubuntu-16.04
+    variables:
+      CC: clang-$(llvm_version)
+      CXX: clang++-$(llvm_version)
+    timeoutInMinutes: 360
+    steps:
+
+      - script: |
+          sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+          if [[ $(llvm_version) == '4.0' || $(llvm_version) == '5.0' ]]; then
+            sudo apt-get update
+            sudo apt-get --no-install-suggests --no-install-recommends install gcc-4.9 clang-$(llvm_version)
+          else
+            LLVM_VERSION=$(llvm_version)
+            get -O - http://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+            sudo add-apt-repository "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-$LLVM_VERSION main"
+            sudo apt-get update
+            sudo apt-get --no-install-suggests --no-install-recommends install clang-$(llvm_version)
+          fi
+        displayName: Install build toolchain
+
+      - bash: echo "##vso[task.prependpath]$CONDA/bin"
+        displayName: Add conda to PATH
+
+      - template: unix-build.yml

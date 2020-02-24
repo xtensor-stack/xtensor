@@ -48,15 +48,6 @@ matrix:
             - ubuntu-toolchain-r-test
           packages:
             - g++-6
-      env: COMPILER=gcc GCC=6 BOUND_CHECKS=1 BUILD_BENCHMARK=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-6
       env: COMPILER=gcc GCC=6 COLUMN_MAJOR_LAYOUT=1
     - os: linux
       if: branch = master
@@ -92,51 +83,26 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
-      env: COMPILER=gcc GCC=7 ENABLE_CPP17=1
+            - g++-8
+      env: COMPILER=gcc GCC=8 BOUND_CHECKS=1 BUILD_BENCHMARK=1
     - os: linux
       if: branch = master
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-4.0
           packages:
-            - g++-4.9
-            - clang-4.0
-      env: COMPILER=clang CLANG=4.0 
+            - g++-8
+      env: COMPILER=gcc GCC=8 ENABLE_CPP17=1
     - os: linux
       if: branch = master
       addons:
         apt:
           sources:
             - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-5.0
           packages:
-            - g++-4.9
-            - clang-5.0
-      env: COMPILER=clang CLANG=5.0 ENABLE_TBB=1 DISABLE_XSIMD=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-5.0
-          packages:
-            - g++-4.9
-            - clang-5.0
-      env: COMPILER=clang CLANG=5.0 ENABLE_OPENMP=1 DISABLE_XSIMD=1
-    - os: linux
-      if: branch = master
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-            - llvm-toolchain-xenial-6.0
-          packages:
-            - clang-6.0
-      env: COMPILER=clang CLANG=6.0
+            - g++-9
+      env: COMPILER=gcc GCC=9
     - os: osx
       if: branch = master
       osx_image: xcode8
@@ -150,12 +116,7 @@ before_install:
     - |
       # Configure build variables
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-        if [[ "$COMPILER" == "gcc" ]]; then
-          export CXX=g++-$GCC CC=gcc-$GCC;
-        fi
-        if [[ "$COMPILER" == "clang" ]]; then
-          export CXX=clang++-$CLANG CC=clang-$CLANG;
-        fi
+        export CXX=g++-$GCC CC=gcc-$GCC;
       elif [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
         export CXX=clang++ CC=clang;
       fi
@@ -172,8 +133,8 @@ install:
     - hash -r
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
-    - conda install cmake -c conda-forge
-    - conda install xtl==0.6.9 xsimd==7.4.4 nlohmann_json -c conda-forge
+    - conda env create --file environment-dev.yml
+    - source activate xtensor
     - |
       if [[ "$CHECK_CYCLIC_INCLUDES"  == 1 ]]; then
         set -e
