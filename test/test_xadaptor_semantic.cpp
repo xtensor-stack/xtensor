@@ -43,7 +43,7 @@ namespace xt
     };
 
     using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
-    TYPED_TEST_CASE(adaptor_semantic, testing_types);
+    TYPED_TEST_SUITE(adaptor_semantic, testing_types);
 
     TYPED_TEST(adaptor_semantic, xsimd_info)
     {

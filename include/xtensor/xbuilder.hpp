@@ -852,7 +852,7 @@ namespace xt
         }
 
         template <class T, class... CT>
-        inline auto vstack_shape(const std::tuple<CT...>& t, std::array<T, 1> shape)
+        inline auto vstack_shape(const std::tuple<CT...>&, std::array<T, 1> shape)
         {
             std::array<T, 2> res = { sizeof...(CT), shape[0] };
             return res;

@@ -84,7 +84,7 @@ namespace xt
     };
 
     using testing_types = ::testing::Types<xarray<double>, xtensor<double, 2>>;
-    TYPED_TEST_CASE(operation, testing_types);
+    TYPED_TEST_SUITE(operation, testing_types);
 
     TYPED_TEST(operation, plus)
     {

@@ -29,7 +29,7 @@ namespace xt
     };
 
     using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
-    TYPED_TEST_CASE(scalar_semantic, testing_types);
+    TYPED_TEST_SUITE(scalar_semantic, testing_types);
 
     TYPED_TEST(scalar_semantic, a_plus_equal_b)
     {

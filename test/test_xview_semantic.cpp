@@ -80,7 +80,7 @@ namespace xt
     };
 
     using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
-    TYPED_TEST_CASE(view_semantic, testing_types);
+    TYPED_TEST_SUITE(view_semantic, testing_types);
 
     TYPED_TEST(view_semantic, a_plus_b)
     {
