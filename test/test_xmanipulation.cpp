@@ -106,7 +106,7 @@ namespace xt
         auto flat3 = ravel(a);
         EXPECT_EQ(flat, flat3);
     }
-    
+
     TEST(xmanipulation, flatten)
     {
         xtensor<double, 3> a = linspace<double>(1., 100., 100).reshape({2, 5, 10});
@@ -122,6 +122,19 @@ namespace xt
         auto v2 = strided_view(a, {range(0, 2), range(0, 3), range(0, 3)});
         xtensor<double, 1> fl2 = flatten<XTENSOR_DEFAULT_TRAVERSAL>(v2);
         EXPECT_EQ(fl2, expected);
+
+        xt::xarray<float> af = xt::arange<float>(100., 127.).reshape({3,3,3});
+        auto view = xt::flatten(xt::view(af, xt::range(1,3), xt::range(1,3), xt::range(1,3)));
+        auto iter = view.begin();
+        EXPECT_EQ(*iter++, 113);
+        EXPECT_EQ(*iter++, 114);
+        EXPECT_EQ(*iter++, 116);
+        EXPECT_EQ(*iter++, 117);
+        EXPECT_EQ(*iter++, 122);
+        EXPECT_EQ(*iter++, 123);
+        EXPECT_EQ(*iter++, 125);
+        EXPECT_EQ(*iter++, 126);
+        EXPECT_EQ(iter, view.end());
     }
 
     TEST(xmanipulation, flatnonzero)
