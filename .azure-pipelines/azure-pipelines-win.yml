@@ -35,7 +35,7 @@ jobs:
       # Note: conda activate doesn't work here, because it creates a new shell!
       - script: |
           conda install cmake ^
-                        gtest ^
+                        gtest==1.10.0 ^
                         ninja ^
                         nlohmann_json ^
                         xtl==0.6.9 ^

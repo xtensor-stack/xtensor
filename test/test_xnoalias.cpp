@@ -25,7 +25,7 @@ namespace xt
     };
 
     using testing_types = ::testing::Types<xarray_dynamic, xtensor_dynamic>;
-    TYPED_TEST_CASE(xnoalias, testing_types);
+    TYPED_TEST_SUITE(xnoalias, testing_types);
 
     TYPED_TEST(xnoalias, a_plus_b)
     {

@@ -26,7 +26,7 @@ namespace xt
 
     using testing_types = ::testing::Types<row_major_result<>, column_major_result<>,
         central_major_result<>, unit_shape_result<>>;
-    TYPED_TEST_CASE(xiterator_test, testing_types);
+    TYPED_TEST_SUITE(xiterator_test, testing_types);
 
     using std::size_t;
 

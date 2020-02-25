@@ -33,7 +33,7 @@ install:
   - conda info -a
   - conda env create --file environment-dev.yml
   - CALL conda.bat activate xtensor
-  - conda install gtest=1.8.0 -c conda-forge
+  - conda install gtest=1.10.0 -c conda-forge
   - ps: if($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") {
         cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DCMAKE_BUILD_TYPE=RELEASE .
         }
