@@ -258,8 +258,30 @@ namespace xt
      * ravel and flatten implementation *
      ************************************/
 
-    template <class I, class CI>
-    class xiterator_adaptor;
+    namespace detail
+    {
+        template <class E, layout_type L>
+        struct expression_iterator_getter
+        {
+            using iterator = decltype(std::declval<E>().template begin<L>());
+            using const_iterator = decltype(std::declval<E>().template cbegin<L>());
+
+            inline static iterator begin(E& e)
+            {
+                return e.template begin<L>();
+            }
+
+            inline static const_iterator cbegin(E& e)
+            {
+                return e.template cbegin<L>();
+            }
+
+            inline static auto size(E& e)
+            {
+                return e.size();
+            }
+        };
+    }
 
     /**
      * Returns a flatten view of the given expression. No copy is made.
@@ -272,11 +294,12 @@ namespace xt
     inline auto ravel(E&& e)
     {
         using iterator = decltype(e.template begin<L>());
-        using const_iterator = decltype(e.template cbegin<L>());
-        using adaptor_type = xiterator_adaptor<iterator, const_iterator>;
+        using iterator_getter = detail::expression_iterator_getter<std::remove_reference_t<E>, L>;
+        auto size = e.size();
+        auto adaptor = make_xiterator_adaptor(std::forward<E>(e), iterator_getter());
         constexpr layout_type layout = std::is_pointer<iterator>::value ? L : layout_type::dynamic;
-        using type = xtensor_view<adaptor_type, 1, layout, extension::get_expression_tag_t<E>>;
-        return type(adaptor_type(e.template begin<L>(), e.template cbegin<L>(), e.size()), { e.size() });
+        using type = xtensor_view<decltype(adaptor), 1, layout, extension::get_expression_tag_t<E>>;
+        return type(std::move(adaptor), { size });
     }
 
     /**
