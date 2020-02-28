@@ -199,12 +199,12 @@ install:
              --form description="Automatic Coverity Scan build from Coverity branch" \
              https://scan.coverity.com/builds?project=xTensor
       fi
-      make -j2 test_xtensor_lib
+      make test_xreducer
 
     - if [[ "$BUILD_BENCHMARK" == 1 ]]; then
         make -j2 benchmark_xtensor ;
       fi
     - cd test
 script:
-    - ./test_xtensor_lib
+    - ./test_xreducer
     

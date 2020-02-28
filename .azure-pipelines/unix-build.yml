@@ -15,13 +15,13 @@ steps:
       
   - script: |
       source activate xtensor
-      make -j2 test_xtensor_lib
+      make test_xreducer
     displayName: Build xtensor
     workingDirectory: $(Build.BinariesDirectory)/build
           
   - script: |
       source activate xtensor
       cd test
-      ./test_xtensor_lib
+      ./test_xreducer
     displayName: Test xtensor
     workingDirectory: $(Build.BinariesDirectory)/build/test

@@ -40,8 +40,8 @@ install:
         else {
         cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDISABLE_VS2017=ON -DCMAKE_BUILD_TYPE=RELEASE .
         }
-  - nmake test_xtensor_lib
+  - nmake test_xreducer
   - cd test
 
 build_script:
-  - .\test_xtensor_lib
+  - .\test_xreducer

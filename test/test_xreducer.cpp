@@ -57,7 +57,44 @@ namespace xt
         }
     }
 
-    TEST(xreducer, functor_type)
+    TEST(xreducer, bug)
+    {
+        xt::xarray<double> xarr = {0.,1.,2.,3.,4.,5.,6.,7.,8.};
+	xarr.reshape({3,3});
+
+        // case 1
+        {
+            auto sum = xt::sum(xarr, xt::evaluation_strategy::immediate);
+            std::cout << sum << std::endl;
+        }
+
+        // case 4
+        {
+	    auto real_sum = xt::eval(xt::sum(xarr, xt::evaluation_strategy::immediate));
+	    std::cout << real_sum << std::endl;
+        }
+
+        // case 6
+        {
+	    auto sum = xt::sum(xarr, xt::evaluation_strategy::immediate);
+	    auto square = xt::square(xarr/sum);
+	    std::cout << square << std::endl;
+        }
+
+        // case 7
+        {
+            auto sum = xt::sum(xarr, {1})();
+	    std::cout << sum << std::endl;
+        }
+
+        // case 8
+        {
+            auto sum = xt::sum(xt::square(xarr), {1})();
+	    std::cout << sum << std::endl;
+        }
+    }
+
+    /*TEST(xreducer, functor_type)
     {
         auto sum = [](auto const& left, auto const& right) { return left + right; };
         auto sum_functor = xt::make_xreducer_functor(sum);
@@ -678,5 +715,5 @@ namespace xt
         xt::xtensor<xt::xtensor_fixed<float, xt::xshape<3>>, 1> c = {a, b};
         auto res = xt::sum(c)();
         EXPECT_EQ(res, a * 2);
-    }
+    }*/
 }

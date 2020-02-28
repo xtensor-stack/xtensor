@@ -73,7 +73,7 @@ jobs:
           call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x86_amd64
           cmake --build . ^
                 --config Release ^
-                --target test_xtensor_lib ^
+                --target test_xreducer ^
                 -- -v
         displayName: "Build xtensor"
         workingDirectory: $(Build.BinariesDirectory)/build
@@ -82,6 +82,6 @@ jobs:
       - script: |
           setlocal EnableDelayedExpansion
           cd test
-          .\test_xtensor_lib
+          .\test_xreducer
         displayName: "Test xtensor"
         workingDirectory: $(Build.BinariesDirectory)/build/test
