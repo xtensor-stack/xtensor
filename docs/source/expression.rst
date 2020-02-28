@@ -119,6 +119,40 @@ in the previous example, so the broadcasting happens as follows:
     ---------
     (4, 2, 3) # Result
 
+Accessing elements
+------------------
+
+You can access the elements of any ``xexpression`` with ``operator()``:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+
+    xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+    auto f = 2 * a;
+
+    double d1 = a(0, 2);
+    double d2 = f(1, 2);
+
+It is possible to call ``operator()`` with fewer or more arguments than the number of dimensions
+of the expression:
+
+- if ``operator()`` is called with too many arguments, we drops the most left ones
+- if ``operator()`` is called with too few arguments, we prepend them with ``0`` values until
+  we match the number of dimensions
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+
+    xt::xarray<double> a = {{1., 2., 3.}, {4., 5., 6.}};
+
+    double d1 = a(2); // equivalent to a(0, 2)
+    double d2 = a(1, 1, 2) // equivalent to a(1, 2)
+
+The reason for this is that it is the one rule that ensures ``(a + b)(i0, ..., in) = a(i0, ..., in) + b(i0, ..., in)``,
+i.e. commutativity of element access and broadcasting.
+
 Expression interface
 --------------------
 
