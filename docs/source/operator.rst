@@ -206,6 +206,17 @@ build the ``xreducer_functors`` object, the last function can be omitted:
                                         arr,
                                         {1, 3});
 
+If no axes are provided, the reduction is performed over all the axes, and the result is a 0-D expression.
+Since `xtensor`'s expressions are lazy evaluated, you need to explicitely call the access operator to trigger
+the evaluation and get the result:
+
+.. code::
+
+    #include "xtensor/xarray.hpp"
+    #include "xtensor/xreducer.hpp"
+
+    xt::xarray<double> arr = some_init_function({3, 2, 4, 6, 5});
+    double res = xt::reduce([](double a, double b) { return a*a + b*b; }, arr)();
 
 Accumulators
 ------------
@@ -265,9 +276,9 @@ Choosing an evaluation_strategy is straightforward. For reducers:
     #include "xtensor/xreducer.hpp"
 
     xt::xarray<double> a = xt::ones<double>({3, 2, 4, 6, 5});
-    auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::immediate());
+    auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::immediate);
     // or select the default:
-    // auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::lazy());
+    // auto res = xt::sum(a, {1, 3}, xt::evaluation_strategy::lazy);
 
 Note: for accumulators, only the ``immediate`` evaluation strategy is currently
 implemented.
