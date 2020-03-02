@@ -30,7 +30,7 @@ namespace xt
     TEST(xaxis_slice_iterator, begin)
     {
         xarray<int> a = get_slice_test_array();
-        auto iter_begin = xaxis_slice_begin(a, 0);
+        auto iter_begin = axis_slice_begin(a, 0);
         EXPECT_EQ(size_t(1), iter_begin->dimension());
         EXPECT_EQ(a.shape()[0], iter_begin->shape()[0]);
         EXPECT_EQ(a(0, 0, 0), (*iter_begin)(0));
@@ -43,29 +43,29 @@ namespace xt
         xarray<int> a = get_slice_test_array();
         xarray<int, layout_type::column_major> a_col = get_slice_test_array();
 
-        auto dist = std::distance(xaxis_slice_begin(a, 0), xaxis_slice_end(a, 0));
+        auto dist = std::distance(axis_slice_begin(a, 0), axis_slice_end(a, 0));
         EXPECT_EQ(12, dist);
 
-        dist = std::distance(xaxis_slice_begin(a_col), xaxis_slice_end(a_col));
+        dist = std::distance(axis_slice_begin(a_col), axis_slice_end(a_col));
         EXPECT_EQ(12, dist);
 
-        dist = std::distance(xaxis_slice_begin(a, 1), xaxis_slice_end(a, 1));
+        dist = std::distance(axis_slice_begin(a, 1), axis_slice_end(a, 1));
         EXPECT_EQ(8, dist);
        
-        dist = std::distance(xaxis_slice_begin(a_col, 1), xaxis_slice_end(a_col, 1));
+        dist = std::distance(axis_slice_begin(a_col, 1), axis_slice_end(a_col, 1));
         EXPECT_EQ(8, dist);
        
-        dist = std::distance(xaxis_slice_begin(a, 2), xaxis_slice_end(a, 2));
+        dist = std::distance(axis_slice_begin(a, 2), axis_slice_end(a, 2));
         EXPECT_EQ(6, dist);
 
-        dist = std::distance(xaxis_slice_begin(a_col, 2), xaxis_slice_end(a_col, 2));
+        dist = std::distance(axis_slice_begin(a_col, 2), axis_slice_end(a_col, 2));
         EXPECT_EQ(6, dist);
     }
 
     TEST(xaxis_slice_iterator, increment)
     {
         xarray<int> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, 0);
+        auto iter = axis_slice_begin(a, 0);
         ++iter;
 
         EXPECT_EQ(size_t(1), iter->dimension());
@@ -78,7 +78,7 @@ namespace xt
     TEST(xaxis_slice_iterator, const_array)
     {
         const xarray<int> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, 2);
+        auto iter = axis_slice_begin(a, 2);
         ++iter;
 
         EXPECT_EQ(size_t(1), iter->dimension());
@@ -94,7 +94,7 @@ namespace xt
     TEST(xaxis_slice_iterator, axis_0)
     {
         xarray<int> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, size_t(0));
+        auto iter = axis_slice_begin(a, size_t(0));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
         EXPECT_EQ(a(1, 0, 0), (*iter)(1));
@@ -136,7 +136,7 @@ namespace xt
     TEST(xaxis_slice_iterator, axis_0_col)
     {
         xarray<int, layout_type::column_major> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, size_t(0));
+        auto iter = axis_slice_begin(a, size_t(0));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
         EXPECT_EQ(a(1, 0, 0), (*iter)(1));
@@ -178,7 +178,7 @@ namespace xt
     TEST(xaxis_slice_iterator, axis_1)
     {
         xarray<int> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, size_t(1));
+        auto iter = axis_slice_begin(a, size_t(1));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
         EXPECT_EQ(a(0, 1, 0), (*iter)(1));
@@ -216,7 +216,7 @@ namespace xt
     TEST(xaxis_slice_iterator, axis_1_col)
     {
         xarray<int, layout_type::column_major> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, size_t(1));
+        auto iter = axis_slice_begin(a, size_t(1));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
         EXPECT_EQ(a(0, 1, 0), (*iter)(1));
@@ -255,7 +255,7 @@ namespace xt
     TEST(xaxis_slice_iterator, axis_2)
     {
         xarray<int> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, size_t(2));
+        auto iter = axis_slice_begin(a, size_t(2));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
         EXPECT_EQ(a(0, 0, 1), (*iter)(1));
@@ -291,7 +291,7 @@ namespace xt
     TEST(xaxis_slice_iterator, axis_2_col)
     {
         xarray<int, layout_type::column_major> a = get_slice_test_array();
-        auto iter = xaxis_slice_begin(a, size_t(2));
+        auto iter = axis_slice_begin(a, size_t(2));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
         EXPECT_EQ(a(0, 0, 1), (*iter)(1));

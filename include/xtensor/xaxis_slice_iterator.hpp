@@ -17,12 +17,12 @@ namespace xt
 
     /**
      * @class xaxis_slice_iterator
-     * @brief Class for iteration over one dimensional slices
+     * @brief Class for iteration over one-dimensional slices
      *
-     * The xaxis_slice_iterator iterates over one dimensional slices
+     * The xaxis_slice_iterator iterates over one-dimensional slices
      * oriented along the specified axis
      *
-     * @param CT the closure type of the \ref xexpression
+     * @tparam CT the closure type of the \ref xexpression
      */
     template <class CT>
     class xaxis_slice_iterator
@@ -120,8 +120,9 @@ namespace xt
      */
      //@{
     /**
-     * Constructs xaxis_slice_iterator
+     * Constructs an xaxis_slice_iterator
      *
+     * @param e the expression to iterate over
      * @param axis the axis to iterate over taking one dimensional slices
      */
     template <class CT>
@@ -132,8 +133,9 @@ namespace xt
     }
 
     /**
-     * Constructs xaxis_slice_iterator starting at specified index and initializes
+     * Constructs an xaxis_slice_iterator starting at specified index and offset
      *
+     * @param e the expression to iterate over
      * @param axis the axis to iterate over taking one dimensional slices
      * @param index the starting index for the iterator
      * @param offset the starting offset for the iterator
@@ -169,7 +171,7 @@ namespace xt
      */
      //@{
     /**
-     * Increments the index and offset to the next iterator position
+     * Increments the iterator to the next position and returns it.
      */
     template <class CT>
     inline auto xaxis_slice_iterator<CT>::operator++() -> self_type&
@@ -184,6 +186,10 @@ namespace xt
         return *this;
     }
 
+    /**
+     * Makes a copy of the iterator, increments it to the next
+     * position, and returns the copy.
+     */
     template <class CT>
     inline auto xaxis_slice_iterator<CT>::operator++(int) -> self_type
     {
@@ -200,7 +206,7 @@ namespace xt
     /**
      * Returns the strided view at the current iteration position
      *
-     * @return strided_view
+     * @return a strided_view
      */
     template <class CT>
     inline auto xaxis_slice_iterator<CT>::operator*() const -> reference
@@ -208,6 +214,11 @@ namespace xt
         return m_sv;
     }
 
+    /**
+     * Returns a pointer to the strided view at the current iteration position
+     *
+     * @return a pointer to a strided_view
+     */
     template <class CT>
     inline auto xaxis_slice_iterator<CT>::operator->() const -> pointer
     {
@@ -220,9 +231,9 @@ namespace xt
      */
     //@{
     /**
-     * Checks equality of the expression
+     * Checks equality of the xaxis_slice_iterator and \c rhs.
      *
-     * @return bool equality
+     * @return true if the iterators are equivalent, false otherwise
      */
     template <class CT>
     inline bool xaxis_slice_iterator<CT>::equal(const self_type& rhs) const
@@ -230,6 +241,11 @@ namespace xt
         return p_expression == rhs.p_expression && m_index == rhs.m_index;
     }
 
+    /**
+     * Checks equality of the iterators.
+     *
+     * @return true if the iterators are equivalent, false otherwise
+     */
     template <class CT>
     inline bool operator==(const xaxis_slice_iterator<CT>& lhs, const xaxis_slice_iterator<CT>& rhs)
     {
@@ -237,8 +253,8 @@ namespace xt
     }
 
     /**
-     * Checks inequality of the expressions
-     * @return bool inequality
+     * Checks inequality of the iterators
+     * @return true if the iterators are different, true otherwise
      */
     template <class CT>
     inline bool operator!=(const xaxis_slice_iterator<CT>& lhs, const xaxis_slice_iterator<CT>& rhs)
@@ -252,47 +268,66 @@ namespace xt
      */
     //@{
     /**
-     * @return an iterator to the first element of the expression for axis 0
+     * Returns an iterator to the first element of the expression for axis 0
+     *
+     * @param e the expession to iterate over
+     * @return an instance of xaxis_slice_iterator
      */
     template <class E>
-    inline auto xaxis_slice_begin(E&& e)
+    inline auto axis_slice_begin(E&& e)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
         return return_type(std::forward<E>(e), 0);
     }
 
     /**
-     * @return an iterator to the first element of the expression for the specified axis
+     * Returns an iterator to the first element of the expression for the specified axis
+     *
+     * @param e the expession to iterate over
      * @param axis the axis to iterate over
+     * @return an instance of xaxis_slice_iterator 
      */
     template <class E>
-    inline auto xaxis_slice_begin(E&& e, typename std::decay_t<E>::size_type axis)
+    inline auto axis_slice_begin(E&& e, typename std::decay_t<E>::size_type axis)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
         return return_type(std::forward<E>(e), axis, 0, e.data_offset());
     }
 
     /**
-     * @return Returns an iterator to the element following the last element of
+     * Returns an iterator to the element following the last element of
      * the expression for axis 0
+     *
+     * @param e the expession to iterate over
+     * @return an instance of xaxis_slice_iterator
      */
     template <class E>
-    inline auto xaxis_slice_end(E&& e)
+    inline auto axis_slice_end(E&& e)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
-        return return_type(std::forward<E>(e), 0, std::accumulate(e.shape().begin() + 1, e.shape().end(), size_t(1), std::multiplies<>()), e.size());
+        return return_type(std::forward<E>(e),
+                           0,
+                           std::accumulate(e.shape().begin() + 1, e.shape().end(), size_t(1), std::multiplies<>()),
+                           e.size());
     }
 
     /**
-     * @return Returns an iterator to the element following the last element of
+     * Returns an iterator to the element following the last element of
      * the expression for the specified axis
+     *
+     * @param e the expession to iterate over
+     * @param axis the axis to iterate over
+     * @return an instance of xaxis_slice_iterator 
      */
     template <class E>
-    inline auto xaxis_slice_end(E&& e, typename std::decay_t<E>::size_type axis)
+    inline auto axis_slice_end(E&& e, typename std::decay_t<E>::size_type axis)
     {
         using return_type = xaxis_slice_iterator<xtl::closure_type_t<E>>;
         auto index_sum = std::accumulate(e.shape().begin(), e.shape().begin() + axis, size_t(1), std::multiplies<>());
-        return return_type(std::forward<E>(e), axis, std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), index_sum, std::multiplies<>()), e.size() + axis);
+        return return_type(std::forward<E>(e),
+                           axis,
+                           std::accumulate(e.shape().begin() + axis + 1, e.shape().end(), index_sum, std::multiplies<>()),
+                           e.size() + axis);
     }
     //@}
 }
