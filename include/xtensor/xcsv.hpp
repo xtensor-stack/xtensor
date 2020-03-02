@@ -31,7 +31,7 @@ namespace xt
     using xcsv_tensor = xtensor_container<std::vector<T, A>, 2, layout_type::row_major>;
 
     template <class T, class A = std::allocator<T>>
-    xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter = ',', const std::size_t skip_rows = 0, const ptrdiff_t max_rows = -1, const std::string comments = "#");
+    xcsv_tensor<T, A> load_csv(std::istream& stream, const char delimiter = ',', const std::size_t skip_rows = 0, const std::ptrdiff_t max_rows = -1, const std::string comments = "#");
 
     template <class E>
     void dump_csv(std::ostream& stream, const xexpression<E>& e);

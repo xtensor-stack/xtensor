@@ -54,7 +54,7 @@ Defined in ``xtensor/xbuilder.hpp``
 .. doxygenfunction:: xt::logspace
    :project: xtensor
 
-.. doxygenfunction:: xt::concatenate
+.. doxygenfunction:: xt::concatenate(std::tuple<CT...>&&, std::size_t)
    :project: xtensor
 
 .. doxygenfunction:: xt::stack
