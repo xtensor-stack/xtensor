@@ -64,7 +64,7 @@ namespace xt
 
     TEST(xaxis_slice_iterator, increment)
     {
-        xarray<int> a = get_slice_test_array();
+        xarray<int, layout_type::row_major> a = get_slice_test_array();
         auto iter = axis_slice_begin(a, 0);
         ++iter;
 
@@ -77,7 +77,7 @@ namespace xt
 
     TEST(xaxis_slice_iterator, const_array)
     {
-        const xarray<int> a = get_slice_test_array();
+        const xarray<int, layout_type::row_major> a = get_slice_test_array();
         auto iter = axis_slice_begin(a, 2);
         ++iter;
 
@@ -93,7 +93,7 @@ namespace xt
 
     TEST(xaxis_slice_iterator, axis_0)
     {
-        xarray<int> a = get_slice_test_array();
+        xarray<int, layout_type::row_major> a = get_slice_test_array();
         auto iter = axis_slice_begin(a, size_t(0));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
@@ -177,7 +177,7 @@ namespace xt
 
     TEST(xaxis_slice_iterator, axis_1)
     {
-        xarray<int> a = get_slice_test_array();
+        xarray<int, layout_type::row_major> a = get_slice_test_array();
         auto iter = axis_slice_begin(a, size_t(1));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));
@@ -254,7 +254,7 @@ namespace xt
 
     TEST(xaxis_slice_iterator, axis_2)
     {
-        xarray<int> a = get_slice_test_array();
+        xarray<int, layout_type::row_major> a = get_slice_test_array();
         auto iter = axis_slice_begin(a, size_t(2));
 
         EXPECT_EQ(a(0, 0, 0), (*iter)(0));

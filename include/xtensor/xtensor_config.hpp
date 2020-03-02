@@ -40,8 +40,6 @@
 #define XTENSOR_THROW(exception, msg) throw exception(msg)
 #endif
 
-
-
 // Workaround for some missing constexpr functionality in MSVC 2015 and MSVC 2017 x86
 #if defined(_MSC_VER)
     #define XTENSOR_CONSTEXPR_ENHANCED const
