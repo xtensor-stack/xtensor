@@ -1950,6 +1950,7 @@ namespace detail {
      * \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the mean is computed (optional)
+     * @param es the evaluation strategy (optional)
      * @return an \ref xexpression
      */
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
@@ -1987,6 +1988,7 @@ namespace detail {
      * Returns an \ref xreducer for the mean of elements over given
      * \em axes.
      * @param e an \ref xexpression
+     * @param weights \ref xexpression containing weights associated with the values in \ref e
      * @param axes the axes along which the mean is computed (optional)
      * @return an \ref xexpression
      *
@@ -2648,6 +2650,7 @@ namespace detail {
      * \em axes, excluding nans.
      * @param e an \ref xexpression
      * @param axes the axes along which the mean is computed (optional)
+     * @param es the evaluation strategy (optional)
      * @return an \ref xexpression
      */
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,

@@ -830,7 +830,7 @@ namespace xt
      * @param f the reducing function to apply.
      * @param e the \ref xexpression to reduce.
      * @param axes the list of axes.
-     * @param evaluation_strategy evaluation strategy to use (lazy (default), or immediate)
+     * @param options evaluation strategy to use (lazy (default), or immediate)
      *
      * The returned expression either hold a const reference to \p e or a copy
      * depending on whether \p e is an lvalue or an rvalue.

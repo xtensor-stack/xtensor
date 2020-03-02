@@ -764,7 +764,6 @@ namespace xt
      *
      * @param e the input xexpression
      * @param shift the number of places by which elements are shifted
-     * @param axis the axis along which elements are shifted.
      *
      * @return a roll of the input expression
      */
