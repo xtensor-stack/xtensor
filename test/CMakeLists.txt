@@ -175,6 +175,7 @@ set(XTENSOR_TESTS
     test_xaccumulator.cpp
     test_xadapt.cpp
     test_xaxis_iterator.cpp
+    test_xaxis_slice_iterator.cpp
     test_xbuffer_adaptor.cpp
     test_xcomplex.cpp
     test_xcsv.cpp

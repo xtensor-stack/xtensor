@@ -78,5 +78,23 @@ including any of its header. Here is a list of available macros:
 - ``XTENSOR_DEFAULT_TRAVERSAL``: defines the default traversal order (row_major, column_major) for algorithms and iterators on tensors
   and arrays. We *strongly* discourage using this macro, which is provided for testing purpose.
 
+Build the documentation
+-----------------------
+
+First install the tools required to build the documentation:
+
+.. code::
+
+    conda install breathe doxygen sphinx_rtd_theme -c conda-forge
+
+You can then build the documentation:
+
+.. code::
+
+    cd docs
+    make html
+
+Type ``make help`` to see the list of available documentation targets.
+
 .. _xsimd: https://github.com/xtensor-stack/xsimd
 .. _tbb: https://www.threadingbuildingblocks.org

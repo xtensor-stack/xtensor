@@ -813,7 +813,7 @@ namespace xt
      * Converts ``std::vector<index_type>`` (returned e.g. from ``xt::argwhere``) to a flattened
      * ``xtensor``.
      *
-     * @param vector of indices
+     * @param idx a vector of indices
      *
      * @return ``xt::xtensor<typename index_type::value_type, 1>`` (e.g. ``xt::xtensor<size_t, 1>``)
      */

@@ -21,7 +21,7 @@ Defined in ``xtensor/xpad.hpp``
 .. doxygenfunction:: xt::pad(E&& , S, pad_mode, V)
    :project: xtensor
 
-.. doxygenfunction:: xt::tile(E&& , const std::vector<S>&)
+.. doxygenfunction:: xt::tile(E&& , std::initializer_list<S>)
    :project: xtensor
 
 .. doxygenfunction:: xt::tile(E&& , S)

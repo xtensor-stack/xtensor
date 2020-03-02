@@ -379,11 +379,11 @@ namespace xt
      */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class C, std::size_t... X,
               XTL_REQUIRES(std::is_pointer<C>)>
-    inline auto adapt(C&& ptr, const fixed_shape<X...>& /*shape*/)
+    inline auto adapt(C&& pointer, const fixed_shape<X...>& /*shape*/)
     {
         using buffer_type = xbuffer_adaptor<C, xt::no_ownership, detail::default_allocator_for_ptr_t<C>>;
         using return_type = xfixed_adaptor<buffer_type, fixed_shape<X...>, L>;
-        return return_type(buffer_type(ptr, detail::fixed_compute_size<fixed_shape<X...>>::value));
+        return return_type(buffer_type(pointer, detail::fixed_compute_size<fixed_shape<X...>>::value));
     }
 
 #ifndef X_OLD_CLANG
