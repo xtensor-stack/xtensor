@@ -206,6 +206,7 @@ set(XTENSOR_TESTS
     test_extended_xmath_reducers.cpp
     test_extended_xhistogram.cpp
     test_extended_xsort.cpp
+    test_invalid_write_size.cpp
 )
 
 if(nlohmann_json_FOUND)
