@@ -578,6 +578,25 @@ namespace xt
         EXPECT_EQ(ref, actual);
     }
 
+    struct vtype
+    {
+        double a = 0;
+        size_t b = 0;
+
+        explicit operator double() const { return a; }
+    };
+
+    TYPED_TEST(operation, cast_custom_type)
+    {
+        using vtype_container_t = xop_test::rebind_container_t<TypeParam, vtype>;
+        using shape_type = typename vtype_container_t::shape_type;
+        shape_type shape = { 3, 2 };
+        vtype_container_t a(shape);
+        auto ref = static_cast<double>(a(0, 0));
+        auto actual = (cast<double>(a))(0, 0);
+        EXPECT_EQ(ref, actual);
+    }
+
     TYPED_TEST(operation, mixed_arithmetic)
     {
         using int_container_t = xop_test::rebind_container_t<TypeParam, int>;

@@ -72,6 +72,21 @@ namespace xt
             template <std::size_t... N, class is_shape_trivial>
             constexpr bool xfunction_cache_impl<fixed_shape<N...>, is_shape_trivial>::is_initialized;
         #endif
+
+        template <class... CT>
+        struct xfunction_bool_load_type
+        {
+            using type = xtl::promote_type_t<typename std::decay_t<CT>::bool_load_type...>;
+        };
+
+        template <class CT>
+        struct xfunction_bool_load_type<CT>
+        {
+            using type = typename std::decay_t<CT>::bool_load_type;
+        };
+
+        template <class... CT>
+        using xfunction_bool_load_type_t = typename xfunction_bool_load_type<CT...>::type;
     }
 
     /************************
@@ -179,7 +194,7 @@ namespace xt
         using difference_type = common_difference_type_t<std::decay_t<CT>...>;
 
         using simd_value_type = xt_simd::simd_type<value_type>;
-        using bool_load_type = xtl::promote_type_t<typename std::decay_t<CT>::bool_load_type...>;
+        using bool_load_type = detail::xfunction_bool_load_type_t<CT...>;// xtl::promote_type_t<typename std::decay_t<CT>::bool_load_type...>;
 
         template <class requested_type>
         using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
