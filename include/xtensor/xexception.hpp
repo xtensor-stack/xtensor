@@ -183,31 +183,17 @@ namespace xt
         It efirst = last - static_cast<std::ptrdiff_t>((std::min)(shape.size(), dst));
         std::size_t axis = 0;
         
-        if(shape.empty())
+        while (efirst != last)
         {
-            if(first != last && *(--last) != value_type(0))
+            if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)
             {
-                XTENSOR_THROW(std::out_of_range, "index out of bound (empty array)");
+                XTENSOR_THROW(std::out_of_range,
+                                "index " + std::to_string(*efirst) +
+                                " is out of bounds for axis " +
+                                std::to_string(axis) + " with size " +
+                                std::to_string(shape[axis]));
             }
-            else
-            {
-                return;
-            }
-        }
-        else
-        {
-            while (efirst != last)
-            {
-                if (*efirst >= value_type(shape[axis]) && shape[axis] != 1)
-                {
-                    XTENSOR_THROW(std::out_of_range,
-                                  "index " + std::to_string(*efirst) +
-                                  " is out of bounds for axis " +
-                                  std::to_string(axis) + " with size " +
-                                  std::to_string(shape[axis]));
-                }
-                ++efirst, ++axis;
-            }
+            ++efirst, ++axis;
         }
     }
 
