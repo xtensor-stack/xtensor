@@ -22,6 +22,10 @@ namespace xt
     template <class CT, class R> class xrepeat;
     template <class S, class R> class xrepeat_stepper;
 
+    /***********
+     * xrepeat *
+     ***********/
+
     template <class CT, class R>
     struct xcontainer_inner_types<xrepeat<CT, R>>
     {
@@ -49,69 +53,9 @@ namespace xt
         using stepper = const_stepper;
     };
 
-    template <class S, class R>
-    class xrepeat_stepper
-    {
-    public:
-
-        using repeats_type = R;
-        using storage_type = typename S::storage_type;
-        using subiterator_type = typename S::subiterator_type;
-        using subiterator_traits = typename S::subiterator_traits;
-        using value_type = typename subiterator_traits::value_type;
-        using reference = typename subiterator_traits::reference;
-        using pointer = typename subiterator_traits::pointer;
-        using difference_type = typename subiterator_traits::difference_type;
-        using size_type = typename storage_type::size_type;
-        using shape_type = typename storage_type::shape_type;
-        using simd_value_type = xt_simd::simd_type<value_type>;
-
-        template <class requested_type>
-        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
-
-        xrepeat_stepper(S&& s, const shape_type& shape, const repeats_type& repeats, const size_type& axis);
-
-        reference operator*() const;
-
-        void step(size_type dim, size_type n = 1);
-        void step_back(size_type dim, size_type n = 1);
-        void reset(size_type dim);
-        void reset_back(size_type dim);
-
-        void to_begin();
-        void to_end(layout_type l);
-
-        template <class T>
-        simd_return_type<T> step_simd();
-
-        void step_leading();
-
-        template <class V>
-        void store_simd(const V& vec);
-
-    private:
-
-        S m_substepper;
-        const shape_type& m_shape;
-
-        std::ptrdiff_t m_repeating_steps;
-        std::vector<size_type> m_positions;
-        size_type m_subposition;
-
-        const size_type& m_repeating_axis;
-        const repeats_type& m_repeats;
-
-        void make_step(size_type dim, size_type n);
-        void make_step_back(size_type dim, size_type n);
-
-        std::vector<size_type> get_next_positions(const size_type dim, const size_type steps_to_go) const;
-        std::vector<size_type> get_next_positions_back(const size_type dim, const size_type steps_to_go) const;
-    };
-
     template <class CT, class R>
-    class xrepeat :
-        public xiterable<xrepeat<CT, R>>,
-        public xaccessible<xrepeat<CT, R>>
+    class xrepeat : public xiterable<xrepeat<CT, R>>,
+                    public xaccessible<xrepeat<CT, R>>
     {
     public:
         using xexpression_type = std::decay_t<CT>;
@@ -149,13 +93,13 @@ namespace xt
         const_stepper stepper_begin() const;
         const_stepper stepper_begin(const shape_type& s) const;
 
-        const_stepper stepper_end(const layout_type l) const;
-        const_stepper stepper_end(const shape_type& s, const layout_type l) const;
+        const_stepper stepper_end(layout_type l) const;
+        const_stepper stepper_end(const shape_type& s, layout_type l) const;
 
     private:
 
         CT m_e;
-        const size_type m_repeating_axis;
+        size_type m_repeating_axis;
         repeats_type m_repeats;
         shape_type m_shape;
 
@@ -164,32 +108,80 @@ namespace xt
         template <class Arg, class... Args>
         const_reference access(Arg arg, Args... args) const;
 
-        template<size_type I, class Arg, class... Args>
-        inline const_reference access_impl(stepper&& s, Arg arg, Args... args) const
-        {
-            s.step(I, static_cast<size_type>(arg));
-            return access_impl<I+1>(std::forward<stepper>(s), args...);
-        }
+        template<std::size_t I, class Arg, class... Args>
+        const_reference access_impl(stepper&& s, Arg arg, Args... args) const;
 
-        template<size_type I>
-        inline const_reference access_impl(stepper&& s) const
-        {
-            return *s;
-        }
+        template<std::size_t I>
+        const_reference access_impl(stepper&& s) const;
 
-        template<size_type I, class Arg, class... Args>
-        inline reference access_impl(stepper&& s, Arg arg, Args... args)
-        {
-            s.step(I, static_cast<size_type>(arg));
-            return access_impl<I+1>(std::forward<stepper>(s), args...);
-        }
-
-        template<size_type I>
-        inline reference access_impl(stepper&& s)
-        {
-            return *s;
-        }
     };
+
+    /*******************
+     * xrepeat_stepper *
+     *******************/
+
+    template <class S, class R>
+    class xrepeat_stepper
+    {
+    public:
+
+        using repeats_type = R;
+        using storage_type = typename S::storage_type;
+        using subiterator_type = typename S::subiterator_type;
+        using subiterator_traits = typename S::subiterator_traits;
+        using value_type = typename subiterator_traits::value_type;
+        using reference = typename subiterator_traits::reference;
+        using pointer = typename subiterator_traits::pointer;
+        using difference_type = typename subiterator_traits::difference_type;
+        using size_type = typename storage_type::size_type;
+        using shape_type = typename storage_type::shape_type;
+        using simd_value_type = xt_simd::simd_type<value_type>;
+
+        template <class requested_type>
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
+
+        xrepeat_stepper(S&& s, const shape_type& shape, const repeats_type& repeats, size_type axis);
+
+        reference operator*() const;
+
+        void step(size_type dim, size_type n = 1);
+        void step_back(size_type dim, size_type n = 1);
+        void reset(size_type dim);
+        void reset_back(size_type dim);
+
+        void to_begin();
+        void to_end(layout_type l);
+
+        template <class T>
+        simd_return_type<T> step_simd();
+
+        void step_leading();
+
+        template <class V>
+        void store_simd(const V& vec);
+
+    private:
+
+        S m_substepper;
+        const shape_type& m_shape;
+
+        std::ptrdiff_t m_repeating_steps;
+        std::vector<size_type> m_positions;
+        size_type m_subposition;
+
+        size_type m_repeating_axis;
+        const repeats_type& m_repeats;
+
+        void make_step(size_type dim, size_type n);
+        void make_step_back(size_type dim, size_type n);
+
+        std::vector<size_type> get_next_positions(size_type dim, size_type steps_to_go) const;
+        std::vector<size_type> get_next_positions_back(size_type dim, size_type steps_to_go) const;
+    };
+
+    /**************************
+     * xrepeat implementation *
+     **************************/
 
     template <class CT, class R>
     template <class CTA>
@@ -270,21 +262,40 @@ namespace xt
     }
 
     template <class CT, class R>
-    inline auto xrepeat<CT, R>::stepper_end(const layout_type l) const -> const_stepper
+    inline auto xrepeat<CT, R>::stepper_end(layout_type l) const -> const_stepper
     {
         return stepper_end(m_e.shape(), l);
     }
 
     template <class CT, class R>
-    inline auto xrepeat<CT, R>::stepper_end(const shape_type& s, const layout_type l) const -> const_stepper
+    inline auto xrepeat<CT, R>::stepper_end(const shape_type& s, layout_type l) const -> const_stepper
     {
         auto st = const_stepper(m_e.stepper_begin(s), m_shape, m_repeats, m_repeating_axis);
         st.to_end(l);
         return st;
     }
 
+    template <class CT, class R>
+    template<std::size_t I, class Arg, class... Args>
+    inline auto xrepeat<CT, R>::access_impl(stepper&& s, Arg arg, Args... args) const -> const_reference
+    {
+        s.step(I, static_cast<size_type>(arg));
+        return access_impl<I+1>(std::forward<stepper>(s), args...);
+    }
+
+    template <class CT, class R>
+    template<std::size_t I>
+    inline auto xrepeat<CT, R>::access_impl(stepper&& s) const -> const_reference
+    {
+        return *s;
+    }
+
+    /**********************************
+     * xrepeat_stepper implementation *
+     **********************************/
+
     template<class S, class R>
-    xrepeat_stepper<S, R>::xrepeat_stepper(S&& s, const shape_type& shape, const repeats_type& repeats, const size_type& axis)
+    xrepeat_stepper<S, R>::xrepeat_stepper(S&& s, const shape_type& shape, const repeats_type& repeats, size_type axis)
         : m_substepper(std::forward<S>(s))
         , m_shape(shape)
         , m_repeating_steps(0)
@@ -459,7 +470,7 @@ namespace xt
     }
 
     template<class S, class R>
-    inline auto xrepeat_stepper<S, R>::get_next_positions(const size_type dim, const size_type steps_to_go) const -> std::vector<size_type>
+    inline auto xrepeat_stepper<S, R>::get_next_positions(size_type dim, size_type steps_to_go) const -> std::vector<size_type>
     {
         size_type next_position_for_dim = m_positions[dim] + steps_to_go;
         if (dim > 0)
@@ -483,7 +494,7 @@ namespace xt
     }
 
     template<class S, class R>
-    inline auto xrepeat_stepper<S, R>::get_next_positions_back(const size_type dim, const size_type steps_to_go) const -> std::vector<size_type>
+    inline auto xrepeat_stepper<S, R>::get_next_positions_back(size_type dim, size_type steps_to_go) const -> std::vector<size_type>
     {
         auto next_position_for_dim = static_cast<std::ptrdiff_t>(m_positions[dim] - steps_to_go);
         if (dim > 0)
