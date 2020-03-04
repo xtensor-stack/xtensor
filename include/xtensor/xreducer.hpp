@@ -1315,20 +1315,23 @@ namespace xt
     {
         XTENSOR_TRY(check_element_index(shape(), first, last));
         auto stepper = const_stepper(*this, 0);
-        size_type dim = 0;
-        // drop left most elements
-        auto size = std::ptrdiff_t(this->dimension()) - std::distance(first, last);
-        auto begin = first - size;
-        while (begin != last)
+        if (first != last)
         {
-            if (begin < first)
+            size_type dim = 0;
+            // drop left most elements
+            auto size = std::ptrdiff_t(this->dimension()) - std::distance(first, last);
+            auto begin = first - size;
+            while (begin != last)
             {
-                stepper.step(dim++, std::size_t(0));
-                begin++;
-            }
-            else
-            {
-                stepper.step(dim++, std::size_t(*begin++));
+                if (begin < first)
+                {
+                    stepper.step(dim++, std::size_t(0));
+                    begin++;
+                }
+                else
+                {
+                    stepper.step(dim++, std::size_t(*begin++));
+                }
             }
         }
         return *stepper;
