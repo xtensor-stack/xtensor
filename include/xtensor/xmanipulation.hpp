@@ -888,7 +888,7 @@ namespace xt
         template<class E, class R>
         inline auto make_xrepeat(E&& e, R&& r, typename std::decay_t<E>::size_type axis)
         {
-            return xrepeat<E, R>(std::forward<E>(e), std::forward<R>(r), axis);
+            return xrepeat<const_xclosure_t<E>, R>(std::forward<E>(e), std::forward<R>(r), axis);
         }
     }
 
