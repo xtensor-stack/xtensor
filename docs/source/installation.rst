@@ -94,6 +94,16 @@ this folder contains ``include`` and ``lib`` subfolders.
 
 See the :doc:`build-options` section for more details about cmake options.
 
+Although not officially supported, ``xtensor`` can be installed with MinGW:
+
+.. code::
+
+    mkdir build
+    cd build
+    cmake -G "MinGW Makefiles" -DCMAKE_INSTALL_PREFIX=path_to_prefix ..
+    mingw32-make
+    mingw32-make install
+
 Including xtensor in your project
 ---------------------------------
 
