@@ -104,9 +104,24 @@
     TEST(xfunc_on_xexpression, field_expression)
     {
         Field x, y;
+        xt::xtensor<double , 1> res{{20, 20, 20, 20, 20, 0, 0, 0, 0, 0}};
         x.m_data.fill(10);
+        y.m_data.fill(0);
 
         y = x + x;
 
-        std::cout << y.m_data << "\n";
+        EXPECT_EQ(y.m_data, res);
+    }
+
+    TEST(xfunc_on_xexpression, copy_constructor)
+    {
+        // Compilation test only
+        // checks that there is no ambiguity among xfunction constructors
+        xt::xtensor<double, 1> x{{1, 2}}, y{{3, 4}};
+        xt::xtensor<double, 1> res{{4, 6}};
+
+        auto expr = x + y;
+        decltype(expr) expr2{expr};
+
+        EXPECT_EQ(xt::eval(expr2), res);
     }
