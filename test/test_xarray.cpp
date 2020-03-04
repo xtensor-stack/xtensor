@@ -243,11 +243,16 @@ namespace xt
     TEST(xarray, zerod)
     {
         xarray_dynamic a;
+        EXPECT_EQ(0u, a.dimension());
         EXPECT_EQ(0, a());
 
         xarray_dynamic b = {1, 2, 3};
         xarray_dynamic c(2 + xt::sum(b));
         EXPECT_EQ(8, c());
+
+        EXPECT_EQ(8, c(1, 2));
+        xindex idx = { 1, 2 };
+        EXPECT_EQ(8, c.element(idx.cbegin(), idx.cend()));
     }
 
     TEST(xarray, xiterator)
