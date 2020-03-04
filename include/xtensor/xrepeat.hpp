@@ -45,14 +45,15 @@ namespace xt
         using xexpression_type = std::decay_t<CT>;
         using repeats_type = std::decay_t<R>;
         using inner_shape_type = typename xexpression_type::inner_shape_type;
-        using stepper = xrepeat_stepper<typename xexpression_type::stepper, repeats_type>;
-        using const_stepper = xrepeat_stepper<typename xexpression_type::stepper, repeats_type>;
+        using const_stepper = xrepeat_stepper<typename xexpression_type::const_stepper, repeats_type>;
+        using stepper = const_stepper;
     };
 
     template <class S, class R>
     class xrepeat_stepper
     {
     public:
+
         using repeats_type = R;
         using storage_type = typename S::storage_type;
         using subiterator_type = typename S::subiterator_type;
@@ -89,6 +90,7 @@ namespace xt
         void store_simd(const V& vec);
 
     private:
+
         S m_substepper;
         const shape_type& m_shape;
 
@@ -131,13 +133,10 @@ namespace xt
 
         using iterable_type = xiterable<xrepeat<CT, R>>;
         using stepper = typename iterable_type::stepper;
-        using const_stepper = typename iterable_type::stepper;
+        using const_stepper = typename iterable_type::const_stepper;
 
         template<class CTA>
         explicit xrepeat(CTA&& e, R&& repeats, size_type axis);
-
-        template <class... Args>
-        reference operator()(Args... args);
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -145,29 +144,20 @@ namespace xt
         const shape_type& shape() const noexcept;
 
         template <class It>
-        reference element(It first, It last);
-
-        template <class It>
         const_reference element(It first, It last) const;
 
-        stepper stepper_begin() const;
+        const_stepper stepper_begin() const;
+        const_stepper stepper_begin(const shape_type& s) const;
 
-        stepper stepper_begin(const shape_type& s) const;
-
-        stepper stepper_end(const layout_type l) const;
-
-        stepper stepper_end(const shape_type& s, const layout_type l) const;
+        const_stepper stepper_end(const layout_type l) const;
+        const_stepper stepper_end(const shape_type& s, const layout_type l) const;
 
     private:
+
         CT m_e;
         const size_type m_repeating_axis;
         repeats_type m_repeats;
         shape_type m_shape;
-
-        reference access();
-
-        template <class Arg, class... Args>
-        reference access(Arg arg, Args... args);
 
         const_reference access() const;
 
@@ -215,13 +205,6 @@ namespace xt
 
     template <class CT, class R>
     template <class... Args>
-    inline auto xrepeat<CT, R>::operator()(Args... args) -> reference
-    {
-        return access(args...);
-    }
-
-    template <class CT, class R>
-    template <class... Args>
     inline auto xrepeat<CT, R>::operator()(Args... args) const -> const_reference
     {
         return access(args...);
@@ -231,29 +214,6 @@ namespace xt
     inline auto xrepeat<CT, R>::shape() const noexcept -> const shape_type&
     {
         return m_shape;
-    }
-
-    /**
-    * Returns a reference to the element at the specified position in the view.
-    * @param first iterator starting the sequence of indices
-    * @param last iterator ending the sequence of indices
-    * The number of indices in the sequence should be equal to or greater than the the number
-    * of dimensions of the view..
-    */
-    template <class CT, class R>
-    template <class It>
-    inline auto xrepeat<CT, R>::element(It first, It last) -> reference
-    {
-        auto stepper = stepper_begin();
-        auto dimension = 0;
-        auto iter = first;
-        while (iter != last)
-        {
-            stepper.step(dimension, *iter);
-            ++dimension;
-            ++first;
-        }
-        return access_impl<0>(stepper);
     }
 
     /**
@@ -280,24 +240,6 @@ namespace xt
     }
 
     template <class CT, class R>
-    inline auto xrepeat<CT, R>::access() -> reference
-    {
-        return access_impl<0>(stepper_begin(m_e.shape()));
-    }
-
-    template <class CT, class R>
-    template <class Arg, class... Args>
-    inline auto xrepeat<CT, R>::access(Arg arg, Args... args) -> reference
-    {
-        constexpr size_t number_of_arguments = 1 + sizeof...(Args);
-        if (number_of_arguments > this->dimension())
-        {
-            return access(args...);
-        }
-        return access_impl<0>(stepper_begin(m_e.shape()), arg, args...);
-    }
-
-    template <class CT, class R>
     inline auto xrepeat<CT, R>::access() const -> const_reference
     {
         return access_impl<0>(stepper_begin(m_e.shape()));
@@ -316,27 +258,27 @@ namespace xt
     }
 
     template <class CT, class R>
-    inline auto xrepeat<CT, R>::stepper_begin() const -> stepper
+    inline auto xrepeat<CT, R>::stepper_begin() const -> const_stepper
     {
         return stepper_begin(m_e.shape());
     }
 
     template <class CT, class R>
-    inline auto xrepeat<CT, R>::stepper_begin(const shape_type& s) const -> stepper
+    inline auto xrepeat<CT, R>::stepper_begin(const shape_type& s) const -> const_stepper
     {
-        return stepper(m_e.stepper_begin(s), m_shape, m_repeats, m_repeating_axis);
+        return const_stepper(m_e.stepper_begin(s), m_shape, m_repeats, m_repeating_axis);
     }
 
     template <class CT, class R>
-    inline auto xrepeat<CT, R>::stepper_end(const layout_type l) const -> stepper
+    inline auto xrepeat<CT, R>::stepper_end(const layout_type l) const -> const_stepper
     {
         return stepper_end(m_e.shape(), l);
     }
 
     template <class CT, class R>
-    inline auto xrepeat<CT, R>::stepper_end(const shape_type& s, const layout_type l) const -> stepper
+    inline auto xrepeat<CT, R>::stepper_end(const shape_type& s, const layout_type l) const -> const_stepper
     {
-        auto st = stepper(m_e.stepper_begin(s), m_shape, m_repeats, m_repeating_axis);
+        auto st = const_stepper(m_e.stepper_begin(s), m_shape, m_repeats, m_repeating_axis);
         st.to_end(l);
         return st;
     }

@@ -10,13 +10,23 @@
 #include "gtest/gtest.h"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xrepeat.hpp"
-
-
 #include "xtensor/xview.hpp"
 #include "xtensor/xio.hpp"
 
 namespace xt
 {
+
+    TEST(xrepeat, const_array)
+    {
+        xarray<size_t> const array = {1, 2, 3};
+
+        const auto repeated_array = xt::repeat(array, 1, 0);
+
+        ASSERT_EQ(1, repeated_array(0));
+        ASSERT_EQ(2, repeated_array(1));
+        ASSERT_EQ(3, repeated_array(2));
+    }
+
     TEST(xrepeat, stepper_begin)
     {
         xarray<size_t> array = {
