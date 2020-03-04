@@ -240,6 +240,9 @@ namespace xt
         template <class Func, class... CTA, class U = std::enable_if_t<!std::is_base_of<std::decay_t<Func>, self_type>::value>>
         xfunction(Func&& f, CTA&&... e) noexcept;
 
+        template <class FA, class ... CTA>
+        xfunction(xfunction<FA, CTA...> xf) noexcept;
+
         ~xfunction() = default;
 
         xfunction(const xfunction&) = default;
@@ -309,6 +312,8 @@ namespace xt
         simd_return_type<requested_type> load_simd(size_type i) const;
 
         const tuple_type& arguments() const noexcept;
+
+        const functor_type& functor() const noexcept;
 
     private:
 
@@ -487,6 +492,16 @@ namespace xt
     template <class Func, class... CTA, class U>
     inline xfunction<F, CT...>::xfunction(Func&& f, CTA&&... e) noexcept
         : m_e(std::forward<CTA>(e)...), m_f(std::forward<Func>(f)) {}
+
+    /**
+     * Constructs an xfunction applying the specified function given by another
+     * xfunction with its arguments.
+     * @param xf the xfunction to apply
+     */
+    template <class F, class... CT>
+    template <class FA, class... CTA>
+    inline xfunction<F, CT...>::xfunction(xfunction<FA, CTA...> xf) noexcept
+        : m_e(xf.arguments()), m_f(xf.functor()) {}
     //@}
 
     /**
@@ -740,6 +755,12 @@ namespace xt
     inline auto xfunction<F, CT...>::arguments() const noexcept -> const tuple_type&
     {
         return m_e;
+    }
+
+    template <class F, class... CT>
+    inline auto xfunction<F, CT...>::functor() const noexcept -> const functor_type&
+    {
+        return m_f;
     }
 
     template <class F, class... CT>

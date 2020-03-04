@@ -47,9 +47,9 @@ namespace xt
     struct NAME                                                                  \
     {                                                                            \
         template <class T1, class T2>                                            \
-        constexpr auto operator()(const T1& arg1, const T2& arg2) const          \
+        constexpr auto operator()(T1&& arg1, T2&& arg2) const                    \
         {                                                                        \
-            return (arg1 OP arg2);                                               \
+            return (std::forward<T1>(arg1) OP std::forward<T2>(arg2));           \
         }                                                                        \
         template <class B>                                                       \
         constexpr auto simd_apply(const B& arg1, const B& arg2) const            \
