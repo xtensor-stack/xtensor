@@ -36,6 +36,15 @@ Defined in ``xtensor/xmanipulation.hpp``
 .. doxygenfunction:: xt::ravel
    :project: xtensor
 
+.. doxygenfunction:: xt::repeat(E&&, std::size_t, std::size_t)
+   :project: xtensor
+
+.. doxygenfunction:: xt::repeat(E&&, const std::vector<std::size_t>&, std::size_t)
+   :project: xtensor
+
+.. doxygenfunction:: xt::repeat(E&&, std::vector<std::size_t>&&, std::size_t)
+   :project: xtensor
+
 .. doxygenfunction:: xt::roll(E&&, std::ptrdiff_t)
    :project: xtensor
 
