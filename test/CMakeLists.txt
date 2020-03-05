@@ -39,6 +39,16 @@ if(CPP17)
   if(_cxx_std_flag)
     message(STATUS "Building with C++17")
   endif()
+elseif(CPP20)
+  # User requested C++17, but compiler might not oblige.
+  set_compiler_flag(
+    _cxx_std_flag CXX
+    "-std=c++2a"  # this should work with GNU, Intel, PGI
+    "/std:c++2a"  # this should work with MSVC
+  )
+  if(_cxx_std_flag)
+    message(STATUS "Building with C++20")
+  endif()
 else()
   set_compiler_flag(
     _cxx_std_flag CXX REQUIRED
