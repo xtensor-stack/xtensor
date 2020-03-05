@@ -8,6 +8,7 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+#include "xtensor/xadapt.hpp"
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xfixed.hpp"
@@ -313,6 +314,13 @@ namespace xt
         xt::xarray<int> a = {3, 4, 2, 1};
         auto r1 = xt::argpartition(a, 2);
         EXPECT_TRUE(check_argpartition(a, r1, 2));
+
+        std::size_t s = a.size();
+        int* arr = a.data();
+        dynamic_shape<std::size_t> sh = { s };
+        auto b = xt::adapt(arr, s, xt::no_ownership(), sh);
+        auto r2 = xt::argpartition(b, 2);
+        EXPECT_TRUE(check_argpartition(b, r2, 2));
     }
 
     TEST(xsort, median)
