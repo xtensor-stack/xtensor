@@ -678,7 +678,7 @@ namespace xt
         result_type res;
 
         dynamic_shape<std::size_t> permutation, reverse_permutation;
-        bool is_leading_axis = (ax == detail::leading_axis(res));
+        bool is_leading_axis = (ax == detail::leading_axis(de));
 
         if (!is_leading_axis)
         {
