@@ -21,7 +21,6 @@
 
 namespace xt
 {
-
     TEST(xsort, argsort)
     {
         xarray<double> a1 = {2, 3, 1};
@@ -106,6 +105,13 @@ namespace xt
 
         xarray<double> ex_3 = {{1, 3, 5}, {4, 4, 4}};
         EXPECT_EQ(ex_3, sort(a, 1));
+
+#ifndef XTENSOR_DISABLE_EXCEPTIONS
+	xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
+	xarr.reshape({4,4});
+        auto view = xt::reshape_view(xt::transpose(xarr, {1,0}), {2,8});
+        EXPECT_NO_THROW(xt::sort(view, 0));
+#endif
     }
 
     TEST(xsort, fixed)
@@ -292,6 +298,13 @@ namespace xt
         xt::xarray<int> a = {3, 4, 2, 1};
         auto r1 = xt::partition(a, 2);
         EXPECT_TRUE(check_partition(r1, 2));
+
+#ifndef XTENSOR_DISABLE_EXCEPTIONS
+	xt::xarray<double> xarr = xt::eval(xt::arange(0,16));
+	xarr.reshape({4,4});
+        auto view = xt::transpose(xarr, {1,0});
+	EXPECT_NO_THROW(xt::partition(view, 1, 0));
+#endif
     }
 
     template <class T, class U>
