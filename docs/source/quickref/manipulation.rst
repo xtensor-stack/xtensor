@@ -45,6 +45,17 @@ flip
     auto f0 = xt::flip(a, 0);
     auto f1 = xt::flip(a, 1);
 
+repeat
+------
+
+.. code::
+
+    #include "xmanipulation.hpp"
+
+    xt::xarray<int> a = {{1, 2}, {3, 4}};
+    auto r0 = xt::repeat(a, 3, 1);
+    auto r1 = xt::repeat(a, {1, 2}, 0);
+
 roll
 ----
 

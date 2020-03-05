@@ -30,3 +30,4 @@ xexpression API is actually implemented in ``xstrided_container`` and ``xcontain
    xbroadcast
    xindex_view
    xfunctor_view
+   xrepeat

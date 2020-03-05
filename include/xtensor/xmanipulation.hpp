@@ -888,10 +888,25 @@ namespace xt
         template<class E, class R>
         inline auto make_xrepeat(E&& e, R&& r, typename std::decay_t<E>::size_type axis)
         {
+            const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
+            if (r.size() != e.shape(casted_axis))
+            {
+                XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
+            }
             return xrepeat<const_xclosure_t<E>, R>(std::forward<E>(e), std::forward<R>(r), axis);
         }
     }
 
+    /**
+     * @brief Repeats elements of an expression along a given axis.
+     *
+     * @param e the input xexpression
+     * @param repeats The number of repetition of each elements. \ref repeats is broadcasted to
+     * fit the shape of the given \ref axis.
+     * @param axis the axis along which to repeat the value
+     *
+     * @return an expression which as the same shape as \ref e, except along the given \ref axis
+     */
     template <class E>
     inline auto repeat(E&& e, std::size_t repeats, std::size_t axis)
     {
@@ -901,26 +916,36 @@ namespace xt
         return repeat(std::forward<E>(e), std::move(broadcasted_repeats), axis);
     }
 
+    /**
+     * @brief Repeats elements of an expression along a given axis.
+     *
+     * @param e the input xexpression
+     * @param repeats The number of repetition of each elements. The size of \ref repeats 
+     * must match the shape of the given \ref axis.
+     * @param axis the axis along which to repeat the value
+     *
+     * @return an expression which as the same shape as \ref e, except along the given \ref axis
+     */
     template <class E>
     inline auto repeat(E&& e, const std::vector<std::size_t>& repeats, std::size_t axis)
     {
-        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
-        if (repeats.size() != e.shape(casted_axis))
-        {
-            XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
-        }
-        return detail::make_xrepeat(std::forward<E>(e), repeats, casted_axis);
+        return detail::make_xrepeat(std::forward<E>(e), repeats, axis);
     }
 
+    /**
+     * @brief Repeats elements of an expression along a given axis.
+     *
+     * @param e the input xexpression
+     * @param repeats The number of repetition of each elements. The size of \ref repeats 
+     * must match the shape of the given \ref axis.
+     * @param axis the axis along which to repeat the value
+     *
+     * @return an expression which as the same shape as \ref e, except along the given \ref axis
+     */
     template <class E>
     inline auto repeat(E&& e, std::vector<std::size_t>&& repeats, std::size_t axis)
     {
-        const auto casted_axis = static_cast<typename std::decay_t<E>::size_type>(axis);
-        if (repeats.size() != e.shape(casted_axis))
-        {
-            XTENSOR_THROW(std::invalid_argument, "repeats must have the same size as the specified axis");
-        }
-        return detail::make_xrepeat(std::forward<E>(e), std::move(repeats), casted_axis);
+        return detail::make_xrepeat(std::forward<E>(e), std::move(repeats), axis);
     }
 }
 

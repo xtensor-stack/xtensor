@@ -53,6 +53,17 @@ namespace xt
         using stepper = const_stepper;
     };
 
+    /**
+     * @class xrepeat
+     * @brief Expression with repeated values along an axis.
+     *
+     * The xrepeat class implements the repetition of the elements of
+     * an \ref xexpression along a given axis. xrepeat is not meant
+     * to be used directly, but only with the \ref repeat helper
+     * functions.
+     *
+     * @sa repeat
+     */
     template <class CT, class R>
     class xrepeat : public xiterable<xrepeat<CT, R>>,
                     public xaccessible<xrepeat<CT, R>>
@@ -82,10 +93,10 @@ namespace xt
         template<class CTA>
         explicit xrepeat(CTA&& e, R&& repeats, size_type axis);
 
+        const shape_type& shape() const noexcept;
+
         template <class... Args>
         const_reference operator()(Args... args) const;
-
-        const shape_type& shape() const noexcept;
 
         template <class It>
         const_reference element(It first, It last) const;
@@ -183,6 +194,14 @@ namespace xt
      * xrepeat implementation *
      **************************/
 
+    /**
+     * Constructs an xrepeat expression repeating the element of the specified
+     * \ref xexpression.
+     *
+     * @param e the input expression
+     * @param repeats The number of repetitions for each elements
+     * @param axis The axis along which to repeat the value
+     */
     template <class CT, class R>
     template <class CTA>
     xrepeat<CT, R>::xrepeat(CTA&& e, R&& repeats, size_type axis)
@@ -195,17 +214,26 @@ namespace xt
         m_shape[axis] = static_cast<value_type>(std::accumulate(m_repeats.begin(), m_repeats.end(), 0));
     }
 
+    /**
+     * Returns the shape of the expression.
+     */
+    template <class CT, class R>
+    inline auto xrepeat<CT, R>::shape() const noexcept -> const shape_type&
+    {
+        return m_shape;
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the function. Indices
+     * must be unsigned integers, the number of indices should be equal or greater than
+     * the number of dimensions of the expression.
+     */
     template <class CT, class R>
     template <class... Args>
     inline auto xrepeat<CT, R>::operator()(Args... args) const -> const_reference
     {
         return access(args...);
-    }
-
-    template <class CT, class R>
-    inline auto xrepeat<CT, R>::shape() const noexcept -> const shape_type&
-    {
-        return m_shape;
     }
 
     /**
