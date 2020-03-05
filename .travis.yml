@@ -103,10 +103,22 @@ matrix:
           packages:
             - g++-9
       env: COMPILER=gcc GCC=9
+    - os: linux
+      if: branch = master
+      addons:
+        apt:
+          sources:
+            - ubuntu-toolchain-r-test
+          packages:
+            - g++-9
+      env: COMPILER=gcc GCC=9 ENABLE_CPP20=1
     - os: osx
       if: branch = master
       osx_image: xcode8
       compiler: clang
+  allow_failures:
+    - env: COMPILER=gcc GCC=9 ENABLE_CPP20=1
+
 env:
   global:
     - MINCONDA_VERSION="latest"
@@ -181,6 +193,8 @@ install:
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DXTENSOR_USE_OPENMP=ON ..;
       elif [[ "$ENABLE_CPP17" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DCPP17=ON ..;
+      elif [[ "$ENABLE_CPP20" == 1 ]]; then
+        cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DCPP20=ON ..;
       elif [[ "$DISABLE_EXCEPTION" == 1 ]]; then
         cmake -DDOWNLOAD_GTEST=ON -DXTENSOR_DISABLE_EXCEPTIONS=ON ..;
       else

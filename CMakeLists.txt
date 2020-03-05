@@ -198,6 +198,7 @@ OPTION(DOWNLOAD_GBENCHMARK "download google benchmark and build from source" ON)
 OPTION(DEFAULT_COLUMN_MAJOR "set default layout to column major" OFF)
 OPTION(DISABLE_VS2017 "disables the compilation of some test with Visual Studio 2017" OFF)
 OPTION(CPP17 "enables C++17" OFF)
+OPTION(CPP20 "enables C++20 (experimental)" OFF)
 OPTION(XTENSOR_DISABLE_EXCEPTIONS "Disable C++ exceptions" OFF)
 OPTION(DISABLE_MSVC_ITERATOR_CHECK "Disable the MVSC iterator check" ON)
 
