@@ -104,7 +104,7 @@ namespace xt
         template <class E, class R, class F>
         inline auto run_lambda_over_axis(const E& e, R& res, std::size_t axis, F&& lambda)
         {
-            if (axis != detail::leading_axis(res))
+            if (axis != detail::leading_axis(e))
             {
                 dynamic_shape<std::size_t> permutation, reverse_permutation;
                 std::tie(permutation, reverse_permutation) = get_permutations(e.dimension(), axis, e.layout());
@@ -476,7 +476,7 @@ namespace xt
         std::size_t kth = kth_copy.back();
 
         dynamic_shape<std::size_t> permutation, reverse_permutation;
-        bool is_leading_axis = (ax == detail::leading_axis(res));
+        bool is_leading_axis = (ax == detail::leading_axis(de));
 
         if (!is_leading_axis)
         {
