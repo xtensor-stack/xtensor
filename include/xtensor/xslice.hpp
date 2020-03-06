@@ -890,9 +890,24 @@ namespace xt
         struct slice_implementation_getter
         {
             template <class E, class SL>
-            inline decltype(auto) operator()(E&, SL&& slice, std::size_t) const
+            inline decltype(auto) operator()(E& e, SL&& slice, std::size_t index) const
+            {
+                return get_slice(e, std::forward<SL>(slice), index, std::is_signed<std::decay_t<SL>>());
+            }
+
+        private:
+
+            template <class E, class SL>
+            inline decltype(auto) get_slice(E&, SL&& slice, std::size_t, std::false_type) const
             {
                 return std::forward<SL>(slice);
+            }
+
+            template <class E, class SL>
+            inline decltype(auto) get_slice(E& e, SL&& slice, std::size_t index, std::true_type) const
+            {
+                using int_type = std::decay_t<SL>;
+                return slice < int_type(0) ? slice + static_cast<std::ptrdiff_t>(e.shape(index)) : std::ptrdiff_t(slice);
             }
         };
 

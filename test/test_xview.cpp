@@ -128,6 +128,18 @@ namespace xt
         }
     }
 
+    TEST(xview, negative_index)
+    {
+        view_shape_type shape = {3, 4};
+        xarray<double> a(shape);
+        std::vector<double> data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+        std::copy(data.cbegin(), data.cend(), a.template begin<layout_type::row_major>());
+
+        auto view0 = view(a, -2, range(1, 4));
+        auto view1 = view(a, 1, range(1, 4));
+        EXPECT_EQ(view0, view1);
+    }
+
     TEST(xview, stored_range)
     {
         view_shape_type shape = { 3, 4 };
