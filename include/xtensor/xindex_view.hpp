@@ -138,6 +138,7 @@ namespace xt
         size_type size() const noexcept;
         size_type dimension() const noexcept;
         const inner_shape_type& shape() const noexcept;
+        size_type shape(size_type index) const;
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
 
@@ -348,6 +349,16 @@ namespace xt
     inline auto xindex_view<CT, I>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
+    }
+
+
+    /**
+     * Returns the i-th dimension of the expression.
+     */
+    template <class CT, class I>
+    inline auto xindex_view<CT, I>::shape(size_type i) const -> size_type
+    {
+        return m_shape[i];
     }
 
     template <class CT, class I>

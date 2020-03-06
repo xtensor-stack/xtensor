@@ -62,6 +62,10 @@ Slices can be specified in the following ways:
     // => v4(0, 0, 0) = a(1, 0, 0)
     // => v4(1, 1, 1) = a(2, 1, 3)
 
+    // View built with negative index
+    auto v5 = xt::view(a, -2, xt::all(), xt::range(0, 4, 2));
+    // => v5 == v2
+
 The range function supports the placeholder ``_`` syntax:
 
 .. code::
@@ -92,7 +96,20 @@ you are actually also altering the underlying expression.
     v1(0, 0) = 1;
     // => a(1, 0, 1) = 1
 
+The convenient methods ``row`` and ``col`` are available for 2-D expressions:
 
+.. code::
+
+    #include <vector>
+    #include "xtensor/xtensor.hpp"
+    #include "xtensor/xview.hpp"
+
+    xt::xtensor<double, 2> a = {{1, 2}, {3, 4}};
+    auto r = xt::row(a, 0);
+    // => r = {1, 2}
+    auto c = xt::col(a, -1);
+    // => c = { 2, 4 }
+    
 Strided views
 -------------
 

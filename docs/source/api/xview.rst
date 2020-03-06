@@ -16,6 +16,12 @@ Defined in ``xtensor/xview.hpp``
 .. doxygenfunction:: xt::view
    :project: xtensor
 
+.. doxygenfunction:: xt::row
+   :project: xtensor
+
+.. doxygenfunction:: xt::col
+   :project: xtensor
+
 Defined in ``xtensor/xslice.hpp``
 
 .. doxygenfunction:: xt::range(A, B)
