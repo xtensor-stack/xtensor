@@ -7,6 +7,80 @@
 Changelog
 =========
 
+0.21.4
+------
+
+- Fix warning -Wsign-conversion in ``xview``
+  `#1902 <https://github.com/xtensor-stack/xtensor/pull/1902>`_
+- Fixed issue due to thread_local storage on some architectures
+  `#1905 <https://github.com/xtensor-stack/xtensor/pull/1905>`_
+- benchmark/CMakeLists.txt: fixed a tiny spelling mistake
+  `#1904 <https://github.com/xtensor-stack/xtensor/pull/1904>`_
+- nd-iterator implementation
+  `#1891 <https://github.com/xtensor-stack/xtensor/pull/1891>`_
+- Add GoatCounter analytics for the documentation
+  `#1908 <https://github.com/xtensor-stack/xtensor/pull/1908>`_
+- Added ``noexcept`` in ``svector``
+  `#1919 <https://github.com/xtensor-stack/xtensor/pull/1919>`_
+- Add implementation of repeat (similar to numpy)
+  `#1896 <https://github.com/xtensor-stack/xtensor/pull/1896>`_
+- Fix initialization of out shape in ``xt::tile``
+  `#1923 <https://github.com/xtensor-stack/xtensor/pull/1923>`_
+- ``xaxis_slice_iterator`` – Iterates over 1D slices oriented along the specified axis
+  `#1916 <https://github.com/xtensor-stack/xtensor/pull/1916>`_
+- Fixed cxx11 lib guard
+  `#1925 <https://github.com/xtensor-stack/xtensor/pull/1925>`_
+- Fixed CXX11 ABI when _GLIBCXX_USE_DUAL_ABI is set to 0
+  `#1927 <https://github.com/xtensor-stack/xtensor/pull/1927>`_
+- Enabling array-bounds warning
+  `#1933 <https://github.com/xtensor-stack/xtensor/pull/1933>`_
+- Fixed warnings
+  `#1934 <https://github.com/xtensor-stack/xtensor/pull/1934>`_
+- Compile with g++ instead of gcc, clarify include directories
+  `#1938 <https://github.com/xtensor-stack/xtensor/pull/1938>`_
+- broadcast function now accepts fixed shapes
+  `#1939 <https://github.com/xtensor-stack/xtensor/pull/1939>`_
+- Don't print decimal point after ``inf`` or ``nan``
+  `#1940 <https://github.com/xtensor-stack/xtensor/pull/1940>`_
+- Improved performance of ``xt::tile``
+  `#1943 <https://github.com/xtensor-stack/xtensor/pull/1943>`_
+- Refactoring CI
+  `#1942 <https://github.com/xtensor-stack/xtensor/pull/1942>`_
+- Documentation build: Switched to channel QuantStack
+  `#1948 <https://github.com/xtensor-stack/xtensor/pull/1948>`_
+- Removed warnings due to gtest upgrade
+  `#1949 <https://github.com/xtensor-stack/xtensor/pull/1949>`_
+- Fixed flatten view of view
+  `#1950 <https://github.com/xtensor-stack/xtensor/pull/1950>`_
+- Improved narrative documentation of reducers
+  `#1958 <https://github.com/xtensor-stack/xtensor/pull/1958>`_
+- Add test for printing xarray of type ``size_t``
+  `#1947 <https://github.com/xtensor-stack/xtensor/pull/1947>`_
+- Added documentation for iterators
+  `#1961 <https://github.com/xtensor-stack/xtensor/pull/1961>`_
+- Fixed ``check_element_index`` behavior for 0-D expressions
+  `#1965 <https://github.com/xtensor-stack/xtensor/pull/1965>`_
+- Fixed ``element`` method of xreducer
+  `#1966 <https://github.com/xtensor-stack/xtensor/pull/1966>`_
+- Fixed ``cast`` for third-party types
+  `#1967 <https://github.com/xtensor-stack/xtensor/pull/1967>`_
+- fix ``xoperation``
+  `#1790 <https://github.com/xtensor-stack/xtensor/pull/1790>`_
+- Added installation instruction with MinGW
+  `#1969 <https://github.com/xtensor-stack/xtensor/pull/1969>`_
+- ``xrepeat`` now stores ``const_xclosure_t<E>`` instead of ``E``
+  `#1968 <https://github.com/xtensor-stack/xtensor/pull/1968>`_
+- Fixed ``argpartition`` leading axis test
+  `#1971 <https://github.com/xtensor-stack/xtensor/pull/1971>`_
+- Added tests with C++20 enabled
+  `#1974 <https://github.com/xtensor-stack/xtensor/pull/1974>`_
+- Added documentation for ``repeat``
+  `#1975 <https://github.com/xtensor-stack/xtensor/pull/1975>`_
+- Fixed sort and partition
+  `#1976 <https://github.com/xtensor-stack/xtensor/pull/1976>`_
+- xt::view now supports negative indices
+  `#1979 <https://github.com/xtensor-stack/xtensor/pull/1979>`_
+
 0.21.3
 ------
 
