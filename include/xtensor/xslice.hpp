@@ -1516,7 +1516,7 @@ namespace xt
     template <class T>
     inline auto xdrop_slice<T>::operator()(size_type i) const noexcept -> size_type
     {
-        if (i < m_inc.begin()->first)
+        if (m_inc.empty() || i < m_inc.begin()->first)
         {
             return i;
         }
