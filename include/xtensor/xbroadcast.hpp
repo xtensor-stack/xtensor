@@ -346,6 +346,7 @@ namespace xt
     /**
      * @name Data
      */
+    //@{
     /**
      * Returns a constant reference to the element at the specified position in the expression.
      * @param args a list of indices specifying the position in the function. Indices

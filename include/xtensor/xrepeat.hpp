@@ -66,9 +66,11 @@ namespace xt
      */
     template <class CT, class R>
     class xrepeat : public xiterable<xrepeat<CT, R>>,
-                    public xaccessible<xrepeat<CT, R>>
+                    public xaccessible<xrepeat<CT, R>>,
+                    public xsharable_expression<xrepeat<CT, R>>
     {
     public:
+
         using xexpression_type = std::decay_t<CT>;
         using value_type = typename xexpression_type::value_type;
         using shape_type = typename xexpression_type::shape_type;
@@ -81,6 +83,8 @@ namespace xt
         using temporary_type = typename container_type::temporary_type;
 
         static constexpr layout_type static_layout = xexpression_type::static_layout;
+        static constexpr bool contiguous_layout = false;
+
         using bool_load_type = typename xexpression_type::bool_load_type;
         using pointer = typename xexpression_type::pointer;
         using const_pointer = typename xexpression_type::const_pointer;
@@ -94,13 +98,26 @@ namespace xt
         explicit xrepeat(CTA&& e, R&& repeats, size_type axis);
 
         const shape_type& shape() const noexcept;
+        layout_type layout() const noexcept;
+        bool is_contiguous() const noexcept;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
 
+        template <class... Args>
+        const_reference unchecked(Args... args) const;
+
         template <class It>
         const_reference element(It first, It last) const;
 
+        const xexpression_type& expression() const noexcept;
+
+        template <class S>
+        bool broadcast_shape(S& shape, bool reuse_cache = false) const;
+
+        template <class S>
+        bool has_linear_assign(const S& strides) const noexcept;
+        
         const_stepper stepper_begin() const;
         const_stepper stepper_begin(const shape_type& s) const;
 
@@ -215,6 +232,10 @@ namespace xt
     }
 
     /**
+     * @name Size and shape
+     */
+    //@{
+    /**
      * Returns the shape of the expression.
      */
     template <class CT, class R>
@@ -223,6 +244,26 @@ namespace xt
         return m_shape;
     }
 
+    /**
+     * Returns the layout_type of the expression.
+     */
+    template <class CT, class R>
+    inline auto xrepeat<CT, R>::layout() const noexcept -> layout_type
+    {
+        return m_e.layout();
+    }
+
+    template <class CT, class R>
+    inline bool xrepeat<CT, R>::is_contiguous() const noexcept
+    {
+        return false;
+    }
+    //@}
+
+    /**
+     * @name Data
+     */
+    //@{
     /**
      * Returns a constant reference to the element at the specified position in the expression.
      * @param args a list of indices specifying the position in the function. Indices
@@ -234,6 +275,32 @@ namespace xt
     inline auto xrepeat<CT, R>::operator()(Args... args) const -> const_reference
     {
         return access(args...);
+    }
+
+    /**
+     * Returns a constant reference to the element at the specified position in the expression.
+     * @param args a list of indices specifying the position in the expression. Indices
+     * must be unsigned integers, the number of indices must be equal to the number of
+     * dimensions of the expression, else the behavior is undefined.
+     *
+     * @warning This method is meant for performance, for expressions with a dynamic
+     * number of dimensions (i.e. not known at compile time). Since it may have
+     * undefined behavior (see parameters), operator() should be prefered whenever
+     * it is possible.
+     * @warning This method is NOT compatible with broadcasting, meaning the following
+     * code has undefined behavior:
+     * \code{.cpp}
+     * xt::xarray<double> a = {{0, 1}, {2, 3}};
+     * xt::xarray<double> b = {0, 1};
+     * auto fd = a + b;
+     * double res = fd.uncheked(0, 1);
+     * \endcode
+     */
+    template <class CT, class R>
+    template <class... Args>
+    inline auto xrepeat<CT, R>::unchecked(Args... args) const -> const_reference
+    {
+        return this->operator()(args...);
     }
 
     /**
@@ -258,6 +325,46 @@ namespace xt
         }
         return access_impl<0>(std::forward<stepper>(s));
     }
+
+    /**
+     * Returns a constant reference to the underlying expression of the broadcast expression.
+     */
+    template <class CT, class R>
+    inline auto xrepeat<CT, R>::expression() const noexcept -> const xexpression_type&
+    {
+        return m_e;
+    }
+    //@}
+
+    /**
+     * @name Broadcasting
+     */
+    //@{
+    /**
+     * Broadcast the shape of the function to the specified parameter.
+     * @param shape the result shape
+     * @param reuse_cache parameter for internal optimization
+     * @return a boolean indicating whether the broadcasting is trivial
+     */
+    template <class CT, class R>
+    template <class S>
+    inline bool xrepeat<CT, R>::broadcast_shape(S& shape, bool reuse_cache) const
+    {
+        return xt::broadcast_shape(m_shape, shape);
+    }
+
+    /**
+     * Checks whether the xbroadcast can be linearly assigned to an expression
+     * with the specified strides.
+     * @return a boolean indicating whether a linear assign is possible
+     */
+    template <class CT, class R>
+    template <class S>
+    inline bool xrepeat<CT, R>::has_linear_assign(const S&) const noexcept
+    {
+        return false;
+    }
+    //@}
 
     template <class CT, class R>
     inline auto xrepeat<CT, R>::access() const -> const_reference
