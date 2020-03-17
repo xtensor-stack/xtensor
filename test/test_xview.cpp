@@ -1097,6 +1097,12 @@ namespace xt
         EXPECT_FALSE(b);
         b = detail::is_strided_view<decltype(a), xrange<int>, xrange<int>, int>::value;
         EXPECT_TRUE(b);
+
+        std::vector<size_t> empty;
+        auto v5 = xt::view(a, drop(empty), drop(empty), drop(empty));
+        v5(1, 1, 1) = 456;
+        EXPECT_EQ(v5, a);
+        EXPECT_EQ(a(1, 1, 1), 456);
     }
 
     TEST(xview, drop_negative)
