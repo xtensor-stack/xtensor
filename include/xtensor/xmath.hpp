@@ -2679,17 +2679,17 @@ namespace detail {
     template <class T = void, class E, class I, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, std::initializer_list<I> axes, EVS es = EVS())
     {
-        return nanmean(std::forward<E>(e),
-                       xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
-                       es);
+        return nanmean<T>(std::forward<E>(e),
+                          xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                          es);
     }
 #else
     template <class T = void, class E, class I, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
     inline auto nanmean(E&& e, const I (&axes)[N], EVS es = EVS())
     {
-        return nanmean(std::forward<E>(e),
-                       xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
-                       es);
+        return nanmean<T>(std::forward<E>(e),
+                          xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                          es);
     }
 #endif
 
