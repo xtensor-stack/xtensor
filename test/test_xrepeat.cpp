@@ -99,6 +99,14 @@ namespace xt
         ASSERT_EQ(9, *stepper);
     }
 
+    TEST(xrepeat, assign)
+    {
+        xt::xarray<int> a = {{1, 2}, {3, 4}};
+        xt::xarray<int> b = xt::repeat(a, 3, 1);
+        xt::xarray<int> res = {{1, 1, 1, 2, 2, 2}, {3, 3, 3, 4, 4, 4}};
+        EXPECT_EQ(b, res);
+    }
+
     TEST(xrepeat_stepper, step_with_repeat_1)
     {
         xarray<size_t> array = {
