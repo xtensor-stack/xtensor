@@ -23,6 +23,7 @@
 #include "xgenerator.hpp"
 #include "xindex_view.hpp"
 #include "xreducer.hpp"
+#include "xrepeat.hpp"
 #include "xscalar.hpp"
 #include "xstrided_view.hpp"
 #include "xtensor.hpp"
@@ -653,6 +654,33 @@ namespace xt
         };
     }
 
+    /**********************************************
+     * xrepeat extension for optional expressions *
+     **********************************************/
+
+    namespace extension
+    {
+        template <class CT, class X>
+        class xrepeat_optional : public xoptional_empty_base<xrepeat<CT, X>>
+        {
+        public:
+
+            using expression_tag = xoptional_expression_tag;
+            using value_expression = xbroadcast<xt::detail::value_expression_t<CT>, X>;
+            using flag_expression = xbroadcast<xt::detail::flag_expression_t<CT>, X>;
+            using const_value_expression = value_expression;
+            using const_flag_expression = flag_expression;
+
+            const_value_expression value() const;
+            const_flag_expression has_value() const;
+        };
+
+        template <class CT, class X>
+        struct xrepeat_base_impl<xoptional_expression_tag, CT, X>
+        {
+            using type = xrepeat_optional<CT, X>;
+        };
+    }
     /****************************************************
      * xstrided_view extension for optional expressions *
      ****************************************************/

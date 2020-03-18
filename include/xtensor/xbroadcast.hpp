@@ -147,6 +147,7 @@ namespace xt
 
         using self_type = xbroadcast<CT, X>;
         using xexpression_type = std::decay_t<CT>;
+        using accessible_base = xconst_accessible<self_type>;
         using extension_base = extension::xbroadcast_base_t<CT, X>;
         using expression_tag = typename extension_base::expression_tag;
 
@@ -177,10 +178,11 @@ namespace xt
         template <class CTA>
         xbroadcast(CTA&& e, shape_type&& s);
 
+        using accessible_base::size;
         const inner_shape_type& shape() const noexcept;
-        size_type shape(size_type i) const noexcept;
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
+        using accessible_base::shape;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
@@ -315,15 +317,6 @@ namespace xt
     inline auto xbroadcast<CT, X>::shape() const noexcept -> const inner_shape_type&
     {
         return m_shape;
-    }
-
-    /**
-     * Returns the shape of the expression.
-     */
-    template <class CT, class X>
-    inline auto xbroadcast<CT, X>::shape(size_type i) const noexcept -> size_type
-    {
-        return m_shape[i];
     }
 
     /**
