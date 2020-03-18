@@ -19,8 +19,36 @@
 
 namespace xt
 {
-    template <class CT, class R> class xrepeat;
-    template <class S, class R> class xrepeat_stepper;
+    template <class CT, class R>
+    class xrepeat;
+    
+    template <class S, class R>
+    class xrepeat_stepper;
+
+    /*********************
+     * xrepeat extension *
+     *********************/
+
+    namespace extension
+    {
+        template <class Tag, class CT, class X>
+        struct xrepeat_base_impl;
+
+        template <class CT, class X>
+        struct xrepeat_base_impl<xtensor_expression_tag, CT, X>
+        {
+            using type = xtensor_empty_base;
+        };
+
+        template <class CT, class X>
+        struct xrepeat_base
+            : xrepeat_base_impl<xexpression_tag_t<CT>, CT, X>
+        {
+        };
+
+        template <class CT, class X>
+        using xrepeat_base_t = typename xrepeat_base<CT, X>::type;
+    }
 
     /***********
      * xrepeat *
@@ -30,7 +58,7 @@ namespace xt
     struct xcontainer_inner_types<xrepeat<CT, R>>
     {
         using xexpression_type = std::decay_t<CT>;
-        using reference = inner_reference_t<CT>;
+        using reference = typename xexpression_type::const_reference;
         using const_reference = typename xexpression_type::const_reference;
         using size_type = typename xexpression_type::size_type;
         using temporary_type = typename xexpression_type::temporary_type;
@@ -65,13 +93,19 @@ namespace xt
      * @sa repeat
      */
     template <class CT, class R>
-    class xrepeat : public xiterable<xrepeat<CT, R>>,
-                    public xaccessible<xrepeat<CT, R>>,
-                    public xsharable_expression<xrepeat<CT, R>>
+    class xrepeat : public xconst_iterable<xrepeat<CT, R>>,
+                    public xconst_accessible<xrepeat<CT, R>>,
+                    public xsharable_expression<xrepeat<CT, R>>,
+                    public extension::xrepeat_base_t<CT, R>
     {
     public:
 
+        using self_type = xrepeat<CT, R>;
         using xexpression_type = std::decay_t<CT>;
+        using accessible_base = xconst_accessible<self_type>;
+        using extension_base = extension::xrepeat_base_t<CT, R>;
+        using expression_tag = typename extension_base::expression_tag;
+
         using value_type = typename xexpression_type::value_type;
         using shape_type = typename xexpression_type::shape_type;
         using repeats_type = xtl::const_closure_type_t<R>;
@@ -97,9 +131,11 @@ namespace xt
         template<class CTA>
         explicit xrepeat(CTA&& e, R&& repeats, size_type axis);
 
+        using accessible_base::size;
         const shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
         bool is_contiguous() const noexcept;
+        using accessible_base::shape;
 
         template <class... Args>
         const_reference operator()(Args... args) const;
