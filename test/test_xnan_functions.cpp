@@ -187,4 +187,49 @@ namespace xt
         EXPECT_EQ(nanvar(nantest::aN, {0}, evaluation_strategy::immediate), eaN0);
         EXPECT_TRUE(allclose(nanvar(nantest::aN, {1}, evaluation_strategy::immediate), eaN1));
     }
+
+    using shape_type = dynamic_shape<size_t>;
+
+    /*******************
+     * type conversion *
+     *******************/
+
+#define CHECK_RESULT_TYPE(EXPRESSION, EXPECTED_TYPE)                                 \
+    {                                                                                \
+        using result_type = typename std::decay_t<decltype(EXPRESSION)>::value_type; \
+        EXPECT_TRUE((std::is_same<result_type, EXPECTED_TYPE>::value));              \
+    }
+
+    TEST(xnanfunctions, result_type) {
+        shape_type shape = {4, 3, 2};
+        xarray<int> aint(shape);
+        xarray<float> afloat(shape);
+        xarray<double> adouble(shape);
+
+        /*********
+         * int *
+         *********/
+        CHECK_RESULT_TYPE(nansum(aint, {1, 2}), int);
+        CHECK_RESULT_TYPE(nanmean(aint, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanstd(aint, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanvar(aint, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanmean<int>(aint, {1, 2}), int);
+
+        /*********
+         * float *
+         *********/
+        CHECK_RESULT_TYPE(nansum(afloat, {1, 2}), float);
+        CHECK_RESULT_TYPE(nanmean(afloat, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanstd(afloat, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanvar(afloat, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanmean<float>(afloat, {1, 2}), float);
+
+        /**********
+         * double *
+         **********/
+        CHECK_RESULT_TYPE(nansum(adouble, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanmean(adouble, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanstd(adouble, {1, 2}), double);
+        CHECK_RESULT_TYPE(nanvar(adouble, {1, 2}), double);
+    }
 }
