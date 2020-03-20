@@ -66,20 +66,31 @@ namespace xt
         CHECK_RESULT_TYPE(FUNC<signed int>(INPUT), signed int);                      \
         CHECK_RESULT_TYPE(FUNC<int>(INPUT), int);                                    \
         CHECK_RESULT_TYPE(FUNC<unsigned long long>(INPUT), unsigned long long);      \
-        CHECK_RESULT_TYPE(FUNC<signed long long>(INPUT), signed long long);
+        CHECK_RESULT_TYPE(FUNC<signed long long>(INPUT), signed long long);          \
+        CHECK_RESULT_TYPE(FUNC<long long>(INPUT), long long);                        \
+        CHECK_RESULT_TYPE(FUNC<float>(INPUT), float);                                \
+        CHECK_RESULT_TYPE(FUNC<double>(INPUT), double);
 
     TEST(xmath, result_type)
     {
         shape_type shape = {3, 2};
         xarray<unsigned char> auchar(shape);
         xarray<short> ashort(shape);
+        xarray<unsigned short> aushort(shape);
         xarray<int> aint(shape);
         xarray<unsigned int> auint(shape);
+        xarray<long long> along(shape);
         xarray<unsigned long long> aulong(shape);
         xarray<float> afloat(shape);
         xarray<double> adouble(shape);
         xarray<std::complex<float>> afcomplex(shape);
         xarray<std::complex<double>> adcomplex(shape);
+
+#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT)                                   \
+        CHECK_TEMPLATED_RESULT_TYPE(mean, INPUT)                                     \
+        CHECK_TEMPLATED_RESULT_TYPE(variance, INPUT)
+// FIXME: the first 6 checks in "#define CHECK_TEMPLATED_RESULT_TYPE(FUNC, INPUT)" fail
+//        CHECK_TEMPLATED_RESULT_TYPE(stddev, INPUT)
 
         /*****************
          * unsigned char *
@@ -92,7 +103,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(auchar), unsigned long long);
         CHECK_RESULT_TYPE(mean(auchar), double);
         CHECK_RESULT_TYPE(minmax(auchar), ARRAY_TYPE(unsigned char));
-        CHECK_TEMPLATED_RESULT_TYPE(mean, auchar);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auchar);
 
         /*********
          * short *
@@ -105,7 +116,20 @@ namespace xt
         CHECK_RESULT_TYPE(sum(ashort), long long);
         CHECK_RESULT_TYPE(mean(ashort), double);
         CHECK_RESULT_TYPE(minmax(ashort), ARRAY_TYPE(short));
-        CHECK_TEMPLATED_RESULT_TYPE(mean, ashort);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort);
+
+        /******************
+         * unsigned short *
+         ******************/
+        CHECK_RESULT_TYPE(aushort + aushort, int);
+        CHECK_RESULT_TYPE(2u * aushort, unsigned int);
+        CHECK_RESULT_TYPE(2.0 * aushort, double);
+        CHECK_RESULT_TYPE(sqrt(aushort), double);
+        CHECK_RESULT_TYPE(abs(aushort), unsigned short);
+        CHECK_RESULT_TYPE(sum(aushort), unsigned long long);
+        CHECK_RESULT_TYPE(mean(aushort), double);
+        CHECK_RESULT_TYPE(minmax(aushort), ARRAY_TYPE(unsigned short));
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort);
 
         /*******
          * int *
@@ -118,7 +142,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(aint), long long);
         CHECK_RESULT_TYPE(mean(aint), double);
         CHECK_RESULT_TYPE(minmax(aint), ARRAY_TYPE(int));
-        CHECK_TEMPLATED_RESULT_TYPE(mean, aint);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint);
 
         /****************
          * unsigned int *
@@ -131,7 +155,20 @@ namespace xt
         CHECK_RESULT_TYPE(sum(auint), unsigned long long);
         CHECK_RESULT_TYPE(mean(auint), double);
         CHECK_RESULT_TYPE(minmax(auint), ARRAY_TYPE(unsigned int));
-        CHECK_TEMPLATED_RESULT_TYPE(mean, auint);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint);
+
+        /**********************
+         * long long *
+         **********************/
+        CHECK_RESULT_TYPE(along + along, signed long long);
+        CHECK_RESULT_TYPE(2 * along, signed long long);
+        CHECK_RESULT_TYPE(2.0 * along, double);
+        CHECK_RESULT_TYPE(sqrt(along), double);
+        CHECK_RESULT_TYPE(abs(along), signed long long);
+        CHECK_RESULT_TYPE(sum(along), signed long long);
+        CHECK_RESULT_TYPE(mean(along), double);
+        CHECK_RESULT_TYPE(minmax(along), ARRAY_TYPE(signed long long));
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along);
 
         /**********************
          * unsigned long long *
@@ -144,7 +181,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(aulong), unsigned long long);
         CHECK_RESULT_TYPE(mean(aulong), double);
         CHECK_RESULT_TYPE(minmax(aulong), ARRAY_TYPE(unsigned long long));
-        CHECK_TEMPLATED_RESULT_TYPE(mean, aulong);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong);
 
         /*********
          * float *
@@ -157,7 +194,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(afloat), double);
         CHECK_RESULT_TYPE(mean(afloat), double);
         CHECK_RESULT_TYPE(minmax(afloat), ARRAY_TYPE(float));
-        CHECK_TEMPLATED_RESULT_TYPE(mean, afloat);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat);
 
         /**********
          * double *
@@ -169,7 +206,7 @@ namespace xt
         CHECK_RESULT_TYPE(sum(adouble), double);
         CHECK_RESULT_TYPE(mean(adouble), double);
         CHECK_RESULT_TYPE(minmax(adouble), ARRAY_TYPE(double));
-        CHECK_TEMPLATED_RESULT_TYPE(mean, adouble);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble);
 
         /***********************
          * std::complex<float> *

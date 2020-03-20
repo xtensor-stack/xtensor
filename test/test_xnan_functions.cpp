@@ -202,34 +202,73 @@ namespace xt
 
     TEST(xnanfunctions, result_type) {
         shape_type shape = {4, 3, 2};
+        xarray<short> ashort(shape);
+        xarray<unsigned short> aushort(shape);
         xarray<int> aint(shape);
+        xarray<unsigned int> auint(shape);
+        xarray<long long> along(shape);
+        xarray<unsigned long long> aulong(shape);
         xarray<float> afloat(shape);
         xarray<double> adouble(shape);
+
+#define CHECK_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE)                               \
+        CHECK_RESULT_TYPE(nansum(INPUT, {1, 2}), RESULT_TYPE);                      \
+        CHECK_RESULT_TYPE(nanmean(INPUT, {1, 2}), double);                          \
+        CHECK_RESULT_TYPE(nanvar(INPUT, {1, 2}), double);                           \
+        CHECK_RESULT_TYPE(nanstd(INPUT, {1, 2}), double);
+
+#define CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(INPUT, RESULT_TYPE)                     \
+        CHECK_RESULT_TYPE(nansum<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)          \
+        CHECK_RESULT_TYPE(nanmean<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)         \
+        CHECK_RESULT_TYPE(nanvar<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)          \
+        CHECK_RESULT_TYPE(nanstd<RESULT_TYPE>(INPUT, {1, 2}), RESULT_TYPE)
+
+        /*********
+         * short *
+         *********/
+        CHECK_RESULT_TYPE_FOR_ALL(ashort, short);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(ashort, int);
+
+        /******************
+         * unsigned short *
+         ******************/
+        CHECK_RESULT_TYPE_FOR_ALL(aushort, unsigned short);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aushort, unsigned int);
 
         /*********
          * int *
          *********/
-        CHECK_RESULT_TYPE(nansum(aint, {1, 2}), int);
-        CHECK_RESULT_TYPE(nanmean(aint, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanstd(aint, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanvar(aint, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanmean<int>(aint, {1, 2}), int);
+        CHECK_RESULT_TYPE_FOR_ALL(aint, int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aint, int);
+
+        /****************
+         * unsigned int *
+         ****************/
+        CHECK_RESULT_TYPE_FOR_ALL(auint, unsigned int);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(auint, unsigned int);
+
+        /**********************
+         * long long *
+         **********************/
+        CHECK_RESULT_TYPE_FOR_ALL(along, signed long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(along, signed long long);
+
+        /**********************
+         * unsigned long long *
+         **********************/
+        CHECK_RESULT_TYPE_FOR_ALL(aulong, unsigned long long);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(aulong, unsigned long long);
 
         /*********
          * float *
          *********/
-        CHECK_RESULT_TYPE(nansum(afloat, {1, 2}), float);
-        CHECK_RESULT_TYPE(nanmean(afloat, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanstd(afloat, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanvar(afloat, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanmean<float>(afloat, {1, 2}), float);
+        CHECK_RESULT_TYPE_FOR_ALL(afloat, float);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(afloat, float);
 
         /**********
          * double *
          **********/
-        CHECK_RESULT_TYPE(nansum(adouble, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanmean(adouble, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanstd(adouble, {1, 2}), double);
-        CHECK_RESULT_TYPE(nanvar(adouble, {1, 2}), double);
+        CHECK_RESULT_TYPE_FOR_ALL(adouble, double);
+        CHECK_TEMPLATED_RESULT_TYPE_FOR_ALL(adouble, double);
     }
 }
