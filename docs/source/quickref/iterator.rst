@@ -126,7 +126,7 @@ Iterating over axis 1:
         std::cout << *iter++ << std::endl;
     }
     // Prints:
-    // { 1, 5, 13 } 
+    // { 1, 5, 9 } 
     // { 2, 6, 10 }
     // { 3, 7, 11 }
     // { 4, 8, 12 }
