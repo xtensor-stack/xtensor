@@ -1268,17 +1268,23 @@ namespace xt
         auto st_all = xt::stddev(py_a);
         auto vr_all = xt::variance(py_a);
         auto vr_all_ddof = xt::variance(py_a, {0, 1, 2, 3}, 1);
+        std::vector<size_t> axes_all = {0, 1, 2, 3};
+        auto vr_all_ddof_with_axes_arr = xt::variance(py_a, axes_all, 1);
 
         auto st = xt::stddev(py_a, {0, 2});
         auto vr = xt::variance(py_a, {0, 2});
         auto vr_ddof = xt::variance(py_a, {0, 2}, 1);
+        std::vector<size_t> axes02 = {0, 2};
+        auto vr_ddof_with_axes_arr = xt::variance(py_a, axes02, 1);
 
         EXPECT_TRUE(xt::allclose(st_all, py_st_all));
         EXPECT_TRUE(xt::allclose(vr_all, py_vr_all));
         EXPECT_TRUE(xt::allclose(vr_all_ddof, py_vr_all_ddof));
+        EXPECT_TRUE(xt::allclose(vr_all_ddof_with_axes_arr, py_vr_all_ddof));
         EXPECT_TRUE(xt::allclose(st, py_st));
         EXPECT_TRUE(xt::allclose(vr, py_vr));
         EXPECT_TRUE(xt::allclose(vr_ddof, py_vr_ddof));
+        EXPECT_TRUE(xt::allclose(vr_ddof_with_axes_arr, py_vr_ddof));
     }
 
 }

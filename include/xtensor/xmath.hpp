@@ -2089,7 +2089,7 @@ namespace detail {
         return detail::mean_noaxis<void>(square(abs(sc - mean(sc, es))), ddof, es);
     }
 
-    template <class E, class D=int, class EVS = DEFAULT_STRATEGY_REDUCERS,
+    template <class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto variance(E&& e, EVS es = EVS())
     {
@@ -2143,7 +2143,7 @@ namespace detail {
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<std::decay_t<X>>>, xtl::negation<std::is_integral<EVS>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<std::decay_t<X>>>, is_reducer_options<EVS>)>
     inline auto variance(E&& e, X&& axes, EVS es = EVS())
     {
       return variance(std::forward<E>(e), std::forward<X>(axes), 0u, es);
@@ -2182,12 +2182,22 @@ namespace detail {
                       es);
     }
 
-    template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class E, class A, std::size_t N, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto variance(E&& e, const A (&axes)[N], EVS es = EVS())
     {
         return variance(std::forward<E>(e),
                         xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
                         es);
+    }
+
+    template <class E, class A, std::size_t N, class D, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto variance(E&& e, const A (&axes)[N], D const& ddof, EVS es = EVS())
+    {
+      return variance(std::forward<E>(e),
+                      xtl::forward_sequence<std::array<std::size_t, N>, decltype(axes)>(axes),
+                      ddof,
+                      es);
     }
 #else
     template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
@@ -2198,11 +2208,21 @@ namespace detail {
                       es);
     }
 
-    template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    template <class E, class A, class EVS = DEFAULT_STRATEGY_REDUCERS,
+              XTL_REQUIRES(is_reducer_options<EVS>)>
     inline auto variance(E&& e, std::initializer_list<A> axes, EVS es = EVS())
     {
         return variance(std::forward<E>(e),
                         xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                        es);
+    }
+
+    template <class E, class A, class D, class EVS = DEFAULT_STRATEGY_REDUCERS>
+    inline auto variance(E&& e, std::initializer_list<A> axes, D const& ddof, EVS es = EVS())
+    {
+        return variance(std::forward<E>(e),
+                        xtl::forward_sequence<dynamic_shape<std::size_t>, decltype(axes)>(axes),
+                        ddof,
                         es);
     }
 #endif
