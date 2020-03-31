@@ -38,6 +38,18 @@ namespace xt
         return lhs.size() == rhs.size() && std::equal(rhs.begin(), rhs.end(), lhs.begin());
     }
 
+    TEST(xview, iterator_compilation)
+    {
+        xt::xtensor<double, 2> U = xt::zeros<double>({1000L,1000L});
+        auto step_result_v = xt::view(U, 1, xt::range(1, 999));
+
+        auto it0 = step_result_v.begin();
+        auto end0 = step_result_v.end();
+
+        auto it1 = U.begin();
+        auto end1 = U.end();
+    }
+
     TEST(xview, temporary_type)
     {
         {
