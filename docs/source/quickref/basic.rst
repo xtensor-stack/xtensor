@@ -125,7 +125,7 @@ length of the underlying buffer and remaining dimensions:
     std::cout << a0 << std::endl;
     // outputs {{1., 2., 3.}, {4., 5., 6. }}
 
-    xt::xtensor<double, 2> a1 = {{1. 2.}, {3., 4.}, {5., 6.}};
+    xt::xtensor<double, 2> a1 = {{1., 2.}, {3., 4.}, {5., 6.}};
     a1.reshape({-1, 3});
     std::cout << a1 << std::endl;
     // outputs {{1., 2., 3.}, {4., 5., 6. }}
