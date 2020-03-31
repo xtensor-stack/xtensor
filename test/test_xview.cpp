@@ -1120,6 +1120,20 @@ namespace xt
         EXPECT_EQ(v1, exp_v1);
     }
 
+    TEST(xview, const_keep_drop_slice)
+    {
+        xt::xtensor<double, 1> xs = xt::arange<double>(10);
+        const auto kidx = xt::keep(0, 3, 5);
+        const auto didx = xt::drop(1, 2, 4, 6, 7, 8, 9);
+        auto kv = xt::view(xs, kidx);
+        auto dv = xt::view(xs, didx);
+        xt::xtensor<double, 1> kres = kv;
+        xt::xtensor<double, 1> dres = dv;
+        xt::xtensor<double, 1> expected = { 0., 3., 5. };
+        EXPECT_EQ(kres, expected);
+        EXPECT_EQ(dres, expected);
+    }
+
     TEST(xview, mixed_types)
     {
         xt::xarray<std::uint8_t> input;

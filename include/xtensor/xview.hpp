@@ -158,7 +158,8 @@ namespace xt
         // If we have no discontiguous slices, we can calculate strides for this view.
         template <class E, class... S>
         struct is_strided_view
-            : std::integral_constant<bool, xtl::conjunction<has_data_interface<E>, is_strided_slice_impl<S>...>::value>
+            : std::integral_constant<bool, xtl::conjunction<has_data_interface<E>,
+                                                            is_strided_slice_impl<std::decay_t<S>>...>::value>
         {
         };
 
