@@ -1852,7 +1852,6 @@ namespace detail {
      * Reducing functions *
      **********************/
 
-
     /**
      * @defgroup  red_functions reducing functions
      */
@@ -2124,7 +2123,7 @@ namespace detail {
      */
     template <class T = void, class E, class X, class D, class EVS = DEFAULT_STRATEGY_REDUCERS,
               XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<D>)>
-    inline auto variance(E&& e, X&& axes, D const& ddof, EVS es = EVS())
+    inline auto variance(E&& e, X&& axes, const D& ddof, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
         // note: forcing copy of first axes argument -- is there a better solution?
