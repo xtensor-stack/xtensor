@@ -11,20 +11,38 @@ Reducing functions
 
 Defined in ``xtensor/xmath.hpp``
 
+.. doxygenfunction:: sum(E&&, EVS)
+   :project: xtensor
+
 .. _sum-function-reference:
 .. doxygenfunction:: sum(E&&, X&&, EVS)
+   :project: xtensor
+
+.. doxygenfunction:: prod(E&&, EVS)
    :project: xtensor
 
 .. _prod-function-reference:
 .. doxygenfunction:: prod(E&&, X&&, EVS)
    :project: xtensor
 
+.. doxygenfunction:: mean(E&&, EVS)
+   :project: xtensor
+
 .. _mean-function-reference:
 .. doxygenfunction:: mean(E&&, X&&, EVS)
    :project: xtensor
 
-.. _variance-function-reference:
+.. doxygenfunction:: variance(E&&, EVS)
+   :project: xtensor
+
 .. doxygenfunction:: variance(E&&, X&&, EVS)
+   :project: xtensor
+
+.. _variance-function-reference:
+.. doxygenfunction:: variance(E&&, X&&, const D&, EVS)
+   :project: xtensor
+
+.. doxygenfunction:: stddev(E&&, EVS)
    :project: xtensor
 
 .. _stddev-function-reference:
@@ -35,8 +53,14 @@ Defined in ``xtensor/xmath.hpp``
 .. doxygenfunction:: diff(const xexpression<T>&, unsigned int, std::ptrdiff_t)
    :project: xtensor
 
+.. doxygenfunction:: amax(E&&, EVS)
+   :project: xtensor
+
 .. _amax-function-reference:
 .. doxygenfunction:: amax(E&&, X&&, EVS)
+   :project: xtensor
+
+.. doxygenfunction:: amin(E&&, EVS)
    :project: xtensor
 
 .. _amin-function-reference:
