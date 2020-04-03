@@ -641,7 +641,7 @@ namespace xt
      *
      * \code{.cpp}
      * xt::xarray<double> a = {{1, 2, 3}, {4, 5, 6}};
-     * xt::slice_vector sv({xt::range(0, 1)});
+     * xt::xstrided_slice_vector sv({xt::range(0, 1)});
      * sv.push_back(xt::range(0, 3, 2));
      * auto v = xt::strided_view(a, sv);
      * // ==> {{1, 3}}
