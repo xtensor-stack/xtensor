@@ -74,6 +74,7 @@ namespace xt
     inline xarray_adaptor<xtl::closure_type_t<C>, L, std::decay_t<SC>>
     adapt(C&& container, const SC& shape, layout_type l = L)
     {
+        static_assert(!std::is_integral<SC>::value, "shape cannot be a integer");
         using return_type = xarray_adaptor<xtl::closure_type_t<C>, L, std::decay_t<SC>>;
         return return_type(std::forward<C>(container), shape, l);
     }
@@ -89,6 +90,7 @@ namespace xt
                            std::is_pointer<C>)>
     inline auto adapt(C&& pointer, const SC& shape, layout_type l = L)
     {
+        static_assert(!std::is_integral<SC>::value, "shape cannot be a integer");
         using buffer_type = xbuffer_adaptor<C, xt::no_ownership, detail::default_allocator_for_ptr_t<C>>;
         using return_type = xarray_adaptor<buffer_type, L, std::decay_t<SC>>;
         std::size_t size = compute_size(shape);
@@ -108,6 +110,7 @@ namespace xt
     inline xarray_adaptor<xtl::closure_type_t<C>, layout_type::dynamic, std::decay_t<SC>>
     adapt(C&& container, SC&& shape, SS&& strides)
     {
+        static_assert(!std::is_integral<std::decay_t<SC>>::value, "shape cannot be a integer");
         using return_type = xarray_adaptor<xtl::closure_type_t<C>, layout_type::dynamic, std::decay_t<SC>>;
         return return_type(std::forward<C>(container),
                            xtl::forward_sequence<typename return_type::inner_shape_type, SC>(shape),
@@ -130,6 +133,7 @@ namespace xt
     inline xarray_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, L, SC>
     adapt(P&& pointer, typename A::size_type size, O ownership, const SC& shape, layout_type l = L, const A& alloc = A())
     {
+        static_assert(!std::is_integral<SC>::value, "shape cannot be a integer");
         (void)ownership;
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
         using return_type = xarray_adaptor<buffer_type, L, SC>;
@@ -154,6 +158,7 @@ namespace xt
     inline xarray_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, layout_type::dynamic, std::decay_t<SC>>
     adapt(P&& pointer, typename A::size_type size, O ownership, SC&& shape, SS&& strides, const A& alloc = A())
     {
+        static_assert(!std::is_integral<std::decay_t<SC>>::value, "shape cannot be a integer");
         (void)ownership;
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
         using return_type = xarray_adaptor<buffer_type, layout_type::dynamic, std::decay_t<SC>>;
@@ -226,6 +231,7 @@ namespace xt
     inline xtensor_adaptor<C, detail::array_size<SC>::value, L>
     adapt(C&& container, const SC& shape, layout_type l = L)
     {
+        static_assert(!std::is_integral<SC>::value, "shape cannot be a integer");
         constexpr std::size_t N = detail::array_size<SC>::value;
         using return_type = xtensor_adaptor<xtl::closure_type_t<C>, N, L>;
         return return_type(std::forward<C>(container), shape, l);
@@ -242,6 +248,7 @@ namespace xt
                            std::is_pointer<C>)>
     inline auto adapt(C&& pointer, const SC& shape, layout_type l = L)
     {
+        static_assert(!std::is_integral<SC>::value, "shape cannot be a integer");
         using buffer_type = xbuffer_adaptor<C, xt::no_ownership, detail::default_allocator_for_ptr_t<C>>;
         constexpr std::size_t N = detail::array_size<SC>::value;
         using return_type = xtensor_adaptor<buffer_type, N, L>;
@@ -261,6 +268,7 @@ namespace xt
     inline xtensor_adaptor<C, detail::array_size<SC>::value, layout_type::dynamic>
     adapt(C&& container, SC&& shape, SS&& strides)
     {
+        static_assert(!std::is_integral<std::decay_t<SC>>::value, "shape cannot be a integer");
         constexpr std::size_t N = detail::array_size<SC>::value;
         using return_type = xtensor_adaptor<xtl::closure_type_t<C>, N, layout_type::dynamic>;
         return return_type(std::forward<C>(container),
@@ -306,6 +314,7 @@ namespace xt
     inline xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, detail::array_size<SC>::value, L>
     adapt(P&& pointer, typename A::size_type size, O ownership, const SC& shape, layout_type l = L, const A& alloc = A())
     {
+        static_assert(!std::is_integral<SC>::value, "shape cannot be a integer");
         (void)ownership;
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
         constexpr std::size_t N = detail::array_size<SC>::value;
@@ -331,6 +340,7 @@ namespace xt
     inline xtensor_adaptor<xbuffer_adaptor<xtl::closure_type_t<P>, O, A>, detail::array_size<SC>::value, layout_type::dynamic>
     adapt(P&& pointer, typename A::size_type size, O ownership, SC&& shape, SS&& strides, const A& alloc = A())
     {
+        static_assert(!std::is_integral<std::decay_t<SC>>::value, "shape cannot be a integer");
         (void)ownership;
         using buffer_type = xbuffer_adaptor<xtl::closure_type_t<P>, O, A>;
         constexpr std::size_t N = detail::array_size<SC>::value;
