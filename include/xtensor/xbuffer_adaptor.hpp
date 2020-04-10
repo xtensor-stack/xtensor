@@ -51,17 +51,18 @@ namespace xt
             using self_type = xbuffer_storage<CP, A>;
             using allocator_type = A;
             using destructor_type = allocator_type;
-            using value_type = typename allocator_type::value_type;
+            using allocator_traits = std::allocator_traits<allocator_type>;
+            using value_type = typename allocator_traits::value_type;
             using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_type::const_reference,
-                                  typename allocator_type::reference>;
-            using const_reference = typename allocator_type::const_reference;
+                                  const value_type&,
+                                  value_type&>;
+            using const_reference = const value_type&;
             using pointer = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_type::const_pointer,
-                                  typename allocator_type::pointer>;
-            using const_pointer = typename allocator_type::const_pointer;
-            using size_type = typename allocator_type::size_type;
-            using difference_type = typename allocator_type::difference_type;
+                                  typename allocator_traits::const_pointer,
+                                  typename allocator_traits::pointer>;
+            using const_pointer = typename allocator_traits::const_pointer;
+            using size_type = typename allocator_traits::size_type;
+            using difference_type = typename allocator_traits::difference_type;
 
             xbuffer_storage();
 
@@ -91,16 +92,17 @@ namespace xt
             using destructor_type = D;
             using value_type = std::remove_const_t<std::remove_pointer_t<std::remove_reference_t<CP>>>;
             using allocator_type = std::allocator<value_type>;
+            using allocator_traits = std::allocator_traits<allocator_type>;
             using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_type::const_reference,
-                                  typename allocator_type::reference>;
-            using const_reference = typename allocator_type::const_reference;
+                                  const value_type&,
+                                  value_type&>;
+            using const_reference = const value_type&;
             using pointer = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_type::const_pointer,
-                                  typename allocator_type::pointer>;
-            using const_pointer = typename allocator_type::const_pointer;
-            using size_type = typename allocator_type::size_type;
-            using difference_type = typename allocator_type::difference_type;
+                                  typename allocator_traits::const_pointer,
+                                  typename allocator_traits::pointer>;
+            using const_pointer = typename allocator_traits::const_pointer;
+            using size_type = typename allocator_traits::size_type;
+            using difference_type = typename allocator_traits::difference_type;
 
             xbuffer_smart_pointer();
 
@@ -130,17 +132,18 @@ namespace xt
             using self_type = xbuffer_owner_storage<CP, A>;
             using allocator_type = A;
             using destructor_type = allocator_type;
-            using value_type = typename allocator_type::value_type;
+            using allocator_traits = std::allocator_traits<allocator_type>;
+            using value_type = typename allocator_traits::value_type;
             using reference = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_type::const_reference,
-                                  typename allocator_type::reference>;
-            using const_reference = typename allocator_type::const_reference;
+                                  const value_type&,
+                                  value_type&>;
+            using const_reference = const value_type&;
             using pointer = std::conditional_t<std::is_const<std::remove_pointer_t<std::remove_reference_t<CP>>>::value,
-                                  typename allocator_type::const_pointer,
-                                  typename allocator_type::pointer>;
-            using const_pointer = typename allocator_type::const_pointer;
-            using size_type = typename allocator_type::size_type;
-            using difference_type = typename allocator_type::difference_type;
+                                  typename allocator_traits::const_pointer,
+                                  typename allocator_traits::pointer>;
+            using const_pointer = typename allocator_traits::const_pointer;
+            using size_type = typename allocator_traits::size_type;
+            using difference_type = typename allocator_traits::difference_type;
 
             xbuffer_owner_storage() = default;
 

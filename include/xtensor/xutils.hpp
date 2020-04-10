@@ -17,6 +17,7 @@
 #include <cstddef>
 #include <initializer_list>
 #include <iostream>
+#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
@@ -736,7 +737,8 @@ namespace xt
         template <class U>
         struct rebind
         {
-            using other = tracking_allocator<U, typename A::template rebind<U>::other, P>;
+            using traits = std::allocator_traits<A>;
+            using other = tracking_allocator<U, typename traits::template rebind_alloc<U>, P>;
         };
     };
 
@@ -774,7 +776,8 @@ namespace xt
     template <class X, template <class, class> class C, class T, class A>
     struct rebind_container<X, C<T, A>>
     {
-        using allocator = typename A::template rebind<X>::other;
+        using traits = std::allocator_traits<A>;
+        using allocator = typename traits::template rebind_alloc<X>;
         using type = C<X, allocator>;
     };
 
