@@ -1329,7 +1329,8 @@ namespace xt
     template <class X, class T, std::size_t N, class A, bool B>
     struct rebind_container<X, svector<T, N, A, B>>
     {
-        using allocator = typename A::template rebind<X>::other;
+        using traits = std::allocator_traits<A>;
+        using allocator = typename traits::template rebind_alloc<X>;
         using type = svector<X, N, allocator, B>;
     };
 
