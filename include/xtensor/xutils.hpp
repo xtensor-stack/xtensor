@@ -609,6 +609,27 @@ namespace xt
     {
     };
 
+    /******************************
+     * is_iterator implementation *
+     ******************************/
+
+    template <class E, class = void>
+    struct is_iterator : std::false_type
+    {
+    };
+
+    template <class E>
+    struct is_iterator<E, void_t<decltype(
+        *std::declval<const E>(),
+        std::declval<const E>() == std::declval<const E>(),
+        std::declval<const E>() != std::declval<const E>(),
+        ++ (*std::declval<E*>()),
+        (*std::declval<E*>()) ++,
+        std::true_type())>>
+        : std::true_type
+    {
+    };
+
     /********************************************
      * xtrivial_default_construct implemenation *
      ********************************************/

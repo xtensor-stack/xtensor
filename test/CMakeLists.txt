@@ -210,6 +210,7 @@ set(XTENSOR_TESTS
     test_xoptional.cpp
     test_xoptional_assembly_adaptor.cpp
     test_xoptional_assembly_storage.cpp
+    test_xset_operation.cpp
     test_xrandom.cpp
     test_xrepeat.cpp
     test_xsort.cpp
