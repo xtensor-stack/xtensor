@@ -107,15 +107,21 @@ namespace xt
         v2.erase(v2.begin() + 1, v2.end());
         EXPECT_TRUE(std::equal(s2.begin(), s2.end(), v2.begin()));
 
+        std::size_t i1 = 50;
+        std::size_t i2 = 50;
         EXPECT_TRUE(s2.on_stack());
         s2.push_back(10);
         s2.push_back(20);
         s2.push_back(30);
         s2.push_back(40);
+        s2.push_back(i1);
+        s2.push_back(std::move(i1));
         v2.push_back(10);
         v2.push_back(20);
         v2.push_back(30);
         v2.push_back(40);
+        v2.push_back(i2);
+        v2.push_back(std::move(i2));
         EXPECT_FALSE(s2.on_stack());
         EXPECT_TRUE(std::equal(s2.begin(), s2.end(), v2.begin()));
     }

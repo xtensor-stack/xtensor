@@ -677,6 +677,7 @@ namespace xt
         const_pointer data() const;
 
         void push_back(const T& elt);
+        void push_back(T&& elt);
         void pop_back();
 
         iterator begin();
@@ -983,6 +984,16 @@ namespace xt
             grow();
         }
         *(m_end++) = elt;
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    void svector<T, N, A, Init>::push_back(T&& elt)
+    {
+        if (m_end >= m_capacity)
+        {
+            grow();
+        }
+        *(m_end++) = std::move(elt);
     }
 
     template <class T, std::size_t N, class A, bool Init>
