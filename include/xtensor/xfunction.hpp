@@ -50,7 +50,7 @@ namespace xt
             bool is_trivial;
             bool is_initialized;
 
-            xfunction_cache_impl() : shape(xtl::make_sequence<S>(0, std::size_t(0))), is_initialized(false) {}
+            xfunction_cache_impl() : shape(xtl::make_sequence<S>(0, std::size_t(0))), is_initialized(false), is_trivial(false) {}
         };
 
         template<std::size_t... N, class is_shape_trivial>
