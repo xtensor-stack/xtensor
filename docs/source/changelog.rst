@@ -7,6 +7,35 @@
 Changelog
 =========
 
+0.21.5
+------
+
+- Fix segfault when using ``xt::drop`` on an empty list of indices
+  `#1990 <https://github.com/xtensor-stack/xtensor/pull/1990>`_
+- Implemented missing methods in ``xrepeat`` class
+  `#1993 <https://github.com/xtensor-stack/xtensor/pull/1993>`_
+- Added extension base to ``xrepeat`` and clean up ``xbroadcast``
+  `#1994 <https://github.com/xtensor-stack/xtensor/pull/1994>`_
+- Fix return type of ``nanmean`` and add unittest
+  `#1996 <https://github.com/xtensor-stack/xtensor/pull/1996>`_
+- Add result type template argument for ``stddev``, ``variance``, ``nanstd`` and ``nanvar``
+  `#1999 <https://github.com/xtensor-stack/xtensor/pull/1999>`_
+- Fix variance overload
+  `#2002 <https://github.com/xtensor-stack/xtensor/pull/2002>`_
+- Added missing ``xaxis_slice_iterator`` header to CMakeLists.txt
+  `#2009 <https://github.com/xtensor-stack/xtensor/pull/2009>`_
+- Fixed xview on const keep and const drop slices
+  `#2010 <https://github.com/xtensor-stack/xtensor/pull/2010>`_
+- Added ``static_assert`` to ``adapt`` methods
+  `#2015 <https://github.com/xtensor-stack/xtensor/pull/2015>`_
+- Removed allocator deprecated calls
+  `#2018 <https://github.com/xtensor-stack/xtensor/pull/2018>`_
+- Added missing overload of ``push_back`` to ``svector``
+  `#2024 <https://github.com/xtensor-stack/xtensor/pull/2024>`_
+- Initialized all members of ``xfunciton_cache_impl``
+  `#2026 <https://github.com/xtensor-stack/xtensor/pull/2026>`_
+
+
 0.21.4
 ------
 
