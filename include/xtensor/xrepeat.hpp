@@ -21,7 +21,7 @@ namespace xt
 {
     template <class CT, class R>
     class xrepeat;
-    
+
     template <class S, class R>
     class xrepeat_stepper;
 
@@ -153,7 +153,7 @@ namespace xt
 
         template <class S>
         bool has_linear_assign(const S& strides) const noexcept;
-        
+
         const_stepper stepper_begin() const;
         const_stepper stepper_begin(const shape_type& s) const;
 
@@ -384,7 +384,7 @@ namespace xt
      */
     template <class CT, class R>
     template <class S>
-    inline bool xrepeat<CT, R>::broadcast_shape(S& shape, bool reuse_cache) const
+    inline bool xrepeat<CT, R>::broadcast_shape(S& shape, bool) const
     {
         return xt::broadcast_shape(m_shape, shape);
     }
