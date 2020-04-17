@@ -156,7 +156,6 @@ namespace xt
     inline auto in1d(E&& element, I&& test_elements_begin, I&& test_elements_end) noexcept
     {
         XTENSOR_ASSERT(element.dimension() == 1ul);
-        XTENSOR_ASSERT(test_elements.dimension() == 1ul);
         return isin(std::forward<E>(element), std::forward<I>(test_elements_begin), std::forward<I>(test_elements_end));
     }
 
