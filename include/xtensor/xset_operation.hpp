@@ -29,26 +29,25 @@ namespace xt
     namespace detail
     {
 
-        template<class, typename = void>
-        struct make_lambda_isin_dispatch : std::integral_constant<int, 0> {};
-
-        template<class E>
-        struct make_lambda_isin_dispatch<E, std::enable_if_t<std::is_lvalue_reference<E>::value>>
-            : std::integral_constant<int, 1> {};
-
-        template <class E>
-        inline auto make_lambda_isin(E&& e, std::integral_constant<int, 0>)
+        template <bool lvalue>
+        struct lambda_isin
         {
-            return [e](const auto& t) {
-                return std::find(e.begin(), e.end(), t) != e.end(); };
-        }
+            template <class E>
+            static auto make(E&& e)
+            {
+                return [&e](const auto& t) { return std::find(e.begin(), e.end(), t) != e.end(); };
+            }
+        };
 
-        template <class E>
-        inline auto make_lambda_isin(E&& e, std::integral_constant<int, 1>)
+        template <>
+        struct lambda_isin<false>
         {
-            return [&e](const auto& t) {
-                return std::find(e.begin(), e.end(), t) != e.end(); };
-        }
+            template <class E>
+            static auto make(E&& e)
+            {
+                return [e](const auto& t) { return std::find(e.begin(), e.end(), t) != e.end(); };
+            }
+        };
 
     }
 
@@ -83,7 +82,7 @@ namespace xt
     template <class E, class F, class = typename std::enable_if_t<has_iterator_interface<F>::value>>
     inline auto isin(E&& element, F&& test_elements) noexcept
     {
-        auto lambda = detail::make_lambda_isin(test_elements, detail::make_lambda_isin_dispatch<E>{});
+        auto lambda = detail::lambda_isin<std::is_lvalue_reference<F>::value>::make(std::forward<F>(test_elements));
         return make_lambda_xfunction(std::move(lambda), std::forward<E>(element));
     }
 
