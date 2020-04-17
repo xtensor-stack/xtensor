@@ -26,6 +26,32 @@
 namespace xt
 {
 
+    namespace detail
+    {
+
+        template<class, typename = void>
+        struct make_lambda_isin_dispatch : std::integral_constant<int, 0> {};
+
+        template<class E>
+        struct make_lambda_isin_dispatch<E, std::enable_if_t<std::is_lvalue_reference<E>::value>>
+            : std::integral_constant<int, 1> {};
+
+        template <class E>
+        inline auto make_lambda_isin(E&& e, std::integral_constant<int, 0>)
+        {
+            return [e](const auto& t) {
+                return std::find(e.begin(), e.end(), t) != e.end(); };
+        }
+
+        template <class E>
+        inline auto make_lambda_isin(E&& e, std::integral_constant<int, 1>)
+        {
+            return [&e](const auto& t) {
+                return std::find(e.begin(), e.end(), t) != e.end(); };
+        }
+
+    }
+
     /**
     * @ingroup logical_operators
     * @brief isin
@@ -57,8 +83,7 @@ namespace xt
     template <class E, class F, class = typename std::enable_if_t<has_iterator_interface<F>::value>>
     inline auto isin(E&& element, F&& test_elements) noexcept
     {
-        auto lambda = [&test_elements](const auto& t) {
-            return std::find(test_elements.begin(), test_elements.end(), t) != test_elements.end(); };
+        auto lambda = detail::make_lambda_isin(test_elements, detail::make_lambda_isin_dispatch<E>{});
         return make_lambda_xfunction(std::move(lambda), std::forward<E>(element));
     }
 
