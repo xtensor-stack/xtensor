@@ -112,6 +112,90 @@ endif()
 # Build
 # =====
 
+function(PREPEND var prefix)
+   set(listVar "")
+   foreach(f ${ARGN})
+      list(APPEND listVar "${prefix}${f}")
+   endforeach(f)
+   set(${var} "${listVar}" PARENT_SCOPE)
+endfunction()
+
+function(POSTFIX var postfix)
+   set(listVar "")
+   foreach(f ${ARGN})
+      list(APPEND listVar "${f}${postfix}")
+   endforeach(f)
+   set(${var} "${listVar}" PARENT_SCOPE)
+endfunction()
+
+set(XTENSOR_SINGLE_INCLUDE
+    xtensor/xaccessible.hpp
+    xtensor/xaccumulator.hpp
+    xtensor/xadapt.hpp
+    xtensor/xarray.hpp
+    xtensor/xassign.hpp
+    xtensor/xaxis_iterator.hpp
+    xtensor/xaxis_slice_iterator.hpp
+    xtensor/xbroadcast.hpp
+    xtensor/xbuffer_adaptor.hpp
+    xtensor/xbuilder.hpp
+    xtensor/xcomplex.hpp
+    xtensor/xcontainer.hpp
+    xtensor/xcsv.hpp
+    xtensor/xdynamic_view.hpp
+    xtensor/xeval.hpp
+    xtensor/xexception.hpp
+    xtensor/xexpression.hpp
+    # xtensor/xexpression_holder.hpp
+    xtensor/xexpression_traits.hpp
+    xtensor/xfixed.hpp
+    xtensor/xfunction.hpp
+    xtensor/xfunctor_view.hpp
+    xtensor/xgenerator.hpp
+    xtensor/xhistogram.hpp
+    xtensor/xindex_view.hpp
+    xtensor/xinfo.hpp
+    xtensor/xio.hpp
+    xtensor/xiterable.hpp
+    xtensor/xiterator.hpp
+    # xtensor/xjson.hpp
+    xtensor/xlayout.hpp
+    xtensor/xmanipulation.hpp
+    xtensor/xmasked_view.hpp
+    xtensor/xmath.hpp
+    # xtensor/xmime.hpp
+    xtensor/xnoalias.hpp
+    xtensor/xnorm.hpp
+    # xtensor/xnpy.hpp
+    xtensor/xoffset_view.hpp
+    xtensor/xoperation.hpp
+    xtensor/xoptional.hpp
+    xtensor/xoptional_assembly.hpp
+    xtensor/xoptional_assembly_base.hpp
+    xtensor/xoptional_assembly_storage.hpp
+    xtensor/xpad.hpp
+    xtensor/xrandom.hpp
+    xtensor/xreducer.hpp
+    xtensor/xrepeat.hpp
+    xtensor/xscalar.hpp
+    xtensor/xsemantic.hpp
+    xtensor/xshape.hpp
+    xtensor/xslice.hpp
+    xtensor/xsort.hpp
+    xtensor/xstorage.hpp
+    xtensor/xstrided_view.hpp
+    xtensor/xstrided_view_base.hpp
+    xtensor/xstrides.hpp
+    xtensor/xtensor.hpp
+    xtensor/xtensor_config.hpp
+    xtensor/xtensor_forward.hpp
+    xtensor/xtensor_simd.hpp
+    xtensor/xutils.hpp
+    xtensor/xvectorize.hpp
+    xtensor/xview.hpp
+    xtensor/xview_utils.hpp
+)
+
 set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaccessible.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaccumulator.hpp
@@ -284,3 +368,16 @@ configure_file(${PROJECT_NAME}.pc.in
                 @ONLY)
 install(FILES "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc"
         DESTINATION "${CMAKE_INSTALL_LIBDIR}/pkgconfig/")
+
+# Write single include
+# ====================
+
+PREPEND(XTENSOR_SINGLE_INCLUDE "#include <" ${XTENSOR_SINGLE_INCLUDE})
+POSTFIX(XTENSOR_SINGLE_INCLUDE ">" ${XTENSOR_SINGLE_INCLUDE})
+string(REPLACE ";" "\n" XTENSOR_SINGLE_INCLUDE "${XTENSOR_SINGLE_INCLUDE}")
+string(CONCAT XTENSOR_SINGLE_INCLUDE "#ifndef XTENSOR\n" "#define XTENSOR\n\n" "${XTENSOR_SINGLE_INCLUDE}" "\n\n#endif\n")
+
+file(WRITE "${CMAKE_INSTALL_INCLUDEDIR}/xtensor.hpp" "${XTENSOR_SINGLE_INCLUDE}")
+
+install(FILES "${CMAKE_INSTALL_INCLUDEDIR}/xtensor.hpp"
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
