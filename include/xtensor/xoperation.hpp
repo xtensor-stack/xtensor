@@ -959,6 +959,7 @@ namespace xt
     {
         return detail::make_xfunction<typename detail::cast<R>::functor>(std::forward<E>(e));
     }
+
 }
 
 #endif

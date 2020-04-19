@@ -163,6 +163,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xrepeat.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xscalar.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsemantic.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xset_operation.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xshape.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xslice.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xsort.hpp
