@@ -36,4 +36,15 @@ namespace xt
         EXPECT_EQ(xt::in1d(a, b.begin(), b.end()), res);
         EXPECT_EQ(xt::in1d(a, {1, 2}), res);
     }
+
+    TEST(xset_operation, searchsorted)
+    {
+        xt::xtensor<size_t,1> a = {1, 2, 7, 8, 20};
+        xt::xtensor<size_t,1> v = {9, 2, 2, 3, 22, 0};
+        xt::xtensor<size_t,1> res_right = {4, 1, 1, 2, 5, 0};
+        xt::xtensor<size_t,1> res_left = {4, 2, 2, 2, 5, 0};
+        EXPECT_EQ(xt::searchsorted(a, v), res_right);
+        EXPECT_EQ(xt::searchsorted(a, v, true), res_right);
+        EXPECT_EQ(xt::searchsorted(a, v, false), res_left);
+    }
 }

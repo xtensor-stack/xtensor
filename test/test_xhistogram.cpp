@@ -55,4 +55,30 @@ namespace xt
         EXPECT_EQ(bc3.size(), std::size_t(10));
         EXPECT_EQ(bc3(3), expc(3));
     }
+
+    TEST(xhistogram, digitize)
+    {
+        xt::xtensor<size_t,1> bin_edges = {0, 10, 20, 30};
+        xt::xtensor<size_t,1> data = {1, 12, 2, 21, 11, 10};
+        xt::xtensor<size_t,1> res_left = {1, 2, 1, 3, 2, 2};
+        xt::xtensor<size_t,1> res_right = {1, 2, 1, 3, 2, 1};
+        EXPECT_EQ(xt::digitize(data, bin_edges), res_left);
+        EXPECT_EQ(xt::digitize(data, bin_edges, false), res_left);
+        EXPECT_EQ(xt::digitize(data, bin_edges, true), res_right);
+    }
+
+
+    TEST(xhistogram, bin_items_1)
+    {
+        xt::xtensor<size_t,1> a = xt::bin_items(11, xt::xtensor<double,1>{0.9, 0.0, 0.0, 0.1});
+        xt::xtensor<size_t,1> b = {9, 0, 0, 2};
+        EXPECT_EQ(a, b);
+    }
+
+    TEST(xhistogram, bin_items_2)
+    {
+        xt::xtensor<size_t,1> a = xt::bin_items(11, xt::xtensor<double,1>{0.25, 0.25, 0.25, 0.25});
+        xt::xtensor<size_t,1> b = {3, 3, 3, 2};
+        EXPECT_EQ(a, b);
+    }
 }
