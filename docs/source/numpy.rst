@@ -189,6 +189,8 @@ The random module provides simple ways to create random tensor expressions, lazi
 | ``np.random.permutation(30)``                 | ``xt::random::permutation(30)``               |
 +-----------------------------------------------+-----------------------------------------------+
 
+See :ref:`random`.
+
 Concatenation, splitting, squeezing
 -----------------------------------
 
@@ -609,6 +611,8 @@ xtensor universal functions are provided for a large set number of mathematical 
 +-------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
 | ``np.bincount(arr)``                                                          | ``xt::bincount(arr)``                                                          |
 +-------------------------------------------------------------------------------+--------------------------------------------------------------------------------+
+
+See :ref:`histogram`.
 
 Linear algebra
 --------------
