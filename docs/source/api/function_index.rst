@@ -16,6 +16,7 @@ Functions and generators
    xbuilder
    xmanipulation
    xsort
+   xset_operation
    xrandom
    xhistogram
    xpad

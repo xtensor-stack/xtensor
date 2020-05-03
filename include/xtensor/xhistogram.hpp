@@ -452,7 +452,8 @@ namespace xt
      *
      * @return 1D container with the number of items per bin
      */
-    inline xt::xtensor<size_t,1> bin_items(size_t N, const xt::xtensor<double,1>& weights)
+    template <class E>
+    inline xt::xtensor<size_t,1> bin_items(size_t N, E&& weights)
     {
         if (weights.size() <= 1) {
             xt::xtensor<size_t,1> n = N * xt::ones<size_t>({1});

@@ -21,6 +21,12 @@ Defined in ``xtensor/xhistogram.hpp``
 .. doxygenfunction:: xt::histogram_bin_edges(E1&&, E2&&, E3, E3, std::size_t, histogram_algorithm)
    :project: xtensor
 
+.. doxygenfunction:: xt::digitize(E1&&, E2&&, E3&&, bool, bool)
+   :project: xtensor
+
+.. doxygenfunction:: xt::bin_items(size_t, E&&)
+   :project: xtensor
+
 Further overloads
 -----------------
 
@@ -40,4 +46,7 @@ Further overloads
    :project: xtensor
 
 .. doxygenfunction:: xt::histogram_bin_edges(E1&&, std::size_t, histogram_algorithm)
+   :project: xtensor
+
+.. doxygenfunction:: xt::bin_items(size_t, size_t)
    :project: xtensor
