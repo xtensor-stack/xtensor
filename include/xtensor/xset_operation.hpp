@@ -174,13 +174,17 @@ namespace xt
 
         auto out = xt::empty<size_t>(v.shape());
 
-        if (right) {
-            for (size_t i = 0; i < v.size(); ++i) {
+        if (right)
+        {
+            for (size_t i = 0; i < v.size(); ++i)
+            {
                 out(i) = std::lower_bound(a.cbegin(), a.cend(), v(i)) - a.cbegin();
             }
         }
-        else {
-            for (size_t i = 0; i < v.size(); ++i) {
+        else
+        {
+            for (size_t i = 0; i < v.size(); ++i)
+            {
                 out(i) = std::upper_bound(a.cbegin(), a.cend(), v(i)) - a.cbegin();
             }
         }

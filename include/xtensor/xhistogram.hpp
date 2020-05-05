@@ -30,11 +30,11 @@ namespace xt
      * @param data The data.
      * @param bin_edges The bin-edges. It has to be 1-dimensional and monotonic.
      * @param right Indicating whether the intervals include the right or the left bin edge.
-     * @param assume_sorted Assume data sorted. [default: false]
+     * @param is_data_sorted Set true if data is sorted. [default: false]
      * @return Output array of indices, of same shape as x.
      */
     template <class E1, class E2>
-    inline auto digitize(E1&& data, E2&& bin_edges, bool right = false, bool assume_sorted = false)
+    inline auto digitize(E1&& data, E2&& bin_edges, bool right = false, bool is_data_sorted = false)
     {
         XTENSOR_ASSERT(bin_edges.dimension() == 1);
         XTENSOR_ASSERT(bin_edges.size() >= 2);
@@ -42,11 +42,12 @@ namespace xt
         XTENSOR_ASSERT(xt::amin(data)[0] >= bin_edges[0]);
         XTENSOR_ASSERT(xt::amax(data)[0] <= bin_edges[bin_edges.size() - 1]);
 
-        if (assume_sorted) {
-            return xt::searchsorted(bin_edges, xt::sort(data), right);
+        if (is_data_sorted)
+        {
+            return xt::searchsorted(std::forward<E2>(bin_edges), std::forward<E1>(data), right);
         }
 
-        return xt::searchsorted(bin_edges, data, right);
+        return xt::searchsorted(std::forward<E2>(bin_edges), xt::sort(std::forward<E1>(data)), right);
     }
 
     /**
@@ -453,28 +454,29 @@ namespace xt
      * @return 1D container with the number of items per bin
      */
     template <class E>
-    inline xt::xtensor<size_t,1> bin_items(size_t N, E&& weights)
+    inline xt::xtensor<size_t, 1> bin_items(size_t N, E&& weights)
     {
-        if (weights.size() <= 1) {
-            xt::xtensor<size_t,1> n = N * xt::ones<size_t>({1});
+        if (weights.size() <= std::size_t(1))
+        {
+            xt::xtensor<size_t, 1> n = N * xt::ones<size_t>({1});
             return n;
         }
 
-        xt::xtensor<double,1> P = weights;
+        using value_type = typename std::decay_t<E>::value_type;
 
-        XTENSOR_ASSERT(xt::all(P >= 0.0));
-        XTENSOR_ASSERT(xt::sum(P)(0) > 0.0);
+        XTENSOR_ASSERT(xt::all(weights >= static_cast<value_type>(0)));
+        XTENSOR_ASSERT(xt::sum(weights)() > static_cast<value_type>(0));
 
-        P /= xt::sum(P)(0);
+        xt::xtensor<double, 1> P = xt::cast<double>(weights) / static_cast<double>(xt::sum(weights)());
+        xt::xtensor<size_t, 1> n = xt::ceil(static_cast<double>(N) * P);
 
-        xt::xtensor<size_t,1> n = xt::ceil((double)N * P);
-
-        if (xt::sum(n)(0) == N) {
+        if (xt::sum(n)() == N)
+        {
             return n;
         }
 
-        xt::xtensor<size_t,1> d = xt::zeros<size_t>(P.shape());
-        xt::xtensor<size_t,1> sorter = xt::argsort(P);
+        xt::xtensor<size_t, 1> d = xt::zeros<size_t>(P.shape());
+        xt::xtensor<size_t, 1> sorter = xt::argsort(P);
         sorter = xt::view(sorter, xt::range(P.size(), _, -1));
         sorter = xt::view(sorter, xt::range(0, xt::sum(n)(0) - N));
         xt::view(d, xt::keep(sorter)) = 1;
