@@ -30,11 +30,10 @@ namespace xt
      * @param data The data.
      * @param bin_edges The bin-edges. It has to be 1-dimensional and monotonic.
      * @param right Indicating whether the intervals include the right or the left bin edge.
-     * @param is_data_sorted Set true if data is sorted. [default: false]
      * @return Output array of indices, of same shape as x.
      */
     template <class E1, class E2>
-    inline auto digitize(E1&& data, E2&& bin_edges, bool right = false, bool is_data_sorted = false)
+    inline auto digitize(E1&& data, E2&& bin_edges, bool right = false)
     {
         XTENSOR_ASSERT(bin_edges.dimension() == 1);
         XTENSOR_ASSERT(bin_edges.size() >= 2);
@@ -42,12 +41,7 @@ namespace xt
         XTENSOR_ASSERT(xt::amin(data)[0] >= bin_edges[0]);
         XTENSOR_ASSERT(xt::amax(data)[0] <= bin_edges[bin_edges.size() - 1]);
 
-        if (is_data_sorted)
-        {
-            return xt::searchsorted(std::forward<E2>(bin_edges), std::forward<E1>(data), right);
-        }
-
-        return xt::searchsorted(std::forward<E2>(bin_edges), xt::sort(std::forward<E1>(data)), right);
+        return xt::searchsorted(std::forward<E2>(bin_edges), std::forward<E1>(data), right);
     }
 
     /**
