@@ -158,6 +158,41 @@ namespace xt
         return isin(std::forward<E>(element), std::forward<I>(test_elements_begin), std::forward<I>(test_elements_end));
     }
 
+    /**
+     * @ingroup searchsorted
+     * @brief Find indices where elements should be inserted to maintain order.
+     *
+     * @param a Input array: sorted (array_like).
+     * @param v Values to insert into a (array_like).
+     * @param right If ``false``, the index of the first suitable location found is given.
+     * @return Array of insertion points with the same shape as v.
+     */
+    template <class E1, class E2>
+    inline auto searchsorted(E1&& a, E2&& v, bool right = true)
+    {
+        XTENSOR_ASSERT(std::is_sorted(a.cbegin(), a.cend()));
+
+        auto out = xt::empty<size_t>(v.shape());
+
+        if (right)
+        {
+            for (size_t i = 0; i < v.size(); ++i)
+            {
+                out(i) = std::lower_bound(a.cbegin(), a.cend(), v(i)) - a.cbegin();
+            }
+        }
+        else
+        {
+            for (size_t i = 0; i < v.size(); ++i)
+            {
+                out(i) = std::upper_bound(a.cbegin(), a.cend(), v(i)) - a.cbegin();
+            }
+        }
+
+
+        return out;
+    }
+
 }
 
 #endif
