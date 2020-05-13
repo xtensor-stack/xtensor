@@ -243,6 +243,9 @@ namespace xt
 
         xarray<uint8_t> c = {1, 2};
         EXPECT_EQ(mean(c)(), 1.5);
+
+        const auto rvalue_xarray = [] () { return xtensor<double, 1>({1, 2}); };
+        EXPECT_EQ(mean(rvalue_xarray(), {0})(), 1.5);
     }
 
     TEST(xreducer, average)
