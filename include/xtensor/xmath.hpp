@@ -1909,23 +1909,26 @@ namespace detail {
         {
             // sum cannot always be a double. It could be a complex number which cannot operate on
             // std::plus<double>.
+            const auto size = e.size();
             auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes), es);
-            return mean_division<T>(std::move(s), e.size() - ddof);
+            return mean_division<T>(std::move(s), size - ddof);
         }
 
 #ifdef X_OLD_CLANG
         template <class T, class E, class I, class D, class EVS>
         inline auto mean(E&& e, std::initializer_list<I> axes, const D& ddof, EVS es)
         {
+            const auto size = e.size();
             auto s = sum<T>(std::forward<E>(e), axes, es);
-            return detail::mean_division<T>(std::move(s), e.size() - ddof);
+            return detail::mean_division<T>(std::move(s), size - ddof);
         }
 #else
         template <class T, class E, class I, std::size_t N, class D, class EVS>
         inline auto mean(E&& e, const I (&axes)[N], const D& ddof, EVS es)
         {
+            const auto size = e.size();
             auto s = sum<T>(std::forward<E>(e), axes, es);
-            return detail::mean_division<T>(std::move(s), e.size() - ddof);
+            return detail::mean_division<T>(std::move(s), size - ddof);
         }
 #endif
 
@@ -1934,7 +1937,7 @@ namespace detail {
         inline auto mean_noaxis(E&& e, const D& ddof, EVS es)
         {
             using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
-            auto size = e.size();
+            const auto size = e.size();
             return sum<T>(std::forward<E>(e), es) / static_cast<value_type>(size - ddof);
         }
     }
