@@ -31,6 +31,9 @@
 *.swp
 *~
 
+# Generated directory
+include/tmp/
+
 # Build directory
 build/
 
