@@ -41,3 +41,9 @@ Defined in ``xtensor/xadapt.hpp``
 
 .. doxygenfunction:: xt::adapt(T (&)[N], SC&&, SS&&)
    :project: xtensor
+
+.. doxygenfunction:: xt::adapt_smart_ptr(P&&, const I (&)[N], layout_type)
+   :project: xtensor
+
+.. doxygenfunction:: xt::adapt_smart_ptr(P&&, const I (&)[N], D&&, layout_type)
+   :project: xtensor
