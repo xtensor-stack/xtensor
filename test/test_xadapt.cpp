@@ -430,6 +430,42 @@ namespace xt
         };
     }
 
+    TEST(xarray_adaptor, smart_ptr)
+    {
+        auto data = std::vector<double>{1,2,3,4,5,6,7,8};
+        auto shared_buf = std::make_shared<xadapt_test::Buffer>(data);
+        auto unique_buf = std::make_unique<xadapt_test::Buffer>(data);
+        std::vector<size_t> shape = {4, 2};
+
+        std::shared_ptr<double> dptr(new double[8], std::default_delete<double[]>());
+        dptr.get()[2] = 2.1;
+        auto xdptr = adapt_smart_ptr(dptr, shape);
+
+        if (XTENSOR_DEFAULT_LAYOUT == layout_type::row_major)
+        {
+            EXPECT_EQ(xdptr(1, 0), 2.1);
+            xdptr(3, 1) = 123.;
+            EXPECT_EQ(dptr.get()[7], 123.);
+        }
+        else
+        {
+            EXPECT_EQ(xdptr(2, 0), 2.1);
+            xdptr(3, 1) = 123.;
+            EXPECT_EQ(dptr.get()[7], 123.);
+        }
+
+        EXPECT_EQ(shared_buf.use_count(), 1);
+        {
+            auto obj = adapt_smart_ptr(shared_buf.get()->buf.data(), shape, shared_buf);
+            EXPECT_EQ(shared_buf.use_count(), 2);
+        }
+        EXPECT_EQ(shared_buf.use_count(), 1);
+
+        {
+            auto obj = adapt_smart_ptr(unique_buf.get()->buf.data(), shape, std::move(unique_buf));
+        }
+    }
+
 #ifndef X_OLD_CLANG
     TEST(xtensor_adaptor, smart_ptr)
     {
