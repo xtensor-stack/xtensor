@@ -79,7 +79,7 @@ Let's use ``xtensor`` instead of ``xarray`` in the previous example:
 
     std::array<size_t, 3> shape = { 3, 2, 4 };
     xt::xtensor<double, 3> a(shape);
-    // whis is equivalent to
+    // this is equivalent to
     // xt::xtensor<double, 3, xt::layout_type::row_major> a(shape);
 
 Or when using ``xtensor_fixed``:
