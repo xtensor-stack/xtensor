@@ -63,8 +63,6 @@ Example 1: Use an algorithm of the C++ library on a numpy array in-place
 
 .. code::
 
-    Python Code
-
     import numpy as np
     import xtensor_python_test as xt
 
