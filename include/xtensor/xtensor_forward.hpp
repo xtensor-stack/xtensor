@@ -175,7 +175,7 @@ namespace xt
      * @tparam T The value type of the elements.
      * @tparam FSH A xshape template shape.
      * @tparam L The layout_type of the tensor (default: XTENSOR_DEFAULT_LAYOUT).
-     * @tparam Sharable Wether the tnesor can be used in shared expression.
+     * @tparam Sharable Whether the tensor can be used in shared expression.
      */
     template <class T,
               class FSH,
