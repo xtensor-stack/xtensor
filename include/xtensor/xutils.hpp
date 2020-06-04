@@ -201,6 +201,8 @@ namespace xt
      * accumulate implementation *
      *****************************/
 
+    /// @cond DOXYGEN_INCLUDE_NOEXCEPT
+
     namespace detail
     {
         template <std::size_t I, class F, class R, class... T>
@@ -226,6 +228,8 @@ namespace xt
     {
         return detail::accumulate_impl<0, F, R, T...>(std::forward<F>(f), init, t);
     }
+
+    /// @endcond
 
     /***************************
      * argument implementation *
