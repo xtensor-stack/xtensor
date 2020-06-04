@@ -297,6 +297,12 @@ namespace xt
         template <class T, class S>
         using both_integer = xtl::conjunction<std::is_integral<T>, std::is_integral<S>>;
 
+        template <class T, class S>
+        using integer_with_signed_integer = xtl::conjunction<both_integer<T, S>, std::is_signed<S>>;
+
+        template <class T, class S>
+        using integer_with_unsigned_integer = xtl::conjunction<both_integer<T, S>, std::is_unsigned<S>>;
+
         template <class T, class S = T, XTL_REQUIRES(xtl::negation<both_integer<T, S>>)>
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
@@ -304,7 +310,7 @@ namespace xt
             return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
         }
 
-        template <class T, class S = T, XTL_REQUIRES(both_integer<T, S>)>
+        template <class T, class S = T, XTL_REQUIRES(integer_with_signed_integer<T, S>)>
         inline auto arange_impl(T start, T stop, S step = 1) noexcept
         {
             bool empty_cond = (stop - start) / step <= 0;
@@ -315,6 +321,18 @@ namespace xt
                                      : static_cast<std::size_t>((start - stop - step - S(1)) / -step);
             }
             return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), {shape});
+        }
+
+        template <class T, class S = T, XTL_REQUIRES(integer_with_unsigned_integer<T, S>)>
+        inline auto arange_impl(T start, T stop, S step = 1) noexcept
+        {
+            bool empty_cond = stop <= start;
+            std::size_t shape = 0;
+            if (!empty_cond)
+            {
+                shape = static_cast<std::size_t>((stop - start + step - S(1)) / step);
+            }
+            return detail::make_xgenerator(detail::arange_generator<T, T, S>(start, stop, step), { shape });
         }
 
         template <class F>
