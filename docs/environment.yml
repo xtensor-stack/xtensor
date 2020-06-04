@@ -5,3 +5,4 @@ channels:
 
 dependencies:
   - breathe
+  - sphinx=2.4.4
