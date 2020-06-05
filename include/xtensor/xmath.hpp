@@ -2085,8 +2085,8 @@ namespace detail {
               XTL_REQUIRES(is_reducer_options<EVS>, std::is_integral<D>)>
     inline auto variance(E&& e, D const& ddof, EVS es = EVS())
     {
-        decltype(auto) sc = detail::shared_forward<E>(e);
-        return detail::mean_noaxis<T>(square(sc - mean<T>(sc, es)), ddof, es);
+        auto cached_mean = mean<T>(e, es)();
+        return detail::mean_noaxis<T>(square(std::forward<E>(e) - std::move(cached_mean)), ddof, es);
     }
 
     template <class T = void, class E, class EVS = DEFAULT_STRATEGY_REDUCERS,
