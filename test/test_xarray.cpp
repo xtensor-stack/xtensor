@@ -361,4 +361,21 @@ namespace xt
         EXPECT_TRUE(std::is_destructible<array_type>::value);
         EXPECT_TRUE(std::is_nothrow_destructible<array_type>::value);
     }
+
+    TEST(xarray, bool_container)
+    {
+        xt::xarray<int> a{1, 0, 1, 0}, b{1, 1, 0, 0};
+
+        xt::xarray<bool> c = a & b;
+        EXPECT_TRUE(c(0));
+        EXPECT_FALSE(c(1));
+        EXPECT_FALSE(c(2));
+        EXPECT_FALSE(c(3));
+
+        xt::xarray<bool> d = a | b;
+        EXPECT_TRUE(d(0));
+        EXPECT_TRUE(d(1));
+        EXPECT_TRUE(d(2));
+        EXPECT_FALSE(d(3));
+    }
 }
