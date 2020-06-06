@@ -368,4 +368,21 @@ namespace xt
         EXPECT_TRUE(std::is_destructible<tensor_type>::value);
         EXPECT_TRUE(std::is_nothrow_destructible<tensor_type>::value);
     }
+
+    TEST(xtensor, bool_container)
+    {
+        xt::xtensor<int, 1> a{1, 0, 1, 0}, b{1, 1, 0, 0};
+
+        xt::xtensor<bool, 1> c = a & b;
+        EXPECT_TRUE(c(0));
+        EXPECT_FALSE(c(1));
+        EXPECT_FALSE(c(2));
+        EXPECT_FALSE(c(3));
+
+        xt::xtensor<bool, 1> d = a | b;
+        EXPECT_TRUE(d(0));
+        EXPECT_TRUE(d(1));
+        EXPECT_TRUE(d(2));
+        EXPECT_FALSE(d(3));
+    }
 }

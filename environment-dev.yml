@@ -4,5 +4,5 @@ channels:
 dependencies:
   - cmake
   - xtl=0.6.12
-  - xsimd=7.4.6
+  - xsimd=7.4.8
   - nlohmann_json

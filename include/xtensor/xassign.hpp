@@ -295,16 +295,16 @@ namespace xt
 
         /**
          * Considering the assigment LHS = RHS, if the requested value type used for
-         * loading simd form RHS is not complex while LHS value_type is complex,
+         * loading simd from RHS is not complex while LHS value_type is complex,
          * the assignment fails. The reason is that SIMD batches of complex values cannot
          * be implicitly instanciated from batches of scalar values.
          * Making the constructor implicit does not fix the issue since in the end,
          * the assignment is done with vec.store(buffer) where vec is a batch of scalars
          * and buffer an array of complex. SIMD batches of scalars do not provide overloads
-         * of store that accept buffer of commplex values and that SHOULD NOT CHANGE.
+         * of store that accept buffer of complex values and that SHOULD NOT CHANGE.
          * Load and store overloads must accept SCALAR BUFFERS ONLY.
          * Therefore, the solution is to explicitly force the instantiation of complex
-         * batches in the assignment mechanism. A common situation tthat triggers this
+         * batches in the assignment mechanism. A common situation that triggers this
          * issue is:
          * xt::xarray<double> rhs = { 1, 2, 3 };
          * xt::xarray<std::complex<double>> lhs = rhs;
@@ -953,7 +953,7 @@ namespace xt
         {
             for (std::size_t i = 0; i < simd_size; ++i)
             {
-                res_stepper.template store_simd<simd_type>(fct_stepper.template step_simd<value_type>());
+                res_stepper.store_simd(fct_stepper.template step_simd<value_type>());
             }
             for (std::size_t i = 0; i < simd_rest; ++i)
             {
