@@ -674,11 +674,11 @@ namespace xt
         template <bool... values>
         using all_true = xtl::conjunction<std::integral_constant<bool, values>...>;
 
-        template <class X, class Y, std::size_t axis, class AxesSequence> 
+        template <class X, class Y, std::size_t axis, class AxesSequence>
         struct concat_fixed_shape_impl;
 
         template <class X, class Y, std::size_t axis, std::size_t... Is>
-        struct concat_fixed_shape_impl<X, Y, axis, std::index_sequence<Is...>> 
+        struct concat_fixed_shape_impl<X, Y, axis, std::index_sequence<Is...>>
         {
             static_assert(X::size() == Y::size(), "Concatenation requires equisized shapes");
             static_assert(axis < X::size(), "Concatenation requires a valid axis");
@@ -689,17 +689,17 @@ namespace xt
                                                  : X::template get<Is>())...>;
         };
 
-        template <std::size_t axis, class X, class Y, class... Rest> 
+        template <std::size_t axis, class X, class Y, class... Rest>
         struct concat_fixed_shape;
 
-        template <std::size_t axis, class X, class Y> 
-        struct concat_fixed_shape<axis, X, Y> 
+        template <std::size_t axis, class X, class Y>
+        struct concat_fixed_shape<axis, X, Y>
         {
             using type = typename concat_fixed_shape_impl<X, Y, axis, std::make_index_sequence<X::size()>>::type;
         };
 
-        template <std::size_t axis, class X, class Y, class... Rest> 
-        struct concat_fixed_shape 
+        template <std::size_t axis, class X, class Y, class... Rest>
+        struct concat_fixed_shape
         {
             using type = typename concat_fixed_shape<axis, X, typename concat_fixed_shape<axis, Y, Rest...>::type>::type;
         };
@@ -775,7 +775,7 @@ namespace xt
      * xt::xarray<double> a = {{1, 2, 3}};
      * xt::xarray<double> b = {{2, 3, 4}};
      * xt::xarray<double> c = xt::concatenate(xt::xtuple(a, b)); // => {{1, 2, 3},
-     *                                                                  {2, 3, 4}}
+     *                                                           //     {2, 3, 4}}
      * xt::xarray<double> d = xt::concatenate(xt::xtuple(a, b), 1); // => {{1, 2, 3, 2, 3, 4}}
      * \endcode
      */
@@ -787,7 +787,7 @@ namespace xt
     }
 
     template <std::size_t axis, class... CT, typename = std::enable_if_t<detail::all_fixed_shapes<CT...>::value>>
-    inline auto concatenate(std::tuple<CT...> &&t) 
+    inline auto concatenate(std::tuple<CT...> &&t)
     {
         using shape_type = detail::concat_fixed_shape_t<axis, typename std::decay_t<CT>::shape_type...>;
         return detail::make_xgenerator(detail::concatenate_impl<CT...>(std::move(t), axis), shape_type{});
@@ -826,10 +826,10 @@ namespace xt
      * xt::xarray<double> a = {1, 2, 3};
      * xt::xarray<double> b = {5, 6, 7};
      * xt::xarray<double> s = xt::stack(xt::xtuple(a, b)); // => {{1, 2, 3},
-     *                                                            {5, 6, 7}}
+     *                                                     //     {5, 6, 7}}
      * xt::xarray<double> t = xt::stack(xt::xtuple(a, b), 1); // => {{1, 5},
-     *                                                               {2, 6},
-     *                                                               {3, 7}}
+     *                                                        //     {2, 6},
+     *                                                        //     {3, 7}}
      * \endcode
      */
     template <class... CT>
