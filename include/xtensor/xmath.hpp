@@ -51,6 +51,8 @@ namespace xt
         static constexpr T LN2 = 0.693147180559945309417;
     };
 
+    double pi = numeric_constants<double>::PI;
+
     /***********
      * Helpers *
      ***********/
