@@ -170,8 +170,7 @@ When compiled and run, this produces the following output:
 
   .. code-block:: cpp
 
-      const auto& s = arr.shape();
-      std::copy(s.cbegin(), s.cend(), std::ostream_iterator<double>(std::cout, " "));
+      std::cout << xt::adapt(arr.shape()); // with: #include "xtensor/xadapt.hpp"
 
 Third example: index access
 ---------------------------
