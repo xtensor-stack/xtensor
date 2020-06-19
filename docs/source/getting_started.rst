@@ -166,12 +166,18 @@ When compiled and run, this produces the following output:
 
 .. tip::
 
-  To print the shape to the standard output you can use
+  To print the shape to the standard output you can use either:
 
   .. code-block:: cpp
 
       const auto& s = arr.shape();
       std::copy(s.cbegin(), s.cend(), std::ostream_iterator<double>(std::cout, " "));
+
+  Or:
+
+  .. code-block:: cpp
+
+      std::cout << xt::adapt(arr.shape()); // with: #include "xtensor/xadapt.hpp"
 
 Third example: index access
 ---------------------------
