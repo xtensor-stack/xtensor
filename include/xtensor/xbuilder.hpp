@@ -631,7 +631,7 @@ namespace xt
             using value_type = typename CT::value_type;
 
             inline concatenate_invoker_same_type(vector_type& t, size_type axis)
-                : m_t(std::move(t)), m_axis(axis)
+                : m_t(t), m_axis(axis)
             {
             }
 
