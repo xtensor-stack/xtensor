@@ -140,8 +140,8 @@ Aliasing and temporaries
 ------------------------
 
 In some cases, an expression should not be directly assigned to a container. Instead, it has to be assigned to a temporary variable before being copied
-into the destination container. This occurs when the destination container is involved in the expression and has to be resized. This phenomenon is
-known as *aliasing*.
+into the destination container. A typical case where this happens is when the destination container is involved in the expression and has to be resized.
+This phenomenon is known as *aliasing*.
 
 To prevent this, `xtensor` assigns the expression to a temporary variable before copying it. In the case of ``xarray``, this results in an extra dynamic memory
 allocation and copy.
