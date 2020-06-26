@@ -75,18 +75,17 @@ namespace xt
             return chunk_indexes;
         }
 
-        template <class T, size_t N, size_t... Is>
-        std::tuple<std::array<size_t, N>, std::array<size_t, N>> unpack_impl(std::array<T, N> &arr, std::index_sequence<Is...>) const
-        {
-            std::array<size_t, N> arr0 = {{std::get<0>(arr[Is])...}};
-            std::array<size_t, N> arr1 = {{std::get<1>(arr[Is])...}};
-            return std::make_tuple(arr0, arr1);
-        }
-
         template <class T, std::size_t N>
         std::tuple<std::array<size_t, N>, std::array<size_t, N>> unpack(std::array<T, N> &arr) const
         {
-            return unpack_impl(arr, std::make_index_sequence<N>());
+            std::array<size_t, N> arr0;
+            std::array<size_t, N> arr1;
+            for (size_t i = 0; i < N; ++i)
+            {
+                arr0[i] = std::get<0>(arr[i]);
+                arr1[i] = std::get<1>(arr[i]);
+            }
+            return std::make_tuple(arr0, arr1);
         }
 
         xt::xarray<chunk_type> m_chunks;
