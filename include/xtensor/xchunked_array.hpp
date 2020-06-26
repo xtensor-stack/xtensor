@@ -15,8 +15,9 @@ namespace xt
         inline const_reference operator()(Idxs... idxs) const
         {
             std::cout << "Accessing chunked array at";
-            auto chunk_indexes = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
+            auto chunk_indexes_packed = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
             std::cout << std::endl;
+            auto chunk_indexes = unpack(chunk_indexes_packed);
             auto indexes_of_chunk(std::get<0>(chunk_indexes));
             auto indexes_in_chunk(std::get<1>(chunk_indexes));
             chunk_type chunk = m_chunks.element(indexes_of_chunk.cbegin(), indexes_of_chunk.cend());
@@ -58,28 +59,34 @@ namespace xt
     private:
 
         template <class Dim, class Idx>
-        size_t get_index_of_chunk_in_dimension(Dim dim, Idx idx) const
-        {
-            size_t index_of_chunk = idx / m_chunk_shape[dim];
-            return index_of_chunk;
-        }
-
-        template <class Dim, class Idx>
-        size_t get_index_in_chunk_in_dimension(Dim dim, Idx idx) const
+        std::tuple<size_t, size_t> get_chunk_indexes_in_dimension(Dim dim, Idx idx) const
         {
             std::cout << " " << dim;
-            size_t index_of_chunk = get_index_of_chunk_in_dimension(dim, idx);
+            size_t index_of_chunk = idx / m_chunk_shape[dim];
             size_t index_in_chunk = idx - index_of_chunk * m_chunk_shape[dim];
-            return index_in_chunk;
+            return std::make_tuple(index_of_chunk, index_in_chunk);
         }
 
         template <size_t... dims, class... Idxs>
-        std::tuple<std::array<size_t, sizeof...(Idxs)>, std::array<size_t, sizeof...(Idxs)>>
+        std::array<std::tuple<size_t, size_t>, sizeof...(Idxs)>
         get_chunk_indexes(std::index_sequence<dims...>, Idxs... idxs) const
         {
-            std::array<size_t, sizeof...(Idxs)> indexes_of_chunk = {{get_index_of_chunk_in_dimension(dims, idxs)...}};
-            std::array<size_t, sizeof...(Idxs)> indexes_in_chunk = {{get_index_in_chunk_in_dimension(dims, idxs)...}};
-            return std::make_tuple(indexes_of_chunk, indexes_in_chunk);
+            std::array<std::tuple<size_t, size_t>, sizeof...(Idxs)> chunk_indexes = {{get_chunk_indexes_in_dimension(dims, idxs)...}};
+            return chunk_indexes;
+        }
+
+        template <class T, size_t N, size_t... Is>
+        std::tuple<std::array<size_t, N>, std::array<size_t, N>> unpack_impl(std::array<T, N> &arr, std::index_sequence<Is...>) const
+        {
+            std::array<size_t, N> arr0 = {{std::get<0>(arr[Is])...}};
+            std::array<size_t, N> arr1 = {{std::get<1>(arr[Is])...}};
+            return std::make_tuple(arr0, arr1);
+        }
+
+        template <class T, std::size_t N>
+        std::tuple<std::array<size_t, N>, std::array<size_t, N>> unpack(std::array<T, N> &arr) const
+        {
+            return unpack_impl(arr, std::make_index_sequence<N>());
         }
 
         xt::xarray<chunk_type> m_chunks;
