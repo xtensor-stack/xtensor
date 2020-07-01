@@ -23,8 +23,7 @@ namespace xt
      * The xaccessible class implements constant access methods common to all expressions.
      *
      * @tparam D The derived type, i.e. the inheriting class for which xconst_accessible
-     *      
-     *
+     *           provides the interface.
      */
     template <class D>
     class xconst_accessible
