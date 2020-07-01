@@ -14,9 +14,7 @@ namespace xt
         template <class... Idxs>
         inline const_reference operator()(Idxs... idxs) const
         {
-            std::cout << "Accessing chunked array at";
             auto chunk_indexes_packed = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
-            std::cout << std::endl;
             auto chunk_indexes = unpack(chunk_indexes_packed);
             auto indexes_of_chunk(std::get<0>(chunk_indexes));
             auto indexes_in_chunk(std::get<1>(chunk_indexes));
@@ -26,7 +24,6 @@ namespace xt
             for (auto index_of_chunk: indexes_of_chunk)
             {
                 auto index_in_chunk = indexes_in_chunk[di];
-                std::cout << "Dimension " << di << ": chunk " << index_of_chunk << " at " << index_in_chunk << std::endl;
                 di++;
             }
             return val;
@@ -39,20 +36,15 @@ namespace xt
         {
             std::vector<size_t> shape_chunk(shape.size());
             size_t di = 0;
-            std::cout << "Creating chunked array with shape";
             for (auto s: shape)
             {
-                std::cout << " " << s;
                 size_t chunk_nb = s / chunks[di];
                 if (s % chunks[di] > 0)
                     chunk_nb += 1;  // edge chunk
                 shape_chunk[di] = chunk_nb;
                 di++;
             }
-            std::cout << ", chunk shape";
             for (auto s: chunks)
-                std::cout << " " << s;
-            std::cout << std::endl;
             m_chunks.resize(shape_chunk);
         }
 
@@ -61,7 +53,6 @@ namespace xt
         template <class Dim, class Idx>
         std::tuple<size_t, size_t> get_chunk_indexes_in_dimension(Dim dim, Idx idx) const
         {
-            std::cout << " " << dim;
             size_t index_of_chunk = idx / m_chunk_shape[dim];
             size_t index_in_chunk = idx - index_of_chunk * m_chunk_shape[dim];
             return std::make_tuple(index_of_chunk, index_in_chunk);
