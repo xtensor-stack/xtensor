@@ -23,7 +23,6 @@ namespace xt
             return val;
         }
 
-
         xchunked_array(std::vector<size_t> shape, std::vector<size_t> chunks):
             m_shape(shape),
             m_chunk_shape(chunks)
@@ -54,6 +53,10 @@ namespace xt
 
     private:
 
+        xt::xarray<chunk_type> m_chunks;
+        std::vector<size_t> m_shape;
+        std::vector<size_t> m_chunk_shape;
+
         template <class Dim, class Idx>
         std::tuple<size_t, size_t> get_chunk_indexes_in_dimension(Dim dim, Idx idx) const
         {
@@ -83,16 +86,24 @@ namespace xt
             return std::make_tuple(arr0, arr1);
         }
 
-        xt::xarray<chunk_type> m_chunks;
-        std::vector<size_t> m_shape;
-        std::vector<size_t> m_chunk_shape;
-
         template <class It>
         inline auto element(It first, It last) -> typename chunk_type::value_type
         {
-            return 0.;  // FIXME: this doesn't return the element
+            std::vector<size_t> indexes_of_chunk;
+            std::vector<size_t> indexes_in_chunk;
+            std::tuple<size_t, size_t> chunk_index;
+            int dim = 0;
+            for (auto it = first; it != last; ++it)
+            {
+                chunk_index = get_chunk_indexes_in_dimension(dim, *it);
+                indexes_of_chunk.push_back(std::get<0>(chunk_index));
+                indexes_in_chunk.push_back(std::get<1>(chunk_index));
+                dim++;
+            }
+            chunk_type chunk = m_chunks.element(indexes_of_chunk.begin(), indexes_of_chunk.end());
+            const_reference val = chunk.element(indexes_in_chunk.begin(), indexes_in_chunk.end());
+            return val;
         }
-
     };
 
     template <class chunk_type>
@@ -103,5 +114,4 @@ namespace xt
         using reference = typename chunk_type::reference;
         using size_type = std::size_t;
     };
-
 }
