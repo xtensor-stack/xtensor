@@ -16,10 +16,18 @@ namespace xt
 
     TEST(xchunked_array, indexed_access)
     {
-        chunked_array a(
-            {10, 10, 10},
-            {2, 3, 4}
-        );
-        a(3, 9, 8);
+        std::vector<size_t> shape = {10, 10, 10};
+        std::vector<size_t> chunk_shape = {2, 3, 4};
+        chunked_array a(shape, chunk_shape);
+
+        std::vector<size_t> idx = {3, 9, 8};
+
+        a[idx] = 4.;
+        ASSERT_EQ(a[idx], 4.);
+        ASSERT_EQ(a(3, 9, 8), 4.);
+
+        a(3, 9, 8) = 5.;
+        ASSERT_EQ(a(3, 9, 8), 5.);
+        ASSERT_EQ(a[idx], 5.);
     }
 }
