@@ -5,7 +5,7 @@
 namespace xt
 {
     template <class chunk_type>
-    class xchunked_array
+    class xchunked_array: public xt::xconst_accessible<xchunked_array<chunk_type>>
     {
     public:
 
@@ -20,12 +20,6 @@ namespace xt
             auto indexes_in_chunk(std::get<1>(chunk_indexes));
             chunk_type chunk = m_chunks.element(indexes_of_chunk.cbegin(), indexes_of_chunk.cend());
             const_reference val = chunk.element(indexes_in_chunk.cbegin(), indexes_in_chunk.cend());
-            int di = 0;
-            for (auto index_of_chunk: indexes_of_chunk)
-            {
-                auto index_in_chunk = indexes_in_chunk[di];
-                di++;
-            }
             return val;
         }
 
@@ -46,6 +40,16 @@ namespace xt
             }
             for (auto s: chunks)
             m_chunks.resize(shape_chunk);
+        }
+
+        typename chunk_type::value_type operator[](const xindex& index)
+        {
+            return element(index.cbegin(), index.cend());
+        }
+
+        const typename chunk_type::value_type operator[](const xindex& index) const
+        {
+            return element(index.cbegin(), index.cend());
         }
 
     private:
@@ -82,6 +86,22 @@ namespace xt
         xt::xarray<chunk_type> m_chunks;
         std::vector<size_t> m_shape;
         std::vector<size_t> m_chunk_shape;
+
+        template <class It>
+        inline auto element(It first, It last) -> typename chunk_type::value_type
+        {
+            return 0.;  // FIXME: this doesn't return the element
+        }
+
+    };
+
+    template <class chunk_type>
+    struct xcontainer_inner_types<xchunked_array<chunk_type>>
+    {
+        using temporary_type = xarray<chunk_type>;
+        using const_reference = typename chunk_type::const_reference;
+        using reference = typename chunk_type::reference;
+        using size_type = std::size_t;
     };
 
 }
