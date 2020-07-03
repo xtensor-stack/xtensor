@@ -15,15 +15,17 @@ namespace xt
         template <class... Idxs>
         inline const_reference operator()(Idxs... idxs) const
         {
-            auto ci = get_chunk_and_indexes(idxs...);
-            return ci.first.element(ci.second.cbegin(), ci.second.cend());
+            auto ii = get_indexes(idxs...);
+            auto& chunk = m_chunks.element(ii.first.cbegin(), ii.first.cend());
+            return chunk.element(ii.second.cbegin(), ii.second.cend());
         }
 
         template <class... Idxs>
         inline reference operator()(Idxs... idxs)
         {
-            auto ci = get_chunk_and_indexes(idxs...);
-            return ci.first.element(ci.second.cbegin(), ci.second.cend());
+            auto ii = get_indexes(idxs...);
+            auto& chunk = m_chunks.element(ii.first.cbegin(), ii.first.cend());
+            return chunk.element(ii.second.cbegin(), ii.second.cend());
         }
 
         xchunked_array(std::vector<size_t> shape, std::vector<size_t> chunk_shape):
@@ -64,14 +66,13 @@ namespace xt
         std::vector<size_t> m_chunk_shape;
 
         template <class... Idxs>
-        inline std::pair<chunk_type, std::array<size_t, sizeof...(Idxs)>> get_chunk_and_indexes(Idxs... idxs) const
+        inline std::pair<std::array<size_t, sizeof...(Idxs)>, std::array<size_t, sizeof...(Idxs)>> get_indexes(Idxs... idxs) const
         {
             auto chunk_indexes_packed = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
             auto chunk_indexes = unpack(chunk_indexes_packed);
             auto indexes_of_chunk = chunk_indexes.first;
             auto indexes_in_chunk = chunk_indexes.second;
-            auto chunk = m_chunks.element(indexes_of_chunk.cbegin(), indexes_of_chunk.cend());
-            return std::make_pair(chunk, indexes_in_chunk);
+            return std::make_pair(indexes_of_chunk, indexes_in_chunk);
         }
 
         template <class Dim, class Idx>
@@ -104,7 +105,7 @@ namespace xt
         }
 
         template <class It>
-        inline std::pair<chunk_type, std::vector<size_t>> get_chunk_and_indexes_dynamic(It first, It last) const
+        inline std::pair<std::vector<size_t>, std::vector<size_t>> get_indexes_dynamic(It first, It last) const
         {
             std::vector<size_t> indexes_of_chunk;
             std::vector<size_t> indexes_in_chunk;
@@ -117,22 +118,23 @@ namespace xt
                 indexes_in_chunk.push_back(chunk_index.second);
                 dim++;
             }
-            chunk_type chunk = m_chunks.element(indexes_of_chunk.begin(), indexes_of_chunk.end());
-            return std::make_pair(chunk, indexes_in_chunk);
+            return std::make_pair(indexes_of_chunk, indexes_in_chunk);
         }
 
         template <class It>
         inline reference element(It first, It last)
         {
-            auto ci = get_chunk_and_indexes_dynamic(first, last);
-            return ci.first.element(ci.second.begin(), ci.second.end());
+            auto ii = get_indexes_dynamic(first, last);
+            auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
+            return chunk.element(ii.second.begin(), ii.second.end());
         }
 
         template <class It>
         inline const_reference element(It first, It last) const
         {
-            auto ci = get_chunk_and_indexes_dynamic(first, last);
-            return ci.first.element(ci.second.begin(), ci.second.end());
+            auto ii = get_indexes_dynamic(first, last);
+            auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
+            return chunk.element(ii.second.begin(), ii.second.end());
         }
     };
 
