@@ -20,10 +20,12 @@ namespace xt
             {10, 10, 10},
             {2, 3, 4}
         );
-
-        a(3, 9, 8);
-
         std::vector<size_t> idx = {3, 9, 8};
-        a[idx];
+
+        a[idx] = 4.;
+        ASSERT_EQ(a(3, 9, 8), 4.);
+
+        a(3, 9, 8) = 5.;
+        ASSERT_EQ(a(3, 9, 8), 5.);
     }
 }

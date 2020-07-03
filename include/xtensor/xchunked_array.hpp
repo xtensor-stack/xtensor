@@ -5,21 +5,25 @@
 namespace xt
 {
     template <class chunk_type>
-    class xchunked_array: public xt::xconst_accessible<xchunked_array<chunk_type>>
+    class xchunked_array: public xt::xaccessible<xchunked_array<chunk_type>>
     {
     public:
 
         using const_reference = typename chunk_type::const_reference;
+        using reference = typename chunk_type::reference;
 
         template <class... Idxs>
         inline const_reference operator()(Idxs... idxs) const
         {
-            auto chunk_indexes_packed = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
-            auto chunk_indexes = unpack(chunk_indexes_packed);
-            auto indexes_of_chunk(std::get<0>(chunk_indexes));
-            auto indexes_in_chunk(std::get<1>(chunk_indexes));
-            chunk_type chunk = m_chunks.element(indexes_of_chunk.cbegin(), indexes_of_chunk.cend());
-            const_reference val = chunk.element(indexes_in_chunk.cbegin(), indexes_in_chunk.cend());
+            reference val = get_val(idxs...);
+            const_reference& const_val = val;
+            return const_val;
+        }
+
+        template <class... Idxs>
+        inline reference operator()(Idxs... idxs)
+        {
+            reference val = get_val(idxs...);
             return val;
         }
 
@@ -41,14 +45,16 @@ namespace xt
             m_chunks.resize(shape_chunk);
         }
 
-        typename chunk_type::value_type operator[](const xindex& index)
+        reference operator[](const xindex& index)
         {
-            return element(index.cbegin(), index.cend());
+            reference el = element(index.cbegin(), index.cend());
+            return el;
         }
 
-        const typename chunk_type::value_type operator[](const xindex& index) const
+        const_reference operator[](const xindex& index) const
         {
-            return element(index.cbegin(), index.cend());
+            const_reference const_el = element(index.cbegin(), index.cend());
+            return const_el;
         }
 
     private:
@@ -56,6 +62,18 @@ namespace xt
         xt::xarray<chunk_type> m_chunks;
         std::vector<size_t> m_shape;
         std::vector<size_t> m_chunk_shape;
+
+        template <class... Idxs>
+        inline reference get_val(Idxs... idxs)
+        {
+            auto chunk_indexes_packed = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
+            auto chunk_indexes = unpack(chunk_indexes_packed);
+            auto indexes_of_chunk(std::get<0>(chunk_indexes));
+            auto indexes_in_chunk(std::get<1>(chunk_indexes));
+            chunk_type chunk = m_chunks.element(indexes_of_chunk.cbegin(), indexes_of_chunk.cend());
+            reference val = chunk.element(indexes_in_chunk.cbegin(), indexes_in_chunk.cend());
+            return val;
+        }
 
         template <class Dim, class Idx>
         std::tuple<size_t, size_t> get_chunk_indexes_in_dimension(Dim dim, Idx idx) const
@@ -87,7 +105,7 @@ namespace xt
         }
 
         template <class It>
-        inline auto element(It first, It last) -> typename chunk_type::value_type
+        inline reference get_element(It first, It last)
         {
             std::vector<size_t> indexes_of_chunk;
             std::vector<size_t> indexes_in_chunk;
@@ -101,8 +119,23 @@ namespace xt
                 dim++;
             }
             chunk_type chunk = m_chunks.element(indexes_of_chunk.begin(), indexes_of_chunk.end());
-            const_reference val = chunk.element(indexes_in_chunk.begin(), indexes_in_chunk.end());
+            reference val = chunk.element(indexes_in_chunk.begin(), indexes_in_chunk.end());
             return val;
+        }
+
+        template <class It>
+        inline reference element(It first, It last)
+        {
+            reference val = get_element(first, last);
+            return val;
+        }
+
+        template <class It>
+        inline const_reference element(It first, It last) const
+        {
+            reference val = get_element(first, last);
+            const_reference& const_val = val;
+            return const_val;
         }
     };
 
