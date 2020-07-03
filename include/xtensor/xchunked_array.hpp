@@ -15,16 +15,15 @@ namespace xt
         template <class... Idxs>
         inline const_reference operator()(Idxs... idxs) const
         {
-            reference val = get_val(idxs...);
-            const_reference& const_val = val;
-            return const_val;
+            auto ci = get_chunk_and_indexes(idxs...);
+            return ci.first.element(ci.second.cbegin(), ci.second.cend());
         }
 
         template <class... Idxs>
         inline reference operator()(Idxs... idxs)
         {
-            reference val = get_val(idxs...);
-            return val;
+            auto ci = get_chunk_and_indexes(idxs...);
+            return ci.first.element(ci.second.cbegin(), ci.second.cend());
         }
 
         xchunked_array(std::vector<size_t> shape, std::vector<size_t> chunks):
@@ -64,35 +63,34 @@ namespace xt
         std::vector<size_t> m_chunk_shape;
 
         template <class... Idxs>
-        inline reference get_val(Idxs... idxs)
+        inline std::pair<chunk_type, std::array<size_t, sizeof...(Idxs)>> get_chunk_and_indexes(Idxs... idxs) const
         {
             auto chunk_indexes_packed = get_chunk_indexes(std::make_index_sequence<sizeof...(Idxs)>(), idxs...);
             auto chunk_indexes = unpack(chunk_indexes_packed);
-            auto indexes_of_chunk(std::get<0>(chunk_indexes));
-            auto indexes_in_chunk(std::get<1>(chunk_indexes));
-            chunk_type chunk = m_chunks.element(indexes_of_chunk.cbegin(), indexes_of_chunk.cend());
-            reference val = chunk.element(indexes_in_chunk.cbegin(), indexes_in_chunk.cend());
-            return val;
+            auto indexes_of_chunk = chunk_indexes.first;
+            auto indexes_in_chunk = chunk_indexes.second;
+            auto chunk = m_chunks.element(indexes_of_chunk.cbegin(), indexes_of_chunk.cend());
+            return std::make_pair(chunk, indexes_in_chunk);
         }
 
         template <class Dim, class Idx>
-        std::tuple<size_t, size_t> get_chunk_indexes_in_dimension(Dim dim, Idx idx) const
+        std::pair<size_t, size_t> get_chunk_indexes_in_dimension(Dim dim, Idx idx) const
         {
             size_t index_of_chunk = idx / m_chunk_shape[dim];
             size_t index_in_chunk = idx - index_of_chunk * m_chunk_shape[dim];
-            return std::make_tuple(index_of_chunk, index_in_chunk);
+            return std::make_pair(index_of_chunk, index_in_chunk);
         }
 
         template <size_t... dims, class... Idxs>
-        std::array<std::tuple<size_t, size_t>, sizeof...(Idxs)>
+        std::array<std::pair<size_t, size_t>, sizeof...(Idxs)>
         get_chunk_indexes(std::index_sequence<dims...>, Idxs... idxs) const
         {
-            std::array<std::tuple<size_t, size_t>, sizeof...(Idxs)> chunk_indexes = {{get_chunk_indexes_in_dimension(dims, idxs)...}};
+            std::array<std::pair<size_t, size_t>, sizeof...(Idxs)> chunk_indexes = {{get_chunk_indexes_in_dimension(dims, idxs)...}};
             return chunk_indexes;
         }
 
         template <class T, std::size_t N>
-        std::tuple<std::array<size_t, N>, std::array<size_t, N>> unpack(std::array<T, N> &arr) const
+        std::pair<std::array<size_t, N>, std::array<size_t, N>> unpack(std::array<T, N> &arr) const
         {
             std::array<size_t, N> arr0;
             std::array<size_t, N> arr1;
@@ -101,41 +99,39 @@ namespace xt
                 arr0[i] = std::get<0>(arr[i]);
                 arr1[i] = std::get<1>(arr[i]);
             }
-            return std::make_tuple(arr0, arr1);
+            return std::make_pair(arr0, arr1);
         }
 
         template <class It>
-        inline reference get_element(It first, It last)
+        inline std::pair<chunk_type, std::vector<size_t>> get_chunk_and_indexes_dynamic(It first, It last) const
         {
             std::vector<size_t> indexes_of_chunk;
             std::vector<size_t> indexes_in_chunk;
-            std::tuple<size_t, size_t> chunk_index;
+            std::pair<size_t, size_t> chunk_index;
             int dim = 0;
             for (auto it = first; it != last; ++it)
             {
                 chunk_index = get_chunk_indexes_in_dimension(dim, *it);
-                indexes_of_chunk.push_back(std::get<0>(chunk_index));
-                indexes_in_chunk.push_back(std::get<1>(chunk_index));
+                indexes_of_chunk.push_back(chunk_index.first);
+                indexes_in_chunk.push_back(chunk_index.second);
                 dim++;
             }
             chunk_type chunk = m_chunks.element(indexes_of_chunk.begin(), indexes_of_chunk.end());
-            reference val = chunk.element(indexes_in_chunk.begin(), indexes_in_chunk.end());
-            return val;
+            return std::make_pair(chunk, indexes_in_chunk);
         }
 
         template <class It>
         inline reference element(It first, It last)
         {
-            reference val = get_element(first, last);
-            return val;
+            auto ci = get_chunk_and_indexes_dynamic(first, last);
+            return ci.first.element(ci.second.begin(), ci.second.end());
         }
 
         template <class It>
         inline const_reference element(It first, It last) const
         {
-            reference val = get_element(first, last);
-            const_reference& const_val = val;
-            return const_val;
+            auto ci = get_chunk_and_indexes_dynamic(first, last);
+            return ci.first.element(ci.second.begin(), ci.second.end());
         }
     };
 
