@@ -271,7 +271,7 @@ The following definitions are required:
 .. code::
 
     template <class T>
-    struct xcontainer_inner_type<table_adaptor<T>>
+    struct xcontainer_inner_types<table<T>>
     {
         using temporary_type = xarray<T>;
     };
@@ -299,7 +299,8 @@ and to define a bunch of typedefs.
 
     public:
 
-        using self_type = table<T>;
+        using self_type = table_adaptor<T>;
+        using semantic_base = xcontainer_semantic<self_type>;
 
         using value_type = T;
         using reference = T&;
@@ -314,7 +315,7 @@ and to define a bunch of typedefs.
         using shape_type = inner_shape_type;
         using strides_type = inner_strides_type;
 
-        using iterable_base = xexpression_iterable<self_type>;
+        using iterable_base = xiterable<self_type>;
         using stepper = typename iterable_base::stepper;
         using const_stepper = typename iterable_base::const_stepper;
     };
@@ -353,7 +354,6 @@ constructor and assign operator.
 
         template <class E>
         table_adaptor(const xexpression<E>& e)
-            : base_type()
         {
             semantic_base::assign(e);
         }
