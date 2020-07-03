@@ -26,22 +26,23 @@ namespace xt
             return ci.first.element(ci.second.cbegin(), ci.second.cend());
         }
 
-        xchunked_array(std::vector<size_t> shape, std::vector<size_t> chunks):
+        xchunked_array(std::vector<size_t> shape, std::vector<size_t> chunk_shape):
             m_shape(shape),
-            m_chunk_shape(chunks)
+            m_chunk_shape(chunk_shape)
         {
             std::vector<size_t> shape_chunk(shape.size());
             size_t di = 0;
             for (auto s: shape)
             {
-                size_t chunk_nb = s / chunks[di];
-                if (s % chunks[di] > 0)
+                size_t chunk_nb = s / chunk_shape[di];
+                if (s % chunk_shape[di] > 0)
                     chunk_nb += 1;  // edge chunk
                 shape_chunk[di] = chunk_nb;
                 di++;
             }
-            for (auto s: chunks)
             m_chunks.resize(shape_chunk);
+            for (auto& c: m_chunks)
+                c.resize(chunk_shape);
         }
 
         reference operator[](const xindex& index)
