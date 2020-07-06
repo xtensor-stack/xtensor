@@ -5,12 +5,40 @@
 namespace xt
 {
     template <class chunk_type>
-    class xchunked_array: public xt::xaccessible<xchunked_array<chunk_type>>
+    class xchunked_array: public xt::xaccessible<xchunked_array<chunk_type>>,
+                          public xt::xiterable<xchunked_array<chunk_type>>
     {
     public:
 
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
+        using self_type = xchunked_array<chunk_type>;
+        using iterable_base = xconst_iterable<self_type>;
+        using const_stepper = typename iterable_base::const_stepper;
+        using stepper = typename iterable_base::stepper;
+        using inner_types = xcontainer_inner_types<self_type>;
+        using size_type = typename inner_types::size_type;
+        using storage_type = typename inner_types::storage_type;
+        using value_type = typename storage_type::value_type;
+        using pointer = value_type*;
+        using const_pointer = const value_type*;
+        using difference_type = std::ptrdiff_t;
+        using shape_type = typename chunk_type::shape_type;
+
+        template <class O>
+        const_stepper stepper_begin(const O& shape) const noexcept;
+        template <class O>
+        const_stepper stepper_end(const O& shape, layout_type) const noexcept;
+
+        template <class O>
+        stepper stepper_begin(const O& shape) noexcept;
+        template <class O>
+        stepper stepper_end(const O& shape, layout_type) noexcept;
+
+        const shape_type& shape() const
+        {
+            return m_shape;
+        }
 
         template <class... Idxs>
         inline const_reference operator()(Idxs... idxs) const
@@ -60,11 +88,27 @@ namespace xt
             return const_el;
         }
 
+        template <class It>
+        inline reference element(It first, It last)
+        {
+            auto ii = get_indexes_dynamic(first, last);
+            auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
+            return chunk.element(ii.second.begin(), ii.second.end());
+        }
+
+        template <class It>
+        inline const_reference element(It first, It last) const
+        {
+            auto ii = get_indexes_dynamic(first, last);
+            auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
+            return chunk.element(ii.second.begin(), ii.second.end());
+        }
+
     private:
 
         xt::xarray<chunk_type> m_chunks;
-        typename chunk_type::shape_type m_shape;
-        typename chunk_type::shape_type m_chunk_shape;
+        shape_type m_shape;
+        shape_type m_chunk_shape;
 
         template <class... Idxs>
         inline std::pair<std::array<size_t, sizeof...(Idxs)>, std::array<size_t, sizeof...(Idxs)>> get_indexes(Idxs... idxs) const
@@ -121,22 +165,6 @@ namespace xt
             }
             return std::make_pair(indexes_of_chunk, indexes_in_chunk);
         }
-
-        template <class It>
-        inline reference element(It first, It last)
-        {
-            auto ii = get_indexes_dynamic(first, last);
-            auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
-            return chunk.element(ii.second.begin(), ii.second.end());
-        }
-
-        template <class It>
-        inline const_reference element(It first, It last) const
-        {
-            auto ii = get_indexes_dynamic(first, last);
-            auto& chunk = m_chunks.element(ii.first.begin(), ii.first.end());
-            return chunk.element(ii.second.begin(), ii.second.end());
-        }
     };
 
     template <class chunk_type>
@@ -146,5 +174,46 @@ namespace xt
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using size_type = std::size_t;
+        using storage_type = chunk_type;
     };
+
+    template <class chunk_type>
+    struct xiterable_inner_types<xchunked_array<chunk_type>>
+    {
+        using inner_shape_type = typename chunk_type::shape_type;
+        using const_stepper = xindexed_stepper<xchunked_array<chunk_type>, true>;
+        using stepper = xindexed_stepper<xchunked_array<chunk_type>, false>;
+    };
+
+    template <class chunk_type>
+    template <class O>
+    inline auto xchunked_array<chunk_type>::stepper_begin(const O& shape) const noexcept -> const_stepper
+    {
+        size_type offset = shape.size() - this->dimension();
+        return const_stepper(this, offset);
+    }
+
+    template <class chunk_type>
+    template <class O>
+    inline auto xchunked_array<chunk_type>::stepper_end(const O& shape, layout_type) const noexcept -> const_stepper
+    {
+        size_type offset = shape.size() - this->dimension();
+        return const_stepper(this, offset, true);
+    }
+
+    template <class chunk_type>
+    template <class O>
+    inline auto xchunked_array<chunk_type>::stepper_begin(const O& shape) noexcept -> stepper
+    {
+        size_type offset = shape.size() - this->dimension();
+        return stepper(this, offset);
+    }
+
+    template <class chunk_type>
+    template <class O>
+    inline auto xchunked_array<chunk_type>::stepper_end(const O& shape, layout_type) noexcept -> stepper
+    {
+        size_type offset = shape.size() - this->dimension();
+        return stepper(this, offset, true);
+    }
 }
