@@ -5,14 +5,16 @@
 namespace xt
 {
     template <class chunk_type>
-    class xchunked_array: public xt::xaccessible<xchunked_array<chunk_type>>,
-                          public xt::xiterable<xchunked_array<chunk_type>>
+    class xchunked_array: public xaccessible<xchunked_array<chunk_type>>,
+                          public xiterable<xchunked_array<chunk_type>>,
+                          public xcontainer_semantic<xchunked_array<chunk_type>>
     {
     public:
 
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using self_type = xchunked_array<chunk_type>;
+        using semantic_base = xcontainer_semantic<self_type>;
         using iterable_base = xconst_iterable<self_type>;
         using const_stepper = typename iterable_base::const_stepper;
         using stepper = typename iterable_base::stepper;
@@ -76,6 +78,24 @@ namespace xt
                 c.resize(chunk_shape);
         }
 
+        xchunked_array(const xchunked_array&) = default;
+        xchunked_array& operator=(const xchunked_array&) = default;
+
+        xchunked_array(xchunked_array&&) = default;
+        xchunked_array& operator=(xchunked_array&&) = default;
+
+        template <class E>
+        xchunked_array(const xexpression<E>& e)
+        {
+            semantic_base::assign(e);
+        }
+
+        template <class E>
+        self_type& operator=(const xexpression<E>& e)
+        {
+            return semantic_base::operator=(e);
+        }
+
         reference operator[](const xindex& index)
         {
             reference el = element(index.cbegin(), index.cend());
@@ -106,7 +126,7 @@ namespace xt
 
     private:
 
-        xt::xarray<chunk_type> m_chunks;
+        xarray<chunk_type> m_chunks;
         shape_type m_shape;
         shape_type m_chunk_shape;
 
@@ -164,6 +184,24 @@ namespace xt
                 dim++;
             }
             return std::make_pair(indexes_of_chunk, indexes_in_chunk);
+        }
+
+        size_type dimension() const
+        {
+            return shape().size();
+        }
+
+        template <class S>
+        bool broadcast_shape(const S& s) const
+        {
+            // Available in "xtensor/xtrides.hpp"
+            return broadcast_shape(shape(), s);
+        }
+
+        template <class S>
+        bool is_trivial_broadcast(const S& str) const noexcept
+        {
+            return false;
         }
     };
 
