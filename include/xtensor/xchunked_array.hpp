@@ -28,7 +28,8 @@ namespace xt
             return chunk.element(ii.second.cbegin(), ii.second.cend());
         }
 
-        xchunked_array(std::vector<size_t> shape, std::vector<size_t> chunk_shape):
+        template <class S>
+        xchunked_array(S shape, S chunk_shape):
             m_shape(shape),
             m_chunk_shape(chunk_shape)
         {
@@ -62,8 +63,8 @@ namespace xt
     private:
 
         xt::xarray<chunk_type> m_chunks;
-        std::vector<size_t> m_shape;
-        std::vector<size_t> m_chunk_shape;
+        typename chunk_type::shape_type m_shape;
+        typename chunk_type::shape_type m_chunk_shape;
 
         template <class... Idxs>
         inline std::pair<std::array<size_t, sizeof...(Idxs)>, std::array<size_t, sizeof...(Idxs)>> get_indexes(Idxs... idxs) const
@@ -75,8 +76,8 @@ namespace xt
             return std::make_pair(indexes_of_chunk, indexes_in_chunk);
         }
 
-        template <class Dim, class Idx>
-        std::pair<size_t, size_t> get_chunk_indexes_in_dimension(Dim dim, Idx idx) const
+        template <class Idx>
+        std::pair<size_t, size_t> get_chunk_indexes_in_dimension(size_t dim, Idx idx) const
         {
             size_t index_of_chunk = idx / m_chunk_shape[dim];
             size_t index_in_chunk = idx - index_of_chunk * m_chunk_shape[dim];
@@ -110,7 +111,7 @@ namespace xt
             std::vector<size_t> indexes_of_chunk;
             std::vector<size_t> indexes_in_chunk;
             std::pair<size_t, size_t> chunk_index;
-            int dim = 0;
+            size_t dim = 0;
             for (auto it = first; it != last; ++it)
             {
                 chunk_index = get_chunk_indexes_in_dimension(dim, *it);
