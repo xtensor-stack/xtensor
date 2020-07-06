@@ -271,7 +271,7 @@ The following definitions are required:
 .. code::
 
     template <class T>
-    struct xcontainer_inner_types<table<T>>
+    struct xcontainer_inner_types<table_adaptor<T>>
     {
         using temporary_type = xarray<T>;
     };
