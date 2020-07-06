@@ -21,13 +21,22 @@ namespace xt
         chunked_array a(shape, chunk_shape);
 
         std::vector<size_t> idx = {3, 9, 8};
+        double v;
 
-        a[idx] = 4.;
-        ASSERT_EQ(a[idx], 4.);
-        ASSERT_EQ(a(3, 9, 8), 4.);
+        v = 1.;
+        a[idx] = v;
+        ASSERT_EQ(a[idx], v);
+        ASSERT_EQ(a(3, 9, 8), v);
 
-        a(3, 9, 8) = 5.;
-        ASSERT_EQ(a(3, 9, 8), 5.);
-        ASSERT_EQ(a[idx], 5.);
+        v = 2.;
+        a(3, 9, 8) = v;
+        ASSERT_EQ(a(3, 9, 8), v);
+        ASSERT_EQ(a[idx], v);
+
+        v = 3.;
+        for (auto& it: a)
+            it = v;
+        for (auto it: a)
+            ASSERT_EQ(it, v);
     }
 }
