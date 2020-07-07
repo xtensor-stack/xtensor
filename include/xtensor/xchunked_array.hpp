@@ -1,18 +1,47 @@
+#ifndef XTENSOR_CHUNKED_ARRAY_HPP
+#define XTENSOR_CHUNKED_ARRAY_HPP
+
 #include <vector>
 #include <array>
+
 #include "xarray.hpp"
+#include "xnoalias.hpp"
+#include "xstrided_view.hpp"
 
 namespace xt
 {
     template <class chunk_type>
-    class xchunked_array: public xt::xaccessible<xchunked_array<chunk_type>>,
-                          public xt::xiterable<xchunked_array<chunk_type>>
+    class xchunked_array;
+
+    template <class chunk_type>
+    struct xcontainer_inner_types<xchunked_array<chunk_type>>
+    {
+        using const_reference = typename chunk_type::const_reference;
+        using reference = typename chunk_type::reference;
+        using size_type = std::size_t;
+        using storage_type = chunk_type;
+        using temporary_type = xchunked_array<chunk_type>;
+    };
+
+    template <class chunk_type>
+    struct xiterable_inner_types<xchunked_array<chunk_type>>
+    {
+        using inner_shape_type = typename chunk_type::shape_type;
+        using const_stepper = xindexed_stepper<xchunked_array<chunk_type>, true>;
+        using stepper = xindexed_stepper<xchunked_array<chunk_type>, false>;
+    };
+
+    template <class chunk_type>
+    class xchunked_array: public xaccessible<xchunked_array<chunk_type>>,
+                          public xiterable<xchunked_array<chunk_type>>,
+                          public xcontainer_semantic<xchunked_array<chunk_type>>
     {
     public:
 
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using self_type = xchunked_array<chunk_type>;
+        using semantic_base = xcontainer_semantic<self_type>;
         using iterable_base = xconst_iterable<self_type>;
         using const_stepper = typename iterable_base::const_stepper;
         using stepper = typename iterable_base::stepper;
@@ -24,6 +53,7 @@ namespace xt
         using const_pointer = const value_type*;
         using difference_type = std::ptrdiff_t;
         using shape_type = typename chunk_type::shape_type;
+        using temporary_type = typename inner_types::temporary_type;
 
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
@@ -76,6 +106,49 @@ namespace xt
                 c.resize(chunk_shape);
         }
 
+        xchunked_array(const xchunked_array&) = default;
+        xchunked_array& operator=(const xchunked_array&) = default;
+
+        xchunked_array(xchunked_array&&) = default;
+        xchunked_array& operator=(xchunked_array&&) = default;
+
+        template <class E>
+        xchunked_array(const xexpression<E>& e)
+        {
+            const auto& sh = e.derived_cast().shape();
+            resize_container(m_shape, sh.size());
+            std::copy(sh.begin(), sh.end(), m_shape.begin());
+            m_chunk_shape = m_shape;
+            // Naive implementation to refine later
+            m_chunk_shape[0] = std::min(size_type(10), m_shape[0]);
+            size_type nb_chunks = m_shape[0] / m_chunk_shape[0];
+            bool additional_chunk = m_shape[0] % m_chunk_shape[0] > 0;
+            if (additional_chunk)
+            {
+                m_chunks.resize({nb_chunks + 1u});
+            }
+            else
+            {
+                m_chunks.resize({nb_chunks});
+            }
+            for (size_type i = 0; i < nb_chunks; ++i)
+            {
+                noalias(m_chunks(i)) = strided_view(e.derived_cast(),
+                    {range(i * m_chunk_shape[0], (i + 1u) * m_chunk_shape[0]), ellipsis()});
+            }
+            if (additional_chunk)
+            {
+                noalias(m_chunks(nb_chunks)) = strided_view(e.derived_cast(),
+                    {range(nb_chunks * m_chunk_shape[0], m_shape[0]), ellipsis()});
+            }
+        }
+
+        template <class E>
+        self_type& operator=(const xexpression<E>& e)
+        {
+            return semantic_base::operator=(e);
+        }
+
         reference operator[](const xindex& index)
         {
             reference el = element(index.cbegin(), index.cend());
@@ -106,7 +179,7 @@ namespace xt
 
     private:
 
-        xt::xarray<chunk_type> m_chunks;
+        xarray<chunk_type> m_chunks;
         shape_type m_shape;
         shape_type m_chunk_shape;
 
@@ -165,25 +238,27 @@ namespace xt
             }
             return std::make_pair(indexes_of_chunk, indexes_in_chunk);
         }
+
+        size_type dimension() const
+        {
+            return shape().size();
+        }
+
+        template <class S>
+        bool broadcast_shape(const S& s) const
+        {
+            // Available in "xtensor/xtrides.hpp"
+            return broadcast_shape(shape(), s);
+        }
+
+        template <class S>
+        bool is_trivial_broadcast(const S& str) const noexcept
+        {
+            return false;
+        }
     };
 
-    template <class chunk_type>
-    struct xcontainer_inner_types<xchunked_array<chunk_type>>
-    {
-        using temporary_type = xarray<chunk_type>;
-        using const_reference = typename chunk_type::const_reference;
-        using reference = typename chunk_type::reference;
-        using size_type = std::size_t;
-        using storage_type = chunk_type;
-    };
 
-    template <class chunk_type>
-    struct xiterable_inner_types<xchunked_array<chunk_type>>
-    {
-        using inner_shape_type = typename chunk_type::shape_type;
-        using const_stepper = xindexed_stepper<xchunked_array<chunk_type>, true>;
-        using stepper = xindexed_stepper<xchunked_array<chunk_type>, false>;
-    };
 
     template <class chunk_type>
     template <class O>
@@ -217,3 +292,6 @@ namespace xt
         return stepper(this, offset, true);
     }
 }
+
+#endif
+

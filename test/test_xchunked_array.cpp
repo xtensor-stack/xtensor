@@ -8,6 +8,8 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+
+#include "xtensor/xbroadcast.hpp"
 #include "xtensor/xchunked_array.hpp"
 
 namespace xt
@@ -38,5 +40,28 @@ namespace xt
             it = v;
         for (auto it: a)
             ASSERT_EQ(it, v);
+    }
+
+    TEST(xchunked_array, assign_expression)
+    {
+        std::vector<size_t> shape = {2, 2, 2};
+        std::vector<size_t> chunk_shape = {2, 3, 4};
+        chunked_array a(shape, chunk_shape);
+
+        a = xt::broadcast(3., a.shape());
+        for (const auto& v: a)
+        {
+            EXPECT_EQ(v, 3.);
+        }
+
+        std::vector<size_t> shape2 = {32, 10, 10};
+        chunked_array a2(shape2, chunk_shape);
+
+        a2 = xt::broadcast(3., a2.shape());
+        for (const auto& v: a2)
+        {
+            EXPECT_EQ(v, 3.);
+        }
+
     }
 }
