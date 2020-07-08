@@ -23,45 +23,52 @@ namespace xt
         chunked_array a(shape, chunk_shape);
 
         std::vector<size_t> idx = {3, 9, 8};
-        double v;
+        double val;
 
-        v = 1.;
-        a[idx] = v;
-        ASSERT_EQ(a[idx], v);
-        ASSERT_EQ(a(3, 9, 8), v);
+        val = 1.;
+        a[idx] = val;
+        ASSERT_EQ(a[idx], val);
+        ASSERT_EQ(a(3, 9, 8), val);
 
-        v = 2.;
-        a(3, 9, 8) = v;
-        ASSERT_EQ(a(3, 9, 8), v);
-        ASSERT_EQ(a[idx], v);
+        val = 2.;
+        a(3, 9, 8) = val;
+        ASSERT_EQ(a(3, 9, 8), val);
+        ASSERT_EQ(a[idx], val);
 
-        v = 3.;
+        val = 3.;
         for (auto& it: a)
-            it = v;
+            it = val;
         for (auto it: a)
-            ASSERT_EQ(it, v);
+            ASSERT_EQ(it, val);
     }
 
     TEST(xchunked_array, assign_expression)
     {
-        std::vector<size_t> shape = {2, 2, 2};
-        std::vector<size_t> chunk_shape = {2, 3, 4};
-        chunked_array a(shape, chunk_shape);
+        std::vector<size_t> shape1 = {2, 2, 2};
+        std::vector<size_t> chunk_shape1 = {2, 3, 4};
+        chunked_array a1(shape1, chunk_shape1);
+        double val;
 
-        a = xt::broadcast(3., a.shape());
-        for (const auto& v: a)
+        val = 3.;
+        a1 = xt::broadcast(val, a1.shape());
+        for (const auto& v: a1)
         {
-            EXPECT_EQ(v, 3.);
+            EXPECT_EQ(v, val);
         }
 
         std::vector<size_t> shape2 = {32, 10, 10};
-        chunked_array a2(shape2, chunk_shape);
+        chunked_array a2(shape2, chunk_shape1);
 
-        a2 = xt::broadcast(3., a2.shape());
+        a2 = xt::broadcast(val, a2.shape());
         for (const auto& v: a2)
         {
-            EXPECT_EQ(v, 3.);
+            EXPECT_EQ(v, val);
         }
 
+        a2 += a2;
+        for (const auto& v: a2)
+        {
+            EXPECT_EQ(v, 2. * val);
+        }
     }
 }
