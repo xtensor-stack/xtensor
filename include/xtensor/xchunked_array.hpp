@@ -54,6 +54,8 @@ namespace xt
         using difference_type = std::ptrdiff_t;
         using shape_type = typename chunk_type::shape_type;
         using temporary_type = typename inner_types::temporary_type;
+        using bool_load_type = xt::bool_load_type<value_type>;
+        static constexpr layout_type static_layout = layout_type::dynamic;
 
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
@@ -68,6 +70,16 @@ namespace xt
         const shape_type& shape() const
         {
             return m_shape;
+        }
+
+        inline layout_type layout() const noexcept
+        {
+            return static_layout;
+        }
+
+        inline bool is_contiguous() const noexcept
+        {
+            return false;
         }
 
         template <class... Idxs>
@@ -177,6 +189,17 @@ namespace xt
             return chunk.element(ii.second.begin(), ii.second.end());
         }
 
+        size_type dimension() const
+        {
+            return shape().size();
+        }
+
+        template <class S>
+        bool broadcast_shape(S& s, bool reuse_cache = false) const
+        {
+            return xt::broadcast_shape(shape(), s);
+        }
+
     private:
 
         xarray<chunk_type> m_chunks;
@@ -237,18 +260,6 @@ namespace xt
                 dim++;
             }
             return std::make_pair(indexes_of_chunk, indexes_in_chunk);
-        }
-
-        size_type dimension() const
-        {
-            return shape().size();
-        }
-
-        template <class S>
-        bool broadcast_shape(const S& s) const
-        {
-            // Available in "xtensor/xtrides.hpp"
-            return broadcast_shape(shape(), s);
         }
 
         template <class S>
