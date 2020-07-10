@@ -99,23 +99,9 @@ namespace xt
         }
 
         template <class S>
-        xchunked_array(S shape, S chunk_shape):
-            m_shape(shape),
-            m_chunk_shape(chunk_shape)
+        xchunked_array(S shape, S chunk_shape)
         {
-            std::vector<size_t> shape_chunk(shape.size());
-            size_t di = 0;
-            for (auto s: shape)
-            {
-                size_t chunk_nb = s / chunk_shape[di];
-                if (s % chunk_shape[di] > 0)
-                    chunk_nb += 1;  // edge chunk
-                shape_chunk[di] = chunk_nb;
-                di++;
-            }
-            m_chunks.resize(shape_chunk);
-            for (auto& c: m_chunks)
-                c.resize(chunk_shape);
+            resize(shape, chunk_shape);
         }
 
         xchunked_array(const xchunked_array&) = default;
@@ -152,6 +138,49 @@ namespace xt
             {
                 noalias(m_chunks(nb_chunks)) = strided_view(e.derived_cast(),
                     {range(nb_chunks * m_chunk_shape[0], m_shape[0]), ellipsis()});
+            }
+        }
+
+        template <class E, class S>
+        xchunked_array(const xexpression<E>& e, S chunk_shape)
+        {
+            const auto& shape = e.derived_cast().shape();
+            resize_container(m_shape, shape.size());
+            std::copy(shape.begin(), shape.end(), m_shape.begin());
+            m_chunk_shape = chunk_shape;
+            resize(m_shape, m_chunk_shape);
+            shape_type ic(dimension());  // index of chunk, initialized to 0...
+            xstrided_slice_vector sv;  // element slice corresponding to chunk
+            size_t di = 0;  // dimension index
+            // initialize slice
+            for (auto i: ic)
+            {
+                sv.push_back(range(0, m_chunk_shape[di]));
+                di++;
+            }
+            for (auto& chunk: m_chunks)
+            {
+                noalias(chunk) = strided_view(e.derived_cast(), sv);
+                di = 0;
+                while (true)
+                {
+                    if (ic[di] + 1 == m_chunks.shape()[di])
+                    {
+                        ic[di] = 0;
+                        sv[di] = range(0, m_chunk_shape[di]);
+                        if (di + 1 == dimension())
+                            break;
+                        else
+                            di++;
+
+                    }
+                    else
+                    {
+                        ic[di] += 1;
+                        sv[di] = range(ic[di] * m_chunk_shape[di], (ic[di] + 1) * m_chunk_shape[di]);
+                        break;
+                    }
+                }
             }
         }
 
@@ -205,6 +234,29 @@ namespace xt
         xarray<chunk_type> m_chunks;
         shape_type m_shape;
         shape_type m_chunk_shape;
+
+        template <class S>
+        void resize(S& shape, S& chunk_shape)
+        {
+            // compute chunk number in each dimension (shape_of_chunks)
+            std::vector<size_t> shape_of_chunks(shape.size());
+            size_t di = 0;
+            for (auto s: shape)
+            {
+                size_t cn = s / chunk_shape[di];
+                if (s % chunk_shape[di] > 0)
+                    cn += 1;  // edge chunk
+                shape_of_chunks[di] = cn;
+                di++;
+            }
+            // resize the xarray of chunks
+            m_chunks.resize(shape_of_chunks);
+            // resize each chunk
+            for (auto& c: m_chunks)
+                c.resize(chunk_shape);
+            m_shape = shape;
+            m_chunk_shape = chunk_shape;
+        }
 
         template <class... Idxs>
         inline std::pair<std::array<size_t, sizeof...(Idxs)>, std::array<size_t, sizeof...(Idxs)>> get_indexes(Idxs... idxs) const
@@ -268,8 +320,6 @@ namespace xt
             return false;
         }
     };
-
-
 
     template <class chunk_type>
     template <class O>
