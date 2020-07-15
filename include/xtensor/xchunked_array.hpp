@@ -10,9 +10,29 @@
 
 namespace xt
 {
-    // use tag dispatch to call chunk_shape() or shape() depending on whether expression is chunked or not
+    // use SFINAE to check if expression has chunk_shape()
+    // expression always has shape(), make it the second choice if chunk_shape() exists through the 0 argument
+    // (0 is of type int and can be cast to long)
+    template<class E>
+    auto is_chunked_impl(const xexpression<E>& e, int) -> decltype(e.derived_cast().chunk_shape(), bool())
+    {
+        return true;
+    }
+
+    template<class E>
+    auto is_chunked_impl(const xexpression<E>& e, long) -> decltype(e.derived_cast().shape(), bool())
+    {
+        return false;
+    }
+
+    template<class E>
+    auto is_chunked(const xexpression<E>& e) -> bool
+    {
+        return is_chunked_impl(e, 0);
+    }
+
     template <class E>
-    std::vector<size_t> _get_chunk_shape_or_shape(std::true_type, const xexpression<E>& e)
+    auto get_chunk_shape_or_shape_impl(const xexpression<E>& e, int) -> decltype(e.derived_cast().chunk_shape(), std::vector<size_t>())
     {
         const auto& s = e.derived_cast().chunk_shape();
         std::vector<size_t> chunk_shape(s.size());
@@ -21,7 +41,7 @@ namespace xt
     }
 
     template <class E>
-    std::vector<size_t> _get_chunk_shape_or_shape(std::false_type, const xexpression<E>& e)
+    auto get_chunk_shape_or_shape_impl(const xexpression<E>& e, long) -> decltype(e.derived_cast().shape(), std::vector<size_t>())
     {
         const auto& s = e.derived_cast().shape();
         std::vector<size_t> shape(s.size());
@@ -30,9 +50,9 @@ namespace xt
     }
 
     template <class E>
-    std::vector<size_t> get_chunk_shape_or_shape(const xexpression<E>& e)
+    auto get_chunk_shape_or_shape(const xexpression<E>& e) -> std::vector<size_t>
     {
-        return _get_chunk_shape_or_shape<E>(std::integral_constant<bool, is_chunked(e)>{}, e);
+        return get_chunk_shape_or_shape_impl(e, 0);
     }
 
     template <class chunk_type>
@@ -364,27 +384,6 @@ namespace xt
     {
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset, true);
-    }
-
-    // use SFINAE to check if expression has chunk_shape()
-    // expression always has shape(), make it the second choice if chunk_shape() exists through the 0 argument
-    // (0 is of type int and can be cast to long)
-    template<class E>
-    constexpr auto is_chunked_imp(const xexpression<E>& e, int) -> decltype(e.derived_cast().chunk_shape(), bool())
-    {
-        return true;
-    }
-
-    template<class E>
-    constexpr auto is_chunked_imp(const xexpression<E>& e, long) -> decltype(e.derived_cast().shape(), bool())
-    {
-        return false;
-    }
-
-    template<class E>
-    constexpr auto is_chunked(const xexpression<E>& e) -> bool
-    {
-        return is_chunked_imp(e, 0);
     }
 }
 
