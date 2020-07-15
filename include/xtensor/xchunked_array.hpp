@@ -165,17 +165,17 @@ namespace xt
                 bool last_chunk = ci == m_chunks.size() - 1;
                 if (!last_chunk)
                 {
-                    di = 0;
+                    di = dimension() - 1;
                     while (true)
                     {
                         if (ic[di] + 1 == m_chunks.shape()[di])
                         {
                             ic[di] = 0;
                             sv[di] = range(0, m_chunk_shape[di]);
-                            if (di + 1 == dimension())
+                            if (di == 0)
                                 break;
                             else
-                                di++;
+                                di--;
 
                         }
                         else
