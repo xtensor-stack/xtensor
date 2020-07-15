@@ -75,13 +75,33 @@ namespace xt
           {{1., 2., 3.},
            {4., 5., 6.},
            {7., 8., 9.}};
+
+        EXPECT_EQ(xt::is_chunked(a3), false);
+
         std::vector<size_t> chunk_shape4 = {2, 2};
         auto a4 = chunked_array(a3, chunk_shape4);
+
+        EXPECT_EQ(xt::is_chunked(a4), true);
+
         double i = 1.;
         for (const auto& v: a4)
         {
             EXPECT_EQ(v, i);
             i += 1.;
+        }
+
+        auto a5 = chunked_array(a4);
+        EXPECT_EQ(xt::is_chunked(a5), true);
+        for (const auto& v: a5.chunk_shape())
+        {
+            EXPECT_EQ(v, 2);
+        }
+
+        auto a6 = chunked_array(a3);
+        EXPECT_EQ(xt::is_chunked(a6), true);
+        for (const auto& v: a6.chunk_shape())
+        {
+            EXPECT_EQ(v, 3);
         }
     }
 }

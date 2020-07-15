@@ -10,6 +10,26 @@
 
 namespace xt
 {
+    template<class E, bool is_chunked>
+    std::enable_if_t<is_chunked == true, std::vector<size_t>>
+    get_chunk_shape_or_shape(const xexpression<E>& e)
+    {
+        const auto& s = e.derived_cast().chunk_shape();
+        std::vector<size_t> chunk_shape(s.size());
+        std::copy(s.begin(), s.end(), chunk_shape.begin());
+        return chunk_shape;
+    }
+
+    template<class E, bool is_chunked>
+    std::enable_if_t<is_chunked == false, std::vector<size_t>>
+    get_chunk_shape_or_shape(const xexpression<E>& e)
+    {
+        const auto& s = e.derived_cast().shape();
+        std::vector<size_t> shape(s.size());
+        std::copy(s.begin(), s.end(), shape.begin());
+        return shape;
+    }
+
     template <class chunk_type>
     class xchunked_array;
 
@@ -110,37 +130,6 @@ namespace xt
         xchunked_array(xchunked_array&&) = default;
         xchunked_array& operator=(xchunked_array&&) = default;
 
-        template <class E>
-        xchunked_array(const xexpression<E>& e)
-        {
-            const auto& sh = e.derived_cast().shape();
-            resize_container(m_shape, sh.size());
-            std::copy(sh.begin(), sh.end(), m_shape.begin());
-            m_chunk_shape = m_shape;
-            // Naive implementation to refine later
-            m_chunk_shape[0] = std::min(size_type(10), m_shape[0]);
-            size_type nb_chunks = m_shape[0] / m_chunk_shape[0];
-            bool additional_chunk = m_shape[0] % m_chunk_shape[0] > 0;
-            if (additional_chunk)
-            {
-                m_chunks.resize({nb_chunks + 1u});
-            }
-            else
-            {
-                m_chunks.resize({nb_chunks});
-            }
-            for (size_type i = 0; i < nb_chunks; ++i)
-            {
-                noalias(m_chunks(i)) = strided_view(e.derived_cast(),
-                    {range(i * m_chunk_shape[0], (i + 1u) * m_chunk_shape[0]), ellipsis()});
-            }
-            if (additional_chunk)
-            {
-                noalias(m_chunks(nb_chunks)) = strided_view(e.derived_cast(),
-                    {range(nb_chunks * m_chunk_shape[0], m_shape[0]), ellipsis()});
-            }
-        }
-
         template <class E, class S>
         xchunked_array(const xexpression<E>& e, S chunk_shape)
         {
@@ -191,6 +180,14 @@ namespace xt
         }
 
         template <class E>
+        xchunked_array(const xexpression<E>& e)
+        {
+            const auto& chunk_shape = get_chunk_shape_or_shape<E, is_chunked(e)>(e);
+            xchunked_array<chunk_type> arr(e, chunk_shape);
+            *this = arr;
+        }
+
+        template <class E>
         self_type& operator=(const xexpression<E>& e)
         {
             return semantic_base::operator=(e);
@@ -227,6 +224,11 @@ namespace xt
         size_type dimension() const
         {
             return shape().size();
+        }
+
+        shape_type chunk_shape() const
+        {
+            return m_chunk_shape;
         }
 
         template <class S>
@@ -358,7 +360,24 @@ namespace xt
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset, true);
     }
+
+    template<class E>
+    constexpr auto is_chunked_imp(const xexpression<E>& e, int) -> decltype(e.derived_cast().chunk_shape(), bool())
+    {
+        return true;
+    }
+
+    template<class E>
+    constexpr auto is_chunked_imp(const xexpression<E>& e, long) -> decltype(e.derived_cast().shape(), bool())
+    {
+        return false;
+    }
+
+    template<class E>
+    constexpr auto is_chunked(const xexpression<E>& e) -> bool
+    {
+        return is_chunked_imp(e, 0);
+    }
 }
 
 #endif
-
