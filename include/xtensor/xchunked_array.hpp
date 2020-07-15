@@ -158,29 +158,35 @@ namespace xt
                 sv.push_back(range(0, m_chunk_shape[di]));
                 di++;
             }
+            size_t ci = 0;
             for (auto& chunk: m_chunks)
             {
                 noalias(chunk) = strided_view(e.derived_cast(), sv);
-                di = 0;
-                while (true)
+                bool last_chunk = ci == m_chunks.size() - 1;
+                if (!last_chunk)
                 {
-                    if (ic[di] + 1 == m_chunks.shape()[di])
+                    di = 0;
+                    while (true)
                     {
-                        ic[di] = 0;
-                        sv[di] = range(0, m_chunk_shape[di]);
-                        if (di + 1 == dimension())
-                            break;
-                        else
-                            di++;
+                        if (ic[di] + 1 == m_chunks.shape()[di])
+                        {
+                            ic[di] = 0;
+                            sv[di] = range(0, m_chunk_shape[di]);
+                            if (di + 1 == dimension())
+                                break;
+                            else
+                                di++;
 
-                    }
-                    else
-                    {
-                        ic[di] += 1;
-                        sv[di] = range(ic[di] * m_chunk_shape[di], (ic[di] + 1) * m_chunk_shape[di]);
-                        break;
+                        }
+                        else
+                        {
+                            ic[di] += 1;
+                            sv[di] = range(ic[di] * m_chunk_shape[di], (ic[di] + 1) * m_chunk_shape[di]);
+                            break;
+                        }
                     }
                 }
+                ci += 1;
             }
         }
 

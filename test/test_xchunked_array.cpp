@@ -70,5 +70,18 @@ namespace xt
         {
             EXPECT_EQ(v, 2. * val);
         }
+
+        xt::xarray<double> a3
+          {{1., 2., 3.},
+           {4., 5., 6.},
+           {7., 8., 9.}};
+        std::vector<size_t> chunk_shape4 = {2, 2};
+        auto a4 = chunked_array(a3, chunk_shape4);
+        double i = 1.;
+        for (const auto& v: a4)
+        {
+            EXPECT_EQ(v, i);
+            i += 1.;
+        }
     }
 }
