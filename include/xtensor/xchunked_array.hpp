@@ -10,9 +10,9 @@
 
 namespace xt
 {
-    template<class E, bool is_chunked>
-    std::enable_if_t<is_chunked == true, std::vector<size_t>>
-    get_chunk_shape_or_shape(const xexpression<E>& e)
+    // use tag dispatch to call chunk_shape() or shape() depending on whether expression is chunked or not
+    template <class E>
+    std::vector<size_t> _get_chunk_shape_or_shape(std::true_type, const xexpression<E>& e)
     {
         const auto& s = e.derived_cast().chunk_shape();
         std::vector<size_t> chunk_shape(s.size());
@@ -20,14 +20,19 @@ namespace xt
         return chunk_shape;
     }
 
-    template<class E, bool is_chunked>
-    std::enable_if_t<is_chunked == false, std::vector<size_t>>
-    get_chunk_shape_or_shape(const xexpression<E>& e)
+    template <class E>
+    std::vector<size_t> _get_chunk_shape_or_shape(std::false_type, const xexpression<E>& e)
     {
         const auto& s = e.derived_cast().shape();
         std::vector<size_t> shape(s.size());
         std::copy(s.begin(), s.end(), shape.begin());
         return shape;
+    }
+
+    template <class E>
+    std::vector<size_t> get_chunk_shape_or_shape(const xexpression<E>& e)
+    {
+        return _get_chunk_shape_or_shape<E>(std::integral_constant<bool, is_chunked(e)>{}, e);
     }
 
     template <class chunk_type>
@@ -182,7 +187,7 @@ namespace xt
         template <class E>
         xchunked_array(const xexpression<E>& e)
         {
-            const auto& chunk_shape = get_chunk_shape_or_shape<E, is_chunked(e)>(e);
+            const auto& chunk_shape = get_chunk_shape_or_shape<E>(e);
             xchunked_array<chunk_type> arr(e, chunk_shape);
             *this = arr;
         }
@@ -361,6 +366,9 @@ namespace xt
         return stepper(this, offset, true);
     }
 
+    // use SFINAE to check if expression has chunk_shape()
+    // expression always has shape(), make it the second choice if chunk_shape() exists through the 0 argument
+    // (0 is of type int and can be cast to long)
     template<class E>
     constexpr auto is_chunked_imp(const xexpression<E>& e, int) -> decltype(e.derived_cast().chunk_shape(), bool())
     {
