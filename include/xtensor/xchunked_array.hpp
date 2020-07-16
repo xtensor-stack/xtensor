@@ -10,30 +10,40 @@
 
 namespace xt
 {
-    template <class E, class = void>
-    struct chunk_helper
+    namespace detail
     {
-        static const auto& chunk_shape(const xexpression<E>& e)
-        {
-            return e.derived_cast().shape();
-        }
-        using is_chunked = std::false_type;
-    };
+        // Workaround for VS2015
+        template <class E>
+        using try_chunk_shape = decltype(std::declval<E>().chunk_shape());
 
-    template <class E>
-    struct chunk_helper<E, void_t<decltype(std::declval<E>().chunk_shape())>>
-    {
-        static const auto& chunk_shape(const xexpression<E>& e)
+        template <class E, template <class> class OP, class = void>
+        struct chunk_helper_impl
         {
-            return e.derived_cast().chunk_shape();
-        }
-        using is_chunked = std::true_type;
-    };
+            static const auto& chunk_shape(const xexpression<E>& e)
+            {
+                return e.derived_cast().shape();
+            }
+            using is_chunked = std::false_type;
+        };
+
+        template <class E, template <class> class OP>
+        struct chunk_helper_impl<E, OP, void_t<OP<E>>>
+        {
+            static const auto& chunk_shape(const xexpression<E>& e)
+            {
+                return e.derived_cast().chunk_shape();
+            }
+            using is_chunked = std::true_type;
+        };
+
+        template <class E>
+        using chunk_helper = chunk_helper_impl<E, try_chunk_shape>;
+    }
 
     template<class E>
-    constexpr auto is_chunked(const xexpression<E>& e) -> bool
+    constexpr bool is_chunked(const xexpression<E>& e)
     {
-        using return_type = typename chunk_helper<E>::is_chunked;
+        using return_type = typename detail::chunk_helper<E>::is_chunked;
         return return_type::value;
     }
 
@@ -189,9 +199,8 @@ namespace xt
         template <class E>
         xchunked_array(const xexpression<E>& e)
         {
-            const auto& chunk_shape = chunk_helper<E>::chunk_shape(e);
-            xchunked_array<chunk_type> arr(e, chunk_shape);
-            *this = arr;
+            const auto& chunk_shape = detail::chunk_helper<E>::chunk_shape(e);
+            *this = xchunked_array<chunk_type>(e, chunk_shape);
         }
 
         template <class E>

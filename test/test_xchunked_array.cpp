@@ -44,6 +44,9 @@ namespace xt
 
     TEST(xchunked_array, assign_expression)
     {
+#ifdef _MSC_FULL_VER
+        std::cout << "MSC_FULL_VER = " << _MSC_FULL_VER << std::endl;
+#endif
         std::vector<size_t> shape1 = {2, 2, 2};
         std::vector<size_t> chunk_shape1 = {2, 3, 4};
         chunked_array a1(shape1, chunk_shape1);
