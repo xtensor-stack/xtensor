@@ -44,6 +44,9 @@ namespace xt
 
     TEST(xchunked_array, assign_expression)
     {
+#ifdef _MSC_FULL_VER
+        std::cout << "MSC_FULL_VER = " << _MSC_FULL_VER << std::endl;
+#endif
         std::vector<size_t> shape1 = {2, 2, 2};
         std::vector<size_t> chunk_shape1 = {2, 3, 4};
         chunked_array a1(shape1, chunk_shape1);
@@ -75,13 +78,33 @@ namespace xt
           {{1., 2., 3.},
            {4., 5., 6.},
            {7., 8., 9.}};
+
+        EXPECT_EQ(xt::is_chunked(a3), false);
+
         std::vector<size_t> chunk_shape4 = {2, 2};
         auto a4 = chunked_array(a3, chunk_shape4);
+
+        EXPECT_EQ(xt::is_chunked(a4), true);
+
         double i = 1.;
         for (const auto& v: a4)
         {
             EXPECT_EQ(v, i);
             i += 1.;
+        }
+
+        auto a5 = chunked_array(a4);
+        EXPECT_EQ(xt::is_chunked(a5), true);
+        for (const auto& v: a5.chunk_shape())
+        {
+            EXPECT_EQ(v, 2);
+        }
+
+        auto a6 = chunked_array(a3);
+        EXPECT_EQ(xt::is_chunked(a6), true);
+        for (const auto& v: a6.chunk_shape())
+        {
+            EXPECT_EQ(v, 3);
         }
     }
 }
