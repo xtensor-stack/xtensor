@@ -17,8 +17,9 @@ namespace xt
         {
             return e.derived_cast().shape();
         }
-        static bool is_chunked(const xexpression<E>& e)
+        static auto is_chunked(const xexpression<E>& e)
         {
+            (void)(e);
             return false;
         }
     };
@@ -30,8 +31,9 @@ namespace xt
         {
             return e.derived_cast().chunk_shape();
         }
-        static bool is_chunked(const xexpression<E>& e)
+        static auto is_chunked(const xexpression<E>& e)
         {
+            (void)(e);
             return true;
         }
     };
