@@ -17,11 +17,7 @@ namespace xt
         {
             return e.derived_cast().shape();
         }
-        static auto is_chunked(const xexpression<E>& e)
-        {
-            (void)(e);
-            return false;
-        }
+        using is_chunked = std::false_type;
     };
 
     template <class E>
@@ -31,17 +27,14 @@ namespace xt
         {
             return e.derived_cast().chunk_shape();
         }
-        static auto is_chunked(const xexpression<E>& e)
-        {
-            (void)(e);
-            return true;
-        }
+        using is_chunked = std::true_type;
     };
 
     template<class E>
-    auto is_chunked(const xexpression<E>& e) -> bool
+    constexpr auto is_chunked(const xexpression<E>& e) -> bool
     {
-        return chunk_helper<E>::is_chunked(e);
+        using return_type = typename chunk_helper<E>::is_chunked;
+        return return_type::value;
     }
 
     template <class chunk_type>
