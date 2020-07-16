@@ -10,49 +10,36 @@
 
 namespace xt
 {
-    // use SFINAE to check if expression has chunk_shape()
-    // expression always has shape(), make it the second choice if chunk_shape() exists through the 0 argument
-    // (0 is of type int and can be cast to long)
-    template<class E>
-    auto is_chunked_impl(const xexpression<E>& e, int) -> decltype(e.derived_cast().chunk_shape(), bool())
+    template <class E, class = void>
+    struct chunk_helper
     {
-        return true;
-    }
+        static const auto& chunk_shape(const xexpression<E>& e)
+        {
+            return e.derived_cast().shape();
+        }
+        static bool is_chunked(const xexpression<E>& e)
+        {
+            return false;
+        }
+    };
 
-    template<class E>
-    auto is_chunked_impl(const xexpression<E>& e, long) -> decltype(e.derived_cast().shape(), bool())
+    template <class E>
+    struct chunk_helper<E, void_t<decltype(std::declval<E>().chunk_shape())>>
     {
-        return false;
-    }
+        static const auto& chunk_shape(const xexpression<E>& e)
+        {
+            return e.derived_cast().chunk_shape();
+        }
+        static bool is_chunked(const xexpression<E>& e)
+        {
+            return true;
+        }
+    };
 
     template<class E>
     auto is_chunked(const xexpression<E>& e) -> bool
     {
-        return is_chunked_impl(e, 0);
-    }
-
-    template <class E>
-    auto get_chunk_shape_or_shape_impl(const xexpression<E>& e, int) -> decltype(e.derived_cast().chunk_shape(), std::vector<size_t>())
-    {
-        const auto& s = e.derived_cast().chunk_shape();
-        std::vector<size_t> chunk_shape(s.size());
-        std::copy(s.begin(), s.end(), chunk_shape.begin());
-        return chunk_shape;
-    }
-
-    template <class E>
-    auto get_chunk_shape_or_shape_impl(const xexpression<E>& e, long) -> decltype(e.derived_cast().shape(), std::vector<size_t>())
-    {
-        const auto& s = e.derived_cast().shape();
-        std::vector<size_t> shape(s.size());
-        std::copy(s.begin(), s.end(), shape.begin());
-        return shape;
-    }
-
-    template <class E>
-    auto get_chunk_shape_or_shape(const xexpression<E>& e) -> std::vector<size_t>
-    {
-        return get_chunk_shape_or_shape_impl(e, 0);
+        return chunk_helper<E>::is_chunked(e);
     }
 
     template <class chunk_type>
@@ -207,7 +194,7 @@ namespace xt
         template <class E>
         xchunked_array(const xexpression<E>& e)
         {
-            const auto& chunk_shape = get_chunk_shape_or_shape<E>(e);
+            const auto& chunk_shape = chunk_helper<E>::chunk_shape(e);
             xchunked_array<chunk_type> arr(e, chunk_shape);
             *this = arr;
         }
