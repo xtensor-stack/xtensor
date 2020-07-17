@@ -14,7 +14,7 @@
 
 namespace xt
 {
-    using chunked_array = xt::xchunked_array<xt::xarray<double>>;
+    using chunked_array = xchunked_array<xarray<xarray<double>>>;
 
     TEST(xchunked_array, indexed_access)
     {
@@ -53,7 +53,7 @@ namespace xt
         double val;
 
         val = 3.;
-        a1 = xt::broadcast(val, a1.shape());
+        a1 = broadcast(val, a1.shape());
         for (const auto& v: a1)
         {
             EXPECT_EQ(v, val);
@@ -62,7 +62,7 @@ namespace xt
         std::vector<size_t> shape2 = {32, 10, 10};
         chunked_array a2(shape2, chunk_shape1);
 
-        a2 = xt::broadcast(val, a2.shape());
+        a2 = broadcast(val, a2.shape());
         for (const auto& v: a2)
         {
             EXPECT_EQ(v, val);
@@ -74,17 +74,17 @@ namespace xt
             EXPECT_EQ(v, 2. * val);
         }
 
-        xt::xarray<double> a3
+        xarray<double> a3
           {{1., 2., 3.},
            {4., 5., 6.},
            {7., 8., 9.}};
 
-        EXPECT_EQ(xt::is_chunked(a3), false);
+        EXPECT_EQ(is_chunked(a3), false);
 
         std::vector<size_t> chunk_shape4 = {2, 2};
         auto a4 = chunked_array(a3, chunk_shape4);
 
-        EXPECT_EQ(xt::is_chunked(a4), true);
+        EXPECT_EQ(is_chunked(a4), true);
 
         double i = 1.;
         for (const auto& v: a4)
@@ -94,14 +94,14 @@ namespace xt
         }
 
         auto a5 = chunked_array(a4);
-        EXPECT_EQ(xt::is_chunked(a5), true);
+        EXPECT_EQ(is_chunked(a5), true);
         for (const auto& v: a5.chunk_shape())
         {
             EXPECT_EQ(v, 2);
         }
 
         auto a6 = chunked_array(a3);
-        EXPECT_EQ(xt::is_chunked(a6), true);
+        EXPECT_EQ(is_chunked(a6), true);
         for (const auto& v: a6.chunk_shape())
         {
             EXPECT_EQ(v, 3);
