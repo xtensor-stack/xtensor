@@ -47,37 +47,40 @@ namespace xt
         return return_type::value;
     }
 
-    template <class chunk_type>
+    template <class chunk_storage>
     class xchunked_array;
 
-    template <class chunk_type>
-    struct xcontainer_inner_types<xchunked_array<chunk_type>>
+    template <class chunk_storage>
+    struct xcontainer_inner_types<xchunked_array<chunk_storage>>
     {
+        using chunk_type = typename chunk_storage::value_type;
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using size_type = std::size_t;
         using storage_type = chunk_type;
-        using temporary_type = xchunked_array<chunk_type>;
+        using temporary_type = xchunked_array<chunk_storage>;
     };
 
-    template <class chunk_type>
-    struct xiterable_inner_types<xchunked_array<chunk_type>>
+    template <class chunk_storage>
+    struct xiterable_inner_types<xchunked_array<chunk_storage>>
     {
+        using chunk_type = typename chunk_storage::value_type;
         using inner_shape_type = typename chunk_type::shape_type;
-        using const_stepper = xindexed_stepper<xchunked_array<chunk_type>, true>;
-        using stepper = xindexed_stepper<xchunked_array<chunk_type>, false>;
+        using const_stepper = xindexed_stepper<xchunked_array<chunk_storage>, true>;
+        using stepper = xindexed_stepper<xchunked_array<chunk_storage>, false>;
     };
 
-    template <class chunk_type>
-    class xchunked_array: public xaccessible<xchunked_array<chunk_type>>,
-                          public xiterable<xchunked_array<chunk_type>>,
-                          public xcontainer_semantic<xchunked_array<chunk_type>>
+    template <class chunk_storage>
+    class xchunked_array: public xaccessible<xchunked_array<chunk_storage>>,
+                          public xiterable<xchunked_array<chunk_storage>>,
+                          public xcontainer_semantic<xchunked_array<chunk_storage>>
     {
     public:
 
+        using chunk_type = typename chunk_storage::value_type;
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
-        using self_type = xchunked_array<chunk_type>;
+        using self_type = xchunked_array<chunk_storage>;
         using semantic_base = xcontainer_semantic<self_type>;
         using iterable_base = xconst_iterable<self_type>;
         using const_stepper = typename iterable_base::const_stepper;
@@ -200,7 +203,7 @@ namespace xt
         xchunked_array(const xexpression<E>& e)
         {
             const auto& chunk_shape = detail::chunk_helper<E>::chunk_shape(e);
-            *this = xchunked_array<chunk_type>(e, chunk_shape);
+            *this = xchunked_array<chunk_storage>(e, chunk_shape);
         }
 
         template <class E>
@@ -255,7 +258,7 @@ namespace xt
 
     private:
 
-        xarray<chunk_type> m_chunks;
+        chunk_storage m_chunks;
         shape_type m_shape;
         shape_type m_chunk_shape;
 
@@ -345,33 +348,33 @@ namespace xt
         }
     };
 
-    template <class chunk_type>
+    template <class chunk_storage>
     template <class O>
-    inline auto xchunked_array<chunk_type>::stepper_begin(const O& shape) const noexcept -> const_stepper
+    inline auto xchunked_array<chunk_storage>::stepper_begin(const O& shape) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset);
     }
 
-    template <class chunk_type>
+    template <class chunk_storage>
     template <class O>
-    inline auto xchunked_array<chunk_type>::stepper_end(const O& shape, layout_type) const noexcept -> const_stepper
+    inline auto xchunked_array<chunk_storage>::stepper_end(const O& shape, layout_type) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset, true);
     }
 
-    template <class chunk_type>
+    template <class chunk_storage>
     template <class O>
-    inline auto xchunked_array<chunk_type>::stepper_begin(const O& shape) noexcept -> stepper
+    inline auto xchunked_array<chunk_storage>::stepper_begin(const O& shape) noexcept -> stepper
     {
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset);
     }
 
-    template <class chunk_type>
+    template <class chunk_storage>
     template <class O>
-    inline auto xchunked_array<chunk_type>::stepper_end(const O& shape, layout_type) noexcept -> stepper
+    inline auto xchunked_array<chunk_storage>::stepper_end(const O& shape, layout_type) noexcept -> stepper
     {
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset, true);
