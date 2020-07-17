@@ -184,7 +184,7 @@ hold a const reference or a value for ``e`` depending on the lvalue-ness of the 
 Reusing expressions / sharing expressions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Sometimes it is necessary to use a xexpression in two seperate places in another xexpression. For example, when computing
+Sometimes it is necessary to use a xexpression in two separate places in another xexpression. For example, when computing
 something like ``sin(A) + cos(A)`` we can see A being referenced twice. This works fine if we can guarantee that ``A`` has a
 long enough lifetime. However, when writing generic interfaces that accept rvalues we cannot always guarantee that ``A`` will
 live long enough.
@@ -230,7 +230,7 @@ But under certain circumstances it might be required, e.g. to implement a fully 
 
 We can see that, before returning from the function, four copies of ``shared_weights``
 exist: two in the two ``xt::sum`` functions, and one is the temporary. The last one lies
-in ``weights`` itself, it is a technical requirement for the ``share`` syyntax. After
+in ``weights`` itself, it is a technical requirement for the ``share`` syntax. After
 returning from the function, only two copies of the ``xshared_expression`` will exist.
 As discussed before, ``xt::make_xshared`` has the same overhead as creating a ``std::shared_ptr``
 which is used internally by the shared expression.
