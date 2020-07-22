@@ -27,13 +27,7 @@ namespace xt
     template <class T1, class T2, class S1, class S2>
     void remap(T1& file_array, T2& array, S1& in_stream, S2& out_stream)
     {
-        typedef typename std::remove_pointer<T1>::type T;
-        if (file_array != NULL)
-        {
-            delete file_array;
-            file_array = NULL;
-        }
-        file_array = new T(array, in_stream, out_stream);
+        file_array = T1(array, in_stream, out_stream);
     }
 
     template <class EC>
@@ -93,7 +87,7 @@ namespace xt
             return m_shape;
         }
 
-        xfiles_array(): m_file_array(NULL)
+        xfiles_array()
         {
         }
 
@@ -129,7 +123,7 @@ namespace xt
         {
             auto index = get_indexes(idxs...);
             map_file_array(index.cbegin(), index.cend());
-            return *m_file_array;
+            return m_file_array;
         }
 
         template <class... Idxs>
@@ -137,7 +131,7 @@ namespace xt
         {
             auto index = get_indexes(idxs...);
             map_file_array(index.cbegin(), index.cend());
-            return *m_file_array;
+            return m_file_array;
         }
 
         xfiles_array(const xfiles_array&) = default;
@@ -149,27 +143,27 @@ namespace xt
         reference operator[](const xindex& index)
         {
             map_file_array(index.cbegin(), index.cend());
-            return *m_file_array;
+            return m_file_array;
         }
 
         const_reference operator[](const xindex& index) const
         {
             map_file_array(index.cbegin(), index.cend());
-            return *m_file_array;
+            return m_file_array;
         }
 
         template <class It>
         inline reference element(It first, It last)
         {
             map_file_array(first, last);
-            return *m_file_array;
+            return m_file_array;
         }
 
         template <class It>
         inline const_reference element(It first, It last) const
         {
             map_file_array(first, last);
-            return *m_file_array;
+            return m_file_array;
         }
 
         size_type dimension() const
@@ -185,7 +179,7 @@ namespace xt
     private:
 
         shape_type m_shape;
-        EC* m_file_array;
+        EC m_file_array;
         xarray<typename EC::value_type> m_array;
         std::ifstream m_in_file;
         std::ofstream m_out_file;
