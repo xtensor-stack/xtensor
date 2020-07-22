@@ -11,9 +11,12 @@ namespace xt
     {
     public:
 
-        xdisk_reference(T& value)
+        xdisk_reference(T& value, xarray<T>* array, std::ifstream* in_file, std::ofstream* out_file)
         {
             m_pvalue = &value;
+            m_array = array;
+            m_in_file = in_file;
+            m_out_file = out_file;
         }
 
         operator const T() const
@@ -38,23 +41,14 @@ namespace xt
             return os << *obj.m_pvalue;
         }
 
-        static std::ifstream* m_in_file;
-        static std::ofstream* m_out_file;
-        const static xarray<T>* m_array;
+        std::ifstream* m_in_file;
+        std::ofstream* m_out_file;
+        xarray<T>* m_array;
 
     private:
 
         T* m_pvalue;
     };
-
-    template <class T>
-    std::ifstream* xdisk_reference<T>::m_in_file = NULL;
-
-    template <class T>
-    std::ofstream* xdisk_reference<T>::m_out_file = NULL;
-
-    template <class T>
-    const xarray<T>* xdisk_reference<T>::m_array = NULL;
 
     template <class T>
     class xdisk_array;
@@ -98,9 +92,6 @@ namespace xt
             m_array = &arr;
             m_in_file = &in_file;
             m_out_file = &out_file;
-            reference::m_array = &arr;
-            reference::m_in_file = &in_file;
-            reference::m_out_file = &out_file;
         }
 
         template <class S>
@@ -113,8 +104,8 @@ namespace xt
         template <class... Idxs>
         inline reference operator()(Idxs... idxs)
         {
-            auto i = get_indexes(idxs...);
-            return m_array->element(i.cbegin(), i.cend());
+            auto index = get_indexes(idxs...);
+            return reference(m_array->element(index.cbegin(), index.cend()), m_array, m_in_file, m_out_file);
         }
 
         template <class... Idxs>
@@ -126,28 +117,24 @@ namespace xt
 
         reference operator[](const xindex& index)
         {
-            reference el = m_array->element(index.cbegin(), index.cend());
-            return el;
+            return reference(m_array->element(index.cbegin(), index.cend()), m_array, m_in_file, m_out_file);
         }
 
         const_reference operator[](const xindex& index) const
         {
-            const_reference const_el = m_array->element(index.cbegin(), index.cend());
-            return const_el;
+            return m_array->element(index.cbegin(), index.cend());
         }
 
         template <class It>
         inline reference element(It first, It last)
         {
-            reference el = m_array->element(first, last);
-            return el;
+            return reference(m_array->element(first, last), m_array, m_in_file, m_out_file);
         }
 
         template <class It>
         inline const_reference element(It first, It last) const
         {
-            const_reference const_el = m_array->element(first, last);
-            return const_el;
+            return m_array->element(first, last);
         }
 
     private:
