@@ -94,7 +94,7 @@ namespace xt
         template <class I>
         void map_file_array(I first, I last)
         {
-            std::string path = "";
+            std::string path;
             for (auto it = first; it != last; ++it)
             {
                 if (!path.empty())
@@ -105,10 +105,7 @@ namespace xt
             if (m_in_file.is_open())
                 m_array = load_csv<typename EC::value_type>(m_in_file);
             else
-            {
-                auto shape = m_array.shape();
-                m_array = xarray<typename EC::value_type>::from_shape(shape);
-            }
+                m_array = broadcast(0, m_array.shape());
             reopen(m_out_file, path);
             if (m_out_file.is_open())
             {

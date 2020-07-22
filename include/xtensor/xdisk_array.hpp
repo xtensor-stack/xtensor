@@ -107,6 +107,7 @@ namespace xt
         void resize(S& shape)
         {
             m_array->resize(shape);
+            *m_array = broadcast(0, shape);
         }
 
         template <class... Idxs>
