@@ -25,14 +25,15 @@ namespace xt
     }
 
     template <class T1, class T2, class S1, class S2>
-    void remap(T1** file_array, T2& array, S1& in_stream, S2& out_stream)
+    void remap(T1& file_array, T2& array, S1& in_stream, S2& out_stream)
     {
-        if (*file_array != NULL)
+        typedef typename std::remove_pointer<T1>::type T;
+        if (file_array != NULL)
         {
-            delete *file_array;
-            *file_array = NULL;
+            delete file_array;
+            file_array = NULL;
         }
-        *file_array = new T1(array, in_stream, out_stream);
+        file_array = new T(array, in_stream, out_stream);
     }
 
     template <class EC>
@@ -120,7 +121,7 @@ namespace xt
                 dump_csv(m_out_file, m_array);
                 m_out_file.seekp(0);
             }
-            remap(&m_file_array, m_array, m_in_file, m_out_file);
+            remap(m_file_array, m_array, m_in_file, m_out_file);
         }
 
         template <class... Idxs>
