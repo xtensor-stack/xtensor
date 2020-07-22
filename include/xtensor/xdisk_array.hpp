@@ -11,10 +11,11 @@ namespace xt
     {
     public:
 
-        xdisk_reference(T& value, xarray<T>* array, std::ifstream* in_file, std::ofstream* out_file)
+        xdisk_reference(T& value, xarray<T>* array, bool* array_dirty, std::ifstream* in_file, std::ofstream* out_file)
         {
             m_pvalue = &value;
             m_array = array;
+            m_array_dirty = array_dirty;
             m_in_file = in_file;
             m_out_file = out_file;
         }
@@ -31,8 +32,11 @@ namespace xt
 
         T operator=(const T value)
         {
-            *m_pvalue = value;
-            dump_csv(*m_out_file, *m_array);
+            if (value != *m_pvalue)
+            {
+                *m_array_dirty = true;
+                *m_pvalue = value;
+            }
             return *m_pvalue;
         }
 
@@ -41,13 +45,14 @@ namespace xt
             return os << *obj.m_pvalue;
         }
 
-        std::ifstream* m_in_file;
-        std::ofstream* m_out_file;
-        xarray<T>* m_array;
-
     private:
 
         T* m_pvalue;
+        std::ifstream* m_in_file;
+        std::ofstream* m_out_file;
+        xarray<T>* m_array;
+        bool* m_array_dirty;
+
     };
 
     template <class T>
@@ -87,9 +92,10 @@ namespace xt
 
         xdisk_array() {}
 
-        xdisk_array(xarray<T>& arr, std::ifstream& in_file, std::ofstream& out_file)
+        xdisk_array(xarray<T>& array, bool& array_dirty, std::ifstream& in_file, std::ofstream& out_file)
         {
-            m_array = &arr;
+            m_array = &array;
+            m_array_dirty = &array_dirty;
             m_in_file = &in_file;
             m_out_file = &out_file;
         }
@@ -105,7 +111,7 @@ namespace xt
         inline reference operator()(Idxs... idxs)
         {
             auto index = get_indexes(idxs...);
-            return reference(m_array->element(index.cbegin(), index.cend()), m_array, m_in_file, m_out_file);
+            return reference(m_array->element(index.cbegin(), index.cend()), m_array, m_array_dirty, m_in_file, m_out_file);
         }
 
         template <class... Idxs>
@@ -117,7 +123,7 @@ namespace xt
 
         reference operator[](const xindex& index)
         {
-            return reference(m_array->element(index.cbegin(), index.cend()), m_array, m_in_file, m_out_file);
+            return reference(m_array->element(index.cbegin(), index.cend()), m_array, m_array_dirty, m_in_file, m_out_file);
         }
 
         const_reference operator[](const xindex& index) const
@@ -128,7 +134,7 @@ namespace xt
         template <class It>
         inline reference element(It first, It last)
         {
-            return reference(m_array->element(first, last), m_array, m_in_file, m_out_file);
+            return reference(m_array->element(first, last), m_array, m_array_dirty, m_in_file, m_out_file);
         }
 
         template <class It>
@@ -140,6 +146,7 @@ namespace xt
     private:
 
         xarray<T>* m_array;
+        bool* m_array_dirty;
         std::ifstream* m_in_file;
         std::ofstream* m_out_file;
 

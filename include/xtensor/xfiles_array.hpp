@@ -25,9 +25,9 @@ namespace xt
     }
 
     template <class T1, class T2, class S1, class S2>
-    void remap(T1& file_array, T2& array, S1& in_stream, S2& out_stream)
+    void remap(T1& file_array, T2& array, bool& array_dirty, S1& in_stream, S2& out_stream)
     {
-        file_array = T1(array, in_stream, out_stream);
+        file_array = T1(array, array_dirty, in_stream, out_stream);
     }
 
     template <class EC>
@@ -89,6 +89,7 @@ namespace xt
 
         xfiles_array()
         {
+            m_array_dirty = false;
         }
 
         template <class I>
@@ -101,6 +102,16 @@ namespace xt
                     path.append(".");
                 path.append(std::to_string(*it));
             }
+            if (path != m_path)
+            {
+                m_path = path;
+                if (m_array_dirty)
+                {
+                    m_array_dirty = false;
+                    if (m_out_file.is_open())
+                        dump_csv(m_out_file, m_array);
+                }
+            }
             reopen(m_in_file, path);
             if (m_in_file.is_open())
                 m_array = load_csv<typename EC::value_type>(m_in_file);
@@ -112,7 +123,7 @@ namespace xt
                 dump_csv(m_out_file, m_array);
                 m_out_file.seekp(0);
             }
-            remap(m_file_array, m_array, m_in_file, m_out_file);
+            remap(m_file_array, m_array, m_array_dirty, m_in_file, m_out_file);
         }
 
         template <class... Idxs>
@@ -178,8 +189,10 @@ namespace xt
         shape_type m_shape;
         EC m_file_array;
         xarray<typename EC::value_type> m_array;
+        bool m_array_dirty;
         std::ifstream m_in_file;
         std::ofstream m_out_file;
+        std::string m_path;
 
         template <class... Idxs>
         inline std::array<size_t, sizeof...(Idxs)> get_indexes(Idxs... idxs) const
