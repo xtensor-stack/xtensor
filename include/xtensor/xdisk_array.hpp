@@ -16,6 +16,11 @@ namespace xt
             m_pvalue = &value;
         }
 
+        operator const T() const
+        {
+            return *m_pvalue;
+        }
+
         operator T()
         {
             return *m_pvalue;
