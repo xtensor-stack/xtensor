@@ -17,49 +17,40 @@ namespace xt
     void reopen(S& stream, const std::string& path)
     {
         if (stream.is_open())
-        {
             stream.close();
-            stream.clear();
-        }
         stream.open(path);
     }
 
-    template <class T1, class T2>
-    void remap(T1& file_array, T2& array, bool& array_dirty)
-    {
-        file_array = T1(array, array_dirty);
-    }
-
-    template <class EC>
+    template <class EC, class SIN, class SOUT>
     class xfiles_array;
 
-    template <class EC>
-    struct xcontainer_inner_types<xfiles_array<EC>>
+    template <class EC, class SIN, class SOUT>
+    struct xcontainer_inner_types<xfiles_array<EC, SIN, SOUT>>
     {
         using const_reference = const EC&;
         using reference = EC&;
         using size_type = std::size_t;
         using storage_type = EC;
-        using temporary_type = xfiles_array<EC>;
+        using temporary_type = xfiles_array<EC, SIN, SOUT>;
     };
 
-    template <class EC>
-    struct xiterable_inner_types<xfiles_array<EC>>
+    template <class EC, class SIN, class SOUT>
+    struct xiterable_inner_types<xfiles_array<EC, SIN, SOUT>>
     {
         using inner_shape_type = std::vector<size_t>;
-        using const_stepper = xindexed_stepper<xfiles_array<EC>, true>;
-        using stepper = xindexed_stepper<xfiles_array<EC>, false>;
+        using const_stepper = xindexed_stepper<xfiles_array<EC, SIN, SOUT>, true>;
+        using stepper = xindexed_stepper<xfiles_array<EC, SIN, SOUT>, false>;
     };
 
-    template <class EC>
-    class xfiles_array: public xaccessible<xfiles_array<EC>>,
-                        public xiterable<xfiles_array<EC>>
+    template <class EC, class SIN, class SOUT>
+    class xfiles_array: public xaccessible<xfiles_array<EC, SIN, SOUT>>,
+                        public xiterable<xfiles_array<EC, SIN, SOUT>>
     {
     public:
 
         using const_reference = const EC&;
         using reference = EC&;
-        using self_type = xfiles_array<EC>;
+        using self_type = xfiles_array<EC, SIN, SOUT>;
         using iterable_base = xconst_iterable<self_type>;
         using const_stepper = typename iterable_base::const_stepper;
         using stepper = typename iterable_base::stepper;
@@ -120,7 +111,8 @@ namespace xt
                     m_array = load_csv<typename EC::value_type>(m_in_file);
                 else
                     m_array = broadcast(0, m_array.shape());
-                remap(m_file_array, m_array, m_array_dirty);
+                // map file array
+                m_file_array = EC(m_array, m_array_dirty);
             }
         }
 
@@ -188,8 +180,8 @@ namespace xt
         EC m_file_array;
         xarray<typename EC::value_type> m_array;
         bool m_array_dirty;
-        std::ifstream m_in_file;
-        std::ofstream m_out_file;
+        SIN m_in_file;
+        SOUT m_out_file;
         std::string m_path;
 
         template <class... Idxs>
@@ -200,33 +192,33 @@ namespace xt
         }
     };
 
-    template <class EC>
+    template <class EC, class SIN, class SOUT>
     template <class O>
-    inline auto xfiles_array<EC>::stepper_begin(const O& shape) const noexcept -> const_stepper
+    inline auto xfiles_array<EC, SIN, SOUT>::stepper_begin(const O& shape) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset);
     }
 
-    template <class EC>
+    template <class EC, class SIN, class SOUT>
     template <class O>
-    inline auto xfiles_array<EC>::stepper_end(const O& shape, layout_type) const noexcept -> const_stepper
+    inline auto xfiles_array<EC, SIN, SOUT>::stepper_end(const O& shape, layout_type) const noexcept -> const_stepper
     {
         size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset, true);
     }
 
-    template <class EC>
+    template <class EC, class SIN, class SOUT>
     template <class O>
-    inline auto xfiles_array<EC>::stepper_begin(const O& shape) noexcept -> stepper
+    inline auto xfiles_array<EC, SIN, SOUT>::stepper_begin(const O& shape) noexcept -> stepper
     {
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset);
     }
 
-    template <class EC>
+    template <class EC, class SIN, class SOUT>
     template <class O>
-    inline auto xfiles_array<EC>::stepper_end(const O& shape, layout_type) noexcept -> stepper
+    inline auto xfiles_array<EC, SIN, SOUT>::stepper_end(const O& shape, layout_type) noexcept -> stepper
     {
         size_type offset = shape.size() - this->dimension();
         return stepper(this, offset, true);

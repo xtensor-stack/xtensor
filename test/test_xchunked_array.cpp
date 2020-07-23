@@ -114,7 +114,7 @@ namespace xt
     {
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
-        xchunked_array<xfiles_array<xdisk_array<double>>> a1(shape, chunk_shape);
+        xchunked_array<xfiles_array<xdisk_array<double>, std::ifstream, std::ofstream>> a1(shape, chunk_shape);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
         double v2 = 5.6;
