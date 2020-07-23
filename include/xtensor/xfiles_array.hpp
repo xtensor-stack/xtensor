@@ -24,10 +24,10 @@ namespace xt
         stream.open(path);
     }
 
-    template <class T1, class T2, class S1, class S2>
-    void remap(T1& file_array, T2& array, bool& array_dirty, S1& in_stream, S2& out_stream)
+    template <class T1, class T2>
+    void remap(T1& file_array, T2& array, bool& array_dirty)
     {
-        file_array = T1(array, array_dirty, in_stream, out_stream);
+        file_array = T1(array, array_dirty);
     }
 
     template <class EC>
@@ -102,28 +102,26 @@ namespace xt
                     path.append(".");
                 path.append(std::to_string(*it));
             }
-            if (path != m_path)
+            if ((path != m_path) || (path.empty()))
             {
-                m_path = path;
+                // accessing a different chunk
                 if (m_array_dirty)
                 {
+                    // chunk was changed, dump it
                     m_array_dirty = false;
+                    reopen(m_out_file, m_path);
                     if (m_out_file.is_open())
                         dump_csv(m_out_file, m_array);
                 }
+                m_path = path;
+                // load new chunk
+                reopen(m_in_file, path);
+                if (m_in_file.is_open())
+                    m_array = load_csv<typename EC::value_type>(m_in_file);
+                else
+                    m_array = broadcast(0, m_array.shape());
+                remap(m_file_array, m_array, m_array_dirty);
             }
-            reopen(m_in_file, path);
-            if (m_in_file.is_open())
-                m_array = load_csv<typename EC::value_type>(m_in_file);
-            else
-                m_array = broadcast(0, m_array.shape());
-            reopen(m_out_file, path);
-            if (m_out_file.is_open())
-            {
-                dump_csv(m_out_file, m_array);
-                m_out_file.seekp(0);
-            }
-            remap(m_file_array, m_array, m_array_dirty, m_in_file, m_out_file);
         }
 
         template <class... Idxs>
