@@ -2,7 +2,6 @@
 #define XTENSOR_FILE_ARRAY_HPP
 
 #include "xarray.hpp"
-#include "xcsv.hpp"
 
 namespace xt
 {
@@ -37,11 +36,6 @@ namespace xt
             return *m_pvalue;
         }
 
-        friend std::ostream& operator<<(std::ostream& os, const xfile_reference<EC>& obj)
-        {
-            return os << *obj.m_pvalue;
-        }
-
     private:
 
         EC* m_pvalue;
@@ -49,11 +43,11 @@ namespace xt
 
     };
 
-    template <class EC, class SIN, class SOUT>
+    template <class EC, class io_handler>
     class xfile_array;
 
-    template <class EC, class SIN, class SOUT>
-    struct xcontainer_inner_types<xfile_array<EC, SIN, SOUT>>
+    template <class EC, class io_handler>
+    struct xcontainer_inner_types<xfile_array<EC, io_handler>>
     {
         using const_reference = const EC&;
         using reference = EC&;
@@ -61,93 +55,49 @@ namespace xt
         using storage_type = EC;
     };
 
-    template <class EC, class SIN, class SOUT>
-    struct xiterable_inner_types<xfile_array<EC, SIN, SOUT>>
+    template <class EC, class io_handler>
+    struct xiterable_inner_types<xfile_array<EC, io_handler>>
     {
         using inner_shape_type = std::vector<size_t>;
-        using const_stepper = xindexed_stepper<xfile_array<EC, SIN, SOUT>, true>;
-        using stepper = xindexed_stepper<xfile_array<EC, SIN, SOUT>, false>;
+        using const_stepper = xindexed_stepper<xfile_array<EC, io_handler>, true>;
+        using stepper = xindexed_stepper<xfile_array<EC, io_handler>, false>;
     };
 
-    template <class EC, class SIN, class SOUT>
-    class xfile_array: public xaccessible<xfile_array<EC, SIN, SOUT>>,
-                       public xiterable<xfile_array<EC, SIN, SOUT>>
+    template <class EC, class io_handler>
+    class xfile_array: public xaccessible<xfile_array<EC, io_handler>>,
+                       public xiterable<xfile_array<EC, io_handler>>
     {
     public:
 
         using const_reference = const EC&;
         using reference = xfile_reference<EC>;
         using shape_type = std::vector<size_t>;
-        using self_type = xfile_array<EC, SIN, SOUT>;
+        using self_type = xfile_array<EC, io_handler>;
         using inner_types = xcontainer_inner_types<self_type>;
         using size_type = typename inner_types::size_type;
         using storage_type = typename inner_types::storage_type;
         using value_type = storage_type;
 
-        xfile_array() {}
-
         ~xfile_array()
         {
-            if (m_in_file.is_open())
-                m_in_file.close();
             if (m_array_dirty)
-            {
-                if (!m_out_file.is_open())
-                    m_out_file.open(m_path);
-                if (m_out_file.is_open())
-                {
-                    dump();
-                    m_out_file.close();
-                }
-            }
+                m_io_handler.write(m_path);
         }
 
         void set_path(std::string& path)
         {
             if (path != m_path)
             {
-                // maybe dump to old file
+                // maybe write to old file
                 if (m_array_dirty)
                 {
-                    if (!m_out_file.is_open())
-                        m_out_file.open(m_path);
-                    if (m_out_file.is_open())
-                        dump();
+                    m_io_handler.write(m_path);
+                    m_array_dirty = false;
                 }
-                if (m_out_file.is_open())
-                    m_out_file.close();
                 m_path = path;
-                // maybe load new file
-                if (m_in_file.is_open())
-                    m_in_file.close();
-                load();
+                // read new file
+                m_io_handler.read(path);
             }
-        }
-
-        void load()
-        {
-            if (!m_in_file.is_open())
-                m_in_file.open(m_path);
-            if (m_in_file.is_open())
-                m_array = load_csv<EC>(m_in_file);
-            else
-                m_array = broadcast(0, m_array.shape());
-        }
-
-        void dump()
-        {
-            if (!m_out_file.is_open())
-                m_out_file.open(m_path);
-            if (m_out_file.is_open())
-            {
-                dump_csv(m_out_file, m_array);
-                m_array_dirty = false;
-            }
-        }
-
-        bool dirty()
-        {
-            return m_array_dirty;
         }
 
         template <class S>
@@ -155,6 +105,7 @@ namespace xt
         {
             m_array.resize(shape);
             m_array = broadcast(0, shape);
+            m_io_handler.set_array(m_array);
         }
 
         template <class... Idxs>
@@ -197,8 +148,7 @@ namespace xt
 
         xarray<EC> m_array;
         bool m_array_dirty;
-        SIN m_in_file;
-        SOUT m_out_file;
+        io_handler m_io_handler;
         std::string m_path;
 
         template <class... Idxs>
