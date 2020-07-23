@@ -90,11 +90,15 @@ namespace xt
         {
             if (m_in_file.is_open())
                 m_in_file.close();
-            if (m_out_file.is_open())
+            if (m_array_dirty)
             {
-                if (m_array_dirty)
+                if (!m_out_file.is_open())
+                    m_out_file.open(m_path);
+                if (m_out_file.is_open())
+                {
                     dump();
-                m_out_file.close();
+                    m_out_file.close();
+                }
             }
         }
 
