@@ -13,6 +13,7 @@
 #include "xtensor/xchunked_array.hpp"
 #include "xtensor/xchunk_store_manager.hpp"
 #include "xtensor/xfile_array.hpp"
+#include "xtensor/xdisk_io_handler.hpp"
 
 namespace xt
 {
@@ -114,7 +115,7 @@ namespace xt
     {
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
-        xchunked_array<xchunk_store_manager<xfile_array<double, std::ifstream, std::ofstream>>> a1(shape, chunk_shape);
+        xchunked_array<xchunk_store_manager<xfile_array<double, xt::xdisk_io_handler<double>>>> a1(shape, chunk_shape);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
         double v2 = 5.6;
