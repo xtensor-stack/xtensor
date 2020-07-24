@@ -99,20 +99,31 @@ namespace xt
             }
         }
 
+        void set_directory(const char* directory)
+        {
+            m_directory = directory;
+            if (m_directory.back() != '/')
+            {
+                m_directory.append("/");
+            }
+        }
+
         template <class I>
         EC& map_file_array(I first, I last)
         {
             std::string path;
+            std::string fname;
             std::vector<std::size_t> index;
             for (auto it = first; it != last; ++it)
             {
-                if (!path.empty())
+                if (!fname.empty())
                 {
-                    path.append(".");
+                    fname.append(".");
                 }
-                path.append(std::to_string(*it));
+                fname.append(std::to_string(*it));
                 index.push_back(*it);
             }
+            path = m_directory + fname;
             if (index.empty())
             {
                 return m_chunk_pool[0];
@@ -207,6 +218,7 @@ namespace xt
         std::vector<EC> m_chunk_pool;
         std::vector<std::vector<std::size_t>> m_index_pool;
         std::size_t m_unload_index;
+        std::string m_directory;
 
         template <class... Idxs>
         inline std::array<std::size_t, sizeof...(Idxs)> get_indexes(Idxs... idxs) const
