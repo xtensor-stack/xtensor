@@ -11,6 +11,9 @@
 
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xchunked_array.hpp"
+#include "xtensor/xchunk_store_manager.hpp"
+#include "xtensor/xfile_array.hpp"
+#include "xtensor/xdisk_io_handler.hpp"
 
 namespace xt
 {
@@ -106,5 +109,32 @@ namespace xt
         {
             EXPECT_EQ(v, 3);
         }
+    }
+
+    TEST(xchunked_array, disk_array)
+    {
+        std::vector<size_t> shape = {4, 4};
+        std::vector<size_t> chunk_shape = {2, 2};
+        xchunked_array<xchunk_store_manager<xfile_array<double, xt::xdisk_io_handler<double>>>> a1(shape, chunk_shape);
+        std::vector<size_t> idx = {1, 2};
+        double v1 = 3.4;
+        double v2 = 5.6;
+        a1(2, 1) = v1;
+        a1[idx] = v2;
+        ASSERT_EQ(a1(2, 1), v1);
+        ASSERT_EQ(a1[idx], v2);
+
+        std::ifstream in_file;
+        in_file.open("0.1");
+        auto data = xt::load_csv<double>(in_file);
+        xt::xarray<double> ref = {{0, 0}, {v2, 0}};
+        EXPECT_EQ(data, ref);
+        in_file.close();
+
+        in_file.open("1.0");
+        data = xt::load_csv<double>(in_file);
+        ref = {{0, v1}, {0, 0}};
+        EXPECT_EQ(data, ref);
+        in_file.close();
     }
 }
