@@ -116,6 +116,7 @@ namespace xt
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
         xchunked_array<xchunk_store_manager<xfile_array<double, xt::xdisk_io_handler<double>>>> a1(shape, chunk_shape);
+        a1.chunks().set_pool_size(2);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
         double v2 = 5.6;
@@ -124,6 +125,7 @@ namespace xt
         ASSERT_EQ(a1(2, 1), v1);
         ASSERT_EQ(a1[idx], v2);
 
+        a1.chunks().flush();
         std::ifstream in_file;
         in_file.open("0.1");
         auto data = xt::load_csv<double>(in_file);

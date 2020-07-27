@@ -36,7 +36,7 @@ namespace xt
 
     template <class EC>
     class xchunk_store_manager: public xaccessible<xchunk_store_manager<EC>>,
-                        public xiterable<xchunk_store_manager<EC>>
+                                public xiterable<xchunk_store_manager<EC>>
     {
     public:
 
@@ -90,6 +90,12 @@ namespace xt
                 a.resize(chunk_shape);
         }
 
+        void flush()
+        {
+            for (auto a: m_file_array)
+                a.flush();
+        }
+
         template <class I>
         EC& map_file_array(I first, I last)
         {
@@ -100,37 +106,46 @@ namespace xt
                     path.append(".");
                 path.append(std::to_string(*it));
             }
-            // check if the chunk is already loaded in memory
-            std::vector<std::string>::iterator it = std::find(m_path.begin(), m_path.end(), path);
-            size_t index;
-            if (it != m_path.end())
+            if (path.empty())
             {
-                index = std::distance(m_path.begin(), it);
-                m_file_array[index].set_path(path);
-                return m_file_array[index];
+                return m_file_array[0];
             }
-            // if not, get a free chunk in the pool
-            index = 0;
-            bool free_chunk = false;
-            for (auto path: m_path)
+            else
             {
-                if (path.empty())
+                // check if the chunk is already loaded in memory
+                std::vector<std::string>::iterator it = std::find(m_path.begin(), m_path.end(), path);
+                size_t index;
+                if (it != m_path.end())
                 {
-                    free_chunk = true;
-                    break;
+                    index = std::distance(m_path.begin(), it);
+                    m_file_array[index].set_path(path);
+                    return m_file_array[index];
                 }
-                index += 1;
-            }
-            if (free_chunk)
-            {
+                // if not, get a free chunk in the pool
+                index = 0;
+                bool free_chunk = false;
+                for (auto p: m_path)
+                {
+                    if (p.empty())
+                    {
+                        free_chunk = true;
+                        break;
+                    }
+                    index += 1;
+                }
+                if (free_chunk)
+                {
+                    m_file_array[index].set_path(path);
+                    m_path[index] = path;
+                    return m_file_array[index];
+                }
+                // no free chunk, take one (which will thus be unloaded)
+                // current algorithm takes one at random to be fair
+                index = rand() % m_path.size();
                 m_file_array[index].set_path(path);
+                m_path[index] = path;
                 return m_file_array[index];
             }
-            // no free chunk, take one (which will thus be unloaded)
-            // current algorithm takes one at random to be fair
-            index = rand() % m_path.size();
-            m_file_array[index].set_path(path);
-            return m_file_array[index];
         }
 
         template <class... Idxs>
