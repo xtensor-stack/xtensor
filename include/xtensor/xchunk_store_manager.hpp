@@ -1,9 +1,6 @@
 #ifndef XTENSOR_CHUNK_STORE_MANAGER_HPP
 #define XTENSOR_CHUNK_STORE_MANAGER_HPP
 
-#include <istream>
-#include <fstream>
-#include <iostream>
 #include <vector>
 #include <array>
 

@@ -115,7 +115,7 @@ namespace xt
     {
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
-        xchunked_array<xchunk_store_manager<xfile_array<double, xt::xdisk_io_handler<double>>>> a1(shape, chunk_shape);
+        xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<double>>>> a1(shape, chunk_shape);
         a1.chunks().set_pool_size(2);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
@@ -136,7 +136,7 @@ namespace xt
         ref = {{0, v1}, {0, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
-        
+
         a1.chunks().flush();
         in_file.open("0.1");
         data = xt::load_csv<double>(in_file);
@@ -147,6 +147,51 @@ namespace xt
         in_file.open("0.0");
         data = xt::load_csv<double>(in_file);
         ref = {{v3, 0}, {0, 0}};
+        EXPECT_EQ(data, ref);
+        in_file.close();
+    }
+
+    TEST(xfile_array, indexed_access)
+    {
+        std::vector<size_t> shape = {2, 2, 2};
+        xfile_array<double, xdisk_io_handler<double>> a;
+        a.resize(shape);
+        double val = 3.;
+        for (auto it: a)
+            it = val;
+        for (auto it: a)
+            ASSERT_EQ(it, val);
+    }
+
+    TEST(xfile_array, assign_expression)
+    {
+        double v1 = 3.;
+        auto a1 = xfile_array<double, xdisk_io_handler<double>>(broadcast(v1, {2, 2}), "a1");
+        for (const auto& v: a1)
+        {
+            EXPECT_EQ(v, v1);
+        }
+
+        double v2 = 2. * v1;
+        auto a2 = xfile_array<double, xdisk_io_handler<double>>(a1 + a1, "a2");
+        for (const auto& v: a2)
+        {
+            EXPECT_EQ(v, v2);
+        }
+
+        a1.flush();
+        a2.flush();
+
+        std::ifstream in_file;
+        in_file.open("a1");
+        auto data = load_csv<double>(in_file);
+        xarray<double> ref = {{v1, v1}, {v1, v1}};
+        EXPECT_EQ(data, ref);
+        in_file.close();
+
+        in_file.open("a2");
+        data = load_csv<double>(in_file);
+        ref = {{v2, v2}, {v2, v2}};
         EXPECT_EQ(data, ref);
         in_file.close();
     }
