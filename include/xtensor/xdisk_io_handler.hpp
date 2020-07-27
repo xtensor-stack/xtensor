@@ -11,39 +11,31 @@ namespace xt
     {
     public:
 
-        void set_array(xarray<EC>& array)
-        {
-            m_array = &array;
-        }
-
-        void write(std::string& path)
+        void write(xarray<EC>& array, std::string& path)
         {
             std::ofstream m_out_file;
             m_out_file.open(path);
             if (m_out_file.is_open())
             {
-                dump_csv(m_out_file, *m_array);
+                dump_csv(m_out_file, array);
                 m_out_file.close();
             }
         }
 
-        void read(std::string& path)
+        void read(xarray<EC>& array, std::string& path)
         {
             std::ifstream m_in_file;
             m_in_file.open(path);
             if (m_in_file.is_open())
             {
-                *m_array = load_csv<EC>(m_in_file);
+                array = load_csv<EC>(m_in_file);
                 m_in_file.close();
             }
             else
-                *m_array = broadcast(0, m_array->shape());
+            {
+                array = broadcast(0, array.shape());
+            }
         }
-
-    private:
-
-        xarray<EC>* m_array;
-
     };
 }
 
