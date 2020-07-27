@@ -118,7 +118,6 @@ namespace xt
                 if (it != m_path.end())
                 {
                     index = std::distance(m_path.begin(), it);
-                    m_file_array[index].set_path(path);
                     return m_file_array[index];
                 }
                 // if not, get a free chunk in the pool

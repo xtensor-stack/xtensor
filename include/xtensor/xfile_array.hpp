@@ -86,7 +86,10 @@ namespace xt
         void flush()
         {
             if (m_array_dirty)
+            {
                 m_io_handler.write(m_path);
+                m_array_dirty = false;
+            }
         }
 
         xarray<EC>& array()
