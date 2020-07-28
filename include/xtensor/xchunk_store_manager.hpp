@@ -29,7 +29,7 @@ namespace xt
     template <class EC>
     struct xiterable_inner_types<xchunk_store_manager<EC>>
     {
-        using inner_shape_type = std::vector<size_t>;
+        using inner_shape_type = std::vector<std::size_t>;
         using const_stepper = xindexed_stepper<xchunk_store_manager<EC>, true>;
         using stepper = xindexed_stepper<xchunk_store_manager<EC>, false>;
     };
@@ -53,7 +53,7 @@ namespace xt
         using pointer = value_type*;
         using const_pointer = const value_type*;
         using difference_type = std::ptrdiff_t;
-        using shape_type = std::vector<size_t>;
+        using shape_type = std::vector<std::size_t>;
 
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
@@ -74,76 +74,79 @@ namespace xt
         {
             // default pool size is 1
             // so that first chunk is always resized to the chunk shape
-            m_file_array.resize(1);
-            m_path.resize(1);
+            m_chunk_pool.resize(1);
+            m_index_pool.resize(1);
+            m_unload_index = 0;
         }
 
-        void set_pool_size(size_t n)
+        void set_pool_size(std::size_t n)
         {
             // first chunk always has the correct shape
             // get the shape before resizing the pool
-            auto chunk_shape = m_file_array[0].array().shape();
-            m_file_array.resize(n);
-            m_path.resize(n);
+            const auto& chunk_shape = m_chunk_pool[0].array().shape();
+            m_chunk_pool.resize(n);
+            m_index_pool.resize(n);
+            m_unload_index = 0;
             // resize the pool chunks
-            for (auto& a: m_file_array)
-                a.resize(chunk_shape);
+            for (auto& chunk: m_chunk_pool)
+            {
+                chunk.resize(chunk_shape);
+            }
         }
 
         void flush()
         {
-            for (auto a: m_file_array)
-                a.flush();
+            for (auto& chunk: m_chunk_pool)
+            {
+                chunk.flush();
+            }
         }
 
         template <class I>
         EC& map_file_array(I first, I last)
         {
             std::string path;
+            std::vector<std::size_t> index;
             for (auto it = first; it != last; ++it)
             {
                 if (!path.empty())
+                {
                     path.append(".");
+                }
                 path.append(std::to_string(*it));
+                index.push_back(*it);
             }
-            if (path.empty())
+            if (index.empty())
             {
-                return m_file_array[0];
+                return m_chunk_pool[0];
             }
             else
             {
                 // check if the chunk is already loaded in memory
-                std::vector<std::string>::iterator it = std::find(m_path.begin(), m_path.end(), path);
-                size_t index;
-                if (it != m_path.end())
+                const auto it1 = std::find(m_index_pool.cbegin(), m_index_pool.cend(), index);
+                std::size_t i;
+                if (it1 != m_index_pool.cend())
                 {
-                    index = std::distance(m_path.begin(), it);
-                    return m_file_array[index];
+                    i = std::distance(m_index_pool.cbegin(), it1);
+                    return m_chunk_pool[i];
                 }
-                // if not, get a free chunk in the pool
-                index = 0;
-                bool free_chunk = false;
-                for (auto p: m_path)
+                // if not, find a free chunk in the pool
+                std::vector<std::size_t> empty_index;
+                const auto it2 = std::find(m_index_pool.cbegin(), m_index_pool.cend(), empty_index);
+                if (it2 != m_index_pool.cend())
                 {
-                    if (p.empty())
-                    {
-                        free_chunk = true;
-                        break;
-                    }
-                    index += 1;
-                }
-                if (free_chunk)
-                {
-                    m_file_array[index].set_path(path);
-                    m_path[index] = path;
-                    return m_file_array[index];
+                    i = std::distance(m_index_pool.cbegin(), it2);
+                    m_chunk_pool[i].set_path(path);
+                    m_index_pool[i] = index;
+                    return m_chunk_pool[i];
                 }
                 // no free chunk, take one (which will thus be unloaded)
-                // current algorithm takes one at random to be fair
-                index = rand() % m_path.size();
-                m_file_array[index].set_path(path);
-                m_path[index] = path;
-                return m_file_array[index];
+                // fairness is guaranteed through the use of a walking index
+                m_chunk_pool[m_unload_index].set_path(path);
+                m_index_pool[m_unload_index] = index;
+                auto& chunk = m_chunk_pool[m_unload_index];
+                m_unload_index = (m_unload_index + 1) % m_index_pool.size();
+                return chunk;
             }
         }
 
@@ -197,20 +200,21 @@ namespace xt
         template <class S>
         void resize(S& shape)
         {
-            // don't resize according to chunks
+            // don't resize according to total number of chunks
             // instead the pool manages a number of in-memory chunks
         }
 
     private:
 
         shape_type m_shape;
-        std::vector<EC> m_file_array;  // pool of chunks
-        std::vector<std::string> m_path;  // stringified index of chunks in pool
+        std::vector<EC> m_chunk_pool;
+        std::vector<std::vector<std::size_t>> m_index_pool;
+        std::size_t m_unload_index;
 
         template <class... Idxs>
-        inline std::array<size_t, sizeof...(Idxs)> get_indexes(Idxs... idxs) const
+        inline std::array<std::size_t, sizeof...(Idxs)> get_indexes(Idxs... idxs) const
         {
-            std::array<size_t, sizeof...(Idxs)> indexes = {{idxs...}};
+            std::array<std::size_t, sizeof...(Idxs)> indexes = {{idxs...}};
             return indexes;
         }
     };

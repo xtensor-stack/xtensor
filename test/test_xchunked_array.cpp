@@ -123,7 +123,7 @@ namespace xt
         double v3 = 7.8;
         a1(2, 1) = v1;
         a1[idx] = v2;
-        a1(0, 0) = v3; // this should unload chunk 1.0 or 0.1
+        a1(0, 0) = v3; // this should unload chunk 1.0
         ASSERT_EQ(a1(2, 1), v1);
         ASSERT_EQ(a1[idx], v2);
         ASSERT_EQ(a1(0, 0), v3);
@@ -132,32 +132,15 @@ namespace xt
         xt::xarray<double> ref;
         xt::xarray<double> data;
         in_file.open("1.0");
-        if (in_file.is_open())
-        {
-            data = xt::load_csv<double>(in_file);
-            ref = {{0, v1}, {0, 0}};
-            EXPECT_EQ(data, ref);
-            in_file.close();
-        }
-        else
-        {
-            in_file.open("0.1");
-            data = xt::load_csv<double>(in_file);
-            ref = {{0, 0}, {v2, 0}};
-            EXPECT_EQ(data, ref);
-            in_file.close();
-        }
-
+        data = xt::load_csv<double>(in_file);
+        ref = {{0, v1}, {0, 0}};
+        EXPECT_EQ(data, ref);
+        in_file.close();
+        
         a1.chunks().flush();
         in_file.open("0.1");
         data = xt::load_csv<double>(in_file);
         ref = {{0, 0}, {v2, 0}};
-        EXPECT_EQ(data, ref);
-        in_file.close();
-
-        in_file.open("1.0");
-        data = xt::load_csv<double>(in_file);
-        ref = {{0, v1}, {0, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
 
