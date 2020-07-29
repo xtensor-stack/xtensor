@@ -13,6 +13,7 @@ Tensor types
 - ``xarray<T>``: tensor that can be reshaped to any number of dimensions.
 - ``xtensor<T, N>``: tensor with a number of dimensions set to ``N`` at compile time.
 - ``xtensor_fixed<T, xshape<I, J, K>``: tensor whose shape is fixed at compile time.
+- ``xchunked_array<CS>``: chunked array using the ``CS`` chunk storage.
 
 .. note::
 
@@ -28,7 +29,7 @@ Tensor with dynamic shape:
 
     #include "xarray.hpp"
 
-    xt::xarray<double>::shape_type shape = {2, 3}; 
+    xt::xarray<double>::shape_type shape = {2, 3};
     xt::xarray<double> a0(shape);
     xt::xarray<double> a1(shape, 2.5);
     xt::xarray<double> a2 = {{1., 2., 3.}, {4., 5., 6.}};
@@ -40,12 +41,12 @@ Tensor with static number of dimensions:
 
     #include "xtensor.hpp"
 
-    xt::xtensor<double, 2>::shape_type shape = {2, 3}; 
+    xt::xtensor<double, 2>::shape_type shape = {2, 3};
     xt::xtensor<double, 2> a0(shape);
     xt::xtensor<double, 2> a1(shape, 2.5);
     xt::xtensor<double, 2> a2 = {{1., 2., 3.}, {4., 5., 6.}};
     auto a3 = xt::xtensor<double, 2>::from_shape(shape);
-    
+
 Tensor with fixed shape:
 
 .. code::
@@ -53,6 +54,22 @@ Tensor with fixed shape:
     #include "xfixed.hpp"
 
     xt::xtensor_fixed<double, xt::xshape<2, 3>> = {{1., 2., 3.}, {4., 5., 6.}};
+
+In-memory chunked tensor with dynamic shape (created with the ``chunked_array``
+factory function):
+
+.. code::
+
+    #include "xtensor/xchunked_array.hpp"
+
+    std::vector<std::size_t> shape = {10, 10, 10};
+    std::vector<std::size_t> chunk_shape = {2, 3, 4};
+    auto a = xt::chunked_array<double>(shape, chunk_shape);
+    // a is an in-memory chunked array
+    // each chunk is an xarray<double>, and chunks are hold in an xarray
+    // thus a is an xarray of xarray<double> elements
+    a(3, 9, 2) = 1.;  // this will address the chunk of index (1, 3, 0)
+                      // and in this chunk, the element of index (1, 0, 2)
 
 Output
 ------
@@ -234,4 +251,3 @@ The underlying 1D data buffer can be accessed with the ``data`` method:
     a.data()[4] = 8.;
     std::cout << a << std::endl;
     // Outputs {{1., 2., 3.}, {8., 5., 6.}}
-    
