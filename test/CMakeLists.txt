@@ -285,6 +285,12 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
 endforeach()
 
+add_library(blosc STATIC IMPORTED)
+set_target_properties(blosc PROPERTIES
+  IMPORTED_LOCATION "$ENV{CONDA_PREFIX}/lib/libblosc.a"
+  INTERFACE_INCLUDE_DIRECTORIES "$ENV{CONDA_PREFIX}/include/"
+)
+
 add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 if(XTENSOR_USE_XSIMD)
     target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_XSIMD)
@@ -319,4 +325,6 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
 endif()
 
 target_link_libraries(test_xtensor_core_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_directories(test_xtensor_lib PUBLIC ${CONDA_PREFIX}/lib)
+target_link_libraries(test_xtensor_lib PUBLIC blosc)
 add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)

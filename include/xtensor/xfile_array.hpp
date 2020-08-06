@@ -178,6 +178,12 @@ namespace xt
             return m_array;
         }
 
+        template <class C>
+        void configure_format(C& config)
+        {
+            m_io_handler.configure(config);
+        }
+
         void set_path(const char* path)
         {
             std::string p(path);

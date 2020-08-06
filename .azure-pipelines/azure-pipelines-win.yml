@@ -44,6 +44,13 @@ jobs:
           conda list
         displayName: "Install conda packages"
 
+      # Install development versions of xtensor-io
+      - script: |
+          mkdir dev_tmp
+          cd dev_tmp
+          git clone --single-branch --branch blosc https://github.com/davidbrochart/xtensor-io.git
+          mv xtensor-io/include/xtensor-io ../include/
+
       # Install LLVM
       # Note: LLVM distributed by conda is too old
       - script: |

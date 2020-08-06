@@ -14,6 +14,7 @@
 #include "xtensor/xchunk_store_manager.hpp"
 #include "xtensor/xfile_array.hpp"
 #include "xtensor/xdisk_io_handler.hpp"
+#include "xtensor-io/xblosc.hpp"
 
 namespace xt
 {
@@ -115,7 +116,11 @@ namespace xt
     {
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
-        xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<double>>>> a1(shape, chunk_shape);
+        xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<xblosc>>>> a1(shape, chunk_shape);
+        blosc_config config;
+        config.clevel = 1;
+        config.doshuffle = 0;
+        a1.chunks().configure_format(config);
         a1.chunks().set_pool_size(2);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
@@ -131,21 +136,24 @@ namespace xt
         std::ifstream in_file;
         xt::xarray<double> ref;
         xt::xarray<double> data;
-        in_file.open("1.0");
-        data = xt::load_csv<double>(in_file);
+        in_file.open("1.0", std::ifstream::binary);
+        data = xt::load_blosc<double>(in_file);
+        data.reshape(chunk_shape);
         ref = {{0, v1}, {0, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
 
         a1.chunks().flush();
-        in_file.open("0.1");
-        data = xt::load_csv<double>(in_file);
+        in_file.open("0.1", std::ifstream::binary);
+        data = xt::load_blosc<double>(in_file);
+        data.reshape(chunk_shape);
         ref = {{0, 0}, {v2, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
 
-        in_file.open("0.0");
-        data = xt::load_csv<double>(in_file);
+        in_file.open("0.0", std::ifstream::binary);
+        data = xt::load_blosc<double>(in_file);
+        data.reshape(chunk_shape);
         ref = {{v3, 0}, {0, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
@@ -154,7 +162,7 @@ namespace xt
     TEST(xfile_array, indexed_access)
     {
         std::vector<size_t> shape = {2, 2, 2};
-        xfile_array<double, xdisk_io_handler<double>> a;
+        xfile_array<double, xdisk_io_handler<xblosc>> a;
         a.resize(shape);
         double val = 3.;
         for (auto it: a)
@@ -166,14 +174,14 @@ namespace xt
     TEST(xfile_array, assign_expression)
     {
         double v1 = 3.;
-        auto a1 = xfile_array<double, xdisk_io_handler<double>>(broadcast(v1, {2, 2}), "a1");
+        auto a1 = xfile_array<double, xdisk_io_handler<xblosc>>(broadcast(v1, {2, 2}), "a1");
         for (const auto& v: a1)
         {
             EXPECT_EQ(v, v1);
         }
 
         double v2 = 2. * v1;
-        auto a2 = xfile_array<double, xdisk_io_handler<double>>(a1 + a1, "a2");
+        auto a2 = xfile_array<double, xdisk_io_handler<xblosc>>(a1 + a1, "a2");
         for (const auto& v: a2)
         {
             EXPECT_EQ(v, v2);
@@ -183,14 +191,16 @@ namespace xt
         a2.flush();
 
         std::ifstream in_file;
-        in_file.open("a1");
-        auto data = load_csv<double>(in_file);
+        in_file.open("a1", std::ifstream::binary);
+        auto data = load_blosc<double>(in_file);
+        data.reshape({2, 2});
         xarray<double> ref = {{v1, v1}, {v1, v1}};
         EXPECT_EQ(data, ref);
         in_file.close();
 
-        in_file.open("a2");
-        data = load_csv<double>(in_file);
+        in_file.open("a2", std::ifstream::binary);
+        data = load_blosc<double>(in_file);
+        data.reshape({2, 2});
         ref = {{v2, v2}, {v2, v2}};
         EXPECT_EQ(data, ref);
         in_file.close();

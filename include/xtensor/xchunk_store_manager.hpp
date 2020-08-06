@@ -99,6 +99,15 @@ namespace xt
             }
         }
 
+        template <class C>
+        void configure_format(C& config)
+        {
+            for (auto& chunk: m_chunk_pool)
+            {
+                chunk.configure_format(config);
+            }
+        }
+
         void set_directory(const char* directory)
         {
             m_directory = directory;

@@ -34,6 +34,12 @@ install:
   - conda env create --file environment-dev.yml
   - CALL conda.bat activate xtensor
   - conda install gtest=1.10.0 -c conda-forge
+  # Install development versions of xtensor-io
+  - mkdir dev_tmp
+  - cd dev_tmp
+  - git clone --single-branch --branch blosc https://github.com/davidbrochart/xtensor-io.git
+  - mv xtensor-io/include/xtensor-io ../include/
+  - cd ..
   - ps: if($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") {
         cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DCMAKE_BUILD_TYPE=RELEASE .
         }

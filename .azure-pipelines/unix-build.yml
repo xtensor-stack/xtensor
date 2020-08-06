@@ -5,6 +5,13 @@ steps:
       conda env create --file environment-dev.yml
     displayName: Install dependencies
 
+  # Install development versions of xtensor-io
+  - script: |
+      mkdir dev_tmp
+      cd dev_tmp
+      git clone --single-branch --branch blosc https://github.com/davidbrochart/xtensor-io.git
+      mv xtensor-io/include/xtensor-io ../include/
+
   - script: |
       source activate xtensor
       mkdir build
@@ -12,13 +19,13 @@ steps:
       cmake -DXTENSOR_USE_XSIMD=ON -DDOWNLOAD_GTEST=ON $(Build.SourcesDirectory)
     displayName: Configure xtensor
     workingDirectory: $(Build.BinariesDirectory)
-      
+
   - script: |
       source activate xtensor
       make -j2 test_xtensor_lib
     displayName: Build xtensor
     workingDirectory: $(Build.BinariesDirectory)/build
-          
+
   - script: |
       source activate xtensor
       cd test
