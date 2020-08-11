@@ -33,13 +33,9 @@ install:
   - conda info -a
   - conda env create --file environment-dev.yml
   - CALL conda.bat activate xtensor
-  - conda install gtest=1.10.0 -c conda-forge
-  - ps: if($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2015") {
-        cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DXTENSOR_USE_XSIMD=ON -DCMAKE_BUILD_TYPE=RELEASE .
-        }
-        else {
-        cmake -G "NMake Makefiles" -D CMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DBUILD_TESTS=ON -DDISABLE_VS2017=ON -DCMAKE_BUILD_TYPE=RELEASE .
-        }
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2017" set CMAKE_ARGS="-DDISABLE_VS2017=ON"
+  - if "%APPVEYOR_BUILD_WORKER_IMAGE%" == "Visual Studio 2015" set CMAKE_ARGS=""
+  - cmake -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%MINICONDA%\\LIBRARY -DDOWNLOAD_GTEST=ON -DXTENSOR_USE_XSIMD=ON -DCMAKE_BUILD_TYPE=RELEASE %CMAKE_ARGS% .
   - nmake test_xtensor_lib
   - cd test
 
