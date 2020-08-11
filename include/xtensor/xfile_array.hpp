@@ -80,8 +80,21 @@ namespace xt
 
         ~xfile_array()
         {
+            flush();
+        }
+        
+        void flush()
+        {
             if (m_array_dirty)
+            {
                 m_io_handler.write(m_path);
+                m_array_dirty = false;
+            }
+        }
+
+        xarray<EC>& array()
+        {
+            return m_array;
         }
 
         void set_path(std::string& path)

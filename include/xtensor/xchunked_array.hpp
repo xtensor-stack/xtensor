@@ -199,6 +199,11 @@ namespace xt
             }
         }
 
+        chunk_storage& chunks()
+        {
+            return m_chunks;
+        }
+
         template <class E>
         xchunked_array(const xexpression<E>& e)
         {

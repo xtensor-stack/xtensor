@@ -116,24 +116,37 @@ namespace xt
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
         xchunked_array<xchunk_store_manager<xfile_array<double, xt::xdisk_io_handler<double>>>> a1(shape, chunk_shape);
+        a1.chunks().set_pool_size(2);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
         double v2 = 5.6;
+        double v3 = 7.8;
         a1(2, 1) = v1;
         a1[idx] = v2;
+        a1(0, 0) = v3; // this should unload chunk 1.0
         ASSERT_EQ(a1(2, 1), v1);
         ASSERT_EQ(a1[idx], v2);
+        ASSERT_EQ(a1(0, 0), v3);
 
         std::ifstream in_file;
-        in_file.open("0.1");
-        auto data = xt::load_csv<double>(in_file);
-        xt::xarray<double> ref = {{0, 0}, {v2, 0}};
-        EXPECT_EQ(data, ref);
-        in_file.close();
-
+        xt::xarray<double> ref;
+        xt::xarray<double> data;
         in_file.open("1.0");
         data = xt::load_csv<double>(in_file);
         ref = {{0, v1}, {0, 0}};
+        EXPECT_EQ(data, ref);
+        in_file.close();
+        
+        a1.chunks().flush();
+        in_file.open("0.1");
+        data = xt::load_csv<double>(in_file);
+        ref = {{0, 0}, {v2, 0}};
+        EXPECT_EQ(data, ref);
+        in_file.close();
+
+        in_file.open("0.0");
+        data = xt::load_csv<double>(in_file);
+        ref = {{v3, 0}, {0, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
     }
