@@ -440,12 +440,6 @@ This part is relatively straightforward:
         return xt::broadcast_shape(shape(), s);
     }
 
-    template <class S>
-    bool is_trivial_broadcast(const S& str) const noexcept
-    {
-        return false;
-    }
-
 Implement resize overloads
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
