@@ -77,9 +77,6 @@ totally:
     template <class S>
     bool broadcast_shape(const S& shape) const;
 
-    template <class S>
-    bool is_trivial_broadcast(const S& strides) const;
-
 **data access methods**
 
 .. code::

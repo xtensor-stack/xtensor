@@ -263,9 +263,6 @@ methods:
     template <class S>
     bool broadcast_shape(const S& shape) const;
 
-    template <class S>
-    bool is_trivial_broadcast(const S& strides) const;
-
 Lower-level methods are also provided, meant for optimized assignment and BLAS bindings.
 They are covered in the :ref:`xtensor-assign-label` section.
 
