@@ -68,6 +68,7 @@ namespace xt
 
         template <class S>
         xchunked_array(S&& shape, S&& chunk_shape);
+        ~xchunked_array() = default;
 
         xchunked_array(const xchunked_array&) = default;
         xchunked_array& operator=(const xchunked_array&) = default;
@@ -379,8 +380,6 @@ namespace xt
         return m_chunk_shape;
     }
 
-
-    
     template <class CS>
     template <class S1, class S2>
     inline void xchunked_array<CS>::resize(S1&& shape, S2&& chunk_shape)
