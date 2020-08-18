@@ -653,13 +653,20 @@ namespace xt
         inline xbuffer_owner_storage<CP, A>::xbuffer_owner_storage(P&& data, size_type size, const allocator_type& alloc)
             : m_data(std::forward<P>(data)), m_size(size), m_moved_from(false), m_allocator(alloc)
         {
+            std::cout << "Constructor: " << std::endl;
+            std::cout << "this: " << this << std::endl;
+            std::cout << "data: " << this->data() << std::endl;
         }
 
         template <class CP, class A>
         inline xbuffer_owner_storage<CP, A>::~xbuffer_owner_storage()
         {
+            std::cout << "Destructor: " << std::endl;
+            std::cout << "this: " << this << std::endl;
+            std::cout << "data: " << data() << std::endl;
             if (!m_moved_from)
             {
+                std::cout << "Destroying the data" << std::endl;
                 safe_destroy_deallocate(m_allocator, m_data.get(), m_size);
                 m_size = 0;
             }
@@ -668,6 +675,11 @@ namespace xt
         template <class CP, class A>
         inline auto xbuffer_owner_storage<CP, A>::operator=(const self_type& rhs) -> self_type&
         {
+            std::cout << "Copy assignment: " << std::endl;
+            std::cout << "this: " << this << std::endl;
+            std::cout << "data: " << this->data() << std::endl;
+            std::cout << "rhs this: " << &rhs << std::endl;
+            std::cout << "rhs data: " << rhs.data() << std::endl;
             using std::swap;
             if (this != &rhs)
             {
@@ -691,8 +703,14 @@ namespace xt
 
         template <class CP, class A>
         inline xbuffer_owner_storage<CP, A>::xbuffer_owner_storage(self_type&& rhs)
-            : m_data(std::move(rhs.m_data)), m_size(std::move(rhs.m_size)), m_moved_from(std::move(rhs.m_moved_from)), m_allocator(std::move(rhs.m_allocator))
+            : m_data(std::move(rhs.m_data))
+            , m_size(std::move(rhs.m_size))
+            , m_moved_from(std::move(rhs.m_moved_from))
+            , m_allocator(std::move(rhs.m_allocator))
         {
+            std::cout << "Move constructor: " << std::endl;
+            std::cout << "this: " << this << std::endl;
+            std::cout << "data: " << this->data() << std::endl;
             rhs.m_moved_from = true;
             rhs.m_size = 0;
         }
@@ -700,6 +718,11 @@ namespace xt
         template <class CP, class A>
         inline auto xbuffer_owner_storage<CP, A>::operator=(self_type&& rhs) -> self_type&
         {
+            std::cout << "Move assignment: " << std::endl;
+            std::cout << "this: " << this << std::endl;
+            std::cout << "data: " << this->data() << std::endl;
+            std::cout << "rhs this: " << &rhs << std::endl;
+            std::cout << "rhs data: " << rhs.data() << std::endl;
             swap(rhs);
             return *this;
         }

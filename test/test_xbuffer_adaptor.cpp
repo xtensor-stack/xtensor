@@ -226,14 +226,15 @@ namespace xt
         {
             size_t size = 4;
             std::allocator<double> alloc;
-            value_type* buffer = alloc.allocate(size);
-            std::iota(buffer, buffer+size, 1);
-            owner_adaptor adaptor(buffer, size);
+            double* buffer = alloc.allocate(size);
+            //double* buffer = detail::safe_init_allocate(alloc, size);
+            std::iota(buffer, buffer+size, 1.);
+            owner_adaptor adaptor(buffer, size, alloc);
             return adaptor;
         }
     }
 
-    TEST(xbuffer_adpator, value_semantic)
+    TEST(xbuffer_adaptor, value_semantic)
     {
         auto a = build_buffer_adaptor();
         EXPECT_EQ(a[0], 1.);
