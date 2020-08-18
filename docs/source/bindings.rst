@@ -246,7 +246,7 @@ for C:
 
     // Equivalent to is_tensor<T>::value || is_array<T>::value
     template <class T>
-    sturct is_container : xtl::disjunction<is_tensor<T>, is_array<T>>
+    struct is_container : xtl::disjunction<is_tensor<T>, is_array<T>>
     {
     };
 
