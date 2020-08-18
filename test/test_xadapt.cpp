@@ -10,6 +10,7 @@
 #include "gtest/gtest.h"
 #include "xtensor/xadapt.hpp"
 #include "xtensor/xstrides.hpp"
+#include "test_common.hpp"
 
 namespace xt
 {
@@ -502,4 +503,26 @@ namespace xt
         }
     }
 #endif
+
+    namespace
+    {
+        auto build_adaptor()
+        {
+            using value_type = double;
+            std::size_t size = 4;
+            //value_type* buffer = new value_type[size];
+            std::allocator<double> alloc;
+            value_type* buffer = alloc.allocate(size);
+            std::iota(buffer, buffer+size, 1);
+            std::vector<std::size_t> shape = { size };
+            auto array = adapt(buffer, size, acquire_ownership(), shape);
+            return array;
+        }
+     }
+
+    TEST(xarray_adaptor, value_semantic)
+    {
+        auto a = build_adaptor();
+        EXPECT_EQ(a(0), 1.);
+    }
 }

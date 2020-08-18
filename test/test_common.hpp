@@ -10,6 +10,8 @@
 #ifndef TEST_COMMON_HPP
 #define TEST_COMMON_HPP
 
+#include <iostream>
+
 #include "xtensor/xlayout.hpp"
 #include "xtensor/xmanipulation.hpp"
 #include "test_common_macros.hpp"
@@ -928,6 +930,96 @@ namespace xt
         EXPECT_TRUE((std::is_same<const_storage_iterator, exp_const_storage_iterator>::value));
         EXPECT_TRUE((std::is_same<reverse_storage_iterator, exp_reverse_storage_iterator>::value));
         EXPECT_TRUE((std::is_same<const_reverse_storage_iterator, exp_const_reverse_storage_iterator>::value));
+    }
+
+    template <class T>
+    class printing_value
+    {
+    public:
+
+        using self_type = printing_value;
+
+        printing_value();
+        explicit printing_value(const T& v);
+        ~printing_value();
+
+        printing_value(const printing_value&);
+        printing_value& operator=(const printing_value&);
+
+        printing_value(printing_value&&);
+        printing_value& operator=(printing_value&&);
+
+        printing_value& operator=(const T&);
+        operator const T&() const;
+
+    private:
+        
+        T m_value;
+    };
+
+    template <class T>
+    inline printing_value<T>::printing_value()
+        : m_value()
+    {
+        std::cout << "Default constructor" << std::endl;
+    }
+
+    template <class T>
+    inline printing_value<T>::printing_value(const T& v)
+        : m_value(v)
+    {
+        std::cout << "Consructor with v = " << v << std::endl;
+    }
+
+    template <class T>
+    inline printing_value<T>::~printing_value()
+    {
+        std::cout << "Destructor" << std::endl;
+    }
+
+    template <class T>
+    inline printing_value<T>::printing_value(const printing_value& rhs)
+        : m_value(rhs.m_value)
+    {
+        std::cout << "Copy constructor" << std::endl;
+    }
+
+    template <class T>
+    inline auto printing_value<T>::operator=(const printing_value& rhs) -> self_type&
+    {
+        std::cout << "Copy assignment" << std::endl;
+        m_value = rhs.m_value;
+        return *this;
+    }
+
+    template <class T>
+    inline printing_value<T>::printing_value(printing_value&& rhs)
+        : m_value(std::move(rhs.m_value))
+    {
+        std::cout << "Move constructor" << std::endl;
+    }
+
+    template <class T>
+    inline auto printing_value<T>::operator=(printing_value&& rhs) -> self_type&
+    {
+        std::cout << "Move assignment" << std::endl;
+        m_value = std::move(rhs.m_value);
+        return *this;
+    }
+
+    template <class T>
+    inline auto printing_value<T>::operator=(const T& v) -> self_type&
+    {
+        std::cout << "Value assignment" << std::endl;
+        m_value = v;
+        return *this;
+    }
+
+    template <class T>
+    inline printing_value<T>::operator const T&() const
+    {
+        std::cout << "Conversion operator" << std::endl;
+        return m_value;
     }
 }
 

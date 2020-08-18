@@ -7,6 +7,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
+#include <numeric>
+
 #include "gtest/gtest.h"
 #include "test_common_macros.hpp"
 #include "xtensor/xbuffer_adaptor.hpp"
@@ -216,5 +218,24 @@ namespace xt
         EXPECT_EQ(data[size - 1], 1.2);
 
         delete[] data;
+    }
+
+    namespace
+    {
+        auto build_buffer_adaptor()
+        {
+            size_t size = 4;
+            std::allocator<double> alloc;
+            value_type* buffer = alloc.allocate(size);
+            std::iota(buffer, buffer+size, 1);
+            owner_adaptor adaptor(buffer, size);
+            return adaptor;
+        }
+    }
+
+    TEST(xbuffer_adpator, value_semantic)
+    {
+        auto a = build_buffer_adaptor();
+        EXPECT_EQ(a[0], 1.);
     }
 }
