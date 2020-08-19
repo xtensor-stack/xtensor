@@ -183,6 +183,9 @@ namespace xt
         const std::string& path() const noexcept;
         void set_path(std::string& path);
 
+        template <class C>
+        void configure_format(C& config);
+
         void flush();
 
     private:
@@ -209,7 +212,7 @@ namespace xt
         : m_value(value), m_dirty(dirty)
     {
     }
-    
+
     template <class T>
     template <class V>
     inline auto xfile_reference<T>::operator=(const V& v) -> self_type&
@@ -344,7 +347,7 @@ namespace xt
         , m_path(path)
     {
     }
-        
+
     template <class E, class IOH>
     template <class OE>
     inline auto xfile_array_container<E, IOH>::operator=(const xexpression<OE>& e) -> self_type&
@@ -357,13 +360,13 @@ namespace xt
     {
         return m_storage.size();
     }
-    
+
     template <class E, class IOH>
     inline auto xfile_array_container<E, IOH>::shape() const noexcept -> const shape_type&
     {
         return m_storage.shape();
     }
-    
+
     template <class E, class IOH>
     inline auto xfile_array_container<E, IOH>::layout() const noexcept -> layout_type
     {
@@ -399,7 +402,7 @@ namespace xt
         m_storage.resize(std::forward<S>(shape), strides);
         m_dirty = true;
     }
-    
+
     template <class E, class IOH>
     template <class S>
     inline auto xfile_array_container<E, IOH>::reshape(S&& shape, layout_type layout) & -> self_type&
@@ -532,15 +535,17 @@ namespace xt
         return m_storage.load_simd(i);
     }
 
-
-
-
-
-
     template <class E, class IOH>
     inline const std::string& xfile_array_container<E, IOH>::path() const noexcept
     {
         return m_path;
+    }
+
+    template <class E, class IOH>
+    template <class C>
+    inline void xfile_array_container<E, IOH>::configure_format(C& config)
+    {
+        m_io_handler.configure_format(config);
     }
 
     template <class E, class IOH>
