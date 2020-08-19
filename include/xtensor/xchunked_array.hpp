@@ -459,7 +459,7 @@ namespace xt
         auto size = static_cast<size_t>(std::distance(first, last));
         std::vector<size_t> indexes_of_chunk(size);
         std::vector<size_t> indexes_in_chunk(size);
-        for (auto dim = 0; dim < size; ++dim)
+        for (size_t dim = 0; dim < size; ++dim)
         {
             auto chunk_index = get_chunk_indexes_in_dimension(dim, *first++);
             indexes_of_chunk[dim] = chunk_index.first;
