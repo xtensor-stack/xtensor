@@ -198,6 +198,34 @@ namespace xt
             }
         }
     }
+
+    struct xcsv_config
+    {
+        char delimiter;
+        std::size_t skip_rows;
+        std::ptrdiff_t max_rows;
+        std::string comments;
+
+        xcsv_config()
+            : delimiter(',')
+            , skip_rows(0)
+            , max_rows(-1)
+            , comments("#")
+        {
+        }
+    };
+
+    template <class E>
+    auto load_file(std::istream& stream, const xcsv_config& config)
+    {
+        return load_csv<typename E::value_type>(stream, config.delimiter, config.skip_rows, config.max_rows, config.comments);
+    }
+
+    template <class E>
+    void dump_file(std::ostream& stream, const xexpression<E> &e, const xcsv_config&)
+    {
+        dump_csv(stream, e);
+    }
 }
 
 #endif

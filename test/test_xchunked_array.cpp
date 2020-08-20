@@ -14,6 +14,7 @@
 #include "xtensor/xchunk_store_manager.hpp"
 #include "xtensor/xfile_array.hpp"
 #include "xtensor/xdisk_io_handler.hpp"
+#include "xtensor/xcsv.hpp"
 
 namespace xt
 {
@@ -115,7 +116,7 @@ namespace xt
     {
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
-        xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<double>>>> a1(shape, chunk_shape);
+        xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<xcsv_config>>>> a1(shape, chunk_shape);
         a1.chunks().set_pool_size(2);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
@@ -154,7 +155,7 @@ namespace xt
     TEST(xfile_array, indexed_access)
     {
         std::vector<size_t> shape = {2, 2, 2};
-        xfile_array<double, xdisk_io_handler<double>> a;
+        xfile_array<double, xdisk_io_handler<xcsv_config>> a;
         a.resize(shape);
         double val = 3.;
         for (auto it: a)
@@ -166,14 +167,14 @@ namespace xt
     TEST(xfile_array, assign_expression)
     {
         double v1 = 3.;
-        auto a1 = xfile_array<double, xdisk_io_handler<double>>(broadcast(v1, {2, 2}), "a1");
+        auto a1 = xfile_array<double, xdisk_io_handler<xcsv_config>>(broadcast(v1, {2, 2}), "a1");
         for (const auto& v: a1)
         {
             EXPECT_EQ(v, v1);
         }
 
         double v2 = 2. * v1;
-        auto a2 = xfile_array<double, xdisk_io_handler<double>>(a1 + a1, "a2");
+        auto a2 = xfile_array<double, xdisk_io_handler<xcsv_config>>(a1 + a1, "a2");
         for (const auto& v: a2)
         {
             EXPECT_EQ(v, v2);

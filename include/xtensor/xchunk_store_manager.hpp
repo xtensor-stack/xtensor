@@ -10,7 +10,7 @@
 
 namespace xt
 {
-    
+
     /************************************
      * xchunk_store_manager declaration *
      ************************************/
@@ -84,7 +84,7 @@ namespace xt
         stepper stepper_begin(const O& shape) noexcept;
         template <class O>
         stepper stepper_end(const O& shape, layout_type) noexcept;
-        
+
         template <class O>
         const_stepper stepper_begin(const O& shape) const noexcept;
         template <class O>
@@ -94,7 +94,11 @@ namespace xt
         void resize(S&& shape);
 
         void set_pool_size(std::size_t n);
+        void set_directory(const char* directory);
         void flush();
+
+        template <class C>
+        void configure_format(C& config);
 
         template <class I>
         reference map_file_array(I first, I last);
@@ -111,6 +115,7 @@ namespace xt
         chunk_pool_type m_chunk_pool;
         index_pool_type m_index_pool;
         std::size_t m_unload_index;
+        std::string m_directory;
     };
 
     /***************************************
@@ -163,7 +168,7 @@ namespace xt
     {
         return map_file_array(first, last);
     }
-    
+
     template <class EC>
     template <class O>
     inline auto xchunk_store_manager<EC>::stepper_begin(const O& shape) noexcept -> stepper
@@ -203,7 +208,7 @@ namespace xt
         // don't resize according to total number of chunks
         // instead the pool manages a number of in-memory chunks
     }
-    
+
     template <class EC>
     inline void xchunk_store_manager<EC>::set_pool_size(std::size_t n)
     {
@@ -230,20 +235,42 @@ namespace xt
     }
 
     template <class EC>
+    template <class C>
+    void xchunk_store_manager<EC>::configure_format(C& config)
+    {
+        for (auto& chunk: m_chunk_pool)
+        {
+            chunk.configure_format(config);
+        }
+    }
+
+    template <class EC>
+    void xchunk_store_manager<EC>::set_directory(const char* directory)
+    {
+        m_directory = directory;
+        if (m_directory.back() != '/')
+        {
+            m_directory.append("/");
+        }
+    }
+
+    template <class EC>
     template <class I>
     inline auto xchunk_store_manager<EC>::map_file_array(I first, I last) -> reference
     {
         std::string path;
+        std::string fname;
         std::vector<std::size_t> index;
         for (auto it = first; it != last; ++it)
         {
-            if (!path.empty())
+            if (!fname.empty())
             {
-                path.append(".");
+                fname.append(".");
             }
-            path.append(std::to_string(*it));
+            fname.append(std::to_string(*it));
             index.push_back(*it);
         }
+        path = m_directory + fname;
         if (index.empty())
         {
             return m_chunk_pool[0];
