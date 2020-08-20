@@ -209,7 +209,7 @@ namespace xt
     {
         // first chunk always has the correct shape
         // get the shape before resizing the pool
-        auto chunk_shape = m_chunk_pool[0].array().shape();
+        auto chunk_shape = m_chunk_pool[0].storage().shape();
         m_chunk_pool.resize(n);
         m_index_pool.resize(n);
         m_unload_index = 0;
