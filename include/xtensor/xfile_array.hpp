@@ -167,6 +167,19 @@ namespace xt
         template <class O>
         const_stepper stepper_end(const O& shape, layout_type) const noexcept;
 
+        reference data_element(size_type i);
+        const_reference data_element(size_type i) const;
+
+        template <class requested_type>
+        using simd_return_type = xt_simd::simd_return_type<value_type, requested_type>;
+
+        template <class align, class simd>
+        void store_simd(size_type i, const simd& e);
+        template <class align, class requested_type = value_type,
+                  std::size_t N = xt_simd::simd_traits<requested_type>::size>
+        container_simd_return_type_t<storage_type, value_type, requested_type>
+        load_simd(size_type i) const;
+
         const std::string& path() const noexcept;
         void set_path(std::string& path);
 
@@ -490,6 +503,39 @@ namespace xt
         size_type offset = shape.size() - this->dimension();
         return const_stepper(this, offset, true);
     }
+
+    template <class E, class IOH>
+    inline auto xfile_array_container<E, IOH>::data_element(size_type i) -> reference 
+    {
+        return reference(m_storage.data_element(i), m_dirty);
+    }
+    
+    template <class E, class IOH>
+    inline auto xfile_array_container<E, IOH>::data_element(size_type i) const -> const_reference
+    {
+        return m_storage.element(i);
+    }
+
+    template <class E, class IOH>
+    template <class align, class simd>
+    inline void xfile_array_container<E, IOH>::store_simd(size_type i, const simd& e)
+    {
+        m_storage.store_simd(i, e);
+        m_dirty = true;
+    }
+
+    template <class E, class IOH>
+    template <class align, class requested_type, std::size_t N>
+    inline auto xfile_array_container<E, IOH>::load_simd(size_type i) const
+        -> container_simd_return_type_t<storage_type, value_type, requested_type>
+    {
+        return m_storage.load_simd(i);
+    }
+
+
+
+
+
 
     template <class E, class IOH>
     inline const std::string& xfile_array_container<E, IOH>::path() const noexcept
