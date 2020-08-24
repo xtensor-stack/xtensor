@@ -10,46 +10,65 @@ namespace xt
     class xdisk_io_handler
     {
     public:
+
         template <class E>
-        void write(xexpression<E>& expression, std::string& path)
-        {
-            std::ofstream m_out_file(path, std::ofstream::binary);
-            if (m_out_file.is_open())
-            {
-                dump_file(m_out_file, expression, m_format_config);
-            }
-            else
-            {
-                std::runtime_error("write: failed to open file " + path);
-            }
-        }
+        void write(const xexpression<E>& expression, const std::string& path) const;
 
         template <class ET>
-        void read(ET& array, std::string& path)
+        void read(ET& array, const std::string& path, bool throw_on_fail = false) const;
+
+        void configure_format(const C& format_config);
+
+    private:
+
+        C m_format_config;
+    };
+
+    template <class C>
+    template <class E>
+    inline void xdisk_io_handler<C>::write(const xexpression<E>& expression, const std::string& path) const
+    {
+        std::ofstream out_file(path, std::ofstream::binary);
+        if (out_file.is_open())
         {
-            // not all formats store the shape (e.g. Blosc)
-            // so we reshape after loading
-            std::ifstream m_in_file(path, std::ifstream::binary);
-            const auto shape = array.shape();
-            if (m_in_file.is_open())
+            dump_file(out_file, expression, m_format_config);
+        }
+        else
+        {
+            std::runtime_error("write: failed to open file " + path);
+        }
+    }
+
+    template <class C>
+    template <class ET>
+    inline void xdisk_io_handler<C>::read(ET& array, const std::string& path, bool throw_on_fail) const
+    {
+        std::ifstream in_file(path, std::ifstream::binary);
+        if (in_file.is_open())
+        {
+            load_file<ET>(in_file, array, m_format_config);
+        }
+        else
+        {
+            if (throw_on_fail)
             {
-                array = load_file<ET>(m_in_file, m_format_config);
-                array.reshape(shape);
+                XTENSOR_THROW(std::runtime_error, "read: failed to open file " + path);
             }
             else
             {
+                auto shape = array.shape();
                 array = zeros<typename ET::value_type>(shape);
             }
         }
+    }
 
-        void configure_format(C& format_config)
-        {
-            m_format_config = format_config;
-        }
+    template <class C>
+    inline void xdisk_io_handler<C>::configure_format(const C& format_config)
+    {
+        m_format_config = format_config;
+    }
 
-    private:
-        C m_format_config;
-    };
+
 }
 
 #endif
