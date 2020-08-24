@@ -216,9 +216,9 @@ namespace xt
     };
 
     template <class E>
-    auto load_file(std::istream& stream, const xcsv_config& config)
+    void load_file(std::istream& stream, xexpression<E>& e, const xcsv_config& config)
     {
-        return load_csv<typename E::value_type>(stream, config.delimiter, config.skip_rows, config.max_rows, config.comments);
+        e.derived_cast() = load_csv<typename E::value_type>(stream, config.delimiter, config.skip_rows, config.max_rows, config.comments);
     }
 
     template <class E>
