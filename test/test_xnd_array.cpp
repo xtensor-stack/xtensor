@@ -9,6 +9,7 @@
 
 #include "gtest/gtest.h"
 
+#include "xtensor/xarray.hpp"
 #include "xtensor/xnd_array.hpp"
 
 namespace xt
@@ -21,9 +22,9 @@ namespace xt
         a2.set_type("float64");
 
         auto a3 = a2.astype("int32");
-        
+
         xarray<int> a4({{3, 4}, {5, 6}});
-        auto a5 = a3.get_array<int32_t>();
+        auto a5 = a3.get<xarray<int32_t>>();
 
         EXPECT_EQ(a4, a5);
     }

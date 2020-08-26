@@ -45,7 +45,7 @@ namespace xt
         void swap(xnd_array&);
 
         template <class T>
-        xarray<T> get_array();
+        T get();
 
         void print() const;
         xnd_array astype(const std::string&);
@@ -78,7 +78,7 @@ namespace xt
 
             virtual xnd_array_impl* clone() const = 0;
             virtual void print() const = 0;
-            virtual void get_array(void*&) = 0;
+            virtual void get(void*&) = 0;
             virtual ~xnd_array_impl() = default;
 
         protected:
@@ -97,7 +97,7 @@ namespace xt
             xnd_expression_wrapper* clone() const;
 
             void print() const;
-            void get_array(void*&);
+            void get(void*&);
 
             ~xnd_expression_wrapper() = default;
 
@@ -163,12 +163,12 @@ namespace xt
     }
 
     template <class T>
-    inline xarray<T> xnd_array::get_array()
+    inline T xnd_array::get()
     {
-        void* p_array;
-        p_holder->get_array(p_array);
-        xarray<T> a;
-        a = *(xarray<T>*)p_array;
+        void* p;
+        p_holder->get(p);
+        T a;
+        a = *(T*)p;
         return a;
     }
 
@@ -188,7 +188,7 @@ namespace xt
             xnd_array new_array;
             if (m_dtype == "int32")
             {
-                auto a = get_array<int32_t>();
+                auto a = get<xarray<int32_t>>();
                 if (dtype == "float64")
                 {
                     new_array = xt::cast<double>(a);
@@ -199,7 +199,7 @@ namespace xt
             }
             else if (m_dtype == "float64")
             {
-                auto a = get_array<double>();
+                auto a = get<xarray<double>>();
                 if (dtype == "int32")
                 {
                     new_array = xt::cast<int32_t>(a);
@@ -275,9 +275,9 @@ namespace xt
         }
 
         template <class CTE>
-        inline void xnd_expression_wrapper<CTE>::get_array(void*& p_array)
+        inline void xnd_expression_wrapper<CTE>::get(void*& p)
         {
-            p_array = (void*)&m_expression;
+            p = (void*)&m_expression;
         }
 
         template <class CTE>
