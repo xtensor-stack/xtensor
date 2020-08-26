@@ -11,6 +11,7 @@
 #define XTENSOR_XND_ARRAY_HPP
 
 #include "xarray.hpp"
+#include "xio.hpp"
 
 namespace xt
 {
