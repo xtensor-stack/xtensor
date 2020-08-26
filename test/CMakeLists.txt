@@ -223,6 +223,7 @@ set(XTENSOR_TESTS
     test_extended_xhistogram.cpp
     test_extended_xsort.cpp
     test_xchunked_array.cpp
+    test_xnd_array.cpp
 )
 
 if(nlohmann_json_FOUND)
