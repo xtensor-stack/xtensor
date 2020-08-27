@@ -554,7 +554,7 @@ namespace xt
         if (path != m_path)
         {
             // maybe write to old file
-            if (m_dirty)
+            if (m_dirty && !m_path.empty())
             {
                 m_io_handler.write(m_storage, m_path);
                 m_dirty = false;
@@ -568,7 +568,7 @@ namespace xt
     template <class E, class IOH>
     inline void xfile_array_container<E, IOH>::flush()
     {
-        if (m_dirty)
+        if (m_dirty && !m_path.empty())
         {
             m_io_handler.write(m_storage, m_path);
             m_dirty = false;
