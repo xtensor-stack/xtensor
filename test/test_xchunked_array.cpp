@@ -156,6 +156,7 @@ namespace xt
     {
         std::vector<size_t> shape = {2, 2, 2};
         xfile_array<double, xdisk_io_handler<xcsv_config>> a;
+        a.ignore_empty_path(true);
         a.resize(shape);
         double val = 3.;
         for (auto it: a)
@@ -168,6 +169,7 @@ namespace xt
     {
         double v1 = 3.;
         auto a1 = xfile_array<double, xdisk_io_handler<xcsv_config>>(broadcast(v1, {2, 2}), "a1");
+        a1.ignore_empty_path(true);
         for (const auto& v: a1)
         {
             EXPECT_EQ(v, v1);
@@ -175,6 +177,7 @@ namespace xt
 
         double v2 = 2. * v1;
         auto a2 = xfile_array<double, xdisk_io_handler<xcsv_config>>(a1 + a1, "a2");
+        a2.ignore_empty_path(true);
         for (const auto& v: a2)
         {
             EXPECT_EQ(v, v2);
