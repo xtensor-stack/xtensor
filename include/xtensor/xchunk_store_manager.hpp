@@ -131,6 +131,7 @@ namespace xt
         , m_index_pool(1u)
         , m_unload_index(0u)
     {
+        m_chunk_pool[0].ignore_empty_path(true);
     }
 
     template <class EC>
@@ -222,6 +223,7 @@ namespace xt
         for (auto& chunk: m_chunk_pool)
         {
             chunk.resize(chunk_shape);
+            chunk.ignore_empty_path(true);
         }
     }
 
