@@ -191,7 +191,7 @@ namespace xt
 
     private:
 
-        bool enable_io(std::string& path);
+        bool enable_io(const std::string& path) const;
 
         E m_storage;
         bool m_dirty;
@@ -561,18 +561,9 @@ namespace xt
     }
 
     template <class E, class IOH>
-    inline bool xfile_array_container<E, IOH>::enable_io(std::string& path)
+    inline bool xfile_array_container<E, IOH>::enable_io(const std::string& path) const
     {
-        bool res;
-        if (path.empty())
-        {
-            res = !m_ignore_empty_path;
-        }
-        else
-        {
-            res = true;
-        }
-        return res;
+        return !path.empty() || !m_ignore_empty_path;
     }
 
     template <class E, class IOH>
@@ -581,14 +572,7 @@ namespace xt
         if (path != m_path)
         {
             // maybe write to old file
-            if (m_dirty)
-            {
-                if (enable_io(m_path))
-                {
-                    m_io_handler.write(m_storage, m_path);
-                }
-                m_dirty = false;
-            }
+            flush();
             m_path = path;
             // read new file
             if (enable_io(path))
