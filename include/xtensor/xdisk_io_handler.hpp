@@ -35,7 +35,7 @@ namespace xt
         }
         else
         {
-            std::runtime_error("write: failed to open file " + path);
+            XTENSOR_THROW(std::runtime_error, "write: failed to open file " + path);
         }
     }
 

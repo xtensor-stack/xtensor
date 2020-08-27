@@ -181,6 +181,7 @@ namespace xt
         load_simd(size_type i) const;
 
         const std::string& path() const noexcept;
+        void ignore_empty_path(bool ignore);
         void set_path(std::string& path);
 
         template <class C>
@@ -190,10 +191,13 @@ namespace xt
 
     private:
 
+        bool enable_io(const std::string& path) const;
+
         E m_storage;
         bool m_dirty;
         IOH m_io_handler;
         std::string m_path;
+        bool m_ignore_empty_path;
     };
 
     template <class T,
@@ -335,6 +339,7 @@ namespace xt
         , m_dirty(true)
         , m_io_handler()
         , m_path(detail::file_helper<E>::path(e))
+        , m_ignore_empty_path(false)
     {
     }
 
@@ -345,6 +350,7 @@ namespace xt
         , m_dirty(true)
         , m_io_handler()
         , m_path(path)
+        , m_ignore_empty_path(false)
     {
     }
 
@@ -512,7 +518,7 @@ namespace xt
     {
         return reference(m_storage.data_element(i), m_dirty);
     }
-    
+
     template <class E, class IOH>
     inline auto xfile_array_container<E, IOH>::data_element(size_type i) const -> const_reference
     {
@@ -549,19 +555,30 @@ namespace xt
     }
 
     template <class E, class IOH>
+    inline void xfile_array_container<E, IOH>::ignore_empty_path(bool ignore)
+    {
+        m_ignore_empty_path = ignore;
+    }
+
+    template <class E, class IOH>
+    inline bool xfile_array_container<E, IOH>::enable_io(const std::string& path) const
+    {
+        return !path.empty() || !m_ignore_empty_path;
+    }
+
+    template <class E, class IOH>
     inline void xfile_array_container<E, IOH>::set_path(std::string& path)
     {
         if (path != m_path)
         {
             // maybe write to old file
-            if (m_dirty)
-            {
-                m_io_handler.write(m_storage, m_path);
-                m_dirty = false;
-            }
+            flush();
             m_path = path;
             // read new file
-            m_io_handler.read(m_storage, path);
+            if (enable_io(path))
+            {
+                m_io_handler.read(m_storage, path);
+            }
         }
     }
 
@@ -570,7 +587,10 @@ namespace xt
     {
         if (m_dirty)
         {
-            m_io_handler.write(m_storage, m_path);
+            if (enable_io(m_path))
+            {
+                m_io_handler.write(m_storage, m_path);
+            }
             m_dirty = false;
         }
     }
