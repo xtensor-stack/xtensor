@@ -3,6 +3,6 @@ channels:
   - conda-forge
 dependencies:
   - cmake
-  - xtl=0.6.16
+  - xtl=0.6.17
   - xsimd=7.4.8
   - nlohmann_json

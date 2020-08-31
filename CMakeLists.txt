@@ -179,6 +179,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xvectorize.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/zarray.hpp
 )
 
 add_library(xtensor INTERFACE)
