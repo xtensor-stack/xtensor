@@ -180,6 +180,10 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xview_utils.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zarray.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/zarray_impl.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/zdispatcher.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/zfunction.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/zmath.hpp
 )
 
 add_library(xtensor INTERFACE)
