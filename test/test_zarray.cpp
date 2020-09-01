@@ -9,7 +9,9 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/zarray.hpp"
+#include "xtensor/zdispatcher.hpp"
 
+#ifndef XTENSOR_DISABLE_EXCEPTIONS
 namespace xt
 {
     TEST(zarray, value_semantics)
@@ -21,5 +23,23 @@ namespace xt
 
         EXPECT_EQ(a, ra);
     }
+
+    // TODO : move to dedicated test file
+    TEST(zarray, dispatching)
+    {
+        using dispatcher_type = zsingle_dispatcher<math::exp_fun>;
+        dispatcher_type::init();
+
+        xarray<double> a = {{0.5, 1.5}, {2.5, 3.5}};
+        xarray<double> expa = {{std::exp(0.5), std::exp(1.5)}, {std::exp(2.5), std::exp(3.5)}};
+        xarray<double> res;
+        zarray za(a);
+        zarray zres(res);
+
+        dispatcher_type::dispatch(za.get_implementation(), zres.get_implementation());
+
+        EXPECT_EQ(expa, res);
+    }
 }
+#endif
 
