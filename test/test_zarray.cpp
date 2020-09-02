@@ -9,7 +9,7 @@
 
 #include "gtest/gtest.h"
 #include "xtensor/zarray.hpp"
-#include "xtensor/zdispatcher.hpp"
+#include "xtensor/zfunction.hpp"
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
 namespace xt
@@ -27,7 +27,7 @@ namespace xt
     // TODO : move to dedicated test file
     TEST(zarray, dispatching)
     {
-        using dispatcher_type = zsingle_dispatcher<math::exp_fun>;
+        using dispatcher_type = zdispatcher_t<math::exp_fun, 1>;
         dispatcher_type::init();
 
         xarray<double> a = {{0.5, 1.5}, {2.5, 3.5}};
@@ -39,6 +39,36 @@ namespace xt
         dispatcher_type::dispatch(za.get_implementation(), zres.get_implementation());
 
         EXPECT_EQ(expa, res);
+    }
+
+    // TODO: move to dedicated test file
+    TEST(zarray, add)
+    {
+        using exp_dispatcher_type = zdispatcher_t<math::exp_fun, 1>;
+        exp_dispatcher_type::init();
+
+        using add_dispatcher_type = zdispatcher_t<detail::plus, 2>;
+        add_dispatcher_type::init();
+
+        using nested_zfunction_type = zfunction<math::exp_fun, const zarray&>;
+        using zfunction_type = zfunction<detail::plus, const zarray&, nested_zfunction_type>;
+
+        xarray<double> a = {{0.5, 1.5}, {2.5, 3.5}};
+        xarray<double> b = {{-0.2, 2.4}, {1.3, 4.7}};
+        xarray<double> res;
+
+        zarray za(a);
+        zarray zb(b);
+        zarray zres(res);
+
+        zfunction_type f(zadd(), za, nested_zfunction_type(zexp(), zb));
+        f.assign_to(zres.get_implementation());
+
+        auto expected = xarray<double>::from_shape({2, 2});
+        std::transform(a.cbegin(), a.cend(), b.cbegin(), expected.begin(),
+                       [](const double& lhs, const double& rhs) { return lhs + std::exp(rhs); });
+
+        EXPECT_TRUE(all(isclose(res, expected)));
     }
 }
 #endif

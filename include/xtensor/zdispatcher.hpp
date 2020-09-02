@@ -7,8 +7,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef ZDISPATCHER_HPP
-#define ZDISPATCHER_HPP
+#ifndef XTENSOR_ZDISPATCHER_HPP
+#define XTENSOR_ZDISPATCHER_HPP
 
 #include <xtl/xmultimethods.hpp>
 
@@ -21,7 +21,7 @@ namespace xt
     using supported_type = mpl::vector<float, double>;
 
     template <class type_list>
-    using zdispatcher_impl = xtl::functor_dispatcher
+    using zrun_dispatcher_impl = xtl::functor_dispatcher
     <
         type_list,
         void,
@@ -29,57 +29,150 @@ namespace xt
         xtl::basic_fast_dispatcher
     >;
 
-    using zsingle_dispatcher_impl = zdispatcher_impl
+    template <class type_list>
+    using ztype_dispatcher_impl = xtl::functor_dispatcher
     <
-        mpl::vector<const zarray_impl, zarray_impl>
+        type_list,
+        size_t,
+        xtl::static_caster,
+        xtl::basic_fast_dispatcher
     >;
 
-    using zdouble_dispatcher_impl = zdispatcher_impl
-    <
-        mpl::vector<const zarray_impl, const zarray_impl, zarray_impl>
-    >;
+    /**********************
+     * zdouble_dispatcher *
+     **********************/
 
-    template <class D>
-    struct zsingle_dispatcher_base
+    // Double dispatchers are used for unary operations.
+    // They dispatch on the single argument and on the
+    // result.
+
+    template <class F>
+    class zdouble_dispatcher
     {
-        static zsingle_dispatcher_impl& get()
+    private:
+
+        using zfunctor_type = get_zmapped_functor_t<F>;
+        using ztype_dispatcher = ztype_dispatcher_impl<mpl::vector<const zarray_impl>>;
+        using zrun_dispatcher = zrun_dispatcher_impl<mpl::vector<const zarray_impl, zarray_impl>>;
+        
+        static ztype_dispatcher& type_dispatcher()
         {
-            static zsingle_dispatcher_impl dispatcher;
+            static ztype_dispatcher dispatcher;
             return dispatcher;
+        }
+
+        static zrun_dispatcher& run_dispatcher()
+        {
+            static zrun_dispatcher dispatcher;
+            return dispatcher;
+        }
+
+    public:
+
+        template <class T, class R>
+        static void insert()
+        {
+            using arg_type = const ztyped_array<T>;
+            using res_type = ztyped_array<R>;
+            run_dispatcher().template insert<arg_type, res_type>(&zfunctor_type::template run<T, R>);
+            type_dispatcher().template insert<arg_type>(&zfunctor_type::template index<T>);
         }
 
         static void init()
         {
-            D::template insert<float, float>();
-            D::template insert<double, double>();
+            insert<float, float>();
+            insert<double, double>();
         }
 
         static void dispatch(const zarray_impl& z1, zarray_impl& res)
         {
-            get().dispatch(z1, res);
+            run_dispatcher().dispatch(z1, res);
+        }
+
+        static size_t get_type_index(const zarray_impl& z1)
+        {
+            return type_dispatcher().dispatch(z1);
+        }
+   };
+
+    /**********************
+     * ztriple_dispatcher *
+     **********************/
+
+    // Triple dispatchers are used for binary operations.
+    // They dispatch on both arguments and on the result.
+
+    template <class F>
+    class ztriple_dispatcher
+    {
+    private:
+
+        using zfunctor_type = get_zmapped_functor_t<F>;
+        using ztype_dispatcher = ztype_dispatcher_impl<mpl::vector<const zarray_impl, const zarray_impl>>;
+        using zrun_dispatcher = zrun_dispatcher_impl<mpl::vector<const zarray_impl, const zarray_impl, zarray_impl>>;
+        
+        static ztype_dispatcher& type_dispatcher()
+        {
+            static ztype_dispatcher dispatcher;
+            return dispatcher;
+        }
+
+        static zrun_dispatcher& run_dispatcher()
+        {
+            static zrun_dispatcher dispatcher;
+            return dispatcher;
+        }
+
+    public:
+
+        template <class T1, class T2, class R>
+        static void insert()
+        {
+            using arg_type1 = const ztyped_array<T1>;
+            using arg_type2 = const ztyped_array<T2>;
+            using res_type = ztyped_array<R>;
+            run_dispatcher().template insert<arg_type1, arg_type2, res_type>(&zfunctor_type::template run<T1, T2, R>);
+            type_dispatcher().template insert<arg_type1, arg_type1>(&zfunctor_type::template index<T1, T2>);
+        }
+
+        static void init()
+        {
+            insert<float, float, float>();
+            insert<double, double, double>();
+        }
+
+        static void dispatch(const zarray_impl& z1, const zarray_impl& z2, zarray_impl& res)
+        {
+            run_dispatcher().dispatch(z1, z2, res);
+        }
+
+        static size_t get_type_index(const zarray_impl& z1, const zarray_impl& z2)
+        {
+            return type_dispatcher().dispatch(z1, z2);
         }
     };
 
+    /***************
+     * zdispatcher *
+     ***************/
+
+    template <class F, size_t N>
+    struct zdispatcher;
+
     template <class F>
-    class zsingle_dispatcher;
+    struct zdispatcher<F, 1>
+    {
+        using type = zdouble_dispatcher<F>;
+    };
 
-#define DEFINE_SINGLE_DISPATCHER(FUNCTOR, FUNCTION)\
-    template <> \
-    struct zsingle_dispatcher<FUNCTOR>\
-        : private zsingle_dispatcher_base<zsingle_dispatcher<FUNCTOR>> \
-    {\
-        using base_type = zsingle_dispatcher_base<zsingle_dispatcher<FUNCTOR>>; \
-        using base_type::dispatch; \
-        using base_type::init; \
-        template <class T1, class T2>\
-        static void insert() \
-        {\
-            base_type::get().template insert<const ztyped_array<T1>, ztyped_array<T2>>(&FUNCTION<T1, T2>); \
-        }\
-    }
+    template <class F>
+    struct zdispatcher<F, 2>
+    {
+        using type = ztriple_dispatcher<F>;
+    };
 
-DEFINE_SINGLE_DISPATCHER(math::exp_fun, zexp);
-
+    template <class F, size_t N>
+    using zdispatcher_t = typename zdispatcher<F, N>::type;
 }
 
 #endif

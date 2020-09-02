@@ -27,20 +27,66 @@ namespace xt
         }
     }
 
-    template <class T1, class T2, class R>
-    inline void zadd(const ztyped_array<T1>& z1,
-                     const ztyped_array<T2>& z2,
-                     ztyped_array<R>& zres)
-    {
-        detail::zassign_data(zres.get_array(), z1.get_array() + z2.get_array());
-    }
+    template <class XF>
+    struct get_zmapped_functor;
+    
+    template <class XF>
+    using get_zmapped_functor_t = typename get_zmapped_functor<XF>::type;
 
-    template <class T1, class R>
-    inline void zexp(const ztyped_array<T1>& z1,
-                     ztyped_array<R>& zres)
+/*#define DEFINE_ZFUNCTOR_MAPPING(XF, ZF) \
+    template <>                         \
+    struct get_zmapped_functor<XF>      \
+    { using type = ZF; }
+*/
+    struct zadd
     {
-        detail::zassign_data(zres.get_array(), xt::exp(z1.get_array()));
-    }
+        template <class T1, class T2, class R>
+        static void run(const ztyped_array<T1>& z1,
+                        const ztyped_array<T2>& z2,
+                        ztyped_array<R>& zres)
+        {
+            detail::zassign_data(zres.get_array(), z1.get_array() + z2.get_array());
+        }
+
+        template <class T1, class T2>
+        static size_t index(const ztyped_array<T1>&, const ztyped_array<T2>&)
+        {
+            using result_type = ztyped_array<decltype(std::declval<T1>() + std::declval<T2>())>;
+            return result_type::get_class_static_index();
+        }
+    };
+
+    template <>
+    struct get_zmapped_functor<detail::plus>
+    {
+        using type = zadd;
+    };
+
+    //DEFINE_ZFUNCTOR_MAPPING((detail::plus), zadd);
+
+    struct zexp
+    {
+        template <class T, class R>
+        static void run(const ztyped_array<T>& z,
+                        ztyped_array<R>& zres)
+        {
+            detail::zassign_data(zres.get_array(), xt::exp(z.get_array()));
+        }
+
+        template <class T>
+        static size_t index(const ztyped_array<T>&)
+        {
+            using value_type = decltype(std::declval<math::exp_fun>()(std::declval<T>()));
+            return ztyped_array<value_type>::get_class_static_index();
+        }
+    };
+
+    template <>
+    struct get_zmapped_functor<math::exp_fun>
+    {
+        using type = zexp;
+    };
+    //DEFINE_ZFUNCTOR_MAPPING((math::exp_fun), zexp);
 }
 
 #endif
