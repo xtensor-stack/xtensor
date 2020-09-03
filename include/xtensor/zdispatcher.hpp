@@ -173,6 +173,57 @@ namespace xt
 
     template <class F, size_t N>
     using zdispatcher_t = typename zdispatcher<F, N>::type;
+
+    /************************
+     * zarray_impl_register *
+     ************************/
+
+    class zarray_impl_register
+    {
+    public:
+
+        template <class T>
+        void insert()
+        {
+            size_t& idx = ztyped_array<T>::get_class_static_index();
+            if (idx == SIZE_MAX)
+            {
+                m_register.resize(++m_next_index);
+                idx = m_register.size() - 1u;
+
+            }
+            else if (m_register.size() <= idx)
+            {
+                m_register.resize(idx + 1u);
+            }
+            m_register[idx] = std::unique_ptr<zarray_impl>(detail::build_zarray(std::move(xarray<T>())));
+        }
+
+        const zarray_impl& operator[](size_t index) const
+        {
+            return *(m_register[index]);
+        }
+
+        static zarray_impl_register& instance()
+        {
+            static zarray_impl_register r;
+            return r;
+        }
+
+    private:
+
+        zarray_impl_register()
+            : m_next_index(0)
+        {
+            insert<float>();
+            insert<double>();
+        }
+
+        size_t m_next_index;
+        std::vector<std::unique_ptr<zarray_impl>> m_register;
+    };
+
+
 }
 
 #endif
