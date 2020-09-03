@@ -15,6 +15,33 @@
 namespace xt
 {
 
+    /*************************
+     * zarray_expression_tag *
+     *************************/
+
+    struct zarray_expression_tag {};
+
+    namespace extension
+    {
+        template <>
+        struct expression_tag_and<xtensor_expression_tag, zarray_expression_tag>
+        {
+            using type = zarray_expression_tag;
+        };
+
+        template <>
+        struct expression_tag_and<zarray_expression_tag, xtensor_expression_tag>
+            : expression_tag_and<xtensor_expression_tag, zarray_expression_tag>
+        {
+        };
+
+        template <>
+        struct expression_tag_and<zarray_expression_tag, zarray_expression_tag>
+        {
+            using type = zarray_expression_tag;
+        };
+    }
+
     /***************
      * zarray_impl *
      ***************/

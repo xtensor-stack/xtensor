@@ -16,6 +16,7 @@
 
 #include "xarray.hpp"
 #include "zarray_impl.hpp"
+#include "zassign.hpp"
 
 namespace xt
 {
@@ -24,10 +25,20 @@ namespace xt
      * zarray *
      **********/
 
-    class zarray
+    class zarray;
+
+    template <>
+    struct xcontainer_inner_types<zarray>
+    {
+        using temporary_type = zarray;
+    };
+
+    class zarray : public xcontainer_semantic<zarray>
     {
     public:
 
+        using expression_tag = zarray_expression_tag;
+        using semantic_base = xcontainer_semantic<zarray>;
         using implementation_ptr = std::unique_ptr<zarray_impl>;
 
         zarray() = default;
@@ -37,12 +48,16 @@ namespace xt
         zarray(E&& e);
 
         zarray(implementation_ptr&& impl);
+        zarray& operator=(implementation_ptr&& impl);
 
         zarray(const zarray& rhs);
         zarray& operator=(const zarray& rhs);
 
         zarray(zarray&& rhs);
         zarray& operator=(zarray&& rhs);
+
+        template <class E>
+        zarray& operator=(const xexpression<E>&);
 
         void swap(zarray& rhs);
 
@@ -57,6 +72,12 @@ namespace xt
 
     private:
 
+        template <class E>
+        void init_implementation(E&& e, xtensor_expression_tag);
+
+        template <class E>
+        void init_implementation(const xexpression<E>& e, zarray_expression_tag);
+
         implementation_ptr p_impl;
     };
 
@@ -65,14 +86,33 @@ namespace xt
      *************************/
 
     template <class E>
-    inline zarray::zarray(E&& e)
-        : p_impl(detail::build_zarray(std::forward<E>(e)))
+    inline void zarray::init_implementation(E&& e, xtensor_expression_tag)
     {
+        p_impl = implementation_ptr(detail::build_zarray(std::forward<E>(e)));
+    }
+
+    template <class E>
+    inline void zarray::init_implementation(const xexpression<E>& e, zarray_expression_tag)
+    {
+        p_impl = nullptr;
+        semantic_base::assign(e);
+    }
+    
+    template <class E>
+    inline zarray::zarray(E&& e)
+    {
+        init_implementation(std::forward<E>(e), extension::get_expression_tag_t<std::decay_t<E>>());
     }
 
     inline zarray::zarray(implementation_ptr&& impl)
         : p_impl(std::move(impl))
     {
+    }
+
+    inline zarray& zarray::operator=(implementation_ptr&& impl)
+    {
+        p_impl = std::move(impl);
+        return *this;
     }
 
     inline zarray::zarray(const zarray& rhs)
@@ -98,6 +138,12 @@ namespace xt
         return *this;
     }
 
+    template <class E>
+    inline zarray& zarray::operator=(const xexpression<E>& e)
+    {
+        return semantic_base::operator=(e);
+    }
+    
     inline void zarray::swap(zarray& rhs)
     {
         std::swap(p_impl, rhs.p_impl);
