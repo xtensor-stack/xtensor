@@ -69,6 +69,9 @@ namespace xt
                        [](const double& lhs, const double& rhs) { return lhs + std::exp(rhs); });
 
         EXPECT_TRUE(all(isclose(res, expected)));
+
+        size_t res_index = f.get_result_type_index();
+        EXPECT_EQ(res_index, ztyped_array<double>::get_class_static_index());
     }
 }
 #endif
