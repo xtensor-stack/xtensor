@@ -24,10 +24,11 @@ namespace xt
      * zarray *
      **********/
 
-    class zarray
+    class zarray : public xexpression<zarray>
     {
     public:
 
+        using expression_tag = zarray_expression_tag;
         using implementation_ptr = std::unique_ptr<zarray_impl>;
 
         zarray() = default;

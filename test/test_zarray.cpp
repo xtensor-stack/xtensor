@@ -42,7 +42,7 @@ namespace xt
     }
 
     // TODO: move to dedicated test file
-    TEST(zarray, add)
+    TEST(zarray, zfunction)
     {
         using exp_dispatcher_type = zdispatcher_t<math::exp_fun, 1>;
         exp_dispatcher_type::init();
@@ -72,6 +72,32 @@ namespace xt
 
         size_t res_index = f.get_result_type_index();
         EXPECT_EQ(res_index, ztyped_array<double>::get_class_static_index());
+    }
+
+    TEST(zarray, operations)
+    {
+        using exp_dispatcher_type = zdispatcher_t<math::exp_fun, 1>;
+        exp_dispatcher_type::init();
+
+        using add_dispatcher_type = zdispatcher_t<detail::plus, 2>;
+        add_dispatcher_type::init();
+
+        xarray<double> a = {{0.5, 1.5}, {2.5, 3.5}};
+        xarray<double> b = {{-0.2, 2.4}, {1.3, 4.7}};
+        xarray<double> res;
+
+        zarray za(a);
+        zarray zb(b);
+        zarray zres(res);
+
+        auto f = za + xt::exp(zb);
+        f.assign_to(zres.get_implementation());
+
+        auto expected = xarray<double>::from_shape({2, 2});
+        std::transform(a.cbegin(), a.cend(), b.cbegin(), expected.begin(),
+                       [](const double& lhs, const double& rhs) { return lhs + std::exp(rhs); });
+
+        EXPECT_TRUE(all(isclose(res, expected)));
     }
 }
 #endif

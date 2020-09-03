@@ -18,9 +18,11 @@
 namespace xt
 {
     template <class F, class... CT>
-    class zfunction
+    class zfunction : public xexpression<zfunction<F, CT...>>
     {
     public:
+
+        using expression_tag = zarray_expression_tag;
 
         using self_type = zfunction<F, CT...>;
         using tuple_type = std::tuple<CT...>;
@@ -59,6 +61,15 @@ namespace xt
 
         tuple_type m_e;
     };
+
+    namespace detail
+    {
+        template <class F, class... E>
+        struct select_xfunction_expression<zarray_expression_tag, F, E...>
+        {
+            using type = zfunction<F, E...>;
+        };
+    }
 
     class zarray;
     
