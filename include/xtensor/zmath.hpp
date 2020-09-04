@@ -42,7 +42,7 @@ namespace xt
     struct ZNAME                                                                   \
     {                                                                              \
         template <class T, class  R>                                               \
-        static void run(const ztyped_array<T>& z, const ztyped_array<R>& zres)     \
+        static void run(const ztyped_array<T>& z, ztyped_array<R>& zres)           \
         {                                                                          \
             detail::zassign_data(zres.get_array(), XOP z.get_array());             \
         }                                                                          \
