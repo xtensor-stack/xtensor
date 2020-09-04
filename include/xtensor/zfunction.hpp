@@ -120,7 +120,7 @@ namespace xt
     std::unique_ptr<zarray_impl> zfunction<F, CT...>::allocate_result() const
     {
         std::size_t idx = get_result_type_index();
-        return std::unique_ptr<zarray_impl>(zarray_impl_register::instance()[idx].clone());
+        return std::unique_ptr<zarray_impl>(zarray_impl_register::get(idx).clone());
     }
 
     template <class F, class... CT>
@@ -139,8 +139,11 @@ namespace xt
     template <std::size_t... I>
     std::size_t zfunction<F, CT...>::get_result_type_index_impl(std::index_sequence<I...>) const
     {
-        auto& reg = zarray_impl_register::instance();
-        return dispatcher_type::get_type_index(reg[detail::get_result_type_index(std::get<I>(m_e))]...);
+        return dispatcher_type::get_type_index(
+                zarray_impl_register::get(
+                    detail::get_result_type_index(std::get<I>(m_e))
+                )...
+               );
     }
 
     template <class F, class... CT>
