@@ -163,6 +163,19 @@ namespace xt
         std::vector<std::unique_ptr<zarray_impl>> m_register;
     };
 
+    /****************
+     * init_zsystem *
+     ****************/
+
+    // Early initialization of all dispatchers
+    // and zarray_impl_register
+    // return int so it can be assigned to a 
+    // static variable and be automatically
+    // called when loading a shared library
+    // for instance.
+
+    int init_zsystem();
+
     /*************************************
      * zdouble_dispatcher implementation *
      *************************************/
@@ -318,6 +331,96 @@ namespace xt
             m_register.resize(idx + 1u);
         }
         m_register[idx] = std::unique_ptr<zarray_impl>(detail::build_zarray(std::move(xarray<T>())));
+    }
+
+    /*******************************
+     * init_zsystem implementation *
+     *******************************/
+
+    namespace detail
+    {
+        inline void init_zdispatchers()
+        {
+            zdispatcher_t<identity, 1>::init();
+            zdispatcher_t<negate, 1>::init();
+            zdispatcher_t<plus, 2>::init();
+            zdispatcher_t<minus, 2>::init();
+            zdispatcher_t<multiplies, 2>::init();
+            zdispatcher_t<divides, 2>::init();
+            //zdispatcher_t<modulus, 2>::init();
+            zdispatcher_t<logical_or, 2>::init();
+            zdispatcher_t<logical_and, 2>::init();
+            //zdispatcher_t<logical_not, 2>::init();
+            //zdispatcher_t<bitwise_or, 2>::init();
+            //zdispatcher_t<bitwise_and, 2>::init();
+            //zdispatcher_t<bitwise_xor, 2>::init();
+            //zdispatcher_t<bitwise_not, 2>::init();
+            //zdispatcher_t<left_shift, 2>::init();
+            //zdispatcher_t<right_shift, 2>::init();
+            zdispatcher_t<less, 2>::init();
+            zdispatcher_t<less_equal, 2>::init();
+            zdispatcher_t<greater, 2>::init();
+            zdispatcher_t<greater_equal, 2>::init();
+            //zdispatcher_t<equal_to, 2>::init();
+            //zdispatcher_t<not_equal_to, 2>::init();
+        }
+    }
+
+    namespace math
+    {
+        inline void init_zdispatchers()
+        {
+            zdispatcher_t<fabs_fun, 1>::init();
+            zdispatcher_t<fmod_fun, 2>::init();
+            zdispatcher_t<remainder_fun, 2>::init();
+            zdispatcher_t<fmax_fun, 2>::init();
+            zdispatcher_t<fmin_fun, 2>::init();
+            zdispatcher_t<fdim_fun, 2>::init();
+            zdispatcher_t<exp_fun, 1>::init();
+            zdispatcher_t<exp2_fun, 1>::init();
+            zdispatcher_t<expm1_fun, 1>::init();
+            zdispatcher_t<log_fun, 1>::init();
+            zdispatcher_t<log10_fun, 1>::init();
+            zdispatcher_t<log2_fun, 1>::init();
+            zdispatcher_t<log1p_fun, 1>::init();
+            zdispatcher_t<pow_fun, 2>::init();
+            zdispatcher_t<sqrt_fun, 1>::init();
+            zdispatcher_t<cbrt_fun, 1>::init();
+            zdispatcher_t<hypot_fun, 2>::init();
+            zdispatcher_t<sin_fun, 1>::init();
+            zdispatcher_t<cos_fun, 1>::init();
+            zdispatcher_t<tan_fun, 1>::init();
+            zdispatcher_t<asin_fun, 1>::init();
+            zdispatcher_t<acos_fun, 1>::init();
+            zdispatcher_t<atan_fun, 1>::init();
+            zdispatcher_t<atan2_fun, 2>::init();
+            zdispatcher_t<sinh_fun, 1>::init();
+            zdispatcher_t<cosh_fun, 1>::init();
+            zdispatcher_t<tanh_fun, 1>::init();
+            zdispatcher_t<asinh_fun, 1>::init();
+            zdispatcher_t<acosh_fun, 1>::init();
+            zdispatcher_t<atanh_fun, 1>::init();
+            zdispatcher_t<erf_fun, 1>::init();
+            zdispatcher_t<erfc_fun, 1>::init();
+            zdispatcher_t<tgamma_fun, 1>::init();
+            zdispatcher_t<lgamma_fun, 1>::init();
+            zdispatcher_t<ceil_fun, 1>::init();
+            zdispatcher_t<floor_fun, 1>::init();
+            zdispatcher_t<trunc_fun, 1>::init();
+            zdispatcher_t<round_fun, 1>::init();
+            zdispatcher_t<nearbyint_fun, 1>::init();
+            zdispatcher_t<rint_fun, 1>::init();
+            zdispatcher_t<isfinite_fun, 1>::init();
+            zdispatcher_t<isinf_fun, 1>::init();
+            zdispatcher_t<isnan_fun, 1>::init();
+        }
+    }
+
+    inline int init_zsystem()
+    {
+        detail::init_zdispatchers();
+        math::init_zdispatchers();
+        return 0;
     }
 }
 
