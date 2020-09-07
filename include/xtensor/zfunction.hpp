@@ -15,7 +15,7 @@
 
 #include "zdispatcher.hpp"
 
-namespace zexperience
+namespace xt
 {
     template <class F, class... CT>
     class zfunction : public xexpression<zfunction<F, CT...>>

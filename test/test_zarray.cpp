@@ -12,7 +12,7 @@
 #include "xtensor/zfunction.hpp"
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
-namespace zexperience
+namespace xt
 {
     using namespace xt;
     TEST(zarray, value_semantics)
