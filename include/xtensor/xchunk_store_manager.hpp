@@ -119,6 +119,9 @@ namespace xt
         template <class I>
         reference map_file_array(I first, I last);
 
+        template <class I>
+        const_reference map_file_array(I first, I last) const;
+
     private:
 
         template <class... Idxs>
@@ -343,6 +346,13 @@ namespace xt
             m_unload_index = (m_unload_index + 1) % m_index_pool.size();
             return chunk;
         }
+    }
+
+    template <class EC, class IP>
+    template <class I>
+    inline auto xchunk_store_manager<EC, IP>::map_file_array(I first, I last) const -> const_reference
+    {
+        return const_cast<xchunk_store_manager<EC, IP>*>(this)->map_file_array(first, last);
     }
 
     template <class EC, class IP>

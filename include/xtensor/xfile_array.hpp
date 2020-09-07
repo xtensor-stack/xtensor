@@ -99,6 +99,7 @@ namespace xt
         using temporary_type = typename inner_types::temporary_type;
         using bool_load_type = xt::bool_load_type<value_type>;
         static constexpr layout_type static_layout = layout_type::dynamic;
+        static constexpr bool contiguous_layout = true;
 
         xfile_array_container() = default;
         ~xfile_array_container();
@@ -182,7 +183,7 @@ namespace xt
 
         const std::string& path() const noexcept;
         void ignore_empty_path(bool ignore);
-        void set_path(std::string& path);
+        void set_path(const std::string& path);
 
         template <class C>
         void configure_format(C& config);
@@ -567,7 +568,7 @@ namespace xt
     }
 
     template <class E, class IOH>
-    inline void xfile_array_container<E, IOH>::set_path(std::string& path)
+    inline void xfile_array_container<E, IOH>::set_path(const std::string& path)
     {
         if (path != m_path)
         {
