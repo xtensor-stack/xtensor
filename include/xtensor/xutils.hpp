@@ -857,6 +857,19 @@ namespace xt
 
     template <class ST>
     using inner_reference_t = typename inner_reference<ST>::type;
+
+    /************
+     * has_rank *
+     ************/
+
+    template <class E, size_t N>
+    struct has_rank
+    {
+        using type = std::integral_constant<bool, std::decay_t<E>::rank == N>;
+    };
+
+    template <class E, size_t N>
+    using has_rank_t = typename has_rank<std::decay_t<E>, N>::type;
 }
 
 #endif

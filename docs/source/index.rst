@@ -69,6 +69,7 @@ for details.
    missing
    histogram
    random
+   sfinae
    file_loading
    build-options
    pitfall

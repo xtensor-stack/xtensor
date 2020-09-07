@@ -432,6 +432,7 @@ namespace xt
 
         using container_iterator = pointer;
         using const_container_iterator = const_pointer;
+        constexpr static std::size_t rank = SIZE_MAX;
 
         // The FSL argument prevents the compiler from calling this constructor
         // instead of the copy constructor when sizeof...(SL) == 0.

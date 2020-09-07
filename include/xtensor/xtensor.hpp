@@ -105,6 +105,7 @@ namespace xt
         using inner_strides_type = typename base_type::inner_strides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
+        constexpr static std::size_t rank = N;
 
         xtensor_container();
         xtensor_container(nested_initializer_list_t<value_type, N> t);
@@ -759,7 +760,7 @@ namespace xt
         std::fill(m_storage.begin(), m_storage.end(), e);
         return *this;
     }
-    
+
     template <class EC, std::size_t N, layout_type L, class Tag>
     inline auto xtensor_view<EC, N, L, Tag>::storage_impl() noexcept -> storage_type&
     {

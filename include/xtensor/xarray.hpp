@@ -104,6 +104,7 @@ namespace xt
         using inner_backstrides_type = typename base_type::inner_backstrides_type;
         using temporary_type = typename semantic_base::temporary_type;
         using expression_tag = Tag;
+        constexpr static std::size_t rank = SIZE_MAX;
 
         xarray_container();
         explicit xarray_container(const shape_type& shape, layout_type l = L);
