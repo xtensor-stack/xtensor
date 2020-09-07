@@ -61,7 +61,7 @@ namespace xt
         zarray zb(b);
         zarray zres(res);
 
-        zfunction_type f(zadd(), za, nested_zfunction_type(zexp(), zb));
+        zfunction_type f(zplus(), za, nested_zfunction_type(zexp(), zb));
         f.assign_to(zres.get_implementation());
 
         auto expected = xarray<double>::from_shape({2, 2});
