@@ -182,6 +182,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/zarray.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zarray_impl.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zdispatcher.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/zdispatching_types.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zfunction.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zmath.hpp
 )

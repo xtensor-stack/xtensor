@@ -12,13 +12,12 @@
 
 #include <xtl/xmultimethods.hpp>
 
+#include "zdispatching_types.hpp"
 #include "zmath.hpp"
 
 namespace xt
 {
     namespace mpl = xtl::mpl;
-
-    using supported_type = mpl::vector<float, double>;
 
     template <class type_list>
     using zrun_dispatcher_impl = xtl::functor_dispatcher
@@ -54,6 +53,9 @@ namespace xt
         template <class T, class R>
         static void insert();
 
+        template <class T, class R, class... U>
+        static void register_dispatching(mpl::vector<mpl::vector<T, R>, U...>);
+
         static void init();
         static void dispatch(const zarray_impl& z1, zarray_impl& res);
         static size_t get_type_index(const zarray_impl& z1);
@@ -68,13 +70,18 @@ namespace xt
         template <class T, class R>
         void insert_impl();
 
+        template <class T, class R, class...U>
+        inline void register_dispatching_impl(mpl::vector<mpl::vector<T, R>, U...>);
+        inline void register_dispatching_impl(mpl::vector<>);
+
         using zfunctor_type = get_zmapped_functor_t<F>;
         using ztype_dispatcher = ztype_dispatcher_impl<mpl::vector<const zarray_impl>>;
         using zrun_dispatcher = zrun_dispatcher_impl<mpl::vector<const zarray_impl, zarray_impl>>;
         
         ztype_dispatcher m_type_dispatcher;
         zrun_dispatcher m_run_dispatcher;
-   };
+    };
+
 
     /**********************
      * ztriple_dispatcher *
@@ -91,6 +98,9 @@ namespace xt
         template <class T1, class T2, class R>
         static void insert();
 
+        template <class T1, class T2, class R, class... U>
+        static void register_dispatching(mpl::vector<mpl::vector<T1, T2, R>, U...>);
+
         static void init();
         static void dispatch(const zarray_impl& z1, const zarray_impl& z2, zarray_impl& res);
         static size_t get_type_index(const zarray_impl& z1, const zarray_impl& z2);
@@ -104,6 +114,10 @@ namespace xt
 
         template <class T1, class T2, class R>
         void insert_impl();
+
+        template <class T1, class T2, class R, class...U>
+        inline void register_dispatching_impl(mpl::vector<mpl::vector<T1, T2, R>, U...>);
+        inline void register_dispatching_impl(mpl::vector<>);
 
         using zfunctor_type = get_zmapped_functor_t<F>;
         using ztype_dispatcher = ztype_dispatcher_impl<mpl::vector<const zarray_impl, const zarray_impl>>;
@@ -180,6 +194,18 @@ namespace xt
      * zdouble_dispatcher implementation *
      *************************************/
 
+    namespace detail
+    {
+        template <class F>
+        struct unary_dispatching_types
+        {
+            using type = unary_op_same_types;
+        };
+
+        template <class F>
+        using unary_dispatching_types_t = typename unary_dispatching_types<F>::type;
+    }
+
     template <class F>
     template <class T, class R>
     inline void zdouble_dispatcher<F>::insert()
@@ -187,6 +213,13 @@ namespace xt
         instance().template insert_impl<T, R>();
     }
     
+    template <class F>
+    template <class T, class R, class... U>
+    inline void zdouble_dispatcher<F>::register_dispatching(mpl::vector<mpl::vector<T, R>, U...>)
+    {
+        instance().register_dispatching_impl(mpl::vector<mpl::vector<T, R>, U...>());
+    }
+
     template <class F>
     inline void zdouble_dispatcher<F>::init()
     {
@@ -215,8 +248,7 @@ namespace xt
     template <class F>
     inline zdouble_dispatcher<F>::zdouble_dispatcher()
     {
-        insert_impl<float, float>();
-        insert_impl<double, double>();
+        register_dispatching_impl(detail::unary_dispatching_types_t<F>());
     }
 
     template <class F>
@@ -229,9 +261,34 @@ namespace xt
         m_type_dispatcher.template insert<arg_type>(&zfunctor_type::template index<T>);
     }
 
+    template <class F>
+    template <class T, class R, class...U>
+    inline void zdouble_dispatcher<F>::register_dispatching_impl(mpl::vector<mpl::vector<T, R>, U...>)
+    {
+        insert_impl<T, R>();
+        register_dispatching_impl(mpl::vector<U...>());
+    }
+
+    template <class F>
+    inline void zdouble_dispatcher<F>::register_dispatching_impl(mpl::vector<>)
+    {
+    }
+    
     /*************************************
      * ztriple_dispatcher implementation *
      *************************************/
+
+    namespace detail
+    {
+        template <class F>
+        struct binary_dispatching_types
+        {
+            using type = binary_op_same_types;
+        };
+
+        template <class F>
+        using binary_dispatching_types_t = typename binary_dispatching_types<F>::type;
+    }
 
     template <class F>
     template <class T1, class T2, class R>
@@ -240,6 +297,13 @@ namespace xt
         instance().template insert_impl<T1, T2, R>();
     }
     
+    template <class F>
+    template <class T1, class T2, class R, class... U>
+    inline void ztriple_dispatcher<F>::register_dispatching(mpl::vector<mpl::vector<T1, T2, R>, U...>)
+    {
+        instance().register_impl(mpl::vector<mpl::vector<T1, T2, R>, U...>());
+    }
+
     template <class F>
     inline void ztriple_dispatcher<F>::init()
     {
@@ -268,8 +332,7 @@ namespace xt
     template <class F>
     inline ztriple_dispatcher<F>::ztriple_dispatcher()
     {
-        insert_impl<float, float, float>();
-        insert_impl<double, double, double>();
+        register_dispatching_impl(detail::binary_dispatching_types_t<F>());
     }
 
     template <class F>
@@ -283,6 +346,20 @@ namespace xt
         m_type_dispatcher.template insert<arg_type1, arg_type1>(&zfunctor_type::template index<T1, T2>);
     }
 
+
+    template <class F>
+    template <class T1, class T2, class R, class...U>
+    inline void ztriple_dispatcher<F>::register_dispatching_impl(mpl::vector<mpl::vector<T1, T2, R>, U...>)
+    {
+        insert_impl<T1, T2, R>();
+        register_dispatching_impl(mpl::vector<U...>());
+    }
+
+    template <class F>
+    inline void ztriple_dispatcher<F>::register_dispatching_impl(mpl::vector<>)
+    {
+    }
+    
     /***************************************
      * zarray_impl_register implementation *
      ***************************************/

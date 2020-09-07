@@ -55,7 +55,6 @@ namespace xt
     };                                                                             \
     XTENSOR_ZMAPPED_FUNCTOR(ZNAME, XFUN)
 
-#define ZCONCAT(X, Y) X Y
 #define XTENSOR_BINARY_ZOPERATOR(ZNAME, XOP, XFUN)                                 \
     struct ZNAME                                                                   \
     {                                                                              \
