@@ -160,7 +160,6 @@ namespace xt
             fname.append(std::to_string(*it));
         }
         path = m_directory + fname;
-        std::cout << path << std::endl;
     }
 
     /***************************************
