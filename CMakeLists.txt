@@ -120,6 +120,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_iterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_slice_iterator.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xbin.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
