@@ -285,7 +285,7 @@ namespace xt
      *
      * @param e the expession to iterate over
      * @param axis the axis to iterate over
-     * @return an instance of xaxis_slice_iterator 
+     * @return an instance of xaxis_slice_iterator
      */
     template <class E>
     inline auto axis_slice_begin(E&& e, typename std::decay_t<E>::size_type axis)
@@ -317,7 +317,7 @@ namespace xt
      *
      * @param e the expession to iterate over
      * @param axis the axis to iterate over
-     * @return an instance of xaxis_slice_iterator 
+     * @return an instance of xaxis_slice_iterator
      */
     template <class E>
     inline auto axis_slice_end(E&& e, typename std::decay_t<E>::size_type axis)

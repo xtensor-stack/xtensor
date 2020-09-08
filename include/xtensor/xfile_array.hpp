@@ -298,7 +298,7 @@ namespace xt
         {
             using is_stored = std::false_type;
 
-            static const char* path(const xexpression<E>& e)
+            static const char* path(const xexpression<E>&)
             {
                 return "";
             }
@@ -320,7 +320,7 @@ namespace xt
     }
 
     template<class E>
-    constexpr bool is_stored(const xexpression<E>& e)
+    constexpr bool is_stored(const xexpression<E>&)
     {
         using return_type = typename detail::file_helper<E>::is_stored;
         return return_type::value;
@@ -429,7 +429,7 @@ namespace xt
 
     template <class E, class IOH>
     template <class... Idxs>
-    inline auto xfile_array_container<E, IOH>::operator()(Idxs... idxs) -> reference 
+    inline auto xfile_array_container<E, IOH>::operator()(Idxs... idxs) -> reference
     {
         return reference(m_storage(idxs...), m_dirty);
     }
@@ -462,7 +462,7 @@ namespace xt
     }
 
     template <class E, class IOH>
-    inline auto xfile_array_container<E, IOH>::storage() const noexcept -> const storage_type& 
+    inline auto xfile_array_container<E, IOH>::storage() const noexcept -> const storage_type&
     {
         return m_storage;
     }
@@ -514,7 +514,7 @@ namespace xt
     }
 
     template <class E, class IOH>
-    inline auto xfile_array_container<E, IOH>::data_element(size_type i) -> reference 
+    inline auto xfile_array_container<E, IOH>::data_element(size_type i) -> reference
     {
         return reference(m_storage.data_element(i), m_dirty);
     }

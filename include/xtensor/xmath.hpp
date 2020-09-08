@@ -1882,6 +1882,9 @@ namespace detail {
      * \em axes.
      * @param e an \ref xexpression
      * @param axes the axes along which the product is computed (optional)
+     * @param ddof delta degrees of freedom (optional).
+     *             The divisor used in calculations is N - ddof, where N represents the number of
+                   elements. By default ddof is zero.
      * @param es evaluation strategy of the reducer
      * @return an \ref xreducer
      */
@@ -1909,26 +1912,32 @@ namespace detail {
         {
             // sum cannot always be a double. It could be a complex number which cannot operate on
             // std::plus<double>.
-            const auto size = e.size();
+            using size_type = typename std::decay_t<E>::size_type;
+            const size_type size = e.size();
+            XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
             auto s = sum<T>(std::forward<E>(e), std::forward<X>(axes), es);
-            return mean_division<T>(std::move(s), size - ddof);
+            return mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
         }
 
 #ifdef X_OLD_CLANG
         template <class T, class E, class I, class D, class EVS>
         inline auto mean(E&& e, std::initializer_list<I> axes, const D& ddof, EVS es)
         {
-            const auto size = e.size();
+            using size_type = typename std::decay_t<E>::size_type;
+            const size_type size = e.size();
+            XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
             auto s = sum<T>(std::forward<E>(e), axes, es);
-            return detail::mean_division<T>(std::move(s), size - ddof);
+            return detail::mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
         }
 #else
         template <class T, class E, class I, std::size_t N, class D, class EVS>
         inline auto mean(E&& e, const I (&axes)[N], const D& ddof, EVS es)
         {
-            const auto size = e.size();
+            using size_type = typename std::decay_t<E>::size_type;
+            const size_type size = e.size();
+            XTENSOR_ASSERT(static_cast<size_type>(ddof) <= size);
             auto s = sum<T>(std::forward<E>(e), axes, es);
-            return detail::mean_division<T>(std::move(s), size - ddof);
+            return detail::mean_division<T>(std::move(s), size - static_cast<size_type>(ddof));
         }
 #endif
 
@@ -2116,7 +2125,9 @@ namespace detail {
      *
      * @param e an \ref xexpression
      * @param axes the axes along which the variance is computed (optional)
-     * @param ddof delta degrees of freedom (optional)
+     * @param ddof delta degrees of freedom (optional).
+     *             The divisor used in calculations is N - ddof, where N represents the number of
+                   elements. By default ddof is zero.
      * @param es evaluation strategy to use (lazy (default), or immediate)
      * @return an \ref xexpression
      *
@@ -2947,13 +2958,13 @@ namespace detail {
     template<class E1, class E2, class E3, typename T>
     inline auto interp(const E1 &x, const E2 &xp, const E3 &fp, T left, T right)
     {
-        using size_type = common_size_type_t<E1,E2,E3>;
+        using size_type = common_size_type_t<E1, E2, E3>;
         using value_type = typename E3::value_type;
 
         // basic checks
-        XTENSOR_ASSERT( xp.dimension() == 1 );
-        XTENSOR_ASSERT( std::is_sorted(x.cbegin(), x.cend()) );
-        XTENSOR_ASSERT( std::is_sorted(xp.cbegin(), xp.cend()) );
+        XTENSOR_ASSERT(xp.dimension() == 1);
+        XTENSOR_ASSERT(std::is_sorted(x.cbegin(), x.cend()));
+        XTENSOR_ASSERT(std::is_sorted(xp.cbegin(), xp.cend()));
 
         // allocate output
         auto f = xtensor<value_type, 1>::from_shape(x.shape());
@@ -3055,7 +3066,7 @@ namespace detail {
                 return covar;
             }
 
-            XTENSOR_ASSERT( x.dimension() == 2 );
+            XTENSOR_ASSERT(x.dimension() == 2);
 
             auto covar = eval(zeros<value_type>({ s[0], s[0] }));
             auto m = eval(mean(x, {1}));
