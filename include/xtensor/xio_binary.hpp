@@ -7,8 +7,8 @@
 * The full license is in the file LICENSE, distributed with this software. *
 ****************************************************************************/
 
-#ifndef XTENSOR_IO_BIN_HPP
-#define XTENSOR_IO_BIN_HPP
+#ifndef XTENSOR_IO_BINARY_HPP
+#define XTENSOR_IO_BINARY_HPP
 
 #include <fstream>
 
@@ -44,7 +44,7 @@ namespace xt
     }  // namespace detail
 
     /**
-     * Save xexpression to BIN format
+     * Save xexpression to binary format
      *
      * @param stream An output stream to which to dump the data
      * @param e the xexpression
@@ -56,7 +56,7 @@ namespace xt
     }
 
     /**
-     * Save xexpression to BIN format
+     * Save xexpression to binary format
      *
      * @param filename The filename or path to dump the data
      * @param e the xexpression
@@ -73,7 +73,7 @@ namespace xt
     }
 
     /**
-     * Save xexpression to BIN format in a string
+     * Save xexpression to binary format in a string
      *
      * @param e the xexpression
      */
@@ -86,13 +86,13 @@ namespace xt
     }
 
     /**
-     * Loads a BIN file
+     * Loads a binary file
      *
      * @param stream An input stream from which to load the file
-     * @tparam T select the type of the BIN file
+     * @tparam T select the type of the binary file
      * @tparam L select layout_type::column_major if you stored data in
      *           Fortran format
-     * @return xarray with contents from BIN file
+     * @return xarray with contents from binary file
      */
     template <typename T, layout_type L = layout_type::dynamic>
     inline auto load_bin(std::istream& stream)
@@ -104,13 +104,13 @@ namespace xt
     }
 
     /**
-     * Loads a BIN file
+     * Loads a binary file
      *
      * @param filename The filename or path to the file
-     * @tparam T select the type of the BIN file
+     * @tparam T select the type of the binary file
      * @tparam L select layout_type::column_major if you stored data in
      *           Fortran format
-     * @return xarray with contents from BIN file
+     * @return xarray with contents from binary file
      */
     template <typename T, layout_type L = layout_type::dynamic>
     inline auto load_bin(const std::string& filename)
@@ -123,18 +123,18 @@ namespace xt
         return load_bin<T, L>(stream);
     }
 
-    struct xbin_config
+    struct xio_binary_config
     {
     };
 
     template <class E>
-    void load_file(std::istream& stream, xexpression<E>& e, const xbin_config&)
+    void load_file(std::istream& stream, xexpression<E>& e, const xio_binary_config&)
     {
         e.derived_cast() = load_bin<typename E::value_type>(stream);
     }
 
     template <class E>
-    void dump_file(std::ostream& stream, const xexpression<E> &e, const xbin_config& config)
+    void dump_file(std::ostream& stream, const xexpression<E> &e, const xio_binary_config& config)
     {
         dump_bin(stream, e);
     }

@@ -120,7 +120,6 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xassign.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_iterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xaxis_slice_iterator.hpp
-    ${XTENSOR_INCLUDE_DIR}/xtensor/xbin.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbroadcast.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuffer_adaptor.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xbuilder.hpp
@@ -141,6 +140,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/xindex_view.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xinfo.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xio.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/xio_binary.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterable.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xiterator.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/xjson.hpp

@@ -9,11 +9,11 @@
 
 #include "gtest/gtest.h"
 
-#include "xtensor/xbin.hpp"
+#include "xtensor/xio_binary.hpp"
 
 namespace xt
 {
-    TEST(xbin, dump_load)
+    TEST(xio_binary, dump_load)
     {
         xtensor<double, 2> data
             {{ 1.0,  2.0,  3.0,  4.0},
@@ -21,11 +21,11 @@ namespace xt
 
         const char* fname = "data.bin";
         std::ofstream out_file(fname, std::ofstream::binary);
-        dump_file(out_file, data, xbin_config());
+        dump_file(out_file, data, xio_binary_config());
 
         xarray<double> a;
         std::ifstream in_file(fname, std::ifstream::binary);
-        load_file(in_file, a, xbin_config());
+        load_file(in_file, a, xio_binary_config());
         a.reshape({2, 4});
 
         ASSERT_TRUE(all(equal(a, data)));

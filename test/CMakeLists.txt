@@ -190,7 +190,6 @@ set(XTENSOR_TESTS
     test_xadapt.cpp
     test_xaxis_iterator.cpp
     test_xaxis_slice_iterator.cpp
-    test_xbin.cpp
     test_xbuffer_adaptor.cpp
     test_xcomplex.cpp
     test_xcsv.cpp
@@ -203,6 +202,7 @@ set(XTENSOR_TESTS
     test_xindex_view.cpp
     test_xinfo.cpp
     test_xio.cpp
+    test_xio_binary.cpp
     test_xlayout.cpp
     test_xmanipulation.cpp
     test_xmasked_view.cpp
