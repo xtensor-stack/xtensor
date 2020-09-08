@@ -13,7 +13,7 @@
 #include "test_common_macros.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xarray.hpp"
-// #include "xtensor/xfixed.hpp"
+#include "xtensor/xfixed.hpp"
 #include "xtensor/xview.hpp"
 
 namespace xt
@@ -35,13 +35,13 @@ namespace xt
         xt::xarray<size_t> a = {{9, 9, 9}, {9, 9, 9}};
         xt::xtensor<size_t, 1> b = {9, 9};
         xt::xtensor<size_t, 2> c = {{9, 9}, {9, 9}};
-        // xt::xtensor_fixed<size_t, xt::xshape<2, 2>> d = {{9, 9}, {9, 9}};
+        xt::xtensor_fixed<size_t, xt::xshape<2, 2>> d = {{9, 9}, {9, 9}};
         auto v = xt::view(c, 0, xt::all());
 
         EXPECT_TRUE(sfinae_rank_basic_func(a) == 0ul);
         EXPECT_TRUE(sfinae_rank_basic_func(b) == 0ul);
         EXPECT_TRUE(sfinae_rank_basic_func(c) == 2ul);
-        // EXPECT_TRUE(sfinae_rank_basic_func(d) == 2ul);
+        EXPECT_TRUE(sfinae_rank_basic_func(d) == 2ul);
         EXPECT_TRUE(sfinae_rank_basic_func(v) == 0ul);
         EXPECT_TRUE(sfinae_rank_basic_func(2ul * a) == 0ul);
         EXPECT_TRUE(sfinae_rank_basic_func(2ul * b) == 0ul);
@@ -72,13 +72,13 @@ namespace xt
         xt::xarray<size_t> a = {{9, 9, 9}, {9, 9, 9}};
         xt::xtensor<size_t, 1> b = {9, 9};
         xt::xtensor<size_t, 2> c = {{9, 9}, {9, 9}};
-        // xt::xtensor_fixed<size_t, xt::xshape<2, 2>> d = {{9, 9}, {9, 9}};
+        xt::xtensor_fixed<size_t, xt::xshape<2, 2>> d = {{9, 9}, {9, 9}};
         auto v = xt::view(c, 0, xt::all());
 
         EXPECT_TRUE(sfinae_rank_func(a) == 0ul);
         EXPECT_TRUE(sfinae_rank_func(b) == 1ul);
         EXPECT_TRUE(sfinae_rank_func(c) == 2ul);
-        // EXPECT_TRUE(sfinae_rank_func(d) == 2ul);
+        EXPECT_TRUE(sfinae_rank_func(d) == 2ul);
         EXPECT_TRUE(sfinae_rank_func(v) == 0ul);
         EXPECT_TRUE(sfinae_rank_func(2ul * a) == 0ul);
         EXPECT_TRUE(sfinae_rank_func(2ul * b) == 0ul);
@@ -102,13 +102,13 @@ namespace xt
         xt::xarray<size_t> a = {{9, 9, 9}, {9, 9, 9}};
         xt::xtensor<size_t, 1> b = {9, 9};
         xt::xtensor<size_t, 2> c = {{9, 9}, {9, 9}};
-        // xt::xtensor_fixed<size_t, xt::xshape<2, 2>> d = {{9, 9}, {9, 9}};
+        xt::xtensor_fixed<size_t, xt::xshape<2, 2>> d = {{9, 9}, {9, 9}};
         auto v = xt::view(c, 0, xt::all());
 
         EXPECT_TRUE(sfinae_fixed_func(a) == false);
         EXPECT_TRUE(sfinae_fixed_func(b) == true);
         EXPECT_TRUE(sfinae_fixed_func(c) == true);
-        // EXPECT_TRUE(sfinae_fixed_func(d) == 2ul);
+        EXPECT_TRUE(sfinae_fixed_func(d) == 2ul);
         EXPECT_TRUE(sfinae_fixed_func(v) == false);
         EXPECT_TRUE(sfinae_fixed_func(2ul * a) == false);
         EXPECT_TRUE(sfinae_fixed_func(2ul * b) == false);
