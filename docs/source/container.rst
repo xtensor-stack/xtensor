@@ -14,12 +14,12 @@ A multi-dimensional array of `xtensor` consists of a contiguous one-dimensional 
 unsigned integers to the location of an element in the buffer. The range in which the indices can vary is specified by the
 `shape` of the array.
 
-The scheme used to map indices into a location in the buffer is a strided indexing scheme. In such a scheme, the index ``(i0, ..., in)`` corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where ``(s0, ..., sn)`` are the `strides` of the array. Some particular cases of strided schemes implement well known memory layouts:
+The scheme used to map indices into a location in the buffer is a strided indexing scheme. In such a scheme, the index ``(i0, ..., in)`` corresponds to the offset ``sum(ik * sk)`` from the beginning of the one-dimensional buffer, where ``(s0, ..., sn)`` are the `strides` of the array. Some particular cases of strided schemes implement well-known memory layouts:
 
 - the row-major layout (or C layout) is a strided index scheme where the strides grow from right to left
 - the column-major layout (or Fortran layout) is a strided index scheme where the strides grow from left to right
 
-``xtensor`` provides a ``layout_type`` enum that helps to specify the layout used by multi-dimensional arrays. This enum can be used in two ways:
+``xtensor`` provides a ``layout_type`` enum that helps to specify the layout used by multidimensional arrays. This enum can be used in two ways:
 
 - at compile time, as a template argument. The value ``layout_type::dynamic`` allows specifying any strided index scheme at runtime (including row-major and column-major schemes), while ``layout_type::row_major`` and ``layout_type::column_major`` fixes the strided index scheme and disable ``resize`` and constructor overloads taking a set of strides or a layout value as parameter. The default value of the template parameter is ``XTENSOR_DEFAULT_LAYOUT``.
 - at runtime if the previous template parameter was set to ``layout_type::dynamic``. In that case, ``resize`` and constructor overloads allow specifying a set of strides or a layout value to avoid strides computation. If neither strides nor layout is specified when instantiating or resizing a multi-dimensional array, strides corresponding to ``XTENSOR_DEFAULT_LAYOUT`` are used.
@@ -62,7 +62,7 @@ However, in the latter case, the layout of the array is forced to ``row_major`` 
 Runtime vs Compile-time dimensionality
 --------------------------------------
 
-Three container classes implementing multi-dimensional arrays are provided: ``xarray`` and ``xtensor`` and ``xtensor_fixed``.
+Three container classes implementing multidimensional arrays are provided: ``xarray`` and ``xtensor`` and ``xtensor_fixed``.
 
 - ``xarray`` can be reshaped dynamically to any number of dimensions. It is the container that is the most similar to numpy arrays.
 - ``xtensor`` has a dimension set at compilation time, which enables many optimizations. For example, shapes and strides

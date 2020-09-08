@@ -276,7 +276,7 @@ Conclusion
 
 Each solution has its pros and cons and choosing one of them should be done according to the flexibility you want to
 impose on your API and the constraints you are imposed by the implementation. For instance, a method that requires a
-lot of typing in the bindings might not suit for libraries with a huge amount of functions to expose, while a full
+lot of typing in the bindings might not suit for libraries with a huge number of functions to expose, while a full
 generic API might be problematic if the implementation expects containers only. Below is a summary of the advantages
 and drawbacks of the different options:
 

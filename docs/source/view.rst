@@ -159,7 +159,7 @@ The ``xstrided_view`` is very efficient on contigous memory (e.g. ``xtensor`` or
 Transposed views
 ----------------
 
-``xtensor`` provides a lazy transposed view on any expression, whose layout is either row major order or column major order. Trying to build
+``xtensor`` provides a lazy transposed view on any expression, whose layout is either row-major order or column major order. Trying to build
 a transposed view on a expression with a dynamic layout throws an exception.
 
 .. code::

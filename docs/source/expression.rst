@@ -137,7 +137,7 @@ You can access the elements of any ``xexpression`` with ``operator()``:
 It is possible to call ``operator()`` with fewer or more arguments than the number of dimensions
 of the expression:
 
-- if ``operator()`` is called with too many arguments, we drops the most left ones
+- if ``operator()`` is called with too many arguments, we drop the most left ones
 - if ``operator()`` is called with too few arguments, we prepend them with ``0`` values until
   we match the number of dimensions
 
