@@ -854,6 +854,41 @@ namespace xt
         EXPECT_EQ(res5[0], 8.0);
     }
 
+    /********************
+     * Mean and average *
+     ********************/
+
+    TEST(xmath, mean)
+    {
+        xt::xtensor<double,2> v = {{1.0, 1.0, 1.0}, {2.0, 2.0, 2.0}};
+        xt::xtensor<double,1> m0 = {1.5, 1.5, 1.5};
+        xt::xtensor<double,1> m1 = {1.0, 2.0};
+        double m = 9.0 / 6.0;
+
+        EXPECT_TRUE(xt::all(xt::equal(xt::mean(v, 0), m0)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::mean(v, {0}), m0)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::mean(v, 1), m1)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::mean(v, {1}), m1)));
+        EXPECT_EQ(xt::mean(v)(), m);
+        EXPECT_EQ(xt::mean(v, {0, 1})(), m);
+    }
+
+    TEST(xmath, average)
+    {
+        xt::xtensor<double,2> v = {{1.0, 1.0, 1.0}, {2.0, 2.0, 2.0}};
+        xt::xtensor<double,2> w = {{2.0, 2.0, 2.0}, {2.0, 2.0, 2.0}};
+        xt::xtensor<double,1> m0 = {1.5, 1.5, 1.5};
+        xt::xtensor<double,1> m1 = {1.0, 2.0};
+        double m = 9.0 / 6.0;
+
+        EXPECT_TRUE(xt::all(xt::equal(xt::average(v, w, 0), m0)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::average(v, w, {0}), m0)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::average(v, w, 1), m1)));
+        EXPECT_TRUE(xt::all(xt::equal(xt::average(v, w, {1}), m1)));
+        EXPECT_EQ(xt::average(v, w)(), m);
+        EXPECT_EQ(xt::average(v, w, {0, 1})(), m);
+    }
+
     /************************
      * Linear interpolation *
      ************************/
@@ -862,7 +897,7 @@ namespace xt
     {
         xt::xtensor<double,1> xp = {0.0, 1.0, 3.0};
         xt::xtensor<double,1> fp = {0.0, 1.0, 3.0};
-        xt::xtensor<double,1> x  = {0.0, .5, 1.0, 1.5, 2.0, 2.5, 3.0};
+        xt::xtensor<double,1> x = {0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0};
 
         auto f = xt::interp(x,xp,fp);
 

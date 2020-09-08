@@ -276,6 +276,8 @@ Mathematical functions
 +-----------------------------------------------+---------------------------------------------------------------------+
 | :ref:`mean <mean-function-reference>`         | mean of elements over given axes                                    |
 +-----------------------------------------------+---------------------------------------------------------------------+
+| :ref:`average <average-function-reference>`   | weighted average along the specified axis                           |
++-----------------------------------------------+---------------------------------------------------------------------+
 | :ref:`variance <variance-function-reference>` | variance of elements over given axes                                |
 +-----------------------------------------------+---------------------------------------------------------------------+
 | :ref:`stddev <stddev-function-reference>`     | standard deviation of elements over given axes                      |
