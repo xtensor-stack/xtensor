@@ -11,6 +11,18 @@
 
 #include "gtest/gtest.h"
 #include "test_common_macros.hpp"
+
+// Workaround to avoid warnings regarding initialization
+// of distribution internal variables
+#if (defined(__GNUC__) && !defined(__clang__))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuninitialized"
+#include "xtensor/xgenerator.hpp"
+#pragma GCC diagnostic pop
+#else
+#endif
+
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xfixed.hpp"

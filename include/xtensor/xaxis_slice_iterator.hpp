@@ -144,7 +144,7 @@ namespace xt
     template <class CTA>
     inline xaxis_slice_iterator<CT>::xaxis_slice_iterator(CTA&& e, size_type axis, size_type index, size_type offset) :
         p_expression(get_storage_init<storing_type>(std::forward<CTA>(e))), m_index(index),
-        m_offset(offset), m_axis_stride(e.strides()[axis] * (e.shape()[axis] - 1)),
+        m_offset(offset), m_axis_stride(static_cast<size_type>(e.strides()[axis]) * (e.shape()[axis] - 1u)),
         m_lower_shape(0), m_upper_shape(0), m_iter_size(0), m_is_target_axis(false),
         m_sv(strided_view(std::forward<CT>(e), std::forward<shape_type>({ e.shape()[axis] }),
             std::forward<strides_type>({ e.strides()[axis] }), offset, e.layout()))
