@@ -22,7 +22,7 @@ Build
   on your system.
 - ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
-- ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is avaliable on your system.
+- ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is available on your system.
 
 All these options are disabled by default. Enabling ``DOWNLOAD_GTEST`` or
 setting ``GTEST_SRC_DIR`` enables ``BUILD_TESTS``.
@@ -66,7 +66,7 @@ including any of its header. Here is a list of available macros:
   on your system.
 - ``XTENSOR_USE_TBB``: enables parallel assignment loop. This requires that you have you have tbb_ installed
   on your system.
-- ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is avaliable on your system.
+- ``XTENSOR_USE_OPENMP``: enables parallel assignment loop using OpenMP. This requires that OpenMP is available on your system.
 - ``XTENSOR_DEFAULT_DATA_CONTAINER(T, A)``: defines the type used as the default data container for tensors and arrays. ``T``
   is the ``value_type`` of the container and ``A`` its ``allocator_type``.
 - ``XTENSOR_DEFAULT_SHAPE_CONTAINER(T, EA, SA)``: defines the type used as the default shape container for tensors and arrays.
