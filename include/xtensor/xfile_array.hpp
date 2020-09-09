@@ -182,7 +182,7 @@ namespace xt
 
         const std::string& path() const noexcept;
         void ignore_empty_path(bool ignore);
-        void set_path(std::string& path);
+        void set_path(const std::string& path);
 
         template <class C>
         void configure_format(C& config);
@@ -567,7 +567,7 @@ namespace xt
     }
 
     template <class E, class IOH>
-    inline void xfile_array_container<E, IOH>::set_path(std::string& path)
+    inline void xfile_array_container<E, IOH>::set_path(const std::string& path)
     {
         if (path != m_path)
         {
@@ -577,7 +577,10 @@ namespace xt
             // read new file
             if (enable_io(path))
             {
+                // file format may not preserve shape
+                const auto s = m_storage.shape();
                 m_io_handler.read(m_storage, path);
+                m_storage.reshape(s);
             }
         }
     }
