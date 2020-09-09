@@ -320,7 +320,7 @@ namespace xt
             std::size_t i;
             if (it1 != m_index_pool.cend())
             {
-                i = std::distance(m_index_pool.cbegin(), it1);
+                i = static_cast<std::size_t>(std::distance(m_index_pool.cbegin(), it1));
                 return m_chunk_pool[i];
             }
             // if not, find a free chunk in the pool
@@ -328,7 +328,7 @@ namespace xt
             const auto it2 = std::find(m_index_pool.cbegin(), m_index_pool.cend(), empty_index);
             if (it2 != m_index_pool.cend())
             {
-                i = std::distance(m_index_pool.cbegin(), it2);
+                i = static_cast<std::size_t>(std::distance(m_index_pool.cbegin(), it2));
                 m_chunk_pool[i].set_path(path);
                 m_index_pool[i].resize(static_cast<size_t>(std::distance(first, last)));
                 std::copy(first, last, m_index_pool[i].begin());

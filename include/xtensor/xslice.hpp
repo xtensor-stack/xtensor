@@ -1374,7 +1374,7 @@ namespace xt
         std::size_t sz = m_indices.size();
         for (std::size_t i = 0; i < sz; ++i)
         {
-            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<std::ptrdiff_t>(shape) + m_raw_indices[i] : m_raw_indices[i];
+            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<size_type>(shape) + m_raw_indices[i] : m_raw_indices[i];
         }
     }
 
@@ -1495,7 +1495,7 @@ namespace xt
         std::size_t sz = m_indices.size();
         for (std::size_t i = 0; i < sz; ++i)
         {
-            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<std::ptrdiff_t>(shape) + m_raw_indices[i] : m_raw_indices[i];
+            m_indices[i] = m_raw_indices[i] < 0 ? static_cast<size_type>(shape) + m_raw_indices[i] : m_raw_indices[i];
         }
         size_type cum = size_type(0);
         size_type prev_cum = cum;

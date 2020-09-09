@@ -8,6 +8,14 @@
 ****************************************************************************/
 
 #include "gtest/gtest.h"
+
+#if (defined(__GNUC__) && !defined(__clang__))
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#include "xtensor/xmath.hpp"
+#pragma GCC diagnostic pop
+#endif
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xtensor.hpp"
 #include "xtensor/xmath.hpp"

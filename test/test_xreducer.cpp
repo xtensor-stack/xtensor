@@ -9,23 +9,25 @@
 
 #include "gtest/gtest.h"
 #include "test_common_macros.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xtensor.hpp"
-#include "xtensor/xutils.hpp"
-#include "xtensor/xfixed.hpp"
-#include "xtensor/xbuilder.hpp"
-#include "xtensor/xmath.hpp"
-#include "xtensor/xreducer.hpp"
-#include "xtensor/xview.hpp"
-#include "xtensor/xmanipulation.hpp"
 #if (defined(__GNUC__) && !defined(__clang__))
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#include "xtensor/xrandom.hpp"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wfloat-conversion"
+#include "xtensor/xmath.hpp"
 #pragma GCC diagnostic pop
 #else
-#include "xtensor/xrandom.hpp"
+#include "xtensor/xmath.hpp"
 #endif
+#include "xtensor/xutils.hpp"
+#include "xtensor/xfixed.hpp"
+#include "xtensor/xbuilder.hpp"
+#include "xtensor/xreducer.hpp"
+#include "xtensor/xview.hpp"
+#include "xtensor/xmanipulation.hpp"
+#include "xtensor/xarray.hpp"
+#include "xtensor/xtensor.hpp"
+#include "xtensor/xrandom.hpp"
 
 #include "xtensor/xio.hpp"
 
@@ -680,6 +682,7 @@ namespace xt
         xt::xtensor_fixed<float, xt::xshape<3>> a = {1, 2, 3}, b = {1, 2, 3};
         xt::xtensor<xt::xtensor_fixed<float, xt::xshape<3>>, 1> c = {a, b};
         auto res = xt::sum(c)();
-        EXPECT_EQ(res, a * 2);
+        EXPECT_EQ(res, a * 2.);
     }
 }
+

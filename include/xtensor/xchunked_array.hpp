@@ -427,8 +427,8 @@ namespace xt
     template <class Idx>
     inline std::pair<size_t, size_t> xchunked_array<CS, EX>::get_chunk_indexes_in_dimension(size_t dim, Idx idx) const
     {
-        size_t index_of_chunk = idx / m_chunk_shape[dim];
-        size_t index_in_chunk = idx - index_of_chunk * m_chunk_shape[dim];
+        size_t index_of_chunk = static_cast<size_t>(idx) / m_chunk_shape[dim];
+        size_t index_in_chunk = static_cast<size_t>(idx) - index_of_chunk * m_chunk_shape[dim];
         return std::make_pair(index_of_chunk, index_in_chunk);
     }
 
