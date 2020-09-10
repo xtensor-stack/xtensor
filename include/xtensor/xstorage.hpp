@@ -380,7 +380,7 @@ namespace xt
     inline void uvector<T, A>::reserve(size_type /*new_cap*/)
     {
     }
-    
+
     template <class T, class A>
     inline auto uvector<T, A>::capacity() const noexcept -> size_type
     {
@@ -1335,8 +1335,6 @@ namespace xt
         lhs.swap(rhs);
     }
 
-    #define XTENSOR_SELECT_ALIGN (XTENSOR_DEFAULT_ALIGNMENT != 0 ? XTENSOR_DEFAULT_ALIGNMENT : alignof(T))
-
     template <class X, class T, std::size_t N, class A, bool B>
     struct rebind_container<X, svector<T, N, A, B>>
     {
@@ -1350,7 +1348,7 @@ namespace xt
      *
      * To be moved to xtl, along with the rest of xstorage.hpp
      */
-    template <class T, std::size_t N, std::size_t Align = XTENSOR_SELECT_ALIGN>
+    template <class T, std::size_t N, std::size_t Align = XTENSOR_SELECT_ALIGN(T)>
     class alignas(Align) aligned_array : public std::array<T, N>
     {
     public:
@@ -1653,7 +1651,7 @@ namespace xt
 
         XTENSOR_FIXED_SHAPE_CONSTEXPR bool empty() const
         {
-            return sizeof...(X) == 0; 
+            return sizeof...(X) == 0;
         }
 
     private:
@@ -1903,6 +1901,5 @@ namespace std
 #endif
 
 #undef XTENSOR_CONST
-#undef XTENSOR_SELECT_ALIGN
 
 #endif

@@ -109,6 +109,10 @@
 #define XTENSOR_OPENMP_TRESHOLD 0
 #endif
 
+#ifndef XTENSOR_SELECT_ALIGN
+#define XTENSOR_SELECT_ALIGN(T) (XTENSOR_DEFAULT_ALIGNMENT != 0 ? XTENSOR_DEFAULT_ALIGNMENT : alignof(T))
+#endif
+
 #ifdef IN_DOXYGEN
 namespace xtl
 {
