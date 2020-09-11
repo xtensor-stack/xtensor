@@ -7,6 +7,78 @@
 Changelog
 =========
 
+0.21.6
+------
+
+- Added implementation of ``isin`` and ``in1d``
+  `#2021 <https://github.com/xtensor-stack/xtensor/pull/2021>`_
+- Wrote single include header
+  `#2031 <https://github.com/xtensor-stack/xtensor/pull/2031>`_
+- Added details for ``xt::random`` to docs
+  `#2043 <https://github.com/xtensor-stack/xtensor/pull/2043>`_
+- Added ``digitize``, ``searchsorted``, and ``bin_items``
+  `#2037 <https://github.com/xtensor-stack/xtensor/pull/2037>`_
+- Fixed error with zero tensor size in ``xt::mean``
+  `#2047 <https://github.com/xtensor-stack/xtensor/pull/2047>`_
+- Fixed initialization order in ``xfunction``
+  `#2050 <https://github.com/xtensor-stack/xtensor/pull/2050>`_
+- ``adapt_smart_ptr`` overloads now accept STL-like container as shape
+  `#2052 <https://github.com/xtensor-stack/xtensor/pull/2052>`_
+- Added ``xchunked_array``
+  `#2076 <https://github.com/xtensor-stack/xtensor/pull/2076>`_
+- ``xchunked_array`` inherits from ``xiterable``
+  `#2082 <https://github.com/xtensor-stack/xtensor/pull/2082>`_
+- ``xchunked_array`` inherits from ``xcontainer_semantic``
+  `#2083 <https://github.com/xtensor-stack/xtensor/pull/2083>`_
+- Fixed assignment operator of ``xchunked_array``
+  `#2084 <https://github.com/xtensor-stack/xtensor/pull/2084>`_
+- Added constructors from ``xexpression`` and ``chunk_shape`` to ``xchunked_array``
+  `#2087 <https://github.com/xtensor-stack/xtensor/pull/2087>`_
+- Fixed chunk layout
+  `#2091 <https://github.com/xtensor-stack/xtensor/pull/2091>`_
+- Copy constructor gets expression's chunk_shape if it is chunked 
+  `#2092 <https://github.com/xtensor-stack/xtensor/pull/2092>`_
+- Replaced template parameter chunk_type with chunk_storage
+  `#2095 <https://github.com/xtensor-stack/xtensor/pull/2095>`_
+- Implemented on-disk chunked array 
+  `#2096 <https://github.com/xtensor-stack/xtensor/pull/2096>`_
+- Implemented chunk pool in xchunk_store_manager 
+  `#2099 <https://github.com/xtensor-stack/xtensor/pull/2099>`_
+- ``xfile_array`` is now an expression
+  `#2107 <https://github.com/xtensor-stack/xtensor/pull/2107>`_
+- ``xchunked_array`` code cleanup
+  `#2109 <https://github.com/xtensor-stack/xtensor/pull/2109>`_
+- ``xchunked_store_manager`` code cleanup
+  `#2110 <https://github.com/xtensor-stack/xtensor/pull/2110>`_
+- Refactored ``xfile_array``
+  `#2117 <https://github.com/xtensor-stack/xtensor/pull/2117>`_
+- Added simd accessors to ``xfil_array_container``
+  `#2118 <https://github.com/xtensor-stack/xtensor/pull/2118>`_
+- Abstracted file format through a formal class
+  `#2115 <https://github.com/xtensor-stack/xtensor/pull/2115>`_
+- Added ``xchunked_array`` extension template 
+  `#2122 <https://github.com/xtensor-stack/xtensor/pull/2122>`_
+- Refactored ``xdisk_io_handler``
+  `#2123 <https://github.com/xtensor-stack/xtensor/pull/2123>`_
+- Fixed exception for file write operation
+  `#2125 <https://github.com/xtensor-stack/xtensor/pull/2125>`_
+- Implemented ``zarray``
+  `#2127 <https://github.com/xtensor-stack/xtensor/pull/2127>`_
+- Implemented the skeleton of the dynamic expression system
+  `#2129 <https://github.com/xtensor-stack/xtensor/pull/2129>`_
+- Implemented zfunctions, equivalent of xfunction for dynamic expression system
+  `#2130 <https://github.com/xtensor-stack/xtensor/pull/2130>`_
+- Implemented ``allocate_result`` in ``zfunction``
+  `#2132 <https://github.com/xtensor-stack/xtensor/pull/2132>`_
+- Implemented assign mechanism for ``zarray``
+  `#2133 <https://github.com/xtensor-stack/xtensor/pull/2133>`_
+- Added xindex_path to transform indexes into path
+  `#2131 <https://github.com/xtensor-stack/xtensor/pull/2131>`_
+- Fixing various compiler warnings
+  `#2145 <https://github.com/xtensor-stack/xtensor/pull/2145>`_
+- Removed conversion and initialization warnings
+  `#2141 <https://github.com/xtensor-stack/xtensor/pull/2141>`_
+
 0.21.5
 ------
 
@@ -34,7 +106,6 @@ Changelog
   `#2024 <https://github.com/xtensor-stack/xtensor/pull/2024>`_
 - Initialized all members of ``xfunciton_cache_impl``
   `#2026 <https://github.com/xtensor-stack/xtensor/pull/2026>`_
-
 
 0.21.4
 ------
