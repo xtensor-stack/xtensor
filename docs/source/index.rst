@@ -70,6 +70,7 @@ for details.
    histogram
    random
    sfinae
+   xsimd
    file_loading
    build-options
    pitfall
