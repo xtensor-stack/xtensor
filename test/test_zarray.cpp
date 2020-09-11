@@ -12,8 +12,9 @@
 #include "xtensor/zfunction.hpp"
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
-namespace xt
+namespace zexperience
 {
+    using namespace xt;
     TEST(zarray, value_semantics)
     {
         xarray<double> a = {{1., 2.}, {3., 4.}};
