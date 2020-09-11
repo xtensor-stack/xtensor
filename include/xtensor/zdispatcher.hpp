@@ -14,7 +14,7 @@
 
 #include "zmath.hpp"
 
-namespace xt
+namespace zexperience
 {
     namespace mpl = xtl::mpl;
 

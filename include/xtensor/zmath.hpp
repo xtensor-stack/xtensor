@@ -13,7 +13,7 @@
 #include "xmath.hpp"
 #include "zarray_impl.hpp"
 
-namespace xt
+namespace zexperience
 {
     namespace detail
     {

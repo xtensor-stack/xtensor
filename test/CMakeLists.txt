@@ -181,7 +181,6 @@ set(COMMON_BASE
     test_xview.cpp
     test_xview_semantic.cpp
     test_xutils.cpp
-    test_zarray.cpp
 )
 
 set(XTENSOR_TESTS

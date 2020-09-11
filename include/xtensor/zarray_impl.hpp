@@ -12,7 +12,7 @@
 
 #include "xarray.hpp"
 
-namespace xt
+namespace zexperience
 {
 
     /*************************
