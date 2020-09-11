@@ -46,6 +46,6 @@ namespace xt
     {
         int fac = 10;
         Foo<int> foo(10);
-        EXPECT_TRUE(xt::sum(foo.get())() == fac);
+        EXPECT_TRUE(xt::sum(foo.get())() == fac * 10 * 10);
     }
 }
