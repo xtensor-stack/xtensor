@@ -316,7 +316,13 @@ list(REMOVE_ITEM XTENSOR_SINGLE_INCLUDE
     xtensor/xexpression_holder.hpp
     xtensor/xjson.hpp
     xtensor/xmime.hpp
-    xtensor/xnpy.hpp)
+    xtensor/xnpy.hpp
+    xtensor/zarray.hpp
+    xtensor/zarray_impl.hpp
+    xtensor/zassign.hpp
+    xtensor/zdispatcher.hpp
+    xtensor/zfunction.hpp
+    xtensor/zmath.hpp)
 
 PREPEND(XTENSOR_SINGLE_INCLUDE "#include <" ${XTENSOR_SINGLE_INCLUDE})
 POSTFIX(XTENSOR_SINGLE_INCLUDE ">" ${XTENSOR_SINGLE_INCLUDE})
