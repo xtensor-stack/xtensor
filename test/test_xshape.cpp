@@ -58,4 +58,12 @@ namespace xt
         ASSERT_TRUE(expect_v);
         ASSERT_TRUE(expect_a);
     }
+
+    TEST(xshape, has_shape)
+    {
+        std::array<size_t, 2> shape = {2, 3};
+        xt::xtensor<size_t, 2> A = xt::zeros<size_t>(shape);
+        ASSERT_TRUE(xt::has_shape(A, shape));
+        ASSERT_TRUE(xt::has_shape(A, {2, 3}));
+    }
 }
