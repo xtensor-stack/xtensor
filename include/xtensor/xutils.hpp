@@ -859,17 +859,47 @@ namespace xt
     using inner_reference_t = typename inner_reference<ST>::type;
 
     /************
+     * get_rank *
+     ************/
+
+    template <class E, typename = void>
+    struct get_rank
+    {
+        constexpr static std::size_t value = SIZE_MAX;
+    };
+
+    template <class E>
+    struct get_rank<E, decltype((void)E::rank, void())>
+    {
+        constexpr static std::size_t value= E::rank;
+    };
+
+    /******************
+     * has_fixed_rank *
+     ******************/
+
+    template <class E>
+    struct has_fixed_rank
+    {
+        using type = std::integral_constant<bool, get_rank<std::decay_t<E>>::value != SIZE_MAX>;
+    };
+
+    template <class E>
+    using has_fixed_rank_t = typename has_fixed_rank<std::decay_t<E>>::type;
+
+    /************
      * has_rank *
      ************/
 
     template <class E, size_t N>
     struct has_rank
     {
-        using type = std::integral_constant<bool, std::decay_t<E>::rank == N>;
+        using type = std::integral_constant<bool, get_rank<std::decay_t<E>>::value == N>;
     };
 
     template <class E, size_t N>
     using has_rank_t = typename has_rank<std::decay_t<E>, N>::type;
+
 }
 
 #endif
