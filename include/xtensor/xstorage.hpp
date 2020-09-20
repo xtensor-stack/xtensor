@@ -715,6 +715,11 @@ namespace xt
 
         iterator insert(const_iterator it, const T& elt);
 
+        template <class It>
+        iterator insert(const_iterator pos, It first, It last);
+
+        iterator insert(const_iterator pos, std::initializer_list<T> l);
+
         template <std::size_t ON, class OA, bool InitA>
         void swap(svector<T, ON, OA, InitA>& rhs);
 
@@ -1181,6 +1186,34 @@ namespace xt
         const T* src_ptr = cond ? it + (elt_ptr - it) + std::ptrdiff_t(1) : elt_ptr;
         *it = *src_ptr;
         return it;
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    template <class It>
+    inline auto svector<T, N, A, Init>::insert(const_iterator pos, It first, It last) -> iterator
+    {
+        auto it = const_cast<pointer>(pos);
+        difference_type n = std::distance(first, last);
+        if (n > 0)
+        {
+            if (n > m_capacity - m_end)
+            {
+                std::ptrdiff_t elt_no = it - m_begin;
+                grow(static_cast<size_t>((m_capacity - m_begin) + n));
+                it = m_begin + elt_no;
+            }
+
+            std::move_backward(it, m_end, m_end + n);
+            m_end += n;
+            std::copy(first, last, it);
+        }
+        return it;
+    }
+
+    template <class T, std::size_t N, class A, bool Init>
+    inline auto svector<T, N, A, Init>::insert(const_iterator pos, std::initializer_list<T> l) -> iterator
+    {
+        return insert(pos, l.begin(), l.end());
     }
 
     template <class T, std::size_t N, class A, bool Init>
