@@ -144,6 +144,49 @@ namespace xt
         EXPECT_TRUE(std::equal(s.begin(), s.end(), v.begin()));
     }
 
+    TEST(svector, insert_range)
+    {
+        svector_type s0 = {1,2,3,4};
+        svector_type s1 = s0;
+        svector_type s2 = s0;
+        std::vector<std::size_t> v0(s0.begin(), s0.end());
+        std::vector<std::size_t> v1(v0);
+        std::vector<std::size_t> v2(v0);
+        std::vector<std::size_t> ins = {1, 4};
+
+        s0.insert(s0.begin(), ins.cbegin(), ins.cend());
+        v0.insert(v0.begin(), ins.cbegin(), ins.cend());
+        s1.insert(s1.begin()+2, ins.cbegin(), ins.cend());
+        v1.insert(v1.begin()+2, ins.cbegin(), ins.cend());
+        s2.insert(s2.begin()+4, ins.cbegin(), ins.cend());
+        v2.insert(v2.begin()+4, ins.cbegin(), ins.cend());
+
+        EXPECT_TRUE(std::equal(s0.begin(), s0.end(), v0.begin()));
+        EXPECT_TRUE(std::equal(s1.begin(), s1.end(), v1.begin()));
+        EXPECT_TRUE(std::equal(s2.begin(), s2.end(), v2.begin()));
+    }
+
+    TEST(svector, insert_initializer_list)
+    {
+        svector_type s0 = {1,2,3,4};
+        svector_type s1 = s0;
+        svector_type s2 = s0;
+        std::vector<std::size_t> v0(s0.begin(), s0.end());
+        std::vector<std::size_t> v1(v0);
+        std::vector<std::size_t> v2(v0);
+
+        s0.insert(s0.begin(), {1u, 4u});
+        v0.insert(v0.begin(), {1u, 4u});
+        s1.insert(s1.begin()+2, {1u, 4u});
+        v1.insert(v1.begin()+2, {1u, 4u});
+        s2.insert(s2.begin()+4, {1u, 4u});
+        v2.insert(v2.begin()+4, {1u, 4u});
+
+        EXPECT_TRUE(std::equal(s0.begin(), s0.end(), v0.begin()));
+        EXPECT_TRUE(std::equal(s1.begin(), s1.end(), v1.begin()));
+        EXPECT_TRUE(std::equal(s2.begin(), s2.end(), v2.begin()));
+    }
+
     TEST(svector, constructor)
     {
         svector_type a;
