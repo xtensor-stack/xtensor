@@ -13,7 +13,7 @@
 #include "xassign.hpp"
 #include "zarray_impl.hpp"
 
-namespace zexperience
+namespace xt
 {
     template <>
     class xexpression_assigner<zarray_expression_tag>

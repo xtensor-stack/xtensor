@@ -182,6 +182,7 @@ set(XTENSOR_HEADERS
     ${XTENSOR_INCLUDE_DIR}/xtensor/zarray.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zarray_impl.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zdispatcher.hpp
+    ${XTENSOR_INCLUDE_DIR}/xtensor/zdispatching_types.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zfunction.hpp
     ${XTENSOR_INCLUDE_DIR}/xtensor/zmath.hpp
 )
@@ -316,13 +317,7 @@ list(REMOVE_ITEM XTENSOR_SINGLE_INCLUDE
     xtensor/xexpression_holder.hpp
     xtensor/xjson.hpp
     xtensor/xmime.hpp
-    xtensor/xnpy.hpp
-    xtensor/zarray.hpp
-    xtensor/zarray_impl.hpp
-    xtensor/zassign.hpp
-    xtensor/zdispatcher.hpp
-    xtensor/zfunction.hpp
-    xtensor/zmath.hpp)
+    xtensor/xnpy.hpp)
 
 PREPEND(XTENSOR_SINGLE_INCLUDE "#include <" ${XTENSOR_SINGLE_INCLUDE})
 POSTFIX(XTENSOR_SINGLE_INCLUDE ">" ${XTENSOR_SINGLE_INCLUDE})

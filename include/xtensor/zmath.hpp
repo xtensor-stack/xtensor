@@ -13,7 +13,7 @@
 #include "xmath.hpp"
 #include "zarray_impl.hpp"
 
-namespace zexperience
+namespace xt
 {
     namespace detail
     {
@@ -55,7 +55,6 @@ namespace zexperience
     };                                                                             \
     XTENSOR_ZMAPPED_FUNCTOR(ZNAME, XFUN)
 
-#define ZCONCAT(X, Y) X Y
 #define XTENSOR_BINARY_ZOPERATOR(ZNAME, XOP, XFUN)                                 \
     struct ZNAME                                                                   \
     {                                                                              \
@@ -175,7 +174,7 @@ namespace zexperience
     XTENSOR_UNARY_ZFUNCTOR(zerfc, xt::erfc, math::erfc_fun);
     XTENSOR_UNARY_ZFUNCTOR(ztgamma, xt::tgamma, math::tgamma_fun);
     XTENSOR_UNARY_ZFUNCTOR(zlgamma, xt::lgamma, math::lgamma_fun);
-    XTENSOR_UNARY_ZFUNCTOR(zceil, xt::ceil, math::ceil_fun);
+    /*XTENSOR_UNARY_ZFUNCTOR(zceil, xt::ceil, math::ceil_fun);
     XTENSOR_UNARY_ZFUNCTOR(zfloor, xt::floor, math::floor_fun);
     XTENSOR_UNARY_ZFUNCTOR(ztrunc, xt::trunc, math::trunc_fun);
     XTENSOR_UNARY_ZFUNCTOR(zround, xt::round, math::round_fun);
@@ -183,7 +182,7 @@ namespace zexperience
     XTENSOR_UNARY_ZFUNCTOR(zrint, xt::rint, math::rint_fun);
     XTENSOR_UNARY_ZFUNCTOR(zisfinite, xt::isfinite, math::isfinite_fun);
     XTENSOR_UNARY_ZFUNCTOR(zisinf, xt::isinf, math::isinf_fun);
-    XTENSOR_UNARY_ZFUNCTOR(zisnan, xt::isnan, math::isnan_fun);
+    XTENSOR_UNARY_ZFUNCTOR(zisnan, xt::isnan, math::isnan_fun);*/
 
 #undef XTENSOR_BINARY_ZFUNCTOR
 #undef XTENSOR_UNARY_ZFUNCTOR

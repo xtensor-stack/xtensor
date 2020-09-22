@@ -18,7 +18,7 @@
 #include "zarray_impl.hpp"
 #include "zassign.hpp"
 
-namespace zexperience
+namespace xt
 {
 
     /**********
