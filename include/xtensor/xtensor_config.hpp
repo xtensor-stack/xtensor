@@ -31,6 +31,7 @@
 
 // Exception support.
 #if defined(XTENSOR_DISABLE_EXCEPTIONS)
+#include <iostream>
 #define XTENSOR_THROW(_, msg)            \
     {                                    \
       std::cerr << msg << std::endl;     \
