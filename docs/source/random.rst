@@ -70,7 +70,8 @@ xt::random::gamma
 
 :ref:`xt::random::gamma <random-gamma-function-reference>`
 
-Produces (an array of) random positive floating-point values, distributed according to the probability density:
+Produces (an array of) random positive floating-point values,
+distributed according to the probability density:
 
 .. math::
 
@@ -80,19 +81,48 @@ where :math:`\alpha` is the shape (also known as :math:`k`) and :math:`\beta` th
 
 .. note::
 
-    Do not confuse the first argument of ``xt::random``, the shape of the output array, with the parameter :math:`alpha`.
+    Different from NumPy, the first argument is the shape of the output array.
 
 .. seealso::
 
     *   `numpy.random.gamma <https://numpy.org/doc/stable/reference/random/generated/numpy.random.gamma.html?highlight=gamma#numpy.random.gamma>`_
     *   `std::gamma_distribution <https://en.cppreference.com/w/cpp/numeric/random/gamma_distribution>`_
     *   `Weisstein, Eric W. "Gamma Distribution." From MathWorld – A Wolfram Web Resource. <http://mathworld.wolfram.com/GammaDistribution.html>`_
-    *   `Wikipedia, "Gamma distribution". <http://en.wikipedia.org/wiki/Gamma_distribution>`_
+    *   `Wikipedia, "Gamma distribution". <https://en.wikipedia.org/wiki/Gamma_distribution>`_
 
 xt::random::weibull
 ===================
 
 :ref:`xt::random::weibull <random-weibull-function-reference>`
+
+Produces (an array of) random positive floating-point values,
+distributed according to the probability density:
+
+.. math::
+
+    P(x) = \frac{a}{b} \left( \frac{x}{b} \right)^{a - 1} e^{-(x / b)^a}
+
+where :math:`a > 0` is the shape parameter and :math:`b > 0` the scale parameter.
+In particular, a random variable is produced as
+
+.. math::
+
+    X = b (- \ln (U))^{1/a}
+
+where :math:`U` is drawn from the uniform distribution (0, 1].
+
+By default both the shape :math:`a = 1` and the scale :math:`b = 1`.
+Note that you can specify only :math:`a` while choosing the default for :math:`b`.
+
+.. note::
+
+    Different from NumPy, the first argument is the shape of the output array.
+
+.. seealso::
+
+    *   `numpy.random.weibull <https://numpy.org/doc/stable/reference/random/generated/numpy.random.weibull.html?highlight=weibull#numpy.random.weibull>`_
+    *   `std::weibull_distribution <https://en.cppreference.com/w/cpp/numeric/random/weibull_distribution>`_
+    *   `Wikipedia, "Weibull distribution". <https://en.wikipedia.org/wiki/Weibull_distribution>`_
 
 xt::random::extreme_value
 =========================
