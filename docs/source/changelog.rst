@@ -7,6 +7,24 @@
 Changelog
 =========
 
+0.21.7
+------
+
+- Removed zheaders from single header
+  `#2157 <https://github.com/xtensor-stack/xtensor/pull/2157>`_
+- Implemented insertion of range and intializer list in svector
+  `#2165 <https://github.com/xtensor-stack/xtensor/pull/2165>`_
+- Adding has_shape
+  `#2163 <https://github.com/xtensor-stack/xtensor/pull/2163>`_
+- Adding get_rank and has_fixed_rank
+  `#2162 <https://github.com/xtensor-stack/xtensor/pull/2162>`_
+- Zrefactoring
+  `#2140 <https://github.com/xtensor-stack/xtensor/pull/2140>`_
+- Added missing header
+  `#2169 <https://github.com/xtensor-stack/xtensor/pull/2169>`_
+- Extending docs random
+  `#2173 <https://github.com/xtensor-stack/xtensor/pull/2173>`_
+
 0.21.6
 ------
 
