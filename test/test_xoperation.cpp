@@ -807,17 +807,18 @@ namespace xt
     TEST(operation, left_shift)
     {
         xarray<int> arr({5,1, 1000});
+        xarray<int> arr2({2,1, 3});
         xarray<int> res1 = left_shift(arr, 4);
-        xarray<int> res2 = left_shift(arr, arr);
+        xarray<int> res2 = left_shift(arr, arr2);
         EXPECT_EQ(left_shift(arr, 4)(1), 16);
         xarray<int> expected1 = {80, 16, 16000};
-        xarray<int> expected2 = {160, 2, 256000};
+        xarray<int> expected2 = {20, 2, 8000};
 
         EXPECT_EQ(expected1, res1);
         EXPECT_EQ(expected2, res2);
 
         xarray<int> res3 = arr << 4;
-        xarray<int> res4 = arr << arr;
+        xarray<int> res4 = arr << arr2;
         EXPECT_EQ(expected1, res3);
         EXPECT_EQ(expected2, res4);
     }
@@ -825,17 +826,18 @@ namespace xt
     TEST(operation, right_shift)
     {
         xarray<int> arr({5,1, 1000});
+        xarray<int> arr2({2,1, 3});
         xarray<int> res1 = right_shift(arr, 4);
-        xarray<int> res2 = right_shift(arr, arr);
+        xarray<int> res2 = right_shift(arr, arr2);
         EXPECT_EQ(right_shift(arr, 4)(1), 0);
         xarray<int> expected1 = {0, 0, 62};
-        xarray<int> expected2 = {0, 0, 3};
+        xarray<int> expected2 = {1, 0, 125};
 
         EXPECT_EQ(expected1, res1);
         EXPECT_EQ(expected2, res2);
 
         xarray<int> res3 = arr >> 4;
-        xarray<int> res4 = arr >> arr;
+        xarray<int> res4 = arr >> arr2;
         EXPECT_EQ(expected1, res3);
         EXPECT_EQ(expected2, res4);
     }
