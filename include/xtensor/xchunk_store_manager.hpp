@@ -108,6 +108,8 @@ namespace xt
         template <class S>
         void resize(S&& shape);
 
+        std::size_t size();
+
         void set_pool_size(std::size_t n);
         void set_directory(const char* directory);
         IP& get_index_path();
@@ -119,6 +121,9 @@ namespace xt
         template <class I>
         reference map_file_array(I first, I last);
 
+        template <class I>
+        const_reference map_file_array(I first, I last) const;
+
     private:
 
         template <class... Idxs>
@@ -128,6 +133,7 @@ namespace xt
         using index_pool_type = std::vector<shape_type>;
 
         shape_type m_shape;
+        shape_type m_shape_internal;
         chunk_pool_type m_chunk_pool;
         index_pool_type m_index_pool;
         std::size_t m_unload_index;
@@ -169,6 +175,7 @@ namespace xt
     template <class EC, class IP>
     inline xchunk_store_manager<EC, IP>::xchunk_store_manager()
         : m_shape()
+        , m_shape_internal()
         // default pool size is 1
         // so that first chunk is always resized to the chunk shape
         , m_chunk_pool(1u)
@@ -248,10 +255,17 @@ namespace xt
 
     template <class EC, class IP>
     template <class S>
-    inline void xchunk_store_manager<EC, IP>::resize(S&&)
+    inline void xchunk_store_manager<EC, IP>::resize(S&& shape)
     {
         // don't resize according to total number of chunks
         // instead the pool manages a number of in-memory chunks
+        m_shape_internal = shape;
+    }
+
+    template <class EC, class IP>
+    inline std::size_t xchunk_store_manager<EC, IP>::size()
+    {
+        return compute_size(m_shape);
     }
 
     template <class EC, class IP>
@@ -300,6 +314,8 @@ namespace xt
     void xchunk_store_manager<EC, IP>::set_directory(const char* directory)
     {
         m_index_path.set_directory(directory);
+        // make shape public
+        m_shape = m_shape_internal;
     }
 
     template <class EC, class IP>
@@ -343,6 +359,13 @@ namespace xt
             m_unload_index = (m_unload_index + 1) % m_index_pool.size();
             return chunk;
         }
+    }
+
+    template <class EC, class IP>
+    template <class I>
+    inline auto xchunk_store_manager<EC, IP>::map_file_array(I first, I last) const -> const_reference
+    {
+        return const_cast<xchunk_store_manager<EC, IP>*>(this)->map_file_array(first, last);
     }
 
     template <class EC, class IP>
