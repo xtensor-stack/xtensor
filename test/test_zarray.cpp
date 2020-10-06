@@ -122,6 +122,12 @@ namespace xt
 
         const auto& res = zres.get_array<double>();
         EXPECT_TRUE(all(isclose(res, expected)));
+
+        zarray zres2;
+        zres2 = za + xt::exp(zb);
+
+        const auto& res2 = zres2.get_array<double>();
+        EXPECT_TRUE(all(isclose(res2, expected)));
     }
 
     TEST(zarray, chunked_array)
