@@ -44,7 +44,7 @@ namespace xt
         zarray() = default;
         ~zarray() = default;
 
-        template <class E>
+        template <class E, class U = std::enable_if_t<!std::is_base_of<std::decay_t<E>, zarray>::value>>
         zarray(E&& e);
 
         zarray(implementation_ptr&& impl);
@@ -98,7 +98,7 @@ namespace xt
         semantic_base::assign(e);
     }
     
-    template <class E>
+    template <class E, class U>
     inline zarray::zarray(E&& e)
     {
         init_implementation(std::forward<E>(e), extension::get_expression_tag_t<std::decay_t<E>>());
