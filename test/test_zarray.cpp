@@ -141,6 +141,17 @@ namespace xt
         shape_type res = za.as_chunked_array().chunk_shape();
         EXPECT_EQ(res, chunk_shape);
     }
+
+    TEST(zarray, from_zarray)
+    {
+        xarray<double> a = {{0.5, 1.5}, {2.5, 3.5}};
+
+        zarray za(a);
+        zarray zb(za);
+
+        const auto& b = zb.get_array<double>();
+        EXPECT_TRUE(all(b, a));
+    }
 }
 #endif
 
