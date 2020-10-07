@@ -18,7 +18,7 @@ namespace xt
     class xindex_path
     {
     public:
-        void set_directory(const char* directory);
+        void set_directory(const std::string& directory);
         template <class I>
         void index_to_path(I, I, std::string&);
 
@@ -111,7 +111,7 @@ namespace xt
         std::size_t size();
 
         void set_pool_size(std::size_t n);
-        void set_directory(const char* directory);
+        void set_directory(const std::string& directory);
         IP& get_index_path();
         void flush();
 
@@ -133,7 +133,6 @@ namespace xt
         using index_pool_type = std::vector<shape_type>;
 
         shape_type m_shape;
-        shape_type m_shape_internal;
         chunk_pool_type m_chunk_pool;
         index_pool_type m_index_pool;
         std::size_t m_unload_index;
@@ -144,7 +143,7 @@ namespace xt
      * xindex_path implementation *
      ******************************/
 
-    void xindex_path::set_directory(const char* directory)
+    void xindex_path::set_directory(const std::string& directory)
     {
         m_directory = directory;
         if (m_directory.back() != '/')
@@ -175,7 +174,6 @@ namespace xt
     template <class EC, class IP>
     inline xchunk_store_manager<EC, IP>::xchunk_store_manager()
         : m_shape()
-        , m_shape_internal()
         // default pool size is 1
         // so that first chunk is always resized to the chunk shape
         , m_chunk_pool(1u)
@@ -259,7 +257,7 @@ namespace xt
     {
         // don't resize according to total number of chunks
         // instead the pool manages a number of in-memory chunks
-        m_shape_internal = shape;
+        m_shape = shape;
     }
 
     template <class EC, class IP>
@@ -311,11 +309,9 @@ namespace xt
     }
 
     template <class EC, class IP>
-    void xchunk_store_manager<EC, IP>::set_directory(const char* directory)
+    void xchunk_store_manager<EC, IP>::set_directory(const std::string& directory)
     {
         m_index_path.set_directory(directory);
-        // make shape public
-        m_shape = m_shape_internal;
     }
 
     template <class EC, class IP>

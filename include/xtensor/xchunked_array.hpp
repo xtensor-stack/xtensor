@@ -6,9 +6,21 @@
 
 #include "xnoalias.hpp"
 #include "xstrided_view.hpp"
+#include "xchunk_store_manager.hpp"
 
 namespace xt
 {
+
+    template <class T>
+    struct is_chunk_store_manager : std::false_type
+    {
+    };
+    
+    template <class T>
+    struct is_chunk_store_manager<xchunk_store_manager<T>>
+        : std::true_type
+    {
+    };
 
     /******************************
      * xchunked_array declaration *
@@ -69,8 +81,12 @@ namespace xt
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
-        template <class S>
+        template <class S, class U = typename std::enable_if<is_chunk_store_manager<chunk_storage>::value>>
+        xchunked_array(S&& shape, S&& chunk_shape, const std::string& directory, std::size_t pool_size = 1);
+
+        template <class S, class U = typename std::enable_if<!is_chunk_store_manager<chunk_storage>::value>>
         xchunked_array(S&& shape, S&& chunk_shape);
+
         ~xchunked_array() = default;
 
         xchunked_array(const xchunked_array&) = default;
@@ -212,7 +228,16 @@ namespace xt
      *********************************/
 
     template <class CS, class EX>
-    template <class S>
+    template <class S, class U>
+    inline xchunked_array<CS, EX>::xchunked_array(S&& shape, S&& chunk_shape, const std::string& directory, std::size_t pool_size)
+    {
+        resize(std::forward<S>(shape), std::forward<S>(chunk_shape));
+        m_chunks.set_directory(directory);
+        m_chunks.set_pool_size(pool_size);
+    }
+
+    template <class CS, class EX>
+    template <class S, class U>
     inline xchunked_array<CS, EX>::xchunked_array(S&& shape, S&& chunk_shape)
     {
         resize(std::forward<S>(shape), std::forward<S>(chunk_shape));
