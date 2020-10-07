@@ -117,9 +117,8 @@ namespace xt
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
         std::string chunk_dir = "files";
-        xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<xcsv_config>>>> a1(shape, chunk_shape);
-        a1.chunks().set_directory(chunk_dir.c_str());
-        a1.chunks().set_pool_size(2);
+        std::size_t pool_size = 2;
+        xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<xcsv_config>>>> a1(shape, chunk_shape, chunk_dir, pool_size);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
         double v2 = 5.6;
