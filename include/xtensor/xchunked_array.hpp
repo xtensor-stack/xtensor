@@ -4,7 +4,6 @@
 #include <vector>
 #include <array>
 
-#include "xarray.hpp"
 #include "xnoalias.hpp"
 #include "xstrided_view.hpp"
 
@@ -68,6 +67,7 @@ namespace xt
         using temporary_type = typename inner_types::temporary_type;
         using bool_load_type = xt::bool_load_type<value_type>;
         static constexpr layout_type static_layout = layout_type::dynamic;
+        static constexpr bool contiguous_layout = false;
 
         template <class S>
         xchunked_array(S&& shape, S&& chunk_shape);
@@ -87,6 +87,9 @@ namespace xt
 
         template <class E>
         xchunked_array& operator=(const xexpression<E>& e);
+
+        template <class E>
+        void assign(const xexpression<E>& e);
 
         const shape_type& shape() const noexcept;
         layout_type layout() const noexcept;
@@ -108,6 +111,9 @@ namespace xt
         bool broadcast_shape(S& s, bool reuse_cache = false) const;
 
         template <class S>
+        bool has_linear_assign(const S& strides) const noexcept;
+
+        template <class S>
         stepper stepper_begin(const S& shape) noexcept;
         template <class S>
         stepper stepper_end(const S& shape, layout_type) noexcept;
@@ -124,15 +130,15 @@ namespace xt
     private:
 
         template <class... Idxs>
-        using indexes_type = std::pair<std::array<size_t, sizeof...(Idxs)>, std::array<size_t, sizeof...(Idxs)>>;
+        using indexes_type = std::pair<std::array<std::size_t, sizeof...(Idxs)>, std::array<std::size_t, sizeof...(Idxs)>>;
 
         template <class... Idxs>
-        using chunk_indexes_type = std::array<std::pair<size_t, size_t>, sizeof...(Idxs)>;
+        using chunk_indexes_type = std::array<std::pair<std::size_t, std::size_t>, sizeof...(Idxs)>;
 
         template <std::size_t N>
-        using static_indexes_type = std::pair<std::array<size_t, N>, std::array<size_t, N>>;
+        using static_indexes_type = std::pair<std::array<std::size_t, N>, std::array<std::size_t, N>>;
 
-        using dynamic_indexes_type = std::pair<std::vector<size_t>, std::vector<size_t>>;
+        using dynamic_indexes_type = std::pair<std::vector<std::size_t>, std::vector<std::size_t>>;
 
         template <class S1, class S2>
         void resize(S1&& shape, S2&& chunk_shape);
@@ -141,9 +147,9 @@ namespace xt
         indexes_type<Idxs...> get_indexes(Idxs... idxs) const;
 
         template <class Idx>
-        std::pair<size_t, size_t> get_chunk_indexes_in_dimension(size_t dim, Idx idx) const;
+        std::pair<std::size_t, std::size_t> get_chunk_indexes_in_dimension(std::size_t dim, Idx idx) const;
 
-        template <size_t... dims, class... Idxs>
+        template <std::size_t... dims, class... Idxs>
         chunk_indexes_type<Idxs...> get_chunk_indexes(std::index_sequence<dims...>, Idxs... idxs) const;
 
         template <class T, std::size_t N>
@@ -224,10 +230,16 @@ namespace xt
     inline xchunked_array<CS, EX>::xchunked_array(const xexpression<E>& e, S&& chunk_shape)
     {
         resize(e.derived_cast().shape(), std::forward<S>(chunk_shape));
+        assign(e);
+    }
+
+    template <class CS, class EX>
+    template <class E>
+    inline void xchunked_array<CS, EX>::assign(const xexpression<E>& e)
+    {
         xstrided_slice_vector sv(m_chunk_shape.size());  // element slice corresponding to chunk
         std::transform(m_chunk_shape.begin(), m_chunk_shape.end(), sv.begin(),
                        [](auto size) { return range(0, size); });
-
         shape_type ic(this->dimension());  // index of chunk, initialized to 0...
         size_type ci = 0;
         for (auto& chunk: m_chunks)
@@ -251,7 +263,6 @@ namespace xt
                         {
                             di--;
                         }
-
                     }
                     else
                     {
@@ -269,7 +280,8 @@ namespace xt
     template <class E>
     inline auto xchunked_array<CS, EX>::operator=(const xexpression<E>& e) -> self_type&
     {
-        return semantic_base::operator=(e);
+        assign(e);
+        return *this;
     }
 
     template <class CS, class EX>
@@ -279,7 +291,7 @@ namespace xt
     }
 
     template <class CS, class EX>
-    inline auto xchunked_array<CS, EX>::layout() const noexcept -> layout_type 
+    inline auto xchunked_array<CS, EX>::layout() const noexcept -> layout_type
     {
         return static_layout;
     }
@@ -331,6 +343,13 @@ namespace xt
     inline bool xchunked_array<CS, EX>::broadcast_shape(S& s, bool) const
     {
         return xt::broadcast_shape(shape(), s);
+    }
+
+    template <class CS, class EX>
+    template <class S>
+    inline bool xchunked_array<CS, EX>::has_linear_assign(const S& strides) const noexcept
+    {
+        return false;
     }
 
     template <class CS, class EX>
@@ -388,7 +407,7 @@ namespace xt
     inline void xchunked_array<CS, EX>::resize(S1&& shape, S2&& chunk_shape)
     {
         // compute chunk number in each dimension (shape_of_chunks)
-        std::vector<size_t> shape_of_chunks(shape.size());
+        std::vector<std::size_t> shape_of_chunks(shape.size());
         std::transform
         (
             shape.cbegin(), shape.cend(),
@@ -396,14 +415,14 @@ namespace xt
             shape_of_chunks.begin(),
             [](auto s, auto cs)
             {
-                size_t cn = s / cs;
+                std::size_t cn = s / cs;
                 if (s % cs > 0)
-                    cn += size_t(1); // edge_chunk
+                    cn += std::size_t(1); // edge_chunk
                 return cn;
             }
         );
 
-        // resize the xarray of chunks
+        // resize the chunk container
         m_chunks.resize(shape_of_chunks);
         // resize each chunk
         for (auto& c: m_chunks)
@@ -425,15 +444,15 @@ namespace xt
 
     template <class CS, class EX>
     template <class Idx>
-    inline std::pair<size_t, size_t> xchunked_array<CS, EX>::get_chunk_indexes_in_dimension(size_t dim, Idx idx) const
+    inline std::pair<std::size_t, std::size_t> xchunked_array<CS, EX>::get_chunk_indexes_in_dimension(std::size_t dim, Idx idx) const
     {
-        size_t index_of_chunk = static_cast<size_t>(idx) / m_chunk_shape[dim];
-        size_t index_in_chunk = static_cast<size_t>(idx) - index_of_chunk * m_chunk_shape[dim];
+        std::size_t index_of_chunk = static_cast<size_t>(idx) / m_chunk_shape[dim];
+        std::size_t index_in_chunk = static_cast<size_t>(idx) - index_of_chunk * m_chunk_shape[dim];
         return std::make_pair(index_of_chunk, index_in_chunk);
     }
 
     template <class CS, class EX>
-    template <size_t... dims, class... Idxs>
+    template <std::size_t... dims, class... Idxs>
     inline auto xchunked_array<CS, EX>::get_chunk_indexes(std::index_sequence<dims...>, Idxs... idxs) const
         -> chunk_indexes_type<Idxs...>
     {
@@ -445,9 +464,9 @@ namespace xt
     template <class T, std::size_t N>
     inline auto xchunked_array<CS, EX>::unpack(const std::array<T, N> &arr) const -> static_indexes_type<N>
     {
-        std::array<size_t, N> arr0;
-        std::array<size_t, N> arr1;
-        for (size_t i = 0; i < N; ++i)
+        std::array<std::size_t, N> arr0;
+        std::array<std::size_t, N> arr1;
+        for (std::size_t i = 0; i < N; ++i)
         {
             arr0[i] = std::get<0>(arr[i]);
             arr1[i] = std::get<1>(arr[i]);
@@ -459,10 +478,10 @@ namespace xt
     template <class It>
     inline auto xchunked_array<CS, EX>::get_indexes_dynamic(It first, It last) const -> dynamic_indexes_type
     {
-        auto size = static_cast<size_t>(std::distance(first, last));
-        std::vector<size_t> indexes_of_chunk(size);
-        std::vector<size_t> indexes_in_chunk(size);
-        for (size_t dim = 0; dim < size; ++dim)
+        auto size = static_cast<std::size_t>(std::distance(first, last));
+        std::vector<std::size_t> indexes_of_chunk(size);
+        std::vector<std::size_t> indexes_in_chunk(size);
+        for (std::size_t dim = 0; dim < size; ++dim)
         {
             auto chunk_index = get_chunk_indexes_in_dimension(dim, *first++);
             indexes_of_chunk[dim] = chunk_index.first;

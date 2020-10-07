@@ -18,13 +18,13 @@
 
 namespace xt
 {
-    using chunked_array = xchunked_array<xarray<xarray<double>>>;
+    using in_memory_chunked_array = xchunked_array<xarray<xarray<double>>>;
 
     TEST(xchunked_array, indexed_access)
     {
         std::vector<size_t> shape = {10, 10, 10};
         std::vector<size_t> chunk_shape = {2, 3, 4};
-        chunked_array a(shape, chunk_shape);
+        in_memory_chunked_array a(shape, chunk_shape);
 
         std::vector<size_t> idx = {3, 9, 8};
         double val;
@@ -53,7 +53,7 @@ namespace xt
 #endif
         std::vector<size_t> shape1 = {2, 2, 2};
         std::vector<size_t> chunk_shape1 = {2, 3, 4};
-        chunked_array a1(shape1, chunk_shape1);
+        in_memory_chunked_array a1(shape1, chunk_shape1);
         double val;
 
         val = 3.;
@@ -64,7 +64,7 @@ namespace xt
         }
 
         std::vector<size_t> shape2 = {32, 10, 10};
-        chunked_array a2(shape2, chunk_shape1);
+        in_memory_chunked_array a2(shape2, chunk_shape1);
 
         a2 = broadcast(val, a2.shape());
         for (const auto& v: a2)
@@ -86,7 +86,7 @@ namespace xt
         EXPECT_EQ(is_chunked(a3), false);
 
         std::vector<size_t> chunk_shape4 = {2, 2};
-        auto a4 = chunked_array(a3, chunk_shape4);
+        auto a4 = in_memory_chunked_array(a3, chunk_shape4);
 
         EXPECT_EQ(is_chunked(a4), true);
 
@@ -97,14 +97,14 @@ namespace xt
             i += 1.;
         }
 
-        auto a5 = chunked_array(a4);
+        auto a5 = in_memory_chunked_array(a4);
         EXPECT_EQ(is_chunked(a5), true);
         for (const auto& v: a5.chunk_shape())
         {
             EXPECT_EQ(v, 2);
         }
 
-        auto a6 = chunked_array(a3);
+        auto a6 = in_memory_chunked_array(a3);
         EXPECT_EQ(is_chunked(a6), true);
         for (const auto& v: a6.chunk_shape())
         {
@@ -116,7 +116,9 @@ namespace xt
     {
         std::vector<size_t> shape = {4, 4};
         std::vector<size_t> chunk_shape = {2, 2};
+        std::string chunk_dir = "files";
         xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<xcsv_config>>>> a1(shape, chunk_shape);
+        a1.chunks().set_directory(chunk_dir.c_str());
         a1.chunks().set_pool_size(2);
         std::vector<size_t> idx = {1, 2};
         double v1 = 3.4;
@@ -132,20 +134,20 @@ namespace xt
         std::ifstream in_file;
         xt::xarray<double> ref;
         xt::xarray<double> data;
-        in_file.open("1.0");
+        in_file.open(chunk_dir + "/1.0");
         data = xt::load_csv<double>(in_file);
         ref = {{0, v1}, {0, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
 
         a1.chunks().flush();
-        in_file.open("0.1");
+        in_file.open(chunk_dir + "/0.1");
         data = xt::load_csv<double>(in_file);
         ref = {{0, 0}, {v2, 0}};
         EXPECT_EQ(data, ref);
         in_file.close();
 
-        in_file.open("0.0");
+        in_file.open(chunk_dir + "/0.0");
         data = xt::load_csv<double>(in_file);
         ref = {{v3, 0}, {0, 0}};
         EXPECT_EQ(data, ref);

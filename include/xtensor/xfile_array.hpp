@@ -12,18 +12,18 @@ namespace xt
 {
 
     template <class T>
-    class xfile_reference
+    class xfile_value_reference
     {
     public:
 
-        using self_type = xfile_reference<T>;
+        using self_type = xfile_value_reference<T>;
         using const_reference = const T&;
 
-        xfile_reference(T& value, bool& dirty);
-        ~xfile_reference() = default;
+        xfile_value_reference(T& value, bool& dirty);
+        ~xfile_value_reference() = default;
 
-        xfile_reference(const xfile_reference&) = default;
-        xfile_reference(xfile_reference&&) = default;
+        xfile_value_reference(const xfile_value_reference&) = default;
+        xfile_value_reference(xfile_value_reference&&) = default;
 
         self_type& operator=(const self_type&);
         self_type& operator=(self_type&&);
@@ -50,7 +50,19 @@ namespace xt
         T& m_value;
         bool& m_dirty;
     };
+}
 
+namespace std
+{
+    template <class T>
+    struct is_signed<xt::xfile_value_reference<T>>
+        : is_signed<T>
+    {
+    };
+}
+
+namespace xt
+{
     template <class E, class IOH>
     class xfile_array_container;
 
@@ -59,7 +71,7 @@ namespace xt
     {
         using storage_type = E;
         using value_type = typename storage_type::value_type;
-        using reference = xfile_reference<value_type>;
+        using reference = xfile_value_reference<value_type>;
         using const_reference = typename storage_type::const_reference;
         using size_type = typename storage_type::size_type;
         using temporary_type = xfile_array_container<E, IOH>;
@@ -99,6 +111,7 @@ namespace xt
         using temporary_type = typename inner_types::temporary_type;
         using bool_load_type = xt::bool_load_type<value_type>;
         static constexpr layout_type static_layout = layout_type::dynamic;
+        static constexpr bool contiguous_layout = true;
 
         xfile_array_container() = default;
         ~xfile_array_container();
@@ -182,7 +195,7 @@ namespace xt
 
         const std::string& path() const noexcept;
         void ignore_empty_path(bool ignore);
-        void set_path(std::string& path);
+        void set_path(const std::string& path);
 
         template <class C>
         void configure_format(C& config);
@@ -207,19 +220,19 @@ namespace xt
               class SA = std::allocator<typename std::vector<T, A>::size_type>>
     using xfile_array = xfile_array_container<xarray<T, L, A, SA>, IOH>;
 
-    /**********************************
-     * xfile_reference implementation *
-     **********************************/
+    /****************************************
+     * xfile_value_reference implementation *
+     ****************************************/
 
     template <class T>
-    inline xfile_reference<T>::xfile_reference(T& value, bool& dirty)
+    inline xfile_value_reference<T>::xfile_value_reference(T& value, bool& dirty)
         : m_value(value), m_dirty(dirty)
     {
     }
 
     template <class T>
     template <class V>
-    inline auto xfile_reference<T>::operator=(const V& v) -> self_type&
+    inline auto xfile_value_reference<T>::operator=(const V& v) -> self_type&
     {
         if (v != m_value)
         {
@@ -231,7 +244,7 @@ namespace xt
 
     template <class T>
     template <class V>
-    inline auto xfile_reference<T>::operator+=(const V& v) -> self_type&
+    inline auto xfile_value_reference<T>::operator+=(const V& v) -> self_type&
     {
         if (v != T(0))
         {
@@ -243,7 +256,7 @@ namespace xt
 
     template <class T>
     template <class V>
-    inline auto xfile_reference<T>::operator-=(const V& v) -> self_type&
+    inline auto xfile_value_reference<T>::operator-=(const V& v) -> self_type&
     {
         if (v != T(0))
         {
@@ -255,7 +268,7 @@ namespace xt
 
     template <class T>
     template <class V>
-    inline auto xfile_reference<T>::operator*=(const V& v) -> self_type&
+    inline auto xfile_value_reference<T>::operator*=(const V& v) -> self_type&
     {
         if (v != T(1))
         {
@@ -267,7 +280,7 @@ namespace xt
 
     template <class T>
     template <class V>
-    inline auto xfile_reference<T>::operator/=(const V& v) -> self_type&
+    inline auto xfile_value_reference<T>::operator/=(const V& v) -> self_type&
     {
         if (v != T(1))
         {
@@ -278,7 +291,7 @@ namespace xt
     }
 
     template <class T>
-    inline xfile_reference<T>::operator const_reference() const
+    inline xfile_value_reference<T>::operator const_reference() const
     {
         return m_value;
     }
@@ -567,7 +580,7 @@ namespace xt
     }
 
     template <class E, class IOH>
-    inline void xfile_array_container<E, IOH>::set_path(std::string& path)
+    inline void xfile_array_container<E, IOH>::set_path(const std::string& path)
     {
         if (path != m_path)
         {
