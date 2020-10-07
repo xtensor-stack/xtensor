@@ -17,6 +17,13 @@
 
 namespace xt
 {
+    std::string get_load_filename(std::string const& npy_prefix, layout_type lt = layout_type::row_major) {
+      using detail::is_big_endian;
+      std::string lts = lt == layout_type::row_major ? "" : "_fortran";
+      std::string endianess = is_big_endian() ? ".be" : ".le";
+      return npy_prefix + lts + endianess + ".npy";
+    }
+
     TEST(xnpy, load)
     {
         xarray<double> darr = {{{ 0.29731723,  0.04380157,  0.94748308},
@@ -41,28 +48,28 @@ namespace xt
 
         xarray<int> iarr1d = {3, 4, 5, 6, 7};
 
-        auto darr_loaded = load_npy<double>("files/xnpy_files/double.npy");
+        auto darr_loaded = load_npy<double>(get_load_filename("files/xnpy_files/double"));
         EXPECT_TRUE(all(isclose(darr, darr_loaded)));
 
-        std::ifstream dstream("files/xnpy_files/double.npy");
+        std::ifstream dstream(get_load_filename("files/xnpy_files/double"));
         auto darr_loaded_stream = load_npy<double>(dstream);
         EXPECT_TRUE(all(isclose(darr, darr_loaded_stream)))
             << "Loading double numpy array from stream failed";
         dstream.close();
 
-        auto barr_loaded = load_npy<bool>("files/xnpy_files/bool.npy");
+        auto barr_loaded = load_npy<bool>(get_load_filename("files/xnpy_files/bool"));
         EXPECT_TRUE(all(equal(barr, barr_loaded)));
 
-        std::ifstream bstream("files/xnpy_files/bool.npy");
+        std::ifstream bstream(get_load_filename("files/xnpy_files/bool"));
         auto barr_loaded_stream = load_npy<bool>(bstream);
         EXPECT_TRUE(all(equal(barr, barr_loaded_stream)))
             << "Loading boolean numpy array from stream failed";
         bstream.close();
 
-        auto dfarr_loaded = load_npy<double, layout_type::column_major>("files/xnpy_files/double_fortran.npy");
+        auto dfarr_loaded = load_npy<double, layout_type::column_major>(get_load_filename("files/xnpy_files/double_fortran"));
         EXPECT_TRUE(all(isclose(darr, dfarr_loaded)));
 
-        auto iarr1d_loaded = load_npy<int>("files/xnpy_files/int.npy");
+        auto iarr1d_loaded = load_npy<int>(get_load_filename("files/xnpy_files/int"));
         EXPECT_TRUE(all(equal(iarr1d, iarr1d_loaded)));
     }
 
@@ -79,7 +86,8 @@ namespace xt
             fn1_contents.size() == fn2_contents.size();
     }
 
-    std::string get_filename(int n)
+
+    std::string get_dump_filename(int n)
     {
         std::string filename = "files/xnpy_files/test_dump_" + std::to_string(n) + ".npy";
         return filename;
@@ -92,7 +100,7 @@ namespace xt
 
     TEST(xnpy, dump)
     {
-        std::string filename = get_filename(0);
+        std::string filename = get_dump_filename(0);
         xarray<bool> barr = {{{0, 0, 1},
                               {1, 1, 0},
                               {1, 0, 1}},
@@ -106,11 +114,7 @@ namespace xt
         xtensor<uint64_t, 1> ularr = {12ul, 14ul, 16ul, 18ul, 1234321ul};
         dump_npy(filename, barr);
 
-        std::string compare_name = "files/xnpy_files/bool.npy";
-        if (barr.layout() == layout_type::column_major)
-        {
-            compare_name = "files/xnpy_files/bool_fortran.npy";
-        }
+        std::string compare_name = get_load_filename("files/xnpy_files/bool", barr.layout());
 
         EXPECT_TRUE(compare_binary_files(filename, compare_name));
 
@@ -120,16 +124,12 @@ namespace xt
 
         std::remove(filename.c_str());
 
-        filename = get_filename(1);
+        filename = get_dump_filename(1);
         dump_npy(filename, ularr);
         auto ularrcpy = load_npy<uint64_t>(filename);
         EXPECT_TRUE(all(equal(ularr, ularrcpy)));
 
-        compare_name = "files/xnpy_files/unsignedlong.npy";
-        if (barr.layout() == layout_type::column_major)
-        {
-            compare_name = "files/xnpy_files/unsignedlong_fortran.npy";
-        }
+        compare_name = get_load_filename("files/xnpy_files/unsignedlong", barr.layout());
 
         EXPECT_TRUE(compare_binary_files(filename, compare_name));
 
@@ -143,7 +143,7 @@ namespace xt
     TEST(xnpy, xfunction_cast)
     {
         // compilation test, cf: https://github.com/xtensor-stack/xtensor/issues/1070
-        auto dc = cast<char>(load_npy<double>("files/xnpy_files/double.npy"));
+        auto dc = cast<char>(load_npy<double>(get_load_filename("files/xnpy_files/double")));
         EXPECT_EQ(dc(0, 0), 0);
         xarray<char> adc = dc;
         EXPECT_EQ(adc(0, 0), 0);

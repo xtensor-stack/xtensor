@@ -242,17 +242,20 @@ endif()
 
 # Add files for npy tests
 set(XNPY_FILES
-    bool.npy
-    bool_fortran.npy
-    double.npy
-    double_fortran.npy
-    int.npy
-    unsignedlong.npy
-    unsignedlong_fortran.npy
+    bool
+    bool_fortran
+    double
+    double_fortran
+    int
+    unsignedlong
+    unsignedlong_fortran
 )
+
 foreach(filename IN LISTS XNPY_FILES)
-    configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files/xnpy_files/${filename}
-        ${CMAKE_CURRENT_BINARY_DIR}/files/xnpy_files/${filename} COPYONLY)
+    foreach(suffix .be.npy .le.npy)
+        configure_file(${CMAKE_CURRENT_SOURCE_DIR}/files/xnpy_files/${filename}${suffix}
+            ${CMAKE_CURRENT_BINARY_DIR}/files/xnpy_files/${filename}${suffix} COPYONLY)
+    endforeach()
 endforeach()
 
 set(XTENSOR_PREPROCESS_FILES
