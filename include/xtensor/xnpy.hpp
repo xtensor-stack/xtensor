@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <complex>
 #include <cstdint>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -42,17 +43,15 @@ namespace xt
     namespace detail
     {
 
-    /* Compile-time test for byte order.
-       If your compiler does not define these per default, you may want to define
-       one of these constants manually.
-       Defaults to little endian order. */
-#if defined(__BYTE_ORDER) && __BYTE_ORDER == __BIG_ENDIAN || defined(__BIG_ENDIAN__) || \
-    defined(__ARMEB__) || defined(__THUMBEB__) || defined(__AARCH64EB__) ||             \
-    defined(_MIBSEB) || defined(__MIBSEB) || defined(__MIBSEB__)
-        const bool big_endian = true;
-#else
-        const bool big_endian = false;
-#endif
+        /* Test for endianess. Compiler can optimize that to a single constant. */
+        static inline bool is_big_endian()
+        {
+            uint32_t utmp = 0x01020304;
+            char btmp[sizeof(utmp)];
+            std::memcpy(&btmp[0], &utmp, sizeof(utmp));
+            const bool big_endian = btmp[0] == 0x01;
+            return big_endian;
+        }
 
         const char magic_string[] = "\x93NUMPY";
         const std::size_t magic_string_length = 6;
@@ -61,7 +60,7 @@ namespace xt
         const char big_endian_char = '>';
         const char no_endian_char = '|';
 
-        constexpr char host_endian_char = (big_endian ? big_endian_char : little_endian_char);
+        char host_endian_char = (is_big_endian() ? big_endian_char : little_endian_char);
 
         template <class O>
         inline void write_magic(O& ostream,
