@@ -392,7 +392,7 @@ namespace xt
                 version[0] = 2;
                 version[1] = 0;
             }
-            std::size_t padding_len = 16 - metadata_len % 16;
+            std::size_t padding_len = 64 - (metadata_len % 64);
             std::string padding(padding_len, ' ');
             ss_header << padding;
             ss_header << std::endl;
