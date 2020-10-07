@@ -99,7 +99,7 @@ The following minimal ``CMakeLists.txt`` is enough to build the first example:
 
         target_link_libraries(... xtensor::optimize)
 
-    set the following compiler flags:
+    set the following compiler flags, if supported by the target compiler:
 
     *   Unix: ``-march=native``;
     *   Windows: ``/EHsc /MP /bigobj``.

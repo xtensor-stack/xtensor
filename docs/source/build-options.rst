@@ -103,7 +103,8 @@ anything, the system will do its best to enable the most recent supported instru
 Linux/OSX
 ~~~~~~~~~
 
-Whether you enabled ``XTENSOR_USE_XSIMD`` or not, it is highly recommended to build with ``-march=native`` option:
+Whether you enabled ``XTENSOR_USE_XSIMD`` or not, it is highly recommended to build with ``-march=native`` option,
+if your compiler supports it:
 
 .. code:: cmake
 
