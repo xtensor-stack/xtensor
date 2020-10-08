@@ -400,7 +400,7 @@ namespace xt
 
     template <class CS, class EX>
     template <class S>
-    inline bool xchunked_array<CS, EX>::has_linear_assign(const S& strides) const noexcept
+    inline bool xchunked_array<CS, EX>::has_linear_assign(const S&) const noexcept
     {
         return false;
     }
