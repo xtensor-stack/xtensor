@@ -70,6 +70,8 @@ namespace xt
         template <class T>
         const xarray<T>& get_array() const;
 
+        const zchunked_array& as_chunked_array() const;
+
     private:
 
         template <class E>
@@ -169,6 +171,11 @@ namespace xt
     inline const xarray<T>& zarray::get_array() const
     {
         return dynamic_cast<const ztyped_array<T>*>(p_impl.get())->get_array();
+    }
+
+    inline const zchunked_array& zarray::as_chunked_array() const
+    {
+        return dynamic_cast<const zchunked_array&>(*(p_impl.get()));
     }
 }
 

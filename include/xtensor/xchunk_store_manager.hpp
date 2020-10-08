@@ -143,7 +143,7 @@ namespace xt
      * xindex_path implementation *
      ******************************/
 
-    void xindex_path::set_directory(const std::string& directory)
+    inline void xindex_path::set_directory(const std::string& directory)
     {
         m_directory = directory;
         if (m_directory.back() != '/')
