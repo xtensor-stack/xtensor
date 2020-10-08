@@ -92,6 +92,7 @@ namespace xt
     {
         xt::xarray<double> arr = { 5., 6. };
         xt::strided_view(arr, { 0 }) = xt::strided_view(arr, { 1 });
+        EXPECT_EQ(arr(0), arr(1));
     }
 
     TEST(xstrided_view, three_dimensional)

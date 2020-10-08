@@ -40,6 +40,53 @@ namespace xt
     template <class T>
     using disable_chunk_store_manager_t = typename disable_chunk_store_manager<T>::type;
 
+    /*********************************
+     * xchunked_semantic declaration *
+     *********************************/
+
+    template <class D>
+    class xchunked_semantic : public xsemantic_base<D>
+    {
+    public:
+
+        using base_type = xsemantic_base<D>;
+        using derived_type = D;
+        using temporary_type = typename base_type::temporary_type;
+
+        template <class E>
+        derived_type& assign_xexpression(const xexpression<E>& e);
+
+        template <class E>
+        derived_type& computed_assign(const xexpression<E>& e);
+
+        template <class E, class F>
+        derived_type& scalar_computed_assign(const E& e, F&& f);
+
+    protected:
+
+        xchunked_semantic() = default;
+        ~xchunked_semantic() = default;
+
+        xchunked_semantic(const xchunked_semantic&) = default;
+        xchunked_semantic& operator=(const xchunked_semantic&) = default;
+
+        xchunked_semantic(xchunked_semantic&&) = default;
+        xchunked_semantic& operator=(xchunked_semantic&&) = default;
+
+        template <class E>
+        derived_type& operator=(const xexpression<E>&);
+
+    private:
+
+        template <class E, class CS,
+                  disable_chunk_store_manager_t<CS> = 0>
+        derived_type& assign_temporary(const xexpression<E>& e, const CS& cs);
+
+        template <class E, class CS,
+                  enable_chunk_store_manager_t<CS> = 0>
+        derived_type& assign_temporary(const xexpression<E>& e, const CS& cs);
+    };
+
     /******************************
      * xchunked_array declaration *
      ******************************/
@@ -82,7 +129,7 @@ namespace xt
         using const_reference = typename chunk_type::const_reference;
         using reference = typename chunk_type::reference;
         using self_type = xchunked_array<chunk_storage, extension>;
-        using semantic_base = xcontainer_semantic<self_type>;
+        using semantic_base = xchunked_semantic<self_type>;
         using iterable_base = xconst_iterable<self_type>;
         using const_stepper = typename iterable_base::const_stepper;
         using stepper = typename iterable_base::stepper;
@@ -125,6 +172,12 @@ namespace xt
 
         template <class E, class S>
         xchunked_array(const xexpression<E>& e, S&& chunk_shape);
+
+        template <class E, class S>
+        xchunked_array(const xexpression<E>& e,
+                       S&& chunk_shape,
+                       const std::string& directory,
+                       std::size_t pool_size = 1u);
 
         template <class E>
         xchunked_array& operator=(const xexpression<E>& e);
@@ -207,6 +260,59 @@ namespace xt
     template<class E>
     constexpr bool is_chunked(const xexpression<E>& e);
 
+    /************************************
+     * xchunked_semantic implementation *
+     ************************************/
+
+    template <class D>
+    template <class E>
+    inline auto xchunked_semantic<D>::assign_xexpression(const xexpression<E>& e) -> derived_type&
+    {
+        return this->derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xchunked_semantic<D>::computed_assign(const xexpression<E>& e) -> derived_type&
+    {
+        return this->derived_cast();
+    }
+
+    template <class D>
+    template <class E, class F>
+    inline auto xchunked_semantic<D>::scalar_computed_assign(const E& e, F&& f) -> derived_type&
+    {
+        return this->derived_cast();
+    }
+
+    template <class D>
+    template <class E>
+    inline auto xchunked_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
+    {
+        temporary_type tmp = build_temporary(e, this->derived_cast().chunks());
+        return assign_temporary(std::move(tmp));
+    }
+    
+    template <class D>
+    template <class E, class CS,
+              disable_chunk_store_manager_t<CS>>
+    inline auto xchunked_semantic<D>::assign_temporary(const xexpression<E>& e, const CS&) -> derived_type&
+    {
+        temporary_type tmp(e, e.derived_cast().chunk_shape());
+        return (this->derived_cast() = std::move(tmp));
+    }
+
+    template <class D>
+    template <class E, class CS,
+              enable_chunk_store_manager_t<CS>>
+    inline auto xchunked_semantic<D>::assign_temporary(const xexpression<E>& e, const CS& cs) -> derived_type&
+    {
+        temporary_type tmp(e, e.derived_cast().chunk_shape(), cs.get_temporary_directory(), cs.get_pool_size());
+        tmp.chunks().flush();
+        this->derived_cast().chunks().reset_to_directory(tmp.chunks().get_directory());
+        return this->derived_cast();
+    }
+
     /*******************************
      * chunk_helper implementation *
      *******************************/
@@ -283,6 +389,20 @@ namespace xt
     inline xchunked_array<CS, EX>::xchunked_array(const xexpression<E>& e, S&& chunk_shape)
     {
         resize(e.derived_cast().shape(), std::forward<S>(chunk_shape));
+        assign(e);
+    }
+
+    template <class CS, class EX>
+    template <class E, class S>
+    inline xchunked_array<CS, EX>::xchunked_array(const xexpression<E>& e,
+                                                  S&& chunk_shape,
+                                                  const std::string& directory,
+                                                  std::size_t pool_size)
+    {
+        static_assert(is_chunk_store_manager<CS>::value, "Invalid constructor for in-memory chunked array");
+        resize(e.derived_cast().shape(), std::forward<S>(chunk_shape));
+        m_chunks.set_directory(directory);
+        m_chunks.set_pool_size(pool_size);
         assign(e);
     }
 
