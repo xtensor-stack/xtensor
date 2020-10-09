@@ -44,9 +44,6 @@ namespace xt
         zarray() = default;
         ~zarray() = default;
 
-        template <class E, class U = std::enable_if_t<!std::is_base_of<std::decay_t<E>, zarray>::value>>
-        zarray(E&& e);
-
         zarray(implementation_ptr&& impl);
         zarray& operator=(implementation_ptr&& impl);
 
@@ -56,6 +53,15 @@ namespace xt
         zarray(zarray&& rhs);
         zarray& operator=(zarray&& rhs);
 
+        template <class E>
+        zarray(const xexpression<E>& e);
+
+        template <class E>
+        zarray(xexpression<E>& e);
+
+        template <class E>
+        zarray(xexpression<E>&& e);
+        
         template <class E>
         zarray& operator=(const xexpression<E>&);
 
@@ -99,12 +105,6 @@ namespace xt
         p_impl = nullptr;
         semantic_base::assign(e);
     }
-    
-    template <class E, class U>
-    inline zarray::zarray(E&& e)
-    {
-        init_implementation(std::forward<E>(e), extension::get_expression_tag_t<std::decay_t<E>>());
-    }
 
     inline zarray::zarray(implementation_ptr&& impl)
         : p_impl(std::move(impl))
@@ -132,6 +132,24 @@ namespace xt
     inline zarray::zarray(zarray&& rhs)
         : p_impl(std::move(rhs.p_impl))
     {
+    }
+
+    template <class E>
+    inline zarray::zarray(const xexpression<E>& e)
+    {
+        init_implementation(e.derived_cast(), extension::get_expression_tag_t<std::decay_t<E>>());
+    }
+
+    template <class E>
+    inline zarray::zarray(xexpression<E>& e)
+    {
+        init_implementation(e.derived_cast(), extension::get_expression_tag_t<std::decay_t<E>>());
+    }
+
+    template <class E>
+    inline zarray::zarray(xexpression<E>&& e)
+    {
+        init_implementation(std::move(e).derived_cast(), extension::get_expression_tag_t<std::decay_t<E>>());
     }
 
     inline zarray& zarray::operator=(zarray&& rhs)
