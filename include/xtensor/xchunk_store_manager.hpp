@@ -108,6 +108,9 @@ namespace xt
         template <class S>
         void resize(S&& shape);
 
+        template <class S>
+        void set_chunk_shape(S&& chunk_shape);
+
         std::size_t size();
 
         void set_pool_size(std::size_t n);
@@ -258,6 +261,13 @@ namespace xt
         // don't resize according to total number of chunks
         // instead the pool manages a number of in-memory chunks
         m_shape = shape;
+    }
+
+    template <class EC, class IP>
+    template <class S>
+    inline void xchunk_store_manager<EC, IP>::set_chunk_shape(S&& chunk_shape)
+    {
+        m_chunk_pool[0].resize(chunk_shape);
     }
 
     template <class EC, class IP>
