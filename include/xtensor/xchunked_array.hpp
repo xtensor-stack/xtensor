@@ -16,8 +16,8 @@ namespace xt
     {
     };
     
-    template <class T>
-    struct is_chunk_store_manager<xchunk_store_manager<T>>
+    template <class EC, class IP>
+    struct is_chunk_store_manager<xchunk_store_manager<EC, IP>>
         : std::true_type
     {
     };
