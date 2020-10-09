@@ -266,9 +266,9 @@ namespace xt
                                                   const std::string& directory,
                                                   std::size_t pool_size)
     {
-        resize(std::forward<S>(shape), std::forward<S>(chunk_shape));
         m_chunks.set_directory(directory);
         m_chunks.set_pool_size(pool_size);
+        resize(std::forward<S>(shape), std::forward<S>(chunk_shape));
     }
 
     template <class CS, class EX>
