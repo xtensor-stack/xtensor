@@ -10,6 +10,8 @@
 #include "gtest/gtest.h"
 #include "xtensor/zarray.hpp"
 #include "xtensor/zfunction.hpp"
+#include "xtensor/xfile_array.hpp"
+#include "xtensor/xdisk_io_handler.hpp"
 
 #ifndef XTENSOR_DISABLE_EXCEPTIONS
 namespace xt
@@ -150,7 +152,28 @@ namespace xt
         zarray zb(za);
 
         const auto& b = zb.get_array<double>();
-        EXPECT_TRUE(all(b, a));
+        EXPECT_EQ(b, a);
+    }
+
+    TEST(zarray, assign_chunked)
+    {
+        std::vector<size_t> shape = {4, 4};
+        std::vector<size_t> chunk_shape = {2, 2};
+        std::string chunk_dir = "files";
+        std::size_t pool_size = 2;
+        using chunked_array = xchunked_array<xchunk_store_manager<xfile_array<double, xdisk_io_handler<xcsv_config>>>>;
+        chunked_array a1(shape, chunk_shape, chunk_dir, pool_size);
+
+        double v = 489.1;
+        zarray z1(a1);
+        z1(2, 2) = v;
+        z1(1, 1) = 1;  // will flush previous chunk assignment
+
+        using file_array = xfile_array<double, xdisk_io_handler<xcsv_config>>;
+        file_array a2;
+        a2.set_path("files/1.1");
+
+        EXPECT_EQ(a2(0, 0), v);
     }
 }
 #endif
