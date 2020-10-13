@@ -72,7 +72,8 @@ namespace xt
         using const_stepper = typename iterable_base::const_stepper;
         using shape_type = typename iterable_base::inner_shape_type;
 
-        xchunk_store_manager();
+        template <class S>
+        xchunk_store_manager(S&& shape, S&& chunk_shape, const std::string& directory, std::size_t pool_size);
         ~xchunk_store_manager() = default;
 
         xchunk_store_manager(const xchunk_store_manager&) = default;
@@ -110,8 +111,6 @@ namespace xt
 
         std::size_t size();
 
-        void set_pool_size(std::size_t n);
-        void set_directory(const std::string& directory);
         IP& get_index_path();
         void flush();
 
@@ -172,15 +171,23 @@ namespace xt
      ***************************************/
 
     template <class EC, class IP>
-    inline xchunk_store_manager<EC, IP>::xchunk_store_manager()
-        : m_shape()
-        // default pool size is 1
-        // so that first chunk is always resized to the chunk shape
-        , m_chunk_pool(1u)
-        , m_index_pool(1u)
+    template <class S>
+    inline xchunk_store_manager<EC, IP>::xchunk_store_manager(S&& shape,
+                                                              S&& chunk_shape,
+                                                              const std::string& directory,
+                                                              std::size_t pool_size)
+        : m_shape(shape)
+        , m_chunk_pool(pool_size)
+        , m_index_pool(pool_size)
         , m_unload_index(0u)
     {
-        m_chunk_pool[0].ignore_empty_path(true);
+        // resize the pool chunks
+        for (auto& chunk: m_chunk_pool)
+        {
+            chunk.resize(chunk_shape);
+            chunk.ignore_empty_path(true);
+        }
+        m_index_path.set_directory(directory);
     }
 
     template <class EC, class IP>
@@ -267,23 +274,6 @@ namespace xt
     }
 
     template <class EC, class IP>
-    inline void xchunk_store_manager<EC, IP>::set_pool_size(std::size_t n)
-    {
-        // first chunk always has the correct shape
-        // get the shape before resizing the pool
-        auto chunk_shape = m_chunk_pool[0].storage().shape();
-        m_chunk_pool.resize(n);
-        m_index_pool.resize(n);
-        m_unload_index = 0;
-        // resize the pool chunks
-        for (auto& chunk: m_chunk_pool)
-        {
-            chunk.resize(chunk_shape);
-            chunk.ignore_empty_path(true);
-        }
-    }
-
-    template <class EC, class IP>
     inline void xchunk_store_manager<EC, IP>::flush()
     {
         for (auto& chunk: m_chunk_pool)
@@ -306,12 +296,6 @@ namespace xt
     IP& xchunk_store_manager<EC, IP>::get_index_path()
     {
         return m_index_path;
-    }
-
-    template <class EC, class IP>
-    void xchunk_store_manager<EC, IP>::set_directory(const std::string& directory)
-    {
-        m_index_path.set_directory(directory);
     }
 
     template <class EC, class IP>

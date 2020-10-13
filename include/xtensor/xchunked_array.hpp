@@ -182,7 +182,7 @@ namespace xt
         using dynamic_indexes_type = std::pair<std::vector<std::size_t>, std::vector<std::size_t>>;
 
         template <class S1, class S2>
-        void resize(S1&& shape, S2&& chunk_shape);
+        void resize(S1&& shape, S2&& chunk_shape, bool resize_chunks = true);
 
         template <class... Idxs>
         indexes_type<Idxs...> get_indexes(Idxs... idxs) const;
@@ -265,10 +265,11 @@ namespace xt
                                                   S&& chunk_shape,
                                                   const std::string& directory,
                                                   std::size_t pool_size)
+        : m_chunks(shape, chunk_shape, directory, pool_size)
     {
-        m_chunks.set_directory(directory);
-        m_chunks.set_pool_size(pool_size);
-        resize(std::forward<S>(shape), std::forward<S>(chunk_shape));
+        // don't resize the "logical" chunks
+        // instead, the "physical" chunks in the pool are resized
+        resize(std::forward<S>(shape), std::forward<S>(chunk_shape), false);
     }
 
     template <class CS, class EX>
@@ -457,7 +458,7 @@ namespace xt
 
     template <class CS, class EX>
     template <class S1, class S2>
-    inline void xchunked_array<CS, EX>::resize(S1&& shape, S2&& chunk_shape)
+    inline void xchunked_array<CS, EX>::resize(S1&& shape, S2&& chunk_shape, bool resize_chunks)
     {
         // compute chunk number in each dimension (shape_of_chunks)
         std::vector<std::size_t> shape_of_chunks(shape.size());
@@ -477,10 +478,13 @@ namespace xt
 
         // resize the chunk container
         m_chunks.resize(shape_of_chunks);
-        // resize each chunk
-        for (auto& c: m_chunks)
+        if (resize_chunks)
         {
-            c.resize(chunk_shape);
+            // resize each chunk
+            for (auto& c: m_chunks)
+            {
+                c.resize(chunk_shape);
+            }
         }
 
         m_shape = xtl::forward_sequence<shape_type, S1>(shape);
