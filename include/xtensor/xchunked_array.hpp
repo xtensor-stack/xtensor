@@ -4,43 +4,12 @@
 #include <vector>
 #include <array>
 
+#include "xarray.hpp"
 #include "xnoalias.hpp"
 #include "xstrided_view.hpp"
 
 namespace xt
 {
-
-    template <class EC, class IP>
-    class xchunk_store_manager;
-
-    template <class T>
-    struct is_chunk_store_manager : std::false_type
-    {
-    };
-    
-    template <class EC, class IP>
-    struct is_chunk_store_manager<xchunk_store_manager<EC, IP>>
-        : std::true_type
-    {
-    };
-
-    template <class T>
-    struct enable_chunk_store_manager
-        : std::enable_if<is_chunk_store_manager<T>::value, int>
-    {
-    };
-
-    template <class T>
-    using enable_chunk_store_manager_t = typename enable_chunk_store_manager<T>::type;
-
-    template <class T>
-    struct disable_chunk_store_manager
-        : std::enable_if<!is_chunk_store_manager<T>::value, int>
-    {
-    };
-
-    template <class T>
-    using disable_chunk_store_manager_t = typename disable_chunk_store_manager<T>::type;
 
     /******************************
      * xchunked_array declaration *
@@ -101,19 +70,8 @@ namespace xt
         static constexpr layout_type static_layout = layout_type::dynamic;
         static constexpr bool contiguous_layout = false;
 
-        template <class S,
-                  class CS = chunk_storage,
-                  disable_chunk_store_manager_t<CS> = 0>
-        xchunked_array(S&& shape, S&& chunk_shape);
-
-        template <class S,
-                  class CS = chunk_storage,
-                  enable_chunk_store_manager_t<CS> = 0>
-        xchunked_array(S&& shape,
-                       S&& chunk_shape,
-                       const std::string& directory,
-                       std::size_t pool_size = 1);
-
+        template <class S>
+        xchunked_array(chunk_storage_type&& chunks, S&& shape, S&& chunk_shape);
         ~xchunked_array() = default;
 
         xchunked_array(const xchunked_array&) = default;
@@ -184,7 +142,7 @@ namespace xt
         using dynamic_indexes_type = std::pair<std::vector<std::size_t>, std::vector<std::size_t>>;
 
         template <class S1, class S2>
-        void resize(S1&& shape, S2&& chunk_shape, bool resize_chunks = true);
+        void resize(S1&& shape, S2&& chunk_shape);
 
         template <class... Idxs>
         indexes_type<Idxs...> get_indexes(Idxs... idxs) const;
@@ -209,6 +167,9 @@ namespace xt
     template<class E>
     constexpr bool is_chunked(const xexpression<E>& e);
 
+    template <class T, class S>
+    xchunked_array<xarray<xarray<T>>> chunked_array(S&& shape, S&& chunk_shape);
+
     /*******************************
      * chunk_helper implementation *
      *******************************/
@@ -227,6 +188,16 @@ namespace xt
             {
                 return e.derived_cast().shape();
             }
+
+            template <class S1, class S2>
+            static void resize(E& chunks, const S1& container_shape, const S2& chunk_shape)
+            {
+                chunks.resize(container_shape);
+                for(auto& c: chunks)
+                {
+                    c.resize(chunk_shape);
+                }
+            }
         };
 
         template <class E, template <class> class OP>
@@ -236,6 +207,12 @@ namespace xt
             static const auto& chunk_shape(const xexpression<E>& e)
             {
                 return e.derived_cast().chunk_shape();
+            }
+
+            template <class S1, class S2>
+            static void resize(E& chunks, const S1& container_shape, const S2& chunk_shape)
+            {
+                chunks.resize(container_shape, chunk_shape);
             }
         };
 
@@ -250,28 +227,23 @@ namespace xt
         return return_type::value;
     }
 
+    template <class T, class S>
+    inline xchunked_array<xarray<xarray<T>>> chunked_array(S&& shape, S&& chunk_shape)
+    {
+        using chunk_storage = xarray<xarray<T>>;
+        return xchunked_array<chunk_storage>(chunk_storage(), std::forward<S>(shape), std::forward<S>(chunk_shape));
+    }
+
     /*********************************
      * xchunked_array implementation *
      *********************************/
 
     template <class CS, class EX>
-    template <class S, class T, disable_chunk_store_manager_t<T>>
-    inline xchunked_array<CS, EX>::xchunked_array(S&& shape, S&& chunk_shape)
+    template <class S>
+    inline xchunked_array<CS, EX>::xchunked_array(CS&& chunks, S&& shape, S&& chunk_shape)
+        : m_chunks(chunks)
     {
         resize(std::forward<S>(shape), std::forward<S>(chunk_shape));
-    }
-
-    template <class CS, class EX>
-    template <class S, class T, enable_chunk_store_manager_t<T>>
-    inline xchunked_array<CS, EX>::xchunked_array(S&& shape,
-                                                  S&& chunk_shape,
-                                                  const std::string& directory,
-                                                  std::size_t pool_size)
-        : m_chunks(shape, chunk_shape, directory, pool_size)
-    {
-        // don't resize the "logical" chunks
-        // instead, the "physical" chunks in the pool are resized
-        resize(std::forward<S>(shape), std::forward<S>(chunk_shape), false);
     }
 
     template <class CS, class EX>
@@ -460,7 +432,7 @@ namespace xt
 
     template <class CS, class EX>
     template <class S1, class S2>
-    inline void xchunked_array<CS, EX>::resize(S1&& shape, S2&& chunk_shape, bool resize_chunks)
+    inline void xchunked_array<CS, EX>::resize(S1&& shape, S2&& chunk_shape)
     {
         // compute chunk number in each dimension (shape_of_chunks)
         std::vector<std::size_t> shape_of_chunks(shape.size());
@@ -478,16 +450,7 @@ namespace xt
             }
         );
 
-        // resize the chunk container
-        m_chunks.resize(shape_of_chunks);
-        if (resize_chunks)
-        {
-            // resize each chunk
-            for (auto& c: m_chunks)
-            {
-                c.resize(chunk_shape);
-            }
-        }
+        detail::chunk_helper<CS>::resize(m_chunks, shape_of_chunks, chunk_shape);
 
         m_shape = xtl::forward_sequence<shape_type, S1>(shape);
         m_chunk_shape = xtl::forward_sequence<shape_type, S2>(chunk_shape);

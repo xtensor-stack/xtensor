@@ -9,7 +9,6 @@
 
 #include "gtest/gtest.h"
 
-#include "xtensor/xarray.hpp"
 #include "xtensor/xbroadcast.hpp"
 #include "xtensor/xchunked_array.hpp"
 #include "xtensor/xcsv.hpp"
@@ -22,7 +21,7 @@ namespace xt
     {
         std::vector<size_t> shape = {10, 10, 10};
         std::vector<size_t> chunk_shape = {2, 3, 4};
-        in_memory_chunked_array a(shape, chunk_shape);
+        auto a = chunked_array<double>(shape, chunk_shape);
 
         std::vector<size_t> idx = {3, 9, 8};
         double val;
@@ -48,7 +47,7 @@ namespace xt
     {
         std::vector<size_t> shape1 = {2, 2, 2};
         std::vector<size_t> chunk_shape1 = {2, 3, 4};
-        in_memory_chunked_array a1(shape1, chunk_shape1);
+        auto a1 = chunked_array<double>(shape1, chunk_shape1);
         double val;
 
         val = 3.;
@@ -59,7 +58,7 @@ namespace xt
         }
 
         std::vector<size_t> shape2 = {32, 10, 10};
-        in_memory_chunked_array a2(shape2, chunk_shape1);
+        auto a2 = chunked_array<double>(shape2, chunk_shape1);
 
         a2 = broadcast(val, a2.shape());
         for (const auto& v: a2)

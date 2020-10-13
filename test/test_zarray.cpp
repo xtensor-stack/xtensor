@@ -129,7 +129,7 @@ namespace xt
         using shape_type = std::vector<size_t>;
         shape_type shape = {10, 10, 10};
         shape_type chunk_shape = {2, 3, 4};
-        xchunked_array<xarray<xarray<double>>> a(shape, chunk_shape);
+        auto a = chunked_array<double>(shape, chunk_shape);
 
         zarray za(a);
         shape_type res = za.as_chunked_array().chunk_shape();
