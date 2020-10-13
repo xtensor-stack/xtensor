@@ -6,10 +6,12 @@
 
 #include "xnoalias.hpp"
 #include "xstrided_view.hpp"
-#include "xchunk_store_manager.hpp"
 
 namespace xt
 {
+
+    template <class EC, class IP>
+    class xchunk_store_manager;
 
     template <class T>
     struct is_chunk_store_manager : std::false_type
