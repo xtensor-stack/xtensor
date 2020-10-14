@@ -12,6 +12,7 @@
 
 #include <algorithm>
 #include <functional>
+#include <memory>
 #include <numeric>
 #include <stdexcept>
 
@@ -707,7 +708,7 @@ namespace xt
     inline void xcontainer<D>::store_simd(size_type i, const simd& e)
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        xt_simd::store_simd<value_type, typename simd::value_type>(&(storage()[i]), e, align_mode());
+        xt_simd::store_simd<value_type, typename simd::value_type>(std::addressof(storage()[i]), e, align_mode());
     }
 
     template <class D>
@@ -717,7 +718,7 @@ namespace xt
         //-> simd_return_type<requested_type>
     {
         using align_mode = driven_align_mode_t<alignment, data_alignment>;
-        return xt_simd::load_simd<value_type, requested_type>(&(storage()[i]), align_mode());
+        return xt_simd::load_simd<value_type, requested_type>(std::addressof(storage()[i]), align_mode());
     }
 
     template <class D>
