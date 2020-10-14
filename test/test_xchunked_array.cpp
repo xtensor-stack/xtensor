@@ -72,6 +72,13 @@ namespace xt
             EXPECT_EQ(v, 2. * val);
         }
 
+        a2 += 2.;
+        for (const auto& v: a2)
+        {
+            EXPECT_EQ(v, 2. * val + 2.);
+        }
+
+
         xarray<double> a3
           {{1., 2., 3.},
            {4., 5., 6.},
@@ -80,7 +87,7 @@ namespace xt
         EXPECT_EQ(is_chunked(a3), false);
 
         std::vector<size_t> chunk_shape4 = {2, 2};
-        auto a4 = in_memory_chunked_array(a3, chunk_shape4);
+        auto a4 = chunked_array(a3, chunk_shape4);
 
         EXPECT_EQ(is_chunked(a4), true);
 
@@ -98,7 +105,7 @@ namespace xt
             EXPECT_EQ(v, 2);
         }
 
-        auto a6 = in_memory_chunked_array(a3);
+        auto a6 = chunked_array(a3);
         EXPECT_EQ(is_chunked(a6), true);
         for (const auto& v: a6.chunk_shape())
         {
