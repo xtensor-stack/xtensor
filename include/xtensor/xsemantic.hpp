@@ -385,7 +385,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator+=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() + e.derived_cast());
+        return this->derived_cast() = this->derived_cast() + e.derived_cast();
     }
 
     /**
@@ -397,7 +397,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator-=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() - e.derived_cast());
+        return this->derived_cast() = this->derived_cast() - e.derived_cast();
     }
 
     /**
@@ -409,7 +409,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator*=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() * e.derived_cast());
+        return this->derived_cast() = this->derived_cast() * e.derived_cast();
     }
 
     /**
@@ -421,7 +421,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator/=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() / e.derived_cast());
+        return this->derived_cast() = this->derived_cast() / e.derived_cast();
     }
 
     /**
@@ -433,7 +433,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator%=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() % e.derived_cast());
+        return this->derived_cast() = this->derived_cast() % e.derived_cast();
     }
 
     /**
@@ -445,7 +445,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator&=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() & e.derived_cast());
+        return this->derived_cast() = this->derived_cast() & e.derived_cast();
     }
 
     /**
@@ -457,7 +457,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator|=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() | e.derived_cast());
+        return this->derived_cast() = this->derived_cast() | e.derived_cast();
     }
 
     /**
@@ -469,7 +469,7 @@ namespace xt
     template <class E>
     inline auto xsemantic_base<D>::operator^=(const xexpression<E>& e) -> derived_type&
     {
-        return operator=(this->derived_cast() ^ e.derived_cast());
+        return this->derived_cast() = this->derived_cast() ^ e.derived_cast();
     }
     //@}
 
