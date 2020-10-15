@@ -10,6 +10,8 @@
 #include "gtest/gtest.h"
 
 #include <complex>
+#include <xtl/xcomplex.hpp>
+
 #include "xtensor/xarray.hpp"
 #include "xtensor/xbuilder.hpp"
 #include "xtensor/xcomplex.hpp"
@@ -305,5 +307,13 @@ namespace xt
         EXPECT_EQ(rc(0).real(), r(0));
         EXPECT_EQ(rc(1).real(), r(1));
         EXPECT_EQ(rc(2).real(), r(2));
+    }
+
+    TEST(xcomplex, xcomplex)
+    {
+        using complex_type = xtl::xcomplex<double>;
+        xt::xarray<complex_type> a = xt::ones<complex_type>(std::vector<size_t>(3,7));
+    
+        auto simd_loaded = a.template load_simd<xt_simd::aligned_mode, complex_type, xt_simd::simd_traits<complex_type>::size>(0);
     }
 }

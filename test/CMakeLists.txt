@@ -272,7 +272,10 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
     string(REPLACE ".cpp" "" targetname ${filename})
     add_executable(${targetname} ${filename} ${TEST_HEADERS} ${XTENSOR_HEADERS})
     if(XTENSOR_USE_XSIMD)
-        target_compile_definitions(${targetname} PRIVATE XTENSOR_USE_XSIMD)
+        target_compile_definitions(${targetname}
+                                   PRIVATE
+                                   XTENSOR_USE_XSIMD
+                                   XSIMD_ENABLE_XTL_COMPLEX)
         target_link_libraries(${targetname} PRIVATE xsimd)
     endif()
     if(XTENSOR_USE_TBB)
@@ -296,7 +299,10 @@ endforeach()
 
 add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
 if(XTENSOR_USE_XSIMD)
-    target_compile_definitions(test_xtensor_lib PRIVATE XTENSOR_USE_XSIMD)
+    target_compile_definitions(test_xtensor_lib
+                               PRIVATE
+                               XTENSOR_USE_XSIMD
+                               XSIMD_ENABLE_XTL_COMPLEX)
     target_link_libraries(test_xtensor_lib PRIVATE xsimd)
 endif()
 if(XTENSOR_USE_TBB)
