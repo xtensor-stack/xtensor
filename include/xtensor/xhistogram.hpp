@@ -237,7 +237,7 @@ namespace xt
             case histogram_algorithm::logspace:
             {
                 using rhs_value_type
-                    = std::conditional_t<std::is_integral<value_type>::value, double, value_type>;
+                    = std::conditional_t<xtl::is_integral<value_type>::value, double, value_type>;
 
                 xtensor<value_type, 1> bin_edges = xt::cast<value_type>(
                     xt::logspace<rhs_value_type>(std::log10(left), std::log10(right), bins + 1));
@@ -405,7 +405,7 @@ namespace xt
         using input_value_type = typename std::decay_t<E1>::value_type;
         using size_type = typename std::decay_t<E1>::size_type;
 
-        static_assert(std::is_integral<typename std::decay_t<E1>::value_type>::value,
+        static_assert(xtl::is_integral<typename std::decay_t<E1>::value_type>::value,
                       "Bincount data has to be integral type.");
         XTENSOR_ASSERT(data.dimension() == 1);
         XTENSOR_ASSERT(weights.dimension() == 1);

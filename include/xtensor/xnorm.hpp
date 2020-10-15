@@ -37,7 +37,7 @@ namespace xt
     namespace traits_detail
     {
 
-        template <class T, bool scalar = std::is_arithmetic<T>::value>
+        template <class T, bool scalar = xtl::is_arithmetic<T>::value>
         struct norm_of_scalar_impl;
 
         template <class T>
@@ -56,7 +56,7 @@ namespace xt
             using squared_norm_type = xtl::promote_type_t<T>;
         };
 
-        template <class T, bool integral = std::is_integral<T>::value,
+        template <class T, bool integral = xtl::is_integral<T>::value,
                   bool floating = std::is_floating_point<T>::value>
         struct norm_of_array_elements_impl;
 

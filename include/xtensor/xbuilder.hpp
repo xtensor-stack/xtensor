@@ -217,7 +217,7 @@ namespace xt
 
         // These methods should be private methods of arange_generator, however thi leads
         // to ICE on VS2015
-        template <class R, class E, class U, class X, XTL_REQUIRES(std::is_integral<X>)>
+        template <class R, class E, class U, class X, XTL_REQUIRES(xtl::is_integral<X>)>
         inline void arange_assign_to(xexpression<E>& e, U start, X step) noexcept
         {
             auto& de = e.derived_cast();
@@ -230,7 +230,7 @@ namespace xt
             }
         }
 
-        template <class R, class E, class U, class X, XTL_REQUIRES(xtl::negation<std::is_integral<X>>)>
+        template <class R, class E, class U, class X, XTL_REQUIRES(xtl::negation<xtl::is_integral<X>>)>
         inline void arange_assign_to(xexpression<E>& e, U start, X step) noexcept
         {
             auto& buf = e.derived_cast().storage();
@@ -295,10 +295,10 @@ namespace xt
         };
 
         template <class T, class S>
-        using both_integer = xtl::conjunction<std::is_integral<T>, std::is_integral<S>>;
+        using both_integer = xtl::conjunction<xtl::is_integral<T>, xtl::is_integral<S>>;
 
         template <class T, class S>
-        using integer_with_signed_integer = xtl::conjunction<both_integer<T, S>, std::is_signed<S>>;
+        using integer_with_signed_integer = xtl::conjunction<both_integer<T, S>, xtl::is_signed<S>>;
 
         template <class T, class S>
         using integer_with_unsigned_integer = xtl::conjunction<both_integer<T, S>, std::is_unsigned<S>>;

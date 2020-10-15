@@ -239,7 +239,7 @@ namespace xt
         void shuffle(xexpression<T>& e, E& engine = random::get_default_random_engine());
 
         template <class T, class E = random::default_engine_type>
-        std::enable_if_t<std::is_integral<T>::value, xtensor<T, 1>>
+        std::enable_if_t<xtl::is_integral<T>::value, xtensor<T, 1>>
         permutation(T e, E& engine = random::get_default_random_engine());
 
         template <class T, class E = random::default_engine_type>
@@ -902,7 +902,7 @@ namespace xt
          * @return randomly permuted copy of container or arange.
          */
         template <class T, class E>
-        std::enable_if_t<std::is_integral<T>::value, xtensor<T, 1>>
+        std::enable_if_t<xtl::is_integral<T>::value, xtensor<T, 1>>
         permutation(T e, E& engine)
         {
             xt::xtensor<T, 1> res = xt::arange<T>(e);

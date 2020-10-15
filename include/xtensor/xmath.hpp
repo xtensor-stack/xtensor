@@ -223,21 +223,21 @@ XTENSOR_INT_SPECIALIZATION_IMPL(FUNC_NAME, RETURN_VAL, unsigned long long);     
         // might return int instead of bool and the SIMD detection requires
         // bool return type.
         template <class T>
-        inline std::enable_if_t<std::is_arithmetic<T>::value, bool>
+        inline std::enable_if_t<xtl::is_arithmetic<T>::value, bool>
         isinf(const T& t)
         {
             return bool(std::isinf(t));
         }
 
         template <class T>
-        inline std::enable_if_t<std::is_arithmetic<T>::value, bool>
+        inline std::enable_if_t<xtl::is_arithmetic<T>::value, bool>
         isnan(const T& t)
         {
             return bool(std::isnan(t));
         }
 
         template <class T>
-        inline std::enable_if_t<std::is_arithmetic<T>::value, bool>
+        inline std::enable_if_t<xtl::is_arithmetic<T>::value, bool>
         isfinite(const T& t)
         {
             return bool(std::isfinite(t));
@@ -367,7 +367,7 @@ namespace detail {
 
 #define XTENSOR_REDUCER_FUNCTION(NAME, FUNCTOR, RESULT_TYPE, INIT)                                                \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>             \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>             \
     inline auto NAME(E&& e, X&& axes, EVS es = EVS())                                                             \
     {                                                                                                             \
         using result_type = std::conditional_t<std::is_same<T, void>::value, RESULT_TYPE, T>;                     \
@@ -380,7 +380,7 @@ namespace detail {
     }                                                                                                             \
                                                                                                                   \
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,                            \
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>                            \
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>                            \
     inline auto NAME(E&& e, X axis, EVS es = EVS())                                                               \
     {                                                                                                             \
         return NAME(std::forward<E>(e), {axis}, es);                                                              \
@@ -621,7 +621,7 @@ namespace detail {
 
         struct deg2rad
         {
-            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
             constexpr double operator()(const A& a) const noexcept
             {
               return a * xt::numeric_constants<double>::PI / 180.0;
@@ -633,7 +633,7 @@ namespace detail {
               return a * xt::numeric_constants<A>::PI / A(180.0);
             }
 
-            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
             constexpr double simd_apply(const A& a) const noexcept
             {
               return a * xt::numeric_constants<double>::PI / 180.0;
@@ -648,7 +648,7 @@ namespace detail {
 
         struct rad2deg
         {
-            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
             constexpr double operator()(const A& a) const noexcept
             {
               return a * 180.0 / xt::numeric_constants<double>::PI;
@@ -660,7 +660,7 @@ namespace detail {
               return a * A(180.0) / xt::numeric_constants<A>::PI;
             }
 
-            template <class A, std::enable_if_t<std::is_integral<A>::value, int> = 0>
+            template <class A, std::enable_if_t<xtl::is_integral<A>::value, int> = 0>
             constexpr double simd_apply(const A& a) const noexcept
             {
               return a * 180.0 / xt::numeric_constants<double>::PI;
@@ -835,7 +835,7 @@ namespace detail {
         struct sign_impl
         {
             template <class XT = T>
-            static constexpr std::enable_if_t<std::is_signed<XT>::value, T> run(T x)
+            static constexpr std::enable_if_t<xtl::is_signed<XT>::value, T> run(T x)
             {
                 return std::isnan(x) ? std::numeric_limits<T>::quiet_NaN() : x == 0 ? T(copysign(T(0), x)) : T(copysign(T(1), x));
             }
@@ -1907,7 +1907,7 @@ namespace detail {
         }
 
         template <class T, class E, class X, class D, class EVS,
-                  XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<D>)>
+                  XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
         inline auto mean(E&& e, X&& axes, D const& ddof, EVS es)
         {
             // sum cannot always be a double. It could be a complex number which cannot operate on
@@ -1942,7 +1942,7 @@ namespace detail {
 #endif
 
         template <class T, class E, class D, class EVS,
-                  XTL_REQUIRES(is_reducer_options<EVS>, std::is_integral<D>)>
+                  XTL_REQUIRES(is_reducer_options<EVS>, xtl::is_integral<D>)>
         inline auto mean_noaxis(E&& e, const D& ddof, EVS es)
         {
             using value_type = typename std::conditional_t<std::is_same<T, void>::value, double, T>;
@@ -2004,7 +2004,7 @@ namespace detail {
      * @sa mean
      */
     template <class E, class W, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_reducer_options<EVS>, xtl::negation<std::is_integral<X>>)>
+              XTL_REQUIRES(is_reducer_options<EVS>, xtl::negation<xtl::is_integral<X>>)>
     inline auto average(E&& e, W&& weights, X&& axes, EVS ev = EVS())
     {
         xindex_type_t<typename std::decay_t<E>::shape_type> broadcast_shape;
@@ -2091,7 +2091,7 @@ namespace detail {
     }
 
     template <class T = void, class E, class D, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(is_reducer_options<EVS>, std::is_integral<D>)>
+              XTL_REQUIRES(is_reducer_options<EVS>, xtl::is_integral<D>)>
     inline auto variance(E&& e, D const& ddof, EVS es = EVS())
     {
         auto cached_mean = mean<T>(e, es)();
@@ -2134,7 +2134,7 @@ namespace detail {
      * @sa stddev, mean
      */
     template <class T = void, class E, class X, class D, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<D>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<D>)>
     inline auto variance(E&& e, X&& axes, const D& ddof, EVS es = EVS())
     {
         decltype(auto) sc = detail::shared_forward<E>(e);
@@ -2155,7 +2155,7 @@ namespace detail {
     }
 
     template <class T = void, class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<std::decay_t<X>>>, is_reducer_options<EVS>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<std::decay_t<X>>>, is_reducer_options<EVS>)>
     inline auto variance(E&& e, X&& axes, EVS es = EVS())
     {
       return variance<T>(std::forward<E>(e), std::forward<X>(axes), 0u, es);
@@ -2522,7 +2522,7 @@ namespace detail {
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>
     inline auto count_nonzero(E&& e, X&& axes, EVS es = EVS())
     {
         COUNT_NON_ZEROS_CONTENT;
@@ -2531,7 +2531,7 @@ namespace detail {
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>
+              XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>
     inline auto count_nonzero(E&& e, X axis, EVS es = EVS())
     {
         return count_nonzero(std::forward<E>(e), {axis}, es);
@@ -2565,14 +2565,14 @@ namespace detail {
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-             XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<std::is_integral<X>>)>
+             XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::negation<xtl::is_integral<X>>)>
     inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), std::forward<X>(axes), es);
     }
 
     template <class E, class X, class EVS = DEFAULT_STRATEGY_REDUCERS,
-             XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, std::is_integral<X>)>
+             XTL_REQUIRES(xtl::negation<is_reducer_options<X>>, xtl::is_integral<X>)>
     inline auto count_nonnan(E&& e, X&& axes, EVS es = EVS())
     {
         return xt::count_nonzero(!xt::isnan(std::forward<E>(e)), {axes}, es);
