@@ -380,7 +380,7 @@ namespace xt
     inline void uvector<T, A>::reserve(size_type /*new_cap*/)
     {
     }
-    
+
     template <class T, class A>
     inline auto uvector<T, A>::capacity() const noexcept -> size_type
     {
@@ -1640,8 +1640,8 @@ namespace xt
         template <std::size_t idx>
         constexpr static auto get()
         {
-            using cast_type = std::array<std::size_t, sizeof...(X)>;
-            return std::get<idx>(cast_type{X...});
+            using tmp_cast_type = std::array<std::size_t, sizeof...(X)>;
+            return std::get<idx>(tmp_cast_type{X...});
         }
 
         XTENSOR_FIXED_SHAPE_CONSTEXPR operator cast_type() const
@@ -1686,7 +1686,7 @@ namespace xt
 
         XTENSOR_FIXED_SHAPE_CONSTEXPR bool empty() const
         {
-            return sizeof...(X) == 0; 
+            return sizeof...(X) == 0;
         }
 
     private:
