@@ -7,6 +7,54 @@
 Changelog
 =========
 
+0.21.8
+------
+
+- Fix undefined behavior while testing shifts 
+  `#2175 <https://github.com/xtensor-stack/xtensor/pull/2175>`_
+- Fix ``zarray`` initialization from ``zarray``
+  `#2180 <https://github.com/xtensor-stack/xtensor/pull/2180>`_
+- Portable and generic implementation of endianess detection
+  `#2182 <https://github.com/xtensor-stack/xtensor/pull/2182>`_
+- Fix xnpy save padding computation
+  `#2183 <https://github.com/xtensor-stack/xtensor/pull/2183>`_
+- Only use ``-march=native`` if it's available
+  `#2184 <https://github.com/xtensor-stack/xtensor/pull/2184>`_
+- Fix ``xchunked_array`` assignment
+  `#2177 <https://github.com/xtensor-stack/xtensor/pull/2177>`_
+- Add specific ``xchunked_array`` constructor for ``xchunk_store_manager``
+  `#2188 <https://github.com/xtensor-stack/xtensor/pull/2188>`_
+- Make xnpy tests aware of both little and big endian targets
+  `#2189 <https://github.com/xtensor-stack/xtensor/pull/2189>`_
+- Fixed constructors of ``xchunked_array``
+  `#2190 <https://github.com/xtensor-stack/xtensor/pull/2190>`_
+- First implementation of ``zchunked_wrapper``
+  `#2193 <https://github.com/xtensor-stack/xtensor/pull/2193>`_
+- Don't mark dirty a resized or reshaped ``xfile_array``
+  `#2194 <https://github.com/xtensor-stack/xtensor/pull/2194>`_
+- Replaced catch-all constructor of ``zarray`` with more restrictive ones
+  `#2195 <https://github.com/xtensor-stack/xtensor/pull/2195>`_
+- Fixed SFINAE based on ``xchunked_store_manager``
+  `#2197 <https://github.com/xtensor-stack/xtensor/pull/2197>`_
+- Fix generated cmake config to include missing required lib
+  `#2200 <https://github.com/xtensor-stack/xtensor/pull/2200>`_
+- Add ``set_chunk_shape`` to the first chunk of the pool
+  `#2198 <https://github.com/xtensor-stack/xtensor/pull/2198>`_
+- Chunked array refactoring
+  `#2201 <https://github.com/xtensor-stack/xtensor/pull/2201>`_
+- Refactored ``xchunked_array`` semantic
+  `#2202 <https://github.com/xtensor-stack/xtensor/pull/2202>`_
+- Added missing header to CMakeLists.txt
+  `#2203 <https://github.com/xtensor-stack/xtensor/pull/2203>`_
+- Fixed ``load_simd`` for ``xcomplex``
+  `#2204 <https://github.com/xtensor-stack/xtensor/pull/2204>`_
+- Upgraded to xtl 0.6.20
+  `#2206 <https://github.com/xtensor-stack/xtensor/pull/2206>`_
+- changed std traits to new ``xtl::xtraits``
+  `#2205 <https://github.com/xtensor-stack/xtensor/pull/2205>`_
+- ``xstorage.hpp``: Renamed a shadowing variable inside a function
+  `#2207 <https://github.com/xtensor-stack/xtensor/pull/2207>`_
+
 0.21.7
 ------
 
