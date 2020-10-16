@@ -164,7 +164,7 @@ namespace xt
     template <class shape_type>
     inline std::size_t compute_size(const shape_type& shape) noexcept
     {
-        return detail::compute_size_impl(shape, std::is_signed<std::decay_t<typename std::decay_t<shape_type>::value_type>>());
+        return detail::compute_size_impl(shape, xtl::is_signed<std::decay_t<typename std::decay_t<shape_type>::value_type>>());
     }
 
     namespace detail

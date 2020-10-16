@@ -293,7 +293,7 @@ namespace xt
       return detail::tile(std::forward<E>(e), std::vector<S>{reps});
     }
 
-    template <class E, class C, XTL_REQUIRES(xtl::negation<std::is_integral<C>>)>
+    template <class E, class C, XTL_REQUIRES(xtl::negation<xtl::is_integral<C>>)>
     inline auto tile(E&& e, const C& reps)
     {
       return detail::tile(std::forward<E>(e), reps);
@@ -306,7 +306,7 @@ namespace xt
      * @param reps The number of repetitions of A along the first axis.
      * @return The tiled array.
      */
-    template <class E, class S = typename std::decay_t<E>::size_type, XTL_REQUIRES(std::is_integral<S>)>
+    template <class E, class S = typename std::decay_t<E>::size_type, XTL_REQUIRES(xtl::is_integral<S>)>
     inline auto tile(E&& e, S reps)
     {
       std::vector<S> tw(e.shape().size(), static_cast<S>(1));

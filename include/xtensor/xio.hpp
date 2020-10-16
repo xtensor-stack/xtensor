@@ -428,7 +428,7 @@ namespace xt
         };
 
         template <class T>
-        struct printer<T, std::enable_if_t<std::is_integral<typename T::value_type>::value && !std::is_same<typename T::value_type, bool>::value>>
+        struct printer<T, std::enable_if_t<xtl::is_integral<typename T::value_type>::value && !std::is_same<typename T::value_type, bool>::value>>
         {
             using value_type = std::decay_t<typename T::value_type>;
             using cache_type = std::vector<value_type>;
@@ -460,7 +460,7 @@ namespace xt
                 {
                     m_max = math::abs(val);
                 }
-                if (std::is_signed<value_type>::value && val < 0)
+                if (xtl::is_signed<value_type>::value && val < 0)
                 {
                     m_sign = true;
                 }
@@ -597,7 +597,7 @@ namespace xt
         };
 
         template <class T>
-        struct printer<T, std::enable_if_t<!std::is_fundamental<typename T::value_type>::value && !xtl::is_complex<typename T::value_type>::value>>
+        struct printer<T, std::enable_if_t<!xtl::is_fundamental<typename T::value_type>::value && !xtl::is_complex<typename T::value_type>::value>>
         {
             using const_reference = typename T::const_reference;
             using value_type = std::decay_t<typename T::value_type>;

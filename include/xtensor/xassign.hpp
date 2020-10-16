@@ -530,9 +530,9 @@ namespace xt
         using argument_type = std::decay_t<FROM>;
         using result_type = std::decay_t<TO>;
 
-        static const bool value = std::is_arithmetic<result_type>::value &&
+        static const bool value = xtl::is_arithmetic<result_type>::value &&
             (sizeof(result_type) < sizeof(argument_type) ||
-             (std::is_integral<result_type>::value && std::is_floating_point<argument_type>::value));
+             (xtl::is_integral<result_type>::value && std::is_floating_point<argument_type>::value));
     };
 
     template <class FROM, class TO>
@@ -541,7 +541,7 @@ namespace xt
         using argument_type = std::decay_t<FROM>;
         using result_type = std::decay_t<TO>;
 
-        static const bool value = std::is_signed<argument_type>::value != std::is_signed<result_type>::value;
+        static const bool value = xtl::is_signed<argument_type>::value != xtl::is_signed<result_type>::value;
     };
 
     template <class FROM, class TO>

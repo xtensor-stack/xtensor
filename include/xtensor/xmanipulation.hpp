@@ -49,7 +49,7 @@ namespace xt
     template <class E>
     auto squeeze(E&& e);
 
-    template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!std::is_integral<S>::value, int> = 0>
+    template <class E, class S, class Tag = check_policy::none, std::enable_if_t<!xtl::is_integral<S>::value, int> = 0>
     auto squeeze(E&& e, S&& axis, Tag check_policy = Tag());
 
     template <class E>
@@ -442,7 +442,7 @@ namespace xt
      * @param check_policy select check_policy. With check_policy::full(), selecting an axis
      *        which is greater than one will throw a runtime_error.
      */
-    template <class E, class S, class Tag, std::enable_if_t<!std::is_integral<S>::value, int>>
+    template <class E, class S, class Tag, std::enable_if_t<!xtl::is_integral<S>::value, int>>
     inline auto squeeze(E&& e, S&& axis, Tag check_policy)
     {
         return detail::squeeze_impl(std::forward<E>(e), std::forward<S>(axis), check_policy);

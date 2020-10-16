@@ -178,7 +178,7 @@ namespace xt
         {
             using slice = xtl::mpl::front_t<V>;
             static constexpr bool is_range_slice = is_xrange<slice>::value;
-            static constexpr bool is_int_slice = std::is_integral<slice>::value;
+            static constexpr bool is_int_slice = xtl::is_integral<slice>::value;
             static constexpr bool is_all_slice = is_xall_slice<slice>::value;
             static constexpr bool have_all_seen = all_seen || is_all_slice;
             static constexpr bool have_range_seen = is_range_slice;
@@ -206,7 +206,7 @@ namespace xt
         {
             using slice = xtl::mpl::front_t<V>;
             static constexpr bool is_range_slice = is_xrange<slice>::value;
-            static constexpr bool is_int_slice = std::is_integral<slice>::value;
+            static constexpr bool is_int_slice = xtl::is_integral<slice>::value;
             static constexpr bool is_all_slice = is_xall_slice<slice>::value;
 
             static constexpr bool have_int_seen = int_seen || is_int_slice;

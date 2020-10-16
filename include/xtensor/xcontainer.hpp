@@ -984,7 +984,7 @@ namespace xt
     template <class S>
     inline auto& xstrided_container<D>::reshape(S&& shape, layout_type layout) &
     {
-        reshape_impl(std::forward<S>(shape), std::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
+        reshape_impl(std::forward<S>(shape), xtl::is_signed<std::decay_t<typename std::decay_t<S>::value_type>>(), std::forward<layout_type>(layout));
         return this->derived_cast();
     }
 
@@ -995,7 +995,7 @@ namespace xt
         using sh_type = rebind_container_t<T, shape_type>;
         sh_type sh = xtl::make_sequence<sh_type>(shape.size());
         std::copy(shape.begin(), shape.end(), sh.begin());
-        reshape_impl(std::move(sh), std::is_signed<T>(), std::forward<layout_type>(layout));
+        reshape_impl(std::move(sh), xtl::is_signed<T>(), std::forward<layout_type>(layout));
         return this->derived_cast();
     }
 
