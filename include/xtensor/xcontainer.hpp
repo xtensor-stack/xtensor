@@ -1026,14 +1026,14 @@ namespace xt
     template <class S>
     inline void xstrided_container<D>::reshape_impl(S&& _shape, std::true_type /* is signed */, layout_type layout)
     {
-        using value_type = typename std::decay_t<S>::value_type;
+        using tmp_value_type = typename std::decay_t<S>::value_type;
         auto new_size = compute_size(_shape);
         if (this->size() % new_size)
         {
             XTENSOR_THROW(std::runtime_error, "Negative axis size cannot be inferred. Shape mismatch.");
         }
         std::decay_t<S> shape = _shape;
-        value_type accumulator = 1;
+        tmp_value_type accumulator = 1;
         std::size_t neg_idx = 0;
         std::size_t i = 0;
         for(auto it = shape.begin(); it != shape.end(); ++it, i++)
@@ -1048,7 +1048,7 @@ namespace xt
         }
         if(accumulator < 0)
         {
-            shape[neg_idx] = static_cast<value_type>(this->size()) / std::abs(accumulator);
+            shape[neg_idx] = static_cast<tmp_value_type>(this->size()) / std::abs(accumulator);
         }
         else if(this->size() != new_size)
         {
@@ -1060,7 +1060,7 @@ namespace xt
         resize_container(m_backstrides, m_shape.size());
         compute_strides<D::static_layout>(m_shape, m_layout, m_strides, m_backstrides);
     }
-    
+
     template <class D>
     inline auto xstrided_container<D>::mutable_layout() noexcept -> layout_type&
     {
