@@ -12,6 +12,8 @@ cmake_minimum_required(VERSION 3.1)
 if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
     project(xtensor-test)
 
+    enable_testing()
+
     find_package(xtensor REQUIRED CONFIG)
     set(XTENSOR_INCLUDE_DIR ${xtensor_INCLUDE_DIRS})
 endif ()
@@ -137,7 +139,10 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
                      ${CMAKE_CURRENT_BINARY_DIR}/googletest-build EXCLUDE_FROM_ALL)
 
     set(GTEST_INCLUDE_DIRS "${gtest_SOURCE_DIR}/include")
-    set(GTEST_BOTH_LIBRARIES gtest_main gtest)
+    add_library(GTest::GTest INTERFACE IMPORTED)
+    target_link_libraries(GTest::GTest INTERFACE gtest)
+    add_library(GTest::Main INTERFACE IMPORTED)
+    target_link_libraries(GTest::Main INTERFACE gtest_main)
 else()
     find_package(GTest REQUIRED)
 endif()
@@ -291,11 +296,12 @@ foreach(filename IN LISTS COMMON_BASE XTENSOR_TESTS)
         add_dependencies(${targetname} gtest_main)
     endif()
     target_include_directories(${targetname} PRIVATE ${XTENSOR_INCLUDE_DIR})
-    target_link_libraries(${targetname} PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(${targetname} PRIVATE xtensor GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
     add_custom_target(
         x${targetname}
         COMMAND ${targetname}
         DEPENDS ${targetname} ${filename} ${XTENSOR_HEADERS})
+    add_test(NAME ${targetname} COMMAND ${targetname})
 endforeach()
 
 add_executable(test_xtensor_lib ${COMMON_BASE} ${XTENSOR_TESTS} ${TEST_HEADERS} ${XTENSOR_HEADERS})
@@ -320,9 +326,10 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
 endif()
 
 target_include_directories(test_xtensor_lib PRIVATE ${XTENSOR_INCLUDE_DIR})
-target_link_libraries(test_xtensor_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_lib PRIVATE xtensor GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
 
 add_custom_target(xtest COMMAND test_xtensor_lib DEPENDS test_xtensor_lib)
+add_test(NAME xtest COMMAND test_xtensor_lib)
 
 # Some files will be compiled twice, however compiling common files in a static
 # library and linking test_xtensor_lib with it removes half of the tests at
@@ -334,5 +341,5 @@ if(DOWNLOAD_GTEST OR GTEST_SRC_DIR)
     add_dependencies(test_xtensor_core_lib gtest_main)
 endif()
 
-target_link_libraries(test_xtensor_core_lib PRIVATE xtensor ${GTEST_BOTH_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries(test_xtensor_core_lib PRIVATE xtensor GTest::GTest GTest::Main ${CMAKE_THREAD_LIBS_INIT})
 add_custom_target(coverity COMMAND coverity_scan DEPENDS test_xtensor_core_lib)

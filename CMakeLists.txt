@@ -237,6 +237,7 @@ if(MSVC AND DISABLE_MSVC_ITERATOR_CHECK)
 endif()
 
 if(BUILD_TESTS)
+    enable_testing()
     add_subdirectory(test)
 endif()
 
