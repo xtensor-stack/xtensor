@@ -60,7 +60,7 @@ namespace xt
         const char big_endian_char = '>';
         const char no_endian_char = '|';
 
-        static char host_endian_char = (is_big_endian() ? big_endian_char : little_endian_char);
+        const char host_endian_char = (is_big_endian() ? big_endian_char : little_endian_char);
 
         template <class O>
         inline void write_magic(O& ostream,
