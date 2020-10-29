@@ -119,14 +119,17 @@ namespace xt
             constexpr char no_endian_char = '|';
 
             if(sizeof(T) <= sizeof(char))
-              return no_endian_char;
+            {
+                return no_endian_char;
+            }
 
-            switch(xtl::endianness()) {
-              case xtl::endian::little_endian:
+            switch(xtl::endianness())
+            {
+            case xtl::endian::little_endian:
                 return little_endian_char;
-              case xtl::endian::big_endian:
+            case xtl::endian::big_endian:
                 return big_endian_char;
-              default:
+            default:
                 return no_endian_char;
             }
         }
