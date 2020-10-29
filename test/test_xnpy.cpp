@@ -18,10 +18,17 @@
 namespace xt
 {
     std::string get_load_filename(std::string const& npy_prefix, layout_type lt = layout_type::row_major) {
-      using detail::is_big_endian;
       std::string lts = lt == layout_type::row_major ? "" : "_fortran";
-      std::string endianess = is_big_endian() ? ".be" : ".le";
-      return npy_prefix + lts + endianess + ".npy";
+      std::string endianness;
+      switch(xtl::endianness()) {
+        case xtl::endian::big_endian:
+          endianness = ".be";
+          break;
+        case xtl::endian::little_endian:
+          endianness = ".le";
+          break;
+      };
+      return npy_prefix + lts + endianness + ".npy";
     }
 
     TEST(xnpy, load)
