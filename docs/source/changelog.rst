@@ -7,6 +7,26 @@
 Changelog
 =========
 
+0.21.9
+------
+
+- Adding macro ``XTENSOR_SELECT_ALIGN``
+  `#2152 <https://github.com/xtensor-stack/xtensor/pull/2152>`_
+- xcontainer.hpp: Renamed a shadowing type name inside a function
+  `#2208 <https://github.com/xtensor-stack/xtensor/pull/2208>`_
+- Add chunk_memory_layout to chunked_array factory
+  `#2211 <https://github.com/xtensor-stack/xtensor/pull/2211>`_
+- CMake: Modernized GTest-integration
+  `#2212 <https://github.com/xtensor-stack/xtensor/pull/2212>`_
+- ``xnpy.hpp``: fix multiple definition of 'host_endian_char' variable when included in different linked objects
+  `#2214 <https://github.com/xtensor-stack/xtensor/pull/2214>`_
+- Made global variable const to force internal linkage 
+  `#2216 <https://github.com/xtensor-stack/xtensor/pull/2216>`_
+- Use xtl::endianness instead of bundling it
+  `#2218 <https://github.com/xtensor-stack/xtensor/pull/2218>`_
+- Fix call to resize of chunk container
+  `#2219 <https://github.com/xtensor-stack/xtensor/pull/2219>`_
+
 0.21.8
 ------
 
