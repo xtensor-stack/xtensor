@@ -55,8 +55,7 @@ Tensor with fixed shape:
 
     xt::xtensor_fixed<double, xt::xshape<2, 3>> = {{1., 2., 3.}, {4., 5., 6.}};
 
-In-memory chunked tensor with dynamic shape (created with the ``chunked_array``
-factory function):
+In-memory chunked tensor with dynamic shape:
 
 .. code::
 
@@ -65,11 +64,6 @@ factory function):
     std::vector<std::size_t> shape = {10, 10, 10};
     std::vector<std::size_t> chunk_shape = {2, 3, 4};
     auto a = xt::chunked_array<double>(shape, chunk_shape);
-    // a is an in-memory chunked array
-    // each chunk is an xarray<double>, and chunks are hold in an xarray
-    // thus a is an xarray of xarray<double> elements
-    a(3, 9, 2) = 1.;  // this will address the chunk of index (1, 3, 0)
-                      // and in this chunk, the element of index (1, 0, 2)
 
 Output
 ------

@@ -220,13 +220,52 @@ namespace xt
     template<class E>
     constexpr bool is_chunked(const xexpression<E>& e);
 
+    /**
+     * Creates an in-memory chunked array.
+     * This function returns an uninitialized ``xchunked_array<xarray<T>>``.
+     *
+     * @tparam T The type of the elements (e.g. double)
+     * @tparam L The layout_type of the array
+     * @tparam EXT The type of the array extension (default: empty_extension)
+     *
+     * @param shape The shape of the array
+     * @param chunk_shape The shape of a chunk
+     * @param chunk_memory_layout The layout of each chunk (default: XTENSOR_DEFAULT_LAYOUT)
+     *
+     * @return returns a ``xchunked_array<xarray<T>>`` with the given shape, chunk shape and memory layout.
+     */
     template <class T, layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class S>
     xchunked_array<xarray<xarray<T>>, EXT> chunked_array(S&& shape, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
 
+    /**
+     * Creates an in-memory chunked array.
+     * This function returns a ``xchunked_array<xarray<T>>`` initialized from an expression.
+     *
+     * @tparam L The layout_type of the array
+     * @tparam EXT The type of the array extension (default: empty_extension)
+     *
+     * @param e The expression to initialize the chunked array from
+     * @param chunk_shape The shape of a chunk
+     * @param chunk_memory_layout The layout of each chunk (default: XTENSOR_DEFAULT_LAYOUT)
+     *
+     * @return returns a ``xchunked_array<xarray<T>>`` from the given expression, with the given chunk shape and memory layout.
+     */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class E, class S>
     xchunked_array<xarray<xarray<typename E::value_type>>, EXT>
     chunked_array(const xexpression<E>& e, S&& chunk_shape, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
 
+    /**
+     * Creates an in-memory chunked array.
+     * This function returns a ``xchunked_array<xarray<T>>`` initialized from an expression.
+     *
+     * @tparam L The layout_type of the array
+     * @tparam EXT The type of the array extension (default: empty_extension)
+     *
+     * @param e The expression to initialize the chunked array from
+     * @param chunk_memory_layout The layout of each chunk (default: XTENSOR_DEFAULT_LAYOUT)
+     *
+     * @return returns a ``xchunked_array<xarray<T>>`` from the given expression, with the expression's chunk shape and the given memory layout.
+     */
     template <layout_type L = XTENSOR_DEFAULT_LAYOUT, class EXT = empty_extension, class E>
     xchunked_array<xarray<xarray<typename E::value_type>>, EXT>
     chunked_array(const xexpression<E>&e, layout_type chunk_memory_layout = XTENSOR_DEFAULT_LAYOUT);
@@ -398,7 +437,7 @@ namespace xt
         }
         return this->derived_cast();
     }
-    
+
     template <class D>
     template <class E>
     inline auto xchunked_semantic<D>::operator=(const xexpression<E>& e) -> derived_type&
@@ -407,7 +446,7 @@ namespace xt
         get_assigner(d.chunks()).build_and_assign_temporary(e, d);
         return d;
     }
-    
+
     template <class D>
     template <class CS>
     inline auto xchunked_semantic<D>::get_assigner(const CS&) const -> xchunked_assigner<temporary_type, CS>

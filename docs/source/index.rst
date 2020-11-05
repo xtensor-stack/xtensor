@@ -87,6 +87,7 @@ for details.
    view
    quickref/iterator
    quickref/manipulation
+   quickref/chunked_arrays
 
 .. toctree::
    :caption: API REFERENCE
