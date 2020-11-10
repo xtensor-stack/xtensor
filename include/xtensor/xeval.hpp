@@ -10,6 +10,7 @@
 #ifndef XTENSOR_EVAL_HPP
 #define XTENSOR_EVAL_HPP
 
+#include "xexpression_traits.hpp"
 #include "xtensor_forward.hpp"
 #include "xshape.hpp"
 
@@ -40,28 +41,12 @@ namespace xt
     }
 
     /// @cond DOXYGEN_INCLUDE_SFINAE
-    template <class T, class I = std::decay_t<T>>
+    template <class T>
     inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && detail::is_array<typename I::shape_type>::value && !detail::is_fixed<typename I::shape_type>::value, xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>>
+        -> std::enable_if_t<!detail::is_container<std::decay_t<T>>::value, temporary_type_t<T>>
     {
-        return xtensor<typename I::value_type, std::tuple_size<typename I::shape_type>::value>(std::forward<T>(t));
+        return std::forward<T>(t);
     }
-
-    template <class T, class I = std::decay_t<T>>
-    inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && !detail::is_array<typename I::shape_type>::value && !detail::is_fixed<typename I::shape_type>::value, xt::xarray<typename I::value_type>>
-    {
-        return xarray<typename I::value_type>(std::forward<T>(t));
-    }
-
-    template <class T, class I = std::decay_t<T>>
-    inline auto eval(T&& t)
-        -> std::enable_if_t<!detail::is_container<I>::value && detail::is_fixed<typename I::shape_type>::value && !detail::is_array<typename I::shape_type>::value,
-                            xt::xtensor_fixed<typename I::value_type, typename I::shape_type>>
-    {
-        return xtensor_fixed<typename I::value_type, typename I::shape_type>(std::forward<T>(t));
-    }
-    /// @endcond
 }
 
 #endif
